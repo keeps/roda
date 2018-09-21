@@ -1,9 +1,33 @@
 @external '*';
 
-@def PRIMARY_COLOR eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.primary\")");
-@def PRIMARY_COLOR_HOVER eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.primary.hover\")");
-@def MENU_PRIMARY_COLOR eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.menu.primary\")");
-@def MENU_SECONDARY_COLOR eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.menu.secondary\")");
+@def COLOR_PRIMARY				eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.primary\")");
+@def COLOR_PRIMARY_HOVER		eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.primary.hover\")");
+
+@def COLOR_MENU_PRIMARY			eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.menu.primary\")");
+@def COLOR_MENU_SECONDARY		eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.menu.secondary\")");
+
+@def COLOR_BUTTON_DANGER		eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.button.danger\")");
+@def COLOR_BUTTON_DANGER_HOVER	eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.button.danger.hover\")");
+@def COLOR_BUTTON_DEFAULT		eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.button.default\")");
+@def COLOR_BUTTON_DEFAULT_HOVER	eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.button.default.hover\")");
+@def COLOR_BUTTON_DISABLED		eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.button.disabled\")");
+
+@def COLOR_LABEL_DEFAULT		eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.label.default\")");
+@def COLOR_LABEL_SUCCESS		eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.label.success\")");
+@def COLOR_LABEL_DANGER			eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.label.danger\")");
+@def COLOR_LABEL_WARNING		eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.label.warning\")");
+@def COLOR_LABEL_INFO			eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.label.info\")");
+
+@def COLOR_ACTIONS_PRIMARY			eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.actions.primary\")");
+@def COLOR_ACTIONS_PRIMARY_HOVER	eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.actions.primary.hover\")");
+@def COLOR_ACTIONS_DANGER			eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.actions.danger\")");
+@def COLOR_ACTIONS_DANGER_HOVER		eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.actions.danger.hover\")");
+
+@def COLOR_SIDEBAR_BACKGROUND		eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.sidebar.background\")");
+@def COLOR_TABLE_SIDEBAR_BACKGROUND	eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.table.sidebar.background\")");
+
+@def COLOR_FOOTER_BACKGROUND	eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.footer.background\")");
+@def COLOR_FOOTER_FOREGROUND	eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.footer.foreground\")");
 
 @def FONT_PRIMARY "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
 @def FONT_MONOSPACED "UbuntuMono", "Lucida Console", Monaco, monospace;
@@ -33,12 +57,12 @@
 }
 
 .roda {
-    background-color: #414042;
+    background-color: COLOR_FOOTER_BACKGROUND;
 }
 
 a {
     text-decoration: none;
-    color: PRIMARY_COLOR;
+    color: COLOR_PRIMARY;
 }
 
 a:HOVER {
@@ -167,7 +191,7 @@ table .label-success, table .label-danger, table .label-warning, table .label-in
 }
 
 .label-success {
-    background-color: #5cb85c;
+    background-color: COLOR_LABEL_SUCCESS;
     display: inline;
     padding: .2em .6em .3em;
     /*     font-size: 75%; */
@@ -181,7 +205,7 @@ table .label-success, table .label-danger, table .label-warning, table .label-in
 }
 
 .label-danger {
-    background-color: #d9534f;
+    background-color: COLOR_LABEL_DANGER;
     display: inline;
     padding: .2em .6em .3em;
     /*     font-size: 75%; */
@@ -195,7 +219,7 @@ table .label-success, table .label-danger, table .label-warning, table .label-in
 }
 
 .label-warning {
-    background-color: #f0ad4e;
+    background-color: COLOR_LABEL_WARNING;
     display: inline;
     padding: .2em .6em .3em;
     /*font-size: 75%;
@@ -209,7 +233,7 @@ table .label-success, table .label-danger, table .label-warning, table .label-in
 }
 
 .label-info {
-    background-color: #3e9ce8;
+    background-color: COLOR_LABEL_INFO;
     display: inline;
     padding: .2em .6em .3em;
     /*     font-size: 75%; */
@@ -223,7 +247,7 @@ table .label-success, table .label-danger, table .label-warning, table .label-in
 }
 
 .label-default {
-    background-color: #777;
+    background-color: COLOR_LABEL_DEFAULT;
     display: inline;
     padding: .2em .6em .3em;
     /*     font-size: 75%; */
@@ -286,9 +310,13 @@ div.inline {
     background: linear-gradient(-90deg, #fff 30%, rgba(255, 255, 255, 0) 100%);
 }
 
+.my-asyncdatagrid-side-panel .fade-out, .sidebar .fade-out {
+	text-overflow: ellipsis;
+	overflow: hidden;
+}
+
 .my-asyncdatagrid-side-panel .fade-out:after, .sidebar .fade-out:after {
-    /* @alternate */ background: -webkit-linear-gradient(right, #eee 30%, rgba(255, 255, 255, 0) 100%);
-    background: linear-gradient(-90deg, #eee 30%, rgba(255, 255, 255, 0) 100%);
+	background: none;
 }
 
 
@@ -341,7 +369,7 @@ div.inline {
     content: '\f05a';
     @mixin fontawesome();
     padding-right: 10px;
-    color: PRIMARY_COLOR;
+    color: COLOR_PRIMARY;
     
 }
 
@@ -370,7 +398,7 @@ div.inline {
 .slider {
     height: 100%;
     width: 380px;
-    background: PRIMARY_COLOR;
+    background: COLOR_PRIMARY;
     display: none;
     color: white;
     position: absolute;
@@ -425,7 +453,7 @@ div.inline {
 }
 
 .footer {
-    background-color: #414042;
+    background-color: COLOR_FOOTER_BACKGROUND;
     margin-top: 0;
 }
 
@@ -438,7 +466,7 @@ div.inline {
 }
 
 .footer * {
-    color: white;
+    color: COLOR_FOOTER_FOREGROUND;
 }
 
 .footer p,
@@ -566,7 +594,7 @@ pre code {
 	font-size: 0.8em;
 }
 .form-separator {
-	color: PRIMARY_COLOR;
+	color: COLOR_PRIMARY;
 	font-size: 1.6rem;
 	font-weight: 300;
 	margin: 1em -15px 0 -15px !important;
@@ -636,7 +664,7 @@ pre code {
 
 .content .fieldTextBox, .content .form-textbox {
     border: 0;
-    border-left: 2px solid PRIMARY_COLOR;
+    border-left: 2px solid COLOR_PRIMARY;
 }
 .panelDescriptiveMetadata .fieldTextBox, .panelDescriptiveMetadata .form-textbox {
 	border-left: 0;
@@ -757,7 +785,7 @@ pre code {
     border-radius: 2px;
     padding: 8px 27px 8px 10px;
     border: none;
-    background-color: PRIMARY_COLOR;
+    background-color: COLOR_PRIMARY;
     font-family: FONT_PRIMARY;
     color: white;
     font-weight: 600;
@@ -781,59 +809,59 @@ pre code {
 }
 
 .btn:hover {
-    background-color: PRIMARY_COLOR_HOVER;
+    background-color: COLOR_PRIMARY_HOVER;
     cursor: pointer;
     cursor: hand;
     cursor: pointer;
 }
 
 .btn-default {
-    background-color: rgba(0,0,0,0.3);
+    background-color: COLOR_BUTTON_DEFAULT;
 }
 
 .btn-default:hover {
-    background-color: rgba(0,0,0,0.4);
+    background-color: COLOR_BUTTON_DEFAULT_HOVER;
 }
 
 .btn-primary {
-    background-color: PRIMARY_COLOR;
+    background-color: COLOR_PRIMARY;
 }
 
 .btn-primary:hover {
-    background-color: PRIMARY_COLOR_HOVER;
+    background-color: COLOR_PRIMARY_HOVER;
 }
 
 .actions-popup .btn-primary, .slider .btn-primary {
-	background-color: rgba(0,0,0,0.5);
+	background-color: COLOR_ACTIONS_PRIMARY;
 }
 
 .actions-popup .btn-primary:hover, .slider .btn-primary:hover {
-	background-color: rgba(0,0,0,0.6);
+	background-color: COLOR_ACTIONS_PRIMARY_HOVER;
 }
 
 .btn-danger {
-    background-color: #d9534f;
+    background-color: COLOR_BUTTON_DANGER;
 }
 
 .btn-danger:hover {
-    background-color: #c9302c;
+    background-color: COLOR_BUTTON_DANGER_HOVER;
 }
 
 .actions-popup .btn-danger, .slider .btn-danger {
-	background-color: rgb(140, 8, 4);
+	background-color: COLOR_ACTIONS_DANGER;
 }
 
 .actions-popup .btn-danger:hover, .slider .btn-danger:hover {
-	background-color: rgb(185, 6, 1);;
+	background-color: COLOR_ACTIONS_DANGER_HOVER;
 }
 
 .btn-link {
     background-color: transparent;
-    color: PRIMARY_COLOR;
+    color: COLOR_PRIMARY;
 }
 
 .btn-link:hover {
-    color: PRIMARY_COLOR_HOVER;
+    color: COLOR_PRIMARY_HOVER;
     text-decoration: underline;
     background-color: transparent;
 }
@@ -1029,7 +1057,7 @@ pre code {
 .toolbarLink-selected,
 .toolbarLink.active {
     color: white;
-    background-color: PRIMARY_COLOR;
+    background-color: COLOR_PRIMARY;
 
 }
 
@@ -1053,13 +1081,13 @@ pre code {
 .panel {
     margin-bottom: 20px;
     border: 1px solid #ddd;
-    background-color: PRIMARY_COLOR;
+    background-color: COLOR_PRIMARY;
     padding-left: 2px;
 }
 
 .panel-heading {
     padding: 10px 15px;
-    color: PRIMARY_COLOR;
+    color: COLOR_PRIMARY;
     background-color: white;
 }
 
@@ -1102,7 +1130,7 @@ pre code {
 
 .my-collections-table-cell-link * {
     text-decoration: underline;
-    color: PRIMARY_COLOR;
+    color: COLOR_PRIMARY;
 }
 
 .my-collections-table-cell-alignright * {
@@ -1126,7 +1154,7 @@ pre code {
     vertical-align: top;
     float: right;
     margin-left: 20px;
-    background-color: #eee;
+    background-color: COLOR_TABLE_SIDEBAR_BACKGROUND;
     padding: 1rem 1.5rem 0 1.5rem;
 }
 
@@ -1174,7 +1202,7 @@ pre code {
 
 .my-asyncdatagrid-pager-pagesize a {
     color: white;
-    background-color: PRIMARY_COLOR;
+    background-color: COLOR_PRIMARY;
     padding: 4px 8px 4px 8px;
     font-size: 11px;
     margin-left: 5px;
@@ -1185,7 +1213,7 @@ pre code {
 }
 
 .my-asyncdatagrid-pager-pagesize a:hover {
-    background-color: PRIMARY_COLOR;
+    background-color: COLOR_PRIMARY;
 }
 
 .my-asyncdatagrid-autoupdate-signal {
@@ -1279,7 +1307,7 @@ pre code {
 
 .gwt-TabBar .gwt-TabBarItem {
     margin: 2px;
-    background-color: MENU_PRIMARY_COLOR;
+    background-color: COLOR_MENU_PRIMARY;
     padding: 5px 10px;
     cursor: pointer;
     cursor: hand;
@@ -1760,7 +1788,7 @@ td.datePickerMonth, td.datePickerYear {
 				BANNER
 ************************************************/
 .banner {
-    background-color: PRIMARY_COLOR;
+    background-color: COLOR_PRIMARY;
     position: relative;
     height: 110px;
 }
@@ -1796,7 +1824,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .menu {
     padding: 0 30px;
-    background-color: MENU_PRIMARY_COLOR;
+    background-color: COLOR_MENU_PRIMARY;
 }
 
 /**********************************************
@@ -1816,7 +1844,7 @@ td.datePickerMonth, td.datePickerYear {
 				MENU
 ************************************************/
 .gwt-MenuBar {
-    background-color: MENU_PRIMARY_COLOR;
+    background-color: COLOR_MENU_PRIMARY;
 }
 
 .gwt-MenuBar table {
@@ -1824,14 +1852,14 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .gwt-MenuBar.gwt-MenuBar-vertical {
-    background-color: MENU_SECONDARY_COLOR;
-    color: MENU_PRIMARY_COLOR;
+    background-color: COLOR_MENU_SECONDARY;
+    color: COLOR_MENU_PRIMARY;
 }
 
 .gwt-MenuBar.gwt-MenuBar-vertical .gwt-MenuItem {
     min-width: 130px;
-    background-color: MENU_SECONDARY_COLOR;
-    color: MENU_PRIMARY_COLOR;
+    background-color: COLOR_MENU_SECONDARY;
+    color: COLOR_MENU_PRIMARY;
 }
 
 .gwt-MenuBar .gwt-MenuItem {
@@ -1846,13 +1874,13 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .gwt-MenuBar .gwt-MenuItem-selected {
-    background-color: MENU_SECONDARY_COLOR;
-    color: MENU_PRIMARY_COLOR;
+    background-color: COLOR_MENU_SECONDARY;
+    color: COLOR_MENU_PRIMARY;
 }
 
 .gwt-MenuBar.gwt-MenuBar-vertical .gwt-MenuItem-selected {
-    background-color: MENU_PRIMARY_COLOR;
-    color: MENU_SECONDARY_COLOR;
+    background-color: COLOR_MENU_PRIMARY;
+    color: COLOR_MENU_SECONDARY;
 }
 
 .gwt-MenuBarPopup {
@@ -2011,7 +2039,7 @@ td.datePickerMonth, td.datePickerYear {
 ************************************************/
 
 .sidebar {
-    background: #eee;
+    background: COLOR_SIDEBAR_BACKGROUND;
     padding: 0 !important;
     min-width: 220px;
 }
@@ -2208,7 +2236,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .descriptionGroup-header {
-    background-color: PRIMARY_COLOR;
+    background-color: COLOR_PRIMARY;
     font-weight: 500;
     color: white;
     padding: 5px;
@@ -2361,7 +2389,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .representationInformationPresent i {
-    color: PRIMARY_COLOR;
+    color: COLOR_PRIMARY;
     background-color: white;
     border-radius: 1em;
     width: 1em;
@@ -2369,7 +2397,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .slider .representationInformationPresent i {
-    background-color: PRIMARY_COLOR;
+    background-color: COLOR_PRIMARY;
     color: white;
     border-radius: 1em;
     width: 1em;
@@ -2425,7 +2453,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .browseItemMetadata .gwt-TabBarItem:hover {
-    color: PRIMARY_COLOR;
+    color: COLOR_PRIMARY;
 }
 
 .browseItemMetadata .addTabWrapper {
@@ -2438,7 +2466,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .browseItemMetadata .addTabWrapper:hover {
-    color: PRIMARY_COLOR;
+    color: COLOR_PRIMARY;
 }
 
 .browseItemMetadata .addTabWrapper:hover:after {
@@ -2464,7 +2492,7 @@ td.datePickerMonth, td.datePickerYear {
     margin: 0;
     background-color: transparent;
     border-bottom: none;
-    color: PRIMARY_COLOR;
+    color: COLOR_PRIMARY;
 }
 
 .browseItemMetadata .gwt-TabBarItem-selected:after {
@@ -2504,7 +2532,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .descriptiveMetadataCard .gwt-TabBarItem-wrapper-selected {
     background-color: white;
-    border-top: 1px solid PRIMARY_COLOR;
+    border-top: 1px solid COLOR_PRIMARY;
 }
 
 .descriptiveMetadataHTML {
@@ -2553,7 +2581,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .browseDownloadLabel {
-    color: PRIMARY_COLOR;
+    color: COLOR_PRIMARY;
     font-size: 1.2rem;
     cursor: pointer;
 }
@@ -2579,7 +2607,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .slider-aip-permissions-table tr {
-    background-color: PRIMARY_COLOR;
+    background-color: COLOR_PRIMARY;
     cursor: default;
 }
 
@@ -3494,7 +3522,7 @@ td.datePickerMonth, td.datePickerYear {
 .searchInputListBox .dropdown-label,
 .searchInputListBoxPopup .dropdown-item {
     line-height: 4rem;
-    background-color: PRIMARY_COLOR;
+    background-color: COLOR_PRIMARY;
     color: white;
     border: none;
     padding: 0 0 0 0;
@@ -3524,7 +3552,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .searchInputListBoxPopup .dropdown-item:hover {
-    background-color: PRIMARY_COLOR_HOVER;
+    background-color: COLOR_PRIMARY_HOVER;
     color: white;
 }
 
@@ -3555,7 +3583,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .searchPanelRight .actions-button:hover {
-    background-color: PRIMARY_COLOR;
+    background-color: COLOR_PRIMARY;
 }
 
 .searchPanelAdvanced .searchBox {
@@ -3634,7 +3662,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .searchButton:hover {
-    background-color: PRIMARY_COLOR;
+    background-color: COLOR_PRIMARY;
 }
 
 .searchButton-html {
@@ -3667,7 +3695,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .searchButton .fa-stack-2x {
-    color: PRIMARY_COLOR;
+    color: COLOR_PRIMARY;
     display: none;
 }
 
@@ -3711,7 +3739,7 @@ td.datePickerMonth, td.datePickerYear {
     padding: 20px !important;
     min-height: auto;
     background-color: #eee;
-    border-top: 2px solid PRIMARY_COLOR;
+    border-top: 2px solid COLOR_PRIMARY;
 }
 
 .searchAdvancedFieldsPanel {
@@ -3868,7 +3896,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .gwt-DialogBox .Caption {
     padding: 5px 10px;
-    background-color: PRIMARY_COLOR;
+    background-color: COLOR_PRIMARY;
     color: white;
     font-weight: 500;
 }
@@ -3902,7 +3930,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .list-panel {
-    border-left: 5px solid PRIMARY_COLOR;
+    border-left: 5px solid COLOR_PRIMARY;
     margin-top: 15px;
     padding: 5px 10px;
     box-shadow: 2px 2px 5px 1px #ddd;
@@ -4233,7 +4261,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableSelectedRow .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableOddRowCell {
-    border: 2px solid PRIMARY_COLOR;
+    border: 2px solid COLOR_PRIMARY;
 }
 
 .viewRepresentation .my-files-table .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableHoveredRow .org-roda-wui-common-client-widgets-MyCellTableResources-TableStyle-cellTableOddRowCell {
@@ -4263,7 +4291,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .filePreviewToolbar-alt .toolbarLink:hover {
 	color: white;
-	background-color: PRIMARY_COLOR;
+	background-color: COLOR_PRIMARY;
 }
 
 .filePreviewToolbar-alt .toolbarLink.disabled {
@@ -4465,7 +4493,7 @@ td.datePickerMonth, td.datePickerYear {
 .viewRepresentationFile .blueSlider {
     height: 630px;
     width: 300px;
-    background: PRIMARY_COLOR;
+    background: COLOR_PRIMARY;
     display: none;
     color: white;
     position: absolute;
@@ -4582,7 +4610,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 #drop a {
-    background-color: PRIMARY_COLOR;
+    background-color: COLOR_PRIMARY;
     padding: 10px 20px;
     color: #fff;
     font-size: 1.2rem;
@@ -4595,7 +4623,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 #drop a:hover {
-    background-color: PRIMARY_COLOR;
+    background-color: COLOR_PRIMARY;
 }
 
 #drop input {
@@ -4746,7 +4774,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .ingest-process-failed-column {
-    color: #d9534f;
+    color: COLOR_LABEL_DANGER;
     font-weight: bolder;
 }
 
@@ -4770,7 +4798,7 @@ td.datePickerMonth, td.datePickerYear {
 .job-report-object-output {
     font-size: 1.1rem;
     line-height: 1.1rem;
-    color: PRIMARY_COLOR;
+    color: COLOR_PRIMARY;
 }
 
 .report .entry, .report .valid {
@@ -5667,8 +5695,8 @@ td.datePickerMonth, td.datePickerYear {
 ************************************************/
 .wui-browse-metadata-descriptive-versions-type {
     /* 	border-bottom: 1px solid rgba(167, 169, 172, 0.5); */
-    border-bottom: 2px solid PRIMARY_COLOR;
-    color: PRIMARY_COLOR;
+    border-bottom: 2px solid COLOR_PRIMARY;
+    color: COLOR_PRIMARY;
     font-size: 1.5rem;
     margin-top: 10px;
 }
@@ -5714,7 +5742,7 @@ td.datePickerMonth, td.datePickerYear {
 .gwt-SuggestBoxPopup .item:hover,
 .gwt-SuggestBoxPopup .item-selected {
     color: white;
-    background-color: PRIMARY_COLOR;
+    background-color: COLOR_PRIMARY;
 }
 
 /**********************************************
@@ -6082,7 +6110,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .plugin-list-item-label {
-    color: PRIMARY_COLOR;
+    color: COLOR_PRIMARY;
 	overflow: hidden;
 	border: none;
     white-space: nowrap;
@@ -6233,7 +6261,7 @@ td.datePickerMonth, td.datePickerYear {
     font-size: 2000%;
     width: 100%;
     text-align: center;
-    color: PRIMARY_COLOR;
+    color: COLOR_PRIMARY;
 }
 
 /***************************************
@@ -6308,7 +6336,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .dialog-left-item-label {
-    color: PRIMARY_COLOR;
+    color: COLOR_PRIMARY;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -6376,7 +6404,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .link-color {
-	color: PRIMARY_COLOR;
+	color: COLOR_PRIMARY;
 }
 
 .ri-toolbarLink {
@@ -6399,11 +6427,11 @@ td.datePickerMonth, td.datePickerYear {
 
 .ri-toolbarLink:hover {
     color: white;
-    background-color: #d9534f;
+    background-color: COLOR_LABEL_DANGER;
 }
 
 .ri-dropdown-listbox {
-	border-bottom: 2px solid PRIMARY_COLOR;
+	border-bottom: 2px solid COLOR_PRIMARY;
     margin-bottom: 20px;
     background-color: white;
 }
@@ -6533,7 +6561,7 @@ span.code {
 }
 
 .incremental-list .removable-textbox:last-of-type .ri-toolbarLink {
-    background-color: PRIMARY_COLOR;
+    background-color: COLOR_PRIMARY;
     color: white;
 }
 
@@ -6624,7 +6652,7 @@ span.code {
     position: absolute;
     right: 8px;
     bottom: -16px;
-    border-top: 8px solid PRIMARY_COLOR;
+    border-top: 8px solid COLOR_PRIMARY;
     border-color: #f8f8f8 transparent transparent;
 }
 
@@ -6636,7 +6664,7 @@ span.code {
     position: absolute;
     right: 8px;
     top: -16px;
-    border-bottom: 8px solid PRIMARY_COLOR;
+    border-bottom: 8px solid COLOR_PRIMARY;
     border-color: transparent transparent #f8f8f8;
 }
 
@@ -6648,7 +6676,7 @@ span.code {
     position: absolute;
     left: 8px;
     top: -16px;
-    border-bottom: 8px solid PRIMARY_COLOR;
+    border-bottom: 8px solid COLOR_PRIMARY;
 }
 
 .actions-popup .actions-layout-title {
@@ -6774,7 +6802,7 @@ span.code {
     border-radius: 2px;
     padding: 8px 8px 8px 10px;
     border: none;
-    background-color: PRIMARY_COLOR;
+    background-color: COLOR_PRIMARY;
     color: white;
     font-weight: 600;
     font-size: 1.1rem;
@@ -6812,7 +6840,7 @@ span.code {
 .sidebar .actionable-button:hover,
 .slider .actionable-button:hover,
 .ActionableStyleButtons .actionable-button:hover {
-    background-color: PRIMARY_COLOR_HOVER;
+    background-color: COLOR_PRIMARY_HOVER;
 }
 
 .sidebar .actionable-button-disabled,
@@ -6856,11 +6884,11 @@ span.code {
 }
 
 .sidebar .actionable-button-destroyed {
-    background-color: #d9534f;
+    background-color: COLOR_ACTIONS_DANGER;
 }
 
 .sidebar .actionable-button-destroyed:hover {
-    background-color: #c9302c;
+    background-color: COLOR_ACTIONS_DANGER_HOVER;
 }
 
 .card + .ActionableStyleButtons, .ActionableStyleButtons + .ActionableStyleButtons {
@@ -6999,7 +7027,7 @@ span.code {
 .navigationToolbar-alt .navigationToolbarLink-selected,
 .navigationToolbar-alt .navigationToolbarLink.active {
     color: white;
-    background-color: PRIMARY_COLOR;
+    background-color: COLOR_PRIMARY;
 }
 
 .navigationToolbarLink.disabled,
