@@ -379,7 +379,7 @@ public class ShowJob extends Composite {
       selectedListPanel.setVisible(true);
 
       if (ClientSelectedItemsUtils.isEmpty(selected) && isJobInFinalState()) {
-        Label noSourceLabel = new Label(messages.noItemsToDisplay());
+        Label noSourceLabel = new Label(messages.noItemsToDisplay(messages.someOfAObject(selected.getSelectedClass())));
         selectedListPanel.add(noSourceLabel);
       } else if (selected instanceof SelectedItemsList) {
         List<String> ids = ((SelectedItemsList<?>) selected).getIds();
@@ -433,7 +433,7 @@ public class ShowJob extends Composite {
         List<String> ids = ((SelectedItemsList<?>) selected).getIds();
 
         if (ids.isEmpty()) {
-          Label noSourceLabel = new Label(messages.noItemsToDisplay());
+          Label noSourceLabel = new Label(messages.noItemsToDisplay(messages.someOfAObject(selected.getSelectedClass())));
           selectedListPanel.add(noSourceLabel);
         } else {
           final Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, job.getUUID()));
@@ -474,7 +474,7 @@ public class ShowJob extends Composite {
         objectLabel.addStyleName("value");
 
         if (StringUtils.isBlank(selected.getSelectedClass())) {
-          objectLabel.setText(messages.noItemsToDisplay());
+          objectLabel.setText(messages.noItemsToDisplay(messages.someOfAObject(selected.getSelectedClass())));
         } else if (AIP.class.getName().equals(selected.getSelectedClass())
           || IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
           objectLabel.setText(messages.allIntellectualEntities());

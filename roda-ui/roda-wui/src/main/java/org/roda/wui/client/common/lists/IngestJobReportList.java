@@ -182,9 +182,6 @@ public class IngestJobReportList extends AsyncTableCell<IndexedReport> {
     addColumn(completionStatusColumn, messages.reportProgress(), true, false, 8);
     addColumn(failedCountColumn, messages.reportFailed(), true, false, 6);
 
-    Label emptyInfo = new Label(messages.noItemsToDisplay());
-    display.setEmptyTableWidget(emptyInfo);
-
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(updatedDateColumn, false));
   }

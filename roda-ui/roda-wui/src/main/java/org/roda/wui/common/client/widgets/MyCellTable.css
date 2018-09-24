@@ -15,6 +15,7 @@
 @external .cellTableSelectedRowCell;
 @external .cellTableWidget;
 @external .cellTableFadeOut;
+@external .table-empty;
 
 .cellTableWidget {
 	border-collapse: initial;
@@ -38,6 +39,10 @@
 
 .cellTableWidget {
 	border-bottom: 1px solid #eee;
+}
+
+.table-empty .cellTableWidget {
+	border-bottom: none;
 }
 
 .cellTableKeyboardSelectedRow {

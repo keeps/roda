@@ -52,8 +52,7 @@
 					ui:field="searchAdvancedFieldOptionsAdd">
 					<ui:text from='{messages.addSearchField}' />
 				</g:Button>
-				<g:Button styleName="btn btn-search advancedSearchButton"
-					ui:field="searchAdvancedGo" enabled="false">
+				<g:Button styleName="btn btn-search advancedSearchButton" ui:field="searchAdvancedGo">
 					<ui:text from='{messages.searchButton}' />
 				</g:Button>
 				<g:Button styleName="btn btn-refresh advancedSearchCleanButton" ui:field="searchAdvancedClean">

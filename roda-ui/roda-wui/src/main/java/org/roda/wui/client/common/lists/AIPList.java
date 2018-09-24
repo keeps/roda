@@ -119,9 +119,6 @@ public class AIPList extends AsyncTableCell<IndexedAIP> {
     display.addColumn(datesColumn, messages.aipDates());
     display.addColumn(hasRepresentationsColumn, HAS_REPRESENTATIONS_ICON);
 
-    Label emptyInfo = new Label(messages.noItemsToDisplay());
-    display.setEmptyTableWidget(emptyInfo);
-
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(datesColumn, true));
 
@@ -133,7 +130,6 @@ public class AIPList extends AsyncTableCell<IndexedAIP> {
     datesColumn.setCellStyleNames("nowrap");
 
     addStyleName("my-collections-table");
-    emptyInfo.addStyleName("my-collections-empty-info");
   }
 
   @Override

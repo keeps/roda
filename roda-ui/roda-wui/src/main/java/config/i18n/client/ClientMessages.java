@@ -307,9 +307,9 @@ public interface ClientMessages extends Messages {
 
   String executingTaskMessage();
 
-  String noItemsToDisplay();
+  String noItemsToDisplay(String itemLabel);
 
-  String noItemsToDisplayButFacetsActive();
+  String noItemsToDisplayButFacetsActive(String itemLabel);
 
   String disableFacets();
 

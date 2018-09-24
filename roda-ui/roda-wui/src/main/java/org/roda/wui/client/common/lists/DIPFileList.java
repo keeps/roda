@@ -83,15 +83,11 @@ public class DIPFileList extends AsyncTableCell<DIPFile> {
     addColumn(iconColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-files-o'></i>"), false, false, 2);
     display.addColumn(idColumn, messages.fileName());
 
-    Label emptyInfo = new Label(messages.noItemsToDisplay());
-    display.setEmptyTableWidget(emptyInfo);
-
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(idColumn, true));
     display.setColumnWidth(iconColumn, 2.5, Unit.EM);
 
     addStyleName("my-collections-table");
-    emptyInfo.addStyleName("my-collections-empty-info");
   }
 
   @Override

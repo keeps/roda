@@ -1,33 +1,33 @@
 @external '*';
 
-@def COLOR_PRIMARY				eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.primary\")");
-@def COLOR_PRIMARY_HOVER		eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.primary.hover\")");
+@def COLOR_PRIMARY				eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.primary")');
+@def COLOR_PRIMARY_HOVER		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.primary.hover")');
 
-@def COLOR_MENU_PRIMARY			eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.menu.primary\")");
-@def COLOR_MENU_SECONDARY		eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.menu.secondary\")");
+@def COLOR_MENU_PRIMARY			eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.menu.primary")');
+@def COLOR_MENU_SECONDARY		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.menu.secondary")');
 
-@def COLOR_BUTTON_DANGER		eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.button.danger\")");
-@def COLOR_BUTTON_DANGER_HOVER	eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.button.danger.hover\")");
-@def COLOR_BUTTON_DEFAULT		eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.button.default\")");
-@def COLOR_BUTTON_DEFAULT_HOVER	eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.button.default.hover\")");
-@def COLOR_BUTTON_DISABLED		eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.button.disabled\")");
+@def COLOR_BUTTON_DANGER		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.button.danger")');
+@def COLOR_BUTTON_DANGER_HOVER	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.button.danger.hover")');
+@def COLOR_BUTTON_DEFAULT		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.button.default")');
+@def COLOR_BUTTON_DEFAULT_HOVER	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.button.default.hover")');
+@def COLOR_BUTTON_DISABLED		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.button.disabled")');
 
-@def COLOR_LABEL_DEFAULT		eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.label.default\")");
-@def COLOR_LABEL_SUCCESS		eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.label.success\")");
-@def COLOR_LABEL_DANGER			eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.label.danger\")");
-@def COLOR_LABEL_WARNING		eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.label.warning\")");
-@def COLOR_LABEL_INFO			eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.label.info\")");
+@def COLOR_LABEL_DEFAULT		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.label.default")');
+@def COLOR_LABEL_SUCCESS		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.label.success")');
+@def COLOR_LABEL_DANGER			eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.label.danger")');
+@def COLOR_LABEL_WARNING		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.label.warning")');
+@def COLOR_LABEL_INFO			eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.label.info")');
 
-@def COLOR_ACTIONS_PRIMARY			eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.actions.primary\")");
-@def COLOR_ACTIONS_PRIMARY_HOVER	eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.actions.primary.hover\")");
-@def COLOR_ACTIONS_DANGER			eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.actions.danger\")");
-@def COLOR_ACTIONS_DANGER_HOVER		eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.actions.danger.hover\")");
+@def COLOR_ACTIONS_PRIMARY			eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.actions.primary")');
+@def COLOR_ACTIONS_PRIMARY_HOVER	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.actions.primary.hover")');
+@def COLOR_ACTIONS_DANGER			eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.actions.danger")');
+@def COLOR_ACTIONS_DANGER_HOVER		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.actions.danger.hover")');
 
-@def COLOR_SIDEBAR_BACKGROUND		eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.sidebar.background\")");
-@def COLOR_TABLE_SIDEBAR_BACKGROUND	eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.table.sidebar.background\")");
+@def COLOR_SIDEBAR_BACKGROUND		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.sidebar.background")');
+@def COLOR_TABLE_SIDEBAR_BACKGROUND	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.table.sidebar.background")');
 
-@def COLOR_FOOTER_BACKGROUND	eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.footer.background\")");
-@def COLOR_FOOTER_FOREGROUND	eval("org.roda.wui.common.client.tools.ConfigurationManager.getString(\"ui.css.color.footer.foreground\")");
+@def COLOR_FOOTER_BACKGROUND	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.footer.background")');
+@def COLOR_FOOTER_FOREGROUND	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.footer.foreground")');
 
 @def FONT_PRIMARY "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
 @def FONT_MONOSPACED "UbuntuMono", "Lucida Console", Monaco, monospace;
@@ -310,13 +310,14 @@ div.inline {
     background: linear-gradient(-90deg, #fff 30%, rgba(255, 255, 255, 0) 100%);
 }
 
-.my-asyncdatagrid-side-panel .fade-out, .sidebar .fade-out {
-	text-overflow: ellipsis;
-	overflow: hidden;
+.my-asyncdatagrid-side-panel .fade-out:after {
+    /* @alternate */ background: eval('"-webkit-linear-gradient(-90deg," + org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.table.sidebar.background") +  " 30%, rgba(255, 255, 255, 0) 100%)"');
+    background: eval('"linear-gradient(-90deg," + org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.table.sidebar.background") +  " 30%, rgba(255, 255, 255, 0) 100%)"');
 }
 
-.my-asyncdatagrid-side-panel .fade-out:after, .sidebar .fade-out:after {
-	background: none;
+.sidebar .fade-out:after {
+    /* @alternate */ background: eval('"-webkit-linear-gradient(-90deg," + org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.sidebar.background") +  " 30%, rgba(255, 255, 255, 0) 100%)"');
+    background: eval('"linear-gradient(-90deg," + org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.sidebar.background") +  " 30%, rgba(255, 255, 255, 0) 100%)"');
 }
 
 
@@ -1124,10 +1125,6 @@ pre code {
     font-weight: 600;
 }
 
-.my-collections-empty-info {
-    padding: 10px;
-}
-
 .my-collections-table-cell-link * {
     text-decoration: underline;
     color: COLOR_PRIMARY;
@@ -1260,6 +1257,33 @@ pre code {
     vertical-align: middle;
 }
 
+.table-empty {
+    margin-top: -30px;
+}
+
+.searchPanelContainer.with-prefilters + .table-empty {
+    margin-top: -15px;
+}
+
+.table-empty thead {
+    display: none;
+}
+
+.table-empty .my-asyncdatagrid-pager-results {
+    display: none;
+}
+
+.table-empty .my-asyncdatagrid-pager-pagesize {
+    display: none;
+}
+
+.table-empty .my-asyncdatagrid-autoupdate-signal {
+    display: none;
+}
+
+.table-empty .csvDownloadButton {
+    display: none;
+}
 
 
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
@@ -3856,11 +3880,13 @@ td.datePickerMonth, td.datePickerYear {
     margin: 0 5px;
 }
 
-.table-empty > .gwt-Label {
+.table-empty-inner > .gwt-Label {
     margin: 15px;
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     margin-top: 1rem;
     margin-bottom: 1rem;
+    font-weight: 600;
+    color: #9a9a9a;
 }
 
 .searchResults .table-empty-clear-facets {

@@ -203,9 +203,6 @@ public class SimpleJobReportList extends AsyncTableCell<IndexedReport> {
     addColumn(lastPluginRunStateColumn, messages.reportStatus(), true, false, 8);
     addColumn(completionStatusColumn, messages.reportProgress(), true, false, 8);
 
-    Label emptyInfo = new Label(messages.noItemsToDisplay());
-    display.setEmptyTableWidget(emptyInfo);
-
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(updatedDateColumn, false));
   }

@@ -136,9 +136,6 @@ public class RepresentationList extends AsyncTableCell<IndexedRepresentation> {
     display.addColumn(createdOnColumn, messages.objectCreatedDate());
     display.addColumn(updatedOnColumn, messages.objectLastModified());
 
-    Label emptyInfo = new Label(messages.noItemsToDisplay());
-    display.setEmptyTableWidget(emptyInfo);
-
     statesColumn.setCellStyleNames("nowrap");
     typeColumn.setCellStyleNames("nowrap");
     sizeInBytesColumn.setCellStyleNames("nowrap");
@@ -150,7 +147,6 @@ public class RepresentationList extends AsyncTableCell<IndexedRepresentation> {
     display.getColumnSortList().push(new ColumnSortInfo(typeColumn, true));
 
     addStyleName("my-representation-table");
-    emptyInfo.addStyleName("my-representation-empty-info");
   }
 
   @Override

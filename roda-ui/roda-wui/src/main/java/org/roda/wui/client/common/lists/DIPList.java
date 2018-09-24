@@ -87,9 +87,6 @@ public class DIPList extends AsyncTableCell<IndexedDIP> {
     display.addColumn(dateCreated, messages.objectCreatedDate());
     display.addColumn(lastModified, messages.objectLastModified());
 
-    Label emptyInfo = new Label(messages.noItemsToDisplay());
-    display.setEmptyTableWidget(emptyInfo);
-
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(titleColumn, true));
 
@@ -100,7 +97,6 @@ public class DIPList extends AsyncTableCell<IndexedDIP> {
     lastModified.setCellStyleNames("nowrap");
 
     addStyleName("my-collections-table");
-    emptyInfo.addStyleName("my-collections-empty-info");
   }
 
   @Override

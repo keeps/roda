@@ -215,6 +215,11 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
               if(redirectOnSingleResult && originalFilter.equals(AsyncTableCell.this.getFilter()) && getVisibleItems().size() == 1){
                 HistoryUtils.resolve(getVisibleItems().get(0));
               }
+              if (getVisibleItems().isEmpty()) {
+                AsyncTableCell.this.addStyleName("table-empty");
+              } else {
+                AsyncTableCell.this.removeStyleName("table-empty");
+              }
             }
           });
       }
@@ -368,12 +373,15 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   }
 
   private void updateEmptyTableWidget() {
+    FlowPanel emptyTablewidget = new FlowPanel();
+
+    emptyTablewidget.addStyleName("table-empty-inner");
+
     if (hasSelectedFacets()) {
-      FlowPanel layout = new FlowPanel();
-      Label l = new Label(messages.noItemsToDisplayButFacetsActive());
+      Label l = new Label(
+        messages.noItemsToDisplayButFacetsActive(messages.someOfAObject(getSelected().getSelectedClass())));
       Button resetFacets = new Button(messages.disableFacets());
 
-      layout.addStyleName("table-empty");
       resetFacets.addStyleName("table-empty-clear-facets btn btn-primary btn-ban");
 
       resetFacets.addClickHandler(new ClickHandler() {
@@ -383,14 +391,12 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
           refresh();
         }
       });
-      layout.add(l);
-      layout.add(resetFacets);
-      display.setEmptyTableWidget(layout);
+      emptyTablewidget.add(l);
+      emptyTablewidget.add(resetFacets);
     } else if (actionable != null) {
-      FlowPanel emptyTablewidget = new FlowPanel();
-      emptyTablewidget.addStyleName("table-empty ActionableStyleButtons");
+      emptyTablewidget.addStyleName("ActionableStyleButtons");
 
-      Label label = new Label(messages.noItemsToDisplay());
+      Label label = new Label(messages.noItemsToDisplay(messages.someOfAObject(getSelected().getSelectedClass())));
       emptyTablewidget.add(label);
 
       emptyTablewidget.add(
@@ -426,15 +432,11 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
             }
           }
         }).buildListWithObjects(new ActionableObject<T>(classToReturn)));
-
-      display.setEmptyTableWidget(emptyTablewidget);
     } else {
-      SimplePanel container = new SimplePanel();
-      container.addStyleName("table-empty");
-      Label label = new Label(messages.noItemsToDisplay());
-      container.add(label);
-      display.setEmptyTableWidget(container);
+      Label label = new Label(messages.noItemsToDisplay(messages.someOfAObject(getSelected().getSelectedClass())));
+      emptyTablewidget.add(label);
     }
+    display.setEmptyTableWidget(emptyTablewidget);
   }
 
   private void configure(final CellTable<T> display) {
