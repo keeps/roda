@@ -26,6 +26,7 @@ import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InactiveUserException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.user.User;
@@ -84,16 +85,17 @@ public class CasApiAuthFilter implements Filter {
     }
 
     // try basic auth
-    try {
-      final Pair<String, String> credentials = new BasicAuthRequestWrapper(request).getCredentials();
-      if (credentials != null) {
+    final Pair<String, String> credentials = new BasicAuthRequestWrapper(request).getCredentials();
+    if (credentials != null) {
+      try {
         doFilterWithCredentials(request, response, filterChain, credentials.getFirst(), credentials.getSecond());
+      } catch (final AuthenticationDeniedException | NotFoundException e) {
+        LOGGER.debug(e.getMessage(), e);
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+      } catch (final GenericException e) {
+        throw new ServletException(e.getMessage(), e);
       }
-    } catch (final AuthenticationDeniedException e) {
-      LOGGER.debug(e.getMessage(), e);
-      response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
-    } catch (final GenericException e) {
-      throw new ServletException(e.getMessage(), e);
+      return;
     }
 
     // try the user in session
@@ -113,7 +115,7 @@ public class CasApiAuthFilter implements Filter {
 
   private void doFilterWithCredentials(final HttpServletRequest request, final HttpServletResponse response,
     final FilterChain filterChain, final String username, final String password)
-    throws GenericException, IOException, ServletException, AuthenticationDeniedException {
+    throws GenericException, IOException, ServletException, AuthenticationDeniedException, NotFoundException {
 
     // check if user is internal
     if (UserUtility.getLdapUtility().isInternal(username)) {
@@ -134,7 +136,8 @@ public class CasApiAuthFilter implements Filter {
    * @param request
    *          the request.
    *
-   * @return <code>true</code> if it is excluded and <code>false</code> otherwise.
+   * @return <code>true</code> if it is excluded and <code>false</code>
+   *         otherwise.
    */
   private boolean isRequestUrlExcluded(final HttpServletRequest request) {
     for (String exclusion : this.exclusions) {

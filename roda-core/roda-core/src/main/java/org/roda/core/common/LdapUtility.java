@@ -2105,13 +2105,15 @@ public class LdapUtility {
 
   }
 
-  public boolean isInternal(String username) throws GenericException {
+  public boolean isInternal(String username) throws GenericException, NotFoundException {
     final CoreSession session = this.service.getAdminSession();
     Entry entry;
     try {
       entry = session.lookup(new Dn(getUserDN(username)));
       return entry.containsAttribute(USER_PASSWORD);
-    } catch (LdapException e) {
+    } catch (LdapNoSuchObjectException e) {
+      throw new NotFoundException(username);
+    }catch (LdapException e) {
       throw new GenericException(e);
     }
 
