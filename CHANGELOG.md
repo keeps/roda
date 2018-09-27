@@ -1,5 +1,16 @@
 # Changelog
 
+## v2.2.11 (27/09/2018)
+Install for demonstration:
+```
+docker pull keeps/roda:v2.2.11
+```
+
+
+#### Bug Fixes:
+- CAS API auth allows incoherent state in basic auth fallback [#1349](https://github.com/keeps/roda/issues/1349)
+---
+
 ## v2.2.10 (03/07/2018)
 Install for demonstration:
 ```
@@ -41,12 +52,23 @@ docker pull keeps/roda:v2.2.8
 ---
 
 ## v2.2.7 (30/05/2018)
-To be announced.
+Install for demonstration:
+```
+docker pull keeps/roda:v2.2.7
+```
 
+Enhancement:
+* Improvement on 2.2.6 release security fix by allowing symbolic links on theme path
 ---
 
 ## v2.2.6 (29/05/2018)
-To be announced.
+Install for demonstration:
+```
+docker pull keeps/roda:v2.2.6
+```
+
+SECURITY FIX (update immediately!):
+* Fixing path transversal vulnerability in theme REST API resource
 ---
 
 ## v2.2.5 (23/05/2018)
