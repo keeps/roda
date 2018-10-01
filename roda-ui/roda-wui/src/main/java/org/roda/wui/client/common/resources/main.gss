@@ -3619,10 +3619,6 @@ td.datePickerMonth, td.datePickerYear {
     height: 4rem; */
 }
 
-.searchPanelRight .searchPanelButtonsSeparator {
-    border-left: 1px solid #aaa;
-}
-
 .searchPanel.searchPanelButtons-0 { margin-right:   0px; }
 .searchPanel.searchPanelButtons-1 { margin-right:  40px; }
 .searchPanel.searchPanelButtons-2 { margin-right:  80px; }
