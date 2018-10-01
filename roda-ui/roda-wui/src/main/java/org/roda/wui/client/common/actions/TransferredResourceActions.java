@@ -367,7 +367,7 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
     } else {
       HistoryUtils.newHistory(TransferUpload.INGEST_RESOLVER);
     }
-    callback.onSuccess(ActionImpact.UPDATED);
+    callback.onSuccess(ActionImpact.NONE);
   }
 
   private void newFolder(AsyncCallback<ActionImpact> callback) {
@@ -406,7 +406,7 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
     managementGroup.addButton(messages.renameButton(), TransferredResourceAction.RENAME, ActionImpact.UPDATED,
       "btn-edit");
     managementGroup.addButton(messages.moveButton(), TransferredResourceAction.MOVE, ActionImpact.UPDATED, "btn-edit");
-    managementGroup.addButton(messages.uploadFilesButton(), TransferredResourceAction.UPLOAD, ActionImpact.UPDATED,
+    managementGroup.addButton(messages.uploadFilesButton(), TransferredResourceAction.UPLOAD, ActionImpact.NONE,
       "btn-upload");
     managementGroup.addButton(messages.createFolderButton(), TransferredResourceAction.NEW_FOLDER, ActionImpact.UPDATED,
       "btn-plus");

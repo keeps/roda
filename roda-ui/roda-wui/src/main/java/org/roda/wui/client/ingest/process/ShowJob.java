@@ -247,14 +247,7 @@ public class ShowJob extends Composite {
 
     AsyncTableCellOptions<IndexedReport> jobReportListBuilderOptions = new AsyncTableCellOptions<>(
       IndexedReport.class, "ShowJob_reports");
-    jobReportListBuilderOptions.addValueChangedHandler(event -> {
-      if (!extraReportFilterParameters.isEmpty() && event.getValue().getTotalCount() == 1) {
-        Report jobReport = event.getValue().getResults().get(0);
-        if (jobReport != null) {
-          HistoryUtils.newHistory(ShowJobReport.RESOLVER, jobReport.getId());
-        }
-      }
-    });
+    jobReportListBuilderOptions.withRedirectOnSingleResult(!extraReportFilterParameters.isEmpty());
     jobReportListBuilderOptions.withFilter(filter);
     jobReportListBuilderOptions.withAutoUpdate(isJobRunning() ? PERIOD_MILLIS : null);
     jobReportListBuilderOptions.withSummary(messages.reportList());

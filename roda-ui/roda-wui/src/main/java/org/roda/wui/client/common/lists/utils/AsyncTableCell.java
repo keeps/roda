@@ -213,7 +213,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
               setResult(result);
               callback.onSuccess(result);
               if(redirectOnSingleResult && originalFilter.equals(AsyncTableCell.this.getFilter()) && getVisibleItems().size() == 1){
-                HistoryUtils.resolve(getVisibleItems().get(0));
+                HistoryUtils.resolve(getVisibleItems().get(0), true);
               }
               if (getVisibleItems().isEmpty()) {
                 AsyncTableCell.this.addStyleName("table-empty");
