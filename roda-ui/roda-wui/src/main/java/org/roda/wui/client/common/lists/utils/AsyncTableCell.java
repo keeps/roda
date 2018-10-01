@@ -220,6 +220,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
               } else {
                 AsyncTableCell.this.removeStyleName("table-empty");
               }
+              clearSelected();
             }
           });
       }
@@ -524,7 +525,8 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
       Header<Boolean> selectHeader = new Header<Boolean>(accessibleHoverableCheckboxCell) {
         @Override
         public Boolean getValue() {
-          return selected.containsAll(getVisibleItems());
+          List<T> visibleItems = getVisibleItems();
+          return !visibleItems.isEmpty() && selected.containsAll(visibleItems);
         }
       };
 
@@ -613,7 +615,6 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   public void refresh() {
     selected = new HashSet<>();
     display.setVisibleRangeAndClearData(new Range(0, getInitialPageSize()), true);
-    clearSelected();
     updateEmptyTableWidget();
   }
 
@@ -864,10 +865,12 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   }
 
   public void clearSelected() {
-    selected.clear();
-    selectionModel.clear();
-    redraw();
-    fireOnCheckboxSelectionChanged();
+    if (selectionModel != null) {
+      selected.clear();
+      selectionModel.clear();
+      redraw();
+      fireOnCheckboxSelectionChanged();
+    }
   }
 
   public int getIndexOfVisibleObject(T object) {
@@ -907,7 +910,8 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   }
 
   public Boolean isAllSelected() {
-    return selectable && selectAllRadioButton.getValue() && selected.containsAll(getVisibleItems());
+    return selectable && selectAllRadioButton != null && selectAllRadioButton.getValue()
+      && selected.containsAll(getVisibleItems());
   }
 
   public String getListId() {

@@ -83,8 +83,6 @@ public class AccessibleHoverableCheckboxCell extends AbstractEditableCell<Boolea
 
     boolean enterPressed = BrowserEvents.KEYDOWN.equals(type) && event.getKeyCode() == KeyCodes.KEY_ENTER;
 
-    GWT.log("event!!");
-
     if (BrowserEvents.CHANGE.equals(type) || enterPressed) {
       Boolean isChecked = input.isChecked();
 
