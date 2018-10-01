@@ -396,7 +396,12 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     } else if (actionable != null) {
       emptyTablewidget.addStyleName("ActionableStyleButtons");
 
-      Label label = new Label(messages.noItemsToDisplay(messages.someOfAObject(getSelected().getSelectedClass())));
+      Label label = new Label();
+      if (originalFilter.equals(this.getFilter())) {
+        label.setText(messages.noItemsToDisplayPreFilters(messages.someOfAObject(getSelected().getSelectedClass())));
+      } else {
+        label.setText(messages.noItemsToDisplay(messages.someOfAObject(getSelected().getSelectedClass())));
+      }
       emptyTablewidget.add(label);
 
       emptyTablewidget.add(
@@ -433,7 +438,12 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
           }
         }).buildListWithObjects(new ActionableObject<T>(classToReturn)));
     } else {
-      Label label = new Label(messages.noItemsToDisplay(messages.someOfAObject(getSelected().getSelectedClass())));
+      Label label = new Label();
+      if (originalFilter.equals(this.getFilter())) {
+        label.setText(messages.noItemsToDisplayPreFilters(messages.someOfAObject(getSelected().getSelectedClass())));
+      } else {
+        label.setText(messages.noItemsToDisplay(messages.someOfAObject(getSelected().getSelectedClass())));
+      }
       emptyTablewidget.add(label);
     }
     display.setEmptyTableWidget(emptyTablewidget);

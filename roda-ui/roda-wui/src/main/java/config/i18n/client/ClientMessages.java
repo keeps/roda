@@ -309,6 +309,8 @@ public interface ClientMessages extends Messages {
 
   String noItemsToDisplay(String itemLabel);
 
+  String noItemsToDisplayPreFilters(String itemLabel);
+
   String noItemsToDisplayButFacetsActive(String itemLabel);
 
   String disableFacets();
