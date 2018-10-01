@@ -41,10 +41,6 @@
 			</build>
 		</profile>
 	</profiles>
-	<properties>
-		<!-- XXX fedora tests really need jersey 2.12 -->
-		<jersey.version>2.12</jersey.version>
-	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.roda-project</groupId>
@@ -79,32 +75,6 @@
 		<dependency>
 			<groupId>javax.ws.rs</groupId>
 			<artifactId>javax.ws.rs-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-configs</artifactId>
-			<version>${fcrepo.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-http-api</artifactId>
-			<version>${fcrepo.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-http-commons</artifactId>
-			<version>${fcrepo.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-auth-common</artifactId>
-			<version>${fcrepo.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-http-commons</artifactId>
-			<version>${fcrepo.version}</version>
-			<type>test-jar</type>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish.grizzly</groupId>
@@ -143,77 +113,8 @@
 			<artifactId>jersey-media-multipart</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.w3</groupId>
-			<artifactId>ldp-testsuite</artifactId>
-			<version>0.1.1</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.jena</groupId>
-					<artifactId>jena-arq</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.openrdf.sesame</groupId>
-					<artifactId>sesame-sail-api</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.openrdf.sesame</groupId>
-					<artifactId>sesame-sail-memory</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.openrdf.sesame</groupId>
-					<artifactId>sesame-queryresultio-api</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>commons-validator</groupId>
-					<artifactId>commons-validator</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.commons</groupId>
-					<artifactId>commons-lang3</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>commons-io</groupId>
-					<artifactId>commons-io</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>commons-codec</groupId>
-					<artifactId>commons-codec</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>log4j</groupId>
-					<artifactId>log4j</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<!-- fixes for ldp-testsuite convergence problems -->
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-sail-api</artifactId>
-			<version>2.7.13</version>
-		</dependency>
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-sail-memory</artifactId>
-			<version>2.7.13</version>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-codec</groupId>
-					<artifactId>commons-codec</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>commons-httpclient</groupId>
-					<artifactId>commons-httpclient</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.openrdf.sesame</groupId>
-			<artifactId>sesame-queryresultio-api</artifactId>
-			<version>2.7.13</version>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-all</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.typesafe.akka</groupId>

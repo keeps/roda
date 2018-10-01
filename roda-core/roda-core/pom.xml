@@ -151,63 +151,6 @@
 		</profile>
 	</profiles>
 	<dependencies>
-		<!-- FEDORA CLIENT - start -->
-		<dependency>
-			<!-- available at artifactory.keep.pt -->
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-client</artifactId>
-			<version>${fcrepo.version}-sleroux-dev</version>
-		</dependency>
-		<dependency>
-			<!-- available at artifactory.keep.pt -->
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-client-impl</artifactId>
-			<version>${fcrepo.version}-sleroux-dev</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.jena</groupId>
-			<artifactId>jena-core</artifactId>
-			<version>${jena.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>log4j</groupId>
-					<artifactId>log4j</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.jena</groupId>
-			<artifactId>jena-arq</artifactId>
-			<version>${jena.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>log4j</groupId>
-					<artifactId>log4j</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
-				<!-- <exclusion> -->
-				<!-- <groupId>com.github.jsonld-java</groupId> -->
-				<!-- <artifactId>jsonld-java</artifactId> -->
-				<!-- </exclusion> -->
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.fcrepo</groupId>
-			<artifactId>fcrepo-kernel-api</artifactId>
-			<version>${fcrepo.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-		</dependency>
-		<!-- FEDORA CLIENT - end -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>

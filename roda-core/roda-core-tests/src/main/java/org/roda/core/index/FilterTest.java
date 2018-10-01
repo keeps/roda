@@ -53,6 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 @Test(groups = {RodaConstants.TEST_GROUP_ALL})
@@ -158,6 +159,7 @@ public class FilterTest {
     model.deleteAIP(aip.getId());
   }
 
+  @Ignore
   @Test
   public void testRunFromFilterWithDeleteThread() throws RODAException {
     AIP aip = model.createAIP(IdUtils.createUUID(), corporaService,

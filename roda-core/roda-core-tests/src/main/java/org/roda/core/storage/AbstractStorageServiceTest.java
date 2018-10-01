@@ -35,7 +35,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.storage.fedora.FedoraStorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -920,9 +919,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     BinaryVersion binaryVersion1 = getStorage().getBinaryVersion(binaryStoragePath, v1.getId());
     // TODO compare properties
     assertEquals(message1, binaryVersion1.getProperties().get(RodaConstants.VERSION_MESSAGE));
-    if (!(getStorage() instanceof FedoraStorageService)) {
-      assertNotNull(binaryVersion1.getCreatedDate());
-    }
+    assertNotNull(binaryVersion1.getCreatedDate());
 
     assertTrue(
       IOUtils.contentEquals(payload1.createInputStream(), binaryVersion1.getBinary().getContent().createInputStream()));

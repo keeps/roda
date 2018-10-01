@@ -1311,7 +1311,7 @@ public class SolrUtils {
           }
         }
       } catch (GenericException e) {
-        LOGGER.info("Problem processing descriptive metadata: {}", e.getMessage());
+        LOGGER.warn("Problem processing descriptive metadata: {}", e.getMessage(), e);
       } catch (Exception e) {
         LOGGER.error("Error processing descriptive metadata: {}", metadata, e);
       }

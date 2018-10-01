@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<name>RODA - Repositório de Objetos Digitais Autênticos</name>
@@ -20,7 +19,7 @@
 		<url>http://www.keep.pt</url>
 	</organization>
 	<prerequisites>
-		<maven>2.2.1</maven>
+		<maven>3.0.5</maven>
 	</prerequisites>
 	<distributionManagement>
 		<repository>
@@ -30,20 +29,6 @@
 		</repository>
 	</distributionManagement>
 	<repositories>
-		<!--
-		<repository>
-			<id>temporary_dependencies_repository</id>
-			<name>temporary_dependencies_repository</name>
-			<releases>
-				<enabled>true</enabled>
-				<checksumPolicy>ignore</checksumPolicy>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<url>file://${roda.temporary.repository}/repository/</url>
-		</repository>
-		-->
 		<repository>
 			<id>KEEPS-Artifacts</id>
 			<name>KEEP Artifacts-releases (fits, etc.)</name>
@@ -83,17 +68,15 @@
 		<cas.client.version>3.5.0</cas.client.version>
 		<jersey.version>2.27</jersey.version>
 		<swagger.version>1.5.21</swagger.version>
-		<jackson.version>2.9.5</jackson.version>
-		<fcrepo.version>4.4.0</fcrepo.version>
-		<spring.version>4.1.1.RELEASE</spring.version>
-		<grizzly.version>2.3.16</grizzly.version>
-		<jena.version>2.13.0</jena.version>
+		<jackson.version>2.9.7</jackson.version>
+		<spring.version>4.3.19.RELEASE</spring.version>
+		<grizzly.version>2.4.3</grizzly.version>
 		<solr.version>7.5.0</solr.version>
-		<akka.version>2.5.13</akka.version>
+		<akka.version>2.5.17</akka.version>
 		<apacheds.version>2.0.0-M24</apacheds.version>
-		<httpcomponents.version>4.5.5</httpcomponents.version>
+		<httpcomponents.version>4.5.6</httpcomponents.version>
 		<poi.version>3.17</poi.version>
-		<commons_ip.version>1.0.1</commons_ip.version>
+		<commons_ip.version>1.0.3</commons_ip.version>
 		<metrics.version>3.2.6</metrics.version>
 		<roda_community_url>http://roda-community.org</roda_community_url>
 		<testng.groups>all</testng.groups>
@@ -188,7 +171,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.8</version>
+				<version>0.8.1</version>
 				<executions>
 					<execution>
 						<id>default-prepare-agent</id>
@@ -233,13 +216,32 @@
 					</includes>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>versions-maven-plugin</artifactId>
+				<version>2.7</version>
+				<configuration>
+					<allowAnyUpdates>false</allowAnyUpdates>
+					<allowMajorUpdates>false</allowMajorUpdates>
+					<rulesUri>https://gist.githubusercontent.com/seahrh/b13f4f3d618ad7c817038e0bc124ef29/raw/a4801150b0d1a378f351ae21eb0f901a71ff10cc/versions-maven-rules.xml</rulesUri>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>display-dependency-updates</goal>
+							<goal>display-plugin-updates</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.3</version>
+					<version>3.8.0</version>
 					<configuration>
 						<source>${java_version}</source>
 						<target>${java_version}</target>
@@ -248,57 +250,52 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>2.4</version>
+					<version>3.1.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-antrun-plugin</artifactId>
-					<version>1.7</version>
+					<version>1.8</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-clean-plugin</artifactId>
-					<version>2.5</version>
+					<version>3.1.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-deploy-plugin</artifactId>
-					<version>2.7</version>
+					<version>2.8.2</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-install-plugin</artifactId>
-					<version>2.4</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-resources-plugin</artifactId>
-					<version>2.6</version>
+					<version>2.5.2</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
-					<version>3.3</version>
+					<version>3.7.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.18.1</version>
+					<version>2.22.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-war-plugin</artifactId>
-					<version>2.6</version>
+					<version>3.2.2</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>2.8</version>
+					<version>3.1.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-assembly-plugin</artifactId>
-					<version>2.4</version>
+					<version>3.1.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
@@ -308,7 +305,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-source-plugin</artifactId>
-					<version>3.0.0</version>
+					<version>3.0.1</version>
 					<configuration>
 						<excludeResources>true</excludeResources>
 					</configuration>
@@ -330,7 +327,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-shade-plugin</artifactId>
-					<version>2.4.2</version>
+					<version>3.2.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
@@ -359,12 +356,12 @@
 				<plugin>
 					<groupId>com.spotify</groupId>
 					<artifactId>docker-maven-plugin</artifactId>
-					<version>0.4.10</version>
+					<version>1.1.1</version>
 				</plugin>
 				<plugin>
 					<groupId>pl.project13.maven</groupId>
 					<artifactId>git-commit-id-plugin</artifactId>
-					<version>2.2.1</version>
+					<version>2.2.5</version>
 					<executions>
 						<execution>
 							<goals>
@@ -387,7 +384,7 @@
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>exec-maven-plugin</artifactId>
-					<version>1.4.0</version>
+					<version>1.6.0</version>
 					<executions>
 						<execution>
 							<goals>
@@ -485,12 +482,12 @@
 			<dependency>
 				<groupId>com.thoughtworks.xstream</groupId>
 				<artifactId>xstream</artifactId>
-				<version>1.2.2</version>
+				<version>1.4.10-java7</version>
 			</dependency>
 			<dependency>
 				<groupId>com.toedter</groupId>
 				<artifactId>jcalendar</artifactId>
-				<version>1.3.2</version>
+				<version>1.4</version>
 			</dependency>
 			<dependency>
 				<groupId>com.bytebybyte.gwt</groupId>
@@ -532,32 +529,17 @@
 			<dependency>
 				<groupId>org.testng</groupId>
 				<artifactId>testng</artifactId>
-				<version>6.9.12</version>
+				<version>6.14.3</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
-				<version>1.7.21</version>
+				<version>1.7.25</version>
 			</dependency>
 			<dependency>
 				<groupId>ch.qos.logback</groupId>
 				<artifactId>logback-classic</artifactId>
 				<version>1.2.3</version>
-			</dependency>
-			<dependency>
-				<groupId>net.sf.gwt-widget</groupId>
-				<artifactId>gwt-widgets</artifactId>
-				<version>0.2.0</version>
-			</dependency>
-			<dependency>
-				<groupId>net.sf.saxon</groupId>
-				<artifactId>saxon</artifactId>
-				<version>9.0</version>
-			</dependency>
-			<dependency>
-				<groupId>net.sf.saxon</groupId>
-				<artifactId>saxon-dom</artifactId>
-				<version>9.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.velocity</groupId>
@@ -575,11 +557,6 @@
 				<version>2.6.0</version>
 			</dependency>
 			<dependency>
-				<groupId>org.apache.xmlgraphics</groupId>
-				<artifactId>fop</artifactId>
-				<version>1.0</version>
-			</dependency>
-			<dependency>
 				<groupId>org.bluestemsoftware.open.maven.plugin</groupId>
 				<artifactId>launch4j-plugin</artifactId>
 				<version>1.5.0.0</version>
@@ -587,7 +564,7 @@
 			<dependency>
 				<groupId>org.codehaus.castor</groupId>
 				<artifactId>castor-xml</artifactId>
-				<version>1.3</version>
+				<version>1.4.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.w3c</groupId>
@@ -678,7 +655,7 @@
 			<dependency>
 				<groupId>jaxen</groupId>
 				<artifactId>jaxen</artifactId>
-				<version>1.1.4</version>
+				<version>1.1.6</version>
 			</dependency>
 			<dependency>
 				<groupId>myfaces</groupId>
@@ -689,11 +666,6 @@
 				<groupId>myfaces</groupId>
 				<artifactId>myfaces-impl</artifactId>
 				<version>1.1.1</version>
-			</dependency>
-			<dependency>
-				<groupId>xerces</groupId>
-				<artifactId>xercesImpl</artifactId>
-				<version>2.11.0</version>
 			</dependency>
 			<dependency>
 				<groupId>xml-apis</groupId>
@@ -847,18 +819,18 @@
 			<dependency>
 				<groupId>net.sf.ehcache</groupId>
 				<artifactId>ehcache</artifactId>
-				<version>2.10.4</version>
+				<version>2.10.5</version>
 			</dependency>
 			<!-- ApacheDS related dependencies - end -->
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
-				<version>3.7</version>
+				<version>3.8.1</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
-				<version>24.0-jre</version>
+				<version>26.0-jre</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.solr</groupId>
@@ -873,7 +845,7 @@
 			<dependency>
 				<groupId>net.sf.saxon</groupId>
 				<artifactId>Saxon-HE</artifactId>
-				<version>9.6.0-7</version>
+				<version>9.9.0-1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.hamcrest</groupId>
@@ -881,21 +853,26 @@
 				<version>1.3</version>
 			</dependency>
 			<dependency>
+				<groupId>org.hamcrest</groupId>
+				<artifactId>hamcrest-all</artifactId>
+				<version>1.3</version>
+			</dependency>
+			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-core</artifactId>
-				<version>1.10.19</version>
+				<version>2.22.0</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.powermock</groupId>
 				<artifactId>powermock-api-mockito</artifactId>
-				<version>1.6.2</version>
+				<version>1.7.4</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.powermock</groupId>
 				<artifactId>powermock-module-junit4</artifactId>
-				<version>1.6.2</version>
+				<version>1.7.4</version>
 				<scope>test</scope>
 			</dependency>
 			<!-- REST API related dependencies - start -->
@@ -912,9 +889,14 @@
 				<version>${jersey.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>org.glassfish.jersey.ext</groupId>
+				<artifactId>jersey-spring3</artifactId>
+				<version>2.25.1</version>
+			</dependency>
+			<dependency>
 				<groupId>javax.ws.rs</groupId>
 				<artifactId>javax.ws.rs-api</artifactId>
-				<version>2.0.1</version>
+				<version>2.1.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.glassfish.jersey.core</groupId>
@@ -968,7 +950,7 @@
 			<dependency>
 				<groupId>xalan</groupId>
 				<artifactId>xalan</artifactId>
-				<version>2.7.1</version>
+				<version>2.7.2</version>
 			</dependency>
 
 			<!-- Actions related dependencies - end -->
@@ -1029,7 +1011,7 @@
 			<dependency>
 				<groupId>com.github.jknack</groupId>
 				<artifactId>handlebars</artifactId>
-				<version>4.0.6</version>
+				<version>4.1.0</version>
 			</dependency>
 			<dependency>
 				<groupId>xmlunit</groupId>
@@ -1039,7 +1021,7 @@
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-csv</artifactId>
-				<version>1.5</version>
+				<version>1.6</version>
 			</dependency>
 			<dependency>
 				<groupId>org.jdom</groupId>
@@ -1049,7 +1031,7 @@
 			<dependency>
 				<groupId>org.seleniumhq.selenium</groupId>
 				<artifactId>selenium-java</artifactId>
-				<version>3.0.1</version>
+				<version>3.14.0</version>
 			</dependency>
 			<dependency>
 				<groupId>io.dropwizard.metrics</groupId>
@@ -1078,7 +1060,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.8.1</version>
+				<version>3.0.1</version>
 			</plugin>
 		</plugins>
 	</reporting>

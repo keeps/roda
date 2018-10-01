@@ -207,7 +207,8 @@ public class PluginManager {
   }
 
   /**
-   * Returns an instance of the {@link Plugin} with the specified ID (classname).
+   * Returns an instance of the {@link Plugin} with the specified ID
+   * (classname).
    * 
    * @param pluginID
    *          the ID (classname) of the {@link Plugin}.
@@ -224,7 +225,7 @@ public class PluginManager {
     }
 
     boolean internalPluginTakesPrecedence = RodaCoreFactory.getRodaConfiguration()
-      .getBoolean("core.plugins.internal.take_precedence_over_external");
+      .getBoolean("core.plugins.internal.take_precedence_over_external", true);
     Plugin<? extends IsRODAObject> cachedExternalPlugin = externalPluginChache.get(pluginID);
     if ((plugin == null || !internalPluginTakesPrecedence) && cachedExternalPlugin != null) {
       plugin = cachedExternalPlugin.cloneMe();
@@ -277,7 +278,7 @@ public class PluginManager {
 
     // schedule
     LOGGER.debug("Starting plugin scanner timer...");
-    int timeInSeconds = RodaCoreFactory.getRodaConfiguration().getInt("core.plugins.external.scheduler.interval");
+    int timeInSeconds = RodaCoreFactory.getRodaConfiguration().getInt("core.plugins.external.scheduler.interval", 30);
     this.loadPluginsTimer = new Timer("Plugin scanner timer", true);
     this.loadPluginsTimer.schedule(new SearchPluginsTask(), timeInSeconds * 1000, timeInSeconds * 1000);
 

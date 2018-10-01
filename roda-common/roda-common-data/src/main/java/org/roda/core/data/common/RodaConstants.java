@@ -471,7 +471,7 @@ public final class RodaConstants {
    * Core (storage, index, orchestrator, etc.)
    */
   public enum StorageType {
-    FILESYSTEM, FEDORA4
+    FILESYSTEM, @Deprecated FEDORA4
   }
 
   public static final StorageType DEFAULT_STORAGE_TYPE = StorageType.FILESYSTEM;

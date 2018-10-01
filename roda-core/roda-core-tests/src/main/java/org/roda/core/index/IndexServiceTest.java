@@ -258,8 +258,13 @@ public class IndexServiceTest {
 
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.INDEX_UUID, aipId));
-    IndexedAIP indexedAip = index.find(IndexedAIP.class, filter, null, new Sublist(0, 10), Collections.emptyList())
-      .getResults().get(0);
+    List<IndexedAIP> results = index.find(IndexedAIP.class, filter, null, new Sublist(0, 10), Collections.emptyList())
+      .getResults();
+
+    Assert.assertEquals(results.size(), 1);
+    IndexedAIP indexedAip = results.get(0);
+
+    LOGGER.info("TEST! AIP: {}", indexedAip);
 
     Instant dateInitial = indexedAip.getDateInitial().toInstant();
     LocalDateTime ldt = LocalDateTime.ofInstant(dateInitial, ZoneOffset.UTC);

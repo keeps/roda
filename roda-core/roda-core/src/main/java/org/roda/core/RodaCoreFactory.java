@@ -130,7 +130,6 @@ import org.roda.core.plugins.orchestrate.akka.distributed.AkkaDistributedPluginW
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.fedora.FedoraStorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
@@ -784,21 +783,7 @@ public class RodaCoreFactory {
 
     StorageType storageType = StorageType.valueOf(
       getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_TYPE, RodaConstants.DEFAULT_STORAGE_TYPE.toString()));
-    if (storageType == RodaConstants.StorageType.FEDORA4) {
-      String url = getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_FEDORA4_URL,
-        "http://localhost:8983/solr/");
-      String username = getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_FEDORA4_USERNAME, "");
-      String password = getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_FEDORA4_PASSWORD, "");
-
-      if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
-        LOGGER.debug("Going to instantiate Fedora with url '{}' username '{}' & password '{}'", url, username,
-          password);
-        return new FedoraStorageService(url, username, password);
-      } else {
-        LOGGER.debug("Going to instantiate Fedora with url '{}'", url);
-        return new FedoraStorageService(url);
-      }
-    } else if (storageType == RodaConstants.StorageType.FILESYSTEM) {
+   if (storageType == RodaConstants.StorageType.FILESYSTEM) {
       LOGGER.debug("Going to instantiate Filesystem on '{}'", storagePath);
       String trashDirName = getRodaConfiguration().getString("core.storage.filesystem.trash",
         RodaConstants.TRASH_CONTAINER);
@@ -1303,13 +1288,15 @@ public class RodaCoreFactory {
 
       if (!FSUtils.exists(rodaApacheDSDataDirectory) || FSUtils.isDirEmpty(rodaApacheDSDataDirectory)) {
         Files.createDirectories(rodaApacheDSDataDirectory);
-        final List<String> ldifFileNames = Arrays.asList("users.ldif", "groups.ldif");
+        final List<String> ldifFileNames = Arrays.asList("users.ldif", "groups.ldif", "roles.ldif");
         final List<String> ldifs = new ArrayList<>();
         for (String ldifFileName : ldifFileNames) {
           final InputStream ldifInputStream = RodaCoreFactory
             .getConfigurationFileAsStream(RodaConstants.CORE_LDAP_FOLDER + "/" + ldifFileName);
-          ldifs.add(IOUtils.toString(ldifInputStream, RodaConstants.DEFAULT_ENCODING));
-          RodaUtils.closeQuietly(ldifInputStream);
+          if (ldifInputStream != null) {
+            ldifs.add(IOUtils.toString(ldifInputStream, RodaConstants.DEFAULT_ENCODING));
+            RodaUtils.closeQuietly(ldifInputStream);
+          }
         }
 
         RodaCoreFactory.ldapUtility.initDirectoryService(ldifs);
@@ -1320,7 +1307,9 @@ public class RodaCoreFactory {
 
       createRoles(rodaConfig);
       indexUsersAndGroupsFromLDAP();
-    } catch (final Exception e) {
+    } catch (
+
+    final Exception e) {
       LOGGER.error("Error starting up embedded ApacheDS", e);
       instantiatedWithoutErrors = false;
     }
@@ -1494,7 +1483,7 @@ public class RodaCoreFactory {
     if (FSUtils.exists(config)) {
       cc.addConfiguration(getExternalConfiguration(config));
     }
-    
+
     cc.addConfiguration(getInternalConfiguration(configurationFile));
 
     // do variable interpolation
