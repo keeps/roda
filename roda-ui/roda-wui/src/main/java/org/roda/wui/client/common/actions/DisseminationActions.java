@@ -171,7 +171,7 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
                           @Override
                           public void onSuccess(final Void nothing) {
                             HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                            doActionCallbackDestroyed();
+                            doActionCallbackNone();
                           }
                         });
                       }
@@ -216,7 +216,7 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
                           @Override
                           public void onSuccess(final Void nothing) {
                             HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                            doActionCallbackDestroyed();
+                            doActionCallbackNone();
                           }
                         });
                       }

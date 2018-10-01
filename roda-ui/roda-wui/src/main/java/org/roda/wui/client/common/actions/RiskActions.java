@@ -214,8 +214,8 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
 
                       @Override
                       public void onSuccess(final Void nothing) {
-                        doActionCallbackDestroyed();
                         HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                        doActionCallbackNone();
                       }
                     });
                   }

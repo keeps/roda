@@ -8,6 +8,7 @@
 package org.roda.wui.client.common.dialogs;
 
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.wui.client.common.lists.pagination.ListSelectionState;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 
@@ -119,7 +120,8 @@ public class DefaultSelectDialog<T extends IsIndexed> extends DialogBox implemen
   }
 
   private T getValue() {
-    return searchWrapper.getListSelectionState(objectClass).getSelected();
+    ListSelectionState<T> listSelectionState = searchWrapper.getListSelectionState(objectClass);
+    return  listSelectionState != null ? listSelectionState.getSelected() : null;
   }
 
   public void setEmptyParentButtonVisible(boolean visible) {

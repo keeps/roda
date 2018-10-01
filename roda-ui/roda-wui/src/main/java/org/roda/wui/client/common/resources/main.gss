@@ -1266,6 +1266,10 @@ pre code {
     margin-top: -30px;
 }
 
+.wui-dialog-layout .table-empty {
+    margin-top: 0;
+}
+
 .searchPanelContainer.with-prefilters + .table-empty {
     margin-top: -15px;
 }

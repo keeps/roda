@@ -243,16 +243,19 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
           Filter filter = new Filter();
           filter.add(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, Boolean.FALSE.toString()));
 
+          boolean moveToRootVisible = false;
           if (!resources.isEmpty() && resources.get(0) != NO_TRANSFERRED_RESOURCE
             && StringUtils.isNotBlank(resources.get(0).getParentUUID())) {
             filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, resources.get(0).getParentUUID()));
+            moveToRootVisible = true;
           }
 
           SelectTransferResourceDialog dialog = new SelectTransferResourceDialog(messages.selectParentTitle(), filter);
+
           if (resources.size() <= RodaConstants.DIALOG_FILTER_LIMIT_NUMBER) {
             dialog.addStyleName("object-dialog");
           }
-          dialog.setEmptyParentButtonVisible(true);
+          dialog.setEmptyParentButtonVisible(moveToRootVisible);
           dialog.showAndCenter();
           dialog.addCloseHandler(e -> callback.onSuccess(ActionImpact.NONE));
           dialog.addValueChangeHandler(event -> {
@@ -294,7 +297,7 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
                     @Override
                     public void onSuccess(final Void nothing) {
                       HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                      doActionCallbackUpdated();
+                      doActionCallbackNone();
                     }
                   });
                 }

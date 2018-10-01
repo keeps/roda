@@ -299,7 +299,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
                               @Override
                               public void onSuccess(final Void nothing) {
                                 HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                                doActionCallbackUpdated();
+                                doActionCallbackNone();
                               }
                             });
                           }
@@ -344,7 +344,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
           @Override
           public void onSuccess(final Void nothing) {
             HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-            doActionCallbackDestroyed();
+            doActionCallbackNone();
           }
         });
       }

@@ -176,7 +176,7 @@ public class FormatActions extends AbstractActionable<Format> {
                       @Override
                       public void onSuccess(final Void nothing) {
                         HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                        doActionCallbackDestroyed();
+                        doActionCallbackNone();
                       }
                     });
                   }

@@ -260,7 +260,7 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
                         @Override
                         public void onSuccess(final Void nothing) {
                           HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                          doActionCallbackDestroyed();
+                          doActionCallbackNone();
                         }
                       });
                   }

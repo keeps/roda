@@ -172,7 +172,7 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
                                 @Override
                                 public void onSuccess(final Void nothing) {
                                   HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                                  doActionCallbackDestroyed();
+                                  doActionCallbackNone();
                                 }
                               });
                           }
@@ -218,7 +218,7 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
               @Override
               public void onSuccess(final Void nothing) {
                 HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                doActionCallbackUpdated();
+                doActionCallbackNone();
               }
             });
           }

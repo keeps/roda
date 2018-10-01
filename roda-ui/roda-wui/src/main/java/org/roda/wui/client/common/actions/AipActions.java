@@ -315,7 +315,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                                 @Override
                                 public void onSuccess(final Void nothing) {
                                   HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                                  doActionCallbackDestroyed();
+                                  doActionCallbackNone();
                                 }
                               });
                           }
@@ -518,7 +518,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                                 @Override
                                 public void onSuccess(final Void nothing) {
                                   HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                                  doActionCallbackDestroyed();
+                                  doActionCallbackNone();
                                 }
                               });
                           }
@@ -575,7 +575,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
           @Override
           public void onSuccess(final Void nothing) {
             HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-            doActionCallbackUpdated();
+            doActionCallbackNone();
           }
         });
       }
@@ -610,7 +610,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                   @Override
                   public void onSuccess(final Void nothing) {
                     HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                    doActionCallbackDestroyed();
+                    doActionCallbackNone();
                   }
                 });
               }
@@ -676,7 +676,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                               @Override
                               public void onSuccess(final Void nothing) {
                                 HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                                doActionCallbackUpdated();
+                                doActionCallbackNone();
                               }
                             });
                           }
