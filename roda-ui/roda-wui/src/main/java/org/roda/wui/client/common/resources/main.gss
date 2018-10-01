@@ -436,6 +436,11 @@ div.inline {
 	opacity: 1;
 }
 
+.my-asyncdatagrid-display th input {
+    /* header checkbox in AsyncTableCell */
+    margin-left: 6px;
+}
+
 /**********************************************
 				SKELETON
 ************************************************/
