@@ -2486,7 +2486,10 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
     controllerAssistant.checkObjectPermissions(user, selectedFiles);
-    controllerAssistant.checkObjectPermissions(user, toFolder);
+
+    IndexedAIP destinationAIP = RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, aipId,
+      RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+    controllerAssistant.checkObjectPermissions(user, destinationAIP);
 
     LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
 
@@ -3372,7 +3375,7 @@ public class Browser extends RodaWuiController {
 
   public static Job updateRepresentationInformationListWithFilter(User user,
     SelectedItems<RepresentationInformation> representationInformationItems, String filterToAdd)
-          throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions

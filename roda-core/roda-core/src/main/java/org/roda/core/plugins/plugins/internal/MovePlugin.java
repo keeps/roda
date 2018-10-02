@@ -212,7 +212,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     try {
       String toAIP;
       String toRepresentation;
-      List<String> toPath = null;
+      List<String> toPath = new ArrayList<>();
 
       if (StringUtils.isNotBlank(destinationId)) {
         List<String> fileFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FILE_AIP_ID,
@@ -223,7 +223,6 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
         toAIP = toFolder.getAipId();
         toRepresentation = toFolder.getRepresentationId();
-        toPath = new ArrayList<>();
         if (toFolder.getPath() != null) {
           toPath.addAll(toFolder.getPath());
         }
