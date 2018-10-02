@@ -816,11 +816,6 @@
 				<artifactId>apacheds-xdbm-partition</artifactId>
 				<version>${apacheds.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>net.sf.ehcache</groupId>
-				<artifactId>ehcache</artifactId>
-				<version>2.10.5</version>
-			</dependency>
 			<!-- ApacheDS related dependencies - end -->
 			<dependency>
 				<groupId>org.apache.commons</groupId>
@@ -896,7 +891,7 @@
 			<dependency>
 				<groupId>javax.ws.rs</groupId>
 				<artifactId>javax.ws.rs-api</artifactId>
-				<version>2.1.1</version>
+				<version>2.0.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.glassfish.jersey.core</groupId>

@@ -264,8 +264,6 @@ public class IndexServiceTest {
     Assert.assertEquals(results.size(), 1);
     IndexedAIP indexedAip = results.get(0);
 
-    LOGGER.info("TEST! AIP: {}", indexedAip);
-
     Instant dateInitial = indexedAip.getDateInitial().toInstant();
     LocalDateTime ldt = LocalDateTime.ofInstant(dateInitial, ZoneOffset.UTC);
     int year = ldt.getYear();

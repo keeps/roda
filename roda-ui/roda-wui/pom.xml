@@ -342,7 +342,7 @@
 		<dependency>
 			<groupId>com.github.nmorel.gwtjackson</groupId>
 			<artifactId>gwt-jackson</artifactId>
-			<version>0.15.4</version>
+			<version>0.14.2</version>
 		</dependency>
 		<!-- WebJars https://www.webjars.org -->
 		<!-- Global icon font -->
