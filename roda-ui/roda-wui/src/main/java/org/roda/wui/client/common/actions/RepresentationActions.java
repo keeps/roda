@@ -238,16 +238,16 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
                             @Override
                             public void onSuccess(final Void nothing) {
-                              HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                               doActionCallbackNone();
+                              HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                             }
                           });
                       }
 
                       @Override
                       public void onFailure(Throwable caught) {
-                        HistoryUtils.newHistory(InternalProcess.RESOLVER);
                         doActionCallbackNone();
+                        HistoryUtils.newHistory(InternalProcess.RESOLVER);
                       }
                     });
                 }
@@ -298,8 +298,8 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
                               @Override
                               public void onSuccess(final Void nothing) {
-                                HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                                 doActionCallbackNone();
+                                HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                               }
                             });
                           }
@@ -317,11 +317,11 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   }
 
   public void newProcess(SelectedItems<IndexedRepresentation> selected, final AsyncCallback<ActionImpact> callback) {
+    callback.onSuccess(ActionImpact.NONE);
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(selected);
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
     HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_ACTION);
-    callback.onSuccess(ActionImpact.UPDATED);
   }
 
   public void identifyFormats(IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
@@ -343,8 +343,8 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
           @Override
           public void onSuccess(final Void nothing) {
-            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
             doActionCallbackNone();
+            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
           }
         });
       }

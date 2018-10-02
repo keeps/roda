@@ -183,6 +183,7 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
   }
 
   private void associateWithNew(AsyncCallback<ActionImpact> callback) {
+    callback.onSuccess(ActionImpact.NONE);
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
     HistoryUtils.newHistory(CreateRepresentationInformation.RESOLVER);
@@ -217,16 +218,16 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
   }
 
   private void startProcess(SelectedItems<RepresentationInformation> objects, AsyncCallback<ActionImpact> callback) {
+    callback.onSuccess(ActionImpact.NONE);
     LastSelectedItemsSingleton.getInstance().setSelectedItems(objects);
     LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
     HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_ACTION);
-    callback.onSuccess(ActionImpact.UPDATED);
   }
 
   private void download(RepresentationInformation object, AsyncCallback<ActionImpact> callback) {
     SafeUri downloadUri = RestUtils.createRepresentationInformationDownloadUri(object.getId());
-    Window.Location.assign(downloadUri.asString());
     callback.onSuccess(ActionImpact.NONE);
+    Window.Location.assign(downloadUri.asString());
   }
 
   private void remove(SelectedItems<RepresentationInformation> objects, AsyncCallback<ActionImpact> callback) {
@@ -247,8 +248,8 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
 
                   @Override
                   public void onFailure(Throwable caught) {
-                    HistoryUtils.newHistory(InternalProcess.RESOLVER);
                     callback.onFailure(caught);
+                    HistoryUtils.newHistory(InternalProcess.RESOLVER);
                   }
 
                   @Override
@@ -272,8 +273,8 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
 
                         @Override
                         public void onSuccess(final Void nothing) {
-                          HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                           doActionCallbackNone();
+                          HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                         }
                       });
                   }
@@ -286,15 +287,15 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
   }
 
   private void create(AsyncCallback<ActionImpact> callback) {
+    callback.onSuccess(ActionImpact.NONE);
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
     HistoryUtils.newHistory(CreateRepresentationInformation.RESOLVER);
-    callback.onSuccess(ActionImpact.NONE);
   }
 
   private void edit(RepresentationInformation object, AsyncCallback<ActionImpact> callback) {
-    HistoryUtils.newHistory(EditRepresentationInformation.RESOLVER, object.getId());
     callback.onSuccess(ActionImpact.NONE);
+    HistoryUtils.newHistory(EditRepresentationInformation.RESOLVER, object.getId());
   }
 
   @Override

@@ -79,8 +79,8 @@ public class PreservationAgentActions extends AbstractActionable<IndexedPreserva
   private void download(IndexedPreservationAgent agent, AsyncCallback<ActionImpact> callback) {
     SafeUri downloadUri = RestUtils.createPreservationAgentUri(agent.getId(),
       RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
-    Window.Location.assign(downloadUri.asString());
     callback.onSuccess(ActionImpact.NONE);
+    Window.Location.assign(downloadUri.asString());
   }
 
   @Override

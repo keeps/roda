@@ -128,10 +128,10 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
   }
 
   private void startProcess(SelectedItems<RiskIncidence> objects, AsyncCallback<ActionImpact> callback) {
+    callback.onSuccess(ActionImpact.NONE);
     LastSelectedItemsSingleton.getInstance().setSelectedItems(objects);
     LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
     HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_ACTION);
-    callback.onSuccess(ActionImpact.UPDATED);
   }
 
   private void remove(SelectedItems<RiskIncidence> objects, AsyncCallback<ActionImpact> callback) {
@@ -171,8 +171,8 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
 
                                 @Override
                                 public void onSuccess(final Void nothing) {
-                                  HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                                   doActionCallbackNone();
+                                  HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                                 }
                               });
                           }
@@ -190,8 +190,8 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
 
   // ACTIONS
   private void edit(RiskIncidence object, AsyncCallback<ActionImpact> callback) {
+    callback.onSuccess(ActionImpact.NONE);
     HistoryUtils.newHistory(EditRiskIncidence.RESOLVER, object.getId());
-    callback.onSuccess(ActionImpact.UPDATED);
   }
 
   private void edit(SelectedItems<RiskIncidence> objects, AsyncCallback<ActionImpact> callback) {
@@ -217,8 +217,8 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
 
               @Override
               public void onSuccess(final Void nothing) {
-                HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                 doActionCallbackNone();
+                HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
               }
             });
           }

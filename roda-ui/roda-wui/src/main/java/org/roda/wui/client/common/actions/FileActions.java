@@ -231,14 +231,9 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   // ACTIONS
 
   private void download(IndexedFile file, final AsyncCallback<ActionImpact> callback) {
-    SafeUri downloadUri = null;
-    if (file != null) {
-      downloadUri = RestUtils.createRepresentationFileDownloadUri(file.getUUID());
-    }
-    if (downloadUri != null) {
-      Window.Location.assign(downloadUri.asString());
-    }
+    SafeUri downloadUri = RestUtils.createRepresentationFileDownloadUri(file.getUUID());
     callback.onSuccess(ActionImpact.NONE);
+    Window.Location.assign(downloadUri.asString());
   }
 
   private void rename(final IndexedFile file, final AsyncCallback<ActionImpact> callback) {
@@ -259,8 +254,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
                     @Override
                     public void onSuccessImpl(IndexedFile newFolder) {
                       Toast.showInfo(messages.dialogSuccess(), messages.renameSuccessful());
+                      doActionCallbackNone();
                       HistoryUtils.openBrowse(newFolder);
-                      doActionCallbackUpdated();
                     }
                   });
               }
@@ -311,12 +306,12 @@ public class FileActions extends AbstractActionable<IndexedFile> {
                         Timer timer = new Timer() {
                           @Override
                           public void run() {
+                            doActionCallbackNone();
                             if (toFolder != null) {
                               HistoryUtils.openBrowse(toFolder);
                             } else {
                               HistoryUtils.openBrowse(aipId, representationId);
                             }
-                            doActionCallbackUpdated();
                           }
                         };
 
@@ -325,14 +320,15 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
                       @Override
                       public void onSuccess(final Void nothing) {
-                        HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                         doActionCallbackNone();
+                        HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                       }
                     });
                   }
 
                   @Override
                   public void onFailureImpl(Throwable caught) {
+                    super.onFailureImpl(caught);
                     HistoryUtils.newHistory(InternalProcess.RESOLVER);
                   }
                 });
@@ -349,10 +345,10 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
         @Override
         public void onSuccess(String details) {
+          doActionCallbackNone();
           LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
           selectedItems.setDetailsMessage(details);
           HistoryUtils.openUpload(aipId, representationId);
-          doActionCallbackUpdated();
         }
       });
   }
@@ -365,10 +361,10 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
           @Override
           public void onSuccess(String details) {
+            doActionCallbackNone();
             LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
             selectedItems.setDetailsMessage(details);
             HistoryUtils.openUpload(file);
-            doActionCallbackUpdated();
           }
         });
     }
@@ -392,16 +388,17 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
                     @Override
                     public void onSuccessImpl(IndexedFile newFolder) {
+                      doActionCallbackNone();
                       HistoryUtils.openBrowse(newFolder);
-                      doActionCallbackUpdated();
                     }
 
                     @Override
                     public void onFailureImpl(Throwable caught) {
                       if (caught instanceof NotFoundException) {
                         Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+                      }else{
+                        super.onFailureImpl(caught);
                       }
-                      callback.onFailure(caught);
                     }
 
                   });
@@ -433,8 +430,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
                     @Override
                     public void onSuccessImpl(IndexedFile newFolder) {
+                      doActionCallbackNone();
                       HistoryUtils.openBrowse(newFolder);
-                      doActionCallbackUpdated();
                     }
 
                     @Override
@@ -442,6 +439,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
                       if (caught instanceof AlreadyExistsException) {
                         Dialogs.showInformationDialog(messages.createFolderAlreadyExistsTitle(),
                           messages.createFolderAlreadyExistsMessage(), messages.dialogOk(), false);
+                      }else{
+                        super.onFailureImpl(caught);
                       }
                     }
                   });
@@ -456,11 +455,11 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   }
 
   private void newProcess(SelectedItems<IndexedFile> selected, final AsyncCallback<ActionImpact> callback) {
+    callback.onSuccess(ActionImpact.NONE);
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(selected);
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
     HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_ACTION);
-    callback.onSuccess(ActionImpact.UPDATED);
   }
 
   private void identifyFormats(IndexedFile file, final AsyncCallback<ActionImpact> callback) {
@@ -481,8 +480,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
           @Override
           public void onSuccess(final Void nothing) {
-            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
             doActionCallbackNone();
+            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
           }
         });
       }
@@ -522,6 +521,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
                           @Override
                           public void run() {
                             List<String> path = file.getPath();
+                            doActionCallbackNone();
                             if (path.isEmpty()) {
                               HistoryUtils.openBrowse(file.getAipId(), file.getRepresentationId());
                             } else {
@@ -531,7 +531,6 @@ public class FileActions extends AbstractActionable<IndexedFile> {
                               HistoryUtils.openBrowse(file.getAipId(), file.getRepresentationId(), parentPath,
                                 parentId);
                             }
-                            doActionCallbackDestroyed();
                           }
                         };
 
@@ -575,8 +574,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
                             Timer timer = new Timer() {
                               @Override
                               public void run() {
+                                doActionCallbackNone();
                                 HistoryUtils.newHistory(HistoryUtils.getCurrentHistoryPath());
-                                doActionCallbackDestroyed();
                               }
                             };
 
@@ -585,16 +584,16 @@ public class FileActions extends AbstractActionable<IndexedFile> {
 
                           @Override
                           public void onSuccess(final Void nothing) {
-                            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                             doActionCallbackNone();
+                            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                           }
                         });
                     }
 
                     @Override
                     public void onFailure(Throwable caught) {
-                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
                       callback.onFailure(caught);
+                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
                     }
                   });
                 }

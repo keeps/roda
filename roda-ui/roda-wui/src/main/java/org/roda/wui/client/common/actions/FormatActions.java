@@ -128,11 +128,11 @@ public class FormatActions extends AbstractActionable<Format> {
   }
 
   private void startProcess(SelectedItems<Format> objects, AsyncCallback<ActionImpact> callback) {
+    callback.onSuccess(ActionImpact.NONE);
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(objects);
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
     HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_ACTION);
-    callback.onSuccess(ActionImpact.UPDATED);
   }
 
   private void remove(SelectedItems<Format> formats, AsyncCallback<ActionImpact> callback) {
@@ -151,8 +151,8 @@ public class FormatActions extends AbstractActionable<Format> {
 
                   @Override
                   public void onFailure(Throwable caught) {
-                    HistoryUtils.newHistory(InternalProcess.RESOLVER);
                     callback.onFailure(caught);
+                    HistoryUtils.newHistory(InternalProcess.RESOLVER);
                   }
 
                   @Override
@@ -175,8 +175,8 @@ public class FormatActions extends AbstractActionable<Format> {
 
                       @Override
                       public void onSuccess(final Void nothing) {
-                        HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                         doActionCallbackNone();
+                        HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                       }
                     });
                   }
@@ -189,13 +189,13 @@ public class FormatActions extends AbstractActionable<Format> {
   }
 
   private void create(AsyncCallback<ActionImpact> callback) {
-    HistoryUtils.newHistory(CreateFormat.RESOLVER);
     callback.onSuccess(ActionImpact.NONE);
+    HistoryUtils.newHistory(CreateFormat.RESOLVER);
   }
 
   private void edit(Format format, AsyncCallback<ActionImpact> callback) {
-    HistoryUtils.newHistory(EditFormat.RESOLVER, format.getId());
     callback.onSuccess(ActionImpact.NONE);
+    HistoryUtils.newHistory(EditFormat.RESOLVER, format.getId());
   }
 
   @Override

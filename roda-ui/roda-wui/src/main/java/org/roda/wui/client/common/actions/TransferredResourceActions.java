@@ -184,7 +184,7 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
     selectedItems.setSelectedItems(objects);
     HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_INGEST);
-    callback.onSuccess(ActionImpact.UPDATED);
+    callback.onSuccess(ActionImpact.NONE);
   }
 
   private void rename(TransferredResource object, AsyncCallback<ActionImpact> callback) {
@@ -219,7 +219,7 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
                     public void onSuccess(String result) {
                       Toast.showInfo(messages.dialogSuccess(), messages.renameSIPSuccessful());
                       HistoryUtils.newHistory(IngestTransfer.RESOLVER, result);
-                      doActionCallbackUpdated();
+                      doActionCallbackNone();
                     }
                   });
               }

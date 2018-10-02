@@ -86,12 +86,8 @@ public class DisseminationFileActions extends AbstractActionable<DIPFile> {
   // ACTIONS
   private void download(DIPFile disseminationFile, AsyncCallback<ActionImpact> callback) {
     SafeUri downloadUri = RestUtils.createDipFileDownloadUri(disseminationFile.getUUID());
-
-    if (downloadUri != null) {
-      Window.Location.assign(downloadUri.asString());
-    }
-
     callback.onSuccess(ActionImpact.NONE);
+    Window.Location.assign(downloadUri.asString());
   }
 
   @Override

@@ -150,7 +150,9 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
 
       @Override
       public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
+        if(caught != null) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
         doActionCallbackUpdated();
       }
 
@@ -163,16 +165,16 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
   }
 
   private void history(IndexedRisk object, AsyncCallback<ActionImpact> callback) {
-    HistoryUtils.newHistory(RiskHistory.RESOLVER, object.getId());
     callback.onSuccess(ActionImpact.NONE);
+    HistoryUtils.newHistory(RiskHistory.RESOLVER, object.getId());
   }
 
   private void startProcess(SelectedItems<IndexedRisk> objects, AsyncCallback<ActionImpact> callback) {
+    callback.onSuccess(ActionImpact.NONE);
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(objects);
     selectedItems.setLastHistory(HistoryUtils.getCurrentHistoryPath());
     HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_ACTION);
-    callback.onSuccess(ActionImpact.UPDATED);
   }
 
   private void remove(SelectedItems<IndexedRisk> objects, AsyncCallback<ActionImpact> callback) {
@@ -191,8 +193,8 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
 
                   @Override
                   public void onFailure(Throwable caught) {
-                    HistoryUtils.newHistory(InternalProcess.RESOLVER);
                     callback.onFailure(caught);
+                    HistoryUtils.newHistory(InternalProcess.RESOLVER);
                   }
 
                   @Override
@@ -214,8 +216,8 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
 
                       @Override
                       public void onSuccess(final Void nothing) {
-                        HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                         doActionCallbackNone();
+                        HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                       }
                     });
                   }
@@ -230,13 +232,13 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
   }
 
   private void create(AsyncCallback<ActionImpact> callback) {
+    callback.onSuccess(ActionImpact.NONE);
     HistoryUtils.newHistory(CreateRisk.RESOLVER);
-    callback.onSuccess(ActionImpact.UPDATED);
   }
 
   private void edit(IndexedRisk object, AsyncCallback<ActionImpact> callback) {
+    callback.onSuccess(ActionImpact.NONE);
     HistoryUtils.newHistory(EditRisk.RESOLVER, object.getId());
-    callback.onSuccess(ActionImpact.UPDATED);
   }
 
   @Override

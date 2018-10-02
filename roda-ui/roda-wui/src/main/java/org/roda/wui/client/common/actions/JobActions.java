@@ -128,15 +128,15 @@ public class JobActions extends AbstractActionable<Job> {
   }
 
   private void ingestProcess(Job object, AsyncCallback<ActionImpact> callback) {
+    callback.onSuccess(ActionImpact.NONE);
     HistoryUtils.newHistory(Search.RESOLVER, IndexedAIP.class.getSimpleName(), RodaConstants.ALL_INGEST_JOB_IDS,
       object.getId());
-    callback.onSuccess(ActionImpact.UPDATED);
   }
 
   private void ingestAppraisal(Job object, AsyncCallback<ActionImpact> callback) {
+    callback.onSuccess(ActionImpact.NONE);
     HistoryUtils.newHistory(IngestAppraisal.RESOLVER, IndexedAIP.class.getSimpleName(), RodaConstants.INGEST_JOB_ID,
       object.getId());
-    callback.onSuccess(ActionImpact.UPDATED);
   }
 
   private void stop(Job object, AsyncCallback<ActionImpact> callback) {
@@ -168,10 +168,10 @@ public class JobActions extends AbstractActionable<Job> {
   }
 
   private void newProcess(AsyncCallback<ActionImpact> callback) {
+    callback.onSuccess(ActionImpact.NONE);
     if (newProcessResolver != null) {
       HistoryUtils.newHistory(newProcessResolver);
     }
-    callback.onSuccess(ActionImpact.UPDATED);
   }
 
   @Override

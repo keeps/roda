@@ -247,17 +247,17 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
       @Override
       public void onSuccess(String itemAIPId) {
         LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
+        doActionCallbackNone();
         HistoryUtils.newHistory(CreateDescriptiveMetadata.RESOLVER, RodaConstants.RODA_OBJECT_AIP, itemAIPId,
           CreateDescriptiveMetadata.NEW);
-        doActionCallbackUpdated();
       }
     });
   }
 
   private void download(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
     SafeUri downloadUri = RestUtils.createAIPDownloadUri(aip.getId());
-    Window.Location.assign(downloadUri.asString());
     callback.onSuccess(ActionImpact.NONE);
+    Window.Location.assign(downloadUri.asString());
   }
 
   private void move(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
@@ -304,25 +304,20 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                                 @Override
                                 public void onFailure(Throwable caught) {
+                                  doActionCallbackNone();
                                   if (result != null) {
                                     HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                                   } else {
                                     HistoryUtils.newHistory(InternalProcess.RESOLVER);
                                   }
-                                  doActionCallbackUpdated();
                                 }
 
                                 @Override
                                 public void onSuccess(final Void nothing) {
-                                  HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                                   doActionCallbackNone();
+                                  HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                                 }
                               });
-                          }
-
-                          @Override
-                          public void onFailure(Throwable caught) {
-                            AsyncCallbackUtils.defaultFailureTreatment(caught);
                           }
                         });
                     }
@@ -397,17 +392,12 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                                 Toast.showInfo(messages.runningInBackgroundTitle(),
                                   messages.runningInBackgroundDescription());
 
+                                doActionCallbackNone();
                                 if (result != null) {
                                   HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                                 } else {
                                   HistoryUtils.newHistory(InternalProcess.RESOLVER);
                                 }
-                                callback.onSuccess(ActionImpact.UPDATED);
-                              }
-
-                              @Override
-                              public void onFailureImpl(Throwable caught) {
-                                AsyncCallbackUtils.defaultFailureTreatment(caught);
                               }
                             });
                         }
@@ -422,16 +412,16 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   private void updatePermissions(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
+    callback.onSuccess(ActionImpact.NONE);
     LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
     HistoryUtils.newHistory(EditPermissions.AIP_RESOLVER, aip.getId());
-    callback.onSuccess(ActionImpact.UPDATED);
   }
 
   private void updatePermissions(SelectedItems<IndexedAIP> aips, AsyncCallback<ActionImpact> callback) {
+    callback.onSuccess(ActionImpact.NONE);
     LastSelectedItemsSingleton.getInstance().setSelectedItems(aips);
     LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
     HistoryUtils.newHistory(EditPermissions.AIP_RESOLVER);
-    callback.onSuccess(ActionImpact.UPDATED);
   }
 
   private void remove(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
@@ -466,8 +456,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                           @Override
                           public void onSuccess(final Void nothing) {
-                            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                             doActionCallbackNone();
+                            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                           }
                         });
                       }
@@ -517,8 +507,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                                 @Override
                                 public void onSuccess(final Void nothing) {
-                                  HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                                   doActionCallbackNone();
+                                  HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                                 }
                               });
                           }
@@ -535,23 +525,23 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   private void newProcess(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
+    callback.onSuccess(ActionImpact.NONE);
     LastSelectedItemsSingleton.getInstance().setSelectedItems(objectToSelectedItems(aip, IndexedAIP.class));
     LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
     HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_ACTION);
-    callback.onSuccess(ActionImpact.NONE);
   }
 
   private void newProcess(SelectedItems<IndexedAIP> aips, AsyncCallback<ActionImpact> callback) {
+    callback.onSuccess(ActionImpact.NONE);
     LastSelectedItemsSingleton.getInstance().setSelectedItems(aips);
     LastSelectedItemsSingleton.getInstance().setLastHistory(HistoryUtils.getCurrentHistoryPath());
     HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_ACTION);
-    callback.onSuccess(ActionImpact.NONE);
   }
 
   private void downloadEvents(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
     SafeUri downloadUri = RestUtils.createPreservationMetadataDownloadUri(aip.getId());
-    Window.Location.assign(downloadUri.asString());
     callback.onSuccess(ActionImpact.NONE);
+    Window.Location.assign(downloadUri.asString());
   }
 
   private void appraisalAccept(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
@@ -574,8 +564,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
           @Override
           public void onSuccess(final Void nothing) {
-            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
             doActionCallbackNone();
+            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
           }
         });
       }
@@ -603,14 +593,14 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                   @Override
                   public void onFailure(Throwable caught) {
+                    doActionCallbackNone();
                     HistoryUtils.newHistory(IngestAppraisal.RESOLVER);
-                    doActionCallbackDestroyed();
                   }
 
                   @Override
                   public void onSuccess(final Void nothing) {
-                    HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                     doActionCallbackNone();
+                    HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                   }
                 });
               }
@@ -626,12 +616,12 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
         if (result) {
           SafeUri downloadUri = RestUtils.createAIPPartDownloadUri(aip.getId(),
             RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
+          doActionCallbackNone();
           Window.Location.assign(downloadUri.asString());
         } else {
           Toast.showInfo(messages.downloadNoDocumentationTitle(), messages.downloadNoDocumentationDescription());
+          doActionCallbackNone();
         }
-
-        doActionCallbackNone();
       }
     });
   }
@@ -675,8 +665,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
                               @Override
                               public void onSuccess(final Void nothing) {
-                                HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                                 doActionCallbackNone();
+                                HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                               }
                             });
                           }

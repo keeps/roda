@@ -109,8 +109,8 @@ public class PreservationEventActions extends AbstractActionable<IndexedPreserva
       downloadUri = RestUtils.createPreservationEventDetailsUri(event.getId(), event.getAipID(),
         event.getRepresentationUUID(), event.getFileUUID(), false, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
     }
-    Window.Location.assign(downloadUri.asString());
     callback.onSuccess(ActionImpact.NONE);
+    Window.Location.assign(downloadUri.asString());
   }
 
   @Override

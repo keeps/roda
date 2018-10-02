@@ -133,12 +133,8 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
   // ACTIONS
   private void download(IndexedDIP dissemination, AsyncCallback<ActionImpact> callback) {
     SafeUri downloadUri = RestUtils.createDipDownloadUri(dissemination.getUUID());
-
-    if (downloadUri != null) {
-      Window.Location.assign(downloadUri.asString());
-    }
-
     callback.onSuccess(ActionImpact.NONE);
+    Window.Location.assign(downloadUri.asString());
   }
 
   private void remove(final IndexedDIP dip, AsyncCallback<ActionImpact> callback) {
@@ -170,8 +166,8 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
 
                           @Override
                           public void onSuccess(final Void nothing) {
-                            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                             doActionCallbackNone();
+                            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                           }
                         });
                       }
@@ -209,14 +205,14 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
                         Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
                           @Override
                           public void onFailure(Throwable caught) {
-                            History.fireCurrentHistoryState();
                             doActionCallbackDestroyed();
+                            History.fireCurrentHistoryState();
                           }
 
                           @Override
                           public void onSuccess(final Void nothing) {
-                            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                             doActionCallbackNone();
+                            HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                           }
                         });
                       }

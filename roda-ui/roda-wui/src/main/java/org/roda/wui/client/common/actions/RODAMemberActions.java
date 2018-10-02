@@ -162,13 +162,13 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
   }
 
   private void createUser(AsyncCallback<ActionImpact> callback) {
+    callback.onSuccess(ActionImpact.NONE);
     HistoryUtils.newHistory(CreateUser.RESOLVER.getHistoryPath());
-    callback.onSuccess(ActionImpact.UPDATED);
   }
 
   private void createGroup(AsyncCallback<ActionImpact> callback) {
+    callback.onSuccess(ActionImpact.NONE);
     HistoryUtils.newHistory(CreateGroup.RESOLVER.getHistoryPath());
-    callback.onSuccess(ActionImpact.UPDATED);
   }
 
   @Override
