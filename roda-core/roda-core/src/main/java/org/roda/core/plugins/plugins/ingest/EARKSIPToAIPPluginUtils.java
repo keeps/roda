@@ -17,6 +17,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.LockingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
@@ -29,6 +30,8 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetada
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
@@ -47,9 +50,9 @@ public class EARKSIPToAIPPluginUtils {
   }
 
   public static AIP earkSIPToAIP(SIP sip, String username, Permissions fullPermissions, ModelService model,
-    List<String> ingestSIPIds, String ingestJobId, Optional<String> parentId, String ingestSIPUUID)
+    List<String> ingestSIPIds, String ingestJobId, Optional<String> parentId, String ingestSIPUUID, Plugin<?> plugin)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
-    AuthorizationDeniedException, ValidationException, IOException {
+    AuthorizationDeniedException, ValidationException, IOException, LockingException {
 
     AIPState state = AIPState.INGEST_PROCESSING;
     Permissions permissions = new Permissions();
@@ -60,38 +63,48 @@ public class EARKSIPToAIPPluginUtils {
     AIP aip = model.createAIP(state, parentId.orElse(null), aipType, permissions, ingestSIPUUID, ingestSIPIds,
       ingestJobId, notify, username);
 
-    // process IP information
-    processIPInformation(model, sip, aip.getId(), notify, false);
+    PluginHelper.acquireObjectLock(aip, plugin);
 
-    // process IPRepresentation information
-    for (IPRepresentation representation : sip.getRepresentations()) {
-      processIPRepresentationInformation(model, representation, aip.getId(), notify, false, username, null);
+    try {
+      // process IP information
+      processIPInformation(model, sip, aip.getId(), notify, false);
+
+      // process IPRepresentation information
+      for (IPRepresentation representation : sip.getRepresentations()) {
+        processIPRepresentationInformation(model, representation, aip.getId(), notify, false, username, null);
+      }
+
+      model.notifyAipCreated(aip.getId());
+
+      AIP createdAIP = model.retrieveAIP(aip.getId());
+
+      // Set Permissions
+      Permissions readPermissions = PermissionUtils.grantReadPermissionToUserGroup(model, createdAIP,
+        aip.getPermissions());
+      Permissions finalPermissions = PermissionUtils.grantAllPermissions(username, readPermissions, fullPermissions);
+      createdAIP.setPermissions(finalPermissions);
+      model.updateAIP(createdAIP, username);
+
+      return model.retrieveAIP(aip.getId());
+    } finally {
+      PluginHelper.releaseObjectLock(aip, plugin);
     }
-
-    model.notifyAipCreated(aip.getId());
-
-    AIP createdAIP = model.retrieveAIP(aip.getId());
-
-    // Set Permissions
-    Permissions readPermissions = PermissionUtils.grantReadPermissionToUserGroup(model, createdAIP,
-      aip.getPermissions());
-    Permissions finalPermissions = PermissionUtils.grantAllPermissions(username, readPermissions, fullPermissions);
-    createdAIP.setPermissions(finalPermissions);
-    model.updateAIP(createdAIP, username);
-
-    return model.retrieveAIP(aip.getId());
   }
 
   public static AIP earkSIPToAIPUpdate(SIP sip, IndexedAIP indexedAIP, ModelService model, StorageService storage,
-    String username, String ingestJobId, Report reportItem) throws RequestNotValidException, NotFoundException,
-    GenericException, AlreadyExistsException, AuthorizationDeniedException, ValidationException {
-    return earkSIPToAIPUpdate(sip, indexedAIP, model, username, Optional.empty(), ingestJobId, reportItem);
+    String username, String ingestJobId, Report reportItem, Plugin<?> plugin)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException, ValidationException, LockingException {
+    return earkSIPToAIPUpdate(sip, indexedAIP, model, username, Optional.empty(), ingestJobId, reportItem, plugin);
   }
 
   public static AIP earkSIPToAIPUpdate(SIP sip, IndexedAIP indexedAIP, ModelService model, String username,
-    Optional<String> searchScope, String ingestJobId, Report reportItem) throws RequestNotValidException,
-    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException, ValidationException {
+    Optional<String> searchScope, String ingestJobId, Report reportItem, Plugin<?> plugin)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException, ValidationException, LockingException {
     boolean notify = false;
+
+    PluginHelper.acquireObjectLock(indexedAIP, plugin);
 
     // process IP information
     processIPInformation(model, sip, indexedAIP.getId(), notify, true);

@@ -806,6 +806,17 @@ public final class PluginHelper {
     acquireObjectLock(Arrays.asList(lite), requestUuid);
   }
 
+  public static <O extends IsRODAObject, P extends IsRODAObject> void acquireObjectLock(O object, Plugin<P> plugin)
+    throws LockingException {
+    Optional<LiteRODAObject> liteOptionl = LiteRODAObjectFactory.get(object);
+    if (liteOptionl.isPresent()) {
+      PluginHelper.acquireObjectLock(liteOptionl.get().getInfo(), plugin);
+    } else {
+      throw new LockingException(
+        "Error getting lite from IndexedAIP with ID '{}' in order to obtain lock" + object.getId());
+    }
+  }
+
   /**
    * 
    * @param requestUuid
@@ -838,6 +849,17 @@ public final class PluginHelper {
     String requestUuid = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
       IdUtils.createUUID());
     releaseObjectLock(Arrays.asList(lite), requestUuid);
+  }
+
+  public static <O extends IsRODAObject, P extends IsRODAObject> void releaseObjectLock(O object, Plugin<P> plugin)
+    throws LockingException {
+    Optional<LiteRODAObject> liteOptionl = LiteRODAObjectFactory.get(object);
+    if (liteOptionl.isPresent()) {
+      PluginHelper.releaseObjectLock(liteOptionl.get().getInfo(), plugin);
+    } else {
+      throw new LockingException(
+        "Error getting lite from IndexedAIP with ID '{}' in order to obtain lock" + object.getId());
+    }
   }
 
   /**
