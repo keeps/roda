@@ -17,6 +17,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
@@ -275,8 +276,13 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_AIP_ID, aipId),
       new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_ID, representationId),
       new SimpleFilterParameter(RodaConstants.FILE_ISDIRECTORY, Boolean.toString(true)));
+
+    if (parentFolder != null) {
+      filter.add(new NotSimpleFilterParameter(RodaConstants.INDEX_UUID, parentFolder.getUUID()));
+    }
+
     SelectFileDialog selectFileDialog = new SelectFileDialog(messages.moveItemTitle(), filter, true);
-    selectFileDialog.setEmptyParentButtonVisible(true);
+    selectFileDialog.setEmptyParentButtonVisible(parentFolder != null);
     selectFileDialog.setSingleSelectionMode();
     selectFileDialog.showAndCenter();
     selectFileDialog.addCloseHandler(e -> callback.onSuccess(ActionImpact.NONE));
