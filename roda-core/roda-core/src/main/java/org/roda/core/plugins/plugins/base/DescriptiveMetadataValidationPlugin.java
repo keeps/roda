@@ -61,13 +61,7 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
     "parameter.force_type", "Force metadata format and version", PluginParameterType.BOOLEAN, "false", true, false,
     "If true, bypass the metadata format and version set in the information package and use the metadata format and version passed as parameters (see above).");
 
-  public static final PluginParameter PARAMETER_VALIDATE_PREMIS = new PluginParameter("parameter.validate_premis",
-    "Validate PREMIS", PluginParameterType.BOOLEAN, "true", true, false,
-    "Validate PREMIS metadata that exists inside the information package.");
-
   private boolean validateDescriptiveMetadata;
-  @SuppressWarnings("unused")
-  private boolean validatePremis;
   private boolean forceDescriptiveMetadataType;
   private String metadataType;
   private String metadataVersion;
@@ -85,7 +79,7 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticName() {
-    return "AIP metadata validation";
+    return "Metadata validation";
   }
 
   @Override
@@ -94,8 +88,8 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "Checks if the descriptive and preservation metadata included in the Information Package is present, and if it is valid according to the "
-      + "XML Schemas installed in the repository. A validation report is generated indicating which AIPs have valid and invalid metadata.";
+    return "Checks if the descriptive metadata included in the Information Package is present, and if it is valid according to the "
+      + "XML Schemas installed in the repository. A validation report is generated indicating which Information Packages have valid and invalid metadata.";
   }
 
   @Override
@@ -115,7 +109,6 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
     pluginParameters.add(PARAMETER_METADATA_TYPE);
     pluginParameters.add(PARAMETER_METADATA_VERSION);
     pluginParameters.add(PARAMETER_FORCE_DESCRIPTIVE_METADATA_TYPE);
-    pluginParameters.add(PARAMETER_VALIDATE_PREMIS);
     return pluginParameters;
   }
 
@@ -123,7 +116,6 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
     validateDescriptiveMetadata = PluginHelper.getBooleanFromParameters(this, PARAMETER_VALIDATE_DESCRIPTIVE_METADATA);
-    validatePremis = PluginHelper.getBooleanFromParameters(this, PARAMETER_VALIDATE_PREMIS);
     forceDescriptiveMetadataType = PluginHelper.getBooleanFromParameters(this,
       PARAMETER_FORCE_DESCRIPTIVE_METADATA_TYPE);
     metadataType = PluginHelper.getStringFromParameters(this, PARAMETER_METADATA_TYPE);
