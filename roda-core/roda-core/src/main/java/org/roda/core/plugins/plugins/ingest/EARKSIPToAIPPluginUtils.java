@@ -103,31 +103,37 @@ public class EARKSIPToAIPPluginUtils {
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, ValidationException, LockingException {
     boolean notify = false;
+    AIP aip;
 
     PluginHelper.acquireObjectLock(indexedAIP, plugin);
+    try {
 
-    // process IP information
-    processIPInformation(model, sip, indexedAIP.getId(), notify, true);
+      // process IP information
+      processIPInformation(model, sip, indexedAIP.getId(), notify, true);
 
-    // process IPRepresentation information
-    for (IPRepresentation representation : sip.getRepresentations()) {
-      processIPRepresentationInformation(model, representation, indexedAIP.getId(), notify, true, username, reportItem);
-    }
-
-    AIP aip = model.retrieveAIP(indexedAIP.getId());
-    aip.setGhost(false);
-    if (searchScope.isPresent()) {
-      aip.setParentId(searchScope.get());
-    }
-    aip.addIngestUpdateJobId(ingestJobId);
-
-    for (String id : sip.getIds()) {
-      if (!aip.getIngestSIPIds().contains(id)) {
-        aip.getIngestSIPIds().add(id);
+      // process IPRepresentation information
+      for (IPRepresentation representation : sip.getRepresentations()) {
+        processIPRepresentationInformation(model, representation, indexedAIP.getId(), notify, true, username,
+          reportItem);
       }
-    }
 
-    model.updateAIP(aip, username);
+      aip = model.retrieveAIP(indexedAIP.getId());
+      aip.setGhost(false);
+      if (searchScope.isPresent()) {
+        aip.setParentId(searchScope.get());
+      }
+      aip.addIngestUpdateJobId(ingestJobId);
+
+      for (String id : sip.getIds()) {
+        if (!aip.getIngestSIPIds().contains(id)) {
+          aip.getIngestSIPIds().add(id);
+        }
+      }
+
+      model.updateAIP(aip, username);
+    } finally {
+      PluginHelper.releaseObjectLock(indexedAIP, plugin);
+    }
 
     return aip;
   }

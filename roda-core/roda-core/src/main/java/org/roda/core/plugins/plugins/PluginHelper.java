@@ -833,6 +833,7 @@ public final class PluginHelper {
    *          uniq identifier of this request
    */
   public static void acquireObjectLock(List<String> lites, String requestUuid) throws LockingException {
+    LOGGER.debug("Acquiring lock for: {} request: {}", lites, requestUuid);
     RodaCoreFactory.getPluginOrchestrator().acquireObjectLock(lites, PluginHelper.getLockRequestTimeout(), true,
       requestUuid);
   }
@@ -878,6 +879,7 @@ public final class PluginHelper {
    *          uniq identifier of this request
    */
   public static void releaseObjectLock(List<String> lites, String requestUuid) {
+    LOGGER.debug("Releasing lock for: {} request: {}", lites, requestUuid);
     RodaCoreFactory.getPluginOrchestrator().releaseObjectLockAsync(lites, requestUuid);
   }
 
