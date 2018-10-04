@@ -189,24 +189,12 @@ public class SiegfriedPluginUtils {
           String version = null;
           String pronom = null;
           String mime = null;
-          String[] pluginVersion = getVersion().split(" ")[0].split("\\.");
 
-          if ("1".equals(pluginVersion[0])) {
-            if (Integer.parseInt(pluginVersion[1]) > 4) {
-              if ("pronom".equalsIgnoreCase(match.get("ns").textValue())) {
-                format = match.get("format").textValue();
-                version = match.get("version").textValue();
-                pronom = match.get("id").textValue();
-                mime = match.get("mime").textValue();
-              }
-            } else {
-              if ("pronom".equalsIgnoreCase(match.get("id").textValue())) {
-                format = match.get("format").textValue();
-                version = match.get("version").textValue();
-                pronom = match.get("puid").textValue();
-                mime = match.get("mime").textValue();
-              }
-            }
+          if ("pronom".equalsIgnoreCase(match.get("ns").textValue())) {
+            format = match.get("format").textValue();
+            version = match.get("version").textValue();
+            pronom = match.get("id").textValue();
+            mime = match.get("mime").textValue();
           }
 
           PremisV3Utils.updateFormatPreservationMetadata(model, aipId, representationId, jsonFilePath, jsonFileId,
