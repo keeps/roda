@@ -24,8 +24,6 @@ import org.slf4j.LoggerFactory;
 
 public class FormatCollection extends AbstractSolrCollection<Format, Format> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(FormatCollection.class);
-
   @Override
   public Class<Format> getIndexClass() {
     return Format.class;

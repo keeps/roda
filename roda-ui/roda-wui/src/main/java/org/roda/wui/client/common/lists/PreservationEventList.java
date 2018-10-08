@@ -115,6 +115,7 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
             ret = b.toSafeHtml();
           }
         }
+
         return ret;
       }
     };

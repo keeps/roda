@@ -38,7 +38,7 @@ public class ThemeResource {
     @ApiParam(value = "The resource id", required = true) @QueryParam(RodaConstants.API_QUERY_PARAM_RESOURCE_ID) String resourceId,
     @ApiParam(value = "The default resource id", required = false) @QueryParam(RodaConstants.API_QUERY_PARAM_DEFAULT_RESOURCE_ID) String fallbackResourceId,
     @ApiParam(value = "If the resource is served inline", required = false) @QueryParam(RodaConstants.API_QUERY_PARAM_INLINE) boolean inline,
-    @HeaderParam("Range") String range, @Context Request req) throws IOException, NotFoundException {
+    @HeaderParam("Range") String range, @Context Request req) throws NotFoundException {
 
     Pair<String, InputStream> themeResource = Theme.getThemeResource(resourceId, fallbackResourceId);
 

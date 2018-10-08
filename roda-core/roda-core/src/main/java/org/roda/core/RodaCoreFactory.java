@@ -223,10 +223,9 @@ public class RodaCoreFactory {
     Arrays.asList("roda-core.properties", "roda-roles.properties", "roda-permissions.properties"));
 
   /**
-   * Shared configuration and message properties (cache). Includes properties
-   * from {@code rodaConfiguration} and translations from ServerMessages,
-   * filtered by the {@code ui.sharedProperties.*} properties in
-   * {@code roda-wui.properties}.
+   * Shared configuration and message properties (cache). Includes properties from
+   * {@code rodaConfiguration} and translations from ServerMessages, filtered by
+   * the {@code ui.sharedProperties.*} properties in {@code roda-wui.properties}.
    *
    * This cache provides the complete set of properties to be shared with the
    * client browser.
@@ -783,7 +782,7 @@ public class RodaCoreFactory {
 
     StorageType storageType = StorageType.valueOf(
       getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_TYPE, RodaConstants.DEFAULT_STORAGE_TYPE.toString()));
-   if (storageType == RodaConstants.StorageType.FILESYSTEM) {
+    if (storageType == RodaConstants.StorageType.FILESYSTEM) {
       LOGGER.debug("Going to instantiate Filesystem on '{}'", storagePath);
       String trashDirName = getRodaConfiguration().getString("core.storage.filesystem.trash",
         RodaConstants.TRASH_CONTAINER);
@@ -1291,8 +1290,8 @@ public class RodaCoreFactory {
         final List<String> ldifFileNames = Arrays.asList("users.ldif", "groups.ldif", "roles.ldif");
         final List<String> ldifs = new ArrayList<>();
         for (String ldifFileName : ldifFileNames) {
-          final InputStream ldifInputStream = RodaCoreFactory
-            .getConfigurationFileAsStream(RodaConstants.CORE_LDAP_FOLDER + "/" + ldifFileName);
+          final InputStream ldifInputStream = RodaCoreFactory.getConfigurationFileAsStream(getConfigPath(),
+            RodaConstants.CORE_LDAP_FOLDER + "/" + ldifFileName);
           if (ldifInputStream != null) {
             ldifs.add(IOUtils.toString(ldifInputStream, RodaConstants.DEFAULT_ENCODING));
             RodaUtils.closeQuietly(ldifInputStream);
@@ -1526,7 +1525,7 @@ public class RodaCoreFactory {
     return propertiesConfiguration;
   }
 
-  private static boolean checkPathIsWithin(Path path, Path folder) {
+  public static boolean checkPathIsWithin(Path path, Path folder) {
     return checkPathIsWithin(path, folder, configSymbolicLinksAllowed);
   }
 
@@ -1603,33 +1602,40 @@ public class RodaCoreFactory {
     }
 
     String configurationFile = relativeConfigPath.resolve(untrustedUserPath).toString();
-
-    return getConfigurationFileAsStream(configurationFile);
+    return getConfigurationFileAsStream(getConfigPath(), configurationFile);
   }
 
   public static InputStream getConfigurationFileAsStream(String configurationFile) {
-    Path config = getConfigPath().resolve(configurationFile);
+    return getConfigurationFileAsStream(getConfigPath(), configurationFile);
+  }
+
+  public static InputStream getConfigurationFileAsStream(Path baseConfigPath, String configurationFile) {
+    Path configFile = baseConfigPath.resolve(configurationFile);
     InputStream inputStream = null;
     try {
-      if (FSUtils.exists(config) && !FSUtils.isDirectory(config) && checkPathIsWithin(config, getConfigPath())) {
-        inputStream = Files.newInputStream(config);
-        LOGGER.trace("Loading configuration from file {}", config);
+      if (FSUtils.exists(configFile) && !FSUtils.isDirectory(configFile)
+        && checkPathIsWithin(configFile, baseConfigPath)) {
+        inputStream = Files.newInputStream(configFile);
+        LOGGER.trace("Loading configuration from file {}", configFile);
       }
     } catch (IOException e) {
       // do nothing
     }
+
     if (inputStream == null) {
+      Path relativizedPath = getConfigPath().getParent().relativize(baseConfigPath);
       inputStream = RodaCoreFactory.class
-        .getResourceAsStream("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + configurationFile);
+        .getResourceAsStream("/" + relativizedPath.toString() + "/" + configurationFile);
       LOGGER.trace("Loading configuration from classpath {}", configurationFile);
     }
+
     return inputStream;
   }
 
   public static InputStream getConfigurationFileAsStream(String configurationFile, String fallbackConfigurationFile) {
-    InputStream inputStream = getConfigurationFileAsStream(configurationFile);
+    InputStream inputStream = getConfigurationFileAsStream(getConfigPath(), configurationFile);
     if (inputStream == null) {
-      inputStream = getConfigurationFileAsStream(fallbackConfigurationFile);
+      inputStream = getConfigurationFileAsStream(getConfigPath(), fallbackConfigurationFile);
     }
     return inputStream;
   }
@@ -1740,8 +1746,7 @@ public class RodaCoreFactory {
    * {@code rodaConfiguration}.
    *
    * The properties that should be shared with the client browser are defined by
-   * the {@code ui.sharedProperties.*} properties in
-   * {@code roda-wui.properties}.
+   * the {@code ui.sharedProperties.*} properties in {@code roda-wui.properties}.
    *
    * @return The configuration properties that should be shared with the client
    *         browser.

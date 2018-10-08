@@ -177,6 +177,7 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
         preCalculatedFields.put(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS, unsuccessfulPlugins);
         preCalculatedFields.put(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS_COUNTER, unsuccessfulPlugins.size());
       }
+
       return preCalculatedFields;
     }
 

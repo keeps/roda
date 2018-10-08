@@ -34,16 +34,18 @@ public class Theme extends RodaWuiController {
 
   public static Pair<String, InputStream> getThemeResource(String id, String fallbackResourceId) {
     String resourceId = id;
-    InputStream themeResourceInputstream = RodaCoreFactory
-      .getConfigurationFileAsStream(RodaConstants.CORE_THEME_FOLDER + "/" + resourceId);
+    InputStream themeResourceInputStream = null;
 
-    if (themeResourceInputstream == null) {
-      themeResourceInputstream = RodaCoreFactory
-        .getConfigurationFileAsStream(RodaConstants.CORE_THEME_FOLDER + "/" + fallbackResourceId);
+    themeResourceInputStream = RodaCoreFactory
+      .getConfigurationFileAsStream(RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER), resourceId);
+
+    if (themeResourceInputStream == null) {
+      themeResourceInputStream = RodaCoreFactory
+        .getConfigurationFileAsStream(RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER), fallbackResourceId);
       resourceId = fallbackResourceId;
     }
 
-    return Pair.of(resourceId, themeResourceInputstream);
+    return Pair.of(resourceId, themeResourceInputStream);
   }
 
   public static StreamResponse getThemeResourceStreamResponse(

@@ -38,7 +38,7 @@ public class Planning {
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
       UserLogin.getInstance().checkRoles(
-        new HistoryResolver[] {RepresentationInformationNetwork.RESOLVER, RiskRegister.RESOLVER}, false, callback);
+        new HistoryResolver[] {RepresentationInformationNetwork.RESOLVER, RiskRegister.RESOLVER, PreservationEvents.PLANNING_RESOLVER}, false, callback);
     }
 
     @Override

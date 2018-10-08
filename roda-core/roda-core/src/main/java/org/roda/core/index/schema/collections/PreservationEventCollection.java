@@ -20,6 +20,8 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent.PreservationMetadataEventClass;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
@@ -35,6 +37,8 @@ import org.roda.core.storage.Binary;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Sets;
 
 import gov.loc.premis.v3.EventComplexType;
 import gov.loc.premis.v3.LinkingAgentIdentifierComplexType;
@@ -122,8 +126,25 @@ public class PreservationEventCollection
       objectClass = PreservationMetadataEventClass.FILE.toString();
     }
 
-    doc.addField(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS, objectClass);
+    if (objectClass.equals(PreservationMetadataEventClass.REPOSITORY.toString())) {
+      doc.addField(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(AIPState.ACTIVE));
 
+      Permissions permissions = new Permissions();
+      List<String> users = RodaCoreFactory.getRodaConfigurationAsList("core.permission.repository_events.user");
+      List<String> groups = RodaCoreFactory.getRodaConfigurationAsList("core.permission.repository_events.group");
+
+      for (String user : users) {
+        permissions.setUserPermissions(user, Sets.newHashSet(PermissionType.READ));
+      }
+
+      for (String group : groups) {
+        permissions.setGroupPermissions(group, Sets.newHashSet(PermissionType.READ));
+      }
+
+      SolrUtils.setPermissions(permissions, doc);
+    }
+
+    doc.addField(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS, objectClass);
     Binary binary = RodaCoreFactory.getModelService().retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(),
       pm.getFileDirectoryPath(), pm.getFileId(), pm.getId());
 
@@ -206,6 +227,7 @@ public class PreservationEventCollection
       } else {
         preCalculatedFields.put(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(AIPState.ACTIVE));
       }
+
       return preCalculatedFields;
     }
 

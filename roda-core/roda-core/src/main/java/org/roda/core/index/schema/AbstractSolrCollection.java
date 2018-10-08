@@ -123,5 +123,4 @@ public abstract class AbstractSolrCollection<I extends IsIndexed, M extends IsMo
 
     return ret;
   }
-
 }
