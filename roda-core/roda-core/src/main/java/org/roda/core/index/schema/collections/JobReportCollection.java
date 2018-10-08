@@ -167,7 +167,8 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
         for (Report item : jobReport.getReports()) {
           if (item.getPluginState().equals(PluginState.SUCCESS)) {
             successfulPlugins.add(item.getPluginName());
-          } else {
+          } else if (item.getPluginState().equals(PluginState.FAILURE)
+            || item.getPluginState().equals(PluginState.PARTIAL_SUCCESS)) {
             unsuccessfulPlugins.add(item.getPluginName());
           }
         }
