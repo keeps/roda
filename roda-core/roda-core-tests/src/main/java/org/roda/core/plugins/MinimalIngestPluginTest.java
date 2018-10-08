@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,8 +22,10 @@ import org.roda.core.TestsHelper;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -31,11 +34,16 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.plugins.ingest.MinimalIngestPlugin;
@@ -107,21 +115,61 @@ public class MinimalIngestPluginTest {
   }
 
   @Test
-  public void testMinimalIngestPluginWithEARKSIPAndNoMoveWhenAutoAccept() throws IOException, RODAException {
+  public void testWithEARKSIPAndNoMoveWhenAutoAccept() throws IOException, RODAException {
     RodaCoreFactory.getRodaConfiguration()
       .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT, false);
 
     AIP aip = EARKSIPPluginsTest.ingestCorpora(MinimalIngestPlugin.class, model, index, corporaPath);
     assessAIP(aip);
+
+    Job job = model.retrieveJob(aip.getIngestJobId());
+    assessJobStats(job, true);
   }
 
   @Test
-  public void testMinimalIngestPluginWithEARKSIPAndMoveWhenAutoAccept() throws IOException, RODAException {
+  public void testWithEARKSIPAndMoveWhenAutoAccept() throws IOException, RODAException {
     RodaCoreFactory.getRodaConfiguration()
       .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT, true);
 
     AIP aip = EARKSIPPluginsTest.ingestCorpora(MinimalIngestPlugin.class, model, index, corporaPath);
     assessAIP(aip);
+
+    Job job = model.retrieveJob(aip.getIngestJobId());
+    assessJobStats(job, true);
+  }
+
+  @Test
+  public void testWithEARKSIPUpdateWithNoAssociatedAIP()
+    throws NotFoundException, GenericException, RequestNotValidException, IsStillUpdatingException,
+    AlreadyExistsException, IOException, AuthorizationDeniedException {
+    RodaCoreFactory.getRodaConfiguration()
+      .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT, true);
+
+    // create corpora
+    TransferredResource transferredResource = EARKSIPPluginsTest.createIngestUpdateCorpora(corporaPath, index, null);
+    Assert.assertNotNull(transferredResource);
+
+    // ingest corpora
+    Job job = TestsHelper.executeJob(MinimalIngestPlugin.class, new HashMap<>(), PluginType.SIP_TO_AIP,
+      SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
+
+    assessJobStats(job, false);
+
+    // assess reports
+    List<Report> jobReports = TestsHelper.getJobReports(index, job, false);
+    Assert.assertEquals(jobReports.size(), 1);
+    Report report = jobReports.get(0);
+    // not equal as it was moved
+    Assert.assertNotEquals(report.getSourceObjectId(), transferredResource.getUUID());
+    Assert.assertEquals(report.getOutcomeObjectId(), Report.NO_OUTCOME_OBJECT_ID);
+    String baseFolder = RodaCoreFactory.getRodaConfiguration().getString("core.ingest.processed.base_folder",
+      "PROCESSED");
+    String unsuccessFolder = RodaCoreFactory.getRodaConfiguration()
+      .getString("core.ingest.processed.unsuccessfully_ingested", "UNSUCCESSFULLY_INGESTED");
+    TransferredResource transferredResourceAfterMove = index.retrieve(TransferredResource.class,
+      report.getSourceObjectId(), Collections.emptyList());
+    Assert.assertTrue(transferredResourceAfterMove.getFullPath().contains(baseFolder));
+    Assert.assertTrue(transferredResourceAfterMove.getFullPath().contains(unsuccessFolder));
   }
 
   private void assessAIP(AIP aip)
@@ -162,4 +210,11 @@ public class MinimalIngestPluginTest {
     Assert.assertEquals(reusableAllFiles.size(), CORPORA_FOLDERS_COUNT + CORPORA_FILES_COUNT);
   }
 
+  private void assessJobStats(Job job, boolean success) {
+    Assert.assertEquals(job.getJobStats().getSourceObjectsProcessedWithSuccess(), success ? 1 : 0);
+    Assert.assertEquals(job.getJobStats().getSourceObjectsProcessedWithFailure(), success ? 0 : 1);
+    Assert.assertEquals(job.getJobStats().getSourceObjectsBeingProcessed(), 0);
+    Assert.assertEquals(job.getJobStats().getSourceObjectsWaitingToBeProcessed(), 0);
+    Assert.assertEquals(job.getJobStats().getSourceObjectsCount(), 1);
+  }
 }

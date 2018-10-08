@@ -144,20 +144,27 @@ public class IngestJobPluginInfo extends JobPluginInfo {
 
   /** Ordered list with no duplicates */
   public List<String> getAipIds() {
-    return transferredResourceToAipIds.values().stream().flatMap(l -> l.stream()).distinct()
-      .collect(Collectors.toList());
+    ArrayList<String> ret = new ArrayList<>(
+      transferredResourceToAipIds.values().stream().flatMap(l -> l.stream()).distinct().collect(Collectors.toList()));
+    ret.remove(Report.NO_OUTCOME_OBJECT_ID);
+    return ret;
   }
 
   public List<String> getAipIds(String transferredResource) {
-    return transferredResourceToAipIds.get(transferredResource);
+    ArrayList<String> ret = new ArrayList<>(transferredResourceToAipIds.get(transferredResource));
+    ret.removeIf(s -> s.equals(Report.NO_OUTCOME_OBJECT_ID));
+    return ret;
   }
 
   public Map<String, List<String>> getAipIdToTransferredResourceIds() {
-    return aipIdToTransferredResourceIds;
+    HashMap<String, List<String>> ret = new HashMap<>(aipIdToTransferredResourceIds);
+    ret.remove(Report.NO_OUTCOME_OBJECT_ID);
+    return ret;
   }
 
   public int getBeingProcessedCounter() {
-    return transferredResourceToAipIds.size();
+    return getAipIdToTransferredResourceIds().values().stream().flatMap(l -> l.stream()).distinct()
+      .collect(Collectors.toList()).size();
   }
 
   public void addReport(Report report, boolean reportIsAnReportItem) {
@@ -167,10 +174,18 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     } else {
       String sourceObjectId = report.getSourceObjectId();
       String outcomeObjectId = report.getOutcomeObjectId();
-      if (StringUtils.isNotBlank(sourceObjectId) && StringUtils.isNotBlank(outcomeObjectId)) {
-        aipIdToTransferredResourceIds.computeIfAbsent(outcomeObjectId, key -> new ArrayList<>()).add(sourceObjectId);
-        transferredResourceToAipIds.computeIfAbsent(sourceObjectId, key -> new ArrayList<>()).add(outcomeObjectId);
+      if (StringUtils.isBlank(sourceObjectId) || StringUtils.isBlank(outcomeObjectId)) {
+        LOGGER.error("Will not add report as both source & outcome object ids are blank!");
+        return;
       }
+
+      if (Report.NO_SOURCE_OBJECT_ID.equals(sourceObjectId)) {
+        LOGGER.error("Will not add report as source object id is not set!");
+        return;
+      }
+
+      aipIdToTransferredResourceIds.computeIfAbsent(outcomeObjectId, key -> new ArrayList<>()).add(sourceObjectId);
+      transferredResourceToAipIds.computeIfAbsent(sourceObjectId, key -> new ArrayList<>()).add(outcomeObjectId);
 
       if (reportsFromBeingProcessed.get(sourceObjectId) != null) {
         reportsFromBeingProcessed.get(sourceObjectId).put(outcomeObjectId, report);

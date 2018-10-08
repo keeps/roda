@@ -21,7 +21,7 @@ public class DeadLetterActor extends UntypedActor {
     if (message instanceof DeadLetter) {
       DeadLetter letter = (DeadLetter) message;
       if (!(letter.message() instanceof String && "Done".equals(String.class.cast(letter.message())))) {
-        LOGGER.error("Dead letter: {}", message);
+        LOGGER.debug("Dead letter: {}", message);
       }
     }
   }
