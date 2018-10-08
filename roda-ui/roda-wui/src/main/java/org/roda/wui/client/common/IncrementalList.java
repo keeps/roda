@@ -20,6 +20,8 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -48,7 +50,7 @@ public class IncrementalList extends Composite implements HasValueChangeHandlers
   @UiField
   Button addDynamicButton;
 
-  private ArrayList<RemovableTextBox> textBoxes;
+  private List<RemovableTextBox> textBoxes;
 
   public IncrementalList() {
     this(false, null);
@@ -128,8 +130,16 @@ public class IncrementalList extends Composite implements HasValueChangeHandlers
             TextBox nextItem = textBoxes.get(textBoxes.indexOf(box) + 1).item;
             nextItem.setFocus(true);
             nextItem.selectAll();
+            ValueChangeEvent.fire(IncrementalList.this, getTextBoxesValue());
           }
         }
+      }
+    });
+
+    box.item.addKeyUpHandler(new KeyUpHandler() {
+      @Override
+      public void onKeyUp(KeyUpEvent event) {
+        ValueChangeEvent.fire(IncrementalList.this, getTextBoxesValue());
       }
     });
 

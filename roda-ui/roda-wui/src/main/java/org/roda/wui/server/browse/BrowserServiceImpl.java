@@ -990,7 +990,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(
-    String representationInformationId, String localeString) throws AuthorizationDeniedException {
+    String representationInformationId, String localeString)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
     return Browser.retrieveRepresentationInformationExtraBundle(user, representationInformationId, locale);

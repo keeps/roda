@@ -497,10 +497,6 @@ div.inline {
     line-height: 1.5em;
 }
 
-.ri-dialog .page-description p {
-    max-width: 40vw;
-}
-
 .roda-logo {
     font-family: 'RODALogo' !important;
     speak: none;
@@ -3932,16 +3928,28 @@ td.datePickerMonth, td.datePickerYear {
     font-weight: 500;
 }
 
-.wui-dialog-confirm {
-
-}
-
-.wui-dialog-information {
-	max-width: 95%
-}
-
 .wui-dialog-layout {
     padding: 10px;
+    width: 60vw;
+}
+
+.gwt-DialogBox.wui-dialog-confirm .wui-dialog-layout,
+.gwt-DialogBox.wui-dialog-information .wui-dialog-layout,
+.gwt-DialogBox.wui-dialog-prompt .wui-dialog-layout {
+    width: initial;
+    max-width: 95vw;
+}
+
+@media (max-width: 768px) {
+    .wui-dialog-layout {
+        width: 90vw;
+    }
+}
+
+@media (max-width: 1280px) {
+    .wui-dialog-layout {
+        width: 75vw;
+    }
 }
 
 .wui-dialog-layout-footer {
@@ -5777,32 +5785,6 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 /**********************************************
-				SELECT AIP
-************************************************/
-.selectAip {
-}
-
-.selectAip .selectAipResultsPanel {
-    width: 800px;
-    height: 400px;
-    overflow-x: scroll;
-    margin-top: 20px;
-    margin-bottom: 20px;
-}
-
-/*
-.selectAip .selectAipResultsPanel .my-asyncdatagrid-pager-results,
-.selectAip .selectAipResultsPanel thead {
-	display: none;
-}*/
-
-@media (max-width: 800px) {
-    .selectAip .selectAipResultsPanel {
-        width: 100%;
-    }
-}
-
-/**********************************************
 				RISKS & AGENT & FORMAT
 ************************************************/
 
@@ -6022,7 +6004,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 /**********************************************
-	    ASSOCIATE WITH REPRESENTATIONS
+	    ASSOCIATE WITH REPRESENTATION INFORMATION
 ************************************************/
 
 .ri-dialog .ri-dialog-list-scroll {
@@ -6358,6 +6340,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .dialog-left-side {
 	margin-bottom: 15px;
+    margin-right: 0;
 }
 
 .dialog-right-side {

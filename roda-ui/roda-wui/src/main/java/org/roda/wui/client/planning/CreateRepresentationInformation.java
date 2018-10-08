@@ -24,6 +24,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -103,7 +104,7 @@ public class CreateRepresentationInformation extends Composite {
 
           @Override
           public void onSuccess(RepresentationInformation result) {
-            HistoryUtils.newHistory(RepresentationInformationNetwork.RESOLVER, result.getId());
+            HistoryUtils.newHistory(ShowRepresentationInformation.RESOLVER, result.getId());
           }
 
         });
@@ -116,6 +117,6 @@ public class CreateRepresentationInformation extends Composite {
   }
 
   private void cancel() {
-    HistoryUtils.newHistory(RepresentationInformationNetwork.RESOLVER);
+    History.back();
   }
 }

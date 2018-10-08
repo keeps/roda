@@ -253,7 +253,9 @@ public class ShowRepresentationInformation extends Composite {
 
         @Override
         public void onSuccess(RepresentationInformationExtraBundle extra) {
-          HtmlSnippetUtils.createExtraShow(extras, extra.getFamilyValues().get(ri.getFamily()), false);
+          if (extra != null) {
+            HtmlSnippetUtils.createExtraShow(extras, extra.getFamilyValues().get(ri.getFamily()), false);
+          }
         }
       });
 

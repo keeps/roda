@@ -371,7 +371,8 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException;
 
   RepresentationInformationExtraBundle retrieveRepresentationInformationExtraBundle(String representationInformationId,
-    String localeString) throws AuthorizationDeniedException;
+    String localeString)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   Map<String, List<String>> retrieveSharedProperties(String localeName);
 }

@@ -24,6 +24,7 @@ import org.roda.wui.client.common.IncrementalFilterList;
 import org.roda.wui.client.common.IncrementalList;
 import org.roda.wui.client.common.IncrementalRelationList;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.FormUtilities;
 
@@ -220,13 +221,7 @@ public class RepresentationInformationDataPanel extends Composite
       });
 
     BrowserService.Util.getInstance().retrieveRepresentationInformationExtraBundle(ri.getId(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<RepresentationInformationExtraBundle>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
+      LocaleInfo.getCurrentLocale().getLocaleName(), new NoAsyncCallback<RepresentationInformationExtraBundle>() {
         @Override
         public void onSuccess(RepresentationInformationExtraBundle extra) {
           RepresentationInformationDataPanel.this.extraBundle = extra;

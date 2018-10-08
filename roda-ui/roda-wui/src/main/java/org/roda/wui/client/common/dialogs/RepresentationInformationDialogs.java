@@ -169,7 +169,22 @@ public class RepresentationInformationDialogs {
           dropDown.addValueChangeHandler(new ValueChangeHandler<String>() {
             @Override
             public void onValueChange(ValueChangeEvent<String> event) {
-              updateAssociationFields(fieldsPanel, dropDown, appropriateFields, result, ri, values);
+              updateAssociationFields(fieldsPanel, dropDown, appropriateFields, result, ri, values, searchButton);
+
+              // set initial enabled status for searchButton
+              boolean searchButtonEnabled = false;
+              for (String field : appropriateFields) {
+                if (!searchButtonEnabled && values.containsKey(field)) {
+                  for (String value : values.get(field)) {
+                    if (StringUtils.isNotBlank(value)) {
+                      searchButtonEnabled = true;
+                      break;
+                    }
+                  }
+                }
+              }
+              searchButton.setEnabled(searchButtonEnabled);
+
               dialogBox.center();
             }
           });
@@ -293,8 +308,8 @@ public class RepresentationInformationDialogs {
   }
 
   private static void updateAssociationFields(FlowPanel fieldsPanel, Dropdown dropDown, List<String> appropriateFields,
-    RepresentationInformationFilterBundle result, RepresentationInformation ri,
-    final Map<String, List<String>> values) {
+    RepresentationInformationFilterBundle result, RepresentationInformation ri, final Map<String, List<String>> values,
+    Button searchButton) {
     fieldsPanel.clear();
     String className = null;
 
@@ -331,7 +346,23 @@ public class RepresentationInformationDialogs {
       values.put(field, valuesForThisField);
 
       IncrementalList incrementalList = new IncrementalList(true, valuesForThisField);
-      incrementalList.addValueChangeHandler(event -> values.put(field, event.getValue()));
+      incrementalList.addValueChangeHandler(event -> {
+        values.put(field, event.getValue());
+
+        // update enabled status for searchButton
+        boolean enabled = false;
+        for (String appropriateField : appropriateFields) {
+          if (!enabled && values.containsKey(appropriateField)) {
+            for (String value : values.get(appropriateField)) {
+              if (StringUtils.isNotBlank(value)) {
+                enabled = true;
+                break;
+              }
+            }
+          }
+        }
+        searchButton.setEnabled(enabled);
+      });
 
       fieldPanel.add(incrementalList);
       fieldsPanel.add(fieldPanel);
@@ -344,7 +375,6 @@ public class RepresentationInformationDialogs {
     final List<HandlerRegistration> clickHandlers = new ArrayList<>();
     final DialogBox dialogBox = new DialogBox(true, true);
     dialogBox.addStyleName("ri-dialog");
-    dialogBox.addStyleName("wui-dialog-prompt");
     dialogBox.setText(title);
 
     final FlowPanel layout = new FlowPanel();
@@ -364,10 +394,10 @@ public class RepresentationInformationDialogs {
           content.addStyleName("row skip_padding full_width content");
 
           final FlowPanel leftSide = new FlowPanel();
-          leftSide.addStyleName("dialog-left-side col3");
+          leftSide.addStyleName("dialog-left-side col_3");
 
           final FlowPanel rightSide = new FlowPanel();
-          rightSide.addStyleName("dialog-right-side col9");
+          rightSide.addStyleName("dialog-right-side col_9");
 
           final Label aipLabel = new Label();
           aipLabel.setText(messages.representationInformationRelationObjectType(RelationObjectType.AIP.toString()));

@@ -6,7 +6,7 @@
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
-	<g:FlowPanel addStyleNames="selectAip wui-dialog-confirm wrapper skip_padding">
+	<g:FlowPanel addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="wui-dialog-layout">
 			<g:FlowPanel>
 				<g:FlowPanel addStyleNames="page-description" ui:field="titlePanel"></g:FlowPanel>

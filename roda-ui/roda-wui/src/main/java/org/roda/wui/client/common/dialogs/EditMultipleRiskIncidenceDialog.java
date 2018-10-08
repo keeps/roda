@@ -100,6 +100,7 @@ public class EditMultipleRiskIncidenceDialog<T extends IsIndexed> extends Dialog
     setModal(true);
     setGlassEnabled(true);
     setAnimationEnabled(false);
+    addStyleDependentName("wui-dialog-confirm");
 
     setText(messages.editIncidencesTitle());
   }

@@ -13,7 +13,7 @@
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
-	<g:FlowPanel addStyleNames="selectAip wui-dialog-confirm wrapper skip_padding">
+	<g:FlowPanel addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="wui-dialog-layout">
 			<commonsearch:SearchWrapper ui:field="searchWrapper" />
 			<g:FlowPanel addStyleNames="wui-dialog-layout-footer">

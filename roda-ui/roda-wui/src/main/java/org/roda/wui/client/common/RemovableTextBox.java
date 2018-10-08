@@ -8,7 +8,6 @@
 package org.roda.wui.client.common;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -65,12 +64,12 @@ public class RemovableTextBox extends Composite implements HasHandlers {
     return item.getText();
   }
 
-  public void addRemoveClickHandler(ClickHandler clickHandler) {
-    removeDynamicTextBoxButton.addClickHandler(clickHandler);
+  public HandlerRegistration addRemoveClickHandler(ClickHandler clickHandler) {
+    return removeDynamicTextBoxButton.addClickHandler(clickHandler);
   }
 
   public HandlerRegistration addChangeHandler(ChangeHandler handler) {
-    return addDomHandler(handler, ChangeEvent.getType());
+    return item.addChangeHandler(handler);
   }
 
   public boolean isAddTextBox() {

@@ -3025,12 +3025,14 @@ public class BrowserHelper {
       .retrieveExtraSupportedMetadata(RodaCoreFactory.getRodaConfigurationAsList("ui.ri.family"), locale);
     Map<String, Set<MetadataValue>> familyValues = new HashMap<>();
 
-    RepresentationInformation ri = RodaCoreFactory.getModelService()
-      .retrieveRepresentationInformation(representationInformationId);
+    RepresentationInformation ri = null;
+    if (representationInformationId != null) {
+      ri = RodaCoreFactory.getModelService().retrieveRepresentationInformation(representationInformationId);
+    }
 
     for (SupportedMetadataTypeBundle metadataTypeBundle : supportedMetadataTypeBundles) {
       String xml = "";
-      if (metadataTypeBundle.getType().equals(ri.getFamily())) {
+      if (ri != null && metadataTypeBundle.getType().equals(ri.getFamily())) {
         xml = ri.getExtras();
       }
 

@@ -82,6 +82,7 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -89,6 +90,7 @@ import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.CellPreviewEvent.Handler;
 import com.google.gwt.view.client.DefaultSelectionEventManager;
@@ -355,6 +357,19 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     if (options.getAutoUpdate() != null) {
       autoUpdate(options.getAutoUpdate());
     }
+
+    // auto-recenter a dialog containing this list
+    display.addRedrawHandler(() -> {
+      Widget parent = this.getParent();
+      while (parent != null) {
+        if (parent instanceof DialogBox) {
+          ((DialogBox) parent).center();
+          break;
+        } else {
+          parent = parent.getParent();
+        }
+      }
+    });
 
     return this;
   }

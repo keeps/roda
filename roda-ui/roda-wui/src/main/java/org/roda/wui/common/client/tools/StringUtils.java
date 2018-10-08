@@ -41,25 +41,25 @@ public class StringUtils {
    * @return a string will all tokens separated by the defined separator
    */
   public static String join(String[] tokens, String separator) {
-    StringBuilder history = new StringBuilder();
+    StringBuilder result = new StringBuilder();
     if (tokens.length > 0) {
-      history.append(tokens[0]);
+      result.append(tokens[0]);
     }
     for (int i = 1; i < tokens.length; i++) {
-      history.append(separator).append(tokens[i]);
+      result.append(separator).append(tokens[i]);
     }
-    return history.toString();
+    return result.toString();
   }
 
   public static String join(List<String> tokens, String separator) {
-    StringBuilder history = new StringBuilder();
+    StringBuilder result = new StringBuilder();
     if (!tokens.isEmpty()) {
-      history.append(tokens.get(0));
+      result.append(tokens.get(0));
     }
     for (int i = 1; i < tokens.size(); i++) {
-      history.append(separator).append(tokens.get(i));
+      result.append(separator).append(tokens.get(i));
     }
-    return history.toString();
+    return result.toString();
   }
 
   /**
