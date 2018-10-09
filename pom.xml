@@ -216,25 +216,6 @@
 					</includes>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>versions-maven-plugin</artifactId>
-				<version>2.7</version>
-				<configuration>
-					<allowAnyUpdates>false</allowAnyUpdates>
-					<allowMajorUpdates>false</allowMajorUpdates>
-					<rulesUri>https://gist.githubusercontent.com/seahrh/b13f4f3d618ad7c817038e0bc124ef29/raw/a4801150b0d1a378f351ae21eb0f901a71ff10cc/versions-maven-rules.xml</rulesUri>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>compile</phase>
-						<goals>
-							<goal>display-dependency-updates</goal>
-							<goal>display-plugin-updates</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -373,7 +354,7 @@
 						<!-- this is false by default, forces the plugin to generate the file -->
 						<generateGitPropertiesFile>true</generateGitPropertiesFile>
 
-						<!-- The path for the properties file to be generated. See Super Pom 
+						<!-- The path for the properties file to be generated. See Super Pom
 							for default variable reference https://maven.apache.org/guides/introduction/introduction-to-the-pom.html -->
 						<generateGitPropertiesFilename>
 							${project.build.directory}/${project.build.finalName}/version.json
@@ -855,7 +836,7 @@
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-core</artifactId>
-				<version>2.22.0</version>
+				<version>2.23.0</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>

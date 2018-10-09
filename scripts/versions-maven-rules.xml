@@ -3,11 +3,13 @@
   <ignoreVersions>
     <!-- Ignore Alpha's, Beta's, release candidates and milestones -->
     <ignoreVersion type="regex">(?i).*Alpha(?:-?\d+)?</ignoreVersion>
-    <ignoreVersion type="regex">(?i).*Beta(?:-?\d+)?</ignoreVersion>
+    <ignoreVersion type="regex">(?i).*Beta(?:-?\d+)?.*</ignoreVersion>
     <ignoreVersion type="regex">(?i).*-B(?:-?\d+)?</ignoreVersion>
     <ignoreVersion type="regex">(?i).*RC(?:-?\d+)?</ignoreVersion>
     <ignoreVersion type="regex">(?i).*CR(?:-?\d+)?</ignoreVersion>
     <ignoreVersion type="regex">(?i).*M(?:-?\d+)?</ignoreVersion>
+    <ignoreVersion type="regex">(?i).*-atlassian(?:-?\d+)?</ignoreVersion>
+    <ignoreVersion type="regex">(?i).*-jenkins(?:-?\d+)?</ignoreVersion>
   </ignoreVersions>
   <rules>
     <!-- Obvious mismatches -->
@@ -16,25 +18,20 @@
         <ignoreVersion type="regex">^200.*$</ignoreVersion>
       </ignoreVersions>
     </rule>
-    <rule groupId="commons-logging" artifactId="commons-logging">
+    <!-- Unresolved incompatibilities -->
+    <rule groupId="javax.ws.rs" artifactId="javax.ws.rs-api">
       <ignoreVersions>
-        <ignoreVersion>99.0-does-not-exist</ignoreVersion>
+        <ignoreVersion >2.1.1</ignoreVersion>
+        <ignoreVersion >2.1</ignoreVersion>
       </ignoreVersions>
     </rule>
-    <rule groupId="org.hamcrest">
+    <rule groupId="com.github.nmorel.gwtjackson" artifactId="gwt-jackson">
       <ignoreVersions>
-        <ignoreVersion>1.4-atlassian-1</ignoreVersion>
-      </ignoreVersions>
-    </rule>
-    <!-- Version 5 of hibernate requires javax.validation 1.1.0. This is a new api and a lot of effort to upgrade -->
-    <rule groupId="org.hibernate" artifactId="hibernate-validator" comparisonMethod="maven">
-      <ignoreVersions>
-        <ignoreVersion type="regex">^5.*$</ignoreVersion>
-      </ignoreVersions>
-    </rule>
-    <rule groupId="javax.validation" artifactId="validation-api">
-      <ignoreVersions>
-        <ignoreVersion type="regex">1.1.0.Final</ignoreVersion>
+        <ignoreVersion>0.15.4</ignoreVersion>
+        <ignoreVersion>0.15.3</ignoreVersion>
+        <ignoreVersion>0.15.2</ignoreVersion>
+        <ignoreVersion>0.15.1</ignoreVersion>
+        <ignoreVersion>0.15.0</ignoreVersion>
       </ignoreVersions>
     </rule>
   </rules>

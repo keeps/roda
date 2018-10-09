@@ -4,6 +4,7 @@
 
 Before releasing:
 1. Security check: `mvn com.redhat.victims.maven:security-versions:check`
+2. Update check: `./scripts/check_versions.sh MINOR`
 
 Example release 2.2.0 and prepare for next version 2.3.0.
 
@@ -18,6 +19,14 @@ Example release 2.2.0 and prepare for next version 2.3.0.
 	4. Accept release
 6. Run `./scripts/update_changelog.sh 2.2.0`
 7. Run `./scripts/prepare_next_version.sh 2.3.0`
+
+Snippet for docker run instructions:
+````
+Install for demonstration:
+```
+docker pull keeps/roda:v2.2.11
+```
+````
 
 ## How to's in travis
 
