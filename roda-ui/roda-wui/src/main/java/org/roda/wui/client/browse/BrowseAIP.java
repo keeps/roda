@@ -95,6 +95,8 @@ import config.i18n.client.ClientMessages;
  */
 public class BrowseAIP extends Composite {
 
+  private static SimplePanel container;
+
   public static void getAndRefresh(String id, AsyncCallback<Widget> callback) {
     container = new SimplePanel();
     refresh(id, new AsyncCallback<BrowseAIPBundle>() {
@@ -109,8 +111,6 @@ public class BrowseAIP extends Composite {
       }
     });
   }
-
-  private static SimplePanel container;
 
   private static void refresh(String id, AsyncCallback<BrowseAIPBundle> callback) {
     BrowserService.Util.getInstance().retrieveBrowseAIPBundle(id, LocaleInfo.getCurrentLocale().getLocaleName(),
@@ -129,7 +129,7 @@ public class BrowseAIP extends Composite {
       });
   }
 
-  private static List<String> fieldsToReturn = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+  private static final List<String> fieldsToReturn = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
   static {
     fieldsToReturn.addAll(
       Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_STATE, RodaConstants.AIP_TITLE, RodaConstants.AIP_LEVEL,
@@ -284,14 +284,8 @@ public class BrowseAIP extends Composite {
         HistoryUtils.newHistory(BrowseTop.RESOLVER);
       }
     });
-    navigationToolbar.withActionImpactHandler(Actionable.ActionImpact.UPDATED, () -> {
-      refresh(aipId, new NoAsyncCallback<BrowseAIPBundle>() {
-        @Override
-        public void onSuccess(BrowseAIPBundle aipBundle) {
-          // nothing to do
-        }
-      });
-    });
+    navigationToolbar.withActionImpactHandler(Actionable.ActionImpact.UPDATED,
+      () -> refresh(aipId, new NoAsyncCallback<>()));
     navigationToolbar.build();
 
     // IDENTIFICATION

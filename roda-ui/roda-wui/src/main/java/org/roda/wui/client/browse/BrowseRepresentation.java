@@ -30,6 +30,7 @@ import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.DisseminationActions;
@@ -103,27 +104,10 @@ public class BrowseRepresentation extends Composite {
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 2) {
-        final String historyAipId = historyTokens.get(0);
-        final String histortyRepresentationId = historyTokens.get(1);
-
-        BrowserService.Util.getInstance().retrieveBrowseRepresentationBundle(historyAipId, histortyRepresentationId,
-          LocaleInfo.getCurrentLocale().getLocaleName(), representationFields,
-          new AsyncCallback<BrowseRepresentationBundle>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
-              errorRedirect(callback);
-            }
-
-            @Override
-            public void onSuccess(final BrowseRepresentationBundle representationBundle) {
-              callback.onSuccess(new BrowseRepresentation(representationBundle));
-            }
-          });
-
+        getAndRefresh(historyTokens.get(0), historyTokens.get(1), callback);
       } else {
-        errorRedirect(callback);
+        HistoryUtils.newHistory(BrowseTop.RESOLVER);
+        callback.onSuccess(null);
       }
     }
 
@@ -141,12 +125,46 @@ public class BrowseRepresentation extends Composite {
     public String getHistoryToken() {
       return "representation";
     }
-
-    private void errorRedirect(AsyncCallback<Widget> callback) {
-      HistoryUtils.newHistory(BrowseTop.RESOLVER);
-      callback.onSuccess(null);
-    }
   };
+
+  private static SimplePanel container;
+
+  public static void getAndRefresh(String aipId, String id, AsyncCallback<Widget> callback) {
+    container = new SimplePanel();
+    refresh(aipId, id, new AsyncCallback<BrowseRepresentationBundle>() {
+      @Override
+      public void onFailure(Throwable caught) {
+        callback.onFailure(caught);
+      }
+
+      @Override
+      public void onSuccess(BrowseRepresentationBundle result) {
+        callback.onSuccess(container);
+      }
+    });
+  }
+
+  private static void refresh(String aipId, String id, AsyncCallback<BrowseRepresentationBundle> callback) {
+    BrowserService.Util.getInstance().retrieveBrowseRepresentationBundle(aipId, id,
+      LocaleInfo.getCurrentLocale().getLocaleName(), fieldsToReturn, new AsyncCallback<BrowseRepresentationBundle>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
+          HistoryUtils.newHistory(BrowseTop.RESOLVER);
+          callback.onSuccess(null);
+        }
+
+        @Override
+        public void onSuccess(BrowseRepresentationBundle bundle) {
+          container.setWidget(new BrowseRepresentation(bundle));
+          callback.onSuccess(bundle);
+        }
+      });
+  }
+
+  private static final List<String> fieldsToReturn = new ArrayList<>(Arrays.asList(RodaConstants.INDEX_UUID,
+    RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID, RodaConstants.REPRESENTATION_TYPE));
 
   interface MyUiBinder extends UiBinder<Widget, BrowseRepresentation> {
   }
@@ -157,9 +175,6 @@ public class BrowseRepresentation extends Composite {
   private String aipId;
   private String repId;
   private String repUUID;
-
-  private static final List<String> representationFields = new ArrayList<>(Arrays.asList(RodaConstants.INDEX_UUID,
-    RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ID, RodaConstants.REPRESENTATION_TYPE));
 
   // Focus
   @UiField
@@ -254,10 +269,15 @@ public class BrowseRepresentation extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     // NAVIGATION TOOLBAR
-    navigationToolbar.withObject(representation).withPermissions(aip.getPermissions())
-      .withActionImpactHandler(Actionable.ActionImpact.DESTROYED,
-        () -> HistoryUtils.newHistory(BrowseTop.RESOLVER, representation.getAipId()))
-      .build();
+    navigationToolbar.withObject(representation);
+    navigationToolbar.withPermissions(aip.getPermissions());
+    navigationToolbar.withActionImpactHandler(Actionable.ActionImpact.DESTROYED,
+      () -> HistoryUtils.newHistory(BrowseTop.RESOLVER, representation.getAipId()));
+    navigationToolbar.withActionImpactHandler(Actionable.ActionImpact.UPDATED,
+      () -> refresh(aipId, repId, new NoAsyncCallback<>()));
+    navigationToolbar.build();
+
+    ;
 
     updateLayout(bundle, state, justActive);
 
