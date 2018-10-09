@@ -31,6 +31,10 @@ public class ConfigurationManager {
   // DO NOT ACCESS DIRECTLY, use getConfigurationProperties()
   private Map<String, List<String>> configurationProperties = null;
 
+  // sets the default value for debug, and after initialization becomes the
+  // configured value of the debug property
+  private boolean debug = true;
+
   public static void initialize(Map<String, List<String>> properties) {
     instance = new ConfigurationManager(properties);
     FacetFactory.initialize();
@@ -154,8 +158,13 @@ public class ConfigurationManager {
     return sb.toString();
   }
 
+  private static boolean isDebugging() {
+    return instance.debug;
+  }
+
   private void debug() {
-    if (getBoolean(true, DEBUG_MODE_PROPERTY)) {
+    debug = getBoolean(debug, DEBUG_MODE_PROPERTY);
+    if (isDebugging()) {
       GWT.log("--- debugging configuration manager start");
       Map<String, List<String>> cfg = new TreeMap<>(getConfigurationProperties());
 
@@ -214,7 +223,7 @@ public class ConfigurationManager {
     private static Map<String, FacetParameter> buildParameters(String listId, List<String> parameterNames) {
       Map<String, FacetParameter> parameters = new HashMap<>();
 
-      if (parameterNames.isEmpty()) {
+      if (parameterNames.isEmpty() && instance.isDebugging()) {
         GWT.log("ConfigurationManager: list '" + listId + "' has no parameters.");
       }
 
@@ -233,7 +242,7 @@ public class ConfigurationManager {
         if (parameter != null) {
           parameters.put(parameter.getName(), parameter);
         } else {
-          GWT.log("ConfigurationManager: ignoring FacetParameter '" + parameterName + "' of type '" + type
+          logger.error("ConfigurationManager: ignoring FacetParameter '" + parameterName + "' of type '" + type
             + "' which has an invalid type or invalid set of args.");
         }
       }
@@ -326,7 +335,7 @@ public class ConfigurationManager {
             return sort;
           }
         }
-        GWT.log("ConfigurationManager: list '" + listId + "', parameter '" + parameterName
+        logger.error("ConfigurationManager: list '" + listId + "', parameter '" + parameterName
           + "' has an invalid SORT argument: '" + possibleSort + "'.");
       }
 

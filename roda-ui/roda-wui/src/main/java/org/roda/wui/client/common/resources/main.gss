@@ -895,7 +895,6 @@ pre code {
     
     line-height: 1;
     float: right;
-    margin-top: 1px;
 
     position: absolute;
     right: 10px;
@@ -1270,6 +1269,14 @@ pre code {
     margin-top: -15px;
 }
 
+.card .table-empty {
+    margin-top: -10px;
+}
+
+.card .searchPanelContainer.with-prefilters + .table-empty {
+    margin-top: 0;
+}
+
 .table-empty thead {
     display: none;
 }
@@ -1290,6 +1297,10 @@ pre code {
     display: none;
 }
 
+.table-empty .my-asyncdatagrid-side-panel {
+    margin-top: 2rem;
+    background: initial;
+}
 
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
     color:    #ddd;
@@ -3881,17 +3892,17 @@ td.datePickerMonth, td.datePickerYear {
     margin: 0 5px;
 }
 
-.table-empty-inner > .gwt-Label {
-    margin: 15px;
+.table-empty-inner .table-empty-inner-label {
     font-size: 1.4rem;
+    margin-left: 1.5rem;
     margin-top: 1rem;
     margin-bottom: 1rem;
     font-weight: 600;
     color: #9a9a9a;
 }
 
-.searchResults .table-empty-clear-facets {
-	margin-top:10px;
+.table-empty-inner .table-empty-inner-link {
+    font-size: 1.4rem;
 }
 
 /**********************************************
@@ -6883,9 +6894,10 @@ span.code {
     margin-right: 2em;
 }
 
-.my-asyncdatagrid-main-panel .ActionableStyleButtons .actionable-button {
+.browseNewDescriptiveMetadataButton,
+.ActionableStyleButtons .actionable-button {
     width: auto;
-    max-width: auto;
+    max-width: initial;
     margin-right: 1rem;
 }
 

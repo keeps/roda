@@ -80,12 +80,14 @@ import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -117,15 +119,12 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
   private MyAsyncDataProvider<T> dataProvider;
   private SingleSelectionModel<T> selectionModel;
-  private AsyncHandler columnSortHandler;
 
   private AccessibleSimplePager resultsPager;
   private RodaPageSizePager pageSizePager;
 
-  private Button csvDownloadButton;
   private CellTable<T> display;
 
-  private Column<T, Boolean> selectColumn;
   private RadioButton selectAllRadioButton = null;
   private Set<T> selected = new HashSet<>();
   private final List<CheckboxSelectionListener<T>> listeners = new ArrayList<>();
@@ -135,6 +134,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   private Facets facets;
   private boolean selectable;
   private List<String> fieldsToReturn;
+  private HandlerRegistration facetsValueChangedHandlerRegistration;
 
   private int initialPageSize;
   private int pageSizeIncrement;
@@ -247,7 +247,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     pageSizePager = new RodaPageSizePager(getPageSizePagerIncrement());
     pageSizePager.setDisplay(display);
 
-    csvDownloadButton = new Button(messages.tableDownloadCSV());
+    Button csvDownloadButton = new Button(messages.tableDownloadCSV());
     csvDownloadButton.addStyleName("btn btn-link csvDownloadButton");
     csvDownloadButton.setVisible(options.isCsvDownloadButtonVisibility());
 
@@ -304,8 +304,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
       display.setSelectionModel(selectionModel);
     }
 
-    columnSortHandler = new AsyncHandler(display);
-    display.addColumnSortHandler(columnSortHandler);
+    display.addColumnSortHandler(new AsyncHandler(display));
 
     getElement().setId("list-" + listId);
     addStyleName("my-asyncdatagrid");
@@ -375,33 +374,32 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
   private void updateEmptyTableWidget() {
     FlowPanel emptyTablewidget = new FlowPanel();
-
     emptyTablewidget.addStyleName("table-empty-inner");
+    String someOfAObject = messages.someOfAObject(getSelected().getSelectedClass());
 
     if (hasSelectedFacets()) {
-      Label l = new Label(
-        messages.noItemsToDisplayButFacetsActive(messages.someOfAObject(getSelected().getSelectedClass())));
-      Button resetFacets = new Button(messages.disableFacets());
 
-      resetFacets.addStyleName("table-empty-clear-facets btn btn-primary btn-ban");
+      Label msgBeforeLink = new InlineLabel(messages.noItemsToDisplayButFacetsActive(someOfAObject) + " ");
+      msgBeforeLink.addStyleName("table-empty-inner-label");
 
-      resetFacets.addClickHandler(new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent event) {
-          clearSelectedFacets();
-          refresh();
-        }
+      Anchor resetFacetsAnchor = new Anchor(messages.resetFacetsLink());
+      resetFacetsAnchor.addStyleName("table-empty-inner-link");
+      resetFacetsAnchor.addClickHandler(event -> {
+        clearSelectedFacets();
+        refresh();
       });
-      emptyTablewidget.add(l);
-      emptyTablewidget.add(resetFacets);
+
+      emptyTablewidget.add(msgBeforeLink);
+      emptyTablewidget.add(resetFacetsAnchor);
     } else if (actionable != null) {
       emptyTablewidget.addStyleName("ActionableStyleButtons");
 
       Label label = new Label();
+      label.addStyleName("table-empty-inner-label");
       if (originalFilter.equals(this.getFilter())) {
-        label.setText(messages.noItemsToDisplayPreFilters(messages.someOfAObject(getSelected().getSelectedClass())));
+        label.setText(messages.noItemsToDisplayPreFilters(someOfAObject));
       } else {
-        label.setText(messages.noItemsToDisplay(messages.someOfAObject(getSelected().getSelectedClass())));
+        label.setText(messages.noItemsToDisplay(someOfAObject));
       }
       emptyTablewidget.add(label);
 
@@ -440,10 +438,11 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
         }).buildListWithObjects(new ActionableObject<T>(classToReturn)));
     } else {
       Label label = new Label();
+      label.addStyleName("table-empty-inner-label");
       if (originalFilter.equals(this.getFilter())) {
-        label.setText(messages.noItemsToDisplayPreFilters(messages.someOfAObject(getSelected().getSelectedClass())));
+        label.setText(messages.noItemsToDisplayPreFilters(someOfAObject));
       } else {
-        label.setText(messages.noItemsToDisplay(messages.someOfAObject(getSelected().getSelectedClass())));
+        label.setText(messages.noItemsToDisplay(someOfAObject));
       }
       emptyTablewidget.add(label);
     }
@@ -452,7 +451,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
   private void configure(final CellTable<T> display) {
     if (selectable) {
-      selectColumn = new Column<T, Boolean>(new AcessibleCheckboxCell(true, false)) {
+      Column<T, Boolean> selectColumn = new Column<T, Boolean>(new AcessibleCheckboxCell(true, false)) {
         @Override
         public Boolean getValue(T object) {
           return selected.contains(object);
@@ -640,7 +639,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
             // disable auto-update
             autoUpdateTimer.cancel();
             setAutoUpdateState(AutoUpdateState.AUTO_UPDATE_ERROR);
-            autoUpdateErrorMessage = caught.getMessage();
+            GWT.log("Could not auto-update table " + listId, caught);
           }
 
           @Override
@@ -1017,8 +1016,12 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   private boolean createAndBindFacets(FlowPanel facetsPanel) {
     facetsPanel.clear();
 
+    if (facetsValueChangedHandlerRegistration != null) {
+      facetsValueChangedHandlerRegistration.removeHandler();
+    }
+
     Map<String, FlowPanel> facetPanels = createInnerFacetPanels(facetsPanel);
-    addValueChangeHandler(listValueChangedEvent -> {
+    facetsValueChangedHandlerRegistration = addValueChangeHandler(listValueChangedEvent -> {
       List<FacetFieldResult> facetResults = listValueChangedEvent.getValue().getFacetResults();
 
       boolean allFacetsAreEmpty = true;
@@ -1068,7 +1071,6 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
               } else {
                 LOGGER.warn("Haven't found the facet parameter: " + facetField);
               }
-
               refresh();
             });
           }

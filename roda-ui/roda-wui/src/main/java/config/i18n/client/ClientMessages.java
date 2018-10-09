@@ -313,6 +313,8 @@ public interface ClientMessages extends Messages {
 
   String noItemsToDisplayButFacetsActive(String itemLabel);
 
+  String resetFacetsLink();
+
   String disableFacets();
 
   String browserOfflineError();
