@@ -6909,6 +6909,18 @@ span.code {
     margin: 1rem;
 }
 
+.sidebar .actionable-button-back {
+    background-color: COLOR_BUTTON_DEFAULT;
+}
+
+.sidebar .actionable-button-back:hover {
+    background-color: COLOR_BUTTON_DEFAULT_HOVER;
+}
+
+.ActionableStyleMenu .actionable-button-back {
+    display: none;
+}
+
 .sidebar .actionable-button-destroyed {
     background-color: COLOR_ACTIONS_DANGER;
 }

@@ -3,11 +3,13 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
              xmlns:m="urn:import:org.roda.wui.client.main"
-             xmlns:search="urn:import:org.roda.wui.client.search">
+             xmlns:search="urn:import:org.roda.wui.client.search"
+			 xmlns:common="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<g:FlowPanel styleName="preservationEvents" addStyleNames="wrapper skip_padding">
+		<common:NavigationToolbar ui:field="navigationToolbar" header="{messages.preservationEventsTitle}" visible="false"/>
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_12 content">
 				<g:FlowPanel styleName="browseItemPanel">
@@ -17,7 +19,6 @@
 					</g:Label>
 					<g:FlowPanel addStyleNames="page-description" ui:field="pageDescription"/>
 				</g:FlowPanel>
-				<m:BreadcrumbPanel ui:field="breadcrumb" addStyleNames="browseBreadcrumb" />
 				<search:PreservationEventsSearch ui:field="eventsSearch" addStyleNames="searchResults" />
 			</g:FlowPanel>
 		</g:FlowPanel>

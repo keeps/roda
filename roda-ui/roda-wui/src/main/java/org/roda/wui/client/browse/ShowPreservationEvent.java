@@ -203,7 +203,7 @@ public class ShowPreservationEvent extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    actionableWidgetBuilder = new ActionableWidgetBuilder<>(PreservationEventActions.get());
+    actionableWidgetBuilder = new ActionableWidgetBuilder<>(PreservationEventActions.get()).withBackButton();
 
     BrowserService.Util.getInstance().retrievePreservationEventViewBundle(eventId,
       new AsyncCallback<PreservationEventViewBundle>() {

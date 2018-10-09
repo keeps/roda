@@ -129,7 +129,7 @@ public class BrowseRepresentation extends Composite {
 
   private static SimplePanel container;
 
-  public static void getAndRefresh(String aipId, String id, AsyncCallback<Widget> callback) {
+  private static void getAndRefresh(String aipId, String id, AsyncCallback<Widget> callback) {
     container = new SimplePanel();
     refresh(aipId, id, new AsyncCallback<BrowseRepresentationBundle>() {
       @Override

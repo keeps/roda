@@ -141,7 +141,7 @@ public class ShowRiskIncidence extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
     this.incidence = incidence;
 
-    actionsSidebar.setWidget(new ActionableWidgetBuilder<>(RiskIncidenceActions.get())
+    actionsSidebar.setWidget(new ActionableWidgetBuilder<>(RiskIncidenceActions.get()).withBackButton()
       .withActionCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
         @Override
         public void onSuccess(Actionable.ActionImpact result) {

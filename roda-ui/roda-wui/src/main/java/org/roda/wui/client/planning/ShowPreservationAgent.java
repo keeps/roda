@@ -161,6 +161,7 @@ public class ShowPreservationAgent extends Composite {
     agentExtensionPanel.setVisible(StringUtils.isNotBlank(agent.getExtension()));
     agentExtension.setText(agent.getExtension());
 
-    actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(agent)));
+    actionsSidebar
+      .setWidget(actionableWidgetBuilder.withBackButton().buildListWithObjects(new ActionableObject<>(agent)));
   }
 }

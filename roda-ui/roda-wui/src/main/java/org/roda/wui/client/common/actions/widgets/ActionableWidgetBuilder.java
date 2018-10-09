@@ -24,6 +24,7 @@ import org.roda.wui.client.common.actions.model.ActionableTitle;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -49,6 +50,7 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
 
   private AsyncCallback<ActionImpact> actionImpactCallback = DEFAULT_ACTION_CALLBACK;
   private Consumer<Integer> widgetCreatedHandler = DEFAULT_WIDGET_CREATION_HANDLER;
+  private boolean includeBackButton = false;
 
   public ActionableWidgetBuilder(Actionable<T> actionable) {
     this.actionable = actionable;
@@ -74,6 +76,11 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
 
   public ActionableWidgetBuilder<T> changeActionable(Actionable<T> actionable) {
     this.actionable = actionable;
+    return this;
+  }
+
+  public ActionableWidgetBuilder<T> withBackButton() {
+    this.includeBackButton = true;
     return this;
   }
 
@@ -155,6 +162,15 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
       }
     }
 
+    if (includeBackButton) {
+      ActionButton<T> backButton = new ActionButton<>(
+        new ActionableButton<>(messages.backButton(), null, ActionImpact.NONE, "fas fa-arrow-circle-left"));
+      backButton.addClickHandler(event -> History.back());
+      backButton.addStyleName("actionable-button-back");
+      panel.add(backButton);
+      addedButtonCount++;
+    }
+
     if (addedButtonCount == 0) {
       Label emptyHelpText = new Label(messages.actionableEmptyHelp(objects.getType()));
       emptyHelpText.addStyleName("actions-empty-help");
@@ -165,4 +181,5 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
 
     return panel;
   }
+
 }

@@ -20,11 +20,9 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
+import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.main.BreadcrumbPanel;
-import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.search.PreservationEventsSearch;
 import org.roda.wui.common.client.HistoryResolver;
@@ -116,13 +114,14 @@ public class PreservationEvents extends Composite {
       RodaConstants.FILE_ANCESTORS_PATH, RodaConstants.FILE_ORIGINALNAME, RodaConstants.FILE_FILE_ID,
       RodaConstants.FILE_AIP_ID, RodaConstants.FILE_REPRESENTATION_ID, RodaConstants.FILE_ISDIRECTORY));
 
-  @UiField
-  BreadcrumbPanel breadcrumb;
-
   @UiField(provided = true)
   PreservationEventsSearch eventsSearch;
 
-  @UiField FlowPanel pageDescription;
+  @UiField
+  FlowPanel pageDescription;
+
+  @UiField
+  NavigationToolbar navigationToolbar;
 
   private String aipId;
   private String representationUUID;
@@ -149,15 +148,16 @@ public class PreservationEvents extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    // create breadcrumbs
-    if (fileUUID != null) {
-      getFileBreadCrumbs();
-    } else if (representationUUID != null) {
-      getRepresentationBreadCrumbs();
-    } else if (aipId != null) {
-      getAIPBreadCrumbs();
-    } else {
-      breadcrumb.setVisible(false);
+    // NAVIGATION TOOLBAR
+    if (fileUUID != null || representationUUID != null || aipId != null) {
+      navigationToolbar.withoutButtons();
+      if (fileUUID != null) {
+        setupFileToolbar();
+      } else if (representationUUID != null) {
+        setupRepresentationToolbar();
+      } else {
+        setupAipToolbar();
+      }
     }
 
     pageDescription.add(new HTMLWidgetWrapper("PreservationEventsDescription.html"));
@@ -175,84 +175,51 @@ public class PreservationEvents extends Composite {
     return instance;
   }
 
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
-  }
-
-  private void getAIPBreadCrumbs() {
+  private void setupAipToolbar() {
     BrowserService.Util.getInstance().retrieveBrowseAIPBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
-      aipFieldsToReturn, new AsyncCallback<BrowseAIPBundle>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-          HistoryUtils.newHistory(BrowseTop.RESOLVER);
-        }
-
+      aipFieldsToReturn, new NoAsyncCallback<BrowseAIPBundle>() {
         @Override
         public void onSuccess(BrowseAIPBundle itemBundle) {
-          breadcrumb
-            .updatePath(BreadcrumbUtils.getAipBreadcrumbs(itemBundle.getAIPAncestors(), itemBundle.getAip(), true));
-          breadcrumb.setVisible(true);
+          navigationToolbar.updateBreadcrumb(itemBundle);
+          navigationToolbar.build();
+          navigationToolbar.setVisible(true);
         }
       });
   }
 
-  private void getRepresentationBreadCrumbs() {
+  private void setupRepresentationToolbar() {
     BrowserService.Util.getInstance().retrieve(IndexedRepresentation.class.getName(), representationUUID,
-      RodaConstants.REPRESENTATION_FIELDS_TO_RETURN, new AsyncCallback<IndexedRepresentation>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
+      RodaConstants.REPRESENTATION_FIELDS_TO_RETURN, new NoAsyncCallback<IndexedRepresentation>() {
         @Override
         public void onSuccess(IndexedRepresentation representation) {
+          navigationToolbar.withObject(representation);
           BrowserService.Util.getInstance().retrieveBrowseRepresentationBundle(representation.getAipId(),
             representation.getId(), LocaleInfo.getCurrentLocale().getLocaleName(), representationFieldsToReturn,
-            new AsyncCallback<BrowseRepresentationBundle>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
-
+            new NoAsyncCallback<BrowseRepresentationBundle>() {
               @Override
               public void onSuccess(BrowseRepresentationBundle repBundle) {
-                breadcrumb.updatePath(BreadcrumbUtils.getRepresentationBreadcrumbs(repBundle));
-                breadcrumb.setVisible(true);
+                navigationToolbar.updateBreadcrumb(repBundle);
+                navigationToolbar.build();
+                navigationToolbar.setVisible(true);
               }
             });
         }
       });
   }
 
-  private void getFileBreadCrumbs() {
+  private void setupFileToolbar() {
     BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), fileUUID,
-      RodaConstants.FILE_FIELDS_TO_RETURN, new AsyncCallback<IndexedFile>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
-        }
-
+      RodaConstants.FILE_FIELDS_TO_RETURN, new NoAsyncCallback<IndexedFile>() {
         @Override
         public void onSuccess(IndexedFile file) {
+          navigationToolbar.withObject(file);
           BrowserService.Util.getInstance().retrieveBrowseFileBundle(file.getAipId(), file.getRepresentationId(),
-            file.getPath(), file.getId(), fileFieldsToReturn, new AsyncCallback<BrowseFileBundle>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                AsyncCallbackUtils.defaultFailureTreatment(caught);
-              }
-
+            file.getPath(), file.getId(), fileFieldsToReturn, new NoAsyncCallback<BrowseFileBundle>() {
               @Override
               public void onSuccess(BrowseFileBundle fileBundle) {
-                breadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(fileBundle));
-                breadcrumb.setVisible(true);
+                navigationToolbar.updateBreadcrumb(fileBundle);
+                navigationToolbar.build();
+                navigationToolbar.setVisible(true);
               }
             });
         }

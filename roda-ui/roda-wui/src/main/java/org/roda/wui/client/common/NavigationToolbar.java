@@ -74,6 +74,7 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
   private boolean requireShiftKeyModifier = false;
   private boolean requireAltKeyModifier = false;
   private Actionable<T> actionable = null;
+  private boolean skipButtonSetup = false;
 
   interface MyUiBinder extends UiBinder<Widget, NavigationToolbar> {
   }
@@ -140,6 +141,11 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     return this;
   }
 
+  public NavigationToolbar<T> withoutButtons() {
+    this.skipButtonSetup = true;
+    return this;
+  }
+
   public NavigationToolbar<T> withProcessor(ProcessRelativeItem<T> processor) {
     this.processor = processor;
     return this;
@@ -190,18 +196,20 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
 
   public void build() {
     hideButtons();
-    if (processor != null) {
-      ListSelectionUtils.bindLayout(currentObject, previousButton, nextButton, keyboardFocus, requireControlKeyModifier,
-        requireShiftKeyModifier, requireAltKeyModifier, processor);
-    } else {
-      ListSelectionUtils.bindLayout(currentObject, previousButton, nextButton, keyboardFocus, requireControlKeyModifier,
-        requireShiftKeyModifier, requireAltKeyModifier);
-    }
-    setNavigationButtonTitles();
+    if (!skipButtonSetup) {
+      if (processor != null) {
+        ListSelectionUtils.bindLayout(currentObject, previousButton, nextButton, keyboardFocus,
+          requireControlKeyModifier, requireShiftKeyModifier, requireAltKeyModifier, processor);
+      } else {
+        ListSelectionUtils.bindLayout(currentObject, previousButton, nextButton, keyboardFocus,
+          requireControlKeyModifier, requireShiftKeyModifier, requireAltKeyModifier);
+      }
+      setNavigationButtonTitles();
 
-    clearSearchPopupHandlers();
-    setupSearchPopup();
-    setupActions();
+      clearSearchPopupHandlers();
+      setupSearchPopup();
+      setupActions();
+    }
   }
 
   private void setNavigationButtonTitles() {
