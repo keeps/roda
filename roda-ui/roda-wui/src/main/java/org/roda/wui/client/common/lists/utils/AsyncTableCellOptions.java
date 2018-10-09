@@ -15,6 +15,7 @@ import org.roda.wui.common.client.tools.ConfigurationManager;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.user.cellview.client.AbstractHasData.RedrawEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.view.client.SelectionChangeEvent;
 
 public class AsyncTableCellOptions<T extends IsIndexed> {
@@ -160,6 +161,10 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
   public AsyncTableCellOptions<T> addRedrawHandler(RedrawEvent.Handler handler) {
     redrawEventHandlers.add(handler);
     return this;
+  }
+
+  public AsyncTableCellOptions<T> withRecenteringOfParentDialog(DialogBox parentDialog) {
+    return addRedrawHandler(() -> parentDialog.center());
   }
 
   public String getListId() {

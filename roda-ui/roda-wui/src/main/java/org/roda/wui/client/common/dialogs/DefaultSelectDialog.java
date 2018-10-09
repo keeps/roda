@@ -53,7 +53,7 @@ public class DefaultSelectDialog<T extends IsIndexed> extends DialogBox implemen
 
   public DefaultSelectDialog(String title, ListBuilder<T> listBuilder) {
     objectClass = listBuilder.getOptions().getClassToReturn();
-    listBuilder.getOptions().addSelectionChangeHandler(event -> {
+    listBuilder.getOptions().withRecenteringOfParentDialog(this).addSelectionChangeHandler(event -> {
       T value = DefaultSelectDialog.this.getValue();
       if (singleSelectionMode) {
         if (value != null) {

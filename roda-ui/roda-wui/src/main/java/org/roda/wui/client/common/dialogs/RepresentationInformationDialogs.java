@@ -261,19 +261,19 @@ public class RepresentationInformationDialogs {
                   listBuilder = new ListBuilder<>(() -> new AIPList(),
                     new AsyncTableCellOptions<>(IndexedAIP.class, aipListId).withFilter(tableFilter)
                       .withJustActive(true).withCsvDownloadButtonVisibility(false)
-                      .addRedrawHandler(() -> dialogBox.center()));
+                      .withRecenteringOfParentDialog(dialogBox));
 
                 } else if (SEARCH_REPRESENTATIONS.equals(dropDown.getSelectedValue())) {
                   listBuilder = new ListBuilder<>(() -> new RepresentationList(),
                     new AsyncTableCellOptions<>(IndexedRepresentation.class, representationsListId)
                       .withFilter(tableFilter).withJustActive(true).withCsvDownloadButtonVisibility(false)
-                      .addRedrawHandler(() -> dialogBox.center()));
+                      .withRecenteringOfParentDialog(dialogBox));
 
                 } else if (SEARCH_FILES.equals(dropDown.getSelectedValue())) {
                   listBuilder = new ListBuilder<>(() -> new SimpleFileList(),
                     new AsyncTableCellOptions<>(IndexedFile.class, filesListId).withFilter(tableFilter)
                       .withJustActive(true).withCsvDownloadButtonVisibility(false)
-                      .addRedrawHandler(() -> dialogBox.center()));
+                      .withRecenteringOfParentDialog(dialogBox));
 
                 }
 
@@ -895,7 +895,7 @@ public class RepresentationInformationDialogs {
       () -> new RepresentationInformationList(),
       new AsyncTableCellOptions<>(RepresentationInformation.class, "RepresentationInformationDialogs_RI")
         .withSummary(messages.representationInformationTitle()).withInitialPageSize(10).withPageSizeIncrement(10)
-        .withCsvDownloadButtonVisibility(false).addRedrawHandler(dialogBox::center).withForceSelectable(true)
+        .withCsvDownloadButtonVisibility(false).withRecenteringOfParentDialog(dialogBox).withForceSelectable(true)
         .addCheckboxSelectionListener(new AsyncTableCell.CheckboxSelectionListener<RepresentationInformation>() {
           @Override
           public void onSelectionChange(SelectedItems<RepresentationInformation> selected) {
