@@ -385,6 +385,8 @@ public interface ClientMessages extends Messages {
 
   String removeJobCreatedMessage();
 
+  String identifyFormatsJobCreatedMessage();
+
   String moveJobCreatedMessage();
 
   String jobCreatedMessage();

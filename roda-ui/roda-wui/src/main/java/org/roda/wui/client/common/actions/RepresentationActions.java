@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -193,7 +192,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   }
 
   // ACTIONS
-  public void download(IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
+  private void download(IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
     SafeUri downloadUri = null;
     if (representation != null) {
       downloadUri = RestUtils.createRepresentationDownloadUri(representation.getAipId(), representation.getId());
@@ -204,11 +203,11 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     callback.onSuccess(ActionImpact.NONE);
   }
 
-  public void remove(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
+  private void remove(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
     remove(objectToSelectedItems(representation, IndexedRepresentation.class), callback);
   }
 
-  public void remove(final SelectedItems<IndexedRepresentation> selectedList,
+  private void remove(final SelectedItems<IndexedRepresentation> selectedList,
     final AsyncCallback<ActionImpact> callback) {
 
     Dialogs.showConfirmDialog(messages.representationRemoveTitle(), messages.representationRemoveMessage(),
@@ -257,11 +256,11 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       });
   }
 
-  public void changeType(final IndexedRepresentation representations, final AsyncCallback<ActionImpact> callback) {
+  private void changeType(final IndexedRepresentation representations, final AsyncCallback<ActionImpact> callback) {
     changeType(objectToSelectedItems(representations, IndexedRepresentation.class), callback);
   }
 
-  public void changeType(final SelectedItems<IndexedRepresentation> representations,
+  private void changeType(final SelectedItems<IndexedRepresentation> representations,
     final AsyncCallback<ActionImpact> callback) {
 
     BrowserService.Util.getInstance().retrieveRepresentationTypeOptions(LocaleInfo.getCurrentLocale().getLocaleName(),
@@ -312,11 +311,11 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       });
   }
 
-  public void newProcess(IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
+  private void newProcess(IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
     newProcess(objectToSelectedItems(representation, IndexedRepresentation.class), callback);
   }
 
-  public void newProcess(SelectedItems<IndexedRepresentation> selected, final AsyncCallback<ActionImpact> callback) {
+  private void newProcess(SelectedItems<IndexedRepresentation> selected, final AsyncCallback<ActionImpact> callback) {
     callback.onSuccess(ActionImpact.NONE);
     LastSelectedItemsSingleton selectedItems = LastSelectedItemsSingleton.getInstance();
     selectedItems.setSelectedItems(selected);
@@ -324,18 +323,18 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     HistoryUtils.newHistory(CreateSelectedJob.RESOLVER, RodaConstants.JOB_PROCESS_ACTION);
   }
 
-  public void identifyFormats(IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
+  private void identifyFormats(IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
     identifyFormats(objectToSelectedItems(representation, IndexedRepresentation.class), callback);
   }
 
-  public void identifyFormats(SelectedItems<IndexedRepresentation> selected,
+  private void identifyFormats(SelectedItems<IndexedRepresentation> selected,
     final AsyncCallback<ActionImpact> callback) {
     BrowserService.Util.getInstance().createFormatIdentificationJob(selected, new ActionAsyncCallback<Job>(callback) {
       @Override
       public void onSuccess(Job result) {
         Toast.showInfo(messages.identifyingFormatsTitle(), messages.identifyingFormatsDescription());
 
-        Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
+        Dialogs.showJobRedirectDialog(messages.identifyFormatsJobCreatedMessage(), new AsyncCallback<Void>() {
           @Override
           public void onFailure(Throwable caught) {
             doActionCallbackUpdated();
@@ -348,18 +347,10 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
           }
         });
       }
-
-      @Override
-      public void onFailure(Throwable caught) {
-        if (caught instanceof NotFoundException) {
-          Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-        }
-        super.onFailure(caught);
-      }
     });
   }
 
-  public void changeState(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
+  private void changeState(final IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
     RepresentationDialogs.showPromptDialogRepresentationStates(messages.changeStatusTitle(), messages.cancelButton(),
       messages.confirmButton(), representation.getRepresentationStates(),
       new ActionNoAsyncCallback<List<String>>(callback) {

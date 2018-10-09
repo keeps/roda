@@ -478,7 +478,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
       public void onSuccess(Job result) {
         Toast.showInfo(messages.identifyingFormatsTitle(), messages.identifyingFormatsDescription());
 
-        Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
+        Dialogs.showJobRedirectDialog(messages.identifyFormatsJobCreatedMessage(), new AsyncCallback<Void>() {
           @Override
           public void onFailure(Throwable caught) {
             doActionCallbackUpdated();
@@ -490,14 +490,6 @@ public class FileActions extends AbstractActionable<IndexedFile> {
             HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
           }
         });
-      }
-
-      @Override
-      public void onFailure(Throwable caught) {
-        if (caught instanceof NotFoundException) {
-          Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-        }
-        super.onFailure(caught);
       }
     });
   }

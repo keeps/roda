@@ -36,7 +36,6 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.RepresentationDialogs;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.CreateSelectedJob;
@@ -299,7 +298,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                           public void onSuccess(Job result) {
                             Toast.showInfo(messages.moveItemTitle(), messages.movingAIP());
 
-                            Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(),
+                            Dialogs.showJobRedirectDialog(messages.moveJobCreatedMessage(),
                               new AsyncCallback<Void>() {
 
                                 @Override
@@ -626,7 +625,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     });
   }
 
-  public void changeType(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
+  private void changeType(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
     changeType(objectToSelectedItems(aip, IndexedAIP.class), callback);
   }
 
