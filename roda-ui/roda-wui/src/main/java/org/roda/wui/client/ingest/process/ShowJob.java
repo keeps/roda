@@ -12,6 +12,7 @@ package org.roda.wui.client.ingest.process;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,6 @@ import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
@@ -100,6 +100,7 @@ import config.i18n.client.ClientMessages;
 public class ShowJob extends Composite {
 
   private static final int PERIOD_MILLIS = 10000;
+  private static final int PERIOD_MILLIS_FAST = 2000;
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -249,10 +250,16 @@ public class ShowJob extends Composite {
       IndexedReport.class, "ShowJob_reports");
     jobReportListBuilderOptions.withRedirectOnSingleResult(!extraReportFilterParameters.isEmpty());
     jobReportListBuilderOptions.withFilter(filter);
-    jobReportListBuilderOptions.withAutoUpdate(isJobRunning() ? PERIOD_MILLIS : null);
     jobReportListBuilderOptions.withSummary(messages.reportList());
     jobReportListBuilderOptions.bindOpener();
     jobReportListBuilderOptions.withSearchPlaceholder(messages.jobProcessedSearchPlaceHolder());
+    if (isJobRecent()) {
+      autoUpdateTimerPeriod = PERIOD_MILLIS_FAST;
+      jobReportListBuilderOptions.withAutoUpdate(autoUpdateTimerPeriod);
+    } else if (isJobRunning()) {
+      autoUpdateTimerPeriod = PERIOD_MILLIS;
+      jobReportListBuilderOptions.withAutoUpdate(autoUpdateTimerPeriod);
+    }
 
     ListBuilder<IndexedReport> jobReportListBuilder;
     if (isIngest) {
@@ -350,16 +357,23 @@ public class ShowJob extends Composite {
 
   @Override
   protected void onLoad() {
-    if (autoUpdateTimer != null && !autoUpdateTimer.isRunning() && isJobRunning()) {
-      autoUpdateTimer.scheduleRepeating(PERIOD_MILLIS);
+    if (autoUpdateTimer != null && !autoUpdateTimer.isRunning() && autoUpdateTimerPeriod > 0) {
+      autoUpdateTimer.scheduleRepeating(autoUpdateTimerPeriod);
     }
 
     JavascriptUtils.stickSidebar();
     super.onLoad();
   }
 
+  private boolean isJobRecent() {
+    // currentTime - jobStartTime < 30 seconds
+    return job != null && ((new Date()).getTime()) - job.getStartDate().getTime() < (30 * 1000);
+  }
+
   private boolean isJobRunning() {
-    return job != null && !job.isInFinalState();
+    boolean recentlyEnded = job.getEndDate() != null
+      && ((new Date()).getTime()) - job.getEndDate().getTime() < (30 * 1000);
+    return job != null && (!job.isInFinalState() || recentlyEnded);
   }
 
   private boolean isJobInFinalState() {
@@ -549,9 +563,10 @@ public class ShowJob extends Composite {
   }
 
   private Timer autoUpdateTimer = null;
+  private int autoUpdateTimerPeriod = 0;
 
   private void scheduleUpdateStatus() {
-    if (!job.isInFinalState()) {
+    if (isJobRunning() || isJobRecent()) {
       if (autoUpdateTimer == null) {
         autoUpdateTimer = new Timer() {
 
@@ -575,7 +590,7 @@ public class ShowJob extends Composite {
           }
         };
       }
-      autoUpdateTimer.schedule(PERIOD_MILLIS);
+      autoUpdateTimer.schedule(autoUpdateTimerPeriod);
     }
   }
 

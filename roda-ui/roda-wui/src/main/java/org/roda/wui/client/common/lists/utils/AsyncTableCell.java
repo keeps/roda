@@ -639,7 +639,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
             // disable auto-update
             autoUpdateTimer.cancel();
             setAutoUpdateState(AutoUpdateState.AUTO_UPDATE_ERROR);
-            GWT.log("Could not auto-update table " + listId, caught);
+            LOGGER.error("Could not auto-update table " + listId, caught);
           }
 
           @Override
