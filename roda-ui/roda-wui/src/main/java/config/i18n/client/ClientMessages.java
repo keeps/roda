@@ -919,6 +919,8 @@ public interface ClientMessages extends Messages {
 
   SafeHtml searchPreFilterEmptyKeyFilterParameter(String searchPreFilterName);
 
+  SafeHtml searchPreFilterLongRangeFilterParameter(String searchPreFilterName, long searchPreFilterFromValue, long searchPreFilterToValue);
+
   SafeHtml searchPreFilterOneOfManyFilterParameterSingle(String searchPreFilterName, String item);
 
   SafeHtml searchPreFilterOneOfManyFilterParameterWithSize(String searchPreFilterName, int listSize);

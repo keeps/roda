@@ -6,6 +6,7 @@ import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
+import org.roda.core.data.v2.index.filter.LongRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.OrFiltersParameters;
@@ -59,6 +60,10 @@ public class SearchPreFilterUtils {
     } else if (parameter instanceof EmptyKeyFilterParameter) {
       EmptyKeyFilterParameter p = (EmptyKeyFilterParameter) parameter;
       return messages.searchPreFilterEmptyKeyFilterParameter(messages.searchPreFilterName(p.getName()));
+    } else if (parameter instanceof LongRangeFilterParameter) {
+      LongRangeFilterParameter p = (LongRangeFilterParameter) parameter;
+      return messages.searchPreFilterLongRangeFilterParameter(messages.searchPreFilterName(p.getName()),
+        p.getFromValue(), p.getToValue());
     } else if (parameter instanceof OneOfManyFilterParameter) {
       OneOfManyFilterParameter p = (OneOfManyFilterParameter) parameter;
       int listSize = p.getValues().size();
