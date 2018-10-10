@@ -12,6 +12,8 @@ import static org.roda.wui.client.common.actions.Actionable.ActionImpact;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.actions.Actionable;
@@ -20,6 +22,7 @@ import org.roda.wui.client.common.actions.model.ActionableButton;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.model.ActionableTitle;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -39,6 +42,7 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
   private static final Consumer<Integer> DEFAULT_WIDGET_CREATION_HANDLER = new Consumer<Integer>() {
     @Override
     public void accept(Integer buttonCount) {
+      // do nothing
     }
   };
 
@@ -111,12 +115,15 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     FlowPanel panel = new FlowPanel();
     panel.addStyleName("actionable-menu");
 
+    boolean isReadonly = NodeType.valueOf(ConfigurationManager.getString(RodaConstants.RODA_NODE_TYPE_KEY))
+      .equals(NodeType.SLAVE);
     int addedButtonCount = 0;
 
     for (ActionableGroup<T> actionGroup : actionableBundle.getGroups()) {
       boolean hasButtonsOnThisGroup = false;
-      for (ActionableButton<T> button : actionGroup.getButtons()) {
-        if (actionable.canAct(button.getAction(), objects)) {
+      for (ActionableButton<T> actionButton : actionGroup.getButtons()) {
+        if ((!isReadonly || actionButton.getImpact().equals(ActionImpact.NONE))
+          && actionable.canAct(actionButton.getAction(), objects)) {
           ActionableTitle actionableTitle = actionGroup.getTitle();
           Label groupTitle = new Label(actionableTitle.getTitle());
           groupTitle.addStyleName("h4 actionable-title");
@@ -131,7 +138,8 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
 
       if (hasButtonsOnThisGroup) {
         for (ActionableButton<T> actionButton : actionGroup.getButtons()) {
-          if (actionable.canAct(actionButton.getAction(), objects)) {
+          if ((!isReadonly || actionButton.getImpact().equals(ActionImpact.NONE))
+            && actionable.canAct(actionButton.getAction(), objects)) {
 
             ActionButton<T> button = new ActionButton<>(actionButton);
 

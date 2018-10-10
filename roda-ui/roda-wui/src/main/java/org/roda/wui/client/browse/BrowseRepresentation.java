@@ -368,11 +368,8 @@ public class BrowseRepresentation extends Composite {
     }
 
     // DISSEMINATIONS (POST-INIT)
-    if (bundle.getDipCount() > 0) {
-      disseminationsSearch.setFilter(IndexedDIP.class, disseminationsFilter);
-    }
-    disseminationsSearch.setVisible(bundle.getDipCount() > 0);
-    disseminationsSearch.getParent().setVisible(bundle.getDipCount() > 0);
+    disseminationsSearch.getParent().setVisible(
+      bundle.getDipCount() > 0 && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_DIP));
 
     // CSS
     this.addStyleName("browse");

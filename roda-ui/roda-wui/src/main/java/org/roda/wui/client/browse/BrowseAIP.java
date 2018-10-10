@@ -228,6 +228,9 @@ public class BrowseAIP extends Composite {
       SearchWrapper representationsSearchWrapper = new SearchWrapper(false)
         .createListAndSearchPanel(representationsListBuilder);
       representationsCard.setWidget(representationsSearchWrapper);
+      representationsCard.setVisible(bundle.getRepresentationCount() > 0);
+    } else {
+      representationsCard.setVisible(false);
     }
 
     // DISSEMINATIONS
@@ -242,6 +245,9 @@ public class BrowseAIP extends Composite {
       SearchWrapper disseminationsSearchWrapper = new SearchWrapper(false)
         .createListAndSearchPanel(disseminationsListBuilder);
       disseminationsCard.setWidget(disseminationsSearchWrapper);
+      disseminationsCard.setVisible(bundle.getDipCount() > 0);
+    } else {
+      disseminationsCard.setVisible(false);
     }
 
     // AIP CHILDREN
@@ -254,6 +260,9 @@ public class BrowseAIP extends Composite {
       SearchWrapper aipChildrenSearchWrapper = new SearchWrapper(false)
         .createListAndSearchPanel(aipChildrenListBuilder);
       aipChildrenCard.setWidget(aipChildrenSearchWrapper);
+      aipChildrenCard.setVisible(bundle.getChildAIPCount() > 0);
+    } else {
+      aipChildrenCard.setVisible(false);
     }
 
     PermissionClientUtils.bindPermission(newDescriptiveMetadata, aip.getPermissions(),
@@ -302,10 +311,6 @@ public class BrowseAIP extends Composite {
     }
 
     addRepresentation.setVisible(bundle.getRepresentationCount() == 0);
-    representationsCard.setVisible(bundle.getRepresentationCount() > 0);
-
-    // DISSEMINATIONS
-    disseminationsCard.setVisible(bundle.getDipCount() > 0);
 
     // AIP CHILDREN
     if (bundle.getChildAIPCount() > 0) {
@@ -316,7 +321,6 @@ public class BrowseAIP extends Composite {
     }
 
     addChildAip.setVisible(bundle.getChildAIPCount() == 0);
-    aipChildrenCard.setVisible(bundle.getChildAIPCount() > 0);
 
     keyboardFocus.setFocus(true);
   }

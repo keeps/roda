@@ -233,25 +233,28 @@ public class RodaCoreFactory {
   private static LoadingCache<Locale, Map<String, List<String>>> SHARED_PROPERTIES_CACHE = CacheBuilder.newBuilder()
     .build(new CacheLoader<Locale, Map<String, List<String>>>() {
       @Override
-      public Map<String, List<String>> load(Locale locale) throws Exception {
+      public Map<String, List<String>> load(Locale locale) {
         Map<String, List<String>> sharedProperties = new HashMap<>(getRodaSharedConfigurationProperties());
         Messages messages = getI18NMessages(locale);
-        List<String> prefixes = RodaCoreFactory
-          .getRodaConfigurationAsList("ui.sharedProperties.whitelist.messages.prefix");
-        for (String prefix : prefixes) {
-          Map<String, String> translations = messages.getTranslations(prefix, String.class, false);
-          for (Map.Entry<String, String> translationEntry : translations.entrySet()) {
-            sharedProperties.put("i18n." + translationEntry.getKey(),
-              Collections.singletonList(translationEntry.getValue()));
-          }
-        }
 
-        List<String> properties = RodaCoreFactory
-          .getRodaConfigurationAsList("ui.sharedProperties.whitelist.messages.property");
-        for (String propertyKey : properties) {
-          if (messages.containsTranslation(propertyKey)) {
-            sharedProperties.put("i18n." + propertyKey,
-              Collections.singletonList(messages.getTranslation(propertyKey)));
+        if (messages != null) {
+          List<String> prefixes = RodaCoreFactory
+            .getRodaConfigurationAsList("ui.sharedProperties.whitelist.messages.prefix");
+          for (String prefix : prefixes) {
+            Map<String, String> translations = messages.getTranslations(prefix, String.class, false);
+            for (Map.Entry<String, String> translationEntry : translations.entrySet()) {
+              sharedProperties.put("i18n." + translationEntry.getKey(),
+                Collections.singletonList(translationEntry.getValue()));
+            }
+          }
+
+          List<String> properties = RodaCoreFactory
+            .getRodaConfigurationAsList("ui.sharedProperties.whitelist.messages.property");
+          for (String propertyKey : properties) {
+            if (messages.containsTranslation(propertyKey)) {
+              sharedProperties.put("i18n." + propertyKey,
+                Collections.singletonList(messages.getTranslation(propertyKey)));
+            }
           }
         }
 
@@ -1758,6 +1761,8 @@ public class RodaCoreFactory {
 
       List<String> prefixes = RodaCoreFactory
         .getRodaConfigurationAsList("ui.sharedProperties.whitelist.configuration.prefix");
+
+      rodaSharedConfigurationPropertiesCache.put(RodaConstants.RODA_NODE_TYPE_KEY, Collections.singletonList(getNodeType().toString()));
 
       Iterator<String> keys = configuration.getKeys();
       while (keys.hasNext()) {

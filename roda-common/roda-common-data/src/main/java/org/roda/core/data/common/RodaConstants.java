@@ -1573,6 +1573,8 @@ public final class RodaConstants {
 
   public static final String ENV_CONFIG_SYMBOLIC_LINKS_FORBIDDEN = "RODA_CONFIG_SYMBOLIC_LINKS_FORBIDDEN";
 
+  public static final String RODA_NODE_TYPE_KEY = "nodeType";
+
   /** Private empty constructor */
   private RodaConstants() {
     // do nothing

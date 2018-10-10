@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.tools.ConfigurationManager;
@@ -39,12 +40,10 @@ public class PermissionClientUtils {
 
         String permissionKey = ConfigurationManager.getString("core.permissions." + method);
         if (canAct && permissions != null && permissionKey != null) {
-          Permissions.PermissionType permissionType = Permissions.PermissionType.valueOf(permissionKey);
+          try {
+            PermissionType permissionType = PermissionType.valueOf(permissionKey);
 
-          if (permissionType != null) {
-            if (permissions.getUserPermissions(user.getName()).contains(permissionType)) {
-              canAct = true;
-            } else {
+            if (!permissions.getUserPermissions(user.getName()).contains(permissionType)) {
               boolean containGroup = false;
               for (String group : user.getGroups()) {
                 if (permissions.getGroupPermissions(group).contains(permissionType)) {
@@ -55,6 +54,8 @@ public class PermissionClientUtils {
 
               canAct = containGroup;
             }
+          } catch(IllegalArgumentException e) {
+            // do nothing
           }
         }
       }
