@@ -807,12 +807,12 @@ public class SolrUtils {
     } else if (parameter instanceof DateRangeFilterParameter) {
       DateRangeFilterParameter param = (DateRangeFilterParameter) parameter;
       appendRange(ret, param.getName(), Date.class, param.getFromValue(), String.class,
-        processToDate(param.getToValue(), param.getGranularity(), param.getTimeZoneOffset(), false),
+        processToDate(param.getToValue(), param.getGranularity(), false),
         prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof DateIntervalFilterParameter) {
       DateIntervalFilterParameter param = (DateIntervalFilterParameter) parameter;
       appendRangeInterval(ret, param.getFromName(), param.getToName(), param.getFromValue(), param.getToValue(),
-        param.getGranularity(), param.getTimeZoneOffset(), prefixWithANDOperatorIfBuilderNotEmpty);
+        param.getGranularity(), prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof LongRangeFilterParameter) {
       LongRangeFilterParameter param = (LongRangeFilterParameter) parameter;
       appendRange(ret, param.getName(), Long.class, param.getFromValue(), Long.class, param.getToValue(),
@@ -955,7 +955,7 @@ public class SolrUtils {
   }
 
   private static void appendRangeInterval(StringBuilder ret, String fromKey, String toKey, Date fromValue, Date toValue,
-    DateGranularity granularity, int timeZoneOffset, boolean prefixWithANDOperatorIfBuilderNotEmpty) {
+    DateGranularity granularity, boolean prefixWithANDOperatorIfBuilderNotEmpty) {
     if (fromValue != null || toValue != null) {
       appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
       ret.append("(");
@@ -963,18 +963,18 @@ public class SolrUtils {
       ret.append(fromKey).append(":[");
       ret.append(processFromDate(fromValue));
       ret.append(" TO ");
-      ret.append(processToDate(toValue, granularity, timeZoneOffset));
+      ret.append(processToDate(toValue, granularity));
       ret.append("]").append(" OR ");
 
       ret.append(toKey).append(":[");
       ret.append(processFromDate(fromValue));
       ret.append(" TO ");
-      ret.append(processToDate(toValue, granularity, timeZoneOffset));
+      ret.append(processToDate(toValue, granularity));
       ret.append("]");
 
       if (fromValue != null && toValue != null) {
         ret.append(" OR ").append("(").append(fromKey).append(":[* TO ")
-          .append(processToDate(fromValue, granularity, timeZoneOffset)).append("]");
+          .append(processToDate(fromValue, granularity)).append("]");
         ret.append(" AND ").append(toKey).append(":[").append(processFromDate(toValue)).append(" TO *]").append(")");
       }
 
@@ -994,18 +994,19 @@ public class SolrUtils {
     return ret;
   }
 
-  private static String processToDate(Date toValue, DateGranularity granularity, int timeZoneOffset) {
-    return processToDate(toValue, granularity, timeZoneOffset, true);
+  private static String processToDate(Date toValue, DateGranularity granularity) {
+    return processToDate(toValue, granularity, true);
   }
 
-  private static String processToDate(Date toValue, DateGranularity granularity, int timeZoneOffset,
+  private static String processToDate(Date toValue, DateGranularity granularity,
     boolean returnAsteriskOnNull) {
     final String ret;
     StringBuilder sb = new StringBuilder();
+
     if (toValue != null) {
       Date toValueWithoutTimeZone = (Date) toValue.clone();
-      toValueWithoutTimeZone.setMinutes(toValueWithoutTimeZone.getMinutes() - timeZoneOffset);
       sb.append(formatDate(toValueWithoutTimeZone));
+
       switch (granularity) {
         case YEAR:
           sb.append("+1YEAR-1MILLISECOND");
@@ -1029,6 +1030,7 @@ public class SolrUtils {
           // do nothing
           break;
       }
+
       ret = sb.toString();
     } else {
       ret = returnAsteriskOnNull ? "*" : null;

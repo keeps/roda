@@ -17,10 +17,7 @@ import org.roda.core.data.common.RodaConstants.DateGranularity;
 public class DateRangeFilterParameter extends RangeFilterParameter<Date> {
 
   private static final long serialVersionUID = -8039972534809175118L;
-
   private DateGranularity granularity = DateGranularity.DAY;
-  @SuppressWarnings("deprecation")
-  private int timeZoneOffset = new Date().getTimezoneOffset();
 
   public DateRangeFilterParameter() {
     super();
@@ -32,24 +29,11 @@ public class DateRangeFilterParameter extends RangeFilterParameter<Date> {
 
   public DateRangeFilterParameter(String name, Date fromValue, Date toValue) {
     super(name, fromValue, toValue);
-
-    if (toValue != null) {
-      this.setTimeZoneOffset(toValue.getTimezoneOffset());
-    } else if (fromValue != null) {
-      this.setTimeZoneOffset(fromValue.getTimezoneOffset());
-    }
   }
 
   public DateRangeFilterParameter(String name, Date fromValue, Date toValue, DateGranularity granularity) {
     this(name, fromValue, toValue);
     this.setGranularity(granularity);
-  }
-
-  public DateRangeFilterParameter(String name, Date fromValue, Date toValue, DateGranularity granularity,
-    int timeZoneOffset) {
-    super(name, fromValue, toValue);
-    this.setGranularity(granularity);
-    this.setTimeZoneOffset(timeZoneOffset);
   }
 
   public DateGranularity getGranularity() {
@@ -60,20 +44,11 @@ public class DateRangeFilterParameter extends RangeFilterParameter<Date> {
     this.granularity = granularity;
   }
 
-  public int getTimeZoneOffset() {
-    return timeZoneOffset;
-  }
-
-  public void setTimeZoneOffset(int timeZoneOffset) {
-    this.timeZoneOffset = timeZoneOffset;
-  }
-
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + ((granularity == null) ? 0 : granularity.hashCode());
-    result = prime * result + timeZoneOffset;
     return result;
   }
 
@@ -87,8 +62,6 @@ public class DateRangeFilterParameter extends RangeFilterParameter<Date> {
       return false;
     DateRangeFilterParameter other = (DateRangeFilterParameter) obj;
     if (granularity != other.granularity)
-      return false;
-    if (timeZoneOffset != other.timeZoneOffset)
       return false;
     return true;
   }
