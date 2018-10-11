@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.lang3.StringUtils;
+import org.glassfish.jersey.server.JSONP;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
@@ -140,7 +141,8 @@ public class IndexResource {
    *           if some error occurs.
    */
   @GET
-  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.TEXT_CSV})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.TEXT_CSV, ExtraMediaType.APPLICATION_JAVASCRIPT})
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
   @ApiOperation(value = "Find indexed resources", notes = "Find indexed resources.", response = IndexResult.class, responseContainer = "List")
   public <T extends IsIndexed> Response list(
     @ApiParam(value = "Class of resources to return", required = true, example = "org.roda.core.data.v2.ip.IndexedFile") @QueryParam(RodaConstants.API_QUERY_KEY_RETURN_CLASS) final String returnClass,
@@ -154,7 +156,8 @@ public class IndexResource {
     @ApiParam(value = "Return only active resources?", defaultValue = "true") @QueryParam(RodaConstants.API_QUERY_KEY_ONLY_ACTIVE) final Boolean onlyActive,
     @ApiParam(value = "Export facet data", defaultValue = "false") @QueryParam(RodaConstants.API_QUERY_KEY_EXPORT_FACETS) final boolean exportFacets,
     @ApiParam(value = "Filename", defaultValue = DEFAULT_CSV_FILENAME) @QueryParam(RodaConstants.API_QUERY_KEY_FILENAME) final String filename,
-    @ApiParam(value = "Choose format in which to get the response") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
+    @ApiParam(value = "Choose format in which to get the response") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @ApiParam(value = "JSONP callback name", required = false, allowMultiple = false, defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
     throws RODAException {
 
     final String mediaType = ApiUtils.getMediaType(acceptFormat, request);

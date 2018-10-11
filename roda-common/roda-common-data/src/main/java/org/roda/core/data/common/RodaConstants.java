@@ -267,7 +267,7 @@ public final class RodaConstants {
   public static final String API_QUERY_KEY_ACCEPT_FORMAT = "acceptFormat";
   public static final String API_QUERY_KEY_INLINE = "inline";
   public static final String API_QUERY_KEY_JSONP_CALLBACK = "callback";
-  public static final String API_QUERY_DEFAULT_JSONP_CALLBACK = "rodaCallback";
+  public static final String API_QUERY_DEFAULT_JSONP_CALLBACK = "";
   public static final String API_QUERY_VALUE_ACCEPT_FORMAT_BIN = "bin";
   public static final String API_QUERY_VALUE_ACCEPT_FORMAT_XML = "xml";
   public static final String API_QUERY_VALUE_ACCEPT_FORMAT_HTML = "html";
