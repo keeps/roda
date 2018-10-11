@@ -84,7 +84,7 @@ public class ApiUtils {
 
   /**
    * Get media type
-   * 
+   *
    * @param acceptFormat
    *          String with required format
    * @param request
@@ -92,7 +92,11 @@ public class ApiUtils {
    * @return media type
    */
   public static String getMediaType(String acceptFormat, HttpServletRequest request) {
-    return getMediaType(acceptFormat, request.getHeader(RodaConstants.API_HTTP_HEADER_ACCEPT));
+    if(StringUtils.isBlank(acceptFormat) && StringUtils.isNotBlank(request.getParameter("callback"))){
+      return ExtraMediaType.APPLICATION_JAVASCRIPT + "; charset=UTF-8";
+    }else{
+      return getMediaType(acceptFormat, request.getHeader(RodaConstants.API_HTTP_HEADER_ACCEPT));
+    }
   }
 
   /**
