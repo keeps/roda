@@ -1,5 +1,16 @@
 # Changelog
 
+## v2.2.12 (11/10/2018)
+Install for demonstration:
+```
+docker pull keeps/roda:v2.2.12
+```
+
+
+#### Enhancements:
+- Add support for jsonp requests in IndexResource#list [#1375](https://github.com/keeps/roda/issues/1375)
+---
+
 ## v2.2.11 (27/09/2018)
 Install for demonstration:
 ```
