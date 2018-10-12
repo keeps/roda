@@ -97,9 +97,9 @@ public class ApiUtils {
    * @return media type
    */
   public static String getMediaType(String acceptFormat, HttpServletRequest request) {
-    if(StringUtils.isBlank(acceptFormat) && StringUtils.isNotBlank(request.getParameter("callback"))){
+    if (StringUtils.isBlank(acceptFormat) && StringUtils.isNotBlank(request.getParameter("callback"))) {
       return ExtraMediaType.APPLICATION_JAVASCRIPT + "; charset=UTF-8";
-    }else{
+    } else {
       return getMediaType(acceptFormat, request.getHeader(RodaConstants.API_HTTP_HEADER_ACCEPT));
     }
   }
@@ -147,8 +147,8 @@ public class ApiUtils {
 
   /**
    * Returns valid start (pair first element) and limit (pair second element)
-   * paging parameters defaulting to start = 0 and limit = 100 if none or
-   * invalid values are provided.
+   * paging parameters defaulting to start = 0 and limit = 100 if none or invalid
+   * values are provided.
    */
   public static Pair<Integer, Integer> processPagingParams(String start, String limit) {
     Integer startInteger;
@@ -274,7 +274,7 @@ public class ApiUtils {
     };
 
     String mediaType = MimeTypeHelper.getContentType(streamResponse.getFilename(), streamResponse.getMediaType());
-    
+
     Response.ResponseBuilder response = Response.status(Status.PARTIAL_CONTENT).entity(so)
       .header(HttpHeaders.CONTENT_TYPE, mediaType).header("Accept-Ranges", "bytes")
       .header("Content-Range", responseRange).header(HttpHeaders.CONTENT_LENGTH, len)
@@ -425,7 +425,7 @@ public class ApiUtils {
 
   public static <T extends IsIndexed> Response okResponse(T indexed, String acceptFormat, String mediaType)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    EntityResponse representation;
+    EntityResponse response;
 
     if (indexed instanceof IndexedAIP) {
       IndexedAIP indexedAIP = (IndexedAIP) indexed;
@@ -433,20 +433,21 @@ public class ApiUtils {
         StoragePath storagePath = ModelUtils.getAIPStoragePath(indexedAIP.getId());
         StorageService storage = RodaCoreFactory.getStorageService();
         Directory directory = storage.getDirectory(storagePath);
-        representation = download(directory, indexedAIP.getTitle());
+        response = download(directory, indexedAIP.getTitle());
       } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
-        || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
+        || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)
+        || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSONP.equals(acceptFormat)) {
         AIP aip = RodaCoreFactory.getModelService().retrieveAIP(indexedAIP.getId());
-        representation = new ObjectResponse<>(acceptFormat, aip);
+        response = new ObjectResponse<>(acceptFormat, aip);
       } else {
         throw new GenericException("Unsupported class: " + acceptFormat);
       }
 
-      if (representation instanceof ObjectResponse) {
-        ObjectResponse<AIP> aip = (ObjectResponse<AIP>) representation;
+      if (response instanceof ObjectResponse) {
+        ObjectResponse<AIP> aip = (ObjectResponse<AIP>) response;
         return Response.ok(aip.getObject(), mediaType).build();
       } else {
-        return ApiUtils.okResponse((StreamResponse) representation);
+        return ApiUtils.okResponse((StreamResponse) response);
       }
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);

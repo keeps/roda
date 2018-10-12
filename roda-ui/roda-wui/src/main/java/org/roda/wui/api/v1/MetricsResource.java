@@ -18,6 +18,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.glassfish.jersey.server.JSONP;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
@@ -25,6 +26,7 @@ import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Metrics;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
+import org.roda.wui.api.v1.utils.ExtraMediaType;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -42,14 +44,17 @@ public class MetricsResource {
   private HttpServletRequest request;
 
   @GET
-  @Produces({MediaType.APPLICATION_JSON})
+  @Produces({MediaType.APPLICATION_JSON, ExtraMediaType.APPLICATION_JAVASCRIPT})
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
   @ApiOperation(value = "Get list of RODA metrics", notes = "Get a list of RODA metrics", response = String.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful response", response = String.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response getMetrics(
     @ApiParam(value = "Choose format in which to get the metrics", allowableValues = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) final String acceptFormat,
-    @QueryParam(RodaConstants.API_METRICS_TO_OBTAIN) final List<String> metricsToObtain) throws RODAException {
+    @QueryParam(RodaConstants.API_METRICS_TO_OBTAIN) final List<String> metricsToObtain,
+    @ApiParam(value = "JSONP callback name", required = false, allowMultiple = false, defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
@@ -60,5 +65,4 @@ public class MetricsResource {
 
     return Response.ok(metrics, mediaType).build();
   }
-
 }

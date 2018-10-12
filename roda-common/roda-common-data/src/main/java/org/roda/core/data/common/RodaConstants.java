@@ -354,14 +354,13 @@ public final class RodaConstants {
   public static final String API_NOTIFICATION_DEFAULT_TEMPLATE = "test-email-template";
 
   // api method allowable values
-  public static final String API_LIST_MEDIA_TYPES = "json, xml";
-  public static final String API_LIST_MEDIA_TYPES_2 = "json, xml, jsonp";
-  public static final String API_GET_MEDIA_TYPES = "json, xml";
-  public static final String API_GET_LIST_MEDIA_TYPES = "json, xml, zip";
-  public static final String API_GET_FILE_MEDIA_TYPES = "json, xml, bin";
-  public static final String API_POST_PUT_MEDIA_TYPES = "json, xml";
-  public static final String API_DELETE_MEDIA_TYPES = "json, xml";
-  public static final String API_GET_METADATA_MEDIA_TYPES = "json, xml, html, bin";
+  public static final String API_LIST_MEDIA_TYPES = "json, xml, jsonp";
+  public static final String API_GET_MEDIA_TYPES = "json, xml, jsonp";
+  public static final String API_GET_LIST_MEDIA_TYPES = "json, xml, zip, jsonp";
+  public static final String API_GET_FILE_MEDIA_TYPES = "json, xml, bin, jsonp";
+  public static final String API_POST_PUT_MEDIA_TYPES = "json, xml, jsonp";
+  public static final String API_DELETE_MEDIA_TYPES = "json, xml, jsonp";
+  public static final String API_GET_METADATA_MEDIA_TYPES = "json, xml, html, bin, jsonp";
   public static final String API_DESCRIPTIVE_METADATA_LANGUAGES = "pt_PT, en_US";
 
   public static final String API_USER_OR_GROUP_MEMBER = "user, group";

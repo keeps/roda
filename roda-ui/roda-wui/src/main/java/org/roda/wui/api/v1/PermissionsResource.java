@@ -12,12 +12,14 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.glassfish.jersey.server.JSONP;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
@@ -25,6 +27,7 @@ import org.roda.core.data.v2.common.ObjectPermissionResult;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
+import org.roda.wui.api.v1.utils.ExtraMediaType;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -43,7 +46,8 @@ public class PermissionsResource {
 
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_USERNAME + "}/{" + RodaConstants.API_PATH_PARAM_PERMISSION_TYPE + "}")
-  @Produces({MediaType.APPLICATION_JSON})
+  @Produces({MediaType.APPLICATION_JSON, ExtraMediaType.APPLICATION_JAVASCRIPT})
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
   @ApiOperation(value = "Test permissions", notes = "Test if user has permissions.", response = ObjectPermissionResult.class, responseContainer = "List")
   @ApiResponses(value = {
     @ApiResponse(code = 200, message = "Successful response", response = ObjectPermissionResult.class, responseContainer = "List"),
@@ -52,7 +56,9 @@ public class PermissionsResource {
   public Response getPermissions(
     @ApiParam(value = "The username to test permission.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_USERNAME) String username,
     @ApiParam(value = "The permission type to test.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_PERMISSION_TYPE) String permissionType,
-    @Context UriInfo uriInfo) throws RODAException {
+    @Context UriInfo uriInfo,
+    @ApiParam(value = "JSONP callback name", required = false, allowMultiple = false, defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    throws RODAException {
     String mediaType = MediaType.APPLICATION_JSON + "; charset=UTF-8";
     MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
 
