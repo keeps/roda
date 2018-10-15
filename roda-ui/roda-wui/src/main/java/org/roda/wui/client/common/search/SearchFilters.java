@@ -8,6 +8,7 @@
 package org.roda.wui.client.common.search;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
@@ -34,7 +35,7 @@ public class SearchFilters {
   public static Filter createIncrementalFilterFromTokens(final List<String> historyTokens, Filter baseFilter) {
     // historyTokens like TYPE/key/value/key/value or key/value/key/value
 
-    Filter resultingFilter = baseFilter == null ? new Filter() : new Filter(baseFilter);
+    Filter resultingFilter = baseFilter == null ? new Filter(Filter.ALL) : new Filter(baseFilter);
 
     List<String> parts = new ArrayList<>(historyTokens);
     if (!parts.isEmpty()) {
@@ -72,5 +73,17 @@ public class SearchFilters {
 
   public static boolean shouldBeIncremental(final Filter filter) {
     return !filter.getParameters().isEmpty() && !SearchFilters.allFilter().equals(filter);
+  }
+
+  public static String classesToHistoryTokens(List<Class> classes) {
+    StringBuilder result = new StringBuilder();
+    for (Class aClass : classes) {
+      result.append("@").append(aClass.getSimpleName());
+    }
+    return result.length() == 0 ? "@Void" : result.toString();
+  }
+
+  public static String classesToHistoryTokens(Class... classes) {
+    return classesToHistoryTokens(Arrays.asList(classes));
   }
 }

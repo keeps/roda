@@ -14,8 +14,7 @@
 						<ui:text from='{messages.searchTitle}' />
 					</h1>
 				</g:HTML>
-				<g:FlowPanel addStyleNames="page-description" ui:field="searchDescription">
-				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="page-description" ui:field="searchDescription" />
 				<commonsearch:CatalogueSearch ui:field="catalogueSearch" />
 			</g:FlowPanel>
 		</g:FlowPanel>

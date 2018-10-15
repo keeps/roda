@@ -170,46 +170,62 @@ public class SearchWrapper extends Composite {
 
   public <T extends IsIndexed> void setFilter(String objectClassSimpleName, Filter filter) {
     SearchPanel<T> searchPanel = components.getSearchPanel(objectClassSimpleName);
-    searchPanel.setDefaultFilter(filter, SearchFilters.shouldBeIncremental(filter));
+    if (searchPanel != null) {
+      searchPanel.setDefaultFilter(filter, SearchFilters.shouldBeIncremental(filter));
+    }
   }
 
   public <T extends IsIndexed> void setFilter(Class<T> objectClass, Filter filter) {
     SearchPanel<T> searchPanel = components.getSearchPanel(objectClass);
-    searchPanel.setDefaultFilter(filter, SearchFilters.shouldBeIncremental(filter));
+    if (searchPanel != null) {
+      searchPanel.setDefaultFilter(filter, SearchFilters.shouldBeIncremental(filter));
+    }
   }
 
   public <T extends IsIndexed> void resetToDefaultFilter(String objectClassSimpleName) {
     SearchPanel<T> searchPanel = components.getSearchPanel(objectClassSimpleName);
-    searchPanel.setDefaultFilter(SearchFilters.allFilter(), false);
+    if (searchPanel != null) {
+      searchPanel.setDefaultFilter(SearchFilters.allFilter(), false);
+    }
   }
 
   public <T extends IsIndexed> void resetToDefaultFilter(Class<T> objectClass) {
     SearchPanel<T> searchPanel = components.getSearchPanel(objectClass);
-    searchPanel.setDefaultFilter(SearchFilters.allFilter(), false);
+    if (searchPanel != null) {
+      searchPanel.setDefaultFilter(SearchFilters.allFilter(), false);
+    }
   }
 
   public <T extends IsIndexed> void addSearchFieldTextValueChangeHandler(String objectClassSimpleName,
     ValueChangeHandler<String> handler) {
     SearchPanel<T> searchPanel = components.getSearchPanel(objectClassSimpleName);
-    searchPanel.addValueChangeHandler(handler);
+    if (searchPanel != null) {
+      searchPanel.addValueChangeHandler(handler);
+    }
   }
 
   public <T extends IsIndexed> void addSearchFieldTextValueChangeHandler(Class<T> objectClass,
     ValueChangeHandler<String> handler) {
     SearchPanel<T> searchPanel = components.getSearchPanel(objectClass);
-    searchPanel.addValueChangeHandler(handler);
+    if (searchPanel != null) {
+      searchPanel.addValueChangeHandler(handler);
+    }
   }
 
   public <T extends IsIndexed> void addListDataChangeHandler(String objectClassSimpleName,
     ValueChangeHandler<IndexResult<T>> handler) {
     AsyncTableCell<T> list = components.getList(objectClassSimpleName);
-    list.addValueChangeHandler(handler);
+    if (list != null) {
+      list.addValueChangeHandler(handler);
+    }
   }
 
   public <T extends IsIndexed> void addListDataChangeHandler(Class<T> objectClass,
     ValueChangeHandler<IndexResult<T>> handler) {
     AsyncTableCell<T> list = components.getList(objectClass);
-    list.addValueChangeHandler(handler);
+    if (list != null) {
+      list.addValueChangeHandler(handler);
+    }
   }
 
   private void initSearchPanelSelectionDropdown() {

@@ -7,9 +7,16 @@
  */
 package org.roda.wui.client.common.search;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -25,7 +32,8 @@ import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
-import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -36,7 +44,7 @@ import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.ClientMessages;
 
 public class CatalogueSearch extends Composite {
-
+  private ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   interface MyUiBinder extends UiBinder<Widget, CatalogueSearch> {
@@ -44,61 +52,141 @@ public class CatalogueSearch extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
+  private static final List<Class<? extends IsIndexed>> searchableClasses = Arrays.asList(IndexedAIP.class,
+    IndexedRepresentation.class, IndexedFile.class);
+
   @UiField(provided = true)
   SearchWrapper searchWrapper;
 
-  public CatalogueSearch(boolean justActive, String itemsListId, String representationsListId, String filesListId,
-    Permissions permissions, boolean startHidden, boolean redirectOnSingleResult) {
+  public CatalogueSearch(List<String> filterHistoryTokens, boolean justActive, String itemsListId,
+    String representationsListId, String filesListId, Permissions permissions, boolean startHidden,
+    boolean redirectOnSingleResult) {
 
-    // prepare lists
-    ListBuilder<IndexedAIP> aipListBuilder = new ListBuilder<>(() -> new AIPList(),
-      new AsyncTableCellOptions<>(IndexedAIP.class, itemsListId).withJustActive(justActive).bindOpener()
-        .withStartHidden(startHidden).withRedirectOnSingleResult(redirectOnSingleResult)
-        .withActionable(AipActions.getWithoutNoAipActions(null, AIPState.ACTIVE, permissions)));
-
-    // add lists to search
-    searchWrapper = new SearchWrapper(true, IndexedAIP.class.getSimpleName()).createListAndSearchPanel(aipListBuilder);
-
-    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)) {
-      ListBuilder<IndexedRepresentation> representationListBuilder = new ListBuilder<>(() -> new RepresentationList(),
-        new AsyncTableCellOptions<>(IndexedRepresentation.class, representationsListId).withJustActive(justActive)
-          .bindOpener().withStartHidden(startHidden).withRedirectOnSingleResult(redirectOnSingleResult)
-          .withActionable(RepresentationActions.getWithoutNoRepresentationActions(null, null)));
-      searchWrapper.createListAndSearchPanel(representationListBuilder);
+    // get classes to show and preFilters to use
+    Map<String, Filter> classFilters = null;
+    if (!filterHistoryTokens.isEmpty()) {
+      classFilters = parseFilters(filterHistoryTokens);
+    } else {
+      classFilters = new HashMap<>();
+      for (Class<? extends IsIndexed> searchableClass : searchableClasses) {
+        classFilters.put(searchableClass.getSimpleName(), Filter.ALL);
+      }
     }
 
-    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_FILE)) {
-      ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new SearchFileList(true),
-        new AsyncTableCellOptions<>(IndexedFile.class, filesListId).withJustActive(justActive).bindOpener()
-          .withRedirectOnSingleResult(redirectOnSingleResult).withStartHidden(startHidden)
-          .withActionable(FileActions.getWithoutNoFileActions(null, null, null, null)));
-      searchWrapper.createListAndSearchPanel(fileListBuilder);
+    searchWrapper = new SearchWrapper(true);
+
+    String preselectedDropdownValue = null;
+    for (Class<? extends IsIndexed> searchableClass : searchableClasses) {
+      if (classFilters.containsKey(searchableClass.getSimpleName())) {
+
+        Filter filter = classFilters.get(searchableClass.getSimpleName());
+        ListBuilder listBuilder = null;
+        if (searchableClass.equals(IndexedAIP.class)
+          && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
+
+          listBuilder = new ListBuilder<>(() -> new AIPList(),
+            new AsyncTableCellOptions<>(IndexedAIP.class, itemsListId)
+              .withActionable(AipActions.getWithoutNoAipActions(null, AIPState.ACTIVE, permissions))
+              .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
+              .withFilter(filter).withStartHidden(startHidden));
+        } else if (searchableClass.equals(IndexedRepresentation.class)
+          && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)) {
+
+          listBuilder = new ListBuilder<>(() -> new RepresentationList(),
+            new AsyncTableCellOptions<>(IndexedRepresentation.class, representationsListId)
+              .withActionable(RepresentationActions.getWithoutNoRepresentationActions(null, null))
+              .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
+              .withFilter(filter).withStartHidden(startHidden));
+        } else if (searchableClass.equals(IndexedFile.class)
+          && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_FILE)) {
+
+          listBuilder = new ListBuilder<>(() -> new SearchFileList(true),
+            new AsyncTableCellOptions<>(IndexedFile.class, filesListId)
+              .withActionable(FileActions.getWithoutNoFileActions(null, null, null, null))
+              .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
+              .withFilter(filter).withStartHidden(startHidden));
+        }
+
+        if (listBuilder != null) {
+          if (preselectedDropdownValue == null) {
+            preselectedDropdownValue = searchableClass.getSimpleName();
+          }
+          searchWrapper.createListAndSearchPanel(listBuilder);
+        }
+      }
+    }
+
+    if (preselectedDropdownValue != null) {
+      searchWrapper.changeDropdownSelectedValue(preselectedDropdownValue);
     }
 
     initWidget(uiBinder.createAndBindUi(this));
+  }
+
+  public CatalogueSearch(boolean justActive, String itemsListId, String representationsListId, String filesListId,
+    Permissions permissions, boolean startHidden, boolean redirectOnSingleResult) {
+    this(Collections.emptyList(), justActive, itemsListId, representationsListId, filesListId, permissions, startHidden,
+      redirectOnSingleResult);
   }
 
   public void refresh() {
     searchWrapper.refreshCurrentList();
   }
 
-  public void setFilters(List<String> historyTokens) {
-    if (!historyTokens.isEmpty()) {
-      Filter filter = SearchFilters.createFilterFromHistoryTokens(ListUtils.tail(historyTokens));
+  private Map<String, Filter> parseFilters(List<String> historyTokens) {
 
-      String classSimpleName = historyTokens.get(0);
-      if (IndexedRepresentation.class.getSimpleName().equals(classSimpleName)) {
-        searchWrapper.setFilter(IndexedRepresentation.class, filter);
-        searchWrapper.changeDropdownSelectedValue(classSimpleName);
-      } else if (IndexedFile.class.getSimpleName().equals(classSimpleName)) {
-        searchWrapper.setFilter(IndexedFile.class, filter);
-        searchWrapper.changeDropdownSelectedValue(classSimpleName);
-      } else if (IndexedAIP.class.getSimpleName().equals(classSimpleName)) {
-        searchWrapper.setFilter(IndexedAIP.class, filter);
-        searchWrapper.changeDropdownSelectedValue(classSimpleName);
+    // classSimpleName -> filter
+    Map<String, Filter> classFilters = new HashMap<>();
+    ListIterator<String> tokens = historyTokens.listIterator();
+    while (tokens.hasNext()) {
+      List<String> classes = new ArrayList<>(Arrays.asList(tokens.next().split("@")));
+
+      // should start with @, so remove the empty string
+      if (classes.size() > 1 && classes.get(0).isEmpty()) {
+        classes.remove(0);
+
+        // get filter
+        if (tokens.hasNext()) {
+          List<String> filterTokens = new ArrayList<>();
+
+          String possibleOperand = tokens.next();
+          if (RodaConstants.OPERATOR_AND.equals(possibleOperand) || RodaConstants.OPERATOR_OR.equals(possibleOperand)) {
+            filterTokens.add(possibleOperand);
+          } else {
+            tokens.previous();
+          }
+
+          while (tokens.hasNext()) {
+            String field = tokens.next();
+            if (field.startsWith("@")) {
+              tokens.previous();
+              break;
+            }
+
+            // add key/value pair
+            filterTokens.add(field);
+            if (tokens.hasNext()) {
+              // filter value
+              filterTokens.add(tokens.next());
+            }
+          }
+
+          Filter filter = SearchFilters.createFilterFromHistoryTokens(filterTokens);
+          if (!filter.equals(Filter.ALL)) {
+            for (String aClass : classes) {
+              classFilters.put(aClass, filter);
+            }
+          } else {
+            logger.error("Could not parse filter (" + StringUtils.join(filterTokens, "/") + ") for classes "
+              + StringUtils.join(classes, ", ") + ". List of tokens: " + StringUtils.join(historyTokens, "/"));
+          }
+        }
       } else {
-        GWT.log("setFilter can not handle tokens: " + historyTokens);
+        logger.error("setFilter can not handle tokens: " + historyTokens);
+        break;
       }
     }
+
+    return classFilters;
   }
 }

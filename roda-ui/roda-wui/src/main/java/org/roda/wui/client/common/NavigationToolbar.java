@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.common;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashSet;
@@ -44,6 +45,7 @@ import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils;
 import org.roda.wui.client.common.lists.pagination.ListSelectionUtils.ProcessRelativeItem;
 import org.roda.wui.client.common.popup.CalloutPopup;
+import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
@@ -441,11 +443,37 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     @Override
     public void act(Action<IndexedAIP> action, IndexedAIP object, AsyncCallback<ActionImpact> callback) {
       if (action.equals(SearchAipAction.SEARCH_DESCENDANTS)) {
-        HistoryUtils.newHistory(Search.RESOLVER, IndexedAIP.class.getSimpleName(), RodaConstants.AIP_ANCESTORS,
-          object.getId());
+        List<String> searchFilters = new ArrayList<>();
+
+        searchFilters.add(SearchFilters.classesToHistoryTokens(IndexedAIP.class));
+        searchFilters.add(RodaConstants.AIP_ANCESTORS);
+        searchFilters.add(object.getId());
+
+        searchFilters.add(SearchFilters.classesToHistoryTokens(IndexedRepresentation.class));
+        searchFilters.add(RodaConstants.REPRESENTATION_ANCESTORS);
+        searchFilters.add(object.getId());
+
+        searchFilters.add(SearchFilters.classesToHistoryTokens(IndexedFile.class));
+        searchFilters.add(RodaConstants.FILE_ANCESTORS);
+        searchFilters.add(object.getId());
+
+        HistoryUtils.newHistory(Search.RESOLVER, searchFilters);
       } else if (action.equals(SearchAipAction.SEARCH_PACKAGE)) {
-        HistoryUtils.newHistory(Search.RESOLVER, IndexedRepresentation.class.getSimpleName(),
-          RodaConstants.REPRESENTATION_AIP_ID, object.getId());
+        List<String> searchFilters = new ArrayList<>();
+
+        searchFilters.add(SearchFilters.classesToHistoryTokens(IndexedAIP.class));
+        searchFilters.add(RodaConstants.AIP_PARENT_ID);
+        searchFilters.add(object.getId());
+
+        searchFilters.add(SearchFilters.classesToHistoryTokens(IndexedRepresentation.class));
+        searchFilters.add(RodaConstants.REPRESENTATION_AIP_ID);
+        searchFilters.add(object.getId());
+
+        searchFilters.add(SearchFilters.classesToHistoryTokens(IndexedFile.class));
+        searchFilters.add(RodaConstants.FILE_AIP_ID);
+        searchFilters.add(object.getId());
+
+        HistoryUtils.newHistory(Search.RESOLVER, searchFilters);
       } else {
         unsupportedAction(action, callback);
       }

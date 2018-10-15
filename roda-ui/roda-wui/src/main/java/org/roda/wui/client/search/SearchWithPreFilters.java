@@ -28,10 +28,10 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  */
 public class SearchWithPreFilters extends Composite {
-
   // Used by Search.RESOLVER
-
-  private static SearchWithPreFilters instance = null;
+  public static void resolveToNewInstance(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    callback.onSuccess(new SearchWithPreFilters(historyTokens));
+  }
 
   interface MyUiBinder extends UiBinder<Widget, SearchWithPreFilters> {
   }
@@ -44,24 +44,12 @@ public class SearchWithPreFilters extends Composite {
   @UiField(provided = true)
   CatalogueSearch catalogueSearch;
 
-  private SearchWithPreFilters() {
+  private SearchWithPreFilters(List<String> historyTokens) {
     // Create main search
-    catalogueSearch = new CatalogueSearch(true, "Search_AIPs", "Search_representations", "Search_files", null, false,
-      true);
+    catalogueSearch = new CatalogueSearch(historyTokens, true, "Search_AIPs", "Search_representations", "Search_files",
+      null, false, true);
 
     initWidget(uiBinder.createAndBindUi(this));
     searchDescription.add(new HTMLWidgetWrapper("SearchDescription.html"));
-  }
-
-  public static SearchWithPreFilters getInstance() {
-    if (instance == null) {
-      instance = new SearchWithPreFilters();
-    }
-    return instance;
-  }
-
-  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    catalogueSearch.setFilters(historyTokens);
-    callback.onSuccess(this);
   }
 }

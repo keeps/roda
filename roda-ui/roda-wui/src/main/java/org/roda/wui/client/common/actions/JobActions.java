@@ -21,6 +21,7 @@ import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.process.CreateDefaultJob;
@@ -129,8 +130,8 @@ public class JobActions extends AbstractActionable<Job> {
 
   private void ingestProcess(Job object, AsyncCallback<ActionImpact> callback) {
     callback.onSuccess(ActionImpact.NONE);
-    HistoryUtils.newHistory(Search.RESOLVER, IndexedAIP.class.getSimpleName(), RodaConstants.ALL_INGEST_JOB_IDS,
-      object.getId());
+    HistoryUtils.newHistory(Search.RESOLVER, SearchFilters.classesToHistoryTokens(IndexedAIP.class),
+      RodaConstants.ALL_INGEST_JOB_IDS, object.getId());
   }
 
   private void ingestAppraisal(Job object, AsyncCallback<ActionImpact> callback) {

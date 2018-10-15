@@ -12,6 +12,7 @@ package org.roda.wui.client.planning;
 
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ri.RepresentationInformation;
@@ -50,7 +51,7 @@ public class RepresentationInformationAssociations extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-      if (historyTokens.size() >= 2) {
+      if (historyTokens.size() >= 2 && RodaConstants.REPRESENTATION_INFORMATION_FILTERS.equals(historyTokens.get(0))) {
         String[] filterParts = RepresentationInformationUtils.breakFilterIntoParts(historyTokens.get(1));
         Filter filter = SearchFilters.createFilterFromHistoryTokens(historyTokens);
         callback.onSuccess(new RepresentationInformationAssociations(filter, filterParts));

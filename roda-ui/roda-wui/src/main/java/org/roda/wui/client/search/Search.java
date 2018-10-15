@@ -37,7 +37,7 @@ public class Search extends Composite {
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
       if (historyTokens.size() > 1) {
-        SearchWithPreFilters.getInstance().resolve(historyTokens, callback);
+        SearchWithPreFilters.resolveToNewInstance(historyTokens, callback);
       } else {
         getInstance().resolve(callback);
       }
