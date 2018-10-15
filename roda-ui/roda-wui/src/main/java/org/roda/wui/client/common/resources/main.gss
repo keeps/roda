@@ -4608,6 +4608,10 @@ td.datePickerMonth, td.datePickerYear {
     display: block;
 }
 
+.slider .slider-info-entry-value p {
+    margin-bottom: 0.5rem;
+}
+
 .table-file-path {
     color: #a7a9ac;
 }

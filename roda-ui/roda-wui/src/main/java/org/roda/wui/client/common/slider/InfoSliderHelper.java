@@ -46,6 +46,7 @@ import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -179,7 +180,11 @@ public class InfoSliderHelper {
     }
 
     if (!aip.getIngestSIPIds().isEmpty()) {
-      values.put(messages.sipId(), new InlineHTML(StringUtils.prettyPrint(aip.getIngestSIPIds())));
+      FlowPanel sipIds = new FlowPanel();
+      for (String ingestSIPId : aip.getIngestSIPIds()) {
+        sipIds.add(new HTMLPanel("p", ingestSIPId));
+      }
+      values.put(messages.sipId(), sipIds);
     }
 
     if (StringUtils.isNotBlank(aip.getIngestJobId())) {
