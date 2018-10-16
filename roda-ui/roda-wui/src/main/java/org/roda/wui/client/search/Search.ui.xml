@@ -2,20 +2,16 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search">
+	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
+	xmlns:common="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<g:FlowPanel styleName="search" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_12 content">
-				<g:HTML>
-					<h1>
-						<ui:text from='{messages.searchTitle}' />
-					</h1>
-				</g:HTML>
-				<g:FlowPanel addStyleNames="page-description" ui:field="searchDescription">
-				</g:FlowPanel>
+				<common:TitlePanel text="{messages.searchTitle}" icon="fas fa-search" />
+				<g:FlowPanel addStyleNames="page-description" ui:field="searchDescription" />
 				<commonsearch:CatalogueSearch ui:field="catalogueSearch" />
 			</g:FlowPanel>
 		</g:FlowPanel>

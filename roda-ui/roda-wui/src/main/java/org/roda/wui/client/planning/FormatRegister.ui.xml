@@ -3,15 +3,17 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
-	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
+	xmlns:common="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<g:FlowPanel styleName="wui-format-register" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:FlowPanel ui:field="title"></g:FlowPanel>
-				<g:FlowPanel addStyleNames="page-description" ui:field="formatRegisterDescription"></g:FlowPanel>
+				<common:TitlePanel text="{messages.formatRegisterTitle}" iconClass="Format">
+					<g:InlineHTML><span class='label-warning browseRepresentationOriginalIcon'>Deprecated</span></g:InlineHTML>
+				</common:TitlePanel>
+				<g:FlowPanel addStyleNames="page-description" ui:field="formatRegisterDescription"/>
 				<commonsearch:SearchWrapper ui:field="searchWrapper" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">

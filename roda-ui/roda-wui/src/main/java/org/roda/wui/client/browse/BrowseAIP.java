@@ -30,6 +30,7 @@ import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.actions.DisseminationActions;
@@ -161,12 +162,7 @@ public class BrowseAIP extends Composite {
 
   // IDENTIFICATION
   @UiField
-  Label itemTitle;
-  @UiField
-  HTML itemIcon;
-
-  @UiField
-  FlowPanel identificationPanel;
+  TitlePanel title;
 
   // DESCRIPTIVE METADATA
 
@@ -411,8 +407,9 @@ public class BrowseAIP extends Composite {
 
   private void updateSectionIdentification(BrowseAIPBundle bundle) {
     IndexedAIP aip = bundle.getAip();
-    itemIcon.setHTML(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false));
-    itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
+
+    title.setIcon(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false));
+    title.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
 
     Sliders.createAipInfoSlider(center, navigationToolbar.getInfoSidebarButton(), bundle);
 

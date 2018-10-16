@@ -12,16 +12,12 @@
 		<common:NavigationToolbar ui:field="navigationToolbar" visible="false"/>
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_12 content">
-				<g:Label styleName="h1" ui:field="ingestTransferTitle">
-					<ui:text from='{messages.ingestTransferTitle}' />
-				</g:Label>
+				<common:TitlePanel text="{messages.ingestTransferTitle}" iconClass="TransferredResource" ui:field="ingestTransferTitle"/>
 				<g:FlowPanel addStyleNames="page-description" ui:field="ingestTransferDescription">
 				</g:FlowPanel>
-				<g:FlowPanel addStyleNames="browseItemPanel">
-					<g:HTML addStyleNames="h3 browseItemIcon" ui:field="itemIcon" />
-					<g:Label addStyleNames="h3 browseItemText" ui:field="itemTitle" />
+				<common:TitlePanel ui:field="itemTitle">
 					<g:Label addStyleNames="browseItemDates" ui:field="itemDates" />
-				</g:FlowPanel>
+				</common:TitlePanel>
 				<search:TransferredResourceSearch ui:field="resourceSearch" addStyleNames="searchResults" />
 				<g:Button addStyleNames="btn btn-download" ui:field="download">
 					<ui:text from='{messages.downloadButton}' />

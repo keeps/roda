@@ -33,8 +33,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -78,9 +76,6 @@ public class FormatRegister extends Composite {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
-  FlowPanel title;
-
-  @UiField
   FlowPanel formatRegisterDescription;
 
   @UiField
@@ -106,13 +101,6 @@ public class FormatRegister extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
     actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(Format.class)));
-
-    Label titleLabel = new Label(messages.formatRegisterTitle());
-    titleLabel.addStyleName("h1 browseItemText");
-    title.add(titleLabel);
-
-    InlineHTML badge = new InlineHTML("<span class='label-warning browseRepresentationOriginalIcon'>Deprecated</span>");
-    title.add(badge);
 
     formatRegisterDescription.add(new HTMLWidgetWrapper("FormatRegisterDescription.html"));
   }

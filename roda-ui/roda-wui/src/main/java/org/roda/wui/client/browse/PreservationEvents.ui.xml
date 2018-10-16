@@ -12,13 +12,8 @@
 		<common:NavigationToolbar ui:field="navigationToolbar" header="{messages.preservationEventsTitle}" visible="false"/>
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_12 content">
-				<g:FlowPanel styleName="browseItemPanel">
-					<g:HTML addStyleNames="h3 browseItemIcon"><i class="fa fa-clock-o"></i></g:HTML>
-					<g:Label addStyleNames="h3 browseItemText">
-						<ui:text from='{messages.preservationEventsTitle}' />
-					</g:Label>
-					<g:FlowPanel addStyleNames="page-description" ui:field="pageDescription"/>
-				</g:FlowPanel>
+				<common:TitlePanel text="{messages.preservationEventsTitle}" iconClass="IndexedPreservationEvent" />
+				<g:FlowPanel addStyleNames="page-description" ui:field="pageDescription"/>
 				<search:PreservationEventsSearch ui:field="eventsSearch" addStyleNames="searchResults" />
 			</g:FlowPanel>
 		</g:FlowPanel>

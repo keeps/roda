@@ -17,6 +17,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.lists.AIPList;
@@ -36,8 +37,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -119,10 +118,9 @@ public class BrowseTop extends Composite {
 
   @UiField(provided = true)
   SearchWrapper search;
+
   @UiField
-  HTML itemIcon;
-  @UiField
-  Label itemTitle;
+  TitlePanel title;
 
   private BrowseTop() {
     // AIP LIST, it has the same id as the AIP children list because facets should
@@ -139,8 +137,7 @@ public class BrowseTop extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     // HEADER
-    itemIcon.setHTML(DescriptionLevelUtils.getTopIconSafeHtml());
-    itemTitle.setText(messages.allCollectionsTitle());
+    title.setIcon(DescriptionLevelUtils.getTopIconSafeHtml());
 
     browseDescription.add(new HTMLWidgetWrapper("BrowseDescription.html"));
 

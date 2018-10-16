@@ -7,10 +7,6 @@
  */
 package org.roda.wui.client.search;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Widget;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.common.actions.Actionable;
@@ -24,17 +20,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SimplePanel;
 
 public class TransferredResourceSearch extends SimplePanel {
-
-  interface MyUiBinder extends UiBinder<Widget, TransferredResourceSearch> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  @UiField(provided = true)
   SearchWrapper searchWrapper;
 
   public TransferredResourceSearch() {
-
+    super();
   }
 
   public TransferredResourceSearch(String resourcesListId, Filter filter,
@@ -46,12 +35,6 @@ public class TransferredResourceSearch extends SimplePanel {
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(transferredResourceListBuilder);
     add(searchWrapper);
-  }
-
-  public void setDefaultFilters(Filter filter) {
-    if (searchWrapper != null) {
-      searchWrapper.setFilter(TransferredResource.class, filter);
-    }
   }
 
   public void refresh() {

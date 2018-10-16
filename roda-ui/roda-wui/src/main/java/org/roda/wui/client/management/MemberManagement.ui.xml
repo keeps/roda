@@ -3,18 +3,15 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
-	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
+	xmlns:common="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_12 content">
-				<g:Label styleName="h1">
-					<ui:text from='{messages.usersAndGroupsTitle}' />
-				</g:Label>
-				<g:FlowPanel addStyleNames="page-description" ui:field="memberManagementDescription">
-				</g:FlowPanel>
+				<common:TitlePanel text="{messages.usersAndGroupsTitle}" iconClass="Group" />
+				<g:FlowPanel addStyleNames="page-description" ui:field="memberManagementDescription" />
 				<commonsearch:SearchWrapper ui:field="searchWrapper" />
 			</g:FlowPanel>
 		</g:FlowPanel>

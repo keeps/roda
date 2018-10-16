@@ -2,19 +2,16 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
 	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
 	xmlns:m="urn:import:org.roda.wui.client.main"
-	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
+	xmlns:common="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<g:FlowPanel styleName="wui-risk-register" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_12 content">
-				<g:Label styleName="h1" ui:field="riskIncidenceRegisterTitle">
-					<ui:text from='{messages.riskIncidenceRegisterTitle}' />
-				</g:Label>
+				<common:TitlePanel text="{messages.riskIncidenceRegisterTitle}" iconClass="RiskIncidence" />
 				<m:BreadcrumbPanel ui:field="breadcrumb" addStyleNames="browseBreadcrumb" />
 				<g:FlowPanel addStyleNames="page-description" ui:field="riskIncidenceRegisterDescription"/>
 				<commonsearch:SearchWrapper ui:field="searchWrapper" />

@@ -22,6 +22,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.TransferredResourceActions;
@@ -48,7 +49,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -149,9 +149,6 @@ public class IngestTransfer extends Composite {
   private final TransferredResource resource;
 
   @UiField
-  Label ingestTransferTitle;
-
-  @UiField
   FlowPanel ingestTransferDescription;
 
   @UiField(provided = true)
@@ -164,10 +161,10 @@ public class IngestTransfer extends Composite {
   Label lastScanned;
 
   @UiField
-  HTML itemIcon;
+  TitlePanel itemTitle;
 
   @UiField
-  Label itemTitle;
+  TitlePanel ingestTransferTitle;
 
   @UiField
   Label itemDates;
@@ -239,11 +236,9 @@ public class IngestTransfer extends Composite {
 
   private void draw() {
     if (resource == null) {
+      itemTitle.setVisible(false);
       ingestTransferTitle.setVisible(true);
       ingestTransferDescription.setVisible(true);
-
-      itemIcon.setHTML(DescriptionLevelUtils.getTopIconSafeHtml());
-      itemTitle.setText(messages.ingestAllTransferredPackages());
       itemDates.setText("");
       download.setVisible(false);
       navigationToolbar.setVisible(false);
@@ -257,12 +252,13 @@ public class IngestTransfer extends Composite {
       ingestTransferTitle.setVisible(false);
       ingestTransferDescription.setVisible(false);
 
+      itemTitle.setVisible(true);
       if (resource.isFile()) {
-        itemIcon
-          .setHTML(DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.VIEW_REPRESENTATION_FILE, false));
+        itemTitle
+          .setIcon(DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.VIEW_REPRESENTATION_FILE, false));
       } else {
-        itemIcon
-          .setHTML(DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.VIEW_REPRESENTATION_FOLDER, false));
+        itemTitle
+          .setIcon(DescriptionLevelUtils.getElementLevelIconSafeHtml(RodaConstants.VIEW_REPRESENTATION_FOLDER, false));
       }
 
       itemTitle.setText(resource.getName());

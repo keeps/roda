@@ -19,6 +19,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
@@ -45,7 +46,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -110,7 +110,7 @@ public class TransferUpload extends Composite {
   private static final String DRAGOVER = "dragover";
 
   @UiField
-  Label uploadTitle;
+  TitlePanel uploadTitle;
 
   @UiField
   Button done;

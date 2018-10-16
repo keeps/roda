@@ -32,7 +32,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -75,9 +74,6 @@ public class RepresentationInformationNetwork extends Composite {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
-  FlowPanel title;
-
-  @UiField
   FlowPanel registerDescription;
 
   @UiField(provided = true)
@@ -100,10 +96,6 @@ public class RepresentationInformationNetwork extends Composite {
     searchPanel = new SearchWrapper(false).createListAndSearchPanel(representationInformationListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
-
-    Label titleLabel = new Label(messages.representationInformationRegisterTitle());
-    titleLabel.addStyleName("h1 browseItemText");
-    title.add(titleLabel);
 
     registerDescription.add(new HTMLWidgetWrapper("RepresentationInformationNetworkDescription.html"));
   }

@@ -936,6 +936,10 @@ pre code {
     content: "\f017";
 }
 
+.btn-history:after {
+    content: "\f1da";
+}
+
 .btn-info:after {
     content: "\f05a";
 }
@@ -2360,6 +2364,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .browseItemPanel {
     vertical-align: middle;
+    text-align: left;
 }
 
 .browseItemPanelWithMargin {

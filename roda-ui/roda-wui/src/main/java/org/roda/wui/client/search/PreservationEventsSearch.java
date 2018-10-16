@@ -18,24 +18,12 @@ import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.SimplePanel;
 
 import config.i18n.client.ClientMessages;
 
-public class PreservationEventsSearch extends Composite {
-
+public class PreservationEventsSearch extends SimplePanel {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  interface MyUiBinder extends UiBinder<Widget, PreservationEventsSearch> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  @UiField(provided = true)
-  SearchWrapper searchWrapper;
 
   public PreservationEventsSearch(String eventsListId, String aipId, String representationUUID, String fileUUID) {
     Filter filter = new Filter();
@@ -49,12 +37,13 @@ public class PreservationEventsSearch extends Composite {
       filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_FILE_UUID, fileUUID));
     }
 
-    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(
+    SearchWrapper searchWrapper = new SearchWrapper(false)
+      .createListAndSearchPanel(
       new ListBuilder<>(() -> new PreservationEventList(),
         new AsyncTableCellOptions<>(IndexedPreservationEvent.class, eventsListId).withFilter(filter)
           .withSummary(messages.searchResults()).bindOpener()
           .withActionable(PreservationEventActions.get(aipId, representationUUID, fileUUID))));
 
-    initWidget(uiBinder.createAndBindUi(this));
+    setWidget(searchWrapper);
   }
 }

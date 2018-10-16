@@ -2,16 +2,15 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:u="urn:import:org.roda.wui.client.management">
+	xmlns:u="urn:import:org.roda.wui.client.management"
+	xmlns:common="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content" ui:field="registerPanel">
-				<g:Label styleName="h1">
-					<ui:text from='{messages.registerUserDataTitle}' />
-				</g:Label>
+				<common:TitlePanel text="{messages.registerUserDataTitle}" iconClass="User" />
 				<u:UserDataPanel ui:field="userDataPanel" />
 			</g:FlowPanel>
 

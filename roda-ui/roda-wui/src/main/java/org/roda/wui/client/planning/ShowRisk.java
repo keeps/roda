@@ -112,7 +112,7 @@ public class ShowRisk extends Composite {
   }
 
   public ShowRisk(IndexedRisk risk) {
-    this.riskShowPanel = new RiskShowPanel(risk, "RiskShowPanel_riskIncidences", true);
+    this.riskShowPanel = new RiskShowPanel(risk, "RiskShowPanel_riskIncidences");
     initWidget(uiBinder.createAndBindUi(this));
     // actionsSidebar is set in the resolve callback
   }

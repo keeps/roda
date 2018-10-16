@@ -10,9 +10,6 @@
 	<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width no_padding">
 			<g:FlowPanel addStyleNames="wui-data-panel">
-				<g:Label styleName="h1" ui:field="title">
-					<ui:text from='{messages.showRiskTitle}' />
-				</g:Label>
 				<g:FlowPanel styleName="field">
 					<g:Label styleName="label">
 						<ui:text from='{messages.riskIdentifier}' />

@@ -2,16 +2,15 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:p="urn:import:org.roda.wui.client.ingest.process">
+	xmlns:p="urn:import:org.roda.wui.client.ingest.process"
+	xmlns:common="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<g:FlowPanel styleName="wui-ingest-new" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">
-					<ui:text from='{messages.createJobTitle}' />
-				</g:Label>
+				<common:TitlePanel text="{messages.createJobTitle}" iconClass="Job" />
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.createJobName}' />
 				</g:Label>

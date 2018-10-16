@@ -2,18 +2,16 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:search="urn:import:org.roda.wui.client.search">
+             xmlns:search="urn:import:org.roda.wui.client.search"
+             xmlns:common="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<g:FlowPanel styleName="wui-ingest-list" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1" ui:field="ingestProcessTitle">
-					<ui:text from='{messages.ingestProcessTitle}' />
-				</g:Label>
-				<g:FlowPanel addStyleNames="page-description" ui:field="ingestProcessDescription">
-				</g:FlowPanel>
+				<common:TitlePanel text="{messages.ingestProcessTitle}" iconClass="Job" />
+				<g:FlowPanel addStyleNames="page-description" ui:field="ingestProcessDescription"/>
 				<search:JobSearch ui:field="jobSearch" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">

@@ -1,16 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:common="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<g:FlowPanel addStyleNames="recoverPanel">
-		<g:HTML>
-			<h1>
-				<ui:text from='{messages.verifyEmailTitle}' />
-			</h1>
-		</g:HTML>
+		<common:TitlePanel text="{messages.verifyEmailTitle}" />
 		<g:FlowPanel ui:field="recoverPanel">
 			<g:Label ui:field="usernameLabel" addStyleNames="form-label">
 				<ui:text from='{messages.verifyEmailUsername}' />

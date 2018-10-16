@@ -37,6 +37,7 @@ import org.roda.core.data.v2.ri.RepresentationInformationRelation;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.RepresentationInformationActions;
@@ -120,10 +121,7 @@ public class ShowRepresentationInformation extends Composite {
   Label dateCreated, dateUpdated;
 
   @UiField
-  Label representationInformationTitle;
-
-  @UiField
-  HTML representationInformationIcon;
+  TitlePanel title;
 
   @UiField
   Label representationInformationDescriptionKey;
@@ -179,8 +177,7 @@ public class ShowRepresentationInformation extends Composite {
   }
 
   public void initElements() {
-    representationInformationIcon.setHTML("<i class='fa fa-info-circle'></i>");
-    representationInformationTitle.setText(ri.getName());
+    title.setText(ri.getName());
 
     representationInformationId.setText(messages.representationInformationIdentifier() + ": " + ri.getId());
 

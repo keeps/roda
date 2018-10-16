@@ -52,9 +52,6 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
-  Label title;
-
-  @UiField
   Label riskId;
 
   @UiField
@@ -147,7 +144,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
     initWidget(uiBinder.createAndBindUi(this));
   }
 
-  public RiskShowPanel(Risk risk, String listId, boolean hasTitle) {
+  public RiskShowPanel(Risk risk, String listId) {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, risk.getId()));
 
     ListBuilder<RiskIncidence> riskIncidenceListBuilder = new ListBuilder<>(() -> new RiskIncidenceList(),
@@ -158,7 +155,6 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(riskIncidenceListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
-    title.setVisible(hasTitle);
     init(risk);
   }
 

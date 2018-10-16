@@ -36,7 +36,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -84,9 +83,6 @@ public class RepresentationInformationAssociations extends Composite {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
-  FlowPanel title;
-
-  @UiField
   HTML description;
 
   @UiField
@@ -113,10 +109,6 @@ public class RepresentationInformationAssociations extends Composite {
       .setHTML(messages.representationInformationAssociatedWith(filterParts[0], filterParts[1], filterParts[2]));
     description.setHTML(
       messages.representationInformationAssociatedWithDescription(filterParts[0], filterParts[1], filterParts[2]));
-
-    Label titleLabel = new Label(messages.representationInformationAssociationsTitle());
-    titleLabel.addStyleName("h1 browseItemText");
-    title.add(titleLabel);
   }
 
   public static SafeHtml getAssociateWithExistingDialogTitle() {
