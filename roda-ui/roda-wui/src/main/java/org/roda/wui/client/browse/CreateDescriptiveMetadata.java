@@ -22,9 +22,12 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
+import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
+import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -33,6 +36,7 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.StringUtils;
@@ -164,6 +168,9 @@ public class CreateDescriptiveMetadata extends Composite {
   @UiField
   HTML idError;
 
+  @UiField
+  TitlePanel title;
+
   /**
    * Create a new panel to edit a user
    * 
@@ -178,6 +185,8 @@ public class CreateDescriptiveMetadata extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
     metadataXML = new TextArea();
     metadataXML.addStyleName("form-textbox metadata-edit-area metadata-form-textbox");
+
+    initTitle(aipId, title);
 
     type.addChangeHandler(new ChangeHandler() {
 
@@ -242,6 +251,31 @@ public class CreateDescriptiveMetadata extends Composite {
     if ("input".equalsIgnoreCase(firstElement.getTagName())) {
       firstElement.setAttribute("title", "browse input");
     }
+  }
+
+  protected static void initTitle(String aipId, TitlePanel title) {
+    BrowserService.Util.getInstance().retrieveBrowseAIPBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
+      new ArrayList<>(Arrays.asList(RodaConstants.AIP_LEVEL, RodaConstants.AIP_TITLE)),
+      new NoAsyncCallback<BrowseAIPBundle>() {
+        @Override
+        public void onSuccess(BrowseAIPBundle aipBundle) {
+          IndexedAIP aip = aipBundle.getAip();
+
+          if (aip.getLevel() != null) {
+            title.setIcon(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false));
+          } else {
+            title.setIcon(DescriptionLevelUtils.getTopIconSafeHtml());
+          }
+
+          if (aip.getTitle() != null) {
+            title.setText(aip.getTitle());
+          } else if (aipBundle.getDescriptiveMetadata().isEmpty()) {
+            title.setText(messages.newArchivalPackage());
+          } else {
+            title.setText(aipId);
+          }
+        }
+      });
   }
 
   @Override

@@ -22,6 +22,7 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -159,6 +160,9 @@ public class EditDescriptiveMetadata extends Composite {
   @UiField
   HTML errors;
 
+  @UiField
+  TitlePanel title;
+
   /**
    * Create a new panel to edit a user
    * 
@@ -184,6 +188,9 @@ public class EditDescriptiveMetadata extends Composite {
       bundle.getId(), bundle.getRawTemplate(), newValues);
 
     initWidget(uiBinder.createAndBindUi(this));
+
+    CreateDescriptiveMetadata.initTitle(aipId, title);
+
     metadataXML = new TextArea();
     metadataXML.addStyleName("form-textbox metadata-edit-area metadata-form-textbox");
     metadataXML.setTitle("Metadata edit area");

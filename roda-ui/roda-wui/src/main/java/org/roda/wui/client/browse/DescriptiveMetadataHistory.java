@@ -19,6 +19,7 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.wui.client.browse.bundle.BinaryVersionBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -151,6 +152,9 @@ public class DescriptiveMetadataHistory extends Composite {
   @UiField
   Button buttonCancel;
 
+  @UiField
+  TitlePanel title;
+
   /**
    * Create a new panel to edit a user
    * 
@@ -165,6 +169,7 @@ public class DescriptiveMetadataHistory extends Composite {
     this.bundle = bundle;
 
     initWidget(uiBinder.createAndBindUi(this));
+    CreateDescriptiveMetadata.initTitle(aipId, title);
     init();
 
     list.addChangeHandler(new ChangeHandler() {

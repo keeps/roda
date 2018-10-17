@@ -10,7 +10,7 @@
 		addStyleNames="skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<common:TitlePanel text="{messages.newDescriptiveMetadataTitle}" iconClass="DescriptiveMetadata" />
+				<common:TitlePanel ui:field="title"/>
 
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.metadataType}' />

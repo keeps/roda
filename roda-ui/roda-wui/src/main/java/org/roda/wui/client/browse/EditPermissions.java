@@ -30,6 +30,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.LoadingAsyncCallback;
+import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.MemberSelectDialog;
@@ -37,6 +38,7 @@ import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -87,6 +89,8 @@ public class EditPermissions extends Composite {
             @Override
             public void onSuccess(IndexedAIP aip) {
               EditPermissions edit = new EditPermissions(IndexedAIP.class.getName(), aip);
+              edit.title.setIcon(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false));
+              edit.title.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
               callback.onSuccess(edit);
             }
           });
@@ -217,6 +221,9 @@ public class EditPermissions extends Composite {
 
   @UiField
   Button buttonApplyToAll;
+
+  @UiField
+  TitlePanel title;
 
   private List<HasPermissions> objects = new ArrayList<>();
   private String objectClass = null;

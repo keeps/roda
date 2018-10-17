@@ -10,7 +10,7 @@
 		addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<common:TitlePanel text="{messages.historyDescriptiveMetadataTitle}" iconClass="DescriptiveMetadata" />
+				<common:TitlePanel ui:field="title" />
 
 				<g:ListBox title="{messages.historyDescriptiveMetadataTitle}" ui:field="list" />
 				<g:Label styleName="wui-browse-metadata-descriptive-versions-type"

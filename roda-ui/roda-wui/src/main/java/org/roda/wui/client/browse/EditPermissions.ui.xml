@@ -9,7 +9,7 @@
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<common:TitlePanel text="{messages.archivalPackagePermissionsTitle}" />
+				<common:TitlePanel text="{messages.archivalPackagePermissionsTitle}" ui:field="title" />
 
 				<g:FlowPanel addStyleNames="page-description" ui:field="editPermissionsDescription" />
 				<g:Label styleName="h4">
