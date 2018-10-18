@@ -265,7 +265,7 @@ public interface UserManagementService extends RemoteService {
    *
    * @throws AuthorizationDeniedException
    */
-  public UserExtraBundle retrieveDefaultExtraBundle() throws AuthorizationDeniedException;
+  public UserExtraBundle retrieveDefaultExtraBundle();
 
   public UserExtraBundle retrieveUserExtraBundle(String name)
     throws AuthorizationDeniedException, GenericException, NotFoundException;

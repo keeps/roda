@@ -203,9 +203,9 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public UserExtraBundle retrieveDefaultExtraBundle() throws AuthorizationDeniedException {
+  public UserExtraBundle retrieveDefaultExtraBundle() {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return UserManagement.retrieveUserExtraBundle(user);
+    return UserManagement.retrieveDefaultExtraBundle(user);
   }
 
   @Override

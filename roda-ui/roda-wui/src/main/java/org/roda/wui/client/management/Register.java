@@ -105,7 +105,6 @@ public class Register extends Composite {
   private RecaptchaWidget recaptchaWidget;
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   @UiField
@@ -237,7 +236,7 @@ public class Register extends Composite {
     } else if (caught instanceof RecaptchaException) {
       Toast.showError(messages.registerWrongCaptcha());
     } else {
-      Toast.showError(messages.registerFailure());
+      Toast.showError(messages.registerFailure() + ": " + caught.getMessage());
     }
   }
 }

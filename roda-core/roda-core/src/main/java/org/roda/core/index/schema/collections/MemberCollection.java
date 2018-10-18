@@ -165,7 +165,5 @@ public class MemberCollection extends AbstractSolrCollection<RODAMember, RODAMem
 
       return group;
     }
-
   }
-
 }

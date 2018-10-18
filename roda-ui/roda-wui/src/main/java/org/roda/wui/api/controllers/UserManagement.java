@@ -462,19 +462,16 @@ public class UserManagement extends RodaWuiController {
     return extraBudle;
   }
 
-  public static UserExtraBundle retrieveUserExtraBundle(User user) throws AuthorizationDeniedException {
+  public static UserExtraBundle retrieveDefaultExtraBundle(User user) {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
-    // check permissions
-    controllerAssistant.checkRoles(user);
-
     // delegate
-    UserExtraBundle extraBudle = UserManagementHelper.retrieveDefaultExtraBundle();
+    UserExtraBundle extraBundle = UserManagementHelper.retrieveDefaultExtraBundle();
 
     // register action
     controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
 
-    return extraBudle;
+    return extraBundle;
   }
 
   public static void deleteMembers(User user, SelectedItems<RODAMember> members)
