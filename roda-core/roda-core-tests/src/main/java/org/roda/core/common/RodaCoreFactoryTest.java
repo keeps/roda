@@ -143,7 +143,9 @@ public class RodaCoreFactoryTest {
     final Map<String, List<String>> baseProperties = ImmutableMap.<String, List<String>> builder()
       .put("testing.prefix.string", Collections.singletonList("string"))
       .put("testing.prefix.array", Arrays.asList("first", "second"))
-      .put("testing.property.thisOne", Collections.singletonList("value")).build();
+      .put("testing.property.thisOne", Collections.singletonList("value"))
+      .put(RodaConstants.RODA_NODE_TYPE_KEY, Collections.singletonList(RodaCoreFactory.getNodeType().toString()))
+      .build();
 
     // add shared properties expected to be present in ServerMessages_locale
     Map<String, List<String>> enProperties = new HashMap<>(baseProperties);
