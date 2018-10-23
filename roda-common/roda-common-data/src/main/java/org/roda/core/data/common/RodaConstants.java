@@ -248,6 +248,7 @@ public final class RodaConstants {
   /*
    * API related
    */
+  public static final String API_BASE_PATH = "/api";
   public static final String API_SEP = "/";
   public static final String API_REST_V1_AIPS = "api/v1/aips/";
   public static final String API_REST_V1_REPRESENTATIONS = "api/v1/representations/";
@@ -1423,6 +1424,13 @@ public final class RodaConstants {
   }
 
   public static final List<String> SYSTEM_USERS = Arrays.asList("admin", "guest");
+
+  public static final String CORS_ALLOW_ORIGIN = "ui.cors.allowOrigin";
+  public static final String CORS_ALLOW_HEADERS = "ui.cors.allowHeaders";
+  public static final String CORS_ALLOW_METHODS = "ui.cors.allowMethods";
+  public static final String CORS_ALLOW_CREDENTIALS = "ui.cors.allowCredentials";
+  public static final String CORS_MAX_AGE = "ui.cors.maxAge";
+  public static final String CORS_EXPOSE_HEADERS = "ui.cors.exposeHeaders";
 
   /* Description level configuration Constants */
   public static final String LEVELS_CLASSIFICATION_PLAN = "levels.classificationplan";

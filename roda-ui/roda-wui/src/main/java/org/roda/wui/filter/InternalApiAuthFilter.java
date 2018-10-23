@@ -95,12 +95,11 @@ public class InternalApiAuthFilter implements Filter {
   private User getBasicAuthUser(final HttpServletRequest request)
     throws AuthenticationDeniedException, GenericException {
     final Pair<String, String> credentials = new BasicAuthRequestWrapper(request).getCredentials();
+
     if (credentials == null) {
-      throw new AuthenticationDeniedException("No credentials!");
+      return UserUtility.getGuest(request.getRemoteAddr());
     } else {
-      final User user = UserUtility.getLdapUtility().getAuthenticatedUser(credentials.getFirst(),
-        credentials.getSecond());
-      return user;
+      return UserUtility.getLdapUtility().getAuthenticatedUser(credentials.getFirst(), credentials.getSecond());
     }
   }
 
