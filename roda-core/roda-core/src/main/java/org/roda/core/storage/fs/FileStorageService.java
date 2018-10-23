@@ -105,18 +105,20 @@ public class FileStorageService implements StorageService {
 
   private void initialize(Path path) throws GenericException {
     if (!FSUtils.exists(path)) {
-      try {
-        Files.createDirectories(path);
-      } catch (IOException e) {
-        throw new GenericException("Could not create path " + path, e);
+      if (Files.isWritable(path.getParent())) {
+        try {
+          Files.createDirectories(path);
+        } catch (IOException e) {
+          throw new GenericException("Could not create path " + path, e);
 
+        }
+      } else {
+        LOGGER.warn("Trying to initialize {} but parent is not writable", path);
       }
     } else if (!FSUtils.isDirectory(path)) {
       throw new GenericException("Path is not a directory " + path);
     } else if (!Files.isReadable(path)) {
       throw new GenericException("Cannot read from path " + path);
-    } else if (!Files.isWritable(path)) {
-      throw new GenericException("Cannot write to path " + path);
     } else {
       // do nothing
     }
