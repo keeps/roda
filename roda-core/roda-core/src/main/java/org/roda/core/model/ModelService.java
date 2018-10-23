@@ -145,8 +145,11 @@ public class ModelService extends ModelObservable {
     this.eventsManager = eventsManager;
     this.nodeType = nodeType;
     this.instanceId = instanceId;
-    ensureAllContainersExist();
-    ensureAllDiretoriesExist();
+
+    if (RodaCoreFactory.checkIfWriteIsAllowed(nodeType)) {
+      ensureAllContainersExist();
+      ensureAllDiretoriesExist();
+    }
   }
 
   private void ensureAllContainersExist() {
