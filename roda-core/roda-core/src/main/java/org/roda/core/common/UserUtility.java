@@ -67,7 +67,8 @@ public class UserUtility {
   }
 
   public static boolean isUserInSession(final HttpServletRequest request) {
-    return request.getSession().getAttribute(UserUtility.RODA_USER) != null;
+    User user = (User) request.getSession().getAttribute(UserUtility.RODA_USER);
+    return user != null && !user.isGuest();
   }
 
   public static User getApiUser(final HttpServletRequest request) throws AuthorizationDeniedException {
