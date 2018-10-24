@@ -830,6 +830,9 @@ public final class PluginHelper {
    *          uniq identifier of this request
    */
   public static void acquireObjectLock(List<String> lites, String requestUuid) throws LockingException {
+    if (lites.isEmpty()) {
+      return;
+    }
     LOGGER.debug("Acquiring lock for: {} request: {}", lites, requestUuid);
     RodaCoreFactory.getPluginOrchestrator().acquireObjectLock(lites, PluginHelper.getLockRequestTimeout(), true,
       requestUuid);
@@ -852,9 +855,9 @@ public final class PluginHelper {
 
   public static <O extends IsRODAObject, P extends IsRODAObject> void releaseObjectLock(O object, Plugin<P> plugin)
     throws LockingException {
-    Optional<LiteRODAObject> liteOptionl = LiteRODAObjectFactory.get(object);
-    if (liteOptionl.isPresent()) {
-      PluginHelper.releaseObjectLock(liteOptionl.get().getInfo(), plugin);
+    Optional<LiteRODAObject> liteOptional = LiteRODAObjectFactory.get(object);
+    if (liteOptional.isPresent()) {
+      PluginHelper.releaseObjectLock(liteOptional.get().getInfo(), plugin);
     } else {
       throw new LockingException(
         "Error getting lite from IndexedAIP with ID '{}' in order to obtain lock" + object.getId());
@@ -876,8 +879,28 @@ public final class PluginHelper {
    *          uniq identifier of this request
    */
   public static void releaseObjectLock(List<String> lites, String requestUuid) {
+    if (lites.isEmpty()) {
+      return;
+    }
     LOGGER.debug("Releasing lock for: {} request: {}", lites, requestUuid);
     RodaCoreFactory.getPluginOrchestrator().releaseObjectLockAsync(lites, requestUuid);
+  }
+
+  public static <P extends IsRODAObject> void releaseObjectLock(List<String> lites, Plugin<P> plugin) {
+    if (lites.isEmpty()) {
+      return;
+    }
+    String requestUuid = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
+      IdUtils.createUUID());
+    LOGGER.debug("Releasing lock for: {} request: {}", lites, requestUuid);
+    RodaCoreFactory.getPluginOrchestrator().releaseObjectLockAsync(lites, requestUuid);
+  }
+
+  public static <P extends IsRODAObject> void releaseObjectLock(Plugin<P> plugin) {
+    String requestUuid = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
+      IdUtils.createUUID());
+    LOGGER.debug("Releasing lock for: {} request: {}", "ALL_LOCKS_BY_REQUEST_UUID", requestUuid);
+    RodaCoreFactory.getPluginOrchestrator().releaseObjectLockAsync(Collections.emptyList(), requestUuid);
   }
 
   public static <T extends IsRODAObject> String getPluginAgentId(Plugin<T> plugin) {

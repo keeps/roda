@@ -185,22 +185,13 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
 
     } catch (RODAException | ParseException | RuntimeException | IOException e) {
       reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
-      LOGGER.error("Error converting " + earkSIPPath + " to AIP", e);
+      LOGGER.error("Error converting {} to AIP", earkSIPPath, e);
     } finally {
       if (sip != null) {
         Path transferredResourcesAbsolutePath = RodaCoreFactory.getTransferredResourcesScanner().getBasePath()
           .toAbsolutePath();
         if (!sip.getBasePath().toAbsolutePath().toString().startsWith(transferredResourcesAbsolutePath.toString())) {
           FSUtils.deletePathQuietly(sip.getBasePath());
-        }
-      }
-      if (aip != null) {
-        try {
-          PluginHelper.releaseObjectLock(aip, this);
-        } catch (LockingException e) {
-          reportItem.setPluginState(PluginState.FAILURE).setHtmlPluginDetails(true)
-            .setPluginDetails(sip.getValidationReport().toHtml(true, true, true, false, false));
-          LOGGER.debug("The SIP {} is not valid", earkSIPPath);
         }
       }
     }

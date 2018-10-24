@@ -209,4 +209,10 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
 
   }
 
+  @Override
+  public void releaseAllObjectLocksAsync() {
+    // TODO Auto-generated method stub
+
+  }
+
 }

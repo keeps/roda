@@ -510,4 +510,9 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     jobsManager.tell(Messages.newJobsManagerReleaseLock(lites, requestUuid), ActorRef.noSender());
   }
 
+  @Override
+  public void releaseAllObjectLocksAsync() {
+    jobsManager.tell(Messages.newJobsManagerReleaseAllLocks(), ActorRef.noSender());
+  }
+
 }

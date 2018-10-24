@@ -72,4 +72,7 @@ public interface PluginOrchestrator {
 
   public void releaseObjectLockAsync(List<String> lites, String requestUuid);
 
+  /** 20181029 hsilva: only tests should invoke this method */
+  public void releaseAllObjectLocksAsync();
+
 }

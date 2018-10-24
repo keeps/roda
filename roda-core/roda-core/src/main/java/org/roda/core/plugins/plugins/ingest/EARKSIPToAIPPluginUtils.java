@@ -65,30 +65,26 @@ public class EARKSIPToAIPPluginUtils {
 
     PluginHelper.acquireObjectLock(aip, plugin);
 
-    try {
-      // process IP information
-      processIPInformation(model, sip, aip.getId(), notify, false);
+    // process IP information
+    processIPInformation(model, sip, aip.getId(), notify, false);
 
-      // process IPRepresentation information
-      for (IPRepresentation representation : sip.getRepresentations()) {
-        processIPRepresentationInformation(model, representation, aip.getId(), notify, false, username, null);
-      }
-
-      model.notifyAipCreated(aip.getId());
-
-      AIP createdAIP = model.retrieveAIP(aip.getId());
-
-      // Set Permissions
-      Permissions readPermissions = PermissionUtils.grantReadPermissionToUserGroup(model, createdAIP,
-        aip.getPermissions());
-      Permissions finalPermissions = PermissionUtils.grantAllPermissions(username, readPermissions, fullPermissions);
-      createdAIP.setPermissions(finalPermissions);
-      model.updateAIP(createdAIP, username);
-
-      return model.retrieveAIP(aip.getId());
-    } finally {
-      PluginHelper.releaseObjectLock(aip, plugin);
+    // process IPRepresentation information
+    for (IPRepresentation representation : sip.getRepresentations()) {
+      processIPRepresentationInformation(model, representation, aip.getId(), notify, false, username, null);
     }
+
+    model.notifyAipCreated(aip.getId());
+
+    AIP createdAIP = model.retrieveAIP(aip.getId());
+
+    // Set Permissions
+    Permissions readPermissions = PermissionUtils.grantReadPermissionToUserGroup(model, createdAIP,
+      aip.getPermissions());
+    Permissions finalPermissions = PermissionUtils.grantAllPermissions(username, readPermissions, fullPermissions);
+    createdAIP.setPermissions(finalPermissions);
+    model.updateAIP(createdAIP, username);
+
+    return model.retrieveAIP(aip.getId());
   }
 
   public static AIP earkSIPToAIPUpdate(SIP sip, IndexedAIP indexedAIP, ModelService model, StorageService storage,
@@ -106,36 +102,29 @@ public class EARKSIPToAIPPluginUtils {
     AIP aip;
 
     PluginHelper.acquireObjectLock(indexedAIP, plugin);
-    try {
 
-      // process IP information
-      processIPInformation(model, sip, indexedAIP.getId(), notify, true);
+    // process IP information
+    processIPInformation(model, sip, indexedAIP.getId(), notify, true);
 
-      // process IPRepresentation information
-      for (IPRepresentation representation : sip.getRepresentations()) {
-        processIPRepresentationInformation(model, representation, indexedAIP.getId(), notify, true, username,
-          reportItem);
-      }
-
-      aip = model.retrieveAIP(indexedAIP.getId());
-      aip.setGhost(false);
-      if (searchScope.isPresent()) {
-        aip.setParentId(searchScope.get());
-      }
-      aip.addIngestUpdateJobId(ingestJobId);
-
-      for (String id : sip.getIds()) {
-        if (!aip.getIngestSIPIds().contains(id)) {
-          aip.getIngestSIPIds().add(id);
-        }
-      }
-
-      model.updateAIP(aip, username);
-    } finally {
-      PluginHelper.releaseObjectLock(indexedAIP, plugin);
+    // process IPRepresentation information
+    for (IPRepresentation representation : sip.getRepresentations()) {
+      processIPRepresentationInformation(model, representation, indexedAIP.getId(), notify, true, username, reportItem);
     }
 
-    return aip;
+    aip = model.retrieveAIP(indexedAIP.getId());
+    aip.setGhost(false);
+    if (searchScope.isPresent()) {
+      aip.setParentId(searchScope.get());
+    }
+    aip.addIngestUpdateJobId(ingestJobId);
+
+    for (String id : sip.getIds()) {
+      if (!aip.getIngestSIPIds().contains(id)) {
+        aip.getIngestSIPIds().add(id);
+      }
+    }
+
+    return model.updateAIP(aip, username);
   }
 
   private static void processIPInformation(ModelService model, SIP sip, String aipId, boolean notify, boolean update)

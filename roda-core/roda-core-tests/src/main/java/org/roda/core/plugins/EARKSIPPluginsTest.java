@@ -121,6 +121,8 @@ public class EARKSIPPluginsTest {
         }
       }
     }, e -> Assert.fail("Error cleaning up", e));
+
+    TestsHelper.releaseAllLocks();
   }
 
   private static TransferredResource createIngestCorpora(Path corporaPath, IndexService index, String sipFileInCorpora,
@@ -224,6 +226,8 @@ public class EARKSIPPluginsTest {
     model.updateAIP(aip, CorporaConstants.EARK_SIP_UPDATE_USER);
     index.commitAIPs();
 
+    TestsHelper.releaseAllLocks();
+
     AIP aipUpdated = ingestUpdateCorpora(aip);
     Assert.assertEquals(aipUpdated.getRepresentations().size(), 2);
     Assert.assertEquals(aipUpdated.getIngestSIPIds().size(), 2);
@@ -283,6 +287,8 @@ public class EARKSIPPluginsTest {
 
     TestsHelper.getJobReports(index, fixAncestorsJob, true);
     index.commitAIPs();
+
+    TestsHelper.releaseAllLocks();
 
     // 20161202 hsilva: somehow a reindex is needed for getting ancestors
     // correctly calculated

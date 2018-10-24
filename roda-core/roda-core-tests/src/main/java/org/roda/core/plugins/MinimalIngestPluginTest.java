@@ -112,6 +112,8 @@ public class MinimalIngestPluginTest {
         }
       }
     }, e -> Assert.fail("Error cleaning up", e));
+
+    TestsHelper.releaseAllLocks();
   }
 
   @Test

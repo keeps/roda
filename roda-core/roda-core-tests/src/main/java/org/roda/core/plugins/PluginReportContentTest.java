@@ -52,7 +52,6 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.plugins.characterization.SiegfriedPlugin;
-import org.roda.core.plugins.plugins.ingest.EARKSIPToAIPPlugin;
 import org.roda.core.plugins.plugins.ingest.MinimalIngestPlugin;
 import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
 import org.roda.core.storage.fs.FSUtils;
@@ -303,12 +302,11 @@ public class PluginReportContentTest {
 
   @Test
   public void testIngestReportsInNto1Scenario() throws RODAException, URISyntaxException, IOException {
+    Map<String, String> parameters = new HashMap<>();
+
     // create & ingest SIP
     TransferredResource transferredResource = EARKSIPPluginsTest.createIngestCorpora(corporaPath, index);
     AssertJUnit.assertNotNull("Transferred resource cannot be null", transferredResource);
-
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS, EARKSIPToAIPPlugin.class.getName());
 
     Job ingest = TestsHelper.executeJob(MinimalIngestPlugin.class, parameters, PluginType.SIP_TO_AIP,
       SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
@@ -323,8 +321,11 @@ public class PluginReportContentTest {
       CorporaConstants.EARK_SIP_UPDATE.replaceFirst("\\.zip", "2.zip"));
     AssertJUnit.assertNotNull("Transferred resource cannot be null", transferredResource2);
 
+    // 20181029 hsilva: the following is required as invoking
+    // EARKSIPPluginsTest.createIngestUpdateCorpora alone will create locks that
+    // are not released by anyone
+    TestsHelper.releaseAllLocks();
     parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS, EARKSIPToAIPPlugin.class.getName());
     ingest = TestsHelper.executeJob(MinimalIngestPlugin.class, parameters, PluginType.SIP_TO_AIP, SelectedItemsList
       .create(TransferredResource.class, transferredResource.getUUID(), transferredResource2.getUUID()));
 

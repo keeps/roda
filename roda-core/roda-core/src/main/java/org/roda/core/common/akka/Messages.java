@@ -202,6 +202,23 @@ public class Messages {
 
   }
 
+  public static JobsManagerReleaseAllLocks newJobsManagerReleaseAllLocks() {
+    return INSTANCE.new JobsManagerReleaseAllLocks();
+  }
+
+  public final class JobsManagerReleaseAllLocks extends AbstractMessage {
+    private static final long serialVersionUID = -2842420964416530808L;
+
+    public JobsManagerReleaseAllLocks() {
+      super();
+    }
+
+    @Override
+    public String toString() {
+      return "JobsManagerReleaseAllLocks []";
+    }
+  }
+
   public static JobsManagerReplyToAcquireLock newJobsManagerReplyToAcquireLock(List<String> lites) {
     return INSTANCE.new JobsManagerReplyToAcquireLock(lites);
   }

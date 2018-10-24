@@ -292,8 +292,12 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       // X) final job info update
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
+
     } catch (JobException e) {
       // throw new PluginException("A job exception has occurred", e);
+    } finally {
+      // remove locks if any
+      PluginHelper.releaseObjectLock(this);
     }
   }
 

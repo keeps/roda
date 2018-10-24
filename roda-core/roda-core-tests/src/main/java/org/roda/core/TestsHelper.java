@@ -169,4 +169,8 @@ public final class TestsHelper {
     return reports;
   }
 
+  public static <T extends IsRODAObject> void releaseAllLocks() {
+    RodaCoreFactory.getPluginOrchestrator().releaseAllObjectLocksAsync();
+  }
+
 }

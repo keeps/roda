@@ -22,6 +22,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.akka.AkkaBaseActor;
 import org.roda.core.common.akka.Messages;
 import org.roda.core.common.akka.Messages.JobsManagerAcquireLock;
+import org.roda.core.common.akka.Messages.JobsManagerReleaseAllLocks;
 import org.roda.core.common.akka.Messages.JobsManagerReleaseLock;
 import org.roda.core.data.v2.jobs.Job;
 import org.slf4j.Logger;
@@ -49,8 +50,10 @@ public class AkkaJobsManager extends AkkaBaseActor {
   private Queue<JobWaiting> jobsWaiting;
   private Map<String, ActorRef> jobsWaitingCreators;
   private ActorRef jobsRouter;
-  // <Lite,Acquire date>
+  // <Lite, LockInfo>
   private Map<String, LockInfo> objectsLocked;
+  // <RequestUUID, List<Lite>>
+  private Map<String, List<String>> requestUuidLites;
   private List<JobsManagerAcquireLock> waitingToAcquireLockRequests;
 
   // metrics
@@ -77,6 +80,7 @@ public class AkkaJobsManager extends AkkaBaseActor {
     this.jobsWaiting = new LinkedList<>();
     this.jobsWaitingCreators = new HashMap<>();
     this.objectsLocked = new HashMap<>();
+    this.requestUuidLites = new HashMap<>();
     this.waitingToAcquireLockRequests = new ArrayList<>();
 
     Props jobsProps = new RoundRobinPool(maxNumberOfJobsInParallel).props(Props.create(AkkaJobActor.class, getSelf()));
@@ -111,6 +115,8 @@ public class AkkaJobsManager extends AkkaBaseActor {
         handleAcquireLock(((Messages.JobsManagerAcquireLock) msg).setSender(getSender()));
       } else if (msg instanceof Messages.JobsManagerReleaseLock) {
         handleReleaseLock((Messages.JobsManagerReleaseLock) msg);
+      } else if (msg instanceof Messages.JobsManagerReleaseAllLocks) {
+        handleReleaseAllLocks((Messages.JobsManagerReleaseAllLocks) msg);
       } else {
         LOGGER.error("Received a message that don't know how to process ({})...", msg.getClass().getName());
         unhandled(msg);
@@ -288,7 +294,9 @@ public class AkkaJobsManager extends AkkaBaseActor {
       if (objectsLocked.get(lite) != null) {
         objectsLocked.get(lite).increaseReentrantAmount();
       } else {
-        objectsLocked.put(lite, new LockInfo(msg.getRequestUuid()));
+        String requestUuid = msg.getRequestUuid();
+        objectsLocked.put(lite, new LockInfo(requestUuid));
+        requestUuidLites.computeIfAbsent(requestUuid, key -> new ArrayList<>()).add(lite);
       }
     }
     // 20180606 hsilva: not sending any list to the sender as it will most
@@ -320,19 +328,28 @@ public class AkkaJobsManager extends AkkaBaseActor {
   }
 
   private void unlock(JobsManagerReleaseLock msg) {
-    for (String lite : msg.getLites()) {
-      LockInfo lockInfo = objectsLocked.get(lite);
-      if (lockInfo == null) {
-        LOGGER.warn("Trying to remove lock from object '{}' whose lock does not exist!", lite);
-      } else if (!lockInfo.requestUuid.equals(msg.getRequestUuid())) {
-        LOGGER.warn("Trying to remove lock from object '{}' whose lock wasn't created by this requester (uuid={})",
-          lite, msg.getRequestUuid());
-      } else {
-        // lock exists & request uuid matches
-        if (lockInfo.reentrantAmount > 0) {
-          lockInfo.decreaseReentrantAmount();
+    String requestUuid = msg.getRequestUuid();
+    if (msg.getLites().isEmpty()) {
+      for (String lite : requestUuidLites.getOrDefault(requestUuid, Collections.emptyList())) {
+        objectsLocked.remove(lite);
+      }
+      requestUuidLites.remove(requestUuid);
+    } else {
+      for (String lite : msg.getLites()) {
+        LockInfo lockInfo = objectsLocked.get(lite);
+        if (lockInfo == null) {
+          LOGGER.warn("Trying to remove lock from object '{}' whose lock does not exist!", lite);
+        } else if (!lockInfo.requestUuid.equals(requestUuid)) {
+          LOGGER.warn("Trying to remove lock from object '{}' whose lock wasn't created by this requester (uuid={})",
+            lite, requestUuid);
         } else {
-          objectsLocked.remove(lite);
+          // lock exists & request uuid matches
+          if (lockInfo.reentrantAmount > 0) {
+            lockInfo.decreaseReentrantAmount();
+          } else {
+            objectsLocked.remove(lite);
+            requestUuidLites.get(requestUuid).remove(lite);
+          }
         }
       }
     }
@@ -392,6 +409,12 @@ public class AkkaJobsManager extends AkkaBaseActor {
     msg.logProcessingStarted();
     unlock(msg);
     msg.logProcessingEnded();
+  }
+
+  private void handleReleaseAllLocks(JobsManagerReleaseAllLocks msg) {
+    objectsLocked = new HashMap<>();
+    requestUuidLites = new HashMap<>();
+    waitingToAcquireLockRequests = new ArrayList<>();
   }
 
   private void log(String msg, String jobId) {
