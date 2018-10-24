@@ -56,7 +56,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
-@Test(groups = {RodaConstants.TEST_GROUP_ALL})
+@Test(groups = {RodaConstants.TEST_GROUP_DEV})
 public class FilterTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(FilterTest.class);
 
@@ -159,7 +159,6 @@ public class FilterTest {
     model.deleteAIP(aip.getId());
   }
 
-  @Ignore
   @Test
   public void testRunFromFilterWithDeleteThread() throws RODAException {
     AIP aip = model.createAIP(IdUtils.createUUID(), corporaService,
@@ -291,5 +290,4 @@ public class FilterTest {
     // cleanup
     model.deleteAIP(aip.getId());
   }
-
 }

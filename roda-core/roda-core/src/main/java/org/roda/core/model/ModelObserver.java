@@ -10,7 +10,6 @@ package org.roda.core.model;
 import java.util.List;
 
 import org.roda.core.data.exceptions.ReturnWithExceptions;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
@@ -117,10 +116,6 @@ public interface ModelObserver {
 
   public ReturnWithExceptions<Void, ModelObserver> representationInformationDeleted(String representationInformationId,
     boolean commit);
-
-  public ReturnWithExceptions<Void, ModelObserver> formatCreatedOrUpdated(Format f, boolean commit);
-
-  public ReturnWithExceptions<Void, ModelObserver> formatDeleted(String formatId, boolean commit);
 
   public ReturnWithExceptions<Void, ModelObserver> notificationCreatedOrUpdated(Notification notification);
 

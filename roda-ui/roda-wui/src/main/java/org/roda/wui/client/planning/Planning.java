@@ -95,8 +95,6 @@ public class Planning {
       PreservationEvents.PLANNING_RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(PreservationAgents.RESOLVER.getHistoryToken())) {
       PreservationAgents.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-    } else if (historyTokens.get(0).equals(FormatRegister.RESOLVER.getHistoryToken())) {
-      FormatRegister.getInstance().resolve(HistoryUtils.tail(historyTokens), callback);
     }
   }
 }

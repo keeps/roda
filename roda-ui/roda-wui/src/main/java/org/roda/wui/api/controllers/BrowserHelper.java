@@ -72,7 +72,6 @@ import org.roda.core.data.v2.common.ObjectPermission;
 import org.roda.core.data.v2.common.ObjectPermissionResult;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
@@ -3003,27 +3002,6 @@ public class BrowserHelper {
     newBundle.setObjectClassFields(fieldsResult);
     newBundle.setTranslations(translationsResult);
     return newBundle;
-  }
-
-  public static Format createFormat(Format format, boolean commit)
-    throws GenericException, AuthorizationDeniedException {
-    return RodaCoreFactory.getModelService().createFormat(format, commit);
-  }
-
-  public static Format updateFormat(Format format, boolean commit)
-    throws GenericException, AuthorizationDeniedException {
-    return RodaCoreFactory.getModelService().updateFormat(format, commit);
-  }
-
-  public static void deleteFormat(String formatId, boolean commit)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    RodaCoreFactory.getModelService().deleteFormat(formatId, commit);
-  }
-
-  public static Job deleteFormat(User user, SelectedItems<Format> selected)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
-    return createAndExecuteInternalJob("Delete formats", selected, DeleteRODAObjectPlugin.class, user,
-      Collections.emptyMap(), "Could not execute format delete action");
   }
 
   public static RelationTypeTranslationsBundle retrieveRelationTypeTranslations(Messages messages) {

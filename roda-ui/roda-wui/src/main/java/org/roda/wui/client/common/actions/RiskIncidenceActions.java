@@ -242,7 +242,7 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
 
     // PRESERVATION
     ActionableGroup<RiskIncidence> preservationGroup = new ActionableGroup<>(messages.preservationTitle());
-    preservationGroup.addButton(messages.formatRegisterProcessButton(), RiskIncidenceAction.START_PROCESS,
+    preservationGroup.addButton(messages.newProcessPreservation(), RiskIncidenceAction.START_PROCESS,
       ActionImpact.UPDATED, "btn-play");
 
     actionableBundle.addGroup(managementGroup).addGroup(preservationGroup);

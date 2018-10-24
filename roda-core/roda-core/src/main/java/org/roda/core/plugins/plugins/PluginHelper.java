@@ -47,7 +47,6 @@ import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.common.OptionalWithCause;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -93,7 +92,6 @@ import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.reindex.ReindexAIPPlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexActionLogPlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexDIPPlugin;
-import org.roda.core.plugins.plugins.reindex.ReindexFormatPlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexIncidencePlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexJobPlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexNotificationPlugin;
@@ -624,7 +622,6 @@ public final class PluginHelper {
     list.add(IndexedPreservationAgent.class);
     list.add(IndexedPreservationEvent.class);
     list.add(DIP.class);
-    list.add(Format.class);
     return list;
   }
 
@@ -1363,8 +1360,6 @@ public final class PluginHelper {
       return ReindexPreservationRepositoryEventPlugin.class.getName();
     } else if (reindexClass.equals(DIP.class)) {
       return ReindexDIPPlugin.class.getName();
-    } else if (reindexClass.equals(Format.class)) {
-      return ReindexFormatPlugin.class.getName();
     } else {
       throw new NotFoundException("No reindex plugin available");
     }

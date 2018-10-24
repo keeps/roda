@@ -13,7 +13,6 @@ import java.util.function.Function;
 
 import org.roda.core.common.ReturnWithExceptionsWrapper;
 import org.roda.core.data.exceptions.ReturnWithExceptions;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
@@ -223,14 +222,6 @@ public abstract class ModelObservable {
     boolean commit) {
     return notifyObserversSafely(
       observer -> observer.representationInformationDeleted(representationInformationId, commit));
-  }
-
-  public ReturnWithExceptionsWrapper notifyFormatCreatedOrUpdated(Format f, boolean commit) {
-    return notifyObserversSafely(observer -> observer.formatCreatedOrUpdated(f, commit));
-  }
-
-  public ReturnWithExceptionsWrapper notifyFormatDeleted(String formatId, boolean commit) {
-    return notifyObserversSafely(observer -> observer.formatDeleted(formatId, commit));
   }
 
   public ReturnWithExceptionsWrapper notifyNotificationCreatedOrUpdated(Notification notification) {

@@ -39,7 +39,6 @@ import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
@@ -911,7 +910,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public Job updateRepresentationInformationListWithFilter(
     SelectedItems<RepresentationInformation> representationInformationItems, String filterToAdd)
-          throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.updateRepresentationInformationListWithFilter(user, representationInformationItems, filterToAdd);
   }
@@ -936,27 +935,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Locale locale = ServerTools.parseLocale(localeString);
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     return Browser.retrieveObjectClassFields(user, messages);
-  }
-
-  @Override
-  public Format createFormat(Format format)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.createFormat(user, format);
-  }
-
-  @Override
-  public void updateFormat(Format format)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.updateFormat(user, format);
-  }
-
-  @Override
-  public Job deleteFormat(SelectedItems<Format> selected)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.deleteFormat(user, selected);
   }
 
   @Override

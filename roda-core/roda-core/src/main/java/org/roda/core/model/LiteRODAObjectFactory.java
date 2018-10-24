@@ -24,7 +24,6 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
@@ -150,10 +149,9 @@ public final class LiteRODAObjectFactory {
   public static <T extends IsRODAObject> Optional<LiteRODAObject> get(T object) {
     Optional<LiteRODAObject> ret = Optional.empty();
 
-    if (object instanceof AIP || object instanceof IndexedAIP || object instanceof DIP || object instanceof IndexedDIP
-      || object instanceof RepresentationInformation || object instanceof Format || object instanceof Job
-      || object instanceof Notification || object instanceof Risk || object instanceof IndexedRisk
-      || object instanceof RiskIncidence || object instanceof LogEntry) {
+    if (object instanceof AIP || object instanceof IndexedAIP || object instanceof DIP
+      || object instanceof RepresentationInformation || object instanceof Job || object instanceof Notification
+      || object instanceof Risk || object instanceof RiskIncidence || object instanceof LogEntry) {
       ret = get(ModelUtils.giveRespectiveModelClass(object.getClass()), Arrays.asList(object.getId()), false);
     } else if (object instanceof DescriptiveMetadata) {
       ret = getDescriptiveMetadata(object);
@@ -168,10 +166,10 @@ public final class LiteRODAObjectFactory {
     } else if (object instanceof TransferredResource) {
       TransferredResource o = (TransferredResource) object;
       ret = get(TransferredResource.class, Arrays.asList(o.getFullPath()), false);
-    } else if (object instanceof Report || object instanceof IndexedReport) {
+    } else if (object instanceof Report) {
       Report o = (Report) object;
       ret = get(Report.class, Arrays.asList(o.getJobId(), o.getId()), false);
-    } else if (object instanceof Representation || object instanceof IndexedRepresentation) {
+    } else if (object instanceof Representation) {
       Representation o = (Representation) object;
       ret = get(Representation.class, Arrays.asList(o.getAipId(), o.getId()), false);
     } else if (object instanceof User) {
@@ -195,9 +193,9 @@ public final class LiteRODAObjectFactory {
     Optional<LiteRODAObject> ret = Optional.empty();
 
     if (objectClass == AIP.class || objectClass == IndexedAIP.class || objectClass == DIP.class
-      || objectClass == RepresentationInformation.class || objectClass == Format.class || objectClass == Job.class
-      || objectClass == Notification.class || objectClass == Risk.class || objectClass == RiskIncidence.class
-      || objectClass == User.class || objectClass == Group.class || objectClass == LogEntry.class) {
+      || objectClass == RepresentationInformation.class || objectClass == Job.class || objectClass == Notification.class
+      || objectClass == Risk.class || objectClass == RiskIncidence.class || objectClass == User.class
+      || objectClass == Group.class || objectClass == LogEntry.class) {
       ret = create(objectClass, 1, ids);
     } else if (objectClass == DescriptiveMetadata.class) {
       if (ids.size() == 2 || ids.size() == 3) {
@@ -310,8 +308,6 @@ public final class LiteRODAObjectFactory {
           ret = getFile(model, split);
         } else if (RepresentationInformation.class.getName().equals(clazz)) {
           ret = (T) model.retrieveRepresentationInformation(firstId);
-        } else if (Format.class.getName().equals(clazz)) {
-          ret = (T) model.retrieveFormat(firstId);
         } else if (Job.class.getName().equals(clazz)) {
           ret = (T) model.retrieveJob(firstId);
         } else if (LogEntry.class.getName().equals(clazz)) {

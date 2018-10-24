@@ -15,11 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -268,12 +264,6 @@ public interface BrowserServiceAsync {
   void retrieveRepresentationInformationWithFilter(String riFilter, AsyncCallback<Pair<String, Integer>> asyncCallback);
 
   void retrieveObjectClassFields(String locale, AsyncCallback<RepresentationInformationFilterBundle> asyncCallback);
-
-  void createFormat(Format f, AsyncCallback<Format> asyncCallback);
-
-  void updateFormat(Format f, AsyncCallback<Void> asyncCallback);
-
-  void deleteFormat(SelectedItems<Format> selected, AsyncCallback<Job> asyncCallback);
 
   void retrieveRepresentationInformationFamilyOptions(String localeString,
     AsyncCallback<Map<String, String>> asyncCallback);

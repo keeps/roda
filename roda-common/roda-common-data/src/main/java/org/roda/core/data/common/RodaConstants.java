@@ -157,7 +157,6 @@ public final class RodaConstants {
   public static final String RODA_OBJECT_OTHER_METADATA = "other_metadata";
   public static final String RODA_OBJECT_MEMBER = "member";
   public static final String RODA_OBJECT_REPRESENTATION_INFORMATION = "representation_information";
-  public static final String RODA_OBJECT_FORMAT = "format";
 
   public static final String RODA_OBJECT_MEMBERS = "members";
   public static final String RODA_OBJECT_RISKS = "risks";
@@ -176,7 +175,6 @@ public final class RodaConstants {
   public static final String RODA_OBJECT_DIPFILES = "dip_files";
   public static final String RODA_OBJECT_TRANSFERRED_RESOURCES = "transferred_resources";
   public static final String RODA_OBJECT_REPRESENTATION_INFORMATION_LIST = "representation_information_list";
-  public static final String RODA_OBJECT_FORMATS = "formats";
 
   public static final String RODA_OBJECT_PERMISSION = "permission";
   public static final String RODA_OBJECT_INDEX_RESULT = "index_result";
@@ -231,7 +229,6 @@ public final class RodaConstants {
   public static final String CORE_DIP_FOLDER = "dip";
   public static final String CORE_DIP_FILE_FOLDER = "dipfile";
   public static final String CORE_REPRESENTATION_INFORMATION_FOLDER = "representation-information";
-  public static final String CORE_FORMAT_FOLDER = "format";
 
   public static final String CORE_I18N_CLIENT_FOLDER = "client";
   public static final String CORE_I18_GWT_XML_FILE = "I18N.gwt.xml";
@@ -320,7 +317,6 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_DIP_FILE_ID = "dip_file_id";
   public static final String API_PATH_PARAM_DIP_FILE_UUID = "dip_file_uuid";
   public static final String API_PATH_PARAM_REPRESENTATION_INFORMATION_ID = "representation_information_id";
-  public static final String API_PATH_PARAM_FORMAT_ID = "format_id";
 
   public static final String API_PATH_PARAM_PART = "part";
   public static final String API_PATH_PARAM_NAME = "name";
@@ -424,8 +420,6 @@ public final class RodaConstants {
   public static final String CONTROLLER_JOB_ID_PARAM = "jobId";
   public static final String CONTROLLER_REPRESENTATION_INFORMATION_PARAM = RODA_OBJECT_REPRESENTATION_INFORMATION;
   public static final String CONTROLLER_REPRESENTATION_INFORMATION_ID_PARAM = "representationInformationId";
-  public static final String CONTROLLER_FORMAT_PARAM = RODA_OBJECT_FORMAT;
-  public static final String CONTROLLER_FORMAT_ID_PARAM = "formatId";
 
   public static final String CONTROLLER_PRE_MITIGATION_PROBABILITY_PARAM = "preMitigationProbability";
   public static final String CONTROLLER_PRE_MITIGATION_IMPACT_PARAM = "preMitigationImpact";
@@ -481,7 +475,8 @@ public final class RodaConstants {
    * Core (storage, index, orchestrator, etc.)
    */
   public enum StorageType {
-    FILESYSTEM, @Deprecated FEDORA4
+    FILESYSTEM, @Deprecated
+    FEDORA4
   }
 
   public static final StorageType DEFAULT_STORAGE_TYPE = StorageType.FILESYSTEM;
@@ -532,7 +527,6 @@ public final class RodaConstants {
   public static final String INDEX_DIP = "DIP";
   public static final String INDEX_DIP_FILE = "DIPFile";
   public static final String INDEX_REPRESENTATION_INFORMATION = "RepresentationInformation";
-  public static final String INDEX_FORMAT = "Format";
 
   /*
    * STORAGE CONTAINERS
@@ -549,7 +543,6 @@ public final class RodaConstants {
   public static final String STORAGE_CONTAINER_PRESERVATION_AGENTS = "agents";
   public static final String STORAGE_CONTAINER_DIP = "dip";
   public static final String STORAGE_CONTAINER_REPRESENTATION_INFORMATION = "representation-information";
-  public static final String STORAGE_CONTAINER_FORMAT = "format";
 
   public static final String STORAGE_HISTORY_CONTAINER_DATA = "data";
   public static final String STORAGE_HISTORY_CONTAINER_METADATA = "metadata";
@@ -745,9 +738,6 @@ public final class RodaConstants {
 
   public static final String REPOSITORY_PERMISSIONS_REPRESENTATION_INFORMATION_MANAGE = "ri.manage";
   public static final String REPOSITORY_PERMISSIONS_REPRESENTATION_INFORMATION_READ = "ri.read";
-
-  public static final String REPOSITORY_PERMISSIONS_FORMAT_MANAGE = "format.manage";
-  public static final String REPOSITORY_PERMISSIONS_FORMAT_READ = "format.read";
 
   public static final String LOG_ACTION_COMPONENT = "actionComponent";
   public static final String LOG_ACTION_METHOD = "actionMethod";
@@ -1091,33 +1081,6 @@ public final class RodaConstants {
   public static final String REPRESENTATION_INFORMATION_SEARCH = "search";
 
   public static final String ONE_OF_FORMAT_FIELDS = "oneOfFormatFields";
-
-  /* Formats */
-  public static final String FORMAT_ID = "id";
-  public static final String FORMAT_NAME = "name";
-  public static final String FORMAT_NAME_SORT = "name_sort";
-  public static final String FORMAT_DEFINITION = "definition";
-  public static final String FORMAT_CATEGORY = "category";
-  public static final String FORMAT_CATEGORY_SORT = "category_sort";
-  public static final String FORMAT_LATEST_VERSION = "latestVersion";
-  public static final String FORMAT_POPULARITY = "popularity";
-  public static final String FORMAT_DEVELOPER = "developer";
-  public static final String FORMAT_INITIAL_RELEASE = "initialRelease";
-  public static final String FORMAT_STANDARD = "standard";
-  public static final String FORMAT_IS_OPEN_FORMAT = "isOpenFormat";
-  public static final String FORMAT_WEBSITE = "website";
-  public static final String FORMAT_PROVENANCE_INFORMATION = "provenanceInformation";
-  public static final String FORMAT_EXTENSIONS = "extensions";
-  public static final String FORMAT_MIMETYPES = "mimetypes";
-  public static final String FORMAT_PRONOMS = "pronoms";
-  public static final String FORMAT_UTIS = "utis";
-  public static final String FORMAT_ALTERNATIVE_DESIGNATIONS = "alternativeDesignations";
-  public static final String FORMAT_VERSIONS = "versions";
-
-  public static final String FORMAT_FILE_EXTENSION = ".json";
-  // @deprecated use {@link #INDEX_SEARCH} instead.
-  @Deprecated()
-  public static final String FORMAT_SEARCH = "search";
 
   /* Notifications */
   public static final String NOTIFICATION_ID = "id";
@@ -1536,7 +1499,6 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_DELETE_DIP = "org.roda.wui.api.controllers.Browser.delete(IndexedDIP)";
   public static final String PERMISSION_METHOD_DELETE_REPRESENTATION = "org.roda.wui.api.controllers.Browser.delete(IndexedRepresentation)";
   public static final String PERMISSION_METHOD_DELETE_FILE = "org.roda.wui.api.controllers.Browser.delete(IndexedFile)";
-  public static final String PERMISSION_METHOD_DELETE_FORMAT = "org.roda.wui.api.controllers.Browser.delete(Format)";
   public static final String PERMISSION_METHOD_DELETE_REPRESENTATION_INFORMATION = "org.roda.wui.api.controllers.Browser.delete(RepresentationInformation)";
   public static final String PERMISSION_METHOD_DELETE_RISK = "org.roda.wui.api.controllers.Browser.delete(IndexedRisk)";
   public static final String PERMISSION_METHOD_DELETE_RISK_INCIDENCE = "org.roda.wui.api.controllers.Browser.delete(RiskIncidence)";
@@ -1563,8 +1525,6 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_CREATE_FILE = "org.roda.wui.api.controllers.Browser.createFile";
   public static final String PERMISSION_METHOD_CHANGE_REPRESENTATION_STATES = "org.roda.wui.api.controllers.Browser.changeRepresentationStates";
   public static final String PERMISSION_METHOD_CREATE_FOLDER = "org.roda.wui.api.controllers.Browser.createFolder";
-  public static final String PERMISSION_METHOD_CREATE_FORMAT = "org.roda.wui.api.controllers.Browser.createFormat";
-  public static final String PERMISSION_METHOD_UPDATE_FORMAT = "org.roda.wui.api.controllers.Browser.updateFormat";
   public static final String PERMISSION_METHOD_CREATE_REPRESENTATION_INFORMATION = "org.roda.wui.api.controllers.Browser.createRepresentationInformation";
   public static final String PERMISSION_METHOD_UPDATE_REPRESENTATION_INFORMATION = "org.roda.wui.api.controllers.Browser.updateRepresentationInformation";
   public static final String PERMISSION_METHOD_CREATE_RISK = "org.roda.wui.api.controllers.Risks.createRisk";

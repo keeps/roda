@@ -32,7 +32,6 @@ import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -1008,16 +1007,6 @@ public class IndexModelObserver implements ModelObserver {
     boolean commit) {
     return SolrUtils.delete(index, RepresentationInformation.class, Arrays.asList(representationInformationId), this,
       commit);
-  }
-
-  @Override
-  public ReturnWithExceptions<Void, ModelObserver> formatCreatedOrUpdated(Format format, boolean commit) {
-    return SolrUtils.create(index, Format.class, format, this, commit);
-  }
-
-  @Override
-  public ReturnWithExceptions<Void, ModelObserver> formatDeleted(String formatId, boolean commit) {
-    return SolrUtils.delete(index, Format.class, Arrays.asList(formatId), this, commit);
   }
 
   @Override

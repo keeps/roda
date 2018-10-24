@@ -146,12 +146,6 @@ source_file = documentation/Risk_Assessment.md
 source_lang = en
 type = GITHUBMARKDOWN
 
-[roda2.theme_FormatRegisterDescription]
-file_filter = roda-ui/roda-wui/src/main/resources/config/theme/FormatRegisterDescription_<lang>.html
-source_file = roda-ui/roda-wui/src/main/resources/config/theme/FormatRegisterDescription.html
-source_lang = en
-type = HTML
-
 [roda2.theme_Error404]
 file_filter = roda-ui/roda-wui/src/main/resources/config/theme/Error404_<lang>.html
 source_file = roda-ui/roda-wui/src/main/resources/config/theme/Error404.html

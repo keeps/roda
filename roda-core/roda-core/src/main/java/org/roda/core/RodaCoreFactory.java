@@ -805,7 +805,6 @@ public class RodaCoreFactory {
           FileStorageService fileStorageService = new FileStorageService(storagePath);
 
           getIndexService().reindexRisks(fileStorageService);
-          getIndexService().reindexFormats(fileStorageService);
           getIndexService().reindexRepresentationInformation(fileStorageService);
           getIndexService().reindexAIPs();
           // reindex other default objects HERE

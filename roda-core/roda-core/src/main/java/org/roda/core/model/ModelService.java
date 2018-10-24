@@ -65,7 +65,6 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIP;
@@ -163,7 +162,6 @@ public class ModelService extends ModelObservable {
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_RISK_INCIDENCE);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_DIP);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_REPRESENTATION_INFORMATION);
-      createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_FORMAT);
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error while ensuring that all containers exist", e);
     }
@@ -251,8 +249,8 @@ public class ModelService extends ModelObservable {
    * 
    * @param aipId
    *          Suggested ID for the AIP, if <code>null</code> then an ID will be
-   *          automatically generated. If ID cannot be allowed because it
-   *          already exists or is not valid, another ID will be provided.
+   *          automatically generated. If ID cannot be allowed because it already
+   *          exists or is not valid, another ID will be provided.
    * @param sourceStorage
    * @param sourcePath
    * @return
@@ -3196,64 +3194,4 @@ public class ModelService extends ModelObservable {
 
     return ret;
   }
-
-  /***************** Format related *****************/
-  /************************************************/
-
-  public Format createFormat(Format format, boolean commit) throws GenericException, AuthorizationDeniedException {
-    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
-
-    try {
-      format.setId(IdUtils.createUUID());
-      String formatAsJson = JsonUtils.getJsonFromObject(format);
-      StoragePath formatPath = ModelUtils.getFormatStoragePath(format.getId());
-      storage.createBinary(formatPath, new StringContentPayload(formatAsJson), false);
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
-      | AlreadyExistsException e) {
-      LOGGER.error("Error creating format in storage", e);
-    }
-
-    notifyFormatCreatedOrUpdated(format, commit).failOnError();
-    return format;
-  }
-
-  public Format updateFormat(Format format, boolean commit) throws GenericException, AuthorizationDeniedException {
-    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
-
-    try {
-      String formatAsJson = JsonUtils.getJsonFromObject(format);
-      StoragePath formatPath = ModelUtils.getFormatStoragePath(format.getId());
-      storage.updateBinaryContent(formatPath, new StringContentPayload(formatAsJson), false, true);
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
-      LOGGER.error("Error updating format in storage", e);
-    }
-
-    notifyFormatCreatedOrUpdated(format, commit).failOnError();
-    return format;
-  }
-
-  public void deleteFormat(String formatId, boolean commit)
-    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
-    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
-
-    StoragePath formatPath = ModelUtils.getFormatStoragePath(formatId);
-    storage.deleteResource(formatPath);
-    notifyFormatDeleted(formatId, commit).failOnError();
-  }
-
-  public Format retrieveFormat(String formatId)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    StoragePath formatPath = ModelUtils.getFormatStoragePath(formatId);
-    Binary binary = storage.getBinary(formatPath);
-    Format ret;
-
-    try (InputStream inputStream = binary.getContent().createInputStream()) {
-      ret = JsonUtils.getObjectFromJson(inputStream, Format.class);
-    } catch (IOException e) {
-      throw new GenericException("Error reading format", e);
-    }
-
-    return ret;
-  }
-
 }

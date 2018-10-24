@@ -27,7 +27,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
@@ -687,19 +686,6 @@ public final class ModelUtils {
     return representationInformationPath.getName().replace(RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION, "");
   }
 
-  public static StoragePath getFormatContainerPath() throws RequestNotValidException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_FORMAT);
-  }
-
-  public static StoragePath getFormatStoragePath(String formatId) throws RequestNotValidException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_FORMAT,
-      formatId + RodaConstants.FORMAT_FILE_EXTENSION);
-  }
-
-  public static String getFormatId(StoragePath formatPath) {
-    return formatPath.getName().replace(RodaConstants.FORMAT_FILE_EXTENSION, "");
-  }
-
   public static StoragePath getNotificationContainerPath() throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_NOTIFICATION);
   }
@@ -783,8 +769,6 @@ public final class ModelUtils {
       return getRiskIncidenceContainerPath();
     } else if (clazz.equals(DIP.class)) {
       return getDIPContainerPath();
-    } else if (clazz.equals(Format.class)) {
-      return getFormatContainerPath();
     } else {
       throw new RequestNotValidException("Unknown class for getting container path: " + clazz.getName());
     }

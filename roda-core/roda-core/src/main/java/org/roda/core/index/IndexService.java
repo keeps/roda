@@ -41,7 +41,6 @@ import org.roda.core.data.utils.XMLUtils;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -380,23 +379,6 @@ public class IndexService {
     }
   }
 
-  public ReturnWithExceptions<Void, ModelObserver> reindexFormat(Format format) {
-    ReturnWithExceptions<Void, ModelObserver> ret = RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseReturn(nodeType);
-    if (ret.isEmpty()) {
-      ret = observer.formatCreatedOrUpdated(format, false);
-    }
-    return ret;
-  }
-
-  public void reindexFormats(StorageService storage) {
-    try {
-      reindexAll(storage, Format.class);
-    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
-      | IOException | IsStillUpdatingException e) {
-      LOGGER.error("Error reindexing formats");
-    }
-  }
-
   public ReturnWithExceptions<Void, ModelObserver> reindexRiskIncidence(RiskIncidence riskIncidence) {
     ReturnWithExceptions<Void, ModelObserver> ret = RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseReturn(nodeType);
     if (ret.isEmpty()) {
@@ -555,8 +537,6 @@ public class IndexService {
       return reindexDIP(DIP.class.cast(object));
     } else if (DIPFile.class.equals(objectClass)) {
       return reindexDIPFile(DIPFile.class.cast(object));
-    } else if (Format.class.equals(objectClass)) {
-      return reindexFormat(Format.class.cast(object));
     } else {
       LOGGER.error("Error trying to reindex an unconfigured object class: {}", objectClass.getName());
       ReturnWithExceptions<Void, ModelObserver> exceptions = new ReturnWithExceptions<>();

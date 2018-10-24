@@ -9,7 +9,6 @@ package org.roda.wui.client.common.lists.utils;
 
 import java.util.function.Supplier;
 
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.AIP;
@@ -36,7 +35,6 @@ import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.DIPFileList;
 import org.roda.wui.client.common.lists.DIPList;
-import org.roda.wui.client.common.lists.FormatList;
 import org.roda.wui.client.common.lists.JobList;
 import org.roda.wui.client.common.lists.LogEntryList;
 import org.roda.wui.client.common.lists.NotificationList;
@@ -80,9 +78,6 @@ public class ListFactory {
     } else if (actualClass.equals(IndexedRisk.class.getName()) || actualClass.equals(Risk.class.getName())) {
       options = new AsyncTableCellOptions<>(IndexedRisk.class, listIdPrefix + "_risk");
       listConstructor = () -> new RiskList();
-    } else if (actualClass.equals(Format.class.getName())) {
-      options = new AsyncTableCellOptions<>(Format.class, listIdPrefix + "_format");
-      listConstructor = () -> new FormatList();
     } else if (actualClass.equals(RiskIncidence.class.getName())) {
       options = new AsyncTableCellOptions<>(RiskIncidence.class, listIdPrefix + "_riskIncidence");
       listConstructor = () -> new RiskIncidenceList();

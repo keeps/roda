@@ -324,7 +324,7 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
 
     // PRESERVATION
     ActionableGroup<RepresentationInformation> preservationGroup = new ActionableGroup<>(messages.preservationTitle());
-    preservationGroup.addButton(messages.formatRegisterProcessButton(), RepresentationInformationAction.START_PROCESS,
+    preservationGroup.addButton(messages.newProcessPreservation(), RepresentationInformationAction.START_PROCESS,
       ActionImpact.UPDATED, "btn-play");
 
     formatActionableBundle.addGroup(managementGroup).addGroup(preservationGroup);

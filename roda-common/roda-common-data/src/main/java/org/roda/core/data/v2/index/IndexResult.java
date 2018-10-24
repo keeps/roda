@@ -17,7 +17,6 @@ import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -109,7 +108,6 @@ public class IndexResult<T extends Serializable> implements Serializable {
     @XmlElement(name = RodaConstants.RODA_OBJECT_RISK, type = IndexedRisk.class),
     @XmlElement(name = RodaConstants.RODA_OBJECT_INCIDENCE, type = RiskIncidence.class),
     @XmlElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION_INFORMATION, type = RepresentationInformation.class),
-    @XmlElement(name = RodaConstants.RODA_OBJECT_FORMAT, type = Format.class),
     @XmlElement(name = RodaConstants.RODA_OBJECT_TRANSFERRED_RESOURCE, type = TransferredResource.class),
     @XmlElement(name = RodaConstants.RODA_OBJECT_USER, type = User.class),
     @XmlElement(name = RodaConstants.RODA_OBJECT_GROUP, type = Group.class),

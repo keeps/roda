@@ -69,14 +69,6 @@ public interface ClientMessages extends Messages {
 
   String representationInformationTitle();
 
-  String createFormatTitle();
-
-  String editFormatTitle();
-
-  String showFormatTitle();
-
-  String formatsTitle();
-
   String newRiskTitle();
 
   String editRiskTitle();
@@ -170,8 +162,6 @@ public interface ClientMessages extends Messages {
   String sidebarActionsTitle();
 
   String sidebarRepresentationInformationTitle();
-
-  String sidebarFormatsTitle();
 
   String sidebarRisksTitle();
 
@@ -1029,34 +1019,6 @@ public interface ClientMessages extends Messages {
 
   String atLeastOneOfAbove();
 
-  /************* Format register ****************/
-
-  String formatRegisterTitle();
-
-  String formatRegisterProcessButton();
-
-  String formatRegisterSearchPlaceHolder();
-
-  String editFormatNotFound(String name);
-
-  String formatRemoveFolderConfirmDialogTitle();
-
-  String formatRemoveSelectedConfirmDialogMessage(Long size);
-
-  String formatRemoveFolderConfirmDialogCancel();
-
-  String formatRemoveFolderConfirmDialogOk();
-
-  String formatRemoveSuccessTitle();
-
-  String formatRemoveSuccessMessage(Long size);
-
-  String formatListItems(String item);
-
-  String formatIsOpenFormat();
-
-  String formatIsNotOpenFormat();
-
   /************* Common Messages ****************/
 
   String logParameter(String name, String value);
@@ -1297,46 +1259,6 @@ public interface ClientMessages extends Messages {
 
   String representationInformationFiles(@PluralCount int size, String link);
 
-  /*** Formats ***/
-
-  String formatIdentifier();
-
-  String formatName();
-
-  String formatDefinition();
-
-  String formatCategory();
-
-  String formatLatestVersion();
-
-  String formatPopularity();
-
-  String formatDeveloper();
-
-  String formatInitialRelease();
-
-  String formatStandard();
-
-  String formatOpen();
-
-  String formatWebsite();
-
-  String formatProvenanceInformation();
-
-  String formatExtensions();
-
-  String formatMimetypes();
-
-  String formatPronoms();
-
-  String formatPronom();
-
-  String formatUtis();
-
-  String formatAlternativeDesignations();
-
-  String formatVersions();
-
   /****** Descriptive Metadata ****/
 
   String metadataType();
@@ -1501,8 +1423,6 @@ public interface ClientMessages extends Messages {
   String searchRepresentationOriginal();
 
   String searchRepresentationStates();
-
-  String searchFormats();
 
   String searchPronomIds();
 

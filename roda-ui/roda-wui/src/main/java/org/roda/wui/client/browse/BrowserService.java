@@ -23,7 +23,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -345,7 +344,7 @@ public interface BrowserService extends RemoteService {
 
   Job updateRepresentationInformationListWithFilter(
     SelectedItems<RepresentationInformation> representationInformationIds, String filterToAdd)
-          throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   Job deleteRepresentationInformation(SelectedItems<RepresentationInformation> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
@@ -353,15 +352,6 @@ public interface BrowserService extends RemoteService {
   Pair<String, Integer> retrieveRepresentationInformationWithFilter(String riFilter) throws RODAException;
 
   RepresentationInformationFilterBundle retrieveObjectClassFields(String locale) throws AuthorizationDeniedException;
-
-  Format createFormat(Format f)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  void updateFormat(Format f)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  Job deleteFormat(SelectedItems<Format> selected)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
   Map<String, String> retrieveRepresentationInformationFamilyOptions(String localeString);
 

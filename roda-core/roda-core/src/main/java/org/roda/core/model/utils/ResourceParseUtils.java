@@ -36,7 +36,6 @@ import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
@@ -308,8 +307,6 @@ public class ResourceParseUtils {
     } else if (classToReturn.equals(RepresentationInformation.class)) {
       ret = OptionalWithCause
         .of(LiteRODAObjectFactory.get(classToReturn, ModelUtils.getRepresentationInformationId(storagePath)));
-    } else if (classToReturn.equals(Format.class)) {
-      ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ModelUtils.getFormatId(storagePath)));
     } else if (classToReturn.equals(Notification.class)) {
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ModelUtils.getNotificationId(storagePath)));
     } else if (classToReturn.equals(Job.class)) {
