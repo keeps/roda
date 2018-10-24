@@ -48,12 +48,7 @@ public class RodaWuiServlet extends HttpServlet {
 
   @Override
   public void destroy() {
-    try {
-      RodaCoreFactory.shutdown();
-      LOGGER.info("Shutdown: ok...");
-    } catch (IOException e) {
-      LOGGER.error("Error while shutting down {}", RodaCoreFactory.class.getName());
-    }
-
+    RodaCoreFactory.shutdown();
+    LOGGER.info("Shutdown: ok...");
   }
 }

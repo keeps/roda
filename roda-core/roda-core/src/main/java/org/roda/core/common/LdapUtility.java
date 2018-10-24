@@ -351,9 +351,12 @@ public class LdapUtility {
     // Initialize the LDAP service
     final Partition rodaPartition = instantiateDirectoryService();
     final CoreSession session = service.getAdminSession();
-
+    
     // Inject the context entry for dc=roda,dc=org partition
     if (!session.exists(rodaPartition.getSuffixDn())) {
+      
+      // first try to repair
+      rodaPartition.repair();
 
       // add root DN
       addEntryIfNotExists(session, this.ldapRootDN, OBJECT_CLASS_TOP, OBJECT_CLASS_DOMAIN,

@@ -234,9 +234,10 @@ public class RodaCoreFactory {
     Arrays.asList("roda-core.properties", "roda-roles.properties", "roda-permissions.properties"));
 
   /**
-   * Shared configuration and message properties (cache). Includes properties from
-   * {@code rodaConfiguration} and translations from ServerMessages, filtered by
-   * the {@code ui.sharedProperties.*} properties in {@code roda-wui.properties}.
+   * Shared configuration and message properties (cache). Includes properties
+   * from {@code rodaConfiguration} and translations from ServerMessages,
+   * filtered by the {@code ui.sharedProperties.*} properties in
+   * {@code roda-wui.properties}.
    *
    * This cache provides the complete set of properties to be shared with the
    * client browser.
@@ -340,6 +341,8 @@ public class RodaCoreFactory {
     } else {
       LOGGER.error("Unknown node type '{}'", nodeType);
     }
+    
+    Runtime.getRuntime().addShutdownHook(new Thread(() -> shutdown()));
   }
 
   public static void instantiateTest(boolean deploySolr, boolean deployLdap, boolean deployTransferredResourcesScanner,
@@ -1382,10 +1385,14 @@ public class RodaCoreFactory {
     return ret;
   }
 
-  public static void shutdown() throws IOException {
+  public static void shutdown() {
     if (instantiated) {
       if (INSTANTIATE_SOLR) {
-        solr.close();
+        try {
+          solr.close();
+        } catch (IOException e) {
+          LOGGER.error("Error shutting down SOLR", e);
+        }
       }
       if (INSTANTIATE_LDAP) {
         stopApacheDS();
@@ -1938,7 +1945,8 @@ public class RodaCoreFactory {
    * {@code rodaConfiguration}.
    *
    * The properties that should be shared with the client browser are defined by
-   * the {@code ui.sharedProperties.*} properties in {@code roda-wui.properties}.
+   * the {@code ui.sharedProperties.*} properties in
+   * {@code roda-wui.properties}.
    *
    * @return The configuration properties that should be shared with the client
    *         browser.
@@ -1951,7 +1959,8 @@ public class RodaCoreFactory {
       List<String> prefixes = RodaCoreFactory
         .getRodaConfigurationAsList("ui.sharedProperties.whitelist.configuration.prefix");
 
-      rodaSharedConfigurationPropertiesCache.put(RodaConstants.RODA_NODE_TYPE_KEY, Collections.singletonList(getNodeType().toString()));
+      rodaSharedConfigurationPropertiesCache.put(RodaConstants.RODA_NODE_TYPE_KEY,
+        Collections.singletonList(getNodeType().toString()));
 
       Iterator<String> keys = configuration.getKeys();
       while (keys.hasNext()) {
