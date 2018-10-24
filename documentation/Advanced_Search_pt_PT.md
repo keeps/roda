@@ -2,7 +2,7 @@
 
 Nesta página poderá pesquisar por Entidades Intelectuais, Representações ou Ficheiros (use a seta para baixo para selecionar o domínio de pesquisa). Para cada um destes domínios pode pesquisar em todas as suas propriedades ou em propriedades específicas (use a seta para baixo para expandir a pesquisa avançada). Por exemplo, se selecionar Entidades Intelectuais, poderá pesquisar num campo específico da metainformação descritiva, ou encontrar ficheiros de um determinado formato, caso selecione a pesquisa avançada por ficheiro.
 
-O motor de pesquisa localiza apenas palavras inteiras. Se pretender pesquisar por termos parciais deverá utilizar o operador "*".
+O motor de pesquisa localiza apenas palavras inteiras. Se pretender pesquisar por termos parciais deverá utilizar o operador "\*".
 
 ## Operadores de pesquisa
 

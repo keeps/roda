@@ -33,7 +33,7 @@ Optional:
 On the SIP you must define the descriptive metadata type and version. As you are using your own, you should define metadata type OTHER, other metadata type e.g. "GolikSwe" and metadata type version e.g. "1". This can be done directly in the METS or using the [RODA-in application](http://rodain.roda-community.org/) or the [commons-ip library](https://github.com/keeps/commons-ip).
 
 ### 2. Configure RODA to index your new desc. metadata format
-On RODA, you must configure how it can index this file. To do so, you must define the XSLT under `$RODA_HOME/config/crosswalks/ingest/` with a name that is calculated by your metadata type and version. 
+On RODA, you must configure how it can index this file. To do so, you must define the XSLT under `$RODA_HOME/config/crosswalks/ingest/` with a name that is calculated by your metadata type and version.
 
 On the example with metadata type=OTHER, other metadata type="GolikSwe" and metadata version 1, you must create the file  `$RODA_HOME/config/crosswalks/ingest/golikswe_1.xslt`.
 
@@ -50,8 +50,9 @@ The resulting XML must be something like:
 ```
 Rules:
 - There are some reserved field names, specially `title`, `dateInitial` and `dateFinal`, that define what appear on the lists
-- You can add new specific fields, but must always add a suffix for the data type. The most used suffixes are "_txt" (any string tokenized), "_ss" (non-tokenized strings for identifiers), "_dd" for ISO1601 dates.
-- A complete list of reserved fields names and suffixes is available on the [AIP SOLR schema](https://github.com/keeps/roda/blob/master/roda-core/roda-core/src/main/resources/config/index/AIP/conf/schema.xml).
+- You can add new specific fields, but must always add a suffix for the data type. The most used suffixes are "\_txt" (any string tokenized), "\_ss" (non-tokenized strings for identifiers), "\_dd" for ISO1601 dates.
+- The definition of the reserved fields names is made [here](https://github.com/keeps/roda/blob/master/roda-core/roda-core/src/main/java/org/roda/core/index/schema/collections/AIPCollection.java#L61) but you may need to also access [here](https://github.com/keeps/roda/blob/master/roda-common/roda-common-data/src/main/java/org/roda/core/data/common/RodaConstants.java#L604) to find out the final name.
+- A complete list of suffixes and fields types is available at the [SOLR base schema](https://github.com/keeps/roda/blob/master/roda-core/roda-core/src/main/resources/config/index/common/conf/managed-schema).
 
 To apply the changes on the stylesheet you must ingest new content or re-index existing content.
 

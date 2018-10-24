@@ -64,7 +64,7 @@ Após uma compilação bem-sucedida, a aplicação web RODA estará disponível 
 Para além do software necessário para compilar o RODA, necessita:
 
 * Eclipse for Java ([Página de download](http://www.eclipse.org/downloads/))
-* Eclipse Maven Plugin ([Download e instruções de instalação](http://www.eclipse.org/m2e/download/))
+* Eclipse Maven Plugin ([Download e instruções de instalação](http://www.eclipse.org/m2e/))
 
 Opcionalmente, pode instalar as seguintes ferramentas:
 

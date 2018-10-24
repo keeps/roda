@@ -3,7 +3,7 @@
 
 RODA is a complete digital repository that delivers functionality for all the main units of the OAIS reference model. RODA is capable of ingesting, managing and providing access to the various types of digital objects produced by large corporations or public bodies. RODA is based on open-source technologies and is supported by existing standards such as the OAIS, METS, EAD and PREMIS.
 
-RODA also implements a series of specifications and standards. To know more about the OAIS Information Packages that RODA supports, please check out the [DLM Archival Standards Board](http://www.dasboard.eu) repositories on GitHub at <https://github.com/DLMArchivalStandardsBoard>.
+RODA also implements a series of specifications and standards. To know more about the OAIS Information Packages that RODA supports, please check out the [DLM Archival Standards Board](http://www.dasboard.eu) repositories on GitHub at <https://github.com/DILCISBoard>.
 
 ## Features
 
@@ -91,7 +91,7 @@ The risk register lists all identified risks that may affect the repository. It 
 
 ### Representation network
 
-Representation information is any information required to understand and render both the digital material and the associated metadata. Digital objects are stored as bitstreams, which are not understandable to a human being without further data to interpret them. Representation information is the extra structural or semantic information, which converts raw data into something more meaningful. 
+Representation information is any information required to understand and render both the digital material and the associated metadata. Digital objects are stored as bitstreams, which are not understandable to a human being without further data to interpret them. Representation information is the extra structural or semantic information, which converts raw data into something more meaningful.
 
 ### Format register (deprecated)
 

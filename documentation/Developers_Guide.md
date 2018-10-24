@@ -64,7 +64,7 @@ After a successful compile, RODA web application will be available at `roda-ui/r
 Besides the software needed to build RODA, you need:
 
 * Eclipse for Java ([Download page](http://www.eclipse.org/downloads/))
-* Eclipse Maven Plugin ([Download & install instructions](http://www.eclipse.org/m2e/download/))
+* Eclipse Maven Plugin ([Download & install instructions](http://www.eclipse.org/m2e/))
 
 Optionally you may install the following tools:
 
