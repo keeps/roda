@@ -22,6 +22,7 @@ import org.roda.wui.client.common.actions.JobActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
@@ -101,6 +102,12 @@ public class IngestProcess extends Composite {
   @UiField
   SimplePanel actionsSidebar;
 
+  @UiField
+  FlowPanel contentFlowPanel;
+
+  @UiField
+  FlowPanel sidebarFlowPanel;
+
   private IngestProcess() {
     Filter jobIngestFilter = new Filter(
       new SimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INGEST.name()));
@@ -112,8 +119,11 @@ public class IngestProcess extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
     ingestProcessDescription.add(new HTMLWidgetWrapper("IngestProcessDescription.html"));
 
-    actionsSidebar.setWidget(new ActionableWidgetBuilder<>(JobActions.get(IngestTransfer.RESOLVER))
-      .buildListWithObjects(new ActionableObject<>(Job.class)));
+    JobActions jobActions = JobActions.get(IngestTransfer.RESOLVER);
+    SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, jobActions.hasAnyRoles());
+    actionsSidebar
+      .setWidget(new ActionableWidgetBuilder<>(jobActions).buildListWithObjects(new ActionableObject<>(Job.class)));
+
   }
 
   @Override

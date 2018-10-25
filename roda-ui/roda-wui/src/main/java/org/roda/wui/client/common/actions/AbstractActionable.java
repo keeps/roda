@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.common.actions;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -132,5 +133,9 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
 
   public boolean hasPermissions(Action<T> action, Permissions permissions) {
     return PermissionClientUtils.hasPermissions(action.getMethods(), permissions);
+  }
+
+  public boolean hasAnyRoles() {
+    return Arrays.asList(this.getActions()).stream().anyMatch(action -> hasPermissions(action));
   }
 }

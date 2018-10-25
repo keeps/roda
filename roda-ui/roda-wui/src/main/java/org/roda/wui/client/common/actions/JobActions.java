@@ -40,23 +40,6 @@ public class JobActions extends AbstractActionable<Job> {
 
   private JobActions(HistoryResolver newProcessResolver) {
     this.newProcessResolver = newProcessResolver;
-
-    // ingest/process, IngestProcess.java
-
-    // new SimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE,
-    // PluginType.INGEST.toString());
-
-    // administration/process, ActionProcess.java
-
-    // new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE,
-    // PluginType.INTERNAL.toString());
-    // new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE,
-    // PluginType.INGEST.toString());
-
-    // administration/internal, InternalProcess.java
-
-    // new SimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE,
-    // PluginType.INTERNAL.toString());
   }
 
   public enum JobAction implements Action<Job> {
@@ -76,6 +59,11 @@ public class JobActions extends AbstractActionable<Job> {
     }
   }
 
+  @Override
+  public JobAction[] getActions() {
+    return JobAction.values();
+  }
+
   private static final Set<HistoryResolver> NEW_PROCESS_RESOLVERS = new HashSet<>(
     Arrays.asList(IngestTransfer.RESOLVER, CreateDefaultJob.RESOLVER));
 
@@ -90,20 +78,22 @@ public class JobActions extends AbstractActionable<Job> {
 
   @Override
   public boolean canAct(Action<Job> action) {
-    return JobAction.NEW_PROCESS.equals(action) && NEW_PROCESS_RESOLVERS.contains(newProcessResolver);
+    return hasPermissions(action) && JobAction.NEW_PROCESS.equals(action)
+      && NEW_PROCESS_RESOLVERS.contains(newProcessResolver);
   }
 
   @Override
   public boolean canAct(Action<Job> action, Job object) {
-    if (JobAction.STOP.equals(action)) {
-      return !object.isInFinalState() && !object.isStopping();
-    } else if (JobAction.INGEST_APPRAISAL.equals(action)) {
-      return object.getJobStats().getOutcomeObjectsWithManualIntervention() > 0;
-    } else if (JobAction.INGEST_PROCESS.equals(action)) {
-      return object.getPluginType().equals(PluginType.INGEST);
-    } else {
-      return false;
+    if (hasPermissions(action)) {
+      if (JobAction.STOP.equals(action)) {
+        return !object.isInFinalState() && !object.isStopping();
+      } else if (JobAction.INGEST_APPRAISAL.equals(action)) {
+        return object.getJobStats().getOutcomeObjectsWithManualIntervention() > 0;
+      } else if (JobAction.INGEST_PROCESS.equals(action)) {
+        return object.getPluginType().equals(PluginType.INGEST);
+      }
     }
+    return false;
   }
 
   @Override

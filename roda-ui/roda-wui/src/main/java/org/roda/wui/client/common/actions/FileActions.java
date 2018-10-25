@@ -109,6 +109,11 @@ public class FileActions extends AbstractActionable<IndexedFile> {
   }
 
   @Override
+  public FileAction[] getActions() {
+    return FileAction.values();
+  }
+
+  @Override
   public FileAction actionForName(String name) {
     return FileAction.valueOf(name);
   }

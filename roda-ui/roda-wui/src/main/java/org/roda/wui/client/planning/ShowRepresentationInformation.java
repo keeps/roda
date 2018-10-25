@@ -47,6 +47,7 @@ import org.roda.wui.client.common.dialogs.RepresentationInformationDialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
@@ -156,6 +157,12 @@ public class ShowRepresentationInformation extends Composite {
   @UiField
   SimplePanel actionsSidebar;
 
+  @UiField
+  FlowPanel contentFlowPanel;
+
+  @UiField
+  FlowPanel sidebarFlowPanel;
+
   private ActionableWidgetBuilder<RepresentationInformation> actionableWidgetBuilder;
 
   private List<FilterParameter> aipParams = new ArrayList<>();
@@ -256,7 +263,9 @@ public class ShowRepresentationInformation extends Composite {
         }
       });
 
-    actionableWidgetBuilder = new ActionableWidgetBuilder<>(RepresentationInformationActions.get())
+    RepresentationInformationActions representationInformationActions = RepresentationInformationActions.get();
+
+    actionableWidgetBuilder = new ActionableWidgetBuilder<>(representationInformationActions)
       .withActionCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
         @Override
         public void onSuccess(Actionable.ActionImpact result) {
@@ -265,6 +274,8 @@ public class ShowRepresentationInformation extends Composite {
           }
         }
       });
+
+    SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, representationInformationActions.hasAnyRoles());
     actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(ri)));
 
     initRelations();

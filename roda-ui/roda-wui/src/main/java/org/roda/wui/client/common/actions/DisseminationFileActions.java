@@ -10,12 +10,9 @@ package org.roda.wui.client.common.actions;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import org.roda.core.data.v2.ip.DIPFile;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
@@ -54,6 +51,11 @@ public class DisseminationFileActions extends AbstractActionable<DIPFile> {
     public List<String> getMethods() {
       return this.methods;
     }
+  }
+
+  @Override
+  public DisseminationFileAction[] getActions() {
+    return DisseminationFileAction.values();
   }
 
   @Override

@@ -22,6 +22,7 @@ import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -84,22 +85,32 @@ public class FormatRegister extends Composite {
   @UiField(provided = true)
   SearchWrapper searchWrapper;
 
+  @UiField
+  FlowPanel contentFlowPanel;
+
+  @UiField
+  FlowPanel sidebarFlowPanel;
+
   private ActionableWidgetBuilder<Format> actionableWidgetBuilder;
 
   /**
    * Create a format register page
    */
   public FormatRegister() {
-    actionableWidgetBuilder = new ActionableWidgetBuilder<>(FormatActions.get());
+
+    FormatActions formatActions = FormatActions.get();
+    actionableWidgetBuilder = new ActionableWidgetBuilder<>(formatActions);
 
     ListBuilder<Format> formatListBuilder = new ListBuilder<>(() -> new FormatList(),
       new AsyncTableCellOptions<>(Format.class, "FormatRegister_formats").withSummary(messages.formatsTitle())
-        .withSearchPlaceholder(messages.formatRegisterSearchPlaceHolder()).withActionable(FormatActions.get())
+        .withSearchPlaceholder(messages.formatRegisterSearchPlaceHolder()).withActionable(formatActions)
         .bindOpener());
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(formatListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
+
+    SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, formatActions.hasAnyRoles());
     actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(Format.class)));
 
     formatRegisterDescription.add(new HTMLWidgetWrapper("FormatRegisterDescription.html"));

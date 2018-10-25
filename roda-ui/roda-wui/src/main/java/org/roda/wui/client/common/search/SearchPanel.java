@@ -162,7 +162,7 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
     actionsPopup.addStyleName("ActionableStyleMenu");
 
     actionableBuilder = actionable != null ? new ActionableWidgetBuilder<>(actionable) : null;
-    actionsButton.setVisible(actionableBuilder != null && list.isSelectable());
+    actionsButton.setVisible(actionableBuilder != null && actionable.hasAnyRoles() && list.isSelectable());
     actionsButton.addClickHandler(event -> {
       if (!list.isVisible()) {
         doSearch();

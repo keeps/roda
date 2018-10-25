@@ -9,12 +9,12 @@
 
 	<g:FlowPanel styleName="wui-risk-register" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
-			<g:FlowPanel addStyleNames="col_10 content">
+			<g:FlowPanel addStyleNames="col_10 content" ui:field="contentFlowPanel">
 				<common:TitlePanel text="{messages.showRiskTitle}" iconClass="IndexedRisk" />
 				<p:RiskShowPanel ui:field="riskShowPanel"/>
 			</g:FlowPanel>
 
-			<g:FlowPanel addStyleNames="col_2 last sidebar">
+			<g:FlowPanel addStyleNames="col_2 last sidebar" ui:field="sidebarFlowPanel">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
 						<g:SimplePanel addStyleNames="sidebar-group" ui:field="actionsSidebar" />

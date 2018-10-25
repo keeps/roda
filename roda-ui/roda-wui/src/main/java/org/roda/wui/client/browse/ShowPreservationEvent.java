@@ -34,6 +34,7 @@ import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.planning.ShowPreservationAgent;
 import org.roda.wui.common.client.HistoryResolver;
@@ -173,7 +174,15 @@ public class ShowPreservationEvent extends Composite {
 
   @UiField
   SimplePanel actionsSidebar;
+
+  @UiField
+  FlowPanel sidebarFlowPanel;
+
+  @UiField
+  FlowPanel contentFlowPanel;
+
   private ActionableWidgetBuilder<IndexedPreservationEvent> actionableWidgetBuilder;
+  private PreservationEventActions preservationEventActions;
 
   private String aipId;
   private String representationUUID;
@@ -203,7 +212,8 @@ public class ShowPreservationEvent extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    actionableWidgetBuilder = new ActionableWidgetBuilder<>(PreservationEventActions.get()).withBackButton();
+    preservationEventActions = PreservationEventActions.get();
+    actionableWidgetBuilder = new ActionableWidgetBuilder<>(preservationEventActions).withBackButton();
 
     BrowserService.Util.getInstance().retrievePreservationEventViewBundle(eventId,
       new AsyncCallback<PreservationEventViewBundle>() {
@@ -312,6 +322,7 @@ public class ShowPreservationEvent extends Composite {
       }
     });
 
+    SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, preservationEventActions.hasAnyRoles());
     actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(event)));
   }
 

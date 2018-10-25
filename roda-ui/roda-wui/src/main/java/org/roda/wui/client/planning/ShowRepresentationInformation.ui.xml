@@ -8,7 +8,7 @@
 
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
-			<g:FlowPanel addStyleNames="col_10 content">
+			<g:FlowPanel addStyleNames="col_10 content" ui:field="contentFlowPanel">
 				<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
 					<g:FlowPanel addStyleNames="row full_width no_padding">
 						<g:FlowPanel addStyleNames="wui-data-panel">
@@ -73,7 +73,7 @@
 				</g:FlowPanel>
 			</g:FlowPanel>
 
-			<g:FlowPanel addStyleNames="col_2 last sidebar">
+			<g:FlowPanel addStyleNames="col_2 last sidebar" ui:field="sidebarFlowPanel">
 				<g:FlowPanel addStyleNames="sticky-flow">
 					<g:FlowPanel addStyleNames="sticky-padding">
 						<g:SimplePanel addStyleNames="sidebar-group" ui:field="actionsSidebar" />

@@ -62,6 +62,11 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
   }
 
   @Override
+  public RODAMemberAction[] getActions() {
+    return RODAMemberAction.values();
+  }
+
+  @Override
   public RODAMemberAction actionForName(String name) {
     return RODAMemberAction.valueOf(name);
   }

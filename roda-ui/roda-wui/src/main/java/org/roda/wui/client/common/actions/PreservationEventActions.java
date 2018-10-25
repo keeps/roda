@@ -63,6 +63,11 @@ public class PreservationEventActions extends AbstractActionable<IndexedPreserva
   }
 
   @Override
+  public PreservationEventAction[] getActions() {
+    return PreservationEventAction.values();
+  }
+
+  @Override
   public PreservationEventAction actionForName(String name) {
     return PreservationEventAction.valueOf(name);
   }

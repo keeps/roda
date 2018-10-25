@@ -71,6 +71,11 @@ public class FormatActions extends AbstractActionable<Format> {
   }
 
   @Override
+  public FormatAction[] getActions() {
+    return FormatAction.values();
+  }
+
+  @Override
   public FormatAction actionForName(String name) {
     return FormatAction.valueOf(name);
   }

@@ -94,6 +94,11 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
   }
 
   @Override
+  public RepresentationInformationAction[] getActions() {
+    return RepresentationInformationAction.values();
+  }
+
+  @Override
   public RepresentationInformationAction actionForName(String name) {
     return RepresentationInformationAction.valueOf(name);
   }

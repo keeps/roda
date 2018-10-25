@@ -22,6 +22,8 @@ public interface Actionable<T extends IsIndexed> {
     List<String> getMethods();
   }
 
+  Action<T>[] getActions();
+
   enum ActionImpact {
     NONE, UPDATED, DESTROYED
   }
@@ -62,4 +64,6 @@ public interface Actionable<T extends IsIndexed> {
   ActionableBundle<T> createActionsBundle();
 
   Action<T> actionForName(String name);
+
+  boolean hasAnyRoles();
 }

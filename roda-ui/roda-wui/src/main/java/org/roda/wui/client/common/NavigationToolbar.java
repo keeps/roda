@@ -268,69 +268,67 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     popup.addStyleName("ActionableStyleMenu");
 
     if (currentObject instanceof IndexedAIP) {
-      AipActions aipActions;
+      AipActions actions;
       IndexedAIP aip = (IndexedAIP) this.currentObject;
       if (aip.getParentID() != null) {
-        aipActions = AipActions.get(aip.getParentID(), aip.getState(), aip.getPermissions());
+        actions = AipActions.get(aip.getParentID(), aip.getState(), aip.getPermissions());
       } else {
-        aipActions = AipActions.get();
+        actions = AipActions.get();
       }
 
-      popup.setWidget(new ActionableWidgetBuilder<>(aipActions).withActionCallback(handler)
+      popup.setWidget(new ActionableWidgetBuilder<>(actions).withActionCallback(handler)
         .buildListWithObjects(new ActionableObject<>(aip)));
       actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
-      actionsButton.setVisible(true);
+      actionsButton.setVisible(actions.hasAnyRoles());
     } else if (currentObject instanceof IndexedRepresentation) {
       IndexedRepresentation representation = (IndexedRepresentation) this.currentObject;
-      RepresentationActions representationActions = RepresentationActions.get(representation.getAipId(), permissions);
+      RepresentationActions actions = RepresentationActions.get(representation.getAipId(), permissions);
 
-      popup.setWidget(new ActionableWidgetBuilder<>(representationActions).withActionCallback(handler)
+      popup.setWidget(new ActionableWidgetBuilder<>(actions).withActionCallback(handler)
         .buildListWithObjects(new ActionableObject<>(representation)));
       actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
-      actionsButton.setVisible(true);
+      actionsButton.setVisible(actions.hasAnyRoles());
     } else if (currentObject instanceof IndexedFile) {
       infoSidebarButton.setTitle(messages.viewRepresentationInfoFileButton());
 
       IndexedFile file = (IndexedFile) this.currentObject;
-      FileActions fileActions = FileActions.get(file.getAipId(), file.getRepresentationId(),
+      FileActions actions = FileActions.get(file.getAipId(), file.getRepresentationId(),
         file.isDirectory() ? file : null, permissions);
 
-      popup.setWidget(new ActionableWidgetBuilder<>(fileActions).withActionCallback(handler)
+      popup.setWidget(new ActionableWidgetBuilder<>(actions).withActionCallback(handler)
         .buildListWithObjects(new ActionableObject<>(file)));
       actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
-      actionsButton.setVisible(true);
+      actionsButton.setVisible(actions.hasAnyRoles());
     } else if (currentObject instanceof IndexedDIP) {
       infoSidebarButton.setTitle(messages.dissemination());
 
       IndexedDIP dip = (IndexedDIP) this.currentObject;
-      DisseminationActions disseminationActions = DisseminationActions.get(permissions);
+      DisseminationActions actions = DisseminationActions.get(permissions);
 
-      popup.setWidget(
-        new ActionableWidgetBuilder<>(disseminationActions).withActionCallback(handler)
-          .buildListWithObjects(new ActionableObject<>(dip)));
+      popup.setWidget(new ActionableWidgetBuilder<>(actions).withActionCallback(handler)
+        .buildListWithObjects(new ActionableObject<>(dip)));
       actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
-      actionsButton.setVisible(true);
+      actionsButton.setVisible(actions.hasAnyRoles());
     } else if (currentObject instanceof DIPFile) {
       infoSidebarButton.setTitle(messages.disseminationFile());
 
       DIPFile dipFile = (DIPFile) this.currentObject;
-      DisseminationFileActions disseminationFileActions = DisseminationFileActions.get(permissions);
+      DisseminationFileActions actions = DisseminationFileActions.get(permissions);
 
-      popup.setWidget(
-        new ActionableWidgetBuilder<>(disseminationFileActions).withActionCallback(handler)
-          .buildListWithObjects(new ActionableObject<>(dipFile)));
+      popup.setWidget(new ActionableWidgetBuilder<>(actions).withActionCallback(handler)
+        .buildListWithObjects(new ActionableObject<>(dipFile)));
       actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
-      actionsButton.setVisible(true);
+      actionsButton.setVisible(actions.hasAnyRoles());
     } else if (currentObject instanceof TransferredResource) {
       infoSidebarButton.setTitle(messages.oneOfAObject(TransferredResource.class.getName()));
 
       TransferredResource transferredResource = (TransferredResource) this.currentObject;
-      TransferredResourceActions transferredResourceActions = TransferredResourceActions.get(null);
+      TransferredResourceActions actions = TransferredResourceActions.get(null);
 
-      popup.setWidget(new ActionableWidgetBuilder<>(transferredResourceActions).withActionCallback(handler)
+      popup.setWidget(new ActionableWidgetBuilder<>(actions).withActionCallback(handler)
         .buildListWithObjects(new ActionableObject<>(transferredResource)));
       actionsButton.addClickHandler(event -> popup.showRelativeTo(actionsButton));
-      actionsButton.setVisible(true);
+      actionsButton.setVisible(actions.hasAnyRoles());
     }
   }
 
@@ -424,6 +422,11 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
       public List<String> getMethods() {
         return this.methods;
       }
+    }
+
+    @Override
+    public SearchAipAction[] getActions() {
+      return SearchAipAction.values();
     }
 
     @Override

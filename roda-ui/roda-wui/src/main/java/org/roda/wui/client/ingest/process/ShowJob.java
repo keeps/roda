@@ -59,6 +59,7 @@ import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.process.Process;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -335,15 +336,7 @@ public class ShowJob extends Composite {
         }
       }).withWidgetCreatedHandler(buttonCount -> {
         // hide sidebar if we don't have actions
-        if (buttonCount > 0) {
-          content.removeStyleName("col_12");
-          content.addStyleName("col_10");
-          sidebar.setVisible(true);
-        } else {
-          content.removeStyleName("col_10");
-          content.addStyleName("col_12");
-          sidebar.setVisible(false);
-        }
+        SidebarUtils.toggleSidebar(content, sidebar, buttonCount > 0);
       }).buildListWithObjects(new ActionableObject<>(job)));
   }
 

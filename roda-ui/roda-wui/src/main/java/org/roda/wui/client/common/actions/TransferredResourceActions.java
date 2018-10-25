@@ -93,6 +93,11 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
   }
 
   @Override
+  public TransferredResourceAction[] getActions() {
+    return TransferredResourceAction.values();
+  }
+
+  @Override
   public TransferredResourceAction actionForName(String name) {
     return TransferredResourceAction.valueOf(name);
   }

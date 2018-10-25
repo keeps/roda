@@ -20,6 +20,7 @@ import org.roda.wui.client.common.actions.RiskActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.process.CreateActionJob;
 import org.roda.wui.client.search.RiskSearch;
 import org.roda.wui.common.client.HistoryResolver;
@@ -84,6 +85,12 @@ public class RiskRegister extends Composite {
   @UiField
   SimplePanel actionsSidebar;
 
+  @UiField
+  FlowPanel contentFlowPanel;
+
+  @UiField
+  FlowPanel sidebarFlowPanel;
+
   /**
    * Create a risk register page
    */
@@ -92,9 +99,11 @@ public class RiskRegister extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
     riskRegisterDescription.add(new HTMLWidgetWrapper("RiskRegisterDescription.html"));
+    RiskActions riskActions = RiskActions.get();
+
+    SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, riskActions.hasAnyRoles());
     actionsSidebar.setWidget(
-      new ActionableWidgetBuilder<>(RiskActions.get())
-        .withActionCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
+      new ActionableWidgetBuilder<>(riskActions).withActionCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
         @Override
         public void onSuccess(Actionable.ActionImpact result) {
           if (Actionable.ActionImpact.DESTROYED.equals(result) || Actionable.ActionImpact.UPDATED.equals(result)) {
@@ -102,6 +111,7 @@ public class RiskRegister extends Composite {
           }
         }
       }).buildListWithObjects(new ActionableObject<>(IndexedRisk.class)));
+
   }
 
   /**

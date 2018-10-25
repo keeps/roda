@@ -115,6 +115,11 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   }
 
   @Override
+  public AipAction[] getActions() {
+    return AipAction.values();
+  }
+
+  @Override
   public AipAction actionForName(String name) {
     return AipAction.valueOf(name);
   }

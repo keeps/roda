@@ -52,6 +52,11 @@ public class PreservationAgentActions extends AbstractActionable<IndexedPreserva
   }
 
   @Override
+  public PreservationAgentAction[] getActions() {
+    return PreservationAgentAction.values();
+  }
+
+  @Override
   public PreservationAgentAction actionForName(String name) {
     return PreservationAgentAction.valueOf(name);
   }

@@ -74,6 +74,11 @@ public class RiskIncidenceActions extends AbstractActionable<RiskIncidence> {
   }
 
   @Override
+  public RiskIncidenceAction[] getActions() {
+    return RiskIncidenceAction.values();
+  }
+
+  @Override
   public RiskIncidenceAction actionForName(String name) {
     return RiskIncidenceAction.valueOf(name);
   }

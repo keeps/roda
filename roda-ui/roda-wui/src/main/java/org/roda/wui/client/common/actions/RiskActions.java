@@ -79,6 +79,11 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
   }
 
   @Override
+  public IndexedRiskAction[] getActions() {
+    return IndexedRiskAction.values();
+  }
+
+  @Override
   public IndexedRiskAction actionForName(String name) {
     return IndexedRiskAction.valueOf(name);
   }

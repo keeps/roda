@@ -22,6 +22,7 @@ import org.roda.wui.client.common.actions.JobActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.management.Management;
 import org.roda.wui.client.search.JobSearch;
@@ -82,6 +83,12 @@ public class ActionProcess extends Composite {
   @UiField
   SimplePanel actionsSidebar;
 
+  @UiField
+  FlowPanel contentFlowPanel;
+
+  @UiField
+  FlowPanel sidebarFlowPanel;
+
   private static ActionProcess instance = null;
 
   private ActionProcess() {
@@ -93,8 +100,10 @@ public class ActionProcess extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
     preservationProcessDescription.add(new HTMLWidgetWrapper("PreservationProcessDescription.html"));
 
-    actionsSidebar.setWidget(new ActionableWidgetBuilder<>(JobActions.get(CreateDefaultJob.RESOLVER))
-      .buildListWithObjects(new ActionableObject<>(Job.class)));
+    JobActions jobActions = JobActions.get(CreateDefaultJob.RESOLVER);
+    SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, jobActions.hasAnyRoles());
+    actionsSidebar
+      .setWidget(new ActionableWidgetBuilder<>(jobActions).buildListWithObjects(new ActionableObject<>(Job.class)));
   }
 
   /**

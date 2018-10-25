@@ -24,6 +24,7 @@ import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -37,6 +38,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -129,6 +131,12 @@ public class ShowRiskIncidence extends Composite {
   @UiField
   SimplePanel actionsSidebar;
 
+  @UiField
+  FlowPanel contentFlowPanel;
+
+  @UiField
+  FlowPanel sidebarFlowPanel;
+
   private ShowRiskIncidence() {
     this.incidence = new RiskIncidence();
     initWidget(uiBinder.createAndBindUi(this));
@@ -141,7 +149,9 @@ public class ShowRiskIncidence extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
     this.incidence = incidence;
 
-    actionsSidebar.setWidget(new ActionableWidgetBuilder<>(RiskIncidenceActions.get()).withBackButton()
+    RiskIncidenceActions riskIncidenceActions = RiskIncidenceActions.get();
+    SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, riskIncidenceActions.hasAnyRoles());
+    actionsSidebar.setWidget(new ActionableWidgetBuilder<>(riskIncidenceActions).withBackButton()
       .withActionCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
         @Override
         public void onSuccess(Actionable.ActionImpact result) {

@@ -76,6 +76,11 @@ public class DisseminationActions extends AbstractActionable<IndexedDIP> {
   }
 
   @Override
+  public DisseminationAction[] getActions() {
+    return DisseminationAction.values();
+  }
+
+  @Override
   public DisseminationAction actionForName(String name) {
     return DisseminationAction.valueOf(name);
   }

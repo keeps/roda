@@ -88,6 +88,11 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
   }
 
   @Override
+  public RepresentationAction[] getActions() {
+    return RepresentationAction.values();
+  }
+
+  @Override
   public RepresentationAction actionForName(String name) {
     return RepresentationAction.valueOf(name);
   }

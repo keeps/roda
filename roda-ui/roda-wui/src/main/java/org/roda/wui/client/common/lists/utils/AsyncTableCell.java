@@ -180,7 +180,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     this.originalFilter = options.getFilter();
     this.justActive = options.isJustActive();
     this.facets = options.getFacets();
-    this.selectable = actionable != null || options.getForceSelectable();
+    this.selectable = (actionable != null && actionable.hasAnyRoles()) || options.getForceSelectable();
     this.redirectOnSingleResult = options.getRedirectOnSingleResult();
 
     this.fieldsToReturn = options.getFieldsToReturn();

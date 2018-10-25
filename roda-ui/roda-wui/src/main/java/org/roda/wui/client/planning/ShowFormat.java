@@ -23,6 +23,7 @@ import org.roda.wui.client.common.actions.FormatActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -173,7 +174,15 @@ public class ShowFormat extends Composite {
   @UiField
   SimplePanel actionsSidebar;
 
-  private ActionableWidgetBuilder<Format> actionableWidgetBuilder = new ActionableWidgetBuilder<>(FormatActions.get())
+  @UiField
+  FlowPanel contentFlowPanel;
+
+  @UiField
+  FlowPanel sidebarFlowPanel;
+
+  private Actionable<Format> actionable = FormatActions.get();
+
+  private ActionableWidgetBuilder<Format> actionableWidgetBuilder = new ActionableWidgetBuilder<>(actionable)
     .withActionCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
       @Override
       public void onSuccess(Actionable.ActionImpact result) {
@@ -195,6 +204,8 @@ public class ShowFormat extends Composite {
   public ShowFormat(Format format) {
     initWidget(uiBinder.createAndBindUi(this));
     this.format = format;
+
+    SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, actionable.hasAnyRoles());
     actionsSidebar.setWidget(actionableWidgetBuilder.buildListWithObjects(new ActionableObject<>(format)));
 
     formatId.setText(format.getId());

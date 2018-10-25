@@ -23,6 +23,7 @@ import org.roda.wui.client.common.actions.RiskActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -33,6 +34,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -101,6 +103,12 @@ public class ShowRisk extends Composite {
   @UiField
   SimplePanel actionsSidebar;
 
+  @UiField
+  FlowPanel contentFlowPanel;
+
+  @UiField
+  FlowPanel sidebarFlowPanel;
+
   /**
    * Create a new panel to view a risk
    *
@@ -131,7 +139,13 @@ public class ShowRisk extends Composite {
   }
 
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
+
     if (historyTokens.size() == 1) {
+      SidebarUtils.showSidebar(contentFlowPanel, sidebarFlowPanel);
+
+      final RiskActions riskActions = RiskActions.get();
+      final RiskActions actionsWithHistory = RiskActions.getWithHistory();
+
       String riskId = historyTokens.get(0);
       BrowserService.Util.getInstance().retrieve(IndexedRisk.class.getName(), riskId, fieldsToReturn,
         new AsyncCallback<IndexedRisk>() {
@@ -149,7 +163,8 @@ public class ShowRisk extends Composite {
 
               @Override
               public void onFailure(Throwable caught) {
-                instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(RiskActions.get()).withBackButton()
+                SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, riskActions.hasAnyRoles());
+                instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(riskActions).withBackButton()
                   .withActionCallback(actionCallback).buildListWithObjects(new ActionableObject<>(result)));
                 callback.onSuccess(instance);
               }
@@ -157,11 +172,13 @@ public class ShowRisk extends Composite {
               @Override
               public void onSuccess(Boolean hasHistory) {
                 if (hasHistory) {
+                  SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, actionsWithHistory.hasAnyRoles());
                   instance.actionsSidebar
-                    .setWidget(new ActionableWidgetBuilder<>(RiskActions.getWithHistory()).withBackButton()
+                    .setWidget(new ActionableWidgetBuilder<>(actionsWithHistory).withBackButton()
                       .withActionCallback(actionCallback).buildListWithObjects(new ActionableObject<>(result)));
                 } else {
-                  instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(RiskActions.get()).withBackButton()
+                  SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, riskActions.hasAnyRoles());
+                  instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(riskActions).withBackButton()
                     .withActionCallback(actionCallback).buildListWithObjects(new ActionableObject<>(result)));
                 }
 
