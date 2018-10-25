@@ -1,5 +1,17 @@
 # Changelog
 
+## v2.2.13 (25/10/2018)
+Install for demonstration:
+```
+docker pull keeps/roda:v2.2.12
+```
+
+
+#### Enhancements:
+
+- Add support for CORS [#1382](https://github.com/keeps/roda/issues/1382)
+---
+
 ## v2.2.12 (11/10/2018)
 Install for demonstration:
 ```
@@ -27,6 +39,15 @@ Install for demonstration:
 ```
 docker pull keeps/roda:v2.2.10
 ```
+
+Run locally for demonstration:
+```
+docker run -p 8080:8080 keeps/roda:v2.2.10
+```
+Open browser on "http://localhost:8080"
+
+- username: admin
+- password: roda
 
 #### Enhancements:
 
