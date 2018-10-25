@@ -30,13 +30,25 @@ import com.google.gwt.user.client.ui.Widget;
 public class SearchWithPreFilters extends Composite {
   // Used by Search.RESOLVER
   public static void resolveToNewInstance(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    callback.onSuccess(new SearchWithPreFilters(historyTokens));
+    callback.onSuccess(getInstance(historyTokens));
   }
 
   interface MyUiBinder extends UiBinder<Widget, SearchWithPreFilters> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+
+  private static SearchWithPreFilters instance = null;
+
+  private static SearchWithPreFilters getInstance(List<String> historyTokens) {
+    // also create a new instance if the historyTokens have changed
+    if (instance == null || !historyTokens.equals(instance.historyTokens)) {
+      instance = new SearchWithPreFilters(historyTokens);
+    }
+    return instance;
+  }
+
+  private final List<String> historyTokens;
 
   @UiField
   FlowPanel searchDescription;
@@ -45,6 +57,8 @@ public class SearchWithPreFilters extends Composite {
   CatalogueSearch catalogueSearch;
 
   private SearchWithPreFilters(List<String> historyTokens) {
+    this.historyTokens = historyTokens;
+
     // Create main search
     catalogueSearch = new CatalogueSearch(historyTokens, true, "Search_AIPs", "Search_representations", "Search_files",
       null, false, true);
