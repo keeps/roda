@@ -20,6 +20,12 @@
 								<g:Label styleName="value" ui:field="logIdValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="logInstanceIdLabel">
+									<ui:text from='{messages.logEntryInstanceId}' />
+								</g:Label>
+								<g:Label styleName="value" ui:field="logInstanceIdValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
 								<g:Label styleName="label" ui:field="logComponentLabel">
 									<ui:text from='{messages.logEntryComponent}' />
 								</g:Label>

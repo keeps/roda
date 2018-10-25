@@ -136,6 +136,12 @@ public class ShowLogEntry extends Composite {
   @UiField
   HTML logStateValue;
 
+  @UiField
+  Label logInstanceIdLabel;
+
+  @UiField
+  Label logInstanceIdValue;
+
   /**
    * Create a new panel to view a log entry
    *
@@ -146,6 +152,10 @@ public class ShowLogEntry extends Composite {
     logIdValue.setText(logEntry.getId());
     logIdLabel.setVisible(StringUtils.isNotBlank(logEntry.getId()));
     logIdValue.setVisible(StringUtils.isNotBlank(logEntry.getId()));
+
+    logInstanceIdValue.setText(logEntry.getInstanceId());
+    logInstanceIdLabel.setVisible(StringUtils.isNotBlank(logEntry.getInstanceId()));
+    logInstanceIdValue.setVisible(StringUtils.isNotBlank(logEntry.getInstanceId()));
 
     logComponentValue.setText(logEntry.getActionComponent());
     logComponentLabel.setVisible(StringUtils.isNotBlank(logEntry.getActionComponent()));

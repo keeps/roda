@@ -1546,6 +1546,8 @@ public interface ClientMessages extends Messages {
 
   String logEntryStateValue(@Select LOG_ENTRY_STATE state);
 
+  String logEntryInstanceId();
+
   /*** Notifications ***/
 
   String notificationRecipients();
