@@ -417,7 +417,7 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
     managementGroup.addButton(messages.uploadFilesButton(), TransferredResourceAction.UPLOAD, ActionImpact.NONE,
       "btn-upload");
     managementGroup.addButton(messages.createFolderButton(), TransferredResourceAction.NEW_FOLDER, ActionImpact.UPDATED,
-      "btn-plus");
+      "btn-plus-circle");
     managementGroup.addButton(messages.removeWholeFolderButton(), TransferredResourceAction.REMOVE,
       ActionImpact.DESTROYED, "btn-danger btn-ban");
 

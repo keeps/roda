@@ -394,11 +394,11 @@ public class BrowseAIP extends Composite {
     });
 
     if (descMetadata != null && !descMetadata.isEmpty()) {
-      descriptiveMetadata.setVisible(true);
+      descriptiveMetadata.getParent().setVisible(true);
       descriptiveMetadata.selectTab(0);
       newDescriptiveMetadata.setVisible(false);
     } else {
-      descriptiveMetadata.setVisible(false);
+      descriptiveMetadata.getParent().setVisible(false);
       newDescriptiveMetadata.setVisible(true);
     }
 

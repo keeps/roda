@@ -360,11 +360,11 @@ public class BrowseRepresentation extends Composite {
 
     if (!bundle.getRepresentationDescriptiveMetadata().isEmpty()) {
       newDescriptiveMetadata.setVisible(false);
-      itemMetadata.setVisible(true);
+      itemMetadata.getParent().setVisible(true);
       itemMetadata.selectTab(0);
     } else {
       newDescriptiveMetadata.setVisible(true);
-      itemMetadata.setVisible(false);
+      itemMetadata.getParent().setVisible(false);
     }
 
     // DISSEMINATIONS (POST-INIT)

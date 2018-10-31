@@ -19,6 +19,7 @@ import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
@@ -691,7 +692,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     ActionableGroup<IndexedAIP> managementGroup = new ActionableGroup<>(messages.intellectualEntity());
     managementGroup.addButton(messages.newArchivalPackage(), AipAction.NEW_CHILD_AIP_TOP, ActionImpact.UPDATED,
       "btn-plus-circle");
-    managementGroup.addButton(messages.newArchivalPackage(), AipAction.NEW_CHILD_AIP_BELOW, ActionImpact.UPDATED,
+    managementGroup.addButton(messages.newSublevel(), AipAction.NEW_CHILD_AIP_BELOW, ActionImpact.UPDATED,
       "btn-plus-circle");
     managementGroup.addButton(messages.changeTypeButton(), AipAction.CHANGE_TYPE, ActionImpact.UPDATED, "btn-edit");
     managementGroup.addButton(messages.moveArchivalPackage(), AipAction.MOVE_IN_HIERARCHY, ActionImpact.UPDATED,
@@ -699,23 +700,28 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     managementGroup.addButton(messages.archivalPackagePermissions(), AipAction.UPDATE_PERMISSIONS, ActionImpact.UPDATED,
       "btn-edit");
     managementGroup.addButton(messages.removeArchivalPackage(), AipAction.REMOVE, ActionImpact.DESTROYED, "btn-ban");
-    managementGroup.addButton(messages.downloadButton(), AipAction.DOWNLOAD, ActionImpact.NONE, "btn-download");
 
     // PRESERVATION
     ActionableGroup<IndexedAIP> preservationGroup = new ActionableGroup<>(messages.preservationTitle());
     preservationGroup.addButton(messages.newProcessPreservation(), AipAction.NEW_PROCESS, ActionImpact.UPDATED,
       "btn-play");
-    preservationGroup.addButton(messages.preservationEventsDownloadButton(), AipAction.DOWNLOAD_EVENTS,
-      ActionImpact.NONE, "btn-download");
 
     // APPRAISAL
     ActionableGroup<IndexedAIP> appraisalGroup = new ActionableGroup<>(messages.appraisalTitle());
     appraisalGroup.addButton(messages.appraisalAccept(), AipAction.APPRAISAL_ACCEPT, ActionImpact.UPDATED, "btn-play");
     appraisalGroup.addButton(messages.appraisalReject(), AipAction.APPRAISAL_REJECT, ActionImpact.DESTROYED, "btn-ban");
-    appraisalGroup.addButton(messages.downloadDocumentation(), AipAction.DOWNLOAD_DOCUMENTATION, ActionImpact.NONE,
+
+    // DOWNLOAD
+    ActionableGroup<IndexedAIP> downloadGroup = new ActionableGroup<>(messages.downloadButton());
+    downloadGroup.addButton(messages.downloadButton() + " " + messages.oneOfAObject(AIP.class.getName()),
+      AipAction.DOWNLOAD, ActionImpact.NONE, "btn-download");
+    downloadGroup.addButton(messages.preservationEventsDownloadButton(), AipAction.DOWNLOAD_EVENTS, ActionImpact.NONE,
+      "btn-download");
+    downloadGroup.addButton(messages.downloadDocumentation(), AipAction.DOWNLOAD_DOCUMENTATION, ActionImpact.NONE,
       "btn-download");
 
-    aipActionableBundle.addGroup(managementGroup).addGroup(preservationGroup).addGroup(appraisalGroup);
+    aipActionableBundle.addGroup(managementGroup).addGroup(preservationGroup).addGroup(appraisalGroup)
+      .addGroup(downloadGroup);
     return aipActionableBundle;
   }
 }

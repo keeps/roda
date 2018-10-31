@@ -310,9 +310,9 @@ public class RepresentationInformationActions extends AbstractActionable<Represe
     // MANAGEMENT
     ActionableGroup<RepresentationInformation> managementGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
     managementGroup.addButton(messages.newButton(), RepresentationInformationAction.NEW, ActionImpact.UPDATED,
-      "btn-plus");
+      "btn-plus-circle");
     managementGroup.addButton(messages.createNewRepresentationInformation(),
-      RepresentationInformationAction.ASSOCIATE_WITH_NEW, ActionImpact.UPDATED, "btn-plus");
+      RepresentationInformationAction.ASSOCIATE_WITH_NEW, ActionImpact.UPDATED, "btn-plus-circle");
     managementGroup.addButton(messages.editButton(), RepresentationInformationAction.EDIT, ActionImpact.UPDATED,
       "btn-edit");
     managementGroup.addButton(messages.addToExistingRepresentationInformation(),

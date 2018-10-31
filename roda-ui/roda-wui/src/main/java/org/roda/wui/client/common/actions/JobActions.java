@@ -172,7 +172,7 @@ public class JobActions extends AbstractActionable<Job> {
     // MANAGEMENT
     ActionableGroup<Job> managementGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
     managementGroup.addButton(messages.newProcessPreservation(), JobAction.NEW_PROCESS, ActionImpact.UPDATED,
-      "btn-plus");
+      "btn-plus-circle");
     managementGroup.addButton(messages.stopButton(), JobAction.STOP, ActionImpact.DESTROYED, "btn-stop");
 
     // FIXME 20180731 bferreira: JobAction.INGEST_APPRAISAL button text should be

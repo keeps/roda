@@ -75,6 +75,7 @@ import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy.KeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.Header;
+import com.google.gwt.user.cellview.client.LoadingStateChangeEvent;
 import com.google.gwt.user.cellview.client.SafeHtmlHeader;
 import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.client.Random;
@@ -187,10 +188,17 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
     this.setVisible(!options.isStartHidden());
 
+    setStylePrimaryName("my-asyncdatagrid");
+
+    HTML loadingPanel = new HTML(HtmlSnippetUtils.LOADING);
+    loadingPanel.setStylePrimaryName("my-asyncdatagrid-loading-panel");
+    add(loadingPanel);
+
     display = new AccessibleCellTable<>(getInitialPageSize(), GWT.create(MyCellTableResources.class), getKeyProvider(),
       options.getSummary());
     display.setKeyboardSelectionPolicy(KeyboardSelectionPolicy.DISABLED);
-    display.setLoadingIndicator(new HTML(HtmlSnippetUtils.LOADING));
+    display.addLoadingStateChangeHandler(event -> setStyleDependentName("loading",
+      LoadingStateChangeEvent.LoadingState.LOADING.equals(event.getLoadingState())));
 
     configure(display);
 
@@ -307,7 +315,6 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     display.addColumnSortHandler(new AsyncHandler(display));
 
     getElement().setId("list-" + listId);
-    addStyleName("my-asyncdatagrid");
     resultsPager.addStyleName("my-asyncdatagrid-pager-results");
     pageSizePager.addStyleName("my-asyncdatagrid-pager-pagesize");
     autoUpdatePanel.addStyleName("my-asyncdatagrid-autoupdate-signal");

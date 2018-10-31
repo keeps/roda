@@ -622,7 +622,8 @@ public class FileActions extends AbstractActionable<IndexedFile> {
       "fileMoveButton");
     managementGroup.addButton(messages.uploadFilesButton(), FileAction.UPLOAD_FILES, ActionImpact.UPDATED, "btn-upload",
       "fileUploadButton");
-    managementGroup.addButton(messages.createFolderButton(), FileAction.CREATE_FOLDER, ActionImpact.UPDATED, "btn-plus",
+    managementGroup.addButton(messages.createFolderButton(), FileAction.CREATE_FOLDER, ActionImpact.UPDATED,
+      "btn-plus-circle",
       "fileCreateFolderButton");
     managementGroup.addButton(messages.removeButton(), FileAction.REMOVE, ActionImpact.DESTROYED, "btn-ban",
       "fileRemoveButton");

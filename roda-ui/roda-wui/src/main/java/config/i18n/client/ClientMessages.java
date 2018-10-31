@@ -1285,6 +1285,8 @@ public interface ClientMessages extends Messages {
 
   String newArchivalPackage();
 
+  String newSublevel();
+
   String moveArchivalPackage();
 
   String archivalPackagePermissions();

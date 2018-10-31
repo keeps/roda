@@ -43,7 +43,7 @@ public class RemovableTextBox extends Composite implements HasHandlers {
     this.isAddTextBox = first;
     initWidget(uiBinder.createAndBindUi(this));
     if (first) {
-      removeDynamicTextBoxButton.setHTML(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-plus\"></i>"));
+      removeDynamicTextBoxButton.setHTML(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-plus-circle\"></i>"));
     } else {
       removeDynamicTextBoxButton.setHTML(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-remove\"></i>"));
     }

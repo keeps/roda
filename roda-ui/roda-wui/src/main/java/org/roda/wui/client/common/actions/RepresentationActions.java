@@ -17,6 +17,7 @@ import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowserService;
@@ -391,8 +392,6 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     ActionableGroup<IndexedRepresentation> managementGroup = new ActionableGroup<>(messages.representation());
     managementGroup.addButton(messages.newRepresentationButton(), RepresentationAction.NEW, ActionImpact.UPDATED,
       "btn-plus-circle");
-    managementGroup.addButton(messages.downloadButton(), RepresentationAction.DOWNLOAD, ActionImpact.NONE,
-      "btn-download");
     managementGroup.addButton(messages.changeTypeButton(), RepresentationAction.CHANGE_TYPE, ActionImpact.UPDATED,
       "btn-edit");
     managementGroup.addButton(messages.changeStatusButton(), RepresentationAction.CHANGE_STATE, ActionImpact.UPDATED,
@@ -406,7 +405,12 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     preservationGroup.addButton(messages.identifyFormatsButton(), RepresentationAction.IDENTIFY_FORMATS,
       ActionImpact.UPDATED, "btn-play");
 
-    representationActionableBundle.addGroup(managementGroup).addGroup(preservationGroup);
+    // DOWNLOAD
+    ActionableGroup<IndexedRepresentation> downloadGroup = new ActionableGroup<>(messages.downloadButton());
+    downloadGroup.addButton(messages.downloadButton() + " " + messages.oneOfAObject(Representation.class.getName()),
+      RepresentationAction.DOWNLOAD, ActionImpact.NONE, "btn-download");
+
+    representationActionableBundle.addGroup(managementGroup).addGroup(preservationGroup).addGroup(downloadGroup);
     return representationActionableBundle;
   }
 }

@@ -624,10 +624,6 @@ pre code {
 	margin-right: 5px;
 }
 
-.browseNewDescriptiveMetadataButton {
-    margin-top: 10px;
-}
-
 .panelDescriptiveMetadata .form-separator:first-child {
 	margin-top:0px !important;
 }
@@ -1140,6 +1136,20 @@ pre code {
 
 .my-asyncdatagrid {
 	text-align: left;
+    position: relative;
+}
+
+.my-asyncdatagrid .my-asyncdatagrid-loading-panel {
+    display: none;
+}
+
+.my-asyncdatagrid-loading .my-asyncdatagrid-side-panel,
+.my-asyncdatagrid-loading .my-asyncdatagrid-main-panel {
+    visibility: hidden;
+}
+
+.my-asyncdatagrid-loading .my-asyncdatagrid-loading-panel {
+    display: block;
 }
 
 .my-asyncdatagrid-main-panel {
@@ -6776,6 +6786,7 @@ span.code {
 .ActionableStyleMenu .actionable-menu {
     display: block;
 }
+
 .ActionableStyleButtons .actionable-title,
 .ActionableStyleMenu .actionable-title {
     display:none;
@@ -6858,9 +6869,9 @@ span.code {
     line-height: normal;
 }
 
-.ActionableStyleButtons .actionable-button,
 .browseNewDescriptiveMetadataButton {
-    max-width: 250px;
+    vertical-align: top;
+    margin-top: 20px;
 }
 
 .sidebar .actionable-title,
@@ -6913,6 +6924,10 @@ span.code {
 
 .my-asyncdatagrid-main-panel .ActionableStyleButtons .actionable-menu {
     margin: 1rem;
+}
+
+.ActionableStyleButtons {
+    display: inline-block;
 }
 
 .sidebar .actionable-button-back {
