@@ -7,6 +7,9 @@
  */
 package org.roda.core.data.v2.index;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
@@ -31,6 +34,8 @@ public class FindRequest extends CountRequest {
   public boolean exportFacets;
   /** The filename for exported CSV. */
   public String filename;
+  /** The index fields to return and use to construct the indexed object. */
+  public List<String> fieldsToReturn;
 
   /**
    * Constructor.
@@ -57,7 +62,7 @@ public class FindRequest extends CountRequest {
    */
   public FindRequest(final String classToReturn, final Filter filter, final Sorter sorter, final Sublist sublist,
     final Facets facets, final boolean onlyActive) {
-    this(classToReturn, filter, sorter, sublist, facets, onlyActive, false, "export.csv");
+    this(classToReturn, filter, sorter, sublist, facets, onlyActive, false, "export.csv", new ArrayList<>());
   }
 
   /**
@@ -79,15 +84,19 @@ public class FindRequest extends CountRequest {
    *          for CSV results, export only facets?
    * @param filename
    *          the filename for exported CSV.
+   * @param fieldsToReturn
+   *          the index fields to return.
    */
   public FindRequest(final String classToReturn, final Filter filter, final Sorter sorter, final Sublist sublist,
-    final Facets facets, final boolean onlyActive, final boolean exportFacets, final String filename) {
+    final Facets facets, final boolean onlyActive, final boolean exportFacets, final String filename,
+    final List<String> fieldsToReturn) {
     super(classToReturn, filter, onlyActive);
     this.sorter = sorter;
     this.sublist = sublist;
     this.facets = facets;
     this.exportFacets = exportFacets;
     this.filename = filename;
+    this.fieldsToReturn = fieldsToReturn;
   }
 
 }

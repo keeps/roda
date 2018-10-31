@@ -243,7 +243,8 @@ public class IndexResource {
       return csvResponse(findRequest, user, null);
     } else {
       final IndexResult<T> result = Browser.find(getClass(findRequest.classToReturn), findRequest.filter,
-        findRequest.sorter, findRequest.sublist, findRequest.facets, user, findRequest.onlyActive, new ArrayList<>());
+        findRequest.sorter, findRequest.sublist, findRequest.facets, user, findRequest.onlyActive,
+        findRequest.fieldsToReturn);
       return Response.ok(result, mediaType).build();
     }
 
@@ -340,7 +341,7 @@ public class IndexResource {
           .toStreamResponse());
     } else {
       IndexResult<T> result = Browser.find(returnClass, findRequest.filter, findRequest.sorter, findRequest.sublist,
-        findRequest.facets, user, findRequest.onlyActive, new ArrayList<>());
+        findRequest.facets, user, findRequest.onlyActive, findRequest.fieldsToReturn);
       if (localeString != null) {
         result = I18nUtility.translate(result, returnClass, localeString);
       }
