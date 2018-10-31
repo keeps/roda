@@ -331,7 +331,7 @@ public class IndexResource {
 
     if (findRequest.exportFacets) {
       IndexResult<T> result = Browser.find(returnClass, findRequest.filter, Sorter.NONE, Sublist.NONE,
-        findRequest.facets, user, findRequest.onlyActive, new ArrayList<>());
+        findRequest.facets, user, findRequest.onlyActive, findRequest.fieldsToReturn);
       if (localeString != null) {
         result = I18nUtility.translate(result, returnClass, localeString);
       }
