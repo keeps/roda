@@ -2114,6 +2114,7 @@ td.datePickerMonth, td.datePickerYear {
 .sidebar .h1, .sidebar .h2, .sidebar .h3, .sidebar .h4, .sidebar .h5,
 .sidebar .h6, .sidebar .actions-layout-title {
     margin-bottom: 0.6rem;
+    margin-top: 0.3rem;
     font-size: 1.8rem;
 }
 
@@ -6758,6 +6759,7 @@ span.code {
     display: none;
 }
 
+.sidebar .actions-empty-help,
 .ActionableStyleMenu .actions-empty-help {
     display: block;
     padding: 5px 15px;
