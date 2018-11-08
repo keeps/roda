@@ -30,7 +30,6 @@ import config.i18n.client.ClientMessages;
 public class DefaultSelectDialog<T extends IsIndexed> extends DialogBox implements SelectDialog<T> {
   private static final Binder binder = GWT.create(Binder.class);
 
-  @SuppressWarnings("rawtypes")
   interface Binder extends UiBinder<Widget, DefaultSelectDialog> {
   }
 
@@ -49,20 +48,13 @@ public class DefaultSelectDialog<T extends IsIndexed> extends DialogBox implemen
   Button emptyParentButton;
 
   private final Class<T> objectClass;
-  private boolean singleSelectionMode = false;
 
   public DefaultSelectDialog(String title, ListBuilder<T> listBuilder) {
     objectClass = listBuilder.getOptions().getClassToReturn();
+    GWT.log("-1");
     listBuilder.getOptions().withRecenteringOfParentDialog(this).addSelectionChangeHandler(event -> {
       T value = DefaultSelectDialog.this.getValue();
-      if (singleSelectionMode) {
-        if (value != null) {
-          ValueChangeEvent.fire(this, value);
-          hide();
-        }
-      } else {
-        selectButton.setEnabled(value != null);
-      }
+      selectButton.setEnabled(value != null);
     });
 
     searchWrapper = new SearchWrapper(false).withListsInsideScrollPanel("selectAipResultsPanel")
@@ -83,7 +75,6 @@ public class DefaultSelectDialog<T extends IsIndexed> extends DialogBox implemen
   }
 
   public void setSingleSelectionMode() {
-    singleSelectionMode = true;
     selectButton.setEnabled(false);
   }
 
@@ -121,7 +112,7 @@ public class DefaultSelectDialog<T extends IsIndexed> extends DialogBox implemen
 
   private T getValue() {
     ListSelectionState<T> listSelectionState = searchWrapper.getListSelectionState(objectClass);
-    return  listSelectionState != null ? listSelectionState.getSelected() : null;
+    return listSelectionState != null ? listSelectionState.getSelected() : null;
   }
 
   public void setEmptyParentButtonVisible(boolean visible) {
