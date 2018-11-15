@@ -18,6 +18,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 
+import org.roda.core.common.ProvidesInputStream;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.common.Pair;
@@ -40,7 +41,7 @@ public class ThemeResource {
     @ApiParam(value = "If the resource is served inline", required = false) @QueryParam(RodaConstants.API_QUERY_PARAM_INLINE) boolean inline,
     @HeaderParam("Range") String range, @Context Request req) throws NotFoundException {
 
-    Pair<String, InputStream> themeResource = Theme.getThemeResource(resourceId, fallbackResourceId);
+    Pair<String, ProvidesInputStream> themeResource = Theme.getThemeResource(resourceId, fallbackResourceId);
 
     if (themeResource.getSecond() != null) {
       return ApiUtils.okResponse(Theme.getThemeResourceStreamResponse(themeResource), inline, range, req);

@@ -20,6 +20,7 @@ import java.util.Date;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConsumesOutputStream;
+import org.roda.core.common.ProvidesInputStream;
 import org.roda.core.common.StreamResponse;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
@@ -32,24 +33,23 @@ public class Theme extends RodaWuiController {
     super();
   }
 
-  public static Pair<String, InputStream> getThemeResource(String id, String fallbackResourceId) {
-    String resourceId = id;
-    InputStream themeResourceInputStream = null;
+  public static Pair<String, ProvidesInputStream> getThemeResource(String id, String fallbackResourceId) {
+    Pair<String, ProvidesInputStream> ret;
+    URL url = RodaCoreFactory.getConfigurationFile(RodaConstants.CORE_THEME_FOLDER + "/" + id);
 
-    themeResourceInputStream = RodaCoreFactory
-      .getConfigurationFileAsStream(RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER), resourceId);
-
-    if (themeResourceInputStream == null) {
-      themeResourceInputStream = RodaCoreFactory
-        .getConfigurationFileAsStream(RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER), fallbackResourceId);
-      resourceId = fallbackResourceId;
+    if (url != null) {
+      ret = Pair.of(id, () -> RodaCoreFactory.getConfigurationFileAsStream(
+              RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER), id));
+    } else {
+      ret = Pair.of(fallbackResourceId, () -> RodaCoreFactory.getConfigurationFileAsStream(
+              RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER), fallbackResourceId));
     }
 
-    return Pair.of(resourceId, themeResourceInputStream);
+    return ret;
   }
 
   public static StreamResponse getThemeResourceStreamResponse(
-    final Pair<String, InputStream> themeResourceInputstream) {
+    final Pair<String, ProvidesInputStream> themeResourceInputstream) {
     final String resourceId = themeResourceInputstream.getFirst();
     final String mimeType = MimeTypeHelper.getContentType(resourceId);
 
@@ -67,7 +67,7 @@ public class Theme extends RodaWuiController {
 
       @Override
       public void consumeOutputStream(OutputStream out) throws IOException {
-        try (InputStream in = themeResourceInputstream.getSecond()) {
+        try (InputStream in = themeResourceInputstream.getSecond().createInputStream()) {
           IOUtils.copy(in, out);
         }
       }
