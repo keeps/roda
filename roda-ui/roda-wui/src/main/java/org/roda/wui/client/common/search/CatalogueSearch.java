@@ -66,6 +66,7 @@ public class CatalogueSearch extends Composite {
     Map<String, Filter> classFilters = null;
     if (!filterHistoryTokens.isEmpty()) {
       classFilters = parseFilters(filterHistoryTokens);
+      redirectOnSingleResult = redirectOnSingleResult && classFilters.keySet().size() <= 1;
     } else {
       classFilters = new HashMap<>();
       for (Class<? extends IsIndexed> searchableClass : searchableClasses) {

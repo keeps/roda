@@ -464,10 +464,6 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
       } else if (action.equals(SearchAipAction.SEARCH_PACKAGE)) {
         List<String> searchFilters = new ArrayList<>();
 
-        searchFilters.add(SearchFilters.classesToHistoryTokens(IndexedAIP.class));
-        searchFilters.add(RodaConstants.AIP_PARENT_ID);
-        searchFilters.add(object.getId());
-
         searchFilters.add(SearchFilters.classesToHistoryTokens(IndexedRepresentation.class));
         searchFilters.add(RodaConstants.REPRESENTATION_AIP_ID);
         searchFilters.add(object.getId());
