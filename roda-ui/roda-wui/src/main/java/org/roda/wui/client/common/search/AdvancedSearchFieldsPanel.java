@@ -37,12 +37,12 @@ public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChan
   private final Map<String, SearchField> searchFields = new HashMap<>();
   private ListBox searchAdvancedFieldOptions;
 
-  private static List<SearchField> getSearchFieldsFromConfig(String className) {
+  private static List<SearchField> getSearchFieldsFromConfig(String classSimpleName) {
     List<SearchField> searchFields = new ArrayList<>();
-    List<String> fields = ConfigurationManager.getStringList(RodaConstants.SEARCH_FIELD_PREFIX, className);
+    List<String> fields = ConfigurationManager.getStringList(RodaConstants.SEARCH_FIELD_PREFIX, classSimpleName);
 
     for (String field : fields) {
-      String fieldPrefix = RodaConstants.SEARCH_FIELD_PREFIX + '.' + className + '.' + field;
+      String fieldPrefix = RodaConstants.SEARCH_FIELD_PREFIX + '.' + classSimpleName + '.' + field;
 
       SearchField searchField = new SearchField();
       String fieldsNames = ConfigurationManager.getString(fieldPrefix, RodaConstants.SEARCH_FIELD_FIELDS);
@@ -170,7 +170,11 @@ public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChan
         ListBox listBox = fieldPanel.getAdvancedFieldBox();
 
         if (activeFields.contains(listBox.getSelectedValue())) {
-          fieldPanel.setWarningVisible(true, listBox.getSelectedValue());
+          String labelI18nKey = ConfigurationManager.getString(RodaConstants.SEARCH_FIELD_PREFIX, classSimpleName,
+            listBox.getSelectedValue(), RodaConstants.SEARCH_FIELD_I18N);
+          String itemLabel = labelI18nKey != null ? ConfigurationManager.getTranslation(labelI18nKey)
+            : listBox.getSelectedValue();
+          fieldPanel.setWarningVisible(true, itemLabel);
         } else {
           activeFields.add(listBox.getSelectedValue());
           fieldPanel.setWarningVisible(false);
@@ -204,4 +208,5 @@ public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChan
   protected void onChange() {
     ValueChangeEvent.fire(this, getWidgetCount());
   }
+
 }
