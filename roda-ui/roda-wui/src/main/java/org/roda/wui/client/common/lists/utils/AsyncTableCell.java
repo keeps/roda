@@ -78,6 +78,7 @@ import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.LoadingStateChangeEvent;
 import com.google.gwt.user.cellview.client.SafeHtmlHeader;
 import com.google.gwt.user.cellview.client.SimplePager;
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -144,6 +145,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   private AsyncCallback<Actionable.ActionImpact> actionableCallback = null;
   private boolean redirectOnSingleResult;
   private Filter originalFilter;
+  private HandlerRegistration selectAllPopupHistoryChangedHandler = null;
 
   enum AutoUpdateState {
     AUTO_UPDATE_OFF, AUTO_UPDATE_ON, AUTO_UPDATE_ERROR, AUTO_UPDATE_PAUSED, AUTO_UPDATE_WORKING
@@ -485,7 +487,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
       CalloutPopup popup = new CalloutPopup(false, false);
       final int popupTimeoutMs = 750;
       Scheduler.RepeatingCommand updatePopupCommand = () -> {
-        if (!hoverState.getFirst() && !hoverState.getSecond()) {
+        if (!resultsPager.isAttached() || (!hoverState.getFirst() && !hoverState.getSecond())) {
           popup.hide();
         } else if (resultsPager.hasNextPage() || resultsPager.hasPreviousPage()) {
           popup.show();
@@ -499,6 +501,18 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
         Scheduler.get().scheduleFixedDelay(updatePopupCommand, popupTimeoutMs);
       });
       focusPanel.addMouseOverHandler(event -> hoverState.setFirst(true));
+
+      // This is not ideal, check issue #1399
+      popup.addAttachHandler(attachEvent -> {
+        if (attachEvent.isAttached()) {
+          selectAllPopupHistoryChangedHandler = History.addValueChangeHandler(historyChangedEvent -> {
+            if (selectAllPopupHistoryChangedHandler != null) {
+              selectAllPopupHistoryChangedHandler.removeHandler();
+            }
+            popup.hide();
+          });
+        }
+      });
 
       FlowPanel popupLayout = new FlowPanel();
       popupLayout.addStyleName("selectAllPopup");
