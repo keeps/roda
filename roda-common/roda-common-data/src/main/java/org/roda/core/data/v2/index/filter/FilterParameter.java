@@ -29,7 +29,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
   @Type(value = DateRangeFilterParameter.class, name = "DateRangeFilterParameter"),
   @Type(value = LongRangeFilterParameter.class, name = "LongRangeFilterParameter"),
   @Type(value = StringRangeFilterParameter.class, name = "StringRangeFilterParameter"),
-  @Type(value = RegexFilterParameter.class, name = "RegexFilterParameter"),
   @Type(value = SimpleFilterParameter.class, name = "SimpleFilterParameter"),
   @Type(value = OrFiltersParameters.class, name = "OrFiltersParameters")})
 public abstract class FilterParameter implements Serializable {

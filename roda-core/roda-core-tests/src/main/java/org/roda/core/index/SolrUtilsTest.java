@@ -45,7 +45,6 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.LikeFilterParameter;
 import org.roda.core.data.v2.index.filter.LongRangeFilterParameter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
-import org.roda.core.data.v2.index.filter.RegexFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
@@ -195,17 +194,7 @@ public class SolrUtilsTest {
       // do nothing as it was expected
     }
 
-    // 10) filter with one RegexFilterParameter
-    try {
-      filter = new Filter();
-      filter.add(new RegexFilterParameter());
-      SolrUtils.parseFilter(filter);
-      Assert.fail("An exception should have been thrown but it wasn't!");
-    } catch (RequestNotValidException e) {
-      // do nothing as it was expected
-    }
-
-    // 11) filter with one BasicSearchFilterParameter
+    // 10) filter with one BasicSearchFilterParameter
     try {
       filter = new Filter();
       filter.add(new BasicSearchFilterParameter(RodaConstants.AIP_SEARCH, fondsOrSeries));
@@ -218,7 +207,7 @@ public class SolrUtilsTest {
       Assert.fail("An exception was not expected!");
     }
 
-    // 12) filter with one EmptyKeyFilterParameter
+    // 11) filter with one EmptyKeyFilterParameter
     try {
       filter = new Filter();
       filter.add(new EmptyKeyFilterParameter(RodaConstants.AIP_SEARCH));
@@ -229,7 +218,7 @@ public class SolrUtilsTest {
       Assert.fail("An exception was not expected!");
     }
 
-    // 13) filter with one empty LongRangeFilterParameter
+    // 12) filter with one empty LongRangeFilterParameter
     try {
       filter = new Filter();
       filter.add(new LongRangeFilterParameter());
@@ -240,7 +229,7 @@ public class SolrUtilsTest {
       // do nothing as it was expected
     }
 
-    // 13.1) filter with one LongRangeFilterParameter
+    // 12.1) filter with one LongRangeFilterParameter
     try {
       filter = new Filter();
       filter.add(new LongRangeFilterParameter(RodaConstants.LOG_DURATION, from, to));
@@ -251,7 +240,7 @@ public class SolrUtilsTest {
       // do nothing as it was expected
     }
 
-    // 14) filter with one DateIntervalFilterParameter
+    // 13) filter with one DateIntervalFilterParameter
     try {
       filter = new Filter();
       filter.add(new DateIntervalFilterParameter());
