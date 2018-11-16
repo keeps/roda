@@ -3583,6 +3583,8 @@ td.datePickerMonth, td.datePickerYear {
     padding-right: 35px;
     min-width: 165px;
     position: relative;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .searchPanelLeft .selected-count-panel {
@@ -6650,10 +6652,6 @@ span.code {
   .btn {
     padding-top: 6px;
     height: 28px;
-  }
-
-  .searchInputListBox .dropdown-label::after {
-    top: 20px;
   }
 
   .search-field-remove {
