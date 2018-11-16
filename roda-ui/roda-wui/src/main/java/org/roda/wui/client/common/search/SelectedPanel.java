@@ -87,7 +87,7 @@ public class SelectedPanel<T extends IsIndexed> extends SimplePanel implements H
       int count = 0;
       if (selected instanceof SelectedItemsList) {
         count = ((SelectedItemsList) selected).getIds().size();
-      } else if (selected instanceof SelectedItemsFilter) {
+      } else if (selected instanceof SelectedItemsFilter && list.getResult() != null) {
         long longCount = list.getResult().getTotalCount();
         count = longCount > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) longCount;
       }

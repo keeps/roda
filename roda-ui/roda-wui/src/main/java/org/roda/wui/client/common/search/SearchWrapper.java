@@ -143,7 +143,7 @@ public class SearchWrapper extends Composite {
   }
 
   public void refreshAllLists() {
-    components.forEachList(AsyncTableCell::refresh);
+    components.forEachList(list -> list.refresh());
   }
 
   public void refreshCurrentList() {
