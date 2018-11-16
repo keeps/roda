@@ -175,14 +175,14 @@ public class JobList extends AsyncTableCell<Job> {
     objectsFailureCountColumn.setSortable(true);
     progressColumn.setSortable(true);
 
-    addColumn(nameColumn, messages.jobName(), true, false);
-    addColumn(usernameColumn, messages.jobCreator(), true, false);
+    addColumn(nameColumn, messages.jobName(), true, false, 11);
+    addColumn(usernameColumn, messages.jobCreator(), true, false, 6);
     addColumn(startDateColumn, messages.jobStartDate(), true, false, 11);
     addColumn(durationColumn, messages.jobDuration(), true, true, 6);
     addColumn(statusColumn, messages.jobStatus(), true, false, 7);
-    addColumn(progressColumn, messages.jobProgress(), true, true, 5);
+    addColumn(progressColumn, messages.jobProgress(), true, true);
     addColumn(objectsTotalCountColumn, messages.jobTotalCountMessage(), true, true, 5);
-    addColumn(objectsSuccessCountColumn, messages.jobSuccessCountMessage(), true, true, 6);
+    addColumn(objectsSuccessCountColumn, messages.jobSuccessCountMessage(), true, true);
     addColumn(objectsFailureCountColumn, messages.jobFailureCountMessage(), true, true, 5);
 
     // default sorting
