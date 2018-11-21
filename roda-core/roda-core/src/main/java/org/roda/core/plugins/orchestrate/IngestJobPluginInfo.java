@@ -144,15 +144,30 @@ public class IngestJobPluginInfo extends JobPluginInfo {
 
   /** Ordered list with no duplicates */
   public List<String> getAipIds() {
-    ArrayList<String> ret = new ArrayList<>(
-      transferredResourceToAipIds.values().stream().flatMap(l -> l.stream()).distinct().collect(Collectors.toList()));
-    ret.remove(Report.NO_OUTCOME_OBJECT_ID);
+    ArrayList<String> ret;
+
+    if (transferredResourceToAipIds != null) {
+      ret = new ArrayList<>(
+        transferredResourceToAipIds.values().stream().flatMap(l -> l.stream()).distinct().collect(Collectors.toList()));
+      ret.remove(Report.NO_OUTCOME_OBJECT_ID);
+    } else {
+      ret = new ArrayList<>();
+    }
+
     return ret;
   }
 
   public List<String> getAipIds(String transferredResource) {
-    ArrayList<String> ret = new ArrayList<>(transferredResourceToAipIds.get(transferredResource));
-    ret.removeIf(s -> s.equals(Report.NO_OUTCOME_OBJECT_ID));
+    ArrayList<String> ret;
+    List<String> aipIds = transferredResourceToAipIds.get(transferredResource);
+
+    if (aipIds != null) {
+      ret = new ArrayList<>(aipIds);
+      ret.removeIf(s -> s.equals(Report.NO_OUTCOME_OBJECT_ID));
+    } else {
+      ret = new ArrayList<>();
+    }
+
     return ret;
   }
 
