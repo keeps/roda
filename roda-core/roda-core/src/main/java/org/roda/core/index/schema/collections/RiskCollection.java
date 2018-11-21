@@ -91,11 +91,7 @@ public class RiskCollection extends AbstractSolrCollection<IndexedRisk, Risk> {
 
   @Override
   public List<CopyField> getCopyFields() {
-    // TODO check if the _txt versions are needed
-    return Arrays.asList(SolrCollection.getCopyAllToSearchField(),
-      new CopyField(RodaConstants.RISK_CATEGORIES, RodaConstants.RISK_CATEGORIES + "_txt"),
-      new CopyField(RodaConstants.RISK_MITIGATION_OWNER, RodaConstants.RISK_MITIGATION_OWNER + "_txt"),
-      new CopyField(RodaConstants.RISK_IDENTIFIED_BY, RodaConstants.RISK_IDENTIFIED_BY + "_txt"));
+    return Arrays.asList(SolrCollection.getCopyAllToSearchField());
   }
 
   @Override

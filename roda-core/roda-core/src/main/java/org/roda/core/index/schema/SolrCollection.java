@@ -1,5 +1,6 @@
 package org.roda.core.index.schema;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -43,11 +44,11 @@ public interface SolrCollection<I extends IsIndexed, M extends IsModelObject> {
   }
 
   static List<DynamicField> getPermissionDynamicFields(boolean stored) {
-    return Arrays.asList(
+    return new ArrayList<>(Arrays.asList(
       new DynamicField(DynamicField.DYNAMIC_FIELD_PERMISSION_USERS, Field.TYPE_STRING).setMultiValued(true)
         .setStored(stored),
       new DynamicField(DynamicField.DYNAMIC_FIELD_PERMISSION_GROUPS, Field.TYPE_STRING).setMultiValued(true)
-        .setStored(stored));
+        .setStored(stored)));
   }
 
   static <T> boolean hasPermissionFilters(Class<T> resultClass) {

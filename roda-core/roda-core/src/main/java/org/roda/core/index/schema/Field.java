@@ -4,8 +4,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest.AddField;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest.Update;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 
 public class Field {
@@ -20,14 +22,21 @@ public class Field {
   private static final String ATTR_DEFAULT = "default";
 
   public static final String TYPE_BOOLEAN = "boolean";
-  public static final String TYPE_TEXT = "text_general";
   public static final String TYPE_LONG = "plong";
   public static final String TYPE_INT = "pint";
   public static final String TYPE_DATE = "pdate";
   public static final String TYPE_STRING = "string";
 
   public static final String FIELD_SEARCH = RodaConstants.INDEX_SEARCH;
-  public static final String TYPE_SEARCH = TYPE_TEXT;
+
+  public static String TYPE_TEXT = null;
+  public static String TYPE_SEARCH = null;
+
+  public static void initialize() {
+    String stemmingLanguage = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.CORE_SOLR_STEMMING_LANGUAGE);
+    TYPE_TEXT = StringUtils.isNotBlank(stemmingLanguage) ? "text_" + stemmingLanguage : "text_general";
+    TYPE_SEARCH = TYPE_TEXT;
+  }
 
   private final String name;
   private final String type;

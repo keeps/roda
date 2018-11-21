@@ -121,6 +121,7 @@ import org.roda.core.events.EventsHandler;
 import org.roda.core.events.EventsManager;
 import org.roda.core.events.EventsNotifier;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrBootstrapUtils;
 import org.roda.core.index.schema.SolrCollectionRegistry;
 import org.roda.core.index.utils.SolrUtils;
@@ -1069,6 +1070,8 @@ public class RodaCoreFactory {
     if (INSTANTIATE_SOLR_TYPE != null) {
       solrType = INSTANTIATE_SOLR_TYPE;
     }
+
+    Field.initialize();
 
     if (solrType == RodaConstants.SolrType.HTTP) {
       String solrBaseUrl = getConfigurationString(RodaConstants.CORE_SOLR_HTTP_URL, "http://localhost:8983/solr/");

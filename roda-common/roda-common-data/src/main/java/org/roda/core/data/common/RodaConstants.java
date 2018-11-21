@@ -46,6 +46,7 @@ public final class RodaConstants {
   public static final String CORE_SOLR_TYPE = "core.solr.type";
   public static final String CORE_SOLR_HTTP_URL = "core.solr.http.url";
   public static final String CORE_SOLR_CLOUD_URLS = "core.solr.cloud.urls";
+  public static final String CORE_SOLR_STEMMING_LANGUAGE = "core.solr.stemming.language";
 
   public static final String CORE_EVENTS_ENABLED = "core.events.enabled";
   public static final String CORE_EVENTS_NOTIFIER_AND_HANDLER_ARE_THE_SAME = "core.events.notifier_and_handler_are_the_same";
