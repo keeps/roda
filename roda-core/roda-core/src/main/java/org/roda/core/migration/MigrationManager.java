@@ -63,8 +63,6 @@ public class MigrationManager {
   // get very big & therefore should be done in a lazy fashion
   public void setupModelMigrations() throws GenericException {
     addModelMigration(Risk.class, 2, RiskToVersion2.class);
-    // addModelMigration(RepresentationInformation.class, 2,
-    // FormatToVersion2.class);
     addModelMigration(PreservationMetadata.class, 2, PreservationMetadataFileToVersion2.class);
     addModelMigration(Representation.class, 2, RepresentationToVersion2.class);
   }

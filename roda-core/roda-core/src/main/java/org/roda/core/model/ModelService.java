@@ -1858,7 +1858,7 @@ public class ModelService extends ModelObservable {
 
   /**
    * @param isHandlingEvent
-   *          this should only be set to true if invoked from EventsOrchestrator
+   *          this should only be set to true if invoked from EventsManager
    *          related methods
    */
   public User createUser(User user, String password, boolean notify, boolean isHandlingEvent)
@@ -1889,7 +1889,7 @@ public class ModelService extends ModelObservable {
 
   /**
    * @param isHandlingEvent
-   *          this should only be set to true if invoked from EventsOrchestrator
+   *          this should only be set to true if invoked from EventsManager
    *          related methods
    */
   public User updateUser(User user, String password, boolean notify, boolean isHandlingEvent)

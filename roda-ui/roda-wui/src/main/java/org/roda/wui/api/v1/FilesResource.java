@@ -296,7 +296,7 @@ public class FilesResource {
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = PreservationMetadata.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
-  public Response ypdatePreservationMetadataOnFile(
+  public Response updatePreservationMetadataOnFile(
     @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileId,
     @FormDataParam(RodaConstants.API_PARAM_FILE) InputStream inputStream,
     @FormDataParam(RodaConstants.API_PARAM_FILE) FormDataContentDisposition fileDetail,

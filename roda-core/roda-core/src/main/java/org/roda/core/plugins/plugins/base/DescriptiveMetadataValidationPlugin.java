@@ -32,7 +32,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.RODAObjectProcessingLogicNew;
+import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
@@ -50,7 +50,7 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
     "If true, the action will check if the descriptive metadata is valid according to the schemas installed in the repository.");
 
   public static final PluginParameter PARAMETER_METADATA_TYPE = new PluginParameter("parameter.metadata_type",
-    "Descriptive metadata format", PluginParameterType.METADATA_TYPE, null, false, false,
+    "Descriptive metadata format", PluginParameterType.STRING, null, false, false,
     "Descriptive metadata format to be used as fallback if the information package does not specify the metadata format or if the action is set to FORCE.");
 
   public static final PluginParameter PARAMETER_METADATA_VERSION = new PluginParameter("parameter.metadata_version",
@@ -121,7 +121,7 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
     metadataType = PluginHelper.getStringFromParameters(this, PARAMETER_METADATA_TYPE);
     metadataVersion = PluginHelper.getStringFromParameters(this, PARAMETER_METADATA_VERSION);
 
-    return PluginHelper.processObjects(this, new RODAObjectProcessingLogicNew<AIP>() {
+    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {

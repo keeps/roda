@@ -365,10 +365,10 @@ public class LdapUtility {
       // add roles DN
       addEntryIfNotExists(session, this.ldapRolesDN, OBJECT_CLASS_TOP, OBJECT_CLASS_ORGANIZATIONAL_UNIT);
 
-      // add roles DN
+      // add people DN
       addEntryIfNotExists(session, this.ldapPeopleDN, OBJECT_CLASS_TOP, OBJECT_CLASS_ORGANIZATIONAL_UNIT);
 
-      // add roles DN
+      // add groups DN
       addEntryIfNotExists(session, this.ldapGroupsDN, OBJECT_CLASS_TOP, OBJECT_CLASS_ORGANIZATIONAL_UNIT);
 
     }

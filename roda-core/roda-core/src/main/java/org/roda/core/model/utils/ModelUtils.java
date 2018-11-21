@@ -15,18 +15,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.iterables.CloseableIterable;
-import org.roda.core.common.tools.ZipEntryInfo;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
@@ -42,7 +37,6 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
-import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.IndexedReport;
@@ -55,11 +49,7 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
-import org.roda.core.model.ModelService;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
-import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultStoragePath;
-import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -782,110 +772,6 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(path);
   }
 
-  /**
-   * @deprecated use DownloadUtils instead.
-   */
-  @Deprecated
-  public static void addToZip(List<ZipEntryInfo> zipEntries, org.roda.core.data.v2.ip.File file, boolean flat)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    StorageService storage = RodaCoreFactory.getStorageService();
-
-    if (!file.isDirectory()) {
-      StoragePath filePath = ModelUtils.getFileStoragePath(file);
-      Binary binary = storage.getBinary(filePath);
-      ZipEntryInfo info = new ZipEntryInfo(flat ? filePath.getName() : storage.getStoragePathAsString(filePath, true),
-        binary.getContent());
-      zipEntries.add(info);
-    } else {
-      // do nothing
-    }
-  }
-
-  /**
-   * @deprecated use DownloadUtils instead.
-   */
-  @Deprecated
-  public static void addToZip(List<ZipEntryInfo> zipEntries, Binary binary) {
-    String path = RodaCoreFactory.getStorageService().getStoragePathAsString(binary.getStoragePath(), true);
-    ZipEntryInfo info = new ZipEntryInfo(path, binary.getContent());
-    zipEntries.add(info);
-  }
-
-  /**
-   * @deprecated use DownloadUtils instead.
-   */
-  @Deprecated
-  public static List<ZipEntryInfo> zipIndexedAIP(List<IndexedAIP> aips)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    List<ZipEntryInfo> zipEntries = new ArrayList<>();
-    ModelService model = RodaCoreFactory.getModelService();
-    for (IndexedAIP aip : aips) {
-      AIP fullAIP = model.retrieveAIP(aip.getId());
-      zipEntries.addAll(aipToZipEntry(fullAIP));
-    }
-    return zipEntries;
-  }
-
-  /**
-   * @deprecated use DownloadUtils instead.
-   */
-  @Deprecated
-  public static List<ZipEntryInfo> aipToZipEntry(AIP aip)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    List<ZipEntryInfo> zipEntries = new ArrayList<>();
-    StorageService storage = RodaCoreFactory.getStorageService();
-    ModelService model = RodaCoreFactory.getModelService();
-
-    StoragePath aipJsonPath = DefaultStoragePath.parse(ModelUtils.getAIPStoragePath(aip.getId()),
-      RodaConstants.STORAGE_AIP_METADATA_FILENAME);
-    addToZip(zipEntries, storage.getBinary(aipJsonPath));
-    for (DescriptiveMetadata dm : aip.getDescriptiveMetadata()) {
-      Binary dmBinary = model.retrieveDescriptiveMetadataBinary(aip.getId(), dm.getId());
-      addToZip(zipEntries, dmBinary);
-    }
-    CloseableIterable<OptionalWithCause<org.roda.core.data.v2.ip.metadata.PreservationMetadata>> preservations = model
-      .listPreservationMetadata(aip.getId(), true);
-    for (OptionalWithCause<org.roda.core.data.v2.ip.metadata.PreservationMetadata> preservation : preservations) {
-      if (preservation.isPresent()) {
-        PreservationMetadata pm = preservation.get();
-        StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(pm);
-        addToZip(zipEntries, storage.getBinary(filePath));
-      } else {
-        LOGGER.error("Cannot get AIP representation file", preservation.getCause());
-      }
-    }
-    IOUtils.closeQuietly(preservations);
-    for (Representation rep : aip.getRepresentations()) {
-      boolean recursive = true;
-      CloseableIterable<OptionalWithCause<org.roda.core.data.v2.ip.File>> allFiles = model.listFilesUnder(aip.getId(),
-        rep.getId(), recursive);
-      for (OptionalWithCause<org.roda.core.data.v2.ip.File> file : allFiles) {
-        if (file.isPresent()) {
-          addToZip(zipEntries, file.get(), false);
-        } else {
-          LOGGER.error("Cannot get AIP representation file", file.getCause());
-        }
-      }
-      IOUtils.closeQuietly(allFiles);
-
-      CloseableIterable<OptionalWithCause<org.roda.core.data.v2.ip.metadata.OtherMetadata>> allOtherMetadata = model
-        .listOtherMetadata(aip.getId(), rep.getId(), null, null, null);
-      for (OptionalWithCause<org.roda.core.data.v2.ip.metadata.OtherMetadata> otherMetadata : allOtherMetadata) {
-        if (otherMetadata.isPresent()) {
-          OtherMetadata o = otherMetadata.get();
-          StoragePath otherMetadataStoragePath = ModelUtils.getOtherMetadataStoragePath(aip.getId(), rep.getId(),
-            o.getFileDirectoryPath(), o.getFileId(), o.getFileSuffix(), o.getType());
-          addToZip(zipEntries, storage.getBinary(otherMetadataStoragePath));
-        } else {
-          LOGGER.error("Cannot get Representation other metadata file", otherMetadata.getCause());
-        }
-      }
-      IOUtils.closeQuietly(allFiles);
-    }
-
-    return zipEntries;
-  }
-
   public static List<IndexedAIP> getIndexedAIPsFromObjectIds(SelectedItems<IndexedAIP> selectedItems)
     throws GenericException, RequestNotValidException {
     List<IndexedAIP> res = new ArrayList<>();
@@ -934,16 +820,6 @@ public final class ModelUtils {
       }
     }
     return res;
-  }
-
-  public static List<ZipEntryInfo> zipAIP(List<AIP> aips, SimpleJobPluginInfo jobPluginInfo)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    List<ZipEntryInfo> zipEntries = new ArrayList<>();
-    for (AIP aip : aips) {
-      zipEntries.addAll(aipToZipEntry(aip));
-      jobPluginInfo.incrementObjectsProcessedWithSuccess();
-    }
-    return zipEntries;
   }
 
   public static <T extends IsRODAObject> Class<T> giveRespectiveModelClass(Class<T> inputClass) {

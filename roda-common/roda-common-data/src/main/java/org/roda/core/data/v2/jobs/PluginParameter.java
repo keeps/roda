@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * @author Rui Castro
  * @author Luis Faria <lfaria@keep.pt>
@@ -46,10 +45,12 @@ public class PluginParameter implements Serializable {
      */
     PLUGIN_SIP_TO_AIP,
 
-    /**
-     * Metadata type select box
-     */
-    METADATA_TYPE,
+    // 20181122 hsilva: this was being used by one plugin but not specific logic
+    // was being user for example for creating web interface
+    // /**
+    // * Metadata type select box
+    // */
+    // METADATA_TYPE,
 
     /**
      * Interface to select an AIP Id
@@ -87,7 +88,6 @@ public class PluginParameter implements Serializable {
     PERMISSION_TYPES;
   }
 
- 
   private String id = null;
   private String name = null;
   private PluginParameterType type = null;

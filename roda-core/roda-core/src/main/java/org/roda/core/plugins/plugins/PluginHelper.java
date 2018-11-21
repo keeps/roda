@@ -83,7 +83,7 @@ import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.RODAObjectProcessingLogicNew;
+import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
@@ -180,13 +180,13 @@ public final class PluginHelper {
   }
 
   public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin, RODAProcessingLogic<T> beforeLogic,
-    RODAObjectProcessingLogicNew<T> perObjectLogic, RODAProcessingLogic<T> afterLogic, IndexService index,
+    RODAObjectProcessingLogic<T> perObjectLogic, RODAProcessingLogic<T> afterLogic, IndexService index,
     ModelService model, StorageService storage, List<LiteOptionalWithCause> liteList) throws PluginException {
     return processObjects(plugin, beforeLogic, perObjectLogic, afterLogic, index, model, storage, liteList, true);
   }
 
   public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin, RODAProcessingLogic<T> beforeLogic,
-    RODAObjectProcessingLogicNew<T> perObjectLogic, RODAProcessingLogic<T> afterLogic, IndexService index,
+    RODAObjectProcessingLogic<T> perObjectLogic, RODAProcessingLogic<T> afterLogic, IndexService index,
     ModelService model, StorageService storage, List<LiteOptionalWithCause> liteList, boolean autoLocking)
     throws PluginException {
     Report report = PluginHelper.initPluginReport(plugin);
@@ -260,19 +260,19 @@ public final class PluginHelper {
   }
 
   public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin, RODAProcessingLogic<T> beforeLogic,
-    RODAObjectProcessingLogicNew<T> perObjectLogic, IndexService index, ModelService model, StorageService storage,
+    RODAObjectProcessingLogic<T> perObjectLogic, IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
     return processObjects(plugin, beforeLogic, perObjectLogic, null, index, model, storage, liteList);
   }
 
   public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin,
-    RODAObjectProcessingLogicNew<T> perObjectLogic, RODAProcessingLogic<T> afterLogic, IndexService index,
+    RODAObjectProcessingLogic<T> perObjectLogic, RODAProcessingLogic<T> afterLogic, IndexService index,
     ModelService model, StorageService storage, List<LiteOptionalWithCause> liteList) throws PluginException {
     return processObjects(plugin, null, perObjectLogic, afterLogic, index, model, storage, liteList);
   }
 
   public static <T extends IsRODAObject> Report processObjects(Plugin<T> plugin,
-    RODAObjectProcessingLogicNew<T> perObjectLogic, IndexService index, ModelService model, StorageService storage,
+    RODAObjectProcessingLogic<T> perObjectLogic, IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
     return processObjects(plugin, null, perObjectLogic, null, index, model, storage, liteList);
   }

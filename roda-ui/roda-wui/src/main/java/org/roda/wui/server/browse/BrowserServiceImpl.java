@@ -71,6 +71,7 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.index.schema.SolrCollectionRegistry;
 import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
@@ -811,7 +812,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public <T extends IsIndexed> T retrieveFromModel(String classNameToReturn, String id) throws RODAException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Class<? extends IsRODAObject> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
-    Class<T> indexedClassToReturn = IndexUtils.giveRespectiveIndexClass(classToReturn);
+    Class<T> indexedClassToReturn = SolrCollectionRegistry.giveRespectiveIndexClass(classToReturn);
     return Browser.retrieve(user, indexedClassToReturn, id, new ArrayList<>());
   }
 

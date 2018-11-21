@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
 package org.roda.core.index.schema;
 
 import java.util.Collection;
@@ -15,6 +22,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.NotSupportedException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsModelObject;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.collections.AIPCollection;
@@ -41,6 +49,7 @@ public final class SolrCollectionRegistry {
   }
 
   private static final Map<Class<? extends IsIndexed>, SolrCollection<? extends IsIndexed, ? extends IsModelObject>> REGISTRY = new HashMap<>();
+  private static final Map<Class<? extends IsModelObject>, Class<? extends IsIndexed>> MODEL_TO_INDEX = new HashMap<>();
 
   static {
     register(new LogEntryCollection());
@@ -71,6 +80,16 @@ public final class SolrCollectionRegistry {
 
   public static <T extends IsIndexed, M extends IsModelObject> void register(SolrCollection<T, M> collection) {
     REGISTRY.put(collection.getIndexClass(), collection);
+    MODEL_TO_INDEX.put(collection.getModelClass(), collection.getIndexClass());
+  }
+
+  public static <T extends IsIndexed> Class<T> giveRespectiveIndexClass(Class<? extends IsRODAObject> inputClass) {
+    Class<? extends IsIndexed> indexClass = MODEL_TO_INDEX.get(inputClass);
+    if (indexClass == null) {
+      return (Class<T>) inputClass;
+    } else {
+      return (Class<T>) indexClass;
+    }
   }
 
   public static Collection<SolrCollection<? extends IsIndexed, ? extends IsModelObject>> registry() {

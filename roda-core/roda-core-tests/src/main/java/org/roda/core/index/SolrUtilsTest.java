@@ -138,10 +138,10 @@ public class SolrUtilsTest {
     // 3) filter with one SimpleFilterParameter (uses exact match)
     try {
       filter = new Filter();
-      filter.add(new SimpleFilterParameter(RodaConstants.AIP_SEARCH, fonds));
+      filter.add(new SimpleFilterParameter(RodaConstants.INDEX_SEARCH, fonds));
       stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
-      assertEquals(String.format("(%s: \"%s\")", RodaConstants.AIP_SEARCH, fonds), stringFilter);
+      assertEquals(String.format("(%s: \"%s\")", RodaConstants.INDEX_SEARCH, fonds), stringFilter);
     } catch (RODAException e) {
       Assert.fail("An exception was not expected!");
     }
@@ -150,12 +150,12 @@ public class SolrUtilsTest {
     // combined with AND operator)
     try {
       filter = new Filter();
-      filter.add(new SimpleFilterParameter(RodaConstants.AIP_SEARCH, fonds));
-      filter.add(new SimpleFilterParameter(RodaConstants.AIP_SEARCH, series));
+      filter.add(new SimpleFilterParameter(RodaConstants.INDEX_SEARCH, fonds));
+      filter.add(new SimpleFilterParameter(RodaConstants.INDEX_SEARCH, series));
       stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
-      assertEquals(String.format("(%s: \"%s\") AND (%s: \"%s\")", RodaConstants.AIP_SEARCH, fonds,
-        RodaConstants.AIP_SEARCH, series), stringFilter);
+      assertEquals(String.format("(%s: \"%s\") AND (%s: \"%s\")", RodaConstants.INDEX_SEARCH, fonds,
+        RodaConstants.INDEX_SEARCH, series), stringFilter);
     } catch (RODAException e) {
       Assert.fail("An exception was not expected!");
     }
@@ -164,11 +164,11 @@ public class SolrUtilsTest {
     // each of the values, and they will be combined using OR operator)
     try {
       filter = new Filter();
-      filter.add(new OneOfManyFilterParameter(RodaConstants.AIP_SEARCH, oneOfManyValues));
+      filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_SEARCH, oneOfManyValues));
       stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
-      assertEquals(String.format("((%s: \"%s\") OR (%s: \"%s\"))", RodaConstants.AIP_SEARCH, fonds,
-        RodaConstants.AIP_SEARCH, series), stringFilter);
+      assertEquals(String.format("((%s: \"%s\") OR (%s: \"%s\"))", RodaConstants.INDEX_SEARCH, fonds,
+        RodaConstants.INDEX_SEARCH, series), stringFilter);
     } catch (RODAException e) {
       Assert.fail("An exception was not expected!");
     }
@@ -197,11 +197,11 @@ public class SolrUtilsTest {
     // 10) filter with one BasicSearchFilterParameter
     try {
       filter = new Filter();
-      filter.add(new BasicSearchFilterParameter(RodaConstants.AIP_SEARCH, fondsOrSeries));
+      filter.add(new BasicSearchFilterParameter(RodaConstants.INDEX_SEARCH, fondsOrSeries));
       stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
       assertEquals(
-        String.format("(%s: (%s) AND %s: (%s))", RodaConstants.AIP_SEARCH, fonds, RodaConstants.AIP_SEARCH, series),
+        String.format("(%s: (%s) AND %s: (%s))", RodaConstants.INDEX_SEARCH, fonds, RodaConstants.INDEX_SEARCH, series),
         stringFilter);
     } catch (RODAException e) {
       Assert.fail("An exception was not expected!");
@@ -210,10 +210,10 @@ public class SolrUtilsTest {
     // 11) filter with one EmptyKeyFilterParameter
     try {
       filter = new Filter();
-      filter.add(new EmptyKeyFilterParameter(RodaConstants.AIP_SEARCH));
+      filter.add(new EmptyKeyFilterParameter(RodaConstants.INDEX_SEARCH));
       stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
-      assertEquals(String.format("(*:* NOT %s:*)", RodaConstants.AIP_SEARCH), stringFilter);
+      assertEquals(String.format("(*:* NOT %s:*)", RodaConstants.INDEX_SEARCH), stringFilter);
     } catch (RODAException e) {
       Assert.fail("An exception was not expected!");
     }
@@ -312,18 +312,18 @@ public class SolrUtilsTest {
     Date parsedDate = SolrUtils.parseDate(test1);
 
     Instant dateInitial = parsedDate.toInstant();
-    LocalDateTime ldt = LocalDateTime.ofInstant(dateInitial, ZoneOffset.UTC);;
-    
+    LocalDateTime ldt = LocalDateTime.ofInstant(dateInitial, ZoneOffset.UTC);
+    ;
+
     Assert.assertEquals(1213, ldt.getYear());
 
     Calendar calInitial = Calendar.getInstance();
     calInitial.setTime(parsedDate);
     Assert.assertEquals(1213, calInitial.get(Calendar.YEAR));
-    
+
     String formatedDate = SolrUtils.formatDate(parsedDate);
 
     Assert.assertEquals(formatedDate, test1);
-    
 
   }
 

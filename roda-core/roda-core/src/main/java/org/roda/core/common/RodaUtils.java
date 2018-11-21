@@ -147,11 +147,6 @@ public class RodaUtils {
     }
   }
 
-  /**
-   * @deprecated 20160907 hsilva: not seeing any method using it, so it will be
-   *             removed soon
-   */
-  @Deprecated
   public static Map<String, Object> copyMap(Object object) {
     if (!(object instanceof Map)) {
       return null;

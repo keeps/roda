@@ -7,16 +7,14 @@
  */
 package org.roda.wui.client.ingest.process;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
-import com.google.gwt.i18n.client.DateTimeFormat;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.FilterParameter;
-import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -210,7 +208,7 @@ public class PluginParameterPanel extends Composite {
   private void createSelectRiskLayout() {
     Label parameterName = new Label(parameter.getName());
     IncrementalAssociativeList list = new IncrementalAssociativeList(IndexedRisk.class, RodaConstants.RISK_ID,
-      RodaConstants.RISK_SEARCH, messages.getRisksDialogName());
+      RodaConstants.INDEX_SEARCH, messages.getRisksDialogName());
 
     list.addChangeHandler(new ChangeHandler() {
 
@@ -250,7 +248,8 @@ public class PluginParameterPanel extends Composite {
     final HorizontalPanel editPanel = new HorizontalPanel();
     final FlowPanel aipPanel = new FlowPanel();
     final Button button = new Button(renderingHints != null && renderingHints.getCustomizedButtonLabel() != null
-      ? renderingHints.getCustomizedButtonLabel() : messages.pluginAipIdButton());
+      ? renderingHints.getCustomizedButtonLabel()
+      : messages.pluginAipIdButton());
     final FlowPanel buttonsPanel = new FlowPanel();
     final Anchor editButton = new Anchor(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-edit\"></i>"));
     final Anchor removeButton = new Anchor(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-remove\"></i>"));
@@ -273,49 +272,50 @@ public class PluginParameterPanel extends Composite {
           selectAipDialog = new SelectAipDialog(parameter.getName());
         }
         selectAipDialog.showAndCenter();
-        //default behaviour of selectAipDialog enabled
-        if (finalRenderingHints==null || !finalRenderingHints.isDisableSelection()) {
-        selectAipDialog.setSingleSelectionMode();
-        selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
+        // default behaviour of selectAipDialog enabled
+        if (finalRenderingHints == null || !finalRenderingHints.isDisableSelection()) {
+          selectAipDialog.setSingleSelectionMode();
+          selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
 
-          @Override
-          public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
-            IndexedAIP aip = event.getValue();
+            @Override
+            public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
+              IndexedAIP aip = event.getValue();
 
-            Label itemTitle = new Label();
-            HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
-            itemIconHtmlPanel.addStyleName("itemIcon");
-            itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
-            itemTitle.addStyleName("itemText");
+              Label itemTitle = new Label();
+              HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
+              itemIconHtmlPanel.addStyleName("itemIcon");
+              itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
+              itemTitle.addStyleName("itemText");
 
-            aipPanel.clear();
-            aipPanel.add(itemIconHtmlPanel);
-            aipPanel.add(itemTitle);
+              aipPanel.clear();
+              aipPanel.add(itemIconHtmlPanel);
+              aipPanel.add(itemTitle);
 
-            editPanel.add(aipPanel);
-            editPanel.add(buttonsPanel);
+              editPanel.add(aipPanel);
+              editPanel.add(buttonsPanel);
 
-            editPanel.setCellWidth(aipPanel, "100%");
+              editPanel.setCellWidth(aipPanel, "100%");
 
-            editPanel.setVisible(true);
-            button.setVisible(false);
+              editPanel.setVisible(true);
+              button.setVisible(false);
 
-            value = aip.getId();
-          }
-        });
-      }
-      }
-    };
-    if (finalRenderingHints==null || !finalRenderingHints.isDisableSelection()) {
-    ClickHandler removeClickHandler = new ClickHandler() {
-
-        @Override public void onClick(ClickEvent event) {
-        editPanel.setVisible(false);
-        button.setVisible(true);
-
-        value = null;
+              value = aip.getId();
+            }
+          });
+        }
       }
     };
+    if (finalRenderingHints == null || !finalRenderingHints.isDisableSelection()) {
+      ClickHandler removeClickHandler = new ClickHandler() {
+
+        @Override
+        public void onClick(ClickEvent event) {
+          editPanel.setVisible(false);
+          button.setVisible(true);
+
+          value = null;
+        }
+      };
       removeButton.addClickHandler(removeClickHandler);
     }
     button.addClickHandler(editClickHandler);

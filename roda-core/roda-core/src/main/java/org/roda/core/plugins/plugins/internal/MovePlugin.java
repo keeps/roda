@@ -216,7 +216,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
 
       if (StringUtils.isNotBlank(destinationId)) {
         List<String> fileFields = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FILE_AIP_ID,
-          RodaConstants.FILE_REPRESENTATION_ID, RodaConstants.FILE_PATH, RodaConstants.FILE_FILE_ID);
+          RodaConstants.FILE_REPRESENTATION_ID, RodaConstants.FILE_PATH, RodaConstants.INDEX_ID);
         IndexedFile toFolder = index.retrieve(IndexedFile.class, destinationId, fileFields);
 
         LOGGER.debug("Moving File {} under {}", file.getId(), toFolder.getId());

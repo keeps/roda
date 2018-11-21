@@ -133,9 +133,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.PluginManager;
 import org.roda.core.plugins.PluginManagerException;
 import org.roda.core.plugins.PluginOrchestrator;
-import org.roda.core.plugins.orchestrate.AkkaDistributedPluginOrchestrator;
 import org.roda.core.plugins.orchestrate.AkkaEmbeddedPluginOrchestrator;
-import org.roda.core.plugins.orchestrate.akka.distributed.AkkaDistributedPluginWorker;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
@@ -205,7 +203,6 @@ public class RodaCoreFactory {
   // Orchestrator related objects
   private static PluginManager pluginManager;
   private static PluginOrchestrator pluginOrchestrator = null;
-  private static AkkaDistributedPluginWorker akkaDistributedPluginWorker;
 
   // Events related
   private static EventsManager eventsManager;
@@ -344,7 +341,7 @@ public class RodaCoreFactory {
     } else {
       LOGGER.error("Unknown node type '{}'", nodeType);
     }
-    
+
     Runtime.getRuntime().addShutdownHook(new Thread(() -> shutdown()));
   }
 
@@ -1327,8 +1324,6 @@ public class RodaCoreFactory {
 
     if (nodeType == NodeType.MASTER) {
       processPreservationEventTypeProperties();
-    } else if (nodeType == NodeType.WORKER) {
-      instantiateWorkerNodeSpecificObjects();
     } else if (nodeType == NodeType.TEST && !INSTANTIATE_LDAP && INSTANTIATE_SOLR) {
       try {
         getIndexService().create(RODAMember.class, new User(RodaConstants.ADMIN));
@@ -1341,11 +1336,7 @@ public class RodaCoreFactory {
 
   private static void instantiateOrchestrator() {
     OrchestratorType orchestratorType = getOrchestratorType();
-    if (orchestratorType == OrchestratorType.AKKA_DISTRIBUTED) {
-      pluginOrchestrator = new AkkaDistributedPluginOrchestrator(
-        getSystemProperty(RodaConstants.CORE_NODE_HOSTNAME, RodaConstants.DEFAULT_NODE_HOSTNAME),
-        getSystemProperty(RodaConstants.CORE_NODE_PORT, RodaConstants.DEFAULT_NODE_PORT));
-    } else if (orchestratorType == OrchestratorType.AKKA) {
+    if (orchestratorType == OrchestratorType.AKKA) {
       pluginOrchestrator = new AkkaEmbeddedPluginOrchestrator();
     } else {
       LOGGER.error("Orchestrator type '{}' is invalid or not supported. No plugin orchestrator will be started!",
@@ -1363,14 +1354,6 @@ public class RodaCoreFactory {
     }
 
     return res;
-  }
-
-  private static void instantiateWorkerNodeSpecificObjects() {
-    akkaDistributedPluginWorker = new AkkaDistributedPluginWorker(
-      getSystemProperty(RodaConstants.CORE_CLUSTER_HOSTNAME, RodaConstants.DEFAULT_NODE_HOSTNAME),
-      getSystemProperty(RodaConstants.CORE_CLUSTER_PORT, RodaConstants.DEFAULT_NODE_PORT),
-      getSystemProperty(RodaConstants.CORE_NODE_HOSTNAME, RodaConstants.DEFAULT_NODE_HOSTNAME),
-      getSystemProperty(RodaConstants.CORE_NODE_PORT, "0"));
   }
 
   public static void addLogger(String loggerConfigurationFile) {
@@ -2120,7 +2103,7 @@ public class RodaCoreFactory {
   }
 
   private static void printFiles(Sorter sorter, Sublist sublist) throws GenericException, RequestNotValidException {
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_SEARCH, "OLA-OLÁ-1234-XXXX_K"));
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_SEARCH, "OLA-OLÁ-1234-XXXX_K"));
     IndexResult<IndexedFile> res = index.find(IndexedFile.class, filter, sorter, sublist, new ArrayList<>());
 
     for (IndexedFile sf : res.getResults()) {

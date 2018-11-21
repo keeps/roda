@@ -15,19 +15,10 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.storage.StorageService;
 
-//@FunctionalInterface
+@FunctionalInterface
 public interface RODAObjectsProcessingLogic<T extends IsRODAObject> {
-  @Deprecated
-  public default void process(IndexService index, ModelService model, StorageService storage, Report report,
-    Job cachedJob, SimpleJobPluginInfo jobPluginInfo, Plugin<T> plugin, List<T> objects) {
-    throw new IllegalStateException("Should implement this method or non-deprecated version of it.");
-  }
-
-  public default void process(IndexService index, ModelService model, StorageService storage, Report report,
-    Job cachedJob, JobPluginInfo jobPluginInfo, Plugin<T> plugin, List<T> objects) {
-    process(index, model, storage, report, cachedJob, (SimpleJobPluginInfo) jobPluginInfo, plugin, objects);
-  }
+  public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+    JobPluginInfo jobPluginInfo, Plugin<T> plugin, List<T> objects);
 }

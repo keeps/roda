@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/keeps/roda.png?branch=master)](https://travis-ci.org/keeps/roda)
 
-RODA 2.0 - Repository of Authentic Digital Objects
+RODA 3.0 - Repository of Authentic Digital Objects
 ==============================================
 RODA is a **digital repository solution** that delivers functionality for all the main units of the OAIS reference model. RODA is capable of ingesting, managing and providing access to the various types of digital objects produced by large corporations or public bodies. RODA is based on open-source technologies and is supported by existing standards such as the Open Archival Information System (OAIS), Metadata Encoding and Transmission Standard (METS), Encoded Archival Description (EAD), Dublin Core (DC) and PREMIS (Preservation Metadata).
 
@@ -81,7 +81,7 @@ Check our [Translation guide](https://github.com/keeps/roda/blob/master/document
 
 ## Specifications
 
-RODA implements a series of specifications and standards. To know more about the OAIS Information Packages that RODA implements, please check out the [DLM Archival Standards Board](http://www.dasboard.eu) repositories at https://github.com/DLMArchivalStandardsBoard
+RODA implements a series of specifications and standards. To know more about the OAIS Information Packages that RODA implements, please check out the [Digital Information LifeCycle Interoperability Standards Board](http://www.dilcis.eu/) repositories on GitHub at https://github.com/dilcisboard.
 
 
 # Professional Support

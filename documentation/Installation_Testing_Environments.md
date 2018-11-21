@@ -22,12 +22,14 @@ On Linux, follow these instructions:
 
 1. Install docker for your system: https://docs.docker.com/engine/installation/
 2. Pull or update to the latest roda container, on the command line run:  `sudo docker pull keeps/roda`
-3. Run the container: `sudo docker run -p 8080:8080 -v ~/.roda:/root/.roda keeps/roda`
+3. Run the container:
+  * RODA 3 `docker run -p 8080:8080 -v ~/.roda:/roda keeps/roda`
+  * RODA 2 `docker run -p 8080:8080 -v ~/.roda:/root/.roda keeps/roda`
 4. Access RODA on your browser: [http://localhost:8080](http://localhost:8080)
 
-NOTE: the docker commands only need `sudo` if your user does not belong to the `docker` group.
+NOTE: the docker commands will need `sudo` before if your user does not belong to the `docker` group.
 
-NOTE 2: if one wants to run some cronjobs in RODA container, there're two possibilities. But before, lets create a cronjob file with the right permissions (chmod 644 ~/cronjob). In this example we are updating, at 2 am, siegfried signature file:
+NOTE 2: if one wants to run some cronjobs in RODA container, there're two possibilities. But before, lets create a cronjob file with the right permissions (chmod 644 ~/cronjob ; sudo chown root.root ~/cronjob). In this example we are updating, at 2 am, siegfried signature file:
 
 ```
 MAILTO=""
@@ -39,21 +41,20 @@ And the two possibilities are:
 Add cronjob file via docker copy (after starting the container)
 
 ```bash
-$> docker cp ~/crontab CONTAINER_NAME:/etc/cron.d/crontab
+$> docker cp ~/cronjob CONTAINER_NAME:/etc/cron.d/cronjob
 ```
 
-Or run the container using the volume option (-v) to pass by the cronjob file - In this scenario, the cronjob file must be owned by root because RODA container user is root (besides file permissions mentioned above):
+Or run the container using the volume option (-v) to pass by the cronjob file:
 
 ```bash
-$> sudo chown root.root ~/crontab
-$> docker run -p 8080:8080 -v ~/.roda:/root/.roda -v ~/crontab:/etc/cron.d/crontab keeps/roda
+$> docker run -p 8080:8080 -v ~/.roda:/root/.roda -v ~/cronjob:/etc/cron.d/cronjob keeps/roda
 ```
 
 To start as a service you can install supervisord and create the file `/etc/supervisor/conf.d/roda.conf` with:
 
 ```
 [program:roda]
-command=docker run -p 8080:8080 -v /home/roda/:/root/.roda keeps/roda
+command=docker run ... (see RODA version specific command above)
 directory=/tmp/
 autostart=true
 autorestart=true

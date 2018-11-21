@@ -22,7 +22,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.RODAObjectProcessingLogicNew;
+import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -103,7 +103,7 @@ public class PluginThatFailsDuringExecuteMethod extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> list) throws PluginException {
-    return PluginHelper.processObjects(this, new RODAObjectProcessingLogicNew<AIP>() {
+    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
 
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,

@@ -3,7 +3,7 @@
 
 RODA is a complete digital repository that delivers functionality for all the main units of the OAIS reference model. RODA is capable of ingesting, managing and providing access to the various types of digital objects produced by large corporations or public bodies. RODA is based on open-source technologies and is supported by existing standards such as the OAIS, METS, EAD and PREMIS.
 
-RODA also implements a series of specifications and standards. To know more about the OAIS Information Packages that RODA supports, please check out the [DLM Archival Standards Board](http://www.dasboard.eu) repositories on GitHub at <https://github.com/DILCISBoard>.
+RODA also implements a series of specifications and standards. To know more about the OAIS Information Packages that RODA implements, please check out the [Digital Information LifeCycle Interoperability Standards Board](http://www.dilcis.eu/) repositories on GitHub at https://github.com/dilcisboard.
 
 ## Features
 

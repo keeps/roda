@@ -50,7 +50,7 @@ public class SearchFileList extends AsyncTableCell<IndexedFile> {
 
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FILE_AIP_ID,
     RodaConstants.FILE_REPRESENTATION_ID, RodaConstants.FILE_ISDIRECTORY, RodaConstants.FILE_REPRESENTATION_UUID,
-    RodaConstants.FILE_ORIGINALNAME, RodaConstants.FILE_FILE_ID, RodaConstants.FILE_PATH, RodaConstants.FILE_SIZE,
+    RodaConstants.FILE_ORIGINALNAME, RodaConstants.INDEX_ID, RodaConstants.FILE_PATH, RodaConstants.FILE_SIZE,
     RodaConstants.FILE_FORMAT_VERSION, RodaConstants.FILE_FILEFORMAT);
 
   public SearchFileList() {
@@ -66,7 +66,6 @@ public class SearchFileList extends AsyncTableCell<IndexedFile> {
   protected void adjustOptions(AsyncTableCellOptions<IndexedFile> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
-
 
   @Override
   protected void configureDisplay(CellTable<IndexedFile> display) {
@@ -179,7 +178,7 @@ public class SearchFileList extends AsyncTableCell<IndexedFile> {
   protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<IndexedFile, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
     columnSortingKeyMap.put(iconColumn, Arrays.asList(RodaConstants.FILE_ISDIRECTORY));
-    columnSortingKeyMap.put(pathColumn, Arrays.asList(RodaConstants.FILE_ORIGINALNAME, RodaConstants.FILE_FILE_ID));
+    columnSortingKeyMap.put(pathColumn, Arrays.asList(RodaConstants.FILE_ORIGINALNAME, RodaConstants.INDEX_ID));
     columnSortingKeyMap.put(sizeColumn, Arrays.asList(RodaConstants.FILE_SIZE));
     columnSortingKeyMap.put(formatColumn, Arrays.asList(RodaConstants.FILE_FORMAT_MIMETYPE));
     return createSorter(columnSortList, columnSortingKeyMap);
