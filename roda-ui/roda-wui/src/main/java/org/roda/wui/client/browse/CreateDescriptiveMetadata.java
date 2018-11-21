@@ -33,7 +33,6 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.FormUtilities;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -452,18 +451,7 @@ public class CreateDescriptiveMetadata extends Composite {
 
           @Override
           public void onSuccess(Job result) {
-            Dialogs.showJobRedirectDialog(messages.removeJobCreatedMessage(), new AsyncCallback<Void>() {
-
-              @Override
-              public void onFailure(Throwable caught) {
-                HistoryUtils.newHistory(LastSelectedItemsSingleton.getInstance().getLastHistory());
-              }
-
-              @Override
-              public void onSuccess(final Void nothing) {
-                HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-              }
-            });
+            HistoryUtils.newHistory(LastSelectedItemsSingleton.getInstance().getLastHistory());
           }
         });
       } else {

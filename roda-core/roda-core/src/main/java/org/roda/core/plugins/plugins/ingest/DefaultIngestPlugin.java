@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -150,7 +151,6 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         processObjects(index, model, storage, report, jobPluginInfo, cachedJob, objects);
       }
     }, index, model, storage, liteList);
-
   }
 
   protected void processObjects(IndexService index, ModelService model, StorageService storage, Report report,
@@ -175,7 +175,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       // an AIP)
       pluginReport = transformTransferredResourceIntoAnAIP(index, model, storage, resources);
       mergeReports(jobPluginInfo, pluginReport);
-      final List<AIP> aips = getAIPsFromReports(model, jobPluginInfo);
+      final List<AIP> aips = getAIPsFromReports(model, index, jobPluginInfo);
       PluginHelper.updateJobInformationAsync(this, jobPluginInfo.incrementStepsCompletedByOne());
 
       // this event can only be created after AIPs exist and that's why it is
@@ -292,7 +292,6 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       // X) final job info update
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
-
     } catch (JobException e) {
       // throw new PluginException("A job exception has occurred", e);
     } finally {
@@ -367,22 +366,64 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     }
   }
 
-  private List<AIP> getAIPsFromReports(ModelService model, IngestJobPluginInfo jobPluginInfo) {
+  private List<AIP> getAIPsFromReports(ModelService model, IndexService index, IngestJobPluginInfo jobPluginInfo) {
     List<AIP> aips = new ArrayList<>();
     List<String> aipIds = jobPluginInfo.getAipIds();
 
-    LOGGER.debug("Getting AIPs: {}", aipIds);
-    for (String aipId : aipIds) {
-      try {
-        aips.add(model.retrieveAIP(aipId));
-      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-        LOGGER.error("Error while retrieving AIP", e);
+    // INFO 20181029 nvieira: verification needed to make ingestion fail when no AIP
+    // id is associated, as the outcome object id, to at least one report
+    boolean continueIngestion = verifyReports(model, index, jobPluginInfo);
+
+    if (continueIngestion) {
+      LOGGER.debug("Getting AIPs from reports: {}", aipIds);
+
+      for (String aipId : aipIds) {
+        try {
+          aips.add(model.retrieveAIP(aipId));
+        } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+          LOGGER.error("Error while retrieving AIP from reports", e);
+        }
       }
+
+      LOGGER.debug("Done retrieving AIPs from reports");
     }
-    LOGGER.debug("Done retrieving AIPs");
 
     jobPluginInfo.updateCounters();
     return aips;
+  }
+
+  private boolean verifyReports(ModelService model, IndexService index, IngestJobPluginInfo jobPluginInfo) {
+    Map<String, Map<String, Report>> reportsFromBeingProcessed = jobPluginInfo.getReportsFromBeingProcessed();
+    List<String> transferredResourcesToRemoveFromjobPluginInfo = new ArrayList<>();
+    boolean noFailures = true;
+    String transferredResourceId = null;
+
+    for (Entry<String, Map<String, Report>> reportEntry : reportsFromBeingProcessed.entrySet()) {
+      transferredResourceId = reportEntry.getKey();
+      Collection<Report> reports = reportEntry.getValue().values();
+      for (Report report : reports) {
+        if (report.getPluginState().equals(PluginState.FAILURE)) {
+          noFailures = false;
+          break;
+        }
+      }
+
+      if (!noFailures) {
+        break;
+      }
+    }
+
+    if (!noFailures) {
+      jobPluginInfo.incrementObjectsProcessedWithFailure();
+      jobPluginInfo.failOtherTransferredResourceAIPs(model, index, transferredResourceId);
+      transferredResourcesToRemoveFromjobPluginInfo.add(transferredResourceId);
+    }
+
+    for (String resourceId : transferredResourcesToRemoveFromjobPluginInfo) {
+      jobPluginInfo.remove(resourceId);
+    }
+
+    return noFailures;
   }
 
   private void sendNotification(ModelService model, IndexService index, Job job, JobStats jobStats)
@@ -430,7 +471,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
           for (IndexedReport report : reports) {
             Report last = report.getReports().get(report.getReports().size() - 1);
-            builder.append(last.getPluginDetails() + "\n\n");
+            builder.append(last.getPluginDetails()).append("\n\n");
           }
 
           scopes.put("failures", new Handlebars.SafeString(builder.toString()));
@@ -461,12 +502,11 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
       notification.setSubject("RODA ingest process finished - " + outcome);
       notification.setFromUser(this.getClass().getSimpleName());
-      notification.setRecipientUsers(Arrays.asList(httpNotifications));
+      notification.setRecipientUsers(Collections.singletonList(httpNotifications));
       Map<String, Object> scope = new HashMap<>();
       scope.put(HTTPNotificationProcessor.JOB_KEY, job);
       model.createNotification(notification, new HTTPNotificationProcessor(httpNotifications, scope));
     }
-
   }
 
   /**
@@ -674,7 +714,6 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   }
 
   private void updateAIPsToBeAppraised(ModelService model, List<AIP> aips, IngestJobPluginInfo jobPluginInfo) {
-
     for (AIP aip : aips) {
       aip.setState(AIPState.UNDER_APPRAISAL);
       try {
