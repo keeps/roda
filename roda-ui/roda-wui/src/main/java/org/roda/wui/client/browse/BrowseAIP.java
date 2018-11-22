@@ -432,7 +432,7 @@ public class BrowseAIP extends Composite {
         if (eventCount >= 0) {
           risksEventsLogs.add(new Label(", "));
         } else {
-          risksEventsLogs.add(new Label(" and "));
+          risksEventsLogs.add(new Label(" " + messages.and() + " "));
         }
       }
 
