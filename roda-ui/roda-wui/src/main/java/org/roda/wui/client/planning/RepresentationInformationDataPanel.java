@@ -166,6 +166,8 @@ public class RepresentationInformationDataPanel extends Composite
     relations.addChangeHandler(changeHandler);
     filters.addChangeHandler(changeHandler);
 
+    tags.setRemovableTextBoxTitle(messages.representationInformationTags());
+
     for (RepresentationInformationSupport val : RepresentationInformationSupport.values()) {
       support.addItem(messages.representationInformationSupportValue(val.toString()), val.toString());
     }

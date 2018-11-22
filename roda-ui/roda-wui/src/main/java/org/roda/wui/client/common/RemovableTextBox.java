@@ -23,6 +23,12 @@ import com.google.gwt.user.client.ui.Widget;
 public class RemovableTextBox extends Composite implements HasHandlers {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
+  public void setRemovableTextBoxTitle(String title) {
+    if (item != null && title != null) {
+      item.setTitle(title);
+    }
+  }
+
   interface MyUiBinder extends UiBinder<Widget, RemovableTextBox> {
   }
 
@@ -75,4 +81,5 @@ public class RemovableTextBox extends Composite implements HasHandlers {
   public boolean isAddTextBox() {
     return isAddTextBox;
   }
+
 }

@@ -50,6 +50,8 @@ public class IncrementalList extends Composite implements HasValueChangeHandlers
   @UiField
   Button addDynamicButton;
 
+  private String title = null;
+
   private List<RemovableTextBox> textBoxes;
 
   public IncrementalList() {
@@ -71,6 +73,13 @@ public class IncrementalList extends Composite implements HasValueChangeHandlers
       addTextBox(null);
     } else {
       setTextBoxList(initialValues);
+    }
+  }
+
+  public void setRemovableTextBoxTitle(String title) {
+    this.title = title;
+    for (RemovableTextBox textBox : textBoxes) {
+      textBox.setRemovableTextBoxTitle(title);
     }
   }
 
@@ -107,6 +116,7 @@ public class IncrementalList extends Composite implements HasValueChangeHandlers
 
   private void addTextBox(String element) {
     final RemovableTextBox box = new RemovableTextBox(textBoxes.isEmpty(), element);
+    box.setRemovableTextBoxTitle(title);
     textBoxPanel.insert(box, 0);
     textBoxes.add(0, box);
     addDynamicButton.setVisible(false);

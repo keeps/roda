@@ -102,7 +102,6 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
 
     inputText = new TextBox();
-    inputText.getElement().setAttribute("title", "input text box");
 
     inputDateBox = new DateBox();
     inputDateBox.setFormat(dateFormat);
@@ -110,7 +109,6 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     inputDateBox.getDatePicker().setYearArrowsVisible(true);
     inputDateBox.setFireNullValues(true);
     inputDateBox.getElement().setPropertyString("placeholder", messages.searchFieldDatePlaceHolder());
-    inputDateBox.getElement().setAttribute("title", "input date box");
 
     inputDateBoxFrom = new DateBox();
     inputDateBoxFrom.setFormat(dateFormat);
@@ -118,7 +116,6 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     inputDateBoxFrom.getDatePicker().setYearArrowsVisible(true);
     inputDateBoxFrom.setFireNullValues(true);
     inputDateBoxFrom.getElement().setPropertyString("placeholder", messages.searchFieldDateFromPlaceHolder());
-    inputDateBoxFrom.getElement().setAttribute("title", "input date box from");
 
     inputDateBoxTo = new DateBox();
     inputDateBoxTo.setFormat(dateFormat);
@@ -126,40 +123,32 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     inputDateBoxTo.getDatePicker().setYearArrowsVisible(true);
     inputDateBoxTo.setFireNullValues(true);
     inputDateBoxTo.getElement().setPropertyString("placeholder", messages.searchFieldDateToPlaceHolder());
-    inputDateBoxTo.getElement().setAttribute("title", "input date box to");
 
     inputNumeric = new TextBox();
     inputNumeric.getElement().setPropertyString("placeholder", messages.searchFieldNumericPlaceHolder());
     inputNumeric.getElement().setAttribute("type", "number");
-    inputNumeric.getElement().setAttribute("title", "input numeric box");
     inputNumericFrom = new TextBox();
     inputNumericFrom.getElement().setPropertyString("placeholder", messages.searchFieldNumericFromPlaceHolder());
     inputNumericFrom.getElement().setAttribute("type", "number");
-    inputNumericFrom.getElement().setAttribute("title", "input numeric box from");
     inputNumericTo = new TextBox();
     inputNumericTo.getElement().setPropertyString("placeholder", messages.searchFieldNumericToPlaceHolder());
     inputNumericTo.getElement().setAttribute("type", "number");
-    inputNumericTo.getElement().setAttribute("title", "input numeric box from to");
 
     inputStorageSizeFrom = new TextBox();
     inputStorageSizeFrom.getElement().setPropertyString("placeholder", messages.searchFieldNumericFromPlaceHolder());
     inputStorageSizeFrom.getElement().setAttribute("type", "number");
-    inputStorageSizeFrom.getElement().setAttribute("title", "input storage size from");
     inputStorageSizeTo = new TextBox();
     inputStorageSizeTo.getElement().setPropertyString("placeholder", messages.searchFieldNumericToPlaceHolder());
     inputStorageSizeTo.getElement().setAttribute("type", "number");
-    inputStorageSizeTo.getElement().setAttribute("title", "input storage size to");
     inputStorageSizeList = new ListBox();
     for (String unit : Humanize.UNITS) {
       inputStorageSizeList.addItem(unit, unit);
     }
-    inputStorageSizeList.getElement().setAttribute("title", "input storage size list");
+    inputStorageSizeList.getElement().setAttribute("title", messages.inputStorageSizeList());
 
     inputCheckBox = new CheckBox();
-    inputCheckBox.getElement().setAttribute("title", "input checkbox");
 
     inputControlled = new ListBox();
-    inputControlled.getElement().setAttribute("title", "input controlled");
 
     panel.add(leftPanel);
 
@@ -306,7 +295,7 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     leftPanel.clear();
     leftPanel.add(searchAdvancedFields);
     leftPanel.add(inputPanel);
-    setInputPanel(searchField.getType());
+    setInputPanel(searchField.getType(), searchField.getLabel());
     panel.add(remove);
     panel.add(duplicateWarning);
     panel.removeStyleName("full_width");
@@ -321,37 +310,48 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     leftPanel.clear();
     leftPanel.add(fieldBox);
     leftPanel.add(inputPanel);
-    setInputPanel(type);
+    setInputPanel(type, label);
     panel.add(remove);
     panel.removeStyleName("full_width");
   }
 
-  private void setInputPanel(String type) {
+  private void setInputPanel(String type, String label) {
     inputPanel.clear();
     inputPanel.removeStyleName("full_width");
 
     if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE)) {
       inputPanel.add(inputDateBox);
+      inputDateBox.getElement().setAttribute("title", label);
     } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE_INTERVAL)) {
       inputPanel.add(inputDateBoxFrom);
       inputPanel.add(inputDateBoxTo);
+      inputDateBoxFrom.getElement().setAttribute("title", label + " (" + messages.dateRangeFieldFrom() + ")");
+      inputDateBoxTo.getElement().setAttribute("title", label + " (" + messages.dateRangeFieldTo() + ")");
     } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC)) {
       inputPanel.add(inputNumeric);
+      inputPanel.getElement().setAttribute("title", label);
     } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC_INTERVAL)) {
       inputPanel.add(inputNumericFrom);
       inputPanel.add(inputNumericTo);
+      inputDateBoxFrom.getElement().setAttribute("title", label + " (" + messages.dateRangeFieldFrom() + ")");
+      inputDateBoxTo.getElement().setAttribute("title", label + " (" + messages.dateRangeFieldTo() + ")");
     } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_STORAGE)) {
       inputPanel.add(inputStorageSizeFrom);
       inputPanel.add(inputStorageSizeTo);
       inputPanel.add(inputStorageSizeList);
+      inputStorageSizeFrom.getElement().setAttribute("title", label + " (" + messages.dateRangeFieldTo() + ")");
+      inputStorageSizeTo.getElement().setAttribute("title", label + " (" + messages.dateRangeFieldTo() + ")");
     } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_BOOLEAN)) {
       inputPanel.add(inputCheckBox);
+      inputCheckBox.getElement().setAttribute("title", label);
     } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_SUGGEST)) {
 
     } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_CONTROLLED)) {
       inputPanel.add(inputControlled);
+      inputControlled.getElement().setAttribute("title", label);
     } else {
       inputPanel.add(inputText);
+      inputText.getElement().setAttribute("title", label);
       inputPanel.addStyleName("full_width");
     }
   }

@@ -1939,4 +1939,16 @@ public interface ClientMessages extends Messages {
   String selectAllPages();
 
   String selectThisPage();
+
+  String dateRangeFieldFrom();
+
+  String dateRangeFieldTo();
+
+  String inputStorageSizeFrom();
+
+  String inputStorageSizeTo();
+
+  String inputStorageSizeList();
+
+  String removableTextBox();
 }
