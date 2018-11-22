@@ -2022,7 +2022,11 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .menu-item-language {
-	text-transform: capitalize;
+    text-transform: capitalize;
+}
+
+.menuPopupContent .gwt-MenuBar .gwt-MenuItem.menu-item-language {
+    padding-right: 2em;
 }
 
 .menu-item-language-selected .fa {
