@@ -19,6 +19,7 @@ import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.management.AcknowledgeNotification;
 import org.roda.wui.client.management.Management;
@@ -198,6 +199,7 @@ public class ContentPanel extends SimplePanel {
                   ContentPanel.this.lastHistoryTokens = historyTokens;
                   ContentPanel.this.lastResolver = resolver;
                   setWidget(widget);
+                  JavascriptUtils.scrollToTop();
                 }
                 setWindowTitle(historyTokens);
               }

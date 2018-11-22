@@ -384,7 +384,6 @@ public class CreateDescriptiveMetadata extends Composite {
 
           @Override
           public void onFailure(Throwable caught) {
-            Window.scrollTo(0, 0);
             if (caught instanceof ValidationException) {
               ValidationException e = (ValidationException) caught;
               updateErrors(e);

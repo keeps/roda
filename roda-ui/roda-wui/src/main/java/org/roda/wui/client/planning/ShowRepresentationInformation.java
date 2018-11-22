@@ -226,7 +226,6 @@ public class ShowRepresentationInformation extends Composite {
         parPanel.addClickHandler(new ClickHandler() {
           @Override
           public void onClick(ClickEvent event) {
-            JavascriptUtils.scrollToTop();
             List<String> history = new ArrayList<>();
             history.addAll(RepresentationInformationNetwork.RESOLVER.getHistoryPath());
             history.add(Search.RESOLVER.getHistoryToken());
@@ -523,15 +522,6 @@ public class ShowRepresentationInformation extends Composite {
       }
 
       if (anchor != null) {
-        anchor.addClickHandler(new ClickHandler() {
-          @Override
-          public void onClick(ClickEvent event) {
-            if (!relation.getObjectType().equals(RelationObjectType.WEB)) {
-              JavascriptUtils.scrollToTop();
-            }
-          }
-        });
-
         widgetToAdd = anchor;
       }
     }

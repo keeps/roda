@@ -438,7 +438,6 @@ public class EditDescriptiveMetadata extends Composite {
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
-    Window.scrollTo(0, 0);
     String xmlText = metadataXML.getText();
     if (inXML) {
       updateMetadataOnServer(xmlText);
