@@ -436,20 +436,33 @@ public class Messages {
     }
   }
 
-  public static JobInitEnded newJobInitEnded() {
-    return INSTANCE.new JobInitEnded();
+  public static JobInitEnded newJobInitEnded(JobPluginInfo jobPluginInfo, boolean noObjectsOrchestrated) {
+    return INSTANCE.new JobInitEnded(jobPluginInfo, noObjectsOrchestrated);
   }
 
   public final class JobInitEnded extends AbstractMessage {
     private static final long serialVersionUID = 5040958276243865900L;
 
-    public JobInitEnded() {
+    private boolean noObjectsOrchestrated;
+    private JobPluginInfo jobPluginInfo;
+
+    public JobInitEnded(JobPluginInfo jobPluginInfo, boolean noObjectsOrchestrated) {
       super();
+      this.jobPluginInfo = jobPluginInfo;
+      this.noObjectsOrchestrated = noObjectsOrchestrated;
+    }
+
+    public JobPluginInfo getJobPluginInfo() {
+      return jobPluginInfo;
+    }
+
+    public boolean isNoObjectsOrchestrated() {
+      return noObjectsOrchestrated;
     }
 
     @Override
     public String toString() {
-      return "JobInitEnded []";
+      return "JobInitEnded [noObjectsOrchestrated=" + noObjectsOrchestrated + ", jobPluginInfo=" + jobPluginInfo + "]";
     }
   }
 

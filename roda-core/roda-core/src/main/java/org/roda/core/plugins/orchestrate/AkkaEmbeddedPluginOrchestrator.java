@@ -152,8 +152,9 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     Filter filter, Plugin<T> plugin) {
     try {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
+      boolean noObjectsOrchestrated = true;
       ActorRef jobActor = (ActorRef) context;
-      ActorRef jobStateInfoActor = getJobContextInformation(PluginHelper.getJobId(plugin));
+      ActorRef jobStateInfoActor = getJobContextInformation(plugin);
       int blockSize = JobsHelper.getBlockSize();
       Plugin<T> innerPlugin;
       Class<T> modelClassToActOn = (Class<T>) ModelUtils.giveRespectiveModelClass(classToActOn);
@@ -166,6 +167,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         List<T1> indexObjects = new ArrayList<>();
 
         while (findAllIterator.hasNext()) {
+          noObjectsOrchestrated = false;
           if (indexObjects.size() == blockSize) {
             innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, modelClassToActOn, blockSize, jobActor);
             jobStateInfoActor.tell(Messages.newPluginExecuteIsReady(innerPlugin,
@@ -183,7 +185,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         }
       }
 
-      jobStateInfoActor.tell(Messages.newJobInitEnded(), jobActor);
+      jobStateInfoActor.tell(Messages.newJobInitEnded(getJobPluginInfo(plugin), noObjectsOrchestrated), jobActor);
 
     } catch (JobIsStoppingException | JobInErrorException e) {
       // do nothing
@@ -199,8 +201,9 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     List<String> uuids) {
     try {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
+      boolean noObjectsOrchestrated = true;
       ActorRef jobActor = (ActorRef) context;
-      ActorRef jobStateInfoActor = getJobContextInformation(PluginHelper.getJobId(plugin));
+      ActorRef jobStateInfoActor = getJobContextInformation(plugin);
       int blockSize = JobsHelper.getBlockSize();
       List<T> objects = JobsHelper.getObjectsFromUUID(model, index, objectClass, uuids);
       Iterator<T> iter = objects.iterator();
@@ -210,6 +213,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       List<T> block = new ArrayList<>();
       while (iter.hasNext()) {
+        noObjectsOrchestrated = false;
         if (block.size() == blockSize) {
           innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, objectClass, blockSize, jobActor);
           jobStateInfoActor.tell(Messages.newPluginExecuteIsReady(innerPlugin,
@@ -226,7 +230,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
           jobActor);
       }
 
-      jobStateInfoActor.tell(Messages.newJobInitEnded(), jobActor);
+      jobStateInfoActor.tell(Messages.newJobInitEnded(getJobPluginInfo(plugin), noObjectsOrchestrated), jobActor);
 
     } catch (JobIsStoppingException | JobInErrorException e) {
       // do nothing
@@ -240,8 +244,9 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public <T extends IsRODAObject> void runPluginOnAllObjects(Object context, Plugin<T> plugin, Class<T> objectClass) {
     LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
+    boolean noObjectsOrchestrated = true;
     ActorRef jobActor = (ActorRef) context;
-    ActorRef jobStateInfoActor = getJobContextInformation(PluginHelper.getJobId(plugin));
+    ActorRef jobStateInfoActor = getJobContextInformation(plugin);
     int blockSize = JobsHelper.getBlockSize();
 
     try (CloseableIterable<OptionalWithCause<LiteRODAObject>> objects = model.listLite(objectClass)) {
@@ -252,6 +257,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       List<LiteOptionalWithCause> block = new ArrayList<>();
       while (iter.hasNext()) {
+        noObjectsOrchestrated = false;
         if (block.size() == blockSize) {
           innerPlugin = getNewPluginInstanceAndInitJobPluginInfo(plugin, objectClass, blockSize, jobActor);
           jobStateInfoActor.tell(Messages.newPluginExecuteIsReady(innerPlugin, block), jobActor);
@@ -271,7 +277,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         jobStateInfoActor.tell(Messages.newPluginExecuteIsReady(innerPlugin, block), jobActor);
       }
 
-      jobStateInfoActor.tell(Messages.newJobInitEnded(), jobActor);
+      jobStateInfoActor.tell(Messages.newJobInitEnded(getJobPluginInfo(plugin), noObjectsOrchestrated), jobActor);
+
     } catch (JobIsStoppingException | JobInErrorException e) {
       // do nothing
     } catch (Exception e) {
@@ -285,12 +292,12 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     try {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       ActorRef jobActor = (ActorRef) context;
-      ActorRef jobStateInfoActor = getJobContextInformation(PluginHelper.getJobId(plugin));
+      ActorRef jobStateInfoActor = getJobContextInformation(plugin);
 
       initJobPluginInfo(plugin, 0, jobActor);
       jobStateInfoActor.tell(Messages.newPluginBeforeAllExecuteIsReady(plugin), jobActor);
       jobStateInfoActor.tell(Messages.newPluginExecuteIsReady(plugin, Collections.emptyList()), jobActor);
-      jobStateInfoActor.tell(Messages.newJobInitEnded(), jobActor);
+      jobStateInfoActor.tell(Messages.newJobInitEnded(getJobPluginInfo(plugin), false), jobActor);
 
     } catch (JobIsStoppingException | JobInErrorException e) {
       // do nothing
@@ -305,7 +312,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     // keep track of each job/plugin relation
     String jobId = PluginHelper.getJobId(plugin);
-    if (jobId != null && runningJobs.get(jobId) != null) {
+    ActorRef jobStateInfoActor = getJobContextInformation(jobId);
+    if (jobStateInfoActor != null) {
       // see if job is stopping
       if (stoppingJobs.contains(jobId)) {
         throw new JobIsStoppingException();
@@ -315,16 +323,9 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         throw new JobInErrorException();
       }
 
-      ActorRef jobStateInfoActor = runningJobs.get(jobId);
-      if (PluginType.INGEST == plugin.getType()) {
-        IngestJobPluginInfo jobPluginInfo = new IngestJobPluginInfo();
-        initJobPluginInfo(plugin, jobActor, jobStateInfoActor, jobPluginInfo, objectsCount);
-        plugin.injectJobPluginInfo(jobPluginInfo);
-      } else if (PluginType.MISC == plugin.getType() || PluginType.AIP_TO_AIP == plugin.getType()) {
-        SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo();
-        initJobPluginInfo(plugin, jobActor, jobStateInfoActor, jobPluginInfo, objectsCount);
-        plugin.injectJobPluginInfo(jobPluginInfo);
-      }
+      JobPluginInfo jobPluginInfo = getJobPluginInfo(plugin);
+      initJobPluginInfo(plugin, jobActor, jobStateInfoActor, jobPluginInfo, objectsCount);
+      plugin.injectJobPluginInfo(jobPluginInfo);
     } else {
       LOGGER.error("Error while trying to init plugin. Cause: unable to find out job id");
     }
@@ -338,7 +339,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     // keep track of each job/plugin relation
     String jobId = PluginHelper.getJobId(innerPlugin);
-    if (jobId != null && runningJobs.get(jobId) != null) {
+    ActorRef jobStateInfoActor = getJobContextInformation(jobId);
+    if (jobStateInfoActor != null) {
       // see if job is stopping
       if (stoppingJobs.contains(jobId)) {
         throw new JobIsStoppingException();
@@ -348,21 +350,22 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         throw new JobInErrorException();
       }
 
-      ActorRef jobStateInfoActor = getJobContextInformation(PluginHelper.getJobId(plugin));
-      if (PluginType.INGEST == plugin.getType()) {
-        IngestJobPluginInfo jobPluginInfo = new IngestJobPluginInfo();
-        initJobPluginInfo(innerPlugin, jobActor, jobStateInfoActor, jobPluginInfo, objectsCount);
-        innerPlugin.injectJobPluginInfo(jobPluginInfo);
-      } else {
-        SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo();
-        initJobPluginInfo(innerPlugin, jobActor, jobStateInfoActor, jobPluginInfo, objectsCount);
-        innerPlugin.injectJobPluginInfo(jobPluginInfo);
-      }
+      JobPluginInfo jobPluginInfo = getJobPluginInfo(plugin);
+      initJobPluginInfo(innerPlugin, jobActor, jobStateInfoActor, jobPluginInfo, objectsCount);
+      innerPlugin.injectJobPluginInfo(jobPluginInfo);
     } else {
       LOGGER.error("Error while trying to init plugin. Cause: unable to find out job id");
     }
 
     return innerPlugin;
+  }
+
+  private <T extends IsRODAObject> JobPluginInfo getJobPluginInfo(Plugin<T> plugin) {
+    if (PluginType.INGEST == plugin.getType()) {
+      return new IngestJobPluginInfo();
+    } else {
+      return new SimpleJobPluginInfo();
+    }
   }
 
   private <T extends IsRODAObject> void initJobPluginInfo(Plugin<T> innerPlugin, ActorRef jobActor,
@@ -399,9 +402,9 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public void stopJobAsync(Job job) {
     String jobId = job.getId();
-    if (jobId != null && runningJobs.get(jobId) != null) {
+    ActorRef jobStateInfoActor = getJobContextInformation(jobId);
+    if (jobStateInfoActor != null) {
       stoppingJobs.add(jobId);
-      ActorRef jobStateInfoActor = runningJobs.get(jobId);
       jobStateInfoActor.tell(Messages.newJobStop(), ActorRef.noSender());
     }
   }
@@ -440,8 +443,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public <T extends IsRODAObject> void updateJobAsync(Plugin<T> plugin, JobPartialUpdate partialUpdate) {
     String jobId = PluginHelper.getJobId(plugin);
-    if (jobId != null && runningJobs.get(jobId) != null) {
-      ActorRef jobStateInfoActor = runningJobs.get(jobId);
+    ActorRef jobStateInfoActor = getJobContextInformation(jobId);
+    if (jobStateInfoActor != null) {
       jobStateInfoActor.tell(partialUpdate, ActorRef.noSender());
       if (partialUpdate instanceof JobStateUpdated && Job.isFinalState(((JobStateUpdated) partialUpdate).getState())) {
         runningJobs.remove(jobId);
@@ -463,12 +466,16 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     return runningJobs.get(jobId);
   }
 
+  public <T extends IsRODAObject> ActorRef getJobContextInformation(Plugin<T> plugin) {
+    return getJobContextInformation(PluginHelper.getJobId(plugin));
+  }
+
   @Override
   public <T extends IsRODAObject> void updateJobInformationAsync(Plugin<T> plugin, JobPluginInfo info)
     throws JobException {
-    String jobId = PluginHelper.getJobId(plugin);
-    if (jobId != null && runningJobs.get(jobId) != null) {
-      ActorRef jobStateInfoActor = runningJobs.get(jobId);
+    ActorRef jobStateInfoActor = getJobContextInformation(plugin);
+
+    if (jobStateInfoActor != null) {
       jobStateInfoActor.tell(Messages.newJobInfoUpdated(plugin, info), ActorRef.noSender());
     } else {
       throw new JobException("Job id or job information is null");

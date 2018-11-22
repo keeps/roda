@@ -14,6 +14,7 @@ import org.roda.core.common.akka.AkkaBaseActor;
 import org.roda.core.common.akka.Messages;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
@@ -218,6 +219,16 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
     // INFO 20160630 hsilva: the following test is needed because messages can
     // be out of order and a plugin might already arrived to the end
     if (jobInfo.isDone()) {
+      if (message.isNoObjectsOrchestrated()) {
+        try {
+          JobPluginInfo jobPluginInfo = message.getJobPluginInfo();
+          jobPluginInfo.finalizeInfo();
+          PluginHelper.updateJobInformationAsync(plugin, jobPluginInfo);
+        } catch (JobException e) {
+          LOGGER.error("Error while updating Job Information", e);
+        }
+      }
+
       workersRouter.tell(Messages.newPluginAfterAllExecuteIsReady(plugin), getSelf());
     }
     markMessageProcessingAsEnded(message);
