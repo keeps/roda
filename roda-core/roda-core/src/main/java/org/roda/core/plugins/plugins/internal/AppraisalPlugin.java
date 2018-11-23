@@ -185,6 +185,7 @@ public class AppraisalPlugin extends AbstractPlugin<AIP> {
           // create job report
           Job ingestJob = model.retrieveJob(jobId);
           Report ingestReport = model.retrieveJobReport(jobId, ingestSIPUUID, aipId);
+          ingestReport.setTotalSteps(ingestReport.getTotalSteps() + 1);
 
           Report ingestReportItem = new Report();
           ingestReportItem.setTitle("Manual appraisal");
