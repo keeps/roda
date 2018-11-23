@@ -98,9 +98,6 @@ public class IngestAppraisal extends Composite {
   @UiField(provided = true)
   SearchWrapper searchWrapper;
 
-  @UiField
-  SimplePanel actionsSidebar;
-
   private IngestAppraisal() {
     AipActions appraisalAipActions = AipActions.get(null, AIPState.UNDER_APPRAISAL, null);
 
@@ -121,24 +118,7 @@ public class IngestAppraisal extends Composite {
     // prepare lists
     ListBuilder<IndexedAIP> aipListBuilder = new ListBuilder<>(() -> new AIPList(),
       new AsyncTableCellOptions<>(IndexedAIP.class, "IngestAppraisal_searchAIPs").withJustActive(false)
-        .withFilter(BASE_FILTER).bindOpener().withActionable(appraisalAipActions)
-        .addCheckboxSelectionListener(selected -> {
-          if (selected instanceof SelectedItemsList) {
-            SelectedItemsList selectedItemsList = (SelectedItemsList) selected;
-            if (!selectedItemsList.getIds().isEmpty()) {
-              actionsSidebar
-                .setWidget(sidebarActionsWidgetbuilder.buildListWithObjects(new ActionableObject<>(selected),
-                  Arrays.asList(AipActions.AipAction.APPRAISAL_ACCEPT, AipActions.AipAction.APPRAISAL_REJECT)));
-            } else {
-              actionsSidebar
-                .setWidget(sidebarActionsWidgetbuilder.buildListWithObjects(new ActionableObject<>(IndexedAIP.class),
-                  Arrays.asList(AipActions.AipAction.APPRAISAL_ACCEPT, AipActions.AipAction.APPRAISAL_REJECT)));
-            }
-          } else {
-            actionsSidebar.setWidget(sidebarActionsWidgetbuilder.buildListWithObjects(new ActionableObject<>(selected),
-              Arrays.asList(AipActions.AipAction.APPRAISAL_ACCEPT, AipActions.AipAction.APPRAISAL_REJECT)));
-          }
-        }));
+        .withFilter(BASE_FILTER).bindOpener().withActionable(appraisalAipActions));
 
     ListBuilder<IndexedRepresentation> representationListBuilder = new ListBuilder<>(() -> new RepresentationList(),
       new AsyncTableCellOptions<>(IndexedRepresentation.class, "IngestAppraisal_searchRepresentations")
@@ -149,9 +129,8 @@ public class IngestAppraisal extends Composite {
         .withFilter(BASE_FILTER).bindOpener());
 
     // add lists to search
-    searchWrapper = new SearchWrapper(true, IndexedAIP.class.getSimpleName())
-      .createListAndSearchPanel(aipListBuilder).createListAndSearchPanel(representationListBuilder)
-      .createListAndSearchPanel(fileListBuilder);
+    searchWrapper = new SearchWrapper(true, IndexedAIP.class.getSimpleName()).createListAndSearchPanel(aipListBuilder)
+      .createListAndSearchPanel(representationListBuilder).createListAndSearchPanel(fileListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
     ingestAppraisalDescription.add(new HTMLWidgetWrapper("IngestAppraisalDescription.html"));
@@ -162,12 +141,6 @@ public class IngestAppraisal extends Composite {
       instance = new IngestAppraisal();
     }
     return instance;
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

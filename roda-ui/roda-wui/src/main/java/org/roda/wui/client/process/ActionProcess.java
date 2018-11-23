@@ -81,13 +81,7 @@ public class ActionProcess extends Composite {
   JobSearch jobSearch;
 
   @UiField
-  SimplePanel actionsSidebar;
-
-  @UiField
   FlowPanel contentFlowPanel;
-
-  @UiField
-  FlowPanel sidebarFlowPanel;
 
   private static ActionProcess instance = null;
 
@@ -95,15 +89,10 @@ public class ActionProcess extends Composite {
     Filter actionFilter = new Filter(
       new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INTERNAL.name()),
       new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INGEST.name()));
-    jobSearch = new JobSearch("ActionProcess_jobs", "ActionProcess_reports", actionFilter, actionFilter, false);
+    jobSearch = new JobSearch("ActionProcess_jobs", "ActionProcess_reports", actionFilter, actionFilter, false, CreateDefaultJob.RESOLVER);
 
     initWidget(uiBinder.createAndBindUi(this));
     preservationProcessDescription.add(new HTMLWidgetWrapper("PreservationProcessDescription.html"));
-
-    JobActions jobActions = JobActions.get(CreateDefaultJob.RESOLVER);
-    SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, jobActions.hasAnyRoles());
-    actionsSidebar
-      .setWidget(new ActionableWidgetBuilder<>(jobActions).buildListWithObjects(new ActionableObject<>(Job.class)));
   }
 
   /**
@@ -120,12 +109,6 @@ public class ActionProcess extends Composite {
   }
 
   interface MyUiBinder extends UiBinder<Widget, ActionProcess> {
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

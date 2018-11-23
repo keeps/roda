@@ -2,7 +2,7 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:search="urn:import:org.roda.wui.client.search"
+             xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
              xmlns:common="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
@@ -13,14 +13,7 @@
 				<common:TitlePanel text="{messages.riskRegisterTitle}" iconClass="IndexedRisk" />
 				<g:FlowPanel addStyleNames="page-description" ui:field="riskRegisterDescription">
 				</g:FlowPanel>
-				<search:RiskSearch ui:field="riskSearch" />
-			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="col_2 last sidebar" ui:field="sidebarFlowPanel">
-				<g:FlowPanel addStyleNames="sticky-flow">
-					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:SimplePanel addStyleNames="sidebar-group" ui:field="actionsSidebar" />
-					</g:FlowPanel>
-				</g:FlowPanel>
+				<commonsearch:SearchWrapper ui:field="riskSearch" />
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

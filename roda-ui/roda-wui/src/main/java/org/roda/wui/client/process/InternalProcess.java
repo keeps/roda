@@ -84,7 +84,7 @@ public class InternalProcess extends Composite {
     Filter reportInternalFilter = new Filter(
       new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_PLUGIN_TYPE, PluginType.INTERNAL.name()));
     jobSearch = new JobSearch("InternalProcess_jobs", "InternalProcess_reports", jobInternalFilter,
-      reportInternalFilter, false);
+      reportInternalFilter, false, null);
 
     initWidget(uiBinder.createAndBindUi(this));
     internalProcessDescription.add(new HTMLWidgetWrapper("InternalProcessDescription.html"));

@@ -84,13 +84,13 @@ public class JobActions extends AbstractActionable<Job> {
 
   @Override
   public boolean canAct(Action<Job> action, Job object) {
-    if (hasPermissions(action)) {
+    if (hasPermissions(action) && object != null) {
       if (JobAction.STOP.equals(action)) {
         return !object.isInFinalState() && !object.isStopping();
       } else if (JobAction.INGEST_APPRAISAL.equals(action)) {
-        return object.getJobStats().getOutcomeObjectsWithManualIntervention() > 0;
+        return object.getJobStats() != null && object.getJobStats().getOutcomeObjectsWithManualIntervention() > 0;
       } else if (JobAction.INGEST_PROCESS.equals(action)) {
-        return object.getPluginType().equals(PluginType.INGEST);
+        return PluginType.INGEST.equals(object.getPluginType());
       }
     }
     return false;

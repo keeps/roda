@@ -435,8 +435,8 @@ public class ShowRepresentationInformation extends Composite {
               new SimpleFilterParameter(RodaConstants.REPRESENTATION_INFORMATION_RELATIONS_WITH_RI, ri.getId()));
 
             BrowserService.Util.getInstance().find(RepresentationInformation.class.getName(), filter, Sorter.NONE,
-              new Sublist(0, 1000), Facets.NONE, LocaleInfo.getCurrentLocale().toString(), true,
-              new ArrayList<>(), new NoAsyncCallback<IndexResult<RepresentationInformation>>() {
+              new Sublist(0, 1000), Facets.NONE, LocaleInfo.getCurrentLocale().toString(), true, new ArrayList<>(),
+              new NoAsyncCallback<IndexResult<RepresentationInformation>>() {
                 @Override
                 public void onSuccess(IndexResult<RepresentationInformation> result) {
                   for (RepresentationInformation r : result.getResults()) {

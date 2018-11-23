@@ -13,16 +13,22 @@ package org.roda.wui.client.planning;
 import java.util.List;
 
 import org.roda.core.data.v2.risks.IndexedRisk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.RiskActions;
+import org.roda.wui.client.common.actions.RiskIncidenceActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
+import org.roda.wui.client.common.lists.RiskIncidenceList;
+import org.roda.wui.client.common.lists.RiskList;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
+import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.process.CreateActionJob;
-import org.roda.wui.client.search.RiskSearch;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -34,7 +40,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -80,38 +85,36 @@ public class RiskRegister extends Composite {
   FlowPanel riskRegisterDescription;
 
   @UiField(provided = true)
-  RiskSearch riskSearch;
-
-  @UiField
-  SimplePanel actionsSidebar;
+  SearchWrapper riskSearch;
 
   @UiField
   FlowPanel contentFlowPanel;
-
-  @UiField
-  FlowPanel sidebarFlowPanel;
 
   /**
    * Create a risk register page
    */
   public RiskRegister() {
-    riskSearch = new RiskSearch();
+
+    ListBuilder<IndexedRisk> riskListBuilder = new ListBuilder<>(() -> new RiskList(),
+      new AsyncTableCellOptions<>(IndexedRisk.class, "RiskRegister_risks").withActionable(RiskActions.get())
+        .withActionableCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
+          @Override
+          public void onSuccess(Actionable.ActionImpact result) {
+            if (Actionable.ActionImpact.DESTROYED.equals(result) || Actionable.ActionImpact.UPDATED.equals(result)) {
+              riskSearch.refreshAllLists();
+            }
+          }
+        }).bindOpener());
+
+    ListBuilder<RiskIncidence> riskIncidenceListBuilder = new ListBuilder<>(() -> new RiskIncidenceList(),
+      new AsyncTableCellOptions<>(RiskIncidence.class, "RiskRegister_riskIncidences")
+        .withActionable(RiskIncidenceActions.getForMultipleEdit()).bindOpener());
+
+    riskSearch = new SearchWrapper(true).createListAndSearchPanel(riskListBuilder)
+      .createListAndSearchPanel(riskIncidenceListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
     riskRegisterDescription.add(new HTMLWidgetWrapper("RiskRegisterDescription.html"));
-    RiskActions riskActions = RiskActions.get();
-
-    SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, riskActions.hasAnyRoles());
-    actionsSidebar.setWidget(
-      new ActionableWidgetBuilder<>(riskActions).withActionCallback(new NoAsyncCallback<Actionable.ActionImpact>() {
-        @Override
-        public void onSuccess(Actionable.ActionImpact result) {
-          if (Actionable.ActionImpact.DESTROYED.equals(result) || Actionable.ActionImpact.UPDATED.equals(result)) {
-            riskSearch.refresh();
-          }
-        }
-      }).buildListWithObjects(new ActionableObject<>(IndexedRisk.class)));
-
   }
 
   /**
@@ -124,12 +127,6 @@ public class RiskRegister extends Composite {
       instance = new RiskRegister();
     }
     return instance;
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

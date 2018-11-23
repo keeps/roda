@@ -100,13 +100,7 @@ public class IngestProcess extends Composite {
   JobSearch jobSearch;
 
   @UiField
-  SimplePanel actionsSidebar;
-
-  @UiField
   FlowPanel contentFlowPanel;
-
-  @UiField
-  FlowPanel sidebarFlowPanel;
 
   private IngestProcess() {
     Filter jobIngestFilter = new Filter(
@@ -115,21 +109,9 @@ public class IngestProcess extends Composite {
       new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_PLUGIN_TYPE, PluginType.INGEST.name()));
 
     jobSearch = new JobSearch("IngestProcess_jobs", "IngestProcess_reports", jobIngestFilter, jobReportIngestFilter,
-      true);
+      true, IngestTransfer.RESOLVER);
     initWidget(uiBinder.createAndBindUi(this));
     ingestProcessDescription.add(new HTMLWidgetWrapper("IngestProcessDescription.html"));
-
-    JobActions jobActions = JobActions.get(IngestTransfer.RESOLVER);
-    SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, jobActions.hasAnyRoles());
-    actionsSidebar
-      .setWidget(new ActionableWidgetBuilder<>(jobActions).buildListWithObjects(new ActionableObject<>(Job.class)));
-
-  }
-
-  @Override
-  protected void onLoad() {
-    super.onLoad();
-    JavascriptUtils.stickSidebar();
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
