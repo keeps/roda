@@ -213,13 +213,22 @@ public class BrowseAIP extends Composite {
     // INIT
     initWidget(uiBinder.createAndBindUi(this));
 
+    AsyncCallback<Actionable.ActionImpact> listActionableCallback = new NoAsyncCallback<Actionable.ActionImpact>() {
+      @Override
+      public void onSuccess(Actionable.ActionImpact impact) {
+        if (!Actionable.ActionImpact.NONE.equals(impact)) {
+          refresh(aipId, new NoAsyncCallback<>());
+        }
+      }
+    };
+
     // REPRESENTATIONS
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)) {
       ListBuilder<IndexedRepresentation> representationsListBuilder = new ListBuilder<>(() -> new RepresentationList(),
         new AsyncTableCellOptions<>(IndexedRepresentation.class, "BrowseAIP_representations")
           .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aip.getId())))
           .withJustActive(justActive).withSummary(messages.listOfRepresentations()).bindOpener()
-          .withActionable(representationActions));
+          .withActionable(representationActions).withActionableCallback(listActionableCallback));
 
       SearchWrapper representationsSearchWrapper = new SearchWrapper(false)
         .createListAndSearchPanel(representationsListBuilder);
@@ -236,7 +245,7 @@ public class BrowseAIP extends Composite {
         new AsyncTableCellOptions<>(IndexedDIP.class, "BrowseAIP_disseminations")
           .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.DIP_AIP_UUIDS, aip.getId())))
           .withJustActive(justActive).withSummary(messages.listOfDisseminations()).bindOpener()
-          .withActionable(disseminationActions));
+          .withActionable(disseminationActions).withActionableCallback(listActionableCallback));
 
       SearchWrapper disseminationsSearchWrapper = new SearchWrapper(false)
         .createListAndSearchPanel(disseminationsListBuilder);
@@ -251,7 +260,8 @@ public class BrowseAIP extends Composite {
       ListBuilder<IndexedAIP> aipChildrenListBuilder = new ListBuilder<>(() -> new AIPList(),
         new AsyncTableCellOptions<>(IndexedAIP.class, "BrowseAIP_aipChildren")
           .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId())))
-          .withJustActive(justActive).withSummary(messages.listOfAIPs()).bindOpener().withActionable(aipActions));
+          .withJustActive(justActive).withSummary(messages.listOfAIPs()).bindOpener().withActionable(aipActions)
+          .withActionableCallback(listActionableCallback));
 
       SearchWrapper aipChildrenSearchWrapper = new SearchWrapper(false)
         .createListAndSearchPanel(aipChildrenListBuilder);
@@ -429,7 +439,7 @@ public class BrowseAIP extends Composite {
         HistoryUtils.createHistoryHashLink(PreservationEvents.BROWSE_RESOLVER, aip.getId()));
 
       if (incidenceCount >= 0) {
-        if (eventCount >= 0) {
+        if (logCount >= 0) {
           risksEventsLogs.add(new Label(", "));
         } else {
           risksEventsLogs.add(new Label(" " + messages.and() + " "));
