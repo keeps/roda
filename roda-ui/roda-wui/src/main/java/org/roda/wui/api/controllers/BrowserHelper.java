@@ -259,7 +259,7 @@ public class BrowserHelper {
       Filter preservationEventFilter = new Filter(
         new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId));
       Long preservationEventCount = RodaCoreFactory.getIndexService().count(IndexedPreservationEvent.class,
-        preservationEventFilter, user, justActive);
+        preservationEventFilter, user, false);
       bundle.setPreservationEventCount(preservationEventCount);
     } else {
       bundle.setPreservationEventCount(-1L);
