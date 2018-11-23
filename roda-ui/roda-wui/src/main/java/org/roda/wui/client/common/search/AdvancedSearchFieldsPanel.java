@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.function.Consumer;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -34,6 +35,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChangeHandlers<Integer> {
   private String classSimpleName;
+  private final Consumer<Integer> fieldkeydownHandler;
   private final Map<String, SearchField> searchFields = new HashMap<>();
   private ListBox searchAdvancedFieldOptions;
 
@@ -95,10 +97,11 @@ public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChan
     return searchFields;
   }
 
-  public AdvancedSearchFieldsPanel(String classSimpleName) {
+  public AdvancedSearchFieldsPanel(String classSimpleName, Consumer<Integer> keydownHandler) {
     super();
 
     this.classSimpleName = classSimpleName;
+    fieldkeydownHandler = keydownHandler;
 
     searchAdvancedFieldOptions = new ListBox();
 
@@ -126,7 +129,7 @@ public class AdvancedSearchFieldsPanel extends FlowPanel implements HasValueChan
   }
 
   public void addSearchFieldPanel(String field) {
-    final SearchFieldPanel searchFieldPanel = new SearchFieldPanel();
+    final SearchFieldPanel searchFieldPanel = new SearchFieldPanel(fieldkeydownHandler);
     String selectedField = field;
 
     searchFieldPanel.setSearchAdvancedFields(searchAdvancedFieldOptions);

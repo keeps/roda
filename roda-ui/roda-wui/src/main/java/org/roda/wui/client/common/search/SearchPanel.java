@@ -218,7 +218,11 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
     if (advancedSearchEnabled) {
       searchAdvancedDisclosureButton.addClickHandler(event -> toggleAdvancedSearchPanel());
 
-      advancedSearchFieldsPanel = new AdvancedSearchFieldsPanel(list.getClassToReturn().getSimpleName());
+      advancedSearchFieldsPanel = new AdvancedSearchFieldsPanel(list.getClassToReturn().getSimpleName(), keyCode -> {
+        if (KeyCodes.KEY_ENTER == keyCode && searchAdvancedGo.isEnabled()) {
+          searchAdvancedGo.click();
+        }
+      });
       advancedSearchFieldsPanel.addValueChangeHandler(event -> searchAdvancedGo.setEnabled(event.getValue() != 0));
       searchAdvancedPanel.insert(advancedSearchFieldsPanel, 0);
     }

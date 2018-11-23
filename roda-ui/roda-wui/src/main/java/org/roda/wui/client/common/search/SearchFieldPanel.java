@@ -10,6 +10,7 @@ package org.roda.wui.client.common.search;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
@@ -27,6 +28,8 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -90,7 +93,7 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
   // controlled
   private ListBox inputControlled;
 
-  public SearchFieldPanel() {
+  public SearchFieldPanel(Consumer<Integer> innerKeydownHandler) {
     panel = new FlowPanel();
     leftPanel = new FlowPanel();
     inputPanel = new FlowPanel();
@@ -101,7 +104,15 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
 
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
 
+    KeyDownHandler keyDownHandler = new KeyDownHandler() {
+      @Override
+      public void onKeyDown(KeyDownEvent event) {
+        innerKeydownHandler.accept(event.getNativeKeyCode());
+      }
+    };
+
     inputText = new TextBox();
+    inputText.addKeyDownHandler(keyDownHandler);
 
     inputDateBox = new DateBox();
     inputDateBox.setFormat(dateFormat);
@@ -109,46 +120,57 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     inputDateBox.getDatePicker().setYearArrowsVisible(true);
     inputDateBox.setFireNullValues(true);
     inputDateBox.getElement().setPropertyString("placeholder", messages.searchFieldDatePlaceHolder());
+    inputDateBox.getTextBox().addKeyDownHandler(keyDownHandler);
 
     inputDateBoxFrom = new DateBox();
     inputDateBoxFrom.setFormat(dateFormat);
-    inputDateBox.getDatePicker().setYearAndMonthDropdownVisible(true);
+    inputDateBoxFrom.getDatePicker().setYearAndMonthDropdownVisible(true);
     inputDateBoxFrom.getDatePicker().setYearArrowsVisible(true);
     inputDateBoxFrom.setFireNullValues(true);
     inputDateBoxFrom.getElement().setPropertyString("placeholder", messages.searchFieldDateFromPlaceHolder());
+    inputDateBoxFrom.getTextBox().addKeyDownHandler(keyDownHandler);
 
     inputDateBoxTo = new DateBox();
     inputDateBoxTo.setFormat(dateFormat);
-    inputDateBox.getDatePicker().setYearAndMonthDropdownVisible(true);
+    inputDateBoxTo.getDatePicker().setYearAndMonthDropdownVisible(true);
     inputDateBoxTo.getDatePicker().setYearArrowsVisible(true);
     inputDateBoxTo.setFireNullValues(true);
     inputDateBoxTo.getElement().setPropertyString("placeholder", messages.searchFieldDateToPlaceHolder());
+    inputDateBoxTo.getTextBox().addKeyDownHandler(keyDownHandler);
 
     inputNumeric = new TextBox();
     inputNumeric.getElement().setPropertyString("placeholder", messages.searchFieldNumericPlaceHolder());
     inputNumeric.getElement().setAttribute("type", "number");
+    inputNumeric.addKeyDownHandler(keyDownHandler);
     inputNumericFrom = new TextBox();
     inputNumericFrom.getElement().setPropertyString("placeholder", messages.searchFieldNumericFromPlaceHolder());
     inputNumericFrom.getElement().setAttribute("type", "number");
+    inputNumericFrom.addKeyDownHandler(keyDownHandler);
     inputNumericTo = new TextBox();
     inputNumericTo.getElement().setPropertyString("placeholder", messages.searchFieldNumericToPlaceHolder());
     inputNumericTo.getElement().setAttribute("type", "number");
+    inputNumericTo.addKeyDownHandler(keyDownHandler);
 
     inputStorageSizeFrom = new TextBox();
     inputStorageSizeFrom.getElement().setPropertyString("placeholder", messages.searchFieldNumericFromPlaceHolder());
     inputStorageSizeFrom.getElement().setAttribute("type", "number");
+    inputStorageSizeFrom.addKeyDownHandler(keyDownHandler);
     inputStorageSizeTo = new TextBox();
     inputStorageSizeTo.getElement().setPropertyString("placeholder", messages.searchFieldNumericToPlaceHolder());
     inputStorageSizeTo.getElement().setAttribute("type", "number");
+    inputStorageSizeTo.addKeyDownHandler(keyDownHandler);
     inputStorageSizeList = new ListBox();
     for (String unit : Humanize.UNITS) {
       inputStorageSizeList.addItem(unit, unit);
     }
     inputStorageSizeList.getElement().setAttribute("title", messages.inputStorageSizeList());
+    inputStorageSizeList.addKeyDownHandler(keyDownHandler);
 
     inputCheckBox = new CheckBox();
+    inputCheckBox.addKeyDownHandler(keyDownHandler);
 
     inputControlled = new ListBox();
+    inputControlled.addKeyDownHandler(keyDownHandler);
 
     panel.add(leftPanel);
 
