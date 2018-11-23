@@ -81,6 +81,7 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.roda.core.common.LdapUtility;
 import org.roda.core.common.Messages;
+import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -117,6 +118,7 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.events.EventsHandler;
 import org.roda.core.events.EventsManager;
 import org.roda.core.events.EventsNotifier;
@@ -1550,6 +1552,11 @@ public class RodaCoreFactory {
   private static void indexUsersAndGroupsFromLDAP() throws GenericException {
     for (User user : getModelService().listUsers()) {
       getModelService().notifyUserUpdated(user).failOnError();
+      try {
+        PremisV3Utils.createOrUpdatePremisUserAgentBinary(user.getName(), getModelService(), getIndexService(), false);
+      } catch (ValidationException | NotFoundException | RequestNotValidException | AuthorizationDeniedException | AlreadyExistsException e) {
+        LOGGER.error("Could not create PREMIS agent for default users");
+      }
     }
 
     for (Group group : getModelService().listGroups()) {

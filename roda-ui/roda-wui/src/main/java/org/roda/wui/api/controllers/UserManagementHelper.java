@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -39,6 +40,9 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaPrincipal;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.index.IndexService;
+import org.roda.core.model.ModelService;
 import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.common.server.ServerTools;
@@ -97,11 +101,14 @@ public class UserManagementHelper {
   }
 
   public static User createUser(User user, String password, UserExtraBundle extra)
-    throws GenericException, EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException,
-    NotFoundException, AuthorizationDeniedException {
+    throws GenericException, AlreadyExistsException, IllegalOperationException, NotFoundException,
+    AuthorizationDeniedException, RequestNotValidException, ValidationException {
     user.setExtra(getUserExtra(extra));
-    User addedUser = RodaCoreFactory.getModelService().createUser(user, password, true);
-    RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
+    ModelService model = RodaCoreFactory.getModelService();
+    IndexService index = RodaCoreFactory.getIndexService();
+    User addedUser = model.createUser(user, password, true);
+    PremisV3Utils.createOrUpdatePremisUserAgentBinary(user.getName(), model, index, false);
+    index.commit(true, RODAMember.class);
     return addedUser;
   }
 
@@ -134,22 +141,30 @@ public class UserManagementHelper {
   }
 
   public static User updateUser(User user, String password, UserExtraBundle extra)
-    throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
+    throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException,
+    ValidationException, RequestNotValidException {
+    ModelService model = RodaCoreFactory.getModelService();
+    IndexService index = RodaCoreFactory.getIndexService();
     user.setExtra(getUserExtra(extra));
     User modifiedUser = RodaCoreFactory.getModelService().updateUser(user, password, true);
+    PremisV3Utils.createOrUpdatePremisUserAgentBinary(user.getName(), model, index, false);
     RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
     return modifiedUser;
   }
 
   public static User updateMyUser(User modifiedUser, String password, UserExtraBundle extra)
-    throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
+    throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException,
+    ValidationException, RequestNotValidException {
+    ModelService model = RodaCoreFactory.getModelService();
+    IndexService index = RodaCoreFactory.getIndexService();
     modifiedUser.setExtra(getUserExtra(extra));
 
-    User currentUser = RodaCoreFactory.getModelService().retrieveUser(modifiedUser.getName());
+    User currentUser = model.retrieveUser(modifiedUser.getName());
     User resetUser = resetUser(modifiedUser, currentUser);
 
-    User finalModifiedUser = RodaCoreFactory.getModelService().updateMyUser(resetUser, password, true);
-    RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
+    User finalModifiedUser = model.updateMyUser(resetUser, password, true);
+    PremisV3Utils.createOrUpdatePremisUserAgentBinary(resetUser.getName(), model, index, false);
+    index.commit(true, RODAMember.class);
     return finalModifiedUser;
   }
 

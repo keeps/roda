@@ -589,8 +589,8 @@ public final class PluginHelper {
   }
 
   /**
-   * 20180525 hsilva: not in use in RODA base source code, so this will be
-   * removed in a near future
+   * 20180525 hsilva: not in use in RODA base source code, so this will be removed
+   * in a near future
    */
   @Deprecated
   public static <T extends IsRODAObject, T1 extends JobPluginInfo> T1 getInitialJobInformation(Plugin<T> plugin,
@@ -1064,9 +1064,8 @@ public final class PluginHelper {
 
     if (job != null) {
       try {
-        boolean notifyAgent = true;
-        PreservationMetadata pm = PremisV3Utils.createPremisUserAgentBinary(job.getUsername(), model, index,
-          notifyAgent);
+        PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(job.getUsername(), model, index,
+          true);
         if (pm != null) {
           agentIds.add(pm.getId());
         }
@@ -1198,8 +1197,8 @@ public final class PluginHelper {
   }
 
   /**
-   * 20180914 hsilva: use updateReportsAndIngestInfoAfterMovingSIPs instead
-   * (just different method name)
+   * 20180914 hsilva: use updateReportsAndIngestInfoAfterMovingSIPs instead (just
+   * different method name)
    */
   @Deprecated
   private static void updateReportsAfterMovingSIPs(ModelService model, IngestJobPluginInfo jobPluginInfo,
@@ -1395,8 +1394,8 @@ public final class PluginHelper {
    * @throws LockingException
    * 
    * @deprecated 20180525 hsilva: this methods should not be used directly, but
-   *             instead one should use PluginHelper.processObjects methods,
-   *             that is why this method will become private in a near future
+   *             instead one should use PluginHelper.processObjects methods, that
+   *             is why this method will become private in a near future
    */
   public static <T extends IsRODAObject> List<T> transformLitesIntoObjects(ModelService model, Plugin<T> plugin,
     Report report, JobPluginInfo pluginInfo, List<LiteOptionalWithCause> lites, Job job, boolean autoLocking)

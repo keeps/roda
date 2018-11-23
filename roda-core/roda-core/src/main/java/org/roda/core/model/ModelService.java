@@ -1356,7 +1356,6 @@ public class ModelService extends ModelObservable {
     ContentPayload payload, boolean notify) throws GenericException, NotFoundException, RequestNotValidException,
     AuthorizationDeniedException, AlreadyExistsException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
-
     return createPreservationMetadata(type, id, null, null, null, null, payload, notify);
   }
 
@@ -1382,6 +1381,13 @@ public class ModelService extends ModelObservable {
     }
 
     return pm;
+  }
+
+  public PreservationMetadata updatePreservationMetadata(PreservationMetadataType type, String id,
+    ContentPayload payload, boolean notify)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+    return updatePreservationMetadata(id, type, null, null, null, null, payload, notify);
   }
 
   public PreservationMetadata updatePreservationMetadata(String id, PreservationMetadataType type, String aipId,

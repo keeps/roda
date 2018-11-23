@@ -773,13 +773,12 @@ public final class PremisV3Utils {
     return dst;
   }
 
-  public static PreservationMetadata createPremisUserAgentBinary(String username, ModelService model,
+  public static PreservationMetadata createOrUpdatePremisUserAgentBinary(String username, ModelService model,
     IndexService index, boolean notify) throws GenericException, ValidationException, NotFoundException,
     RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
     PreservationMetadata pm = null;
 
     if (StringUtils.isNotBlank(username)) {
-
       String id = IdUtils.getUserAgentId(username);
       String fullName = "";
       String extension = "";
@@ -800,8 +799,16 @@ public final class PremisV3Utils {
 
       ContentPayload agentPayload = PremisV3Utils.createPremisAgentBinary(id, fullName, PreservationAgentType.PERSON,
         extension, note, version);
-      pm = model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
 
+      try {
+        if (model.retrievePreservationAgent(id) != null) {
+          pm = model.updatePreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
+        } else {
+          pm = model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
+        }
+      } catch (NotFoundException e) {
+        pm = model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
+      }
     }
 
     return pm;
@@ -874,5 +881,4 @@ public final class PremisV3Utils {
       LOGGER.error("PREMIS will not be updated due to an error", e);
     }
   }
-
 }

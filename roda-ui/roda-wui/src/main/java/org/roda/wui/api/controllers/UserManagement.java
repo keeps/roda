@@ -35,6 +35,7 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.common.ControllerAssistant;
@@ -129,8 +130,8 @@ public class UserManagement extends RodaWuiController {
   }
 
   public static User createUser(User user, User newUser, String password, UserExtraBundle extra)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, EmailAlreadyExistsException,
-    UserAlreadyExistsException, IllegalOperationException {
+    throws AuthorizationDeniedException, NotFoundException, GenericException, AlreadyExistsException,
+    IllegalOperationException, RequestNotValidException, ValidationException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -152,7 +153,7 @@ public class UserManagement extends RodaWuiController {
 
   public static User updateMyUser(User user, User modifiedUser, String password, UserExtraBundle extra)
     throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException,
-    IllegalOperationException {
+    IllegalOperationException, ValidationException, RequestNotValidException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     if (!user.getId().equals(modifiedUser.getId())) {
@@ -177,7 +178,8 @@ public class UserManagement extends RodaWuiController {
   }
 
   public static void updateUser(User user, User modifiedUser, String password, UserExtraBundle extra)
-    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException {
+    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException,
+    ValidationException, RequestNotValidException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -308,7 +310,7 @@ public class UserManagement extends RodaWuiController {
           // 20170523 hsilva: need to set ip address for registering the action
           // as the above method returns a new instante of the modified user
           user.setIpAddress(ipAddress);
-        } catch (final AlreadyExistsException | AuthorizationDeniedException e) {
+        } catch (final RODAException e) {
           throw new GenericException("Error updating email confirmation token - " + e.getMessage(), e);
         }
       }
@@ -434,7 +436,7 @@ public class UserManagement extends RodaWuiController {
       throw new GenericException("Problem sending email", e);
     }
   }
-  
+
   public static UserExtraBundle retrieveOwnUserExtraBundle(User user) throws AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 

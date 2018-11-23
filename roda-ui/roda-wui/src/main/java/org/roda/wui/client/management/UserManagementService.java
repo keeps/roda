@@ -25,6 +25,7 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 
@@ -119,8 +120,8 @@ public interface UserManagementService extends RemoteService {
    * @throws GenericException
    */
   public User createUser(User user, String password, UserExtraBundle extra)
-    throws AuthorizationDeniedException, NotFoundException, EmailAlreadyExistsException, UserAlreadyExistsException,
-    GenericException, IllegalOperationException;
+          throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException,
+          GenericException, IllegalOperationException, RequestNotValidException, ValidationException;
 
   /**
    * Modify a user
@@ -135,7 +136,7 @@ public interface UserManagementService extends RemoteService {
    * @throws GenericException
    */
   public void updateUser(User user, String password, UserExtraBundle extra)
-    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException;
+          throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException, ValidationException, RequestNotValidException;
 
   /**
    * Modify the authenticated user
@@ -151,7 +152,7 @@ public interface UserManagementService extends RemoteService {
    * @throws IllegalOperationException
    */
   public User updateMyUser(User user, String password, UserExtraBundle extra) throws AuthorizationDeniedException,
-    NotFoundException, AlreadyExistsException, GenericException, IllegalOperationException;
+          NotFoundException, AlreadyExistsException, GenericException, IllegalOperationException, ValidationException, RequestNotValidException;
 
   /**
    * Try to remove a user, if user cannot be removed it will be deactivated
