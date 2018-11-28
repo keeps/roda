@@ -759,7 +759,7 @@ public class RodaCoreFactory {
 
         while (resourceIterator.hasNext() && !hasFileResources) {
           Resource resource = resourceIterator.next();
-          if (!resource.isDirectory()) {
+          if (!resource.isDirectory() && !resource.getStoragePath().getContainerName().equals(RodaConstants.STORAGE_CONTAINER_PRESERVATION)) {
             hasFileResources = true;
           }
         }
