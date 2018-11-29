@@ -152,12 +152,9 @@
 						ui:field="riskPosMitigationNotesValue" />
 				</g:FlowPanel>
 
-				<g:FlowPanel addStyleNames="card">
-					<g:Label styleName="h4">
-						<ui:text from='{messages.riskIncidences}' />
-					</g:Label>
+				<g:SimplePanel addStyleNames="card">
 					<commonsearch:SearchWrapper ui:field="searchWrapper" />
-				</g:FlowPanel>
+				</g:SimplePanel>
 
 			</g:FlowPanel>
 		</g:FlowPanel>

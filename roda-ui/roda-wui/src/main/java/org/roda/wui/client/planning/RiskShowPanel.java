@@ -136,7 +136,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
 
     ListBuilder<RiskIncidence> riskIncidenceListBuilder = new ListBuilder<>(() -> new RiskIncidenceList(),
       new AsyncTableCellOptions<>(RiskIncidence.class, listId).withSummary(messages.riskIncidences())
-        .withSearchPlaceholder(messages.riskIncidenceRegisterSearchPlaceHolder())
+        .withSearchPlaceholder(messages.riskIncidenceRegisterSearchPlaceHolder()).bindOpener()
         .withActionable(RiskIncidenceActions.getForMultipleEdit()));
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(riskIncidenceListBuilder);
