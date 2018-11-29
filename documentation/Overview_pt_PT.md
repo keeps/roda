@@ -1,6 +1,12 @@
 # Visão Geral
 
-O RODA é um repositório digital que incorpora toda a funcionalidade exigida pelo modelo de referência OAIS. O RODA é capaz de incorporar, gerir e dar acesso a vários tipos de material digital produzido no âmbito da atividade de grandes empresas ou organismos públicos. O RODA é baseado em tecnologias open-source e é suportado pelas normas OAIS, EAD, METS e PREMIS. Para além do disposto, o RODA implementa ainda um workflow de ingestão configurável, que não só valida os pacotes depositados, como também permite a avaliação e selecção do material por parte dos profissionais de arquivo. O RODA permite a recuperação de informação de múltiplas formas – pesquisa básica, pesquisa avançada, navegação por plano de classificação, apresentação de representações em visualizadores especializados ou download de ficheiros. O módulo de administração permite aos gestores do repositório editar metadados descritivos, lançar ações de preservação (e.g. verificações de integridade, migração de formatos, entre outros), controlar os acessos por parte de utilizadores, consultar estatísticas, logs de acesso, entre muitas outras opções.
+O RODA é um repositório digital que incorpora toda a funcionalidade exigida pelo modelo de referência OAIS. O RODA é capaz de incorporar, gerir e dar acesso a vários tipos de material digital produzido no âmbito da atividade de grandes empresas ou organismos públicos. 
+
+O RODA é baseado em tecnologias open-source e é suportado pelas normas OAIS, EAD, METS e PREMIS. Para além do disposto, o RODA implementa ainda um workflow de ingestão configurável, que não só valida os pacotes depositados, como também permite a avaliação e selecção do material por parte dos profissionais de arquivo. 
+
+O RODA permite a recuperação de informação de múltiplas formas – pesquisa básica, pesquisa avançada, navegação por plano de classificação, apresentação de representações em visualizadores especializados ou download de ficheiros. 
+
+O módulo de administração permite aos gestores do repositório editar metadados descritivos, executar ações de preservação (e.g. verificações de integridade, migração de formatos, entre outros), controlar os acessos por parte de utilizadores, consultar estatísticas, logs de acesso, entre muitas outras opções.
 
 ## O que é que o RODA traz de diferente?
 
@@ -49,6 +55,10 @@ O RODA tem os seus próprios sistemas de catálogo e pesquisa. O conteúdo por s
 ## Formatos de ficheiro suportados
 
 O RODA suporta qualquer formato de ficheiro e esquemas de metadados (desde que baseado em XML). Ferramentas de caracterização de ficheiros podem ser executadas durante o processo de ingestão para capturar a metainformação técnica dos ficheiros originais. Ferramentas de conversão de formatos especializadas podem ser executadas sobre o conteúdo digital para o tornar mais adequado para a preservação a longo termo ou para consumo dos utilizadores finais com as tecnologias atuais.
+
+## Como é que a informação é guardada no RODA?
+
+O RODA é compatível com as especificações de pacotes de SIP, AIP e DIP publicadas pelo [DILCIS Board](http://dilcis.eu), um comité situado sob a alçada do [DLM Forum](http://dlmforum.eu) que é responsável por definir standards para a troca de informação entre arquivos digitais e sistemas de gestão documental.
 
 ## Confiabilidade - Certificação ISO 16363
 
