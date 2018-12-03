@@ -295,7 +295,7 @@ public class HistoryUtils {
   public static String getSearchHistoryByRepresentationInformationFilter(List<String> filters, String searchType) {
     List<String> history = new ArrayList<>();
     history.addAll(Search.RESOLVER.getHistoryPath());
-    history.add(searchType);
+    history.add("@" + searchType);
     history.add(RodaConstants.OPERATOR_OR);
 
     for (String filter : filters) {
