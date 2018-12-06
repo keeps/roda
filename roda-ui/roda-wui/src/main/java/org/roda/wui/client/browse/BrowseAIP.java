@@ -454,7 +454,7 @@ public class BrowseAIP extends Composite {
         HistoryUtils.createHistoryHashLink(UserLog.RESOLVER, aip.getId()));
 
       if (incidenceCount >= 0 || eventCount >= 0) {
-        risksEventsLogs.add(new Label(" and "));
+        risksEventsLogs.add(new Label(" " + messages.and() + " "));
       }
 
       risksEventsLogs.add(logsLink);
