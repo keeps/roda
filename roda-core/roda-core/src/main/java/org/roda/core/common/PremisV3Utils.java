@@ -371,8 +371,7 @@ public final class PremisV3Utils {
     Representation representation = Representation.Factory.newInstance();
     ObjectIdentifierComplexType oict = representation.addNewObjectIdentifier();
     oict.setObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
-    String identifier = IdUtils.getPreservationId(PreservationMetadataType.REPRESENTATION, aipId, representationId,
-      null, null);
+    String identifier = IdUtils.getRepresentationPreservationId(aipId, representationId);
     oict.setObjectIdentifierValue(identifier);
     representation.addNewPreservationLevel().setPreservationLevelValue(getStringPlusAuthority(""));
     return representation;

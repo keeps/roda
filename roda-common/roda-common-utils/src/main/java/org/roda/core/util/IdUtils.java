@@ -17,7 +17,6 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.FileLink;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.RepresentationLink;
-import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.user.RodaPrincipal;
 
@@ -163,11 +162,6 @@ public final class IdUtils {
     List<String> fileDirectoryPath, String fileId) {
     return URNUtils.createRodaPreservationURN(type,
       IdUtils.createUUID(getFileId(aipId, representationId, fileDirectoryPath, fileId, ID_SEPARATOR)));
-  }
-
-  public static String getPreservationId(PreservationMetadata pm) {
-    return getPreservationId(pm.getType(), pm.getAipId(), pm.getRepresentationId(), pm.getFileDirectoryPath(),
-      pm.getFileId());
   }
 
   public static String getPreservationFileId(String fileId) {

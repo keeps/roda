@@ -406,8 +406,7 @@ public class IndexModelObserver implements ModelObserver {
     fieldsToUpdate.put(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(state));
     fieldsToUpdate.put(RodaConstants.PRESERVATION_EVENT_AIP_ID, pm.getAipId());
     fieldsToUpdate.put(RodaConstants.INDEX_ID, pm.getId());
-    return SolrUtils.update(index, IndexedPreservationEvent.class, IdUtils.getPreservationId(pm), fieldsToUpdate,
-      (ModelObserver) this);
+    return SolrUtils.update(index, IndexedPreservationEvent.class, pm.getId(), fieldsToUpdate, (ModelObserver) this);
   }
 
   @Override
@@ -970,7 +969,7 @@ public class IndexModelObserver implements ModelObserver {
     updateFields.put(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(state));
     updateFields.put(RodaConstants.PRESERVATION_EVENT_AIP_ID, pm.getAipId());
     updateFields.put(RodaConstants.PRESERVATION_EVENT_ID, pm.getId());
-    return SolrUtils.update(index, IndexedPreservationEvent.class, IdUtils.getPreservationId(pm), updateFields, this);
+    return SolrUtils.update(index, IndexedPreservationEvent.class, pm.getId(), updateFields, this);
 
   }
 
