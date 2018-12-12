@@ -280,10 +280,6 @@ public class ApiUtils {
       .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\""
         + streamResponse.getFilename() + "\"");
 
-    if (streamResponse.getFileSize() > 0) {
-      response.header(HttpHeaders.CONTENT_LENGTH, streamResponse.getFileSize());
-    }
-
     Date lastModifiedDate = streamResponse.getLastModified();
     if (lastModifiedDate != null) {
       CacheControl cc = new CacheControl();
