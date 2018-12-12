@@ -65,7 +65,6 @@ import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Directory;
 import org.roda.core.storage.Resource;
@@ -395,8 +394,6 @@ public class ApiUtils {
       ret = new org.roda.core.data.v2.log.LogEntries((List<LogEntry>) result.getResults());
     } else if (objectClass.equals(RiskIncidence.class)) {
       ret = new org.roda.core.data.v2.risks.RiskIncidences((List<RiskIncidence>) result.getResults());
-    } else if (objectClass.equals(RODAMember.class)) {
-      ret = new org.roda.core.data.v2.user.RODAMembers((List<RODAMember>) result.getResults());
     } else if (objectClass.equals(IndexedDIP.class)) {
       List<DIP> dips = result.getResults().stream().map(dip -> (DIP) dip).collect(Collectors.toList());
       ret = new org.roda.core.data.v2.ip.DIPs(dips);

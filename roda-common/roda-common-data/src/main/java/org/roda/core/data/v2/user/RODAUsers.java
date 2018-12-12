@@ -22,37 +22,37 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-@XmlRootElement(name = RodaConstants.RODA_OBJECT_MEMBERS)
+@XmlRootElement(name = RodaConstants.RODA_OBJECT_USERS)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class RODAMembers implements RODAObjectList<RODAMember> {
+public class RODAUsers implements RODAObjectList<User> {
   private static final long serialVersionUID = 5656464074709994370L;
-  private List<RODAMember> members;
+  private List<User> users;
 
-  public RODAMembers() {
+  public RODAUsers() {
     super();
-    members = new ArrayList<>();
+    users = new ArrayList<>();
   }
 
-  public RODAMembers(List<RODAMember> members) {
+  public RODAUsers(List<User> users) {
     super();
-    this.members = members;
+    this.users = users;
   }
 
   @Override
-  @JsonProperty(value = RodaConstants.RODA_OBJECT_MEMBERS)
-  @XmlElement(name = RodaConstants.RODA_OBJECT_MEMBER)
-  public List<RODAMember> getObjects() {
-    return members;
+  @JsonProperty(value = RodaConstants.RODA_OBJECT_USERS)
+  @XmlElement(name = RodaConstants.RODA_OBJECT_USER, nillable = true)
+  public List<User> getObjects() {
+    return users;
   }
 
   @Override
-  public void setObjects(List<RODAMember> members) {
-    this.members = members;
+  public void setObjects(List<User> users) {
+    this.users = users;
   }
 
   @Override
-  public void addObject(RODAMember member) {
-    this.members.add(member);
+  public void addObject(User user) {
+    this.users.add(user);
   }
 
 }

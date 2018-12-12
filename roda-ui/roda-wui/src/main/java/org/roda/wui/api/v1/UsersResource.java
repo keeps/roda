@@ -7,8 +7,8 @@
  */
 package org.roda.wui.api.v1;
 
-import java.io.IOException;
 import java.util.Collections;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
@@ -28,12 +28,15 @@ import org.glassfish.jersey.server.JSONP;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.sort.Sorter;
+import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.core.data.v2.user.RODAMembers;
+import org.roda.core.data.v2.user.RODAUsers;
 import org.roda.core.data.v2.user.User;
-import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.controllers.UserManagement;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
@@ -58,9 +61,9 @@ public class UsersResource {
   @GET
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
-  @ApiOperation(value = "List users", notes = "Get a list of users.", response = RODAMembers.class, responseContainer = "List")
+  @ApiOperation(value = "List users", notes = "Get a list of users.", response = RODAUsers.class, responseContainer = "List")
   @ApiResponses(value = {
-    @ApiResponse(code = 200, message = "Successful response", response = RODAMembers.class, responseContainer = "List"),
+    @ApiResponse(code = 200, message = "Successful response", response = RODAUsers.class, responseContainer = "List"),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
   public Response listUsers(
@@ -77,20 +80,15 @@ public class UsersResource {
     // delegate action to controller
     boolean isUser = true;
     boolean justActive = false;
-    Filter filter = new Filter();
-    filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, Boolean.toString(isUser)));
+    Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, Boolean.toString(isUser)));
 
-    RODAMembers members = new RODAMembers();
-    try (IterableIndexResult<RODAMember> findAll = Browser.findAll(RODAMember.class, filter, user, justActive,
-      Collections.emptyList())) {
-      for (RODAMember member : findAll) {
-        members.addObject(member);
-      }
-    } catch (IOException e) {
-      // do nothing
-    }
+    IndexResult<RODAMember> result = Browser.find(RODAMember.class, filter, Sorter.NONE,
+      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive, Collections.emptyList());
 
-    return Response.ok(members, mediaType).build();
+    return Response
+      .ok(new RODAUsers(result.getResults().stream().map(o -> (User) o).collect(Collectors.toList())), mediaType)
+      .build();
   }
 
   @POST

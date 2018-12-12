@@ -153,6 +153,8 @@ public final class RodaConstants {
   public static final String RODA_OBJECT_REPRESENTATION_INFORMATION = "representation_information";
 
   public static final String RODA_OBJECT_MEMBERS = "members";
+  public static final String RODA_OBJECT_USERS = "users";
+  public static final String RODA_OBJECT_GROUPS = "groups";
   public static final String RODA_OBJECT_RISKS = "risks";
   public static final String RODA_OBJECT_INCIDENCES = "incidences";
   public static final String RODA_OBJECT_NOTIFICATIONS = "notifications";
