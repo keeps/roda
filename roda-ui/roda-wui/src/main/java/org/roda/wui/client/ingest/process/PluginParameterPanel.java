@@ -572,6 +572,7 @@ public class PluginParameterPanel extends Composite {
       value = parameter.getDefaultValue();
     }
 
+    parameterBox.setEnabled(!parameter.isReadonly());
     parameterBox.setTitle("parameter box");
     layout.add(parameterName);
     layout.add(parameterBox);
