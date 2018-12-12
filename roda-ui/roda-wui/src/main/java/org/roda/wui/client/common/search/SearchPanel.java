@@ -402,7 +402,7 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
     }
 
     // transform advanced search fields into filter parameters
-    if (this.advancedSearchFieldsPanel != null && this.advancedSearchFieldsPanel.isVisible()) {
+    if (this.searchAdvancedPanel != null && this.searchAdvancedPanel.isVisible()) {
       for (int i = 0; i < advancedSearchFieldsPanel.getWidgetCount(); i++) {
         if (advancedSearchFieldsPanel.getWidget(i) instanceof SearchFieldPanel) {
           SearchFieldPanel searchAdvancedFieldPanel = (SearchFieldPanel) advancedSearchFieldsPanel.getWidget(i);
