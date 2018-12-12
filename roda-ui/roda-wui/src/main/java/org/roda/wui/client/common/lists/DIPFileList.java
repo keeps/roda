@@ -21,7 +21,6 @@ import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -29,7 +28,6 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Label;
 
 import config.i18n.client.ClientMessages;
 
@@ -80,12 +78,11 @@ public class DIPFileList extends AsyncTableCell<DIPFile> {
     iconColumn.setSortable(true);
     idColumn.setSortable(true);
 
-    addColumn(iconColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-files-o'></i>"), false, false, 2);
-    display.addColumn(idColumn, messages.fileName());
+    addColumn(iconColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-files-o'></i>"), false, false, 2.5);
+    addColumn(idColumn, messages.fileName(), false);
 
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(idColumn, true));
-    display.setColumnWidth(iconColumn, 2.5, Unit.EM);
 
     addStyleName("my-collections-table");
   }

@@ -34,7 +34,6 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Label;
 
 import config.i18n.client.ClientMessages;
 
@@ -129,19 +128,12 @@ public class RepresentationList extends AsyncTableCell<IndexedRepresentation> {
     createdOnColumn.setSortable(true);
     updatedOnColumn.setSortable(true);
 
-    display.addColumn(typeColumn, messages.representationType());
-    display.addColumn(numberOfDataFilesColumn, messages.representationFiles());
-    display.addColumn(sizeInBytesColumn, messages.representationSize());
-    display.addColumn(statesColumn, messages.representationStatus());
-    display.addColumn(createdOnColumn, messages.objectCreatedDate());
-    display.addColumn(updatedOnColumn, messages.objectLastModified());
-
-    statesColumn.setCellStyleNames("nowrap");
-    typeColumn.setCellStyleNames("nowrap");
-    sizeInBytesColumn.setCellStyleNames("nowrap");
-    numberOfDataFilesColumn.setCellStyleNames("nowrap");
-    createdOnColumn.setCellStyleNames("nowrap");
-    updatedOnColumn.setCellStyleNames("nowrap");
+    addColumn(typeColumn, messages.representationType(), true);
+    addColumn(numberOfDataFilesColumn, messages.representationFiles(), true);
+    addColumn(sizeInBytesColumn, messages.representationSize(), true);
+    addColumn(statesColumn, messages.representationStatus(), true);
+    addColumn(createdOnColumn, messages.objectCreatedDate(), true);
+    addColumn(updatedOnColumn, messages.objectLastModified(), true);
 
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(typeColumn, true));

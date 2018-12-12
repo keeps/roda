@@ -29,7 +29,6 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Label;
 
 import config.i18n.client.ClientMessages;
 
@@ -83,18 +82,15 @@ public class DIPList extends AsyncTableCell<IndexedDIP> {
     dateCreated.setSortable(true);
     lastModified.setSortable(true);
 
-    display.addColumn(titleColumn, messages.aipGenericTitle());
-    display.addColumn(dateCreated, messages.objectCreatedDate());
-    display.addColumn(lastModified, messages.objectLastModified());
+    addColumn(titleColumn, messages.aipGenericTitle(), false);
+    addColumn(dateCreated, messages.objectCreatedDate(), true, false, 13);
+    addColumn(lastModified, messages.objectLastModified(), true, false, 13);
 
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(titleColumn, true));
 
     display.setColumnWidth(dateCreated, 13.0, Unit.EM);
     display.setColumnWidth(lastModified, 13.0, Unit.EM);
-
-    dateCreated.setCellStyleNames("nowrap");
-    lastModified.setCellStyleNames("nowrap");
 
     addStyleName("my-collections-table");
   }

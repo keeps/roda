@@ -32,7 +32,6 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Label;
 
 import config.i18n.client.ClientMessages;
 
@@ -113,11 +112,11 @@ public class AIPList extends AsyncTableCell<IndexedAIP> {
     datesColumn.setSortable(true);
     hasRepresentationsColumn.setSortable(true);
 
-    display.addColumn(levelColumn,
-      SafeHtmlUtils.fromSafeConstant("<i class='fa fa-tag'></i>&nbsp;" + messages.aipLevel()));
-    display.addColumn(titleColumn, messages.aipGenericTitle());
-    display.addColumn(datesColumn, messages.aipDates());
-    display.addColumn(hasRepresentationsColumn, HAS_REPRESENTATIONS_ICON);
+    addColumn(levelColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-tag'></i>&nbsp;" + messages.aipLevel()),
+      true);
+    addColumn(titleColumn, messages.aipGenericTitle(), false);
+    addColumn(datesColumn, messages.aipDates(), true);
+    addColumn(hasRepresentationsColumn, HAS_REPRESENTATIONS_ICON, false);
 
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(datesColumn, true));
@@ -125,9 +124,6 @@ public class AIPList extends AsyncTableCell<IndexedAIP> {
     display.setColumnWidth(levelColumn, 7.0, Unit.EM);
     display.setColumnWidth(datesColumn, 14.0, Unit.EM);
     display.setColumnWidth(hasRepresentationsColumn, 3.0, Unit.EM);
-
-    levelColumn.setCellStyleNames("nowrap");
-    datesColumn.setCellStyleNames("nowrap");
 
     addStyleName("my-collections-table");
   }

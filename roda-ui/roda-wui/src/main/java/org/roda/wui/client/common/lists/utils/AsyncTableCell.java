@@ -950,6 +950,10 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     return this.listeners;
   }
 
+  protected void addColumn(Column<T, ?> column, SafeHtml headerHTML, boolean nowrap) {
+    addColumn(column, headerHTML, nowrap, false);
+  }
+
   protected void addColumn(Column<T, ?> column, SafeHtml headerHTML, boolean nowrap, boolean alignRight) {
     SafeHtmlHeader header = new SafeHtmlHeader(headerHTML);
     display.addColumn(column, header);
@@ -969,6 +973,16 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     display.setColumnWidth(column, fixedSize, Unit.EM);
   }
 
+  protected void addColumn(Column<T, ?> column, SafeHtml headerHTML, boolean nowrap, boolean alignRight,
+    double fixedSize, Unit unit) {
+    addColumn(column, headerHTML, nowrap, alignRight);
+    display.setColumnWidth(column, fixedSize, unit);
+  }
+
+  protected void addColumn(Column<T, ?> column, String headerText, boolean nowrap) {
+    addColumn(column, SafeHtmlUtils.fromString(headerText), nowrap, false);
+  }
+
   protected void addColumn(Column<T, ?> column, String headerText, boolean nowrap, boolean alignRight) {
     addColumn(column, SafeHtmlUtils.fromString(headerText), nowrap, alignRight);
   }
@@ -976,6 +990,11 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   protected void addColumn(Column<T, ?> column, String headerText, boolean nowrap, boolean alignRight,
     double fixedSize) {
     addColumn(column, SafeHtmlUtils.fromString(headerText), nowrap, alignRight, fixedSize);
+  }
+
+  protected void addColumn(Column<T, ?> column, String headerText, boolean nowrap, boolean alignRight, double fixedSize,
+    Unit unit) {
+    addColumn(column, SafeHtmlUtils.fromString(headerText), nowrap, alignRight, fixedSize, unit);
   }
 
   public IndexResult<T> getResult() {

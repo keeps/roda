@@ -26,6 +26,7 @@ import org.roda.wui.common.client.tools.Humanize.DHMSFormat;
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -175,15 +176,15 @@ public class JobList extends AsyncTableCell<Job> {
     objectsFailureCountColumn.setSortable(true);
     progressColumn.setSortable(true);
 
-    addColumn(nameColumn, messages.jobName(), true, false, 11);
+    addColumn(nameColumn, messages.jobName(), true, false, 100, Style.Unit.PCT);
     addColumn(usernameColumn, messages.jobCreator(), true, false, 6);
     addColumn(startDateColumn, messages.jobStartDate(), true, false, 11);
     addColumn(durationColumn, messages.jobDuration(), true, true, 6);
     addColumn(statusColumn, messages.jobStatus(), true, false, 7);
-    addColumn(progressColumn, messages.jobProgress(), true, true);
+    addColumn(progressColumn, messages.jobProgress(), true, true, 6);
     addColumn(objectsTotalCountColumn, messages.jobTotalCountMessage(), true, true, 5);
-    addColumn(objectsSuccessCountColumn, messages.jobSuccessCountMessage(), true, true);
-    addColumn(objectsFailureCountColumn, messages.jobFailureCountMessage(), true, true, 5);
+    addColumn(objectsSuccessCountColumn, messages.jobSuccessCountMessage(), true, true, 6);
+    addColumn(objectsFailureCountColumn, messages.jobFailureCountMessage(), true, true, 6);
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(startDateColumn, false));
