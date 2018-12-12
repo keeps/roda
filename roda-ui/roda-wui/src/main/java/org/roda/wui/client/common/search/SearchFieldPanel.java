@@ -361,7 +361,7 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
       inputPanel.add(inputStorageSizeFrom);
       inputPanel.add(inputStorageSizeTo);
       inputPanel.add(inputStorageSizeList);
-      inputStorageSizeFrom.getElement().setAttribute("title", label + " (" + messages.dateRangeFieldTo() + ")");
+      inputStorageSizeFrom.getElement().setAttribute("title", label + " (" + messages.dateRangeFieldFrom() + ")");
       inputStorageSizeTo.getElement().setAttribute("title", label + " (" + messages.dateRangeFieldTo() + ")");
     } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_BOOLEAN)) {
       inputPanel.add(inputCheckBox);
