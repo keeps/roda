@@ -1,6 +1,33 @@
 # Changelog
 
-## v3.0.0 (01/01/1970)
+## v3.0.1 (14/12/2018)
+### Install for demonstration
+```
+docker pull keeps/roda:v3.0.1
+```
+
+#### New features:
+
+-  Plugin parameter TextBox in read-only mode [#1234](https://github.com/keeps/roda/issues/1234)
+
+#### Enhancements:
+
+-  Hiding the advanced search and searching uses advanced search fields [#1426](https://github.com/keeps/roda/issues/1426)
+
+#### Bug Fixes:
+
+-  Users/groups REST API endpoint error when using XML as output format [#1429](https://github.com/keeps/roda/issues/1429)
+-  AntiVirus does not show the version correctly [#1428](https://github.com/keeps/roda/issues/1428)
+-  Wrong input box's title in advanced search for representations/files [#1424](https://github.com/keeps/roda/issues/1424)
+-  Links between representation information and files is not working [#1420](https://github.com/keeps/roda/issues/1420)
+-  Dynamic _txt field should be multivalued [#1419](https://github.com/keeps/roda/issues/1419)
+-  Risk incidences table UI for a specific risk is messed up [#1417](https://github.com/keeps/roda/issues/1417)
+-  Partial duplicate of preservation event [#1416](https://github.com/keeps/roda/issues/1416)
+-  MP4 video is not playing in Safari in the HTML5 video [#907](https://github.com/keeps/roda/issues/907)
+
+---
+
+## v3.0.0 (28/11/2018)
 ### Install for demonstration
 ```
 docker pull keeps/roda:v3.0.0
