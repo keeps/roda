@@ -135,7 +135,14 @@ public class UserLogin {
   public void logout() {
     String hash = Window.Location.getHash();
     if (hash.length() > 0) {
-      hash = hash.substring(1);
+      logout(hash.substring(1));
+    }else{
+      logout(null);
+    }
+  }
+
+  public void logout(String hash) {
+    if (hash != null && hash.length() > 0) {
       hash = UriUtils.encode(hash);
     }
 

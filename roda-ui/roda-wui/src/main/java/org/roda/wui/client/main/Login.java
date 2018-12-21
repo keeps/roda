@@ -18,6 +18,7 @@ import org.roda.core.data.exceptions.EmailUnverifiedException;
 import org.roda.core.data.exceptions.InactiveUserException;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.management.RecoverLogin;
@@ -41,6 +42,8 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.TextBox;
@@ -58,7 +61,7 @@ public class Login extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-      getInstance().resolve(historyTokens, callback);
+      new Login().resolve(historyTokens, callback);
     }
 
     @Override
@@ -87,20 +90,6 @@ public class Login extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private static Login instance = null;
-
-  /**
-   * Get the singleton instance
-   * 
-   * @return the instance
-   */
-  public static Login getInstance() {
-    if (instance == null) {
-      instance = new Login();
-    }
-    return instance;
-  }
-
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -115,6 +104,21 @@ public class Login extends Composite {
 
   @UiField
   Button resendEmail;
+
+  @UiField
+  FlowPanel loginPanel;
+
+  @UiField
+  FlowPanel loggedInPanel;
+
+  @UiField
+  InlineHTML loggedInMessage;
+
+  @UiField
+  Button logout;
+
+  @UiField
+  Button homepage;
 
   private List<String> serviceTokens = null;
 
@@ -138,7 +142,31 @@ public class Login extends Composite {
     error.setText("");
     resendEmail.setVisible(false);
     serviceTokens = historyTokens;
-    callback.onSuccess(this);
+
+    UserLogin.getInstance().getAuthenticatedUser(new NoAsyncCallback<User>() {
+      @Override
+      public void onSuccess(User user) {
+        loggedInMessage.setHTML(messages.loggedIn(user.getName()));
+        loginPanel.setVisible(user.isGuest());
+        loggedInPanel.setVisible(!user.isGuest());
+        callback.onSuccess(Login.this);
+      }
+
+      @Override
+      public void onFailure(Throwable caught) {
+        callback.onSuccess(Login.this);
+      }
+    });
+  }
+
+  @UiHandler("homepage")
+  void handleHomepage(ClickEvent e){
+    HistoryUtils.newHistory(Welcome.RESOLVER);
+  }
+
+  @UiHandler("logout")
+  void handleLogout(ClickEvent e) {
+    UserLogin.getInstance().logout(RESOLVER.getHistoryToken());
   }
 
   @UiHandler("login")

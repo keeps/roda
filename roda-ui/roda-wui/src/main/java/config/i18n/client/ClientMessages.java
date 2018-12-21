@@ -1560,6 +1560,10 @@ public interface ClientMessages extends Messages {
 
   String loginLogout();
 
+  SafeHtml loggedIn(String username);
+
+  String welcomePage();
+
   // Login Dialog
 
   String loginDialogTitle();

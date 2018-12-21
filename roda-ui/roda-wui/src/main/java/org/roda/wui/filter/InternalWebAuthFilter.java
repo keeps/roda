@@ -9,8 +9,6 @@ package org.roda.wui.filter;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,6 +62,7 @@ public class InternalWebAuthFilter implements Filter {
 
     URIBuilder uri = new URIBuilder();
     uri.setPath(path);
+    uri.setFragment(hash);
 
     // adding all other parameters
     parameterMap.forEach((param, values) -> {
@@ -76,24 +75,18 @@ public class InternalWebAuthFilter implements Filter {
       parameterMap);
 
     if (requestURI.endsWith("/login")) {
-      String safeFragment;
       if (!hash.startsWith("login" + HistoryUtils.HISTORY_SEP)) {
-        safeFragment = "login" + HistoryUtils.HISTORY_SEP + hash;
-      } else {
-        safeFragment = hash;
+        uri.setFragment("login" + HistoryUtils.HISTORY_SEP + hash);
       }
 
       try {
-        httpResponse.sendRedirect(uri.build().toString() + "#" + safeFragment);
+        httpResponse.sendRedirect(uri.build().toString());
       } catch (URISyntaxException e) {
         LOGGER.error("Could not generate service URL, redirecting to base path " + path, e);
         httpResponse.sendRedirect(path);
       }
     } else if (requestURI.endsWith("/logout")) {
       UserLogin.logout(httpRequest, Collections.emptyList());
-
-      // discard hash and set it to the welcome page
-      uri.setFragment(Welcome.RESOLVER.getHistoryToken());
 
       try {
         httpResponse.sendRedirect(uri.build().toString());

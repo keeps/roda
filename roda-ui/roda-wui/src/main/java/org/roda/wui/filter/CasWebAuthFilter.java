@@ -90,7 +90,7 @@ public class CasWebAuthFilter implements Filter {
     final String url = httpRequest.getRequestURL().toString();
     final String requestURI = httpRequest.getRequestURI();
     final String path = httpRequest.getParameter("path");
-    final String safeFragment = httpRequest.getParameter("hash");
+    final String hash = httpRequest.getParameter("hash");
 
     Map<String, String[]> parameterMap = new HashMap<>(httpRequest.getParameterMap());
     parameterMap.remove("path");
@@ -106,6 +106,7 @@ public class CasWebAuthFilter implements Filter {
       uri.setScheme(rodaServerNameUri.getScheme());
       uri.setHost(rodaServerNameUri.getHost());
       uri.setPort(rodaServerNameUri.getPort());
+      uri.setFragment(hash);
     }
 
     uri.setPath(path);
@@ -117,7 +118,7 @@ public class CasWebAuthFilter implements Filter {
       }
     });
 
-    LOGGER.info("URL: {} ; Request URI: {} ; Path: {} ; Hash: {}; Parameters: {}", url, requestURI, path, safeFragment,
+    LOGGER.info("URL: {} ; Request URI: {} ; Path: {} ; Hash: {}; Parameters: {}", url, requestURI, path, hash,
       parameterMap);
 
     if (url.endsWith("/login")) {
@@ -136,7 +137,7 @@ public class CasWebAuthFilter implements Filter {
           }
         }
 
-        httpResponse.sendRedirect(uri.build().toString() + "#" + safeFragment);
+        httpResponse.sendRedirect(uri.build().toString());
       } catch (URISyntaxException e) {
         LOGGER.error("Could not generate service URL, redirecting to base path " + path, e);
         httpResponse.sendRedirect(path);
@@ -145,11 +146,6 @@ public class CasWebAuthFilter implements Filter {
     } else if (url.endsWith("/logout")) {
 
       UserLogin.logout(httpRequest, Arrays.asList("edu.yale.its.tp.cas.client.filter.user", "_const_cas_assertion_"));
-
-      // TODO add RODA host from config
-
-      // discard hash and set it to the welcome page
-      uri.setFragment(Welcome.RESOLVER.getHistoryToken());
 
       String service;
       try {
