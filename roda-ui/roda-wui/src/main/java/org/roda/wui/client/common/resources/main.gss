@@ -4,7 +4,9 @@
 @def COLOR_PRIMARY_HOVER		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.primary.hover")');
 
 @def COLOR_MENU_PRIMARY			eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.menu.primary")');
+@def COLOR_MENU_PRIMARY_TEXT	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.menu.primary.text")');
 @def COLOR_MENU_SECONDARY		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.menu.secondary")');
+@def COLOR_MENU_SECONDARY_TEXT	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.menu.secondary.text")');
 
 @def COLOR_BUTTON_DANGER		eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.button.danger")');
 @def COLOR_BUTTON_DANGER_HOVER	eval('org.roda.wui.common.client.tools.ConfigurationManager.getString("ui.css.color.button.danger.hover")');
@@ -1907,13 +1909,13 @@ td.datePickerMonth, td.datePickerYear {
 
 .gwt-MenuBar.gwt-MenuBar-vertical {
     background-color: COLOR_MENU_SECONDARY;
-    color: COLOR_MENU_PRIMARY;
+    color: COLOR_MENU_SECONDARY_TEXT;
 }
 
 .gwt-MenuBar.gwt-MenuBar-vertical .gwt-MenuItem {
     min-width: 130px;
     background-color: COLOR_MENU_SECONDARY;
-    color: COLOR_MENU_PRIMARY;
+    color: COLOR_MENU_SECONDARY_TEXT;
 }
 
 .gwt-MenuBar .gwt-MenuItem {
@@ -1922,19 +1924,19 @@ td.datePickerMonth, td.datePickerYear {
     font-weight: 500;
     font-size: 1.4rem;
     font-variant: normal;
-    color: #fff;
+    color: COLOR_MENU_PRIMARY_TEXT;
     padding: 5px 10px;
     text-align: left;
 }
 
 .gwt-MenuBar .gwt-MenuItem-selected {
     background-color: COLOR_MENU_SECONDARY;
-    color: COLOR_MENU_PRIMARY;
+    color: COLOR_MENU_SECONDARY_TEXT;
 }
 
 .gwt-MenuBar.gwt-MenuBar-vertical .gwt-MenuItem-selected {
     background-color: COLOR_MENU_PRIMARY;
-    color: COLOR_MENU_SECONDARY;
+    color: COLOR_MENU_PRIMARY_TEXT;
 }
 
 .gwt-MenuBarPopup {
