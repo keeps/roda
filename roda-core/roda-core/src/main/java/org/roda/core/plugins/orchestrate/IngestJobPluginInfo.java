@@ -272,8 +272,8 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     transferredResourceToAipIds.put(newTransferredResourceId, aipIds);
 
     for (Entry<String, List<String>> aipToTranferredResourceIds : aipIdToTransferredResourceIds.entrySet()) {
-      aipToTranferredResourceIds.getValue().remove(oldTransferredResourceId);
-      if(!aipToTranferredResourceIds.getValue().contains(newTransferredResourceId)) {
+      if(aipToTranferredResourceIds.getValue().contains(oldTransferredResourceId)) {
+        aipToTranferredResourceIds.getValue().remove(oldTransferredResourceId);
         aipToTranferredResourceIds.getValue().add(newTransferredResourceId);
       }
     }
