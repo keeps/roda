@@ -1273,6 +1273,11 @@ pre code {
     vertical-align: middle;
 }
 
+.selectAipResultsPanel {
+    max-height: 60vh;
+}
+
+
 .table-empty {
     margin-top: -30px;
 }
