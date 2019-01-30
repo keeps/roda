@@ -65,7 +65,7 @@ public final class TestsHelper {
   public static <T extends IsRODAObject, T1 extends Plugin<T>> Job executeJob(Class<T1> plugin, PluginType pluginType,
     SelectedItems<T> selectedItems)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    return executeJob(plugin, new HashMap<>(), pluginType, selectedItems, JOB_STATE.COMPLETED);
+    return executeJob(plugin, new HashMap<>(), pluginType, selectedItems, JOB_STATE.COMPLETED, RodaConstants.ADMIN);
   }
 
   /**
@@ -75,13 +75,26 @@ public final class TestsHelper {
   public static <T extends IsRODAObject, T1 extends Plugin<T>> Job executeJob(Class<T1> plugin, PluginType pluginType,
     SelectedItems<T> selectedItems, JOB_STATE expectedJobState)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    return executeJob(plugin, new HashMap<>(), pluginType, selectedItems, expectedJobState);
+    return executeJob(plugin, new HashMap<>(), pluginType, selectedItems, expectedJobState, RodaConstants.ADMIN);
   }
 
   public static <T extends IsRODAObject, T1 extends Plugin<T>> Job executeJob(Class<T1> plugin,
     Map<String, String> pluginParameters, PluginType pluginType, SelectedItems<T> selectedItems)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    return executeJob(plugin, pluginParameters, pluginType, selectedItems, JOB_STATE.COMPLETED);
+    return executeJob(plugin, pluginParameters, pluginType, selectedItems, JOB_STATE.COMPLETED, RodaConstants.ADMIN);
+  }
+
+  public static <T extends IsRODAObject, T1 extends Plugin<T>> Job executeJob(Class<T1> plugin,
+    Map<String, String> pluginParameters, PluginType pluginType, SelectedItems<T> selectedItems, String user)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    return executeJob(plugin, pluginParameters, pluginType, selectedItems, JOB_STATE.COMPLETED, user);
+  }
+
+  public static <T extends IsRODAObject, T1 extends Plugin<T>> Job executeJob(Class<T1> plugin,
+    Map<String, String> pluginParameters, PluginType pluginType, SelectedItems<T> selectedItems,
+    JOB_STATE expectedJobState)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    return executeJob(plugin, pluginParameters, pluginType, selectedItems, expectedJobState, RodaConstants.ADMIN);
   }
 
   /**
@@ -90,7 +103,7 @@ public final class TestsHelper {
    */
   public static <T extends IsRODAObject, T1 extends Plugin<T>> Job executeJob(Class<T1> plugin,
     Map<String, String> pluginParameters, PluginType pluginType, SelectedItems<T> selectedItems,
-    JOB_STATE expectedJobState)
+    JOB_STATE expectedJobState, String user)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
     Job job = new Job();
@@ -100,7 +113,7 @@ public final class TestsHelper {
     job.setPluginParameters(pluginParameters);
     job.setPluginType(pluginType);
     job.setSourceObjects(selectedItems);
-    job.setUsername(RodaConstants.ADMIN);
+    job.setUsername(user);
     try {
       RodaCoreFactory.getModelService().createJob(job);
       RodaCoreFactory.getPluginOrchestrator().executeJob(job, false);

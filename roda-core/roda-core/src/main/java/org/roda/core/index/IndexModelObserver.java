@@ -714,7 +714,7 @@ public class IndexModelObserver implements ModelObserver {
 
     PreservationMetadataType type = pm.getType();
     if (PreservationMetadataType.EVENT.equals(type)) {
-      SolrUtils.create2(index, (ModelObserver) this, IndexedPreservationEvent.class, pm).addTo(ret);
+      indexPreservationEvent(pm).addTo(ret);
     } else if (PreservationMetadataType.AGENT.equals(type)) {
       SolrUtils.create2(index, (ModelObserver) this, IndexedPreservationAgent.class, pm).addTo(ret);
     }

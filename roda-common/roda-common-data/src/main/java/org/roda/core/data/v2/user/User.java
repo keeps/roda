@@ -81,7 +81,7 @@ public class User extends RodaPrincipal {
   }
 
   public User(final String id, final String name, final String email, final boolean guest) {
-    this(id, name, email, guest, "", new HashSet<String>(), new HashSet<String>(), new HashSet<String>());
+    this(id, name, email, guest, "", new HashSet<>(), new HashSet<>(), new HashSet<>());
   }
 
   public User(final String id, final String name, final String email, final boolean guest, final String ipAddress,
