@@ -33,7 +33,9 @@ public class ErrorHandler extends HttpServlet {
     final String uri = (String) request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
 
     // Log the exception
-    LOGGER.error("[{}] {} : {}", statusCode, uri, message, throwable);
+    StringBuilder msg = new StringBuilder();
+    msg.append("[").append(statusCode).append("]").append(" ").append(uri).append(": ").append(message);
+    LOGGER.error(msg.toString(), throwable);
 
     String errorPage = String.format("error_%1$s.html", statusCode);
 
