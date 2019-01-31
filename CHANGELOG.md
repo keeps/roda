@@ -1,5 +1,26 @@
 # Changelog
 
+## v3.0.2 (31/01/2019)
+### Install for demonstration
+```
+docker pull keeps/roda:v3.0.2
+```
+
+#### Enhancements:
+
+-  Chart.js and FileSaver.js as webjars [#1440](https://github.com/keeps/roda/issues/1440)
+-  After login the browser back shows login panel although user is already logged in [#860](https://github.com/keeps/roda/issues/860)
+
+#### Bug Fixes:
+
+-  Ingest events not being indexed correctly [#1438](https://github.com/keeps/roda/issues/1438)
+-  When executing an action over all objects of a specific entity, the humanized filter on UI is not properly showed [#1437](https://github.com/keeps/roda/issues/1437)
+-  When ingesting with multiple SIPs, in the end of the job each AIP has multiple ingest ended events [#1436](https://github.com/keeps/roda/issues/1436)
+-  Node selection window grows vertically forever [#1433](https://github.com/keeps/roda/issues/1433)
+-  Button text overflow [#1431](https://github.com/keeps/roda/issues/1431)
+
+---
+
 ## v3.0.1 (14/12/2018)
 ### Install for demonstration
 ```
