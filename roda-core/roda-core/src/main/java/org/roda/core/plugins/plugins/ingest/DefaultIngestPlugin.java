@@ -394,36 +394,25 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
   private boolean verifyReports(ModelService model, IndexService index, IngestJobPluginInfo jobPluginInfo) {
     Map<String, Map<String, Report>> reportsFromBeingProcessed = jobPluginInfo.getReportsFromBeingProcessed();
-    List<String> transferredResourcesToRemoveFromjobPluginInfo = new ArrayList<>();
-    boolean noFailures = true;
-    String transferredResourceId = null;
+    Set<String> transferredResourcesToRemoveFromjobPluginInfo = new HashSet<>();
 
     for (Entry<String, Map<String, Report>> reportEntry : reportsFromBeingProcessed.entrySet()) {
-      transferredResourceId = reportEntry.getKey();
       Collection<Report> reports = reportEntry.getValue().values();
       for (Report report : reports) {
         if (report.getPluginState().equals(PluginState.FAILURE)) {
-          noFailures = false;
+          transferredResourcesToRemoveFromjobPluginInfo.add(reportEntry.getKey());
           break;
         }
       }
-
-      if (!noFailures) {
-        break;
-      }
-    }
-
-    if (!noFailures) {
-      jobPluginInfo.incrementObjectsProcessedWithFailure();
-      jobPluginInfo.failOtherTransferredResourceAIPs(model, index, transferredResourceId);
-      transferredResourcesToRemoveFromjobPluginInfo.add(transferredResourceId);
     }
 
     for (String resourceId : transferredResourcesToRemoveFromjobPluginInfo) {
+      jobPluginInfo.incrementObjectsProcessedWithFailure();
+      jobPluginInfo.failOtherTransferredResourceAIPs(model, index, resourceId);
       jobPluginInfo.remove(resourceId);
     }
 
-    return noFailures;
+    return transferredResourcesToRemoveFromjobPluginInfo.isEmpty();
   }
 
   private void sendNotification(ModelService model, IndexService index, Job job, JobStats jobStats)
