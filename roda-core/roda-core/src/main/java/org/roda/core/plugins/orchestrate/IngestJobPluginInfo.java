@@ -178,8 +178,7 @@ public class IngestJobPluginInfo extends JobPluginInfo {
   }
 
   public int getBeingProcessedCounter() {
-    return getAipIdToTransferredResourceIds().values().stream().flatMap(l -> l.stream()).distinct()
-      .collect(Collectors.toList()).size();
+    return getReportsFromBeingProcessed().keySet().stream().filter(id -> !id.equals(Report.NO_OUTCOME_OBJECT_ID)).collect(Collectors.toList()).size();
   }
 
   public void addReport(Report report, boolean reportIsAnReportItem) {

@@ -122,10 +122,8 @@ public class SiegfriedPluginUtils {
 
     try (DirectResourceAccess directAccess = model.getStorage().getDirectAccess(representationDataPath)) {
       Path representationFsPath = directAccess.getPath();
-      List<LinkingIdentifier> sources = runSiegfriedOnRepresentationOrFile(model, representation.getAipId(),
+      return runSiegfriedOnRepresentationOrFile(model, representation.getAipId(),
         representation.getId(), new ArrayList<>(), null, representationFsPath);
-
-      return sources;
     } catch (IOException e) {
       throw new GenericException(e);
     }
