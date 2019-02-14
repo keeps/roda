@@ -181,7 +181,9 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
     AIP aip = null;
     try {
-      aip = model.retrieveAIP(pm.getAipId());
+      if (pm.getAipId() != null) {
+        aip = model.retrieveAIP(pm.getAipId());
+      }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error indexing preservation events", e);
       ret.add(e);

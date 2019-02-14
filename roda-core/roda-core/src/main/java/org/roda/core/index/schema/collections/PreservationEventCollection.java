@@ -113,7 +113,6 @@ public class PreservationEventCollection
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
     SolrInputDocument doc = super.toSolrDocument(pm, info);
-
     String objectClass = PreservationMetadataEventClass.REPOSITORY.toString();
 
     if (StringUtils.isNotBlank(pm.getAipId())) {
@@ -134,7 +133,7 @@ public class PreservationEventCollection
     }
 
     if (objectClass.equals(PreservationMetadataEventClass.REPOSITORY.toString())) {
-      doc.addField(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(AIPState.ACTIVE));
+      //doc.addField(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(AIPState.ACTIVE));
 
       Permissions permissions = new Permissions();
       List<String> users = RodaCoreFactory.getRodaConfigurationAsList("core.permission.repository_events.user");
@@ -179,7 +178,6 @@ public class PreservationEventCollection
           li.setType(laict.getLinkingAgentIdentifierType().getStringValue());
           li.setValue(laict.getLinkingAgentIdentifierValue());
           li.setRoles(PremisV3Utils.toStringList(laict.getLinkingAgentRoleArray()));
-
           doc.addField(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER, JsonUtils.getJsonFromObject(li));
         }
       }
@@ -190,7 +188,6 @@ public class PreservationEventCollection
           li.setType(loict.getLinkingObjectIdentifierType().getStringValue());
           li.setValue(loict.getLinkingObjectIdentifierValue());
           li.setRoles(PremisV3Utils.toStringList(loict.getLinkingObjectRoleArray()));
-
           doc.addField(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER,
             JsonUtils.getJsonFromObject(li));
         }
@@ -202,7 +199,6 @@ public class PreservationEventCollection
           li.setType(loict.getLinkingObjectIdentifierType().getStringValue());
           li.setValue(loict.getLinkingObjectIdentifierValue());
           li.setRoles(PremisV3Utils.toStringList(loict.getLinkingObjectRoleArray()));
-
           doc.addField(RodaConstants.PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER,
             JsonUtils.getJsonFromObject(li));
         }
@@ -237,7 +233,6 @@ public class PreservationEventCollection
 
       return preCalculatedFields;
     }
-
   }
 
   @Override
