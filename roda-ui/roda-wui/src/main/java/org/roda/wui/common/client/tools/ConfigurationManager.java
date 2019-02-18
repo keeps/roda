@@ -44,7 +44,6 @@ public class ConfigurationManager {
 
   public static void initialize(Map<String, List<String>> properties) {
     instance = new ConfigurationManager(properties);
-    FacetFactory.initialize();
     instance.debug();
   }
 
@@ -172,7 +171,7 @@ public class ConfigurationManager {
   private void debug() {
     debug = getBoolean(debug, DEBUG_MODE_PROPERTY);
     if (isDebugging()) {
-      GWT.log("--- debugging configuration manager start");
+      consoleLog("--- debugging configuration manager start");
       Map<String, List<String>> cfg = new TreeMap<>(getConfigurationProperties());
 
       StringBuilder debugInfo = new StringBuilder();
@@ -190,40 +189,32 @@ public class ConfigurationManager {
           }
         }
       }
-      GWT.log(debugInfo.toString());
-      GWT.log("--- debugging configuration manager end");
+      consoleLog(debugInfo.toString());
+      consoleLog("--- debugging configuration manager end");
     }
   }
 
-  public static class FacetFactory {
-    private static List<String> enabledListIds = Collections.emptyList();
+  private native void consoleLog(String message) /*-{ console.log(message); }-*/;
 
+  public static class FacetFactory {
     private FacetFactory() {
       // do nothing
     }
 
-    private static void initialize() {
-      enabledListIds = getStringList(RodaConstants.UI_LISTS_PROPERTY);
-    }
-
     public static Facets getFacets(String listId) {
-      if (!enabledListIds.contains(listId)) {
-        return Facets.NONE;
-      }
-
-      return buildFacets(listId);
-    }
-
-    private static Facets buildFacets(String listId) {
       String query = getString(RodaConstants.UI_LISTS_PROPERTY, listId, RodaConstants.UI_LISTS_FACETS_QUERY_PROPERTY);
 
       List<String> parameterNames = getStringList(RodaConstants.UI_LISTS_PROPERTY, listId,
         RodaConstants.UI_LISTS_FACETS_PARAMETERS_PROPERTY);
 
-      if (query != null) {
-        return new Facets(buildParameters(listId, parameterNames), query);
+      if (!parameterNames.isEmpty()) {
+        if (query != null) {
+          return new Facets(buildParameters(listId, parameterNames), query);
+        } else {
+          return new Facets(buildParameters(listId, parameterNames));
+        }
       } else {
-        return new Facets(buildParameters(listId, parameterNames));
+        return Facets.NONE;
       }
     }
 
