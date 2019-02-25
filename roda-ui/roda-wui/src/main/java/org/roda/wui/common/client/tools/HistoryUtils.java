@@ -33,6 +33,7 @@ import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RODAMember;
+import org.roda.wui.client.portal.BrowseAIPPortal;
 import org.roda.wui.client.browse.BrowseDIP;
 import org.roda.wui.client.browse.BrowseFile;
 import org.roda.wui.client.browse.BrowseRepresentation;
@@ -67,15 +68,20 @@ import com.google.gwt.user.client.ui.Widget;
  * @author Luis Faria
  */
 public class HistoryUtils {
-
-  private HistoryUtils() {
-
-  }
-
   public static final String HISTORY_SEP = "/";
   public static final String HISTORY_SEP_REGEX = "/";
   public static final String HISTORY_SEP_ESCAPE = "%2F";
   public static final String HISTORY_PERMISSION_SEP = ".";
+
+  private static boolean USING_PORTAL_UI = false;
+
+  public static void initEndpoint(boolean usingPortalUI) {
+    HistoryUtils.USING_PORTAL_UI = usingPortalUI;
+  }
+
+  private HistoryUtils() {
+    // do nothing
+  }
 
   public static <T> List<T> tail(List<T> list) {
     return ListUtils.tail(list);
@@ -337,7 +343,11 @@ public class HistoryUtils {
 
     if (object instanceof IndexedAIP) {
       IndexedAIP aip = (IndexedAIP) object;
-      path = HistoryUtils.getHistoryBrowse(aip.getId());
+      if (USING_PORTAL_UI) {
+        path = getHistory(BrowseAIPPortal.RESOLVER, aip.getId());
+      } else {
+        path = HistoryUtils.getHistoryBrowse(aip.getId());
+      }
     } else if (object instanceof IndexedRepresentation) {
       IndexedRepresentation representation = (IndexedRepresentation) object;
       path = HistoryUtils.getHistoryBrowse(representation);

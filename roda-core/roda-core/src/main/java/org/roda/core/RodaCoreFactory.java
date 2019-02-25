@@ -647,8 +647,8 @@ public class RodaCoreFactory {
     Path rodaHomePath;
     if (System.getProperty(RodaConstants.INSTALL_FOLDER_SYSTEM_PROPERTY) != null) {
       rodaHomePath = Paths.get(System.getProperty(RodaConstants.INSTALL_FOLDER_SYSTEM_PROPERTY));
-    } else if (System.getenv(RodaConstants.INSTALL_FOLDER_ENVIRONEMNT_VARIABLE) != null) {
-      rodaHomePath = Paths.get(System.getenv(RodaConstants.INSTALL_FOLDER_ENVIRONEMNT_VARIABLE));
+    } else if (System.getenv(RodaConstants.INSTALL_FOLDER_ENVIRONMENT_VARIABLE) != null) {
+      rodaHomePath = Paths.get(System.getenv(RodaConstants.INSTALL_FOLDER_ENVIRONMENT_VARIABLE));
     } else {
       // last attempt (using user home and hidden directory called .roda)
       String userHome = System.getProperty("user.home");

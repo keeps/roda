@@ -839,12 +839,13 @@ public class BrowserHelper {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)
       && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)
-      && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSONP.equals(acceptFormat)) {
+      && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSONP.equals(acceptFormat)
+      && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
       throw new RequestNotValidException(
         "Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT + "' value. Expected values: "
           + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP,
             RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSONP,
-            RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML));
+            RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML));
     }
   }
 
@@ -862,25 +863,25 @@ public class BrowserHelper {
   }
 
   protected static EntityResponse listAIPDescriptiveMetadata(String aipId, String start, String limit,
-    String acceptFormat)
+    String acceptFormat, String language)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     ModelService model = RodaCoreFactory.getModelService();
     AIP aip = model.retrieveAIP(aipId);
     List<DescriptiveMetadata> metadata = aip.getDescriptiveMetadata();
-    return listDescriptiveMetadata(metadata, aipId, start, limit, acceptFormat);
+    return listDescriptiveMetadata(metadata, aipId, start, limit, acceptFormat, language);
   }
 
   protected static EntityResponse listRepresentationDescriptiveMetadata(String aipId, String representationId,
-    String start, String limit, String acceptFormat)
+    String start, String limit, String acceptFormat, String language)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     ModelService model = RodaCoreFactory.getModelService();
     Representation representation = model.retrieveRepresentation(aipId, representationId);
     List<DescriptiveMetadata> metadata = representation.getDescriptiveMetadata();
-    return listDescriptiveMetadata(metadata, aipId, start, limit, acceptFormat);
+    return listDescriptiveMetadata(metadata, aipId, start, limit, acceptFormat, language);
   }
 
   private static EntityResponse listDescriptiveMetadata(List<DescriptiveMetadata> metadata, String aipId, String start,
-    String limit, String acceptFormat)
+    String limit, String acceptFormat, String language)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     StorageService storage = RodaCoreFactory.getStorageService();
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
@@ -903,6 +904,25 @@ public class BrowserHelper {
       }
 
       return DownloadUtils.createZipStreamResponse(zipEntries, aipId);
+    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
+      ModelService model = RodaCoreFactory.getModelService();
+      List<Pair<String, String>> htmlDescriptives = new ArrayList<>();
+
+      for (DescriptiveMetadata dm : metadata) {
+        Binary descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, dm.getId());
+        DescriptiveMetadata descriptiveMetadata = model.retrieveDescriptiveMetadata(aipId, dm.getId());
+        htmlDescriptives.add(Pair.of(dm.getId(), HTMLUtils.descriptiveMetadataToHtml(descriptiveMetadataBinary,
+          descriptiveMetadata.getType(), descriptiveMetadata.getVersion(), ServerTools.parseLocale(language))));
+      }
+
+      return new StreamResponse(
+        new DefaultConsumesOutputStream(aipId + HTML_EXT, RodaConstants.MEDIA_TYPE_TEXT_HTML, out -> {
+          PrintStream printStream = new PrintStream(out);
+          for (Pair<String, String> htmlDescriptive : htmlDescriptives) {
+            printStream.print(htmlDescriptive.getSecond());
+          }
+          printStream.close();
+        }));
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSONP.equals(acceptFormat)) {

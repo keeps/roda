@@ -10,6 +10,7 @@
  */
 package org.roda.wui.common.client;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.LoggerException;
 
 import com.google.gwt.core.client.GWT;
@@ -42,7 +43,7 @@ public interface ClientLoggerService extends RemoteService {
 
       ClientLoggerServiceAsync instance = (ClientLoggerServiceAsync) GWT.create(ClientLoggerService.class);
       ServiceDefTarget target = (ServiceDefTarget) instance;
-      target.setServiceEntryPoint(GWT.getModuleBaseURL() + SERVICE_URI);
+      target.setServiceEntryPoint(GWT.getHostPageBaseURL()  + RodaConstants.GWT_RPC_BASE_URL + SERVICE_URI);
       return instance;
     }
   }

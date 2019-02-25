@@ -124,7 +124,6 @@ public class BrowseDIP extends Composite {
               callback.onSuccess(new BrowseDIP(viewers, browseDipBundle));
             }
           });
-
       } else {
         errorRedirect(callback);
       }
@@ -143,8 +142,6 @@ public class BrowseDIP extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   public static final Sorter DEFAULT_DIPFILE_SORTER = new Sorter(new SortParameter(RodaConstants.DIPFILE_ID, false));
-
-  private ClientLogger logger = new ClientLogger(getClass().getName());
 
   // interface
 

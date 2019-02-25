@@ -248,6 +248,14 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     nextButton.setTitle(messages.searchNext());
   }
 
+  public void setSearchButtonVisibility(boolean visible) {
+    searchButton.setVisible(visible);
+  }
+
+  public void setActionsButtonVisibility(boolean visible) {
+    actionsButton.setVisible(visible);
+  }
+
   public NavigationToolbar<T> withActionImpactHandler(Actionable.ActionImpact actionImpact, Runnable handler) {
     this.handlers.put(actionImpact, handler);
     return this;
@@ -348,7 +356,6 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
 
   public void updateBreadcrumb(BrowseFileBundle bundle) {
     breadcrumb.updatePath(BreadcrumbUtils.getFileBreadcrumbs(bundle));
-
     aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(bundle.getAip().getState()));
     aipState.setVisible(AIPState.ACTIVE != bundle.getAip().getState());
   }

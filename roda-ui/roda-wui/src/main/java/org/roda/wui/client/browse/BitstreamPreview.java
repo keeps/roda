@@ -237,15 +237,14 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       @Override
       public void onAttachOrDetach(AttachEvent attachEvent) {
         if (attachEvent.isAttached()) {
-          GWT.log("add handler");
           adjustPdfPreviewHeight(frame);
           handlerRegistration = Window.addResizeHandler(resizeEvent -> adjustPdfPreviewHeight(frame));
         } else if (handlerRegistration != null) {
-          GWT.log("remove handler");
           handlerRegistration.removeHandler();
         }
       }
     });
+
     panel.add(frame);
     frame.setStyleName("viewRepresentationPDFFilePreview");
   }

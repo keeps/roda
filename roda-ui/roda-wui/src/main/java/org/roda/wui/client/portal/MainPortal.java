@@ -8,7 +8,7 @@
 /**
  * 
  */
-package org.roda.wui.client.main;
+package org.roda.wui.client.portal;
 
 import java.util.List;
 import java.util.Map;
@@ -17,12 +17,11 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.resources.MyResources;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.welcome.Welcome;
+import org.roda.wui.client.main.GAnalyticsTracker;
+import org.roda.wui.client.main.Theme;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
-import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -35,24 +34,17 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
-/**
- * @author Luis Faria
- * 
- */
-public class Main extends Composite implements EntryPoint {
-
+public class MainPortal extends Composite implements EntryPoint {
   private ClientLogger logger = new ClientLogger(getClass().getName());
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @Override
   public void onModuleLoad() {
-
     // Set uncaught exception handler
     ClientLogger.setUncaughtExceptionHandler();
 
@@ -73,31 +65,17 @@ public class Main extends Composite implements EntryPoint {
 
   }
 
-  interface Binder extends UiBinder<Widget, Main> {
+  interface Binder extends UiBinder<Widget, MainPortal> {
   }
 
-  @UiField
-  AccessibleFocusPanel homeLinkArea;
-
-  @UiField
-  FlowPanel bannerLogo;
-
   @UiField(provided = true)
-  Menu menu;
-
-  @UiField(provided = true)
-  ContentPanel contentPanel;
-
-  Composite footer;
+  ContentPanelPortal contentPanel;
 
   /**
    * Create a new main
    */
-  public Main() {
-    menu = new Menu();
-    contentPanel = ContentPanel.getInstance();
-    footer = new Footer();
-
+  public MainPortal() {
+    contentPanel = ContentPanelPortal.getInstance();
     Binder uiBinder = GWT.create(Binder.class);
     initWidget(uiBinder.createAndBindUi(this));
   }
@@ -108,9 +86,12 @@ public class Main extends Composite implements EntryPoint {
   public void init() {
     MyResources.INSTANCE.css().ensureInjected();
 
+    HistoryUtils.initEndpoint(true);
+
     // Remove loading image
     RootPanel.getBodyElement().removeChild(DOM.getElementById("loading"));
     NodeList<Element> bodyChilds = RootPanel.getBodyElement().getElementsByTagName("iframe");
+
     for (int i = 0; i < bodyChilds.getLength(); i++) {
       Element bodyChild = bodyChilds.getItem(i);
       if (!bodyChild.hasAttribute("title")) {
@@ -120,20 +101,12 @@ public class Main extends Composite implements EntryPoint {
 
     // Add main widget to root panel
     RootPanel.get().add(this);
-    RootPanel.get().add(footer);
     RootPanel.get().addStyleName("roda");
 
     // Initialize
-    menu.init();
     contentPanel.init();
     onHistoryChanged(History.getToken());
     History.addValueChangeHandler(event -> onHistoryChanged(event.getValue()));
-
-    bannerLogo.add(new HTMLWidgetWrapper("Banner.html"));
-
-    homeLinkArea.addClickHandler(event -> HistoryUtils.newHistory(Welcome.RESOLVER));
-
-    homeLinkArea.setTitle(messages.homeTitle());
 
     if (ConfigurationManager.getBoolean(false, RodaConstants.UI_COOKIES_ACTIVE_PROPERTY)) {
       JavascriptUtils.setCookieOptions(messages.cookiesMessage(), messages.cookiesDismisse(),
@@ -142,13 +115,8 @@ public class Main extends Composite implements EntryPoint {
   }
 
   private void onHistoryChanged(String historyToken) {
-    if (historyToken.length() == 0) {
-      contentPanel.update(Welcome.RESOLVER.getHistoryPath());
-      HistoryUtils.newHistory(Welcome.RESOLVER);
-    } else {
-      List<String> currentHistoryPath = HistoryUtils.getCurrentHistoryPath();
-      contentPanel.update(currentHistoryPath);
-      GAnalyticsTracker.track(historyToken);
-    }
+    List<String> currentHistoryPath = HistoryUtils.getCurrentHistoryPath();
+    contentPanel.update(currentHistoryPath);
+    GAnalyticsTracker.track(historyToken);
   }
 }

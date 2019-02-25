@@ -579,7 +579,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static EntityResponse listAIPDescriptiveMetadata(User user, String aipId, String start, String limit,
-    String acceptFormat)
+    String acceptFormat, String language)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -596,7 +596,7 @@ public class Browser extends RodaWuiController {
       controllerAssistant.checkObjectPermissions(user, aip);
 
       // delegate
-      return BrowserHelper.listAIPDescriptiveMetadata(aipId, start, limit, acceptFormat);
+      return BrowserHelper.listAIPDescriptiveMetadata(aipId, start, limit, acceptFormat, language);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;
@@ -608,7 +608,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static EntityResponse listRepresentationDescriptiveMetadata(User user, String aipId, String representationId,
-    String start, String limit, String acceptFormat)
+    String start, String limit, String acceptFormat, String language)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -627,7 +627,7 @@ public class Browser extends RodaWuiController {
 
       // delegate
       return BrowserHelper.listRepresentationDescriptiveMetadata(representation.getAipId(), representation.getId(),
-        start, limit, acceptFormat);
+        start, limit, acceptFormat, language);
     } catch (RODAException e) {
       state = LOG_ENTRY_STATE.FAILURE;
       throw e;

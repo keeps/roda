@@ -241,6 +241,7 @@ public class RepresentationsResource {
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit,
     @ApiParam(value = "Choose format in which to get the representation", allowableValues = RodaConstants.API_GET_LIST_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @ApiParam(value = "The language for the HTML output", allowableValues = RodaConstants.API_DESCRIPTIVE_METADATA_LANGUAGES, defaultValue = RodaConstants.API_QUERY_VALUE_LANG_DEFAULT) @DefaultValue(RodaConstants.API_QUERY_VALUE_LANG_DEFAULT) @QueryParam(RodaConstants.API_QUERY_KEY_LANG) String language,
     @ApiParam(value = "JSONP callback name", required = false, allowMultiple = false, defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
@@ -250,7 +251,7 @@ public class RepresentationsResource {
 
     // delegate action to controller
     EntityResponse metadataList = Browser.listRepresentationDescriptiveMetadata(user, aipId, representationId, start,
-      limit, acceptFormat);
+      limit, acceptFormat, language);
 
     if (metadataList instanceof ObjectResponse) {
       ObjectResponse<DescriptiveMetadataList> dmlist = (ObjectResponse<DescriptiveMetadataList>) metadataList;

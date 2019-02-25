@@ -12,6 +12,7 @@ package org.roda.wui.client.common;
 
 import java.util.Map;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;
@@ -46,7 +47,7 @@ public interface UserLoginService extends RemoteService {
 
       UserLoginServiceAsync instance = (UserLoginServiceAsync) GWT.create(UserLoginService.class);
       ServiceDefTarget target = (ServiceDefTarget) instance;
-      target.setServiceEntryPoint(GWT.getModuleBaseURL() + SERVICE_URI);
+      target.setServiceEntryPoint(GWT.getHostPageBaseURL()  + RodaConstants.GWT_RPC_BASE_URL + SERVICE_URI);
       return instance;
     }
   }

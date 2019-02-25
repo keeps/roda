@@ -275,19 +275,19 @@
 
 	<servlet-mapping>
 		<servlet-name>ClientLogger</servlet-name>
-		<url-pattern>/org.roda.wui.RodaWUI/wuilogger</url-pattern>
+		<url-pattern>/gwtrpc/wuilogger</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>UserManagementService</servlet-name>
-		<url-pattern>/org.roda.wui.RodaWUI/UserManagementService</url-pattern>
+		<url-pattern>/gwtrpc/UserManagementService</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>UserLoginService</servlet-name>
-		<url-pattern>/org.roda.wui.RodaWUI/userlogin</url-pattern>
+		<url-pattern>/gwtrpc/userlogin</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>BrowserService</servlet-name>
-		<url-pattern>/org.roda.wui.RodaWUI/browserservice</url-pattern>
+		<url-pattern>/gwtrpc/browserservice</url-pattern>
 	</servlet-mapping>
 
 

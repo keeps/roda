@@ -56,7 +56,8 @@ public final class RodaConstants {
   /*
    * Misc
    */
-  public static final String INSTALL_FOLDER_ENVIRONEMNT_VARIABLE = "RODA_HOME";
+  public static final String INSTALL_FOLDER_ENVIRONMENT_VARIABLE = "RODA_HOME";
+  public static final String GWT_RPC_BASE_URL = "gwtrpc/";
 
   /**
    * XXX Use DateTimeFormatter.ISO_INSTANT instead when GWT supports Instant

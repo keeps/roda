@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -92,10 +93,9 @@ public interface BrowserService extends RemoteService {
      * @return the instance
      */
     public static BrowserServiceAsync getInstance() {
-
       BrowserServiceAsync instance = (BrowserServiceAsync) GWT.create(BrowserService.class);
       ServiceDefTarget target = (ServiceDefTarget) instance;
-      target.setServiceEntryPoint(GWT.getModuleBaseURL() + SERVICE_URI);
+      target.setServiceEntryPoint(GWT.getHostPageBaseURL()  + RodaConstants.GWT_RPC_BASE_URL + SERVICE_URI);
       return instance;
     }
   }

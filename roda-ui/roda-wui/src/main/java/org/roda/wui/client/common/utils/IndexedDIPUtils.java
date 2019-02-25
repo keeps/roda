@@ -20,7 +20,6 @@ public class IndexedDIPUtils {
   public static String interpolateOpenExternalURL(IndexedDIP dip, String locale) {
     Map<String, String> replacements = new HashMap<>();
     replacements.put("locale", locale);
-
     return interpolateOpenExternalURL(dip, replacements);
   }
 

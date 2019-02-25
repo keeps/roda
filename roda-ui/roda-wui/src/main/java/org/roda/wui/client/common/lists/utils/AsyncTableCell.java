@@ -215,16 +215,17 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
             @Override
             public void onFailure(Throwable caught) {
               callback.onFailure(caught);
-
             }
 
             @Override
             public void onSuccess(IndexResult<T> result) {
               setResult(result);
               callback.onSuccess(result);
+
               if(redirectOnSingleResult && originalFilter.equals(AsyncTableCell.this.getFilter()) && getVisibleItems().size() == 1){
                 HistoryUtils.resolve(getVisibleItems().get(0), true);
               }
+
               if (getVisibleItems().isEmpty()) {
                 AsyncTableCell.this.addStyleName("table-empty");
               } else {

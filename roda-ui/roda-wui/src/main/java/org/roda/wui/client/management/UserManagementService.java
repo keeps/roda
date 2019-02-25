@@ -10,6 +10,7 @@
  */
 package org.roda.wui.client.management;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
@@ -58,7 +59,7 @@ public interface UserManagementService extends RemoteService {
 
       UserManagementServiceAsync instance = (UserManagementServiceAsync) GWT.create(UserManagementService.class);
       ServiceDefTarget target = (ServiceDefTarget) instance;
-      target.setServiceEntryPoint(GWT.getModuleBaseURL() + SERVICE_URI);
+      target.setServiceEntryPoint(GWT.getHostPageBaseURL()  + RodaConstants.GWT_RPC_BASE_URL + SERVICE_URI);
       return instance;
     }
   }

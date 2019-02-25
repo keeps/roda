@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 2.7.0//EN" "http://google-web-toolkit.googlecode.com/svn/tags/2.7.0/distro-source/core/src/gwt-module.dtd">
+<module>
+	<!-- Inherit the core Web Toolkit stuff. -->
+	<inherits name='com.google.gwt.user.User' />
+	<inherits name="com.google.gwt.http.HTTP" />
+	<inherits name="com.google.gwt.logging.Logging" />
+	<inherits name="com.google.gwt.resources.Resources" />
+	<source path="client" />
+
+	<!-- I18N -->
+	<extend-property name="locale" values="en" />
+	<extend-property name="locale" values="pt_PT" />
+	<extend-property name="locale" values="es_CL" />
+	<set-property-fallback name="locale" value="en"/>
+
+	<!-- Locale -->
+	<set-configuration-property name="locale.useragent" value="Y"/>
+	<set-configuration-property name="locale.searchorder" value="queryparam,cookie,meta,useragent"/>
+	
+	<!-- GSS -->
+	<set-configuration-property name="CssResource.enableGss" value="true" />
+	<set-configuration-property name="CssResource.gssDefaultInUiBinder" value="true" />
+	<!-- Still needing conversion mode because default CellTable style is still provided in CSS instead of GSS  -->
+	<set-configuration-property name="CssResource.conversionMode" value="strict" />
+	
+
+	<!-- Inherit required libraries -->
+	<inherits name="com.github.nmorel.gwtjackson.GwtJackson" />
+
+	<!-- Inherit sub-projects -->
+	<!-- TODO: Remove the Common sub-module -->
+	<inherits name='org.roda.wui.common.Common' />
+
+	<!-- <inherits name='com.google.gwt.user.theme.standard.Standard' /> -->
+	<!-- <inherits name="com.google.gwt.user.theme.chrome.Chrome" /> -->
+	<!-- <inherits name="com.google.gwt.user.theme.dark.Dark" /> -->
+
+	<!-- Specify the app entry point class. -->
+	<entry-point class='org.roda.wui.client.portal.MainPortal' />
+	<!-- <stylesheet src="Main.css" /> Replaced by MyResources -->
+	<stylesheet src="../api/v1/theme?resource_id=theme.css" />
+	<stylesheet src="../api/v1/theme?resource_id=printing.css" />
+	
+</module>
