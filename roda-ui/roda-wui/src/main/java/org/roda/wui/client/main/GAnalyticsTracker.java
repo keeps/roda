@@ -9,6 +9,7 @@ package org.roda.wui.client.main;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.wui.common.client.tools.ConfigurationManager;
+import org.roda.wui.common.client.tools.StringUtils;
 
 public class GAnalyticsTracker {
 
@@ -27,19 +28,22 @@ public class GAnalyticsTracker {
    * @param historyToken
    */
   public static void track(String historyToken) {
-    final String page = "/#" + historyToken;
 
-    if (accountId == null) {
+    if (StringUtils.isBlank(accountId)) {
       accountId = ConfigurationManager.getString(RodaConstants.UI_GOOGLE_ANALYTICS_CODE_PROPERTY);
-      setAccount(accountId);
+      if (StringUtils.isNotBlank(accountId)) {
+        setAccount(accountId);
+      }
     }
 
-    pageview(page);
+    if (StringUtils.isNotBlank(accountId)) {
+      pageview("/#" + historyToken);
+    }
   }
 
   private static native void setAccount(String accountId)
   /*-{
-  	$wnd.ga('create', accountId, 'auto');
+		$wnd.ga('create', accountId, 'auto');
   }-*/;
 
   /**
@@ -49,8 +53,8 @@ public class GAnalyticsTracker {
    */
   private static native void pageview(String page)
   /*-{
-    $wnd.ga('set', 'page', page);
-    $wnd.ga('send', 'pageview');
+		$wnd.ga('set', 'page', page);
+		$wnd.ga('send', 'pageview');
   }-*/;
 
 }
