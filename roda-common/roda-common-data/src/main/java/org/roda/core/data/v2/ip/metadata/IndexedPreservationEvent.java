@@ -10,6 +10,7 @@ package org.roda.core.data.v2.ip.metadata;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -36,6 +37,8 @@ public class IndexedPreservationEvent implements IsIndexed, HasId, HasPermission
   private List<LinkingIdentifier> linkingAgentIds;
   private List<LinkingIdentifier> outcomeObjectIds;
   private List<LinkingIdentifier> sourcesObjectIds;
+  
+  private Map<String, Object> fields;
 
   @Override
   public String getId() {
@@ -164,6 +167,20 @@ public class IndexedPreservationEvent implements IsIndexed, HasId, HasPermission
   public List<String> liteFields() {
     return Arrays.asList(RodaConstants.PRESERVATION_EVENT_AIP_ID, RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID,
       RodaConstants.PRESERVATION_EVENT_FILE_UUID, RodaConstants.INDEX_UUID);
+  }
+
+  /**
+   * @return the fields
+   */
+  public Map<String, Object> getFields() {
+    return fields;
+  }
+
+  /**
+   * @param fields the fields to set
+   */
+  public void setFields(Map<String, Object> fields) {
+    this.fields = fields;
   }
 
 }

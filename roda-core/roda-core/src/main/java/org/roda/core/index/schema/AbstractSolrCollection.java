@@ -8,7 +8,9 @@
 package org.roda.core.index.schema;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
@@ -124,6 +126,12 @@ public abstract class AbstractSolrCollection<I extends IsIndexed, M extends IsMo
         Permissions permissions = SolrUtils.getPermissions(doc);
         ((HasPermissions) ret).setPermissions(permissions);
       }
+
+      Map<String, Object> indexedFields = new HashMap<>();
+      for (String field : fieldsToReturn) {
+        indexedFields.put(field, doc.get(field));
+      }
+      ret.setFields(indexedFields);
 
     } catch (InstantiationException | IllegalAccessException e) {
       throw new GenericException(e);

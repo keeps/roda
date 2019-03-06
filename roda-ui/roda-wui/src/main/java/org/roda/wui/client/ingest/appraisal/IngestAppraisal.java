@@ -10,13 +10,11 @@
  */
 package org.roda.wui.client.ingest.appraisal;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -25,16 +23,12 @@ import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.AipActions;
-import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
-import org.roda.wui.client.common.lists.AIPList;
-import org.roda.wui.client.common.lists.RepresentationList;
-import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
+import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.common.search.SearchWrapper;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -46,7 +40,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -116,15 +109,16 @@ public class IngestAppraisal extends Composite {
       });
 
     // prepare lists
-    ListBuilder<IndexedAIP> aipListBuilder = new ListBuilder<>(() -> new AIPList(),
+    ListBuilder<IndexedAIP> aipListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
       new AsyncTableCellOptions<>(IndexedAIP.class, "IngestAppraisal_searchAIPs").withJustActive(false)
         .withFilter(BASE_FILTER).bindOpener().withActionable(appraisalAipActions));
 
-    ListBuilder<IndexedRepresentation> representationListBuilder = new ListBuilder<>(() -> new RepresentationList(),
+    ListBuilder<IndexedRepresentation> representationListBuilder = new ListBuilder<>(
+      () -> new ConfigurableAsyncTableCell<>(),
       new AsyncTableCellOptions<>(IndexedRepresentation.class, "IngestAppraisal_searchRepresentations")
         .withJustActive(false).withFilter(BASE_FILTER).bindOpener());
 
-    ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new SearchFileList(true),
+    ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
       new AsyncTableCellOptions<>(IndexedFile.class, "IngestAppraisal_searchFiles").withJustActive(false)
         .withFilter(BASE_FILTER).bindOpener());
 

@@ -10,6 +10,7 @@ package org.roda.core.data.v2.ip;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -38,6 +39,8 @@ public class TransferredResource implements IsModelObject, IsIndexed, HasId, Set
   private Date lastScanDate;
   private String name;
   private boolean file;
+  
+  private Map<String, Object> fields;
 
   @JsonIgnore
   @Override
@@ -263,5 +266,19 @@ public class TransferredResource implements IsModelObject, IsIndexed, HasId, Set
   @Override
   public List<String> liteFields() {
     return Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.TRANSFERRED_RESOURCE_FULLPATH);
+  }
+
+  /**
+   * @return the fields
+   */
+  public Map<String, Object> getFields() {
+    return fields;
+  }
+
+  /**
+   * @param fields the fields to set
+   */
+  public void setFields(Map<String, Object> fields) {
+    this.fields = fields;
   }
 }

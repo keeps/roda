@@ -9,6 +9,7 @@ package org.roda.core.data.v2.ip.metadata;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -23,6 +24,8 @@ public class IndexedPreservationAgent implements IsIndexed, HasId {
   private String note;
   private String extension;
   private List<String> roles;
+
+  private Map<String, Object> fields;
 
   public IndexedPreservationAgent() {
     super();
@@ -109,6 +112,21 @@ public class IndexedPreservationAgent implements IsIndexed, HasId {
   @Override
   public List<String> liteFields() {
     return Arrays.asList(RodaConstants.INDEX_UUID);
+  }
+
+  /**
+   * @return the fields
+   */
+  public Map<String, Object> getFields() {
+    return fields;
+  }
+
+  /**
+   * @param fields
+   *          the fields to set
+   */
+  public void setFields(Map<String, Object> fields) {
+    this.fields = fields;
   }
 
 }

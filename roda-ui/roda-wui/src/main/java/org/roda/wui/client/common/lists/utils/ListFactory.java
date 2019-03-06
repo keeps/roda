@@ -32,18 +32,15 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
-import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.DIPFileList;
 import org.roda.wui.client.common.lists.DIPList;
 import org.roda.wui.client.common.lists.JobList;
 import org.roda.wui.client.common.lists.LogEntryList;
 import org.roda.wui.client.common.lists.NotificationList;
 import org.roda.wui.client.common.lists.RepresentationInformationList;
-import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
 import org.roda.wui.client.common.lists.RiskList;
 import org.roda.wui.client.common.lists.RodaMemberList;
-import org.roda.wui.client.common.lists.SimpleFileList;
 import org.roda.wui.client.common.lists.SimpleJobReportList;
 import org.roda.wui.client.common.lists.TransferredResourceList;
 
@@ -63,14 +60,14 @@ public class ListFactory {
 
     if (actualClass.equals(AIP.class.getName()) || actualClass.equals(IndexedAIP.class.getName())) {
       options = new AsyncTableCellOptions<>(IndexedAIP.class, listIdPrefix + "_AIP");
-      listConstructor = () -> new AIPList();
+      listConstructor = () -> new ConfigurableAsyncTableCell<>();
     } else if (actualClass.equals(Representation.class.getName())
       || actualClass.equals(IndexedRepresentation.class.getName())) {
       options = new AsyncTableCellOptions<>(IndexedRepresentation.class, listIdPrefix + "_representation");
-      listConstructor = () -> new RepresentationList();
+      listConstructor = () -> new ConfigurableAsyncTableCell<>();
     } else if (actualClass.equals(File.class.getName()) || actualClass.equals(IndexedFile.class.getName())) {
       options = new AsyncTableCellOptions<>(IndexedFile.class, listIdPrefix + "_simpleFile");
-      listConstructor = () -> new SimpleFileList();
+      listConstructor = () -> new ConfigurableAsyncTableCell<>();
     } else if (actualClass.equals(RepresentationInformation.class.getName())) {
       options = new AsyncTableCellOptions<>(RepresentationInformation.class,
         listIdPrefix + "_representationInformation");

@@ -394,9 +394,8 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState {
     return fields;
   }
 
-  public IndexedAIP setFields(Map<String, Object> fields) {
+  public void setFields(Map<String, Object> fields) {
     this.fields = fields;
-    return this;
   }
 
   @Override

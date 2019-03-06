@@ -70,6 +70,8 @@ public class Job implements IsModelObject, IsIndexed, HasId {
   // objects to act upon (All, None, List, Filter, etc.)
   private SelectedItems<? extends IsRODAObject> sourceObjects = null;
   private String outcomeObjectsClass = "";
+  
+  private Map<String, Object> fields;
 
   public Job() {
     super();
@@ -263,6 +265,20 @@ public class Job implements IsModelObject, IsIndexed, HasId {
   @Override
   public List<String> liteFields() {
     return Arrays.asList(RodaConstants.INDEX_UUID);
+  }
+
+  /**
+   * @return the fields
+   */
+  public Map<String, Object> getFields() {
+    return fields;
+  }
+
+  /**
+   * @param fields the fields to set
+   */
+  public void setFields(Map<String, Object> fields) {
+    this.fields = fields;
   }
 
 }

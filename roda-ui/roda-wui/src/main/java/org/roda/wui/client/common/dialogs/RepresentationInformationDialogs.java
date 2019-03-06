@@ -37,12 +37,11 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.common.IncrementalList;
 import org.roda.wui.client.common.ValuedLabel;
-import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.RepresentationInformationList;
-import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SimpleFileList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
+import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.Dropdown;
 import org.roda.wui.client.common.search.SearchWrapper;
@@ -258,19 +257,19 @@ public class RepresentationInformationDialogs {
                 Filter tableFilter = new Filter(new OrFiltersParameters(filterList));
 
                 if (SEARCH_ITEMS.equals(dropDown.getSelectedValue())) {
-                  listBuilder = new ListBuilder<>(() -> new AIPList(),
+                  listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
                     new AsyncTableCellOptions<>(IndexedAIP.class, aipListId).withFilter(tableFilter)
                       .withJustActive(true).withCsvDownloadButtonVisibility(false)
                       .withRecenteringOfParentDialog(dialogBox));
 
                 } else if (SEARCH_REPRESENTATIONS.equals(dropDown.getSelectedValue())) {
-                  listBuilder = new ListBuilder<>(() -> new RepresentationList(),
+                  listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
                     new AsyncTableCellOptions<>(IndexedRepresentation.class, representationsListId)
                       .withFilter(tableFilter).withJustActive(true).withCsvDownloadButtonVisibility(false)
                       .withRecenteringOfParentDialog(dialogBox));
 
                 } else if (SEARCH_FILES.equals(dropDown.getSelectedValue())) {
-                  listBuilder = new ListBuilder<>(() -> new SimpleFileList(),
+                  listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
                     new AsyncTableCellOptions<>(IndexedFile.class, filesListId).withFilter(tableFilter)
                       .withJustActive(true).withCsvDownloadButtonVisibility(false)
                       .withRecenteringOfParentDialog(dialogBox));

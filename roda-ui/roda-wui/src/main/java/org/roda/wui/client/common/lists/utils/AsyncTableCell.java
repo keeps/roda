@@ -112,6 +112,8 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static final ClientLogger LOGGER = new ClientLogger(AsyncTableCell.class.getName());
 
+  private AsyncTableCellOptions<T> options;
+
   private Class<T> classToReturn;
   private String listId;
   private Actionable<T> actionable;
@@ -136,6 +138,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   private Facets facets;
   private boolean selectable;
   private List<String> fieldsToReturn;
+
   private HandlerRegistration facetsValueChangedHandlerRegistration;
 
   private int initialPageSize;
@@ -154,7 +157,6 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   private Timer autoUpdateTimer = null;
   private int autoUpdateTimerMillis = 0;
   private AutoUpdateState autoUpdateState = AutoUpdateState.AUTO_UPDATE_OFF;
-  private String autoUpdateErrorMessage = "";
   private AccessibleFocusPanel autoUpdatePanel;
   private InlineHTML autoUpdateSignal = new InlineHTML("");
   private HandlerRegistration autoUpdateHandler;
@@ -168,6 +170,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
   AsyncTableCell<T> initialize(AsyncTableCellOptions<T> options) {
     adjustOptions(options);
+    this.options = options;
 
     this.classToReturn = options.getClassToReturn();
     this.initialPageSize = options.getInitialPageSize();
@@ -221,8 +224,8 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
             public void onSuccess(IndexResult<T> result) {
               setResult(result);
               callback.onSuccess(result);
-
-              if(redirectOnSingleResult && originalFilter.equals(AsyncTableCell.this.getFilter()) && getVisibleItems().size() == 1){
+              if (redirectOnSingleResult && originalFilter.equals(AsyncTableCell.this.getFilter())
+                && getVisibleItems().size() == 1) {
                 HistoryUtils.resolve(getVisibleItems().get(0), true);
               }
 
@@ -370,6 +373,13 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
   protected void adjustOptions(AsyncTableCellOptions<T> options) {
     // override this to add defaults or enforce rules
+  }
+
+  /**
+   * @return the options
+   */
+  public AsyncTableCellOptions<T> getOptions() {
+    return options;
   }
 
   private void toggleSidePanel(boolean toggle) {
@@ -962,6 +972,9 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     if (nowrap && alignRight) {
       header.setHeaderStyleNames("nowrap text-align-right");
       column.setCellStyleNames("nowrap text-align-right");
+    } else if (alignRight) {
+      header.setHeaderStyleNames("text-align-right");
+      column.setCellStyleNames("text-align-right");
     } else if (nowrap) {
       header.setHeaderStyleNames("cellTableFadeOut");
       column.setCellStyleNames("cellTableFadeOut");
@@ -1131,8 +1144,8 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
       FlowPanel facetAndTitle = new FlowPanel();
       facetAndTitle.addStyleName("sidebar-facet-panel");
 
-      String title = ConfigurationManager.getTranslation(RodaConstants.I18N_UI_FACETS_PREFIX,
-        getClassToReturn().getSimpleName(), facetParameter.getName());
+      String title = ConfigurationManager.getTranslationWithDefault(facetParameter.getName(),
+        RodaConstants.I18N_UI_FACETS_PREFIX, getClassToReturn().getSimpleName(), facetParameter.getName());
 
       Label titleLabel = new Label(title);
       titleLabel.addStyleName("h5");
@@ -1188,9 +1201,8 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
       autoUpdateSignal.setHTML(
         "<i class='fas fa-sync fa-spin' title='" + messages.tableUpdating() + "' style='cursor: pointer'></i>");
     } else if (autoUpdateState.equals(AutoUpdateState.AUTO_UPDATE_PAUSED)) {
-      autoUpdateSignal.setHTML(
-        "<i class='fas fa-pause-circle' title='" + messages.tableUpdatePause()
-          + "' style='cursor: pointer; color: #222'></i>");
+      autoUpdateSignal.setHTML("<i class='fas fa-pause-circle' title='" + messages.tableUpdatePause()
+        + "' style='cursor: pointer; color: #222'></i>");
 
       clickHandler = event -> resumeAutoUpdate();
     } else if (autoUpdateState.equals(AutoUpdateState.AUTO_UPDATE_ERROR)) {

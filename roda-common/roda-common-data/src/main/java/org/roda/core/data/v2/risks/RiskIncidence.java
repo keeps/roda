@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -49,6 +50,8 @@ public class RiskIncidence implements IsModelObject, IsIndexed, HasId {
   private Date mitigatedOn = null;
   private String mitigatedBy = null;
   private String mitigatedDescription = null;
+  
+  private Map<String, Object> fields;
 
   public RiskIncidence() {
     super();
@@ -230,6 +233,20 @@ public class RiskIncidence implements IsModelObject, IsIndexed, HasId {
   @Override
   public List<String> liteFields() {
     return Arrays.asList(RodaConstants.INDEX_UUID);
+  }
+
+  /**
+   * @return the fields
+   */
+  public Map<String, Object> getFields() {
+    return fields;
+  }
+
+  /**
+   * @param fields the fields to set
+   */
+  public void setFields(Map<String, Object> fields) {
+    this.fields = fields;
   }
 
 }

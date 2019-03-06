@@ -10,6 +10,7 @@ package org.roda.core.data.v2.jobs;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -34,6 +35,8 @@ public class IndexedReport extends Report implements IsIndexed {
   private List<String> successfulPlugins = new ArrayList<>();
   private List<String> unsuccessfulPlugins = new ArrayList<>();
   private int unsuccessfulPluginsCounter = 0;
+  
+  private Map<String, Object> fields;
 
   public IndexedReport() {
     super();
@@ -135,5 +138,19 @@ public class IndexedReport extends Report implements IsIndexed {
   @Override
   public List<String> liteFields() {
     return Arrays.asList(RodaConstants.JOB_REPORT_JOB_ID, RodaConstants.INDEX_UUID);
+  }
+
+  /**
+   * @return the fields
+   */
+  public Map<String, Object> getFields() {
+    return fields;
+  }
+
+  /**
+   * @param fields the fields to set
+   */
+  public void setFields(Map<String, Object> fields) {
+    this.fields = fields;
   }
 }

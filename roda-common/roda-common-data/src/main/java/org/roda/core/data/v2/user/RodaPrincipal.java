@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.roda.core.data.v2.IsModelObject;
@@ -28,6 +29,8 @@ public abstract class RodaPrincipal implements Serializable, RODAMember, IsModel
 
   private Set<String> allRoles = new HashSet<>();
   private Set<String> directRoles = new HashSet<>();
+  
+  private Map<String, Object> fields;
 
   public RodaPrincipal() {
     this(null, null);
@@ -230,6 +233,20 @@ public abstract class RodaPrincipal implements Serializable, RODAMember, IsModel
   @Override
   public List<Object> toCsvValues() {
     return Arrays.asList(id, name, fullName, isActive(), isUser(), allRoles, directRoles);
+  }
+
+  /**
+   * @return the fields
+   */
+  public Map<String, Object> getFields() {
+    return fields;
+  }
+
+  /**
+   * @param fields the fields to set
+   */
+  public void setFields(Map<String, Object> fields) {
+    this.fields = fields;
   }
 
 }

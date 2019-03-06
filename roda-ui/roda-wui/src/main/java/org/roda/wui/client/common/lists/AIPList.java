@@ -18,6 +18,7 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
+import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -35,6 +36,11 @@ import com.google.gwt.user.cellview.client.TextColumn;
 
 import config.i18n.client.ClientMessages;
 
+/**
+ * 
+ * @deprecated Use {@link ConfigurableAsyncTableCell} instead.
+ */
+@Deprecated
 public class AIPList extends AsyncTableCell<IndexedAIP> {
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());

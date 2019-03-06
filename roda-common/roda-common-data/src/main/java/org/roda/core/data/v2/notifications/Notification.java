@@ -43,6 +43,8 @@ public class Notification implements IsModelObject, IsIndexed, HasId {
   private boolean isAcknowledged = false;
   private Map<String, String> acknowledgedUsers = null;
   private NOTIFICATION_STATE state;
+  
+  private Map<String, Object> fields;
 
   public Notification() {
     super();
@@ -183,5 +185,19 @@ public class Notification implements IsModelObject, IsIndexed, HasId {
   @Override
   public List<String> liteFields() {
     return Arrays.asList(RodaConstants.INDEX_UUID);
+  }
+
+  /**
+   * @return the fields
+   */
+  public Map<String, Object> getFields() {
+    return fields;
+  }
+
+  /**
+   * @param fields the fields to set
+   */
+  public void setFields(Map<String, Object> fields) {
+    this.fields = fields;
   }
 }

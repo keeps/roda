@@ -10,6 +10,7 @@ package org.roda.core.data.v2.log;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -51,6 +52,8 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
   private List<LogEntryParameter> parameters;
 
   private LOG_ENTRY_STATE state;
+  
+  private Map<String, Object> fields;
 
   /**
    * Constructs an empty {@link LogEntry}.
@@ -126,6 +129,20 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
   public List<String> toCsvHeaders() {
     return Arrays.asList("uuid", "id", "address", "datetime", "username", "actionComponent", "actionMethod",
       "relatedObjectID", "duration", "parameters", "state");
+  }
+
+  /**
+   * @return the fields
+   */
+  public Map<String, Object> getFields() {
+    return fields;
+  }
+
+  /**
+   * @param fields the fields to set
+   */
+  public void setFields(Map<String, Object> fields) {
+    this.fields = fields;
   }
 
   @Override

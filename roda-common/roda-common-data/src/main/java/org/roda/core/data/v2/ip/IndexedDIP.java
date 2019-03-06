@@ -9,6 +9,7 @@ package org.roda.core.data.v2.ip;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -23,6 +24,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class IndexedDIP extends DIP implements IsIndexed {
   private static final long serialVersionUID = 4188689893034771594L;
   private String openExternalURL = "";
+
+  private Map<String, Object> fields;
 
   public IndexedDIP() {
     super();
@@ -78,6 +81,21 @@ public class IndexedDIP extends DIP implements IsIndexed {
   @Override
   public List<String> liteFields() {
     return Arrays.asList(RodaConstants.INDEX_UUID);
+  }
+
+  /**
+   * @return the fields
+   */
+  public Map<String, Object> getFields() {
+    return fields;
+  }
+
+  /**
+   * @param fields
+   *          the fields to set
+   */
+  public void setFields(Map<String, Object> fields) {
+    this.fields = fields;
   }
 
 }

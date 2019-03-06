@@ -9,8 +9,8 @@ package org.roda.wui.client.common.dialogs;
 
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
+import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 
 import com.google.gwt.core.client.GWT;
@@ -23,8 +23,9 @@ public class SelectAipDialog extends DefaultSelectDialog<IndexedAIP> {
   private static final String listId = "SelectAipDialog_AIPs";
 
   public SelectAipDialog(String title) {
-    super(title, new ListBuilder<>(() -> new AIPList(), new AsyncTableCellOptions<>(IndexedAIP.class, listId)
-      .withSummary(messages.selectAipSearchResults()).withJustActive(true)));
+    super(title,
+      new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(), new AsyncTableCellOptions<>(IndexedAIP.class, listId)
+        .withSummary(messages.selectAipSearchResults()).withJustActive(true)));
   }
 
   public SelectAipDialog(String title, Filter filter, boolean justActive) {
@@ -32,7 +33,8 @@ public class SelectAipDialog extends DefaultSelectDialog<IndexedAIP> {
   }
 
   public SelectAipDialog(String title, Filter filter, boolean justActive, boolean exportCsvVisible) {
-    super(title, new ListBuilder<>(() -> new AIPList(), new AsyncTableCellOptions<>(IndexedAIP.class, listId)
-      .withSummary(messages.selectAipSearchResults()).withJustActive(justActive).withFilter(filter)));
+    super(title,
+      new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(), new AsyncTableCellOptions<>(IndexedAIP.class, listId)
+        .withSummary(messages.selectAipSearchResults()).withJustActive(justActive).withFilter(filter)));
   }
 }

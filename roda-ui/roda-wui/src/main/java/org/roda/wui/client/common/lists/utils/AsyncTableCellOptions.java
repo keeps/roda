@@ -50,6 +50,10 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
   private boolean forceSelectable;
   private boolean redirectOnSingleResult;
 
+  private List<ColumnOptions> columnOptions;
+  private String defaultSortListColumnName;
+  private boolean defaultSortListAscending;
+
   public AsyncTableCellOptions(Class<T> classToReturn, String listId) {
     this.classToReturn = classToReturn;
     this.listId = listId;
@@ -75,6 +79,10 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
     searchPlaceholder = null;
     forceSelectable = false;
     redirectOnSingleResult = false;
+
+    columnOptions = ConfigurationManager.ColumnOptionsFactory.getColumnOptions(listId);
+    defaultSortListColumnName = null;
+    defaultSortListAscending = true;
   }
 
   public Class<T> getClassToReturn() {
@@ -273,12 +281,61 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
     return this;
   }
 
-  public AsyncTableCellOptions<T> withRedirectOnSingleResult(boolean redirectOnSingleResult){
+  public AsyncTableCellOptions<T> withRedirectOnSingleResult(boolean redirectOnSingleResult) {
     this.redirectOnSingleResult = redirectOnSingleResult;
     return this;
   }
 
-  public boolean getRedirectOnSingleResult(){
+  public boolean getRedirectOnSingleResult() {
     return redirectOnSingleResult;
   }
+
+  /**
+   * @return the columnOptions
+   */
+  public List<ColumnOptions> getColumnOptions() {
+    return columnOptions;
+  }
+
+  /**
+   * @param columnOptions
+   *          the columnOptions to set
+   */
+  public AsyncTableCellOptions<T> withColumnOptions(List<ColumnOptions> columnOptions) {
+    this.columnOptions = columnOptions;
+    return this;
+  }
+
+  /**
+   * @return the defaultSortListColumnName
+   */
+  public String getDefaultSortListColumnName() {
+    return defaultSortListColumnName;
+  }
+
+  /**
+   * @param defaultSortListColumnName
+   *          the defaultSortListColumnName to set
+   */
+  public AsyncTableCellOptions<T> withDefaultSortListColumnName(String defaultSortListColumnName) {
+    this.defaultSortListColumnName = defaultSortListColumnName;
+    return this;
+  }
+
+  /**
+   * @return the defaultSortListAscending
+   */
+  public boolean isDefaultSortListAscending() {
+    return defaultSortListAscending;
+  }
+
+  /**
+   * @param defaultSortListAscending
+   *          the defaultSortListAscending to set
+   */
+  public AsyncTableCellOptions<T> withDefaultSortListAscending(boolean defaultSortListAscending) {
+    this.defaultSortListAscending = defaultSortListAscending;
+    return this;
+  }
+
 }

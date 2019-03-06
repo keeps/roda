@@ -20,8 +20,8 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.AipActions;
-import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
+import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.ingest.transfer.TransferUpload;
@@ -123,10 +123,11 @@ public class BrowseTop extends Composite {
   TitlePanel title;
 
   private BrowseTop() {
-    // AIP LIST, it has the same id as the AIP children list because facets should
+    // AIP LIST, it has the same id as the AIP children list because facets
+    // should
     // be the same
 
-    ListBuilder<IndexedAIP> listBuilder = new ListBuilder<>(() -> new AIPList(),
+    ListBuilder<IndexedAIP> listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
       new AsyncTableCellOptions<>(IndexedAIP.class, "BrowseTop_aip")
         .withFilter(new Filter(new EmptyKeyFilterParameter(RodaConstants.AIP_PARENT_ID))).withJustActive(true)
         .withSummary(messages.listOfAIPs()).bindOpener().withActionable(AipActions.get()));

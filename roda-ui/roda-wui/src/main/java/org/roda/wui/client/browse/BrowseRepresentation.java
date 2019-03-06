@@ -36,8 +36,8 @@ import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.DisseminationActions;
 import org.roda.wui.client.common.actions.FileActions;
 import org.roda.wui.client.common.lists.DIPList;
-import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
+import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.slider.Sliders;
@@ -237,7 +237,6 @@ public class BrowseRepresentation extends Composite {
 
     final AIPState state = aip.getState();
     final boolean justActive = AIPState.ACTIVE.equals(state);
-    boolean showFilesPath = false;
 
     LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
 
@@ -246,7 +245,7 @@ public class BrowseRepresentation extends Composite {
     Filter filesFilter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, repUUID),
       new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
 
-    ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new SearchFileList(showFilesPath),
+    ListBuilder<IndexedFile> fileListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
       new AsyncTableCellOptions<>(IndexedFile.class, "BrowseRepresentation_files").withFilter(filesFilter)
         .withJustActive(justActive).withSummary(summary).bindOpener()
         .withActionable(FileActions.get(aipId, repId, aip.getPermissions())));

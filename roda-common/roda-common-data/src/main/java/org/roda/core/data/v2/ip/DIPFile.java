@@ -8,7 +8,9 @@
 package org.roda.core.data.v2.ip;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -34,6 +36,8 @@ public class DIPFile implements IsModelObject, IsIndexed, HasId, SetsUUID, HasPe
   private long size = 0;
   private boolean isDirectory;
   private String storagePath;
+  
+  private Map<String, Object> fields = new HashMap<>();
 
   public DIPFile() {
     super();
@@ -235,5 +239,19 @@ public class DIPFile implements IsModelObject, IsIndexed, HasId, SetsUUID, HasPe
   @Override
   public List<String> liteFields() {
     return Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.DIPFILE_DIP_ID, RodaConstants.DIPFILE_ID);
+  }
+
+  /**
+   * @return the fields
+   */
+  public Map<String, Object> getFields() {
+    return fields;
+  }
+
+  /**
+   * @param fields the fields to set
+   */
+  public void setFields(Map<String, Object> fields) {
+    this.fields = fields;
   }
 }

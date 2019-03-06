@@ -37,10 +37,9 @@ import org.roda.wui.client.common.actions.DisseminationActions;
 import org.roda.wui.client.common.actions.RepresentationActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
-import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.DIPList;
-import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
+import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.slider.Sliders;
@@ -224,7 +223,7 @@ public class BrowseAIP extends Composite {
 
     // REPRESENTATIONS
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)) {
-      ListBuilder<IndexedRepresentation> representationsListBuilder = new ListBuilder<>(() -> new RepresentationList(),
+      ListBuilder<IndexedRepresentation> representationsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
         new AsyncTableCellOptions<>(IndexedRepresentation.class, "BrowseAIP_representations")
           .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aip.getId())))
           .withJustActive(justActive).withSummary(messages.listOfRepresentations()).bindOpener()
@@ -257,7 +256,7 @@ public class BrowseAIP extends Composite {
 
     // AIP CHILDREN
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
-      ListBuilder<IndexedAIP> aipChildrenListBuilder = new ListBuilder<>(() -> new AIPList(),
+      ListBuilder<IndexedAIP> aipChildrenListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
         new AsyncTableCellOptions<>(IndexedAIP.class, "BrowseAIP_aipChildren")
           .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId())))
           .withJustActive(justActive).withSummary(messages.listOfAIPs()).bindOpener().withActionable(aipActions)

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -46,6 +47,8 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
   private String createdBy = null;
   private Date updatedOn = null;
   private String updatedBy = null;
+  
+  private Map<String, Object> fields;
 
   public RepresentationInformation() {
     super();
@@ -193,6 +196,20 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
   @Override
   public List<String> liteFields() {
     return Arrays.asList(RodaConstants.INDEX_UUID);
+  }
+
+  /**
+   * @return the fields
+   */
+  public Map<String, Object> getFields() {
+    return fields;
+  }
+
+  /**
+   * @param fields the fields to set
+   */
+  public void setFields(Map<String, Object> fields) {
+    this.fields = fields;
   }
 
   @Override

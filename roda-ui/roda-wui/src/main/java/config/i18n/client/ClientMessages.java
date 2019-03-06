@@ -1823,6 +1823,8 @@ public interface ClientMessages extends Messages {
   /************* TO BE ORGANIZED *************************/
 
   String aipLevel();
+  
+  SafeHtml defaultColumnHeader(@Select String field);
 
   String pluginStateMessage(@Select PluginState state);
 

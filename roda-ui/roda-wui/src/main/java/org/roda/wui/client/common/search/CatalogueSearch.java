@@ -30,6 +30,7 @@ import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
+import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.common.client.ClientLogger;
@@ -81,11 +82,11 @@ public class CatalogueSearch extends Composite {
       if (classFilters.containsKey(searchableClass.getSimpleName())) {
 
         Filter filter = classFilters.get(searchableClass.getSimpleName());
-        ListBuilder listBuilder = null;
+        ListBuilder<?> listBuilder = null;
         if (searchableClass.equals(IndexedAIP.class)
           && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
 
-          listBuilder = new ListBuilder<>(() -> new AIPList(),
+          listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
             new AsyncTableCellOptions<>(IndexedAIP.class, itemsListId)
               .withActionable(AipActions.getWithoutNoAipActions(null, AIPState.ACTIVE, permissions))
               .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
@@ -93,7 +94,7 @@ public class CatalogueSearch extends Composite {
         } else if (searchableClass.equals(IndexedRepresentation.class)
           && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)) {
 
-          listBuilder = new ListBuilder<>(() -> new RepresentationList(),
+          listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
             new AsyncTableCellOptions<>(IndexedRepresentation.class, representationsListId)
               .withActionable(RepresentationActions.getWithoutNoRepresentationActions(null, null))
               .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
@@ -101,7 +102,7 @@ public class CatalogueSearch extends Composite {
         } else if (searchableClass.equals(IndexedFile.class)
           && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_FILE)) {
 
-          listBuilder = new ListBuilder<>(() -> new SearchFileList(true),
+          listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
             new AsyncTableCellOptions<>(IndexedFile.class, filesListId)
               .withActionable(FileActions.getWithoutNoFileActions(null, null, null, null))
               .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()

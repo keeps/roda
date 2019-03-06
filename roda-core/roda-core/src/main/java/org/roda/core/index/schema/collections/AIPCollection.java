@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -241,11 +240,6 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
       level = levels.isEmpty() ? null : levels.get(0);
     }
 
-    Map<String, Object> indexedFields = new HashMap<>();
-    for (String field : fieldsToReturn) {
-      indexedFields.put(field, doc.get(field));
-    }
-
     ret.setType(type);
     ret.setLevel(level);
     ret.setTitle(title);
@@ -261,7 +255,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     ret.setGhost(ghost);
     ret.setIngestSIPIds(ingestSIPIds).setIngestJobId(ingestJobId).setIngestUpdateJobIds(ingestUpdateJobIds)
       .setCreatedOn(createdOn).setCreatedBy(createdBy).setUpdatedOn(updatedOn).setUpdatedBy(updatedBy)
-      .setAllUpdateJobIds(allIngestJobIds).setFields(indexedFields);
+      .setAllUpdateJobIds(allIngestJobIds);
 
     return ret;
   }

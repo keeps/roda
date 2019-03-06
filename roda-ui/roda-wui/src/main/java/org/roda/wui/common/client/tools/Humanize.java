@@ -50,9 +50,7 @@ public class Humanize {
   protected static final NumberFormat NUMBER_FORMAT = NumberFormat.getFormat("#");
 
   public static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd");
-  public static final DateTimeFormat DATE_TIME_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss");
-  public static final DateTimeFormat DATE_TIME_MS_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss.SSS");
-  public static final DateTimeFormat DATE_TIME_FORMAT_TIMEZONE = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss z");
+  public static final DateTimeFormat DATE_TIME_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss z");
 
   private Humanize() {
     // do nothing
@@ -205,13 +203,8 @@ public class Humanize {
   }
 
   public static String formatDateTime(Date date) {
-    return applyDateTimeFormat(date, ConfigurationManager.getString(RodaConstants.UI_DATE_TIME_FORMAT_TIMEZONE_SIMPLE),
-      DATE_TIME_FORMAT_TIMEZONE);
-  }
-
-  public static String formatDateTimeMs(Date date) {
-    return applyDateTimeFormat(date, ConfigurationManager.getString(RodaConstants.UI_DATE_TIME_MS_FORMAT_SIMPLE),
-      DATE_TIME_MS_FORMAT);
+    return applyDateTimeFormat(date, ConfigurationManager.getString(RodaConstants.UI_DATE_TIME_FORMAT_SIMPLE),
+      DATE_TIME_FORMAT);
   }
 
   private static String applyDateTimeFormat(Date date, String stringFormat, DateTimeFormat defaultValue) {

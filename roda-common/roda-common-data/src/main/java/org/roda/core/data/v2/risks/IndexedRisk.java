@@ -9,6 +9,7 @@ package org.roda.core.data.v2.risks;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -23,6 +24,8 @@ public class IndexedRisk extends Risk implements IsIndexed {
   private static final long serialVersionUID = 2864416437668370485L;
   private int incidencesCount = 0;
   private int unmitigatedIncidencesCount = 0;
+  
+  private Map<String, Object> fields;
 
   public IndexedRisk() {
     super();
@@ -83,6 +86,20 @@ public class IndexedRisk extends Risk implements IsIndexed {
   @Override
   public List<String> liteFields() {
     return Arrays.asList(RodaConstants.INDEX_UUID);
+  }
+
+  /**
+   * @return the fields
+   */
+  public Map<String, Object> getFields() {
+    return fields;
+  }
+
+  /**
+   * @param fields the fields to set
+   */
+  public void setFields(Map<String, Object> fields) {
+    this.fields = fields;
   }
 
   @Override

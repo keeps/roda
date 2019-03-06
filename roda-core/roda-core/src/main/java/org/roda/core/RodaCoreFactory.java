@@ -234,9 +234,10 @@ public class RodaCoreFactory {
     Arrays.asList("roda-core.properties", "roda-roles.properties", "roda-permissions.properties"));
 
   /**
-   * Shared configuration and message properties (cache). Includes properties from
-   * {@code rodaConfiguration} and translations from ServerMessages, filtered by
-   * the {@code ui.sharedProperties.*} properties in {@code roda-wui.properties}.
+   * Shared configuration and message properties (cache). Includes properties
+   * from {@code rodaConfiguration} and translations from ServerMessages,
+   * filtered by the {@code ui.sharedProperties.*} properties in
+   * {@code roda-wui.properties}.
    *
    * This cache provides the complete set of properties to be shared with the
    * client browser.
@@ -504,11 +505,11 @@ public class RodaCoreFactory {
 
   /**
    * Try to get property from 1) system property (passed in command-line via -D;
-   * if property does not start by "roda.", it will be prepended); 2) environment
-   * variable (upper case, replace '.' by '_' and if property does not start by
-   * "RODA_" after replacements, it will be prepended); 3) RODA configuration
-   * files (with original property value, ensuring that it does not start by
-   * "roda."); 4) return default value
+   * if property does not start by "roda.", it will be prepended); 2)
+   * environment variable (upper case, replace '.' by '_' and if property does
+   * not start by "RODA_" after replacements, it will be prepended); 3) RODA
+   * configuration files (with original property value, ensuring that it does
+   * not start by "roda."); 4) return default value
    * 
    * <p>
    * Example 1: for property = 'roda.node.type' this method will try to find the
@@ -549,11 +550,11 @@ public class RodaCoreFactory {
 
   /**
    * Try to get property from 1) system property (passed in command-line via -D;
-   * if property does not start by "roda.", it will be prepended); 2) environment
-   * variable (upper case, replace '.' by '_' and if property does not start by
-   * "RODA_" after replacements, it will be prepended); 3) RODA configuration
-   * files (with original property value, ensuring that it does not start by
-   * "roda."); 4) return default value
+   * if property does not start by "roda.", it will be prepended); 2)
+   * environment variable (upper case, replace '.' by '_' and if property does
+   * not start by "RODA_" after replacements, it will be prepended); 3) RODA
+   * configuration files (with original property value, ensuring that it does
+   * not start by "roda."); 4) return default value
    * 
    * <p>
    * Example 1: for property = 'roda.node.type' this method will try to find the
@@ -578,11 +579,11 @@ public class RodaCoreFactory {
 
   /**
    * Try to get property from 1) system property (passed in command-line via -D;
-   * if property does not start by "roda.", it will be prepended); 2) environment
-   * variable (upper case, replace '.' by '_' and if property does not start by
-   * "RODA_" after replacements, it will be prepended); 3) RODA configuration
-   * files (with original property value, ensuring that it does not start by
-   * "roda."); 4) return default value
+   * if property does not start by "roda.", it will be prepended); 2)
+   * environment variable (upper case, replace '.' by '_' and if property does
+   * not start by "RODA_" after replacements, it will be prepended); 3) RODA
+   * configuration files (with original property value, ensuring that it does
+   * not start by "roda."); 4) return default value
    * 
    * <p>
    * Example 1: for property = 'roda.node.type' this method will try to find the
@@ -1757,7 +1758,7 @@ public class RodaCoreFactory {
       try {
         configUri = config.toUri().toURL();
       } catch (MalformedURLException e) {
-        LOGGER.error("Configuration {} doesn't exist", configurationFile);
+        LOGGER.error("Configuration {} is malformed: {}", configurationFile, e.getMessage());
         configUri = null;
       }
     } else {
@@ -1766,7 +1767,7 @@ public class RodaCoreFactory {
       if (resource != null) {
         configUri = resource;
       } else {
-        LOGGER.error("Configuration {} doesn't exist", configurationFile);
+        LOGGER.trace("Configuration {} doesn't exist", configurationFile);
         configUri = null;
       }
     }
@@ -1941,7 +1942,8 @@ public class RodaCoreFactory {
    * {@code rodaConfiguration}.
    *
    * The properties that should be shared with the client browser are defined by
-   * the {@code ui.sharedProperties.*} properties in {@code roda-wui.properties}.
+   * the {@code ui.sharedProperties.*} properties in
+   * {@code roda-wui.properties}.
    *
    * @return The configuration properties that should be shared with the client
    *         browser.

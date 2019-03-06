@@ -239,9 +239,8 @@ public class IndexedFile implements IsIndexed, HasId, SetsUUID, HasPermissionFil
     return fields;
   }
 
-  public IndexedFile setFields(Map<String, Object> fields) {
+  public void setFields(Map<String, Object> fields) {
     this.fields = fields;
-    return this;
   }
 
   @Override

@@ -8,6 +8,7 @@
 package org.roda.wui.common.client.tools;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -20,9 +21,12 @@ import org.roda.core.data.v2.index.facet.FacetParameter;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.RangeFacetParameter;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
+import org.roda.wui.client.common.lists.utils.ColumnOptions;
+import org.roda.wui.client.common.lists.utils.ColumnOptions.RenderingHint;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Style.Unit;
 
 /**
  * @author Bruno Ferreira <bferreira@keep.pt>
@@ -65,8 +69,30 @@ public class ConfigurationManager {
    *         the property value was null or the key is not present.
    */
   public static String getString(String... keyParts) {
+    return getStringWithDefault(null, keyParts);
+  }
+
+  /**
+   * @return The property value for the provided keyParts. Or {@code null} if
+   *         the property value was null or the key is not present.
+   */
+  public static String getStringWithDefault(String defaultValue, String... keyParts) {
     List<String> values = getStringList(keyParts);
-    return values.isEmpty() ? null : values.get(0);
+    return values.isEmpty() ? defaultValue : values.get(0);
+  }
+
+  public static <E extends Enum<E>> E getEnum(Class<E> enumType, E defaultValue, String... keyParts) {
+    E ret = defaultValue;
+    List<String> values = getStringList(keyParts);
+    if (!values.isEmpty()) {
+      try {
+        ret = Enum.valueOf(enumType, values.get(0));
+      } catch (IllegalArgumentException | NullPointerException e) {
+        logger.error("Error parsing enum " + values.get(0), e);
+        // proceed with returning the default
+      }
+    }
+    return ret;
   }
 
   /**
@@ -74,9 +100,13 @@ public class ConfigurationManager {
    *         translation was null or the key is not present.
    */
   public static String getTranslation(String... keyParts) {
+    return getTranslationWithDefault(null, keyParts);
+  }
+
+  public static String getTranslationWithDefault(String defaultValue, String... keyParts) {
     String translationKey = "i18n." + getConfigurationKey(keyParts);
     List<String> values = getStringList(translationKey);
-    return values.isEmpty() ? null : values.get(0);
+    return values.isEmpty() ? defaultValue : values.get(0);
   }
 
   /**
@@ -127,6 +157,23 @@ public class ConfigurationManager {
   }
 
   /**
+   * @return The double property value for the provided keyParts. Or
+   *         {@code defaultValue} if the property value was null, not an double
+   *         or the key is not present.
+   */
+  public static Double getDouble(Double defaultValue, String... keyParts) {
+    String value = getString(keyParts);
+    if (value != null) {
+      try {
+        return Double.valueOf(value);
+      } catch (NumberFormatException e) {
+        // proceed with returning the default
+      }
+    }
+    return defaultValue;
+  }
+
+  /**
    * @return The property value for the provided keyParts. Or {@code null} if
    *         the property value was null or the key is not present.
    */
@@ -148,9 +195,13 @@ public class ConfigurationManager {
    * @see RodaCoreFactory#getRodaConfigurationAsList
    */
   public static List<String> getStringList(String... keyParts) {
+    return getStringListWithDefault(new ArrayList<>(), keyParts);
+  }
+
+  public static List<String> getStringListWithDefault(List<String> defaultValue, String... keyParts) {
     String key = getConfigurationKey(keyParts);
     List<String> values = getConfigurationProperties().get(key);
-    return values != null ? values : new ArrayList<>();
+    return values != null ? values : defaultValue;
   }
 
   private static String getConfigurationKey(String... keyParts) {
@@ -194,7 +245,9 @@ public class ConfigurationManager {
     }
   }
 
-  private native void consoleLog(String message) /*-{ console.log(message); }-*/;
+  private native void consoleLog(String message) /*-{
+		console.log(message);
+  }-*/;
 
   public static class FacetFactory {
     private FacetFactory() {
@@ -221,7 +274,7 @@ public class ConfigurationManager {
     private static Map<String, FacetParameter> buildParameters(String listId, List<String> parameterNames) {
       Map<String, FacetParameter> parameters = new HashMap<>();
 
-      if (parameterNames.isEmpty() && instance.isDebugging()) {
+      if (parameterNames.isEmpty() && isDebugging()) {
         GWT.log("ConfigurationManager: list '" + listId + "' has no parameters.");
       }
 
@@ -352,5 +405,61 @@ public class ConfigurationManager {
         RodaConstants.UI_LISTS_FACETS_PARAMETERS_ARGS_MINCOUNT_PROPERTY);
     }
 
+  }
+
+  public static class KeyHelper {
+    private final List<String> namespace;
+
+    public KeyHelper(String... namespace) {
+      this.namespace = Arrays.asList(namespace);
+    }
+
+    public String[] key(String... keyParts) {
+      List<String> keyList = new ArrayList<>(namespace);
+      keyList.addAll(Arrays.asList(keyParts));
+      return keyList.toArray(new String[keyParts.length]);
+    }
+
+  }
+
+  public static class ColumnOptionsFactory {
+    private ColumnOptionsFactory() {
+      // do nothing
+    }
+
+    public static List<ColumnOptions> getColumnOptions(String listId) {
+      List<ColumnOptions> ret = new ArrayList<>();
+
+      List<String> columnNames = getStringList(RodaConstants.UI_LISTS_PROPERTY, listId,
+        RodaConstants.UI_LISTS_COLUMNS_PROPERTY);
+
+      for (String columnName : columnNames) {
+        ColumnOptions col = new ColumnOptions();
+        KeyHelper kh = new KeyHelper(RodaConstants.UI_LISTS_PROPERTY, listId, RodaConstants.UI_LISTS_COLUMNS_PROPERTY,
+          columnName);
+
+        col.setName(columnName);
+        String field = getStringWithDefault(columnName, kh.key(RodaConstants.UI_LISTS_COLUMNS_FIELD_PROPERTY));
+        col.setField(field);
+
+        String headerI18NKey = getStringWithDefault(columnName, kh.key(RodaConstants.UI_LISTS_COLUMNS_HEADER_PROPERTY));
+
+        col.setHeader(getTranslationWithDefault(columnName, headerI18NKey));
+        col.setNowrap(getBoolean(false, kh.key(RodaConstants.UI_LISTS_COLUMNS_NOWRAP_PROPERTY)));
+        col.setAlignRight(getBoolean(false, kh.key(RodaConstants.UI_LISTS_COLUMNS_ALIGNRIGHT_PROPERTY)));
+        col.setWidth(getDouble(0.0, kh.key(RodaConstants.UI_LISTS_COLUMNS_WIDTH_PROPERTY)));
+        col.setWidthUnit(getEnum(Unit.class, Unit.EM, kh.key(RodaConstants.UI_LISTS_COLUMNS_WIDTHUNIT_PROPERTY)));
+        col.setSortable(getBoolean(true, kh.key(RodaConstants.UI_LISTS_COLUMNS_SORTABLE_PROPERTY)));
+        col.setSortBy(
+          getStringListWithDefault(Arrays.asList(field), kh.key(RodaConstants.UI_LISTS_COLUMNS_SORTBY_PROPERTY)));
+        col.setRenderingHint(
+          getEnum(RenderingHint.class, null, kh.key(RodaConstants.UI_LISTS_COLUMNS_RENDERINGHINT_PROPERTY)));
+
+        ret.add(col);
+      }
+
+      return ret;
+
+    }
   }
 }

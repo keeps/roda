@@ -94,8 +94,6 @@ public final class RodaConstants {
   public static final String UI_DATE_FORMAT_TITLE = "ui.date.format.title";
   public static final String UI_DATE_FORMAT_SIMPLE = "ui.date.format.simple";
   public static final String UI_DATE_TIME_FORMAT_SIMPLE = "ui.dateTime.format.simple";
-  public static final String UI_DATE_TIME_MS_FORMAT_SIMPLE = "ui.dateTimeMs.format.simple";
-  public static final String UI_DATE_TIME_FORMAT_TIMEZONE_SIMPLE = "ui.dateTimeTimezone.format.simple";
 
   public static final String UI_COOKIES_ACTIVE_PROPERTY = "ui.cookies.active";
   public static final String UI_GOOGLE_ANALYTICS_CODE_PROPERTY = "ui.google.analytics.code";
@@ -124,6 +122,17 @@ public final class RodaConstants {
   public static final String UI_LISTS_SEARCH_SELECTEDINFO_LABEL_SELECTED_I18N_SINGLE_PROPERTY = "search.selectedInfo.label.selected.i18n.single";
   public static final String UI_LISTS_SEARCH_SELECTEDINFO_LABEL_SELECTED_I18N_MULTIPLE_PROPERTY = "search.selectedInfo.label.selected.i18n.multiple";
   public static final String UI_LISTS_SEARCH_SELECTEDINFO_LABEL_DEFAULT_I18N_PROPERTY = "search.selectedInfo.label.default.i18n";
+  
+  public static final String UI_LISTS_COLUMNS_PROPERTY = "columns[]";
+  public static final String UI_LISTS_COLUMNS_FIELD_PROPERTY = "field";
+  public static final String UI_LISTS_COLUMNS_HEADER_PROPERTY = "header";
+  public static final String UI_LISTS_COLUMNS_NOWRAP_PROPERTY = "nowrap";
+  public static final String UI_LISTS_COLUMNS_ALIGNRIGHT_PROPERTY = "alignRight";
+  public static final String UI_LISTS_COLUMNS_WIDTH_PROPERTY = "width";
+  public static final String UI_LISTS_COLUMNS_WIDTHUNIT_PROPERTY = "widthUnit";
+  public static final String UI_LISTS_COLUMNS_SORTABLE_PROPERTY = "sortable";
+  public static final String UI_LISTS_COLUMNS_SORTBY_PROPERTY = "sortBy";
+  public static final String UI_LISTS_COLUMNS_RENDERINGHINT_PROPERTY = "renderingHint";
 
   public static final String UI_ICONS_CLASS = "ui.icons.class";
 

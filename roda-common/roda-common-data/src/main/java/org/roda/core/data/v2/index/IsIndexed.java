@@ -8,6 +8,7 @@
 package org.roda.core.data.v2.index;
 
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.v2.IsRODAObject;
 
@@ -35,5 +36,19 @@ public interface IsIndexed extends IsRODAObject {
    * @return a {@link List} of {@link String} with the fields.
    */
   List<String> liteFields();
+
+  /**
+   * Return fields as they are indexed
+   * 
+   * @return
+   */
+  Map<String, Object> getFields();
+
+  /**
+   * Set fields as they are indexed
+   * 
+   * @return
+   */
+  void setFields(Map<String, Object> fields);
 
 }

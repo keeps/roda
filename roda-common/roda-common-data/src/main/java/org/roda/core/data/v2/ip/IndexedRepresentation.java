@@ -125,9 +125,8 @@ public class IndexedRepresentation extends Representation
     return fields;
   }
 
-  public IndexedRepresentation setFields(Map<String, Object> fields) {
+  public void setFields(Map<String, Object> fields) {
     this.fields = fields;
-    return this;
   }
 
   @Override
