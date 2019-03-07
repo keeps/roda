@@ -456,12 +456,12 @@ public class BrowserHelper {
 
   private static List<DescriptiveMetadata> orderDescriptiveMetadata(List<DescriptiveMetadata> metadata) {
     List<DescriptiveMetadata> orderedMetadata = new ArrayList<>();
-    boolean order = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("ui.browser.metadata.order"));
+    boolean order = RodaCoreFactory.getProperty("ui.browser.metadata.order", false);
+    List<DescriptiveMetadata> metadataCopy = new ArrayList<>(metadata);
 
     if (order) {
       List<String> metadataDefaultTypes = RodaCoreFactory
         .getRodaConfigurationAsList("ui.browser.metadata.descriptive.types");
-      List<DescriptiveMetadata> metadataCopy = new ArrayList<>(metadata);
 
       for (String metadataDefaultType : metadataDefaultTypes) {
         for (DescriptiveMetadata dm : metadata) {
@@ -472,10 +472,9 @@ public class BrowserHelper {
           }
         }
       }
-
-      orderedMetadata.addAll(metadataCopy);
     }
 
+    orderedMetadata.addAll(metadataCopy);
     return orderedMetadata;
   }
 
