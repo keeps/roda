@@ -442,7 +442,9 @@ public class BrowserHelper {
 
     // Can be null when the AIP is a ghost
     if (listDescriptiveMetadataBinaries != null) {
-      for (DescriptiveMetadata descriptiveMetadata : listDescriptiveMetadataBinaries) {
+      List<DescriptiveMetadata> orderedMetadata = orderDescriptiveMetadata(listDescriptiveMetadataBinaries);
+
+      for (DescriptiveMetadata descriptiveMetadata : orderedMetadata) {
         DescriptiveMetadataViewBundle bundle = retrieveDescriptiveMetadataBundle(aipId, representationId,
           descriptiveMetadata, locale);
         descriptiveMetadataList.add(bundle);
@@ -450,6 +452,31 @@ public class BrowserHelper {
     }
 
     return descriptiveMetadataList;
+  }
+
+  private static List<DescriptiveMetadata> orderDescriptiveMetadata(List<DescriptiveMetadata> metadata) {
+    List<DescriptiveMetadata> orderedMetadata = new ArrayList<>();
+    boolean order = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("ui.browser.metadata.order"));
+
+    if (order) {
+      List<String> metadataDefaultTypes = RodaCoreFactory
+        .getRodaConfigurationAsList("ui.browser.metadata.descriptive.types");
+      List<DescriptiveMetadata> metadataCopy = new ArrayList<>(metadata);
+
+      for (String metadataDefaultType : metadataDefaultTypes) {
+        for (DescriptiveMetadata dm : metadata) {
+          String id = StringUtils.isNotBlank(dm.getVersion()) ? dm.getType() + "_" + dm.getVersion() : dm.getType();
+          if (metadataDefaultType.equals(id)) {
+            orderedMetadata.add(dm);
+            metadataCopy.remove(dm);
+          }
+        }
+      }
+
+      orderedMetadata.addAll(metadataCopy);
+    }
+
+    return orderedMetadata;
   }
 
   private static DescriptiveMetadataViewBundle retrieveDescriptiveMetadataBundle(String aipId, String representationId,
@@ -907,8 +934,9 @@ public class BrowserHelper {
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
       ModelService model = RodaCoreFactory.getModelService();
       List<Pair<String, String>> htmlDescriptives = new ArrayList<>();
+      List<DescriptiveMetadata> orderedMetadata = orderDescriptiveMetadata(metadata);
 
-      for (DescriptiveMetadata dm : metadata) {
+      for (DescriptiveMetadata dm : orderedMetadata) {
         Binary descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, dm.getId());
         DescriptiveMetadata descriptiveMetadata = model.retrieveDescriptiveMetadata(aipId, dm.getId());
         htmlDescriptives.add(Pair.of(dm.getId(), HTMLUtils.descriptiveMetadataToHtml(descriptiveMetadataBinary,

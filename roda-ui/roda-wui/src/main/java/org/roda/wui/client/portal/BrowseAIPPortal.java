@@ -348,7 +348,7 @@ public class BrowseAIPPortal extends Composite {
     navigationToolbar.setSearchButtonVisibility(false);
 
     // DESCRIPTIVE METADATA
-    updateSectionDescriptiveMetadata(bundle);
+    updateSectionDescriptiveMetadata();
 
     // AIP CHILDREN
     if (bundle.getChildAIPCount() > 0) {
@@ -358,21 +358,8 @@ public class BrowseAIPPortal extends Composite {
     keyboardFocus.setFocus(true);
   }
 
-  private void updateSectionDescriptiveMetadata(BrowseAIPBundle bundle) {
-    final List<String> descriptiveMetadataContainers = new ArrayList<>();
-    final Map<String, DescriptiveMetadataViewBundle> bundles = new HashMap<>();
-
-    List<DescriptiveMetadataViewBundle> descMetadata = bundle.getDescriptiveMetadata();
-    if (descMetadata != null) {
-      for (DescriptiveMetadataViewBundle descMetadatum : descMetadata) {
-        HTML container = new HTML();
-        container.addStyleName("metadataContent");
-        descriptiveMetadataContainers.add(descMetadatum.getId());
-        bundles.put(descMetadatum.getId(), descMetadatum);
-      }
-    }
-
-    getDescriptiveMetadataHTML(aipId, descriptiveMetadataContainers, new AsyncCallback<SafeHtml>() {
+  private void updateSectionDescriptiveMetadata() {
+    getDescriptiveMetadataHTML(aipId, new AsyncCallback<SafeHtml>() {
 
       @Override
       public void onFailure(Throwable caught) {
@@ -390,8 +377,7 @@ public class BrowseAIPPortal extends Composite {
     WCAGUtilities.getInstance().makeAccessible(descriptiveMetadata.getElement());
   }
 
-  private void getDescriptiveMetadataHTML(final String aipId, final List<String> metadataIds,
-    final AsyncCallback<SafeHtml> callback) {
+  private void getDescriptiveMetadataHTML(final String aipId, final AsyncCallback<SafeHtml> callback) {
     try {
       SafeUri uri = RestUtils.createDescriptiveMetadataHTMLUri(aipId, null);
       RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
