@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -23,6 +25,8 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public final class XMLUtility {
@@ -58,6 +62,30 @@ public final class XMLUtility {
       XPath xPath = xPathfactory.newXPath();
       XPathExpression expr = xPath.compile(xpath);
       ret = (String) expr.evaluate(doc, XPathConstants.STRING);
+    } catch (SAXException | ParserConfigurationException | XPathExpressionException | IOException e) {
+      // do nothing and return already defined OTHER
+    } finally {
+      IOUtils.closeQuietly(inputStream);
+    }
+    return ret;
+  }
+
+  public static List<String> getListString(InputStream inputStream, String xpath) {
+    List<String> ret = new ArrayList<>();
+    try {
+      DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+      DocumentBuilder builder = factory.newDocumentBuilder();
+      builder.setEntityResolver(new RodaEntityResolver());
+      Document doc;
+      doc = builder.parse(inputStream);
+      XPathFactory xPathfactory = XPathFactory.newInstance();
+      XPath xPath = xPathfactory.newXPath();
+      XPathExpression expr = xPath.compile(xpath);
+      NodeList nodeList = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+      for (int i = 0; i < nodeList.getLength(); i++) {
+        Node node = nodeList.item(i);
+        ret.add(node.getTextContent());
+      }
     } catch (SAXException | ParserConfigurationException | XPathExpressionException | IOException e) {
       // do nothing and return already defined OTHER
     } finally {
