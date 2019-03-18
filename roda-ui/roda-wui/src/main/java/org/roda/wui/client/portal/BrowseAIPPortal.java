@@ -12,9 +12,7 @@ package org.roda.wui.client.portal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
@@ -32,15 +30,14 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.DipFilePreview;
 import org.roda.wui.client.browse.Viewers;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
-import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
-import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
+import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -294,7 +291,7 @@ public class BrowseAIPPortal extends Composite {
     preChildren.setVisible(false);
 
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
-      ListBuilder<IndexedAIP> aipChildrenListBuilder = new ListBuilder<>(() -> new AIPList(),
+      ListBuilder<IndexedAIP> aipChildrenListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
         new AsyncTableCellOptions<>(IndexedAIP.class, "BrowseAIPPortal_aipChildren")
           .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId())))
           .withJustActive(justActive).withSummary(messages.listOfAIPs()).bindOpener()
