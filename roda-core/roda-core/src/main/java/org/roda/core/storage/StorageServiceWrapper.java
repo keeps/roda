@@ -29,6 +29,10 @@ public class StorageServiceWrapper implements StorageService {
     this.nodeType = nodeType;
   }
 
+  public StorageService getWrappedStorageService() {
+    return storageService;
+  }
+
   @Override
   public boolean exists(StoragePath storagePath) {
     return storageService.exists(storagePath);
