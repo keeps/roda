@@ -9,6 +9,7 @@ package org.roda.wui.client.common.lists.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -308,11 +309,13 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
 
       Column<T, ?> column;
       SafeHtml htmlHeader;
+      List<String> sortBy = c.getSortBy();
 
-      if (c.getField().startsWith("default_")) {
+      if (name.startsWith("default_")) {
         // is a default column
-        column = (Column<T, ?>) DEFAULT_COLUMNS.get(c.getField());
+        column = (Column<T, ?>) DEFAULT_COLUMNS.get(name);
         htmlHeader = header.equals(name) ? messages.defaultColumnHeader(name) : SafeHtmlUtils.fromString(header);
+        sortBy = c.getSortBy().equals(Collections.singletonList(name)) ? DEFAULT_COLUMNS_FIELDS.get(name) : sortBy;
       } else {
         column = new TextColumn<T>() {
           @Override
@@ -365,7 +368,7 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
 
       // set column sortable
       column.setSortable(c.isSortable());
-      columnSortingKeyMap.put(column, c.getSortBy());
+      columnSortingKeyMap.put(column, sortBy);
 
       addColumn(column, htmlHeader, c.isNowrap(), c.isAlignRight());
 
