@@ -488,7 +488,7 @@ public class BrowserHelper {
     if (descriptiveMetadata.getType() != null) {
       try {
         String labelWithoutVersion = messages.getTranslation(
-          RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + descriptiveMetadata.getType().toLowerCase());
+          RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + descriptiveMetadata.getType().toLowerCase(), descriptiveMetadata.getId());
 
         if (descriptiveMetadata.getVersion() != null) {
           String labelWithVersion = messages.getTranslation(
