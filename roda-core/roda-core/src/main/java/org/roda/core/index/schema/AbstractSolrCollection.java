@@ -63,6 +63,7 @@ public abstract class AbstractSolrCollection<I extends IsIndexed, M extends IsMo
     }
 
     ret.add(new DynamicField("*_txt", Field.TYPE_TEXT).setIndexed(true).setStored(true).setMultiValued(true));
+    ret.add(new DynamicField("*_t", Field.TYPE_TEXT).setIndexed(true).setStored(true).setMultiValued(false));
 
     return ret;
   }

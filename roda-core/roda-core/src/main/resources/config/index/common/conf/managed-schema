@@ -127,8 +127,8 @@
     <dynamicField name="*_ss" type="strings"  indexed="true"  stored="true"/>
     <dynamicField name="*_l"  type="plong"   indexed="true"  stored="true"/>
     <dynamicField name="*_ls" type="plongs"   indexed="true"  stored="true"/>
+    <!-- *_t and *_txt are commented out here because they are added by SolrBootstrap code
     <dynamicField name="*_t" type="text_general" indexed="true" stored="true" multiValued="false"/>
-    <!-- *_txt is commented out here because it is added by SolrBootstrap code
     <dynamicField name="*_txt" type="text_general" indexed="true" stored="true"/>
     -->
     <dynamicField name="*_b"  type="boolean" indexed="true" stored="true"/>

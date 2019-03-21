@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
@@ -72,7 +72,6 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.schema.SolrCollectionRegistry;
-import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StringContentPayload;
@@ -422,11 +421,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public Set<Pair<String, String>> retrieveReindexPluginObjectClasses() {
     // TODO check permissions
     Set<Pair<String, String>> classNames = new HashSet<>();
-    List<?> classes = PluginHelper.getReindexObjectClasses();
+    List<Class<? extends IsRODAObject>> classes = PluginHelper.getReindexObjectClasses();
     classes.remove(Void.class);
 
-    for (Object o : classes) {
-      Class c = (Class) o;
+    for (Class<? extends IsRODAObject> c : classes) {
       Pair<String, String> names = Pair.of(c.getSimpleName(), c.getName());
       classNames.add(names);
     }
@@ -466,7 +464,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
         viewers.addExtension(extension, type);
       }
 
-      viewers.setTextLimit(rodaConfig.getString("ui.viewers.text.limit"));
+      viewers.setTextLimit(rodaConfig.getString("ui.viewers.text.limit", ""));
+      viewers.setOptions(rodaConfig.getString("ui.viewers." + type + ".options", ""));
     }
 
     return viewers;

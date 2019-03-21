@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>roda-core</artifactId>
@@ -154,6 +153,10 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-text</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>commons-configuration</groupId>
@@ -390,18 +393,10 @@
 			<artifactId>akka-distributed-data_2.11</artifactId>
 		</dependency>
 
-		<!--<dependency>
-			<groupId>com.lightbend.akka.management</groupId>
-			<artifactId>akka-management-cluster-bootstrap_2.11</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.lightbend.akka.discovery</groupId>
-			<artifactId>akka-discovery_2.11</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.lightbend.akka.discovery</groupId>
-			<artifactId>akka-discovery-dns_2.11</artifactId>
-		</dependency>-->
+		<!--<dependency> <groupId>com.lightbend.akka.management</groupId> <artifactId>akka-management-cluster-bootstrap_2.11</artifactId> 
+			</dependency> <dependency> <groupId>com.lightbend.akka.discovery</groupId> 
+			<artifactId>akka-discovery_2.11</artifactId> </dependency> <dependency> <groupId>com.lightbend.akka.discovery</groupId> 
+			<artifactId>akka-discovery-dns_2.11</artifactId> </dependency> -->
 		<!-- Akka related dependencies - end -->
 		<dependency>
 			<groupId>gov.loc</groupId>

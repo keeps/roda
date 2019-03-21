@@ -227,8 +227,9 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   }
 
   private void pdfPreview() {
-    String viewerPdf = GWT.getHostPageBaseURL() + "webjars/pdf-js/1.9.426/web/viewer.html?file="
-      + encode(GWT.getHostPageBaseURL() + bitstreamDownloadUri.asString());
+
+    String viewerPdf = GWT.getHostPageBaseURL() + "webjars/pdfjs-dist-viewer-min/2.0.943/build/minified/web/viewer.html"
+      + "?file=" + encode(GWT.getHostPageBaseURL() + bitstreamDownloadUri.asString()) + "#" + viewers.getOptions();
 
     final Frame frame = new Frame(viewerPdf);
     frame.addAttachHandler(new Handler() {

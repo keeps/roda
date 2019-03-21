@@ -73,7 +73,7 @@
 		<grizzly.version>2.4.3</grizzly.version>
 		<solr.version>7.5.0</solr.version>
 		<akka.version>2.5.17</akka.version>
-		<!--<akka_management.version>0.17.0</akka_management.version>-->
+		<!--<akka_management.version>0.17.0</akka_management.version> -->
 		<apacheds.version>2.0.0-M24</apacheds.version>
 		<httpcomponents.version>4.5.6</httpcomponents.version>
 		<poi.version>3.17</poi.version>
@@ -355,7 +355,7 @@
 						<!-- this is false by default, forces the plugin to generate the file -->
 						<generateGitPropertiesFile>true</generateGitPropertiesFile>
 
-						<!-- The path for the properties file to be generated. See Super Pom
+						<!-- The path for the properties file to be generated. See Super Pom 
 							for default variable reference https://maven.apache.org/guides/introduction/introduction-to-the-pom.html -->
 						<generateGitPropertiesFilename>
 							${project.build.directory}/${project.build.finalName}/version.json
@@ -805,6 +805,11 @@
 				<version>3.8.1</version>
 			</dependency>
 			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-text</artifactId>
+				<version>1.6</version>
+			</dependency>
+			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
 				<version>26.0-jre</version>
@@ -973,21 +978,12 @@
 				<version>${akka.version}</version>
 			</dependency>
 
-			<!--<dependency>
-				<groupId>com.lightbend.akka.management</groupId>
-				<artifactId>akka-management-cluster-bootstrap_2.11</artifactId>
-				<version>${akka_management.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.lightbend.akka.discovery</groupId>
-				<artifactId>akka-discovery_2.11</artifactId>
-				<version>${akka_management.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.lightbend.akka.discovery</groupId>
-				<artifactId>akka-discovery-dns_2.11</artifactId>
-				<version>${akka_management.version}</version>
-			</dependency>-->
+			<!--<dependency> <groupId>com.lightbend.akka.management</groupId> <artifactId>akka-management-cluster-bootstrap_2.11</artifactId> 
+				<version>${akka_management.version}</version> </dependency> <dependency> 
+				<groupId>com.lightbend.akka.discovery</groupId> <artifactId>akka-discovery_2.11</artifactId> 
+				<version>${akka_management.version}</version> </dependency> <dependency> 
+				<groupId>com.lightbend.akka.discovery</groupId> <artifactId>akka-discovery-dns_2.11</artifactId> 
+				<version>${akka_management.version}</version> </dependency> -->
 			<!-- Akka related dependencies - end -->
 			<dependency>
 				<groupId>org.reflections</groupId>

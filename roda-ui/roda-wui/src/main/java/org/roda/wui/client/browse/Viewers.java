@@ -17,12 +17,14 @@ public class Viewers implements Serializable {
   private HashMap<String, String> mimetypes;
   private HashMap<String, String> extensions;
   private String textLimit;
+  private String options;
 
   public Viewers() {
     this.pronoms = new HashMap<>();
     this.mimetypes = new HashMap<>();
     this.extensions = new HashMap<>();
     this.textLimit = "";
+    this.options = "";
   }
 
   public HashMap<String, String> getPronoms() {
@@ -69,9 +71,56 @@ public class Viewers implements Serializable {
     this.textLimit = textLimit;
   }
 
+  /**
+   * @return the options
+   */
+  public String getOptions() {
+    return options;
+  }
+
+  /**
+   * @param options
+   *          the options to set
+   */
+  public void setOptions(String options) {
+    this.options = options;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#toString()
+   */
   @Override
   public String toString() {
-    return "Viewer [pronoms=" + pronoms + ", mimetypes=" + mimetypes + ", extensions=" + extensions + ", textLimit="
-      + textLimit + "]";
+    StringBuilder builder = new StringBuilder();
+    builder.append("Viewers [");
+    if (pronoms != null) {
+      builder.append("pronoms=");
+      builder.append(pronoms);
+      builder.append(", ");
+    }
+    if (mimetypes != null) {
+      builder.append("mimetypes=");
+      builder.append(mimetypes);
+      builder.append(", ");
+    }
+    if (extensions != null) {
+      builder.append("extensions=");
+      builder.append(extensions);
+      builder.append(", ");
+    }
+    if (textLimit != null) {
+      builder.append("textLimit=");
+      builder.append(textLimit);
+      builder.append(", ");
+    }
+    if (options != null) {
+      builder.append("options=");
+      builder.append(options);
+    }
+    builder.append("]");
+    return builder.toString();
   }
+
 }
