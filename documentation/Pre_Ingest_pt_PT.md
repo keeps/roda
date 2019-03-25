@@ -18,7 +18,7 @@ O esquema de classificação básico é geralmente criado pelo Repositório e po
 
 Esta atividade consiste na preparação de 1 ou mais Pacotes de Informação de Submissão (SIP) compatíveis com os requisitos técnicos e não técnicos definidos no Acordo de Aquisição. Para facilitar a criação destes pacotes os produtores poderão utilizar a ferramenta RODA-in. Esta ferramenta e a sua documentação pode ser descarregada em [http://rodain.roda-community.org](http://rodain.roda-community.org "rodain").
 
-[Descarregar RODA-in RODA-in](http://rodain.roda-community.org)
+[Descarregar RODA-in](http://rodain.roda-community.org)
 
 ## Transferência de materiais
 
