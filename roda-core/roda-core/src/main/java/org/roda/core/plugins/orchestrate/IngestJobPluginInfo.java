@@ -198,8 +198,21 @@ public class IngestJobPluginInfo extends JobPluginInfo {
         return;
       }
 
-      aipIdToTransferredResourceIds.computeIfAbsent(outcomeObjectId, key -> new ArrayList<>()).add(sourceObjectId);
-      transferredResourceToAipIds.computeIfAbsent(sourceObjectId, key -> new ArrayList<>()).add(outcomeObjectId);
+      if(aipIdToTransferredResourceIds.containsKey(outcomeObjectId)) {
+        if(!aipIdToTransferredResourceIds.get(outcomeObjectId).contains(sourceObjectId)) {
+          aipIdToTransferredResourceIds.get(outcomeObjectId).add(sourceObjectId);
+        }
+      } else {
+        aipIdToTransferredResourceIds.computeIfAbsent(outcomeObjectId, key -> new ArrayList<>()).add(sourceObjectId);
+      }
+
+      if(transferredResourceToAipIds.containsKey(sourceObjectId)) {
+        if(!transferredResourceToAipIds.get(sourceObjectId).contains(outcomeObjectId)) {
+          transferredResourceToAipIds.get(sourceObjectId).add(outcomeObjectId);
+        }
+      } else {
+        transferredResourceToAipIds.computeIfAbsent(sourceObjectId, key -> new ArrayList<>()).add(outcomeObjectId);
+      }
 
       if (reportsFromBeingProcessed.get(sourceObjectId) != null) {
         reportsFromBeingProcessed.get(sourceObjectId).put(outcomeObjectId, report);
