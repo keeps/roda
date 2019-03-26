@@ -361,10 +361,16 @@ public class JavascriptUtils {
   }-*/;
 
   public static native int pdfDipViewerBottomPosition() /*-{
-    var footerTop = Math.floor($wnd.jQuery('.footer').offset().top);
     var mainBottom = Math.floor($wnd.jQuery('.main').offset().top
         + $wnd.jQuery('.main').outerHeight(true));
-
+        
+    var footerTop;
+    if ($wnd.jQuery('.footer').length) {
+      footerTop = Math.floor($wnd.jQuery('.footer').offset().top);
+    } else {
+      footerTop = mainBottom;
+    }
+    
     var spacing = Math.floor($wnd.jQuery(
         'div.bitstreamPreview.viewRepresentationFilePreview')
         .outerHeight(true))
