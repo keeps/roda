@@ -367,52 +367,49 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   }
 
   private List<AIP> getAIPsFromReports(ModelService model, IndexService index, IngestJobPluginInfo jobPluginInfo) {
-    List<AIP> aips = new ArrayList<>();
+    processReports(model, index, jobPluginInfo);
+
     List<String> aipIds = jobPluginInfo.getAipIds();
+    LOGGER.debug("Getting AIPs from reports: {}", aipIds);
 
-    // INFO 20181029 nvieira: verification needed to make ingestion fail when no AIP
-    // id is associated, as the outcome object id, to at least one report
-    boolean continueIngestion = verifyReports(model, index, jobPluginInfo);
-
-    if (continueIngestion) {
-      LOGGER.debug("Getting AIPs from reports: {}", aipIds);
-
-      for (String aipId : aipIds) {
-        try {
-          aips.add(model.retrieveAIP(aipId));
-        } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-          LOGGER.error("Error while retrieving AIP from reports", e);
-        }
+    List<AIP> aips = new ArrayList<>();
+    for (String aipId : aipIds) {
+      try {
+        aips.add(model.retrieveAIP(aipId));
+      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+        LOGGER.error("Error while retrieving AIP from reports", e);
       }
-
-      LOGGER.debug("Done retrieving AIPs from reports");
     }
+
+    LOGGER.debug("Done retrieving AIPs from reports");
 
     jobPluginInfo.updateCounters();
     return aips;
   }
 
-  private boolean verifyReports(ModelService model, IndexService index, IngestJobPluginInfo jobPluginInfo) {
+  private void processReports(ModelService model, IndexService index, IngestJobPluginInfo jobPluginInfo) {
     Map<String, Map<String, Report>> reportsFromBeingProcessed = jobPluginInfo.getReportsFromBeingProcessed();
-    Set<String> transferredResourcesToRemoveFromjobPluginInfo = new HashSet<>();
+    List<String> transferredResourcesToRemoveFromjobPluginInfo = new ArrayList<>();
 
     for (Entry<String, Map<String, Report>> reportEntry : reportsFromBeingProcessed.entrySet()) {
+      String transferredResourceId = reportEntry.getKey();
       Collection<Report> reports = reportEntry.getValue().values();
       for (Report report : reports) {
         if (report.getPluginState().equals(PluginState.FAILURE)) {
-          transferredResourcesToRemoveFromjobPluginInfo.add(reportEntry.getKey());
+          // 20190329 hsilva: all AIPs from this SIP will be marked as failed
+          // and will not continue
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+          jobPluginInfo.failOtherTransferredResourceAIPs(model, index, transferredResourceId);
+          transferredResourcesToRemoveFromjobPluginInfo.add(transferredResourceId);
+
           break;
         }
       }
     }
 
     for (String resourceId : transferredResourcesToRemoveFromjobPluginInfo) {
-      jobPluginInfo.incrementObjectsProcessedWithFailure();
-      jobPluginInfo.failOtherTransferredResourceAIPs(model, index, resourceId);
       jobPluginInfo.remove(resourceId);
     }
-
-    return transferredResourcesToRemoveFromjobPluginInfo.isEmpty();
   }
 
   private void sendNotification(ModelService model, IndexService index, Job job, JobStats jobStats)
