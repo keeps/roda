@@ -21,7 +21,6 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.BadHistoryTokenException;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -74,6 +73,8 @@ public class ContentPanelPortal extends SimplePanel {
     resolvers.add(SearchPortal.RESOLVER);
     // UUID resolver
     resolvers.add(HistoryUtils.UUID_RESOLVER);
+    // Welcome
+    resolvers.add(WelcomePortal.RESOLVER);
   }
 
   /**
@@ -109,28 +110,28 @@ public class ContentPanelPortal extends SimplePanel {
       @Override
       public void onSuccess(Boolean permitted) {
         if (!permitted) {
-          UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<User>() {
+          UserLoginPortal.getInstance().getAuthenticatedUser(new AsyncCallback<User>() {
             @Override
             public void onFailure(Throwable caught) {
-              UserLogin.getInstance().showSuggestLoginDialog();
+              UserLoginPortal.getInstance().showSuggestLoginDialog();
             }
 
             @Override
             public void onSuccess(User user) {
               if (user.isGuest()) {
-                UserLogin.getInstance().showSuggestLoginDialog();
+                UserLoginPortal.getInstance().showSuggestLoginDialog();
               } else {
                 Dialogs.showInformationDialog(messages.authorizationDeniedAlert(),
                   messages.authorizationDeniedAlertMessageExceptionSimple(""), messages.dialogOk(),
                   new AsyncCallback<Void>() {
                     @Override
                     public void onFailure(Throwable caught) {
-                      HistoryUtils.newHistory(Welcome.RESOLVER);
+                      HistoryUtils.newHistory(WelcomePortal.RESOLVER);
                     }
 
                     @Override
                     public void onSuccess(Void result) {
-                      HistoryUtils.newHistory(Welcome.RESOLVER);
+                      HistoryUtils.newHistory(WelcomePortal.RESOLVER);
                     }
                   });
               }

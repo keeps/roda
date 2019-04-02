@@ -19,7 +19,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.text.StringEscapeUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;

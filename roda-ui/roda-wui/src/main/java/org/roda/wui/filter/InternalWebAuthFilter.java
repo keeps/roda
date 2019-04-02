@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.roda.wui.api.controllers.UserLogin;
-import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

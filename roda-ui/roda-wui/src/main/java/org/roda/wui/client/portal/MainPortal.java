@@ -115,8 +115,13 @@ public class MainPortal extends Composite implements EntryPoint {
   }
 
   private void onHistoryChanged(String historyToken) {
-    List<String> currentHistoryPath = HistoryUtils.getCurrentHistoryPath();
-    contentPanel.update(currentHistoryPath);
-    GAnalyticsTracker.track(historyToken);
+    if (historyToken.length() == 0) {
+      contentPanel.update(WelcomePortal.RESOLVER.getHistoryPath());
+      HistoryUtils.newHistory(WelcomePortal.RESOLVER);
+    } else {
+      List<String> currentHistoryPath = HistoryUtils.getCurrentHistoryPath();
+      contentPanel.update(currentHistoryPath);
+      GAnalyticsTracker.track(historyToken);
+    }
   }
 }

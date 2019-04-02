@@ -39,7 +39,7 @@ public class SearchPortal extends Composite {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRole(this, callback);
+      UserLoginPortal.getInstance().checkRole(this, callback);
     }
 
     @Override
