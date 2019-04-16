@@ -219,6 +219,8 @@ public class BrowseAIPPortal extends Composite {
     preDisseminations.addStyleName("preSectionTitle preDisseminationsTitle");
     preChildren.addStyleName("preSectionTitle preChildrenTitle");
 
+
+
     AsyncCallback<Actionable.ActionImpact> listActionableCallback = new NoAsyncCallback<Actionable.ActionImpact>() {
       @Override
       public void onSuccess(Actionable.ActionImpact impact) {
@@ -331,6 +333,7 @@ public class BrowseAIPPortal extends Composite {
     }
 
     // STATE
+    this.addStyleName("title_" + aip.getLevel().toLowerCase());
     this.addStyleName(aip.getState().toString().toLowerCase());
     aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(aip.getState()));
     aipState.setVisible(!justActive);
