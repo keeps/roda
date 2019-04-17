@@ -333,7 +333,7 @@ public class BrowseAIPPortal extends Composite {
     }
 
     // STATE
-    this.addStyleName("title_" + aip.getLevel().toLowerCase());
+    this.addStyleName("browse_level_" + aip.getLevel().toLowerCase());
     this.addStyleName(aip.getState().toString().toLowerCase());
     aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(aip.getState()));
     aipState.setVisible(!justActive);
