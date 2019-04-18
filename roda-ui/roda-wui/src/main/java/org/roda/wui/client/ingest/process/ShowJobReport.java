@@ -154,7 +154,8 @@ public class ShowJobReport extends Composite {
 
     if (hasSource) {
       String idText = !jobReport.getSourceObjectOriginalIds().isEmpty()
-        ? " (" + StringUtils.prettyPrint(jobReport.getSourceObjectOriginalIds()) + ")" : "";
+        ? " (" + StringUtils.prettyPrint(jobReport.getSourceObjectOriginalIds()) + ")"
+        : "";
 
       if (StringUtils.isNotBlank(jobReport.getSourceObjectOriginalName())) {
         sourceObject.setText(jobReport.getSourceObjectOriginalName() + idText);

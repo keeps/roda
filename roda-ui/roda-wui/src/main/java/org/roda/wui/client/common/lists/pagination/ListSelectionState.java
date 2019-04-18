@@ -15,7 +15,6 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 
 public class ListSelectionState<T extends IsIndexed> implements Serializable {
-
   private static final long serialVersionUID = 1L;
 
   private T selected;
@@ -24,13 +23,14 @@ public class ListSelectionState<T extends IsIndexed> implements Serializable {
   private Facets facets;
   private Sorter sorter;
   private Integer index;
+  private Long total;
 
   public ListSelectionState() {
     super();
   }
 
   public ListSelectionState(T selected, Filter filter, Boolean justActive, Facets facets, Sorter sorter,
-    Integer index) {
+    Integer index, Long total) {
     super();
     this.selected = selected;
     this.filter = filter;
@@ -38,6 +38,7 @@ public class ListSelectionState<T extends IsIndexed> implements Serializable {
     this.facets = facets;
     this.sorter = sorter;
     this.index = index;
+    this.total = total;
   }
 
   public T getSelected() {
@@ -88,6 +89,14 @@ public class ListSelectionState<T extends IsIndexed> implements Serializable {
     this.index = index;
   }
 
+  public Long getTotal() {
+    return total;
+  }
+
+  public void setTotal(Long total) {
+    this.total = total;
+  }
+
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
@@ -120,6 +129,10 @@ public class ListSelectionState<T extends IsIndexed> implements Serializable {
     if (index != null) {
       builder.append("index=");
       builder.append(index);
+    }
+    if (total != null) {
+      builder.append("total=");
+      builder.append(total);
     }
     builder.append("]");
     return builder.toString();

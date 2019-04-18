@@ -57,6 +57,7 @@ import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -75,7 +76,6 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
   private boolean requireControlKeyModifier = true;
   private boolean requireShiftKeyModifier = false;
   private boolean requireAltKeyModifier = false;
-  private Actionable<T> actionable = null;
   private boolean skipButtonSetup = false;
 
   interface MyUiBinder extends UiBinder<Widget, NavigationToolbar> {
@@ -94,6 +94,9 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
 
   @UiField
   HTML aipState;
+
+  @UiField
+  HTML pageInformation;
 
   // buttons on the right side
 
@@ -117,7 +120,6 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
   FlowPanel toolbarPanel;
 
   private T currentObject = null;
-  private Object parentObject = null;
   private Permissions permissions = null;
   private HandlerRegistration searchPopupClickHandler = null;
 
@@ -192,6 +194,7 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     searchButton.setVisible(false);
     previousButton.setVisible(false);
     nextButton.setVisible(false);
+    pageInformation.setVisible(false);
     infoSidebarButton.setVisible(false);
     actionsButton.setVisible(false);
   }
@@ -200,12 +203,18 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
     hideButtons();
     if (!skipButtonSetup) {
       if (processor != null) {
-        ListSelectionUtils.bindLayout(currentObject, previousButton, nextButton, keyboardFocus,
+        ListSelectionUtils.bindLayout(currentObject, previousButton, nextButton, pageInformation, keyboardFocus,
           requireControlKeyModifier, requireShiftKeyModifier, requireAltKeyModifier, processor);
       } else {
-        ListSelectionUtils.bindLayout(currentObject, previousButton, nextButton, keyboardFocus,
+        ListSelectionUtils.bindLayout(currentObject, previousButton, nextButton, pageInformation, keyboardFocus,
           requireControlKeyModifier, requireShiftKeyModifier, requireAltKeyModifier);
       }
+
+      int index = ListSelectionUtils.getIndex(IndexedAIP.class.getName()) + 1;
+      long total = ListSelectionUtils.getTotal(IndexedAIP.class.getName());
+      pageInformation.setHTML("<span>" + NumberFormat.getDecimalFormat().format(index) + "</span> " + messages.of()
+        + " <span>" + NumberFormat.getDecimalFormat().format(total) + "</span>");
+
       setNavigationButtonTitles();
 
       clearSearchPopupHandlers();

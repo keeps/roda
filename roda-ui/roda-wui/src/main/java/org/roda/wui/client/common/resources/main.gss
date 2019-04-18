@@ -7117,6 +7117,19 @@ span.code {
     background-color: #eee;
 }
 
+.navigationToolbarPagination {
+    display: inline-block;
+    line-height: 35px;
+    height: 35px;
+    color: white;
+    background-color: #999;
+    text-align: center;
+    width: auto;
+    font-size: 14px;
+    vertical-align: top;
+    padding: 0 5px 0 5px;
+}
+
 /* Permission related */
 
 .hasNoPermissions {

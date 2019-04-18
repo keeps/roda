@@ -42,6 +42,7 @@ import com.google.gwt.storage.client.StorageMap;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.FocusWidget;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
@@ -87,8 +88,8 @@ public class ListSelectionUtils {
   }
 
   public static <T extends IsIndexed> ListSelectionState<T> create(T selected, Filter filter, Boolean justActive,
-    Facets facets, Sorter sorter, Integer index) {
-    return new ListSelectionState<>(selected, filter, justActive, facets, sorter, index);
+    Facets facets, Sorter sorter, Integer index, Long total) {
+    return new ListSelectionState<>(selected, filter, justActive, facets, sorter, index, total);
   }
 
   @FunctionalInterface
@@ -102,7 +103,7 @@ public class ListSelectionUtils {
     if (newIndex >= 0) {
       BrowserService.Util.getInstance().find(state.getSelected().getClass().getName(), state.getFilter(),
         state.getSorter(), new Sublist(newIndex, 1), state.getFacets(), LocaleInfo.getCurrentLocale().getLocaleName(),
-        state.getJustActive(), new ArrayList<String>(), new AsyncCallback<IndexResult<T>>() {
+        state.getJustActive(), new ArrayList<>(), new AsyncCallback<IndexResult<T>>() {
 
           @Override
           public void onFailure(Throwable caught) {
@@ -120,7 +121,7 @@ public class ListSelectionUtils {
               } else {
                 processor.process(first);
                 callback.onSuccess(ListSelectionUtils.create(first, state.getFilter(), state.getJustActive(),
-                  state.getFacets(), state.getSorter(), newIndex));
+                  state.getFacets(), state.getSorter(), newIndex, result.getTotalCount()));
               }
             } else {
               callback.onFailure(new NotFoundException("No items were found"));
@@ -130,13 +131,28 @@ public class ListSelectionUtils {
     }
   }
 
+  public static int getIndex(String className) {
+    if(clipboard.containsKey(className)) {
+      return clipboard.get(className).getIndex();
+    } else {
+      return 1;
+    }
+  }
+
+  public static long getTotal(String className) {
+    if(clipboard.containsKey(className)) {
+      return clipboard.get(className).getTotal();
+    } else {
+      return 1L;
+    }
+  }
+
   public static <T extends IsIndexed> void save(final ListSelectionState<T> state) {
     String className = state.getSelected().getClass().getName();
     clipboard.put(className, state);
     saveOnStorage(className, state);
   }
 
-  @SuppressWarnings("unchecked")
   public static <T extends IsIndexed> ListSelectionState<T> last(Class<T> objectClass) {
     return (ListSelectionState<T>) clipboard.get(objectClass.getName());
   }
@@ -158,7 +174,6 @@ public class ListSelectionUtils {
   public static <T extends IsIndexed> void jump(final T object, final int relativeIndex,
     final ProcessRelativeItem<T> processor) {
 
-    @SuppressWarnings("unchecked")
     ListSelectionState<T> last = last((Class<T>) object.getClass());
     if (last != null) {
       if (last.getSelected().getUUID().equals(object.getUUID())) {
@@ -172,7 +187,6 @@ public class ListSelectionUtils {
               } else {
                 Toast.showInfo(messages.cannotJumpToPrevious(), messages.cannotJumpToPreviousDescription());
               }
-
             } else {
               AsyncCallbackUtils.defaultFailureTreatment(caught);
             }
@@ -208,7 +222,6 @@ public class ListSelectionUtils {
   public static <T extends IsIndexed> void hasPreviousOrNext(final T object,
     final AsyncCallback<Pair<Boolean, Boolean>> callback) {
     if (object != null) {
-      @SuppressWarnings("unchecked")
       Class<T> objectClass = (Class<T>) object.getClass();
       final ListSelectionState<T> last = last(objectClass);
       if (last != null) {
@@ -261,8 +274,16 @@ public class ListSelectionUtils {
   public static <T extends IsIndexed> void bindLayout(final T object, final HasClickHandlers previousButton,
     final HasClickHandlers nextButton, final FocusPanel keyboardFocus, final boolean requireControlKeyModifier,
     final boolean requireShiftKeyModifier, final boolean requireAltKeyModifier, UIObject... extraUiObjectsToHide) {
-    bindLayout(object, previousButton, nextButton, keyboardFocus, requireControlKeyModifier, requireShiftKeyModifier,
-      requireAltKeyModifier, new ProcessRelativeItem<T>() {
+    bindLayout(object, previousButton, nextButton, null, keyboardFocus, requireControlKeyModifier,
+      requireShiftKeyModifier, requireAltKeyModifier, extraUiObjectsToHide);
+  }
+
+  public static <T extends IsIndexed> void bindLayout(final T object, final HasClickHandlers previousButton,
+    final HasClickHandlers nextButton, final HTML pageInformation, final FocusPanel keyboardFocus,
+    final boolean requireControlKeyModifier, final boolean requireShiftKeyModifier, final boolean requireAltKeyModifier,
+    UIObject... extraUiObjectsToHide) {
+    bindLayout(object, previousButton, nextButton, pageInformation, keyboardFocus, requireControlKeyModifier,
+      requireShiftKeyModifier, requireAltKeyModifier, new ProcessRelativeItem<T>() {
 
         @Override
         public void process(T object) {
@@ -272,9 +293,9 @@ public class ListSelectionUtils {
   }
 
   public static <T extends IsIndexed> void bindLayout(final T object, final HasClickHandlers previousButton,
-    final HasClickHandlers nextButton, final FocusPanel keyboardFocus, final boolean requireControlKeyModifier,
-    final boolean requireShiftKeyModifier, final boolean requireAltKeyModifier, final ProcessRelativeItem<T> processor,
-    final UIObject... extraUiObjectsToHide) {
+    final HasClickHandlers nextButton, final HTML pageInformation, final FocusPanel keyboardFocus,
+    final boolean requireControlKeyModifier, final boolean requireShiftKeyModifier, final boolean requireAltKeyModifier,
+    final ProcessRelativeItem<T> processor, final UIObject... extraUiObjectsToHide) {
 
     StringBuilder b = new StringBuilder();
 
@@ -333,11 +354,11 @@ public class ListSelectionUtils {
       }
     });
 
-    updateLayout(object, previousButton, nextButton, extraUiObjectsToHide);
+    updateLayout(object, previousButton, nextButton, pageInformation, extraUiObjectsToHide);
   }
 
   public static <T extends IsIndexed> void updateLayout(final T object, final HasClickHandlers previousButton,
-    final HasClickHandlers nextButton, final UIObject... extraUiObjectsToHide) {
+    final HasClickHandlers nextButton, final HTML pageInformation, final UIObject... extraUiObjectsToHide) {
     hasPreviousOrNext(object, new AsyncCallback<Pair<Boolean, Boolean>>() {
 
       @Override
@@ -346,6 +367,7 @@ public class ListSelectionUtils {
         if (previousButton instanceof UIObject && nextButton instanceof UIObject) {
           ((UIObject) previousButton).setVisible(false);
           ((UIObject) nextButton).setVisible(false);
+          pageInformation.setVisible(false);
         }
       }
 
@@ -358,6 +380,7 @@ public class ListSelectionUtils {
         if (previousButton instanceof UIObject && nextButton instanceof UIObject) {
           ((UIObject) previousButton).setVisible(hasPrevious || hasNext);
           ((UIObject) nextButton).setVisible(hasPrevious || hasNext);
+          pageInformation.setVisible(hasPrevious || hasNext);
 
           for (UIObject uiObj : extraUiObjectsToHide) {
             uiObj.setVisible(hasPrevious || hasNext);
@@ -374,5 +397,4 @@ public class ListSelectionUtils {
       }
     });
   }
-
 }
