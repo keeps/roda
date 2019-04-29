@@ -31,7 +31,7 @@ RUN set -ex; \
     echo "core.plugins.internal.virus_check.clamav.params = -m --fdpass" >> config/roda-core.properties && \
     echo "core.plugins.internal.virus_check.clamav.get_version = clamdscan --version" >> config/roda-core.properties && \
     echo "core.tools.siegfried.mode = server" >> config/roda-core.properties && \
-    zip /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/roda-core.properties ; \
+    zip -q /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/roda-core.properties ; \
     apt-get remove -y curl zip && apt-get clean && apt-get autoremove ; \
     rm -rf /var/lib/apt/lists/*
 
