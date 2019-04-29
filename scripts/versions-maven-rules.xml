@@ -5,7 +5,7 @@
     <ignoreVersion type="regex">(?i).*Alpha(?:-?\d+)?</ignoreVersion>
     <ignoreVersion type="regex">(?i).*Beta(?:-?\d+)?.*</ignoreVersion>
     <ignoreVersion type="regex">(?i).*-B(?:-?\d+)?</ignoreVersion>
-    <ignoreVersion type="regex">(?i).*RC(?:-?\d+)?</ignoreVersion>
+    <ignoreVersion type="regex">(?i).*RC(?:-?\.?\d+)?</ignoreVersion>
     <ignoreVersion type="regex">(?i).*CR(?:-?\d+)?</ignoreVersion>
     <ignoreVersion type="regex">(?i).*M(?:-?\d+)?</ignoreVersion>
     <ignoreVersion type="regex">(?i).*-atlassian(?:-?\d+)?</ignoreVersion>
@@ -16,6 +16,11 @@
     <rule groupId="commons-collections" artifactId="commons-collections">
       <ignoreVersions>
         <ignoreVersion type="regex">^200.*$</ignoreVersion>
+      </ignoreVersions>
+    </rule>
+    <rule groupId="org.seleniumhq.selenium" artifactId="selenium-java">
+      <ignoreVersions>
+        <ignoreVersion type="regex">^3.141.*$</ignoreVersion>
       </ignoreVersions>
     </rule>
     <!-- Unresolved incompatibilities -->
