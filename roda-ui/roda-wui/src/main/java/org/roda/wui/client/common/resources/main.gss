@@ -3644,6 +3644,10 @@ td.datePickerMonth, td.datePickerYear {
     color: white;
 }
 
+.searchPanelRight .actions-button .fa-stack {
+	width: 2em;
+}
+
 .searchPanelRight > div {
     box-sizing: border-box;
 }
@@ -3754,6 +3758,10 @@ td.datePickerMonth, td.datePickerYear {
 
 .searchAdvancedDisclosureButton.open .fa-angle-down {
     display: none;
+}
+
+.searchButton .fa-stack {
+	width: 2em;
 }
 
 .searchButton .fa-stack-2x {
