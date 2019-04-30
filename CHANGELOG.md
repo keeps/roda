@@ -1,15 +1,45 @@
 # Changelog
 
+## v3.1.0 (30/04/2019)
+Install for demonstration:
+```
+docker pull keeps/roda:v3.1.0
+```
+
+#### New features:
+
+-  Configurable columns in all search results [#1459](https://github.com/keeps/roda/issues/1459)
+-  Create Portal UI endpoint [#1452](https://github.com/keeps/roda/issues/1452)
+
+#### Enhancements:
+
+-  Upgrading PDFjs to 2.0.943 [#1461](https://github.com/keeps/roda/issues/1461)
+-  Possibility to orderly show descriptive metadata on UI [#1451](https://github.com/keeps/roda/issues/1451)
+-  Configuring a ui.list should not need to override all lists [#1445](https://github.com/keeps/roda/issues/1445)
+
+#### Bug Fixes:
+
+-  Stemming for single-valued fields not ative [#1460](https://github.com/keeps/roda/issues/1460)
+-  Repository preservation events are not being re-indexed [#1447](https://github.com/keeps/roda/issues/1447)
+-  Report verification on ingest does not properly support transformation of resources to multiple AIPs [#1444](https://github.com/keeps/roda/issues/1444)
+-  Being processed counter is not being correctly calculated [#1443](https://github.com/keeps/roda/issues/1443)
+-  Bug while searching for filename [#1432](https://github.com/keeps/roda/issues/1432)
+
+---
+
 ## v3.0.2 (31/01/2019)
 ### Install for demonstration
 ```
 docker pull keeps/roda:v3.0.2
 ```
+#### Security fixes
+- Fixing CVE-2018-19360, CVE-2018-19362, CVE-2018-19361 by updating jackson library
 
 #### Enhancements:
 
 -  Chart.js and FileSaver.js as webjars [#1440](https://github.com/keeps/roda/issues/1440)
 -  After login the browser back shows login panel although user is already logged in [#860](https://github.com/keeps/roda/issues/860)
+- Adding menu text color configurations
 
 #### Bug Fixes:
 
@@ -18,6 +48,7 @@ docker pull keeps/roda:v3.0.2
 -  When ingesting with multiple SIPs, in the end of the job each AIP has multiple ingest ended events [#1436](https://github.com/keeps/roda/issues/1436)
 -  Node selection window grows vertically forever [#1433](https://github.com/keeps/roda/issues/1433)
 -  Button text overflow [#1431](https://github.com/keeps/roda/issues/1431)
+-  Fixed problem related with updating old to new transferred resource identifier when moving SIP after ingest
 
 ---
 
