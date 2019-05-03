@@ -210,8 +210,8 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
           requireControlKeyModifier, requireShiftKeyModifier, requireAltKeyModifier);
       }
 
-      int index = ListSelectionUtils.getIndex(IndexedAIP.class.getName()) + 1;
-      long total = ListSelectionUtils.getTotal(IndexedAIP.class.getName());
+      int index = ListSelectionUtils.getIndex(currentObject.getClass().getName()) + 1;
+      long total = ListSelectionUtils.getTotal(currentObject.getClass().getName());
       pageInformation.setHTML("<span>" + NumberFormat.getDecimalFormat().format(index) + "</span> " + messages.of()
         + " <span>" + NumberFormat.getDecimalFormat().format(total) + "</span>");
 
