@@ -81,6 +81,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
@@ -1042,15 +1043,17 @@ public final class PluginHelper {
     List<LinkingIdentifier> sources, List<LinkingIdentifier> outcomes, PluginState outcome,
     String outcomeDetailExtension, boolean notify, Date startDate) throws RequestNotValidException, NotFoundException,
     GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
-
     List<String> agentIds = new ArrayList<>();
+    String agentId = IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion());
+    StoragePath agentPath = ModelUtils.getPreservationMetadataStoragePath(agentId, PreservationMetadataType.AGENT);
 
     try {
-      boolean notifyAgent = true;
-      PreservationMetadata pm = PremisV3Utils.createPremisAgentBinary(plugin, model, notifyAgent);
-      agentIds.add(pm.getId());
+      if (!RodaCoreFactory.getStorageService().exists(agentPath)) {
+        PremisV3Utils.createPremisAgentBinary(plugin, model, true);
+      }
+      agentIds.add(agentId);
     } catch (AlreadyExistsException e) {
-      agentIds.add(IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion()));
+      agentIds.add(agentId);
     } catch (RODAException e) {
       LOGGER.error("Error creating PREMIS agent", e);
     }
@@ -1063,14 +1066,21 @@ public final class PluginHelper {
     }
 
     if (job != null) {
+      String userId = IdUtils.getUserAgentId(job.getUsername());
+      StoragePath userAgentPath = ModelUtils.getPreservationMetadataStoragePath(userId, PreservationMetadataType.AGENT);
+      
       try {
-        PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(job.getUsername(), model, index,
-          true);
-        if (pm != null) {
-          agentIds.add(pm.getId());
+        if (!RodaCoreFactory.getStorageService().exists(userAgentPath)) {
+          PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(job.getUsername(), model, index,
+                  true);
+          if (pm != null) {
+            agentIds.add(userId);
+          }
+        } else {
+          agentIds.add(userId);
         }
       } catch (AlreadyExistsException e) {
-        agentIds.add(IdUtils.getUserAgentId(job.getUsername()));
+        agentIds.add(userId);
       } catch (RODAException e) {
         LOGGER.error("Error creating PREMIS agent", e);
       }
@@ -1084,6 +1094,7 @@ public final class PluginHelper {
       outcome.name(), outcomeDetailNote, outcomeDetailExtension, agentIds);
     model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, representationId, filePath, fileId,
       premisEvent, notify);
+
     PreservationMetadata pm = new PreservationMetadata();
     pm.setId(id);
     pm.setAipId(aipId);
