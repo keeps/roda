@@ -46,6 +46,7 @@ import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -276,8 +277,6 @@ public class BrowseRepresentation extends Composite {
       () -> refresh(aipId, repId, new NoAsyncCallback<>()));
     navigationToolbar.build();
 
-    ;
-
     updateLayout(bundle, state, justActive);
 
     // DESCRIPTIVE METADATA
@@ -360,7 +359,13 @@ public class BrowseRepresentation extends Composite {
     if (!bundle.getRepresentationDescriptiveMetadata().isEmpty()) {
       newDescriptiveMetadata.setVisible(false);
       itemMetadata.getParent().setVisible(true);
-      itemMetadata.selectTab(0);
+
+      int index = ConfigurationManager.getInt(0, "ui.browser.metadata.index.representation");
+      if (bundle.getRepresentationDescriptiveMetadata().size() > index) {
+        itemMetadata.selectTab(index);
+      } else {
+        itemMetadata.selectTab(0);
+      }
     } else {
       newDescriptiveMetadata.setVisible(true);
       itemMetadata.getParent().setVisible(false);

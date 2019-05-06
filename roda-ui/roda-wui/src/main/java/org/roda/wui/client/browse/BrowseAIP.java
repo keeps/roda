@@ -48,6 +48,7 @@ import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -223,7 +224,8 @@ public class BrowseAIP extends Composite {
 
     // REPRESENTATIONS
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)) {
-      ListBuilder<IndexedRepresentation> representationsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
+      ListBuilder<IndexedRepresentation> representationsListBuilder = new ListBuilder<>(
+        () -> new ConfigurableAsyncTableCell<>(),
         new AsyncTableCellOptions<>(IndexedRepresentation.class, "BrowseAIP_representations")
           .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aip.getId())))
           .withJustActive(justActive).withSummary(messages.listOfRepresentations()).bindOpener()
@@ -404,8 +406,14 @@ public class BrowseAIP extends Composite {
 
     if (descMetadata != null && !descMetadata.isEmpty()) {
       descriptiveMetadata.getParent().setVisible(true);
-      descriptiveMetadata.selectTab(0);
       newDescriptiveMetadata.setVisible(false);
+
+      int index = ConfigurationManager.getInt(0, "ui.browser.metadata.index.aip");
+      if (descMetadata.size() > index) {
+        descriptiveMetadata.selectTab(index);
+      } else {
+        descriptiveMetadata.selectTab(0);
+      }
     } else {
       descriptiveMetadata.getParent().setVisible(false);
       newDescriptiveMetadata.setVisible(true);
