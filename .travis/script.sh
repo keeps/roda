@@ -37,8 +37,8 @@ function deploy_to_dockerhub(){
 ################################################
 # Compile, test, code analysis
 ################################################
-
-mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" -Denforcer.skip=true -Proda-wui-docker clean org.jacoco:jacoco-maven-plugin:prepare-agent install sonar:sonar
+# temporary deactivating sonar
+mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" -Denforcer.skip=true -Proda-wui-docker clean org.jacoco:jacoco-maven-plugin:prepare-agent install # sonar:sonar
 
 ################################################
 # Deploy
