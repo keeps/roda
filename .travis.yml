@@ -22,7 +22,7 @@ env:
  - secure: "pfZx774qy6nhBXK+/xnbMexEN/717Bv7V+nyh67IEQ2IBeNLmsnIRMsKL31jTwdpgxLKcofVgBm4VJ+j5wHU3s5NxlLuyUEAavNZTfpWCjQtcWWQMsv/lJcf4iErpm21onOO9O0ulABw8Gyzm6PMd8IBfaLngDiJcCzcCojQC20="
 
 addons:
-  sonarqube:
+  sonarcloud:
     organization: "keeps"
     token:
       secure: "On53R35PWhHE5kJZophSGhiyfU3w/df/TgdVObsw1N64LGaGXiQQxaYuaYRTYT34SQHuZPRqpV84L8QMW5WGDEwH3EhaN3I3on1w6djrQ4lqk0+2yrqHtKkhL5+hByC50UQcdLoX84q6Ri6A570/tpNhT+/GnT2+1deJ5C+fjiU="
