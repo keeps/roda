@@ -18,6 +18,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -83,7 +84,8 @@ public class HTTPNotificationProcessor implements NotificationProcessor {
     try (CloseableHttpClient httpclient = HttpClients.createDefault()) {
       HttpPost httppost = new HttpPost(endpoint);
       httppost.setConfig(requestConfig);
-      httppost.setEntity(new StringEntity(content));
+      httppost
+        .setEntity(new StringEntity(content, ContentType.create("application/json", RodaConstants.DEFAULT_ENCODING)));
 
       HttpResponse response = httpclient.execute(httppost);
       if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
