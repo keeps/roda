@@ -141,10 +141,10 @@ public class EditRiskIncidence extends Composite {
   TextArea mitigatedDescription;
 
   /**
-   * Create a new panel to create a user
+   * Create a new panel to edit incidence
    *
-   * @param user
-   *          the user to create
+   * @param incidence
+   *          the incidence to edit
    */
   public EditRiskIncidence(RiskIncidence incidence) {
     this.incidence = incidence;
