@@ -34,6 +34,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -77,11 +78,11 @@ public class ValidationUtils {
 
   public static Pair<ValidationReport, List<Pair<String, String>>> isAIPMetadataValid(
     boolean forceDescriptiveMetadataType, boolean validateDescriptiveMetadata, String fallbackMetadataType,
-    String fallbackMetadataVersion, ModelService model, String aipId)
+    String fallbackMetadataVersion, ModelService model, AIP aip)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     ValidationReport report = new ValidationReport();
     report.setValid(true);
-    List<DescriptiveMetadata> descriptiveMetadata = model.retrieveAIP(aipId).getDescriptiveMetadata();
+    List<DescriptiveMetadata> descriptiveMetadata = aip.getDescriptiveMetadata();
     List<Pair<String, String>> schemasInfo = new ArrayList<>();
     for (DescriptiveMetadata dm : descriptiveMetadata) {
       StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(dm);
@@ -101,7 +102,7 @@ public class ValidationUtils {
         Map<String, String> properties = new HashMap<>();
         properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.METADATA_TYPE_FORCED.toString());
 
-        model.updateDescriptiveMetadata(aipId, dm.getId(), binary.getContent(), fallbackMetadataType,
+        model.updateDescriptiveMetadata(aip.getId(), dm.getId(), binary.getContent(), fallbackMetadataType,
           fallbackMetadataVersion, properties);
         report.setValid(true);
 
@@ -200,8 +201,8 @@ public class ValidationUtils {
   }
 
   /**
-   * Validates descriptive medatada (e.g. against its schema, but other strategies
-   * may be used)
+   * Validates descriptive medatada (e.g. against its schema, but other
+   * strategies may be used)
    * 
    * @param failIfNoSchema
    * @throws AuthorizationDeniedException
@@ -256,8 +257,8 @@ public class ValidationUtils {
   }
 
   /**
-   * Validates descriptive medatada (e.g. against its schema, but other strategies
-   * may be used)
+   * Validates descriptive medatada (e.g. against its schema, but other
+   * strategies may be used)
    * 
    * @param descriptiveMetadataType
    * @param failIfNoSchema

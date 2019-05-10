@@ -101,16 +101,10 @@ public class PremisSkeletonPluginUtils {
 
     if (!file.isDirectory()) {
       LOGGER.debug("Processing {}", file);
-      try {
-        // FIXME 20190509 hsilva: couldn't this be changed by an exists
-        // invocation? more cheap?
-        model.retrievePreservationFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId());
-      } catch (NotFoundException e) {
+      if (!model.preservationFileExists(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId())) {
         ContentPayload filePreservation = PremisV3Utils.createBaseFile(file, model, fixityAlgorithms);
         String pmId;
         try {
-          // FIXME 20190509 hsilva: couldn't this be changed by an exists
-          // invocation? more cheap?
           PreservationMetadata pm = model.createPreservationMetadata(PreservationMetadataType.FILE, file.getAipId(),
             file.getRepresentationId(), file.getPath(), file.getId(), filePreservation, notifyInSteps);
           pmId = pm.getId();

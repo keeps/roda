@@ -140,7 +140,7 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
     try {
       LOGGER.debug("Validating AIP {}", aip.getId());
       Pair<ValidationReport, List<Pair<String, String>>> reportAndSchemaInfo = ValidationUtils.isAIPMetadataValid(
-        forceDescriptiveMetadataType, validateDescriptiveMetadata, metadataType, metadataVersion, model, aip.getId());
+        forceDescriptiveMetadataType, validateDescriptiveMetadata, metadataType, metadataVersion, model, aip);
       schemasInfo = reportAndSchemaInfo.getSecond();
 
       if (reportAndSchemaInfo.getFirst().isValid()) {
