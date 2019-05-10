@@ -131,10 +131,10 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
   }
 
   private void processAIP(IndexService index, ModelService model, Report pluginReport, JobPluginInfo jobPluginInfo,
-    Job job, AIP aip) {
+    Job cachedJob, AIP aip) {
 
     Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
-    PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
     PluginState state = PluginState.SUCCESS;
 
     try {
@@ -157,20 +157,20 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
 
     try {
       boolean notify = true;
-      createEvent(aip, model, index, reportItem.getPluginState(), notify);
+      createEvent(aip, model, index, reportItem.getPluginState(), notify, cachedJob);
       jobPluginInfo.incrementObjectsProcessed(state);
 
       pluginReport.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
     } catch (PluginException | RuntimeException e) {
       LOGGER.error("Error updating job report", e);
     }
   }
 
-  private void createEvent(AIP aip, ModelService model, IndexService index, PluginState state, boolean notify)
-    throws PluginException {
+  private void createEvent(AIP aip, ModelService model, IndexService index, PluginState state, boolean notify,
+    Job cachedJob) throws PluginException {
     try {
-      PluginHelper.createPluginEvent(this, aip.getId(), model, index, state, "", notify);
+      PluginHelper.createPluginEvent(this, aip.getId(), model, index, state, "", notify, cachedJob);
     } catch (RODAException e) {
       throw new PluginException(e.getMessage(), e);
     }

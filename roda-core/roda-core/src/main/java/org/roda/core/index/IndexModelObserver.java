@@ -846,8 +846,8 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
-  public ReturnWithExceptions<Void, ModelObserver> jobReportCreatedOrUpdated(Report jobReport, Job job) {
-    return SolrUtils.create2(index, this, IndexedReport.class, jobReport, new JobReportCollection.Info(jobReport, job));
+  public ReturnWithExceptions<Void, ModelObserver> jobReportCreatedOrUpdated(Report jobReport, Job cachedJob) {
+    return SolrUtils.create2(index, this, IndexedReport.class, jobReport, new JobReportCollection.Info(jobReport, cachedJob));
   }
 
   @Override

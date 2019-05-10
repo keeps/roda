@@ -43,10 +43,10 @@ public class PremisSkeletonPluginUtils {
     NotFoundException, AuthorizationDeniedException, XmlException, ValidationException {
     gov.loc.premis.v3.Representation representation;
 
-    try {
+    if (model.preservationRepresentationExists(aipId, representationId)) {
       Binary preservationObject = model.retrievePreservationRepresentation(aipId, representationId);
       representation = PremisV3Utils.binaryToRepresentation(preservationObject.getContent(), false);
-    } catch (NotFoundException e) {
+    } else {
       representation = PremisV3Utils.createBaseRepresentation(aipId, representationId);
     }
 
@@ -55,12 +55,7 @@ public class PremisSkeletonPluginUtils {
         if (oFile.isPresent()) {
           File file = oFile.get();
           if (!file.isDirectory()) {
-            try {
-              model.retrievePreservationFile(aipId, representationId, file.getPath(), file.getId());
-              // 20170830 hsilva: this log is after the retrieve because the
-              // method in the catch also does the same logging
-              LOGGER.debug("Processing {}", file);
-            } catch (NotFoundException e1) {
+            if (!model.preservationFileExists(aipId, representationId, file.getPath(), file.getId())) {
               PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, fixityAlgorithms, representation);
             }
           }
@@ -88,6 +83,8 @@ public class PremisSkeletonPluginUtils {
     gov.loc.premis.v3.Representation representation;
 
     try {
+      // FIXME 20190509 hsilva: couldn't this be changed by an exists
+      // invocation? more cheap?
       Binary preservationObject = model.retrievePreservationRepresentation(file.getAipId(), file.getRepresentationId());
       representation = PremisV3Utils.binaryToRepresentation(preservationObject.getContent(), false);
     } catch (NotFoundException e) {
@@ -105,11 +102,15 @@ public class PremisSkeletonPluginUtils {
     if (!file.isDirectory()) {
       LOGGER.debug("Processing {}", file);
       try {
+        // FIXME 20190509 hsilva: couldn't this be changed by an exists
+        // invocation? more cheap?
         model.retrievePreservationFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId());
       } catch (NotFoundException e) {
         ContentPayload filePreservation = PremisV3Utils.createBaseFile(file, model, fixityAlgorithms);
         String pmId;
         try {
+          // FIXME 20190509 hsilva: couldn't this be changed by an exists
+          // invocation? more cheap?
           PreservationMetadata pm = model.createPreservationMetadata(PreservationMetadataType.FILE, file.getAipId(),
             file.getRepresentationId(), file.getPath(), file.getId(), filePreservation, notifyInSteps);
           pmId = pm.getId();

@@ -104,12 +104,12 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
   @Override
   public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, List<AIP> list, Job job) {
+    JobPluginInfo jobPluginInfo, List<AIP> list, Job cachedJob) {
 
     try {
       for (AIP aip : list) {
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
-        PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
 
         LOGGER.debug("Processing AIP {}", aip.getId());
         List<LinkingIdentifier> sources = new ArrayList<>();
@@ -161,14 +161,14 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
         try {
           PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, reportItem.getPluginState(),
-            "", true);
+            "", true, cachedJob);
         } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
           | AuthorizationDeniedException | AlreadyExistsException e) {
           LOGGER.error("Error creating event: {}", e.getMessage(), e);
         }
 
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
       }
     } catch (ClassCastException e) {
       LOGGER.error("Trying to execute an AIP-only plugin with other objects");
@@ -180,14 +180,14 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
   @Override
   public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, List<Representation> list, Job job) {
+    JobPluginInfo jobPluginInfo, List<Representation> list, Job cachedJob) {
 
     for (Representation representation : list) {
       List<LinkingIdentifier> sources = new ArrayList<>();
 
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
         Representation.class);
-      PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
       LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), representation.getAipId());
       try {
         sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation));
@@ -205,14 +205,14 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
       try {
         PluginHelper.createPluginEvent(this, representation.getAipId(), representation.getId(), model, index, sources,
-          null, reportItem.getPluginState(), "", true);
+          null, reportItem.getPluginState(), "", true, cachedJob);
       } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
         | AuthorizationDeniedException | AlreadyExistsException e) {
         LOGGER.error("Error creating event: {}", e.getMessage(), e);
       }
 
       report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
     }
 
     return report;
@@ -220,13 +220,13 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
   @Override
   public Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, List<File> list, Job job) {
+    JobPluginInfo jobPluginInfo, List<File> list, Job cachedJob) {
 
     for (File file : list) {
       List<LinkingIdentifier> sources = new ArrayList<>();
 
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class);
-      PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
       LOGGER.debug("Processing file {} from representation {} of AIP {}", file.getId(), file.getRepresentationId(),
         file.getAipId());
 
@@ -247,14 +247,14 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
         List<LinkingIdentifier> outcomes = null;
         boolean notify = true;
         PluginHelper.createPluginEvent(this, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-          model, index, sources, outcomes, reportItem.getPluginState(), "", notify);
+          model, index, sources, outcomes, reportItem.getPluginState(), "", notify, cachedJob);
       } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
         | AuthorizationDeniedException | AlreadyExistsException e) {
         LOGGER.error("Error creating event: {}", e.getMessage(), e);
       }
 
       report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
     }
 
     return report;

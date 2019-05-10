@@ -91,9 +91,9 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
     }, index, model, storage, liteList);
   }
 
-  private void processAIP(IndexService index, ModelService model, Report report, Job job, AIP aip) {
+  private void processAIP(IndexService index, ModelService model, Report report, Job cachedJob, AIP aip) {
     Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
-    PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
 
     String outcomeDetail = "";
     try {
@@ -101,7 +101,7 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
 
       if (aip.getState() != AIPState.ACTIVE) {
         aip.setState(AIPState.ACTIVE);
-        model.updateAIPState(aip, job.getUsername());
+        model.updateAIPState(aip, cachedJob.getUsername());
       }
       reportItem.setPluginState(PluginState.SUCCESS).setOutcomeObjectState(AIPState.ACTIVE);
       LOGGER.debug("Done with auto accepting AIP {}", aip.getId());
@@ -115,14 +115,14 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
     try {
       boolean notify = true;
       PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), outcomeDetail,
-        notify);
+        notify, cachedJob);
     } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
       | AuthorizationDeniedException | AlreadyExistsException e) {
       LOGGER.error("Error creating event: {}", e.getMessage(), e);
     }
 
     report.addReport(reportItem);
-    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
   }
 
   @Override

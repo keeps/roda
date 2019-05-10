@@ -15,6 +15,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.validation.ValidationException;
@@ -90,8 +91,14 @@ public abstract class SIPToAIPPlugin extends AbstractPlugin<TransferredResource>
     this.eventDescription = description;
   }
 
+  /** @deprecated */
   protected void createUnpackingEventSuccess(ModelService model, IndexService index,
     TransferredResource transferredResource, AIP aip, String unpackDescription) {
+    createUnpackingEventSuccess(model, index, transferredResource, aip, unpackDescription, (Job) null);
+  }
+
+  protected void createUnpackingEventSuccess(ModelService model, IndexService index,
+    TransferredResource transferredResource, AIP aip, String unpackDescription, Job cachedJob) {
     setPreservationEventType(UNPACK_EVENT_TYPE);
     setPreservationSuccessMessage(UNPACK_SUCCESS_MESSAGE);
     setPreservationFailureMessage(UNPACK_FAILURE_MESSAGE);
@@ -99,15 +106,21 @@ public abstract class SIPToAIPPlugin extends AbstractPlugin<TransferredResource>
     try {
       boolean notify = true;
       PluginHelper.createPluginEvent(this, aip.getId(), model, index, transferredResource, PluginState.SUCCESS, "",
-        notify);
+        notify, cachedJob);
     } catch (NotFoundException | RequestNotValidException | GenericException | AuthorizationDeniedException
       | ValidationException | AlreadyExistsException e) {
       LOGGER.warn("Error creating unpacking event: " + e.getMessage(), e);
     }
   }
 
+  /** @deprecated */
   protected void createWellformedEventSuccess(ModelService model, IndexService index,
     TransferredResource transferredResource, AIP aip) {
+    createWellformedEventSuccess(model, index, transferredResource, aip, (Job) null);
+  }
+
+  protected void createWellformedEventSuccess(ModelService model, IndexService index,
+    TransferredResource transferredResource, AIP aip, Job cachedJob) {
     setPreservationEventType(WELLFORMED_EVENT_TYPE);
     setPreservationSuccessMessage(WELLFORMED_SUCCESS_MESSAGE);
     setPreservationFailureMessage(WELLFORMED_FAILURE_MESSAGE);
@@ -115,7 +128,7 @@ public abstract class SIPToAIPPlugin extends AbstractPlugin<TransferredResource>
     try {
       boolean notify = true;
       PluginHelper.createPluginEvent(this, aip.getId(), model, index, transferredResource, PluginState.SUCCESS, "",
-        notify);
+        notify, cachedJob);
     } catch (NotFoundException | RequestNotValidException | GenericException | AuthorizationDeniedException
       | ValidationException | AlreadyExistsException e) {
       LOGGER.warn("Error creating unpacking event: " + e.getMessage(), e);

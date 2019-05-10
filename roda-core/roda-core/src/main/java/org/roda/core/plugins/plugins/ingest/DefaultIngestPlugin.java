@@ -180,7 +180,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
       // this event can only be created after AIPs exist and that's why it is
       // performed here, after transformTransferredResourceIntoAnAIP
-      createIngestStartedEvent(model, index, jobPluginInfo, startDate);
+      createIngestStartedEvent(model, index, jobPluginInfo, startDate, cachedJob);
 
       // 2) virus check
       if (!aips.isEmpty() && PluginHelper.verifyIfStepShouldBePerformed(this,
@@ -273,7 +273,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
           recalculateAIPsList(model, index, jobPluginInfo, aips, true);
           jobPluginInfo.incrementStepsCompletedByOne();
         } else {
-          updateAIPsToBeAppraised(model, aips, jobPluginInfo);
+          updateAIPsToBeAppraised(model, aips, jobPluginInfo, cachedJob);
         }
       }
 
@@ -285,7 +285,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         PluginHelper.moveSIPs(this, model, index, resources, jobPluginInfo);
       }
 
-      createIngestEndedEvent(model, index, jobPluginInfo);
+      createIngestEndedEvent(model, index, jobPluginInfo, cachedJob);
 
       getAfterExecute().ifPresent(e -> e.execute(jobPluginInfo, aips));
 
@@ -591,15 +591,15 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   }
 
   private void createIngestEvent(ModelService model, IndexService index, IngestJobPluginInfo jobPluginInfo,
-    Date eventDate) {
+    Date eventDate, Job cachedJob) {
     Map<String, List<String>> aipIdToTransferredResourceId = jobPluginInfo.getAipIdToTransferredResourceIds();
     for (Map.Entry<String, List<String>> entry : aipIdToTransferredResourceId.entrySet()) {
       for (String transferredResourceId : entry.getValue()) {
         try {
-          AIP aip = model.retrieveAIP(entry.getKey());
           TransferredResource tr = index.retrieve(TransferredResource.class, transferredResourceId,
             Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH));
-          PluginHelper.createPluginEvent(this, aip.getId(), model, index, tr, PluginState.SUCCESS, "", true, eventDate);
+          PluginHelper.createPluginEvent(this, entry.getKey(), model, index, tr, PluginState.SUCCESS, "", true,
+            eventDate, cachedJob);
         } catch (NotFoundException | RequestNotValidException | GenericException | AuthorizationDeniedException
           | ValidationException | AlreadyExistsException e) {
           LOGGER.warn("Error creating ingest event", e);
@@ -609,20 +609,21 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   }
 
   private void createIngestStartedEvent(ModelService model, IndexService index, IngestJobPluginInfo jobPluginInfo,
-    Date startDate) {
+    Date startDate, Job cachedJob) {
     setPreservationEventType(START_TYPE);
     setPreservationSuccessMessage(START_MESSAGE);
     setPreservationFailureMessage(START_MESSAGE);
     setPreservationEventDescription(START_MESSAGE);
-    createIngestEvent(model, index, jobPluginInfo, startDate);
+    createIngestEvent(model, index, jobPluginInfo, startDate, cachedJob);
   }
 
-  private void createIngestEndedEvent(ModelService model, IndexService index, IngestJobPluginInfo jobPluginInfo) {
+  private void createIngestEndedEvent(ModelService model, IndexService index, IngestJobPluginInfo jobPluginInfo,
+    Job cachedJob) {
     setPreservationEventType(END_TYPE);
     setPreservationSuccessMessage(END_SUCCESS);
     setPreservationFailureMessage(END_FAILURE);
     setPreservationEventDescription(END_DESCRIPTION);
-    createIngestEvent(model, index, jobPluginInfo, new Date());
+    createIngestEvent(model, index, jobPluginInfo, new Date(), cachedJob);
   }
 
   private Report createFileFixityInformation(IndexService index, ModelService model, StorageService storage,
@@ -699,17 +700,19 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     return null;
   }
 
-  private void updateAIPsToBeAppraised(ModelService model, List<AIP> aips, IngestJobPluginInfo jobPluginInfo) {
+  private void updateAIPsToBeAppraised(ModelService model, List<AIP> aips, IngestJobPluginInfo jobPluginInfo,
+    Job cachedJob) {
     for (AIP aip : aips) {
       aip.setState(AIPState.UNDER_APPRAISAL);
       try {
-        aip = model.updateAIPState(aip, PluginHelper.getJobUsername(this, model));
+        aip = model.updateAIPState(aip, cachedJob.getUsername());
 
         getParameterValues().put(RodaConstants.PLUGIN_PARAMS_OUTCOMEOBJECTID_TO_SOURCEOBJECTID_MAP,
           JsonUtils.getJsonFromObject(jobPluginInfo.getAipIdToTransferredResourceIds()));
 
         // update main report outcomeObjectState
-        PluginHelper.updateJobReportState(this, model, aip.getIngestSIPUUID(), aip.getId(), AIPState.UNDER_APPRAISAL);
+        PluginHelper.updateJobReportState(this, model, aip.getIngestSIPUUID(), aip.getId(), AIPState.UNDER_APPRAISAL,
+          cachedJob);
 
         // update counters of manual intervention
         jobPluginInfo.incrementOutcomeObjectsWithManualIntervention();

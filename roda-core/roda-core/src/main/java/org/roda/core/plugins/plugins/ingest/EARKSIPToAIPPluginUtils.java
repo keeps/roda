@@ -73,8 +73,8 @@ public class EARKSIPToAIPPluginUtils {
       processIPRepresentationInformation(model, representation, aip.getId(), notify, false, username, null);
     }
 
-    model.notifyAipCreated(aip.getId());
-
+    // INFO 20190509 hsilva: this is required as the previous instructions
+    // update the AIP metadata
     AIP createdAIP = model.retrieveAIP(aip.getId());
 
     // Set Permissions
@@ -82,9 +82,8 @@ public class EARKSIPToAIPPluginUtils {
       aip.getPermissions());
     Permissions finalPermissions = PermissionUtils.grantAllPermissions(username, readPermissions, fullPermissions);
     createdAIP.setPermissions(finalPermissions);
-    model.updateAIP(createdAIP, username);
 
-    return model.retrieveAIP(aip.getId());
+    return model.updateAIP(createdAIP, username);
   }
 
   public static AIP earkSIPToAIPUpdate(SIP sip, IndexedAIP indexedAIP, ModelService model, StorageService storage,

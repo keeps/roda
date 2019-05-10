@@ -388,6 +388,7 @@ public final class PluginHelper {
     return reportItem;
   }
 
+  /** @deprecated will be removed in RODA 4 */
   public static <T extends IsRODAObject> void createJobReport(Plugin<T> plugin, ModelService model, Report reportItem) {
     String jobId = getJobId(plugin);
     Report report = new Report(reportItem);
@@ -410,16 +411,53 @@ public final class PluginHelper {
     }
   }
 
+  public static <T extends IsRODAObject> void createJobReport(Plugin<T> plugin, ModelService model, Report reportItem,
+    Job cachedJob) {
+    String jobId = cachedJob.getId();
+    Report report = new Report(reportItem);
+    report.injectLineSeparator(System.lineSeparator());
+    reportItem.setId(IdUtils.getJobReportId(jobId, reportItem.getSourceObjectId(), reportItem.getOutcomeObjectId()));
+    report.setId(reportItem.getId());
+    report.setJobId(jobId);
+    if (reportItem.getTotalSteps() != 0) {
+      report.setTotalSteps(reportItem.getTotalSteps());
+    } else {
+      report.setTotalSteps(getTotalStepsFromParameters(plugin));
+    }
+    report.addReport(reportItem);
+
+    try {
+      model.createOrUpdateJobReport(report, cachedJob);
+    } catch (GenericException | AuthorizationDeniedException e) {
+      LOGGER.error("Error creating Job Report", e);
+    }
+  }
+
+  /** @deprecated */
   public static <T extends IsRODAObject> void updateJobReportState(Plugin<T> plugin, ModelService model,
     String sourceObjectId, String outcomeObjectId, AIPState newState) {
+    String jobId = getJobId(plugin);
     for (String sourceObjectIdCalculated : getSourceObjectIdsToInitPluginReportItem(plugin, outcomeObjectId,
       sourceObjectId)) {
       try {
-        String jobId = getJobId(plugin);
         Report jobReport = model.retrieveJobReport(jobId, sourceObjectIdCalculated, outcomeObjectId);
         jobReport.setOutcomeObjectState(newState);
         Job job = model.retrieveJob(jobId);
         model.createOrUpdateJobReport(jobReport, job);
+      } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+        LOGGER.error("Error while updating Job Report", e);
+      }
+    }
+  }
+
+  public static <T extends IsRODAObject> void updateJobReportState(Plugin<T> plugin, ModelService model,
+    String sourceObjectId, String outcomeObjectId, AIPState newState, Job cachedJob) {
+    for (String sourceObjectIdCalculated : getSourceObjectIdsToInitPluginReportItem(plugin, outcomeObjectId,
+      sourceObjectId)) {
+      try {
+        Report jobReport = model.retrieveJobReport(cachedJob.getId(), sourceObjectIdCalculated, outcomeObjectId);
+        jobReport.setOutcomeObjectState(newState);
+        model.createOrUpdateJobReport(jobReport, cachedJob);
       } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
         LOGGER.error("Error while updating Job Report", e);
       }
@@ -590,8 +628,8 @@ public final class PluginHelper {
   }
 
   /**
-   * 20180525 hsilva: not in use in RODA base source code, so this will be removed
-   * in a near future
+   * 20180525 hsilva: not in use in RODA base source code, so this will be
+   * removed in a near future
    */
   @Deprecated
   public static <T extends IsRODAObject, T1 extends JobPluginInfo> T1 getInitialJobInformation(Plugin<T> plugin,
@@ -956,6 +994,7 @@ public final class PluginHelper {
    * For SIP > AIP
    */
 
+  /** @deprecated */
   public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
     ModelService model, IndexService index, TransferredResource source, PluginState outcome,
     String outcomeDetailExtension, boolean notify, Date eventDate) throws RequestNotValidException, NotFoundException,
@@ -966,18 +1005,43 @@ public final class PluginHelper {
       .asList(PluginHelper.getLinkingIdentifier(aipId, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
 
     return createPluginEvent(plugin, aipId, null, null, null, model, index, sources, outcomes, outcome,
-      outcomeDetailExtension, notify, eventDate);
+      outcomeDetailExtension, notify, eventDate, (Job) null);
   }
 
   public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
     ModelService model, IndexService index, TransferredResource source, PluginState outcome,
+    String outcomeDetailExtension, boolean notify, Date eventDate, Job cachedJob) throws RequestNotValidException,
+    NotFoundException, GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
+    List<LinkingIdentifier> sources = Arrays
+      .asList(PluginHelper.getLinkingIdentifier(source, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+    List<LinkingIdentifier> outcomes = Arrays
+      .asList(PluginHelper.getLinkingIdentifier(aipId, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+
+    return createPluginEvent(plugin, aipId, null, null, null, model, index, sources, outcomes, outcome,
+      outcomeDetailExtension, notify, eventDate, cachedJob);
+  }
+
+  /** @deprecated */
+  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
+    ModelService model, IndexService index, TransferredResource source, PluginState outcome,
     String outcomeDetailExtension, boolean notify) throws RequestNotValidException, NotFoundException, GenericException,
     AuthorizationDeniedException, ValidationException, AlreadyExistsException {
-    return createPluginEvent(plugin, aipId, model, index, source, outcome, outcomeDetailExtension, notify, new Date());
+    return createPluginEvent(plugin, aipId, model, index, source, outcome, outcomeDetailExtension, notify, new Date(),
+      (Job) null);
+  }
+
+  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
+    ModelService model, IndexService index, TransferredResource source, PluginState outcome,
+    String outcomeDetailExtension, boolean notify, Job cachedJob) throws RequestNotValidException, NotFoundException,
+    GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
+    return createPluginEvent(plugin, aipId, model, index, source, outcome, outcomeDetailExtension, notify, new Date(),
+      cachedJob);
   }
 
   /**
    * For AIP as source only
+   * 
+   * @deprecated
    */
   public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
     ModelService model, IndexService index, PluginState outcome, String outcomeDetailExtension, boolean notify)
@@ -987,10 +1051,22 @@ public final class PluginHelper {
       .asList(PluginHelper.getLinkingIdentifier(aipId, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
     List<LinkingIdentifier> outcomes = null;
     return createPluginEvent(plugin, aipId, null, null, null, model, index, sources, outcomes, outcome,
-      outcomeDetailExtension, notify, new Date());
+      outcomeDetailExtension, notify, new Date(), (Job) null);
+  }
+
+  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
+    ModelService model, IndexService index, PluginState outcome, String outcomeDetailExtension, boolean notify,
+    Job cachedJob) throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
+    ValidationException, AlreadyExistsException {
+    List<LinkingIdentifier> sources = Arrays
+      .asList(PluginHelper.getLinkingIdentifier(aipId, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+    List<LinkingIdentifier> outcomes = null;
+    return createPluginEvent(plugin, aipId, null, null, null, model, index, sources, outcomes, outcome,
+      outcomeDetailExtension, notify, new Date(), cachedJob);
   }
 
   // used by migration plugin
+  /** @deprecated */
   public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
     ModelService model, IndexService index, PluginState outcome, String outcomeDetailExtension, boolean notify,
     Date eventDate) throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
@@ -1000,22 +1076,46 @@ public final class PluginHelper {
     List<LinkingIdentifier> outcomes = Arrays
       .asList(PluginHelper.getLinkingIdentifier(aipId, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
     return createPluginEvent(plugin, aipId, null, null, null, model, index, sources, outcomes, outcome,
-      outcomeDetailExtension, notify, eventDate);
+      outcomeDetailExtension, notify, eventDate, (Job) null);
+  }
+
+  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
+    ModelService model, IndexService index, PluginState outcome, String outcomeDetailExtension, boolean notify,
+    Date eventDate, Job cachedJob) throws RequestNotValidException, NotFoundException, GenericException,
+    AuthorizationDeniedException, ValidationException, AlreadyExistsException {
+    List<LinkingIdentifier> sources = Arrays
+      .asList(PluginHelper.getLinkingIdentifier(aipId, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+    List<LinkingIdentifier> outcomes = Arrays
+      .asList(PluginHelper.getLinkingIdentifier(aipId, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+    return createPluginEvent(plugin, aipId, null, null, null, model, index, sources, outcomes, outcome,
+      outcomeDetailExtension, notify, eventDate, cachedJob);
   }
 
   /**
    * For AIP
+   * 
+   * @deprecated
    */
   public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
     ModelService model, IndexService index, List<LinkingIdentifier> sources, List<LinkingIdentifier> targets,
     PluginState outcome, String outcomeDetailExtension, boolean notify) throws RequestNotValidException,
     NotFoundException, GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
     return createPluginEvent(plugin, aipId, null, null, null, model, index, sources, targets, outcome,
-      outcomeDetailExtension, notify, new Date());
+      outcomeDetailExtension, notify, new Date(), (Job) null);
+  }
+
+  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
+    ModelService model, IndexService index, List<LinkingIdentifier> sources, List<LinkingIdentifier> targets,
+    PluginState outcome, String outcomeDetailExtension, boolean notify, Job cachedJob) throws RequestNotValidException,
+    NotFoundException, GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
+    return createPluginEvent(plugin, aipId, null, null, null, model, index, sources, targets, outcome,
+      outcomeDetailExtension, notify, new Date(), cachedJob);
   }
 
   /**
    * For REPRESENTATION
+   * 
+   * @deprecated
    */
   public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
     String representationId, ModelService model, IndexService index, List<LinkingIdentifier> sources,
@@ -1023,11 +1123,22 @@ public final class PluginHelper {
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
     ValidationException, AlreadyExistsException {
     return createPluginEvent(plugin, aipId, representationId, null, null, model, index, sources, targets, outcome,
-      outcomeDetailExtension, notify, new Date());
+      outcomeDetailExtension, notify, new Date(), (Job) null);
+  }
+
+  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
+    String representationId, ModelService model, IndexService index, List<LinkingIdentifier> sources,
+    List<LinkingIdentifier> targets, PluginState outcome, String outcomeDetailExtension, boolean notify, Job cachedJob)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
+    ValidationException, AlreadyExistsException {
+    return createPluginEvent(plugin, aipId, representationId, null, null, model, index, sources, targets, outcome,
+      outcomeDetailExtension, notify, new Date(), cachedJob);
   }
 
   /**
    * For FILE
+   * 
+   * @deprecated
    */
   public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
     String representationId, List<String> filePath, String fileId, ModelService model, IndexService index,
@@ -1035,14 +1146,23 @@ public final class PluginHelper {
     String outcomeDetailExtension, boolean notify) throws RequestNotValidException, NotFoundException, GenericException,
     AuthorizationDeniedException, ValidationException, AlreadyExistsException {
     return createPluginEvent(plugin, aipId, representationId, filePath, fileId, model, index, sources, outcomes,
-      outcome, outcomeDetailExtension, notify, new Date());
+      outcome, outcomeDetailExtension, notify, new Date(), (Job) null);
+  }
+
+  public static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
+    String representationId, List<String> filePath, String fileId, ModelService model, IndexService index,
+    List<LinkingIdentifier> sources, List<LinkingIdentifier> outcomes, PluginState outcome,
+    String outcomeDetailExtension, boolean notify, Job cachedJob) throws RequestNotValidException, NotFoundException,
+    GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
+    return createPluginEvent(plugin, aipId, representationId, filePath, fileId, model, index, sources, outcomes,
+      outcome, outcomeDetailExtension, notify, new Date(), cachedJob);
   }
 
   private static <T extends IsRODAObject> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipId,
     String representationId, List<String> filePath, String fileId, ModelService model, IndexService index,
     List<LinkingIdentifier> sources, List<LinkingIdentifier> outcomes, PluginState outcome,
-    String outcomeDetailExtension, boolean notify, Date startDate) throws RequestNotValidException, NotFoundException,
-    GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
+    String outcomeDetailExtension, boolean notify, Date startDate, Job cachedJob) throws RequestNotValidException,
+    NotFoundException, GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
     List<String> agentIds = new ArrayList<>();
     String agentId = IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion());
     StoragePath agentPath = ModelUtils.getPreservationMetadataStoragePath(agentId, PreservationMetadataType.AGENT);
@@ -1058,21 +1178,24 @@ public final class PluginHelper {
       LOGGER.error("Error creating PREMIS agent", e);
     }
 
-    Job job;
-    try {
-      job = getJob(plugin, index);
-    } catch (NotFoundException e) {
-      job = null;
+    Job job = cachedJob;
+    // INFO 20190509 hsilva: this is just to make easier to be retro-compatible
+    if (job == null) {
+      try {
+        job = getJob(plugin, index);
+      } catch (NotFoundException e) {
+        job = null;
+      }
     }
 
     if (job != null) {
       String userId = IdUtils.getUserAgentId(job.getUsername());
       StoragePath userAgentPath = ModelUtils.getPreservationMetadataStoragePath(userId, PreservationMetadataType.AGENT);
-      
+
       try {
         if (!RodaCoreFactory.getStorageService().exists(userAgentPath)) {
           PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(job.getUsername(), model, index,
-                  true);
+            true);
           if (pm != null) {
             agentIds.add(userId);
           }
@@ -1208,8 +1331,8 @@ public final class PluginHelper {
   }
 
   /**
-   * 20180914 hsilva: use updateReportsAndIngestInfoAfterMovingSIPs instead (just
-   * different method name)
+   * 20180914 hsilva: use updateReportsAndIngestInfoAfterMovingSIPs instead
+   * (just different method name)
    */
   @Deprecated
   private static void updateReportsAfterMovingSIPs(ModelService model, IngestJobPluginInfo jobPluginInfo,
@@ -1406,8 +1529,8 @@ public final class PluginHelper {
    * @throws LockingException
    * 
    * @deprecated 20180525 hsilva: this methods should not be used directly, but
-   *             instead one should use PluginHelper.processObjects methods, that
-   *             is why this method will become private in a near future
+   *             instead one should use PluginHelper.processObjects methods,
+   *             that is why this method will become private in a near future
    */
   public static <T extends IsRODAObject> List<T> transformLitesIntoObjects(ModelService model, Plugin<T> plugin,
     Report report, JobPluginInfo pluginInfo, List<LiteOptionalWithCause> lites, Job job, boolean autoLocking)

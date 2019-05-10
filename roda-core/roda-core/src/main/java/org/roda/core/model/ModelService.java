@@ -249,8 +249,8 @@ public class ModelService extends ModelObservable {
    * 
    * @param aipId
    *          Suggested ID for the AIP, if <code>null</code> then an ID will be
-   *          automatically generated. If ID cannot be allowed because it already
-   *          exists or is not valid, another ID will be provided.
+   *          automatically generated. If ID cannot be allowed because it
+   *          already exists or is not valid, another ID will be provided.
    * @param sourceStorage
    * @param sourcePath
    * @return
@@ -1292,6 +1292,15 @@ public class ModelService extends ModelObservable {
     return storage.getBinary(path);
   }
 
+  public boolean preservationRepresentationExists(String aipId, String representationId)
+    throws RequestNotValidException {
+    String urn = IdUtils.getPreservationId(PreservationMetadataType.REPRESENTATION, aipId, representationId, null,
+      null);
+    StoragePath path = ModelUtils.getPreservationMetadataStoragePath(urn, PreservationMetadataType.REPRESENTATION,
+      aipId, representationId);
+    return storage.exists(path);
+  }
+
   public Binary retrievePreservationFile(File file)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     return retrievePreservationFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId());
@@ -1303,6 +1312,14 @@ public class ModelService extends ModelObservable {
     StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(identifier, PreservationMetadataType.FILE,
       aipId, representationId, fileDirectoryPath, fileId);
     return storage.getBinary(filePath);
+  }
+
+  public boolean preservationFileExists(String aipId, String representationId, List<String> fileDirectoryPath,
+    String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    String identifier = IdUtils.getPreservationFileId(fileId);
+    StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(identifier, PreservationMetadataType.FILE,
+      aipId, representationId, fileDirectoryPath, fileId);
+    return storage.exists(filePath);
   }
 
   public Binary retrievePreservationEvent(String aipId, String representationId, List<String> filePath, String fileId,
@@ -2224,7 +2241,8 @@ public class ModelService extends ModelObservable {
     return retrieveJobReport(jobId, jobReportId);
   }
 
-  public void createOrUpdateJobReport(Report jobReport, Job job) throws GenericException, AuthorizationDeniedException {
+  public void createOrUpdateJobReport(Report jobReport, Job cachedJob)
+    throws GenericException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     // create job report in storage
@@ -2237,7 +2255,7 @@ public class ModelService extends ModelObservable {
     }
 
     // index it
-    notifyJobReportCreatedOrUpdated(jobReport, job).failOnError();
+    notifyJobReportCreatedOrUpdated(jobReport, cachedJob).failOnError();
   }
 
   public void deleteJobReport(String jobId, String jobReportId)

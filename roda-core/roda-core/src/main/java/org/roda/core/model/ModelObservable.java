@@ -177,8 +177,8 @@ public abstract class ModelObservable {
     return notifyObserversSafely(observer -> observer.jobDeleted(jobId));
   }
 
-  public ReturnWithExceptionsWrapper notifyJobReportCreatedOrUpdated(Report jobReport, Job job) {
-    return notifyObserversSafely(observer -> observer.jobReportCreatedOrUpdated(jobReport, job));
+  public ReturnWithExceptionsWrapper notifyJobReportCreatedOrUpdated(Report jobReport, Job cachedJob) {
+    return notifyObserversSafely(observer -> observer.jobReportCreatedOrUpdated(jobReport, cachedJob));
   }
 
   public ReturnWithExceptionsWrapper notifyJobReportDeleted(String jobReportId) {

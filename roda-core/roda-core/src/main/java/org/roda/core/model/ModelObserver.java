@@ -92,7 +92,7 @@ public interface ModelObserver {
 
   public ReturnWithExceptions<Void, ModelObserver> jobDeleted(String jobId);
 
-  public ReturnWithExceptions<Void, ModelObserver> jobReportCreatedOrUpdated(Report jobReport, Job job);
+  public ReturnWithExceptions<Void, ModelObserver> jobReportCreatedOrUpdated(Report jobReport, Job cachedJob);
 
   public ReturnWithExceptions<Void, ModelObserver> jobReportDeleted(String jobReportId);
 

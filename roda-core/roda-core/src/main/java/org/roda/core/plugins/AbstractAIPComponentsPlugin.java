@@ -64,16 +64,16 @@ public abstract class AbstractAIPComponentsPlugin<T extends IsRODAObject> extend
   }
 
   protected abstract Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException;
+    JobPluginInfo jobPluginInfo, List<AIP> list, Job cachedJob) throws PluginException;
 
   protected abstract Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage,
-    Report report, JobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException;
+    Report report, JobPluginInfo jobPluginInfo, List<Representation> list, Job cachedJob) throws PluginException;
 
   protected abstract Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException;
+    JobPluginInfo jobPluginInfo, List<File> list, Job cachedJob) throws PluginException;
 
   protected Report executeOnIncidence(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, List<RiskIncidence> list, Job job) throws PluginException {
+    JobPluginInfo jobPluginInfo, List<RiskIncidence> list, Job cachedJob) throws PluginException {
 
     List<File> fileList = new ArrayList<>();
     List<Representation> representationList = new ArrayList<>();
@@ -95,15 +95,15 @@ public abstract class AbstractAIPComponentsPlugin<T extends IsRODAObject> extend
     }
 
     if (!fileList.isEmpty()) {
-      executeOnFile(index, model, storage, report, jobPluginInfo, fileList, job);
+      executeOnFile(index, model, storage, report, jobPluginInfo, fileList, cachedJob);
     }
 
     if (!representationList.isEmpty()) {
-      executeOnRepresentation(index, model, storage, report, jobPluginInfo, representationList, job);
+      executeOnRepresentation(index, model, storage, report, jobPluginInfo, representationList, cachedJob);
     }
 
     if (!aipList.isEmpty()) {
-      executeOnAIP(index, model, storage, report, jobPluginInfo, aipList, job);
+      executeOnAIP(index, model, storage, report, jobPluginInfo, aipList, cachedJob);
     }
 
     return report;

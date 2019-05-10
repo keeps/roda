@@ -45,15 +45,15 @@ public class PermissionUtils {
     List<DescriptiveMetadata> descriptiveMetadataList = aip.getDescriptiveMetadata();
     Set<Permissions.PermissionType> readPermissionToUserGroup = new HashSet<>();
 
-    for (DescriptiveMetadata descriptiveMetadata : descriptiveMetadataList) {
-      Binary descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aip.getId(),
-        descriptiveMetadata.getId());
+    String xpath = RodaCoreFactory.getRodaConfigurationAsString("core", "permissions", "xpath");
+    String freeAccessTerm = RodaCoreFactory.getRodaConfigurationAsString("core", "permissions", "freeaccess");
 
-      try(InputStream createInputStream = descriptiveMetadataBinary.getContent().createInputStream()) {
-        String xpath = RodaCoreFactory.getRodaConfigurationAsString("core", "permissions", "xpath");
-        String freeAccessTerm = RodaCoreFactory.getRodaConfigurationAsString("core", "permissions", "freeaccess");
+    if (StringUtils.isNotBlank(xpath) && StringUtils.isNotBlank(freeAccessTerm)) {
+      for (DescriptiveMetadata descriptiveMetadata : descriptiveMetadataList) {
+        Binary descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aip.getId(),
+          descriptiveMetadata.getId());
 
-        if (StringUtils.isNotBlank(xpath) && StringUtils.isNotBlank(freeAccessTerm)) {
+        try (InputStream createInputStream = descriptiveMetadataBinary.getContent().createInputStream()) {
           String useRestrict = XMLUtility.getString(createInputStream, xpath);
           if (useRestrict.equals(freeAccessTerm)) {
             readPermissionToUserGroup.add(Permissions.PermissionType.READ);

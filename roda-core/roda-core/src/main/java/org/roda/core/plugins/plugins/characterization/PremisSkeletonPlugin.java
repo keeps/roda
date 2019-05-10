@@ -42,7 +42,6 @@ import org.roda.core.plugins.AbstractAIPComponentsPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.IdUtils;
@@ -106,14 +105,14 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
 
   @Override
   public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, List<AIP> list, Job job) throws PluginException {
+    JobPluginInfo jobPluginInfo, List<AIP> list, Job cachedJob) throws PluginException {
 
     try {
       List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
       for (AIP aip : list) {
         LOGGER.debug("Processing AIP {}", aip.getId());
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
-        PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
         Map<String, Map<String, List<String>>> updatedData = sipUpdateInformation.getUpdatedData();
 
         if (!sipUpdateInformation.hasUpdatedData() || !updatedData.containsKey(aip.getId())) {
@@ -135,7 +134,8 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
           }
 
           try {
-            PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", true);
+            PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", true,
+              cachedJob);
           } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
             | AuthorizationDeniedException | AlreadyExistsException e) {
             LOGGER.error("Error creating event: {}", e.getMessage(), e);
@@ -187,7 +187,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
         }
 
         report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
       }
     } catch (ClassCastException e) {
       LOGGER.error("Trying to execute an AIP-only plugin with other objects", e);
@@ -199,14 +199,14 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
 
   @Override
   public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, List<Representation> list, Job job) throws PluginException {
+    JobPluginInfo jobPluginInfo, List<Representation> list, Job cachedJob) throws PluginException {
 
     List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
     for (Representation representation : list) {
       LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), representation.getAipId());
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getRepresentationId(representation),
         Representation.class, AIPState.ACTIVE);
-      PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
       reportItem.setPluginState(PluginState.SUCCESS);
 
       try {
@@ -223,14 +223,14 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
       try {
         boolean notify = true;
         PluginHelper.createPluginEvent(this, representation.getAipId(), representation.getId(), model, index, null,
-          null, reportItem.getPluginState(), "", notify);
+          null, reportItem.getPluginState(), "", notify, cachedJob);
       } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
         | AuthorizationDeniedException | AlreadyExistsException e) {
         LOGGER.error("Error creating event: {}", e.getMessage(), e);
       }
 
       report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
     }
 
     return report;
@@ -238,14 +238,14 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
 
   @Override
   public Report executeOnFile(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, List<File> list, Job job) throws PluginException {
+    JobPluginInfo jobPluginInfo, List<File> list, Job cachedJob) throws PluginException {
 
     List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
     for (File file : list) {
       LOGGER.debug("Processing file {} from representation {} from AIP {}", file.getId(), file.getRepresentationId(),
         file.getAipId());
       Report reportItem = PluginHelper.initPluginReportItem(this, IdUtils.getFileId(file), File.class, AIPState.ACTIVE);
-      PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
       reportItem.setPluginState(PluginState.SUCCESS);
 
       try {
@@ -260,14 +260,14 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
       try {
         boolean notify = true;
         PluginHelper.createPluginEvent(this, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-          model, index, null, null, reportItem.getPluginState(), "", notify);
+          model, index, null, null, reportItem.getPluginState(), "", notify, cachedJob);
       } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
         | AuthorizationDeniedException | AlreadyExistsException e) {
         LOGGER.error("Error creating event: {}", e.getMessage(), e);
       }
 
       report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
     }
 
     return report;

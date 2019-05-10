@@ -97,18 +97,18 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
     }, index, model, storage, liteList);
   }
 
-  private void processAIP(IndexService index, ModelService model, Report report, Job currentJob,
+  private void processAIP(IndexService index, ModelService model, Report report, Job cachedJob,
     JobPluginInfo jobPluginInfo, AIP aip) {
     LOGGER.debug("Checking user authorization for creating AIP {}", aip.getId());
 
     Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
-    PluginHelper.updatePartialJobReport(this, model, reportItem, false, currentJob);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
 
     reportItem.setPluginState(PluginState.SUCCESS)
       .setPluginDetails(String.format("Done with checking user authorization for AIP %s", aip.getId()));
 
-    if (currentJob != null) {
-      processAIPPermissions(index, currentJob, aip, reportItem);
+    if (cachedJob != null) {
+      processAIPPermissions(index, cachedJob, aip, reportItem);
     } else {
       reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Unable to determine Job.");
     }
@@ -116,7 +116,7 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
     try {
       boolean notify = true;
       PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(),
-        reportItem.getPluginDetails(), notify);
+        reportItem.getPluginDetails(), notify, cachedJob);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | ValidationException | AlreadyExistsException e) {
       reportItem.setPluginState(PluginState.FAILURE).addPluginDetails("Unable to create event.");
@@ -132,12 +132,12 @@ public class VerifyUserAuthorizationPlugin extends AbstractPlugin<AIP> {
     LOGGER.debug("Done with checking user authorization for AIP {}", aip.getId());
 
     report.addReport(reportItem);
-    PluginHelper.updatePartialJobReport(this, model, reportItem, true, currentJob);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
   }
 
-  private void processAIPPermissions(IndexService index, Job currentJob, AIP aip, Report reportItem) {
+  private void processAIPPermissions(IndexService index, Job cachedJob, AIP aip, Report reportItem) {
     try {
-      String jobCreatorUsername = currentJob.getUsername();
+      String jobCreatorUsername = cachedJob.getUsername();
       if (aip.getParentId() != null) {
         try {
           IndexedAIP parentAIP = index.retrieve(IndexedAIP.class, aip.getParentId(),
