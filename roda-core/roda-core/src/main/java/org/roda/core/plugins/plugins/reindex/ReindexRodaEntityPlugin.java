@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.solr.client.solrj.impl.CloudSolrClient.RouteException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -132,7 +133,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
         List<String> ids = list.stream().map(obj -> obj.getId()).collect(Collectors.toList());
         clearSpecificIndexes(index, ids);
       }
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | RouteException e) {
       LOGGER.error("Error clearing specific indexes of a RODA entity", e);
     }
 
@@ -142,20 +143,27 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
         LOGGER.trace("Reindexing {} {}", object.getClass().getSimpleName(), object.getId());
       }
 
-      ReturnWithExceptions<Void, ModelObserver> exceptions = index.reindex(object);
-      List<Exception> exceptionList = exceptions.getExceptions();
-      if (exceptionList.isEmpty()) {
-        jobPluginInfo.incrementObjectsProcessedWithSuccess();
-      } else {
-        jobPluginInfo.incrementObjectsProcessedWithFailure();
-        Report reportItem = PluginHelper.initPluginReportItem(this, object.getId(), object.getClass());
-        reportItem.setPluginState(PluginState.FAILURE);
+      Report reportItem = PluginHelper.initPluginReportItem(this, object.getId(), object.getClass());
+      try {
+        ReturnWithExceptions<Void, ModelObserver> exceptions = index.reindex(object);
+        List<Exception> exceptionList = exceptions.getExceptions();
+        if (exceptionList.isEmpty()) {
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        } else {
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
 
-        for (Exception e : exceptionList) {
-          reportItem.addPluginDetails(e.getMessage() + "\n");
+          for (Exception e : exceptionList) {
+            reportItem.addPluginDetails(e.getMessage() + "\n");
+          }
+
+          pluginReport.addReport(reportItem.setPluginState(PluginState.FAILURE));
+          PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
         }
-
-        pluginReport.addReport(reportItem);
+      } catch (Exception e) {
+        LOGGER.error("Error while reindexing {} {}", object.getClass(), object.getId(), e);
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+        reportItem.addPluginDetails("Failed to reindex " + object.getClass() + " " + object.getId());
+        pluginReport.addReport(reportItem.setPluginState(PluginState.FAILURE));
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }
     }
@@ -169,7 +177,6 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
       try {
         Job job = PluginHelper.getJob(this, index);
         if (job.getSourceObjects() instanceof SelectedItemsAll) {
-          @SuppressWarnings("unchecked")
           Class<? extends IsIndexed> selectedClass = (Class<? extends IsIndexed>) Class
             .forName(job.getSourceObjects().getSelectedClass());
           index.clearIndexes(SolrCollectionRegistry.getCommitIndexNames(selectedClass));
@@ -195,7 +202,6 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
     if (optimizeIndexes) {
       try {
         Job job = PluginHelper.getJob(this, index);
-        @SuppressWarnings("unchecked")
         Class<? extends IsIndexed> selectedClass = (Class<? extends IsIndexed>) Class
           .forName(job.getSourceObjects().getSelectedClass());
         index.optimizeIndexes(SolrCollectionRegistry.getCommitIndexNames(selectedClass));

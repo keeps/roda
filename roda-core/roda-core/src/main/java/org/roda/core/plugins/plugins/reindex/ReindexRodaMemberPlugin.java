@@ -120,7 +120,6 @@ public class ReindexRodaMemberPlugin extends AbstractPlugin<Void> {
 
   private void reindexRodaMembers(ModelService model, Report pluginReport, JobPluginInfo jobPluginInfo) {
     pluginReport.setPluginState(PluginState.SUCCESS);
-
     try {
       List<User> users = model.listUsers();
       List<Group> groups = model.listGroups();
@@ -141,6 +140,9 @@ public class ReindexRodaMemberPlugin extends AbstractPlugin<Void> {
 
     } catch (GenericException e) {
       LOGGER.error("Error retrieving users/groups for reindexing", e);
+      pluginReport.setPluginState(PluginState.FAILURE);
+    } catch (Exception e) {
+      LOGGER.error("Error indexing users/groups", e);
       pluginReport.setPluginState(PluginState.FAILURE);
     }
   }

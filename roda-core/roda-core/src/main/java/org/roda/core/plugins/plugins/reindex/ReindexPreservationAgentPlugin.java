@@ -13,14 +13,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.common.OptionalWithCause;
@@ -123,9 +121,7 @@ public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
   private void reindexPreservationAgents(ModelService model, Report pluginReport, JobPluginInfo jobPluginInfo) {
     pluginReport.setPluginState(PluginState.SUCCESS);
 
-    CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = null;
-    try {
-      iterable = model.listPreservationAgents();
+    try (CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationAgents()) {
       int agentCounter = 0;
 
       for (OptionalWithCause<PreservationMetadata> opm : iterable) {
@@ -140,11 +136,9 @@ public class ReindexPreservationAgentPlugin extends AbstractPlugin<Void> {
         agentCounter++;
       }
       jobPluginInfo.setSourceObjectsCount(agentCounter);
-    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
+    } catch (Exception e) {
       LOGGER.error("Error getting preservation agents to be reindexed", e);
       pluginReport.setPluginState(PluginState.FAILURE);
-    } finally {
-      IOUtils.closeQuietly(iterable);
     }
   }
 

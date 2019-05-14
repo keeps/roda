@@ -116,9 +116,15 @@ public class ReindexPreservationAIPEventPlugin extends AbstractPlugin<AIP> {
   }
 
   public Report processAIP(IndexService index, Report report, JobPluginInfo jobPluginInfo, AIP aip) {
-    report.setPluginState(PluginState.SUCCESS);
-    index.reindexAIPPreservationEvents(aip);
-    jobPluginInfo.incrementObjectsProcessedWithSuccess();
+    try {
+      index.reindexAIPPreservationEvents(aip);
+      report.setPluginState(PluginState.SUCCESS);
+      jobPluginInfo.incrementObjectsProcessedWithSuccess();
+    } catch (Exception e) {
+      report.setPluginState(PluginState.FAILURE);
+      jobPluginInfo.incrementObjectsProcessedWithFailure();
+    }
+
     return report;
   }
 

@@ -268,7 +268,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                   RodaConstants.FILE_FORMAT_FIELDS_TO_RETURN);
                 String fileMimetype = ifile.getFileFormat().getMimeType();
                 String filePronom = ifile.getFileFormat().getPronom();
-                String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
+                String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
                 List<String> applicableTo = getApplicableTo();
                 List<String> convertableTo = getConvertableTo();
                 Map<String, List<String>> pronomToExtension = getPronomToExtension();

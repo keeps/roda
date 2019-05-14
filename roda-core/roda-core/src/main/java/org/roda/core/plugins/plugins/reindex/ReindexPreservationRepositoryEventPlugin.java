@@ -7,7 +7,6 @@
  */
 package org.roda.core.plugins.plugins.reindex;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,8 +19,6 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.JobException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.common.OptionalWithCause;
@@ -139,8 +136,7 @@ public class ReindexPreservationRepositoryEventPlugin extends AbstractPlugin<Voi
 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
-    } catch (JobException | RequestNotValidException | GenericException | AuthorizationDeniedException
-      | IOException e) {
+    } catch (Exception e) {
       LOGGER.error("Error reindexing RODA entity", e);
       pluginReport.setPluginState(PluginState.FAILURE)
         .setPluginDetails("Could not list preservation repository events");

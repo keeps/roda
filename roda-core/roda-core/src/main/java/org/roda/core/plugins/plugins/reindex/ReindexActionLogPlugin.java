@@ -153,8 +153,17 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
         if (entry.getUUID() == null) {
           entry.setUUID(entry.getId());
         }
-        index.reindexActionLog(entry);
-        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+
+        try {
+          index.reindexActionLog(entry);
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        } catch (Exception e) {
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+          Report reportItem = PluginHelper.initPluginReportItem(this, entry.getId(), LogEntry.class);
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Error when indexing action log " + entry.getId());
+          report.addReport(reportItem);
+          PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
+        }
       } else {
         jobPluginInfo.incrementObjectsProcessedWithFailure();
 
@@ -184,11 +193,9 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
         Report reportItem = PluginHelper.initPluginReportItem(this, id, LogEntry.class);
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(message.toString());
         report.addReport(reportItem);
-
         PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
       }
     }
-
   }
 
   @Override

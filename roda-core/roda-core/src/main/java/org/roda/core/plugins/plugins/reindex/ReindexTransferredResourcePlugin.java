@@ -20,7 +20,6 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
@@ -131,7 +130,7 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Void> {
       // FIXME 20170116 hsilva: it makes no sense relying on a count made
       // before the indexing start to set counters
       jobPluginInfo.incrementObjectsProcessedWithSuccess(resourceCounter);
-    } catch (IsStillUpdatingException | GenericException | AuthorizationDeniedException e) {
+    } catch (Exception e) {
       LOGGER.error("Error updating transferred resources");
       // FIXME 20170116 hsilva: it makes no sense relying on a count made
       // before the indexing start to set counters
