@@ -68,7 +68,7 @@
 		<cas.client.version>3.5.0</cas.client.version>
 		<jersey.version>2.27</jersey.version>
 		<swagger.version>1.5.21</swagger.version>
-		<jackson.version>2.9.8</jackson.version>
+		<jackson.version>2.9.9</jackson.version>
 		<spring.version>4.3.19.RELEASE</spring.version>
 		<grizzly.version>2.4.3</grizzly.version>
 		<solr.version>7.7.1</solr.version>

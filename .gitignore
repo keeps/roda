@@ -13,3 +13,4 @@ independent_plugin_script.sh
 compile_plugin.sh
 jar_plugins/
 roda-cas/overlays/
+**/.factorypath
