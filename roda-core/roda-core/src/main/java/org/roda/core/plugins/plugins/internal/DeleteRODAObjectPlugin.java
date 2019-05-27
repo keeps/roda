@@ -65,11 +65,17 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
   private static final Logger LOGGER = LoggerFactory.getLogger(DeleteRODAObjectPlugin.class);
   private static final String EVENT_DESCRIPTION = "The process of deleting an object of the repository";
   private String details = null;
+  private boolean dontCheckRelatives;
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, new PluginParameter(RodaConstants.PLUGIN_PARAMS_DETAILS,
       "Event details", PluginParameterType.STRING, "", false, false, "Details that will be used when creating event"));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DONT_CHECK_RELATIVES,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DONT_CHECK_RELATIVES, "Don't check relatives",
+        PluginParameterType.BOOLEAN, "false", false, false, "If relatives shouldn't be checked for deletion"));
+
   }
 
   @Override
@@ -101,6 +107,7 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> parameters = new ArrayList<>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DETAILS));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DONT_CHECK_RELATIVES));
     return parameters;
   }
 
@@ -111,6 +118,9 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DETAILS)) {
       details = parameters.get(RodaConstants.PLUGIN_PARAMS_DETAILS);
     }
+
+    dontCheckRelatives = PluginHelper.getBooleanFromParameters(this,
+      pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DONT_CHECK_RELATIVES));
   }
 
   @Override
@@ -147,10 +157,10 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
     reportItem.setPluginState(PluginState.SUCCESS);
 
-    try {
-      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
-      index
-        .execute(
+    if (!dontCheckRelatives) {
+      try {
+        Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
+        index.execute(
           IndexedAIP.class, filter, Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID,
             RodaConstants.AIP_LEVEL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL),
           new IndexRunnable<IndexedAIP>() {
@@ -183,9 +193,10 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
             reportItem.setPluginState(PluginState.FAILURE);
             reportItem.addPluginDetails("Could not delete sublevel AIPs: " + e.getMessage());
           });
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      reportItem.setPluginState(PluginState.FAILURE);
-      reportItem.addPluginDetails("Could not delete sublevel AIPs: " + e.getMessage());
+      } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+        reportItem.setPluginState(PluginState.FAILURE);
+        reportItem.addPluginDetails("Could not delete sublevel AIPs: " + e.getMessage());
+      }
     }
 
     report.addReport(reportItem);

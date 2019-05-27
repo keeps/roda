@@ -86,8 +86,16 @@ public final class JobsHelper {
     return RodaCoreFactory.getRodaConfiguration().getInt(NUMBER_OF_JOB_WORKERS_PROPERTY, defaultNumberOfJobsWorkers);
   }
 
+  /**
+   * 20190527 hsilva: this should only be used for tests
+   */
   public static int getBlockSize() {
     return RodaCoreFactory.getRodaConfiguration().getInt(BLOCK_SIZE_PROPERTY, DEFAULT_BLOCK_SIZE);
+  }
+
+  public static <T extends IsRODAObject> int getBlockSize(Plugin<T> plugin) {
+    return RodaCoreFactory.getRodaConfiguration().getInt(BLOCK_SIZE_PROPERTY + "." + plugin.getClass().getName(),
+      RodaCoreFactory.getRodaConfiguration().getInt(BLOCK_SIZE_PROPERTY, DEFAULT_BLOCK_SIZE));
   }
 
   public static void setBlockSize(int blockSize) {

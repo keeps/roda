@@ -155,7 +155,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       boolean noObjectsOrchestrated = true;
       ActorRef jobActor = (ActorRef) context;
       ActorRef jobStateInfoActor = getJobContextInformation(plugin);
-      int blockSize = JobsHelper.getBlockSize();
+      int blockSize = JobsHelper.getBlockSize(plugin);
       Plugin<T> innerPlugin;
       Class<T> modelClassToActOn = (Class<T>) ModelUtils.giveRespectiveModelClass(classToActOn);
 
@@ -204,7 +204,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       boolean noObjectsOrchestrated = true;
       ActorRef jobActor = (ActorRef) context;
       ActorRef jobStateInfoActor = getJobContextInformation(plugin);
-      int blockSize = JobsHelper.getBlockSize();
+      int blockSize = JobsHelper.getBlockSize(plugin);
       List<T> objects = JobsHelper.getObjectsFromUUID(model, index, objectClass, uuids);
       Iterator<T> iter = objects.iterator();
       Plugin<T> innerPlugin;
@@ -247,7 +247,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     boolean noObjectsOrchestrated = true;
     ActorRef jobActor = (ActorRef) context;
     ActorRef jobStateInfoActor = getJobContextInformation(plugin);
-    int blockSize = JobsHelper.getBlockSize();
+    int blockSize = JobsHelper.getBlockSize(plugin);
 
     try (CloseableIterable<OptionalWithCause<LiteRODAObject>> objects = model.listLite(objectClass)) {
       Iterator<OptionalWithCause<LiteRODAObject>> iter = objects.iterator();
