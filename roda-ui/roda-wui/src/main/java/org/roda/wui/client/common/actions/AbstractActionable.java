@@ -136,6 +136,6 @@ public abstract class AbstractActionable<T extends IsIndexed> implements Actiona
   }
 
   public boolean hasAnyRoles() {
-    return Arrays.asList(this.getActions()).stream().anyMatch(action -> hasPermissions(action));
+    return Arrays.stream(this.getActions()).anyMatch(action -> hasPermissions(action));
   }
 }

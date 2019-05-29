@@ -1499,7 +1499,7 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_UPDATE_USER = "org.roda.wui.api.controllers.UserManagement.updateUser";
   public static final String PERMISSION_METHOD_DELETE_USER = "org.roda.wui.api.controllers.UserManagement.deleteUser";
 
-  public static final String PERMISSION_METHOD_STOP_JOB = "core.roles.org.roda.wui.api.controllers.Jobs.stopJob";
+  public static final String PERMISSION_METHOD_STOP_JOB = "org.roda.wui.api.controllers.Jobs.stopJob";
 
   public static final String ENV_CONFIG_SYMBOLIC_LINKS_FORBIDDEN = "RODA_CONFIG_SYMBOLIC_LINKS_FORBIDDEN";
 
