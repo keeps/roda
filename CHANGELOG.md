@@ -1,5 +1,28 @@
 # Changelog
 
+## v3.1.1 (30/05/2019)
+Install for demonstration:
+```
+docker pull keeps/roda:v3.1.1
+```
+
+#### Enhancements:
+
+-  Create a way to define orchestrator block size per plugin [#1476](https://github.com/keeps/roda/issues/1476)
+-  Introduce cache strategies to improve ingest performance [#1475](https://github.com/keeps/roda/issues/1475)
+-  Add HTTP notification support on MinimalIngestPlugin [#1473](https://github.com/keeps/roda/issues/1473)
+-  Reindex plugins must deal with org.apache.solr.client.solrj.impl.CloudSolrClient$RouteException [#1469](https://github.com/keeps/roda/issues/1469)
+-  Add descriptive metadata config to open specific tab by default [#1464](https://github.com/keeps/roda/issues/1464)
+
+#### Bug Fixes:
+
+-  Fix translation disparities between english and portuguese languages [#1474](https://github.com/keeps/roda/issues/1474)
+-  Stop job button missing [#1470](https://github.com/keeps/roda/issues/1470)
+-  Cannot create an AIP using web user interface [#1468](https://github.com/keeps/roda/issues/1468)
+-  Page information on navigation bar is not generic to files or other possible RODA objects [#1463](https://github.com/keeps/roda/issues/1463)
+
+---
+
 ## v3.1.0 (30/04/2019)
 Install for demonstration:
 ```
@@ -7,12 +30,11 @@ docker pull keeps/roda:v3.1.0
 ```
 
 #### New features:
-
 -  Configurable columns in all search results [#1459](https://github.com/keeps/roda/issues/1459)
 -  Create Portal UI endpoint [#1452](https://github.com/keeps/roda/issues/1452)
 
 #### Enhancements:
-
+-  Upgrading **Solr version to 7.7**
 -  Upgrading PDFjs to 2.0.943 [#1461](https://github.com/keeps/roda/issues/1461)
 -  Possibility to orderly show descriptive metadata on UI [#1451](https://github.com/keeps/roda/issues/1451)
 -  Configuring a ui.list should not need to override all lists [#1445](https://github.com/keeps/roda/issues/1445)
