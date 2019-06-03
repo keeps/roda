@@ -113,9 +113,8 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
     }
 
     try {
-      boolean notify = true;
       PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), outcomeDetail,
-        notify, cachedJob);
+        true, cachedJob);
     } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
       | AuthorizationDeniedException | AlreadyExistsException e) {
       LOGGER.error("Error creating event: {}", e.getMessage(), e);

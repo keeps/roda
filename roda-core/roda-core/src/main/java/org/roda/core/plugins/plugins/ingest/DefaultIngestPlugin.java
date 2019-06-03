@@ -516,7 +516,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       if (jobPluginInfo.getAipIds(transferredResourceId) != null) {
         for (String aipId : jobPluginInfo.getAipIds(transferredResourceId)) {
           Report aipReport = transferredResourcejobPluginInfoEntry.getValue().get(aipId);
-          if (removeAIPProcessingFailed && aipReport.getPluginState() == PluginState.FAILURE) {
+          if (aipReport.getPluginState() == PluginState.FAILURE) {
             LOGGER.trace("Removing AIP {} from the list", aipReport.getOutcomeObjectId());
             oneTransferredResourceAipFailed = true;
             break;
@@ -538,8 +538,10 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       }
     }
 
-    for (String transferredResourceId : transferredResourcesToRemoveFromjobPluginInfo) {
-      jobPluginInfo.remove(transferredResourceId);
+    if (removeAIPProcessingFailed) {
+      for (String transferredResourceId : transferredResourcesToRemoveFromjobPluginInfo) {
+        jobPluginInfo.remove(transferredResourceId);
+      }
     }
 
     for (String aipId : aipsToReturn) {

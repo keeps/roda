@@ -191,7 +191,6 @@ public final class PluginHelper {
     ModelService model, StorageService storage, List<LiteOptionalWithCause> liteList, boolean autoLocking)
     throws PluginException {
     Report report = PluginHelper.initPluginReport(plugin);
-    List<T> list = new ArrayList<>();
     Throwable exceptionOccurred = null;
 
     try {
@@ -199,7 +198,7 @@ public final class PluginHelper {
       PluginHelper.updateJobInformationAsync(plugin, jobPluginInfo);
 
       Job job = PluginHelper.getJob(plugin, model);
-      list = PluginHelper.transformLitesIntoObjects(model, plugin, report, jobPluginInfo, liteList, job, autoLocking);
+      List<T> list = PluginHelper.transformLitesIntoObjects(model, plugin, report, jobPluginInfo, liteList, job, autoLocking);
 
       if (beforeLogic != null) {
         try {
@@ -1347,12 +1346,12 @@ public final class PluginHelper {
           report.getReports().get(0).setSourceAndOutcomeObjectId(newSIPId, report.getOutcomeObjectId());
         }
 
-        // update ingest info
-        jobPluginInfo.replaceTransferredResourceId(oldSIPId, newSIPId);
-
         // update in model
         updateJobReport(model, report);
       }
+
+      // update ingest info
+      jobPluginInfo.replaceTransferredResourceId(oldSIPId, newSIPId);
     }
   }
 

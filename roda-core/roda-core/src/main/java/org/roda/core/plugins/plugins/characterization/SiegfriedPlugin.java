@@ -105,7 +105,6 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
   @Override
   public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, Report report,
     JobPluginInfo jobPluginInfo, List<AIP> list, Job cachedJob) {
-
     try {
       for (AIP aip : list) {
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
