@@ -249,8 +249,8 @@ public class ModelService extends ModelObservable {
    * 
    * @param aipId
    *          Suggested ID for the AIP, if <code>null</code> then an ID will be
-   *          automatically generated. If ID cannot be allowed because it
-   *          already exists or is not valid, another ID will be provided.
+   *          automatically generated. If ID cannot be allowed because it already
+   *          exists or is not valid, another ID will be provided.
    * @param sourceStorage
    * @param sourcePath
    * @return
@@ -2247,15 +2247,25 @@ public class ModelService extends ModelObservable {
 
     // create job report in storage
     try {
+      // if job report changed id, set it and remove old report
+      String newId = IdUtils.getJobReportId(jobReport.getJobId(), jobReport.getSourceObjectId(),
+        jobReport.getOutcomeObjectId());
+      if (!newId.equals(jobReport.getId())) {
+        String oldId = jobReport.getId();
+        jobReport.setId(newId);
+        storage.deleteResource(ModelUtils.getJobReportStoragePath(jobReport.getJobId(), oldId));
+        notifyJobReportDeleted(oldId);
+      }
+
       String jobReportAsJson = JsonUtils.getJsonFromObject(jobReport);
       StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(jobReport.getJobId(), jobReport.getId());
       storage.updateBinaryContent(jobReportPath, new StringContentPayload(jobReportAsJson), false, true);
+
+      // index it
+      notifyJobReportCreatedOrUpdated(jobReport, cachedJob).failOnError();
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
       LOGGER.error("Error creating/updating job report in storage", e);
     }
-
-    // index it
-    notifyJobReportCreatedOrUpdated(jobReport, cachedJob).failOnError();
   }
 
   public void deleteJobReport(String jobId, String jobReportId)
