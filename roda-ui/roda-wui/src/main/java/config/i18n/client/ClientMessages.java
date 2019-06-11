@@ -1049,6 +1049,10 @@ public interface ClientMessages extends Messages {
 
   String editGroupNotFound(String groupname);
 
+  String userRemoveConfirmDialogTitle();
+
+  String userRemoveConfirmDialogMessage();
+
   // Member management
 
   String userStatus();

@@ -18,6 +18,7 @@ import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.management.CreateGroup;
 import org.roda.wui.client.management.CreateUser;
 import org.roda.wui.client.management.UserManagementService;
@@ -165,12 +166,26 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
   }
 
   private void remove(SelectedItems<RODAMember> objects, AsyncCallback<ActionImpact> callback) {
-    UserManagementService.Util.getInstance().deleteRODAMembers(objects, new ActionAsyncCallback<Void>(callback) {
-      @Override
-      public void onSuccess(Void result) {
-        doActionCallbackDestroyed();
-      }
-    });
+    Dialogs.showConfirmDialog(messages.userRemoveConfirmDialogTitle(), messages.userRemoveConfirmDialogMessage(),
+      messages.dialogNo(), messages.dialogYes(), new AsyncCallback<Boolean>() {
+        @Override
+        public void onSuccess(Boolean confirmed) {
+          if (confirmed) {
+            UserManagementService.Util.getInstance().deleteRODAMembers(objects,
+              new ActionAsyncCallback<Void>(callback) {
+                @Override
+                public void onSuccess(Void result) {
+                  doActionCallbackDestroyed();
+                }
+              });
+          }
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          callback.onFailure(caught);
+        }
+      });
   }
 
   private void createUser(AsyncCallback<ActionImpact> callback) {

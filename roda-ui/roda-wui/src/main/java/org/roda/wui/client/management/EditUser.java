@@ -16,6 +16,7 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -181,18 +182,31 @@ public class EditUser extends Composite {
 
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
-    UserManagementService.Util.getInstance().deleteUser(user.getId(), new AsyncCallback<Void>() {
+    Dialogs.showConfirmDialog(messages.userRemoveConfirmDialogTitle(), messages.userRemoveConfirmDialogMessage(),
+      messages.dialogNo(), messages.dialogYes(), new AsyncCallback<Boolean>() {
+        @Override
+        public void onSuccess(Boolean confirmed) {
+          if (confirmed) {
+            UserManagementService.Util.getInstance().deleteUser(user.getId(), new AsyncCallback<Void>() {
 
-      @Override
-      public void onSuccess(Void result) {
-        HistoryUtils.newHistory(MemberManagement.RESOLVER);
-      }
+              @Override
+              public void onSuccess(Void result) {
+                HistoryUtils.newHistory(MemberManagement.RESOLVER);
+              }
 
-      @Override
-      public void onFailure(Throwable caught) {
-        errorMessage(caught, null);
-      }
-    });
+              @Override
+              public void onFailure(Throwable caught) {
+                errorMessage(caught, null);
+              }
+            });
+          }
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          errorMessage(caught, null);
+        }
+      });
   }
 
   @UiHandler("buttonCancel")
