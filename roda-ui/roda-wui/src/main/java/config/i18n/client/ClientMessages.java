@@ -1313,6 +1313,12 @@ public interface ClientMessages extends Messages {
 
   String downloadNoDocumentationDescription();
 
+  String downloadSubmissions();
+
+  String downloadNoSubmissionsTitle();
+
+  String downloadNoSubmissionsDescription();
+
   String addPermission();
 
   String permissionAssignedGroups();

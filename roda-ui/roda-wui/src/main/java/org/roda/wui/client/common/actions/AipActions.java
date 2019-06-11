@@ -74,7 +74,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
   private static final Set<AipAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(
     Arrays.asList(AipAction.DOWNLOAD, AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE,
-      AipAction.NEW_PROCESS, AipAction.DOWNLOAD_EVENTS, AipAction.DOWNLOAD_DOCUMENTATION, AipAction.CHANGE_TYPE));
+      AipAction.NEW_PROCESS, AipAction.DOWNLOAD_EVENTS, AipAction.DOWNLOAD_DOCUMENTATION,
+      AipAction.DOWNLOAD_SUBMISSIONS, AipAction.CHANGE_TYPE));
 
   private static final Set<AipAction> POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS = new HashSet<>(
     Arrays.asList(AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE, AipAction.NEW_PROCESS,
@@ -99,7 +100,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     MOVE_IN_HIERARCHY(RodaConstants.PERMISSION_METHOD_MOVE_AIP_IN_HIERARCHY),
     UPDATE_PERMISSIONS(RodaConstants.PERMISSION_METHOD_UPDATE_AIP_PERMISSIONS),
     REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_AIP), NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
-    DOWNLOAD_EVENTS(), APPRAISAL_ACCEPT(RodaConstants.PERMISSION_METHOD_APPRAISAL),
+    DOWNLOAD_EVENTS(), DOWNLOAD_SUBMISSIONS(), APPRAISAL_ACCEPT(RodaConstants.PERMISSION_METHOD_APPRAISAL),
     APPRAISAL_REJECT(RodaConstants.PERMISSION_METHOD_APPRAISAL), DOWNLOAD_DOCUMENTATION(),
     CHANGE_TYPE(RodaConstants.PERMISSION_METHOD_CHANGE_AIP_TYPE);
 
@@ -210,6 +211,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
       newProcess(aip, callback);
     } else if (AipAction.DOWNLOAD_EVENTS.equals(action)) {
       downloadEvents(aip, callback);
+    } else if (AipAction.DOWNLOAD_SUBMISSIONS.equals(action)) {
+      downloadSubmissions(aip, callback);
     } else if (AipAction.APPRAISAL_ACCEPT.equals(action)) {
       appraisalAccept(aip, callback);
     } else if (AipAction.APPRAISAL_REJECT.equals(action)) {
@@ -304,25 +307,24 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                           public void onSuccess(Job result) {
                             Toast.showInfo(messages.moveItemTitle(), messages.movingAIP());
 
-                            Dialogs.showJobRedirectDialog(messages.moveJobCreatedMessage(),
-                              new AsyncCallback<Void>() {
+                            Dialogs.showJobRedirectDialog(messages.moveJobCreatedMessage(), new AsyncCallback<Void>() {
 
-                                @Override
-                                public void onFailure(Throwable caught) {
-                                  doActionCallbackNone();
-                                  if (result != null) {
-                                    HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                                  } else {
-                                    HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                                  }
-                                }
-
-                                @Override
-                                public void onSuccess(final Void nothing) {
-                                  doActionCallbackNone();
+                              @Override
+                              public void onFailure(Throwable caught) {
+                                doActionCallbackNone();
+                                if (result != null) {
                                   HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                                } else {
+                                  HistoryUtils.newHistory(InternalProcess.RESOLVER);
                                 }
-                              });
+                              }
+
+                              @Override
+                              public void onSuccess(final Void nothing) {
+                                doActionCallbackNone();
+                                HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                              }
+                            });
                           }
                         });
                     }
@@ -631,6 +633,22 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     });
   }
 
+  private void downloadSubmissions(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
+    BrowserService.Util.getInstance().hasSubmissions(aip.getId(), new ActionAsyncCallback<Boolean>(callback) {
+      @Override
+      public void onSuccess(Boolean result) {
+        if (result) {
+          SafeUri downloadUri = RestUtils.createAIPPartDownloadUri(aip.getId(), RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
+          doActionCallbackNone();
+          Window.Location.assign(downloadUri.asString());
+        } else {
+          Toast.showInfo(messages.downloadNoSubmissionsTitle(), messages.downloadNoSubmissionsDescription());
+          doActionCallbackNone();
+        }
+      }
+    });
+  }
+
   private void changeType(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
     changeType(objectToSelectedItems(aip, IndexedAIP.class), callback);
   }
@@ -719,6 +737,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
       "btn-download");
     downloadGroup.addButton(messages.downloadDocumentation(), AipAction.DOWNLOAD_DOCUMENTATION, ActionImpact.NONE,
       "btn-download");
+    downloadGroup.addButton(messages.downloadSubmissions(), AipAction.DOWNLOAD_SUBMISSIONS, ActionImpact.NONE,
+            "btn-download");
 
     aipActionableBundle.addGroup(managementGroup).addGroup(preservationGroup).addGroup(appraisalGroup)
       .addGroup(downloadGroup);

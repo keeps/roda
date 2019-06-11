@@ -823,6 +823,13 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
+  public boolean hasSubmissions(String aipId)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.hasSubmissions(user, aipId);
+  }
+
+  @Override
   public boolean showDIPEmbedded() {
     return RodaCoreFactory.getRodaConfiguration().getBoolean("ui.dip.externalURL.showEmbedded", false);
   }

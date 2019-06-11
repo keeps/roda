@@ -3096,6 +3096,26 @@ public class Browser extends RodaWuiController {
     }
   }
 
+  public static boolean hasSubmissions(User user, String aipId)
+          throws AuthorizationDeniedException, RequestNotValidException, GenericException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+
+    try {
+      return BrowserHelper.hasSubmissions(aipId);
+    } catch (RODAException e) {
+      state = LOG_ENTRY_STATE.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId);
+    }
+  }
+
   public static Notification acknowledgeNotification(User user, String notificationId, String ackToken)
     throws GenericException, NotFoundException, AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};

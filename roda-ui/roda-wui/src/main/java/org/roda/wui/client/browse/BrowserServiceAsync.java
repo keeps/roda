@@ -238,6 +238,8 @@ public interface BrowserServiceAsync {
 
   void hasDocumentation(String aipId, AsyncCallback<Boolean> asyncCallback);
 
+  void hasSubmissions(String aipId, AsyncCallback<Boolean> asyncCallback);
+
   void showDIPEmbedded(AsyncCallback<Boolean> asyncCallback);
 
   void acknowledgeNotification(String notificationId, String ackToken, AsyncCallback<Notification> asyncCallback);
