@@ -25,6 +25,8 @@ import com.google.gwt.user.cellview.client.AbstractHasData.RedrawEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.view.client.SelectionChangeEvent;
+import org.roda.wui.common.client.tools.ConfigurationManager.ColumnOptionsFactory;
+import org.roda.wui.common.client.tools.ConfigurationManager.FacetFactory;
 
 public class AsyncTableCellOptions<T extends IsIndexed> {
   private final Class<T> classToReturn;
@@ -64,7 +66,7 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
     actionableCallback = null;
     filter = SearchFilters.allFilter();
     justActive = false;
-    facets = ConfigurationManager.FacetFactory.getFacets(listId);
+    facets = FacetFactory.getFacets(listId);
     summary = AsyncTableCell.messages.searchResults();
     fieldsToReturn = Collections.emptyList();
     initialPageSize = AsyncTableCell.DEFAULT_INITIAL_PAGE_SIZE;
@@ -81,7 +83,7 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
     forceSelectable = false;
     redirectOnSingleResult = false;
 
-    columnOptions = ConfigurationManager.ColumnOptionsFactory.getColumnOptions(listId);
+    columnOptions = ColumnOptionsFactory.getColumnOptions(listId);
     defaultSortListColumnName = ConfigurationManager.getStringWithDefault("", RodaConstants.UI_LISTS_PROPERTY, listId,
       RodaConstants.UI_LISTS_COLUMNS_DEFAULTSORTLIST_COLUMNNAME);
     defaultSortListAscending = ConfigurationManager.getBoolean(true, RodaConstants.UI_LISTS_PROPERTY, listId,

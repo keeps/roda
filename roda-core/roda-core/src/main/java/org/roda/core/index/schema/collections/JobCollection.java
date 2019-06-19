@@ -10,7 +10,6 @@ package org.roda.core.index.schema.collections;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
@@ -125,8 +124,10 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
     doc.addField(RodaConstants.JOB_PLUGIN_PARAMETERS, JsonUtils.getJsonFromObject(job.getPluginParameters()));
     doc.addField(RodaConstants.JOB_SOURCE_OBJECTS, JsonUtils.getJsonFromObject(job.getSourceObjects()));
     doc.addField(RodaConstants.JOB_OUTCOME_OBJECTS_CLASS, job.getOutcomeObjectsClass());
-    doc.addField(RodaConstants.JOB_HAS_FAILURES, jobStats.getSourceObjectsProcessedWithFailure() > 0
-      || jobStats.getSourceObjectsCount() > jobStats.getSourceObjectsProcessedWithSuccess());
+    doc.addField(RodaConstants.JOB_HAS_FAILURES,
+      jobStats.getSourceObjectsProcessedWithFailure() > 0
+        || (jobStats.getSourceObjectsCount() > jobStats.getSourceObjectsProcessedWithSuccess()
+          + jobStats.getSourceObjectsBeingProcessed() + jobStats.getSourceObjectsWaitingToBeProcessed()));
 
     return doc;
   }
