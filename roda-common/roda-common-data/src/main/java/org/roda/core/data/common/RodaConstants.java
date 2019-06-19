@@ -133,6 +133,8 @@ public final class RodaConstants {
   public static final String UI_LISTS_COLUMNS_SORTABLE_PROPERTY = "sortable";
   public static final String UI_LISTS_COLUMNS_SORTBY_PROPERTY = "sortBy";
   public static final String UI_LISTS_COLUMNS_RENDERINGHINT_PROPERTY = "renderingHint";
+  public static final String UI_LISTS_COLUMNS_DEFAULTSORTLIST_COLUMNNAME = "defaultSortList.columnName";
+  public static final String UI_LISTS_COLUMNS_DEFAULTSORTLIST_ASCENDING = "defaultSortList.ascending";
 
   public static final String UI_ICONS_CLASS = "ui.icons.class";
 

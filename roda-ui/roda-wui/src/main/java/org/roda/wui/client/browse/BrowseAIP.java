@@ -198,6 +198,7 @@ public class BrowseAIP extends Composite {
 
   @UiField
   FlowPanel center;
+
   @UiField
   Label dateCreatedAndModified;
 

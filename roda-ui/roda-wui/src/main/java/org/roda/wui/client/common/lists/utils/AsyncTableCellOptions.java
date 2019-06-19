@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -81,8 +82,10 @@ public class AsyncTableCellOptions<T extends IsIndexed> {
     redirectOnSingleResult = false;
 
     columnOptions = ConfigurationManager.ColumnOptionsFactory.getColumnOptions(listId);
-    defaultSortListColumnName = null;
-    defaultSortListAscending = true;
+    defaultSortListColumnName = ConfigurationManager.getStringWithDefault("", RodaConstants.UI_LISTS_PROPERTY, listId,
+      RodaConstants.UI_LISTS_COLUMNS_DEFAULTSORTLIST_COLUMNNAME);
+    defaultSortListAscending = ConfigurationManager.getBoolean(true, RodaConstants.UI_LISTS_PROPERTY, listId,
+      RodaConstants.UI_LISTS_COLUMNS_DEFAULTSORTLIST_COLUMNNAME);
   }
 
   public Class<T> getClassToReturn() {

@@ -26,9 +26,6 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.common.actions.FileActions;
 import org.roda.wui.client.common.actions.RepresentationActions;
-import org.roda.wui.client.common.lists.AIPList;
-import org.roda.wui.client.common.lists.RepresentationList;
-import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
@@ -42,11 +39,8 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.ClientMessages;
-
 public class CatalogueSearch extends Composite {
   private ClientLogger logger = new ClientLogger(getClass().getName());
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   interface MyUiBinder extends UiBinder<Widget, CatalogueSearch> {
   }
@@ -64,7 +58,7 @@ public class CatalogueSearch extends Composite {
     boolean redirectOnSingleResult) {
 
     // get classes to show and preFilters to use
-    Map<String, Filter> classFilters = null;
+    Map<String, Filter> classFilters;
     if (!filterHistoryTokens.isEmpty()) {
       classFilters = parseFilters(filterHistoryTokens);
       redirectOnSingleResult = redirectOnSingleResult && classFilters.keySet().size() <= 1;
