@@ -127,6 +127,8 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
     if (Job.isFinalState(message.getState())) {
       // 20160817 hsilva: the following instruction is needed for the "sync"
       // execution of a job (i.e. for testing purposes)
+      PluginHelper.processNotifications(plugin);
+
       jobCreator.tell("Done", getSelf());
       jobsManager.tell(Messages.newJobsManagerJobEnded(jobId, plugin.getClass().getName()), getSelf());
       JobsHelper.deleteJobWorkingDirectory(jobId);

@@ -9,6 +9,8 @@ package org.roda.core.plugins.plugins;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
@@ -22,9 +24,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.reflections.Reflections;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.akka.Messages;
@@ -38,6 +42,7 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.LockingException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.NotificationException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
@@ -67,6 +72,7 @@ import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
@@ -90,6 +96,8 @@ import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.plugins.notifications.GenericJobNotification;
+import org.roda.core.plugins.plugins.notifications.JobNotification;
 import org.roda.core.plugins.plugins.reindex.ReindexAIPPlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexActionLogPlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexDIPPlugin;
@@ -198,7 +206,8 @@ public final class PluginHelper {
       PluginHelper.updateJobInformationAsync(plugin, jobPluginInfo);
 
       Job job = PluginHelper.getJob(plugin, model);
-      List<T> list = PluginHelper.transformLitesIntoObjects(model, plugin, report, jobPluginInfo, liteList, job, autoLocking);
+      List<T> list = PluginHelper.transformLitesIntoObjects(model, plugin, report, jobPluginInfo, liteList, job,
+        autoLocking);
 
       if (beforeLogic != null) {
         try {
@@ -627,8 +636,8 @@ public final class PluginHelper {
   }
 
   /**
-   * 20180525 hsilva: not in use in RODA base source code, so this will be
-   * removed in a near future
+   * 20180525 hsilva: not in use in RODA base source code, so this will be removed
+   * in a near future
    */
   @Deprecated
   public static <T extends IsRODAObject, T1 extends JobPluginInfo> T1 getInitialJobInformation(Plugin<T> plugin,
@@ -1330,8 +1339,8 @@ public final class PluginHelper {
   }
 
   /**
-   * 20180914 hsilva: use updateReportsAndIngestInfoAfterMovingSIPs instead
-   * (just different method name)
+   * 20180914 hsilva: use updateReportsAndIngestInfoAfterMovingSIPs instead (just
+   * different method name)
    */
   @Deprecated
   private static void updateReportsAfterMovingSIPs(ModelService model, IngestJobPluginInfo jobPluginInfo,
@@ -1528,8 +1537,8 @@ public final class PluginHelper {
    * @throws LockingException
    * 
    * @deprecated 20180525 hsilva: this methods should not be used directly, but
-   *             instead one should use PluginHelper.processObjects methods,
-   *             that is why this method will become private in a near future
+   *             instead one should use PluginHelper.processObjects methods, that
+   *             is why this method will become private in a near future
    */
   public static <T extends IsRODAObject> List<T> transformLitesIntoObjects(ModelService model, Plugin<T> plugin,
     Report report, JobPluginInfo pluginInfo, List<LiteOptionalWithCause> lites, Job job, boolean autoLocking)
@@ -1662,5 +1671,55 @@ public final class PluginHelper {
 
     outcomeText.append("] ").append(actionMessage);
     return outcomeText.toString();
+  }
+
+  public static void processNotifications(Plugin<?> plugin) {
+    try {
+      ModelService model = RodaCoreFactory.getModelService();
+      IndexService index = RodaCoreFactory.getIndexService();
+
+      Job job = PluginHelper.getJob(plugin, model);
+      JobStats jobStats = job.getJobStats();
+
+      List<JobNotification> notifications = plugin.getNotifications();
+      for (JobNotification notification : notifications) {
+        if (!notification.whenFailed() || jobStats.getSourceObjectsProcessedWithFailure() > 0
+          || job.getState().equals(Job.JOB_STATE.FAILED_TO_COMPLETE)) {
+          try {
+            notification.notify(model, index, job, jobStats);
+          } catch (NotificationException e) {
+            LOGGER.error("Error running notification methods on {}", notification.getClass().getSimpleName(), e);
+          }
+        }
+      }
+
+      // execute generic notifications
+      String notificationPackage = RodaCoreFactory.getRodaConfigurationAsString("core.notification.package");
+      Reflections reflections = new Reflections(notificationPackage);
+      Set<Class<? extends GenericJobNotification>> generics = reflections.getSubTypesOf(GenericJobNotification.class);
+      for (Class<? extends GenericJobNotification> genericNotification : generics) {
+        boolean parameters = Boolean.parseBoolean(
+          plugin.getParameterValues().get("parameter.notification." + genericNotification.getSimpleName() + ".enable"));
+
+        if (parameters) {
+          try {
+            String sendTo = plugin.getParameterValues()
+              .get("parameter.notification." + genericNotification.getSimpleName() + ".to");
+
+            Constructor<? extends GenericJobNotification> constructor = genericNotification
+              .getConstructor(String.class);
+            GenericJobNotification genericJobNotification = constructor.newInstance(sendTo);
+            genericJobNotification.notify(model, index, job, jobStats);
+          } catch (NoSuchMethodException | InstantiationException | IllegalAccessException
+            | InvocationTargetException e) {
+            LOGGER.error("Error getting generic notification methods", e);
+          } catch (NotificationException e) {
+            LOGGER.error("Error running notification methods on {}", genericNotification.getSimpleName(), e);
+          }
+        }
+      }
+    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+      LOGGER.error("Could not send job notification", e);
+    }
   }
 }

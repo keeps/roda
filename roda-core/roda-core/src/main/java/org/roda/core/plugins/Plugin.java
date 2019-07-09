@@ -21,6 +21,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.plugins.plugins.notifications.JobNotification;
 import org.roda.core.storage.StorageService;
 
 /**
@@ -206,4 +207,8 @@ public interface Plugin<T extends IsRODAObject> {
    */
   void shutdown();
 
+  /**
+   * Defines notifications to send when finishing job
+   */
+  List<JobNotification> getNotifications();
 }

@@ -12,5 +12,5 @@ import org.roda.core.model.ModelService;
 
 @FunctionalInterface
 public interface NotificationProcessor {
-  public Notification processNotification(ModelService model, Notification notification);
+  Notification processNotification(ModelService model, Notification notification);
 }

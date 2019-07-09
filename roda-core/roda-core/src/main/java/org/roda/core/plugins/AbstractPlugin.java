@@ -17,6 +17,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.plugins.plugins.notifications.JobNotification;
 
 public abstract class AbstractPlugin<T extends IsRODAObject> implements Plugin<T> {
 
@@ -66,5 +67,10 @@ public abstract class AbstractPlugin<T extends IsRODAObject> implements Plugin<T
   }
 
   public abstract String getVersionImpl();
+
+  @Override
+  public List<JobNotification> getNotifications() {
+    return new ArrayList<>();
+  }
 
 }
