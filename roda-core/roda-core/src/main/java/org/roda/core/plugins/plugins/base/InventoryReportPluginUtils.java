@@ -118,6 +118,8 @@ public class InventoryReportPluginUtils {
         fileInfo.add("");
       } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_FILE_ID)) {
         fileInfo.add(dm.getId());
+      } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_PARENT_ID)) {
+        fileInfo.add(aip.getParentId());
       } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_ISDIRECTORY)) {
         fileInfo.add("false");
       } else if (InventoryReportPlugin.CHECKSUM_ALGORITHMS.contains(fieldName.toUpperCase())) {
@@ -165,6 +167,8 @@ public class InventoryReportPluginUtils {
         fileInfo.add(FSUtils.asString(file.getPath()));
       } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_FILE_ID)) {
         fileInfo.add(file.getId());
+      } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_PARENT_ID)) {
+        fileInfo.add(aip.getParentId());
       } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_ISDIRECTORY)) {
         fileInfo.add(String.valueOf(file.isDirectory()));
       } else if (InventoryReportPlugin.CHECKSUM_ALGORITHMS.contains(fieldName.toUpperCase())) {
@@ -253,6 +257,8 @@ public class InventoryReportPluginUtils {
       } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_FILE_ID)) {
         fileInfo.add(
           otherMetadata.getFileId() + (otherMetadata.getFileSuffix() != null ? otherMetadata.getFileSuffix() : ""));
+      } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_PARENT_ID)) {
+        fileInfo.add(aip.getParentId());
       } else if (fieldName.equalsIgnoreCase(InventoryReportPlugin.CSV_FIELD_ISDIRECTORY)) {
         fileInfo.add("false");
       } else if (InventoryReportPlugin.CHECKSUM_ALGORITHMS.contains(fieldName.toUpperCase())) {
