@@ -133,7 +133,7 @@ public class FilesResource {
 
     if (efile instanceof ObjectResponse) {
       ObjectResponse<org.roda.core.data.v2.ip.File> file = (ObjectResponse<org.roda.core.data.v2.ip.File>) efile;
-      return Response.ok(file.getObject(), mediaType).header("Accept-Ranges", "bytes").build();
+      return Response.ok(file.getObject(), mediaType).build();
     } else {
       return ApiUtils.okResponse((StreamResponse) efile, inline, range, req);
     }

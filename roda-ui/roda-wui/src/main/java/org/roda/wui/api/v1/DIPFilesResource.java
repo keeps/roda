@@ -119,7 +119,7 @@ public class DIPFilesResource {
 
     if (efile instanceof ObjectResponse) {
       ObjectResponse<DIPFile> file = (ObjectResponse<DIPFile>) efile;
-      return Response.ok(file.getObject(), mediaType).header("Accept-Ranges", "bytes").build();
+      return Response.ok(file.getObject(), mediaType).build();
     } else {
       return ApiUtils.okResponse((StreamResponse) efile, inline, range, req);
     }

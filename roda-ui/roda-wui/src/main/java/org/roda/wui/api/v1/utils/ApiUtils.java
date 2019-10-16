@@ -146,8 +146,8 @@ public class ApiUtils {
 
   /**
    * Returns valid start (pair first element) and limit (pair second element)
-   * paging parameters defaulting to start = 0 and limit = 100 if none or invalid
-   * values are provided.
+   * paging parameters defaulting to start = 0 and limit = 100 if none or
+   * invalid values are provided.
    */
   public static Pair<Integer, Integer> processPagingParams(String start, String limit) {
     Integer startInteger;
@@ -197,10 +197,11 @@ public class ApiUtils {
   }
 
   public static Response okResponse(StreamResponse streamResponse, Request request) {
-    return okResponse(streamResponse, false, request);
+    return okResponse(streamResponse, false, false, request);
   }
 
-  public static Response okResponse(StreamResponse streamResponse, boolean inline, Request request) {
+  public static Response okResponse(StreamResponse streamResponse, boolean inline, boolean acceptRanges,
+    Request request) {
 
     StreamingOutput so = new StreamingOutput() {
       @Override
@@ -233,6 +234,10 @@ public class ApiUtils {
       response.cacheControl(cc).tag(etag);
     }
 
+    if (acceptRanges) {
+      response.header("Accept-Ranges", "bytes");
+    }
+
     return response.build();
   }
 
@@ -246,7 +251,7 @@ public class ApiUtils {
     // cannot calculate file size
     if (range == null || !(streamResponse.getStream() instanceof ConsumesSkipableOutputStream)
       || streamResponse.getFileSize() < 0) {
-      return okResponse(streamResponse, inline, request);
+      return okResponse(streamResponse, inline, range == null, request);
     }
 
     String[] ranges = range.split("=")[1].split("-");
