@@ -23,6 +23,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
@@ -118,7 +119,7 @@ public class DIPFilesResource {
 
     if (efile instanceof ObjectResponse) {
       ObjectResponse<DIPFile> file = (ObjectResponse<DIPFile>) efile;
-      return Response.ok(file.getObject(), mediaType).build();
+      return Response.ok(file.getObject(), mediaType).header("Accept-Ranges", "bytes").build();
     } else {
       return ApiUtils.okResponse((StreamResponse) efile, inline, range, req);
     }
