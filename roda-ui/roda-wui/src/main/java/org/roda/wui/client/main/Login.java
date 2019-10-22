@@ -16,6 +16,7 @@ import java.util.List;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.EmailUnverifiedException;
 import org.roda.core.data.exceptions.InactiveUserException;
+import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.NoAsyncCallback;
@@ -202,7 +203,7 @@ public class Login extends Composite {
 
         @Override
         public void onSuccess(final Notification result) {
-          if (result.getState() == Notification.NOTIFICATION_STATE.COMPLETED) {
+          if (result.getState() == NotificationState.COMPLETED) {
             Dialogs.showInformationDialog(messages.loginResendEmailSuccessDialogTitle(),
               messages.loginResendEmailSuccessDialogMessage(), messages.loginResendEmailSuccessDialogButton(), false,
               new AsyncCallback<Void>() {

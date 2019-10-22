@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.annotation.XmlRootElement;
+
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
@@ -27,14 +27,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @author Rui Castro
  * 
  */
-@XmlRootElement(name = RodaConstants.RODA_OBJECT_LOG)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_LOG)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
   private static final long serialVersionUID = -178083792639806983L;
-
-  public enum LOG_ENTRY_STATE {
-    SUCCESS, UNAUTHORIZED, FAILURE, UNKNOWN
-  }
 
   private String uuid;
   private String id;
@@ -51,7 +47,7 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
 
   private List<LogEntryParameter> parameters;
 
-  private LOG_ENTRY_STATE state;
+  private LogEntryState state;
   
   private Map<String, Object> fields;
 
@@ -59,7 +55,7 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
    * Constructs an empty {@link LogEntry}.
    */
   public LogEntry() {
-    this.state = LOG_ENTRY_STATE.UNKNOWN;
+    this.state = LogEntryState.UNKNOWN;
   }
 
   /**
@@ -95,7 +91,7 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
    */
   public LogEntry(String uuid, String id, String address, Date datetime, String username, String actionComponent,
     String actionMethod, List<LogEntryParameter> parameters, String relatedObjectID, long duration,
-    LOG_ENTRY_STATE state, String instanceId, long lineNumber) {
+    LogEntryState state, String instanceId, long lineNumber) {
 
     setId(id);
     setAddress(address);
@@ -393,11 +389,11 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
     this.uuid = uuid;
   }
 
-  public LOG_ENTRY_STATE getState() {
+  public LogEntryState getState() {
     return state;
   }
 
-  public void setState(LOG_ENTRY_STATE state) {
+  public void setState(LogEntryState state) {
     this.state = state;
   }
 

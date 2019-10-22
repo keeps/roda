@@ -11,14 +11,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.annotation.XmlRootElement;
+
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@XmlRootElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class IndexedRepresentation extends Representation
   implements IsIndexed, SetsUUID, HasPermissionFilters, HasStateFilter {

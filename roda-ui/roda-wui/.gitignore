@@ -1,8 +1,7 @@
 gwt-unitCache
 src/main/webapp/WEB-INF/deploy/
 src/main/webapp/WEB-INF/lib/
-src/main/webapp/org.roda.disseminators.common.loading.Loading/
-src/main/webapp/org.roda.wui.main.Main/
+src/main/webapp/org.roda.wui.*
 /target
 /target/
 /build/

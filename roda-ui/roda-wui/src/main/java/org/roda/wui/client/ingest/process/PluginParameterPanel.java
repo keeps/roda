@@ -26,7 +26,7 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.risks.IndexedRisk;
-import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
+import org.roda.core.data.v2.risks.SeverityLevel;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.common.IncrementalAssociativeList;
@@ -186,7 +186,7 @@ public class PluginParameterPanel extends Composite {
     severityBox.addStyleName("form-selectbox");
     severityBox.addStyleName("form-textbox-small");
 
-    for (SEVERITY_LEVEL severity : SEVERITY_LEVEL.values()) {
+    for (SeverityLevel severity : SeverityLevel.values()) {
       severityBox.addItem(messages.severityLevel(severity), severity.toString());
     }
 

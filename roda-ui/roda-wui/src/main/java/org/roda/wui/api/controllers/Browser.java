@@ -64,7 +64,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetada
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Reports;
-import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
+import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
@@ -108,7 +108,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       aipFieldsToReturn.addAll(new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN));
@@ -118,7 +118,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.retrieveBrowseAipBundle(user, aip, locale);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -133,7 +133,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       List<String> aipFieldsWithPermissions = new ArrayList<>(Arrays.asList(RodaConstants.AIP_STATE,
@@ -149,7 +149,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.retrieveBrowseRepresentationBundle(user, aip, representation, locale);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -165,7 +165,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       List<String> aipFieldsWithPermissions = new ArrayList<>(Arrays.asList(RodaConstants.AIP_STATE,
@@ -186,7 +186,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.retrieveBrowseFileBundle(aip, representation, file, user);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -204,7 +204,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       List<String> aipFields = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -223,7 +223,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.retrieveDescriptiveMetadataEditBundle(user, aip, rep, metadataId, type, version, locale);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -241,7 +241,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       List<String> aipFields = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -260,7 +260,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.retrieveDescriptiveMetadataEditBundle(user, aip, rep, metadataId, locale);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -278,7 +278,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -287,7 +287,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.retrieveDescriptiveMetadataVersionsBundle(aipId, representationId, metadataId, locale);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -304,7 +304,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
@@ -314,7 +314,7 @@ public class Browser extends RodaWuiController {
 
       return BrowserHelper.retrieveDipBundle(dipUUID, dipFileUUID, user, locale);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -331,13 +331,13 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user, classToReturn);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.find(classToReturn, filter, sorter, sublist, facets, user, justActive, fieldsToReturn);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -359,7 +359,7 @@ public class Browser extends RodaWuiController {
     final IterableIndexResult<T> ret = BrowserHelper.findAll(classToReturn, filter, user, justActive, fieldsToReturn);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_CLASS_PARAM,
+    controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_CLASS_PARAM,
       classToReturn.getSimpleName(), RodaConstants.CONTROLLER_FILTER_PARAM, filter,
       RodaConstants.CONTROLLER_JUST_ACTIVE_PARAM, justActive);
 
@@ -373,13 +373,13 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user, classToReturn);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.count(classToReturn, filter, justActive, user);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -395,7 +395,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user, classToReturn);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
@@ -406,7 +406,7 @@ public class Browser extends RodaWuiController {
 
       return ret;
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -423,7 +423,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user, classToReturn);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
@@ -434,7 +434,7 @@ public class Browser extends RodaWuiController {
 
       return objects;
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -451,12 +451,12 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkObjectPermissions(user, ids, classToReturn);
 
     // delegate
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       BrowserHelper.delete(user, classToReturn, ids);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -473,13 +473,13 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user, classToReturn);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.suggest(classToReturn, field, query, user, allowPartial);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -506,7 +506,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
@@ -517,7 +517,7 @@ public class Browser extends RodaWuiController {
 
       return BrowserHelper.retrieveAIPRepresentation(representation, acceptFormat);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -533,7 +533,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedAIP indexedAIP = BrowserHelper.retrieve(IndexedAIP.class, aipId,
@@ -543,7 +543,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.retrieveAIPPart(indexedAIP, part);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -559,7 +559,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
@@ -569,7 +569,7 @@ public class Browser extends RodaWuiController {
 
       return BrowserHelper.retrieveAIPRepresentationPart(representation, part);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -589,7 +589,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -598,7 +598,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.listAIPDescriptiveMetadata(aipId, start, limit, acceptFormat, language);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -618,7 +618,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
@@ -629,7 +629,7 @@ public class Browser extends RodaWuiController {
       return BrowserHelper.listRepresentationDescriptiveMetadata(representation.getAipId(), representation.getId(),
         start, limit, acceptFormat, language);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -650,7 +650,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -659,7 +659,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.retrieveAIPDescritiveMetadata(aipId, metadataId, acceptFormat, language);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -678,7 +678,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
@@ -694,7 +694,7 @@ public class Browser extends RodaWuiController {
           representation.getId(), metadataId, versionId, acceptFormat, language);
       }
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -715,7 +715,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -724,7 +724,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.retrieveAIPDescritiveMetadataVersion(aipId, metadataId, versionId, acceptFormat, language);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -743,7 +743,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -752,7 +752,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.listAIPPreservationMetadata(aipId, acceptFormat);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -772,7 +772,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class,
@@ -783,7 +783,7 @@ public class Browser extends RodaWuiController {
       return BrowserHelper.retrieveAIPRepresentationPreservationMetadata(rep.getAipId(), rep.getId(), startAgent,
         limitAgent, startEvent, limitEvent, startFile, limitFile, acceptFormat);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -806,7 +806,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
     IndexedFile file = null;
 
     try {
@@ -817,7 +817,7 @@ public class Browser extends RodaWuiController {
       return BrowserHelper.retrieveAIPRepresentationPreservationMetadataFile(file.getAipId(),
         file.getRepresentationId(), file.getPath(), file.getId(), acceptFormat);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -837,7 +837,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       if (aipId != null) {
@@ -850,7 +850,7 @@ public class Browser extends RodaWuiController {
       return BrowserHelper.retrievePreservationMetadataEvent(id, aipId, representationUUID, fileUUID, onlyDetails,
         acceptFormat, language);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -870,13 +870,13 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.retrievePreservationMetadataAgent(id, acceptFormat);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -893,7 +893,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -905,7 +905,7 @@ public class Browser extends RodaWuiController {
       BrowserHelper.createOrUpdateAIPRepresentationPreservationMetadataFile(aipId, null, new ArrayList<>(), id, is,
         create);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -924,7 +924,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class,
@@ -937,7 +937,7 @@ public class Browser extends RodaWuiController {
       BrowserHelper.createOrUpdateAIPRepresentationPreservationMetadataFile(rep.getAipId(), rep.getId(),
         new ArrayList<>(), id, is, create);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -956,7 +956,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
     IndexedFile file = null;
 
     try {
@@ -967,7 +967,7 @@ public class Browser extends RodaWuiController {
       BrowserHelper.createOrUpdateAIPRepresentationPreservationMetadataFile(file.getAipId(), file.getRepresentationId(),
         file.getPath(), file.getId(), is, create);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -983,7 +983,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -992,7 +992,7 @@ public class Browser extends RodaWuiController {
       // delegate
       BrowserHelper.deletePreservationMetadataFile(PreservationMetadataType.valueOf(type), aipId, null, id, false);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1009,7 +1009,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class,
@@ -1020,7 +1020,7 @@ public class Browser extends RodaWuiController {
       BrowserHelper.deletePreservationMetadataFile(PreservationMetadataType.valueOf(type), rep.getAipId(), rep.getId(),
         id, false);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1041,7 +1041,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -1050,7 +1050,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.retrieveOtherMetadata(aipId, representationId, null, null, type, suffix, acceptFormat);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1070,7 +1070,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
     IndexedFile file = null;
 
     try {
@@ -1083,7 +1083,7 @@ public class Browser extends RodaWuiController {
       return BrowserHelper.retrieveOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
         file.getId(), type, suffix, acceptFormat);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1102,7 +1102,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -1116,7 +1116,7 @@ public class Browser extends RodaWuiController {
       // delegate
       BrowserHelper.createOrUpdateOtherMetadataFile(aipId, representationId, null, null, type, name, is);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1135,7 +1135,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
     IndexedFile file = null;
 
     try {
@@ -1153,7 +1153,7 @@ public class Browser extends RodaWuiController {
       BrowserHelper.createOrUpdateOtherMetadataFile(file.getAipId(), file.getRepresentationId(), file.getPath(),
         file.getId(), type, name, is);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1171,7 +1171,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -1180,7 +1180,7 @@ public class Browser extends RodaWuiController {
       // delegate
       BrowserHelper.deleteOtherMetadataFile(aipId, representationId, null, null, suffix, type);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1197,7 +1197,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
     IndexedFile file = null;
 
     try {
@@ -1210,7 +1210,7 @@ public class Browser extends RodaWuiController {
       BrowserHelper.deleteOtherMetadataFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
         suffix, type);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1234,7 +1234,7 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
     controllerAssistant.checkObjectPermissions(user, selected);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       if (parentId != null) {
@@ -1246,7 +1246,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.moveAIPInHierarchy(user, selected, parentId, details);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1271,7 +1271,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       Permissions permissions = new Permissions();
@@ -1280,7 +1280,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.createAIP(user, null, type, permissions);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1295,7 +1295,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       Permissions permissions = new Permissions();
@@ -1322,7 +1322,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.createAIP(user, parentId, type, permissions);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1338,7 +1338,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedAIP indexedAip = BrowserHelper.retrieve(IndexedAIP.class, aip.getId(),
@@ -1348,7 +1348,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.updateAIP(user, aip);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1364,12 +1364,12 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
     controllerAssistant.checkObjectPermissions(user, aips);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       return BrowserHelper.deleteAIP(user, aips, details);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1386,12 +1386,12 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
     controllerAssistant.checkObjectPermissions(user, representations);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       return BrowserHelper.deleteRepresentation(user, representations, details);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1408,12 +1408,12 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
     controllerAssistant.checkObjectPermissions(user, files);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       return BrowserHelper.deleteFile(user, files, details);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1431,7 +1431,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -1441,7 +1441,7 @@ public class Browser extends RodaWuiController {
       return BrowserHelper.createDescriptiveMetadataFile(aipId, representationId, metadataId, metadataType,
         metadataVersion, metadataPayload);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1461,7 +1461,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -1475,7 +1475,7 @@ public class Browser extends RodaWuiController {
       return BrowserHelper.updateDescriptiveMetadataFile(aipId, representationId, metadataId, metadataType,
         metadataVersion, metadataPayload, properties);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1492,7 +1492,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -1501,7 +1501,7 @@ public class Browser extends RodaWuiController {
       // delegate
       BrowserHelper.deleteDescriptiveMetadataFile(aipId, representationId, metadataId);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1519,7 +1519,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -1528,7 +1528,7 @@ public class Browser extends RodaWuiController {
       // delegate
       BrowserHelper.deleteDescriptiveMetadataFile(aipId, representationId, metadataId);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1546,7 +1546,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -1555,7 +1555,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.createRepresentation(user, aipId, representationId, type, details);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1572,7 +1572,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId(),
@@ -1582,7 +1582,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.updateRepresentation(representation);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1601,7 +1601,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
     IndexedFile file = null;
 
     try {
@@ -1613,7 +1613,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.retrieveAIPRepresentationFile(file, acceptFormat);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1630,7 +1630,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -1644,7 +1644,7 @@ public class Browser extends RodaWuiController {
       return BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(aipId, null, metadataId, metadataType,
         metadataVersion, properties, is, false);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1662,7 +1662,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
@@ -1677,7 +1677,7 @@ public class Browser extends RodaWuiController {
       return BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(representation.getAipId(), representation.getId(),
         metadataId, metadataType, metadataVersion, properties, is, false);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1696,7 +1696,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -1710,7 +1710,7 @@ public class Browser extends RodaWuiController {
       return BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(aipId, null, metadataId, metadataType,
         metadataVersion, properties, is, true);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1729,7 +1729,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
@@ -1744,7 +1744,7 @@ public class Browser extends RodaWuiController {
       return BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(representation.getAipId(), representation.getId(),
         metadataId, metadataType, metadataVersion, properties, is, true);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1770,7 +1770,7 @@ public class Browser extends RodaWuiController {
         forceCommit);
 
       // register action
-      controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_PARENT_PARAM,
+      controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_PARENT_PARAM,
         parentUUID, RodaConstants.CONTROLLER_FOLDERNAME_PARAM, folderName, RodaConstants.CONTROLLER_SUCCESS_PARAM,
         true);
       return transferredResource;
@@ -1778,7 +1778,7 @@ public class Browser extends RodaWuiController {
       // register action
       // FIXME nvieira 20170518: does this make sense to register with SUCCESS?
       // and the other exception, should they be treated differently?
-      controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_PARENT_PARAM,
+      controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_PARENT_PARAM,
         parentUUID, RodaConstants.CONTROLLER_FOLDERNAME_PARAM, folderName, RodaConstants.CONTROLLER_SUCCESS_PARAM,
         false, RodaConstants.CONTROLLER_ERROR_PARAM, e.getMessage());
       throw e;
@@ -1792,12 +1792,12 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       BrowserHelper.deleteTransferredResources(selected, user);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1811,13 +1811,13 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.reindexTransferredResource(path);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1841,7 +1841,7 @@ public class Browser extends RodaWuiController {
         inputStream, forceCommit);
 
       // register action
-      controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_PATH_PARAM, parentUUID,
+      controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_PATH_PARAM, parentUUID,
         RodaConstants.CONTROLLER_FILENAME_PARAM, fileName, RodaConstants.CONTROLLER_SUCCESS_PARAM, true);
 
       return transferredResource;
@@ -1849,7 +1849,7 @@ public class Browser extends RodaWuiController {
       // register action
       // FIXME nvieira 20170518: does this make sense to register with SUCCESS?
       // and the other exception, should they be treated differently?
-      controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_PATH_PARAM, parentUUID,
+      controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_PATH_PARAM, parentUUID,
         RodaConstants.CONTROLLER_FILENAME_PARAM, fileName, RodaConstants.CONTROLLER_SUCCESS_PARAM, false,
         RodaConstants.CONTROLLER_ERROR_PARAM, e.getMessage());
       throw e;
@@ -1864,13 +1864,13 @@ public class Browser extends RodaWuiController {
     // check permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.retrieveClassificationPlan(user, filename);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1885,13 +1885,13 @@ public class Browser extends RodaWuiController {
     // check permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       BrowserHelper.updateTransferredResources(folderRelativePath, waitToFinish);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1912,7 +1912,7 @@ public class Browser extends RodaWuiController {
     // check permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
     Path filePath = Files.createTempFile("descriptive", ".tmp");
 
     try {
@@ -1921,7 +1921,7 @@ public class Browser extends RodaWuiController {
       ContentPayload payload = new FSPathContentPayload(filePath);
       BrowserHelper.updateTransferredResource(folderRelativePath, payload, name, waitToFinish);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1943,7 +1943,7 @@ public class Browser extends RodaWuiController {
     // check permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       List<String> aipFields = new ArrayList<>(RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -1963,7 +1963,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.retrieveSupportedMetadata(user, aip, rep, locale);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -1979,13 +1979,13 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       return BrowserHelper.retrieveTransferredResource(
         BrowserHelper.retrieve(TransferredResource.class, resourceId, new ArrayList<>()), acceptFormat);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2001,7 +2001,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
@@ -2009,7 +2009,7 @@ public class Browser extends RodaWuiController {
       controllerAssistant.checkObjectPermissions(user, resource.getEvent());
       return resource;
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2026,7 +2026,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -2040,7 +2040,7 @@ public class Browser extends RodaWuiController {
       BrowserHelper.revertDescriptiveMetadataVersion(aipId, representationId, descriptiveMetadataId, versionId,
         properties);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2058,7 +2058,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -2067,7 +2067,7 @@ public class Browser extends RodaWuiController {
       // delegate
       BrowserHelper.deleteDescriptiveMetadataVersion(aipId, representationId, descriptiveMetadataId, versionId);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2086,12 +2086,12 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
     controllerAssistant.checkObjectPermissions(user, aips);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       return BrowserHelper.updateAIPPermissions(user, aips, permissions, details, recursive);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2108,12 +2108,12 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
     controllerAssistant.checkObjectPermissions(user, dips);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       return BrowserHelper.updateDIPPermissions(user, dips, permissions, details);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2128,13 +2128,13 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.createRisk(risk, user, true);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2149,7 +2149,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       Map<String, String> properties = new HashMap<>();
@@ -2157,7 +2157,7 @@ public class Browser extends RodaWuiController {
 
       BrowserHelper.updateRisk(risk, user, properties, true, incidences);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2173,7 +2173,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
@@ -2192,7 +2192,7 @@ public class Browser extends RodaWuiController {
 
       BrowserHelper.revertRiskVersion(riskId, versionId, properties, incidences);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2209,13 +2209,13 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       BrowserHelper.deleteRiskVersion(riskId, versionId);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2231,13 +2231,13 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.retrieveRiskVersions(riskId);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2252,13 +2252,13 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.hasRiskVersions(riskId);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2273,13 +2273,13 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.retrieveRiskVersion(riskId, selectedVersion);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2301,7 +2301,7 @@ public class Browser extends RodaWuiController {
       posMitigationProbability, posMitigationImpact);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS,
+    controllerAssistant.registerAction(user, LogEntryState.SUCCESS,
       RodaConstants.CONTROLLER_PRE_MITIGATION_PROBABILITY_PARAM, preMitigationProbability,
       RodaConstants.CONTROLLER_PRE_MITIGATION_IMPACT_PARAM, preMitigationImpact,
       RodaConstants.CONTROLLER_POS_MITIGATION_PROBABILITY_PARAM, posMitigationProbability,
@@ -2320,7 +2320,7 @@ public class Browser extends RodaWuiController {
     List<String> ret = BrowserHelper.retrieveShowMitigationTerms();
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
+    controllerAssistant.registerAction(user, LogEntryState.SUCCESS);
 
     return ret;
   }
@@ -2336,7 +2336,7 @@ public class Browser extends RodaWuiController {
     MitigationPropertiesBundle ret = BrowserHelper.retrieveAllMitigationProperties();
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
+    controllerAssistant.registerAction(user, LogEntryState.SUCCESS);
 
     return ret;
   }
@@ -2348,13 +2348,13 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.deleteRisk(user, selected);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2369,13 +2369,13 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       BrowserHelper.updateRiskCounters();
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2391,13 +2391,13 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
     controllerAssistant.checkObjectPermissions(user, selected);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.appraisal(user, selected, accept, rejectReason);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2413,13 +2413,13 @@ public class Browser extends RodaWuiController {
     // check permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.retrieveDescriptiveMetadataPreview(bundle);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2435,13 +2435,13 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.renameTransferredResource(transferredResourceId, newName);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2458,7 +2458,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedFile folder = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, folderUUID,
@@ -2468,7 +2468,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.renameFolder(user, folder, newName, details);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2490,13 +2490,13 @@ public class Browser extends RodaWuiController {
       RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
     controllerAssistant.checkObjectPermissions(user, destinationAIP);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.moveFiles(user, aipId, representationId, selectedFiles, toFolder, details);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2514,7 +2514,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedRepresentation irep = RodaCoreFactory.getIndexService().retrieve(IndexedRepresentation.class,
@@ -2524,7 +2524,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.createFolder(user, irep, folderUUID, newName, details);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2543,13 +2543,13 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.moveTransferredResource(user, selected, transferredResource);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2566,13 +2566,13 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.retrieveSelectedTransferredResource(selected);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2588,7 +2588,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
@@ -2602,7 +2602,7 @@ public class Browser extends RodaWuiController {
 
       return BrowserHelper.createFile(user, aipId, representationId, directoryPath, fileId, payload, details);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       BrowserHelper.commit(IndexedFile.class);
@@ -2622,7 +2622,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, file.getAipId(),
@@ -2635,7 +2635,7 @@ public class Browser extends RodaWuiController {
       ContentPayload payload = new FSPathContentPayload(temp);
       return BrowserHelper.updateFile(file, payload, createIfNotExists, notify);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2650,7 +2650,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
     IndexedFile file = null;
 
     try {
@@ -2660,7 +2660,7 @@ public class Browser extends RodaWuiController {
       // delegate
       BrowserHelper.deleteFile(user, SelectedItemsList.create(IndexedFile.class, fileUUID), details);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2677,12 +2677,12 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       BrowserHelper.updateRiskIncidence(incidence);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2699,13 +2699,13 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       return BrowserHelper.updateMultipleIncidences(user, selected, status, severity, mitigatedOn, mitigatedBy,
         mitigatedDescription);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2720,12 +2720,12 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       return BrowserHelper.deleteRiskIncidences(user, selected, details);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2742,13 +2742,13 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
     controllerAssistant.checkObjectPermissions(user, dips);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.deleteDIPs(user, dips, details);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2767,7 +2767,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
@@ -2778,7 +2778,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.retrieveDIP(dipId, acceptFormat);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2796,7 +2796,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       DIPFile file = RodaCoreFactory.getIndexService().retrieve(DIPFile.class, dipFileUUID,
@@ -2806,7 +2806,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.retrieveDIPFile(dipFileUUID, acceptFormat);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2822,7 +2822,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
     Path file = Files.createTempFile("descriptive", ".tmp");
 
     try {
@@ -2836,7 +2836,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.createDIPFile(dipId, directoryPath, fileId, size, payload, true);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2855,7 +2855,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
     Path file = Files.createTempFile("descriptive", ".tmp");
 
     try {
@@ -2870,7 +2870,7 @@ public class Browser extends RodaWuiController {
 
       return BrowserHelper.createDIPFile(dipFile.getDipId(), newFileDirectoryPath, filename, size, payload, true);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2889,7 +2889,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
     Path file = Files.createTempFile("descriptive", ".tmp");
 
     try {
@@ -2903,7 +2903,7 @@ public class Browser extends RodaWuiController {
       return BrowserHelper.updateDIPFile(dipFile.getDipId(), dipFile.getPath(), dipFile.getId(), filename, size,
         payload, true);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2921,13 +2921,13 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
     controllerAssistant.checkObjectPermissions(user, files);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.deleteDIPFiles(user, files, details);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2947,7 +2947,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       RepresentationInformation ri = RodaCoreFactory.getIndexService().retrieve(RepresentationInformation.class,
@@ -2957,7 +2957,7 @@ public class Browser extends RodaWuiController {
       // delegate
       return BrowserHelper.retrieveRepresentationInformation(representationInformationId, acceptFormat);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2973,13 +2973,13 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.createFormatIdentificationJob(user, selected);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -2995,12 +2995,12 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
     controllerAssistant.checkObjectPermissions(user, selected);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       return BrowserHelper.changeAIPType(user, selected, newType, details);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -3017,12 +3017,12 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
     controllerAssistant.checkObjectPermissions(user, selected);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       return BrowserHelper.changeRepresentationType(user, selected, newType, details);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -3039,12 +3039,12 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
     controllerAssistant.checkObjectPermissions(user, representation);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       BrowserHelper.changeRepresentationStates(user, representation, newStates, details);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -3061,12 +3061,12 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       return BrowserHelper.verifyPermissions(username, permissionType, queryParams);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -3083,12 +3083,12 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       return BrowserHelper.hasDocumentation(aipId);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -3103,12 +3103,12 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       return BrowserHelper.hasSubmissions(aipId);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -3125,12 +3125,12 @@ public class Browser extends RodaWuiController {
     // only for this purpose
     // controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       return BrowserHelper.acknowledgeNotification(notificationId, ackToken);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -3149,7 +3149,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
@@ -3170,7 +3170,7 @@ public class Browser extends RodaWuiController {
 
       return reportList;
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -3190,7 +3190,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
@@ -3214,7 +3214,7 @@ public class Browser extends RodaWuiController {
         return reportList.getObjects().get(0);
       }
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -3231,13 +3231,13 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.createRepresentationInformation(ri, extra, user.getName(), true);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -3253,12 +3253,12 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       BrowserHelper.updateRepresentationInformation(ri, extra, user.getName(), true);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -3274,13 +3274,13 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.deleteRepresentationInformation(user, selected);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -3295,13 +3295,13 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.retrieveRepresentationInformationWithFilter(riFilter);
     } catch (GenericException | RequestNotValidException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -3317,7 +3317,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
+    controllerAssistant.registerAction(user, LogEntryState.SUCCESS);
     return BrowserHelper.retrieveObjectClassFields(messages);
   }
 
@@ -3328,7 +3328,7 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
+    controllerAssistant.registerAction(user, LogEntryState.SUCCESS);
     return BrowserHelper.retrieveRelationTypeTranslations(messages);
   }
 
@@ -3340,12 +3340,12 @@ public class Browser extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
     try {
       return BrowserHelper.updateRepresentationInformationListWithFilter(representationInformationItems, filterToAdd,
         user);
     } catch (RequestNotValidException | GenericException | NotFoundException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -3358,7 +3358,7 @@ public class Browser extends RodaWuiController {
     String representationInformationId, Locale locale)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     // check user permissions
     controllerAssistant.checkRoles(user);
@@ -3367,7 +3367,7 @@ public class Browser extends RodaWuiController {
     try {
       extra = BrowserHelper.retrieveRepresentationInformationExtraBundle(representationInformationId, locale);
     } catch (NotFoundException | GenericException | RequestNotValidException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -3381,7 +3381,7 @@ public class Browser extends RodaWuiController {
   public static void importLogEntries(User user, InputStream inputStream, String filename) throws GenericException,
     AlreadyExistsException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // check user permissions
@@ -3390,7 +3390,7 @@ public class Browser extends RodaWuiController {
       // delegate
       BrowserHelper.importLogEntries(inputStream, filename);
     } catch (GenericException | AlreadyExistsException | RequestNotValidException | NotFoundException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_FILENAME_PARAM, filename);

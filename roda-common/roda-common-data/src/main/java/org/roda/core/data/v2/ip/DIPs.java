@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.RODAObjectList;
@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-@XmlRootElement(name = RodaConstants.RODA_OBJECT_DIPS)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DIPS)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DIPs implements RODAObjectList<DIP> {
   private static final long serialVersionUID = -820307643991063686L;

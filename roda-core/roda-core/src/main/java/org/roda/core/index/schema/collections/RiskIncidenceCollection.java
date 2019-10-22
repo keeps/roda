@@ -19,9 +19,9 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
+import org.roda.core.data.v2.risks.IncidenceStatus;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
+import org.roda.core.data.v2.risks.SeverityLevel;
 import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
@@ -127,12 +127,12 @@ public class RiskIncidenceCollection extends AbstractSolrCollection<RiskIncidenc
     incidence.setRiskId(SolrUtils.objectToString(doc.get(RodaConstants.RISK_INCIDENCE_RISK_ID), null));
     incidence.setDescription(SolrUtils.objectToString(doc.get(RodaConstants.RISK_INCIDENCE_DESCRIPTION), null));
     if (doc.containsKey(RodaConstants.RISK_INCIDENCE_STATUS)) {
-      incidence.setStatus(INCIDENCE_STATUS.valueOf(SolrUtils
-        .objectToString(doc.get(RodaConstants.RISK_INCIDENCE_STATUS), INCIDENCE_STATUS.UNMITIGATED.toString())));
+      incidence.setStatus(IncidenceStatus.valueOf(SolrUtils
+        .objectToString(doc.get(RodaConstants.RISK_INCIDENCE_STATUS), IncidenceStatus.UNMITIGATED.toString())));
     }
     if (doc.containsKey(RodaConstants.RISK_INCIDENCE_SEVERITY)) {
-      incidence.setSeverity(SEVERITY_LEVEL.valueOf(
-        SolrUtils.objectToString(doc.get(RodaConstants.RISK_INCIDENCE_SEVERITY), SEVERITY_LEVEL.MODERATE.toString())));
+      incidence.setSeverity(SeverityLevel.valueOf(
+        SolrUtils.objectToString(doc.get(RodaConstants.RISK_INCIDENCE_SEVERITY), SeverityLevel.MODERATE.toString())));
     }
     incidence.setDetectedOn(SolrUtils.objectToDate(doc.get(RodaConstants.RISK_INCIDENCE_DETECTED_ON)));
     incidence.setDetectedBy(SolrUtils.objectToString(doc.get(RodaConstants.RISK_INCIDENCE_DETECTED_BY), null));

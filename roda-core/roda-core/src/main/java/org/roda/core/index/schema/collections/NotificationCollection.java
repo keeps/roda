@@ -19,6 +19,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
@@ -121,8 +122,8 @@ public class NotificationCollection extends AbstractSolrCollection<Notification,
     }
 
     if (doc.containsKey(RodaConstants.NOTIFICATION_STATE)) {
-      String defaultState = Notification.NOTIFICATION_STATE.COMPLETED.toString();
-      notification.setState(Notification.NOTIFICATION_STATE
+      String defaultState = NotificationState.COMPLETED.toString();
+      notification.setState(NotificationState
         .valueOf(SolrUtils.objectToString(doc.get(RodaConstants.NOTIFICATION_STATE), defaultState)));
     }
 

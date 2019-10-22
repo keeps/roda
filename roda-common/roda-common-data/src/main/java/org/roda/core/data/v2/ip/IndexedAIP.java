@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.annotation.XmlRootElement;
+
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.descriptionlevels.DescriptionLevel;
@@ -29,7 +29,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @author Hélder Silva <hsilva@keep.pt>
  * @author Luis Faria <lfaria@keep.pt>
  */
-@XmlRootElement(name = RodaConstants.RODA_OBJECT_AIP)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_AIP)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState {
   private static final long serialVersionUID = 38813680938917204L;

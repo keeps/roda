@@ -1,17 +1,28 @@
 <included>
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d [%thread] %-5level %logger{36} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
 	<appender name="WUI_FILEOUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>${roda.home}/log/roda-wui.log</file>
 		<append>true</append>
 		<encoder>
 			<pattern>%d [%thread] %-5level %logger{36} - %msg%n</pattern>
 		</encoder>
-        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <!-- rollover daily -->
-            <fileNamePattern>${roda.home}/log/roda-wui-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
-            <!-- each file should be at most 1GB -->
-            <maxFileSize>1GB</maxFileSize>
-        </rollingPolicy>
+		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+			<!-- rollover daily -->
+			<fileNamePattern>${roda.home}/log/roda-wui-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+			<!-- each file should be at most 1GB -->
+			<maxFileSize>1GB</maxFileSize>
+		</rollingPolicy>
 	</appender>
+
+	<logger name="org.roda.wui.RODA" additivity="false">
+		<level value="INFO" />
+		<appender-ref ref="STDOUT" />
+	</logger>
 
 	<logger name="org.roda.wui" additivity="false">
 		<!-- Client-side logging must be set in org.roda.wui.common.client.GWTLogger

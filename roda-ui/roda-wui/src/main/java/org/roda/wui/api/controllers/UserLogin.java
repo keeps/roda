@@ -17,7 +17,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
+import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
@@ -46,7 +46,7 @@ public class UserLogin extends RodaWuiController {
       user = UserLoginHelper.login(username, password, request);
 
       // register action
-      controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_USERNAME_PARAM,
+      controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_USERNAME_PARAM,
         username);
 
       return user;
@@ -54,7 +54,7 @@ public class UserLogin extends RodaWuiController {
     } catch (AuthenticationDeniedException e) {
       user = UserUtility.getGuest(request.getRemoteAddr());
       // register action
-      controllerAssistant.registerAction(user, LOG_ENTRY_STATE.FAILURE, RodaConstants.CONTROLLER_USERNAME_PARAM,
+      controllerAssistant.registerAction(user, LogEntryState.FAILURE, RodaConstants.CONTROLLER_USERNAME_PARAM,
         username);
       throw e;
     }
@@ -78,12 +78,12 @@ public class UserLogin extends RodaWuiController {
       user = UserLoginHelper.casLogin(username, request);
 
       // register action
-      controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_USERNAME_PARAM,
+      controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_USERNAME_PARAM,
         username);
     } catch (AuthenticationDeniedException e) {
       user = UserUtility.getGuest(request.getRemoteAddr());
       // register action
-      controllerAssistant.registerAction(user, LOG_ENTRY_STATE.FAILURE, RodaConstants.CONTROLLER_USERNAME_PARAM,
+      controllerAssistant.registerAction(user, LogEntryState.FAILURE, RodaConstants.CONTROLLER_USERNAME_PARAM,
         username);
       throw e;
     }
@@ -103,7 +103,7 @@ public class UserLogin extends RodaWuiController {
     UserUtility.removeUserFromSession(request, extraAttributesToBeRemovedFromSession);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_USERNAME_PARAM,
+    controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_USERNAME_PARAM,
       user.getName());
   }
 }

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.RODAObjectList;
@@ -19,7 +19,7 @@ import org.roda.core.data.v2.common.RODAObjectList;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@XmlRootElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION_INFORMATION_LIST)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION_INFORMATION_LIST)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RepresentationInformationList implements RODAObjectList<RepresentationInformation> {
   private static final long serialVersionUID = -1500757245278990237L;

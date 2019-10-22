@@ -34,8 +34,8 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.notifications.Notification;
-import org.roda.core.data.v2.notifications.Notification.NOTIFICATION_STATE;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaPrincipal;
@@ -86,7 +86,7 @@ public class UserManagementHelper {
         Notification notification = UserManagement.sendEmailVerification(servletPath, updatedUser.getName(),
           generateNewToken, user.getIpAddress(), localeString);
 
-        if (notification.getState() == NOTIFICATION_STATE.FAILED) {
+        if (notification.getState() == NotificationState.FAILED) {
           registeredUser.setActive(true);
           boolean notify = true;
           RodaCoreFactory.getModelService().updateUser(registeredUser, password, notify);

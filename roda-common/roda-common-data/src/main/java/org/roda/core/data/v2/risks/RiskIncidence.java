@@ -13,25 +13,20 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.annotation.XmlRootElement;
+
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.HasId;
-import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@XmlRootElement(name = RodaConstants.RODA_OBJECT_INCIDENCE)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_INCIDENCE)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class RiskIncidence implements IsModelObject, IsIndexed, HasId {
   private static final long serialVersionUID = -1089167070045254627L;
-
-  public enum INCIDENCE_STATUS {
-    UNMITIGATED, MITIGATED, ACCEPT_RISK, FALSE_POSITIVE;
-  }
 
   private String id = null;
   private String aipId = null;
@@ -43,8 +38,8 @@ public class RiskIncidence implements IsModelObject, IsIndexed, HasId {
   private String description = null;
   private boolean byPlugin = false;
 
-  private INCIDENCE_STATUS status = null;
-  private SEVERITY_LEVEL severity = null;
+  private IncidenceStatus status = null;
+  private SeverityLevel severity = null;
   private Date detectedOn = null;
   private String detectedBy = null;
   private Date mitigatedOn = null;
@@ -146,19 +141,19 @@ public class RiskIncidence implements IsModelObject, IsIndexed, HasId {
     this.byPlugin = byPlugin;
   }
 
-  public INCIDENCE_STATUS getStatus() {
+  public IncidenceStatus getStatus() {
     return status;
   }
 
-  public void setStatus(INCIDENCE_STATUS status) {
+  public void setStatus(IncidenceStatus status) {
     this.status = status;
   }
 
-  public SEVERITY_LEVEL getSeverity() {
+  public SeverityLevel getSeverity() {
     return severity;
   }
 
-  public void setSeverity(SEVERITY_LEVEL severity) {
+  public void setSeverity(SeverityLevel severity) {
     this.severity = severity;
   }
 

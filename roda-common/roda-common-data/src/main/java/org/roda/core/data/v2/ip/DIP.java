@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.annotation.XmlRootElement;
+
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
@@ -21,7 +21,7 @@ import org.roda.core.data.v2.IsModelObject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@XmlRootElement(name = RodaConstants.RODA_OBJECT_DIP)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DIP)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DIP implements IsModelObject, HasId, HasPermissions {
 

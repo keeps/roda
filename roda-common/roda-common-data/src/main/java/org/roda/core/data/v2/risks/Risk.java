@@ -11,24 +11,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.NamedIndexedModel;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-
-@XmlRootElement(name = RodaConstants.RODA_OBJECT_RISK)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_RISK)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class Risk extends NamedIndexedModel implements IsModelObject {
 
   private static final long serialVersionUID = -585753367605901060L;
-
-  public enum SEVERITY_LEVEL {
-    LOW, MODERATE, HIGH;
-  }
 
   private String description = null;
   private Date identifiedOn = null;
@@ -39,13 +33,13 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
   private int preMitigationProbability = 0;
   private int preMitigationImpact = 0;
   private int preMitigationSeverity = 0;
-  private SEVERITY_LEVEL preMitigationSeverityLevel = null;
+  private SeverityLevel preMitigationSeverityLevel = null;
   private String preMitigationNotes = null;
 
   private int postMitigationProbability = 0;
   private int postMitigationImpact = 0;
   private int postMitigationSeverity = 0;
-  private SEVERITY_LEVEL postMitigationSeverityLevel = null;
+  private SeverityLevel postMitigationSeverityLevel = null;
   private String postMitigationNotes = null;
 
   private String mitigationStrategy = null;
@@ -163,16 +157,16 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
     this.preMitigationSeverity = preMitigationSeverity;
   }
 
-  public SEVERITY_LEVEL getPreMitigationSeverityLevel() {
+  public SeverityLevel getPreMitigationSeverityLevel() {
     return preMitigationSeverityLevel;
   }
 
-  public void setPreMitigationSeverityLevel(SEVERITY_LEVEL preMitigationSeverity) {
+  public void setPreMitigationSeverityLevel(SeverityLevel preMitigationSeverity) {
     this.preMitigationSeverityLevel = preMitigationSeverity;
   }
 
   public void setPreMitigationSeverityLevel(String preMitigationSeverity) {
-    this.preMitigationSeverityLevel = preMitigationSeverity != null ? Risk.SEVERITY_LEVEL.valueOf(preMitigationSeverity)
+    this.preMitigationSeverityLevel = preMitigationSeverity != null ? SeverityLevel.valueOf(preMitigationSeverity)
       : null;
   }
 
@@ -208,17 +202,17 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
     this.postMitigationSeverity = postMitigationSeverity;
   }
 
-  public SEVERITY_LEVEL getPostMitigationSeverityLevel() {
+  public SeverityLevel getPostMitigationSeverityLevel() {
     return postMitigationSeverityLevel;
   }
 
-  public void setPostMitigationSeverityLevel(SEVERITY_LEVEL postMitigationSeverity) {
+  public void setPostMitigationSeverityLevel(SeverityLevel postMitigationSeverity) {
     this.postMitigationSeverityLevel = postMitigationSeverity;
   }
 
   public void setPostMitigationSeverityLevel(String postMitigationSeverity) {
     this.postMitigationSeverityLevel = postMitigationSeverity != null
-      ? Risk.SEVERITY_LEVEL.valueOf(postMitigationSeverity) : null;
+      ? SeverityLevel.valueOf(postMitigationSeverity) : null;
   }
 
   public String getPostMitigationNotes() {
@@ -230,7 +224,7 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
   }
 
   @JsonIgnore
-  public SEVERITY_LEVEL getCurrentSeverityLevel() {
+  public SeverityLevel getCurrentSeverityLevel() {
     if (postMitigationSeverityLevel != null) {
       return postMitigationSeverityLevel;
     } else {

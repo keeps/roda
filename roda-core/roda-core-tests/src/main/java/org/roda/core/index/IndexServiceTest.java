@@ -61,16 +61,16 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.log.LogEntryParameter;
+import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.notifications.Notification;
-import org.roda.core.data.v2.notifications.Notification.NOTIFICATION_STATE;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.ri.RepresentationInformationSupport;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
-import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
+import org.roda.core.data.v2.risks.SeverityLevel;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
@@ -416,7 +416,7 @@ public class IndexServiceTest {
     entry.setId(entry.getUUID());
     entry.setRelatedObjectID("Related");
     entry.setUsername("Username");
-    entry.setState(LOG_ENTRY_STATE.SUCCESS);
+    entry.setState(LogEntryState.SUCCESS);
     List<LogEntryParameter> parameters = new ArrayList<>();
     parameters.add(new LogEntryParameter("NAME1", "VALUE1"));
     parameters.add(new LogEntryParameter("NAME2", "VALUE2"));
@@ -447,7 +447,7 @@ public class IndexServiceTest {
     entry.setId(entry.getUUID());
     entry.setRelatedObjectID("related");
     entry.setUsername("username");
-    entry.setState(LOG_ENTRY_STATE.SUCCESS);
+    entry.setState(LogEntryState.SUCCESS);
     List<LogEntryParameter> parameters = new ArrayList<>();
     parameters.add(new LogEntryParameter("NAME1", "VALUE1"));
     parameters.add(new LogEntryParameter("NAME2", "VALUE2"));
@@ -492,7 +492,7 @@ public class IndexServiceTest {
       entry.setDuration(i);
       entry.setRelatedObjectID("RELATED:" + i);
       entry.setUsername("USER:" + i);
-      entry.setState(LOG_ENTRY_STATE.SUCCESS);
+      entry.setState(LogEntryState.SUCCESS);
       List<LogEntryParameter> parameters = new ArrayList<>();
       parameters.add(new LogEntryParameter("NAME1", "VALUE1"));
       parameters.add(new LogEntryParameter("NAME2", "VALUE2"));
@@ -625,13 +625,13 @@ public class IndexServiceTest {
       risk.setPreMitigationProbability(4);
       risk.setPreMitigationImpact(4);
       risk.setPreMitigationSeverity(16);
-      risk.setPreMitigationSeverityLevel(SEVERITY_LEVEL.HIGH);
+      risk.setPreMitigationSeverityLevel(SeverityLevel.HIGH);
       risk.setPreMitigationNotes("Pre Notes");
 
       risk.setPostMitigationProbability(3);
       risk.setPostMitigationImpact(2);
       risk.setPostMitigationSeverity(6);
-      risk.setPostMitigationSeverityLevel(SEVERITY_LEVEL.MODERATE);
+      risk.setPostMitigationSeverityLevel(SeverityLevel.MODERATE);
       risk.setPostMitigationNotes("Pos Notes");
 
       risk.setMitigationStrategy("Mitigation Strategy");
@@ -727,7 +727,7 @@ public class IndexServiceTest {
     Notification n = model.createNotification(notification, new EmailNotificationProcessor("test-email-template.vm"));
     // notification state must be FAILED because SMTP is not configured on test
     // environment
-    Assert.assertEquals(n.getState(), NOTIFICATION_STATE.FAILED);
+    Assert.assertEquals(n.getState(), NotificationState.FAILED);
     index.commit(Notification.class);
 
     Notification message2 = model.retrieveNotification(notification.getId());

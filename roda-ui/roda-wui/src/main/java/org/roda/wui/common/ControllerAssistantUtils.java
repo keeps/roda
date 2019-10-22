@@ -13,8 +13,8 @@ import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.util.IdUtils;
@@ -29,14 +29,14 @@ public final class ControllerAssistantUtils {
   }
 
   protected static void registerAction(User user, String actionComponent, String actionMethod, String relatedObjectId,
-    long duration, LOG_ENTRY_STATE state, Object... parameters) {
+    long duration, LogEntryState state, Object... parameters) {
     LogEntry logEntry = createLogEntry(user, actionComponent, actionMethod, relatedObjectId, duration, state,
       parameters);
     registerAction(logEntry);
   }
 
   private static LogEntry createLogEntry(User user, String actionComponent, String actionMethod, String relatedObjectId,
-    long duration, LOG_ENTRY_STATE state, Object... parameters) {
+    long duration, LogEntryState state, Object... parameters) {
     List<LogEntryParameter> logParameters = new ArrayList<>();
     if (parameters != null && parameters.length > 0) {
       if ((parameters.length % 2) != 0) {
@@ -56,7 +56,7 @@ public final class ControllerAssistantUtils {
   }
 
   private static LogEntry createLogEntry(User user, String actionComponent, String actionMethod, String relatedObjectId,
-    long duration, LOG_ENTRY_STATE state, List<LogEntryParameter> parameters) {
+    long duration, LogEntryState state, List<LogEntryParameter> parameters) {
     LogEntry logEntry = new LogEntry();
     logEntry.setUUID(IdUtils.createUUID());
     logEntry.setAddress(user.getIpAddress());

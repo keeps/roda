@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.RODAObjectList;
@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-@XmlRootElement(name = RodaConstants.RODA_OBJECT_INCIDENCES)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_INCIDENCES)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RiskIncidences implements RODAObjectList<RiskIncidence> {
   private static final long serialVersionUID = -5429901297485260170L;

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlRootElement;
+
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@XmlRootElement(name = RodaConstants.RODA_OBJECT_REPORT)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_REPORT)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Report implements IsModelObject, HasId {
@@ -33,10 +33,6 @@ public class Report implements IsModelObject, HasId {
   public static final String NO_SOURCE_OBJECT_CLASS = "NO_SOURCE_CLASS";
   public static final String NO_OUTCOME_OBJECT_ID = "NO_OUTCOME_ID";
   public static final String NO_OUTCOME_OBJECT_CLASS = "NO_OUTCOME_CLASS";
-
-  public enum PluginState {
-    SUCCESS, PARTIAL_SUCCESS, FAILURE, RUNNING
-  }
 
   private String id = "";
   private String jobId = "";

@@ -23,7 +23,7 @@ public class RodaWuiServlet extends HttpServlet {
 
   @Override
   public void init() throws ServletException {
-    LOGGER.info("Starting up RODA Core...");
+    LOGGER.info("Starting up RODA, please wait...");
     RodaCoreFactory.instantiate();
     if (!RodaCoreFactory.instantiatedWithoutErrors()) {
       LOGGER.error(
@@ -43,7 +43,7 @@ public class RodaWuiServlet extends HttpServlet {
 
     RodaCoreFactory.addLogger("logback_wui.xml");
 
-    LOGGER.info("RODA WUI started with success!");
+    LOGGER.info("RODA started with success!");
   }
 
   @Override

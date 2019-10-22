@@ -14,7 +14,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
+import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.User;
@@ -42,13 +42,13 @@ public class Risks extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.createRisk(risk, false);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -62,13 +62,13 @@ public class Risks extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.updateRisk(risk, null, false, 0);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -83,13 +83,13 @@ public class Risks extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       BrowserHelper.deleteRisk(riskId, false);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -104,13 +104,13 @@ public class Risks extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.createRiskIncidence(incidence, false);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -125,13 +125,13 @@ public class Risks extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.updateRiskIncidence(incidence, false);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -147,13 +147,13 @@ public class Risks extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       BrowserHelper.deleteRiskIncidence(incidenceId, false);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action

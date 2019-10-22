@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.annotation.XmlRootElement;
+
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
@@ -23,15 +23,11 @@ import org.roda.core.data.v2.ip.HasId;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@XmlRootElement(name = RodaConstants.RODA_OBJECT_NOTIFICATION)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_NOTIFICATION)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class Notification implements IsModelObject, IsIndexed, HasId {
 
   private static final long serialVersionUID = -585753367605901060L;
-
-  public enum NOTIFICATION_STATE {
-    CREATED, COMPLETED, FAILED;
-  }
 
   private String id = null;
   private String subject = null;
@@ -42,7 +38,7 @@ public class Notification implements IsModelObject, IsIndexed, HasId {
   private String acknowledgeToken = null;
   private boolean isAcknowledged = false;
   private Map<String, String> acknowledgedUsers = null;
-  private NOTIFICATION_STATE state;
+  private NotificationState state;
   
   private Map<String, Object> fields;
 
@@ -50,7 +46,7 @@ public class Notification implements IsModelObject, IsIndexed, HasId {
     super();
     this.sentOn = new Date();
     this.acknowledgedUsers = new HashMap<>();
-    this.state = NOTIFICATION_STATE.CREATED;
+    this.state = NotificationState.CREATED;
   }
 
   public Notification(Notification notification) {
@@ -63,7 +59,7 @@ public class Notification implements IsModelObject, IsIndexed, HasId {
     this.acknowledgeToken = notification.getAcknowledgeToken();
     this.isAcknowledged = notification.isAcknowledged();
     this.acknowledgedUsers = notification.getAcknowledgedUsers();
-    this.state = NOTIFICATION_STATE.CREATED;
+    this.state = NotificationState.CREATED;
   }
 
   @JsonIgnore
@@ -149,11 +145,11 @@ public class Notification implements IsModelObject, IsIndexed, HasId {
     this.acknowledgedUsers.put(recipientUser, acknowledgedOn);
   }
 
-  public NOTIFICATION_STATE getState() {
+  public NotificationState getState() {
     return state;
   }
 
-  public void setState(NOTIFICATION_STATE state) {
+  public void setState(NotificationState state) {
     this.state = state;
   }
 

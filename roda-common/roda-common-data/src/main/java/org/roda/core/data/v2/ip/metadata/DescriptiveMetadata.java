@@ -7,7 +7,7 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
-import javax.xml.bind.annotation.XmlRootElement;
+
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
@@ -15,7 +15,7 @@ import org.roda.core.data.v2.IsModelObject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@XmlRootElement(name = RodaConstants.RODA_OBJECT_DESCRIPTIVE_METADATA)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DESCRIPTIVE_METADATA)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DescriptiveMetadata implements IsModelObject {
   private static final long serialVersionUID = 5460845130599998867L;

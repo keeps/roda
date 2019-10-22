@@ -33,13 +33,12 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
+import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.jobs.Report.PluginState;
-import org.roda.core.data.v2.risks.Risk;
-import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
+import org.roda.core.data.v2.risks.IncidenceStatus;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
+import org.roda.core.data.v2.risks.SeverityLevel;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -203,8 +202,8 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
           incidence.setRiskId(riskId);
           incidence.setAipId(aip.getId());
           incidence.setObjectClass(AIP.class.getSimpleName());
-          incidence.setStatus(INCIDENCE_STATUS.UNMITIGATED);
-          incidence.setSeverity(Risk.SEVERITY_LEVEL.valueOf(severity));
+          incidence.setStatus(IncidenceStatus.UNMITIGATED);
+          incidence.setSeverity(SeverityLevel.valueOf(severity));
           incidence.setDescription(incidenceDescription);
           model.createRiskIncidence(incidence, false);
         } catch (GenericException | AlreadyExistsException | NotFoundException | AuthorizationDeniedException e) {
@@ -245,8 +244,8 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
           incidence.setAipId(representation.getAipId());
           incidence.setRepresentationId(representation.getId());
           incidence.setObjectClass(Representation.class.getSimpleName());
-          incidence.setStatus(INCIDENCE_STATUS.UNMITIGATED);
-          incidence.setSeverity(SEVERITY_LEVEL.valueOf(severity));
+          incidence.setStatus(IncidenceStatus.UNMITIGATED);
+          incidence.setSeverity(SeverityLevel.valueOf(severity));
           model.createRiskIncidence(incidence, false);
         } catch (GenericException | AlreadyExistsException | NotFoundException | AuthorizationDeniedException e) {
           state = PluginState.FAILURE;
@@ -289,8 +288,8 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
           incidence.setFilePath(file.getPath());
           incidence.setFileId(file.getId());
           incidence.setObjectClass(File.class.getSimpleName());
-          incidence.setStatus(INCIDENCE_STATUS.UNMITIGATED);
-          incidence.setSeverity(SEVERITY_LEVEL.valueOf(severity));
+          incidence.setStatus(IncidenceStatus.UNMITIGATED);
+          incidence.setSeverity(SeverityLevel.valueOf(severity));
           model.createRiskIncidence(incidence, false);
         } catch (GenericException | AlreadyExistsException | NotFoundException | AuthorizationDeniedException e) {
           state = PluginState.FAILURE;

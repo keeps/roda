@@ -10,8 +10,8 @@ package org.roda.wui.client.common.dialogs;
 import java.util.Date;
 
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
-import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
+import org.roda.core.data.v2.risks.IncidenceStatus;
+import org.roda.core.data.v2.risks.SeverityLevel;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
@@ -75,11 +75,11 @@ public class EditMultipleRiskIncidenceDialog<T extends IsIndexed> extends Dialog
     mitigatedOn.getDatePicker().setYearArrowsVisible(true);
     mitigatedOn.setFireNullValues(true);
 
-    for (INCIDENCE_STATUS istatus : INCIDENCE_STATUS.values()) {
+    for (IncidenceStatus istatus : IncidenceStatus.values()) {
       status.addItem(messages.riskIncidenceStatusValue(istatus), istatus.toString());
     }
 
-    for (SEVERITY_LEVEL iseverity : SEVERITY_LEVEL.values()) {
+    for (SeverityLevel iseverity : SeverityLevel.values()) {
       severity.addItem(messages.severityLevel(iseverity), iseverity.toString());
     }
 

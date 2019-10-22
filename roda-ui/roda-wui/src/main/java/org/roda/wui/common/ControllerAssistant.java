@@ -16,7 +16,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
+import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
 
 public class ControllerAssistant {
@@ -32,7 +32,7 @@ public class ControllerAssistant {
     try {
       UserUtility.checkGroup(user, group);
     } catch (final AuthorizationDeniedException e) {
-      registerAction(user, LOG_ENTRY_STATE.UNAUTHORIZED);
+      registerAction(user, LogEntryState.UNAUTHORIZED);
       throw e;
     }
   }
@@ -41,7 +41,7 @@ public class ControllerAssistant {
     try {
       UserUtility.checkRoles(user, this.getClass());
     } catch (final AuthorizationDeniedException e) {
-      registerAction(user, LOG_ENTRY_STATE.UNAUTHORIZED);
+      registerAction(user, LogEntryState.UNAUTHORIZED);
       throw e;
     }
   }
@@ -50,7 +50,7 @@ public class ControllerAssistant {
     try {
       UserUtility.checkRoles(user, this.getClass(), classToReturn);
     } catch (final AuthorizationDeniedException e) {
-      registerAction(user, LOG_ENTRY_STATE.UNAUTHORIZED);
+      registerAction(user, LogEntryState.UNAUTHORIZED);
       throw e;
     }
   }
@@ -64,7 +64,7 @@ public class ControllerAssistant {
     try {
       UserUtility.checkObjectPermissions(user, obj, this.getClass(), classToReturn);
     } catch (final AuthorizationDeniedException e) {
-      registerAction(user, LOG_ENTRY_STATE.UNAUTHORIZED);
+      registerAction(user, LogEntryState.UNAUTHORIZED);
       throw e;
     }
   }
@@ -79,23 +79,23 @@ public class ControllerAssistant {
     try {
       UserUtility.checkObjectPermissions(user, objs, this.getClass(), classToReturn);
     } catch (final AuthorizationDeniedException e) {
-      registerAction(user, LOG_ENTRY_STATE.UNAUTHORIZED);
+      registerAction(user, LogEntryState.UNAUTHORIZED);
       throw e;
     }
   }
 
-  public void registerAction(final User user, final String relatedObjectId, final LOG_ENTRY_STATE state,
+  public void registerAction(final User user, final String relatedObjectId, final LogEntryState state,
     final Object... parameters) {
     final long duration = new Date().getTime() - startDate.getTime();
     ControllerAssistantUtils.registerAction(user, this.enclosingMethod.getDeclaringClass().getName(),
       this.enclosingMethod.getName(), relatedObjectId, duration, state, parameters);
   }
 
-  public void registerAction(final User user, final LOG_ENTRY_STATE state, final Object... parameters) {
+  public void registerAction(final User user, final LogEntryState state, final Object... parameters) {
     registerAction(user, null, state, parameters);
   }
 
-  public void registerAction(final User user, final LOG_ENTRY_STATE state) {
+  public void registerAction(final User user, final LogEntryState state) {
     registerAction(user, (String) null, state);
   }
 }

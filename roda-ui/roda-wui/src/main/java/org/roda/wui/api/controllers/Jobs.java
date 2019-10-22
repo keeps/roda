@@ -15,7 +15,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
+import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
@@ -41,7 +41,7 @@ public class Jobs extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
     Job updatedJob = new Job(job);
 
     try {
@@ -49,7 +49,7 @@ public class Jobs extends RodaWuiController {
       updatedJob = JobsHelper.createJob(job, async);
       return updatedJob;
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -64,13 +64,13 @@ public class Jobs extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return JobsHelper.startJob(jobId);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -85,13 +85,13 @@ public class Jobs extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       JobsHelper.stopJob(jobId);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -106,13 +106,13 @@ public class Jobs extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       JobsHelper.deleteJob(jobId);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action

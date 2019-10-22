@@ -11,11 +11,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlRootElement;
+
 
 import org.roda.core.data.common.RodaConstants;
 
-@XmlRootElement(name = RodaConstants.RODA_OBJECT_FACET_FIELD_VALUE)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_FACET_FIELD_VALUE)
 public class FacetFieldResult implements Serializable {
 
   private static final long serialVersionUID = 4007898233996477150L;

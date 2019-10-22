@@ -47,12 +47,12 @@ import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.risks.IncidenceStatus;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.core.data.v2.validation.ValidationReport;
@@ -278,7 +278,7 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
 
       incidence.setFileId(fileId);
       incidence.setObjectClass(AIP.class.getSimpleName());
-      incidence.setStatus(INCIDENCE_STATUS.UNMITIGATED);
+      incidence.setStatus(IncidenceStatus.UNMITIGATED);
       incidence.setSeverity(risk.getPreMitigationSeverityLevel());
       model.createRiskIncidence(incidence, false);
     }
@@ -290,7 +290,7 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
     List<RiskIncidence> results = getUnmitigatedIncidences(index, aipId, representationId, filePath, fileId, riskId);
 
     for (RiskIncidence incidence : results) {
-      incidence.setStatus(INCIDENCE_STATUS.MITIGATED);
+      incidence.setStatus(IncidenceStatus.MITIGATED);
       model.updateRiskIncidence(incidence, false);
     }
   }
@@ -299,7 +299,7 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
     List<String> filePath, String fileId, String riskId) throws GenericException, RequestNotValidException {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipId),
       new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISK_ID, riskId),
-      new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_STATUS, INCIDENCE_STATUS.UNMITIGATED.toString()));
+      new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_STATUS, IncidenceStatus.UNMITIGATED.toString()));
 
     if (representationId != null) {
       filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representationId));

@@ -22,8 +22,8 @@ import org.roda.core.common.ConfigurableEmailUtility;
 import org.roda.core.common.HandlebarsUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.notifications.Notification;
-import org.roda.core.data.v2.notifications.Notification.NOTIFICATION_STATE;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;
 import org.roda.core.util.IdUtils;
@@ -103,14 +103,14 @@ public class EmailNotificationProcessor implements NotificationProcessor {
           LOGGER.debug("Sending email ...");
           emailUtility.sendMail(recipient, modifiedBody);
           LOGGER.debug("Email sent");
-          processedNotification.setState(NOTIFICATION_STATE.COMPLETED);
+          processedNotification.setState(NotificationState.COMPLETED);
         } else {
-          processedNotification.setState(NOTIFICATION_STATE.FAILED);
+          processedNotification.setState(NotificationState.FAILED);
           LOGGER.debug("SMTP not defined, cannot send emails");
         }
       }
     } catch (IOException | MessagingException | GenericException e) {
-      processedNotification.setState(NOTIFICATION_STATE.FAILED);
+      processedNotification.setState(NotificationState.FAILED);
       LOGGER.debug("Error sending e-mail: {}", e.getMessage());
     }
     return processedNotification;

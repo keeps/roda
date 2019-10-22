@@ -16,7 +16,7 @@ import java.util.Map;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.common.client.tools.StringUtils;

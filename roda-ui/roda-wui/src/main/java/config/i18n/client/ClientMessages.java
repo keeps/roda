@@ -15,11 +15,11 @@ import java.util.List;
 
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
-import org.roda.core.data.v2.jobs.Report.PluginState;
-import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
-import org.roda.core.data.v2.notifications.Notification.NOTIFICATION_STATE;
-import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
-import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
+import org.roda.core.data.v2.jobs.PluginState;
+import org.roda.core.data.v2.log.LogEntryState;
+import org.roda.core.data.v2.notifications.NotificationState;
+import org.roda.core.data.v2.risks.IncidenceStatus;
+import org.roda.core.data.v2.risks.SeverityLevel;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 
 import com.google.gwt.i18n.client.Messages;
@@ -957,7 +957,7 @@ public interface ClientMessages extends Messages {
 
   String riskHistoryLabel(String versionKey, Date createdDate);
 
-  String severityLevel(@Select SEVERITY_LEVEL level);
+  String severityLevel(@Select SeverityLevel level);
 
   String getRisksDialogName();
 
@@ -1225,7 +1225,7 @@ public interface ClientMessages extends Messages {
 
   String riskIncidenceMitigatedDescription();
 
-  String riskIncidenceStatusValue(@Select INCIDENCE_STATUS status);
+  String riskIncidenceStatusValue(@Select IncidenceStatus status);
 
   String riskIncidenceStatusTitle();
 
@@ -1476,7 +1476,7 @@ public interface ClientMessages extends Messages {
 
   String logEntryParameters();
 
-  String logEntryStateValue(@Select LOG_ENTRY_STATE state);
+  String logEntryStateValue(@Select LogEntryState state);
 
   String logEntryInstanceId();
 
@@ -1838,7 +1838,7 @@ public interface ClientMessages extends Messages {
 
   String pluginStateMessage(@Select PluginState state);
 
-  String notificationStateValue(@Select NOTIFICATION_STATE state);
+  String notificationStateValue(@Select NotificationState state);
 
   String isAcknowledged(@Select String isAcknowledged);
 

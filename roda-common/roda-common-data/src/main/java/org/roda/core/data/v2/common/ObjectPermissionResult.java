@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+
 
 import org.roda.core.data.common.RodaConstants;
 
@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-@XmlRootElement(name = RodaConstants.RODA_OBJECT_OTHERS)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_OTHERS)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ObjectPermissionResult {
   private List<ObjectPermission> objectPermissions;

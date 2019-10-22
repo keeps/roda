@@ -26,8 +26,8 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.notifications.Notification;
-import org.roda.core.data.v2.notifications.Notification.NOTIFICATION_STATE;
 import org.roda.core.model.ModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,10 +58,10 @@ public class HTTPNotificationProcessor implements NotificationProcessor {
 
         if (success) {
           LOGGER.debug("Notification sent");
-          notification.setState(NOTIFICATION_STATE.COMPLETED);
+          notification.setState(NotificationState.COMPLETED);
         } else {
           LOGGER.debug("Notification not sent");
-          notification.setState(NOTIFICATION_STATE.FAILED);
+          notification.setState(NotificationState.FAILED);
         }
       } else {
         LOGGER.warn("No endpoint, cannot send notification.");

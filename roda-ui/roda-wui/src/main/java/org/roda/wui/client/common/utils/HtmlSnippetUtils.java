@@ -20,13 +20,13 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
-import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.jobs.PluginState;
+import org.roda.core.data.v2.log.LogEntryState;
+import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
-import org.roda.core.data.v2.notifications.Notification.NOTIFICATION_STATE;
-import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
+import org.roda.core.data.v2.risks.IncidenceStatus;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
+import org.roda.core.data.v2.risks.SeverityLevel;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.MetadataValue;
@@ -179,12 +179,12 @@ public class HtmlSnippetUtils {
     return pluginStateHTML;
   }
 
-  public static SafeHtml getNotificationStateHTML(NOTIFICATION_STATE state) {
+  public static SafeHtml getNotificationStateHTML(NotificationState state) {
     String label = messages.notificationStateValue(state);
     return getNotificationStateHTML(state, label);
   }
 
-  public static SafeHtml getNotificationStateHTML(NOTIFICATION_STATE state, String label) {
+  public static SafeHtml getNotificationStateHTML(NotificationState state, String label) {
     SafeHtml notificationStateHTML;
     switch (state) {
       case COMPLETED:
@@ -201,13 +201,13 @@ public class HtmlSnippetUtils {
     return notificationStateHTML;
   }
 
-  public static SEVERITY_LEVEL getSeverityLevel(int severity, int lowLimit, int highLimit) {
+  public static SeverityLevel getSeverityLevel(int severity, int lowLimit, int highLimit) {
     if (severity < lowLimit) {
-      return SEVERITY_LEVEL.LOW;
+      return SeverityLevel.LOW;
     } else if (severity < highLimit) {
-      return SEVERITY_LEVEL.MODERATE;
+      return SeverityLevel.MODERATE;
     } else {
-      return SEVERITY_LEVEL.HIGH;
+      return SeverityLevel.HIGH;
     }
   }
 
@@ -215,7 +215,7 @@ public class HtmlSnippetUtils {
     return getSeverityDefinition(getSeverityLevel(severity, lowLimit, highLimit));
   }
 
-  public static SafeHtml getSeverityDefinition(SEVERITY_LEVEL level) {
+  public static SafeHtml getSeverityDefinition(SeverityLevel level) {
     SafeHtml ret;
     switch (level) {
       case LOW:
@@ -234,8 +234,8 @@ public class HtmlSnippetUtils {
     return ret;
   }
 
-  public static SafeHtml getStatusDefinition(INCIDENCE_STATUS status) {
-    if (status.equals(INCIDENCE_STATUS.UNMITIGATED)) {
+  public static SafeHtml getStatusDefinition(IncidenceStatus status) {
+    if (status.equals(IncidenceStatus.UNMITIGATED)) {
       return SafeHtmlUtils
         .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.riskIncidenceStatusValue(status) + CLOSE_SPAN);
     } else {
@@ -244,7 +244,7 @@ public class HtmlSnippetUtils {
     }
   }
 
-  public static SafeHtml getLogEntryStateHtml(LOG_ENTRY_STATE state) {
+  public static SafeHtml getLogEntryStateHtml(LogEntryState state) {
     String labelClass;
 
     switch (state) {

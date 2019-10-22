@@ -10,7 +10,7 @@ package org.roda.core.data.v2.common;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.bind.annotation.XmlRootElement;
+
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-@XmlRootElement(name = "metrics")
+@javax.xml.bind.annotation.XmlRootElement(name = "metrics")
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Metrics {

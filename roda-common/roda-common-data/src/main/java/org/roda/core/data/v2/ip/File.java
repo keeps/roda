@@ -9,7 +9,7 @@ package org.roda.core.data.v2.ip;
 
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlRootElement;
+
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
@@ -17,7 +17,7 @@ import org.roda.core.data.v2.IsModelObject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@XmlRootElement(name = RodaConstants.RODA_OBJECT_FILE)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_FILE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class File implements IsModelObject, HasId {
   private static final long serialVersionUID = 3303019735787641534L;

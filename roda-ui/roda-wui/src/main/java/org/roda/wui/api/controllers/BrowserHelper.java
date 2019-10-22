@@ -114,18 +114,18 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetada
 import org.roda.core.data.v2.ip.metadata.PreservationMetadataList;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RelationObjectType;
 import org.roda.core.data.v2.ri.RepresentationInformation;
+import org.roda.core.data.v2.risks.IncidenceStatus;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
@@ -2443,7 +2443,7 @@ public class BrowserHelper {
       Arrays.asList(RodaConstants.INDEX_UUID));
 
     Filter filter = new Filter(
-      new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_STATUS, INCIDENCE_STATUS.UNMITIGATED.toString()));
+      new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_STATUS, IncidenceStatus.UNMITIGATED.toString()));
     IndexResult<RiskIncidence> findNotMitigatedRiskIncidences = index.find(RiskIncidence.class, filter, Sorter.NONE,
       new Sublist(0, 0), new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_RISK_ID)),
       Arrays.asList(RodaConstants.INDEX_UUID));

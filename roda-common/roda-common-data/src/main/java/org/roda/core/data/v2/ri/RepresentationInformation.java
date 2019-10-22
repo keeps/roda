@@ -13,22 +13,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.NamedIndexedModel;
 import org.roda.core.data.v2.index.IsIndexed;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-
-@XmlRootElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION_INFORMATION)
-@XmlAccessorType(XmlAccessType.PUBLIC_MEMBER)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION_INFORMATION)
+@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.PUBLIC_MEMBER)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RepresentationInformation extends NamedIndexedModel implements IsModelObject, IsIndexed {
   private static final long serialVersionUID = 8766448064705416130L;
@@ -103,8 +97,8 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
     return extras;
   }
 
-  @XmlElement(name = "extras")
-  @XmlJavaTypeAdapter(value = ExtrasHandler.class)
+  @javax.xml.bind.annotation.XmlElement(name = "extras")
+  @javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter(value = ExtrasHandler.class)
   public void setExtras(String extras) {
     this.extras = extras;
   }
@@ -117,7 +111,7 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
     this.support = support;
   }
 
-  @XmlElement(name = "relation")
+  @javax.xml.bind.annotation.XmlElement(name = "relation")
   public List<RepresentationInformationRelation> getRelations() {
     return relations;
   }

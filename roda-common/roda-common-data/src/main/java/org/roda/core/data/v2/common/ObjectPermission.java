@@ -9,13 +9,11 @@ package org.roda.core.data.v2.common;
 
 import java.io.Serializable;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.roda.core.data.common.RodaConstants;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@XmlRootElement(name = RodaConstants.RODA_OBJECT_PERMISSION)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_PERMISSION)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class ObjectPermission implements Serializable {
   private static final long serialVersionUID = -6473833736054473793L;

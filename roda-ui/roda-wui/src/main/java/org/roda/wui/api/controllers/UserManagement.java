@@ -30,7 +30,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
+import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
@@ -55,13 +55,13 @@ public class UserManagement extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return UserManagementHelper.retrieveUser(username);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -76,13 +76,13 @@ public class UserManagement extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return UserManagementHelper.retrieveGroup(groupname);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -96,13 +96,13 @@ public class UserManagement extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return UserManagementHelper.listAllGroups();
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -115,13 +115,13 @@ public class UserManagement extends RodaWuiController {
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return UserManagementHelper.registerUser(user, password, extra, localeString, servletPath);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -137,13 +137,13 @@ public class UserManagement extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return UserManagementHelper.createUser(newUser, password, extra);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -163,13 +163,13 @@ public class UserManagement extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return UserManagementHelper.updateMyUser(modifiedUser, password, extra);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -185,13 +185,13 @@ public class UserManagement extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       UserManagementHelper.updateUser(modifiedUser, password, extra);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -205,13 +205,13 @@ public class UserManagement extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       UserManagementHelper.deleteUser(username);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -226,13 +226,13 @@ public class UserManagement extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       UserManagementHelper.createGroup(group);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -247,13 +247,13 @@ public class UserManagement extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       UserManagementHelper.updateGroup(group);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -267,13 +267,13 @@ public class UserManagement extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       UserManagementHelper.deleteGroup(groupname);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -294,7 +294,7 @@ public class UserManagement extends RodaWuiController {
     // 20170523 hsilva: need to set ip address for registering the action
     user.setIpAddress(ipAddress);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       if (generateNewToken) {
@@ -322,7 +322,7 @@ public class UserManagement extends RodaWuiController {
 
       return sendEmailVerification(servletPath, user, localeString);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -339,7 +339,7 @@ public class UserManagement extends RodaWuiController {
     user.setIpAddress(ipAddress);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_USER_PARAM, user);
+    controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_USER_PARAM, user);
   }
 
   public static void requestPasswordReset(String servletPath, String usernameOrEmail, String localeString,
@@ -363,7 +363,7 @@ public class UserManagement extends RodaWuiController {
     sendRecoverLoginEmail(servletPath, user, localeString);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_USER_PARAM, user);
+    controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_USER_PARAM, user);
   }
 
   public static void resetUserPassword(String username, String password, String resetPasswordToken, String ipAddress)
@@ -376,7 +376,7 @@ public class UserManagement extends RodaWuiController {
     user.setIpAddress(ipAddress);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_USER_PARAM, user);
+    controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_USER_PARAM, user);
   }
 
   private static Notification sendEmailVerification(String servletPath, User user, String localeString)
@@ -447,7 +447,7 @@ public class UserManagement extends RodaWuiController {
     UserExtraBundle extraBudle = UserManagementHelper.retrieveUserExtraBundle(user.getName());
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
+    controllerAssistant.registerAction(user, LogEntryState.SUCCESS);
 
     return extraBudle;
   }
@@ -462,7 +462,7 @@ public class UserManagement extends RodaWuiController {
     UserExtraBundle extraBudle = UserManagementHelper.retrieveUserExtraBundle(name);
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS, RodaConstants.CONTROLLER_NAME_PARAM, name);
+    controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_NAME_PARAM, name);
 
     return extraBudle;
   }
@@ -474,7 +474,7 @@ public class UserManagement extends RodaWuiController {
     UserExtraBundle extraBundle = UserManagementHelper.retrieveDefaultExtraBundle();
 
     // register action
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
+    controllerAssistant.registerAction(user, LogEntryState.SUCCESS);
 
     return extraBundle;
   }
@@ -486,12 +486,12 @@ public class UserManagement extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
     try {
       // delegate
       UserManagementHelper.deleteMembers(members);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -507,12 +507,12 @@ public class UserManagement extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
     try {
       // delegate
       UserManagementHelper.changeActiveMembers(members, activate);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action

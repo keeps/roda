@@ -14,7 +14,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlRootElement;
+
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
@@ -39,7 +39,7 @@ import org.roda.core.data.v2.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@XmlRootElement(name = RodaConstants.RODA_OBJECT_INDEX_RESULT)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_INDEX_RESULT)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class IndexResult<T extends Serializable> implements Serializable {

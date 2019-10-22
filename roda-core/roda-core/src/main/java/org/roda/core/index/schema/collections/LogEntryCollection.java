@@ -20,8 +20,8 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
 import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
@@ -117,11 +117,11 @@ public class LogEntryCollection extends AbstractSolrCollection<LogEntry, LogEntr
     final String parameters = SolrUtils.objectToString(doc.get(RodaConstants.LOG_PARAMETERS), null);
     final String relatedObjectId = SolrUtils.objectToString(doc.get(RodaConstants.LOG_RELATED_OBJECT_ID), null);
     final String username = SolrUtils.objectToString(doc.get(RodaConstants.LOG_USERNAME), null);
-    LOG_ENTRY_STATE state = null;
+    LogEntryState state = null;
 
     if (doc.containsKey(RodaConstants.LOG_STATE)) {
-      state = LOG_ENTRY_STATE
-        .valueOf(SolrUtils.objectToString(doc.get(RodaConstants.LOG_STATE), LOG_ENTRY_STATE.UNKNOWN.toString()));
+      state = LogEntryState
+        .valueOf(SolrUtils.objectToString(doc.get(RodaConstants.LOG_STATE), LogEntryState.UNKNOWN.toString()));
     }
     final String instanceId = SolrUtils.objectToString(doc.get(RodaConstants.LOG_INSTANCE_ID), "");
     final long lineNumber = SolrUtils.objectToLong(doc.get(RodaConstants.LOG_LINE_NUMBER), -1L);

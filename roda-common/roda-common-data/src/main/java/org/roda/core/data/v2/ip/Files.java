@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.RODAObjectList;
@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-@XmlRootElement(name = RodaConstants.RODA_OBJECT_FILES)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_FILES)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Files implements RODAObjectList<File> {
   private static final long serialVersionUID = 7748588920265041356L;

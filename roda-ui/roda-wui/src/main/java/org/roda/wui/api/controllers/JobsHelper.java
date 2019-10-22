@@ -31,7 +31,7 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;

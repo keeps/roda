@@ -14,8 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
@@ -25,14 +26,10 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.HasId;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-@XmlRootElement(name = RodaConstants.RODA_OBJECT_JOB)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_JOB)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Job implements IsModelObject, IsIndexed, HasId {
@@ -135,7 +132,7 @@ public class Job implements IsModelObject, IsIndexed, HasId {
     return this;
   }
 
-  @XmlElement(nillable = true)
+  @javax.xml.bind.annotation.XmlElement(nillable = true)
   public Date getEndDate() {
     return endDate;
   }
@@ -174,7 +171,7 @@ public class Job implements IsModelObject, IsIndexed, HasId {
     return this;
   }
 
-  @XmlElement(nillable = true)
+  @javax.xml.bind.annotation.XmlElement(nillable = true)
   public Map<String, String> getPluginParameters() {
     return pluginParameters;
   }

@@ -12,9 +12,9 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "tasks")
+
+@javax.xml.bind.annotation.XmlRootElement(name = "tasks")
 public class TaskList {
   @XmlElements({@XmlElement(name = "task", type = String.class)})
   private List<String> tasks;

@@ -18,8 +18,8 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.notifications.Notification;
-import org.roda.core.data.v2.notifications.Notification.NOTIFICATION_STATE;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
@@ -43,7 +43,7 @@ public class FileNotificationProcessor implements NotificationProcessor {
       Job job = (Job) scope.get(JOB_KEY);
       String content = createNotificationContent(job);
       notification.setBody(content);
-      notification.setState(NOTIFICATION_STATE.FAILED);
+      notification.setState(NotificationState.FAILED);
 
       if (dropPath != null) {
         LOGGER.debug("Sending notification via drop folder ...");
@@ -64,7 +64,7 @@ public class FileNotificationProcessor implements NotificationProcessor {
             FSUtils.createFile(jobPath, ".ready");
 
             LOGGER.debug("Notification sent");
-            notification.setState(NOTIFICATION_STATE.COMPLETED);
+            notification.setState(NotificationState.COMPLETED);
           } catch (AlreadyExistsException | GenericException | IOException e) {
             LOGGER.warn("Notification not sent", e);
           }

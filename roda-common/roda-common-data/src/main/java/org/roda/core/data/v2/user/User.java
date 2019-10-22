@@ -12,12 +12,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
-import org.roda.core.data.common.RodaConstants;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+
+import org.roda.core.data.common.RodaConstants;
 
 /**
  * This is a user of RODA.
@@ -25,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @author Rui Castro
  * @author Luis Faria <lfaria@keep.pt>
  */
-@XmlRootElement(name = RodaConstants.RODA_OBJECT_USER)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_USER)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class User extends RodaPrincipal {
   private static final long serialVersionUID = 6514790636010895870L;

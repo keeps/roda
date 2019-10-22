@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.SortedMap;
 
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
+import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
@@ -45,7 +45,7 @@ public class Metrics extends RodaWuiController {
     });
     counters.forEach((a, b) -> metrics.addMetric(a, Long.toString(b.getCount())));
 
-    controllerAssistant.registerAction(user, LOG_ENTRY_STATE.SUCCESS);
+    controllerAssistant.registerAction(user, LogEntryState.SUCCESS);
     return metrics;
   }
 }

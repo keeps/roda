@@ -13,7 +13,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.log.LogEntry.LOG_ENTRY_STATE;
+import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.ControllerAssistant;
@@ -46,13 +46,13 @@ public class Notifications extends RodaWuiController {
       tmpl = RodaConstants.API_NOTIFICATION_DEFAULT_TEMPLATE;
     }
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.createNotification(notification, new EmailNotificationProcessor(tmpl));
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -67,13 +67,13 @@ public class Notifications extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       return BrowserHelper.updateNotification(notification);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
@@ -89,13 +89,13 @@ public class Notifications extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
-    LOG_ENTRY_STATE state = LOG_ENTRY_STATE.SUCCESS;
+    LogEntryState state = LogEntryState.SUCCESS;
 
     try {
       // delegate
       BrowserHelper.deleteNotification(notificationId);
     } catch (RODAException e) {
-      state = LOG_ENTRY_STATE.FAILURE;
+      state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action

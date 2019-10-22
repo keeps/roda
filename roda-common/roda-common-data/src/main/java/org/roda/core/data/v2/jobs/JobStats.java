@@ -9,8 +9,6 @@ package org.roda.core.data.v2.jobs;
 
 import java.io.Serializable;
 
-import org.roda.core.data.v2.jobs.Report.PluginState;
-
 public class JobStats implements Serializable {
   private static final long serialVersionUID = 2048747729436732179L;
 

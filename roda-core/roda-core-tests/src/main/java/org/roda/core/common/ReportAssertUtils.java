@@ -12,8 +12,8 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
+import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.testng.Assert;
 
 public final class ReportAssertUtils {

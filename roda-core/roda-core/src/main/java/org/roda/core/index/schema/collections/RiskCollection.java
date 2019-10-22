@@ -22,6 +22,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.SeverityLevel;
 import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
@@ -194,7 +195,7 @@ public class RiskCollection extends AbstractSolrCollection<IndexedRisk, Risk> {
     risk.setPreMitigationSeverity(SolrUtils.objectToInteger(doc.get(RodaConstants.RISK_PRE_MITIGATION_SEVERITY), 0));
     if (doc.containsKey(RodaConstants.RISK_PRE_MITIGATION_SEVERITY_LEVEL)) {
       risk.setPreMitigationSeverityLevel(SolrUtils
-        .objectToEnum(doc.get(RodaConstants.RISK_PRE_MITIGATION_SEVERITY_LEVEL), Risk.SEVERITY_LEVEL.class, null));
+        .objectToEnum(doc.get(RodaConstants.RISK_PRE_MITIGATION_SEVERITY_LEVEL), SeverityLevel.class, null));
     }
     risk.setPreMitigationNotes(SolrUtils.objectToString(doc.get(RodaConstants.RISK_PRE_MITIGATION_NOTES), null));
 
@@ -204,7 +205,7 @@ public class RiskCollection extends AbstractSolrCollection<IndexedRisk, Risk> {
     risk.setPostMitigationSeverity(SolrUtils.objectToInteger(doc.get(RodaConstants.RISK_POST_MITIGATION_SEVERITY), 0));
     if (doc.containsKey(RodaConstants.RISK_POST_MITIGATION_SEVERITY_LEVEL)) {
       risk.setPostMitigationSeverityLevel(SolrUtils
-        .objectToEnum(doc.get(RodaConstants.RISK_POST_MITIGATION_SEVERITY_LEVEL), Risk.SEVERITY_LEVEL.class, null));
+        .objectToEnum(doc.get(RodaConstants.RISK_POST_MITIGATION_SEVERITY_LEVEL), SeverityLevel.class, null));
     }
     risk.setPostMitigationNotes(SolrUtils.objectToString(doc.get(RodaConstants.RISK_POST_MITIGATION_NOTES), null));
 

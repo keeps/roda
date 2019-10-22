@@ -12,9 +12,9 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
+import org.roda.core.data.v2.risks.IncidenceStatus;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
+import org.roda.core.data.v2.risks.SeverityLevel;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -175,7 +175,7 @@ public class EditRiskIncidence extends Composite {
     mitigatedDescription.setText(incidence.getMitigatedDescription());
 
     int selectedIndex = 0;
-    for (INCIDENCE_STATUS istatus : INCIDENCE_STATUS.values()) {
+    for (IncidenceStatus istatus : IncidenceStatus.values()) {
       status.addItem(messages.riskIncidenceStatusValue(istatus), istatus.toString());
 
       if (istatus.equals(incidence.getStatus())) {
@@ -186,7 +186,7 @@ public class EditRiskIncidence extends Composite {
     status.setSelectedIndex(selectedIndex - 1);
 
     selectedIndex = 0;
-    for (SEVERITY_LEVEL iseverity : SEVERITY_LEVEL.values()) {
+    for (SeverityLevel iseverity : SeverityLevel.values()) {
       severity.addItem(messages.severityLevel(iseverity), iseverity.toString());
 
       if (iseverity.equals(incidence.getSeverity())) {
@@ -205,8 +205,8 @@ public class EditRiskIncidence extends Composite {
 
   public void getRiskIncidence() {
     incidence.setDescription(description.getText());
-    incidence.setStatus(INCIDENCE_STATUS.valueOf(status.getSelectedValue()));
-    incidence.setSeverity(SEVERITY_LEVEL.valueOf(severity.getSelectedValue()));
+    incidence.setStatus(IncidenceStatus.valueOf(status.getSelectedValue()));
+    incidence.setSeverity(SeverityLevel.valueOf(severity.getSelectedValue()));
     incidence.setMitigatedOn(mitigatedOn.getValue());
     incidence.setMitigatedBy(mitigatedBy.getText());
     incidence.setMitigatedDescription(mitigatedDescription.getText());

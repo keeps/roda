@@ -24,12 +24,12 @@ import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
+import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.jobs.Report.PluginState;
-import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
+import org.roda.core.data.v2.risks.IncidenceStatus;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.data.v2.risks.RiskIncidence.INCIDENCE_STATUS;
+import org.roda.core.data.v2.risks.SeverityLevel;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -41,8 +41,8 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 
 public class UpdateIncidencesPlugin extends AbstractPlugin<RiskIncidence> {
-  private INCIDENCE_STATUS status;
-  private SEVERITY_LEVEL severity;
+  private IncidenceStatus status;
+  private SeverityLevel severity;
   private Date mitigatedOn;
   private String mitigatedBy;
   private String mitigatedDescription;
@@ -111,11 +111,11 @@ public class UpdateIncidencesPlugin extends AbstractPlugin<RiskIncidence> {
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_STATUS)) {
-      status = INCIDENCE_STATUS.valueOf(parameters.get(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_STATUS));
+      status = IncidenceStatus.valueOf(parameters.get(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_STATUS));
     }
 
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY)) {
-      severity = SEVERITY_LEVEL.valueOf(parameters.get(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY));
+      severity = SeverityLevel.valueOf(parameters.get(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_SEVERITY));
     }
 
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_RISK_INCIDENCE_MITIGATED_ON)) {

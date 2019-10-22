@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlRootElement;
+
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
@@ -20,7 +20,7 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@XmlRootElement(name = RodaConstants.RODA_OBJECT_AIP)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_AIP)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
 

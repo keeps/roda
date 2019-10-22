@@ -10,7 +10,6 @@ package org.roda.core.data.v2.ri;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -24,7 +23,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-public class ExtrasHandler extends XmlAdapter<Object, String> {
+public class ExtrasHandler extends javax.xml.bind.annotation.adapters.XmlAdapter<Object, String> {
   private final DocumentBuilderFactory docBuilderFactory;
   private final TransformerFactory transformerFactory;
 
