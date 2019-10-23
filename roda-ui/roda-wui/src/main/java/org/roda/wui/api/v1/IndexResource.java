@@ -45,6 +45,7 @@ import org.roda.core.data.v2.index.facet.FacetParameter.SORT;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
@@ -113,35 +114,39 @@ public class IndexResource {
    * Find indexed resources.
    *
    * @param returnClass
-   *          {@link Class} of resources to return.
+   *                           {@link Class} of resources to return.
    * @param filterParameters
-   *          List of filter parameters. Example: "formatPronom=fmt/19".
+   *                           List of filter parameters. Example:
+   *                           "formatPronom=fmt/19".
    * @param sortParameters
-   *          List of sort parameters. Examples: "formatPronom", "uuid desc".
+   *                           List of sort parameters. Examples: "formatPronom",
+   *                           "uuid desc".
    * @param start
-   *          Index of the first element to return (0-based index).
+   *                           Index of the first element to return (0-based
+   *                           index).
    * @param limit
-   *          Maximum number of elements to return.
+   *                           Maximum number of elements to return.
    * @param facetAttributes
-   *          Facets to return.
+   *                           Facets to return.
    * @param facetLimit
-   *          Maximum number of facets to return.
+   *                           Maximum number of facets to return.
    * @param localeString
-   *          the locale.
+   *                           the locale.
    * @param onlyActive
-   *          Return only active resources?
+   *                           Return only active resources?
    * @param exportFacets
-   *          for CSV results, export only facets?
+   *                           for CSV results, export only facets?
    * @param filename
-   *          the filename for exported CSV.
+   *                           the filename for exported CSV.
    * @param <T>
-   *          Type of the resources to return.
+   *                           Type of the resources to return.
    * @return a {@link Response} with the resources.
    * @throws RODAException
-   *           if some error occurs.
+   *                         if some error occurs.
    */
   @GET
-  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.TEXT_CSV, ExtraMediaType.APPLICATION_JAVASCRIPT})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.TEXT_CSV,
+    ExtraMediaType.APPLICATION_JAVASCRIPT})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
   @ApiOperation(value = "Find indexed resources", notes = "Find indexed resources.", response = IndexResult.class, responseContainer = "List")
   public <T extends IsIndexed> Response list(
@@ -172,7 +177,12 @@ public class IndexResource {
     for (String filterParameter : filterParameters) {
       final String[] parts = filterParameter.split("=");
       if (parts.length == 2) {
-        findRequest.filter.add(new SimpleFilterParameter(parts[0], parts[1]));
+        if (parts[0].startsWith("!")) {
+          String key = parts[0].substring(1);
+          findRequest.filter.add(new NotSimpleFilterParameter(key, parts[1]));
+        } else {
+          findRequest.filter.add(new SimpleFilterParameter(parts[0], parts[1]));
+        }
       } else {
         LOGGER.warn("Unable to parse filter parameter '{}'. Ignored", filterParameter);
       }
@@ -221,12 +231,12 @@ public class IndexResource {
    * Find indexed resources.
    *
    * @param findRequest
-   *          find parameters.
+   *                      find parameters.
    * @param <T>
-   *          Type of the resources to return.
+   *                      Type of the resources to return.
    * @return a {@link Response} with the resources.
    * @throws RODAException
-   *           if some error occurs.
+   *                         if some error occurs.
    */
   @POST
   @Path("/find")
@@ -254,12 +264,12 @@ public class IndexResource {
    * Find indexed resources.
    *
    * @param findRequestString
-   *          find parameters.
+   *                            find parameters.
    * @param type
-   *          the type of output ("csv").
+   *                            the type of output ("csv").
    * @return a {@link Response} with the resources.
    * @throws RODAException
-   *           if some error occurs.
+   *                         if some error occurs.
    */
   @POST
   @Path("/findFORM")
@@ -282,10 +292,10 @@ public class IndexResource {
    * Count indexed resources.
    *
    * @param countRequest
-   *          count parameters.
+   *                       count parameters.
    * @return a {@link Response} with the count.
    * @throws RODAException
-   *           if some error occurs.
+   *                         if some error occurs.
    */
   @POST
   @Path("/count")
@@ -304,18 +314,19 @@ public class IndexResource {
    * Produces a CSV response with results or facets.
    * 
    * @param findRequest
-   *          the request parameters.
+   *                      the request parameters.
    * @param user
-   *          the current {@link User}.
+   *                      the current {@link User}.
    * @param <T>
-   *          Type of the resources to return.
+   *                      Type of the resources to return.
    * @return a {@link Response} with CSV.
    * @throws RequestNotValidException
-   *           it the request is not valid.
+   *                                        it the request is not valid.
    * @throws AuthorizationDeniedException
-   *           if the user is not authorized to perform this operation.
+   *                                        if the user is not authorized to
+   *                                        perform this operation.
    * @throws GenericException
-   *           if some other error occurs.
+   *                                        if some other error occurs.
    */
   private <T extends IsIndexed> Response csvResponse(final FindRequest findRequest, final User user,
     String localeString) throws RequestNotValidException, AuthorizationDeniedException, GenericException {
@@ -356,12 +367,12 @@ public class IndexResource {
    * Return the {@link Class} with the specified class name.
    * 
    * @param className
-   *          the fully qualified name of the desired class.
+   *                    the fully qualified name of the desired class.
    * @param <T>
-   *          the type of {@link Class}.
+   *                    the type of {@link Class}.
    * @return the {@link Class} with the specified class name.
    * @throws RequestNotValidException
-   *           if the class name is not valid.
+   *                                    if the class name is not valid.
    */
   @SuppressWarnings("unchecked")
   private <T> Class<T> getClass(final String className) throws RequestNotValidException {
