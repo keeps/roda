@@ -9,6 +9,11 @@ package org.roda.wui.client.common.search;
 
 import java.util.List;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -18,11 +23,6 @@ import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 
 import config.i18n.client.ClientMessages;
 
@@ -69,8 +69,19 @@ public class SearchPreFilterUtils {
       return messages.searchPreFilterEmptyKeyFilterParameter(messages.searchPreFilterName(p.getName()));
     } else if (parameter instanceof LongRangeFilterParameter) {
       LongRangeFilterParameter p = (LongRangeFilterParameter) parameter;
-      return messages.searchPreFilterLongRangeFilterParameter(messages.searchPreFilterName(p.getName()),
-        p.getFromValue(), p.getToValue());
+      if (p.getFromValue() != null && p.getToValue() != null) {
+        return messages.searchPreFilterLongRangeFilterParameter(messages.searchPreFilterName(p.getName()),
+          p.getFromValue(), p.getToValue());
+      } else if (p.getFromValue() != null) {
+        return messages.searchPreFilterLongRangeFilterParameterGreaterThan(messages.searchPreFilterName(p.getName()),
+          p.getFromValue());
+      } else if (p.getToValue() != null) {
+        return messages.searchPreFilterLongRangeFilterParameterSmallerThan(messages.searchPreFilterName(p.getName()),
+          p.getToValue());
+      } else {
+        return null;
+      }
+
     } else if (parameter instanceof OneOfManyFilterParameter) {
       OneOfManyFilterParameter p = (OneOfManyFilterParameter) parameter;
       int listSize = p.getValues().size();

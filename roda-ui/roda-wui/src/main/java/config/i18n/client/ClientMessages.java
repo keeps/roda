@@ -13,6 +13,9 @@ package config.i18n.client;
 import java.util.Date;
 import java.util.List;
 
+import com.google.gwt.i18n.client.Messages;
+import com.google.gwt.safehtml.shared.SafeHtml;
+
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -21,9 +24,6 @@ import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.risks.IncidenceStatus;
 import org.roda.core.data.v2.risks.SeverityLevel;
 import org.roda.wui.client.common.actions.model.ActionableObject;
-
-import com.google.gwt.i18n.client.Messages;
-import com.google.gwt.safehtml.shared.SafeHtml;
 
 /**
  * @author Luis Faria
@@ -909,7 +909,13 @@ public interface ClientMessages extends Messages {
 
   SafeHtml searchPreFilterEmptyKeyFilterParameter(String searchPreFilterName);
 
-  SafeHtml searchPreFilterLongRangeFilterParameter(String searchPreFilterName, long searchPreFilterFromValue, long searchPreFilterToValue);
+  SafeHtml searchPreFilterLongRangeFilterParameter(String searchPreFilterName, long searchPreFilterFromValue,
+    long searchPreFilterToValue);
+
+  SafeHtml searchPreFilterLongRangeFilterParameterGreaterThan(String searchPreFilterName,
+    long searchPreFilterFromValue);
+
+  SafeHtml searchPreFilterLongRangeFilterParameterSmallerThan(String searchPreFilterName, long searchPreFilterToValue);
 
   SafeHtml searchPreFilterOneOfManyFilterParameterSingle(String searchPreFilterName, String item);
 
@@ -1833,7 +1839,7 @@ public interface ClientMessages extends Messages {
   /************* TO BE ORGANIZED *************************/
 
   String aipLevel();
-  
+
   SafeHtml defaultColumnHeader(@Select String field);
 
   String pluginStateMessage(@Select PluginState state);
