@@ -218,10 +218,10 @@ public class SearchFieldPanel extends Composite implements HasValueChangeHandler
     this.searchField = searchField;
 
     if (searchField.getTerms() != null) {
+      inputControlled.clear();
       for (Tree<String> term : searchField.getTerms().getChildren()) {
         inputControlled.addItem(term.getLabel(), term.getValue());
       }
-      // TODO add terms to listbox
     }
 
   }
