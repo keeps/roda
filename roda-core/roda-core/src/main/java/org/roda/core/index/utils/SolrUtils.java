@@ -44,6 +44,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
+import org.apache.solr.client.solrj.SolrRequest.METHOD;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
@@ -229,7 +230,7 @@ public class SolrUtils {
     parseAndConfigureFacets(facets, query);
 
     try {
-      QueryResponse response = index.query(SolrCollectionRegistry.getIndexName(classToRetrieve), query);
+      QueryResponse response = index.query(SolrCollectionRegistry.getIndexName(classToRetrieve), query, METHOD.POST);
       ret = queryResponseToIndexResult(response, classToRetrieve, facets, fieldsToReturn);
     } catch (SolrServerException | IOException | NotSupportedException e) {
       throw new GenericException("Could not query index", e);
@@ -276,7 +277,7 @@ public class SolrUtils {
     }
 
     try {
-      QueryResponse response = index.query(SolrCollectionRegistry.getIndexName(classToRetrieve), query);
+      QueryResponse response = index.query(SolrCollectionRegistry.getIndexName(classToRetrieve), query, METHOD.POST);
       IndexResult<T> result = queryResponseToIndexResult(response, classToRetrieve, Facets.NONE, fieldsToReturn);
       ret = Pair.of(result, response.getNextCursorMark());
     } catch (SolrServerException | IOException | NotSupportedException e) {
@@ -323,7 +324,7 @@ public class SolrUtils {
     }
 
     try {
-      QueryResponse response = index.query(SolrCollectionRegistry.getIndexName(classToRetrieve), query);
+      QueryResponse response = index.query(SolrCollectionRegistry.getIndexName(classToRetrieve), query, METHOD.POST);
       ret = queryResponseToIndexResult(response, classToRetrieve, facets, fieldsToReturn);
     } catch (SolrServerException | IOException | NotSupportedException e) {
       throw new GenericException("Could not query index", e);
@@ -807,8 +808,7 @@ public class SolrUtils {
     } else if (parameter instanceof DateRangeFilterParameter) {
       DateRangeFilterParameter param = (DateRangeFilterParameter) parameter;
       appendRange(ret, param.getName(), Date.class, param.getFromValue(), String.class,
-        processToDate(param.getToValue(), param.getGranularity(), false),
-        prefixWithANDOperatorIfBuilderNotEmpty);
+        processToDate(param.getToValue(), param.getGranularity(), false), prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof DateIntervalFilterParameter) {
       DateIntervalFilterParameter param = (DateIntervalFilterParameter) parameter;
       appendRangeInterval(ret, param.getFromName(), param.getToName(), param.getFromValue(), param.getToValue(),
@@ -973,8 +973,8 @@ public class SolrUtils {
       ret.append("]");
 
       if (fromValue != null && toValue != null) {
-        ret.append(" OR ").append("(").append(fromKey).append(":[* TO ")
-          .append(processToDate(fromValue, granularity)).append("]");
+        ret.append(" OR ").append("(").append(fromKey).append(":[* TO ").append(processToDate(fromValue, granularity))
+          .append("]");
         ret.append(" AND ").append(toKey).append(":[").append(processFromDate(toValue)).append(" TO *]").append(")");
       }
 
@@ -998,8 +998,7 @@ public class SolrUtils {
     return processToDate(toValue, granularity, true);
   }
 
-  private static String processToDate(Date toValue, DateGranularity granularity,
-    boolean returnAsteriskOnNull) {
+  private static String processToDate(Date toValue, DateGranularity granularity, boolean returnAsteriskOnNull) {
     final String ret;
     StringBuilder sb = new StringBuilder();
 
