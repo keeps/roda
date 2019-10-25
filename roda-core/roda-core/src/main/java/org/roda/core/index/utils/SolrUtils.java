@@ -45,6 +45,7 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.SolrRequest.METHOD;
+import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
@@ -214,6 +215,23 @@ public class SolrUtils {
     return find(index, classToRetrieve, filter, sorter, sublist, null, fieldsToReturn);
   }
 
+  private static <T extends IsIndexed> QueryResponse query(SolrClient index, Class<T> classToRetrieve, SolrQuery query)
+    throws GenericException, RequestNotValidException {
+
+    // NOTE: work-around https://issues.apache.org/jira/browse/SOLR-12858
+    METHOD method = index instanceof EmbeddedSolrServer ? METHOD.GET : METHOD.POST;
+
+    try {
+      return index.query(SolrCollectionRegistry.getIndexName(classToRetrieve), query, method);
+    } catch (SolrServerException | IOException | NotSupportedException e) {
+      throw new GenericException("Could not query index", e);
+    } catch (SolrException e) {
+      throw new RequestNotValidException(e);
+    } catch (RuntimeException e) {
+      throw new GenericException("Unexpected exception while querying index", e);
+    }
+  }
+
   public static <T extends IsIndexed> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
     Sorter sorter, Sublist sublist, Facets facets, List<String> fieldsToReturn)
     throws GenericException, RequestNotValidException {
@@ -230,14 +248,10 @@ public class SolrUtils {
     parseAndConfigureFacets(facets, query);
 
     try {
-      QueryResponse response = index.query(SolrCollectionRegistry.getIndexName(classToRetrieve), query, METHOD.POST);
+      QueryResponse response = query(index, classToRetrieve, query);
       ret = queryResponseToIndexResult(response, classToRetrieve, facets, fieldsToReturn);
-    } catch (SolrServerException | IOException | NotSupportedException e) {
+    } catch (NotSupportedException e) {
       throw new GenericException("Could not query index", e);
-    } catch (SolrException e) {
-      throw new RequestNotValidException(e);
-    } catch (RuntimeException e) {
-      throw new GenericException("Unexpected exception while querying index", e);
     }
 
     return ret;
@@ -277,15 +291,11 @@ public class SolrUtils {
     }
 
     try {
-      QueryResponse response = index.query(SolrCollectionRegistry.getIndexName(classToRetrieve), query, METHOD.POST);
+      QueryResponse response = query(index, classToRetrieve, query);
       IndexResult<T> result = queryResponseToIndexResult(response, classToRetrieve, Facets.NONE, fieldsToReturn);
       ret = Pair.of(result, response.getNextCursorMark());
-    } catch (SolrServerException | IOException | NotSupportedException e) {
+    } catch (NotSupportedException e) {
       throw new GenericException("Could not query index", e);
-    } catch (SolrException e) {
-      throw new RequestNotValidException(e);
-    } catch (RuntimeException e) {
-      throw new GenericException("Unexpected exception while querying index", e);
     }
 
     return ret;
@@ -324,14 +334,10 @@ public class SolrUtils {
     }
 
     try {
-      QueryResponse response = index.query(SolrCollectionRegistry.getIndexName(classToRetrieve), query, METHOD.POST);
+      QueryResponse response = query(index, classToRetrieve, query);
       ret = queryResponseToIndexResult(response, classToRetrieve, facets, fieldsToReturn);
-    } catch (SolrServerException | IOException | NotSupportedException e) {
+    } catch (NotSupportedException e) {
       throw new GenericException("Could not query index", e);
-    } catch (SolrException e) {
-      throw new RequestNotValidException(e);
-    } catch (RuntimeException e) {
-      throw new GenericException("Unexpected exception while querying index", e);
     }
 
     return ret;
