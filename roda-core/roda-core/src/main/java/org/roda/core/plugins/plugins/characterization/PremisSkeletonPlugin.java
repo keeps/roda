@@ -132,14 +132,6 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
             jobPluginInfo.incrementObjectsProcessedWithFailure();
             reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
           }
-
-          try {
-            PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", true,
-              cachedJob);
-          } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
-            | AuthorizationDeniedException | AlreadyExistsException e) {
-            LOGGER.error("Error creating event: {}", e.getMessage(), e);
-          }
         } else {
           Map<String, List<String>> aipData = updatedData.get(aip.getId());
           PluginState state = PluginState.SUCCESS;
@@ -184,6 +176,14 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
 
           reportItem.setPluginState(state).setPluginDetails("Executed on a SIP update context.");
           jobPluginInfo.incrementObjectsProcessed(state);
+        }
+        
+        try {
+          PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", true,
+            cachedJob);
+        } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+          | AuthorizationDeniedException | AlreadyExistsException e) {
+          LOGGER.error("Error creating event: {}", e.getMessage(), e);
         }
 
         report.addReport(reportItem);
