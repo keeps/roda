@@ -342,23 +342,25 @@ public class UserUtility {
     }
 
     String aipId = toAIP.apply(obj);
-    IndexedAIP aip;
-    try {
-      aip = RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, aipId,
-        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
-    } catch (NotFoundException | GenericException e) {
-      throw new AuthorizationDeniedException("Could not check permissions of object " + obj, e);
-    }
+    if (aipId != null) {
+      IndexedAIP aip;
+      try {
+        aip = RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, aipId,
+          RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+      } catch (NotFoundException | GenericException e) {
+        throw new AuthorizationDeniedException("Could not check permissions of object " + obj, e);
+      }
 
-    Set<String> users = aip.getPermissions().getUsers().get(permissionType);
-    Set<String> groups = aip.getPermissions().getGroups().get(permissionType);
+      Set<String> users = aip.getPermissions().getUsers().get(permissionType);
+      Set<String> groups = aip.getPermissions().getGroups().get(permissionType);
 
-    LOGGER.debug("Checking if user '{}' has permissions to {} object {} (object read permissions: {} & {})",
-      user.getId(), permissionType, aip.getId(), users, groups);
+      LOGGER.debug("Checking if user '{}' has permissions to {} object {} (object read permissions: {} & {})",
+        user.getId(), permissionType, aip.getId(), users, groups);
 
-    if (!users.contains(user.getId()) && iterativeDisjoint(groups, user.getGroups())) {
-      throw new AuthorizationDeniedException(
-        "The user '" + user.getId() + "' does not have permissions to " + permissionType);
+      if (!users.contains(user.getId()) && iterativeDisjoint(groups, user.getGroups())) {
+        throw new AuthorizationDeniedException(
+          "The user '" + user.getId() + "' does not have permissions to " + permissionType);
+      }
     }
   }
 
