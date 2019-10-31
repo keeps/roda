@@ -412,7 +412,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.roda-project</groupId>
-			<artifactId>commons-ip</artifactId>
+			<artifactId>commons-ip2</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>

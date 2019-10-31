@@ -160,6 +160,11 @@ public class ResourceParseUtils {
       fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
       id = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
       fileId = id.substring(URNUtils.getPremisPrefix(PreservationMetadataType.FILE).length());
+    } else if (filename.endsWith(RodaConstants.OTHER_TECH_METADATA_FILE_SUFFIX)) {
+      type = PreservationMetadataType.OTHER;
+      fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
+      fileId = filename.substring(0, filename.length() - RodaConstants.OTHER_TECH_METADATA_FILE_SUFFIX.length());
+      id = fileId;
     } else if (filename.startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.OTHER))) {
       type = PreservationMetadataType.OTHER;
       fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);

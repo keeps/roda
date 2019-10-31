@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<name>RODA - Repositório de Objetos Digitais Autênticos</name>
@@ -77,7 +78,7 @@
 		<apacheds.version>2.0.0-M24</apacheds.version>
 		<httpcomponents.version>4.5.6</httpcomponents.version>
 		<poi.version>3.17</poi.version>
-		<commons_ip.version>1.0.3</commons_ip.version>
+		<commons_ip2.version>2.0.0-alpha1</commons_ip2.version>
 		<metrics.version>3.2.6</metrics.version>
 		<roda_community_url>http://roda-community.org</roda_community_url>
 		<testng.groups>all</testng.groups>
@@ -993,8 +994,8 @@
 			<!-- RODA Commons IP -->
 			<dependency>
 				<groupId>org.roda-project</groupId>
-				<artifactId>commons-ip</artifactId>
-				<version>${commons_ip.version}</version>
+				<artifactId>commons-ip2</artifactId>
+				<version>${commons_ip2.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.httpcomponents</groupId>

@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -37,18 +36,16 @@ import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.util.IdUtils;
-import org.roda_project.commons_ip.model.IPDescriptiveMetadata;
-import org.roda_project.commons_ip.model.IPFile;
-import org.roda_project.commons_ip.model.IPMetadata;
-import org.roda_project.commons_ip.model.IPRepresentation;
-import org.roda_project.commons_ip.model.MetadataType;
-import org.roda_project.commons_ip.model.RepresentationStatus;
-import org.roda_project.commons_ip.model.SIP;
-import org.roda_project.commons_ip.model.MetadataType.MetadataTypeEnum;
+import org.roda_project.commons_ip2.model.IPDescriptiveMetadata;
+import org.roda_project.commons_ip2.model.IPFile;
+import org.roda_project.commons_ip2.model.IPMetadata;
+import org.roda_project.commons_ip2.model.IPRepresentation;
+import org.roda_project.commons_ip2.model.RepresentationStatus;
+import org.roda_project.commons_ip2.model.SIP;
 
-public class EARKSIPToAIPPluginUtils {
+public class EARKSIP2ToAIPPluginUtils {
 
-  private EARKSIPToAIPPluginUtils() {
+  private EARKSIP2ToAIPPluginUtils() {
     // do nothing
   }
 
@@ -154,7 +151,7 @@ public class EARKSIPToAIPPluginUtils {
     for (IPDescriptiveMetadata dm : descriptiveMetadata) {
       String descriptiveMetadataId = dm.getMetadata().getFileName();
       ContentPayload payload = new FSPathContentPayload(dm.getMetadata().getPath());
-      String metadataType = getMetadataType(dm);
+      String metadataType = dm.getMetadataType().asString();
       String metadataVersion = dm.getMetadataVersion();
       try {
         model.createDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload, metadataType,
@@ -307,19 +304,6 @@ public class EARKSIPToAIPPluginUtils {
   }
 
   private static String getType(IPRepresentation sr) {
-    return sr.getContentType().asString();
-  }
-
-  private static String getMetadataType(IPDescriptiveMetadata dm) {
-    MetadataType metadataType = dm.getMetadataType();
-    String type = "";
-    if (metadataType != null) {
-      if (metadataType.getType() == MetadataTypeEnum.OTHER && StringUtils.isNotBlank(metadataType.getOtherType())) {
-        type = metadataType.getOtherType();
-      } else {
-        type = metadataType.getType().getType();
-      }
-    }
-    return type;
+    return sr.getContentInformationType().asString();
   }
 }
