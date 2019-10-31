@@ -1,5 +1,36 @@
 # Changelog
 
+## v3.2.0 (31/10/2019)
+Install for demonstration:
+```
+docker pull keeps/roda:v3.2.0
+```
+
+#### New features:
+
+- E-ARK SIP version 2 support (Common Specification version 2.0.1)
+
+#### Enhancements:
+
+- Added download submissions button on the AIP page [#1479](https://github.com/keeps/roda/issues/1479)
+- Added confirmation when trying to remove a user or group [#1458](https://github.com/keeps/roda/issues/1458)
+- Added Accept-Ranges: bytes header for GET requests without Range header to enable pre-flight
+
+#### Bug Fixes:
+
+- Fixed ingest step report problem after SIP moves
+- Fixed ingest report problem that were not added to the main report after moving SIPS
+- Fixed title sort issue on AIP lists
+- Fixed missing default sort list information problem
+- Fixed has failures facet of job list that was not considering running jobs
+- 
+
+#### Security:
+
+- Upgrading jackson to fix CVE-2019-14540 and CVE-2019-16335 fixes #1495
+
+---
+
 ## v3.1.1 (30/05/2019)
 Install for demonstration:
 ```
