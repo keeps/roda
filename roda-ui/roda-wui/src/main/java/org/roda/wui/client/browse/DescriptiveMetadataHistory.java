@@ -159,7 +159,7 @@ public class DescriptiveMetadataHistory extends Composite {
    * Create a new panel to edit a user
    * 
    * @param user
-   *          the user to edit
+   *               the user to edit
    */
   public DescriptiveMetadataHistory(final String aipId, final String representationId,
     final String descriptiveMetadataId, final DescriptiveMetadataVersionsBundle bundle) {
@@ -213,11 +213,15 @@ public class DescriptiveMetadataHistory extends Composite {
     // create list layout
     for (BinaryVersionBundle version : versionList) {
       String versionKey = version.getId();
-      String message = messages.versionAction(version.getProperties().get(RodaConstants.VERSION_ACTION));
       Date createdDate = version.getCreatedDate();
 
-      if (version.getProperties().get(RodaConstants.VERSION_USER) != null) {
-        message = messages.versionActionBy(message, version.getProperties().get(RodaConstants.VERSION_USER));
+      String message = "";
+      if (version.getProperties() != null) {
+        message = messages.versionAction(version.getProperties().get(RodaConstants.VERSION_ACTION));
+
+        if (version.getProperties().get(RodaConstants.VERSION_USER) != null) {
+          message = messages.versionActionBy(message, version.getProperties().get(RodaConstants.VERSION_USER));
+        }
       }
 
       list.addItem(messages.descriptiveMetadataHistoryLabel(message, createdDate), versionKey);
