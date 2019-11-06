@@ -55,42 +55,44 @@
 		<appender-ref ref="AKKA_FILE" />
 	</appender>
 
-	<appender name="METRICS" class="io.prometheus.client.logback.InstrumentedAppender">
-		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-			<level>WARN</level>
-		</filter>
-	</appender>
+	<appender name="METRICS" class="io.prometheus.client.logback.InstrumentedAppender" />
 
 	<logger name="org.roda.core.plugins.orchestrate.akka" additivity="false">
 		<level value="DEBUG" />
 		<!-- <level value="TRACE" /> -->
 		<appender-ref ref="CORE_FILEOUT" />
 		<!-- <appender-ref ref="AKKA_FILE" /> -->
+		<appender-ref ref="METRICS" />
 	</logger>
 
 	<logger name="org.roda.core.plugins.PluginManager" additivity="false">
 		<level value="INFO" />
 		<appender-ref ref="CORE_FILEOUT" />
+		<appender-ref ref="METRICS" />
 	</logger>
 
 	<logger name="org.roda.core.plugins" additivity="false">
 		<level value="DEBUG" />
 		<appender-ref ref="CORE_FILEOUT" />
+		<appender-ref ref="METRICS" />
 	</logger>
 
 	<logger name="org.roda.core" additivity="false">
 		<level value="DEBUG" />
 		<appender-ref ref="CORE_FILEOUT" />
+		<appender-ref ref="METRICS" />
 	</logger>
 
 	<logger name="org.roda" additivity="false">
 		<level value="INFO" />
 		<appender-ref ref="CORE_FILEOUT" />
+		<appender-ref ref="METRICS" />
 	</logger>
 
 	<logger name="org.roda_project" additivity="false">
 		<level value="WARN" />
 		<appender-ref ref="CORE_FILEOUT" />
+		<appender-ref ref="METRICS" />
 	</logger>
 
 	<logger name="akka" additivity="false">
@@ -101,6 +103,7 @@
 	<logger name="gov.loc.repository.bagit" additivity="false">
 		<level value="DEBUG" />
 		<appender-ref ref="CORE_FILEOUT" />
+		<appender-ref ref="METRICS" />
 	</logger>
 
 	<logger name="org.apache.solr" additivity="false">

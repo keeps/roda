@@ -648,6 +648,8 @@ public class RodaCoreFactory {
     }
     int prometheusMetricsPort = getEnvInt("PROMETHEUS_METRICS_PORT", 0);
     if (prometheusMetricsPort != 0) {
+      LOGGER.info("Initializing prometheus metrics at port {}", prometheusMetricsPort);
+
       new DropwizardExports(metricsRegistry).register();
       DefaultExports.initialize();
 

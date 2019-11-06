@@ -19,9 +19,12 @@
 		</rollingPolicy>
 	</appender>
 
+	<appender name="METRICS" class="io.prometheus.client.logback.InstrumentedAppender" />
+
 	<logger name="org.roda.wui.RODA" additivity="false">
 		<level value="INFO" />
 		<appender-ref ref="STDOUT" />
+		<appender-ref ref="METRICS" />
 	</logger>
 
 	<logger name="org.roda.wui" additivity="false">
@@ -29,6 +32,7 @@
 			and is also influenced by this logger level -->
 		<level value="INFO" />
 		<appender-ref ref="WUI_FILEOUT" />
+		<appender-ref ref="METRICS" />
 	</logger>
 
 	<!-- <logger name="org.roda.wui.common.server" additivity="false"> -->
