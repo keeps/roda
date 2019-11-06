@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" ?>
 <configuration>
 	<include optional="true" url="${roda.logback.include}" />
 
@@ -8,50 +8,57 @@
 		</encoder>
 	</appender>
 
+
 	<appender name="CORE_FILEOUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>${roda.home}/log/roda-core.log</file>
 		<append>true</append>
-	    <encoder>
+		<encoder>
 			<pattern>%d [%thread] %-5level %logger{36} - %msg%n</pattern>
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <!-- rollover daily -->
-            <fileNamePattern>${roda.home}/log/roda-core-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
-            <!-- each file should be at most 1GB -->
-            <maxFileSize>1GB</maxFileSize>
-        </rollingPolicy>
+			<!-- rollover daily -->
+			<fileNamePattern>${roda.home}/log/roda-core-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+			<!-- each file should be at most 1GB -->
+			<maxFileSize>1GB</maxFileSize>
+		</rollingPolicy>
 	</appender>
 
 	<appender name="CORE_FILEOUT_NO_THREAD" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>${roda.home}/log/roda-core.log</file>
 		<append>true</append>
-	    <encoder>
+		<encoder>
 			<pattern>%d %-5level %logger{36} - %msg%n</pattern>
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <!-- rollover daily -->
-            <fileNamePattern>${roda.home}/log/roda-core-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
-            <!-- each file should be at most 1GB -->
-            <maxFileSize>1GB</maxFileSize>
-        </rollingPolicy>
+			<!-- rollover daily -->
+			<fileNamePattern>${roda.home}/log/roda-core-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+			<!-- each file should be at most 1GB -->
+			<maxFileSize>1GB</maxFileSize>
+		</rollingPolicy>
 	</appender>
 
 	<appender name="AKKA_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>${roda.home}/log/roda-core-akka.log</file>
 		<append>true</append>
-	    <encoder>
+		<encoder>
 			<pattern>%d [%X{akkaSourceActor} %X{akkaSourceThread}] %-5level %logger{36} - %msg%n</pattern>
 		</encoder>
 		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <!-- rollover daily -->
-            <fileNamePattern>${roda.home}/log/roda-core-akka-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
-            <!-- each file should be at most 1GB -->
-            <maxFileSize>1GB</maxFileSize>
-        </rollingPolicy>
+			<!-- rollover daily -->
+			<fileNamePattern>${roda.home}/log/roda-core-akka-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+			<!-- each file should be at most 1GB -->
+			<maxFileSize>1GB</maxFileSize>
+		</rollingPolicy>
 	</appender>
 
 	<appender name="AKKA" class="ch.qos.logback.classic.AsyncAppender">
 		<appender-ref ref="AKKA_FILE" />
+	</appender>
+
+	<appender name="METRICS" class="io.prometheus.client.logback.InstrumentedAppender">
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>WARN</level>
+		</filter>
 	</appender>
 
 	<logger name="org.roda.core.plugins.orchestrate.akka" additivity="false">
@@ -103,5 +110,6 @@
 
 	<root level="warn">
 		<appender-ref ref="CORE_FILEOUT" />
+		<appender-ref ref="METRICS" />
 	</root>
 </configuration>

@@ -47,6 +47,12 @@ import java.util.stream.Collectors;
 
 import javax.xml.validation.Schema;
 
+import com.codahale.metrics.JmxReporter;
+import com.codahale.metrics.MetricRegistry;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
 import org.apache.commons.configuration.CombinedConfiguration;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
@@ -143,15 +149,12 @@ import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.codahale.metrics.JmxReporter;
-import com.codahale.metrics.MetricRegistry;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
+import io.prometheus.client.dropwizard.DropwizardExports;
+import io.prometheus.client.exporter.HTTPServer;
+import io.prometheus.client.hotspot.DefaultExports;
 
 /**
  * @author Hélder Silva <hsilva@keep.pt>
@@ -234,10 +237,9 @@ public class RodaCoreFactory {
     Arrays.asList("roda-core.properties", "roda-roles.properties", "roda-permissions.properties"));
 
   /**
-   * Shared configuration and message properties (cache). Includes properties
-   * from {@code rodaConfiguration} and translations from ServerMessages,
-   * filtered by the {@code ui.sharedProperties.*} properties in
-   * {@code roda-wui.properties}.
+   * Shared configuration and message properties (cache). Includes properties from
+   * {@code rodaConfiguration} and translations from ServerMessages, filtered by
+   * the {@code ui.sharedProperties.*} properties in {@code roda-wui.properties}.
    *
    * This cache provides the complete set of properties to be shared with the
    * client browser.
@@ -284,6 +286,8 @@ public class RodaCoreFactory {
   private static Map<String, List<String>> rodaSharedConfigurationPropertiesCache = null;
 
   private static boolean configSymbolicLinksAllowed;
+
+  private static HTTPServer prometheusMetricsServer;
 
   /** Private empty constructor */
   private RodaCoreFactory() {
@@ -505,11 +509,11 @@ public class RodaCoreFactory {
 
   /**
    * Try to get property from 1) system property (passed in command-line via -D;
-   * if property does not start by "roda.", it will be prepended); 2)
-   * environment variable (upper case, replace '.' by '_' and if property does
-   * not start by "RODA_" after replacements, it will be prepended); 3) RODA
-   * configuration files (with original property value, ensuring that it does
-   * not start by "roda."); 4) return default value
+   * if property does not start by "roda.", it will be prepended); 2) environment
+   * variable (upper case, replace '.' by '_' and if property does not start by
+   * "RODA_" after replacements, it will be prepended); 3) RODA configuration
+   * files (with original property value, ensuring that it does not start by
+   * "roda."); 4) return default value
    * 
    * <p>
    * Example 1: for property = 'roda.node.type' this method will try to find the
@@ -550,11 +554,11 @@ public class RodaCoreFactory {
 
   /**
    * Try to get property from 1) system property (passed in command-line via -D;
-   * if property does not start by "roda.", it will be prepended); 2)
-   * environment variable (upper case, replace '.' by '_' and if property does
-   * not start by "RODA_" after replacements, it will be prepended); 3) RODA
-   * configuration files (with original property value, ensuring that it does
-   * not start by "roda."); 4) return default value
+   * if property does not start by "roda.", it will be prepended); 2) environment
+   * variable (upper case, replace '.' by '_' and if property does not start by
+   * "RODA_" after replacements, it will be prepended); 3) RODA configuration
+   * files (with original property value, ensuring that it does not start by
+   * "roda."); 4) return default value
    * 
    * <p>
    * Example 1: for property = 'roda.node.type' this method will try to find the
@@ -579,11 +583,11 @@ public class RodaCoreFactory {
 
   /**
    * Try to get property from 1) system property (passed in command-line via -D;
-   * if property does not start by "roda.", it will be prepended); 2)
-   * environment variable (upper case, replace '.' by '_' and if property does
-   * not start by "RODA_" after replacements, it will be prepended); 3) RODA
-   * configuration files (with original property value, ensuring that it does
-   * not start by "roda."); 4) return default value
+   * if property does not start by "roda.", it will be prepended); 2) environment
+   * variable (upper case, replace '.' by '_' and if property does not start by
+   * "RODA_" after replacements, it will be prepended); 3) RODA configuration
+   * files (with original property value, ensuring that it does not start by
+   * "roda."); 4) return default value
    * 
    * <p>
    * Example 1: for property = 'roda.node.type' this method will try to find the
@@ -641,6 +645,18 @@ public class RodaCoreFactory {
     if (getSystemProperty("com.sun.management.jmxremote", null) != null) {
       jmxMetricsReporter = JmxReporter.forRegistry(metricsRegistry).inDomain("RODA").build();
       jmxMetricsReporter.start();
+    }
+    int prometheusMetricsPort = getEnvInt("PROMETHEUS_METRICS_PORT", 0);
+    if (prometheusMetricsPort != 0) {
+      new DropwizardExports(metricsRegistry).register();
+      DefaultExports.initialize();
+
+      try {
+        prometheusMetricsServer = new HTTPServer(prometheusMetricsPort);
+        // Add metrics about CPU, JVM memory etc.
+      } catch (IOException e) {
+        LOGGER.error("Error initializing Prometheus metrics server", e);
+      }
     }
   }
 
@@ -1401,6 +1417,11 @@ public class RodaCoreFactory {
         jmxMetricsReporter.stop();
       }
 
+      // stop prometheus metrics server
+      if(prometheusMetricsServer != null) {
+        prometheusMetricsServer.stop();
+      }
+
       // delete resources that are no longer needed
       toDeleteDuringShutdown.forEach(e -> FSUtils.deletePathQuietly(e));
     }
@@ -1509,9 +1530,9 @@ public class RodaCoreFactory {
    * exist already.
    * 
    * @param rodaConfig
-   *          roda configuration
+   *                     roda configuration
    * @throws GenericException
-   *           if something unexpected happens creating roles.
+   *                            if something unexpected happens creating roles.
    */
   private static void createRoles(final Configuration rodaConfig) throws GenericException {
     final Iterator<String> keys = rodaConfig.getKeys("core.roles");
@@ -1942,8 +1963,7 @@ public class RodaCoreFactory {
    * {@code rodaConfiguration}.
    *
    * The properties that should be shared with the client browser are defined by
-   * the {@code ui.sharedProperties.*} properties in
-   * {@code roda-wui.properties}.
+   * the {@code ui.sharedProperties.*} properties in {@code roda-wui.properties}.
    *
    * @return The configuration properties that should be shared with the client
    *         browser.
