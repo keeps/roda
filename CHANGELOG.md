@@ -1,5 +1,31 @@
 # Changelog
 
+## v3.3.0 (15/01/2020)
+#### Features:
+- Monitoring: Adding support for Prometheus metrics export
+- Development: Adding Super devmode via mvn using springboot and codeserver
+
+#### Enhancements:
+
+-  Support very large queries to Solr [#1500](https://github.com/keeps/roda/issues/1500)
+- Upgrading PDFJS to 2.3.200
+
+#### Bug Fixes:
+
+-  Authorization denied when accessing repository-level preservation event [#1503](https://github.com/keeps/roda/issues/1503)
+-  Fixity PREMIS event not being created in case of a SIP update with new representations [#1502](https://github.com/keeps/roda/issues/1502)
+-  Search advanced list multiplied everytime is selected [#1498](https://github.com/keeps/roda/issues/1498)
+-  API index does not allow inverse search (regression) [#1497](https://github.com/keeps/roda/issues/1497)
+-  Error showing Job with LongRangeFilterParameter without lower or upper limit  [#1496](https://github.com/keeps/roda/issues/1496)
+-  Recovering login with e-mail makes user loose groups and roles [#1489](https://github.com/keeps/roda/issues/1489)
+- Fixing descriptive metadata history panel when descriptive metadata is edited by the system
+
+#### Security Fixes:
+- Updating Jackson from 2.9.10 to 2.10.1
+
+
+---
+
 ## v3.2.0 (31/10/2019)
 Install for demonstration:
 ```
@@ -12,18 +38,17 @@ docker pull keeps/roda:v3.2.0
 
 #### Enhancements:
 
-- Added download submissions button on the AIP page [#1479](https://github.com/keeps/roda/issues/1479)
-- Added confirmation when trying to remove a user or group [#1458](https://github.com/keeps/roda/issues/1458)
-- Added Accept-Ranges: bytes header for GET requests without Range header to enable pre-flight
+-  Add parentId as a default field when generating inventory report [#1488](https://github.com/keeps/roda/issues/1488)
+-  Default ingest plugin generalization [#1484](https://github.com/keeps/roda/issues/1484)
+-  Add a submission download button [#1479](https://github.com/keeps/roda/issues/1479)
+-  Make post-job (ingest or not) notifications generic [#1477](https://github.com/keeps/roda/issues/1477)
+-  Removing a user doesn't have a confirm dialog [#1458](https://github.com/keeps/roda/issues/1458)
 
 #### Bug Fixes:
 
-- Fixed ingest step report problem after SIP moves
-- Fixed ingest report problem that were not added to the main report after moving SIPS
-- Fixed title sort issue on AIP lists
-- Fixed missing default sort list information problem
-- Fixed has failures facet of job list that was not considering running jobs
-- 
+-  "Has failures" facet of job list not considering running jobs [#1493](https://github.com/keeps/roda/issues/1493)
+-  Title sort not working with default configuration [#1492](https://github.com/keeps/roda/issues/1492)
+-  Ingest reports issue after moving SIPs [#1491](https://github.com/keeps/roda/issues/1491)
 
 #### Security:
 
