@@ -132,7 +132,7 @@ public class ListSelectionUtils {
   }
 
   public static int getIndex(String className) {
-    if(clipboard.containsKey(className)) {
+    if (clipboard.containsKey(className)) {
       return clipboard.get(className).getIndex();
     } else {
       return 1;
@@ -140,7 +140,7 @@ public class ListSelectionUtils {
   }
 
   public static long getTotal(String className) {
-    if(clipboard.containsKey(className)) {
+    if (clipboard.containsKey(className)) {
       return clipboard.get(className).getTotal();
     } else {
       return 1L;
@@ -367,7 +367,9 @@ public class ListSelectionUtils {
         if (previousButton instanceof UIObject && nextButton instanceof UIObject) {
           ((UIObject) previousButton).setVisible(false);
           ((UIObject) nextButton).setVisible(false);
-          pageInformation.setVisible(false);
+          if (pageInformation != null) {
+            pageInformation.setVisible(false);
+          }
         }
       }
 
@@ -380,7 +382,9 @@ public class ListSelectionUtils {
         if (previousButton instanceof UIObject && nextButton instanceof UIObject) {
           ((UIObject) previousButton).setVisible(hasPrevious || hasNext);
           ((UIObject) nextButton).setVisible(hasPrevious || hasNext);
-          pageInformation.setVisible(hasPrevious || hasNext);
+          if (pageInformation != null) {
+            pageInformation.setVisible(hasPrevious || hasNext);
+          }
 
           for (UIObject uiObj : extraUiObjectsToHide) {
             uiObj.setVisible(hasPrevious || hasNext);
