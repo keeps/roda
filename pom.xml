@@ -31,14 +31,14 @@
 	</distributionManagement>
 	<repositories>
 		<repository>
-			<id>KEEPS-Artifacts</id>
-			<name>KEEP Artifacts-releases (fits, etc.)</name>
-			<url>http://artifactory.keep.pt/keep</url>
+			<id>keeps_artifactory</id>
+			<name>KEEP SOLUTIONS artifactory</name>
+			<url>https://artifactory.keep.pt/artifactory/keep</url>
 		</repository>
 		<repository>
 			<id>jcenter</id>
 			<name>bintray</name>
-			<url>http://jcenter.bintray.com</url>
+			<url>https://jcenter.bintray.com</url>
 		</repository>
 	</repositories>
 	<developers>
