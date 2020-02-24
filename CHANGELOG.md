@@ -1,6 +1,28 @@
 # Changelog
 
+## v3.3.1 (24/02/2020)
+Install for demonstration:
+```
+docker pull keeps/roda:v3.3.1
+```
+
+
+### Enhancements
+* Improve file notification processor #1519
+
+### Bug fixes
+* Opening job reports directly via URL (new page) creates a javascript error
+
+### Security
+* Setting all Maven reports to HTTPS to secure against man-in-the-middle attacks to the compilation process
+---
+
 ## v3.3.0 (15/01/2020)
+Install for demonstration:
+```
+docker pull keeps/roda:v3.3.0
+```
+
 #### Features:
 - Monitoring: Adding support for Prometheus metrics export
 - Development: Adding Super devmode via mvn using springboot and codeserver
