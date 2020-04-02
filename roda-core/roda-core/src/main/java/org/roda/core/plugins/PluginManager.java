@@ -781,7 +781,7 @@ public class PluginManager {
     if (plugin.getParameters().isEmpty()) {
       sbParameters.append("No parameters.");
     } else {
-      sbParameters.append(String.format("| **%s** | **%s** | **%s** | **%s** | **%s** | **%s** | %n", "Name",
+      sbParameters.append(String.format("| **%s** | **%s** | **%s** | **%s** | **%s** | **%s** | **%s** | %n", "Name",
         "Description", "Type", "Default value", "Possible values", "Mandatory", "Read only"));
       sbParameters.append(String.format("| --- | --- | --- | --- | --- | --- | --- | %n"));
       for (PluginParameter pluginParameter : plugin.getParameters()) {
