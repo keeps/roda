@@ -13,6 +13,7 @@ package org.roda.wui.client.browse;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.gwt.user.client.Window;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -47,12 +48,14 @@ import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.IndexedDIPUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 import com.google.gwt.core.client.GWT;
@@ -121,7 +124,25 @@ public class BrowseDIP extends Composite {
 
             @Override
             public void onSuccess(BrowseDipBundle browseDipBundle) {
-              callback.onSuccess(new BrowseDIP(viewers, browseDipBundle));
+              BrowserService.Util.getInstance().showDIPEmbedded(new AsyncCallback<Boolean>() {
+                @Override
+                public void onFailure(Throwable caught) {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
+                }
+
+                @Override
+                public void onSuccess(Boolean showEmbedded) {
+                  IndexedDIP dip = browseDipBundle.getDip();
+                  if (StringUtils.isNotBlank(dip.getOpenExternalURL()) && !showEmbedded) {
+                    String url = IndexedDIPUtils.interpolateOpenExternalURL(dip,
+                            LocaleInfo.getCurrentLocale().getLocaleName());
+                    Window.open(url, "_blank", "");
+                    Toast.showInfo(messages.browseFileDipOpenedExternalURL(), url);
+                  } else {
+                    callback.onSuccess(new BrowseDIP(viewers, browseDipBundle));
+                  }
+                }
+              });
             }
           });
       } else {

@@ -161,24 +161,7 @@ public class DisseminationsSliderHelper {
 
       @Override
       public void onClick(ClickEvent event) {
-        BrowserService.Util.getInstance().showDIPEmbedded(new AsyncCallback<Boolean>() {
-          @Override
-          public void onFailure(Throwable caught) {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
-          }
-
-          @Override
-          public void onSuccess(Boolean showEmbedded) {
-            if (StringUtils.isNotBlank(dip.getOpenExternalURL()) && !showEmbedded) {
-              String url = IndexedDIPUtils.interpolateOpenExternalURL(dip,
-                LocaleInfo.getCurrentLocale().getLocaleName());
-              Window.open(url, "_blank", "");
-              Toast.showInfo(messages.browseFileDipOpenedExternalURL(), url);
-            } else {
-              HistoryUtils.openBrowse(dip);
-            }
-          }
-        });
+        HistoryUtils.openBrowse(dip);
       }
 
     });
