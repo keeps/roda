@@ -13,6 +13,7 @@ package org.roda.wui.client.browse;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
@@ -138,6 +139,7 @@ public class BrowseDIP extends Composite {
                             LocaleInfo.getCurrentLocale().getLocaleName());
                     Window.open(url, "_blank", "");
                     Toast.showInfo(messages.browseFileDipOpenedExternalURL(), url);
+                    History.back();
                   } else {
                     callback.onSuccess(new BrowseDIP(viewers, browseDipBundle));
                   }
