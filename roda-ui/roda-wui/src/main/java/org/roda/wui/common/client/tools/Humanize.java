@@ -9,6 +9,7 @@ package org.roda.wui.common.client.tools;
 
 import java.util.Date;
 
+import com.google.gwt.i18n.client.TimeZone;
 import org.roda.core.data.common.RodaConstants;
 
 import com.google.gwt.core.client.GWT;
@@ -51,6 +52,8 @@ public class Humanize {
 
   public static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd");
   public static final DateTimeFormat DATE_TIME_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss z");
+
+  public static final boolean FORMAT_UTC = false;
 
   private Humanize() {
     // do nothing
@@ -225,6 +228,10 @@ public class Humanize {
       }
     } else {
       format = defaultValue;
+    }
+
+    if (ConfigurationManager.getBoolean(FORMAT_UTC, RodaConstants.UI_DATE_TIME_FORMAT_UTC)) {
+      return format.format(date, TimeZone.createTimeZone(0));
     }
 
     return format.format(date);

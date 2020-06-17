@@ -94,6 +94,7 @@ public final class RodaConstants {
   public static final String UI_DATE_FORMAT_TITLE = "ui.date.format.title";
   public static final String UI_DATE_FORMAT_SIMPLE = "ui.date.format.simple";
   public static final String UI_DATE_TIME_FORMAT_SIMPLE = "ui.dateTime.format.simple";
+  public static final String UI_DATE_TIME_FORMAT_UTC = "ui.dateTime.format.UTC";
 
   public static final String UI_COOKIES_ACTIVE_PROPERTY = "ui.cookies.active";
   public static final String UI_GOOGLE_ANALYTICS_CODE_PROPERTY = "ui.google.analytics.code";
