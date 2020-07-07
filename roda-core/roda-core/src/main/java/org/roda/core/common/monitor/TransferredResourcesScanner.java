@@ -150,7 +150,7 @@ public class TransferredResourcesScanner {
     }
     return ret;
   }
-  
+
   public Path retrieveFilePath(String path) throws NotFoundException, RequestNotValidException, GenericException {
     Path p = basePath.resolve(path);
     if (!FSUtils.exists(p)) {
@@ -236,24 +236,30 @@ public class TransferredResourcesScanner {
   public void updateTransferredResources(Optional<String> folderRelativePath, boolean waitToFinish)
     throws IsStillUpdatingException, GenericException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+    Path resolvedBasePath = basePath.resolve(Paths.get(folderRelativePath.get()));
+    boolean isWithin = RodaCoreFactory.checkPathIsWithin(resolvedBasePath,basePath);
+    if (isWithin) {
+      if (!RodaCoreFactory.getTransferredResourcesScannerUpdateStatus(folderRelativePath)) {
+        if (index != null) {
+          ReindexTransferredResourcesRunnable reindexRunnable = new ReindexTransferredResourcesRunnable(index, basePath,
+                  folderRelativePath);
 
-    if (!RodaCoreFactory.getTransferredResourcesScannerUpdateStatus(folderRelativePath)) {
-      if (index != null) {
-        ReindexTransferredResourcesRunnable reindexRunnable = new ReindexTransferredResourcesRunnable(index, basePath,
-          folderRelativePath);
-
-        if (waitToFinish) {
-          reindexRunnable.run();
+          if (waitToFinish) {
+            reindexRunnable.run();
+          } else {
+            Thread threadReindex = new Thread(reindexRunnable, "ReindexThread");
+            threadReindex.start();
+          }
         } else {
-          Thread threadReindex = new Thread(reindexRunnable, "ReindexThread");
-          threadReindex.start();
+          throw new GenericException("Could not update transferred resources because index was not initialized");
         }
       } else {
-        throw new GenericException("Could not update transferred resources because index was not initialized");
+        LOGGER.warn("Could not update transferred resources because it is still updating");
+        throw new IsStillUpdatingException();
       }
-    } else {
-      LOGGER.warn("Could not update transferred resources because it is still updating");
-      throw new IsStillUpdatingException();
+    }else{
+        LOGGER.warn("Request trying to access folders outside the transfer resources folder ({})", folderRelativePath.get());
+        throw new AuthorizationDeniedException("Request trying to access folders outside the transfer resources folder (" + folderRelativePath.get() + ")");
     }
   }
 
