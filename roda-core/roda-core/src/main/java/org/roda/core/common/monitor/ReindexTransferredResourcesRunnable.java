@@ -58,7 +58,14 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
       EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
       Path path;
       if (folderRelativePath.isPresent()) {
-        path = basePath.resolve(Paths.get(folderRelativePath.get()));
+        Path resolvedBasePath = basePath.resolve(Paths.get(folderRelativePath.get()));
+        boolean isWithin = RodaCoreFactory.checkPathIsWithin(resolvedBasePath,basePath);
+        if (isWithin) {
+          path = resolvedBasePath.normalize();
+        }else{
+          LOGGER.warn("Request trying to access folders outside the transfer resources folder ({})", folderRelativePath.get());
+          throw new AuthorizationDeniedException("Request trying to access folders outside the transfer resources folder (" + folderRelativePath.get() + ")");
+        }
       } else {
         path = basePath;
       }
