@@ -7,7 +7,7 @@ set -ex
 ################################################
 function deploy_to_artifactory(){
   echo "Deploy to artifactory"
-  cp settings.xml $HOME/.m2/
+  cp .travis/settings.xml $HOME/.m2/
   mvn $MAVEN_CLI_OPTS clean package deploy -Dmaven.test.skip=true -Denforcer.skip=true -Pcore
   rm $HOME/.m2/settings.xml
 }

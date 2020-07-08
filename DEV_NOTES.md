@@ -74,6 +74,19 @@ travis encrypt-file settings.xml
 ```
 * Follow the instructions given as result of the previous command execution, which will add stuff into .travis.yml
 
+### Update artifactory token
+
+Generate a new token:
+```bash
+# ARTIFACTORY_USER
+echo "roda-travis-$(date -I)"
+# ARTIFACTORY_PASS
+ curl -u lfaria -XPOST "https://artifactory.keep.pt/artifactory/api/security/token" -d expires_in=31536000 -d "username=roda-travis-$(date -I)" -d "scope=member-of-groups:deployers"
+```
+
+Update the variables at [RODA Travis settings](https://travis-ci.org/github/keeps/roda/settings).
+
+
 
 ## Redeploy on docker
 

@@ -14,8 +14,3 @@ sudo sf -update
 sudo cp .travis/clamscan /usr/bin/clamscan
 sudo cp .travis/clamscan /usr/bin/clamdscan
 sudo chmod a+rx /usr/bin/clamscan /usr/bin/clamdscan
-
-# decrypt maven setting.xml
-if [[ ! -z "$encrypted_a8a9ca6bf122_key" ]]; then
-  openssl aes-256-cbc -K $encrypted_a8a9ca6bf122_key -iv $encrypted_a8a9ca6bf122_iv -in .travis/settings.xml.enc -out settings.xml -d
-fi
