@@ -233,11 +233,24 @@ public class TransferredResourcesScanner {
     index.commit(TransferredResource.class);
   }
 
-  public void updateTransferredResources(Optional<String> folderRelativePath, boolean waitToFinish)
+  public Optional<String> updateTransferredResources(Optional<String> folderRelativePath, boolean waitToFinish)
     throws IsStillUpdatingException, GenericException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
-    Path resolvedBasePath = basePath.resolve(Paths.get(folderRelativePath.get()));
-    boolean isWithin = RodaCoreFactory.checkPathIsWithin(resolvedBasePath,basePath);
+    boolean isWithin;
+    Path resolvedBasePath;
+    Optional<String> normalizedRelativePath;
+    if(folderRelativePath.isPresent() && !folderRelativePath.get().isEmpty()) {
+      resolvedBasePath = basePath.resolve(Paths.get(folderRelativePath.get())).normalize();
+      isWithin = RodaCoreFactory.checkPathIsWithin(resolvedBasePath, basePath);
+      if(resolvedBasePath.equals(basePath)){
+        normalizedRelativePath = Optional.empty();
+      }else{
+        normalizedRelativePath = Optional.of(resolvedBasePath.relativize(basePath).toString());
+      }
+    }else{
+      isWithin = true;
+      normalizedRelativePath = Optional.empty();
+    }
     if (isWithin) {
       if (!RodaCoreFactory.getTransferredResourcesScannerUpdateStatus(folderRelativePath)) {
         if (index != null) {
@@ -261,6 +274,7 @@ public class TransferredResourcesScanner {
         LOGGER.warn("Request trying to access folders outside the transfer resources folder ({})", folderRelativePath.get());
         throw new AuthorizationDeniedException("Request trying to access folders outside the transfer resources folder (" + folderRelativePath.get() + ")");
     }
+    return normalizedRelativePath;
   }
 
   public void updateTransferredResource(Optional<String> folderRelativePath, ContentPayload payload, String name,
