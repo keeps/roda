@@ -1,5 +1,28 @@
 # Changelog
 
+## v3.4.0 (09/07/2020)
+### Security fix:
+-  HTTP GET Request to reindex transferred resources folder can access data outside the folder [#1540](https://github.com/keeps/roda/issues/1540)
+
+#### New features:
+
+-  Option to force timezone on all presented dates to UTC [#1539](https://github.com/keeps/roda/issues/1539)
+
+#### Enhancements:
+
+-  Support show embedded / open new page option in DIPs on AIP or Representation levels [#1541](https://github.com/keeps/roda/issues/1541)
+
+#### Bug Fixes:
+
+-  Fixing plugin readme generator [#1542](https://github.com/keeps/roda/issues/1542)
+
+Install for demonstration:
+```
+docker pull keeps/roda:v3.4.0
+```
+
+---
+
 ## v3.3.1 (24/02/2020)
 Install for demonstration:
 ```
