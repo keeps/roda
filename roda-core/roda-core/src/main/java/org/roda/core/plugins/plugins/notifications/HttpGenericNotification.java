@@ -12,7 +12,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotificationException;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobStats;
-import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -31,10 +31,10 @@ public class HttpGenericNotification extends AbstractJobNotification implements 
     try {
       if (StringUtils.isNotBlank(this.getTo())) {
         Notification notification = new Notification();
-        String outcome = Report.PluginState.SUCCESS.toString();
+        String outcome = PluginState.SUCCESS.toString();
 
         if (jobStats.getSourceObjectsProcessedWithFailure() > 0) {
-          outcome = Report.PluginState.FAILURE.toString();
+          outcome = PluginState.FAILURE.toString();
         }
 
         String subject = RodaCoreFactory.getRodaConfigurationAsString("core", "notification", "generic_subject");

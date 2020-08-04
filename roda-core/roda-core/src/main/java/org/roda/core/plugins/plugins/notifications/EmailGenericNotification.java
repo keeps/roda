@@ -17,7 +17,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotificationException;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobStats;
-import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;

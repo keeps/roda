@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
- *
+ * <p>
  * https://github.com/keeps/roda
  */
 package org.roda.core.plugins.plugins.ingest.v2;
@@ -32,9 +32,9 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.LiteRODAObjectFactory;
@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
 /***
  * https://docs.google.com/spreadsheets/d/
  * 1Ncu0My6tf19umSClIA6iXeYlJ4_FP6MygRwFCe0EzyM
- * 
+ *
  * @author Hélder Silva <hsilva@keep.pt>
  */
 public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {

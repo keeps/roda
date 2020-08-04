@@ -20,6 +20,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.plugins.Plugin;
@@ -100,7 +101,7 @@ public class IngestStepsUtils {
       if (jobPluginInfo.getAipIds(transferredResourceId) != null) {
         for (String aipId : jobPluginInfo.getAipIds(transferredResourceId)) {
           Report aipReport = transferredResourcejobPluginInfoEntry.getValue().get(aipId);
-          if (aipReport.getPluginState() == Report.PluginState.FAILURE) {
+          if (aipReport.getPluginState() == PluginState.FAILURE) {
             LOGGER.trace("Removing AIP {} from the list", aipReport.getOutcomeObjectId());
             oneTransferredResourceAipFailed = true;
             break;
@@ -147,8 +148,8 @@ public class IngestStepsUtils {
           JsonUtils.getJsonFromObject(bundle.getJobPluginInfo().getAipIdToTransferredResourceIds()));
 
         // update main report outcomeObjectState
-        PluginHelper.updateJobReportState(bundle.getIngestPlugin(), bundle.getModel(), aip.getIngestSIPUUID(), aip.getId(),
-          AIPState.UNDER_APPRAISAL, cachedJob);
+        PluginHelper.updateJobReportState(bundle.getIngestPlugin(), bundle.getModel(), aip.getIngestSIPUUID(),
+          aip.getId(), AIPState.UNDER_APPRAISAL, cachedJob);
 
         // update counters of manual intervention
         bundle.getJobPluginInfo().incrementOutcomeObjectsWithManualIntervention();
