@@ -89,7 +89,7 @@ public class MinimalIngestPlugin extends DefaultIngestPlugin {
 
   @Override
   public String getVersionImpl() {
-    return "1.0";
+    return "2.0";
   }
 
   @Override

@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.ip.AIPState;
@@ -54,6 +52,7 @@ public class Report implements IsModelObject, HasId {
   private String pluginName = "";
   private String pluginVersion = "";
   private PluginState pluginState = PluginState.RUNNING;
+  private boolean pluginIsMandatory = true;
   private String pluginDetails = "";
   private boolean htmlPluginDetails = false;
 
@@ -94,6 +93,7 @@ public class Report implements IsModelObject, HasId {
     this.pluginName = report.getPluginName();
     this.pluginVersion = report.getPluginVersion();
     this.pluginState = report.getPluginState();
+ //   this.pluginIsMandatory = report.isPluginIsMandatory();
     this.pluginDetails = report.getPluginDetails();
     this.htmlPluginDetails = report.isHtmlPluginDetails();
     this.reports = new ArrayList<>();
@@ -311,6 +311,15 @@ public class Report implements IsModelObject, HasId {
     this.pluginState = pluginState;
     return this;
   }
+  
+  public boolean isPluginIsMandatory() {
+    return pluginIsMandatory;
+  }
+
+  public Report setPluginIsMandatory(boolean pluginIsMandatory) {
+    this.pluginIsMandatory = pluginIsMandatory;
+    return this;
+  }
 
   public String getPluginDetails() {
     return pluginDetails;
@@ -367,6 +376,10 @@ public class Report implements IsModelObject, HasId {
     setPlugin(report.getPlugin());
     setPluginName(report.getPluginName());
     setPluginVersion(report.getPluginVersion());
+    //setPluginIsMandatory(report.isPluginIsMandatory());
+    // TODO if report is about an optional plugin, and current state is not failure,
+    // then mark current state as partial success
+    //setPluginState(calculatePluginState(getPluginState(), report.getPluginState(), report.isPluginIsMandatory()));
     setPluginState(report.getPluginState());
     if (!"".equals(report.getPluginDetails()) && !getPluginDetails().equals(report.getPluginDetails())) {
       setPluginDetails(
@@ -376,6 +389,22 @@ public class Report implements IsModelObject, HasId {
 
     reports.add(report);
     return this;
+  }
+
+  @JsonIgnore
+  private PluginState calculatePluginState(PluginState currentPluginState, PluginState newPluginState,
+    Boolean pluginIsMandatory) {
+    if (pluginIsMandatory) {
+      return newPluginState;
+    } else {
+      if (currentPluginState.equals(PluginState.SUCCESS) && newPluginState.equals(PluginState.FAILURE)) {
+        return PluginState.PARTIAL_SUCCESS;
+      } else if (currentPluginState.equals(PluginState.SUCCESS) && newPluginState.equals(PluginState.SUCCESS)) {
+        return PluginState.SUCCESS;
+      } else {
+        return PluginState.FAILURE;
+      }
+    }
   }
 
   public List<Report> getReports() {
@@ -403,7 +432,8 @@ public class Report implements IsModelObject, HasId {
       + ", title=" + title + ", dateCreated=" + dateCreated + ", dateUpdated=" + dateUpdated + ", completionPercentage="
       + completionPercentage + ", stepsCompleted=" + stepsCompleted + ", totalSteps=" + totalSteps + ", plugin="
       + plugin + ", pluginName=" + pluginName + ", pluginVersion=" + pluginVersion + ", pluginState=" + pluginState
-      + ", pluginDetails=" + pluginDetails + ", htmlPluginDetails=" + htmlPluginDetails + ", reports=" + reports + "]";
+      /*+ ", pluginIsMandatory=" + pluginIsMandatory*/ + ", pluginDetails=" + pluginDetails + ", htmlPluginDetails="
+      + htmlPluginDetails + ", reports=" + reports + "]";
   }
 
 }

@@ -35,19 +35,19 @@ public class IngestStepsUtils {
 
   public static void executePlugin(IngestStepBundle bundle, IngestStep step) {
     if (!step.needsAips() || !bundle.getAips().isEmpty()) {
-      Report pluginReport = IngestStepsUtils.executeStep(bundle, step.getParameters(), step.getPluginName());
+      Report pluginReport = IngestStepsUtils.executeStep(bundle, step);
       mergeReports(bundle.getJobPluginInfo(), pluginReport);
       if (step.needsAips()) {
-        recalculateAIPsList(bundle, step.removesAips());
+        recalculateAIPsList(bundle, step);
       }
     }
   }
 
-  public static Report executeStep(IngestStepBundle bundle, Map<String, String> params, String pluginName) {
-    Plugin<AIP> plugin = RodaCoreFactory.getPluginManager().getPlugin(pluginName, AIP.class);
+  public static Report executeStep(IngestStepBundle bundle, IngestStep step) {
+    Plugin<AIP> plugin = RodaCoreFactory.getPluginManager().getPlugin(step.getPluginName(), AIP.class);
     Map<String, String> mergedParams = new HashMap<>(bundle.getParameterValues());
-    if (params != null) {
-      mergedParams.putAll(params);
+    if (step.getParameters() != null) {
+      mergedParams.putAll(step.getParameters());
     }
 
     // set outcome_object_id > source_object_id relation
@@ -60,7 +60,7 @@ public class IngestStepsUtils {
         bundle.getAips());
       return plugin.execute(bundle.getIndex(), bundle.getModel(), bundle.getStorage(), lites);
     } catch (InvalidParameterException | PluginException | RuntimeException e) {
-      LOGGER.error("Error executing plugin: {}", pluginName, e);
+      LOGGER.error("Error executing plugin: {}", step.getPluginName(), e);
     }
 
     return null;
@@ -84,46 +84,47 @@ public class IngestStepsUtils {
    * Recalculates (if failures must be noticed) and updates AIP objects (by
    * obtaining them from model)
    */
-  public static void recalculateAIPsList(IngestStepBundle bundle, boolean removeAIPProcessingFailed) {
+  public static void recalculateAIPsList(IngestStepBundle bundle, IngestStep step) {
     bundle.getAips().clear();
     Set<String> aipsToReturn = new HashSet<>();
     Set<String> transferredResourceAips;
     List<String> transferredResourcesToRemoveFromjobPluginInfo = new ArrayList<>();
     boolean oneTransferredResourceAipFailed;
     IngestJobPluginInfo jobPluginInfo = bundle.getJobPluginInfo();
+      for (Map.Entry<String, Map<String, Report>> transferredResourcejobPluginInfoEntry : jobPluginInfo
+          .getReportsFromBeingProcessed().entrySet()) {
+        String transferredResourceId = transferredResourcejobPluginInfoEntry.getKey();
+        transferredResourceAips = new HashSet<>();
+        oneTransferredResourceAipFailed = false;
 
-    for (Map.Entry<String, Map<String, Report>> transferredResourcejobPluginInfoEntry : jobPluginInfo
-      .getReportsFromBeingProcessed().entrySet()) {
-      String transferredResourceId = transferredResourcejobPluginInfoEntry.getKey();
-      transferredResourceAips = new HashSet<>();
-      oneTransferredResourceAipFailed = false;
 
-      if (jobPluginInfo.getAipIds(transferredResourceId) != null) {
-        for (String aipId : jobPluginInfo.getAipIds(transferredResourceId)) {
-          Report aipReport = transferredResourcejobPluginInfoEntry.getValue().get(aipId);
-          if (aipReport.getPluginState() == PluginState.FAILURE) {
-            LOGGER.trace("Removing AIP {} from the list", aipReport.getOutcomeObjectId());
-            oneTransferredResourceAipFailed = true;
-            break;
+        if (jobPluginInfo.getAipIds(transferredResourceId) != null) {
+          for (String aipId : jobPluginInfo.getAipIds(transferredResourceId)) {
+            Report aipReport = transferredResourcejobPluginInfoEntry.getValue().get(aipId);
+            if (step.isMandatory() && aipReport.getPluginState() == PluginState.FAILURE) {
+              LOGGER.trace("Removing AIP {} from the list", aipReport.getOutcomeObjectId());
+              oneTransferredResourceAipFailed = true;
+              break;
+            } else {
+              transferredResourceAips.add(aipId);
+            }
+          }
+
+
+          if (oneTransferredResourceAipFailed) {
+            LOGGER.info(
+                "Will not process AIPs from transferred resource '{}' any longer because at least one of them failed",
+                transferredResourceId);
+            jobPluginInfo.incrementObjectsProcessedWithFailure();
+            jobPluginInfo.failOtherTransferredResourceAIPs(bundle.getModel(), bundle.getIndex(), transferredResourceId);
+            transferredResourcesToRemoveFromjobPluginInfo.add(transferredResourceId);
           } else {
-            transferredResourceAips.add(aipId);
+            aipsToReturn.addAll(transferredResourceAips);
           }
         }
-
-        if (oneTransferredResourceAipFailed) {
-          LOGGER.info(
-            "Will not process AIPs from transferred resource '{}' any longer because at least one of them failed",
-            transferredResourceId);
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-          jobPluginInfo.failOtherTransferredResourceAIPs(bundle.getModel(), bundle.getIndex(), transferredResourceId);
-          transferredResourcesToRemoveFromjobPluginInfo.add(transferredResourceId);
-        } else {
-          aipsToReturn.addAll(transferredResourceAips);
-        }
       }
-    }
 
-    if (removeAIPProcessingFailed) {
+    if (step.isMandatory() && step.removesAips()) {
       for (String transferredResourceId : transferredResourcesToRemoveFromjobPluginInfo) {
         jobPluginInfo.remove(transferredResourceId);
       }
