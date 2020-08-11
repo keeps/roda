@@ -15,7 +15,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.HasId;
-import org.roda.core.data.v2.ip.SIPUpdateInformation;
+import org.roda.core.data.v2.ip.SIPInformation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -57,7 +57,7 @@ public class Report implements IsModelObject, HasId {
   private boolean htmlPluginDetails = false;
 
   @JsonIgnore
-  private SIPUpdateInformation updateInformation = new SIPUpdateInformation();
+  private SIPInformation sipInformation = new SIPInformation();
 
   private List<Report> reports = new ArrayList<>();
 
@@ -344,13 +344,13 @@ public class Report implements IsModelObject, HasId {
   }
 
   @JsonIgnore
-  public SIPUpdateInformation getUpdateInformation() {
-    return updateInformation;
+  public SIPInformation getSipInformation() {
+    return sipInformation;
   }
 
   @JsonIgnore
-  public void setUpdateInformation(SIPUpdateInformation updateInformation) {
-    this.updateInformation = updateInformation;
+  public void setSipInformation(SIPInformation sipInformation) {
+    this.sipInformation = sipInformation;
   }
 
   public Report addReport(Report report) {
@@ -450,7 +450,7 @@ public class Report implements IsModelObject, HasId {
       + ", title=" + title + ", dateCreated=" + dateCreated + ", dateUpdated=" + dateUpdated + ", completionPercentage="
       + completionPercentage + ", stepsCompleted=" + stepsCompleted + ", totalSteps=" + totalSteps + ", plugin="
       + plugin + ", pluginName=" + pluginName + ", pluginVersion=" + pluginVersion + ", pluginState=" + pluginState
-      /*+ ", pluginIsMandatory=" + pluginIsMandatory*/ + ", pluginDetails=" + pluginDetails + ", htmlPluginDetails="
+      + ", pluginIsMandatory=" + pluginIsMandatory + ", pluginDetails=" + pluginDetails + ", htmlPluginDetails="
       + htmlPluginDetails + ", reports=" + reports + "]";
   }
 

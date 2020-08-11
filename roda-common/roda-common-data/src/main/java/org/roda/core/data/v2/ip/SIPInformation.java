@@ -17,15 +17,17 @@ import org.roda.core.data.common.RodaConstants;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class SIPUpdateInformation implements Serializable {
+public class SIPInformation implements Serializable {
   private static final long serialVersionUID = -5028697752208138720L;
   private Map<String, Map<String, List<String>>> updatedData;
+  private boolean update;
 
-  public SIPUpdateInformation() {
+  public SIPInformation() {
+    update = false;
     updatedData = new HashMap<>();
   }
 
-  public SIPUpdateInformation(SIPUpdateInformation other) {
+  public SIPInformation(SIPInformation other) {
     updatedData = other.getUpdatedData();
   }
 
@@ -42,6 +44,14 @@ public class SIPUpdateInformation implements Serializable {
   public boolean isValid() {
     // 20170901 nvieira it can be valid with different content in the future
     return hasUpdatedData();
+  }
+
+  public boolean isUpdate() {
+    return update;
+  }
+
+  public void setUpdate(boolean update) {
+    this.update = update;
   }
 
   @JsonIgnore

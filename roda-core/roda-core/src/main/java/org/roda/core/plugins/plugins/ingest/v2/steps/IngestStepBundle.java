@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.SIPInformation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -24,10 +25,11 @@ public class IngestStepBundle {
   private List<TransferredResource> resources;
   private List<AIP> aips;
   private Job cachedJob;
+  private SIPInformation sipInformation;
 
   public IngestStepBundle(Plugin<?> ingestPlugin, IndexService index, ModelService model, StorageService storage,
-    IngestJobPluginInfo jobPluginInfo, PluginParameter pluginParameter, Map<String, String> parameterValues,
-    List<TransferredResource> resources, List<AIP> aips, Job cachedJob) {
+                          IngestJobPluginInfo jobPluginInfo, PluginParameter pluginParameter, Map<String, String> parameterValues,
+                          List<TransferredResource> resources, List<AIP> aips, Job cachedJob, SIPInformation sipInformation) {
     this.ingestPlugin = ingestPlugin;
     this.index = index;
     this.model = model;
@@ -38,6 +40,7 @@ public class IngestStepBundle {
     this.resources = resources;
     this.aips = aips;
     this.cachedJob = cachedJob;
+    this.sipInformation = sipInformation;
   }
 
   public Plugin<?> getIngestPlugin() {
@@ -118,5 +121,13 @@ public class IngestStepBundle {
 
   public void setCachedJob(Job cachedJob) {
     this.cachedJob = cachedJob;
+  }
+
+  public SIPInformation getSipInformation() {
+    return sipInformation;
+  }
+
+  public void setSipInformation(SIPInformation sipInformation) {
+    this.sipInformation = sipInformation;
   }
 }

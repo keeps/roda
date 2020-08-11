@@ -15,6 +15,7 @@ import java.util.Map;
 import org.roda.core.data.common.RodaConstants.PreservationAgentType;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.ip.SIPInformation;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.notifications.JobNotification;
@@ -26,6 +27,7 @@ public abstract class AbstractPlugin<T extends IsRODAObject> implements Plugin<T
   private String version = null;
   private JobPluginInfo jobPluginInfo;
   private boolean mandatory = true;
+  private SIPInformation sipInformation = new SIPInformation();
 
   @Override
   public void injectJobPluginInfo(JobPluginInfo jobPluginInfo) {
@@ -80,5 +82,13 @@ public abstract class AbstractPlugin<T extends IsRODAObject> implements Plugin<T
 
   public void setMandatory(boolean mandatory) {
     this.mandatory = mandatory;
+  }
+
+  public SIPInformation getSipInformation() {
+    return sipInformation;
+  }
+
+  public void setSipInformation(SIPInformation sipInformation) {
+    this.sipInformation = sipInformation;
   }
 }

@@ -29,7 +29,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.SIPUpdateInformation;
+import org.roda.core.data.v2.ip.SIPInformation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -155,6 +155,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       // an AIP)
       pluginReport = transformTransferredResourceIntoAnAIP(index, model, storage, resources);
       IngestStepsUtils.mergeReports(jobPluginInfo, pluginReport);
+      final SIPInformation sipInformation = pluginReport.getSipInformation();
       final List<AIP> aips = getAIPsFromReports(model, index, jobPluginInfo);
       PluginHelper.updateJobInformationAsync(this, jobPluginInfo.incrementStepsCompletedByOne());
 
@@ -166,7 +167,8 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
       for (IngestStep step : steps) {
         IngestStepBundle bundle = new IngestStepBundle(this, index, model, storage, jobPluginInfo,
-          getPluginParameter(step.getParameterName()), getParameterValues(), resources, aips, cachedJob);
+          getPluginParameter(step.getParameterName()), getParameterValues(), resources, aips, cachedJob,
+            sipInformation);
         step.execute(bundle);
       }
 

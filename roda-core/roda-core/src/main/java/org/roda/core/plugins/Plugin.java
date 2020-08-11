@@ -15,6 +15,7 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.ip.SIPInformation;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -215,4 +216,8 @@ public interface Plugin<T extends IsRODAObject> {
   boolean isMandatory();
 
   void setMandatory(boolean mandatory);
+
+  SIPInformation getSipInformation();
+
+  void setSipInformation(SIPInformation sipInformation);
 }

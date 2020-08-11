@@ -28,7 +28,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.SIPUpdateInformation;
+import org.roda.core.data.v2.ip.SIPInformation;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -51,7 +51,10 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
   private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPlugin.class);
   public static final String FILE_SUFFIX = ".json";
 
-  private SIPUpdateInformation sipUpdateInformation = new SIPUpdateInformation();
+  /*
+   * private SIPUpdateInformation sipUpdateInformation = new
+   * SIPUpdateInformation();
+   */
 
   @Override
   public void init() throws PluginException {
@@ -94,10 +97,10 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_SIP_UPDATE_INFORMATION)) {
       try {
-        sipUpdateInformation = JsonUtils.getObjectFromJson(
-          parameters.get(RodaConstants.PLUGIN_PARAMS_SIP_UPDATE_INFORMATION), SIPUpdateInformation.class);
+        setSipInformation(JsonUtils
+          .getObjectFromJson(parameters.get(RodaConstants.PLUGIN_PARAMS_SIP_UPDATE_INFORMATION), SIPInformation.class));
       } catch (GenericException e) {
-        LOGGER.debug("Could not serializable SIP Update information from JSON", e);
+        LOGGER.debug("Could not serializable SIP information from JSON", e);
       }
     }
   }
@@ -112,9 +115,9 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
         LOGGER.debug("Processing AIP {}", aip.getId());
         List<LinkingIdentifier> sources = new ArrayList<>();
-        Map<String, Map<String, List<String>>> updatedData = sipUpdateInformation.getUpdatedData();
+        Map<String, Map<String, List<String>>> updatedData = getSipInformation().getUpdatedData();
 
-        if (sipUpdateInformation.hasUpdatedData() || !updatedData.containsKey(aip.getId())) {
+        if (getSipInformation().hasUpdatedData() || !updatedData.containsKey(aip.getId())) {
           try {
             for (Representation representation : aip.getRepresentations()) {
               LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());

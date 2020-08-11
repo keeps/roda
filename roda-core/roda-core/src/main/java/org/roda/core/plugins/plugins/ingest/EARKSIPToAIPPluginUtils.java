@@ -105,6 +105,11 @@ public class EARKSIPToAIPPluginUtils {
 
     PluginHelper.acquireObjectLock(indexedAIP, plugin);
 
+    // type UPDATE
+    if (reportItem != null) {
+      reportItem.getSipInformation().setUpdate(true);
+    }
+
     // process IP information
     processIPInformation(model, sip, indexedAIP.getId(), notify, true);
 
@@ -257,7 +262,7 @@ public class EARKSIPToAIPPluginUtils {
       representation = model.createRepresentation(aipId, sr.getObjectID(), isOriginal, representationType, notify,
         username);
       if (reportItem != null && update) {
-        reportItem.getUpdateInformation().addRepresentationData(aipId, IdUtils.getRepresentationId(representation));
+        reportItem.getSipInformation().addRepresentationData(aipId, IdUtils.getRepresentationId(representation));
       }
     }
 
@@ -279,7 +284,7 @@ public class EARKSIPToAIPPluginUtils {
       try {
         File createdFile = model.createFile(aipId, representation.getId(), directoryPath, fileId, payload, notify);
         if (reportItem != null && update) {
-          reportItem.getUpdateInformation().addFileData(aipId, IdUtils.getRepresentationId(representation),
+          reportItem.getSipInformation().addFileData(aipId, IdUtils.getRepresentationId(representation),
             createdFile);
         }
       } catch (AlreadyExistsException e) {
@@ -287,7 +292,7 @@ public class EARKSIPToAIPPluginUtils {
           File updatedFile = model.updateFile(aipId, representation.getId(), directoryPath, fileId, payload, true,
             notify);
           if (reportItem != null) {
-            reportItem.getUpdateInformation().addFileData(aipId, IdUtils.getRepresentationId(representation),
+            reportItem.getSipInformation().addFileData(aipId, IdUtils.getRepresentationId(representation),
               updatedFile);
           }
         } else

@@ -57,6 +57,7 @@ public class IngestStepsUtils {
 
     try {
       plugin.setParameterValues(mergedParams);
+      plugin.setSipInformation(bundle.getSipInformation());
       List<LiteOptionalWithCause> lites = LiteRODAObjectFactory.transformIntoLiteWithCause(bundle.getModel(),
         bundle.getAips());
       return plugin.execute(bundle.getIndex(), bundle.getModel(), bundle.getStorage(), lites);
