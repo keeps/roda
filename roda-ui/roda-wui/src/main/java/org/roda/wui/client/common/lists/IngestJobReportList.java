@@ -129,6 +129,10 @@ public class IngestJobReportList extends AsyncTableCell<IndexedReport> {
               ret = SafeHtmlUtils.fromSafeConstant(
                 "<span class='label-default'>" + messages.pluginStateMessage(PluginState.RUNNING) + "</span>");
               break;
+            case PARTIAL_SUCCESS:
+              ret = SafeHtmlUtils.fromSafeConstant(
+                  "<span class='label-warning'>" + messages.pluginStateMessage(PluginState.PARTIAL_SUCCESS) + "</span>");
+              break;
             case FAILURE:
             default:
               ret = SafeHtmlUtils.fromSafeConstant(

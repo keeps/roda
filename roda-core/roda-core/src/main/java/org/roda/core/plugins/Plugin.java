@@ -211,4 +211,8 @@ public interface Plugin<T extends IsRODAObject> {
    * Defines notifications to send when finishing job
    */
   List<JobNotification> getNotifications();
+
+  boolean isMandatory();
+
+  void setMandatory(boolean mandatory);
 }

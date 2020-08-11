@@ -181,6 +181,14 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     return getReportsFromBeingProcessed().keySet().stream().filter(id -> !id.equals(Report.NO_OUTCOME_OBJECT_ID)).collect(Collectors.toList()).size();
   }
 
+ /* public PluginState getPluginState(String sourceObjectId, String outcomeObjectId) {
+    if (allReports.containsKey(sourceObjectId)) {
+      if (allReports.get(sourceObjectId).containsKey(outcomeObjectId)) {
+        return allReports.get(sourceObjectId).get(outcomeObjectId).getPluginState();
+      }
+    }
+  }*/
+
   public void addReport(Report report, boolean reportIsAnReportItem) {
     if (reportIsAnReportItem) {
       reportsFromBeingProcessed.get(report.getSourceObjectId()).get(report.getOutcomeObjectId()).addReport(report,

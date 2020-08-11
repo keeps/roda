@@ -25,6 +25,7 @@ public abstract class AbstractPlugin<T extends IsRODAObject> implements Plugin<T
   private Map<String, String> parameterValues = new HashMap<>();
   private String version = null;
   private JobPluginInfo jobPluginInfo;
+  private boolean mandatory = true;
 
   @Override
   public void injectJobPluginInfo(JobPluginInfo jobPluginInfo) {
@@ -73,4 +74,11 @@ public abstract class AbstractPlugin<T extends IsRODAObject> implements Plugin<T
     return new ArrayList<>();
   }
 
+  public boolean isMandatory() {
+    return mandatory;
+  }
+
+  public void setMandatory(boolean mandatory) {
+    this.mandatory = mandatory;
+  }
 }

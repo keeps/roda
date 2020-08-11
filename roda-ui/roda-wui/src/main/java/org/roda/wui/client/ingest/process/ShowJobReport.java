@@ -217,8 +217,13 @@ public class ShowJobReport extends Composite {
       FlowPanel panelHeading = new FlowPanel();
       panelHeading.setStyleName("panel-heading");
       Label panelTitle = new Label(reportItem.getTitle());
+
+      HTML pluginMandatoryHTML = new HTML(HtmlSnippetUtils.getPluginMandatoryHTML(reportItem.getPluginIsMandatory()));
+      pluginMandatoryHTML.addStyleName("small");
+
       panelTitle.setStyleName("panel-title");
       panelHeading.add(panelTitle);
+      panelHeading.add(pluginMandatoryHTML);
       panel.add(panelHeading);
 
       FlowPanel panelBody = new FlowPanel();

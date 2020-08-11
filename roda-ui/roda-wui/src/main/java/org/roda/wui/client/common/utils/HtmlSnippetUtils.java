@@ -170,6 +170,10 @@ public class HtmlSnippetUtils {
         pluginStateHTML = SafeHtmlUtils
           .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
         break;
+      case PARTIAL_SUCCESS:
+        pluginStateHTML = SafeHtmlUtils
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
+        break;
       case FAILURE:
       default:
         pluginStateHTML = SafeHtmlUtils
@@ -177,6 +181,23 @@ public class HtmlSnippetUtils {
         break;
     }
     return pluginStateHTML;
+  }
+
+  public static SafeHtml getPluginMandatoryHTML(Boolean value) {
+    SafeHtml pluginMandatoryHTML;
+
+    if (value == null) {
+      return SafeHtmlUtils.EMPTY_SAFE_HTML;
+    }
+
+    if (value) {
+      pluginMandatoryHTML = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + "Mandatory" + CLOSE_SPAN);
+    } else {
+      pluginMandatoryHTML = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + "Optional" + CLOSE_SPAN);
+    }
+
+
+    return pluginMandatoryHTML;
   }
 
   public static SafeHtml getNotificationStateHTML(NotificationState state) {

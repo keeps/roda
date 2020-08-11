@@ -52,7 +52,7 @@ public class Report implements IsModelObject, HasId {
   private String pluginName = "";
   private String pluginVersion = "";
   private PluginState pluginState = PluginState.RUNNING;
-  private boolean pluginIsMandatory = true;
+  private Boolean pluginIsMandatory = true;
   private String pluginDetails = "";
   private boolean htmlPluginDetails = false;
 
@@ -93,7 +93,7 @@ public class Report implements IsModelObject, HasId {
     this.pluginName = report.getPluginName();
     this.pluginVersion = report.getPluginVersion();
     this.pluginState = report.getPluginState();
- //   this.pluginIsMandatory = report.isPluginIsMandatory();
+    this.pluginIsMandatory = report.getPluginIsMandatory();
     this.pluginDetails = report.getPluginDetails();
     this.htmlPluginDetails = report.isHtmlPluginDetails();
     this.reports = new ArrayList<>();
@@ -311,14 +311,13 @@ public class Report implements IsModelObject, HasId {
     this.pluginState = pluginState;
     return this;
   }
-  
-  public boolean isPluginIsMandatory() {
+
+  public Boolean getPluginIsMandatory() {
     return pluginIsMandatory;
   }
 
-  public Report setPluginIsMandatory(boolean pluginIsMandatory) {
+  public void setPluginIsMandatory(Boolean pluginIsMandatory) {
     this.pluginIsMandatory = pluginIsMandatory;
-    return this;
   }
 
   public String getPluginDetails() {
@@ -373,14 +372,23 @@ public class Report implements IsModelObject, HasId {
     if (totalSteps != 0) {
       completionPercentage = Math.round((100f / totalSteps) * stepsCompleted);
     }
-    setPlugin(report.getPlugin());
-    setPluginName(report.getPluginName());
-    setPluginVersion(report.getPluginVersion());
-    //setPluginIsMandatory(report.isPluginIsMandatory());
+
+    if ("".equals(getPlugin())) {
+      setPlugin(report.getPlugin());
+    }
+
+    if ("".equals(getPluginName())) {
+      setPluginName(report.getPluginName());
+    }
+
+    if ("".equals(getPluginVersion())) {
+      setPluginVersion(report.getPluginVersion());
+    }
+
     // TODO if report is about an optional plugin, and current state is not failure,
     // then mark current state as partial success
-    //setPluginState(calculatePluginState(getPluginState(), report.getPluginState(), report.isPluginIsMandatory()));
-    setPluginState(report.getPluginState());
+    setPluginState(calculatePluginState(getPluginState(), report.getPluginState(), report.getPluginIsMandatory()));
+    //setPluginState(report.getPluginState());
     if (!"".equals(report.getPluginDetails()) && !getPluginDetails().equals(report.getPluginDetails())) {
       setPluginDetails(
         (!"".equals(getPluginDetails()) ? getPluginDetails() + lineSeparator : "") + report.getPluginDetails());
@@ -395,16 +403,26 @@ public class Report implements IsModelObject, HasId {
   private PluginState calculatePluginState(PluginState currentPluginState, PluginState newPluginState,
     Boolean pluginIsMandatory) {
     if (pluginIsMandatory) {
-      return newPluginState;
-    } else {
-      if (currentPluginState.equals(PluginState.SUCCESS) && newPluginState.equals(PluginState.FAILURE)) {
-        return PluginState.PARTIAL_SUCCESS;
-      } else if (currentPluginState.equals(PluginState.SUCCESS) && newPluginState.equals(PluginState.SUCCESS)) {
-        return PluginState.SUCCESS;
+      if (currentPluginState.equals(PluginState.PARTIAL_SUCCESS)) {
+        switch (newPluginState) {
+          case RUNNING:
+          case SUCCESS:
+            return PluginState.PARTIAL_SUCCESS;
+          case FAILURE:
+            return PluginState.FAILURE;
+        }
       } else {
-        return PluginState.FAILURE;
+        return newPluginState;
+      }
+    } else {
+      if (!currentPluginState.equals(PluginState.FAILURE)) {
+        if (newPluginState.equals(PluginState.FAILURE)) {
+          return PluginState.PARTIAL_SUCCESS;
+        }
       }
     }
+
+    return newPluginState;
   }
 
   public List<Report> getReports() {

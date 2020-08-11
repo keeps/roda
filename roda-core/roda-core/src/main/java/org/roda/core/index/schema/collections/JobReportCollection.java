@@ -91,6 +91,8 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     fields.add(new Field(RodaConstants.JOB_REPORT_PLUGIN_STATE, Field.TYPE_STRING));
     fields
       .add(new Field(RodaConstants.JOB_REPORT_PLUGIN_DETAILS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
+    fields.add(
+      new Field(RodaConstants.JOB_REPORT_PLUGIN_IS_MANDATORY, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
     fields.add(new Field(RodaConstants.JOB_REPORT_HTML_PLUGIN_DETAILS, Field.TYPE_BOOLEAN).setIndexed(false)
       .setDocValues(false));
     fields.add(new Field(RodaConstants.JOB_REPORT_REPORTS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
@@ -135,6 +137,7 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     doc.addField(RodaConstants.JOB_REPORT_PLUGIN_VERSION, jobReport.getPluginVersion());
     doc.addField(RodaConstants.JOB_REPORT_PLUGIN_STATE, jobReport.getPluginState().toString());
     doc.addField(RodaConstants.JOB_REPORT_PLUGIN_DETAILS, jobReport.getPluginDetails());
+    doc.addField(RodaConstants.JOB_REPORT_PLUGIN_IS_MANDATORY, jobReport.getPluginIsMandatory());
     doc.addField(RodaConstants.JOB_REPORT_HTML_PLUGIN_DETAILS, jobReport.isHtmlPluginDetails());
     doc.addField(RodaConstants.JOB_REPORT_REPORTS, JsonUtils.getJsonFromObject(jobReport.getReports()));
     doc.addField(RodaConstants.JOB_REPORT_SOURCE_OBJECT_CLASS, jobReport.getSourceObjectClass());
@@ -165,7 +168,8 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
         SolrUtils.getObjectLabel(index, jobReport.getSourceObjectClass(), jobReport.getSourceObjectId()));
       preCalculatedFields.put(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_LABEL,
         SolrUtils.getObjectLabel(index, jobReport.getOutcomeObjectClass(), jobReport.getOutcomeObjectId()));
-      preCalculatedFields.put(RodaConstants.JOB_REPORT_JOB_PLUGIN_TYPE, SolrUtils.formatEnum(cachedJob.getPluginType()));
+      preCalculatedFields.put(RodaConstants.JOB_REPORT_JOB_PLUGIN_TYPE,
+        SolrUtils.formatEnum(cachedJob.getPluginType()));
 
       List<String> successfulPlugins = new ArrayList<>();
       List<String> unsuccessfulPlugins = new ArrayList<>();
@@ -222,6 +226,7 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     jobReport.setPluginVersion(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_VERSION), null));
     jobReport.setPluginState(
       PluginState.valueOf(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_STATE), null)));
+    jobReport.setPluginIsMandatory(SolrUtils.objectToBoolean(doc.get(RodaConstants.JOB_REPORT_PLUGIN_IS_MANDATORY), null));
     jobReport.setPluginDetails(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_DETAILS), null));
     jobReport
       .setHtmlPluginDetails(SolrUtils.objectToBoolean(doc.get(RodaConstants.JOB_REPORT_HTML_PLUGIN_DETAILS), false));

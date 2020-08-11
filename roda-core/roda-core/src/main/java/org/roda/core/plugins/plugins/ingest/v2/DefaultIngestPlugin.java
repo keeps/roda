@@ -29,6 +29,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.SIPUpdateInformation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -68,7 +69,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
   public static final String END_SUCCESS = "The ingest process has successfully ended.";
   public static final String END_FAILURE = "Failed to conclude the ingest process.";
-  public static final String END_PARTIAL = "The ingest process ended, however, some of the SIPs could not be successfully ingested.";
+  public static final String END_PARTIAL = "The ingest process ended, however, some optional ingest steps failed.";
   public static final String END_DESCRIPTION = "The ingest process has ended.";
   public static final PreservationEventType END_TYPE = PreservationEventType.INGEST_END;
 
@@ -286,13 +287,29 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         try {
           TransferredResource tr = index.retrieve(TransferredResource.class, transferredResourceId,
             Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH));
-          PluginHelper.createPluginEvent(this, entry.getKey(), model, index, tr, PluginState.SUCCESS, "", true,
-            eventDate, cachedJob);
+          final PluginState pluginState = jobPluginInfo.getAllReports().get(transferredResourceId).get(entry.getKey())
+            .getPluginState();
+          setPreservationSuccessMessage(calculatePreservationSuccessMessageFromPluginState(pluginState));
+
+          PluginHelper.createPluginEvent(this, entry.getKey(), model, index, tr, pluginState, "", true, eventDate,
+            cachedJob);
         } catch (NotFoundException | RequestNotValidException | GenericException | AuthorizationDeniedException
           | ValidationException | AlreadyExistsException e) {
           LOGGER.warn("Error creating ingest event", e);
         }
       }
+    }
+  }
+
+  private String calculatePreservationSuccessMessageFromPluginState(PluginState state) {
+    // returns END_SUCCESS message if plugin state is success
+    // returns END_PARTIAL message if plugin state is partial_success
+    switch (state) {
+      case PARTIAL_SUCCESS:
+        return END_PARTIAL;
+      case SUCCESS:
+      default:
+        return END_SUCCESS;
     }
   }
 

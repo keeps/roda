@@ -930,6 +930,7 @@ public final class RodaConstants {
   public static final String JOB_REPORT_PLUGIN_VERSION = "pluginVersion";
   public static final String JOB_REPORT_PLUGIN_STATE = "pluginState";
   public static final String JOB_REPORT_PLUGIN_DETAILS = "pluginDetails";
+  public static final String JOB_REPORT_PLUGIN_IS_MANDATORY = "pluginIsMandatory";
   public static final String JOB_REPORT_HTML_PLUGIN_DETAILS = "htmlPluginDetails";
   public static final String JOB_REPORT_REPORTS = "reports";
   public static final String JOB_REPORT_JOB_NAME = "jobName";

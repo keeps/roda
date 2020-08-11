@@ -45,6 +45,7 @@ public class IngestStepsUtils {
 
   public static Report executeStep(IngestStepBundle bundle, IngestStep step) {
     Plugin<AIP> plugin = RodaCoreFactory.getPluginManager().getPlugin(step.getPluginName(), AIP.class);
+    plugin.setMandatory(step.isMandatory());
     Map<String, String> mergedParams = new HashMap<>(bundle.getParameterValues());
     if (step.getParameters() != null) {
       mergedParams.putAll(step.getParameters());
@@ -91,6 +92,7 @@ public class IngestStepsUtils {
     List<String> transferredResourcesToRemoveFromjobPluginInfo = new ArrayList<>();
     boolean oneTransferredResourceAipFailed;
     IngestJobPluginInfo jobPluginInfo = bundle.getJobPluginInfo();
+
       for (Map.Entry<String, Map<String, Report>> transferredResourcejobPluginInfoEntry : jobPluginInfo
           .getReportsFromBeingProcessed().entrySet()) {
         String transferredResourceId = transferredResourcejobPluginInfoEntry.getKey();

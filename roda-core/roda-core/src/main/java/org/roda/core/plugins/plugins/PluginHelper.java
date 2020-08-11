@@ -391,6 +391,7 @@ public final class PluginHelper {
     reportItem.setPlugin(plugin.getClass().getName());
     reportItem.setPluginName(plugin.getName());
     reportItem.setPluginVersion(plugin.getVersion());
+    reportItem.setPluginIsMandatory(plugin.isMandatory());
     reportItem.setTotalSteps(getTotalStepsFromParameters(plugin));
 
     return reportItem;
@@ -1218,7 +1219,8 @@ public final class PluginHelper {
     }
 
     String id = IdUtils.createPreservationMetadataId(PreservationMetadataType.EVENT);
-    String outcomeDetailNote = (outcome == PluginState.SUCCESS) ? plugin.getPreservationEventSuccessMessage()
+    String outcomeDetailNote = (outcome == PluginState.SUCCESS || outcome == PluginState.PARTIAL_SUCCESS)
+      ? plugin.getPreservationEventSuccessMessage()
       : plugin.getPreservationEventFailureMessage();
     ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, startDate,
       plugin.getPreservationEventType().toString(), plugin.getPreservationEventDescription(), sources, outcomes,
