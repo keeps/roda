@@ -88,7 +88,7 @@ public class JobStats implements Serializable {
   }
 
   public void incrementObjectsProcessed(PluginState state) {
-    if (PluginState.SUCCESS.equals(state)) {
+    if (PluginState.SUCCESS.equals(state) || PluginState.SKIPPED.equals(state)) {
       incrementObjectsProcessedWithSuccess();
     } else {
       incrementObjectsProcessedWithFailure();

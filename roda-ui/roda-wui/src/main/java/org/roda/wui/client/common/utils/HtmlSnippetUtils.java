@@ -171,6 +171,7 @@ public class HtmlSnippetUtils {
           .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
         break;
       case PARTIAL_SUCCESS:
+      case SKIPPED:
         pluginStateHTML = SafeHtmlUtils
             .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
         break;
