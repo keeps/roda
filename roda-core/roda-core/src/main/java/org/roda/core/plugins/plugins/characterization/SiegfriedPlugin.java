@@ -117,7 +117,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
         List<LinkingIdentifier> sources = new ArrayList<>();
         Map<String, Map<String, List<String>>> updatedData = getSipInformation().getUpdatedData();
 
-        if (getSipInformation().hasUpdatedData() || !updatedData.containsKey(aip.getId())) {
+        if (!getSipInformation().hasUpdatedData() || !updatedData.containsKey(aip.getId())) {
           try {
             for (Representation representation : aip.getRepresentations()) {
               LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
