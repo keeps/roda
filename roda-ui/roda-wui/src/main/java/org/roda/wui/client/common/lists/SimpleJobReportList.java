@@ -35,7 +35,6 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Label;
 
 import config.i18n.client.ClientMessages;
 
@@ -50,30 +49,39 @@ public class SimpleJobReportList extends AsyncTableCell<IndexedReport> {
 
   private TooltipTextColumn<IndexedReport> sourceColumn;
   private TooltipTextColumn<IndexedReport> outcomeColumn;
+  private TooltipTextColumn<IndexedReport> pluginColumn;
   private Column<IndexedReport, Date> updatedDateColumn;
   private TextColumn<IndexedReport> lastPluginRunColumn;
   private Column<IndexedReport, SafeHtml> lastPluginRunStateColumn;
   private TextColumn<IndexedReport> completionStatusColumn;
+  private TextColumn<IndexedReport> failedCountColumn;
 
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.JOB_REPORT_ID, RodaConstants.JOB_REPORT_JOB_ID, RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_IDS,
     RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID, RodaConstants.JOB_REPORT_SOURCE_OBJECT_CLASS,
     RodaConstants.JOB_REPORT_SOURCE_OBJECT_LABEL, RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_NAME,
     RodaConstants.JOB_REPORT_OUTCOME_OBJECT_LABEL, RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID,
-    RodaConstants.JOB_REPORT_DATE_UPDATED, RodaConstants.JOB_REPORT_PLUGIN, RodaConstants.JOB_REPORT_PLUGIN_VERSION,
-    RodaConstants.JOB_REPORT_PLUGIN_STATE, RodaConstants.JOB_REPORT_STEPS_COMPLETED,
-    RodaConstants.JOB_REPORT_TOTAL_STEPS, RodaConstants.JOB_REPORT_COMPLETION_PERCENTAGE);
+    RodaConstants.JOB_REPORT_DATE_UPDATED, RodaConstants.JOB_REPORT_PLUGIN, RodaConstants.JOB_REPORT_PLUGIN_NAME,
+    RodaConstants.JOB_REPORT_PLUGIN_VERSION, RodaConstants.JOB_REPORT_PLUGIN_STATE,
+    RodaConstants.JOB_REPORT_STEPS_COMPLETED, RodaConstants.JOB_REPORT_TOTAL_STEPS,
+    RodaConstants.JOB_REPORT_COMPLETION_PERCENTAGE);
 
-  private final Map<String, PluginInfo> pluginsInfo;
+  private Map<String, PluginInfo> pluginsInfo;
+  private boolean insideJob = false;
+  private boolean jobRunning = false;
+  private boolean jobComplex = false;
 
   public SimpleJobReportList() {
     super();
     this.pluginsInfo = Collections.emptyMap();
   }
 
-  public SimpleJobReportList(Map<String, PluginInfo> pluginsInfo) {
+  public SimpleJobReportList(Map<String, PluginInfo> pluginsInfo, boolean insideJob, boolean jobRunning, boolean jobComplex) {
     super();
     this.pluginsInfo = pluginsInfo;
+    this.insideJob = insideJob;
+    this.jobRunning = jobRunning;
+    this.jobComplex = jobComplex;
   }
 
   @Override
@@ -85,7 +93,6 @@ public class SimpleJobReportList extends AsyncTableCell<IndexedReport> {
   protected void configureDisplay(CellTable<IndexedReport> display) {
 
     sourceColumn = new TooltipTextColumn<IndexedReport>() {
-
       @Override
       public String getValue(IndexedReport report) {
         String value = "";
@@ -98,7 +105,6 @@ public class SimpleJobReportList extends AsyncTableCell<IndexedReport> {
     };
 
     outcomeColumn = new TooltipTextColumn<IndexedReport>() {
-
       @Override
       public String getValue(IndexedReport report) {
         String value = "";
@@ -107,6 +113,22 @@ public class SimpleJobReportList extends AsyncTableCell<IndexedReport> {
             value = report.getOutcomeObjectLabel() + " (" + report.getOutcomeObjectId() + ")";
           } else {
             value = report.getOutcomeObjectId();
+          }
+        }
+        return value;
+      }
+    };
+
+    pluginColumn = new TooltipTextColumn<IndexedReport>() {
+      @Override
+      public String getValue(IndexedReport report) {
+        String value = "";
+        if (report != null) {
+          if (StringUtils.isNotBlank(report.getPluginName())) {
+            value = messages.pluginLabel(report.getPluginName());
+            if (StringUtils.isNotBlank(report.getPluginVersion())) {
+              value = messages.pluginLabelWithVersion(report.getPluginName(), report.getPluginVersion());
+            }
           }
         }
         return value;
@@ -122,7 +144,6 @@ public class SimpleJobReportList extends AsyncTableCell<IndexedReport> {
     };
 
     lastPluginRunColumn = new TextColumn<IndexedReport>() {
-
       @Override
       public String getValue(IndexedReport job) {
         String value = null;
@@ -164,6 +185,10 @@ public class SimpleJobReportList extends AsyncTableCell<IndexedReport> {
               ret = SafeHtmlUtils.fromSafeConstant(
                 "<span class='label-default'>" + messages.pluginStateMessage(PluginState.RUNNING) + "</span>");
               break;
+            case PARTIAL_SUCCESS:
+              ret = SafeHtmlUtils.fromSafeConstant(
+                "<span class='label-warning'>" + messages.pluginStateMessage(PluginState.PARTIAL_SUCCESS) + "</span>");
+              break;
             case FAILURE:
             default:
               ret = SafeHtmlUtils.fromSafeConstant(
@@ -176,7 +201,6 @@ public class SimpleJobReportList extends AsyncTableCell<IndexedReport> {
     };
 
     completionStatusColumn = new TextColumn<IndexedReport>() {
-
       @Override
       public String getValue(IndexedReport report) {
         String value = "";
@@ -189,19 +213,41 @@ public class SimpleJobReportList extends AsyncTableCell<IndexedReport> {
       }
     };
 
+    failedCountColumn = new TextColumn<IndexedReport>() {
+      @Override
+      public String getValue(IndexedReport report) {
+        String value = "";
+        if (report != null) {
+          value = Integer.toString(report.getUnsuccessfulPluginsCounter());
+        }
+
+        return value;
+      }
+    };
+
     sourceColumn.setSortable(true);
     outcomeColumn.setSortable(true);
+    pluginColumn.setSortable(true);
     updatedDateColumn.setSortable(true);
     lastPluginRunColumn.setSortable(true);
     lastPluginRunStateColumn.setSortable(true);
     completionStatusColumn.setSortable(false);
+    failedCountColumn.setSortable(true);
 
     addColumn(sourceColumn, messages.reportSource(), true, false);
     addColumn(outcomeColumn, messages.reportOutcome(), true, false);
+    if (!insideJob) {
+      addColumn(pluginColumn, messages.jobPlugin(), true, false);
+    }
     addColumn(updatedDateColumn, messages.reportLastUpdatedAt(), true, false, 11);
-    addColumn(lastPluginRunColumn, messages.reportLastRunTask(), true, false);
     addColumn(lastPluginRunStateColumn, messages.reportStatus(), true, false, 8);
-    addColumn(completionStatusColumn, messages.reportProgress(), true, false, 8);
+    if (jobComplex && jobRunning) {
+      addColumn(completionStatusColumn, messages.reportProgress(), true, false, 8);
+      if (insideJob) {
+        addColumn(lastPluginRunColumn, messages.reportLastRunTask(), true, false);
+        addColumn(failedCountColumn, messages.reportFailed(), true, false, 6);
+      }
+    }
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(updatedDateColumn, false));
@@ -212,9 +258,17 @@ public class SimpleJobReportList extends AsyncTableCell<IndexedReport> {
     Map<Column<IndexedReport, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
     columnSortingKeyMap.put(sourceColumn, Arrays.asList(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID));
     columnSortingKeyMap.put(outcomeColumn, Arrays.asList(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID));
+    if (!insideJob) {
+      columnSortingKeyMap.put(pluginColumn, Arrays.asList(RodaConstants.JOB_REPORT_PLUGIN_NAME));
+    }
     columnSortingKeyMap.put(updatedDateColumn, Arrays.asList(RodaConstants.JOB_REPORT_DATE_UPDATED));
-    columnSortingKeyMap.put(lastPluginRunColumn, Arrays.asList(RodaConstants.JOB_REPORT_PLUGIN));
+    if (insideJob) {
+      columnSortingKeyMap.put(lastPluginRunColumn, Arrays.asList(RodaConstants.JOB_REPORT_PLUGIN));
+    }
     columnSortingKeyMap.put(lastPluginRunStateColumn, Arrays.asList(RodaConstants.JOB_REPORT_PLUGIN_STATE));
+    if (insideJob) {
+      columnSortingKeyMap.put(failedCountColumn, Arrays.asList(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS_COUNTER));
+    }
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 }

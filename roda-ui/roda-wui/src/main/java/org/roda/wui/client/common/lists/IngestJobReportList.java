@@ -33,7 +33,6 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Label;
 
 import config.i18n.client.ClientMessages;
 
@@ -49,6 +48,7 @@ public class IngestJobReportList extends AsyncTableCell<IndexedReport> {
   private TooltipTextColumn<IndexedReport> sourceObjectColumn;
   private TooltipTextColumn<IndexedReport> outcomeObjectColumn;
   private Column<IndexedReport, Date> updatedDateColumn;
+  private TextColumn<IndexedReport> lastPluginRunColumn;
   private Column<IndexedReport, SafeHtml> lastPluginRunStateColumn;
   private TextColumn<IndexedReport> completionStatusColumn;
   private TextColumn<IndexedReport> failedCountColumn;
@@ -61,13 +61,25 @@ public class IngestJobReportList extends AsyncTableCell<IndexedReport> {
     RodaConstants.JOB_REPORT_DATE_UPDATED, RodaConstants.JOB_REPORT_PLUGIN, RodaConstants.JOB_REPORT_PLUGIN_VERSION,
     RodaConstants.JOB_REPORT_PLUGIN_STATE, RodaConstants.JOB_REPORT_STEPS_COMPLETED,
     RodaConstants.JOB_REPORT_TOTAL_STEPS, RodaConstants.JOB_REPORT_COMPLETION_PERCENTAGE,
-    RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS);
+    RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS, RodaConstants.JOB_REPORT_REPORTS);
+
+  private boolean insideJob = false;
+  private boolean jobRunning = false;
+  private boolean jobComplex = false;
+
+  public IngestJobReportList() {
+  }
+
+  public IngestJobReportList(boolean insideJob, boolean jobRunning, boolean jobComplex) {
+    this.insideJob = insideJob;
+    this.jobRunning = jobRunning;
+    this.jobComplex = jobComplex;
+  }
 
   @Override
   protected void adjustOptions(AsyncTableCellOptions<IndexedReport> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
-
 
   @Override
   protected void configureDisplay(CellTable<IndexedReport> display) {
@@ -91,7 +103,6 @@ public class IngestJobReportList extends AsyncTableCell<IndexedReport> {
     };
 
     outcomeObjectColumn = new TooltipTextColumn<IndexedReport>() {
-
       @Override
       public String getValue(IndexedReport report) {
         String value = "";
@@ -115,6 +126,19 @@ public class IngestJobReportList extends AsyncTableCell<IndexedReport> {
       }
     };
 
+    lastPluginRunColumn = new TextColumn<IndexedReport>() {
+      @Override
+      public String getValue(IndexedReport report) {
+        if (report != null) {
+          if (report.getLastRunPlugin() != null) {
+            return messages.pluginLabelWithVersion(report.getLastRunPlugin().getPluginName(),
+              report.getLastRunPlugin().getPluginVersion());
+          }
+        }
+        return "";
+      }
+    };
+
     lastPluginRunStateColumn = new Column<IndexedReport, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(IndexedReport report) {
@@ -131,7 +155,7 @@ public class IngestJobReportList extends AsyncTableCell<IndexedReport> {
               break;
             case PARTIAL_SUCCESS:
               ret = SafeHtmlUtils.fromSafeConstant(
-                  "<span class='label-warning'>" + messages.pluginStateMessage(PluginState.PARTIAL_SUCCESS) + "</span>");
+                "<span class='label-warning'>" + messages.pluginStateMessage(PluginState.PARTIAL_SUCCESS) + "</span>");
               break;
             case FAILURE:
             default:
@@ -146,7 +170,6 @@ public class IngestJobReportList extends AsyncTableCell<IndexedReport> {
     };
 
     completionStatusColumn = new TextColumn<IndexedReport>() {
-
       @Override
       public String getValue(IndexedReport report) {
         String value = "";
@@ -160,7 +183,6 @@ public class IngestJobReportList extends AsyncTableCell<IndexedReport> {
     };
 
     failedCountColumn = new TextColumn<IndexedReport>() {
-
       @Override
       public String getValue(IndexedReport report) {
         String value = "";
@@ -183,8 +205,13 @@ public class IngestJobReportList extends AsyncTableCell<IndexedReport> {
     addColumn(outcomeObjectColumn, messages.showAIPExtended(), true, false);
     addColumn(updatedDateColumn, messages.reportLastUpdatedAt(), true, false, 11);
     addColumn(lastPluginRunStateColumn, messages.reportStatus(), true, false, 8);
-    addColumn(completionStatusColumn, messages.reportProgress(), true, false, 8);
-    addColumn(failedCountColumn, messages.reportFailed(), true, false, 6);
+    if (jobComplex && jobRunning) {
+      addColumn(completionStatusColumn, messages.reportProgress(), true, false, 8);
+      if (insideJob) {
+        addColumn(lastPluginRunColumn, messages.reportLastRunTask(), true, false);
+        addColumn(failedCountColumn, messages.reportFailed(), true, false, 6);
+      }
+    }
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(updatedDateColumn, false));
@@ -197,7 +224,9 @@ public class IngestJobReportList extends AsyncTableCell<IndexedReport> {
     columnSortingKeyMap.put(outcomeObjectColumn, Arrays.asList(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID));
     columnSortingKeyMap.put(updatedDateColumn, Arrays.asList(RodaConstants.JOB_REPORT_DATE_UPDATED));
     columnSortingKeyMap.put(lastPluginRunStateColumn, Arrays.asList(RodaConstants.JOB_REPORT_PLUGIN_STATE));
-    columnSortingKeyMap.put(failedCountColumn, Arrays.asList(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS_COUNTER));
+    if (insideJob) {
+      columnSortingKeyMap.put(failedCountColumn, Arrays.asList(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS_COUNTER));
+    }
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 

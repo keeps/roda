@@ -10,6 +10,7 @@ package org.roda.wui.client.search;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.wui.client.common.actions.JobActions;
 import org.roda.wui.client.common.lists.IngestJobReportList;
 import org.roda.wui.client.common.lists.JobList;
@@ -17,10 +18,11 @@ import org.roda.wui.client.common.lists.SimpleJobReportList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
+import org.roda.wui.common.client.HistoryResolver;
 
 import com.google.gwt.user.client.ui.SimplePanel;
-import org.roda.wui.client.process.CreateDefaultJob;
-import org.roda.wui.common.client.HistoryResolver;
+
+import java.util.Collections;
 
 public class JobSearch extends SimplePanel {
   public JobSearch(String jobsListId, String jobReportsListId, Filter defaultJobFilter, Filter defaultJobReportFilter,

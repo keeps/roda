@@ -385,8 +385,6 @@ public class Report implements IsModelObject, HasId {
       setPluginVersion(report.getPluginVersion());
     }
 
-    // TODO if report is about an optional plugin, and current state is not failure,
-    // then mark current state as partial success
     setPluginState(calculatePluginState(getPluginState(), report.getPluginState(), report.getPluginIsMandatory()));
     //setPluginState(report.getPluginState());
     if (!"".equals(report.getPluginDetails()) && !getPluginDetails().equals(report.getPluginDetails())) {
@@ -440,6 +438,13 @@ public class Report implements IsModelObject, HasId {
 
   public String getLineSeparator() {
     return lineSeparator;
+  }
+
+  @JsonIgnore
+  public Report getLastRunPlugin() {
+    int size = reports.size();
+    if (size == 0) return null;
+    return reports.get(size-1);
   }
 
   @Override

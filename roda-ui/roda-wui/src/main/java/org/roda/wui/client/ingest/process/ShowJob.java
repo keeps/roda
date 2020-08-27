@@ -95,8 +95,7 @@ import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.ClientMessages;
 
 /**
- * @author Luis Faria
- * 
+ * @author Luis Faria public SimpleJob
  */
 public class ShowJob extends Composite {
 
@@ -178,7 +177,7 @@ public class ShowJob extends Composite {
     RodaConstants.AIP_TITLE);
 
   private Job job;
-  private final Map<String, PluginInfo> pluginsInfo;
+  private Map<String, PluginInfo> pluginsInfo;
 
   @UiField
   Label name;
@@ -247,8 +246,8 @@ public class ShowJob extends Composite {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getUUID()));
     filter.add(extraReportFilterParameters);
 
-    AsyncTableCellOptions<IndexedReport> jobReportListBuilderOptions = new AsyncTableCellOptions<>(
-      IndexedReport.class, "ShowJob_reports");
+    AsyncTableCellOptions<IndexedReport> jobReportListBuilderOptions = new AsyncTableCellOptions<>(IndexedReport.class,
+      "ShowJob_reports");
     jobReportListBuilderOptions.withRedirectOnSingleResult(!extraReportFilterParameters.isEmpty());
     jobReportListBuilderOptions.withFilter(filter);
     jobReportListBuilderOptions.withSummary(messages.reportList());
@@ -264,9 +263,11 @@ public class ShowJob extends Composite {
 
     ListBuilder<IndexedReport> jobReportListBuilder;
     if (isIngest) {
-      jobReportListBuilder = new ListBuilder<>(() -> new IngestJobReportList(), jobReportListBuilderOptions);
+      jobReportListBuilder = new ListBuilder<>(() -> new IngestJobReportList(true, isJobRunning(), isJobComplex()),
+        jobReportListBuilderOptions);
     } else {
-      jobReportListBuilder = new ListBuilder<>(() -> new SimpleJobReportList(pluginsInfo), jobReportListBuilderOptions);
+      jobReportListBuilder = new ListBuilder<>(() -> new SimpleJobReportList(this.pluginsInfo, true, isJobRunning(), isJobComplex()),
+        jobReportListBuilderOptions);
     }
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(jobReportListBuilder);
@@ -373,6 +374,20 @@ public class ShowJob extends Composite {
     return job != null && job.isInFinalState();
   }
 
+  private boolean isJobComplex() {
+    String value = job.getPluginParameters().get(RodaConstants.PLUGIN_PARAMS_TOTAL_STEPS);
+    int totalSteps = 1;
+    if (value != null) {
+      try {
+        totalSteps = Integer.parseInt(value);
+      } catch (NumberFormatException e) {
+        // return default value
+      }
+    }
+
+    return totalSteps > 1;
+  }
+
   private void showIngestSourceObjects(final SelectedItems<?> selected) {
     if (selected != null) {
       selectedList.clear();
@@ -433,7 +448,8 @@ public class ShowJob extends Composite {
         List<String> ids = ((SelectedItemsList<?>) selected).getIds();
 
         if (ids.isEmpty()) {
-          Label noSourceLabel = new Label(messages.noItemsToDisplay(messages.someOfAObject(selected.getSelectedClass())));
+          Label noSourceLabel = new Label(
+            messages.noItemsToDisplay(messages.someOfAObject(selected.getSelectedClass())));
           selectedListPanel.add(noSourceLabel);
         } else {
           final Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.INDEX_UUID, job.getUUID()));
@@ -553,6 +569,30 @@ public class ShowJob extends Composite {
     refreshSidebar();
 
     scheduleUpdateStatus();
+
+    refreshJobPluginInfo();
+  }
+
+  private void refreshJobPluginInfo() {
+    BrowserService.Util.getInstance().retrieveJobBundle(job.getId(), new ArrayList<>(), new AsyncCallback<JobBundle>() {
+      @Override
+      public void onFailure(Throwable caught) {
+        if (caught instanceof NotFoundException) {
+          Toast.showError(messages.notFoundError(), messages.jobNotFound());
+          HistoryUtils.newHistory(Process.RESOLVER);
+        } else {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
+      }
+
+      @Override
+      public void onSuccess(JobBundle jobBundle) {
+        pluginsInfo = new HashMap<>();
+        for (PluginInfo pluginInfo : jobBundle.getPluginsInfo()) {
+          pluginsInfo.put(pluginInfo.getId(), pluginInfo);
+        }
+      }
+    });
   }
 
   private Timer autoUpdateTimer = null;
