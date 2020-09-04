@@ -421,6 +421,30 @@ public final class PluginHelper {
   }
 
   public static <T extends IsRODAObject> void createJobReport(Plugin<T> plugin, ModelService model, Report reportItem,
+    Job cachedJob, List<TransferredResource> resources) {
+    String jobId = cachedJob.getId();
+    for (TransferredResource resource : resources) {
+      Report report = new Report(reportItem);
+      report.injectLineSeparator(System.lineSeparator());
+      report.setJobId(jobId);
+      report.setId(IdUtils.getJobReportId(jobId, resource.getUUID(), reportItem.getOutcomeObjectId()));
+      report.setSourceAndOutcomeObjectId(resource.getUUID(), reportItem.getOutcomeObjectId());
+
+      if (reportItem.getTotalSteps() != 0) {
+        report.setTotalSteps(reportItem.getTotalSteps());
+      } else {
+        report.setTotalSteps(getTotalStepsFromParameters(plugin));
+      }
+
+      try {
+        model.createOrUpdateJobReport(report, cachedJob);
+      } catch (GenericException | AuthorizationDeniedException e) {
+        LOGGER.error("Error creating Job Report", e);
+      }
+    }
+  }
+
+  public static <T extends IsRODAObject> void createJobReport(Plugin<T> plugin, ModelService model, Report reportItem,
     Job cachedJob) {
     String jobId = cachedJob.getId();
     Report report = new Report(reportItem);
@@ -471,6 +495,48 @@ public final class PluginHelper {
         LOGGER.error("Error while updating Job Report", e);
       }
     }
+  }
+
+  public static <T extends IsRODAObject> void mergeJobReportNoOutcome(Plugin<T> plugin, ModelService model,
+    Report reportItem, Job cachedJob) {
+    String jobId = getJobId(plugin);
+    try {
+      // fetch NO_OUTCOME_ID report
+      Report noOutcomeIDReport = model.retrieveJobReport(jobId, reportItem.getSourceObjectId(),
+        Report.NO_OUTCOME_OBJECT_ID);
+
+      // copy the meta plugin information to a new report
+      Report report = new Report(noOutcomeIDReport);
+      report.setSourceAndOutcomeObjectId(reportItem.getSourceObjectId(), reportItem.getOutcomeObjectId());
+      report.setSourceAndOutcomeObjectClass(reportItem.getSourceObjectClass(), reportItem.getOutcomeObjectClass());
+      report.setSourceObjectOriginalName(reportItem.getSourceObjectOriginalName());
+      report.setSourceObjectOriginalIds(reportItem.getSourceObjectOriginalIds());
+      // add the reportItem to the new copied report
+      report.setReports(Collections.singletonList(reportItem));
+      // save the new copied report
+      model.createOrUpdateJobReport(report, cachedJob);
+    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+      LOGGER.error("Error while updating Job Report", e);
+    }
+  }
+
+  public static <T extends IsRODAObject> void updateJobReportMetaPluginInformation(Plugin<T> plugin, ModelService model,
+    Report metaPluginReport, Job cachedJob, IngestJobPluginInfo jobPluginInfo) {
+
+    jobPluginInfo.getAllReports().keySet().forEach((sourceObjectId) -> {
+      jobPluginInfo.getAllReports().get(sourceObjectId).keySet().forEach((outcomeObjectId) -> {
+        try {
+          Report jobReport = model.retrieveJobReport(cachedJob.getId(), sourceObjectId, outcomeObjectId);
+          jobReport.setTitle(metaPluginReport.getTitle());
+          jobReport.setPlugin(metaPluginReport.getPlugin());
+          jobReport.setPluginName(metaPluginReport.getPluginName());
+          jobReport.setPluginVersion(metaPluginReport.getPluginVersion());
+          model.createOrUpdateJobReport(jobReport, cachedJob);
+        } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+          LOGGER.error("Error while updating Job Report", e);
+        }
+      });
+    });
   }
 
   public static <T extends IsRODAObject> void updatePartialJobReport(Plugin<T> plugin, ModelService model,

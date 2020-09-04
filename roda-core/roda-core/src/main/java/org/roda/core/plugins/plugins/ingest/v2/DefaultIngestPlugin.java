@@ -142,6 +142,8 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       final IngestJobPluginInfo jobPluginInfo = (IngestJobPluginInfo) outerJobPluginInfo;
       PluginHelper.updateJobInformationAsync(this, jobPluginInfo.setTotalSteps(getTotalSteps()));
 
+      // PluginHelper.createJobReport(this, model, report, cachedJob, resources);
+
       // 0) process "parent id" and "force parent id" info. (because we might
       // need to fallback to default values)
       String parentId = PluginHelper.getStringFromParameters(this,
@@ -157,6 +159,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       IngestStepsUtils.mergeReports(jobPluginInfo, pluginReport);
       final SIPInformation sipInformation = pluginReport.getSipInformation();
       final List<AIP> aips = getAIPsFromReports(model, index, jobPluginInfo);
+      PluginHelper.updateJobReportMetaPluginInformation(this, model, report, cachedJob, jobPluginInfo);
       PluginHelper.updateJobInformationAsync(this, jobPluginInfo.incrementStepsCompletedByOne());
 
       // this event can only be created after AIPs exist and that's why it is
@@ -168,7 +171,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       for (IngestStep step : steps) {
         IngestStepBundle bundle = new IngestStepBundle(this, index, model, storage, jobPluginInfo,
           getPluginParameter(step.getParameterName()), getParameterValues(), resources, aips, cachedJob,
-            sipInformation);
+          sipInformation);
         step.execute(bundle);
       }
 
