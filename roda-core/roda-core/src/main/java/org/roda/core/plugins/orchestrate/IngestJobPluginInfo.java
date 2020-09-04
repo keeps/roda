@@ -281,6 +281,17 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     }
   }
 
+  public void updateMetaPluginInformation(Report metaReport) {
+    this.getAllReports().forEach((k, v) -> {
+      v.forEach((id, report) -> {
+        report.setTitle(metaReport.getTitle());
+        report.setPlugin(metaReport.getPlugin());
+        report.setPluginName(metaReport.getPluginName());
+        report.setPluginVersion(metaReport.getPluginVersion());
+      });
+    });
+  }
+
   public void replaceTransferredResourceId(String oldTransferredResourceId, String newTransferredResourceId) {
     Map<String, Report> aipReports = allReports.remove(oldTransferredResourceId);
     allReports.put(newTransferredResourceId, aipReports);
