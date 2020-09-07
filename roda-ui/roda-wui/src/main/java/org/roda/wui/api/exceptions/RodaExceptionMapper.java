@@ -18,6 +18,7 @@ import org.glassfish.jersey.server.ContainerRequest;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.NotImplementedException;
@@ -63,9 +64,9 @@ public class RodaExceptionMapper implements ExceptionMapper<RODAException> {
     } else if (e instanceof NotFoundException) {
       responseBuilder = Response.status(Status.NOT_FOUND)
         .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, message));
-    } else if (e instanceof AlreadyExistsException || e instanceof JobAlreadyStartedException) {
+    } else if (e instanceof AlreadyExistsException || e instanceof JobAlreadyStartedException || e instanceof IsStillUpdatingException) {
       responseBuilder = Response.status(Status.CONFLICT)
-        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, message));
+          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, message));
     } else {
       responseBuilder = Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()));
     }

@@ -266,7 +266,8 @@ public class TransferredResource {
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
   @ApiOperation(value = "Reindex resource", notes = "Reindex resource.", response = Void.class)
   @ApiResponses(value = {@ApiResponse(code = 204, message = "OK", response = Void.class),
-    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class),
+    @ApiResponse(code = 409, message = "Still updating", response = ApiResponseMessage.class)})
 
   public Response reindexResources(
     @ApiParam(value = "The path of the resource") @QueryParam("transferred_resource_path") String path,

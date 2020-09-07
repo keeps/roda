@@ -251,7 +251,7 @@ public class TransferredResourcesScanner {
         }
       } else {
         LOGGER.warn("Could not update transferred resources because it is still updating");
-        throw new IsStillUpdatingException();
+        throw new IsStillUpdatingException("Could not update transferred resources because it is still updating");
       }
     }else{
         LOGGER.warn("Request trying to access folders outside the transfer resources folder ({})", folderRelativePath.get());
