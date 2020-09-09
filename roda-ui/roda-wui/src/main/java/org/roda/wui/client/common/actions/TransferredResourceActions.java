@@ -360,8 +360,9 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
       public void onFailure(Throwable caught) {
         if (caught instanceof IsStillUpdatingException) {
           Toast.showInfo(messages.dialogRefresh(), messages.updateIsCurrentlyRunning());
+        } else {
+          super.onFailure(caught);
         }
-        super.onFailure(caught);
       }
 
       @Override
