@@ -281,7 +281,7 @@ public class TransferredResource {
 
     // delegate action to controller
     org.roda.core.data.v2.ip.TransferredResource resource = Browser.reindexTransferredResource(user, path);
-    return Response.ok(resource, mediaType).build();
+    return Response.ok(resource, mediaType).status(Status.NO_CONTENT).build();
   }
 
 }
