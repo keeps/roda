@@ -16,7 +16,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Iterator;
@@ -113,21 +115,28 @@ public final class ZipUtility {
     boolean filesWithAbsolutePath) throws IOException {
     ZipInputStream zipInputStream = new ZipInputStream(inputStream);
     ZipEntry zipEntry = zipInputStream.getNextEntry();
+    String canonicalDestinationDirPath = outputDir.getCanonicalPath();
 
     if (zipEntry == null) {
       zipInputStream.close();
       throw new IOException("No files inside ZIP");
     } else {
-
       List<File> extractedFiles = new ArrayList<>();
 
       while (zipEntry != null) {
-
         // for each entry to be extracted
         String entryName = zipEntry.getName();
         LOGGER.debug("Extracting {}", entryName);
 
         File newFile = new File(outputDir, entryName);
+        String canonicalDestinationFile = newFile.getCanonicalPath();
+        if (!canonicalDestinationFile.startsWith(canonicalDestinationDirPath + File.separator)) {
+          LOGGER.debug("Removing already extracted files due to suspicious zip file");
+          for (File f : extractedFiles) {
+            Files.delete(Paths.get(f.getCanonicalPath()));
+          }
+          throw new IOException("Detected a ZIP entry outside of the target dir: " + entryName);
+        }
 
         if (filesWithAbsolutePath) {
           extractedFiles.add(newFile);
