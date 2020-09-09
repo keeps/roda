@@ -137,7 +137,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
           }
         } else {
           Map<String, List<String>> aipData = updatedData.get(aip.getId());
-          PluginState state = PluginState.SUCCESS;
+          PluginState state = PluginState.SKIPPED;
 
           if (aipData.containsKey(RodaConstants.RODA_OBJECT_REPRESENTATION)) {
             List<Representation> filteredList = aip.getRepresentations().stream()
@@ -150,6 +150,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
                 LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
                 sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation));
                 model.notifyRepresentationUpdated(representation).failOnError();
+                state = PluginState.SUCCESS;
               } catch (RODAException e) {
                 state = PluginState.FAILURE;
                 LOGGER.error("Error running Siegfried " + aip.getId(), e);
