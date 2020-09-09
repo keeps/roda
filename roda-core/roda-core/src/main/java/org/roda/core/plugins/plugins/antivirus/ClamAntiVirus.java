@@ -166,9 +166,9 @@ public class ClamAntiVirus implements AntiVirus {
       .getString("core.plugins.internal.virus_check.clamav.get_version", "clamscan --version");
     List<String> command = new ArrayList<>(Arrays.asList(clamavGetVersion.split(" ")));
     try {
-      String executeOutput = CommandUtility.execute(command);
+      String executeOutput = CommandUtility.execute(command,false);
       if (executeOutput.contains("\n")) {
-        return executeOutput.split("\\n")[0];
+        return executeOutput.split("\n")[0];
       }
       return executeOutput;
     } catch (CommandException e) {
