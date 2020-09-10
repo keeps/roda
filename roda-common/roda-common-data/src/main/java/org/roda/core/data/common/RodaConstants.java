@@ -160,7 +160,6 @@ public final class RodaConstants {
   public static final String RODA_OBJECT_USER = "user";
   public static final String RODA_OBJECT_GROUP = "group";
   public static final String RODA_OBJECT_DESCRIPTIVE_METADATA = "descriptive_metadata";
-  public static final String RODA_OBJECT_DISPOSAL_SCHEDULE_METADATA = "disposal_schedule_metadata";
   public static final String RODA_OBJECT_PRESERVATION_METADATA = "preservation_metadata";
   public static final String RODA_OBJECT_OTHER_METADATA = "other_metadata";
   public static final String RODA_OBJECT_MEMBER = "member";

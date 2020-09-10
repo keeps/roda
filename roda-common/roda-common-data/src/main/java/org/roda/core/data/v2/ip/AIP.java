@@ -11,15 +11,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.roda.core.data.v2.ip.metadata.DisposalSchedule;
 
 @javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_AIP)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -37,8 +34,6 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
   private List<DescriptiveMetadata> descriptiveMetadata;
 
   private List<Representation> representations;
-
-  private DisposalSchedule disposalSchedule;
 
   private String ingestSIPUUID = "";
   private List<String> ingestSIPIds;
