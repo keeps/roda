@@ -49,15 +49,15 @@ public class IngestJobReportList extends AsyncTableCell<IndexedReport> {
 
   private TooltipTextColumn<IndexedReport> sourceObjectColumn;
   private TooltipTextColumn<IndexedReport> outcomeObjectColumn;
+  private TooltipTextColumn<IndexedReport> jobNameColumn;
   private TooltipTextColumn<IndexedReport> pluginNameColumn;
   private Column<IndexedReport, Date> updatedDateColumn;
   private TextColumn<IndexedReport> lastPluginRunColumn;
   private Column<IndexedReport, SafeHtml> lastPluginRunStateColumn;
   private TextColumn<IndexedReport> completionStatusColumn;
-  private TextColumn<IndexedReport> failedCountColumn;
 
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
-    RodaConstants.JOB_REPORT_ID, RodaConstants.JOB_REPORT_JOB_ID, RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_IDS,
+    RodaConstants.JOB_REPORT_ID, RodaConstants.JOB_REPORT_TITLE, RodaConstants.JOB_REPORT_JOB_ID, RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_IDS,
     RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID, RodaConstants.JOB_REPORT_SOURCE_OBJECT_CLASS,
     RodaConstants.JOB_REPORT_SOURCE_OBJECT_LABEL, RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_NAME,
     RodaConstants.JOB_REPORT_OUTCOME_OBJECT_LABEL, RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID,
@@ -121,18 +121,29 @@ public class IngestJobReportList extends AsyncTableCell<IndexedReport> {
       }
     };
 
-    pluginNameColumn = new TooltipTextColumn<IndexedReport>() {
+    jobNameColumn = new TooltipTextColumn<IndexedReport>() {
       @Override
       public String getValue(IndexedReport report) {
         String value = "";
         if (report != null) {
-          value = report.getPluginName();
+          value =report.getTitle();
         }
 
         return value;
       }
     };
 
+    pluginNameColumn = new TooltipTextColumn<IndexedReport>() {
+      @Override
+      public String getValue(IndexedReport report) {
+        String value = "";
+        if (report != null) {
+          value = messages.pluginLabelWithVersion(report.getPluginName(), report.getPluginVersion());
+        }
+
+        return value;
+      }
+    };
 
     updatedDateColumn = new Column<IndexedReport, Date>(
       new DateCell(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
@@ -198,30 +209,18 @@ public class IngestJobReportList extends AsyncTableCell<IndexedReport> {
       }
     };
 
-    failedCountColumn = new TextColumn<IndexedReport>() {
-      @Override
-      public String getValue(IndexedReport report) {
-        String value = "";
-        if (report != null) {
-          value = Integer.toString(report.getUnsuccessfulPluginsCounter());
-        }
-
-        return value;
-      }
-    };
-
     sourceObjectColumn.setSortable(true);
     outcomeObjectColumn.setSortable(true);
     pluginNameColumn.setSortable(true);
     updatedDateColumn.setSortable(true);
     lastPluginRunStateColumn.setSortable(true);
     completionStatusColumn.setSortable(false);
-    failedCountColumn.setSortable(true);
 
     addColumn(sourceObjectColumn, messages.showSIPExtended(), true, false);
     addColumn(outcomeObjectColumn, messages.showAIPExtended(), true, false);
     if (!insideJob) {
-      addColumn(pluginNameColumn, messages.reportJob(), true, false);
+      addColumn(jobNameColumn, messages.jobName(), true, false);
+      addColumn(pluginNameColumn, messages.jobPlugin(), true, false);
     }
     addColumn(updatedDateColumn, messages.reportLastUpdatedAt(), true, false, 11);
     addColumn(lastPluginRunStateColumn, messages.reportStatus(), true, false, 8);
@@ -229,7 +228,6 @@ public class IngestJobReportList extends AsyncTableCell<IndexedReport> {
       addColumn(completionStatusColumn, messages.reportProgress(), true, false, 8);
       if (insideJob) {
         addColumn(lastPluginRunColumn, messages.reportLastRunTask(), true, false);
-        addColumn(failedCountColumn, messages.reportFailed(), true, false, 6);
       }
     }
 
@@ -244,10 +242,8 @@ public class IngestJobReportList extends AsyncTableCell<IndexedReport> {
     columnSortingKeyMap.put(outcomeObjectColumn, Collections.singletonList(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID));
     columnSortingKeyMap.put(updatedDateColumn, Collections.singletonList(RodaConstants.JOB_REPORT_DATE_UPDATED));
     columnSortingKeyMap.put(pluginNameColumn, Collections.singletonList(RodaConstants.JOB_REPORT_PLUGIN_NAME));
+    columnSortingKeyMap.put(jobNameColumn, Collections.singletonList(RodaConstants.JOB_REPORT_TITLE));
     columnSortingKeyMap.put(lastPluginRunStateColumn, Collections.singletonList(RodaConstants.JOB_REPORT_PLUGIN_STATE));
-    if (insideJob) {
-      columnSortingKeyMap.put(failedCountColumn, Collections.singletonList(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS_COUNTER));
-    }
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 

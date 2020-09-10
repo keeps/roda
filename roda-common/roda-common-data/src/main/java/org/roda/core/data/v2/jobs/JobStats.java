@@ -17,7 +17,9 @@ public class JobStats implements Serializable {
   private int sourceObjectsBeingProcessed = 0;
   private int sourceObjectsWaitingToBeProcessed = 0;
   private int sourceObjectsProcessedWithSuccess = 0;
+  private int sourceObjectsProcessedWithPartialSuccess = 0;
   private int sourceObjectsProcessedWithFailure = 0;
+  private int sourceObjectsProcessedWithSkipped = 0;
   private int outcomeObjectsWithManualIntervention = 0;
 
   public JobStats() {
@@ -67,6 +69,23 @@ public class JobStats implements Serializable {
   public JobStats setSourceObjectsProcessedWithSuccess(int sourceObjectsProcessedWithSuccess) {
     this.sourceObjectsProcessedWithSuccess = sourceObjectsProcessedWithSuccess;
     return this;
+  }
+
+  public int getSourceObjectsProcessedWithPartialSuccess() {
+    return sourceObjectsProcessedWithPartialSuccess;
+  }
+
+  public JobStats setSourceObjectsProcessedWithPartialSuccess(int sourceObjectsProcessedWithPartialSuccess) {
+    this.sourceObjectsProcessedWithPartialSuccess = sourceObjectsProcessedWithPartialSuccess;
+    return this;
+  }
+
+  public int getSourceObjectsProcessedWithSkipped() {
+    return sourceObjectsProcessedWithSkipped;
+  }
+
+  public void setSourceObjectsProcessedWithSkipped(int sourceObjectsProcessedWithSkipped) {
+    this.sourceObjectsProcessedWithSkipped = sourceObjectsProcessedWithSkipped;
   }
 
   public int getSourceObjectsProcessedWithFailure() {
@@ -207,7 +226,9 @@ public class JobStats implements Serializable {
     return "JobStats [completionPercentage=" + completionPercentage + ", sourceObjectsCount=" + sourceObjectsCount
       + ", sourceObjectsBeingProcessed=" + sourceObjectsBeingProcessed + ", sourceObjectsWaitingToBeProcessed="
       + sourceObjectsWaitingToBeProcessed + ", sourceObjectsProcessedWithSuccess=" + sourceObjectsProcessedWithSuccess
+      + ", sourceObjectsProcessedWithPartialSuccess=" + sourceObjectsProcessedWithPartialSuccess
       + ", sourceObjectsProcessedWithFailure=" + sourceObjectsProcessedWithFailure
+        + ", sourceObjectsProcessedWithSkipped=" + sourceObjectsProcessedWithSkipped
       + ", outcomeObjectsWithManualIntervention=" + outcomeObjectsWithManualIntervention + "]";
   }
 

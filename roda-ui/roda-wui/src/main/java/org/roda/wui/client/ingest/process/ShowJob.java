@@ -548,9 +548,19 @@ public class ShowJob extends Composite {
       b.append(messages.showJobProgressSuccessfulCount(job.getJobStats().getSourceObjectsProcessedWithSuccess()));
       b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
     }
+    if (job.getJobStats().getSourceObjectsProcessedWithPartialSuccess() > 0) {
+      b.append(SafeHtmlUtils.fromSafeConstant("&nbsp;<span class='label-warning'>"));
+      b.append(messages.showJobProgressPartialSuccessfulCount(job.getJobStats().getSourceObjectsProcessedWithPartialSuccess()));
+      b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+    }
     if (job.getJobStats().getSourceObjectsProcessedWithFailure() > 0) {
       b.append(SafeHtmlUtils.fromSafeConstant("&nbsp;<span class='label-danger'>"));
       b.append(messages.showJobProgressFailedCount(job.getJobStats().getSourceObjectsProcessedWithFailure()));
+      b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+    }
+    if (job.getJobStats().getSourceObjectsProcessedWithSkipped() > 0) {
+      b.append(SafeHtmlUtils.fromSafeConstant("&nbsp;<span class='label-default'>"));
+      b.append(messages.showJobProgressSkippedCount(job.getJobStats().getSourceObjectsProcessedWithSkipped()));
       b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
     }
     if (job.getJobStats().getSourceObjectsBeingProcessed() > 0) {

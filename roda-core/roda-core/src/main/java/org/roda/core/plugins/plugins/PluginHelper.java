@@ -527,7 +527,7 @@ public final class PluginHelper {
       jobPluginInfo.getAllReports().get(sourceObjectId).keySet().forEach((outcomeObjectId) -> {
         try {
           Report jobReport = model.retrieveJobReport(cachedJob.getId(), sourceObjectId, outcomeObjectId);
-          jobReport.setTitle(metaPluginReport.getTitle());
+          jobReport.setTitle(cachedJob.getName());
           jobReport.setPlugin(metaPluginReport.getPlugin());
           jobReport.setPluginName(metaPluginReport.getPluginName());
           jobReport.setPluginVersion(metaPluginReport.getPluginVersion());

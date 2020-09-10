@@ -793,7 +793,9 @@ public final class RodaConstants {
   public static final String JOB_SOURCE_OBJECTS_WAITING_TO_BE_PROCESSED = "sourceObjectsWaitingToBeProcessed";
   public static final String JOB_SOURCE_OBJECTS_BEING_PROCESSED = "sourceObjectsBeingProcessed";
   public static final String JOB_SOURCE_OBJECTS_PROCESSED_WITH_SUCCESS = "sourceObjectsProcessedWithSuccess";
+  public static final String JOB_SOURCE_OBJECTS_PROCESSED_WITH_PARTIAL_SUCCESS = "sourceObjectsProcessedWithPartialSuccess";
   public static final String JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE = "sourceObjectsProcessedWithFailure";
+  public static final String JOB_SOURCE_OBJECTS_PROCESSED_WITH_SKIPPED = "sourceObjectsProcessedWithSkipped";
   public static final String JOB_OUTCOME_OBJECTS_WITH_MANUAL_INTERVENTION = "outcomeObjectsWithManualIntervention";
   public static final String JOB_PLUGIN = "plugin";
   public static final String JOB_PLUGIN_TYPE = "pluginType";
@@ -804,6 +806,8 @@ public final class RodaConstants {
   public static final String JOB_IN_FINAL_STATE = "inFinalState";
   public static final String JOB_STOPPING = "stopping";
   public static final String JOB_HAS_FAILURES = "hasFailures";
+  public static final String JOB_HAS_PARTIAL_SUCCESS = "hasPartialSuccess";
+  public static final String JOB_HAS_SKIPPED = "hasSkipped";
   public static final String JOB_FILE_EXTENSION = ".json";
 
   /* Plugins related parameters */

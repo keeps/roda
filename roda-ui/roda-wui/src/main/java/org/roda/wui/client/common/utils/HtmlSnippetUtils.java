@@ -81,7 +81,10 @@ public class HtmlSnippetUtils {
       if (JOB_STATE.COMPLETED.equals(state)) {
         if (job.getJobStats().getSourceObjectsCount() == job.getJobStats().getSourceObjectsProcessedWithSuccess()) {
           ret = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + messages.showJobStatusCompleted() + CLOSE_SPAN);
+              .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + messages.showJobStatusCompleted() + CLOSE_SPAN);
+        } else if (job.getJobStats().getSourceObjectsProcessedWithPartialSuccess() > 0) {
+          ret = SafeHtmlUtils
+              .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
         } else if (job.getJobStats().getSourceObjectsProcessedWithSuccess() > 0) {
           ret = SafeHtmlUtils
             .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
@@ -466,5 +469,23 @@ public class HtmlSnippetUtils {
     Label mvLabel = new Label(getFieldLabel(mv));
     layout.add(mvLabel);
     panel.add(layout);
+  }
+
+  public static SafeHtml getIngestProcessJobListIcon(String innerIcon, String outerIcon, String tooltip) {
+    String beginSpan = "<span style=\"font-size: 0.5em\" class=\"fa-stack fa-xs\" title=\"" + tooltip + "\">";
+    String innerIconTag = "<i class=\"" + innerIcon + " fa-stack-1x\"></i>";
+    String outerIconTag = "<i class=\"" + outerIcon + " fa-stack-2x\"></i>";
+    String endSpan = "</span>";
+
+    return SafeHtmlUtils.fromSafeConstant(beginSpan + innerIconTag + outerIconTag + endSpan);
+  }
+
+  public static SafeHtml getIngestProcessJobListIcon(String icon, String tooltip) {
+    String beginSpan = "<span style=\"font-size: 0.5em\" class=\"fa-stack fa-xs\" title=\"" + tooltip + "\">";
+    String innerIcon = "<i class=\"" + icon + " fa-stack-1x\"></i>";
+    String outerIcon = "<i class=\"far fa-circle fa-stack-2x\"></i>";
+    String endSpan = "</span>";
+
+    return SafeHtmlUtils.fromSafeConstant(beginSpan + innerIcon + outerIcon + endSpan);
   }
 }

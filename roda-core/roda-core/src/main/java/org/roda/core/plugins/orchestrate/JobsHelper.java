@@ -205,11 +205,14 @@ public final class JobsHelper {
     jobStats.setCompletionPercentage(jobPluginInfo.getCompletionPercentage());
     jobStats.setSourceObjectsCount(jobPluginInfo.getSourceObjectsCount());
     jobStats.setSourceObjectsBeingProcessed(jobPluginInfo.getSourceObjectsBeingProcessed());
+    jobStats.setSourceObjectsProcessedWithPartialSuccess(jobPluginInfo.getSourceObjectsProcessedWithPartialSuccess());
     jobStats.setSourceObjectsProcessedWithSuccess(jobPluginInfo.getSourceObjectsProcessedWithSuccess());
     jobStats.setSourceObjectsProcessedWithFailure(jobPluginInfo.getSourceObjectsProcessedWithFailure());
+    jobStats.setSourceObjectsProcessedWithSkipped(jobPluginInfo.getSourceObjectsProcessedWithSkipped());
     jobStats
       .setSourceObjectsWaitingToBeProcessed(jobStats.getSourceObjectsCount() - jobStats.getSourceObjectsBeingProcessed()
-        - jobStats.getSourceObjectsProcessedWithFailure() - jobStats.getSourceObjectsProcessedWithSuccess());
+        - jobStats.getSourceObjectsProcessedWithFailure() - jobStats.getSourceObjectsProcessedWithSuccess()
+        - jobStats.getSourceObjectsProcessedWithPartialSuccess() - jobStats.getSourceObjectsProcessedWithSkipped());
     jobStats.setOutcomeObjectsWithManualIntervention(jobPluginInfo.getOutcomeObjectsWithManualIntervention());
     return job;
   }

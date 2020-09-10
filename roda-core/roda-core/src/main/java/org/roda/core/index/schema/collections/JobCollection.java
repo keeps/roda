@@ -82,9 +82,13 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
     fields.add(new Field(RodaConstants.JOB_SOURCE_OBJECTS_WAITING_TO_BE_PROCESSED, Field.TYPE_INT));
     fields.add(new Field(RodaConstants.JOB_SOURCE_OBJECTS_BEING_PROCESSED, Field.TYPE_INT));
     fields.add(new Field(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SUCCESS, Field.TYPE_INT));
+    fields.add(new Field(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_PARTIAL_SUCCESS, Field.TYPE_INT));
     fields.add(new Field(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE, Field.TYPE_INT));
+    fields.add(new Field(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SKIPPED, Field.TYPE_INT));
     fields.add(new Field(RodaConstants.JOB_OUTCOME_OBJECTS_WITH_MANUAL_INTERVENTION, Field.TYPE_INT));
     fields.add(new Field(RodaConstants.JOB_HAS_FAILURES, Field.TYPE_BOOLEAN).setStored(false));
+    fields.add(new Field(RodaConstants.JOB_HAS_PARTIAL_SUCCESS, Field.TYPE_BOOLEAN).setStored(false));
+    fields.add(new Field(RodaConstants.JOB_HAS_SKIPPED, Field.TYPE_BOOLEAN).setStored(false));
 
     return fields;
   }
@@ -115,8 +119,12 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
     doc.addField(RodaConstants.JOB_SOURCE_OBJECTS_BEING_PROCESSED, jobStats.getSourceObjectsBeingProcessed());
     doc.addField(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SUCCESS,
       jobStats.getSourceObjectsProcessedWithSuccess());
+    doc.addField(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_PARTIAL_SUCCESS,
+      jobStats.getSourceObjectsProcessedWithPartialSuccess());
     doc.addField(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE,
       jobStats.getSourceObjectsProcessedWithFailure());
+    doc.addField(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SKIPPED,
+      jobStats.getSourceObjectsProcessedWithSkipped());
     doc.addField(RodaConstants.JOB_OUTCOME_OBJECTS_WITH_MANUAL_INTERVENTION,
       jobStats.getOutcomeObjectsWithManualIntervention());
     doc.addField(RodaConstants.JOB_PLUGIN_TYPE, job.getPluginType().toString());
@@ -127,7 +135,11 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
     doc.addField(RodaConstants.JOB_HAS_FAILURES,
       jobStats.getSourceObjectsProcessedWithFailure() > 0
         || (jobStats.getSourceObjectsCount() > jobStats.getSourceObjectsProcessedWithSuccess()
-          + jobStats.getSourceObjectsBeingProcessed() + jobStats.getSourceObjectsWaitingToBeProcessed()));
+          + jobStats.getSourceObjectsProcessedWithPartialSuccess()
+          + jobStats.getSourceObjectsProcessedWithSkipped() + jobStats.getSourceObjectsBeingProcessed()
+          + jobStats.getSourceObjectsWaitingToBeProcessed()));
+    doc.addField(RodaConstants.JOB_HAS_PARTIAL_SUCCESS, jobStats.getSourceObjectsProcessedWithPartialSuccess() > 0);
+    doc.addField(RodaConstants.JOB_HAS_SKIPPED, jobStats.getSourceObjectsProcessedWithSkipped() > 0);
 
     return doc;
   }
@@ -154,6 +166,10 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
       SolrUtils.objectToInteger(doc.get(RodaConstants.JOB_SOURCE_OBJECTS_BEING_PROCESSED), 0));
     jobStats.setSourceObjectsProcessedWithSuccess(
       SolrUtils.objectToInteger(doc.get(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SUCCESS), 0));
+    jobStats.setSourceObjectsProcessedWithPartialSuccess(
+      SolrUtils.objectToInteger(doc.get(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_PARTIAL_SUCCESS), 0));
+    jobStats.setSourceObjectsProcessedWithSkipped(
+        SolrUtils.objectToInteger(doc.get(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SKIPPED), 0));
     jobStats.setSourceObjectsProcessedWithFailure(
       SolrUtils.objectToInteger(doc.get(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE), 0));
     jobStats.setOutcomeObjectsWithManualIntervention(

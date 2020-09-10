@@ -101,6 +101,8 @@ public interface ClientMessages extends Messages {
 
   String internalProcessTitle();
 
+  String disposalProcessTitle();
+
   String loginTitle();
 
   String searchTitle();
@@ -564,6 +566,10 @@ public interface ClientMessages extends Messages {
   SafeHtml showJobProgressTotalCount(int objectsCount);
 
   SafeHtml showJobProgressSuccessfulCount(int objectsProcessedWithSuccess);
+
+  SafeHtml showJobProgressPartialSuccessfulCount(int objectsProcessedWithSuccess);
+
+  SafeHtml showJobProgressSkippedCount(int objectsProcessedWithSkipped);
 
   SafeHtml showJobProgressFailedCount(int objectsProcessedWithFailure);
 
@@ -1118,6 +1124,10 @@ public interface ClientMessages extends Messages {
   String jobTotalCountMessage();
 
   String jobSuccessCountMessage();
+
+  String jobPartialSuccessCountMessage();
+
+  String jobSkippedCountMessage();
 
   String jobFailureCountMessage();
 

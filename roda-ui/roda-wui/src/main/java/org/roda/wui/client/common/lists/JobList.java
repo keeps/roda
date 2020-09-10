@@ -8,6 +8,7 @@
 package org.roda.wui.client.common.lists;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -56,13 +57,16 @@ public class JobList extends AsyncTableCell<Job> {
   private TextColumn<Job> progressColumn;
   private TextColumn<Job> objectsTotalCountColumn;
   private Column<Job, SafeHtml> objectsSuccessCountColumn;
+  private Column<Job, SafeHtml> objectsPartialSuccessCountColumn;
   private Column<Job, SafeHtml> objectsFailureCountColumn;
-
+  private Column<Job, SafeHtml> objectsSkippedCountColumn;
 
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.JOB_NAME,
     RodaConstants.JOB_USERNAME, RodaConstants.JOB_START_DATE, RodaConstants.JOB_END_DATE, RodaConstants.JOB_STATE,
     RodaConstants.JOB_SOURCE_OBJECTS_COUNT, RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SUCCESS,
-    RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE, RodaConstants.JOB_COMPLETION_PERCENTAGE);
+    RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_PARTIAL_SUCCESS,
+    RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE, RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SKIPPED,
+    RodaConstants.JOB_COMPLETION_PERCENTAGE);
 
   @Override
   protected void adjustOptions(AsyncTableCellOptions<Job> options) {
@@ -141,6 +145,22 @@ public class JobList extends AsyncTableCell<Job> {
       }
     };
 
+    objectsPartialSuccessCountColumn = new Column<Job, SafeHtml>(new SafeHtmlCell()) {
+
+      @Override
+      public SafeHtml getValue(Job job) {
+        SafeHtmlBuilder b = new SafeHtmlBuilder();
+        if (job != null) {
+          b.append(job.getJobStats().getSourceObjectsProcessedWithPartialSuccess() > 0
+            ? SafeHtmlUtils.fromSafeConstant("<span>")
+            : SafeHtmlUtils.fromSafeConstant("<span class='ingest-process-counter-0'>"));
+          b.append(job.getJobStats().getSourceObjectsProcessedWithPartialSuccess());
+          b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+        }
+        return b.toSafeHtml();
+      }
+    };
+
     objectsFailureCountColumn = new Column<Job, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(Job job) {
@@ -160,6 +180,22 @@ public class JobList extends AsyncTableCell<Job> {
       }
     };
 
+    objectsSkippedCountColumn = new Column<Job, SafeHtml>(new SafeHtmlCell()) {
+
+      @Override
+      public SafeHtml getValue(Job job) {
+        SafeHtmlBuilder b = new SafeHtmlBuilder();
+        if (job != null) {
+          b.append(
+            job.getJobStats().getSourceObjectsProcessedWithSkipped() > 0 ? SafeHtmlUtils.fromSafeConstant("<span>")
+              : SafeHtmlUtils.fromSafeConstant("<span class='ingest-process-counter-0'>"));
+          b.append(job.getJobStats().getSourceObjectsProcessedWithSkipped());
+          b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+        }
+        return b.toSafeHtml();
+      }
+    };
+
     progressColumn = new TextColumn<Job>() {
       @Override
       public String getValue(Job job) {
@@ -173,7 +209,9 @@ public class JobList extends AsyncTableCell<Job> {
     statusColumn.setSortable(true);
     objectsTotalCountColumn.setSortable(true);
     objectsSuccessCountColumn.setSortable(true);
+    objectsPartialSuccessCountColumn.setSortable(true);
     objectsFailureCountColumn.setSortable(true);
+    objectsSkippedCountColumn.setSortable(true);
     progressColumn.setSortable(true);
 
     addColumn(nameColumn, messages.jobName(), true, false, 100, Style.Unit.PCT);
@@ -183,8 +221,14 @@ public class JobList extends AsyncTableCell<Job> {
     addColumn(statusColumn, messages.jobStatus(), true, false, 7);
     addColumn(progressColumn, messages.jobProgress(), true, true, 6);
     addColumn(objectsTotalCountColumn, messages.jobTotalCountMessage(), true, true, 5);
-    addColumn(objectsSuccessCountColumn, messages.jobSuccessCountMessage(), true, true, 6);
-    addColumn(objectsFailureCountColumn, messages.jobFailureCountMessage(), true, true, 6);
+    addColumn(objectsSuccessCountColumn,
+      HtmlSnippetUtils.getIngestProcessJobListIcon("fas fa-check", messages.jobSuccessCountMessage()), true, true, 5);
+    addColumn(objectsPartialSuccessCountColumn, HtmlSnippetUtils.getIngestProcessJobListIcon("fas fa-check",
+      "fas fa-circle-notch", messages.jobPartialSuccessCountMessage()), true, true, 5);
+    addColumn(objectsFailureCountColumn,
+      HtmlSnippetUtils.getIngestProcessJobListIcon("fas fa-times", messages.jobFailureCountMessage()), true, true, 5);
+    addColumn(objectsSkippedCountColumn,
+      HtmlSnippetUtils.getIngestProcessJobListIcon("fas fa-forward", messages.jobSkippedCountMessage()), true, true, 5);
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(startDateColumn, false));
@@ -194,16 +238,20 @@ public class JobList extends AsyncTableCell<Job> {
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
     Map<Column<Job, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
-    columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.JOB_NAME));
-    columnSortingKeyMap.put(startDateColumn, Arrays.asList(RodaConstants.JOB_START_DATE));
-    columnSortingKeyMap.put(statusColumn, Arrays.asList(RodaConstants.JOB_STATE));
-    columnSortingKeyMap.put(progressColumn, Arrays.asList(RodaConstants.JOB_COMPLETION_PERCENTAGE));
-    columnSortingKeyMap.put(objectsTotalCountColumn, Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_COUNT));
+    columnSortingKeyMap.put(nameColumn, Collections.singletonList(RodaConstants.JOB_NAME));
+    columnSortingKeyMap.put(startDateColumn, Collections.singletonList(RodaConstants.JOB_START_DATE));
+    columnSortingKeyMap.put(statusColumn, Collections.singletonList(RodaConstants.JOB_STATE));
+    columnSortingKeyMap.put(progressColumn, Collections.singletonList(RodaConstants.JOB_COMPLETION_PERCENTAGE));
+    columnSortingKeyMap.put(objectsTotalCountColumn, Collections.singletonList(RodaConstants.JOB_SOURCE_OBJECTS_COUNT));
     columnSortingKeyMap.put(objectsSuccessCountColumn,
-      Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SUCCESS));
+        Collections.singletonList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SUCCESS));
+    columnSortingKeyMap.put(objectsPartialSuccessCountColumn,
+        Collections.singletonList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_PARTIAL_SUCCESS));
     columnSortingKeyMap.put(objectsFailureCountColumn,
-      Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE));
-    columnSortingKeyMap.put(usernameColumn, Arrays.asList(RodaConstants.JOB_USERNAME));
+        Collections.singletonList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE));
+    columnSortingKeyMap.put(objectsSkippedCountColumn,
+        Collections.singletonList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SKIPPED));
+    columnSortingKeyMap.put(usernameColumn, Collections.singletonList(RodaConstants.JOB_USERNAME));
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 

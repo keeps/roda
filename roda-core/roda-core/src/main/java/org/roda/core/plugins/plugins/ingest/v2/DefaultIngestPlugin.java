@@ -181,6 +181,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       getAfterExecute().ifPresent(e -> e.execute(jobPluginInfo, aips));
 
       // X) final job info update
+      jobPluginInfo.updateSourceObjectsProcessed();
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
     } catch (JobException e) {

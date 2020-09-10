@@ -100,7 +100,9 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     int sourceObjectsCount = 0;
     int sourceObjectsBeingProcessed = 0;
     int sourceObjectsProcessedWithSuccess = 0;
+    int sourceObjectsProcessedWithPartialSuccess = 0;
     int sourceObjectsProcessedWithFailure = 0;
+    int sourceObjectsProcessedWithSkipped = 0;
     int outcomeObjectsWithManualIntervention = 0;
     for (JobPluginInfo jpi : jobInfos.values()) {
       IngestJobPluginInfo pluginInfo = (IngestJobPluginInfo) jpi;
@@ -114,6 +116,8 @@ public class IngestJobPluginInfo extends JobPluginInfo {
 
         sourceObjectsProcessedWithSuccess += pluginInfo.getSourceObjectsProcessedWithSuccess();
         sourceObjectsProcessedWithFailure += pluginInfo.getSourceObjectsProcessedWithFailure();
+        sourceObjectsProcessedWithPartialSuccess += pluginInfo.getSourceObjectsProcessedWithPartialSuccess();
+        sourceObjectsProcessedWithSkipped += pluginInfo.getSourceObjectsProcessedWithSkipped();
         outcomeObjectsWithManualIntervention += pluginInfo.getOutcomeObjectsWithManualIntervention();
       }
       sourceObjectsBeingProcessed += pluginInfo.getSourceObjectsBeingProcessed();
@@ -125,7 +129,9 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     ingestInfoUpdated.setSourceObjectsCount(sourceObjectsCount);
     ingestInfoUpdated.setSourceObjectsBeingProcessed(sourceObjectsBeingProcessed);
     ingestInfoUpdated.setSourceObjectsProcessedWithSuccess(sourceObjectsProcessedWithSuccess);
+    ingestInfoUpdated.setSourceObjectsProcessedWithPartialSuccess(sourceObjectsProcessedWithPartialSuccess);
     ingestInfoUpdated.setSourceObjectsProcessedWithFailure(sourceObjectsProcessedWithFailure);
+    ingestInfoUpdated.setSourceObjectsProcessedWithSkipped(sourceObjectsProcessedWithSkipped);
     ingestInfoUpdated.setOutcomeObjectsWithManualIntervention(outcomeObjectsWithManualIntervention);
     return ingestInfoUpdated;
   }
@@ -178,16 +184,16 @@ public class IngestJobPluginInfo extends JobPluginInfo {
   }
 
   public int getBeingProcessedCounter() {
-    return getReportsFromBeingProcessed().keySet().stream().filter(id -> !id.equals(Report.NO_OUTCOME_OBJECT_ID)).collect(Collectors.toList()).size();
+    return getReportsFromBeingProcessed().keySet().stream().filter(id -> !id.equals(Report.NO_OUTCOME_OBJECT_ID))
+      .collect(Collectors.toList()).size();
   }
 
- /* public PluginState getPluginState(String sourceObjectId, String outcomeObjectId) {
-    if (allReports.containsKey(sourceObjectId)) {
-      if (allReports.get(sourceObjectId).containsKey(outcomeObjectId)) {
-        return allReports.get(sourceObjectId).get(outcomeObjectId).getPluginState();
-      }
-    }
-  }*/
+  /*
+   * public PluginState getPluginState(String sourceObjectId, String
+   * outcomeObjectId) { if (allReports.containsKey(sourceObjectId)) { if
+   * (allReports.get(sourceObjectId).containsKey(outcomeObjectId)) { return
+   * allReports.get(sourceObjectId).get(outcomeObjectId).getPluginState(); } } }
+   */
 
   public void addReport(Report report, boolean reportIsAnReportItem) {
     if (reportIsAnReportItem) {
@@ -206,16 +212,16 @@ public class IngestJobPluginInfo extends JobPluginInfo {
         return;
       }
 
-      if(aipIdToTransferredResourceIds.containsKey(outcomeObjectId)) {
-        if(!aipIdToTransferredResourceIds.get(outcomeObjectId).contains(sourceObjectId)) {
+      if (aipIdToTransferredResourceIds.containsKey(outcomeObjectId)) {
+        if (!aipIdToTransferredResourceIds.get(outcomeObjectId).contains(sourceObjectId)) {
           aipIdToTransferredResourceIds.get(outcomeObjectId).add(sourceObjectId);
         }
       } else {
         aipIdToTransferredResourceIds.computeIfAbsent(outcomeObjectId, key -> new ArrayList<>()).add(sourceObjectId);
       }
 
-      if(transferredResourceToAipIds.containsKey(sourceObjectId)) {
-        if(!transferredResourceToAipIds.get(sourceObjectId).contains(outcomeObjectId)) {
+      if (transferredResourceToAipIds.containsKey(sourceObjectId)) {
+        if (!transferredResourceToAipIds.get(sourceObjectId).contains(outcomeObjectId)) {
           transferredResourceToAipIds.get(sourceObjectId).add(outcomeObjectId);
         }
       } else {
@@ -245,13 +251,55 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     setSourceObjectsProcessedWithFailure(getSourceObjectsCount() - beingProcessed);
   }
 
+  public void updateSourceObjectsProcessed() {
+    int countSuccess = 0;
+    int countPartialSuccess = 0;
+    int countFailure = 0;
+    int countSkipped = 0;
+
+    for (Map<String, Report> map : getAllReports().values()) {
+      for (Report report : map.values()) {
+        if (PluginState.FAILURE.equals(report.getPluginState())) {
+          countFailure++;
+        } else if (PluginState.SUCCESS.equals(report.getPluginState())) {
+          countSuccess++;
+        } else if (PluginState.PARTIAL_SUCCESS.equals(report.getPluginState())) {
+          countPartialSuccess++;
+        } else if (PluginState.SKIPPED.equals(report.getPluginState())) {
+          countSkipped++;
+        }
+      }
+    }
+    setSourceObjectsProcessedWithFailure(countFailure);
+    setSourceObjectsProcessedWithPartialSuccess(countPartialSuccess);
+    setSourceObjectsProcessedWithSuccess(countSuccess);
+    setSourceObjectsProcessedWithSkipped(countSkipped);
+  }
+
   @Override
   public void finalizeInfo() {
     super.finalizeInfo();
+
+    /*
+     * int countSuccess = 0; int countPartialSuccess = 0; int countFailure = 0;
+     * 
+     * if (allReports != null) { for (Map<String, Report> map : allReports.values())
+     * { for (Report report : map.values()) { if
+     * (PluginState.FAILURE.equals(report.getPluginState())) { countFailure++; }
+     * else if (PluginState.SUCCESS.equals(report.getPluginState())) {
+     * countSuccess++; } else if
+     * (PluginState.PARTIAL_SUCCESS.equals(report.getPluginState())) {
+     * countPartialSuccess++; } } }
+     * 
+     * setSourceObjectsProcessedWithFailure(countFailure);
+     * setSourceObjectsProcessedWithPartialSuccess(countPartialSuccess);
+     * setSourceObjectsProcessedWithSuccess(countSuccess); }
+     */
+
     // INFO 20160601 hsilva: the following line is needed because we only mark,
     // during ingest processing, the failure and therefore in the end we have to
     // set the success counter
-    setSourceObjectsProcessedWithSuccess(getSourceObjectsCount() - getSourceObjectsProcessedWithFailure());
+    //setSourceObjectsProcessedWithSuccess(getSourceObjectsCount() - getSourceObjectsProcessedWithFailure());
     setStepsCompleted(getTotalSteps());
 
     // 20161220 hsilva: preparing maps for garbage collection
@@ -303,7 +351,7 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     transferredResourceToAipIds.put(newTransferredResourceId, aipIds);
 
     for (Entry<String, List<String>> aipToTranferredResourceIds : aipIdToTransferredResourceIds.entrySet()) {
-      if(aipToTranferredResourceIds.getValue().contains(oldTransferredResourceId)) {
+      if (aipToTranferredResourceIds.getValue().contains(oldTransferredResourceId)) {
         aipToTranferredResourceIds.getValue().remove(oldTransferredResourceId);
         aipToTranferredResourceIds.getValue().add(newTransferredResourceId);
       }

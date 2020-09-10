@@ -403,12 +403,15 @@ public class Report implements IsModelObject, HasId {
     if (pluginIsMandatory) {
       if (currentPluginState.equals(PluginState.PARTIAL_SUCCESS)) {
         switch (newPluginState) {
+          case SKIPPED:
           case RUNNING:
           case SUCCESS:
             return PluginState.PARTIAL_SUCCESS;
           case FAILURE:
             return PluginState.FAILURE;
         }
+      } else if (newPluginState.equals(PluginState.SKIPPED)){
+        return currentPluginState;
       } else {
         return newPluginState;
       }
