@@ -75,11 +75,13 @@ public class CasApiAuthFilter implements Filter {
         UserLogin.casLogin(request.getUserPrincipal().getName(), request);
         filterChain.doFilter(request, response);
       } catch (InactiveUserException e) {
+        LOGGER.error("Inactive user '" + request.getUserPrincipal().getName() + "': " + e.getMessage());
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-          "Inactive user '" + request.getUserPrincipal().getName() + "': " + e.getMessage());
+          "Error authenticating user");
       } catch (RODAException e) {
+        LOGGER.error("Error authenticating user '" + request.getUserPrincipal().getName() + "': " + e.getMessage());
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-          "Error authenticating CAS user '" + request.getUserPrincipal().getName() + "': " + e.getMessage());
+          "Error authenticating user");
       }
       return;
     }
@@ -90,8 +92,8 @@ public class CasApiAuthFilter implements Filter {
       try {
         doFilterWithCredentials(request, response, filterChain, credentials.getFirst(), credentials.getSecond());
       } catch (final AuthenticationDeniedException | NotFoundException e) {
-        LOGGER.debug(e.getMessage(), e);
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+        LOGGER.error("Error authenticating user '" + request.getUserPrincipal().getName() + "': " + e.getMessage());
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error authenticating user");
       } catch (final GenericException e) {
         throw new ServletException(e.getMessage(), e);
       }
