@@ -52,7 +52,7 @@ public class IngestJobReportList extends AsyncTableCell<IndexedReport> {
   private TooltipTextColumn<IndexedReport> jobNameColumn;
   private TooltipTextColumn<IndexedReport> pluginNameColumn;
   private Column<IndexedReport, Date> updatedDateColumn;
-  private TextColumn<IndexedReport> lastPluginRunColumn;
+  private TooltipTextColumn<IndexedReport> lastPluginRunColumn;
   private Column<IndexedReport, SafeHtml> lastPluginRunStateColumn;
   private TextColumn<IndexedReport> completionStatusColumn;
 
@@ -153,7 +153,7 @@ public class IngestJobReportList extends AsyncTableCell<IndexedReport> {
       }
     };
 
-    lastPluginRunColumn = new TextColumn<IndexedReport>() {
+    lastPluginRunColumn = new TooltipTextColumn<IndexedReport>() {
       @Override
       public String getValue(IndexedReport report) {
         if (report != null) {
@@ -227,7 +227,7 @@ public class IngestJobReportList extends AsyncTableCell<IndexedReport> {
     if (jobComplex && jobRunning) {
       addColumn(completionStatusColumn, messages.reportProgress(), true, false, 8);
       if (insideJob) {
-        addColumn(lastPluginRunColumn, messages.reportLastRunTask(), true, false);
+        addColumn(lastPluginRunColumn, messages.reportLastRunTask(), true, false, 10);
       }
     }
 

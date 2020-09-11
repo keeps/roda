@@ -255,25 +255,41 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     int countSuccess = 0;
     int countPartialSuccess = 0;
     int countFailure = 0;
-    int countSkipped = 0;
 
     for (Map<String, Report> map : getAllReports().values()) {
+      PluginState SIPState = PluginState.SUCCESS;
       for (Report report : map.values()) {
-        if (PluginState.FAILURE.equals(report.getPluginState())) {
-          countFailure++;
-        } else if (PluginState.SUCCESS.equals(report.getPluginState())) {
-          countSuccess++;
-        } else if (PluginState.PARTIAL_SUCCESS.equals(report.getPluginState())) {
-          countPartialSuccess++;
-        } else if (PluginState.SKIPPED.equals(report.getPluginState())) {
-          countSkipped++;
+        switch (report.getPluginState()) {
+          case FAILURE:
+            SIPState = report.getPluginState();
+            break;
+          case PARTIAL_SUCCESS:
+            if (!PluginState.FAILURE.equals(SIPState))
+              SIPState = PluginState.PARTIAL_SUCCESS;
+            break;
+          default:
+            break;
         }
       }
+      switch (SIPState) {
+        case SUCCESS:
+          countSuccess++;
+          break;
+        case PARTIAL_SUCCESS:
+          countPartialSuccess++;
+          break;
+        case FAILURE:
+          countFailure++;
+          break;
+        default:
+          break;
+      }
     }
+
     setSourceObjectsProcessedWithFailure(countFailure);
     setSourceObjectsProcessedWithPartialSuccess(countPartialSuccess);
     setSourceObjectsProcessedWithSuccess(countSuccess);
-    setSourceObjectsProcessedWithSkipped(countSkipped);
+    setSourceObjectsProcessedWithSkipped(0);
   }
 
   @Override
@@ -299,7 +315,8 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     // INFO 20160601 hsilva: the following line is needed because we only mark,
     // during ingest processing, the failure and therefore in the end we have to
     // set the success counter
-    //setSourceObjectsProcessedWithSuccess(getSourceObjectsCount() - getSourceObjectsProcessedWithFailure());
+    // setSourceObjectsProcessedWithSuccess(getSourceObjectsCount() -
+    // getSourceObjectsProcessedWithFailure());
     setStepsCompleted(getTotalSteps());
 
     // 20161220 hsilva: preparing maps for garbage collection
