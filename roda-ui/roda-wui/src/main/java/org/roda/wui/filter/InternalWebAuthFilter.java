@@ -8,6 +8,7 @@
 package org.roda.wui.filter;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.HashMap;
@@ -63,6 +64,11 @@ public class InternalWebAuthFilter implements Filter {
     uri.setPath(path);
     uri.setFragment(hash);
 
+    if (uri.isAbsolute()) {
+      LOGGER.error("ERROR");
+      httpResponse.sendRedirect("/");
+    }
+
     // adding all other parameters
     parameterMap.forEach((param, values) -> {
       for (String value : values) {
@@ -78,24 +84,30 @@ public class InternalWebAuthFilter implements Filter {
         uri.setFragment("login" + HistoryUtils.HISTORY_SEP + hash);
       }
 
-      try {
-        httpResponse.sendRedirect(uri.build().toString());
-      } catch (URISyntaxException e) {
-        LOGGER.error("Could not generate service URL, redirecting to base path " + path, e);
-        httpResponse.sendRedirect(path);
-      }
+      redirect(httpResponse, uri);
     } else if (requestURI.endsWith("/logout")) {
       UserLogin.logout(httpRequest, Collections.emptyList());
 
-      try {
-        httpResponse.sendRedirect(uri.build().toString());
-      } catch (URISyntaxException e) {
-        LOGGER.error("Could not generate service URL, redirecting to base path " + path, e);
-        httpResponse.sendRedirect(path);
-      }
+      redirect(httpResponse, uri);
 
     } else {
       chain.doFilter(request, response);
+    }
+  }
+
+  private void redirect(HttpServletResponse httpResponse, URIBuilder uri) throws IOException {
+    try {
+      URI redirectURL = uri.build();
+      if (redirectURL.isAbsolute()) {
+        httpResponse.sendRedirect("/");
+      } else {
+        httpResponse.sendRedirect(redirectURL.toString());
+      }
+
+    } catch (URISyntaxException e) {
+      LOGGER.error("Could not generate service URL", e);
+      httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+        "Unexpected error, see server logs for details");
     }
   }
 
