@@ -152,8 +152,8 @@ public class EARKSIPPluginsTest {
   }
 
   protected static <T extends Plugin<TransferredResource>> AIP ingestCorpora(Class<T> pluginClass, ModelService model,
-    IndexService index, Path corporaPath) throws RequestNotValidException, NotFoundException, GenericException,
-    AlreadyExistsException, AuthorizationDeniedException, IOException, IsStillUpdatingException {
+    IndexService index, Path corporaPath, boolean failIfReportNotSucceeded) throws RequestNotValidException, NotFoundException,
+    GenericException, AlreadyExistsException, AuthorizationDeniedException, IOException, IsStillUpdatingException {
     String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
     AIP root = model.createAIP(parentId, aipType, new Permissions(), RodaConstants.ADMIN);
@@ -168,7 +168,7 @@ public class EARKSIPPluginsTest {
     Job job = TestsHelper.executeJob(pluginClass, parameters, PluginType.SIP_TO_AIP,
       SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
 
-    TestsHelper.getJobReports(index, job, true);
+    TestsHelper.getJobReports(index, job, failIfReportNotSucceeded);
     index.commitAIPs();
 
     IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
@@ -179,6 +179,12 @@ public class EARKSIPPluginsTest {
     IndexedAIP indexedAIP = find.getResults().get(0);
 
     return model.retrieveAIP(indexedAIP.getId());
+  }
+
+  protected static <T extends Plugin<TransferredResource>> AIP ingestCorpora(Class<T> pluginClass, ModelService model,
+    IndexService index, Path corporaPath) throws RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, IOException, IsStillUpdatingException {
+    return ingestCorpora(pluginClass, model, index, corporaPath, false);
   }
 
   private AIP ingestUpdateCorpora(AIP aip) throws RequestNotValidException, NotFoundException, GenericException,
