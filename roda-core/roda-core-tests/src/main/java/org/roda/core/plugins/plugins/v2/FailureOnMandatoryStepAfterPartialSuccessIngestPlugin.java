@@ -1,4 +1,4 @@
-package org.roda.core.plugins.plugins;
+package org.roda.core.plugins.plugins.v2;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,6 +13,8 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.plugins.PluginThatAlwaysFailsDuringExecuteMethod;
 import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
 import org.roda.core.plugins.plugins.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.characterization.SiegfriedPlugin;
@@ -29,7 +31,7 @@ import org.roda.core.plugins.plugins.notifications.JobNotification;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-public class FailureOnMandatoryStepIngestPlugin extends DefaultIngestPlugin {
+public class FailureOnMandatoryStepAfterPartialSuccessIngestPlugin extends DefaultIngestPlugin {
   private static List<IngestStep> steps = new ArrayList<>();
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
@@ -81,13 +83,16 @@ public class FailureOnMandatoryStepIngestPlugin extends DefaultIngestPlugin {
     // 3) create file fixity information
     steps.add(new IngestStep(PremisSkeletonPlugin.class.getName(), RodaConstants.PLUGIN_PARAMS_CREATE_PREMIS_SKELETON,
       true, true, true, true));
-    // 4) PluginThatAlwaysFailsDuringExecuteMethod
+    // 4) format identification (using Siegfried)
+    steps.add(new IngestStep(PluginThatAlwaysFailsDuringExecuteMethod.class.getName(), PLUGIN_PARAMS_PLUGIN_THAT_FAILS,
+        true, false, true, false));
+    // 5) PluginThatAlwaysFailsDuringExecuteMethod
     steps.add(new IngestStep(PluginThatAlwaysFailsDuringExecuteMethod.class.getName(), PLUGIN_PARAMS_PLUGIN_THAT_FAILS,
         true, true, true, true));
-    // 5) verify producer authorization
+    // 6) verify producer authorization
     steps.add(new IngestStep(VerifyUserAuthorizationPlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK, true, true, true, true));
-    // 6) Auto accept
+    // 7) Auto accept
     steps.add(new AutoAcceptIngestStep(AutoAcceptSIPPlugin.class.getName(), RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT,
       true, true, true, true));
   }
@@ -130,7 +135,7 @@ public class FailureOnMandatoryStepIngestPlugin extends DefaultIngestPlugin {
 
   @Override
   public Plugin<TransferredResource> cloneMe() {
-    return new FailureOnMandatoryStepIngestPlugin();
+    return new FailureOnMandatoryStepAfterPartialSuccessIngestPlugin();
   }
 
   @Override

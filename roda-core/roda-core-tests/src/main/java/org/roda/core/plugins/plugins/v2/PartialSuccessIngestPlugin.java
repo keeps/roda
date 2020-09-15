@@ -1,7 +1,6 @@
-package org.roda.core.plugins.plugins;
+package org.roda.core.plugins.plugins.v2;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +13,8 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.plugins.PluginThatAlwaysFailsDuringExecuteMethod;
 import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
 import org.roda.core.plugins.plugins.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.characterization.SiegfriedPlugin;

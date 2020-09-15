@@ -46,9 +46,8 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.plugins.FailureOnMandatoryStepIngestPlugin;
-import org.roda.core.plugins.plugins.PartialSuccessIngestPlugin;
-import org.roda.core.plugins.plugins.ingest.MinimalIngestPlugin;
+import org.roda.core.plugins.plugins.v2.FailureOnMandatoryStepAfterPartialSuccessIngestPlugin;
+import org.roda.core.plugins.plugins.v2.FailureOnMandatoryStepIngestPlugin;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,6 +131,42 @@ public class FailureIngestPluginTest {
     List<Report> jobReports = TestsHelper.getJobReports(index, job, false);
     Assert.assertEquals(jobReports.size(), 1);
     Assert.assertEquals(jobReports.get(0).getReports().size(), 4);
+
+    assessJobStats(job, 0,1,0);
+  }
+
+  @Test
+  public void testWithEARKSIPMandatoryPluginFailureViaUnexpectedExceptionAfterPartialAndNoMoveWhenAutoAccept()throws IOException, RODAException {
+    RodaCoreFactory.getRodaConfiguration()
+        .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT, false);
+
+    AIP aip = EARKSIPPluginsTest.ingestCorpora(FailureOnMandatoryStepAfterPartialSuccessIngestPlugin.class, model, index, corporaPath, false);
+    assessAIP(aip);
+
+    Job job = model.retrieveJob(aip.getIngestJobId());
+
+    // assess reports
+    List<Report> jobReports = TestsHelper.getJobReports(index, job, false);
+    Assert.assertEquals(jobReports.size(), 1);
+    Assert.assertEquals(jobReports.get(0).getReports().size(), 5);
+
+    assessJobStats(job, 0,1,0);
+  }
+
+  @Test
+  public void testWithEARKSIPMandatoryPluginFailureViaUnexpectedExceptionAfterPartialAndMoveWhenAutoAccept()throws IOException, RODAException {
+    RodaCoreFactory.getRodaConfiguration()
+        .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT, true);
+
+    AIP aip = EARKSIPPluginsTest.ingestCorpora(FailureOnMandatoryStepAfterPartialSuccessIngestPlugin.class, model, index, corporaPath, false);
+    assessAIP(aip);
+
+    Job job = model.retrieveJob(aip.getIngestJobId());
+
+    // assess reports
+    List<Report> jobReports = TestsHelper.getJobReports(index, job, false);
+    Assert.assertEquals(jobReports.size(), 1);
+    Assert.assertEquals(jobReports.get(0).getReports().size(), 5);
 
     assessJobStats(job, 0,1,0);
   }
