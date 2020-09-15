@@ -385,7 +385,7 @@ public class Report implements IsModelObject, HasId {
       setPluginVersion(report.getPluginVersion());
     }
 
-    setPluginState(calculatePluginState(getPluginState(), report.getPluginState(), report.getPluginIsMandatory()));
+    setPluginState(ReportUtils.calculatePluginState(getPluginState(), report.getPluginState(), report.getPluginIsMandatory()));
     //setPluginState(report.getPluginState());
     if (!"".equals(report.getPluginDetails()) && !getPluginDetails().equals(report.getPluginDetails())) {
       setPluginDetails(
@@ -397,7 +397,7 @@ public class Report implements IsModelObject, HasId {
     return this;
   }
 
-  @JsonIgnore
+  /*@JsonIgnore
   private PluginState calculatePluginState(PluginState currentPluginState, PluginState newPluginState,
     Boolean pluginIsMandatory) {
     if (pluginIsMandatory) {
@@ -424,7 +424,7 @@ public class Report implements IsModelObject, HasId {
     }
 
     return newPluginState;
-  }
+  }*/
 
   public List<Report> getReports() {
     return reports;
