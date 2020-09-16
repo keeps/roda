@@ -9,6 +9,9 @@
 		<version>3.6.0-SNAPSHOT</version>
 		<relativePath>../..</relativePath>
 	</parent>
+	<properties>
+		<io.prometheus.version>0.9.0</io.prometheus.version>
+	</properties>
 	<profiles>
 		<profile>
 			<id>default</id>
@@ -429,22 +432,22 @@
 		<dependency>
 			<groupId>io.prometheus</groupId>
 			<artifactId>simpleclient_dropwizard</artifactId>
-			<version>0.8.0</version>
+			<version>${io.prometheus.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.prometheus</groupId>
 			<artifactId>simpleclient_hotspot</artifactId>
-			<version>0.8.0</version>
+			<version>${io.prometheus.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.prometheus</groupId>
 			<artifactId>simpleclient_httpserver</artifactId>
-			<version>0.8.0</version>
+			<version>${io.prometheus.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.prometheus</groupId>
 			<artifactId>simpleclient_logback</artifactId>
-			<version>0.8.0</version>
+			<version>${io.prometheus.version}</version>
 		</dependency>
 	</dependencies>
 </project>

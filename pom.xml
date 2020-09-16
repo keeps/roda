@@ -19,9 +19,6 @@
 		<name>KEEP SOLUTIONS</name>
 		<url>http://www.keep.pt</url>
 	</organization>
-	<prerequisites>
-		<maven>3.0.5</maven>
-	</prerequisites>
 	<distributionManagement>
 		<repository>
 			<id>keeps_artifactory</id>
@@ -66,10 +63,10 @@
 		<roda.temporary.repository>${user.dir}</roda.temporary.repository>
 		<java_version>1.8</java_version>
 		<gwt.version>2.9.0</gwt.version>
-		<cas.client.version>3.5.0</cas.client.version>
-		<jersey.version>2.27</jersey.version>
-		<swagger.version>1.5.24</swagger.version>
-		<jackson.version>2.10.1</jackson.version>
+		<cas.client.version>3.6.1</cas.client.version>
+		<jersey.version>2.31</jersey.version>
+		<swagger.version>1.6.2</swagger.version>
+		<jackson.version>2.11.2</jackson.version>
 		<spring.version>4.3.19.RELEASE</spring.version>
 		<grizzly.version>2.4.3</grizzly.version>
 		<solr.version>7.7.2</solr.version>
@@ -82,7 +79,7 @@
 		<metrics.version>3.2.6</metrics.version>
 		<roda_community_url>http://roda-community.org</roda_community_url>
 		<testng.groups>all</testng.groups>
-		<springboot.version>2.1.9.RELEASE</springboot.version>
+		<springboot.version>2.3.3.RELEASE</springboot.version>
 	</properties>
 	<profiles>
 		<profile>
@@ -118,7 +115,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
-						<version>3.0.0</version>
 						<configuration>
 							<excludeResources>true</excludeResources>
 						</configuration>
@@ -172,9 +168,33 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.0.0-M2</version>
+				<executions>
+					<execution>
+						<id>enforce-maven</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireMavenVersion>
+									<version>3.3.9</version>
+									<message>Invalid Maven version. It should, at least, be 3.3.9</message>
+								</requireMavenVersion>
+								<requireJavaVersion>
+									<version>1.8</version>
+								</requireJavaVersion>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.1</version>
+				<version>0.8.6</version>
 				<executions>
 					<execution>
 						<id>default-prepare-agent</id>
@@ -243,7 +263,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.8.0</version>
+					<version>3.8.1</version>
 					<configuration>
 						<source>${java_version}</source>
 						<target>${java_version}</target>
@@ -252,12 +272,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.1.0</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-antrun-plugin</artifactId>
-					<version>1.8</version>
+					<version>3.2.0</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -276,28 +291,23 @@
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-site-plugin</artifactId>
-					<version>3.7.1</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
-					<version>2.22.0</version>
+					<version>2.22.2</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-war-plugin</artifactId>
-					<version>3.2.2</version>
+					<version>3.3.1</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>3.1.1</version>
+					<version>3.1.2</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-assembly-plugin</artifactId>
-					<version>3.1.0</version>
+					<version>3.3.0</version>
 				</plugin>
 				<plugin>
 					<groupId>net.ltgt.gwt.maven</groupId>
@@ -307,7 +317,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-source-plugin</artifactId>
-					<version>3.0.1</version>
+					<version>3.2.1</version>
 					<configuration>
 						<excludeResources>true</excludeResources>
 					</configuration>
@@ -329,7 +339,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-shade-plugin</artifactId>
-					<version>3.2.0</version>
+					<version>3.2.4</version>
 				</plugin>
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
@@ -358,12 +368,12 @@
 				<plugin>
 					<groupId>com.spotify</groupId>
 					<artifactId>docker-maven-plugin</artifactId>
-					<version>1.2.1</version>
+					<version>1.2.2</version>
 				</plugin>
 				<plugin>
 					<groupId>pl.project13.maven</groupId>
 					<artifactId>git-commit-id-plugin</artifactId>
-					<version>2.2.5</version>
+					<version>4.0.2</version>
 					<executions>
 						<execution>
 							<goals>
@@ -382,18 +392,6 @@
 						</generateGitPropertiesFilename>
 						<format>json</format>
 					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>exec-maven-plugin</artifactId>
-					<version>1.6.0</version>
-					<executions>
-						<execution>
-							<goals>
-								<goal>java</goal>
-							</goals>
-						</execution>
-					</executions>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -438,7 +436,7 @@
 			<dependency>
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>
-				<version>1.12</version>
+				<version>1.15</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-collections</groupId>
@@ -463,7 +461,7 @@
 			<dependency>
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
-				<version>2.6</version>
+				<version>2.8.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.poi</groupId>
@@ -815,12 +813,12 @@
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
-				<version>3.9</version>
+				<version>3.11</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-text</artifactId>
-				<version>1.6</version>
+				<version>1.9</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>
@@ -855,7 +853,7 @@
 			<dependency>
 				<groupId>org.mockito</groupId>
 				<artifactId>mockito-core</artifactId>
-				<version>2.27.0</version>
+				<version>2.28.2</version>
 				<scope>test</scope>
 			</dependency>
 			<dependency>
@@ -1018,7 +1016,7 @@
 			<dependency>
 				<groupId>com.github.jknack</groupId>
 				<artifactId>handlebars</artifactId>
-				<version>4.1.0</version>
+				<version>4.2.0</version>
 			</dependency>
 			<dependency>
 				<groupId>xmlunit</groupId>
@@ -1028,7 +1026,7 @@
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-csv</artifactId>
-				<version>1.6</version>
+				<version>1.8</version>
 			</dependency>
 			<dependency>
 				<groupId>org.jdom</groupId>
@@ -1067,7 +1065,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.0.1</version>
+				<version>3.2.0</version>
 			</plugin>
 		</plugins>
 	</reporting>
