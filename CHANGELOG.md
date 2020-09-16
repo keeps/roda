@@ -1,5 +1,34 @@
 # Changelog
 
+## v3.5.0 (16/09/2020)
+#### New features:
+
+-  Hide actions which user does not have permissions to execute [#1022](https://github.com/keeps/roda/issues/1022)
+
+#### Enhancements:
+
+-  Bump GWT from 2.8.3 to 2.9.0 [#1549](https://github.com/keeps/roda/issues/1549)
+-  REST API: Tranferred resource reindex better error mapping [#1547](https://github.com/keeps/roda/issues/1547)
+-  Default ingest plugin generalization [#1484](https://github.com/keeps/roda/issues/1484)
+-  Job report list consistency [#1328](https://github.com/keeps/roda/issues/1328)
+-  Improve default ingest plugin final states [#1300](https://github.com/keeps/roda/issues/1300)
+
+#### Security Fixes:
+
+- Blocking URL redirection from remote source ([CWE-601](https://cwe.mitre.org/data/definitions/601.html))
+- Guarding against ["Zip Slip"](https://snyk.io/research/zip-slip-vulnerability)
+- Fixed [information exposure through stack trace](https://wiki.sei.cmu.edu/confluence/display/java/ERR01-J.+Do+not+allow+exceptions+to+expose+sensitive+information)
+- Guarding against cross-site scripting ([CWE-79](https://cwe.mitre.org/data/definitions/79.html))
+
+#### Bug Fixes:
+
+-  AntivirusPlugin version command polluted by warning [#1548](https://github.com/keeps/roda/issues/1548)
+-  Siegfried task on SIP update optimization not working [#1536](https://github.com/keeps/roda/issues/1536)
+-  API create/update descriptive metadata is failing [#1516](https://github.com/keeps/roda/issues/1516)
+-  Greater than 100% progress on deletion of a list of AIPs in some cases [#1506](https://github.com/keeps/roda/issues/1506)
+
+---
+
 ## v3.4.0 (09/07/2020)
 ### Security fix:
 -  HTTP GET Request to reindex transferred resources folder can access data outside the folder [#1540](https://github.com/keeps/roda/issues/1540)
