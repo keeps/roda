@@ -302,7 +302,7 @@ public class ShowPreservationEvent extends Composite {
       eventOutcomeLabel.setStyleName("label-success");
     } else if (PluginState.FAILURE.equals(eventOutcome)) {
       eventOutcomeLabel.setStyleName("label-danger");
-    } else if (PluginState.PARTIAL_SUCCESS.equals(eventOutcome)) {
+    } else if (PluginState.PARTIAL_SUCCESS.equals(eventOutcome) || PluginState.SKIPPED.equals(eventOutcome)) {
       eventOutcomeLabel.setStyleName("label-warning");
     }
 

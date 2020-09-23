@@ -1285,9 +1285,20 @@ public final class PluginHelper {
     }
 
     String id = IdUtils.createPreservationMetadataId(PreservationMetadataType.EVENT);
-    String outcomeDetailNote = (outcome == PluginState.SUCCESS || outcome == PluginState.PARTIAL_SUCCESS)
+    String outcomeDetailNote;
+    switch (outcome) {
+      case SKIPPED:
+        outcomeDetailNote = plugin.getPreservationEventSkippedMessage();
+        break;
+      case SUCCESS:
+        outcomeDetailNote = plugin.getPreservationEventSuccessMessage();
+        break;
+      default:
+        outcomeDetailNote = plugin.getPreservationEventFailureMessage();
+    }
+/*    String outcomeDetailNote = (outcome == PluginState.SUCCESS || outcome == PluginState.PARTIAL_SUCCESS)
       ? plugin.getPreservationEventSuccessMessage()
-      : plugin.getPreservationEventFailureMessage();
+      : plugin.getPreservationEventFailureMessage();*/
     ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, startDate,
       plugin.getPreservationEventType().toString(), plugin.getPreservationEventDescription(), sources, outcomes,
       outcome.name(), outcomeDetailNote, outcomeDetailExtension, agentIds);

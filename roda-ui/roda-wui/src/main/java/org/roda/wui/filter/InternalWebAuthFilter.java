@@ -65,7 +65,7 @@ public class InternalWebAuthFilter implements Filter {
     uri.setFragment(hash);
 
     if (uri.isAbsolute()) {
-      LOGGER.error("ERROR");
+      LOGGER.error("URI value can not be absolute");
       httpResponse.sendRedirect("/");
     }
 

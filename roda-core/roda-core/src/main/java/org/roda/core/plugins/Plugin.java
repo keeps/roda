@@ -100,6 +100,10 @@ public interface Plugin<T extends IsRODAObject> {
    */
   String getPreservationEventFailureMessage();
 
+  default String getPreservationEventSkippedMessage() {
+    return "The package skipped the action.";
+  }
+
   /**
    * Returns the {@link List} of {@link PluginParameter}s necessary to run this
    * {@link Plugin}.
