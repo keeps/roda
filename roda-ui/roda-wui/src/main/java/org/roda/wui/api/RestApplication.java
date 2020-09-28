@@ -22,6 +22,7 @@ public class RestApplication extends ResourceConfig {
   private static final String RODA_API_PACKAGE = "org.roda.wui.api";
   private static final String SWAGGER_PACKAGE = "io.swagger.jaxrs.listing";
   private static final String API_VERSION = "1";
+  private static final String RODA_SWAGGER_API_TITLE = "RODA API";
 
   public RestApplication() {
     super();
@@ -36,6 +37,7 @@ public class RestApplication extends ResourceConfig {
     register(ApiOriginFilter.class);
     BeanConfig beanConfig = new BeanConfig();
     beanConfig.setVersion(API_VERSION);
+    beanConfig.setTitle(RODA_SWAGGER_API_TITLE);
     beanConfig.setBasePath(RodaConstants.API_BASE_PATH);
     beanConfig.setResourcePackage(RODA_API_PACKAGE);
     beanConfig.setScan(true);
