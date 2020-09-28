@@ -159,7 +159,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       IngestStepsUtils.mergeReports(jobPluginInfo, pluginReport);
       final SIPInformation sipInformation = pluginReport.getSipInformation();
       final List<AIP> aips = getAIPsFromReports(model, index, jobPluginInfo);
-      jobPluginInfo.updateMetaPluginInformation(report);
+      jobPluginInfo.updateMetaPluginInformation(report, cachedJob);
       PluginHelper.updateJobReportMetaPluginInformation(this, model, report, cachedJob, jobPluginInfo);
       PluginHelper.updateJobInformationAsync(this, jobPluginInfo.incrementStepsCompletedByOne());
 

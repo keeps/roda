@@ -346,10 +346,10 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     }
   }
 
-  public void updateMetaPluginInformation(Report metaReport) {
+  public void updateMetaPluginInformation(Report metaReport, Job cachedJob) {
     this.getAllReports().forEach((k, v) -> {
       v.forEach((id, report) -> {
-        report.setTitle(metaReport.getTitle());
+        report.setTitle(cachedJob.getName());
         report.setPlugin(metaReport.getPlugin());
         report.setPluginName(metaReport.getPluginName());
         report.setPluginVersion(metaReport.getPluginVersion());
