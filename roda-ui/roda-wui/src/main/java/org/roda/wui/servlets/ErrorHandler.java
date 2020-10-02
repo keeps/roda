@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 public class ErrorHandler extends HttpServlet {
 
   private static final long serialVersionUID = -8243921066429750410L;
-
   private static final Logger LOGGER = LoggerFactory.getLogger(ErrorHandler.class);
 
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -32,15 +31,23 @@ public class ErrorHandler extends HttpServlet {
     final Integer statusCode = (Integer) request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
     final String uri = (String) request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
 
-    // Log the exception
-    StringBuilder msg = new StringBuilder();
-    msg.append("[").append(statusCode).append("]").append(" ").append(uri).append(": ").append(message);
-    LOGGER.error(msg.toString(), throwable);
+    // Handle 404 error as info
+    if (statusCode.equals(404)) {
+      StringBuilder msg = new StringBuilder();
+      msg.append("[").append(statusCode).append("]").append(" ").append(uri).append(": ").append(message);
+      LOGGER.info(msg.toString(), throwable);
+    } else {
 
-    String errorPage = String.format("error_%1$s.html", statusCode);
+      // Log the exception
+      StringBuilder msg = new StringBuilder();
+      msg.append("[").append(statusCode).append("]").append(" ").append(uri).append(": ").append(message);
+      LOGGER.error(msg.toString(), throwable);
 
-    // Forward to the friendly error page
-    RequestDispatcher rd = request.getRequestDispatcher(errorPage);
-    rd.forward(request, response);
+      String errorPage = String.format("error_%1$s.html", statusCode);
+
+      // Forward to the friendly error page
+      RequestDispatcher rd = request.getRequestDispatcher(errorPage);
+      rd.forward(request, response);
+    }
   }
 }
