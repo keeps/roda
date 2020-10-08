@@ -13,11 +13,8 @@ import java.util.function.Function;
 
 import org.roda.core.common.ReturnWithExceptionsWrapper;
 import org.roda.core.data.exceptions.ReturnWithExceptions;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.DIP;
-import org.roda.core.data.v2.ip.DIPFile;
-import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.*;
+import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -95,6 +92,18 @@ public abstract class ModelObservable {
     String descriptiveMetadataBinaryId) {
     return notifyObserversSafely(
       observer -> observer.descriptiveMetadataDeleted(aipId, representationId, descriptiveMetadataBinaryId));
+  }
+
+  public ReturnWithExceptionsWrapper notifyDisposalHoldCreated(DisposalHold disposalHold) {
+    return notifyObserversSafely(observer -> observer.disposalHoldCreated(disposalHold));
+  }
+
+  public ReturnWithExceptionsWrapper notifyDisposalHoldUpdated(DisposalHold disposalHold) {
+    return notifyObserversSafely(observer -> observer.disposalHoldUpdated(disposalHold));
+  }
+
+  public ReturnWithExceptionsWrapper notifyDisposalHoldDeleted(String disposalHoldId) {
+    return notifyObserversSafely(observer -> observer.disposalHoldDeleted(disposalHoldId));
   }
 
   public ReturnWithExceptionsWrapper notifyRepresentationCreated(Representation representation) {
