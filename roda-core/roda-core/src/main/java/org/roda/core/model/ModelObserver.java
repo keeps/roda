@@ -10,11 +10,8 @@ package org.roda.core.model;
 import java.util.List;
 
 import org.roda.core.data.exceptions.ReturnWithExceptions;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.DIP;
-import org.roda.core.data.v2.ip.DIPFile;
-import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.*;
+import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -48,6 +45,12 @@ public interface ModelObserver {
 
   public ReturnWithExceptions<Void, ModelObserver> descriptiveMetadataDeleted(String aipId, String representationId,
     String descriptiveMetadataBinaryId);
+
+  public ReturnWithExceptions<Void, ModelObserver> disposalHoldCreated(DisposalHold disposalHold);
+
+  public ReturnWithExceptions<Void, ModelObserver> disposalHoldUpdated(DisposalHold disposalHold);
+
+  public ReturnWithExceptions<Void, ModelObserver> disposalHoldDeleted(String disposalHoldId);
 
   public ReturnWithExceptions<Void, ModelObserver> representationCreated(Representation representation);
 
@@ -132,5 +135,4 @@ public interface ModelObserver {
   public ReturnWithExceptions<Void, ModelObserver> dipFileUpdated(DIPFile file);
 
   public ReturnWithExceptions<Void, ModelObserver> dipFileDeleted(String dipId, List<String> path, String fileId);
-
 }

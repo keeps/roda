@@ -193,6 +193,8 @@ public final class RodaConstants {
   public static final String RODA_OBJECT_OTHERS = "results";
   public static final String RODA_OBJECT_OTHER = "result";
 
+  public static final String RODA_OBJECT_DISPOSAL_HOLD = "disposal_hold";
+
   /*
    * Installation (and most probably classpath as well) related variables
    */
@@ -551,6 +553,7 @@ public final class RodaConstants {
   public static final String STORAGE_CONTAINER_PRESERVATION_AGENTS = "agents";
   public static final String STORAGE_CONTAINER_DIP = "dip";
   public static final String STORAGE_CONTAINER_REPRESENTATION_INFORMATION = "representation-information";
+  public static final String STORAGE_CONTAINER_DISPOSAL_HOLD = "disposal-hold";
 
   public static final String STORAGE_HISTORY_CONTAINER_DATA = "data";
   public static final String STORAGE_HISTORY_CONTAINER_METADATA = "metadata";
@@ -572,6 +575,7 @@ public final class RodaConstants {
   public static final String STORAGE_DIRECTORY_OTHER = "other";
 
   public static final String STORAGE_AIP_METADATA_FILENAME = "aip.json";
+  public static final String STORAGE_DISPOSAL_HOLD_METADATA_FILENAME = "disposalHold.json";
   public static final String STORAGE_DIP_METADATA_FILENAME = "dip.json";
 
   /*

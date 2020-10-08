@@ -13,11 +13,7 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 import org.apache.commons.io.IOUtils;
@@ -26,23 +22,14 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.DIP;
-import org.roda.core.data.v2.ip.DIPFile;
-import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.*;
+import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -54,12 +41,7 @@ import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.model.LiteRODAObjectFactory;
-import org.roda.core.storage.Binary;
-import org.roda.core.storage.DefaultBinary;
-import org.roda.core.storage.DefaultDirectory;
-import org.roda.core.storage.DefaultStoragePath;
-import org.roda.core.storage.Resource;
-import org.roda.core.storage.StorageService;
+import org.roda.core.storage.*;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -376,6 +358,32 @@ public class ResourceParseUtils {
     }
 
     return aip;
+  }
+
+  public static DisposalHold getDisposalHoldMetadata(StorageService storage, String disposalHoldId)
+          throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    return getDisposalHoldMetadata(storage, disposalHoldId, ModelUtils.getDisposalHoldStoragePath(disposalHoldId));
+  }
+
+  public static DisposalHold getDisposalHoldMetadata(StorageService storage, String disposalHoldId,StoragePath storagePath)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(storagePath,
+      RodaConstants.STORAGE_DISPOSAL_HOLD_METADATA_FILENAME);
+    Binary binary = storage.getBinary(metadataStoragePath);
+
+    String json;
+    DisposalHold disposalHold = null;
+    try (InputStream inputStream = binary.getContent().createInputStream()) {
+      json = IOUtils.toString(inputStream, Charset.forName(RodaConstants.DEFAULT_ENCODING));
+      disposalHold = JsonUtils.getObjectFromJson(json, DisposalHold.class);
+
+      // Setting information that does not come in JSON
+      disposalHold.setId(disposalHoldId);
+    } catch (IOException | GenericException e) {
+      throw new GenericException("Could not parse disposal hold metadata of " + disposalHoldId + " at " + metadataStoragePath, e);
+    }
+
+    return disposalHold;
   }
 
   public static DIP getDIPMetadata(StorageService storage, StoragePath storagePath)
