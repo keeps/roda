@@ -124,7 +124,7 @@ public final class RodaConstants {
   public static final String UI_LISTS_SEARCH_SELECTEDINFO_LABEL_SELECTED_I18N_SINGLE_PROPERTY = "search.selectedInfo.label.selected.i18n.single";
   public static final String UI_LISTS_SEARCH_SELECTEDINFO_LABEL_SELECTED_I18N_MULTIPLE_PROPERTY = "search.selectedInfo.label.selected.i18n.multiple";
   public static final String UI_LISTS_SEARCH_SELECTEDINFO_LABEL_DEFAULT_I18N_PROPERTY = "search.selectedInfo.label.default.i18n";
-  
+
   public static final String UI_LISTS_COLUMNS_PROPERTY = "columns[]";
   public static final String UI_LISTS_COLUMNS_FIELD_PROPERTY = "field";
   public static final String UI_LISTS_COLUMNS_HEADER_PROPERTY = "header";
@@ -165,6 +165,7 @@ public final class RodaConstants {
   public static final String RODA_OBJECT_OTHER_METADATA = "other_metadata";
   public static final String RODA_OBJECT_MEMBER = "member";
   public static final String RODA_OBJECT_REPRESENTATION_INFORMATION = "representation_information";
+  public static final String RODA_OBJECT_DISPOSAL_SCHEDULE = "disposal_schedule";
 
   public static final String RODA_OBJECT_MEMBERS = "members";
   public static final String RODA_OBJECT_USERS = "users";
@@ -554,6 +555,7 @@ public final class RodaConstants {
   public static final String STORAGE_CONTAINER_DIP = "dip";
   public static final String STORAGE_CONTAINER_REPRESENTATION_INFORMATION = "representation-information";
   public static final String STORAGE_CONTAINER_DISPOSAL_HOLD = "disposal-hold";
+  public static final String STORAGE_CONTAINER_DISPOSAL_SCHEDULE = "disposal-schedule";
 
   public static final String STORAGE_HISTORY_CONTAINER_DATA = "data";
   public static final String STORAGE_HISTORY_CONTAINER_METADATA = "metadata";
@@ -1195,6 +1197,8 @@ public final class RodaConstants {
   public static final String PRESERVATION_LINKING_OBJECT_SOURCE = "source";
   public static final String PRESERVATION_LINKING_OBJECT_OUTCOME = "outcome";
 
+  public static final String DISPOSAL_SCHEDULE_FILE_EXTENSION = ".json";
+
   public enum PreservationEventType {
     CREATION("creation"), DEACCESSION("deaccession"), DECOMPRESSION("decompression"), NORMALIZATION("normalization"),
     FIXITY_CHECK("fixity check"), VALIDATION("validation"), CAPTURE("capture"), REPLICATION("replication"),
@@ -1433,8 +1437,8 @@ public final class RodaConstants {
     RodaConstants.REPRESENTATION_ID, RodaConstants.REPRESENTATION_AIP_ID);
 
   public static final List<String> FILE_FIELDS_TO_RETURN = Arrays.asList(RodaConstants.INDEX_UUID,
-    RodaConstants.INDEX_ID, RodaConstants.FILE_PATH, RodaConstants.FILE_REPRESENTATION_ID,
-    RodaConstants.FILE_AIP_ID, RodaConstants.FILE_ISDIRECTORY);
+    RodaConstants.INDEX_ID, RodaConstants.FILE_PATH, RodaConstants.FILE_REPRESENTATION_ID, RodaConstants.FILE_AIP_ID,
+    RodaConstants.FILE_ISDIRECTORY);
 
   public static final List<String> FILE_FORMAT_FIELDS_TO_RETURN = Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.INDEX_ID, RodaConstants.FILE_FORMAT_MIMETYPE, RodaConstants.FILE_PRONOM);
