@@ -36,6 +36,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
@@ -701,6 +702,10 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DIP);
   }
 
+  public static StoragePath getDisposalScheduleContainerPath() throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISPOSAL_SCHEDULE);
+  }
+
   public static StoragePath getDIPStoragePath(String dipId) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DIP, dipId);
   }
@@ -767,6 +772,8 @@ public final class ModelUtils {
       return getRiskIncidenceContainerPath();
     } else if (clazz.equals(DIP.class)) {
       return getDIPContainerPath();
+    } else if (clazz.equals(DisposalSchedule.class)) {
+      return getDisposalScheduleContainerPath();
     } else {
       throw new RequestNotValidException("Unknown class for getting container path: " + clazz.getName());
     }
@@ -847,5 +854,8 @@ public final class ModelUtils {
     } else {
       return inputClass;
     }
+  }
+  public static StoragePath getDisposalScheduleStoragePath(String disposalScheduleId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISPOSAL_SCHEDULE, disposalScheduleId + RodaConstants.JOB_FILE_EXTENSION);
   }
 }

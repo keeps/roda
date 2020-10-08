@@ -76,7 +76,11 @@ import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
+import org.roda.core.data.v2.ip.disposal.RetentionTriggerCode;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
@@ -163,6 +167,7 @@ public class ModelService extends ModelObservable {
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_RISK_INCIDENCE);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_DIP);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_REPRESENTATION_INFORMATION);
+      createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_DISPOSAL_SCHEDULE);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_DISPOSAL_HOLD);
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error while ensuring that all containers exist", e);
@@ -3249,7 +3254,8 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  public DisposalHold createDisposalHold(DisposalHold disposalHold, String createdBy) throws GenericException, AuthorizationDeniedException {
+  public DisposalHold createDisposalHold(DisposalHold disposalHold, String createdBy)
+    throws GenericException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     try {
@@ -3264,7 +3270,7 @@ public class ModelService extends ModelObservable {
       StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
       storage.createBinary(disposalHoldPath, new StringContentPayload(disposalHoldAsJson), false);
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
-            | AlreadyExistsException e) {
+      | AlreadyExistsException e) {
       LOGGER.error("Error creating disposal hold in storage", e);
     }
     return disposalHold;
@@ -3309,5 +3315,79 @@ public class ModelService extends ModelObservable {
     }
   }
 
+  /***************** Disposal schedule related *****************/
+  /*****************************************************************************/
 
+  public DisposalSchedule createDisposalSchedule(String title, String description, String mandate, String scopeNotes,
+    DisposalActionCode actionCode, RetentionTriggerCode retentionTriggerCode, String retentionTriggerElementId,
+    RetentionPeriodIntervalCode retentionPeriodIntervalCode, Integer retentionPeriodDuration, String createdBy)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    // create disposal schedule
+    String disposalScheduleId = IdUtils.createUUID();
+    DisposalSchedule disposalSchedule = new DisposalSchedule(disposalScheduleId, title, description, mandate,
+      scopeNotes, actionCode, retentionTriggerCode, retentionTriggerElementId, retentionPeriodIntervalCode,
+      retentionPeriodDuration, createdBy);
+
+    String disposalScheduleAsJson = JsonUtils.getJsonFromObject(disposalSchedule);
+    StoragePath disposalSchedulePath = ModelUtils.getDisposalScheduleStoragePath(disposalSchedule.getId());
+    storage.createBinary(disposalSchedulePath, new StringContentPayload(disposalScheduleAsJson), false);
+
+    return disposalSchedule;
+  }
+
+  public void updateDisposalSchedule(DisposalSchedule disposalSchedule)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    String disposalScheduleAsJson = JsonUtils.getJsonFromObject(disposalSchedule);
+    StoragePath disposalSchedulePath = ModelUtils.getDisposalScheduleStoragePath(disposalSchedule.getId());
+    storage.updateBinaryContent(disposalSchedulePath, new StringContentPayload(disposalScheduleAsJson), false, false);
+  }
+
+  public DisposalSchedule retrieveDisposalSchedule(String disposalScheduleId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    StoragePath disposalSchedulePath = ModelUtils.getDisposalScheduleStoragePath(disposalScheduleId);
+    Binary binary = storage.getBinary(disposalSchedulePath);
+    DisposalSchedule ret;
+
+    try (InputStream inputStream = binary.getContent().createInputStream()) {
+      ret = JsonUtils.getObjectFromJson(inputStream, DisposalSchedule.class);
+    } catch (IOException | GenericException e) {
+      throw new GenericException("Error reading disposal schedule: " + disposalScheduleId, e);
+    }
+
+    return ret;
+  }
+
+  public CloseableIterable<OptionalWithCause<DisposalSchedule>> listDisposalSchedules()
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+    StoragePath disposalScheduleContainerPath = ModelUtils.getDisposalScheduleContainerPath();
+
+    try {
+      CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(disposalScheduleContainerPath, false);
+      return ResourceParseUtils.convert(getStorage(), iterable, DisposalSchedule.class);
+    } catch (NotFoundException e) {
+      return new EmptyClosableIterable<>();
+    }
+  }
+
+  public void deleteDisposalSchedule(String disposalScheduleId) throws NotFoundException, GenericException,
+    AuthorizationDeniedException, RequestNotValidException, IllegalOperationException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    StoragePath disposalSchedulePath = ModelUtils.getDisposalScheduleStoragePath(disposalScheduleId);
+
+    // check if the disposal schedule was used to destroy an AIP
+    // if so, block the action and keep the disposal schedule
+    if (retrieveDisposalSchedule(disposalScheduleId).getDestroyedTimestamp() == null) {
+      // remove it from storage
+      storage.deleteResource(disposalSchedulePath);
+    } else {
+      throw new IllegalOperationException("Error deleting disposal schedule: " + disposalScheduleId
+        + ". Reason: One or more AIPs where destroyed under this disposal schedule");
+    }
+  }
 }
