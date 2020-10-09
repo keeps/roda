@@ -29,7 +29,6 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.*;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -358,32 +357,6 @@ public class ResourceParseUtils {
     }
 
     return aip;
-  }
-
-  public static DisposalHold getDisposalHoldMetadata(StorageService storage, String disposalHoldId)
-          throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    return getDisposalHoldMetadata(storage, disposalHoldId, ModelUtils.getDisposalHoldStoragePath(disposalHoldId));
-  }
-
-  public static DisposalHold getDisposalHoldMetadata(StorageService storage, String disposalHoldId,StoragePath storagePath)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(storagePath,
-      RodaConstants.STORAGE_DISPOSAL_HOLD_METADATA_FILENAME);
-    Binary binary = storage.getBinary(metadataStoragePath);
-
-    String json;
-    DisposalHold disposalHold = null;
-    try (InputStream inputStream = binary.getContent().createInputStream()) {
-      json = IOUtils.toString(inputStream, Charset.forName(RodaConstants.DEFAULT_ENCODING));
-      disposalHold = JsonUtils.getObjectFromJson(json, DisposalHold.class);
-
-      // Setting information that does not come in JSON
-      disposalHold.setId(disposalHoldId);
-    } catch (IOException | GenericException e) {
-      throw new GenericException("Could not parse disposal hold metadata of " + disposalHoldId + " at " + metadataStoragePath, e);
-    }
-
-    return disposalHold;
   }
 
   public static DIP getDIPMetadata(StorageService storage, StoragePath storagePath)

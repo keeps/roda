@@ -575,7 +575,6 @@ public final class RodaConstants {
   public static final String STORAGE_DIRECTORY_OTHER = "other";
 
   public static final String STORAGE_AIP_METADATA_FILENAME = "aip.json";
-  public static final String STORAGE_DISPOSAL_HOLD_METADATA_FILENAME = "disposalHold.json";
   public static final String STORAGE_DIP_METADATA_FILENAME = "dip.json";
 
   /*
@@ -813,6 +812,9 @@ public final class RodaConstants {
   public static final String JOB_HAS_PARTIAL_SUCCESS = "hasPartialSuccess";
   public static final String JOB_HAS_SKIPPED = "hasSkipped";
   public static final String JOB_FILE_EXTENSION = ".json";
+
+  /* Disposal related parameters */
+  public static final String DISPOSAL_HOLD_FILE_EXTENSION = ".json";
 
   /* Plugins related parameters */
   public static final String PLUGIN_PARAMS_LOCK_REQUEST_UUID = "parameter.lock_request_uuid";
