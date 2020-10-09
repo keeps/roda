@@ -20,6 +20,7 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.disposal.Disposal;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.management.AcknowledgeNotification;
 import org.roda.wui.client.management.Management;
@@ -99,6 +100,8 @@ public class ContentPanel extends SimplePanel {
     resolvers.add(Ingest.RESOLVER);
     // Management
     resolvers.add(Management.RESOLVER);
+    // Disposal
+    resolvers.add(Disposal.RESOLVER);
     // Planning
     resolvers.add(Planning.RESOLVER);
     // User Management
