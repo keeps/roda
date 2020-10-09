@@ -3269,7 +3269,49 @@ public class ModelService extends ModelObservable {
     }else{
       throw new AuthorizationDeniedException("Error deleting disposal hold: " + disposalHold.getId());
     }
+  }
 
+  public DisposalHold addHoldToAIP(DisposalHold disposalHold, String aipId)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+    try {
+      Map<Date, String> activeAIPs = disposalHold.getActiveAIPs();
+      activeAIPs.put(new Date(), aipId);
+      disposalHold.setActiveAIPs(activeAIPs);
+
+      String disposalHoldAsJson = JsonUtils.getJsonFromObject(disposalHold);
+      StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
+      storage.updateBinaryContent(disposalHoldPath, new StringContentPayload(disposalHoldAsJson), false, true);
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
+      LOGGER.error("Error adding disposal hold to AIP in storage", e);
+    }
+    return disposalHold;
+  }
+
+  public DisposalHold liftHoldInAIP(DisposalHold disposalHold, String aipId)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+    Map<Date, String> activeAIPs = disposalHold.getActiveAIPs();
+    if (!activeAIPs.containsValue(aipId)) {
+      throw new NotFoundException(
+        "The aip (" + aipId + ") not contains the disposal hold (" + disposalHold.getId() + ")");
+    }
+
+    try {
+      activeAIPs.remove(aipId);
+      disposalHold.setActiveAIPs(activeAIPs);
+
+      Map<Date, String> inactiveAIPs = disposalHold.getInactiveAIPs();
+      inactiveAIPs.put(new Date(), aipId);
+      disposalHold.setInactiveAIPs(inactiveAIPs);
+
+      String disposalHoldAsJson = JsonUtils.getJsonFromObject(disposalHold);
+      StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
+      storage.updateBinaryContent(disposalHoldPath, new StringContentPayload(disposalHoldAsJson), false, true);
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
+      LOGGER.error("Error adding disposal hold to AIP in storage", e);
+    }
+    return disposalHold;
   }
 
 }
