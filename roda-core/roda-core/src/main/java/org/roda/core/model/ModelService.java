@@ -119,6 +119,7 @@ public class ModelService extends ModelObservable {
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_RISK_INCIDENCE);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_DIP);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_REPRESENTATION_INFORMATION);
+      createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_DISPOSAL_HOLD);
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error while ensuring that all containers exist", e);
     }
@@ -3204,7 +3205,7 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  public DisposalHold createDisposalHold(DisposalHold disposalHold) throws GenericException, AuthorizationDeniedException {
+  public DisposalHold createDisposalHold(DisposalHold disposalHold, String createdBy) throws GenericException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     try {
@@ -3212,9 +3213,11 @@ public class ModelService extends ModelObservable {
         disposalHold.setId(IdUtils.createUUID());
       }
 
-      disposalHold.setCreationTimestamp(new Date());
+      disposalHold.setCreatedOn(new Date());
+      disposalHold.setCreatedBy(createdBy);
+
       String disposalHoldAsJson = JsonUtils.getJsonFromObject(disposalHold);
-      StoragePath disposalHoldPath = ModelUtils.getRiskStoragePath(disposalHold.getId());
+      StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
       storage.createBinary(disposalHoldPath, new StringContentPayload(disposalHoldAsJson), false);
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
             | AlreadyExistsException e) {
@@ -3223,12 +3226,13 @@ public class ModelService extends ModelObservable {
     return disposalHold;
   }
 
-
-  public DisposalHold updateDisposalHold(DisposalHold disposalHold)
+  public DisposalHold updateDisposalHold(DisposalHold disposalHold, String updatedBy)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
     try {
       disposalHold.setUpdatedOn(new Date());
+      disposalHold.setUpdatedBy(updatedBy);
+
       String disposalHoldAsJson = JsonUtils.getJsonFromObject(disposalHold);
       StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
 
@@ -3239,12 +3243,33 @@ public class ModelService extends ModelObservable {
     return disposalHold;
   }
 
-  public void deleteDisposalHold(String disposalHoldId)
+  public DisposalHold liftDisposalHold(DisposalHold disposalHold)
+          throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+    try {
+      disposalHold.setLiftedOn(new Date());
+      String disposalHoldAsJson = JsonUtils.getJsonFromObject(disposalHold);
+      StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
+
+      storage.updateBinaryContent(disposalHoldPath, new StringContentPayload(disposalHoldAsJson), false, true);
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
+      LOGGER.error("Error updating disposal hold in storage", e);
+    }
+    return disposalHold;
+  }
+
+  public void deleteDisposalHold(DisposalHold disposalHold, String liftedBy)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHoldId);
-    storage.deleteResource(disposalHoldPath);
+    if(disposalHold.getActiveAIPs().isEmpty() && disposalHold.getInactiveAIPs().isEmpty()){
+      disposalHold.setLiftedBy(liftedBy);
+      StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
+      storage.deleteResource(disposalHoldPath);
+    }else{
+      throw new AuthorizationDeniedException("Error deleting disposal hold: " + disposalHold.getId());
+    }
+
   }
 
 }
