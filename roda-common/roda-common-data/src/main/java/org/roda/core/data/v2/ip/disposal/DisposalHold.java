@@ -27,6 +27,8 @@ public class DisposalHold implements IsModelObject {
   private String scopeNotes;
   private Date destructionTimestamp;
 
+  private Date updatedOn;
+
   public DisposalHold(String disposalHoldId, String title, String description, String mandate, String scopeNotes) {
   }
 
@@ -93,27 +95,11 @@ public class DisposalHold implements IsModelObject {
     this.destructionTimestamp = destructionTimestamp;
   }
 
-  @Override
-  public boolean equals(Object o) {
-    if (this == o)
-      return true;
-    if (o == null || getClass() != o.getClass())
-      return false;
-    DisposalHold that = (DisposalHold) o;
-    return id.equals(that.id) && creationTimestamp.equals(that.creationTimestamp) && title.equals(that.title)
-      && description.equals(that.description) && mandate.equals(that.mandate) && scopeNotes.equals(that.scopeNotes)
-      && destructionTimestamp.equals(that.destructionTimestamp);
+  public Date getUpdatedOn() {
+    return updatedOn;
   }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(id, creationTimestamp, title, description, mandate, scopeNotes, destructionTimestamp);
-  }
-
-  @Override
-  public String toString() {
-    return "DisposalHold{" + "id='" + id + '\'' + ", creationTimestamp=" + creationTimestamp + ", title='" + title
-      + '\'' + ", description='" + description + '\'' + ", mandate='" + mandate + '\'' + ", scopeNotes='" + scopeNotes
-      + '\'' + ", destructionTimestamp=" + destructionTimestamp + '}';
+  public void setUpdatedOn(Date updatedOn) {
+    this.updatedOn = updatedOn;
   }
 }

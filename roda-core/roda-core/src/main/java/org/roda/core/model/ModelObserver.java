@@ -46,12 +46,6 @@ public interface ModelObserver {
   public ReturnWithExceptions<Void, ModelObserver> descriptiveMetadataDeleted(String aipId, String representationId,
     String descriptiveMetadataBinaryId);
 
-  public ReturnWithExceptions<Void, ModelObserver> disposalHoldCreated(DisposalHold disposalHold);
-
-  public ReturnWithExceptions<Void, ModelObserver> disposalHoldUpdated(DisposalHold disposalHold);
-
-  public ReturnWithExceptions<Void, ModelObserver> disposalHoldDeleted(String disposalHoldId);
-
   public ReturnWithExceptions<Void, ModelObserver> representationCreated(Representation representation);
 
   public ReturnWithExceptions<Void, ModelObserver> representationUpdated(Representation representation);
