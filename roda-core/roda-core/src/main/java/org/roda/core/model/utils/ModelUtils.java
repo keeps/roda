@@ -86,16 +86,8 @@ public final class ModelUtils {
     return Arrays.asList(RodaConstants.STORAGE_CONTAINER_AIP, aipId);
   }
 
-  private static List<String> getDisposalHoldPath(String disposalHoldId) {
-    return Arrays.asList(RodaConstants.STORAGE_CONTAINER_DISPOSAL_HOLD, disposalHoldId);
-  }
-
   public static StoragePath getAIPStoragePath(String aipId) throws RequestNotValidException {
     return DefaultStoragePath.parse(getAIPPath(aipId));
-  }
-
-  public static StoragePath getDisposalHoldStoragePath(String disposalHoldId) throws RequestNotValidException {
-    return DefaultStoragePath.parse(getDisposalHoldPath(disposalHoldId));
   }
 
   private static List<String> getAIPMetadataPath(String aipId) {
@@ -620,6 +612,10 @@ public final class ModelUtils {
 
   public static StoragePath getJobStoragePath(String jobId) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_JOB, jobId + RodaConstants.JOB_FILE_EXTENSION);
+  }
+
+  public static StoragePath getDisposalHoldStoragePath(String disposalHoldId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISPOSAL_HOLD, disposalHoldId + RodaConstants.DISPOSAL_HOLD_FILE_EXTENSION);
   }
 
   public static String getJobId(StoragePath jobPath) {

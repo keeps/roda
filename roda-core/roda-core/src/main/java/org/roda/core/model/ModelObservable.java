@@ -94,18 +94,6 @@ public abstract class ModelObservable {
       observer -> observer.descriptiveMetadataDeleted(aipId, representationId, descriptiveMetadataBinaryId));
   }
 
-  public ReturnWithExceptionsWrapper notifyDisposalHoldCreated(DisposalHold disposalHold) {
-    return notifyObserversSafely(observer -> observer.disposalHoldCreated(disposalHold));
-  }
-
-  public ReturnWithExceptionsWrapper notifyDisposalHoldUpdated(DisposalHold disposalHold) {
-    return notifyObserversSafely(observer -> observer.disposalHoldUpdated(disposalHold));
-  }
-
-  public ReturnWithExceptionsWrapper notifyDisposalHoldDeleted(String disposalHoldId) {
-    return notifyObserversSafely(observer -> observer.disposalHoldDeleted(disposalHoldId));
-  }
-
   public ReturnWithExceptionsWrapper notifyRepresentationCreated(Representation representation) {
     return notifyObserversSafely(observer -> observer.representationCreated(representation));
   }
