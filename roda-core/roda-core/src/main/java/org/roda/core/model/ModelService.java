@@ -3318,18 +3318,19 @@ public class ModelService extends ModelObservable {
   /***************** Disposal schedule related *****************/
   /*****************************************************************************/
 
-  public DisposalSchedule createDisposalSchedule(String title, String description, String mandate, String scopeNotes,
-    DisposalActionCode actionCode, RetentionTriggerCode retentionTriggerCode, String retentionTriggerElementId,
-    RetentionPeriodIntervalCode retentionPeriodIntervalCode, Integer retentionPeriodDuration, String createdBy)
+  public DisposalSchedule createDisposalSchedule(DisposalSchedule disposalSchedule, String createdBy)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    // create disposal schedule
-    String disposalScheduleId = IdUtils.createUUID();
-    DisposalSchedule disposalSchedule = new DisposalSchedule(disposalScheduleId, title, description, mandate,
-      scopeNotes, actionCode, retentionTriggerCode, retentionTriggerElementId, retentionPeriodIntervalCode,
-      retentionPeriodDuration, createdBy);
+    if (disposalSchedule.getId() == null) {
+      disposalSchedule.setId(IdUtils.createUUID());
+    }
+
+    disposalSchedule.setCreatedBy(createdBy);
+    disposalSchedule.setCreatedOn(new Date());
+    disposalSchedule.setUpdatedBy(createdBy);
+    disposalSchedule.setUpdatedOn(new Date());
 
     String disposalScheduleAsJson = JsonUtils.getJsonFromObject(disposalSchedule);
     StoragePath disposalSchedulePath = ModelUtils.getDisposalScheduleStoragePath(disposalSchedule.getId());
