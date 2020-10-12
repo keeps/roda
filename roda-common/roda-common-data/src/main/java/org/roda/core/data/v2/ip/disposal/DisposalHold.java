@@ -24,7 +24,11 @@ public class DisposalHold implements IsModelObject {
   private String id;
   private String title;
   private String description;
+  // describes the authority and jurisdiction under which the disposal hold
+  // operates
   private String mandate;
+  // provide additional information to users on how the disposal hold should
+  // be interpreted and applied
   private String scopeNotes;
 
   // automatically generated upon disposal hold creation action
@@ -41,8 +45,8 @@ public class DisposalHold implements IsModelObject {
   private Date updatedOn;
   private String updatedBy;
 
-  private Map<Date, String> activeAIPs;
-  private Map<Date, String> inactiveAIPs;
+  private Map<String, Date> activeAIPs;
+  private Map<String, Date> inactiveAIPs;
 
   public DisposalHold() {
     super();
@@ -131,11 +135,11 @@ public class DisposalHold implements IsModelObject {
     this.updatedOn = updatedOn;
   }
 
-  public Map<Date, String> getActiveAIPs() {
+  public Map<String, Date> getActiveAIPs() {
     return activeAIPs;
   }
 
-  public void setActiveAIPs(Map<Date, String> activeAIPs) {
+  public void setActiveAIPs(Map<String, Date> activeAIPs) {
     this.activeAIPs = activeAIPs;
   }
 
@@ -147,11 +151,11 @@ public class DisposalHold implements IsModelObject {
     this.updatedBy = updatedBy;
   }
 
-  public Map<Date, String> getInactiveAIPs() {
+  public Map<String, Date> getInactiveAIPs() {
     return inactiveAIPs;
   }
 
-  public void setInactiveAIPs(Map<Date, String> inactiveAIPs) {
+  public void setInactiveAIPs(Map<String, Date> inactiveAIPs) {
     this.inactiveAIPs = inactiveAIPs;
   }
 
@@ -187,51 +191,55 @@ public class DisposalHold implements IsModelObject {
     this.originatedBy = originatedBy;
   }
 
+  @JsonIgnore
+  public void addAIPtoActiveAIPs(String aipId) {
+    getActiveAIPs().put(aipId, new Date());
+  }
+
+  @JsonIgnore
+  public void removeActiveAIP(String aipId) {
+    getActiveAIPs().remove(aipId);
+    getInactiveAIPs().put(aipId, new Date());
+  }
+
+  @JsonIgnore
+  public void liftAllAIPs() {
+    getActiveAIPs().forEach((key, value) -> {
+      getInactiveAIPs().put(key, new Date());
+    });
+
+    getActiveAIPs().clear();
+  }
+
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
     DisposalHold that = (DisposalHold) o;
-    return Objects.equals(id, that.id) &&
-            Objects.equals(title, that.title) &&
-            Objects.equals(description, that.description) &&
-            Objects.equals(mandate, that.mandate) &&
-            Objects.equals(scopeNotes, that.scopeNotes) &&
-            Objects.equals(createdOn, that.createdOn) &&
-            Objects.equals(createdBy, that.createdBy) &&
-            Objects.equals(originatedOn, that.originatedOn) &&
-            Objects.equals(originatedBy, that.originatedBy) &&
-            Objects.equals(liftedOn, that.liftedOn) &&
-            Objects.equals(liftedBy, that.liftedBy) &&
-            Objects.equals(updatedOn, that.updatedOn) &&
-            Objects.equals(updatedBy, that.updatedBy) &&
-            Objects.equals(activeAIPs, that.activeAIPs) &&
-            Objects.equals(inactiveAIPs, that.inactiveAIPs);
+    return Objects.equals(id, that.id) && Objects.equals(title, that.title)
+      && Objects.equals(description, that.description) && Objects.equals(mandate, that.mandate)
+      && Objects.equals(scopeNotes, that.scopeNotes) && Objects.equals(createdOn, that.createdOn)
+      && Objects.equals(createdBy, that.createdBy) && Objects.equals(originatedOn, that.originatedOn)
+      && Objects.equals(originatedBy, that.originatedBy) && Objects.equals(liftedOn, that.liftedOn)
+      && Objects.equals(liftedBy, that.liftedBy) && Objects.equals(updatedOn, that.updatedOn)
+      && Objects.equals(updatedBy, that.updatedBy) && Objects.equals(activeAIPs, that.activeAIPs)
+      && Objects.equals(inactiveAIPs, that.inactiveAIPs);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, title, description, mandate, scopeNotes, createdOn, createdBy, originatedOn, originatedBy, liftedOn, liftedBy, updatedOn, updatedBy, activeAIPs, inactiveAIPs);
+    return Objects.hash(id, title, description, mandate, scopeNotes, createdOn, createdBy, originatedOn, originatedBy,
+      liftedOn, liftedBy, updatedOn, updatedBy, activeAIPs, inactiveAIPs);
   }
 
   @Override
   public String toString() {
-    return "DisposalHold{" +
-            "id='" + id + '\'' +
-            ", title='" + title + '\'' +
-            ", description='" + description + '\'' +
-            ", mandate='" + mandate + '\'' +
-            ", scopeNotes='" + scopeNotes + '\'' +
-            ", createdOn=" + createdOn +
-            ", createdBy='" + createdBy + '\'' +
-            ", originatedOn=" + originatedOn +
-            ", originatedBy='" + originatedBy + '\'' +
-            ", liftedOn=" + liftedOn +
-            ", liftedBy='" + liftedBy + '\'' +
-            ", updatedOn=" + updatedOn +
-            ", updatedBy='" + updatedBy + '\'' +
-            ", activeAIPs=" + activeAIPs +
-            ", inactiveAIPs=" + inactiveAIPs +
-            '}';
+    return "DisposalHold{" + "id='" + id + '\'' + ", title='" + title + '\'' + ", description='" + description + '\''
+      + ", mandate='" + mandate + '\'' + ", scopeNotes='" + scopeNotes + '\'' + ", createdOn=" + createdOn
+      + ", createdBy='" + createdBy + '\'' + ", originatedOn=" + originatedOn + ", originatedBy='" + originatedBy + '\''
+      + ", liftedOn=" + liftedOn + ", liftedBy='" + liftedBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='"
+      + updatedBy + '\'' + ", activeAIPs=" + activeAIPs + ", inactiveAIPs=" + inactiveAIPs + '}';
   }
 }
