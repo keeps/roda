@@ -3254,25 +3254,23 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  public DisposalHold createDisposalHold(DisposalHold disposalHold, String createdBy)
-    throws GenericException, AuthorizationDeniedException {
+  public DisposalHold createDisposalHold(DisposalHold disposalHold, String createdBy) throws GenericException,
+    AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, NotFoundException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    try {
-      if (disposalHold.getId() == null) {
-        disposalHold.setId(IdUtils.createUUID());
-      }
-
-      disposalHold.setCreatedOn(new Date());
-      disposalHold.setCreatedBy(createdBy);
-
-      String disposalHoldAsJson = JsonUtils.getJsonFromObject(disposalHold);
-      StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
-      storage.createBinary(disposalHoldPath, new StringContentPayload(disposalHoldAsJson), false);
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
-      | AlreadyExistsException e) {
-      LOGGER.error("Error creating disposal hold in storage", e);
+    if (disposalHold.getId() == null) {
+      disposalHold.setId(IdUtils.createUUID());
     }
+
+    disposalHold.setCreatedOn(new Date());
+    disposalHold.setCreatedBy(createdBy);
+    disposalHold.setUpdatedOn(new Date());
+    disposalHold.setUpdatedBy(createdBy);
+
+    String disposalHoldAsJson = JsonUtils.getJsonFromObject(disposalHold);
+    StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
+    storage.createBinary(disposalHoldPath, new StringContentPayload(disposalHoldAsJson), false);
+
     return disposalHold;
   }
 
@@ -3290,14 +3288,16 @@ public class ModelService extends ModelObservable {
     return disposalHold;
   }
 
-  public void deleteDisposalHold(DisposalHold disposalHold) throws RequestNotValidException, NotFoundException,
+  public void deleteDisposalHold(String disposalHoldId) throws RequestNotValidException, NotFoundException,
     GenericException, AuthorizationDeniedException, IllegalOperationException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    if(disposalHold.getActiveAIPs().isEmpty() && disposalHold.getInactiveAIPs().isEmpty()){
+    DisposalHold disposalHold = retrieveDisposalHold(disposalHoldId);
+
+    if (disposalHold.getActiveAIPs().isEmpty() && disposalHold.getInactiveAIPs().isEmpty()) {
       StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
       storage.deleteResource(disposalHoldPath);
-    }else{
+    } else {
       throw new IllegalOperationException("Error deleting disposal hold: " + disposalHold.getId()
         + ". Reason: One or more AIPs where associated under this disposal hold");
     }
@@ -3338,9 +3338,12 @@ public class ModelService extends ModelObservable {
     return disposalSchedule;
   }
 
-  public void updateDisposalSchedule(DisposalSchedule disposalSchedule)
+  public void updateDisposalSchedule(DisposalSchedule disposalSchedule, String updatedBy)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    disposalSchedule.setUpdatedOn(new Date());
+    disposalSchedule.setUpdatedBy(updatedBy);
 
     String disposalScheduleAsJson = JsonUtils.getJsonFromObject(disposalSchedule);
     StoragePath disposalSchedulePath = ModelUtils.getDisposalScheduleStoragePath(disposalSchedule.getId());

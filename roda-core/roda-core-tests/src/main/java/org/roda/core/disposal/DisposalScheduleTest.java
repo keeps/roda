@@ -100,7 +100,7 @@ public class DisposalScheduleTest {
     DisposalSchedule disposalSchedule = createDisposalSchedule();
     disposalSchedule.setDestroyedTimestamp(new Date());
 
-    model.updateDisposalSchedule(disposalSchedule);
+    model.updateDisposalSchedule(disposalSchedule, "admin");
     StoragePath disposalScheduleStoragePath = ModelUtils.getDisposalScheduleStoragePath(disposalSchedule.getId());
     try {
       model.deleteDisposalSchedule(disposalSchedule.getId());
