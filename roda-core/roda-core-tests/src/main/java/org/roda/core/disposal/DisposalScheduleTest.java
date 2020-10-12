@@ -124,7 +124,17 @@ public class DisposalScheduleTest {
     int retentionPeriodDuration = 10;
     String createdBy = "admin";
 
-    return model.createDisposalSchedule(title, description, mandate, scopeNotes, actionCode, triggerCode,
-      retentionTriggerElementId, periodIntervalCode, retentionPeriodDuration, createdBy);
+    DisposalSchedule schedule = new DisposalSchedule();
+    schedule.setTitle(title);
+    schedule.setDescription(description);
+    schedule.setMandate(mandate);
+    schedule.setScopeNotes(scopeNotes);
+    schedule.setActionCode(actionCode);
+    schedule.setRetentionTriggerCode(triggerCode);
+    schedule.setRetentionTriggerElementId(retentionTriggerElementId);
+    schedule.setRetentionPeriodIntervalCode(periodIntervalCode);
+    schedule.setRetentionPeriodDuration(retentionPeriodDuration);
+
+    return model.createDisposalSchedule(schedule, createdBy);
   }
 }

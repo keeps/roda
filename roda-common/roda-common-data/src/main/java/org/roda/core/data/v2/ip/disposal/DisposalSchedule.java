@@ -46,7 +46,8 @@ public class DisposalSchedule implements IsModelObject, HasId {
 
   public DisposalSchedule(String id, String title, String description, String mandate, String scopeNotes,
     DisposalActionCode actionCode, RetentionTriggerCode retentionTriggerCode, String retentionTriggerElementId,
-    RetentionPeriodIntervalCode retentionPeriodIntervalCode, Integer retentionPeriodDuration, String createdBy) {
+    RetentionPeriodIntervalCode retentionPeriodIntervalCode, Integer retentionPeriodDuration, Date createdOn,
+    String createdBy) {
     super();
     this.id = id;
     this.title = title;
@@ -59,9 +60,9 @@ public class DisposalSchedule implements IsModelObject, HasId {
     this.retentionPeriodIntervalCode = retentionPeriodIntervalCode;
     this.retentionPeriodDuration = retentionPeriodDuration;
 
-    this.createdOn = new Date();
+    this.createdOn = createdOn;
     this.createdBy = createdBy;
-    this.updatedOn = new Date();
+    this.updatedOn = createdOn;
     this.updatedBy = createdBy;
   }
 
