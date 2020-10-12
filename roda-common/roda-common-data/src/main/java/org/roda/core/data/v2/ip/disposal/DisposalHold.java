@@ -2,6 +2,8 @@ package org.roda.core.data.v2.ip.disposal;
 
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
+import java.util.TreeMap;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
@@ -25,8 +27,13 @@ public class DisposalHold implements IsModelObject {
   private String mandate;
   private String scopeNotes;
 
+  // automatically generated upon disposal hold creation action
   private Date createdOn;
   private String createdBy;
+
+  // the date on which the legal or administrative order was issued
+  private Date originatedOn;
+  private String originatedBy;
 
   private Date liftedOn;
   private String liftedBy;
@@ -37,7 +44,20 @@ public class DisposalHold implements IsModelObject {
   private Map<Date, String> activeAIPs;
   private Map<Date, String> inactiveAIPs;
 
+  public DisposalHold() {
+    super();
+    this.activeAIPs = new TreeMap<>();
+    this.inactiveAIPs = new TreeMap<>();
+  }
+
   public DisposalHold(String disposalHoldId, String title, String description, String mandate, String scopeNotes) {
+    this.id = disposalHoldId;
+    this.title = title;
+    this.description = description;
+    this.mandate = mandate;
+    this.scopeNotes = scopeNotes;
+    this.activeAIPs = new TreeMap<>();
+    this.inactiveAIPs = new TreeMap<>();
   }
 
   @JsonIgnore
@@ -149,5 +169,69 @@ public class DisposalHold implements IsModelObject {
 
   public void setLiftedBy(String liftedBy) {
     this.liftedBy = liftedBy;
+  }
+
+  public Date getOriginatedOn() {
+    return originatedOn;
+  }
+
+  public void setOriginatedOn(Date originatedOn) {
+    this.originatedOn = originatedOn;
+  }
+
+  public String getOriginatedBy() {
+    return originatedBy;
+  }
+
+  public void setOriginatedBy(String originatedBy) {
+    this.originatedBy = originatedBy;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    DisposalHold that = (DisposalHold) o;
+    return Objects.equals(id, that.id) &&
+            Objects.equals(title, that.title) &&
+            Objects.equals(description, that.description) &&
+            Objects.equals(mandate, that.mandate) &&
+            Objects.equals(scopeNotes, that.scopeNotes) &&
+            Objects.equals(createdOn, that.createdOn) &&
+            Objects.equals(createdBy, that.createdBy) &&
+            Objects.equals(originatedOn, that.originatedOn) &&
+            Objects.equals(originatedBy, that.originatedBy) &&
+            Objects.equals(liftedOn, that.liftedOn) &&
+            Objects.equals(liftedBy, that.liftedBy) &&
+            Objects.equals(updatedOn, that.updatedOn) &&
+            Objects.equals(updatedBy, that.updatedBy) &&
+            Objects.equals(activeAIPs, that.activeAIPs) &&
+            Objects.equals(inactiveAIPs, that.inactiveAIPs);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(id, title, description, mandate, scopeNotes, createdOn, createdBy, originatedOn, originatedBy, liftedOn, liftedBy, updatedOn, updatedBy, activeAIPs, inactiveAIPs);
+  }
+
+  @Override
+  public String toString() {
+    return "DisposalHold{" +
+            "id='" + id + '\'' +
+            ", title='" + title + '\'' +
+            ", description='" + description + '\'' +
+            ", mandate='" + mandate + '\'' +
+            ", scopeNotes='" + scopeNotes + '\'' +
+            ", createdOn=" + createdOn +
+            ", createdBy='" + createdBy + '\'' +
+            ", originatedOn=" + originatedOn +
+            ", originatedBy='" + originatedBy + '\'' +
+            ", liftedOn=" + liftedOn +
+            ", liftedBy='" + liftedBy + '\'' +
+            ", updatedOn=" + updatedOn +
+            ", updatedBy='" + updatedBy + '\'' +
+            ", activeAIPs=" + activeAIPs +
+            ", inactiveAIPs=" + inactiveAIPs +
+            '}';
   }
 }
