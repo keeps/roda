@@ -9,8 +9,11 @@ package org.roda.core.model;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -18,7 +21,15 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -35,7 +46,17 @@ import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
-import org.roda.core.data.exceptions.*;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthenticationDeniedException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.EmailAlreadyExistsException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IllegalOperationException;
+import org.roda.core.data.exceptions.InvalidTokenException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.utils.XMLUtils;
@@ -44,10 +65,23 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.ip.*;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.DIPFile;
+import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
+import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.metadata.*;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.ip.metadata.OtherMetadata;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -68,7 +102,17 @@ import org.roda.core.model.iterables.LogEntryStorageIterable;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.model.utils.ResourceListUtils;
 import org.roda.core.model.utils.ResourceParseUtils;
-import org.roda.core.storage.*;
+import org.roda.core.storage.Binary;
+import org.roda.core.storage.BinaryVersion;
+import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.DefaultBinary;
+import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.Directory;
+import org.roda.core.storage.EmptyClosableIterable;
+import org.roda.core.storage.Entity;
+import org.roda.core.storage.Resource;
+import org.roda.core.storage.StorageService;
+import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.HTTPUtility;
@@ -3229,89 +3273,41 @@ public class ModelService extends ModelObservable {
   public DisposalHold updateDisposalHold(DisposalHold disposalHold, String updatedBy)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
-    try {
-      disposalHold.setUpdatedOn(new Date());
-      disposalHold.setUpdatedBy(updatedBy);
+    disposalHold.setUpdatedOn(new Date());
+    disposalHold.setUpdatedBy(updatedBy);
 
-      String disposalHoldAsJson = JsonUtils.getJsonFromObject(disposalHold);
-      StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
+    String disposalHoldAsJson = JsonUtils.getJsonFromObject(disposalHold);
+    StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
 
-      storage.updateBinaryContent(disposalHoldPath, new StringContentPayload(disposalHoldAsJson), false, true);
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
-      LOGGER.error("Error updating disposal hold in storage", e);
-    }
+    storage.updateBinaryContent(disposalHoldPath, new StringContentPayload(disposalHoldAsJson), false, true);
+
     return disposalHold;
   }
 
-  public DisposalHold liftDisposalHold(DisposalHold disposalHold)
-          throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
-    try {
-      disposalHold.setLiftedOn(new Date());
-      String disposalHoldAsJson = JsonUtils.getJsonFromObject(disposalHold);
-      StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
-
-      storage.updateBinaryContent(disposalHoldPath, new StringContentPayload(disposalHoldAsJson), false, true);
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
-      LOGGER.error("Error updating disposal hold in storage", e);
-    }
-    return disposalHold;
-  }
-
-  public void deleteDisposalHold(DisposalHold disposalHold, String liftedBy)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+  public void deleteDisposalHold(DisposalHold disposalHold) throws RequestNotValidException, NotFoundException,
+    GenericException, AuthorizationDeniedException, IllegalOperationException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     if(disposalHold.getActiveAIPs().isEmpty() && disposalHold.getInactiveAIPs().isEmpty()){
-      disposalHold.setLiftedBy(liftedBy);
       StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
       storage.deleteResource(disposalHoldPath);
     }else{
-      throw new AuthorizationDeniedException("Error deleting disposal hold: " + disposalHold.getId());
+      throw new IllegalOperationException("Error deleting disposal hold: " + disposalHold.getId()
+        + ". Reason: One or more AIPs where associated under this disposal hold");
     }
   }
 
-  public DisposalHold addHoldToAIP(DisposalHold disposalHold, String aipId)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
-    try {
-      Map<Date, String> activeAIPs = disposalHold.getActiveAIPs();
-      activeAIPs.put(new Date(), aipId);
-      disposalHold.setActiveAIPs(activeAIPs);
-
-      String disposalHoldAsJson = JsonUtils.getJsonFromObject(disposalHold);
-      StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
-      storage.updateBinaryContent(disposalHoldPath, new StringContentPayload(disposalHoldAsJson), false, true);
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
-      LOGGER.error("Error adding disposal hold to AIP in storage", e);
-    }
-    return disposalHold;
-  }
-
-  public DisposalHold liftHoldInAIP(DisposalHold disposalHold, String aipId)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
-    Map<Date, String> activeAIPs = disposalHold.getActiveAIPs();
-    if (!activeAIPs.containsValue(aipId)) {
-      throw new NotFoundException(
-        "The aip (" + aipId + ") not contains the disposal hold (" + disposalHold.getId() + ")");
-    }
+  public CloseableIterable<OptionalWithCause<DisposalHold>> listDisposalHolds()
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+    StoragePath disposalHoldContainerPath = ModelUtils.getDisposalHoldContainerPath();
 
     try {
-      activeAIPs.remove(aipId);
-      disposalHold.setActiveAIPs(activeAIPs);
-
-      Map<Date, String> inactiveAIPs = disposalHold.getInactiveAIPs();
-      inactiveAIPs.put(new Date(), aipId);
-      disposalHold.setInactiveAIPs(inactiveAIPs);
-
-      String disposalHoldAsJson = JsonUtils.getJsonFromObject(disposalHold);
-      StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
-      storage.updateBinaryContent(disposalHoldPath, new StringContentPayload(disposalHoldAsJson), false, true);
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
-      LOGGER.error("Error adding disposal hold to AIP in storage", e);
+      CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(disposalHoldContainerPath, false);
+      return ResourceParseUtils.convert(getStorage(), iterable, DisposalHold.class);
+    } catch (NotFoundException e) {
+      return new EmptyClosableIterable<>();
     }
-    return disposalHold;
   }
+
 
 }

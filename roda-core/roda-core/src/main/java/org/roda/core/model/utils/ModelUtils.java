@@ -618,6 +618,10 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISPOSAL_HOLD, disposalHoldId + RodaConstants.DISPOSAL_HOLD_FILE_EXTENSION);
   }
 
+  public static StoragePath getDisposalHoldContainerPath() throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISPOSAL_HOLD);
+  }
+
   public static String getJobId(StoragePath jobPath) {
     return jobPath.getName().replace(RodaConstants.JOB_FILE_EXTENSION, "");
   }
