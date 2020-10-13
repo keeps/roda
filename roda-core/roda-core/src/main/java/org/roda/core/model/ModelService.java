@@ -76,11 +76,10 @@ import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
-import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
-import org.roda.core.data.v2.ip.disposal.RetentionTriggerCode;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
@@ -3303,16 +3302,22 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public CloseableIterable<OptionalWithCause<DisposalHold>> listDisposalHolds()
-    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+  public DisposalHolds listDisposalHolds()
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
     StoragePath disposalHoldContainerPath = ModelUtils.getDisposalHoldContainerPath();
+    DisposalHolds disposalHolds = new DisposalHolds();
 
     try {
       CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(disposalHoldContainerPath, false);
-      return ResourceParseUtils.convert(getStorage(), iterable, DisposalHold.class);
+      for (Resource resource : iterable) {
+        DisposalHold hold = ResourceParseUtils.convertResourceToObject(resource, DisposalHold.class);
+        disposalHolds.addDisposalHold(hold);
+      }
     } catch (NotFoundException e) {
-      return new EmptyClosableIterable<>();
+      return new DisposalHolds();
     }
+
+    return disposalHolds;
   }
 
   /***************** Disposal schedule related *****************/
@@ -3339,7 +3344,7 @@ public class ModelService extends ModelObservable {
     return disposalSchedule;
   }
 
-  public void updateDisposalSchedule(DisposalSchedule disposalSchedule, String updatedBy)
+  public DisposalSchedule updateDisposalSchedule(DisposalSchedule disposalSchedule, String updatedBy)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
@@ -3349,6 +3354,8 @@ public class ModelService extends ModelObservable {
     String disposalScheduleAsJson = JsonUtils.getJsonFromObject(disposalSchedule);
     StoragePath disposalSchedulePath = ModelUtils.getDisposalScheduleStoragePath(disposalSchedule.getId());
     storage.updateBinaryContent(disposalSchedulePath, new StringContentPayload(disposalScheduleAsJson), false, false);
+
+    return disposalSchedule;
   }
 
   public DisposalSchedule retrieveDisposalSchedule(String disposalScheduleId)
@@ -3366,16 +3373,23 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  public CloseableIterable<OptionalWithCause<DisposalSchedule>> listDisposalSchedules()
-    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+  public DisposalSchedules listDisposalSchedules()
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
     StoragePath disposalScheduleContainerPath = ModelUtils.getDisposalScheduleContainerPath();
+    DisposalSchedules disposalSchedules = new DisposalSchedules();
 
     try {
       CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(disposalScheduleContainerPath, false);
-      return ResourceParseUtils.convert(getStorage(), iterable, DisposalSchedule.class);
+      for (Resource resource : iterable) {
+        DisposalSchedule schedule = ResourceParseUtils.convertResourceToObject(resource, DisposalSchedule.class);
+        disposalSchedules.addObject(schedule);
+      }
+
     } catch (NotFoundException e) {
-      return new EmptyClosableIterable<>();
+      return disposalSchedules;
     }
+
+    return disposalSchedules;
   }
 
   public void deleteDisposalSchedule(String disposalScheduleId) throws NotFoundException, GenericException,

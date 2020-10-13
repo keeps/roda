@@ -29,6 +29,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
@@ -58,6 +59,8 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobMixIn;
 import org.roda.core.data.v2.jobs.PluginInfo;
@@ -77,6 +80,7 @@ import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.controllers.Browser;
+import org.roda.wui.api.controllers.Disposals;
 import org.roda.wui.api.controllers.Jobs;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.Viewers;
@@ -135,6 +139,41 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public Map<String, List<String>> retrieveSharedProperties(String localeString) {
     Locale locale = ServerTools.parseLocale(localeString);
     return RodaCoreFactory.getRodaSharedProperties(locale);
+  }
+
+  @Override
+  public DisposalSchedule createDisposalSchedule(DisposalSchedule schedule) throws AuthorizationDeniedException,
+    AlreadyExistsException, NotFoundException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Disposals.createDisposalSchedule(user, schedule);
+  }
+
+  @Override
+  public DisposalSchedule retrieveDisposalSchedule(String disposalScheduleId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.retrieveDisposalSchedule(user, disposalScheduleId);
+  }
+
+  @Override
+  public DisposalSchedules listDisposalSchedules()
+    throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.listDisposalSchedules(user);
+  }
+
+  @Override
+  public DisposalSchedule updateDisposalSchedule(DisposalSchedule schedule)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Disposals.updateDisposalSchedule(user, schedule);
+  }
+
+  @Override
+  public void deleteDisposalSchedule(String disposalScheduleId) throws NotFoundException, AuthorizationDeniedException,
+    IllegalOperationException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Disposals.deleteDisposalSchedule(user, disposalScheduleId);
   }
 
   @Override

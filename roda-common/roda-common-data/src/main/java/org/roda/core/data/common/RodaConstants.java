@@ -166,6 +166,9 @@ public final class RodaConstants {
   public static final String RODA_OBJECT_MEMBER = "member";
   public static final String RODA_OBJECT_REPRESENTATION_INFORMATION = "representation_information";
   public static final String RODA_OBJECT_DISPOSAL_SCHEDULE = "disposal_schedule";
+  public static final String RODA_OBJECT_DISPOSAL_SCHEDULES = "disposal_schedules";
+  public static final String RODA_OBJECT_DISPOSAL_HOLD = "disposal_hold";
+  public static final String RODA_OBJECT_DISPOSAL_HOLDS = "disposal_holds";
 
   public static final String RODA_OBJECT_MEMBERS = "members";
   public static final String RODA_OBJECT_USERS = "users";
@@ -193,8 +196,6 @@ public final class RodaConstants {
   public static final String RODA_OBJECT_FACET_VALUE = "facet_value";
   public static final String RODA_OBJECT_OTHERS = "results";
   public static final String RODA_OBJECT_OTHER = "result";
-
-  public static final String RODA_OBJECT_DISPOSAL_HOLD = "disposal_hold";
 
   /*
    * Installation (and most probably classpath as well) related variables
@@ -330,6 +331,8 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_DIP_FILE_ID = "dip_file_id";
   public static final String API_PATH_PARAM_DIP_FILE_UUID = "dip_file_uuid";
   public static final String API_PATH_PARAM_REPRESENTATION_INFORMATION_ID = "representation_information_id";
+  public static final String API_PATH_PARAM_DISPOSAL_SCHEDULE_ID = "disposal_schedule_id";
+  public static final String API_PATH_PARAM_DISPOSAL_HOLD_ID = "disposal_hold_id";
 
   public static final String API_PATH_PARAM_PART = "part";
   public static final String API_PATH_PARAM_NAME = "name";
@@ -415,6 +418,9 @@ public final class RodaConstants {
   public static final String CONTROLLER_DIP_FILE_ID_PARAM = "dipFileId";
   public static final String CONTROLLER_DIP_FILE_UUID_PARAM = "dipFileUUID";
   public static final String CONTROLLER_AGENT_ID_PARAM = "agentId";
+
+  public static final String CONTROLLER_DISPOSAL_SCHEDULE_PARAM = RODA_OBJECT_DISPOSAL_SCHEDULE;
+  public static final String CONTROLLER_DISPOSAL_SCHEDULE_ID_PARAM = "disposalScheduleId";
 
   public static final String CONTROLLER_ID_OBJECT_PARAM = "transferred_resource_uuid, transferred_resource_path, sip, transferred_resource_original_name";
   public static final String CONTROLLER_SIP_PARAM = "sip";
@@ -1158,6 +1164,9 @@ public final class RodaConstants {
   public static final String PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER = "linkingAgentIdentifier";
   public static final String PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER = "linkingOutcomeObjectIdentifier";
   public static final String PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER = "linkingSourceObjectIdentifier";
+
+  /* Disposal Schedule */
+  public static final String DISPOSAL_SCHEDULE_ID = "id";
 
   /* Preservation agents fields */
   public static final String PRESERVATION_AGENT_ID = "id";

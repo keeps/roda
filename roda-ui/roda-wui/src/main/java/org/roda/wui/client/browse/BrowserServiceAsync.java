@@ -29,6 +29,8 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -280,4 +282,14 @@ public interface BrowserServiceAsync {
     AsyncCallback<RepresentationInformationExtraBundle> asyncCallback);
 
   void retrieveSharedProperties(String localeName, AsyncCallback<Map<String, List<String>>> asyncCallback);
+
+  void createDisposalSchedule(DisposalSchedule schedule, AsyncCallback<DisposalSchedule> async);
+
+  void retrieveDisposalSchedule(String disposalScheduleId, AsyncCallback<DisposalSchedule> async);
+
+  void listDisposalSchedules(AsyncCallback<DisposalSchedules> async);
+
+  void updateDisposalSchedule(DisposalSchedule schedule, AsyncCallback<DisposalSchedule> async);
+
+  void deleteDisposalSchedule(String disposalScheduleId, AsyncCallback<Void> async);
 }

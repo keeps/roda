@@ -17,6 +17,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
@@ -37,6 +38,8 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -95,7 +98,7 @@ public interface BrowserService extends RemoteService {
     public static BrowserServiceAsync getInstance() {
       BrowserServiceAsync instance = (BrowserServiceAsync) GWT.create(BrowserService.class);
       ServiceDefTarget target = (ServiceDefTarget) instance;
-      target.setServiceEntryPoint(GWT.getHostPageBaseURL()  + RodaConstants.GWT_RPC_BASE_URL + SERVICE_URI);
+      target.setServiceEntryPoint(GWT.getHostPageBaseURL() + RodaConstants.GWT_RPC_BASE_URL + SERVICE_URI);
       return instance;
     }
   }
@@ -324,8 +327,7 @@ public interface BrowserService extends RemoteService {
   boolean hasDocumentation(String aipId)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException;
 
-  boolean hasSubmissions(String aipId)
-          throws AuthorizationDeniedException, RequestNotValidException, GenericException;
+  boolean hasSubmissions(String aipId) throws AuthorizationDeniedException, RequestNotValidException, GenericException;
 
   boolean showDIPEmbedded();
 
@@ -368,4 +370,19 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   Map<String, List<String>> retrieveSharedProperties(String localeName);
+
+  DisposalSchedule createDisposalSchedule(DisposalSchedule schedule) throws AuthorizationDeniedException,
+    AlreadyExistsException, NotFoundException, GenericException, RequestNotValidException;
+
+  DisposalSchedule retrieveDisposalSchedule(String disposalScheduleId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  DisposalSchedules listDisposalSchedules()
+    throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException;
+
+  DisposalSchedule updateDisposalSchedule(DisposalSchedule schedule)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  void deleteDisposalSchedule(String disposalScheduleId) throws NotFoundException, AuthorizationDeniedException,
+    IllegalOperationException, GenericException, RequestNotValidException;
 }
