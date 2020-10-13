@@ -121,7 +121,7 @@ public class DisposalScheduleResource {
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DisposalSchedule.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
-  public Response updateDIP(DisposalSchedule schedule,
+  public Response updateDisposalSchedule(DisposalSchedule schedule,
     @ApiParam(value = "Choose format in which to get the disposal schedule", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
     @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
     throws RODAException {
