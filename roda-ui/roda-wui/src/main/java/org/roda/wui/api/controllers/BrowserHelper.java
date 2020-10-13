@@ -103,6 +103,7 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataList;
@@ -3321,4 +3322,9 @@ public class BrowserHelper {
       throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException, IllegalOperationException {
     RodaCoreFactory.getModelService().deleteDisposalSchedule(disposalScheduleId);
   }
+
+  public static DisposalHold createDisposalHold(DisposalHold disposalHold, User user) throws GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException, RequestNotValidException {
+    return RodaCoreFactory.getModelService().createDisposalHold(disposalHold, user.getName());
+  }
+
 }
