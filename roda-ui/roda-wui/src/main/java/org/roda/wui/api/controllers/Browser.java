@@ -59,6 +59,8 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
@@ -1770,17 +1772,16 @@ public class Browser extends RodaWuiController {
         forceCommit);
 
       // register action
-      controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_PARENT_PARAM,
-        parentUUID, RodaConstants.CONTROLLER_FOLDERNAME_PARAM, folderName, RodaConstants.CONTROLLER_SUCCESS_PARAM,
-        true);
+      controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_PARENT_PARAM, parentUUID,
+        RodaConstants.CONTROLLER_FOLDERNAME_PARAM, folderName, RodaConstants.CONTROLLER_SUCCESS_PARAM, true);
       return transferredResource;
     } catch (GenericException e) {
       // register action
       // FIXME nvieira 20170518: does this make sense to register with SUCCESS?
       // and the other exception, should they be treated differently?
-      controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_PARENT_PARAM,
-        parentUUID, RodaConstants.CONTROLLER_FOLDERNAME_PARAM, folderName, RodaConstants.CONTROLLER_SUCCESS_PARAM,
-        false, RodaConstants.CONTROLLER_ERROR_PARAM, e.getMessage());
+      controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_PARENT_PARAM, parentUUID,
+        RodaConstants.CONTROLLER_FOLDERNAME_PARAM, folderName, RodaConstants.CONTROLLER_SUCCESS_PARAM, false,
+        RodaConstants.CONTROLLER_ERROR_PARAM, e.getMessage());
       throw e;
     }
   }
@@ -3097,7 +3098,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static boolean hasSubmissions(User user, String aipId)
-          throws AuthorizationDeniedException, RequestNotValidException, GenericException {
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -3394,6 +3395,46 @@ public class Browser extends RodaWuiController {
       throw e;
     } finally {
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_FILENAME_PARAM, filename);
+    }
+  }
+
+  public static DisposalSchedule retrieveDisposalSchedule(User user, String scheduleId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    // controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().retrieveDisposalSchedule(scheduleId);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, scheduleId, state, RodaConstants.DISPOSAL_SCHEDULE_ID, scheduleId);
+    }
+  }
+
+  public static DisposalSchedules listDisposalSchedules(User user)
+    throws GenericException, RequestNotValidException, IOException, AuthorizationDeniedException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    // controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().listDisposalSchedules();
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state);
     }
   }
 }
