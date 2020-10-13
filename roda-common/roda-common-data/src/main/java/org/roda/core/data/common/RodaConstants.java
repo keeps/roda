@@ -422,6 +422,9 @@ public final class RodaConstants {
   public static final String CONTROLLER_DISPOSAL_SCHEDULE_PARAM = RODA_OBJECT_DISPOSAL_SCHEDULE;
   public static final String CONTROLLER_DISPOSAL_SCHEDULE_ID_PARAM = "disposalScheduleId";
 
+  public static final String CONTROLLER_DISPOSAL_HOLD_PARAM = RODA_OBJECT_DISPOSAL_HOLD;
+  //public static final String CONTROLLER_DISPOSAL_HOLD_ID_PARAM = "disposalScheduleId";
+
   public static final String CONTROLLER_ID_OBJECT_PARAM = "transferred_resource_uuid, transferred_resource_path, sip, transferred_resource_original_name";
   public static final String CONTROLLER_SIP_PARAM = "sip";
   public static final String CONTROLLER_ID_OBJECT_RESOURCE_PATH = "transferred_resource_path";
@@ -1167,6 +1170,9 @@ public final class RodaConstants {
 
   /* Disposal Schedule */
   public static final String DISPOSAL_SCHEDULE_ID = "id";
+
+  /* Disposal Hold */
+  public static final String DISPOSAL_HOLD_ID = "id";
 
   /* Preservation agents fields */
   public static final String PRESERVATION_AGENT_ID = "id";

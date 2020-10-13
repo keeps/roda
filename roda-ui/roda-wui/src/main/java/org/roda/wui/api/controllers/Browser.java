@@ -59,6 +59,8 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -3435,6 +3437,46 @@ public class Browser extends RodaWuiController {
     } finally {
       // register action
       controllerAssistant.registerAction(user, state);
+    }
+  }
+
+  public static DisposalHolds listDisposalHolds(User user)
+    throws GenericException, RequestNotValidException, IOException, AuthorizationDeniedException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    // controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().listDisposalHolds();
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state);
+    }
+  }
+
+  public static DisposalHold retrieveDisposalHold(User user, String holdId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    // controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().retrieveDisposalHold(holdId);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, holdId, state, RodaConstants.DISPOSAL_HOLD_ID, holdId);
     }
   }
 }
