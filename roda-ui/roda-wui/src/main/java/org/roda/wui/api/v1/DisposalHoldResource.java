@@ -55,7 +55,7 @@ public class DisposalHoldResource {
     @ApiResponse(code = 200, message = "Successful response", response = DisposalHold.class, responseContainer = "List"),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
-  public Response listSchedules(
+  public Response listHolds(
     @ApiParam(value = "Choose format in which to get the disposal hold", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
     @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
     throws RODAException, IOException {
@@ -77,7 +77,7 @@ public class DisposalHoldResource {
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DisposalHold.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
-  public Response retrieveSchedule(
+  public Response retrieveHold(
     @ApiParam(value = "The ID of the disposal hold to retrieve.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_DISPOSAL_HOLD_ID) String holdId,
     @ApiParam(value = "Choose format in which to get the disposal hold", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
     @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
