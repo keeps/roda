@@ -36,6 +36,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -774,6 +775,8 @@ public final class ModelUtils {
       return getDIPContainerPath();
     } else if (clazz.equals(DisposalSchedule.class)) {
       return getDisposalScheduleContainerPath();
+    } else if (clazz.equals(DisposalHold.class)) {
+      return getDisposalHoldContainerPath();
     } else {
       throw new RequestNotValidException("Unknown class for getting container path: " + clazz.getName());
     }

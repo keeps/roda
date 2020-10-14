@@ -59,6 +59,8 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.jobs.Job;
@@ -174,6 +176,41 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     IllegalOperationException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Disposals.deleteDisposalSchedule(user, disposalScheduleId);
+  }
+
+  @Override
+  public DisposalHold createDisposalHold(DisposalHold hold) throws AuthorizationDeniedException, AlreadyExistsException,
+    NotFoundException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Disposals.createDisposalHold(user, hold);
+  }
+
+  @Override
+  public DisposalHold retrieveDisposalHold(String disposalHoldId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.retrieveDisposalHold(user, disposalHoldId);
+  }
+
+  @Override
+  public DisposalHolds listDisposalHolds()
+    throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.listDisposalHolds(user);
+  }
+
+  @Override
+  public DisposalHold updateDisposalHold(DisposalHold hold)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Disposals.updateDisposalHold(user, hold);
+  }
+
+  @Override
+  public void deleteDisposalHold(String disposalHoldId) throws NotFoundException, AuthorizationDeniedException,
+    IllegalOperationException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Disposals.deleteDisposalHold(user, disposalHoldId);
   }
 
   @Override

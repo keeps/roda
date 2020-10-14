@@ -3,8 +3,11 @@ package org.roda.wui.api.v1;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -19,7 +22,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.controllers.Disposals;
@@ -110,6 +112,52 @@ public class DisposalHoldResource {
     // delegate action to controller
     DisposalHold disposalhold = Disposals.createDisposalHold(user, hold);
     return Response.ok(disposalhold, mediaType).build();
+  }
+
+  @PUT
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
+  @ApiOperation(value = "Update disposal hold", notes = "Update existing disposal hold", response = DisposalHold.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DisposalHold.class),
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
+
+  public Response updateDisposalHold(DisposalHold hold,
+    @ApiParam(value = "Choose format in which to get the disposal hold", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    throws RODAException {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+
+    // get user
+    User user = UserUtility.getApiUser(request);
+
+    // delegate action to controller
+    DisposalHold updateDisposalHold = Disposals.updateDisposalHold(user, hold);
+    return Response.ok(updateDisposalHold, mediaType).build();
+  }
+
+  @DELETE
+  @Path("/{" + RodaConstants.API_PATH_PARAM_DISPOSAL_HOLD_ID + "}")
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
+  @ApiOperation(value = "Delete disposal hold", notes = "Delete disposal hold", response = Void.class)
+  @ApiResponses(value = {@ApiResponse(code = 204, message = "OK", response = Void.class),
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
+
+  public Response deleteHold(
+    @ApiParam(value = "The ID of the disposal hold to delete.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_DISPOSAL_HOLD_ID) String disposalHoldId,
+    @ApiParam(value = "Reason to delete disposal hold", required = true) @FormParam(RodaConstants.API_QUERY_PARAM_DETAILS) String details,
+    @ApiParam(value = "Choose format in which to get the response", allowableValues = RodaConstants.API_DELETE_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    throws RODAException {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+
+    // get user
+    User user = UserUtility.getApiUser(request);
+
+    // delegate action to controller
+    Disposals.deleteDisposalHold(user, disposalHoldId);
+
+    return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Disposal hold deleted"), mediaType).build();
   }
 
 }

@@ -38,6 +38,8 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.jobs.Job;
@@ -384,5 +386,20 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   void deleteDisposalSchedule(String disposalScheduleId) throws NotFoundException, AuthorizationDeniedException,
+    IllegalOperationException, GenericException, RequestNotValidException;
+
+  DisposalHold createDisposalHold(DisposalHold hold) throws AuthorizationDeniedException, AlreadyExistsException,
+    NotFoundException, GenericException, RequestNotValidException;
+
+  DisposalHold retrieveDisposalHold(String disposalHoldId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  DisposalHolds listDisposalHolds()
+    throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException;
+
+  DisposalHold updateDisposalHold(DisposalHold hold)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  void deleteDisposalHold(String disposalHoldId) throws NotFoundException, AuthorizationDeniedException,
     IllegalOperationException, GenericException, RequestNotValidException;
 }

@@ -3311,7 +3311,7 @@ public class ModelService extends ModelObservable {
       CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(disposalHoldContainerPath, false);
       for (Resource resource : iterable) {
         DisposalHold hold = ResourceParseUtils.convertResourceToObject(resource, DisposalHold.class);
-        disposalHolds.addDisposalHold(hold);
+        disposalHolds.addObject(hold);
       }
     } catch (NotFoundException e) {
       return new DisposalHolds();

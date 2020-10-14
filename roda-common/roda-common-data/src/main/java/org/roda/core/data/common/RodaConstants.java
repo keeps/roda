@@ -423,7 +423,7 @@ public final class RodaConstants {
   public static final String CONTROLLER_DISPOSAL_SCHEDULE_ID_PARAM = "disposalScheduleId";
 
   public static final String CONTROLLER_DISPOSAL_HOLD_PARAM = RODA_OBJECT_DISPOSAL_HOLD;
-  //public static final String CONTROLLER_DISPOSAL_HOLD_ID_PARAM = "disposalScheduleId";
+  public static final String CONTROLLER_DISPOSAL_HOLD_ID_PARAM = "disposalScheduleId";
 
   public static final String CONTROLLER_ID_OBJECT_PARAM = "transferred_resource_uuid, transferred_resource_path, sip, transferred_resource_original_name";
   public static final String CONTROLLER_SIP_PARAM = "sip";

@@ -9,13 +9,14 @@ import org.roda.core.data.common.RodaConstants;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.roda.core.data.v2.common.RODAObjectList;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 @javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_HOLDS)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DisposalHolds {
+public class DisposalHolds implements RODAObjectList<DisposalHold> {
   private List<DisposalHold> disposalHoldList;
 
   public DisposalHolds() {
@@ -28,17 +29,20 @@ public class DisposalHolds {
     disposalHoldList = DisposalHolds;
   }
 
-  @JsonProperty(value = RodaConstants.RODA_OBJECT_DISPOSAL_HOLDS)
-  @XmlElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_HOLD)
-  public List<DisposalHold> getDisposalHolds() {
+  @Override
+  @JsonProperty(value = RodaConstants.RODA_OBJECT_DISPOSAL_SCHEDULES)
+  @XmlElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_SCHEDULE)
+  public List<DisposalHold> getObjects() {
     return disposalHoldList;
   }
 
-  public void setDisposalHolds(List<DisposalHold> disposalHolds) {
+  @Override
+  public void setObjects(List<DisposalHold> disposalHolds) {
     this.disposalHoldList = disposalHolds;
   }
 
-  public void addDisposalHold(DisposalHold disposalHold) {
+  @Override
+  public void addObject(DisposalHold disposalHold) {
     this.disposalHoldList.add(disposalHold);
   }
 }
