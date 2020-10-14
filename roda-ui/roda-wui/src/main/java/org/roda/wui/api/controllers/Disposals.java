@@ -117,4 +117,49 @@ public class Disposals extends RodaWuiController {
               disposalHold);
     }
   }
+
+  public static DisposalHold updateDisposalHold(User user, DisposalHold disposalHold)
+          throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    // controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+
+      // delegate
+      return BrowserHelper.updateDisposalHold(disposalHold, user);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, disposalHold.getId(), state,
+              RodaConstants.CONTROLLER_DISPOSAL_HOLD_PARAM, disposalHold);
+    }
+  }
+
+  public static void deleteDisposalHold(User user, String disposalHoldId) throws RequestNotValidException,
+          GenericException, NotFoundException, AuthorizationDeniedException, IllegalOperationException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    // controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // delegate
+      BrowserHelper.deleteDisposalHold(disposalHoldId);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, disposalHoldId, state,
+              RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId);
+    }
+  }
 }

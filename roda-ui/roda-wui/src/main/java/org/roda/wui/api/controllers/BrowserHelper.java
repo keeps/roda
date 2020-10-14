@@ -3327,4 +3327,13 @@ public class BrowserHelper {
     return RodaCoreFactory.getModelService().createDisposalHold(disposalHold, user.getName());
   }
 
+  public static DisposalHold updateDisposalHold(DisposalHold disposalHold, User user) throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
+    return RodaCoreFactory.getModelService().updateDisposalHold(disposalHold, user.getName());
+  }
+
+  public static void deleteDisposalHold(String disposalHoldId)
+          throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException, IllegalOperationException {
+    RodaCoreFactory.getModelService().deleteDisposalHold(disposalHoldId);
+  }
+
 }
