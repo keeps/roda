@@ -117,7 +117,7 @@ public class DisposalScheduleResource {
   @PUT
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
-  @ApiOperation(value = "Update DIP", notes = "Update existing disposal schedule", response = DisposalSchedule.class)
+  @ApiOperation(value = "Update disposal hold", notes = "Update existing disposal schedule", response = DisposalSchedule.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DisposalSchedule.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
 
