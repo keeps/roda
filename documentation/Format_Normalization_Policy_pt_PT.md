@@ -1,7 +1,6 @@
-
 ***NOTA: A informação desta página está desatualizada. Para mais informação contacte dos administradores do projeto.***
 
-# Política de normalização de formatos
+# Suporte pela comunidade
 
 O RODA suporta qualquer formato de ficheiro, mas apenas tem ferramentas para converter automaticamente para formatos de preservação (normalização) num conjunto limitado de formatos de ficheiro e classes de objetos.
 
