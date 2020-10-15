@@ -1,4 +1,4 @@
-# Troubleshooting
+# agradecimentos
 
 O Troubleshooting é uma forma de resolução de problemas, frequentemente aplicado para reparar produtos com falhas. É uma procura lógica e sistemática pela fonte de um problema de modo a resolvê-lo e tornar o produto ou processo operacional outra vez.
 
