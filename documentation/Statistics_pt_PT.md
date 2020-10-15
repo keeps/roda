@@ -1,4 +1,4 @@
-# Configurar novas estatisticas
+# Central Authentication Service (CAS)
 
 Esta página fornece informações sobre como configurar novas estatísticas com base nas informações disponíveis no repositório. É importante saber que, para entender esta informação, é preciso ser-se um utilizador avançado com conhecimento de HTML, CSS e Javascript.
 
