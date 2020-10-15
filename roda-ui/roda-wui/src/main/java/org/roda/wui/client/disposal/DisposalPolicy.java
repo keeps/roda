@@ -50,7 +50,27 @@ public class DisposalPolicy extends Composite {
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-      getInstance().resolve(historyTokens, callback);
+      BrowserService.Util.getInstance().listDisposalSchedules(new AsyncCallback<DisposalSchedules>() {
+        @Override
+        public void onFailure(Throwable throwable) {
+        }
+
+        @Override
+        public void onSuccess(DisposalSchedules disposalSchedules) {
+          BrowserService.Util.getInstance().listDisposalHolds(new AsyncCallback<DisposalHolds>() {
+            @Override
+            public void onFailure(Throwable throwable) {
+
+            }
+
+            @Override
+            public void onSuccess(DisposalHolds disposalHolds) {
+              callback.onSuccess(new DisposalPolicy(disposalSchedules,disposalHolds));
+            }
+          });
+
+        }
+      });
     }
 
     @Override
@@ -259,6 +279,11 @@ public class DisposalPolicy extends Composite {
     // Disposal schedules table
     createDisposalSchedulesPanel(disposalSchedules);
 
+      content.add(schedulesPanel);
+
+
+
+    }
     disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
   }
 
