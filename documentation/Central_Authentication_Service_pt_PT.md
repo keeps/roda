@@ -52,25 +52,25 @@ Adicione estas linhas com a configuração LDAP
 # LDAP General properties
 #========================================
 ldap.url=ldap://localhost:10389
-    
+
 # Start TLS for SSL connections
 ldap.useStartTLS=false
-    
+
 # Directory root DN
 ldap.rootDn=dc=roda,dc=org
-    
+
 # Base DN of users to be authenticated
 ldap.baseDn=ou=users,dc=roda,dc=org
-    
+
 # LDAP connection timeout in milliseconds
 ldap.connectTimeout=3000
-    
+
 # Manager credential DN
 ldap.managerDn=uid=admin,ou=system
-    
+
 # Manager credential password
 ldap.managerPassword=roda
-    
+
 #========================================
 # LDAP connection pool configuration
 #========================================
@@ -78,33 +78,33 @@ ldap.pool.minSize=1
 ldap.pool.maxSize=10
 ldap.pool.validateOnCheckout=false
 ldap.pool.validatePeriodically=true
-    
+
 # Amount of time in milliseconds to block on pool exhausted condition
 # before giving up.
 ldap.pool.blockWaitTime=3000
-    
+
 # Frequency of connection validation in seconds
 # Only applies if validatePeriodically=true
 ldap.pool.validatePeriod=300
-    
+
 # Attempt to prune connections every N seconds
 ldap.pool.prunePeriod=300
-    
+
 # Maximum amount of time an idle connection is allowed to be in
 # pool before it is liable to be removed/destroyed
 ldap.pool.idleTime=600
-    
+
 #========================================
 # LDAP Authentication
 #========================================
 ldap.authn.searchFilter=uid={user}
-    
+
 # Ldap domain used to resolve dn
 ldap.domain=roda.org
-    
+
 # Should LDAP Password Policy be enabled?
 ldap.usePpolicy=false
-    
+
 # Allow multiple DNs during authentication?
 ldap.allowMultipleDns=false
 ```
@@ -153,9 +153,9 @@ ldap.allowMultipleDns=false
 ### Prepare o SSL para o Jetty
 
 Crie uma keystore em **etc/jetty/thekeystore** com a password **changeit**.
-    
+
 **NOTA**: Quando o comando perguntar "Qual é o seu primeiro e último nome?", escreva **localhost**.
-    
+
 ```bash
 keytool -keystore etc/jetty/thekeystore -alias jetty -genkey -keyalg RSA -sigalg SHA256withRSA
 ```
@@ -178,7 +178,7 @@ sudo cp -r etc/* /etc/cas
     <scope>runtime</scope>
 </dependency>
 ```
-    
+
 ```xml
 <!-- Add support for LDAP authentication -->
 <dependency>
@@ -211,7 +211,7 @@ sudo cp -r etc/* /etc/cas
        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
        http://www.ldaptive.org/schema/spring-ext http://www.ldaptive.org/schema/spring-ext.xsd">
-    
+
     <bean id="ldapAuthenticationHandler"
           class="org.jasig.cas.authentication.LdapAuthenticationHandler"
           p:principalIdAttribute="uid"
@@ -223,7 +223,7 @@ sudo cp -r etc/* /etc/cas
             </map>
         </property>
     </bean>
-    
+
     <ldaptive:ad-authenticator id="authenticator"
                                ldapUrl="${ldap.url}"
                                userFilter="${ldap.authn.searchFilter}"
@@ -244,7 +244,7 @@ sudo cp -r etc/* /etc/cas
                                useSSL="${ldap.use.ssl:false}"
                                subtreeSearch="${ldap.subtree.search:true}"
                                useStartTLS="${ldap.useStartTLS}" />
-    
+
     <util:map id="authenticationHandlersResolvers">
         <entry key-ref="ldapAuthenticationHandler" value-ref="primaryPrincipalResolver" />
         <!--
@@ -252,18 +252,18 @@ sudo cp -r etc/* /etc/cas
         <entry key-ref="primaryAuthenticationHandler" value-ref="primaryPrincipalResolver" />
         -->
     </util:map>
-    
+
     <util:list id="authenticationMetadataPopulators">
         <ref bean="successfulHandlerMetaDataPopulator" />
         <ref bean="rememberMeAuthenticationMetaDataPopulator" />
     </util:list>
-    
+
     <bean id="attributeRepository" class="org.jasig.services.persondir.support.NamedStubPersonAttributeDao"
           p:backingMap-ref="attrRepoBackingMap" />
-    
+
     <alias name="acceptUsersAuthenticationHandler" alias="primaryAuthenticationHandler" />
     <alias name="personDirectoryPrincipalResolver" alias="primaryPrincipalResolver" />
-    
+
     <util:map id="attrRepoBackingMap">
         <entry key="uid" value="uid" />
         <entry key="eduPersonAffiliation" value="eduPersonAffiliation" />
@@ -277,31 +277,31 @@ sudo cp -r etc/* /etc/cas
             </list>
         </entry>
     </util:map>
-    
+
     <alias name="serviceThemeResolver" alias="themeResolver" />
-    
+
     <alias name="jsonServiceRegistryDao" alias="serviceRegistryDao" />
-    
+
     <alias name="defaultTicketRegistry" alias="ticketRegistry" />
-    
+
     <alias name="ticketGrantingTicketExpirationPolicy" alias="grantingTicketExpirationPolicy" />
     <alias name="multiTimeUseOrTimeoutExpirationPolicy" alias="serviceTicketExpirationPolicy" />
-    
+
     <alias name="anyAuthenticationPolicy" alias="authenticationPolicy" />
     <alias name="acceptAnyAuthenticationPolicyFactory" alias="authenticationPolicyFactory" />
-    
+
     <bean id="auditTrailManager"
           class="org.jasig.inspektr.audit.support.Slf4jLoggingAuditTrailManager"
           p:entrySeparator="${cas.audit.singleline.separator:|}"
           p:useSingleLine="${cas.audit.singleline:false}"/>
-    
+
     <alias name="neverThrottle" alias="authenticationThrottle" />
-    
+
     <util:list id="monitorsList">
         <ref bean="memoryMonitor" />
         <ref bean="sessionMonitor" />
     </util:list>
-    
+
     <alias name="defaultPrincipalFactory" alias="principalFactory" />
     <alias name="defaultAuthenticationTransactionManager" alias="authenticationTransactionManager" />
     <alias name="defaultPrincipalElectionStrategy" alias="principalElectionStrategy" />
@@ -330,7 +330,7 @@ Se as credenciais forem válidas, verá a mensagem "**Log In Successful**".
 
 **NOTA**: O certificado que geramos acima utiliza a tecnologia de assinatura automática e o browser irá reclamar com isso.
 Para fins de teste, pode ignorar esse aviso e aceitar o certificado.
-    
+
 
 ## Prepare o RODA para usar o CAS
 
@@ -349,16 +349,16 @@ Para fins de teste, pode ignorar esse aviso e aceitar o certificado.
 ##############################################
 # Internal filters
 ##############################################
-    
+
 # Disable internal filters
 ui.filter.internal.enabled = false
 ui.filter.internal.realm = RODA REST API
 ui.filter.internal.exclusions = ^/swagger.json,^/v1/theme/?
-    
+
 ##############################################
 # CAS filters
 ##############################################
-    
+
 # Enable CAS filters
 ui.filter.cas.enabled = true
 ui.filter.cas.casServerUrlPrefix = https://localhost:8443/cas
