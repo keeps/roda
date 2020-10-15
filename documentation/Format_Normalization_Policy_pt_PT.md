@@ -1,4 +1,3 @@
-
 ***NOTA: A informação desta página está desatualizada. Para mais informação contacte dos administradores do projeto.***
 
 # Política de normalização de formatos
