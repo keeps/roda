@@ -6,11 +6,28 @@
 
     <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
     <g:FlowPanel styleName="wui-representation-information-network" addStyleNames="wrapper skip_padding">
+
         <g:FlowPanel addStyleNames="row full_width skip_padding">
-            <g:FlowPanel addStyleNames="col_12 content" ui:field="content">
+            <g:FlowPanel addStyleNames="col_12">
                 <common:TitlePanel text="{messages.disposalPolicyTitle}" iconClass="DisposalPolicy"/>
                 <g:FlowPanel addStyleNames="page-description" ui:field="disposalPolicyDescription"></g:FlowPanel>
             </g:FlowPanel>
+        </g:FlowPanel>
+
+        <g:FlowPanel addStyleNames="content">
+            <g:FlowPanel addStyleNames="row full_width skip_padding" ui:field="contentDisposalSchedulesTable">
+            </g:FlowPanel>
+
+            <g:Button addStyleNames="btn btn-block btn-plus" ui:field="newDisposalSchedule">
+                <ui:text from='{messages.newDisposalScheduleTitle}' />
+            </g:Button>
+
+            <g:FlowPanel addStyleNames="row full_width skip_padding" ui:field="contentDisposalHoldsTable">
+            </g:FlowPanel>
+
+            <g:Button addStyleNames="btn btn-block btn-plus" ui:field="newDisposalHold">
+                <ui:text from='{messages.newDisposalHoldTitle}' />
+            </g:Button>
         </g:FlowPanel>
     </g:FlowPanel>
 </ui:UiBinder>
