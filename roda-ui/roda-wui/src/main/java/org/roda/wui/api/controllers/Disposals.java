@@ -8,6 +8,7 @@ import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.log.LogEntryState;
@@ -35,7 +36,7 @@ public class Disposals extends RodaWuiController {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    // controllerAssistant.checkRoles(user);
+    controllerAssistant.checkRoles(user);
 
     LogEntryState state = LogEntryState.SUCCESS;
 
@@ -56,7 +57,7 @@ public class Disposals extends RodaWuiController {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    // controllerAssistant.checkRoles(user);
+    controllerAssistant.checkRoles(user);
 
     LogEntryState state = LogEntryState.SUCCESS;
 
@@ -79,7 +80,7 @@ public class Disposals extends RodaWuiController {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    // controllerAssistant.checkRoles(user);
+    controllerAssistant.checkRoles(user);
 
     LogEntryState state = LogEntryState.SUCCESS;
 
@@ -96,13 +97,12 @@ public class Disposals extends RodaWuiController {
     }
   }
 
-  public static DisposalHold createDisposalHold(User user, DisposalHold disposalHold)
-          throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
-          AlreadyExistsException {
+  public static DisposalHold createDisposalHold(User user, DisposalHold disposalHold) throws GenericException,
+    AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    // controllerAssistant.checkRoles(user);
+    controllerAssistant.checkRoles(user);
 
     LogEntryState state = LogEntryState.SUCCESS;
 
@@ -113,17 +113,16 @@ public class Disposals extends RodaWuiController {
       throw e;
     } finally {
       // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_DISPOSAL_HOLD_PARAM,
-              disposalHold);
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_DISPOSAL_HOLD_PARAM, disposalHold);
     }
   }
 
   public static DisposalHold updateDisposalHold(User user, DisposalHold disposalHold)
-          throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    // controllerAssistant.checkRoles(user);
+    controllerAssistant.checkRoles(user);
 
     LogEntryState state = LogEntryState.SUCCESS;
 
@@ -137,16 +136,16 @@ public class Disposals extends RodaWuiController {
     } finally {
       // register action
       controllerAssistant.registerAction(user, disposalHold.getId(), state,
-              RodaConstants.CONTROLLER_DISPOSAL_HOLD_PARAM, disposalHold);
+        RodaConstants.CONTROLLER_DISPOSAL_HOLD_PARAM, disposalHold);
     }
   }
 
   public static void deleteDisposalHold(User user, String disposalHoldId) throws RequestNotValidException,
-          GenericException, NotFoundException, AuthorizationDeniedException, IllegalOperationException {
+    GenericException, NotFoundException, AuthorizationDeniedException, IllegalOperationException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    // controllerAssistant.checkRoles(user);
+    controllerAssistant.checkRoles(user);
 
     LogEntryState state = LogEntryState.SUCCESS;
 
@@ -158,8 +157,76 @@ public class Disposals extends RodaWuiController {
       throw e;
     } finally {
       // register action
-      controllerAssistant.registerAction(user, disposalHoldId, state,
-              RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId);
+      controllerAssistant.registerAction(user, disposalHoldId, state, RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM,
+        disposalHoldId);
+    }
+  }
+
+  public static DisposalConfirmationMetadata createDisposalConfirmationMetadata(User user,
+    DisposalConfirmationMetadata confirmationMetadata) throws GenericException, AuthorizationDeniedException,
+    RequestNotValidException, NotFoundException, AlreadyExistsException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return BrowserHelper.createDisposalConfirmationMetadata(confirmationMetadata, user);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_DISPOSAL_CONFIRMATION_METADATA_PARAM,
+        confirmationMetadata);
+    }
+  }
+
+  public static DisposalConfirmationMetadata updateDisposalConfirmationMetadata(User user,
+    DisposalConfirmationMetadata confirmationMetadata) throws AuthorizationDeniedException, GenericException,
+    NotFoundException, RequestNotValidException, AlreadyExistsException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+
+      // delegate
+      return BrowserHelper.updateDisposalConfirmationMetadata(confirmationMetadata, user);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, confirmationMetadata.getId(), state,
+        RodaConstants.CONTROLLER_DISPOSAL_CONFIRMATION_METADATA_PARAM, confirmationMetadata);
+    }
+  }
+
+  public static void deleteDisposalConfirmation(User user, String disposalConfirmationId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // delegate
+      BrowserHelper.deleteDisposalConfirmation(disposalConfirmationId);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, disposalConfirmationId, state,
+        RodaConstants.CONTROLLER_DISPOSAL_CONFIRMATION_ID_PARAM, disposalConfirmationId);
     }
   }
 }

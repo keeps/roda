@@ -76,6 +76,7 @@ import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
@@ -168,6 +169,7 @@ public class ModelService extends ModelObservable {
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_REPRESENTATION_INFORMATION);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_DISPOSAL_SCHEDULE);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_DISPOSAL_HOLD);
+      createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_DISPOSAL_CONFIRMATION);
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error while ensuring that all containers exist", e);
     }
@@ -3011,6 +3013,11 @@ public class ModelService extends ModelObservable {
         objectClass);
     } else if (Report.class.equals(objectClass)) {
       ret = ResourceParseUtils.convertLite(getStorage(), listReportResources(), objectClass);
+      /*
+       * } else if (DisposalConfirmation.class.equals(objectClass)) { ret =
+       * ResourceParseUtils.convertLite(getStorage(),
+       * ResourceListUtils.listDisposalConfirmationResources(storage), objectClass);
+       */
     } else {
       StoragePath containerPath = ModelUtils.getContainerPath(objectClass);
       final CloseableIterable<Resource> resourcesIterable = storage.listResourcesUnderContainer(containerPath, false);
@@ -3407,5 +3414,80 @@ public class ModelService extends ModelObservable {
       throw new IllegalOperationException("Error deleting disposal schedule: " + disposalScheduleId
         + ". Reason: One or more AIPs where destroyed under this disposal schedule");
     }
+  }
+
+  /***************** Disposal confirmations related *****************/
+  /*****************************************************************************/
+  public DisposalConfirmationMetadata retrieveDisposalConfirmationMetadata(String disposalConfirmationId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(
+      ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId),
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME);
+    Binary binary = storage.getBinary(metadataStoragePath);
+    DisposalConfirmationMetadata ret;
+
+    try (InputStream inputStream = binary.getContent().createInputStream()) {
+      ret = JsonUtils.getObjectFromJson(inputStream, DisposalConfirmationMetadata.class);
+    } catch (IOException | GenericException e) {
+      throw new GenericException("Error reading disposal confirmation: " + disposalConfirmationId, e);
+    }
+
+    return ret;
+  }
+
+  public DisposalConfirmationMetadata createDisposalConfirmationMetadata(
+    DisposalConfirmationMetadata disposalConfirmationMetadata, String createdBy)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    if (disposalConfirmationMetadata.getId() == null) {
+      disposalConfirmationMetadata.setId(IdUtils.createUUID());
+    }
+
+    disposalConfirmationMetadata.setCreatedBy(createdBy);
+    disposalConfirmationMetadata.setCreatedOn(new Date());
+    disposalConfirmationMetadata.setUpdatedBy(createdBy);
+    disposalConfirmationMetadata.setUpdatedOn(new Date());
+
+    String disposalConfirmationAsJson = JsonUtils.getJsonFromObject(disposalConfirmationMetadata);
+
+    DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(
+      ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationMetadata.getId()),
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME);
+
+    storage.createBinary(metadataStoragePath, new StringContentPayload(disposalConfirmationAsJson), false);
+    notifyDisposalConfirmationCreatedOrUpdated(disposalConfirmationMetadata).failOnError();
+
+    return disposalConfirmationMetadata;
+  }
+
+  public DisposalConfirmationMetadata updateDisposalConfirmationMetadata(
+    DisposalConfirmationMetadata disposalConfirmationMetadata, String updatedBy) throws AuthorizationDeniedException,
+    RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    disposalConfirmationMetadata.setUpdatedBy(updatedBy);
+    disposalConfirmationMetadata.setUpdatedOn(new Date());
+
+    String disposalConfirmationAsJson = JsonUtils.getJsonFromObject(disposalConfirmationMetadata);
+
+    DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(
+      ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationMetadata.getId()),
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME);
+
+    storage.createBinary(metadataStoragePath, new StringContentPayload(disposalConfirmationAsJson), false);
+    notifyDisposalConfirmationCreatedOrUpdated(disposalConfirmationMetadata).failOnError();
+
+    return disposalConfirmationMetadata;
+  }
+
+  public void deleteDisposalConfirmation(String disposalConfirmationId)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    StoragePath disposalSchedulePath = ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId);
+    storage.deleteResource(disposalSchedulePath);
+    notifyDisposalConfirmationDeleted(disposalConfirmationId, false).failOnError();
   }
 }

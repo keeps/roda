@@ -168,6 +168,8 @@ public final class RodaConstants {
   public static final String RODA_OBJECT_DISPOSAL_SCHEDULES = "disposal_schedules";
   public static final String RODA_OBJECT_DISPOSAL_HOLD = "disposal_hold";
   public static final String RODA_OBJECT_DISPOSAL_HOLDS = "disposal_holds";
+  public static final String RODA_OBJECT_DISPOSAL_CONFIRMATION_METADATA = "disposal_confirmation_metadata";
+  public static final String RODA_OBJECT_DISPOSAL_CONFIRMATIONS_METADATA = "disposal_confirmations_metadata";
 
   public static final String RODA_OBJECT_MEMBERS = "members";
   public static final String RODA_OBJECT_USERS = "users";
@@ -332,6 +334,7 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_REPRESENTATION_INFORMATION_ID = "representation_information_id";
   public static final String API_PATH_PARAM_DISPOSAL_SCHEDULE_ID = "disposal_schedule_id";
   public static final String API_PATH_PARAM_DISPOSAL_HOLD_ID = "disposal_hold_id";
+  public static final String API_PATH_PARAM_DISPOSAL_CONFIRMATION_ID = "disposal_confirmation_id";
 
   public static final String API_PATH_PARAM_PART = "part";
   public static final String API_PATH_PARAM_NAME = "name";
@@ -423,6 +426,9 @@ public final class RodaConstants {
 
   public static final String CONTROLLER_DISPOSAL_HOLD_PARAM = RODA_OBJECT_DISPOSAL_HOLD;
   public static final String CONTROLLER_DISPOSAL_HOLD_ID_PARAM = "disposalScheduleId";
+
+  public static final String CONTROLLER_DISPOSAL_CONFIRMATION_METADATA_PARAM = RODA_OBJECT_DISPOSAL_CONFIRMATION_METADATA;
+  public static final String CONTROLLER_DISPOSAL_CONFIRMATION_ID_PARAM = "disposalConfirmationId";
 
   public static final String CONTROLLER_ID_OBJECT_PARAM = "transferred_resource_uuid, transferred_resource_path, sip, transferred_resource_original_name";
   public static final String CONTROLLER_SIP_PARAM = "sip";
@@ -546,6 +552,7 @@ public final class RodaConstants {
   public static final String INDEX_DIP = "DIP";
   public static final String INDEX_DIP_FILE = "DIPFile";
   public static final String INDEX_REPRESENTATION_INFORMATION = "RepresentationInformation";
+  public static final String INDEX_DISPOSAL_CONFIRMATION = "DisposalConfirmation";
 
   /*
    * STORAGE CONTAINERS
@@ -564,6 +571,12 @@ public final class RodaConstants {
   public static final String STORAGE_CONTAINER_REPRESENTATION_INFORMATION = "representation-information";
   public static final String STORAGE_CONTAINER_DISPOSAL_HOLD = "disposal-hold";
   public static final String STORAGE_CONTAINER_DISPOSAL_SCHEDULE = "disposal-schedule";
+  public static final String STORAGE_CONTAINER_DISPOSAL_CONFIRMATION = "disposal-confirmation";
+
+  /*
+   * Disposal Confirmation
+   */
+  public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME = "metadata.json";
 
   public static final String STORAGE_HISTORY_CONTAINER_DATA = "data";
   public static final String STORAGE_HISTORY_CONTAINER_METADATA = "metadata";
@@ -824,6 +837,16 @@ public final class RodaConstants {
   public static final String JOB_HAS_PARTIAL_SUCCESS = "hasPartialSuccess";
   public static final String JOB_HAS_SKIPPED = "hasSkipped";
   public static final String JOB_FILE_EXTENSION = ".json";
+
+  public static final String DISPOSAL_CONFIRMATION_APPROVER = "approver";
+  public static final String DISPOSAL_CONFIRMATION_CREATED_ON = "createdOn";
+  public static final String DISPOSAL_CONFIRMATION_CREATED_BY = "createdBy";
+  public static final String DISPOSAL_CONFIRMATION_UPDATED_ON = "updatedOn";
+  public static final String DISPOSAL_CONFIRMATION_UPDATED_BY = "updatedBy";
+  public static final String DISPOSAL_CONFIRMATION_NUMBER_OF_AIPS = "numberOfAIPs";
+  public static final String DISPOSAL_CONFIRMATION_NUMBER_OF_COLLECTIONS = "numberOfCollections";
+  public static final String DISPOSAL_CONFIRMATION_STATE = "state";
+
 
   /* Disposal related parameters */
   public static final String DISPOSAL_HOLD_FILE_EXTENSION = ".json";
@@ -1174,6 +1197,9 @@ public final class RodaConstants {
 
   /* Disposal Hold */
   public static final String DISPOSAL_HOLD_ID = "id";
+
+  /* Disposal Confirmation */
+  public static final String DISPOSAL_COFIRMATION_ID = "id";
 
   /* Preservation agents fields */
   public static final String PRESERVATION_AGENT_ID = "id";
@@ -1535,6 +1561,10 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_CREATE_GROUP = "org.roda.wui.api.controllers.UserManagement.createGroup";
   public static final String PERMISSION_METHOD_UPDATE_USER = "org.roda.wui.api.controllers.UserManagement.updateUser";
   public static final String PERMISSION_METHOD_DELETE_USER = "org.roda.wui.api.controllers.UserManagement.deleteUser";
+
+  public static final String PERMISSION_METHOD_CREATE_DISPOSAL_SCHEDULE = "org.roda.wui.api.controllers.Disposals.createDisposalSchedule";
+  public static final String PERMISSION_METHOD_DELETE_DISPOSAL_SCHEDULE = "org.roda.wui.api.controllers.Disposals.deleteDisposalSchedule";
+  public static final String PERMISSION_METHOD_UPDATE_DISPOSAL_SCHEDULE = "org.roda.wui.api.controllers.Disposals.updateDisposalSchedule";
 
   public static final String PERMISSION_METHOD_STOP_JOB = "org.roda.wui.api.controllers.Jobs.stopJob";
 
