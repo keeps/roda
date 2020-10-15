@@ -89,8 +89,8 @@ public class DisposalConfirmations extends Composite {
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty()) {
       callback.onSuccess(this);
-    }  /*else {
-       * String basePage = historyTokens.remove(0); if
+    } /*
+       * else { String basePage = historyTokens.remove(0); if
        * (ShowRepresentationInformation.RESOLVER.getHistoryToken().equals(basePage)) {
        * ShowRepresentationInformation.RESOLVER.resolve(historyTokens, callback); }
        * else if
@@ -109,6 +109,5 @@ public class DisposalConfirmations extends Composite {
        * callback.onSuccess(this); } else { HistoryUtils.newHistory(RESOLVER);
        * callback.onSuccess(null); }
        */
-    }
   }
 }
