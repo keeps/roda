@@ -1,4 +1,4 @@
-# Avaliação de riscos
+# Politicas de normalização de formatos
 
 O RODA vem com um sistema de gestão de riscos pré-carregado com mais de 80 riscos de preservação obtidos do [Digital Repository Audit Method Based on Risk Assessment (DRAMBORA)](http://www.repositoryaudit.eu) desenvolvido pelo [Digital Curation Centre (DCC)](http://www.dcc.ac.uk) e pela DigitalPreservationEurope (DPE).
 
