@@ -10,17 +10,15 @@
         <g:FlowPanel addStyleNames="row full_width skip_padding">
             <g:FlowPanel addStyleNames="col_12">
                 <common:TitlePanel text="{messages.disposalPolicyTitle}" iconClass="DisposalPolicy"/>
-                <g:FlowPanel addStyleNames="page-description" ui:field="disposalPolicyDescription"/>
+                <g:FlowPanel addStyleNames="page-description" ui:field="disposalPolicyDescription"></g:FlowPanel>
                 <g:FlowPanel ui:field="contentDisposalSchedulesTable">
                 </g:FlowPanel>
-                <g:Button addStyleNames="btn btn-plus" ui:field="newDisposalSchedule">
-                    <ui:text from='{messages.newDisposalScheduleTitle}'/>
-                </g:Button>
+                <g:FlowPanel ui:field="newDisposalSchedule">
+                </g:FlowPanel>
                 <g:FlowPanel ui:field="contentDisposalHoldsTable">
                 </g:FlowPanel>
-                <g:Button addStyleNames="btn btn-plus" ui:field="newDisposalHold">
-                    <ui:text from='{messages.newDisposalHoldTitle}'/>
-                </g:Button>
+                <g:FlowPanel  ui:field="newDisposalHold">
+                </g:FlowPanel>
             </g:FlowPanel>
         </g:FlowPanel>
     </g:FlowPanel>

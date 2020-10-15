@@ -2,6 +2,7 @@ package org.roda.wui.client.disposal;
 
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
@@ -10,12 +11,15 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -38,48 +42,13 @@ import config.i18n.client.ClientMessages;
  */
 
 public class DisposalPolicy extends Composite {
-  public static final HistoryResolver RESOLVER = new HistoryResolver() {
-    @Override
-    public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-      BrowserService.Util.getInstance().listDisposalSchedules(new AsyncCallback<DisposalSchedules>() {
-        @Override
-        public void onFailure(Throwable throwable) {
+  public static final HistoryResolver RESOLVER=new HistoryResolver(){@Override public void resolve(List<String>historyTokens,AsyncCallback<Widget>callback){if(PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_SCHEDULES)&&PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_HOLDS)){loadDisposalSchedulesAndHolds(callback);}else if(PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_SCHEDULES)){loadDisposalSchedules(callback);}else if(PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_HOLDS)){loadDisposalHolds(callback);}else{HistoryUtils.newHistory(Disposal.RESOLVER,DisposalConfirmations.RESOLVER.getHistoryToken());}}
 
-        }
+  @Override public void isCurrentUserPermitted(AsyncCallback<Boolean>callback){UserLogin.getInstance().checkRole(this,callback);}
 
-        @Override
-        public void onSuccess(DisposalSchedules disposalSchedules) {
-          BrowserService.Util.getInstance().listDisposalHolds(new AsyncCallback<DisposalHolds>() {
-            @Override
-            public void onFailure(Throwable throwable) {
+  @Override public List<String>getHistoryPath(){return ListUtils.concat(Disposal.RESOLVER.getHistoryPath(),getHistoryToken());}
 
-            }
-
-            @Override
-            public void onSuccess(DisposalHolds disposalHolds) {
-              callback.onSuccess(new DisposalPolicy(disposalSchedules, disposalHolds));
-            }
-          });
-
-        }
-      });
-    }
-
-    @Override
-    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRole(this, callback);
-    }
-
-    @Override
-    public List<String> getHistoryPath() {
-      return ListUtils.concat(Disposal.RESOLVER.getHistoryPath(), getHistoryToken());
-    }
-
-    @Override
-    public String getHistoryToken() {
-      return "policy";
-    }
-  };
+  @Override public String getHistoryToken(){return"policy";}};
 
   private static DisposalPolicy instance = null;
 
@@ -97,27 +66,67 @@ public class DisposalPolicy extends Composite {
   FlowPanel contentDisposalSchedulesTable;
 
   @UiField
-  Button newDisposalSchedule;
+  FlowPanel newDisposalSchedule;
 
   @UiField
   FlowPanel contentDisposalHoldsTable;
 
   @UiField
-  Button newDisposalHold;
+  FlowPanel newDisposalHold;
 
   private DisposalSchedules disposalSchedules;
   private DisposalHolds disposalHolds;
 
-  /**
-   * Create a representation information page
-   */
-  private DisposalPolicy(DisposalSchedules disposalSchedules, DisposalHolds disposalHolds) {
-    initWidget(uiBinder.createAndBindUi(this));
-    this.disposalSchedules = disposalSchedules;
-    this.disposalHolds = disposalHolds;
-    contentDisposalSchedulesTable.addStyleName("basicTable");
-    contentDisposalHoldsTable.addStyleName("basicTable");
+  private static void loadDisposalSchedulesAndHolds(AsyncCallback<Widget> callback) {
+    BrowserService.Util.getInstance().listDisposalSchedules(new AsyncCallback<DisposalSchedules>() {
+      @Override
+      public void onFailure(Throwable throwable) {
+      }
 
+      @Override
+      public void onSuccess(DisposalSchedules disposalSchedules) {
+        BrowserService.Util.getInstance().listDisposalHolds(new AsyncCallback<DisposalHolds>() {
+          @Override
+          public void onFailure(Throwable throwable) {
+          }
+
+          @Override
+          public void onSuccess(DisposalHolds disposalHolds) {
+            callback.onSuccess(new DisposalPolicy(disposalSchedules, disposalHolds));
+          }
+        });
+      }
+    });
+  }
+
+  private static void loadDisposalSchedules(AsyncCallback<Widget> callback) {
+    BrowserService.Util.getInstance().listDisposalSchedules(new AsyncCallback<DisposalSchedules>() {
+      @Override
+      public void onFailure(Throwable throwable) {
+      }
+
+      @Override
+      public void onSuccess(DisposalSchedules disposalSchedules) {
+        callback.onSuccess(new DisposalPolicy(disposalSchedules));
+      }
+    });
+  }
+
+  private static void loadDisposalHolds(AsyncCallback<Widget> callback) {
+    BrowserService.Util.getInstance().listDisposalHolds(new AsyncCallback<DisposalHolds>() {
+      @Override
+      public void onFailure(Throwable throwable) {
+      }
+
+      @Override
+      public void onSuccess(DisposalHolds disposalHolds) {
+        callback.onSuccess(new DisposalPolicy(disposalHolds));
+      }
+    });
+  }
+
+  private void createDisposalSchedulesPanel(DisposalSchedules disposalSchedules) {
+    contentDisposalSchedulesTable.addStyleName("basicTable");
     // Disposal schedules table
     if (disposalSchedules.getObjects().isEmpty()) {
       Label label = new HTML(SafeHtmlUtils.fromSafeConstant(messages.noItemsToDisplayPreFilters("disposal schedules")));
@@ -136,14 +145,24 @@ public class DisposalPolicy extends Composite {
       schedulesPanel.add(table);
       contentDisposalSchedulesTable.add(schedulesPanel);
 
-      // if(PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_SCHEDULE)){
-      // Button buttonNewHold = new Button("New disposal schedule");
-      // buttonNewHold.addStyleName("rodaButton");
-      // contentNewDisposalScheduleBtn.add(buttonNewHold);
-      // }
-    }
+      if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_SCHEDULE)) {
+        Button newDisposalScheduleBtn = new Button();
+        newDisposalScheduleBtn.addStyleName("btn btn-plus");
+        newDisposalScheduleBtn.setText(messages.newDisposalScheduleTitle());
+        newDisposalScheduleBtn.addClickHandler(new ClickHandler() {
 
-    // Disposal holds table
+          @Override
+          public void onClick(ClickEvent event) {
+            HistoryUtils.newHistory(Disposal.RESOLVER, DisposalConfirmations.RESOLVER.getHistoryToken());
+          }
+        });
+        newDisposalSchedule.add(newDisposalScheduleBtn);
+      }
+    }
+  }
+
+  private void createDisposalHoldsPanel(DisposalHolds disposalHolds) {
+    contentDisposalHoldsTable.addStyleName("basicTable");
     if (disposalHolds.getObjects().isEmpty()) {
       Label label = new HTML(SafeHtmlUtils.fromSafeConstant(messages.noItemsToDisplayPreFilters("disposal holds")));
       label.addStyleName("basicTableEmpty");
@@ -161,17 +180,61 @@ public class DisposalPolicy extends Composite {
       holdsPanel.add(tableHolds);
       contentDisposalHoldsTable.add(holdsPanel);
 
-      // if(PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_SCHEDULE)){
-      // Button buttonNewHold = new Button("New disposal hold");
-      // buttonNewHold.addStyleName("rodaButton");
-      // buttonNewHold.click();
-      // contentNewDisposalHoldBtn.add(buttonNewHold);
+      if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_HOLD)) {
+        Button newDisposalHoldBtn = new Button();
+        newDisposalHoldBtn.addStyleName("btn btn-plus");
+        newDisposalHoldBtn.setText(messages.newDisposalHoldTitle());
+        newDisposalHoldBtn.addClickHandler(new ClickHandler() {
 
-      // }
+          @Override
+          public void onClick(ClickEvent event) {
+            HistoryUtils.newHistory(Disposal.RESOLVER, DisposalConfirmations.RESOLVER.getHistoryToken());
+          }
+        });
+        newDisposalHold.add(newDisposalHoldBtn);
+      }
     }
+  }
+
+  private DisposalPolicy(DisposalSchedules disposalSchedules) {
+    initWidget(uiBinder.createAndBindUi(this));
+    this.disposalSchedules = disposalSchedules;
+    contentDisposalHoldsTable.setVisible(false);
+    newDisposalHold.setVisible(false);
+
+    // Disposal schedules table
+    createDisposalSchedulesPanel(disposalSchedules);
 
     disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
   }
+
+
+  private DisposalPolicy(DisposalHolds disposalHolds) {
+    initWidget(uiBinder.createAndBindUi(this));
+    this.disposalHolds = disposalHolds;
+    contentDisposalSchedulesTable.setVisible(false);
+    newDisposalSchedule.setVisible(false);
+
+    // Disposal holds table
+    createDisposalHoldsPanel(disposalHolds);
+
+    disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
+  }
+
+  private DisposalPolicy(DisposalSchedules disposalSchedules, DisposalHolds disposalHolds) {
+    initWidget(uiBinder.createAndBindUi(this));
+    this.disposalSchedules = disposalSchedules;
+    this.disposalHolds = disposalHolds;
+
+    // Disposal schedules table
+    createDisposalSchedulesPanel(disposalSchedules);
+
+    // Disposal holds table
+    createDisposalHoldsPanel(disposalHolds);
+
+    disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
+  }
+
 
   private BasicTablePanel<DisposalSchedule> getBasicTablePanelForDisposalSchedules(
     DisposalSchedules disposalSchedules) {
