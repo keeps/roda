@@ -6,10 +6,10 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.common.RODAObjectList;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.roda.core.data.v2.common.RODAObjectList;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -17,6 +17,7 @@ import org.roda.core.data.v2.common.RODAObjectList;
 @javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_HOLDS)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DisposalHolds implements RODAObjectList<DisposalHold> {
+  private static final long serialVersionUID = -7273926545808506951L;
   private List<DisposalHold> disposalHoldList;
 
   public DisposalHolds() {
@@ -30,8 +31,8 @@ public class DisposalHolds implements RODAObjectList<DisposalHold> {
   }
 
   @Override
-  @JsonProperty(value = RodaConstants.RODA_OBJECT_DISPOSAL_SCHEDULES)
-  @XmlElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_SCHEDULE)
+  @JsonProperty(value = RodaConstants.RODA_OBJECT_DISPOSAL_HOLDS)
+  @XmlElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_HOLD)
   public List<DisposalHold> getObjects() {
     return disposalHoldList;
   }
