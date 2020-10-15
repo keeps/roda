@@ -1,4 +1,4 @@
-# Guia do programador
+# Guia de documentação
 
 Este é um guia rápido e simples sobre como começar a programar no RODA.
 
@@ -109,7 +109,7 @@ O RODA está estruturado da seguinte maneira:
 
 ### /roda-common/
 
-* **roda-common-data** - este módulo contém todos os objetos de modelo relacionados com o RODA usados em todos os outros módulos/projetos
+* **roda-common-data** - este módulo contém todos os objetos de modelo relacionados com o RODA que são usados em todos os outros módulos/projetos
 * **roda-common-utils** - este módulo contém serviços base para serem usados por outros módulos/projetos
 
 
@@ -140,7 +140,7 @@ Para criar novos plugins e usá-los no RODA, é necessário:
 3. Depois de criar o plugin, é necessário gerar um ficheiro jar
 4. Esse ficheiro jar deve, então, ser incluído na pasta de instalação base do RODA, mais especificamente em **config/plugins/PLUGIN_NAME/**
 
-## API REST
+## A ingestão é composta por um fluxo de trabalho configurável e com múltiplos passos que valida a informação submetida e extrai metainformação técnica dos ficheiros submetidos. O processo de ingestão pode também validar formatos de ficheiro de acordo com as políticas de preservação definidas, e inclui passos de validação da qualidade tanto automáticos como manuais.
 
 O RODA é completamente controlado através de uma API REST. Isto é fantástico para desenvolver serviços externos ou integrar outras aplicações com o repositório. A documentação do API está disponível em [https://demo.roda-community.org/api-docs/](https://demo.roda-community.org/api-docs/).
 
