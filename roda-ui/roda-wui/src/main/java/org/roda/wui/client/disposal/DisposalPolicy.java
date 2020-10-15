@@ -50,27 +50,16 @@ public class DisposalPolicy extends Composite {
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-      BrowserService.Util.getInstance().listDisposalSchedules(new AsyncCallback<DisposalSchedules>() {
-        @Override
-        public void onFailure(Throwable throwable) {
-        }
-
-        @Override
-        public void onSuccess(DisposalSchedules disposalSchedules) {
-          BrowserService.Util.getInstance().listDisposalHolds(new AsyncCallback<DisposalHolds>() {
-            @Override
-            public void onFailure(Throwable throwable) {
-
-            }
-
-            @Override
-            public void onSuccess(DisposalHolds disposalHolds) {
-              callback.onSuccess(new DisposalPolicy(disposalSchedules,disposalHolds));
-            }
-          });
-
-        }
-      });
+      if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_SCHEDULES)
+        && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_HOLDS)) {
+        loadDisposalSchedulesAndHolds(callback);
+      } else if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_SCHEDULES)) {
+        loadDisposalSchedules(callback);
+      } else if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_HOLDS)) {
+        loadDisposalHolds(callback);
+      } else {
+        HistoryUtils.newHistory(Disposal.RESOLVER, DisposalConfirmations.RESOLVER.getHistoryToken());
+      }
     }
 
     @Override
