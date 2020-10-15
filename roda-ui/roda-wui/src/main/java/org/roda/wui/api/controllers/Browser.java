@@ -59,6 +59,7 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
@@ -3425,7 +3426,7 @@ public class Browser extends RodaWuiController {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    // controllerAssistant.checkRoles(user);
+    controllerAssistant.checkRoles(user);
 
     LogEntryState state = LogEntryState.SUCCESS;
 
@@ -3445,7 +3446,7 @@ public class Browser extends RodaWuiController {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    // controllerAssistant.checkRoles(user);
+    controllerAssistant.checkRoles(user);
 
     LogEntryState state = LogEntryState.SUCCESS;
 
@@ -3465,7 +3466,7 @@ public class Browser extends RodaWuiController {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    // controllerAssistant.checkRoles(user);
+    controllerAssistant.checkRoles(user);
 
     LogEntryState state = LogEntryState.SUCCESS;
 

@@ -34,6 +34,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
@@ -211,7 +212,7 @@ public final class LiteRODAObjectFactory {
       }
     } else if (objectClass == Report.class || objectClass == Representation.class) {
       ret = create(objectClass, 2, ids);
-    } else if (objectClass == TransferredResource.class || objectClass == PreservationMetadata.class) {
+    } else if (objectClass == TransferredResource.class || objectClass == PreservationMetadata.class || objectClass == DisposalConfirmationMetadata.class) {
       ret = create(objectClass, ids.size(), ids);
     }
 
@@ -336,6 +337,8 @@ public final class LiteRODAObjectFactory {
           ret = (T) model.retrieveUser(firstId);
         } else if (Group.class.getName().equals(clazz)) {
           ret = (T) model.retrieveGroup(firstId);
+        } else if (DisposalConfirmationMetadata.class.getName().equals(clazz)) {
+          ret = (T) model.retrieveDisposalConfirmationMetadata(firstId);
         }
       }
 

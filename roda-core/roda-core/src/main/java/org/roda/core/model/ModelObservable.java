@@ -13,8 +13,12 @@ import java.util.function.Function;
 
 import org.roda.core.common.ReturnWithExceptionsWrapper;
 import org.roda.core.data.exceptions.ReturnWithExceptions;
-import org.roda.core.data.v2.ip.*;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.DIPFile;
+import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -251,5 +255,13 @@ public abstract class ModelObservable {
 
   public ReturnWithExceptionsWrapper notifyDIPFileDeleted(String dipId, List<String> path, String fileId) {
     return notifyObserversSafely(observer -> observer.dipFileDeleted(dipId, path, fileId));
+  }
+
+  public ReturnWithExceptionsWrapper notifyDisposalConfirmationCreatedOrUpdated(DisposalConfirmationMetadata confirmation) {
+    return notifyObserversSafely(observer -> observer.disposalConfirmationCreateOrUpdate(confirmation));
+  }
+
+  public ReturnWithExceptionsWrapper notifyDisposalConfirmationDeleted(String disposalConfirmationId, boolean commit) {
+    return notifyObserversSafely(observer -> observer.disposalConfirmationDeleted(disposalConfirmationId, commit));
   }
 }

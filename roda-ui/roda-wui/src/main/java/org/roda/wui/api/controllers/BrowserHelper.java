@@ -103,6 +103,7 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -3336,4 +3337,16 @@ public class BrowserHelper {
     RodaCoreFactory.getModelService().deleteDisposalHold(disposalHoldId);
   }
 
+  public static DisposalConfirmationMetadata createDisposalConfirmationMetadata(DisposalConfirmationMetadata confirmationMetadata, User user) throws AlreadyExistsException, AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    return RodaCoreFactory.getModelService().createDisposalConfirmationMetadata(confirmationMetadata, user.getName());
+  }
+
+  public static DisposalConfirmationMetadata updateDisposalConfirmationMetadata(DisposalConfirmationMetadata confirmationMetadata, User user) throws AlreadyExistsException, AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    return RodaCoreFactory.getModelService().updateDisposalConfirmationMetadata(confirmationMetadata, user.getName());
+  }
+
+  public static void deleteDisposalConfirmation(String disposalConfirmationId)
+      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().deleteDisposalConfirmation(disposalConfirmationId);
+  }
 }

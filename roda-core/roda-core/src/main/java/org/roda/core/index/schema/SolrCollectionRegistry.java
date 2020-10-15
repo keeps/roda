@@ -28,6 +28,7 @@ import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.collections.AIPCollection;
 import org.roda.core.index.schema.collections.DIPCollection;
 import org.roda.core.index.schema.collections.DIPFileCollection;
+import org.roda.core.index.schema.collections.DisposalConfirmationCollection;
 import org.roda.core.index.schema.collections.FileCollection;
 import org.roda.core.index.schema.collections.JobCollection;
 import org.roda.core.index.schema.collections.JobReportCollection;
@@ -76,6 +77,8 @@ public final class SolrCollectionRegistry {
     register(new RiskIncidenceCollection());
 
     register(new RepresentationInformationCollection());
+
+    register(new DisposalConfirmationCollection());
   }
 
   public static <T extends IsIndexed, M extends IsModelObject> void register(SolrCollection<T, M> collection) {

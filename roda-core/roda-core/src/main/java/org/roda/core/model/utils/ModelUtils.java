@@ -36,6 +36,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -617,7 +618,8 @@ public final class ModelUtils {
   }
 
   public static StoragePath getDisposalHoldStoragePath(String disposalHoldId) throws RequestNotValidException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISPOSAL_HOLD, disposalHoldId + RodaConstants.DISPOSAL_HOLD_FILE_EXTENSION);
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISPOSAL_HOLD,
+      disposalHoldId + RodaConstants.DISPOSAL_HOLD_FILE_EXTENSION);
   }
 
   public static StoragePath getDisposalHoldContainerPath() throws RequestNotValidException {
@@ -707,6 +709,10 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISPOSAL_SCHEDULE);
   }
 
+  public static StoragePath getDisposalConfirmationContainerPath() throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISPOSAL_CONFIRMATION);
+  }
+
   public static StoragePath getDIPStoragePath(String dipId) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DIP, dipId);
   }
@@ -777,6 +783,8 @@ public final class ModelUtils {
       return getDisposalScheduleContainerPath();
     } else if (clazz.equals(DisposalHold.class)) {
       return getDisposalHoldContainerPath();
+    } else if (clazz.equals(DisposalConfirmationMetadata.class)) {
+      return getDisposalConfirmationContainerPath();
     } else {
       throw new RequestNotValidException("Unknown class for getting container path: " + clazz.getName());
     }
@@ -858,7 +866,23 @@ public final class ModelUtils {
       return inputClass;
     }
   }
+
   public static StoragePath getDisposalScheduleStoragePath(String disposalScheduleId) throws RequestNotValidException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISPOSAL_SCHEDULE, disposalScheduleId + RodaConstants.JOB_FILE_EXTENSION);
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISPOSAL_SCHEDULE,
+      disposalScheduleId + RodaConstants.JOB_FILE_EXTENSION);
+  }
+
+/*  public static StoragePath getDisposalConfirmationStoragePath(String disposalConfirmationId)
+    throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISPOSAL_CONFIRMATION, disposalConfirmationId,
+      RodaConstants.STORAGE_CONTAINER_DISPOSAL_CONFIRMATION_METADATA_SUFFIX + RodaConstants.JOB_FILE_EXTENSION);
+  }*/
+
+  public static StoragePath getDisposalConfirmationStoragePath(String disposalConfirmationId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(getDisposalConfirmationPath(disposalConfirmationId));
+  }
+
+  private static List<String> getDisposalConfirmationPath(String confirmationId) {
+    return Arrays.asList(RodaConstants.STORAGE_CONTAINER_DISPOSAL_CONFIRMATION, confirmationId);
   }
 }
