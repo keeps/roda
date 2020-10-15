@@ -1,0 +1,9 @@
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+             xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+    <g:FlowPanel addStyleNames="full_width skip_padding">
+        <g:SimplePanel ui:field="header"/>
+        <g:SimplePanel ui:field="info"/>
+        <g:SimplePanel ui:field="table"/>
+        <g:SimplePanel addStyleNames="clearfix"/>
+    </g:FlowPanel>
+</ui:UiBinder>

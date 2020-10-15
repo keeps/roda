@@ -18,6 +18,8 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -72,6 +74,48 @@ public class HtmlSnippetUtils {
 
   private HtmlSnippetUtils() {
     // do nothing
+  }
+
+  public static SafeHtml getDisposalScheduleStateHtml(DisposalSchedule disposalSchedule){
+    SafeHtml ret = null;
+    if(disposalSchedule != null && disposalSchedule.getState() != null) {
+      SafeHtmlBuilder b = new SafeHtmlBuilder();
+      switch (disposalSchedule.getState()) {
+        case ACTIVE:
+          b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
+          break;
+        case ARCHIVED:
+        default:
+          b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT));
+          break;
+      }
+
+      b.append(SafeHtmlUtils.fromString(messages.disposalScheduleState(disposalSchedule.getState().toString())));
+      b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+      ret = b.toSafeHtml();
+    }
+    return ret;
+  }
+
+  public static SafeHtml getDisposalHoldStateHtml(DisposalHold disposalHold){
+    SafeHtml ret = null;
+    if(disposalHold != null && disposalHold.getState() != null) {
+      SafeHtmlBuilder b = new SafeHtmlBuilder();
+      switch (disposalHold.getState()) {
+        case ACTIVE:
+          b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
+          break;
+        case LIFTED:
+        default:
+          b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT));
+          break;
+      }
+
+      b.append(SafeHtmlUtils.fromString(messages.disposalHoldState(disposalHold.getState().toString())));
+      b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+      ret = b.toSafeHtml();
+    }
+    return ret;
   }
 
   public static SafeHtml getJobStateHtml(Job job) {

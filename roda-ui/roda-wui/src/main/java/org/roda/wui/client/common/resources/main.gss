@@ -7138,6 +7138,15 @@ span.code {
     padding: 0 5px 0 5px;
 }
 
+.basicTableEmpty{
+    font-size: 1.4rem;
+    margin-left: 1.5rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    color: #9a9a9a;
+}
+
 /* Permission related */
 
 .hasNoPermissions {
