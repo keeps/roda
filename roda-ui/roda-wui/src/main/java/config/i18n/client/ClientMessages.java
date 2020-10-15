@@ -101,8 +101,6 @@ public interface ClientMessages extends Messages {
 
   String internalProcessTitle();
 
-  String disposalProcessTitle();
-
   String loginTitle();
 
   String searchTitle();
@@ -1983,4 +1981,13 @@ public interface ClientMessages extends Messages {
   String inputStorageSizeList();
 
   String removableTextBox();
+
+  /** Disposal **/
+  String disposalPolicyTitle();
+
+  String disposalDestroyedRecordsTitle();
+
+  String disposalConfirmationsTitle();
+
+  String disposalNewConfirmationAction();
 }
