@@ -47,6 +47,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
@@ -847,7 +848,8 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> jobReportCreatedOrUpdated(Report jobReport, Job cachedJob) {
-    return SolrUtils.create2(index, this, IndexedReport.class, jobReport, new JobReportCollection.Info(jobReport, cachedJob));
+    return SolrUtils.create2(index, this, IndexedReport.class, jobReport,
+      new JobReportCollection.Info(jobReport, cachedJob));
   }
 
   @Override
@@ -1127,6 +1129,17 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public ReturnWithExceptions<Void, ModelObserver> dipFileDeleted(String dipId, List<String> path, String fileId) {
     return deleteDocumentFromIndex(DIPFile.class, IdUtils.getDIPFileId(dipId, path, fileId));
+  }
+
+  @Override
+  public ReturnWithExceptions<Void, ModelObserver> disposalConfirmationCreateOrUpdate(
+    DisposalConfirmationMetadata confirmation) {
+    return SolrUtils.create2(index, this, DisposalConfirmationMetadata.class, confirmation);
+  }
+
+  @Override
+  public ReturnWithExceptions<Void, ModelObserver> disposalConfirmationDeleted(String confirmationId, boolean commit) {
+    return deleteDocumentFromIndex(DisposalConfirmationMetadata.class, confirmationId);
   }
 
 }

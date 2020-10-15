@@ -66,6 +66,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
@@ -101,6 +102,7 @@ import org.roda.core.plugins.plugins.notifications.JobNotification;
 import org.roda.core.plugins.plugins.reindex.ReindexAIPPlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexActionLogPlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexDIPPlugin;
+import org.roda.core.plugins.plugins.reindex.ReindexDisposalConfirmationPlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexIncidencePlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexJobPlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexNotificationPlugin;
@@ -736,6 +738,7 @@ public final class PluginHelper {
     list.add(IndexedPreservationAgent.class);
     list.add(IndexedPreservationEvent.class);
     list.add(DIP.class);
+    list.add(DisposalConfirmationMetadata.class);
     return list;
   }
 
@@ -1296,9 +1299,11 @@ public final class PluginHelper {
       default:
         outcomeDetailNote = plugin.getPreservationEventFailureMessage();
     }
-/*    String outcomeDetailNote = (outcome == PluginState.SUCCESS || outcome == PluginState.PARTIAL_SUCCESS)
-      ? plugin.getPreservationEventSuccessMessage()
-      : plugin.getPreservationEventFailureMessage();*/
+    /*
+     * String outcomeDetailNote = (outcome == PluginState.SUCCESS || outcome ==
+     * PluginState.PARTIAL_SUCCESS) ? plugin.getPreservationEventSuccessMessage() :
+     * plugin.getPreservationEventFailureMessage();
+     */
     ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, startDate,
       plugin.getPreservationEventType().toString(), plugin.getPreservationEventDescription(), sources, outcomes,
       outcome.name(), outcomeDetailNote, outcomeDetailExtension, agentIds);
@@ -1637,6 +1642,8 @@ public final class PluginHelper {
       return ReindexPreservationRepositoryEventPlugin.class.getName();
     } else if (reindexClass.equals(DIP.class)) {
       return ReindexDIPPlugin.class.getName();
+    } else if (reindexClass.equals(DisposalConfirmationMetadata.class)) {
+      return ReindexDisposalConfirmationPlugin.class.getName();
     } else {
       throw new NotFoundException("No reindex plugin available");
     }

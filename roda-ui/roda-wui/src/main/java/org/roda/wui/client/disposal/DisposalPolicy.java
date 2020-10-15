@@ -2,7 +2,13 @@ package org.roda.wui.client.disposal;
 
 import java.util.List;
 
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.HTML;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -25,7 +31,17 @@ public class DisposalPolicy extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-      getInstance().resolve(historyTokens, callback);
+      BrowserService.Util.getInstance().listDisposalSchedules(new AsyncCallback<DisposalSchedules>() {
+        @Override
+        public void onFailure(Throwable throwable) {
+
+        }
+
+        @Override
+        public void onSuccess(DisposalSchedules disposalSchedules) {
+          callback.onSuccess(new DisposalPolicy(disposalSchedules));
+        }
+      });
     }
 
     @Override
@@ -58,25 +74,23 @@ public class DisposalPolicy extends Composite {
   @UiField
   FlowPanel content;
 
+  private DisposalSchedules disposalSchedules;
+
   /**
    * Create a representation information page
    */
-  public DisposalPolicy() {
+  private DisposalPolicy(DisposalSchedules disposalSchedules) {
     initWidget(uiBinder.createAndBindUi(this));
 
-    disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
-  }
+    this.disposalSchedules =disposalSchedules;
 
-  /**
-   * Get the singleton instance
-   *
-   * @return the instance
-   */
-  public static DisposalPolicy getInstance() {
-    if (instance == null) {
-      instance = new DisposalPolicy();
+    GWT.log("" + disposalSchedules.getObjects().size());
+
+    if (disposalSchedules.getObjects().isEmpty()) {
+      content.add(new HTML(SafeHtmlUtils.fromSafeConstant("VAZIO!!!")));
     }
-    return instance;
+
+    disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
