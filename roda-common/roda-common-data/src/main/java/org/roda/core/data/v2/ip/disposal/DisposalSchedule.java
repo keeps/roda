@@ -46,6 +46,8 @@ public class DisposalSchedule implements IsModelObject, HasId {
   private Date updatedOn = null;
   private String updatedBy = null;
 
+  private DisposalScheduleState state;
+
   public DisposalSchedule() {
     super();
   }
@@ -65,6 +67,8 @@ public class DisposalSchedule implements IsModelObject, HasId {
     this.retentionTriggerElementId = retentionTriggerElementId;
     this.retentionPeriodIntervalCode = retentionPeriodIntervalCode;
     this.retentionPeriodDuration = retentionPeriodDuration;
+    this.state = DisposalScheduleState.ACTIVE;
+    this.numberOfAIPUnder = 0L;
 
     this.createdOn = createdOn;
     this.createdBy = createdBy;
@@ -208,6 +212,14 @@ public class DisposalSchedule implements IsModelObject, HasId {
     this.updatedBy = updatedBy;
   }
 
+  public DisposalScheduleState getState() {
+    return state;
+  }
+
+  public void setState(DisposalScheduleState state) {
+    this.state = state;
+  }
+
   @JsonIgnore
   public void incrementNumberOfAIPs(int number) {
     this.numberOfAIPUnder += number;
@@ -224,29 +236,25 @@ public class DisposalSchedule implements IsModelObject, HasId {
       return true;
     if (o == null || getClass() != o.getClass())
       return false;
-    DisposalSchedule schedule = (DisposalSchedule) o;
-    return Objects.equals(getId(), schedule.getId()) && Objects.equals(getTitle(), schedule.getTitle())
-      && Objects.equals(getDescription(), schedule.getDescription())
-      && Objects.equals(getMandate(), schedule.getMandate())
-      && Objects.equals(getScopeNotes(), schedule.getScopeNotes()) && getActionCode() == schedule.getActionCode()
-      && getRetentionTriggerCode() == schedule.getRetentionTriggerCode()
-      && Objects.equals(getRetentionTriggerElementId(), schedule.getRetentionTriggerElementId())
-      && getRetentionPeriodIntervalCode() == schedule.getRetentionPeriodIntervalCode()
-      && Objects.equals(getRetentionPeriodDuration(), schedule.getRetentionPeriodDuration())
-      && Objects.equals(getDestroyedTimestamp(), schedule.getDestroyedTimestamp())
-      && Objects.equals(getNumberOfAIPUnder(), schedule.getNumberOfAIPUnder())
-      && Objects.equals(getCreatedOn(), schedule.getCreatedOn())
-      && Objects.equals(getCreatedBy(), schedule.getCreatedBy())
-      && Objects.equals(getUpdatedOn(), schedule.getUpdatedOn())
-      && Objects.equals(getUpdatedBy(), schedule.getUpdatedBy());
+    DisposalSchedule that = (DisposalSchedule) o;
+    return Objects.equals(id, that.id) && Objects.equals(title, that.title)
+      && Objects.equals(description, that.description) && Objects.equals(mandate, that.mandate)
+      && Objects.equals(scopeNotes, that.scopeNotes) && actionCode == that.actionCode
+      && retentionTriggerCode == that.retentionTriggerCode
+      && Objects.equals(retentionTriggerElementId, that.retentionTriggerElementId)
+      && retentionPeriodIntervalCode == that.retentionPeriodIntervalCode
+      && Objects.equals(retentionPeriodDuration, that.retentionPeriodDuration)
+      && Objects.equals(destroyedTimestamp, that.destroyedTimestamp)
+      && Objects.equals(numberOfAIPUnder, that.numberOfAIPUnder) && Objects.equals(createdOn, that.createdOn)
+      && Objects.equals(createdBy, that.createdBy) && Objects.equals(updatedOn, that.updatedOn)
+      && Objects.equals(updatedBy, that.updatedBy) && state == that.state;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(getId(), getTitle(), getDescription(), getMandate(), getScopeNotes(), getActionCode(),
-      getRetentionTriggerCode(), getRetentionTriggerElementId(), getRetentionPeriodIntervalCode(),
-      getRetentionPeriodDuration(), getDestroyedTimestamp(), getNumberOfAIPUnder(), getCreatedOn(), getCreatedBy(),
-      getUpdatedOn(), getUpdatedBy());
+    return Objects.hash(id, title, description, mandate, scopeNotes, actionCode, retentionTriggerCode,
+      retentionTriggerElementId, retentionPeriodIntervalCode, retentionPeriodDuration, destroyedTimestamp,
+      numberOfAIPUnder, createdOn, createdBy, updatedOn, updatedBy, state);
   }
 
   @Override
@@ -257,6 +265,6 @@ public class DisposalSchedule implements IsModelObject, HasId {
       + '\'' + ", retentionPeriodIntervalCode=" + retentionPeriodIntervalCode + ", retentionPeriodDuration="
       + retentionPeriodDuration + ", destroyedTimestamp=" + destroyedTimestamp + ", numberOfAIPUnder="
       + numberOfAIPUnder + ", createdOn=" + createdOn + ", createdBy='" + createdBy + '\'' + ", updatedOn=" + updatedOn
-      + ", updatedBy='" + updatedBy + '\'' + '}';
+      + ", updatedBy='" + updatedBy + '\'' + ", state=" + state + '}';
   }
 }

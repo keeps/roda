@@ -48,6 +48,8 @@ public class DisposalHold implements IsModelObject {
   private Map<String, Date> activeAIPs;
   private Map<String, Date> inactiveAIPs;
 
+  private DisposalHoldState state;
+
   public DisposalHold() {
     super();
     this.activeAIPs = new TreeMap<>();
@@ -62,6 +64,7 @@ public class DisposalHold implements IsModelObject {
     this.scopeNotes = scopeNotes;
     this.activeAIPs = new TreeMap<>();
     this.inactiveAIPs = new TreeMap<>();
+    this.state = DisposalHoldState.ACTIVE;
   }
 
   @JsonIgnore
@@ -191,6 +194,14 @@ public class DisposalHold implements IsModelObject {
     this.originatedBy = originatedBy;
   }
 
+  public DisposalHoldState getState() {
+    return state;
+  }
+
+  public void setState(DisposalHoldState state) {
+    this.state = state;
+  }
+
   @JsonIgnore
   public void addAIPtoActiveAIPs(String aipId) {
     getActiveAIPs().put(aipId, new Date());
@@ -225,13 +236,13 @@ public class DisposalHold implements IsModelObject {
       && Objects.equals(originatedBy, that.originatedBy) && Objects.equals(liftedOn, that.liftedOn)
       && Objects.equals(liftedBy, that.liftedBy) && Objects.equals(updatedOn, that.updatedOn)
       && Objects.equals(updatedBy, that.updatedBy) && Objects.equals(activeAIPs, that.activeAIPs)
-      && Objects.equals(inactiveAIPs, that.inactiveAIPs);
+      && Objects.equals(inactiveAIPs, that.inactiveAIPs) && state == that.state;
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(id, title, description, mandate, scopeNotes, createdOn, createdBy, originatedOn, originatedBy,
-      liftedOn, liftedBy, updatedOn, updatedBy, activeAIPs, inactiveAIPs);
+      liftedOn, liftedBy, updatedOn, updatedBy, activeAIPs, inactiveAIPs, state);
   }
 
   @Override
@@ -240,6 +251,6 @@ public class DisposalHold implements IsModelObject {
       + ", mandate='" + mandate + '\'' + ", scopeNotes='" + scopeNotes + '\'' + ", createdOn=" + createdOn
       + ", createdBy='" + createdBy + '\'' + ", originatedOn=" + originatedOn + ", originatedBy='" + originatedBy + '\''
       + ", liftedOn=" + liftedOn + ", liftedBy='" + liftedBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='"
-      + updatedBy + '\'' + ", activeAIPs=" + activeAIPs + ", inactiveAIPs=" + inactiveAIPs + '}';
+      + updatedBy + '\'' + ", activeAIPs=" + activeAIPs + ", inactiveAIPs=" + inactiveAIPs + ", state=" + state + '}';
   }
 }

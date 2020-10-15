@@ -13,17 +13,19 @@ package config.i18n.client;
 import java.util.Date;
 import java.util.List;
 
-import com.google.gwt.i18n.client.Messages;
-import com.google.gwt.safehtml.shared.SafeHtml;
-
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
+import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
+import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.risks.IncidenceStatus;
 import org.roda.core.data.v2.risks.SeverityLevel;
 import org.roda.wui.client.common.actions.model.ActionableObject;
+
+import com.google.gwt.i18n.client.Messages;
+import com.google.gwt.safehtml.shared.SafeHtml;
 
 /**
  * @author Luis Faria
@@ -1990,4 +1992,35 @@ public interface ClientMessages extends Messages {
   String disposalConfirmationsTitle();
 
   String disposalNewConfirmationAction();
+
+  String disposalScheduleTitle();
+
+  String disposalScheduleMandate();
+
+  String disposalSchedulePeriod();
+
+  String disposalScheduleActionCol();
+
+  String disposalScheduleAction(@Select String action);
+
+  String disposalScheduleNumberOfAIPs();
+
+  String disposalScheduleStateCol();
+
+  String disposalScheduleState(@Select String state);
+
+  String disposalHoldTitle();
+
+  String disposalHoldMandate();
+
+  String disposalHoldNumberOfAIPs();
+
+  String disposalHoldStateCol();
+
+  String disposalHoldState(@Select String state);
+
+  String newDisposalScheduleTitle();
+
+  String newDisposalHoldTitle();
+
 }
