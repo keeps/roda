@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
 import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -2023,4 +2024,19 @@ public interface ClientMessages extends Messages {
 
   String newDisposalHoldTitle();
 
+  String disposalConfirmationTitle();
+
+  String disposalConfirmationCreationDate();
+
+  String disposalConfirmationCreationBy();
+
+  String disposalConfirmationStatus();
+
+  String disposalConfirmationAIPs();
+
+  String disposalConfirmationCollections();
+
+  String disposalConfirmationSize();
+
+  String disposalConfirmationState(@Select DisposalConfirmationState state);
 }

@@ -23,7 +23,8 @@ import org.roda.core.index.utils.SolrUtils;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-public class DisposalConfirmationCollection extends AbstractSolrCollection<DisposalConfirmationMetadata, DisposalConfirmationMetadata> {
+public class DisposalConfirmationCollection
+  extends AbstractSolrCollection<DisposalConfirmationMetadata, DisposalConfirmationMetadata> {
   @Override
   public Class<DisposalConfirmationMetadata> getIndexClass() {
     return DisposalConfirmationMetadata.class;
@@ -58,14 +59,18 @@ public class DisposalConfirmationCollection extends AbstractSolrCollection<Dispo
   public List<Field> getFields() {
     List<Field> fields = new ArrayList<>(super.getFields());
 
+    fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_TITLE, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_CREATED_BY, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_CREATED_ON, Field.TYPE_DATE));
-    fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_UPDATED_BY, Field.TYPE_STRING));
-    fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_UPDATED_ON, Field.TYPE_DATE));
+    fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_EXECUTED_BY, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_EXECUTED_ON, Field.TYPE_DATE));
+    fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_RESTORED_ON, Field.TYPE_DATE));
+    fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_RESTORED_BY, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_APPROVER, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_STATE, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_AIPS, Field.TYPE_LONG));
     fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_COLLECTIONS, Field.TYPE_LONG));
+    fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_SIZE, Field.TYPE_LONG));
 
     return fields;
   }
@@ -76,31 +81,43 @@ public class DisposalConfirmationCollection extends AbstractSolrCollection<Dispo
 
     SolrInputDocument doc = super.toSolrDocument(confirmation, info);
 
+    doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_TITLE, confirmation.getTitle());
     doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_CREATED_BY, confirmation.getCreatedBy());
     doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_CREATED_ON,
       SolrUtils.formatDateWithMillis(confirmation.getCreatedOn()));
-    doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_UPDATED_BY, confirmation.getUpdatedBy());
-    doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_UPDATED_ON,
-      SolrUtils.formatDateWithMillis(confirmation.getUpdatedOn()));
+    doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_EXECUTED_BY, confirmation.getExecutedBy());
+    doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_EXECUTED_ON,
+      SolrUtils.formatDateWithMillis(confirmation.getExecutedOn()));
+    doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_RESTORED_BY, confirmation.getRestoredBy());
+    doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_RESTORED_ON,
+      SolrUtils.formatDateWithMillis(confirmation.getRestoredOn()));
     doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_STATE, confirmation.getState().toString());
     doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_APPROVER, confirmation.getApprover());
     doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_AIPS, confirmation.getNumberOfAIPs());
     doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_COLLECTIONS, confirmation.getNumberOfCollections());
+    doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_SIZE, confirmation.getSize());
 
     return doc;
   }
 
   @Override
-  public DisposalConfirmationMetadata fromSolrDocument(SolrDocument doc, List<String> fieldsToReturn) throws GenericException {
+  public DisposalConfirmationMetadata fromSolrDocument(SolrDocument doc, List<String> fieldsToReturn)
+    throws GenericException {
 
     final DisposalConfirmationMetadata confirmation = super.fromSolrDocument(doc, fieldsToReturn);
 
+    confirmation.setTitle(SolrUtils.objectToString(doc.get(RodaConstants.DISPOSAL_CONFIRMATION_TITLE), null));
     confirmation
       .setCreatedOn(SolrUtils.objectToDateWithMillis(doc.get(RodaConstants.DISPOSAL_CONFIRMATION_CREATED_ON)));
     confirmation.setCreatedBy(SolrUtils.objectToString(doc.get(RodaConstants.DISPOSAL_CONFIRMATION_CREATED_BY), null));
     confirmation
-      .setUpdatedOn(SolrUtils.objectToDateWithMillis(doc.get(RodaConstants.DISPOSAL_CONFIRMATION_UPDATED_ON)));
-    confirmation.setUpdatedBy(SolrUtils.objectToString(doc.get(RodaConstants.DISPOSAL_CONFIRMATION_UPDATED_BY), null));
+      .setExecutedOn(SolrUtils.objectToDateWithMillis(doc.get(RodaConstants.DISPOSAL_CONFIRMATION_EXECUTED_ON)));
+    confirmation
+      .setExecutedBy(SolrUtils.objectToString(doc.get(RodaConstants.DISPOSAL_CONFIRMATION_EXECUTED_BY), null));
+    confirmation
+      .setRestoredOn(SolrUtils.objectToDateWithMillis(doc.get(RodaConstants.DISPOSAL_CONFIRMATION_RESTORED_ON)));
+    confirmation
+      .setRestoredBy(SolrUtils.objectToString(doc.get(RodaConstants.DISPOSAL_CONFIRMATION_RESTORED_BY), null));
     confirmation.setApprover(SolrUtils.objectToString(doc.get(RodaConstants.DISPOSAL_CONFIRMATION_APPROVER), null));
     if (doc.containsKey(RodaConstants.JOB_STATE)) {
       confirmation.setState(DisposalConfirmationState
@@ -110,6 +127,7 @@ public class DisposalConfirmationCollection extends AbstractSolrCollection<Dispo
       .setNumberOfAIPs(SolrUtils.objectToLong(doc.get(RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_AIPS), 0L));
     confirmation.setNumberOfCollections(
       SolrUtils.objectToLong(doc.get(RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_COLLECTIONS), 0L));
+    confirmation.setSize(SolrUtils.objectToLong(doc.get(RodaConstants.DISPOSAL_CONFIRMATION_SIZE), 0L));
 
     return confirmation;
   }

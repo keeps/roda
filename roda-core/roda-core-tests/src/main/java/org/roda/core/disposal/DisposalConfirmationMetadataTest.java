@@ -13,13 +13,14 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
-import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
@@ -62,7 +63,7 @@ public class DisposalConfirmationMetadataTest {
   @AfterClass
   public void tearDown() throws Exception {
     RodaCoreFactory.shutdown();
-    FSUtils.deletePath(basePath);
+    // FSUtils.deletePath(basePath);
   }
 
   @AfterMethod
@@ -75,7 +76,13 @@ public class DisposalConfirmationMetadataTest {
     NotFoundException, RequestNotValidException, AlreadyExistsException {
 
     DisposalConfirmationMetadata confirmation = model.createDisposalConfirmationMetadata(createDisposalConfirmation(),
-      "admin", "admin");
+      "admin");
+
+    model.createDisposalConfirmationMetadata(createDisposalConfirmation(DisposalConfirmationState.PENDING),
+        "mguimaraes");
+
+    model.createDisposalConfirmationMetadata(createDisposalConfirmation(DisposalConfirmationState.RESTORED),
+        "lfaria");
 
     DisposalConfirmationMetadata retrievedConfirmation = SolrUtils.retrieve(solrClient,
       DisposalConfirmationMetadata.class, confirmation.getId(), new ArrayList<>());
@@ -84,20 +91,37 @@ public class DisposalConfirmationMetadataTest {
   }
 
   @Test(expectedExceptions = NotFoundException.class)
-  public void testDisposalConfirmationDeletion() throws AlreadyExistsException, AuthorizationDeniedException,
-    GenericException, NotFoundException, RequestNotValidException {
+  public void testDisposalConfirmationPendingDeletion() throws AlreadyExistsException, AuthorizationDeniedException,
+    GenericException, NotFoundException, RequestNotValidException, IllegalOperationException {
     DisposalConfirmationMetadata confirmation = model.createDisposalConfirmationMetadata(createDisposalConfirmation(),
-      "admin", "admin");
+      "admin");
 
     model.deleteDisposalConfirmation(confirmation.getId());
 
     SolrUtils.retrieve(solrClient, DisposalConfirmationMetadata.class, confirmation.getId(), Collections.emptyList());
   }
 
+  @Test(expectedExceptions = IllegalOperationException.class)
+  public void testDisposalConfirmationApprovedOrRecoveredDeletion()
+    throws AlreadyExistsException, AuthorizationDeniedException, GenericException, NotFoundException,
+    RequestNotValidException, IllegalOperationException {
+    DisposalConfirmationMetadata confirmation = model
+      .createDisposalConfirmationMetadata(createDisposalConfirmation(DisposalConfirmationState.APPROVED), "admin");
+
+    model.deleteDisposalConfirmation(confirmation.getId());
+  }
+
   private DisposalConfirmationMetadata createDisposalConfirmation() {
+    return createDisposalConfirmation(DisposalConfirmationState.PENDING);
+  }
+
+  private DisposalConfirmationMetadata createDisposalConfirmation(DisposalConfirmationState state) {
     DisposalConfirmationMetadata confirmation = new DisposalConfirmationMetadata();
-    confirmation.setNumberOfAIPs(10L);
-    confirmation.setNumberOfCollections(20L);
+    confirmation.setTitle("Confirmation");
+    confirmation.setNumberOfAIPs(100L);
+    confirmation.setNumberOfCollections(1L);
+    confirmation.setState(state);
+    confirmation.setSize(12346234L);
 
     return confirmation;
   }

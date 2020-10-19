@@ -842,11 +842,15 @@ public final class RodaConstants {
   public static final String DISPOSAL_CONFIRMATION_APPROVER = "approver";
   public static final String DISPOSAL_CONFIRMATION_CREATED_ON = "createdOn";
   public static final String DISPOSAL_CONFIRMATION_CREATED_BY = "createdBy";
-  public static final String DISPOSAL_CONFIRMATION_UPDATED_ON = "updatedOn";
-  public static final String DISPOSAL_CONFIRMATION_UPDATED_BY = "updatedBy";
+  public static final String DISPOSAL_CONFIRMATION_EXECUTED_ON = "executedOn";
+  public static final String DISPOSAL_CONFIRMATION_EXECUTED_BY = "executedBy";
+  public static final String DISPOSAL_CONFIRMATION_RESTORED_ON = "restoredOn";
+  public static final String DISPOSAL_CONFIRMATION_RESTORED_BY = "restoredBy";
   public static final String DISPOSAL_CONFIRMATION_NUMBER_OF_AIPS = "numberOfAIPs";
   public static final String DISPOSAL_CONFIRMATION_NUMBER_OF_COLLECTIONS = "numberOfCollections";
   public static final String DISPOSAL_CONFIRMATION_STATE = "state";
+  public static final String DISPOSAL_CONFIRMATION_TITLE = "title";
+  public static final String DISPOSAL_CONFIRMATION_SIZE = "size";
 
 
   /* Disposal related parameters */

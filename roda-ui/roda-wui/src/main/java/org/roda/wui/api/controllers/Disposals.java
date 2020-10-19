@@ -209,7 +209,7 @@ public class Disposals extends RodaWuiController {
   }
 
   public static void deleteDisposalConfirmation(User user, String disposalConfirmationId)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IllegalOperationException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
