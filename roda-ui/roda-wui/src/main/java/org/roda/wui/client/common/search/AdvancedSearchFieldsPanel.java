@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.function.Consumer;
 
+import com.google.gwt.core.client.GWT;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;

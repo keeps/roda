@@ -18,14 +18,15 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginState;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.notifications.NotificationState;
-import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.IncidenceStatus;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.risks.SeverityLevel;
@@ -76,9 +77,9 @@ public class HtmlSnippetUtils {
     // do nothing
   }
 
-  public static SafeHtml getDisposalScheduleStateHtml(DisposalSchedule disposalSchedule){
+  public static SafeHtml getDisposalScheduleStateHtml(DisposalSchedule disposalSchedule) {
     SafeHtml ret = null;
-    if(disposalSchedule != null && disposalSchedule.getState() != null) {
+    if (disposalSchedule != null && disposalSchedule.getState() != null) {
       SafeHtmlBuilder b = new SafeHtmlBuilder();
       switch (disposalSchedule.getState()) {
         case ACTIVE:
@@ -97,9 +98,9 @@ public class HtmlSnippetUtils {
     return ret;
   }
 
-  public static SafeHtml getDisposalHoldStateHtml(DisposalHold disposalHold){
+  public static SafeHtml getDisposalHoldStateHtml(DisposalHold disposalHold) {
     SafeHtml ret = null;
-    if(disposalHold != null && disposalHold.getState() != null) {
+    if (disposalHold != null && disposalHold.getState() != null) {
       SafeHtmlBuilder b = new SafeHtmlBuilder();
       switch (disposalHold.getState()) {
         case ACTIVE:
@@ -125,10 +126,10 @@ public class HtmlSnippetUtils {
       if (JOB_STATE.COMPLETED.equals(state)) {
         if (job.getJobStats().getSourceObjectsCount() == job.getJobStats().getSourceObjectsProcessedWithSuccess()) {
           ret = SafeHtmlUtils
-              .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + messages.showJobStatusCompleted() + CLOSE_SPAN);
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + messages.showJobStatusCompleted() + CLOSE_SPAN);
         } else if (job.getJobStats().getSourceObjectsProcessedWithPartialSuccess() > 0) {
           ret = SafeHtmlUtils
-              .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
         } else if (job.getJobStats().getSourceObjectsProcessedWithSuccess() > 0) {
           ret = SafeHtmlUtils
             .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
@@ -220,7 +221,7 @@ public class HtmlSnippetUtils {
       case PARTIAL_SUCCESS:
       case SKIPPED:
         pluginStateHTML = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
         break;
       case FAILURE:
       default:
@@ -243,7 +244,6 @@ public class HtmlSnippetUtils {
     } else {
       pluginMandatoryHTML = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + "Optional" + CLOSE_SPAN);
     }
-
 
     return pluginMandatoryHTML;
   }
@@ -531,5 +531,26 @@ public class HtmlSnippetUtils {
     String endSpan = "</span>";
 
     return SafeHtmlUtils.fromSafeConstant(beginSpan + innerIcon + outerIcon + endSpan);
+  }
+
+  public static SafeHtml getDisposalConfirmationStateHTML(DisposalConfirmationState state) {
+    String labelClass;
+
+    switch (state) {
+      case PENDING:
+        labelClass = "label-warning";
+        break;
+      case APPROVED:
+        labelClass = "label-success";
+        break;
+      case RESTORED:
+        labelClass = "label-info";
+        break;
+      default:
+        labelClass = "label-default";
+        break;
+    }
+
+    return SafeHtmlUtils.fromSafeConstant("<span class='" + labelClass + "'>" + messages.disposalConfirmationState(state) + CLOSE_SPAN);
   }
 }

@@ -3,6 +3,7 @@ package org.roda.core.data.v2.ip.disposal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -24,15 +25,22 @@ public class DisposalConfirmationMetadata implements IsModelObject, IsIndexed, H
   private static final long serialVersionUID = 1429757961220532837L;
 
   private String id;
+  private String title;
 
   private Date createdOn;
   private String createdBy;
-  private Date updatedOn;
-  private String updatedBy;
 
-  private String approver;
-  private Long numberOfAIPs;
-  private Long numberOfCollections;
+  private Date executedOn = null;
+  private String executedBy = null;
+
+  private Date restoredOn = null;
+  private String restoredBy = null;
+
+  private String approver = null;
+
+  private Long size = null;
+  private Long numberOfAIPs = null;
+  private Long numberOfCollections = null;
 
   private DisposalConfirmationState state;
 
@@ -41,6 +49,7 @@ public class DisposalConfirmationMetadata implements IsModelObject, IsIndexed, H
   public DisposalConfirmationMetadata() {
     super();
     state = DisposalConfirmationState.PENDING;
+    fields = new HashMap<>();
   }
 
   @JsonIgnore
@@ -106,20 +115,52 @@ public class DisposalConfirmationMetadata implements IsModelObject, IsIndexed, H
     this.state = state;
   }
 
-  public Date getUpdatedOn() {
-    return updatedOn;
+  public Date getExecutedOn() {
+    return executedOn;
   }
 
-  public void setUpdatedOn(Date updatedOn) {
-    this.updatedOn = updatedOn;
+  public void setExecutedOn(Date executedOn) {
+    this.executedOn = executedOn;
   }
 
-  public String getUpdatedBy() {
-    return updatedBy;
+  public String getExecutedBy() {
+    return executedBy;
   }
 
-  public void setUpdatedBy(String updatedBy) {
-    this.updatedBy = updatedBy;
+  public void setExecutedBy(String executedBy) {
+    this.executedBy = executedBy;
+  }
+
+  public Date getRestoredOn() {
+    return restoredOn;
+  }
+
+  public void setRestoredOn(Date restoredOn) {
+    this.restoredOn = restoredOn;
+  }
+
+  public String getRestoredBy() {
+    return restoredBy;
+  }
+
+  public void setRestoredBy(String restoredBy) {
+    this.restoredBy = restoredBy;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
+  public Long getSize() {
+    return size;
+  }
+
+  public void setSize(Long size) {
+    this.size = size;
   }
 
   @Override
@@ -129,24 +170,30 @@ public class DisposalConfirmationMetadata implements IsModelObject, IsIndexed, H
     if (o == null || getClass() != o.getClass())
       return false;
     DisposalConfirmationMetadata that = (DisposalConfirmationMetadata) o;
-    return Objects.equals(getId(), that.getId()) && Objects.equals(getCreatedOn(), that.getCreatedOn())
-      && Objects.equals(getCreatedBy(), that.getCreatedBy()) && Objects.equals(getUpdatedOn(), that.getUpdatedOn())
-      && Objects.equals(getUpdatedBy(), that.getUpdatedBy()) && Objects.equals(getApprover(), that.getApprover())
+    return Objects.equals(getId(), that.getId()) && Objects.equals(getTitle(), that.getTitle())
+      && Objects.equals(getCreatedOn(), that.getCreatedOn()) && Objects.equals(getCreatedBy(), that.getCreatedBy())
+      && Objects.equals(getExecutedOn(), that.getExecutedOn()) && Objects.equals(getExecutedBy(), that.getExecutedBy())
+      && Objects.equals(getRestoredOn(), that.getRestoredOn()) && Objects.equals(getRestoredBy(), that.getRestoredBy())
+      && Objects.equals(getApprover(), that.getApprover()) && Objects.equals(getSize(), that.getSize())
       && Objects.equals(getNumberOfAIPs(), that.getNumberOfAIPs())
-      && Objects.equals(getNumberOfCollections(), that.getNumberOfCollections()) && getState() == that.getState();
+      && Objects.equals(getNumberOfCollections(), that.getNumberOfCollections()) && getState() == that.getState()
+      && Objects.equals(getFields(), that.getFields());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(getId(), getCreatedOn(), getCreatedBy(), getUpdatedOn(), getUpdatedBy(), getApprover(),
-      getNumberOfAIPs(), getNumberOfCollections(), getState());
+    return Objects.hash(getId(), getTitle(), getCreatedOn(), getCreatedBy(), getExecutedOn(), getExecutedBy(),
+      getRestoredOn(), getRestoredBy(), getApprover(), getSize(), getNumberOfAIPs(), getNumberOfCollections(),
+      getState(), getFields());
   }
 
   @Override
   public String toString() {
-    return "DisposalConfirmation{" + "id='" + id + '\'' + ", createdOn=" + createdOn + ", createdBy='" + createdBy
-      + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\'' + ", approver='" + approver + '\''
-      + ", numberOfAIPs=" + numberOfAIPs + ", numberOfCollections=" + numberOfCollections + ", state=" + state + '}';
+    return "DisposalConfirmationMetadata{" + "id='" + id + '\'' + ", title='" + title + '\'' + ", createdOn="
+      + createdOn + ", createdBy='" + createdBy + '\'' + ", executedOn=" + executedOn + ", executedBy='" + executedBy
+      + '\'' + ", restoredOn=" + restoredOn + ", restoredBy='" + restoredBy + '\'' + ", approver='" + approver + '\''
+      + ", size=" + size + ", numberOfAIPs=" + numberOfAIPs + ", numberOfCollections=" + numberOfCollections
+      + ", state=" + state + ", fields=" + fields + '}';
   }
 
   @JsonIgnore
@@ -162,7 +209,8 @@ public class DisposalConfirmationMetadata implements IsModelObject, IsIndexed, H
    */
   @Override
   public List<String> toCsvHeaders() {
-    return Arrays.asList("id", "createdOn", "createdBy", "approver", "numberOfAIPs", "numberOfCollections");
+    return Arrays.asList("id", "title", "createdOn", "createdBy", "executedOn", "executedBy", "approver",
+      "numberOfAIPs", "numberOfCollections", "size");
   }
 
   /**
@@ -172,7 +220,8 @@ public class DisposalConfirmationMetadata implements IsModelObject, IsIndexed, H
    */
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(id, createdBy, createdOn, approver, numberOfAIPs, numberOfCollections);
+    return Arrays.asList(id, title, createdOn, createdBy, executedOn, executedBy, approver, numberOfAIPs,
+      numberOfCollections, size);
   }
 
   /**

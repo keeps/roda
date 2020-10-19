@@ -3,7 +3,11 @@ package org.roda.wui.client.disposal;
 import java.util.List;
 
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.disposal.confirmations.CreateDisposalConfirmation;
+import org.roda.wui.client.disposal.confirmations.ShowDisposalConfirmation;
+import org.roda.wui.client.search.DisposalConfirmationSearch;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
@@ -42,7 +46,7 @@ public class DisposalConfirmations extends Composite {
 
     @Override
     public String getHistoryToken() {
-      return "confirmations";
+      return "confirmation_register";
     }
   };
 
@@ -60,12 +64,16 @@ public class DisposalConfirmations extends Composite {
   @UiField
   FlowPanel content;
 
+  @UiField(provided = true)
+  DisposalConfirmationSearch searchPanel;
+
   /**
    * Create a disposal confirmation page
    */
   public DisposalConfirmations() {
-    initWidget(uiBinder.createAndBindUi(this));
+    searchPanel = new DisposalConfirmationSearch("Disposal_confirmations");
 
+    initWidget(uiBinder.createAndBindUi(this));
     disposalConfirmationDescription.add(new HTMLWidgetWrapper("DisposalConfirmationDescription.html"));
   }
 
@@ -83,31 +91,40 @@ public class DisposalConfirmations extends Composite {
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
-    // TODO: add logic
+    HistoryUtils.newHistory(CreateDisposalConfirmation.RESOLVER);
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty()) {
       callback.onSuccess(this);
-    } /*
-       * else { String basePage = historyTokens.remove(0); if
-       * (ShowRepresentationInformation.RESOLVER.getHistoryToken().equals(basePage)) {
-       * ShowRepresentationInformation.RESOLVER.resolve(historyTokens, callback); }
-       * else if
-       * (CreateRepresentationInformation.RESOLVER.getHistoryToken().equals(basePage))
-       * { CreateRepresentationInformation.RESOLVER.resolve(historyTokens, callback);
-       * } else if
-       * (EditRepresentationInformation.RESOLVER.getHistoryToken().equals(basePage)) {
-       * EditRepresentationInformation.RESOLVER.resolve(historyTokens, callback); }
-       * else if
-       * (RepresentationInformationAssociations.RESOLVER.getHistoryToken().equals(
-       * basePage)) {
-       * RepresentationInformationAssociations.RESOLVER.resolve(historyTokens,
-       * callback); } else if (Search.RESOLVER.getHistoryToken().equals(basePage)) {
-       * searchPanel.setFilter(RepresentationInformation.class,
-       * SearchFilters.createFilterFromHistoryTokens(historyTokens));
-       * callback.onSuccess(this); } else { HistoryUtils.newHistory(RESOLVER);
-       * callback.onSuccess(null); }
-       */
+    } else {
+      String basePage = historyTokens.remove(0);
+      if (ShowDisposalConfirmation.RESOLVER.getHistoryToken().equals(basePage)) {
+        ShowDisposalConfirmation.RESOLVER.resolve(historyTokens, callback);
+      } else if (CreateDisposalConfirmation.RESOLVER.getHistoryToken().equals(basePage)) {
+        CreateDisposalConfirmation.RESOLVER.resolve(historyTokens, callback);
+      }
+    }
+
+    /*
+     * else { String basePage = historyTokens.remove(0); if
+     * (ShowRepresentationInformation.RESOLVER.getHistoryToken().equals(basePage)) {
+     * ShowRepresentationInformation.RESOLVER.resolve(historyTokens, callback); }
+     * else if
+     * (CreateRepresentationInformation.RESOLVER.getHistoryToken().equals(basePage))
+     * { CreateRepresentationInformation.RESOLVER.resolve(historyTokens, callback);
+     * } else if
+     * (EditRepresentationInformation.RESOLVER.getHistoryToken().equals(basePage)) {
+     * EditRepresentationInformation.RESOLVER.resolve(historyTokens, callback); }
+     * else if
+     * (RepresentationInformationAssociations.RESOLVER.getHistoryToken().equals(
+     * basePage)) {
+     * RepresentationInformationAssociations.RESOLVER.resolve(historyTokens,
+     * callback); } else if (Search.RESOLVER.getHistoryToken().equals(basePage)) {
+     * searchPanel.setFilter(RepresentationInformation.class,
+     * SearchFilters.createFilterFromHistoryTokens(historyTokens));
+     * callback.onSuccess(this); } else { HistoryUtils.newHistory(RESOLVER);
+     * callback.onSuccess(null); }
+     */
   }
 }

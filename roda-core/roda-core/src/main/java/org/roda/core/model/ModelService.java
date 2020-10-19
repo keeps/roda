@@ -77,6 +77,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
@@ -3447,8 +3448,6 @@ public class ModelService extends ModelObservable {
 
     disposalConfirmationMetadata.setCreatedBy(createdBy);
     disposalConfirmationMetadata.setCreatedOn(new Date());
-    disposalConfirmationMetadata.setUpdatedBy(createdBy);
-    disposalConfirmationMetadata.setUpdatedOn(new Date());
 
     String disposalConfirmationAsJson = JsonUtils.getJsonFromObject(disposalConfirmationMetadata);
 
@@ -3463,12 +3462,9 @@ public class ModelService extends ModelObservable {
   }
 
   public DisposalConfirmationMetadata updateDisposalConfirmationMetadata(
-    DisposalConfirmationMetadata disposalConfirmationMetadata, String updatedBy) throws AuthorizationDeniedException,
+    DisposalConfirmationMetadata disposalConfirmationMetadata) throws AuthorizationDeniedException,
     RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
-
-    disposalConfirmationMetadata.setUpdatedBy(updatedBy);
-    disposalConfirmationMetadata.setUpdatedOn(new Date());
 
     String disposalConfirmationAsJson = JsonUtils.getJsonFromObject(disposalConfirmationMetadata);
 
@@ -3483,11 +3479,20 @@ public class ModelService extends ModelObservable {
   }
 
   public void deleteDisposalConfirmation(String disposalConfirmationId)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+      throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException, IllegalOperationException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     StoragePath disposalSchedulePath = ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId);
-    storage.deleteResource(disposalSchedulePath);
-    notifyDisposalConfirmationDeleted(disposalConfirmationId, false).failOnError();
+    DisposalConfirmationMetadata metadata = retrieveDisposalConfirmationMetadata(disposalConfirmationId);
+
+    // check if the disposal confirmation is pending
+    // if so the disposal confirmation can be deleted from the system
+    if (DisposalConfirmationState.PENDING.equals(metadata.getState())) {
+      storage.deleteResource(disposalSchedulePath);
+      notifyDisposalConfirmationDeleted(disposalConfirmationId, false).failOnError();
+    } else {
+      throw new IllegalOperationException("Error deleting disposal confirmation: " + disposalConfirmationId
+          + ". Reason: This confirmation state is " + metadata.getState().toString() + " and cannot be deleted");
+    }
   }
 }

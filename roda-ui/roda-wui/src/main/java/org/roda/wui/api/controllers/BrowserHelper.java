@@ -3342,11 +3342,11 @@ public class BrowserHelper {
   }
 
   public static DisposalConfirmationMetadata updateDisposalConfirmationMetadata(DisposalConfirmationMetadata confirmationMetadata, User user) throws AlreadyExistsException, AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    return RodaCoreFactory.getModelService().updateDisposalConfirmationMetadata(confirmationMetadata, user.getName());
+    return RodaCoreFactory.getModelService().updateDisposalConfirmationMetadata(confirmationMetadata);
   }
 
   public static void deleteDisposalConfirmation(String disposalConfirmationId)
-      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException, IllegalOperationException {
     RodaCoreFactory.getModelService().deleteDisposalConfirmation(disposalConfirmationId);
   }
 }
