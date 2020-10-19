@@ -5,11 +5,11 @@
              xmlns:common="urn:import:org.roda.wui.client.common">
 
     <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
-    <g:FlowPanel styleName="wui-disposal-destroyed-records" addStyleNames="wrapper skip_padding">
+    <g:FlowPanel styleName="wui-show-disposal-confirmation" addStyleNames="wrapper skip_padding">
+
         <g:FlowPanel addStyleNames="row full_width skip_padding">
-            <g:FlowPanel addStyleNames="col_12 content" ui:field="content">
-                <common:TitlePanel text="{messages.disposalDestroyedRecordsTitle}" iconClass="DisposalDestroyedRecords"/>
-                <g:FlowPanel addStyleNames="page-description" ui:field="disposalDestroyedRecordsDescription"/>
+            <g:FlowPanel addStyleNames="col_12">
+
             </g:FlowPanel>
         </g:FlowPanel>
     </g:FlowPanel>

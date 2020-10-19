@@ -66,7 +66,7 @@ public class DisposalScheduleTest {
   @AfterClass
   public void tearDown() throws Exception {
     RodaCoreFactory.shutdown();
-    //FSUtils.deletePath(basePath);
+    FSUtils.deletePath(basePath);
   }
 
   @AfterMethod

@@ -7147,6 +7147,11 @@ span.code {
     color: #9a9a9a;
 }
 
+.basicTable{
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
 /* Permission related */
 
 .hasNoPermissions {

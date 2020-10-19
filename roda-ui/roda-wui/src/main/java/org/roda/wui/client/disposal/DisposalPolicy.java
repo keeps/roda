@@ -16,15 +16,14 @@ import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -116,6 +115,8 @@ public class DisposalPolicy extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
     this.disposalSchedules = disposalSchedules;
     this.disposalHolds = disposalHolds;
+    contentDisposalSchedulesTable.addStyleName("basicTable");
+    contentDisposalHoldsTable.addStyleName("basicTable");
 
     // Disposal schedules table
     if (disposalSchedules.getObjects().isEmpty()) {
@@ -136,9 +137,9 @@ public class DisposalPolicy extends Composite {
       contentDisposalSchedulesTable.add(schedulesPanel);
 
       // if(PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_SCHEDULE)){
-      //Button buttonNewHold = new Button("New disposal schedule");
-      //buttonNewHold.addStyleName("rodaButton");
-      //contentNewDisposalScheduleBtn.add(buttonNewHold);
+      // Button buttonNewHold = new Button("New disposal schedule");
+      // buttonNewHold.addStyleName("rodaButton");
+      // contentNewDisposalScheduleBtn.add(buttonNewHold);
       // }
     }
 
@@ -161,10 +162,10 @@ public class DisposalPolicy extends Composite {
       contentDisposalHoldsTable.add(holdsPanel);
 
       // if(PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_SCHEDULE)){
-      //Button buttonNewHold = new Button("New disposal hold");
-      //buttonNewHold.addStyleName("rodaButton");
-      //buttonNewHold.click();
-      //contentNewDisposalHoldBtn.add(buttonNewHold);
+      // Button buttonNewHold = new Button("New disposal hold");
+      // buttonNewHold.addStyleName("rodaButton");
+      // buttonNewHold.click();
+      // contentNewDisposalHoldBtn.add(buttonNewHold);
 
       // }
     }

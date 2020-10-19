@@ -23,6 +23,7 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.IndexedReport;
@@ -33,7 +34,6 @@ import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.wui.client.portal.BrowseAIPPortal;
 import org.roda.wui.client.browse.BrowseDIP;
 import org.roda.wui.client.browse.BrowseFile;
 import org.roda.wui.client.browse.BrowseRepresentation;
@@ -41,6 +41,7 @@ import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.ShowPreservationEvent;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.disposal.confirmations.ShowDisposalConfirmation;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.ingest.process.ShowJobReport;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
@@ -53,6 +54,7 @@ import org.roda.wui.client.planning.ShowPreservationAgent;
 import org.roda.wui.client.planning.ShowRepresentationInformation;
 import org.roda.wui.client.planning.ShowRisk;
 import org.roda.wui.client.planning.ShowRiskIncidence;
+import org.roda.wui.client.portal.BrowseAIPPortal;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.widgets.Toast;
@@ -409,6 +411,10 @@ public class HistoryUtils {
     } else if (object instanceof LogEntry) {
       LogEntry logEntry = (LogEntry) object;
       HistoryUtils.newHistory(ShowLogEntry.RESOLVER, logEntry.getUUID());
+    } else if (object instanceof DisposalConfirmationMetadata) {
+      DisposalConfirmationMetadata confirmationMetadata = (DisposalConfirmationMetadata) object;
+      path = HistoryUtils.getHistory(ShowDisposalConfirmation.RESOLVER.getHistoryPath(),
+        confirmationMetadata.getUUID());
     } else {
       Toast.showError("Resolve of class not supported: " + object.getClass().getName());
     }
