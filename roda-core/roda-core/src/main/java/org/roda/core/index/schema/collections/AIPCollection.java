@@ -95,6 +95,12 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     fields.add(new Field(RodaConstants.AIP_DATE_INITIAL, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.AIP_DATE_FINAL, Field.TYPE_DATE));
 
+    fields.add(new Field(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.AIP_DISPOSAL_SCHEDULE_NAME, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.AIP_DISPOSAL_HOLDS_ID, Field.TYPE_STRING).setMultiValued(true));
+    fields.add(new Field(RodaConstants.AIP_DESTRUCTED_ON, Field.TYPE_DATE));
+    fields.add(new Field(RodaConstants.AIP_DESTRUCTED_APPROVED_BY, Field.TYPE_STRING));
+
     fields.add(SolrCollection.getSortFieldOf(RodaConstants.AIP_TITLE));
 
     return fields;
@@ -121,6 +127,12 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     doc.addField(RodaConstants.AIP_CREATED_BY, aip.getCreatedBy());
     doc.addField(RodaConstants.AIP_UPDATED_ON, SolrUtils.formatDate(aip.getUpdatedOn()));
     doc.addField(RodaConstants.AIP_UPDATED_BY, aip.getUpdatedBy());
+
+    doc.addField(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID, aip.getDisposalScheduleId());
+    doc.addField(RodaConstants.AIP_DISPOSAL_SCHEDULE_NAME, aip.getDisposalScheduleName());
+    doc.addField(RodaConstants.AIP_DISPOSAL_HOLDS_ID, aip.getDisposalHoldsId());
+    doc.addField(RodaConstants.AIP_DESTRUCTED_ON, aip.getDestructionOn());
+    doc.addField(RodaConstants.AIP_DESTRUCTED_APPROVED_BY, aip.getDestructionApprovedBy());
 
     doc.addField(RodaConstants.INGEST_SIP_IDS, aip.getIngestSIPIds());
     doc.addField(RodaConstants.INGEST_JOB_ID, aip.getIngestJobId());
@@ -232,6 +244,11 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     final String createdBy = SolrUtils.objectToString(doc.get(RodaConstants.AIP_CREATED_BY), "");
     final Date updatedOn = SolrUtils.objectToDate(doc.get(RodaConstants.AIP_UPDATED_ON));
     final String updatedBy = SolrUtils.objectToString(doc.get(RodaConstants.AIP_UPDATED_BY), "");
+    final String disposalScheduleId = SolrUtils.objectToString(doc.get(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID), "");
+    final String disposalScheduleName = SolrUtils.objectToString(doc.get(RodaConstants.AIP_DISPOSAL_SCHEDULE_NAME), "");
+    final List<String> disposalHoldsId = SolrUtils.objectToListString(doc.get(RodaConstants.AIP_DISPOSAL_HOLDS_ID));
+    final Date destructedOn = SolrUtils.objectToDate(doc.get(RodaConstants.AIP_DESTRUCTED_ON));
+    final String destructedApprovedBy = SolrUtils.objectToString(doc.get(RodaConstants.AIP_DESTRUCTED_APPROVED_BY), "");
 
     String level;
     if (ghost) {
@@ -256,6 +273,11 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     ret.setIngestSIPIds(ingestSIPIds).setIngestJobId(ingestJobId).setIngestUpdateJobIds(ingestUpdateJobIds)
       .setCreatedOn(createdOn).setCreatedBy(createdBy).setUpdatedOn(updatedOn).setUpdatedBy(updatedBy)
       .setAllUpdateJobIds(allIngestJobIds);
+    ret.setDisposalScheduleId(disposalScheduleId);
+    ret.setDisposalScheduleName(disposalScheduleName);
+    ret.setDisposalHoldsId(disposalHoldsId);
+    ret.setDestructionOn(destructedOn);
+    ret.setDestructionApprovedBy(destructedApprovedBy);
 
     return ret;
   }

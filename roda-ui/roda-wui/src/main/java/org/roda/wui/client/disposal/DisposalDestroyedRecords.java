@@ -1,8 +1,19 @@
 package org.roda.wui.client.disposal;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.lists.AIPList;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
+import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
+import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -55,6 +66,9 @@ public class DisposalDestroyedRecords extends Composite {
   @UiField
   FlowPanel disposalDestroyedRecordsDescription;
 
+  @UiField(provided = true)
+  SearchWrapper disposalDestroyedRecordsSearch;
+
   @UiField
   FlowPanel content;
 
@@ -62,8 +76,15 @@ public class DisposalDestroyedRecords extends Composite {
    * Create a representation information page
    */
   public DisposalDestroyedRecords() {
-    initWidget(uiBinder.createAndBindUi(this));
 
+    ListBuilder<IndexedAIP> aipChildrenListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
+      new AsyncTableCellOptions<>(IndexedAIP.class, "DisposalDestroyedRecords_aip")
+        .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.RESIDUAL.name())))
+        .withSummary(messages.listOfAIPs()).bindOpener());
+
+    disposalDestroyedRecordsSearch = new SearchWrapper(false).createListAndSearchPanel(aipChildrenListBuilder);
+
+    initWidget(uiBinder.createAndBindUi(this));
     disposalDestroyedRecordsDescription.add(new HTMLWidgetWrapper("DisposalDestroyedRecordsDescription.html"));
   }
 

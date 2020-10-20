@@ -50,23 +50,33 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
   private Date updatedOn = null;
   private String updatedBy = null;
 
+  private String disposalScheduleId = null;
+  private String disposalScheduleName = null;
+  private List<String> disposalHoldsId = new ArrayList<>();
+  private Date destructionOn = null;
+  private String destructionApprovedBy = null;
+
   public AIP() {
     super();
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions) {
     this(id, parentId, type, state, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>(),
-      new AIPFormat(), new ArrayList<Relationship>(), new Date(), null, new Date(), null);
+      new AIPFormat(), new ArrayList<Relationship>(), new Date(), null, new Date(), null, null, null,
+      new ArrayList<String>(), new Date(), null);
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions, String createdBy) {
     this(id, parentId, type, state, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>(),
-      new AIPFormat(), new ArrayList<Relationship>(), new Date(), createdBy, new Date(), createdBy);
+      new AIPFormat(), new ArrayList<Relationship>(), new Date(), createdBy, new Date(), createdBy, null, null,
+      new ArrayList<String>(), new Date(), null);
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions,
     List<DescriptiveMetadata> descriptiveMetadata, List<Representation> representations, AIPFormat format,
-    List<Relationship> relationships, Date createdOn, String createdBy, Date updatedOn, String updatedBy) {
+    List<Relationship> relationships, Date createdOn, String createdBy, Date updatedOn, String updatedBy,
+    String disposalScheduleId, String disposalScheduleName, List<String> disposalHoldsId, Date destructionOn,
+    String destructionApprovedBy) {
     super();
     this.id = id;
     this.parentId = parentId;
@@ -83,6 +93,12 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
     this.createdBy = createdBy;
     this.updatedOn = updatedOn;
     this.updatedBy = updatedBy;
+
+    this.disposalScheduleId = disposalScheduleId;
+    this.disposalScheduleName = disposalScheduleName;
+    this.disposalHoldsId = disposalHoldsId;
+    this.destructionOn = destructionOn;
+    this.destructionApprovedBy = destructionApprovedBy;
   }
 
   @JsonIgnore
@@ -237,6 +253,52 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
     }
   }
 
+  public String getDisposalScheduleId() {
+    return disposalScheduleId;
+  }
+
+  public void setDisposalScheduleId(String disposalScheduleId) {
+    this.disposalScheduleId = disposalScheduleId;
+  }
+
+  public String getDisposalScheduleName() {
+    return disposalScheduleName;
+  }
+
+  public void setDisposalScheduleName(String disposalScheduleName) {
+    this.disposalScheduleName = disposalScheduleName;
+  }
+
+  public List<String> getDisposalHoldsId() {
+    return disposalHoldsId;
+  }
+
+  public AIP setDisposalHoldsId(List<String> disposalHoldsId) {
+    this.disposalHoldsId = disposalHoldsId;
+    return this;
+  }
+
+  public AIP addDisposalHoldsId(String disposalHoldsId) {
+    this.disposalHoldsId.add(disposalHoldsId);
+    return this;
+  }
+
+  public Date getDestructionOn() {
+    return destructionOn;
+  }
+
+  public void setDestructionOn(Date destructionOn) {
+    this.destructionOn = destructionOn;
+  }
+
+  public String getDestructionApprovedBy() {
+    return destructionApprovedBy;
+  }
+
+  public void setDestructionApprovedBy(String destructionApprovedBy) {
+    this.destructionApprovedBy = destructionApprovedBy;
+  }
+
   public AIPFormat getFormat() {
     return format;
   }
@@ -325,7 +387,20 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
       return false;
     if (ingestJobId != null ? !ingestJobId.equals(aip.ingestJobId) : aip.ingestJobId != null)
       return false;
-    return ghost != null ? ghost.equals(aip.ghost) : aip.ghost == null;
+    if (ghost != null ? !ghost.equals(aip.ghost) : aip.ghost != null)
+      return false;
+    if (disposalScheduleId != null ? !disposalScheduleId.equals(aip.disposalScheduleId)
+      : aip.disposalScheduleId != null)
+      return false;
+    if (disposalScheduleName != null ? !disposalScheduleName.equals(aip.disposalScheduleName)
+      : aip.disposalScheduleName != null)
+      return false;
+    if (disposalHoldsId != null ? !disposalHoldsId.equals(aip.disposalHoldsId) : aip.disposalHoldsId != null)
+      return false;
+    if (destructionOn != null ? !destructionOn.equals(aip.destructionOn) : aip.destructionOn != null)
+      return false;
+    return destructionApprovedBy != null ? destructionApprovedBy.equals(aip.destructionApprovedBy)
+      : aip.destructionApprovedBy == null;
 
   }
 
@@ -341,6 +416,11 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
     result = 31 * result + (ingestSIPIds != null ? ingestSIPIds.hashCode() : 0);
     result = 31 * result + (ingestJobId != null ? ingestJobId.hashCode() : 0);
     result = 31 * result + (ghost != null ? ghost.hashCode() : 0);
+    result = 31 * result + (disposalScheduleId != null ? disposalScheduleId.hashCode() : 0);
+    result = 31 * result + (disposalScheduleName != null ? disposalScheduleName.hashCode() : 0);
+    result = 31 * result + (disposalHoldsId != null ? disposalHoldsId.hashCode() : 0);
+    result = 31 * result + (destructionOn != null ? destructionOn.hashCode() : 0);
+    result = 31 * result + (destructionApprovedBy != null ? destructionApprovedBy.hashCode() : 0);
     return result;
   }
 
@@ -348,10 +428,13 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
   public String toString() {
     return "AIP{" + "id='" + id + '\'' + ", parentId='" + parentId + '\'' + ", type='" + type + '\'' + ", state="
       + state + ", permissions=" + permissions + ", descriptiveMetadata=" + descriptiveMetadata + ", representations="
-      + representations + ", ingestSIPId='" + ingestSIPIds + '\'' + ", ingestJobId='" + ingestJobId + '\''
-      + ", ingestJobIds='" + ingestUpdateJobIds + '\'' + ", ghost=" + ghost + ", format=" + format + ", relationships="
-      + relationships + ", createdOn=" + createdOn + ", createdBy=" + createdBy + ", updatedOn=" + updatedOn
-      + ", updatedBy=" + updatedBy + '}';
+      + representations + ", ingestSIPUUID='" + ingestSIPUUID + '\'' + ", ingestSIPIds=" + ingestSIPIds
+      + ", ingestJobId='" + ingestJobId + '\'' + ", ingestUpdateJobIds=" + ingestUpdateJobIds + ", ghost=" + ghost
+      + ", format=" + format + ", relationships=" + relationships + ", createdOn=" + createdOn + ", createdBy='"
+      + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\'' + ", disposalScheduleId='"
+      + disposalScheduleId + '\'' + ", disposalScheduleName='" + disposalScheduleName + '\'' + ", disposalHoldsId="
+      + disposalHoldsId + ", destructionOn=" + destructionOn + ", destructionApprovedBy='" + destructionApprovedBy
+      + '\'' + '}';
   }
 
 }
