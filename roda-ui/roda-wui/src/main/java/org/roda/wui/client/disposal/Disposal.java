@@ -65,7 +65,8 @@ public class Disposal {
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty()) {
       callback.onSuccess(page);
-    } else if (historyTokens.get(0).equals(DisposalPolicy.RESOLVER.getHistoryToken())) {
+    }
+    if (historyTokens.get(0).equals(DisposalPolicy.RESOLVER.getHistoryToken())) {
       DisposalPolicy.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(DisposalConfirmations.RESOLVER.getHistoryToken())) {
       DisposalConfirmations.getInstance().resolve(HistoryUtils.tail(historyTokens), callback);

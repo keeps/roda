@@ -52,6 +52,7 @@ public class DisposalHold implements IsModelObject {
 
   public DisposalHold() {
     super();
+    this.state = DisposalHoldState.ACTIVE;
     this.activeAIPs = new TreeMap<>();
     this.inactiveAIPs = new TreeMap<>();
   }
