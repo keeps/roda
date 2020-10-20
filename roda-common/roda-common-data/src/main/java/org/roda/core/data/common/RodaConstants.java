@@ -675,6 +675,13 @@ public final class RodaConstants {
   public static final String AIP_UPDATED_ON = "updatedOn";
   public static final String AIP_UPDATED_BY = "updatedBy";
 
+  public static final String AIP_DISPOSAL_SCHEDULE_ID = "disposalScheduleId";
+  public static final String AIP_DISPOSAL_SCHEDULE_NAME = "disposalScheduleName";
+  public static final String AIP_DISPOSAL_HOLDS_ID = "disposalHoldsId";
+  public static final String AIP_DESTRUCTED_ON = "destructedOn";
+  public static final String AIP_DESTRUCTED_APPROVED_BY = "destructionApprovedBy";
+  public static final String AIP_DUE_DATE = "dueDate";
+
   // AIP types
   public static final String AIP_TYPE_MIXED = "MIXED";
 

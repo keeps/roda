@@ -4,10 +4,15 @@ import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertFalse;
 import static org.testng.AssertJUnit.assertTrue;
 
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
+import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
@@ -18,14 +23,25 @@ import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.ip.disposal.RetentionTriggerCode;
+import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.index.IndexService;
+import org.roda.core.index.IndexServiceTest;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.storage.fs.FileStorageService;
+import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
@@ -44,12 +60,14 @@ public class DisposalScheduleTest {
   private Path storagePath;
 
   private ModelService model;
+  private static StorageService corporaService;
+  private static IndexService index;
 
   @BeforeClass
   public void setUp() throws Exception {
     basePath = TestsHelper.createBaseTempDir(DisposalScheduleTest.class, true);
 
-    boolean deploySolr = false;
+    boolean deploySolr = true;
     boolean deployLdap = false;
     boolean deployFolderMonitor = false;
     boolean deployOrchestrator = true;
@@ -59,6 +77,10 @@ public class DisposalScheduleTest {
       deployPluginManager, deployDefaultResources);
     model = RodaCoreFactory.getModelService();
     storagePath = RodaCoreFactory.getStoragePath();
+    index = RodaCoreFactory.getIndexService();
+
+    URL corporaURL = IndexServiceTest.class.getResource("/corpora");
+    corporaService = new FileStorageService(Paths.get(corporaURL.toURI()));
 
     LOGGER.info("Running Disposal schedule tests under storage {}", basePath);
   }
@@ -66,7 +88,7 @@ public class DisposalScheduleTest {
   @AfterClass
   public void tearDown() throws Exception {
     RodaCoreFactory.shutdown();
-    //FSUtils.deletePath(basePath);
+    // FSUtils.deletePath(basePath);
   }
 
   @AfterMethod
@@ -109,6 +131,60 @@ public class DisposalScheduleTest {
     }
 
     assertTrue(Files.exists(FSUtils.getEntityPath(storagePath, disposalScheduleStoragePath)));
+  }
+
+  @Test
+  public void testDisposalScheduleAipAssociation() throws AuthorizationDeniedException, RequestNotValidException,
+    NotFoundException, GenericException, AlreadyExistsException, ValidationException {
+
+    // generate AIP ID
+    final String aipCorporaId = CorporaConstants.SOURCE_AIP_ID;
+    final String aipId = IdUtils.createUUID();
+    final DefaultStoragePath aipPath = DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, aipCorporaId);
+    final AIP aip = model.createAIP(aipId, corporaService, aipPath, RodaConstants.ADMIN);
+    // Generate Disposal
+    DisposalSchedule disposalSchedule = createDisposalSchedule();
+
+    // Associate AIP with Disposal schedule
+    aip.setDisposalScheduleId(disposalSchedule.getId());
+    aip.setDisposalScheduleName("NORMAL");
+    aip.setDestructionOn(new Date());
+    aip.setDestructionApprovedBy(RodaConstants.ADMIN);
+    AIP updatedAIP = model.updateAIP(aip, RodaConstants.ADMIN);
+
+    // check it is connected
+    AIP retrievedAIP = model.retrieveAIP(aipId);
+    assertEquals(updatedAIP, retrievedAIP);
+  }
+
+  @Test
+  public void testDisposalScheduleAipIndexAssociation() throws GenericException, AuthorizationDeniedException,
+    ValidationException, AlreadyExistsException, RequestNotValidException, NotFoundException {
+    // generate AIP ID
+    final String aipId = IdUtils.createUUID();
+
+    // Create AIP
+    final AIP aip = model.createAIP(aipId, corporaService,
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+      RodaConstants.ADMIN);
+
+    // Generate Disposal
+    DisposalSchedule disposalSchedule = createDisposalSchedule();
+
+    // Associate AIP with Disposal schedule
+    aip.setDisposalScheduleId(disposalSchedule.getId());
+    aip.setDisposalScheduleName("NORMAL");
+    //aip.setDestructionOn(new Date());
+    aip.setDestructionApprovedBy(RodaConstants.ADMIN);
+    model.updateAIP(aip, RodaConstants.ADMIN);
+    index.commitAIPs();
+
+    // Retrieve AIP
+    final IndexedAIP indexedAip = index.retrieve(IndexedAIP.class, aipId, new ArrayList<>());
+    assertEquals(aip.getDisposalScheduleId(), indexedAip.getDisposalScheduleId());
+    assertEquals(aip.getDisposalScheduleName(), indexedAip.getDisposalScheduleName());
+    assertEquals(aip.getDestructionOn(), indexedAip.getDestructionOn());
+    assertEquals(aip.getDestructionApprovedBy(), indexedAip.getDestructionApprovedBy());
   }
 
   private DisposalSchedule createDisposalSchedule() throws AlreadyExistsException, AuthorizationDeniedException,
