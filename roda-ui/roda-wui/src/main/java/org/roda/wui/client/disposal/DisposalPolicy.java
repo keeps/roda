@@ -12,12 +12,17 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
+import org.roda.wui.client.disposal.hold.CreateDisposalHold;
+import org.roda.wui.client.disposal.hold.ShowDisposalHold;
+import org.roda.wui.client.disposal.schedule.CreateDisposalSchedule;
+import org.roda.wui.client.disposal.schedule.ShowDisposalSchedule;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -42,13 +47,27 @@ import config.i18n.client.ClientMessages;
  */
 
 public class DisposalPolicy extends Composite {
-  public static final HistoryResolver RESOLVER=new HistoryResolver(){@Override public void resolve(List<String>historyTokens,AsyncCallback<Widget>callback){if(PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_SCHEDULES)&&PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_HOLDS)){loadDisposalSchedulesAndHolds(callback);}else if(PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_SCHEDULES)){loadDisposalSchedules(callback);}else if(PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_HOLDS)){loadDisposalHolds(callback);}else{HistoryUtils.newHistory(Disposal.RESOLVER,DisposalConfirmations.RESOLVER.getHistoryToken());}}
+  public static final HistoryResolver RESOLVER = new HistoryResolver() {
+    @Override
+    public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+      getInstance().resolve(historyTokens, callback);
+    }
 
-  @Override public void isCurrentUserPermitted(AsyncCallback<Boolean>callback){UserLogin.getInstance().checkRole(this,callback);}
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().checkRole(this, callback);
+    }
 
-  @Override public List<String>getHistoryPath(){return ListUtils.concat(Disposal.RESOLVER.getHistoryPath(),getHistoryToken());}
+    @Override
+    public List<String> getHistoryPath() {
+      return ListUtils.concat(Disposal.RESOLVER.getHistoryPath(), getHistoryToken());
+    }
 
-  @Override public String getHistoryToken(){return"policy";}};
+    @Override
+    public String getHistoryToken() {
+      return "policy";
+    }
+  };
 
   private static DisposalPolicy instance = null;
 
@@ -58,6 +77,18 @@ public class DisposalPolicy extends Composite {
   private static DisposalPolicy.MyUiBinder uiBinder = GWT.create(DisposalPolicy.MyUiBinder.class);
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+
+  /**
+   * Get the singleton instance
+   *
+   * @return the instance
+   */
+  public static DisposalPolicy getInstance() {
+    if (instance == null) {
+      instance = new DisposalPolicy();
+    }
+    return instance;
+  }
 
   @UiField
   FlowPanel disposalPolicyDescription;
@@ -92,6 +123,7 @@ public class DisposalPolicy extends Composite {
 
           @Override
           public void onSuccess(DisposalHolds disposalHolds) {
+
             callback.onSuccess(new DisposalPolicy(disposalSchedules, disposalHolds));
           }
         });
@@ -134,30 +166,19 @@ public class DisposalPolicy extends Composite {
       contentDisposalSchedulesTable.add(label);
     } else {
       FlowPanel schedulesPanel = new FlowPanel();
-      BasicTablePanel<DisposalSchedule> table = getBasicTablePanelForDisposalSchedules(disposalSchedules);
-      table.getSelectionModel().addSelectionChangeHandler(event -> {
-        DisposalSchedule selectedObject = table.getSelectionModel().getSelectedObject();
-        if (selectedObject != null) {
-          table.getSelectionModel().clear();
+      BasicTablePanel<DisposalSchedule> tableSchedules = getBasicTablePanelForDisposalSchedules(disposalSchedules);
+      tableSchedules.getSelectionModel().addSelectionChangeHandler(event -> {
+        DisposalSchedule selectedSchedule = tableSchedules.getSelectionModel().getSelectedObject();
+        if (selectedSchedule != null) {
+          tableSchedules.getSelectionModel().clear();
+          List<String> path = HistoryUtils.getHistory(ShowDisposalSchedule.RESOLVER.getHistoryPath(),
+            selectedSchedule.getId());
+          HistoryUtils.newHistory(path);
         }
       });
 
-      schedulesPanel.add(table);
+      schedulesPanel.add(tableSchedules);
       contentDisposalSchedulesTable.add(schedulesPanel);
-
-      if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_SCHEDULE)) {
-        Button newDisposalScheduleBtn = new Button();
-        newDisposalScheduleBtn.addStyleName("btn btn-plus");
-        newDisposalScheduleBtn.setText(messages.newDisposalScheduleTitle());
-        newDisposalScheduleBtn.addClickHandler(new ClickHandler() {
-
-          @Override
-          public void onClick(ClickEvent event) {
-            HistoryUtils.newHistory(Disposal.RESOLVER, DisposalConfirmations.RESOLVER.getHistoryToken());
-          }
-        });
-        newDisposalSchedule.add(newDisposalScheduleBtn);
-      }
     }
   }
 
@@ -174,26 +195,57 @@ public class DisposalPolicy extends Composite {
         DisposalHold selectedHold = tableHolds.getSelectionModel().getSelectedObject();
         if (selectedHold != null) {
           tableHolds.getSelectionModel().clear();
+          List<String> path = HistoryUtils.getHistory(ShowDisposalHold.RESOLVER.getHistoryPath(), selectedHold.getId());
+          HistoryUtils.newHistory(path);
         }
       });
 
       holdsPanel.add(tableHolds);
       contentDisposalHoldsTable.add(holdsPanel);
-
-      if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_HOLD)) {
-        Button newDisposalHoldBtn = new Button();
-        newDisposalHoldBtn.addStyleName("btn btn-plus");
-        newDisposalHoldBtn.setText(messages.newDisposalHoldTitle());
-        newDisposalHoldBtn.addClickHandler(new ClickHandler() {
-
-          @Override
-          public void onClick(ClickEvent event) {
-            HistoryUtils.newHistory(Disposal.RESOLVER, DisposalConfirmations.RESOLVER.getHistoryToken());
-          }
-        });
-        newDisposalHold.add(newDisposalHoldBtn);
-      }
     }
+  }
+
+  private void initButtons(){
+    initNewDisposalScheduleButton();
+    initNewDisposalHoldButton();
+  }
+
+  private void initNewDisposalScheduleButton() {
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_SCHEDULE)) {
+      Button newDisposalScheduleBtn = new Button();
+      newDisposalScheduleBtn.addStyleName("btn btn-plus");
+      newDisposalScheduleBtn.setText(messages.newDisposalScheduleTitle());
+      newDisposalScheduleBtn.addClickHandler(new ClickHandler() {
+
+        @Override
+        public void onClick(ClickEvent event) {
+          HistoryUtils.newHistory(CreateDisposalSchedule.RESOLVER);
+        }
+      });
+      newDisposalSchedule.add(newDisposalScheduleBtn);
+    }
+  }
+
+  private void initNewDisposalHoldButton() {
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_HOLD)) {
+      Button newDisposalHoldBtn = new Button();
+      newDisposalHoldBtn.addStyleName("btn btn-plus");
+      newDisposalHoldBtn.setText(messages.newDisposalHoldTitle());
+      newDisposalHoldBtn.addClickHandler(new ClickHandler() {
+
+        @Override
+        public void onClick(ClickEvent event) {
+          HistoryUtils.newHistory(Disposal.RESOLVER, DisposalPolicy.RESOLVER.getHistoryToken(),
+                  CreateDisposalHold.RESOLVER.getHistoryToken());
+        }
+      });
+      newDisposalHold.add(newDisposalHoldBtn);
+    }
+  }
+
+  private DisposalPolicy() {
+    initWidget(uiBinder.createAndBindUi(this));
+    disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
   }
 
   private DisposalPolicy(DisposalSchedules disposalSchedules) {
@@ -202,18 +254,21 @@ public class DisposalPolicy extends Composite {
     contentDisposalHoldsTable.setVisible(false);
     newDisposalHold.setVisible(false);
 
+    initButtons();
+
     // Disposal schedules table
     createDisposalSchedulesPanel(disposalSchedules);
 
     disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
   }
 
-
   private DisposalPolicy(DisposalHolds disposalHolds) {
     initWidget(uiBinder.createAndBindUi(this));
     this.disposalHolds = disposalHolds;
     contentDisposalSchedulesTable.setVisible(false);
     newDisposalSchedule.setVisible(false);
+
+    initButtons();
 
     // Disposal holds table
     createDisposalHoldsPanel(disposalHolds);
@@ -226,6 +281,8 @@ public class DisposalPolicy extends Composite {
     this.disposalSchedules = disposalSchedules;
     this.disposalHolds = disposalHolds;
 
+    initButtons();
+
     // Disposal schedules table
     createDisposalSchedulesPanel(disposalSchedules);
 
@@ -234,7 +291,6 @@ public class DisposalPolicy extends Composite {
 
     disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
   }
-
 
   private BasicTablePanel<DisposalSchedule> getBasicTablePanelForDisposalSchedules(
     DisposalSchedules disposalSchedules) {
@@ -265,9 +321,13 @@ public class DisposalPolicy extends Composite {
         new BasicTablePanel.ColumnInfo<>(messages.disposalSchedulePeriod(), 8, new TextColumn<DisposalSchedule>() {
           @Override
           public String getValue(DisposalSchedule schedule) {
-            String value = schedule.getRetentionPeriodDuration().toString() + " "
-              + schedule.getRetentionPeriodIntervalCode().toString().toLowerCase();
-            return value;
+            if (schedule.getRetentionPeriodDuration() == null && schedule.getRetentionPeriodIntervalCode() == null) {
+              return "";
+            } else {
+              String value = schedule.getRetentionPeriodDuration().toString() + " "
+                + schedule.getRetentionPeriodIntervalCode().toString().toLowerCase();
+              return value;
+            }
           }
         }),
 
@@ -342,26 +402,23 @@ public class DisposalPolicy extends Composite {
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty()) {
+      if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_SCHEDULES)
+        && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_HOLDS)) {
+        loadDisposalSchedulesAndHolds(callback);
+      } else if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_SCHEDULES)) {
+        loadDisposalSchedules(callback);
+      } else if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_HOLDS)) {
+        loadDisposalHolds(callback);
+      }
       callback.onSuccess(this);
-    } /*
-       * else { String basePage = historyTokens.remove(0); if
-       * (ShowRepresentationInformation.RESOLVER.getHistoryToken().equals(basePage)) {
-       * ShowRepresentationInformation.RESOLVER.resolve(historyTokens, callback); }
-       * else if
-       * (CreateRepresentationInformation.RESOLVER.getHistoryToken().equals(basePage))
-       * { CreateRepresentationInformation.RESOLVER.resolve(historyTokens, callback);
-       * } else if
-       * (EditRepresentationInformation.RESOLVER.getHistoryToken().equals(basePage)) {
-       * EditRepresentationInformation.RESOLVER.resolve(historyTokens, callback); }
-       * else if
-       * (RepresentationInformationAssociations.RESOLVER.getHistoryToken().equals(
-       * basePage)) {
-       * RepresentationInformationAssociations.RESOLVER.resolve(historyTokens,
-       * callback); } else if (Search.RESOLVER.getHistoryToken().equals(basePage)) {
-       * searchPanel.setFilter(RepresentationInformation.class,
-       * SearchFilters.createFilterFromHistoryTokens(historyTokens));
-       * callback.onSuccess(this); } else { HistoryUtils.newHistory(RESOLVER);
-       * callback.onSuccess(null); } }
-       */
+    } else if (historyTokens.get(0).equals(CreateDisposalSchedule.RESOLVER.getHistoryToken())) {
+      CreateDisposalSchedule.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (historyTokens.get(0).equals(CreateDisposalHold.RESOLVER.getHistoryToken())) {
+      CreateDisposalHold.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (historyTokens.get(0).equals(ShowDisposalHold.RESOLVER.getHistoryToken())) {
+      ShowDisposalHold.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (historyTokens.get(0).equals(ShowDisposalSchedule.RESOLVER.getHistoryToken())) {
+      ShowDisposalSchedule.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    }
   }
 }

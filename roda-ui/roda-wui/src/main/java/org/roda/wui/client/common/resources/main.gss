@@ -7152,6 +7152,10 @@ span.code {
     margin-bottom: 1rem;
 }
 
+.disposalScopeNotes{
+    min-height: 20rem;
+}
+
 /* Permission related */
 
 .hasNoPermissions {

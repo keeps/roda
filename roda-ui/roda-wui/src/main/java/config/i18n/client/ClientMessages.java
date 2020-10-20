@@ -434,6 +434,10 @@ public interface ClientMessages extends Messages {
 
   String editButton();
 
+  String liftButton();
+
+  String discontinueButton();
+
   String saveButton();
 
   String addButton();
@@ -1986,6 +1990,7 @@ public interface ClientMessages extends Messages {
   String removableTextBox();
 
   /** Disposal **/
+
   String disposalPolicyTitle();
 
   String disposalDestroyedRecordsTitle();
@@ -1996,7 +2001,13 @@ public interface ClientMessages extends Messages {
 
   String disposalScheduleTitle();
 
+  String disposalScheduleIdentifier();
+
+  String disposalScheduleDescription();
+
   String disposalScheduleMandate();
+
+  String disposalScheduleNotes();
 
   String disposalSchedulePeriod();
 
@@ -2004,15 +2015,27 @@ public interface ClientMessages extends Messages {
 
   String disposalScheduleAction(@Select String action);
 
+  String disposalScheduleRetentionTriggerCode();
+
+  String disposalScheduleRetentionPeriodInterval();
+
+  String disposalScheduleRetentionPeriodDuration();
+
   String disposalScheduleNumberOfAIPs();
 
   String disposalScheduleStateCol();
 
   String disposalScheduleState(@Select String state);
 
+  String disposalHoldIdentifier();
+
   String disposalHoldTitle();
 
+  String disposalHoldDescription();
+
   String disposalHoldMandate();
+
+  String disposalHoldNotes();
 
   String disposalHoldNumberOfAIPs();
 
@@ -2039,4 +2062,17 @@ public interface ClientMessages extends Messages {
   String disposalConfirmationSize();
 
   String disposalConfirmationState(@Select DisposalConfirmationState state);
+  
+  String createDisposalScheduleFailure(String reason);
+
+  String createDisposalScheduleAlreadyExists(String title);
+
+  String createDisposalHoldFailure(String reason);
+
+  String createDisposalHoldAlreadyExists(String title);
+
+  String showDisposalHoldTitle();
+
+  String showDisposalScheduleTitle();
+
 }
