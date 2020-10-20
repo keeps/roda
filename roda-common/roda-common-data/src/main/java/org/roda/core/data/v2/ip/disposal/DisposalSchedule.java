@@ -50,6 +50,8 @@ public class DisposalSchedule implements IsModelObject, HasId {
 
   public DisposalSchedule() {
     super();
+    this.state = DisposalScheduleState.ACTIVE;
+    this.numberOfAIPUnder = 0L;
   }
 
   public DisposalSchedule(String id, String title, String description, String mandate, String scopeNotes,
