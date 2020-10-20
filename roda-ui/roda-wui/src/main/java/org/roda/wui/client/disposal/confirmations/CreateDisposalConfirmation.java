@@ -56,10 +56,7 @@ public class CreateDisposalConfirmation extends Composite {
     .create(CreateDisposalConfirmation.MyUiBinder.class);
 
   /**
-   * Create a new panel to create a user
-   *
-   * @param user
-   *          the user to create
+   * Create a new panel to create a disposal confirmation
    */
   public CreateDisposalConfirmation() {
     initWidget(uiBinder.createAndBindUi(this));

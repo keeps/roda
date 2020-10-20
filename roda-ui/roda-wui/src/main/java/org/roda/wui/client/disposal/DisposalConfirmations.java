@@ -12,10 +12,8 @@ import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -24,7 +22,7 @@ import com.google.gwt.user.client.ui.Widget;
 import config.i18n.client.ClientMessages;
 
 /**
- * @author Tiago Fraga <tfraga@keep.pt>
+ * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public class DisposalConfirmations extends Composite {
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
@@ -105,26 +103,5 @@ public class DisposalConfirmations extends Composite {
         CreateDisposalConfirmation.RESOLVER.resolve(historyTokens, callback);
       }
     }
-
-    /*
-     * else { String basePage = historyTokens.remove(0); if
-     * (ShowRepresentationInformation.RESOLVER.getHistoryToken().equals(basePage)) {
-     * ShowRepresentationInformation.RESOLVER.resolve(historyTokens, callback); }
-     * else if
-     * (CreateRepresentationInformation.RESOLVER.getHistoryToken().equals(basePage))
-     * { CreateRepresentationInformation.RESOLVER.resolve(historyTokens, callback);
-     * } else if
-     * (EditRepresentationInformation.RESOLVER.getHistoryToken().equals(basePage)) {
-     * EditRepresentationInformation.RESOLVER.resolve(historyTokens, callback); }
-     * else if
-     * (RepresentationInformationAssociations.RESOLVER.getHistoryToken().equals(
-     * basePage)) {
-     * RepresentationInformationAssociations.RESOLVER.resolve(historyTokens,
-     * callback); } else if (Search.RESOLVER.getHistoryToken().equals(basePage)) {
-     * searchPanel.setFilter(RepresentationInformation.class,
-     * SearchFilters.createFilterFromHistoryTokens(historyTokens));
-     * callback.onSuccess(this); } else { HistoryUtils.newHistory(RESOLVER);
-     * callback.onSuccess(null); }
-     */
   }
 }

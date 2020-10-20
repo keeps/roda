@@ -9,13 +9,13 @@
 
     <g:FlowPanel styleName="wui-disposal-confirmation" addStyleNames="wrapper skip_padding">
         <g:FlowPanel addStyleNames="row full_width skip_padding">
-            <g:FlowPanel addStyleNames="col_10 content" ui:field="content">
+            <g:FlowPanel addStyleNames="col_12 content" ui:field="content">
                 <common:TitlePanel text="{messages.disposalConfirmationsTitle}" iconClass="DisposalConfirmations"/>
                 <g:FlowPanel addStyleNames="page-description" ui:field="disposalConfirmationDescription"/>
                 <search:DisposalConfirmationSearch ui:field="searchPanel"/>
             </g:FlowPanel>
 
-            <g:FlowPanel addStyleNames="col_2 last sidebar">
+            <!--<g:FlowPanel addStyleNames="col_2 last sidebar">
                 <g:FlowPanel addStyleNames="sticky-flow">
                     <g:FlowPanel addStyleNames="sticky-padding">
                         <g:Label addStyleNames="h4">
@@ -26,7 +26,7 @@
                         </g:Button>
                     </g:FlowPanel>
                 </g:FlowPanel>
-            </g:FlowPanel>
+            </g:FlowPanel>-->
         </g:FlowPanel>
     </g:FlowPanel>
 

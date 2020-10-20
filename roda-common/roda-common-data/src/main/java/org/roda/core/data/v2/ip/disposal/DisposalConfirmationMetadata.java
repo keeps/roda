@@ -1,5 +1,6 @@
 package org.roda.core.data.v2.ip.disposal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -26,6 +27,7 @@ public class DisposalConfirmationMetadata implements IsModelObject, IsIndexed, H
 
   private String id;
   private String title;
+  private DisposalConfirmationState state;
 
   private Date createdOn;
   private String createdBy;
@@ -42,13 +44,16 @@ public class DisposalConfirmationMetadata implements IsModelObject, IsIndexed, H
   private Long numberOfAIPs = null;
   private Long numberOfCollections = null;
 
-  private DisposalConfirmationState state;
+  private List<String> disposalScheduleIds;
+  private List<String> disposalHoldIds;
 
   private Map<String, Object> fields;
 
   public DisposalConfirmationMetadata() {
     super();
     state = DisposalConfirmationState.PENDING;
+    disposalScheduleIds = new ArrayList<String>();
+    disposalHoldIds = new ArrayList<String>();
     fields = new HashMap<>();
   }
 
@@ -163,6 +168,22 @@ public class DisposalConfirmationMetadata implements IsModelObject, IsIndexed, H
     this.size = size;
   }
 
+  public List<String> getDisposalScheduleIds() {
+    return disposalScheduleIds;
+  }
+
+  public void setDisposalScheduleIds(List<String> disposalScheduleIds) {
+    this.disposalScheduleIds = disposalScheduleIds;
+  }
+
+  public List<String> getDisposalHoldIds() {
+    return disposalHoldIds;
+  }
+
+  public void setDisposalHoldIds(List<String> disposalHoldIds) {
+    this.disposalHoldIds = disposalHoldIds;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -171,29 +192,32 @@ public class DisposalConfirmationMetadata implements IsModelObject, IsIndexed, H
       return false;
     DisposalConfirmationMetadata that = (DisposalConfirmationMetadata) o;
     return Objects.equals(getId(), that.getId()) && Objects.equals(getTitle(), that.getTitle())
-      && Objects.equals(getCreatedOn(), that.getCreatedOn()) && Objects.equals(getCreatedBy(), that.getCreatedBy())
-      && Objects.equals(getExecutedOn(), that.getExecutedOn()) && Objects.equals(getExecutedBy(), that.getExecutedBy())
-      && Objects.equals(getRestoredOn(), that.getRestoredOn()) && Objects.equals(getRestoredBy(), that.getRestoredBy())
-      && Objects.equals(getApprover(), that.getApprover()) && Objects.equals(getSize(), that.getSize())
-      && Objects.equals(getNumberOfAIPs(), that.getNumberOfAIPs())
-      && Objects.equals(getNumberOfCollections(), that.getNumberOfCollections()) && getState() == that.getState()
+      && getState() == that.getState() && Objects.equals(getCreatedOn(), that.getCreatedOn())
+      && Objects.equals(getCreatedBy(), that.getCreatedBy()) && Objects.equals(getExecutedOn(), that.getExecutedOn())
+      && Objects.equals(getExecutedBy(), that.getExecutedBy()) && Objects.equals(getRestoredOn(), that.getRestoredOn())
+      && Objects.equals(getRestoredBy(), that.getRestoredBy()) && Objects.equals(getApprover(), that.getApprover())
+      && Objects.equals(getSize(), that.getSize()) && Objects.equals(getNumberOfAIPs(), that.getNumberOfAIPs())
+      && Objects.equals(getNumberOfCollections(), that.getNumberOfCollections())
+      && Objects.equals(getDisposalScheduleIds(), that.getDisposalScheduleIds())
+      && Objects.equals(getDisposalHoldIds(), that.getDisposalHoldIds())
       && Objects.equals(getFields(), that.getFields());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(getId(), getTitle(), getCreatedOn(), getCreatedBy(), getExecutedOn(), getExecutedBy(),
-      getRestoredOn(), getRestoredBy(), getApprover(), getSize(), getNumberOfAIPs(), getNumberOfCollections(),
-      getState(), getFields());
+    return Objects.hash(getId(), getTitle(), getState(), getCreatedOn(), getCreatedBy(), getExecutedOn(),
+      getExecutedBy(), getRestoredOn(), getRestoredBy(), getApprover(), getSize(), getNumberOfAIPs(),
+      getNumberOfCollections(), getDisposalScheduleIds(), getDisposalHoldIds(), getFields());
   }
 
   @Override
   public String toString() {
-    return "DisposalConfirmationMetadata{" + "id='" + id + '\'' + ", title='" + title + '\'' + ", createdOn="
-      + createdOn + ", createdBy='" + createdBy + '\'' + ", executedOn=" + executedOn + ", executedBy='" + executedBy
-      + '\'' + ", restoredOn=" + restoredOn + ", restoredBy='" + restoredBy + '\'' + ", approver='" + approver + '\''
-      + ", size=" + size + ", numberOfAIPs=" + numberOfAIPs + ", numberOfCollections=" + numberOfCollections
-      + ", state=" + state + ", fields=" + fields + '}';
+    return "DisposalConfirmationMetadata{" + "id='" + id + '\'' + ", title='" + title + '\'' + ", state=" + state
+      + ", createdOn=" + createdOn + ", createdBy='" + createdBy + '\'' + ", executedOn=" + executedOn
+      + ", executedBy='" + executedBy + '\'' + ", restoredOn=" + restoredOn + ", restoredBy='" + restoredBy + '\''
+      + ", approver='" + approver + '\'' + ", size=" + size + ", numberOfAIPs=" + numberOfAIPs
+      + ", numberOfCollections=" + numberOfCollections + ", disposalScheduleIds=" + disposalScheduleIds
+      + ", disposalHoldIds=" + disposalHoldIds + ", fields=" + fields + '}';
   }
 
   @JsonIgnore

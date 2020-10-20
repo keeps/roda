@@ -8,6 +8,7 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -65,16 +66,12 @@ public class Disposal {
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty()) {
       callback.onSuccess(page);
-    } else if (historyTokens.size() == 1) {
-      if (historyTokens.get(0).equals(DisposalPolicy.RESOLVER.getHistoryToken())) {
-        DisposalPolicy.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-      } else if (historyTokens.get(0).equals(DisposalConfirmations.RESOLVER.getHistoryToken())) {
-        DisposalConfirmations.getInstance().resolve(HistoryUtils.tail(historyTokens), callback);
-      } else if (historyTokens.get(0).equals(DisposalDestroyedRecords.RESOLVER.getHistoryToken())) {
-        DisposalDestroyedRecords.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-      }
-    } else if (historyTokens.size() == 2) {
-      CreateDisposal.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (historyTokens.get(0).equals(DisposalPolicy.RESOLVER.getHistoryToken())) {
+      DisposalPolicy.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (historyTokens.get(0).equals(DisposalConfirmations.RESOLVER.getHistoryToken())) {
+      DisposalConfirmations.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (historyTokens.get(0).equals(DisposalDestroyedRecords.RESOLVER.getHistoryToken())) {
+      DisposalDestroyedRecords.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     }
   }
 }
