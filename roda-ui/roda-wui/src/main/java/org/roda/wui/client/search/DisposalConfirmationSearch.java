@@ -1,6 +1,5 @@
 package org.roda.wui.client.search;
 
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.wui.client.common.lists.DisposalConfirmationList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;

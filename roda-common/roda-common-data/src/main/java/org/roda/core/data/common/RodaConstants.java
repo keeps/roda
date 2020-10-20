@@ -952,6 +952,7 @@ public final class RodaConstants {
   public static final String PLUGIN_CATEGORY_REPLICATION = "replication";
   public static final String PLUGIN_CATEGORY_MANAGEMENT = "management";
   public static final String PLUGIN_CATEGORY_REINDEX = "reindex";
+  public static final String PLUGIN_CATEGORY_DISPOSAL = "disposal";
 
   public static final String PLUGIN_CATEGORY_VALIDATION = "validation";
   public static final String PLUGIN_CATEGORY_FORMAT_IDENTIFICATION = "format_identification";
@@ -1580,6 +1581,8 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_CREATE_DISPOSAL_HOLD = "org.roda.wui.api.controllers.Disposals.createDisposalHold";
   public static final String PERMISSION_METHOD_DELETE_DISPOSAL_HOLD = "org.roda.wui.api.controllers.Disposals.deleteDisposalHold";
   public static final String PERMISSION_METHOD_UPDATE_DISPOSAL_HOLD = "org.roda.wui.api.controllers.Disposals.updateDisposalHold";
+
+  public static final String PERMISSION_METHOD_CREATE_DISPOSAL_CONFIRMATION = "org.roda.wui.api.controllers.Disposals.createDisposalConfirmation";
 
   public static final String PERMISSION_METHOD_LIST_DISPOSAL_SCHEDULES = "org.roda.wui.api.controllers.Browser.listDisposalSchedules";
   public static final String PERMISSION_METHOD_LIST_DISPOSAL_HOLDS = "org.roda.wui.api.controllers.Browser.listDisposalHolds";

@@ -1997,6 +1997,8 @@ public interface ClientMessages extends Messages {
 
   String disposalConfirmationsTitle();
 
+  String createDisposalConfirmationTitle();
+
   String disposalNewConfirmationAction();
 
   String disposalScheduleTitle();
@@ -2075,4 +2077,19 @@ public interface ClientMessages extends Messages {
 
   String showDisposalScheduleTitle();
 
+  String disposalConfirmationTitle();
+
+  String disposalConfirmationCreationDate();
+
+  String disposalConfirmationCreationBy();
+
+  String disposalConfirmationStatus();
+
+  String disposalConfirmationAIPs();
+
+  String disposalConfirmationCollections();
+
+  String disposalConfirmationSize();
+
+  String disposalConfirmationState(@Select DisposalConfirmationState state);
 }
