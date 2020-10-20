@@ -63,7 +63,7 @@ public class DisposalConfirmationMetadataTest {
   @AfterClass
   public void tearDown() throws Exception {
     RodaCoreFactory.shutdown();
-    FSUtils.deletePath(basePath);
+    // FSUtils.deletePath(basePath);
   }
 
   @AfterMethod
@@ -77,6 +77,12 @@ public class DisposalConfirmationMetadataTest {
 
     DisposalConfirmationMetadata confirmation = model.createDisposalConfirmationMetadata(createDisposalConfirmation(),
       "admin");
+
+    model.createDisposalConfirmationMetadata(createDisposalConfirmation(DisposalConfirmationState.PENDING),
+        "mguimaraes");
+
+    model.createDisposalConfirmationMetadata(createDisposalConfirmation(DisposalConfirmationState.RESTORED),
+        "lfaria");
 
     DisposalConfirmationMetadata retrievedConfirmation = SolrUtils.retrieve(solrClient,
       DisposalConfirmationMetadata.class, confirmation.getId(), new ArrayList<>());

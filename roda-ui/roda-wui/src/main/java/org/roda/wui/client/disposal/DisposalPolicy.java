@@ -2,12 +2,15 @@ package org.roda.wui.client.disposal;
 
 import java.util.List;
 
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.HTML;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalHolds;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.lists.utils.BasicTablePanel;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.hold.CreateDisposalHold;
 import org.roda.wui.client.disposal.hold.ShowDisposalHold;
@@ -47,17 +50,16 @@ public class DisposalPolicy extends Composite {
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-      BrowserService.Util.getInstance().listDisposalSchedules(new AsyncCallback<DisposalSchedules>() {
-        @Override
-        public void onFailure(Throwable throwable) {
-
-        }
-
-        @Override
-        public void onSuccess(DisposalSchedules disposalSchedules) {
-          callback.onSuccess(new DisposalPolicy(disposalSchedules));
-        }
-      });
+      if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_SCHEDULES)
+          && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_HOLDS)) {
+        loadDisposalSchedulesAndHolds(callback);
+      } else if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_SCHEDULES)) {
+        loadDisposalSchedules(callback);
+      } else if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_HOLDS)) {
+        loadDisposalHolds(callback);
+      } else {
+        HistoryUtils.newHistory(Disposal.RESOLVER, DisposalConfirmations.RESOLVER.getHistoryToken());
+      }
     }
 
     @Override
@@ -173,19 +175,30 @@ public class DisposalPolicy extends Composite {
       contentDisposalSchedulesTable.add(label);
     } else {
       FlowPanel schedulesPanel = new FlowPanel();
-      BasicTablePanel<DisposalSchedule> tableSchedules = getBasicTablePanelForDisposalSchedules(disposalSchedules);
-      tableSchedules.getSelectionModel().addSelectionChangeHandler(event -> {
-        DisposalSchedule selectedSchedule = tableSchedules.getSelectionModel().getSelectedObject();
-        if (selectedSchedule != null) {
-          tableSchedules.getSelectionModel().clear();
-          List<String> path = HistoryUtils.getHistory(ShowDisposalSchedule.RESOLVER.getHistoryPath(),
-            selectedSchedule.getId());
-          HistoryUtils.newHistory(path);
+      BasicTablePanel<DisposalSchedule> table = getBasicTablePanelForDisposalSchedules(disposalSchedules);
+      table.getSelectionModel().addSelectionChangeHandler(event -> {
+        DisposalSchedule selectedObject = table.getSelectionModel().getSelectedObject();
+        if (selectedObject != null) {
+          table.getSelectionModel().clear();
         }
       });
 
-      schedulesPanel.add(tableSchedules);
+      schedulesPanel.add(table);
       contentDisposalSchedulesTable.add(schedulesPanel);
+
+      if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_SCHEDULE)) {
+        Button newDisposalScheduleBtn = new Button();
+        newDisposalScheduleBtn.addStyleName("btn btn-plus");
+        newDisposalScheduleBtn.setText(messages.newDisposalScheduleTitle());
+        newDisposalScheduleBtn.addClickHandler(new ClickHandler() {
+
+          @Override
+          public void onClick(ClickEvent event) {
+            HistoryUtils.newHistory(Disposal.RESOLVER, CreateDisposal.RESOLVER.getHistoryToken(), CreateDisposalSchedule.RESOLVER.getHistoryToken());
+          }
+        });
+        newDisposalSchedule.add(newDisposalScheduleBtn);
+      }
     }
   }
 
@@ -266,11 +279,6 @@ public class DisposalPolicy extends Composite {
     // Disposal schedules table
     createDisposalSchedulesPanel(disposalSchedules);
 
-      content.add(schedulesPanel);
-
-
-
-    }
     disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
   }
 
@@ -301,7 +309,15 @@ public class DisposalPolicy extends Composite {
     // Disposal holds table
     createDisposalHoldsPanel(disposalHolds);
 
-    GWT.log("" + disposalSchedules.getObjects().size());
+    disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
+  }
+
+  private BasicTablePanel<DisposalSchedule> getBasicTablePanelForDisposalSchedules(
+      DisposalSchedules disposalSchedules) {
+    Label header = new Label("Disposal Schedule");
+    header.addStyleName("h5");
+
+    HTMLPanel info = new HTMLPanel("");
 
     if (disposalSchedules.getObjects().isEmpty()) {
       return new BasicTablePanel<>(header, messages.noItemsToDisplayPreFilters("disposal schedules"));
@@ -360,8 +376,48 @@ public class DisposalPolicy extends Composite {
             }
           }));
     }
+  }
 
-    disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
+  private BasicTablePanel<DisposalHold> getBasicTablePanelForDisposalHolds(DisposalHolds disposalHolds) {
+    Label headerHolds = new Label("Disposal Hold");
+    headerHolds.addStyleName("h5");
+
+    HTMLPanel info = new HTMLPanel("");
+
+    if (disposalHolds.getObjects().isEmpty()) {
+      return new BasicTablePanel<>(headerHolds, messages.noItemsToDisplayPreFilters("disposal holds"));
+    } else {
+      return new BasicTablePanel<DisposalHold>(headerHolds, info, disposalHolds.getObjects().iterator(),
+
+          new BasicTablePanel.ColumnInfo<>(messages.disposalHoldTitle(), 15, new TextColumn<DisposalHold>() {
+            @Override
+            public String getValue(DisposalHold hold) {
+              return hold.getTitle();
+            }
+          }),
+
+          new BasicTablePanel.ColumnInfo<>(messages.disposalScheduleMandate(), 0, new TextColumn<DisposalHold>() {
+            @Override
+            public String getValue(DisposalHold hold) {
+              return hold.getMandate();
+            }
+          }),
+
+          new BasicTablePanel.ColumnInfo<>(messages.disposalHoldNumberOfAIPs(), 8, new TextColumn<DisposalHold>() {
+            @Override
+            public String getValue(DisposalHold hold) {
+              return String.valueOf(hold.getActiveAIPs().size());
+            }
+          }),
+
+          new BasicTablePanel.ColumnInfo<>(messages.disposalHoldStateCol(), 8,
+              new Column<DisposalHold, SafeHtml>(new SafeHtmlCell()) {
+                @Override
+                public SafeHtml getValue(DisposalHold hold) {
+                  return HtmlSnippetUtils.getDisposalHoldStateHtml(hold);
+                }
+              }));
+    }
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

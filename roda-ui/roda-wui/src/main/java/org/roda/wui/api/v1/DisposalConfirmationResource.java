@@ -119,28 +119,7 @@ public class DisposalConfirmationResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    DisposalConfirmationMetadata disposalConfirmationMetadata = Disposals.createDisposalConfirmationMetadata(user,
-      metadata);
-    return Response.ok(disposalConfirmationMetadata, mediaType).build();
-  }
-
-  @PUT
-  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
-  @ApiOperation(value = "Update disposal confirmation", notes = "Update existing disposal confirmation", response = DisposalConfirmationMetadata.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DisposalConfirmationMetadata.class),
-    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
-  public Response updateDisposalConfirmation(DisposalConfirmationMetadata metadata,
-    @ApiParam(value = "Choose format in which to get the disposal confirmation", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-    @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
-    throws RODAException {
-    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
-
-    // get user
-    User user = UserUtility.getApiUser(request);
-
-    // delegate action to controller
-    DisposalConfirmationMetadata disposalConfirmationMetadata = Disposals.updateDisposalConfirmationMetadata(user,
+    DisposalConfirmationMetadata disposalConfirmationMetadata = Disposals.createDisposalConfirmation(user,
       metadata);
     return Response.ok(disposalConfirmationMetadata, mediaType).build();
   }

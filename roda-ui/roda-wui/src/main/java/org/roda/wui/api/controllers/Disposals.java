@@ -11,6 +11,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.ControllerAssistant;
@@ -162,9 +163,13 @@ public class Disposals extends RodaWuiController {
     }
   }
 
-  public static DisposalConfirmationMetadata createDisposalConfirmationMetadata(User user,
-    DisposalConfirmationMetadata confirmationMetadata) throws GenericException, AuthorizationDeniedException,
-    RequestNotValidException, NotFoundException, AlreadyExistsException {
+  public static DisposalConfirmationMetadata recoverDisposalConfirmation(User user, String disposalConfirmationId) {
+    return null;
+  }
+
+  public static DisposalConfirmationMetadata createDisposalConfirmation(User user,
+    DisposalConfirmationMetadata confirmationMetadata) throws AuthorizationDeniedException, AlreadyExistsException,
+    NotFoundException, GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -173,6 +178,15 @@ public class Disposals extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
+
+      // Create the AIP.json with all the AIP overdue
+
+      // Copy the disposal schedules
+
+      // Copy the disposal holds
+
+      // Create the disposal confirmation metadata (storage & index)
+
       return BrowserHelper.createDisposalConfirmationMetadata(confirmationMetadata, user);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
@@ -184,9 +198,8 @@ public class Disposals extends RodaWuiController {
     }
   }
 
-  public static DisposalConfirmationMetadata updateDisposalConfirmationMetadata(User user,
-    DisposalConfirmationMetadata confirmationMetadata) throws AuthorizationDeniedException, GenericException,
-    NotFoundException, RequestNotValidException, AlreadyExistsException {
+  public static void destroyAIP(User user, String disposalConfirmationId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -194,18 +207,11 @@ public class Disposals extends RodaWuiController {
 
     LogEntryState state = LogEntryState.SUCCESS;
 
-    try {
+    // fetch the overdue AIPs
+    // create the job to destroy the overdue AIPs
 
-      // delegate
-      return BrowserHelper.updateDisposalConfirmationMetadata(confirmationMetadata, user);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, confirmationMetadata.getId(), state,
-        RodaConstants.CONTROLLER_DISPOSAL_CONFIRMATION_METADATA_PARAM, confirmationMetadata);
-    }
+    //return BrowserHelper.destroyOverdueAIPs(user, null);
+
   }
 
   public static void deleteDisposalConfirmation(User user, String disposalConfirmationId)

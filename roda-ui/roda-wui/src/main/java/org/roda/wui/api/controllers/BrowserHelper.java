@@ -3316,12 +3316,13 @@ public class BrowserHelper {
     return RodaCoreFactory.getModelService().createDisposalSchedule(disposalSchedule, user.getName());
   }
 
-  public static DisposalSchedule updateDisposalSchedule(DisposalSchedule disposalSchedule, User user) throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
+  public static DisposalSchedule updateDisposalSchedule(DisposalSchedule disposalSchedule, User user)
+    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
     return RodaCoreFactory.getModelService().updateDisposalSchedule(disposalSchedule, user.getName());
   }
 
-  public static void deleteDisposalSchedule(String disposalScheduleId)
-      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException, IllegalOperationException {
+  public static void deleteDisposalSchedule(String disposalScheduleId) throws GenericException,
+    RequestNotValidException, NotFoundException, AuthorizationDeniedException, IllegalOperationException {
     RodaCoreFactory.getModelService().deleteDisposalSchedule(disposalScheduleId);
   }
 
@@ -3330,25 +3331,31 @@ public class BrowserHelper {
     return RodaCoreFactory.getModelService().createDisposalHold(disposalHold, user.getName());
   }
 
-  public static DisposalHold updateDisposalHold(DisposalHold disposalHold, User user) throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
+  public static DisposalHold updateDisposalHold(DisposalHold disposalHold, User user)
+    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
     return RodaCoreFactory.getModelService().updateDisposalHold(disposalHold, user.getName());
   }
 
-  public static void deleteDisposalHold(String disposalHoldId)
-          throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException, IllegalOperationException {
+  public static void deleteDisposalHold(String disposalHoldId) throws GenericException, RequestNotValidException,
+    NotFoundException, AuthorizationDeniedException, IllegalOperationException {
     RodaCoreFactory.getModelService().deleteDisposalHold(disposalHoldId);
   }
 
-  public static DisposalConfirmationMetadata createDisposalConfirmationMetadata(DisposalConfirmationMetadata confirmationMetadata, User user) throws AlreadyExistsException, AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+  public static DisposalConfirmationMetadata createDisposalConfirmationMetadata(
+    DisposalConfirmationMetadata confirmationMetadata, User user) throws AlreadyExistsException,
+    AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     return RodaCoreFactory.getModelService().createDisposalConfirmationMetadata(confirmationMetadata, user.getName());
   }
 
-  public static DisposalConfirmationMetadata updateDisposalConfirmationMetadata(DisposalConfirmationMetadata confirmationMetadata, User user) throws AlreadyExistsException, AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    return RodaCoreFactory.getModelService().updateDisposalConfirmationMetadata(confirmationMetadata);
-  }
-
-  public static void deleteDisposalConfirmation(String disposalConfirmationId)
-      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException, IllegalOperationException {
+  public static void deleteDisposalConfirmation(String disposalConfirmationId) throws GenericException,
+    RequestNotValidException, NotFoundException, AuthorizationDeniedException, IllegalOperationException {
     RodaCoreFactory.getModelService().deleteDisposalConfirmation(disposalConfirmationId);
   }
+
+//  public static Job destroyOverdueAIPs(User user, SelectedItems<IndexedAIP> selected)
+//    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+//    Map<String, String> pluginParameters = new HashMap<>();
+//    return createAndExecuteJob("Destroy overdue AIPs", selected, DeleteRODAObjectPlugin.class, PluginType.AIP_TO_AIP,
+//      user, pluginParameters, "Could not execute overdue AIP destruction action");
+//  }
 }

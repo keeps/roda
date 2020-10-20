@@ -10,7 +10,7 @@
         <g:FlowPanel addStyleNames="row full_width skip_padding">
             <g:FlowPanel addStyleNames="col_12">
                 <common:TitlePanel text="{messages.disposalPolicyTitle}" iconClass="DisposalPolicy"/>
-                <g:FlowPanel addStyleNames="page-description" ui:field="disposalPolicyDescription"></g:FlowPanel>
+                <g:FlowPanel addStyleNames="page-description" ui:field="disposalPolicyDescription"/>
                 <g:FlowPanel ui:field="contentDisposalSchedulesTable">
                 </g:FlowPanel>
                 <g:FlowPanel ui:field="newDisposalSchedule">

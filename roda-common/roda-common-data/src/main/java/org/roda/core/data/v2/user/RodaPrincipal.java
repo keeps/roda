@@ -215,7 +215,7 @@ public abstract class RodaPrincipal implements Serializable, RODAMember, IsModel
   }
 
   public boolean hasRoles(List<String> roles) {
-    // INFO mguimaraes contain at least one role)
+    // INFO mguimaraes contain at least one role
     boolean contains = false;
 
     for (String role : roles) {
