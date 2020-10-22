@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
@@ -25,6 +26,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
@@ -162,13 +164,13 @@ public class DisposalHoldTest {
     DisposalHold disposalHold = model.createDisposalHold(createDisposalHold(), RodaConstants.ADMIN);
     DisposalHold disposalHold2 = model.createDisposalHold(createDisposalHold(), RodaConstants.ADMIN);
 
-    aip.addDisposalHoldsId(disposalHold.getId());
-    aip.addDisposalHoldsId(disposalHold2.getId());
-    AIP updatedAIP = model.updateAIP(aip, RodaConstants.ADMIN);
+    DisposalHoldAssociation disposalHoldAssociation = model.createDisposalHoldAssociation(aip.getId(), disposalHold.getId(), new Date(), RodaConstants.ADMIN);
+    DisposalHoldAssociation disposalHoldAssociation2 = model.createDisposalHoldAssociation(aip.getId(), disposalHold2.getId(), new Date(), RodaConstants.ADMIN);
 
     // check it is connected
-    AIP retrievedAIP = model.retrieveAIP(aipId);
-    assertEquals(updatedAIP, retrievedAIP);
+    AIP retrievedAIP = model.retrieveAIP(aip.getId());
+    assertEquals(retrievedAIP.getDisposalHoldAssociation().get(0), disposalHoldAssociation);
+    assertEquals(retrievedAIP.getDisposalHoldAssociation().get(1), disposalHoldAssociation2);
   }
 
     @Test
@@ -186,15 +188,20 @@ public class DisposalHoldTest {
     DisposalHold disposalHold = model.createDisposalHold(createDisposalHold(), RodaConstants.ADMIN);
     DisposalHold disposalHold2 = model.createDisposalHold(createDisposalHold(), RodaConstants.ADMIN);
 
-    // Associate AIP with Disposal schedule
-    aip.addDisposalHoldsId(disposalHold.getId());
-    aip.addDisposalHoldsId(disposalHold2.getId());
-    model.updateAIP(aip, RodaConstants.ADMIN);
+    model.createDisposalHoldAssociation(aip.getId(), disposalHold.getId(), new Date(), RodaConstants.ADMIN);
+    model.createDisposalHoldAssociation(aip.getId(), disposalHold2.getId(), new Date(), RodaConstants.ADMIN);
+
     index.commitAIPs();
 
     // Retrieve AIP
     final IndexedAIP indexedAip = index.retrieve(IndexedAIP.class, aipId, new ArrayList<>());
-    assertEquals(aip.getDisposalHoldsId(), indexedAip.getDisposalHoldsId());
+    ArrayList<String> disposalHoldsAssociationsIds = new ArrayList<>();
+
+    for (DisposalHoldAssociation dhAssociation : aip.getDisposalHoldAssociation()) {
+      disposalHoldsAssociationsIds.add(dhAssociation.getId());
+    }
+
+    assertEquals(disposalHoldsAssociationsIds, indexedAip.getDisposalHoldsId());
   }
 
   private DisposalHold createDisposalHold() {
