@@ -170,6 +170,7 @@ public final class RodaConstants {
   public static final String RODA_OBJECT_DISPOSAL_HOLDS = "disposal_holds";
   public static final String RODA_OBJECT_DISPOSAL_CONFIRMATION_METADATA = "disposal_confirmation_metadata";
   public static final String RODA_OBJECT_DISPOSAL_CONFIRMATIONS_METADATA = "disposal_confirmations_metadata";
+  public static final String RODA_OBJECT_DISPOSAL_HOLD_ASSOCIATION = "disposal_hold_association";
 
   public static final String RODA_OBJECT_MEMBERS = "members";
   public static final String RODA_OBJECT_USERS = "users";
@@ -676,11 +677,10 @@ public final class RodaConstants {
   public static final String AIP_UPDATED_BY = "updatedBy";
 
   public static final String AIP_DISPOSAL_SCHEDULE_ID = "disposalScheduleId";
-  public static final String AIP_DISPOSAL_SCHEDULE_NAME = "disposalScheduleName";
   public static final String AIP_DISPOSAL_HOLDS_ID = "disposalHoldsId";
   public static final String AIP_DESTRUCTED_ON = "destructedOn";
   public static final String AIP_DESTRUCTED_APPROVED_BY = "destructionApprovedBy";
-  public static final String AIP_DUE_DATE = "dueDate";
+  public static final String AIP_OVERDUE_DATE = "overdueDate";
 
   // AIP types
   public static final String AIP_TYPE_MIXED = "MIXED";
