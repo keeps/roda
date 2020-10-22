@@ -179,7 +179,7 @@ public class Disposals extends RodaWuiController {
 
     try {
 
-      // Create the AIP.json with all the AIP overdue
+      // Create the AIP.json with all the overdue AIP
 
       // Copy the disposal schedules
 
