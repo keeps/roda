@@ -2,7 +2,12 @@ package org.roda.wui.client.disposal;
 
 import java.util.List;
 
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.DisposalConfirmationActions;
+import org.roda.wui.client.common.actions.model.ActionableObject;
+import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
+import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.disposal.confirmations.CreateDisposalConfirmation;
 import org.roda.wui.client.disposal.confirmations.ShowDisposalConfirmation;
 import org.roda.wui.client.search.DisposalConfirmationSearch;
@@ -17,6 +22,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -59,11 +65,17 @@ public class DisposalConfirmations extends Composite {
   @UiField
   FlowPanel disposalConfirmationDescription;
 
-  @UiField
-  FlowPanel content;
-
   @UiField(provided = true)
   DisposalConfirmationSearch searchPanel;
+
+  @UiField
+  SimplePanel actionsSidebar;
+
+  @UiField
+  FlowPanel contentFlowPanel;
+
+  @UiField
+  FlowPanel sidebarFlowPanel;
 
   /**
    * Create a disposal confirmation page
@@ -94,7 +106,11 @@ public class DisposalConfirmations extends Composite {
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty()) {
-      callback.onSuccess(this);
+      final DisposalConfirmationActions confirmationActions = DisposalConfirmationActions.get();
+      SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, confirmationActions.hasAnyRoles());
+      instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(confirmationActions)
+        .buildListWithObjects(new ActionableObject<>(DisposalConfirmationMetadata.class)));
+      callback.onSuccess(instance);
     } else {
       String basePage = historyTokens.remove(0);
       if (ShowDisposalConfirmation.RESOLVER.getHistoryToken().equals(basePage)) {
