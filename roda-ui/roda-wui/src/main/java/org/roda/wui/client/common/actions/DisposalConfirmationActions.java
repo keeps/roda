@@ -7,8 +7,11 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
+import org.roda.wui.client.disposal.confirmations.CreateDisposalConfirmation;
+import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import config.i18n.client.ClientMessages;
 
@@ -20,7 +23,7 @@ public class DisposalConfirmationActions extends AbstractActionable<DisposalConf
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public enum DisposalConfirmationAction implements Action<DisposalConfirmationMetadata> {
-    NEW_CONFIRMATION(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_CONFIRMATION);
+    NEW(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_CONFIRMATION);
 
     private List<String> methods;
 
@@ -53,20 +56,35 @@ public class DisposalConfirmationActions extends AbstractActionable<DisposalConf
 
   @Override
   public boolean canAct(Action<DisposalConfirmationMetadata> action) {
-    return hasPermissions(action) && DisposalConfirmationAction.NEW_CONFIRMATION.equals(action);
+    return hasPermissions(action);
+  }
+
+  @Override
+  public void act(Action<DisposalConfirmationMetadata> action, AsyncCallback<ActionImpact> callback) {
+    if (DisposalConfirmationAction.NEW.equals(action)) {
+      newConfirmation(callback);
+    } else {
+      unsupportedAction(action, callback);
+    }
+  }
+
+  // ACTIONS
+  private void newConfirmation(AsyncCallback<ActionImpact> callback) {
+    callback.onSuccess(ActionImpact.NONE);
+    HistoryUtils.newHistory(CreateDisposalConfirmation.RESOLVER);
   }
 
   @Override
   public ActionableBundle<DisposalConfirmationMetadata> createActionsBundle() {
     ActionableBundle<DisposalConfirmationMetadata> confirmationActionableBundle = new ActionableBundle<>();
 
-    // MANAGEMENT
-    ActionableGroup<DisposalConfirmationMetadata> managementGroup = new ActionableGroup<>(
-      messages.sidebarActionsTitle());
-    managementGroup.addButton(messages.newProcessPreservation(), DisposalConfirmationAction.NEW_CONFIRMATION,
-      ActionImpact.UPDATED, "btn-plus-circle");
+    // management
+    ActionableGroup<DisposalConfirmationMetadata> actionsGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
 
-    confirmationActionableBundle.addGroup(managementGroup);
+    actionsGroup.addButton(messages.newDisposalConfirmationButton(), DisposalConfirmationAction.NEW, ActionImpact.NONE,
+      "btn-plus-circle");
+
+    confirmationActionableBundle.addGroup(actionsGroup);
 
     return confirmationActionableBundle;
   }

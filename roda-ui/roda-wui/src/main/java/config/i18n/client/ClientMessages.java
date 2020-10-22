@@ -164,6 +164,8 @@ public interface ClientMessages extends Messages {
 
   String sidebarActionsTitle();
 
+  String sidebarDisposalBinTitle();
+
   String sidebarRepresentationInformationTitle();
 
   String sidebarRisksTitle();
@@ -2092,4 +2094,14 @@ public interface ClientMessages extends Messages {
   String disposalConfirmationSize();
 
   String disposalConfirmationState(@Select DisposalConfirmationState state);
+
+  String applyDisposalScheduleButton();
+
+  String deleteDisposalConfirmationReport();
+
+  String permanentlyDeleteFromBinButton();
+
+  String recoverFromBinButton();
+
+  String newDisposalConfirmationButton();
 }
