@@ -147,7 +147,6 @@ public class DisposalScheduleTest {
 
     // Associate AIP with Disposal schedule
     aip.setDisposalScheduleId(disposalSchedule.getId());
-    aip.setDisposalScheduleName("NORMAL");
     aip.setDestructionOn(new Date());
     aip.setDestructionApprovedBy(RodaConstants.ADMIN);
     AIP updatedAIP = model.updateAIP(aip, RodaConstants.ADMIN);
@@ -173,7 +172,6 @@ public class DisposalScheduleTest {
 
     // Associate AIP with Disposal schedule
     aip.setDisposalScheduleId(disposalSchedule.getId());
-    aip.setDisposalScheduleName("NORMAL");
     //aip.setDestructionOn(new Date());
     aip.setDestructionApprovedBy(RodaConstants.ADMIN);
     model.updateAIP(aip, RodaConstants.ADMIN);
@@ -182,7 +180,6 @@ public class DisposalScheduleTest {
     // Retrieve AIP
     final IndexedAIP indexedAip = index.retrieve(IndexedAIP.class, aipId, new ArrayList<>());
     assertEquals(aip.getDisposalScheduleId(), indexedAip.getDisposalScheduleId());
-    assertEquals(aip.getDisposalScheduleName(), indexedAip.getDisposalScheduleName());
     assertEquals(aip.getDestructionOn(), indexedAip.getDestructionOn());
     assertEquals(aip.getDestructionApprovedBy(), indexedAip.getDestructionApprovedBy());
   }
