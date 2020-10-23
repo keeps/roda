@@ -2104,4 +2104,18 @@ public interface ClientMessages extends Messages {
   String recoverFromBinButton();
 
   String newDisposalConfirmationButton();
+
+  String removeDisposalScheduleButton();
+
+  String createDisposalScheduleButton();
+
+  String disposalScheduleSelectionDialogTitle();
+
+  String changeDisposalScheduleActionTitle();
+
+  String confirmDisposalScheduleActionTitle();
+
+  String dissociateDisposalScheduleDialogTitle();
+
+  String dissociateDisposalScheduleDialogMessage(Long size);
 }

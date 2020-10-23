@@ -7161,3 +7161,30 @@ span.code {
 .hasNoPermissions {
     display: none;
 }
+
+.disposal-confirmation-select {
+    margin-bottom: 10px;
+}
+
+.disposal-confirmation-select input[type="radio"] {
+        display: none;
+        margin: 10px;
+}
+
+.disposal-confirmation-select input[type=radio] + label {
+    display:inline-block;
+    padding: 4px 12px;
+    background-color: #e7e7e7;
+    border-color: #ddd;
+    cursor: pointer;
+}
+
+.disposal-confirmation-select input[type=radio]:checked + label {
+   background-image: none;
+   background-color:#d0d0d0;
+}
+
+.disposal-schedules-modal-table {
+    margin-bottom: 10px;
+    min-height: 80vh;
+}
