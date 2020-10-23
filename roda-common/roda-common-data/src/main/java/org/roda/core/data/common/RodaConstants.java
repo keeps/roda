@@ -952,7 +952,6 @@ public final class RodaConstants {
   public static final String PLUGIN_CATEGORY_REPLICATION = "replication";
   public static final String PLUGIN_CATEGORY_MANAGEMENT = "management";
   public static final String PLUGIN_CATEGORY_REINDEX = "reindex";
-  public static final String PLUGIN_CATEGORY_DISPOSAL = "disposal";
 
   public static final String PLUGIN_CATEGORY_VALIDATION = "validation";
   public static final String PLUGIN_CATEGORY_FORMAT_IDENTIFICATION = "format_identification";
