@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:common="urn:import:org.roda.wui.client.common">
+
+    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
+    <g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
+        <g:FlowPanel addStyleNames="row full_width skip_padding">
+            <g:FlowPanel addStyleNames="col_10 content" ui:field="content">
+                <common:TitlePanel iconClass="DisposalPolicy" ui:field="titlePanel"/>
+                <g:FlowPanel addStyleNames="page-description" ui:field="disposalPolicyAIPDescription"></g:FlowPanel>
+                <g:FlowPanel addStyleNames="wui-data-panel">
+                    <g:FlowPanel styleName="field">
+                        <g:Label styleName="label">
+                            <ui:text from='{messages.disposalSchedule}'/>
+                        </g:Label>
+                        <g:Label styleName="value" ui:field="disposalName"/>
+                    </g:FlowPanel>
+                    <g:FlowPanel styleName="field">
+                        <g:Label styleName="label">
+                            <ui:text from='{messages.disposalRetentionStartDate}'/>
+                        </g:Label>
+                        <g:Label styleName="value" ui:field="disposalRetentionStartDate"/>
+                    </g:FlowPanel>
+                    <g:FlowPanel styleName="field">
+                        <g:Label styleName="label">
+                            <ui:text from='{messages.disposalRetentionDueDate}'/>
+                        </g:Label>
+                        <g:Label styleName="value" ui:field="disposalRetentionDueDate"/>
+                    </g:FlowPanel>
+                    <g:FlowPanel styleName="field">
+                        <g:Label styleName="label">
+                            <ui:text from='{messages.disposalRetentionPeriod}'/>
+                        </g:Label>
+                        <g:Label styleName="value" ui:field="disposalRetentionPeriod"/>
+                    </g:FlowPanel>
+                    <g:FlowPanel styleName="field">
+                        <g:Label styleName="label">
+                            <ui:text from='{messages.disposalDisposalAction}'/>
+                        </g:Label>
+                        <g:Label styleName="value" ui:field="disposalDisposalAction"/>
+                    </g:FlowPanel>
+                    <g:FlowPanel styleName="field">
+                        <g:Label styleName="label">
+                            <ui:text from='{messages.disposalDisposalStatus}'/>
+                        </g:Label>
+                        <g:Label styleName="value" ui:field="disposalDisposalStatus"/>
+                    </g:FlowPanel>
+                    <g:FlowPanel ui:field="disposalHoldsList" />
+                </g:FlowPanel>
+            </g:FlowPanel>
+            <g:FlowPanel addStyleNames="col_2 last sidebar">
+				<g:FlowPanel addStyleNames="sticky-flow">
+					<g:FlowPanel addStyleNames="sticky-padding">
+						<g:SimplePanel addStyleNames="sidebar-group" ui:field="actionsSidebar" />
+					</g:FlowPanel>
+				</g:FlowPanel>
+			</g:FlowPanel>
+        </g:FlowPanel>
+    </g:FlowPanel>
+</ui:UiBinder>

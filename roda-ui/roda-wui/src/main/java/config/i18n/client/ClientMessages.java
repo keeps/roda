@@ -18,6 +18,7 @@ import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
 import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
+import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.notifications.NotificationState;
@@ -2114,4 +2115,21 @@ public interface ClientMessages extends Messages {
   String changeDisposalScheduleSuccessTitle();
 
   String changeDisposalScheduleSuccessMessage(Long size);
+
+  String disposalPolicyAIPWithoutAssociation();
+
+  String disposalPolicyAIPDueForDestruction(String duration,String code);
+
+  String disposalSchedule();
+
+  String disposalRetentionStartDate();
+
+  String disposalRetentionDueDate();
+
+  String disposalRetentionPeriod();
+
+  String disposalDisposalAction();
+
+  String disposalDisposalStatus();
+  
 }

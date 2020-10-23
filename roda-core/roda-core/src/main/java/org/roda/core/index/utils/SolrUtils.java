@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -109,6 +110,10 @@ import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
+import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ri.RelationObjectType;
@@ -1601,4 +1606,46 @@ public class SolrUtils {
     }
   }
 
+  public static Date getOverdueDate(DisposalSchedule disposalSchedule, AIP aip) {
+    Date overDueDate = null;
+    Integer retentionPeriodDuration = disposalSchedule.getRetentionPeriodDuration();
+    Calendar cal = Calendar.getInstance();
+
+    if (disposalSchedule.getRetentionTriggerCode() != null) {
+      // TODO: change this
+      switch (disposalSchedule.getRetentionTriggerCode()) {
+        case FROM_NOW:
+        case FROM_RECORD_ORIGINATED_DATE:
+        case FROM_RECORD_METADATA_DATE:
+          cal.setTime(aip.getCreatedOn());
+      }
+    }
+
+    if (!disposalSchedule.getRetentionPeriodIntervalCode().equals(RetentionPeriodIntervalCode.NO_RETENTION_PERIOD)) {
+      switch (disposalSchedule.getRetentionPeriodIntervalCode()) {
+        case YEARS:
+          cal.add(Calendar.YEAR, retentionPeriodDuration);
+        case MONTHS:
+          cal.add(Calendar.MONTH, retentionPeriodDuration);
+        case WEEKS:
+          cal.add(Calendar.WEEK_OF_MONTH, retentionPeriodDuration);
+        case DAYS:
+          cal.add(Calendar.DATE, retentionPeriodDuration);
+      }
+      overDueDate = cal.getTime();
+    }
+    return overDueDate;
+  }
+
+  public static DisposalSchedule getDisposalSchedule(AIP aip, List<String> ancestors, ModelService model)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+    DisposalSchedule disposalSchedule = null;
+    try {
+      disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
+    } catch (NotFoundException e) {
+      return null;
+    }
+
+    return disposalSchedule;
+  }
 }
