@@ -72,6 +72,8 @@ public class Disposal {
       DisposalConfirmations.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(DisposalDestroyedRecords.RESOLVER.getHistoryToken())) {
       DisposalDestroyedRecords.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (historyTokens.get(0).equals(DisposalPolicyAssociation.RESOLVER.getHistoryToken())) {
+      DisposalPolicyAssociation.RESOLVER.resolve(historyTokens, callback);
     }
   }
 }

@@ -82,6 +82,7 @@ import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
@@ -3328,55 +3329,60 @@ public class ModelService extends ModelObservable {
 
     return disposalHolds;
   }
-  
-  public DisposalHoldAssociation retrieveDisposalHoldAssociation(String aipId, String disposalHoldId) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+
+  public DisposalHoldAssociation retrieveDisposalHoldAssociation(String aipId, String disposalHoldId)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
-    
+
     DisposalHoldAssociation ret = null;
     for (DisposalHoldAssociation disposalHold : aip.getDisposalHoldAssociation()) {
-      if (disposalHold.getId().equals(disposalHoldId)){
+      if (disposalHold.getId().equals(disposalHoldId)) {
         ret = disposalHold;
         break;
       }
     }
 
-    if (ret == null){
+    if (ret == null) {
       throw new NotFoundException("Could not find disposal hold: " + disposalHoldId);
     }
 
     return ret;
   }
 
-  public DisposalHoldAssociation createDisposalHoldAssociation(String aipId, String disposalHoldId, Date associatedOn, String associatedBy) throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+  public DisposalHoldAssociation createDisposalHoldAssociation(String aipId, String disposalHoldId, Date associatedOn,
+    String associatedBy)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
 
     final DisposalHold disposalHold = retrieveDisposalHold(disposalHoldId);
-    if (disposalHold.getLiftedOn() != null){
+    if (disposalHold.getLiftedOn() != null) {
       throw new NotFoundException("Could not associate an AIP with a disposal hold that is lifted: " + disposalHoldId);
     }
-    DisposalHoldAssociation disposalHoldAssociation = new DisposalHoldAssociation(disposalHoldId, associatedOn, associatedBy);
+    DisposalHoldAssociation disposalHoldAssociation = new DisposalHoldAssociation(disposalHoldId, associatedOn,
+      associatedBy);
 
     // update AIP metadata
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
     aip.addDisposalHold(disposalHoldAssociation);
     updateAIPMetadata(aip);
-    //TODO notify
+    notifyAipUpdated(aip.getId());
 
     return disposalHoldAssociation;
   }
 
-  public void deleteDisposalHoldAssociation(String aipId, String disposalHoldId) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+  public void deleteDisposalHoldAssociation(String aipId, String disposalHoldId)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     // update AIP metadata
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
-    for(Iterator<DisposalHoldAssociation> it = aip.getDisposalHoldAssociation().iterator();it.hasNext();){
+    for (Iterator<DisposalHoldAssociation> it = aip.getDisposalHoldAssociation().iterator(); it.hasNext();) {
       DisposalHoldAssociation disposalHoldAssociation = it.next();
-      if (disposalHoldAssociation.getId().equals(disposalHoldId)){
+      if (disposalHoldAssociation.getId().equals(disposalHoldId)) {
         it.remove();
         break;
       }
     }
 
     updateAIPMetadata(aip);
-    //TODO notify
+    // TODO notify
   }
 
   /***************** Disposal schedule related *****************/

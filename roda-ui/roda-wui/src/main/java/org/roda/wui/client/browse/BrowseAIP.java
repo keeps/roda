@@ -46,6 +46,7 @@ import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
+import org.roda.wui.client.disposal.DisposalPolicyAssociation;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.common.client.tools.ConfigurationManager;
@@ -197,6 +198,9 @@ public class BrowseAIP extends Composite {
   FlowPanel risksEventsLogs;
 
   @UiField
+  FlowPanel disposalPolicy;
+
+  @UiField
   FlowPanel center;
 
   @UiField
@@ -307,6 +311,9 @@ public class BrowseAIP extends Composite {
 
     // IDENTIFICATION
     updateSectionIdentification(bundle);
+
+    // DISPOSAL
+    updateDisposalInformation(bundle);
 
     // DESCRIPTIVE METADATA
     updateSectionDescriptiveMetadata(bundle);
@@ -483,6 +490,18 @@ public class BrowseAIP extends Composite {
     } else {
       dateCreatedAndModified.setText("");
     }
+  }
+
+  private void updateDisposalInformation(BrowseAIPBundle bundle) {
+    String disposalScheduleId = bundle.getAip().getDisposalScheduleId();
+    String message = messages.disposalPolicyAIPWithoutAssociation();
+    if (disposalScheduleId != null && bundle.getAip().getOverdueDate() != null) {
+      message = messages.disposalPolicyAIPDueForDestruction(bundle.getAip().getDisposalRetentionPeriodDuration(),
+        bundle.getAip().getDisposalRetentionPeriodCode());
+    }
+    Anchor disposalPolicyLink = new Anchor(message,
+      HistoryUtils.createHistoryHashLink(DisposalPolicyAssociation.RESOLVER, aip.getId()));
+    disposalPolicy.add(disposalPolicyLink);
   }
 
   private void getDescriptiveMetadataHTML(final String aipId, final String descId,
