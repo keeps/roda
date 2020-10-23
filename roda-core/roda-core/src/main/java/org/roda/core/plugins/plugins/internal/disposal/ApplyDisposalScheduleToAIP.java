@@ -1,11 +1,14 @@
-package org.roda.core.plugins.plugins.disposal;
+package org.roda.core.plugins.plugins.internal.disposal;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -107,7 +110,7 @@ public class ApplyDisposalScheduleToAIP extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    return Collections.singletonList(RodaConstants.PLUGIN_CATEGORY_DISPOSAL);
+    return Collections.singletonList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
   }
 
   @Override
