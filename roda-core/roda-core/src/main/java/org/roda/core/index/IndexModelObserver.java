@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,7 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
@@ -107,11 +109,15 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
     try {
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
+
       indexAIP(aip, ancestors).addTo(ret);
       if (ret.isEmpty()) {
         indexRepresentations(aip, ancestors).addTo(ret);
         if (ret.isEmpty()) {
           indexPreservationsEvents(aip.getId(), null).addTo(ret);
+          if (ret.isEmpty()) {
+            indexDisposalScheduleInAIP(aip, ancestors);
+          }
         }
       }
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
@@ -123,15 +129,25 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private ReturnWithExceptions<Void, ModelObserver> indexAIP(final AIP aip, final List<String> ancestors) {
-    return indexAIP(aip, ancestors, false);
+    return indexAIP(aip, ancestors, false, null, null);
+  }
+
+  private ReturnWithExceptions<Void, ModelObserver> indexAIP(final AIP aip, final List<String> ancestors,
+    DisposalSchedule disposalSchedule, Date overdueDate) {
+    return indexAIP(aip, ancestors, false, disposalSchedule, overdueDate);
   }
 
   private ReturnWithExceptions<Void, ModelObserver> indexAIP(final AIP aip, final List<String> ancestors,
     boolean safemode) {
+    return indexAIP(aip, ancestors, false, null, null);
+  }
+
+  private ReturnWithExceptions<Void, ModelObserver> indexAIP(final AIP aip, final List<String> ancestors,
+    boolean safemode, DisposalSchedule disposalSchedule, Date overdueDate) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
-    SolrUtils.create2(index, (ModelObserver) this, IndexedAIP.class, aip, new AIPCollection.Info(ancestors, safemode))
-      .addTo(ret);
+    SolrUtils.create2(index, (ModelObserver) this, IndexedAIP.class, aip,
+      new AIPCollection.Info(ancestors, safemode, disposalSchedule, overdueDate)).addTo(ret);
 
     // if there was an error indexing, try in safe mode
     if (!ret.isEmpty()) {
@@ -241,6 +257,22 @@ public class IndexModelObserver implements ModelObserver {
       ret.add(e);
     }
 
+    return ret;
+  }
+
+  private ReturnWithExceptions<Void, ModelObserver> indexDisposalScheduleInAIP(AIP aip, List<String> ancestors) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+    DisposalSchedule disposalSchedule = null;
+    try {
+      disposalSchedule = SolrUtils.getDisposalSchedule(aip, ancestors, model);
+      if (disposalSchedule != null) {
+        Date overdueDate = SolrUtils.getOverdueDate(disposalSchedule, aip);
+        indexAIP(aip, ancestors, disposalSchedule, overdueDate).addTo(ret);
+      }
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
+      LOGGER.error("Cannot index disposal schedule in AIP: {}", aip.getId(), e);
+      ret.add(e);
+    }
     return ret;
   }
 

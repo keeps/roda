@@ -71,9 +71,14 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState {
 
   private String disposalScheduleId = null;
   private String disposalScheduleName = null;
+  private String disposalRetentionPeriodCode = null;
+  private String disposalRetentionPeriodDuration = null;
   private List<String> disposalHoldsId = new ArrayList<>();
   private Date destructionOn = null;
   private String destructionApprovedBy = null;
+  private String disposalAction = null;
+  private Date overdueDate = null;
+  private boolean disposalHoldStatus = false;
 
   /**
    * Constructs an empty (<strong>invalid</strong>) {@link IndexedAIP}.
@@ -93,7 +98,8 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState {
       other.getDateFinal(), other.getDescription(), other.getParentID(), other.getAncestors(), other.getPermissions(),
       other.getNumberOfSubmissionFiles(), other.getNumberOfDocumentationFiles(), other.getNumberOfSchemaFiles(),
       other.getHasRepresentations(), other.getGhost(), other.getDisposalScheduleId(), other.getDisposalScheduleName(),
-      other.getDisposalHoldsId(), other.getDestructionOn(), other.getDestructionApprovedBy());
+      other.getDisposalRetentionPeriodCode(), other.getDisposalRetentionPeriodDuration(), other.getDisposalHoldsId(),
+      other.getDestructionOn(), other.getDestructionApprovedBy());
   }
 
   /**
@@ -111,8 +117,9 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState {
   public IndexedAIP(String id, AIPState state, String type, String level, String title, Date dateInitial,
     Date dateFinal, String description, String parentID, List<String> ancestors, Permissions permissions,
     Long numberOfSubmissionFiles, Long numberOfDocumentationFiles, Long numberOfSchemaFiles, Boolean hasRepresentations,
-    Boolean ghost, String disposalScheduleId, String disposalScheduleName, List<String> disposalHoldsId,
-    Date destructionOn, String destructionApprovedBy) {
+    Boolean ghost, String disposalScheduleId, String disposalScheduleName, String disposalRetentionPeriodCode,
+    String disposalRetentionPeriodDuration, List<String> disposalHoldsId, Date destructionOn,
+    String destructionApprovedBy) {
     super();
     this.id = id;
     this.state = state;
@@ -132,6 +139,8 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState {
     this.ghost = ghost;
     this.disposalScheduleId = disposalScheduleId;
     this.disposalScheduleName = disposalScheduleName;
+    this.disposalRetentionPeriodCode = disposalRetentionPeriodCode;
+    this.disposalRetentionPeriodDuration = disposalRetentionPeriodDuration;
     this.disposalHoldsId = disposalHoldsId;
     this.destructionOn = destructionOn;
     this.destructionApprovedBy = destructionApprovedBy;
@@ -383,6 +392,24 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState {
     return this;
   }
 
+  public String getDisposalRetentionPeriodCode() {
+    return disposalRetentionPeriodCode;
+  }
+
+  public IndexedAIP setDisposalRetentionPeriodCode(String disposalRetentionPeriodCode) {
+    this.disposalRetentionPeriodCode = disposalRetentionPeriodCode;
+    return this;
+  }
+
+  public String getDisposalRetentionPeriodDuration() {
+    return disposalRetentionPeriodDuration;
+  }
+
+  public IndexedAIP setDisposalRetentionPeriodDuration(String disposalRetentionPeriodDuration) {
+    this.disposalRetentionPeriodDuration = disposalRetentionPeriodDuration;
+    return this;
+  }
+
   public List<String> getDisposalHoldsId() {
     return disposalHoldsId;
   }
@@ -407,6 +434,33 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState {
 
   public IndexedAIP setDestructionApprovedBy(String destructionApprovedBy) {
     this.destructionApprovedBy = destructionApprovedBy;
+    return this;
+  }
+
+  public String getDisposalAction() {
+    return disposalAction;
+  }
+
+  public IndexedAIP setDisposalAction(String disposalAction) {
+    this.disposalAction = disposalAction;
+    return this;
+  }
+
+  public Date getOverdueDate() {
+    return overdueDate;
+  }
+
+  public IndexedAIP setOverdueDate(Date overdueDate) {
+    this.overdueDate = overdueDate;
+    return this;
+  }
+
+  public boolean isDisposalHoldStatus() {
+    return disposalHoldStatus;
+  }
+
+  public IndexedAIP setDisposalHoldStatus(boolean disposalHoldStatus) {
+    this.disposalHoldStatus = disposalHoldStatus;
     return this;
   }
 
