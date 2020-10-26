@@ -7,19 +7,26 @@ import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.DisposalDialogs;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
+import org.roda.wui.client.ingest.process.ShowJob;
+import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import config.i18n.client.ClientMessages;
@@ -80,7 +87,7 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
   @Override
   public void act(Action<IndexedAIP> action, IndexedAIP object, AsyncCallback<ActionImpact> callback) {
     if (DisposalCreateConfirmationDestroyAction.DESTROY.equals(action)) {
-
+      createDisposalConfirmationReport(objectToSelectedItems(object, IndexedAIP.class), callback);
     } else if (DisposalCreateConfirmationDestroyAction.CHANGE_SCHEDULE.equals(action)) {
       changeDisposalSchedule(objectToSelectedItems(object, IndexedAIP.class), callback);
     } else {
@@ -88,46 +95,109 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
     }
   }
 
+  @Override
+  public void act(Action<IndexedAIP> action, SelectedItems<IndexedAIP> objects, AsyncCallback<ActionImpact> callback) {
+    if (DisposalCreateConfirmationDestroyAction.DESTROY.equals(action)) {
+      createDisposalConfirmationReport(objects, callback);
+    } else if (DisposalCreateConfirmationDestroyAction.CHANGE_SCHEDULE.equals(action)) {
+      changeDisposalSchedule(objects, callback);
+    } else {
+      unsupportedAction(action, callback);
+    }
+  }
+
   // ACTIONS
-  private void changeDisposalSchedule(SelectedItemsList<IndexedAIP> selectedItemsList,
+  private void createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItemsList,
     AsyncCallback<ActionImpact> callback) {
     ClientSelectedItemsUtils.size(IndexedAIP.class, selectedItemsList, new ActionNoAsyncCallback<Long>(callback) {
+      @Override
+      public void onSuccess(final Long size) {
+        Dialogs.showConfirmDialog(messages.createDisposalConfirmationReportDialogTitle(),
+          messages.createDisposalConfirmationReportDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
+          new ActionNoAsyncCallback<Boolean>(callback) {
+            @Override
+            public void onSuccess(Boolean result) {
+              if (result) {
+
+              } else {
+                doActionCallbackNone();
+              }
+            }
+          });
+      }
+    });
+  }
+
+  private void changeDisposalSchedule(SelectedItems<IndexedAIP> items, AsyncCallback<ActionImpact> callback) {
+    ClientSelectedItemsUtils.size(IndexedAIP.class, items, new ActionNoAsyncCallback<Long>(callback) {
       @Override
       public void onSuccess(final Long size) {
         BrowserService.Util.getInstance().listDisposalSchedules(new ActionNoAsyncCallback<DisposalSchedules>(callback) {
           @Override
           public void onSuccess(DisposalSchedules schedules) {
+            // Show the active disposal schedules only
+            schedules.getObjects().removeIf(schedule -> DisposalScheduleState.ARCHIVED.equals(schedule.getState()));
             DisposalDialogs.showDisposalScheduleSelection(messages.disposalScheduleSelectionDialogTitle(), schedules,
               new ActionNoAsyncCallback<DisposalSchedule>(callback) {
                 @Override
-                public void onSuccess(DisposalSchedule result) {
+                public void onFailure(Throwable caught) {
+                  doActionCallbackNone();
+                }
+
+                @Override
+                public void onSuccess(DisposalSchedule disposalSchedule) {
                   // the result can be null, if null treat as removing the disposal schedule
-                  if (result == null) {
-                    Dialogs.showConfirmDialog(messages.dissociateDisposalScheduleDialogTitle(),
-                      messages.dissociateDisposalScheduleDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
-                      new ActionNoAsyncCallback<Boolean>(callback) {
-                        @Override
-                        public void onSuccess(Boolean result) {
-                          if (result) {
 
-                          } else {
-                            doActionCallbackNone();
-                          }
-                        }
-                      });
-                  } else {
-                    Dialogs.showConfirmDialog("", "", messages.cancelButton(), messages.confirmButton(),
-                      new ActionNoAsyncCallback<Boolean>(callback) {
-                        @Override
-                        public void onSuccess(Boolean result) {
-                          if (result) {
+                  Dialogs.showConfirmDialog(
+                    disposalSchedule != null ? messages.changeDisposalScheduleDialogTitle()
+                      : messages.dissociateDisposalScheduleDialogTitle(),
+                    disposalSchedule != null ? messages.changeDisposalScheduleDialogMessage(size)
+                      : messages.dissociateDisposalScheduleDialogMessage(size),
+                    messages.dialogNo(), messages.dialogYes(), new ActionNoAsyncCallback<Boolean>(callback) {
+                      @Override
+                      public void onSuccess(Boolean result) {
+                        if (result) {
+                          BrowserService.Util.getInstance().changeDisposalSchedule(items,
+                            disposalSchedule == null ? null : disposalSchedule.getId(),
+                            new ActionAsyncCallback<Job>(callback) {
 
-                          } else {
-                            doActionCallbackNone();
-                          }
+                              @Override
+                              public void onFailure(Throwable caught) {
+                                callback.onFailure(caught);
+                                HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                              }
+
+                              @Override
+                              public void onSuccess(Job job) {
+                                Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+
+                                  @Override
+                                  public void onFailure(Throwable caught) {
+                                    Timer timer = new Timer() {
+                                      @Override
+                                      public void run() {
+                                        Toast.showInfo(messages.changeDisposalScheduleSuccessTitle(),
+                                          messages.changeDisposalScheduleSuccessMessage(size));
+                                        doActionCallbackUpdated();
+                                      }
+                                    };
+
+                                    timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                                  }
+
+                                  @Override
+                                  public void onSuccess(final Void nothing) {
+                                    doActionCallbackNone();
+                                    HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                                  }
+                                });
+                              }
+                            });
+                        } else {
+                          doActionCallbackNone();
                         }
-                      });
-                  }
+                      }
+                    });
                 }
               });
           }

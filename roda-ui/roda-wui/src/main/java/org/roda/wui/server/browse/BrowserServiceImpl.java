@@ -1057,4 +1057,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Locale locale = ServerTools.parseLocale(localeString);
     return Browser.retrieveRepresentationInformationExtraBundle(user, representationInformationId, locale);
   }
+
+  @Override
+  public Job changeDisposalSchedule(SelectedItems<IndexedAIP> selected, String disposalScheduleId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Disposals.changeDisposalSchedule(user, selected, disposalScheduleId);
+  }
 }

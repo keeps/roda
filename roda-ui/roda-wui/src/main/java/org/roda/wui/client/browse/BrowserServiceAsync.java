@@ -304,4 +304,6 @@ public interface BrowserServiceAsync {
   void updateDisposalHold(DisposalHold hold, AsyncCallback<DisposalHold> async);
 
   void deleteDisposalHold(String disposalHoldId, AsyncCallback<Void> async);
+
+  void changeDisposalSchedule(SelectedItems<IndexedAIP> selected, String disposalScheduleId, AsyncCallback<Job> async);
 }
