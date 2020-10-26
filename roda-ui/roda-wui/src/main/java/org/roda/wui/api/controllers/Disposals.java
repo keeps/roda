@@ -15,7 +15,6 @@ import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
-import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
@@ -173,8 +172,9 @@ public class Disposals extends RodaWuiController {
   }
 
   public static DisposalConfirmationMetadata createDisposalConfirmation(User user,
-    DisposalConfirmationMetadata confirmationMetadata) throws AuthorizationDeniedException, AlreadyExistsException,
-    NotFoundException, GenericException, RequestNotValidException {
+    DisposalConfirmationMetadata confirmationMetadata, SelectedItems<IndexedAIP> objects)
+    throws AuthorizationDeniedException, AlreadyExistsException, NotFoundException, GenericException,
+    RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -220,7 +220,8 @@ public class Disposals extends RodaWuiController {
   }
 
   public static void deleteDisposalConfirmation(User user, String disposalConfirmationId)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IllegalOperationException {
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
+    IllegalOperationException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
