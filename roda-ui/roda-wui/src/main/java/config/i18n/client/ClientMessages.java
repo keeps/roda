@@ -2050,22 +2050,6 @@ public interface ClientMessages extends Messages {
   String newDisposalScheduleTitle();
 
   String newDisposalHoldTitle();
-
-  String disposalConfirmationTitle();
-
-  String disposalConfirmationCreationDate();
-
-  String disposalConfirmationCreationBy();
-
-  String disposalConfirmationStatus();
-
-  String disposalConfirmationAIPs();
-
-  String disposalConfirmationCollections();
-
-  String disposalConfirmationSize();
-
-  String disposalConfirmationState(@Select DisposalConfirmationState state);
   
   String createDisposalScheduleFailure(String reason);
 

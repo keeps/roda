@@ -3,8 +3,7 @@ package org.roda.wui.client.common.dialogs;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.wui.client.common.lists.utils.TooltipTextColumn;
-import org.roda.wui.client.disposal.CreateDisposalSchedule;
-import org.roda.wui.client.planning.CreateRisk;
+import org.roda.wui.client.disposal.schedule.CreateDisposalSchedule;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.MyCellTableResources;
 

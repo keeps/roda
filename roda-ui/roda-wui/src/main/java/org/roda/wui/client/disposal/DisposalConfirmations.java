@@ -12,7 +12,6 @@ import org.roda.wui.client.disposal.confirmations.CreateDisposalConfirmation;
 import org.roda.wui.client.disposal.confirmations.ShowDisposalConfirmation;
 import org.roda.wui.client.search.DisposalConfirmationSearch;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
@@ -50,7 +49,7 @@ public class DisposalConfirmations extends Composite {
 
     @Override
     public String getHistoryToken() {
-      return "confirmation_register";
+      return "confirmations";
     }
   };
 
@@ -97,11 +96,6 @@ public class DisposalConfirmations extends Composite {
       instance = new DisposalConfirmations();
     }
     return instance;
-  }
-
-  @UiHandler("buttonApply")
-  void buttonApplyHandler(ClickEvent e) {
-    HistoryUtils.newHistory(CreateDisposalConfirmation.RESOLVER);
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
