@@ -40,6 +40,11 @@
                 </g:Label>
                 <g:Label ui:field="disposalActionsError" addStyleNames="form-label-error"></g:Label>
                 <g:ListBox addStyleNames="form-textbox" ui:field="disposalActions"/>
+                <g:Label addStyleNames="form-label"  ui:field="retentionTriggerElementIdLabel">
+                    <ui:text from='{messages.disposalScheduleRetentionTriggerElementId}' />
+                </g:Label>
+                <g:Label ui:field="retentionTriggerElementIdError" addStyleNames="form-label-error"></g:Label>
+                <g:TextBox addStyleNames="form-textbox" ui:field="retentionTriggerElementId"/>
                 <g:Label addStyleNames="form-label"  ui:field="retentionTriggersLabel">
                     <ui:text from='{messages.disposalScheduleRetentionTriggerCode}' />
                 </g:Label>

@@ -121,7 +121,7 @@ public class DisposalHoldDataPanel extends Composite implements HasValueChangeHa
       titleError.setText(messages.mandatoryField());
       titleError.setVisible(true);
       Window.scrollTo(title.getAbsoluteLeft(), title.getAbsoluteTop());
-      errorList.add(messages.isAMandatoryField(messages.username()));
+      errorList.add(messages.isAMandatoryField(messages.disposalHoldTitle()));
     } else {
       title.removeStyleName("isWrong");
       titleError.setVisible(false);
