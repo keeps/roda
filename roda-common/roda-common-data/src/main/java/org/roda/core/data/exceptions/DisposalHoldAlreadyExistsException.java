@@ -6,6 +6,8 @@ package org.roda.core.data.exceptions;
 public class DisposalHoldAlreadyExistsException extends AlreadyExistsException {
 
 
+    private static final long serialVersionUID = -9204333449702855127L;
+
     /**
      * Constructs a new {@link DisposalHoldAlreadyExistsException}.
      */

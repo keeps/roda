@@ -42,6 +42,8 @@ public class Disposals extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
+    // validate disposal schedule
+
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {

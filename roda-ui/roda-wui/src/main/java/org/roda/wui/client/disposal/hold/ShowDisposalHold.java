@@ -111,28 +111,6 @@ public class ShowDisposalHold extends Composite {
     instance = this;
     this.disposalHold = disposalHold;
 
-    /*
-     * if (PermissionClientUtils.hasPermissions(RodaConstants.
-     * PERMISSION_METHOD_UPDATE_DISPOSAL_HOLD)) { Button editBtn = new Button();
-     * editBtn.addStyleName("btn"); editBtn.setText(messages.editButton());
-     * editBtn.addClickHandler(new ClickHandler() {
-     * 
-     * @Override public void onClick(ClickEvent event) {
-     * HistoryUtils.newHistory(CreateDisposalSchedule.RESOLVER); } });
-     * editHold.add(editBtn); }
-     */
-
-    /*
-     * if (PermissionClientUtils.hasPermissions(RodaConstants.
-     * PERMISSION_METHOD_DELETE_DISPOSAL_HOLD)) { Button liftBtn = new Button();
-     * liftBtn.addStyleName("btn btn-danger");
-     * liftBtn.setText(messages.liftButton()); liftBtn.addClickHandler(new
-     * ClickHandler() {
-     * 
-     * @Override public void onClick(ClickEvent event) {
-     * HistoryUtils.newHistory(CreateDisposalSchedule.RESOLVER); } });
-     * liftHold.add(liftBtn); }
-     */
     initWidget(uiBinder.createAndBindUi(this));
     initElements();
     initButtons();

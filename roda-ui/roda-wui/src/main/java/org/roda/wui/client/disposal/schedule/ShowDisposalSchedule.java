@@ -6,6 +6,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
@@ -149,28 +150,6 @@ public class ShowDisposalSchedule extends Composite {
     instance = this;
     this.disposalSchedule = disposalSchedule;
 
-    /*
-     * if (PermissionClientUtils.hasPermissions(RodaConstants.
-     * PERMISSION_METHOD_UPDATE_DISPOSAL_HOLD)) { Button editBtn = new Button();
-     * editBtn.addStyleName("btn"); editBtn.setText(messages.editButton());
-     * editBtn.addClickHandler(new ClickHandler() {
-     *
-     * @Override public void onClick(ClickEvent event) {
-     * HistoryUtils.newHistory(CreateDisposalSchedule.RESOLVER); } });
-     * editHold.add(editBtn); }
-     */
-
-    /*
-     * if (PermissionClientUtils.hasPermissions(RodaConstants.
-     * PERMISSION_METHOD_DELETE_DISPOSAL_HOLD)) { Button liftBtn = new Button();
-     * liftBtn.addStyleName("btn btn-danger");
-     * liftBtn.setText(messages.liftButton()); liftBtn.addClickHandler(new
-     * ClickHandler() {
-     *
-     * @Override public void onClick(ClickEvent event) {
-     * HistoryUtils.newHistory(CreateDisposalSchedule.RESOLVER); } });
-     * liftHold.add(liftBtn); }
-     */
     initWidget(uiBinder.createAndBindUi(this));
     initElements();
     initButtons();
@@ -203,14 +182,25 @@ public class ShowDisposalSchedule extends Composite {
     disposalActionsValue.setHTML(disposalSchedule.getActionCode().toString());
     disposalActionsLabel.setVisible(StringUtils.isNotBlank(disposalSchedule.getActionCode().toString()));
 
-    retentionTriggersValue.setHTML(disposalSchedule.getRetentionTriggerCode().toString());
-    retentionTriggersLabel.setVisible(StringUtils.isNotBlank(disposalSchedule.getRetentionTriggerCode().toString()));
+    if(disposalSchedule.getRetentionTriggerCode() == null){
+      retentionTriggersValue.setHTML("");
+      retentionTriggersLabel.setVisible(false);
+    }else{
+      retentionTriggersValue.setHTML(disposalSchedule.getRetentionTriggerCode().toString());
+      retentionTriggersLabel.setVisible(StringUtils.isNotBlank(disposalSchedule.getRetentionTriggerCode().toString()));
+    }
 
-
-    String retentionPeriod = disposalSchedule.getRetentionPeriodDuration().toString() + " " + disposalSchedule.getRetentionPeriodIntervalCode().toString();
-    retentionPeriodValue.setHTML(retentionPeriod);
-    retentionPeriodLabel
-      .setVisible(StringUtils.isNotBlank(retentionPeriod));
+    if(disposalSchedule.getRetentionPeriodIntervalCode() == null){
+      retentionPeriodValue.setHTML("");
+      retentionPeriodLabel.setVisible(false);
+    }else if(disposalSchedule.getRetentionPeriodIntervalCode().equals(RetentionPeriodIntervalCode.NO_RETENTION_PERIOD)){
+      retentionPeriodValue.setHTML(disposalSchedule.getRetentionPeriodIntervalCode().toString());
+      retentionPeriodLabel.setVisible(true);
+    } else{
+      String retentionPeriod = disposalSchedule.getRetentionPeriodDuration().toString() + " " + disposalSchedule.getRetentionPeriodIntervalCode().toString();
+      retentionPeriodValue.setHTML(retentionPeriod);
+      retentionPeriodLabel.setVisible(true);
+    }
 
     stateValue.setHTML(HtmlSnippetUtils.getDisposalScheduleStateHtml(disposalSchedule));
   }
