@@ -114,8 +114,8 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
 
     this.editmode = editmode;
     super.setVisible(visible);
-    errors.setVisible(false);
 
+    setInitialState();
     initList();
 
     ValueChangeHandler<String> valueChangedHandler = new ValueChangeHandler<String>() {
@@ -139,12 +139,31 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
       }
     };
 
-    ChangeHandler retentionPeriodChangeHandler = new ChangeHandler() {
+    ChangeHandler retentionTriggerChangeHandler = new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent event) {
 
+        if (retentionTriggers.getSelectedValue().equals("")) {
+          retentionPeriodIntervalsLabel.setVisible(false);
+          retentionPeriodIntervals.setVisible(false);
+          retentionPeriodIntervals.setSelectedIndex(0);
+
+          retentionPeriodDurationLabel.setVisible(false);
+          retentionPeriodDuration.setVisible(false);
+          retentionPeriodDuration.setValue("");
+        } else {
+          retentionPeriodIntervalsLabel.setVisible(true);
+          retentionPeriodIntervals.setVisible(true);
+        }
+      }
+    };
+
+    ChangeHandler retentionPeriodChangeHandler = new ChangeHandler() {
+      @Override
+      public void onChange(ChangeEvent event) {
         if (retentionPeriodIntervals.getSelectedValue()
-          .equals(RetentionPeriodIntervalCode.NO_RETENTION_PERIOD.toString())) {
+          .equals(RetentionPeriodIntervalCode.NO_RETENTION_PERIOD.toString())
+          || retentionPeriodIntervals.getSelectedValue().equals("")) {
           retentionPeriodDurationLabel.setVisible(false);
           retentionPeriodDuration.setVisible(false);
           retentionPeriodDuration.setValue("");
@@ -159,7 +178,8 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
       @Override
       public void onChange(ChangeEvent event) {
 
-        if (disposalActions.getSelectedValue().equals(DisposalActionCode.RETAIN_PERMANENTLY.toString())) {
+        if (disposalActions.getSelectedValue().equals(DisposalActionCode.RETAIN_PERMANENTLY.toString())
+          || disposalActions.getSelectedValue().equals("")) {
           retentionTriggersLabel.setVisible(false);
           retentionTriggers.setVisible(false);
           retentionTriggers.setSelectedIndex(0);
@@ -174,18 +194,26 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
         } else {
           retentionTriggersLabel.setVisible(true);
           retentionTriggers.setVisible(true);
-
-          retentionPeriodIntervalsLabel.setVisible(true);
-          retentionPeriodIntervals.setVisible(true);
-
-          retentionPeriodDurationLabel.setVisible(true);
-          retentionPeriodDuration.setVisible(true);
         }
       }
     };
 
     disposalActions.addChangeHandler(disposalActionChangeHandler);
+    retentionTriggers.addChangeHandler(retentionTriggerChangeHandler);
     retentionPeriodIntervals.addChangeHandler(retentionPeriodChangeHandler);
+  }
+
+  private void setInitialState() {
+    errors.setVisible(false);
+
+    retentionTriggersLabel.setVisible(false);
+    retentionTriggers.setVisible(false);
+
+    retentionPeriodIntervalsLabel.setVisible(false);
+    retentionPeriodIntervals.setVisible(false);
+
+    retentionPeriodDurationLabel.setVisible(false);
+    retentionPeriodDuration.setVisible(false);
   }
 
   private void initList() {
@@ -295,7 +323,7 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
       disposalActionsError.setVisible(false);
     }
 
-    if(disposalActions.getSelectedValue() != DisposalActionCode.RETAIN_PERMANENTLY.toString()) {
+    if (disposalActions.getSelectedValue() != DisposalActionCode.RETAIN_PERMANENTLY.toString()) {
       if (retentionTriggers.getSelectedValue().length() == 0) {
         retentionTriggers.addStyleName("isWrong");
         retentionTriggersError.setText(messages.mandatoryField());
@@ -341,9 +369,9 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
     boolean isNumber = true;
     try {
       Integer intNum = Integer.parseInt(string);
-      if(intNum > 0){
+      if (intNum > 0) {
         return true;
-      }else{
+      } else {
         return false;
       }
     } catch (NumberFormatException e) {

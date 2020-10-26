@@ -6,6 +6,8 @@ package org.roda.core.data.exceptions;
 public class DisposalScheduleAlreadyExistsException extends AlreadyExistsException {
 
 
+    private static final long serialVersionUID = -4589782633937474385L;
+
     /**
      * Constructs a new {@link DisposalScheduleAlreadyExistsException}.
      */

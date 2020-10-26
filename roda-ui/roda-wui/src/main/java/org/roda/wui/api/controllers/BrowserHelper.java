@@ -3313,8 +3313,9 @@ public class BrowserHelper {
     }
   }
 
-  public static DisposalSchedule createDisposalSchedule(DisposalSchedule disposalSchedule, User user) throws GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException, RequestNotValidException {
-    // TODO -> validate schedule
+  public static DisposalSchedule createDisposalSchedule(DisposalSchedule disposalSchedule, User user)
+    throws GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException,
+    RequestNotValidException {
     return RodaCoreFactory.getModelService().createDisposalSchedule(disposalSchedule, user.getName());
   }
 
@@ -3328,8 +3329,8 @@ public class BrowserHelper {
     RodaCoreFactory.getModelService().deleteDisposalSchedule(disposalScheduleId);
   }
 
-  public static DisposalHold createDisposalHold(DisposalHold disposalHold, User user) throws GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException, RequestNotValidException {
-    //TODO -> validate hold
+  public static DisposalHold createDisposalHold(DisposalHold disposalHold, User user) throws GenericException,
+    AuthorizationDeniedException, AlreadyExistsException, NotFoundException, RequestNotValidException {
     return RodaCoreFactory.getModelService().createDisposalHold(disposalHold, user.getName());
   }
 
