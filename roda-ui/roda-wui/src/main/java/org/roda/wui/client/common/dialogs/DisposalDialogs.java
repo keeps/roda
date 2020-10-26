@@ -112,6 +112,7 @@ public class DisposalDialogs {
 
     cancelButton.addClickHandler(event -> {
       dialogBox.hide();
+      callback.onFailure(null);
     });
 
     noScheduleButton.addClickHandler(clickEvent -> {

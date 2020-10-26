@@ -2118,4 +2118,16 @@ public interface ClientMessages extends Messages {
   String dissociateDisposalScheduleDialogTitle();
 
   String dissociateDisposalScheduleDialogMessage(Long size);
+
+  String createDisposalConfirmationReportDialogTitle();
+
+  String createDisposalConfirmationReportDialogMessage(Long size);
+
+  String changeDisposalScheduleDialogTitle();
+
+  String changeDisposalScheduleDialogMessage(Long size);
+
+  String changeDisposalScheduleSuccessTitle();
+
+  String changeDisposalScheduleSuccessMessage(Long size);
 }

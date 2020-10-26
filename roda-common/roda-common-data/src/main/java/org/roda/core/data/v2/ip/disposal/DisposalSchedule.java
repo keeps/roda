@@ -39,7 +39,7 @@ public class DisposalSchedule implements IsModelObject, HasId {
   // prevent this disposal from being deleted
   private Date destroyedTimestamp = null;
 
-  private Long numberOfAIPUnder;
+  private Long numberOfAIPUnder = 0L;
 
   private Date createdOn = null;
   private String createdBy = null;
@@ -220,6 +220,16 @@ public class DisposalSchedule implements IsModelObject, HasId {
 
   public void setState(DisposalScheduleState state) {
     this.state = state;
+  }
+
+  @JsonIgnore
+  public void incrementNumberOfAIPsByOne() {
+    incrementNumberOfAIPs(1);
+  }
+
+  @JsonIgnore
+  public void decreaseNumberOfAIPsByOne() {
+    decreaseNumberOfAIPs(1);
   }
 
   @JsonIgnore

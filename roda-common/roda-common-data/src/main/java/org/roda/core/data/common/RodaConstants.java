@@ -944,6 +944,8 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_INCLUDE_SCHEMAS = "parameter.include_schemas";
   public static final String PLUGIN_PARAMS_INCLUDE_DOCUMENTATION = "parameter.include_documentation";
 
+  public static final String PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID = "paramter.disposal_schedule_id";
+
   public static final String PLUGIN_CATEGORY_CONVERSION = "conversion";
   public static final String PLUGIN_CATEGORY_CHARACTERIZATION = "characterization";
   public static final String PLUGIN_CATEGORY_RISK_MANAGEMENT = "risk_management";

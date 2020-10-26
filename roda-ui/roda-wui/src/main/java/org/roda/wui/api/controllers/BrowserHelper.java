@@ -147,6 +147,8 @@ import org.roda.core.plugins.plugins.internal.DeleteRODAObjectPlugin;
 import org.roda.core.plugins.plugins.internal.MovePlugin;
 import org.roda.core.plugins.plugins.internal.UpdateIncidencesPlugin;
 import org.roda.core.plugins.plugins.internal.UpdatePermissionsPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.ApplyDisposalScheduleToAIPPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.DisposalScheduleRemoverPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.BinaryVersion;
@@ -3352,7 +3354,20 @@ public class BrowserHelper {
     RodaCoreFactory.getModelService().deleteDisposalConfirmation(disposalConfirmationId);
   }
 
-//  public static Job destroyOverdueAIPs(User user, SelectedItems<IndexedAIP> selected)
+  public static Job changeDisposalSchedule(User user, SelectedItems<IndexedAIP> selected, String disposalScheduleId) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID, disposalScheduleId);
+
+    if (disposalScheduleId == null) {
+      return createAndExecuteInternalJob("Remove disposal schedule", selected, DisposalScheduleRemoverPlugin.class, user,
+          Collections.emptyMap(), "Could not execute change disposal schedule action");
+    } else {
+      return createAndExecuteInternalJob("Change disposal schedule", selected, ApplyDisposalScheduleToAIPPlugin.class, user,
+          pluginParameters, "Could not execute change disposal schedule action");
+    }
+  }
+
+  //  public static Job destroyOverdueAIPs(User user, SelectedItems<IndexedAIP> selected)
 //    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
 //    Map<String, String> pluginParameters = new HashMap<>();
 //    return createAndExecuteJob("Destroy overdue AIPs", selected, DeleteRODAObjectPlugin.class, PluginType.AIP_TO_AIP,
