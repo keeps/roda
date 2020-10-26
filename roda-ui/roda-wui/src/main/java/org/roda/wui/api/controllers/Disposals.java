@@ -42,6 +42,7 @@ public class Disposals extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     // validate disposal schedule
+    DisposalsHelper.validateDisposalSchedule(disposalSchedule);
 
     LogEntryState state = LogEntryState.SUCCESS;
 
@@ -63,6 +64,9 @@ public class Disposals extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
+
+    // validate disposal schedule
+    DisposalsHelper.validateDisposalSchedule(disposalSchedule);
 
     LogEntryState state = LogEntryState.SUCCESS;
 
@@ -109,6 +113,9 @@ public class Disposals extends RodaWuiController {
     // check user permissions
     controllerAssistant.checkRoles(user);
 
+    //validate disposal hold
+    DisposalsHelper.validateDisposalHold(disposalHold);
+
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
@@ -128,6 +135,9 @@ public class Disposals extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
+
+    //validate disposal hold
+    DisposalsHelper.validateDisposalHold(disposalHold);
 
     LogEntryState state = LogEntryState.SUCCESS;
 

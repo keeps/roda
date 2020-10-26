@@ -77,6 +77,17 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
   @UiField
   Label retentionTriggersError;
 
+  // retention triggers elementId
+
+  @UiField
+  Label retentionTriggerElementIdLabel;
+
+  @UiField
+  TextBox retentionTriggerElementId;
+
+  @UiField
+  Label retentionTriggerElementIdError;
+
   // retention period interval
 
   @UiField
@@ -180,6 +191,11 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
 
         if (disposalActions.getSelectedValue().equals(DisposalActionCode.RETAIN_PERMANENTLY.toString())
           || disposalActions.getSelectedValue().equals("")) {
+
+          retentionTriggerElementIdLabel.setVisible(false);
+          retentionTriggerElementId.setVisible(false);
+          retentionTriggerElementId.setValue("");
+
           retentionTriggersLabel.setVisible(false);
           retentionTriggers.setVisible(false);
           retentionTriggers.setSelectedIndex(0);
@@ -205,6 +221,9 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
 
   private void setInitialState() {
     errors.setVisible(false);
+
+    retentionTriggerElementIdLabel.setVisible(false);
+    retentionTriggerElementId.setVisible(false);
 
     retentionTriggersLabel.setVisible(false);
     retentionTriggers.setVisible(false);
@@ -249,6 +268,7 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
     disposalSchedule.setScopeNotes(notes.getText());
     disposalSchedule.setActionCode(getDisposalActionCode(disposalActions.getSelectedValue()));
     if (getDisposalActionCode(disposalActions.getSelectedValue()) != DisposalActionCode.RETAIN_PERMANENTLY) {
+      disposalSchedule.setRetentionTriggerElementId(retentionTriggerElementId.getValue());
       disposalSchedule.setRetentionTriggerCode(getRetentionTriggerCode(retentionTriggers.getSelectedValue()));
       disposalSchedule
         .setRetentionPeriodIntervalCode(getRetentionPeriodIntervalCode(retentionTriggers.getSelectedValue()));
@@ -306,7 +326,7 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
       titleError.setText(messages.mandatoryField());
       titleError.setVisible(true);
       Window.scrollTo(title.getAbsoluteLeft(), title.getAbsoluteTop());
-      errorList.add(messages.isAMandatoryField(messages.username()));
+      errorList.add(messages.isAMandatoryField(messages.disposalScheduleTitle()));
     } else {
       title.removeStyleName("isWrong");
       titleError.setVisible(false);
@@ -317,19 +337,30 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
       disposalActionsError.setText(messages.mandatoryField());
       disposalActionsError.setVisible(true);
       Window.scrollTo(disposalActions.getAbsoluteLeft(), disposalActions.getAbsoluteTop());
-      errorList.add(messages.isAMandatoryField(messages.username()));
+      errorList.add(messages.isAMandatoryField(messages.disposalScheduleActionCol()));
     } else {
       disposalActions.removeStyleName("isWrong");
       disposalActionsError.setVisible(false);
     }
 
     if (disposalActions.getSelectedValue() != DisposalActionCode.RETAIN_PERMANENTLY.toString()) {
+      if (retentionTriggerElementId.getValue().length() == 0) {
+        retentionTriggerElementId.addStyleName("isWrong");
+        retentionTriggerElementIdError.setText(messages.mandatoryField());
+        retentionTriggerElementIdError.setVisible(true);
+        Window.scrollTo(retentionTriggerElementId.getAbsoluteLeft(), retentionTriggerElementId.getAbsoluteTop());
+        errorList.add(messages.isAMandatoryField(messages.disposalScheduleRetentionTriggerElementId()));
+      } else {
+        retentionTriggerElementId.removeStyleName("isWrong");
+        retentionTriggerElementIdError.setVisible(false);
+      }
+
       if (retentionTriggers.getSelectedValue().length() == 0) {
         retentionTriggers.addStyleName("isWrong");
         retentionTriggersError.setText(messages.mandatoryField());
         retentionTriggersError.setVisible(true);
         Window.scrollTo(retentionTriggers.getAbsoluteLeft(), retentionTriggers.getAbsoluteTop());
-        errorList.add(messages.isAMandatoryField(messages.username()));
+        errorList.add(messages.isAMandatoryField(messages.disposalScheduleRetentionTriggerCode()));
       } else {
         retentionTriggers.removeStyleName("isWrong");
         retentionTriggersError.setVisible(false);
@@ -340,7 +371,7 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
         retentionPeriodIntervalsError.setText(messages.mandatoryField());
         retentionPeriodIntervalsError.setVisible(true);
         Window.scrollTo(retentionPeriodIntervals.getAbsoluteLeft(), retentionPeriodIntervals.getAbsoluteTop());
-        errorList.add(messages.isAMandatoryField(messages.username()));
+        errorList.add(messages.isAMandatoryField(messages.disposalScheduleRetentionPeriodInterval()));
       } else {
         retentionPeriodIntervals.removeStyleName("isWrong");
         retentionPeriodIntervalsError.setVisible(false);
@@ -352,7 +383,7 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
           retentionPeriodDurationError.setText(messages.mandatoryField());
           retentionPeriodDurationError.setVisible(true);
           Window.scrollTo(retentionPeriodDuration.getAbsoluteLeft(), retentionPeriodDuration.getAbsoluteTop());
-          errorList.add(messages.isAMandatoryField(messages.username()));
+          errorList.add(messages.disposalScheduleRetentionPeriodNotValidFormat());
         } else {
           retentionPeriodDuration.removeStyleName("isWrong");
           retentionPeriodDurationError.setVisible(false);
@@ -368,17 +399,14 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
   private boolean isNumberValid(String string) {
     boolean isNumber = true;
     try {
-      Integer intNum = Integer.parseInt(string);
-      if (intNum > 0) {
-        return true;
-      } else {
-        return false;
+      int intNum = Integer.parseInt(string);
+      if (intNum <= 0) {
+        isNumber = false;
       }
     } catch (NumberFormatException e) {
       isNumber = false;
-    } finally {
-      return isNumber;
     }
+    return isNumber;
   }
 
   public boolean isTitleReadOnly() {
