@@ -402,4 +402,7 @@ public interface BrowserService extends RemoteService {
 
   void deleteDisposalHold(String disposalHoldId) throws NotFoundException, AuthorizationDeniedException,
     IllegalOperationException, GenericException, RequestNotValidException;
+
+  Job changeDisposalSchedule(SelectedItems<IndexedAIP> selected, String disposalScheduleId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 }

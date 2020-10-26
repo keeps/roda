@@ -8,11 +8,14 @@ import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
@@ -210,7 +213,7 @@ public class Disposals extends RodaWuiController {
     // fetch the overdue AIPs
     // create the job to destroy the overdue AIPs
 
-    //return BrowserHelper.destroyOverdueAIPs(user, null);
+    // return BrowserHelper.destroyOverdueAIPs(user, null);
 
   }
 
@@ -233,6 +236,26 @@ public class Disposals extends RodaWuiController {
       // register action
       controllerAssistant.registerAction(user, disposalConfirmationId, state,
         RodaConstants.CONTROLLER_DISPOSAL_CONFIRMATION_ID_PARAM, disposalConfirmationId);
+    }
+  }
+
+  public static Job changeDisposalSchedule(User user, SelectedItems<IndexedAIP> selected, String scheduleId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+    try {
+      // delegate
+      return BrowserHelper.changeDisposalSchedule(user, selected, scheduleId);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selected);
     }
   }
 }
