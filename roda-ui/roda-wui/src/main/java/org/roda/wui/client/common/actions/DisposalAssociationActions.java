@@ -3,12 +3,26 @@ package org.roda.wui.client.common.actions;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.actions.model.ActionableObject;
+import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.dialogs.DisposalDialogs;
+import org.roda.wui.client.ingest.process.ShowJob;
+import org.roda.wui.client.process.InternalProcess;
+import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import config.i18n.client.ClientMessages;
@@ -64,7 +78,58 @@ public class DisposalAssociationActions extends AbstractActionable<IndexedAIP> {
   }
 
   private void edit(IndexedAIP aip, AsyncCallback<ActionImpact> callback) {
-    GWT.log("EDIT action");
+    BrowserService.Util.getInstance().listDisposalSchedules(new ActionNoAsyncCallback<DisposalSchedules>(callback) {
+      @Override
+      public void onSuccess(DisposalSchedules schedules) {
+        schedules.getObjects().removeIf(schedule -> DisposalScheduleState.ARCHIVED.equals(schedule.getState()));
+        DisposalDialogs.showDisposalScheduleSelection(messages.disposalScheduleSelectionDialogTitle(), schedules,
+          new ActionNoAsyncCallback<DisposalSchedule>(callback) {
+            @Override
+            public void onFailure(Throwable caught) {
+              doActionCallbackNone();
+            }
+
+            @Override
+            public void onSuccess(DisposalSchedule disposalSchedule) {
+              BrowserService.Util.getInstance().changeDisposalSchedule(objectToSelectedItems(aip, IndexedAIP.class),
+                disposalSchedule == null ? null : disposalSchedule.getId(), new AsyncCallback<Job>() {
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    callback.onFailure(caught);
+                    HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                  }
+
+                  @Override
+                  public void onSuccess(Job job) {
+                    Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+
+                      @Override
+                      public void onFailure(Throwable caught) {
+                        Timer timer = new Timer() {
+                          @Override
+                          public void run() {
+                            Toast.showInfo(messages.changeDisposalScheduleSuccessTitle(),
+                              messages.changeDisposalScheduleSuccessMessage(1L));
+                            doActionCallbackUpdated();
+                          }
+                        };
+
+                        timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                      }
+
+                      @Override
+                      public void onSuccess(final Void nothing) {
+                        doActionCallbackNone();
+                        HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                      }
+                    });
+                  }
+                });
+            }
+
+          });
+      }
+    });
   }
 
   @Override

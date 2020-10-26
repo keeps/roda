@@ -47,7 +47,7 @@
                         </g:Label>
                         <g:Label styleName="value" ui:field="disposalDisposalStatus"/>
                     </g:FlowPanel>
-                    <g:FlowPanel ui:field="disposalHoldsList" />
+                    <g:FlowPanel ui:field="disposalHoldsPanel" />
                 </g:FlowPanel>
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="col_2 last sidebar">
