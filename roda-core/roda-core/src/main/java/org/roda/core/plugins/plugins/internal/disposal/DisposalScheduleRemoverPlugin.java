@@ -66,7 +66,7 @@ public class DisposalScheduleRemoverPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Remove disposal schedule of AIP";
+    return "Remove disposal schedule from AIP";
   }
 
   @Override

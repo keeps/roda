@@ -103,7 +103,7 @@ public class DisposalConfirmationResource {
     return Response.ok(disposalConfirmationMetadata, mediaType).build();
   }
 
-  @POST
+  /*@POST
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
   @ApiOperation(value = "Create disposal confirmation", notes = "Create a new disposal confirmation", response = DisposalConfirmationMetadata.class)
@@ -122,7 +122,7 @@ public class DisposalConfirmationResource {
     DisposalConfirmationMetadata disposalConfirmationMetadata = Disposals.createDisposalConfirmation(user,
       metadata);
     return Response.ok(disposalConfirmationMetadata, mediaType).build();
-  }
+  }*/
 
   @DELETE
   @Path("/{" + RodaConstants.API_PATH_PARAM_DISPOSAL_CONFIRMATION_ID + "}")

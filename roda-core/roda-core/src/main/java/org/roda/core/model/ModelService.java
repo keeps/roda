@@ -3461,23 +3461,6 @@ public class ModelService extends ModelObservable {
     return disposalConfirmationMetadata;
   }
 
-  public DisposalConfirmationMetadata updateDisposalConfirmationMetadata(
-    DisposalConfirmationMetadata disposalConfirmationMetadata) throws AuthorizationDeniedException,
-    RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException {
-    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
-
-    String disposalConfirmationAsJson = JsonUtils.getJsonFromObject(disposalConfirmationMetadata);
-
-    DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(
-      ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationMetadata.getId()),
-      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME);
-
-    storage.createBinary(metadataStoragePath, new StringContentPayload(disposalConfirmationAsJson), false);
-    notifyDisposalConfirmationCreatedOrUpdated(disposalConfirmationMetadata).failOnError();
-
-    return disposalConfirmationMetadata;
-  }
-
   public void deleteDisposalConfirmation(String disposalConfirmationId)
       throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException, IllegalOperationException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
