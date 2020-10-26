@@ -7,6 +7,7 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.common.TitlePanel;
@@ -14,18 +15,27 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.DisposalAssociationActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
+import org.roda.wui.client.common.lists.utils.BasicTablePanel;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.disposal.hold.ShowDisposalHold;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 
+import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -74,6 +84,7 @@ public class DisposalPolicyAssociation extends Composite {
   };
 
   private static DisposalPolicyAssociation instance = null;
+  private List<DisposalHold> disposalHoldList = new ArrayList<>();
 
   @UiField
   FlowPanel disposalPolicyAIPDescription;
@@ -103,7 +114,7 @@ public class DisposalPolicyAssociation extends Composite {
   Label disposalDisposalStatus;
 
   @UiField
-  FlowPanel disposalHoldsList;
+  FlowPanel disposalHoldsPanel;
 
   @UiField
   SimplePanel actionsSidebar;
@@ -130,7 +141,9 @@ public class DisposalPolicyAssociation extends Composite {
     } else {
       disposalName.setText(aip.getDisposalScheduleName());
       disposalRetentionStartDate.setText(aip.getCreatedOn().toString());
-      disposalRetentionDueDate.setText(aip.getOverdueDate().toString());
+      if(aip.getOverdueDate() != null){
+        disposalRetentionDueDate.setText(aip.getOverdueDate().toString());
+      }
       disposalRetentionPeriod
         .setText(aip.getDisposalRetentionPeriodDuration() + " " + aip.getDisposalRetentionPeriodCode());
       disposalDisposalAction.setText(aip.getDisposalAction());
@@ -144,8 +157,8 @@ public class DisposalPolicyAssociation extends Composite {
     actionsSidebar
       .setWidget(actionableWidgetBuilder.withBackButton().buildListWithObjects(new ActionableObject<>(aip)));
 
-    if(!aip.getDisposalHoldsId().isEmpty()){
-     fetchDisposalHolds(aip.getDisposalHoldsId());
+    if (!aip.getDisposalHoldsId().isEmpty()) {
+      fetchDisposalHolds(aip.getDisposalHoldsId());
     }
   }
 
@@ -159,13 +172,67 @@ public class DisposalPolicyAssociation extends Composite {
 
         @Override
         public void onSuccess(DisposalHold disposalHold) {
-          addDisposalHold(disposalHold);
+          disposalHoldList.add(disposalHold);
+          refreshDisposalHoldList();
         }
       });
     }
   }
 
-  private void addDisposalHold(DisposalHold disposalHold) {
-    disposalHoldsList.add(new Label(disposalHold.getTitle()));
+  private void refreshDisposalHoldList() {
+    DisposalHolds disposalHolds = new DisposalHolds(disposalHoldList);
+    BasicTablePanel<DisposalHold> tableHolds = getBasicTablePanelForDisposalHolds(disposalHolds);
+    tableHolds.getSelectionModel().addSelectionChangeHandler(event -> {
+      DisposalHold selectedHold = tableHolds.getSelectionModel().getSelectedObject();
+      if (selectedHold != null) {
+        tableHolds.getSelectionModel().clear();
+        List<String> path = HistoryUtils.getHistory(ShowDisposalHold.RESOLVER.getHistoryPath(), selectedHold.getId());
+        HistoryUtils.newHistory(path);
+      }
+    });
+    disposalHoldsPanel.clear();
+    disposalHoldsPanel.add(tableHolds);
+  }
+
+  private BasicTablePanel<DisposalHold> getBasicTablePanelForDisposalHolds(DisposalHolds disposalHolds) {
+    Label headerHolds = new Label("Disposal Hold");
+    headerHolds.addStyleName("h5");
+
+    HTMLPanel info = new HTMLPanel("");
+
+    if (disposalHolds.getObjects().isEmpty()) {
+      return new BasicTablePanel<>(headerHolds, messages.noItemsToDisplayPreFilters("disposal holds"));
+    } else {
+      return new BasicTablePanel<DisposalHold>(headerHolds, info, disposalHolds.getObjects().iterator(),
+
+        new BasicTablePanel.ColumnInfo<>(messages.disposalHoldTitle(), 15, new TextColumn<DisposalHold>() {
+          @Override
+          public String getValue(DisposalHold hold) {
+            return hold.getTitle();
+          }
+        }),
+
+        new BasicTablePanel.ColumnInfo<>(messages.disposalScheduleMandate(), 0, new TextColumn<DisposalHold>() {
+          @Override
+          public String getValue(DisposalHold hold) {
+            return hold.getMandate();
+          }
+        }),
+
+        new BasicTablePanel.ColumnInfo<>(messages.disposalHoldNumberOfAIPs(), 8, new TextColumn<DisposalHold>() {
+          @Override
+          public String getValue(DisposalHold hold) {
+            return String.valueOf(hold.getActiveAIPs().size());
+          }
+        }),
+
+        new BasicTablePanel.ColumnInfo<>(messages.disposalHoldStateCol(), 8,
+          new Column<DisposalHold, SafeHtml>(new SafeHtmlCell()) {
+            @Override
+            public SafeHtml getValue(DisposalHold hold) {
+              return HtmlSnippetUtils.getDisposalHoldStateHtml(hold);
+            }
+          }));
+    }
   }
 }
