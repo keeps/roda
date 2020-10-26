@@ -50,16 +50,7 @@ public class DisposalPolicy extends Composite {
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-      if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_SCHEDULES)
-          && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_HOLDS)) {
-        loadDisposalSchedulesAndHolds(callback);
-      } else if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_SCHEDULES)) {
-        loadDisposalSchedules(callback);
-      } else if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_HOLDS)) {
-        loadDisposalHolds(callback);
-      } else {
-        HistoryUtils.newHistory(Disposal.RESOLVER, DisposalConfirmations.RESOLVER.getHistoryToken());
-      }
+      getInstance().resolve(historyTokens, callback);
     }
 
     @Override
@@ -175,30 +166,19 @@ public class DisposalPolicy extends Composite {
       contentDisposalSchedulesTable.add(label);
     } else {
       FlowPanel schedulesPanel = new FlowPanel();
-      BasicTablePanel<DisposalSchedule> table = getBasicTablePanelForDisposalSchedules(disposalSchedules);
-      table.getSelectionModel().addSelectionChangeHandler(event -> {
-        DisposalSchedule selectedObject = table.getSelectionModel().getSelectedObject();
-        if (selectedObject != null) {
-          table.getSelectionModel().clear();
+      BasicTablePanel<DisposalSchedule> tableSchedules = getBasicTablePanelForDisposalSchedules(disposalSchedules);
+      tableSchedules.getSelectionModel().addSelectionChangeHandler(event -> {
+        DisposalSchedule selectedSchedule = tableSchedules.getSelectionModel().getSelectedObject();
+        if (selectedSchedule != null) {
+          tableSchedules.getSelectionModel().clear();
+          List<String> path = HistoryUtils.getHistory(ShowDisposalSchedule.RESOLVER.getHistoryPath(),
+            selectedSchedule.getId());
+          HistoryUtils.newHistory(path);
         }
       });
 
-      schedulesPanel.add(table);
+      schedulesPanel.add(tableSchedules);
       contentDisposalSchedulesTable.add(schedulesPanel);
-
-      if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_SCHEDULE)) {
-        Button newDisposalScheduleBtn = new Button();
-        newDisposalScheduleBtn.addStyleName("btn btn-plus");
-        newDisposalScheduleBtn.setText(messages.newDisposalScheduleTitle());
-        newDisposalScheduleBtn.addClickHandler(new ClickHandler() {
-
-          @Override
-          public void onClick(ClickEvent event) {
-            HistoryUtils.newHistory(Disposal.RESOLVER, CreateDisposal.RESOLVER.getHistoryToken(), CreateDisposalSchedule.RESOLVER.getHistoryToken());
-          }
-        });
-        newDisposalSchedule.add(newDisposalScheduleBtn);
-      }
     }
   }
 
@@ -225,7 +205,7 @@ public class DisposalPolicy extends Composite {
     }
   }
 
-  private void initButtons(){
+  private void initButtons() {
     initNewDisposalScheduleButton();
     initNewDisposalHoldButton();
   }
@@ -256,7 +236,7 @@ public class DisposalPolicy extends Composite {
         @Override
         public void onClick(ClickEvent event) {
           HistoryUtils.newHistory(Disposal.RESOLVER, DisposalPolicy.RESOLVER.getHistoryToken(),
-                  CreateDisposalHold.RESOLVER.getHistoryToken());
+            CreateDisposalHold.RESOLVER.getHistoryToken());
         }
       });
       newDisposalHold.add(newDisposalHoldBtn);
@@ -313,7 +293,7 @@ public class DisposalPolicy extends Composite {
   }
 
   private BasicTablePanel<DisposalSchedule> getBasicTablePanelForDisposalSchedules(
-      DisposalSchedules disposalSchedules) {
+    DisposalSchedules disposalSchedules) {
     Label header = new Label("Disposal Schedule");
     header.addStyleName("h5");
 
@@ -389,34 +369,34 @@ public class DisposalPolicy extends Composite {
     } else {
       return new BasicTablePanel<DisposalHold>(headerHolds, info, disposalHolds.getObjects().iterator(),
 
-          new BasicTablePanel.ColumnInfo<>(messages.disposalHoldTitle(), 15, new TextColumn<DisposalHold>() {
-            @Override
-            public String getValue(DisposalHold hold) {
-              return hold.getTitle();
-            }
-          }),
+        new BasicTablePanel.ColumnInfo<>(messages.disposalHoldTitle(), 15, new TextColumn<DisposalHold>() {
+          @Override
+          public String getValue(DisposalHold hold) {
+            return hold.getTitle();
+          }
+        }),
 
-          new BasicTablePanel.ColumnInfo<>(messages.disposalScheduleMandate(), 0, new TextColumn<DisposalHold>() {
-            @Override
-            public String getValue(DisposalHold hold) {
-              return hold.getMandate();
-            }
-          }),
+        new BasicTablePanel.ColumnInfo<>(messages.disposalScheduleMandate(), 0, new TextColumn<DisposalHold>() {
+          @Override
+          public String getValue(DisposalHold hold) {
+            return hold.getMandate();
+          }
+        }),
 
-          new BasicTablePanel.ColumnInfo<>(messages.disposalHoldNumberOfAIPs(), 8, new TextColumn<DisposalHold>() {
-            @Override
-            public String getValue(DisposalHold hold) {
-              return String.valueOf(hold.getActiveAIPs().size());
-            }
-          }),
+        new BasicTablePanel.ColumnInfo<>(messages.disposalHoldNumberOfAIPs(), 8, new TextColumn<DisposalHold>() {
+          @Override
+          public String getValue(DisposalHold hold) {
+            return String.valueOf(hold.getActiveAIPs().size());
+          }
+        }),
 
-          new BasicTablePanel.ColumnInfo<>(messages.disposalHoldStateCol(), 8,
-              new Column<DisposalHold, SafeHtml>(new SafeHtmlCell()) {
-                @Override
-                public SafeHtml getValue(DisposalHold hold) {
-                  return HtmlSnippetUtils.getDisposalHoldStateHtml(hold);
-                }
-              }));
+        new BasicTablePanel.ColumnInfo<>(messages.disposalHoldStateCol(), 8,
+          new Column<DisposalHold, SafeHtml>(new SafeHtmlCell()) {
+            @Override
+            public SafeHtml getValue(DisposalHold hold) {
+              return HtmlSnippetUtils.getDisposalHoldStateHtml(hold);
+            }
+          }));
     }
   }
 
