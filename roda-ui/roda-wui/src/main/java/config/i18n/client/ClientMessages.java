@@ -2020,6 +2020,8 @@ public interface ClientMessages extends Messages {
 
   String disposalScheduleAction(@Select String action);
 
+  String disposalScheduleRetentionTriggerElementId();
+
   String disposalScheduleRetentionTriggerCode();
 
   String disposalScheduleRetentionPeriodInterval();
@@ -2132,4 +2134,5 @@ public interface ClientMessages extends Messages {
 
   String disposalDisposalStatus();
   
+  String disposalScheduleRetentionPeriodNotValidFormat();
 }

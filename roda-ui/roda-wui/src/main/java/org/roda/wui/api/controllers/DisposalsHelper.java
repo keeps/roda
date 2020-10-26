@@ -13,7 +13,6 @@ import org.roda.wui.common.client.tools.StringUtils;
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 public class DisposalsHelper {
-
   public DisposalsHelper() {
   };
 
@@ -25,24 +24,24 @@ public class DisposalsHelper {
 
   public static void validateDisposalSchedule(DisposalSchedule disposalSchedule)
     throws DisposalScheduleNotValidException {
-
-    if (StringUtils.isNotBlank(disposalSchedule.getTitle())) {
+    if (StringUtils.isBlank(disposalSchedule.getTitle())) {
       throw new DisposalScheduleNotValidException("The disposal schedule title is mandatory");
     }
-
     if (!isDisposalActionValid(disposalSchedule.getActionCode())) {
       throw new DisposalScheduleNotValidException("The disposal action code is not valid");
     }
-
     if (!isRetentionTriggerValid(disposalSchedule.getActionCode(), disposalSchedule.getRetentionTriggerCode())) {
       throw new DisposalScheduleNotValidException("The retention trigger is not valid");
+    }
+
+    if (!isRetentionTriggerElementIdValid(disposalSchedule.getActionCode(), disposalSchedule.getRetentionTriggerElementId())) {
+      throw new DisposalScheduleNotValidException("The retention trigger element id is not valid");
     }
 
     if (!isRetentionPeriodIntervalValid(disposalSchedule.getActionCode(),
       disposalSchedule.getRetentionPeriodIntervalCode())) {
       throw new DisposalScheduleNotValidException("The retention period interval is not valid");
     }
-
     if (!isRetentionPeriodDurationValid(disposalSchedule.getActionCode(),
       disposalSchedule.getRetentionPeriodIntervalCode(), disposalSchedule.getRetentionPeriodDuration())) {
       throw new DisposalScheduleNotValidException("The retention period duration is not valid.");
@@ -52,77 +51,63 @@ public class DisposalsHelper {
   private static boolean isNumberValid(String string) {
     boolean isNumber = true;
     try {
-      Integer intNum = Integer.parseInt(string);
-      if (intNum > 0) {
-        return true;
-      } else {
-        return false;
+      int intNum = Integer.parseInt(string);
+      if (intNum <= 0) {
+        isNumber = false;
       }
     } catch (NumberFormatException e) {
       isNumber = false;
-    } finally {
-      return isNumber;
     }
+    return isNumber;
   }
 
   private static boolean isRetentionPeriodDurationValid(DisposalActionCode actionCode,
     RetentionPeriodIntervalCode retentionPeriodIntervalCode, Integer retentionPeriodDuration) {
     if (actionCode.equals(DisposalActionCode.RETAIN_PERMANENTLY)
-      && retentionPeriodIntervalCode.equals(RetentionPeriodIntervalCode.NO_RETENTION_PERIOD)) {
-      if (StringUtils.isBlank(retentionPeriodDuration.toString())) {
-        if (isNumberValid(retentionPeriodDuration.toString())) {
-          return true;
-        }
-      }
-    } else if (isNumberValid(retentionPeriodDuration.toString())) {
-      return true;
+      || retentionPeriodIntervalCode.equals(RetentionPeriodIntervalCode.NO_RETENTION_PERIOD)) {
+      return retentionPeriodDuration == null;
     }
-    return false;
+    return isNumberValid(retentionPeriodDuration.toString());
   }
 
   private static boolean isRetentionPeriodIntervalValid(DisposalActionCode actionCode,
     RetentionPeriodIntervalCode retentionPeriodIntervalCode) {
     if (actionCode.equals(DisposalActionCode.RETAIN_PERMANENTLY)) {
-      if (StringUtils.isBlank(retentionPeriodIntervalCode.toString())) {
-        return true;
-      }
+      return retentionPeriodIntervalCode == null;
     } else {
-      if (retentionPeriodIntervalCode.equals(RetentionPeriodIntervalCode.NO_RETENTION_PERIOD)
+      return retentionPeriodIntervalCode.equals(RetentionPeriodIntervalCode.NO_RETENTION_PERIOD)
         || retentionPeriodIntervalCode.equals(RetentionPeriodIntervalCode.DAYS)
         || retentionPeriodIntervalCode.equals(RetentionPeriodIntervalCode.WEEKS)
         || retentionPeriodIntervalCode.equals(RetentionPeriodIntervalCode.MONTHS)
-        || retentionPeriodIntervalCode.equals(RetentionPeriodIntervalCode.YEARS)) {
-        return true;
-      }
+        || retentionPeriodIntervalCode.equals(RetentionPeriodIntervalCode.YEARS);
     }
-    return false;
   }
 
   private static boolean isRetentionTriggerValid(DisposalActionCode actionCode,
     RetentionTriggerCode retentionTriggerCode) {
-
     if (actionCode.equals(DisposalActionCode.RETAIN_PERMANENTLY)) {
-      if (StringUtils.isBlank(retentionTriggerCode.toString())) {
-        return true;
-      }
+      return retentionTriggerCode == null;
     } else {
-      if (retentionTriggerCode.equals(RetentionTriggerCode.FROM_NOW)
+      return retentionTriggerCode.equals(RetentionTriggerCode.FROM_NOW)
         || retentionTriggerCode.equals(RetentionTriggerCode.FROM_RECORD_METADATA_DATE)
-        || retentionTriggerCode.equals(RetentionTriggerCode.FROM_RECORD_ORIGINATED_DATE)) {
-        return true;
-      }
+        || retentionTriggerCode.equals(RetentionTriggerCode.FROM_RECORD_ORIGINATED_DATE);
     }
-    return false;
+  }
+
+  private static boolean isRetentionTriggerElementIdValid(DisposalActionCode actionCode,
+                                                 String retentionTriggerElementId) {
+    if (actionCode.equals(DisposalActionCode.RETAIN_PERMANENTLY)) {
+      return retentionTriggerElementId == null;
+    } else {
+      return StringUtils.isNotBlank(retentionTriggerElementId);
+    }
   }
 
   private static boolean isDisposalActionValid(DisposalActionCode actionCode) {
     if (StringUtils.isNotBlank(actionCode.toString())) {
-      if (actionCode.equals(DisposalActionCode.RETAIN_PERMANENTLY) || actionCode.equals(DisposalActionCode.DESTROY)
-        || actionCode.equals(DisposalActionCode.REVIEW)) {
-        return true;
-      }
+      return actionCode.equals(DisposalActionCode.RETAIN_PERMANENTLY) || actionCode.equals(DisposalActionCode.DESTROY)
+        || actionCode.equals(DisposalActionCode.REVIEW);
     }
     return false;
   }
-
 }
