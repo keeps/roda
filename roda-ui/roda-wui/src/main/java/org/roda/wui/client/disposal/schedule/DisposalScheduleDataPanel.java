@@ -208,6 +208,9 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
           retentionPeriodDuration.setVisible(false);
           retentionPeriodDuration.setValue("");
         } else {
+          retentionTriggerElementIdLabel.setVisible(true);
+          retentionTriggerElementId.setVisible(true);
+
           retentionTriggersLabel.setVisible(true);
           retentionTriggers.setVisible(true);
         }
