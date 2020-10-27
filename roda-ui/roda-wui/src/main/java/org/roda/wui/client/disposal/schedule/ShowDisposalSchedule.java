@@ -5,13 +5,16 @@ import java.util.List;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.DisposalPolicy;
+import org.roda.wui.client.disposal.hold.EditDisposalHold;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -210,6 +213,14 @@ public class ShowDisposalSchedule extends Composite {
     Button editScheduleBtn = new Button();
     editScheduleBtn.addStyleName("btn btn-block btn-edit");
     editScheduleBtn.setText(messages.editButton());
+    if(PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_UPDATE_DISPOSAL_SCHEDULE)){
+      editScheduleBtn.addClickHandler(new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent clickEvent) {
+          HistoryUtils.newHistory(EditDisposalSchedule.RESOLVER,disposalSchedule.getId());
+        }
+      });
+    }
     buttonsPanel.add(editScheduleBtn);
 
 

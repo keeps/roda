@@ -12,8 +12,6 @@ import org.roda.core.data.v2.ip.disposal.RetentionTriggerCode;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -59,6 +57,9 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
   TextArea notes;
 
   // disposal actions
+
+  @UiField
+  Label disposalActionsLabel;
 
   @UiField
   ListBox disposalActions;
@@ -112,29 +113,35 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
 
   private boolean editmode;
 
-  // has to be true to detected new field changes
-  private boolean changed = true;
+  private boolean changed = false;
   private boolean checked = false;
 
   @UiField
   HTML errors;
 
-  public DisposalScheduleDataPanel(boolean visible, boolean editmode) {
+  public DisposalScheduleDataPanel(DisposalSchedule disposalSchedule, boolean editmode) {
 
     initWidget(uiBinder.createAndBindUi(this));
 
     this.editmode = editmode;
-    super.setVisible(visible);
 
     setInitialState();
+    initHandlers();
     initList();
 
-    ValueChangeHandler<String> valueChangedHandler = new ValueChangeHandler<String>() {
-      @Override
-      public void onValueChange(ValueChangeEvent<String> event) {
-        DisposalScheduleDataPanel.this.onChange();
-      }
-    };
+    if (editmode) {
+      setEditInitialState();
+      setDisposalSchedule(disposalSchedule);
+    }
+  }
+
+  private void setEditInitialState() {
+    disposalActionsLabel.setVisible(false);
+    disposalActions.setVisible(false);
+    disposalActionsError.setVisible(false);
+  }
+
+  private void initHandlers() {
 
     ChangeHandler changeHandler = new ChangeHandler() {
       @Override
@@ -143,12 +150,10 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
       }
     };
 
-    KeyUpHandler keyUpHandler = new KeyUpHandler() {
-      @Override
-      public void onKeyUp(KeyUpEvent event) {
-        onChange();
-      }
-    };
+    title.addChangeHandler(changeHandler);
+    description.addChangeHandler(changeHandler);
+    mandate.addChangeHandler(changeHandler);
+    notes.addChangeHandler(changeHandler);
 
     ChangeHandler retentionTriggerChangeHandler = new ChangeHandler() {
       @Override
@@ -261,6 +266,9 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
 
   public void setDisposalSchedule(DisposalSchedule disposalSchedule) {
     this.title.setText(disposalSchedule.getTitle());
+    this.description.setText(disposalSchedule.getDescription());
+    this.mandate.setText(disposalSchedule.getMandate());
+    this.notes.setText(disposalSchedule.getScopeNotes());
   }
 
   public DisposalSchedule getDisposalSchedule() {
@@ -269,13 +277,15 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
     disposalSchedule.setDescription(description.getText());
     disposalSchedule.setMandate(mandate.getText());
     disposalSchedule.setScopeNotes(notes.getText());
-    disposalSchedule.setActionCode(getDisposalActionCode(disposalActions.getSelectedValue()));
-    if (getDisposalActionCode(disposalActions.getSelectedValue()) != DisposalActionCode.RETAIN_PERMANENTLY) {
-      disposalSchedule.setRetentionTriggerElementId(retentionTriggerElementId.getValue());
-      disposalSchedule.setRetentionTriggerCode(getRetentionTriggerCode(retentionTriggers.getSelectedValue()));
-      disposalSchedule
-        .setRetentionPeriodIntervalCode(getRetentionPeriodIntervalCode(retentionTriggers.getSelectedValue()));
-      disposalSchedule.setRetentionPeriodDuration(Integer.parseInt(retentionPeriodDuration.getText()));
+    if(!editmode) {
+      disposalSchedule.setActionCode(getDisposalActionCode(disposalActions.getSelectedValue()));
+      if (getDisposalActionCode(disposalActions.getSelectedValue()) != DisposalActionCode.RETAIN_PERMANENTLY) {
+        disposalSchedule.setRetentionTriggerElementId(retentionTriggerElementId.getValue());
+        disposalSchedule.setRetentionTriggerCode(getRetentionTriggerCode(retentionTriggers.getSelectedValue()));
+        disposalSchedule
+                .setRetentionPeriodIntervalCode(getRetentionPeriodIntervalCode(retentionTriggers.getSelectedValue()));
+        disposalSchedule.setRetentionPeriodDuration(Integer.parseInt(retentionPeriodDuration.getText()));
+      }
     }
     return disposalSchedule;
   }
@@ -324,6 +334,7 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
    */
   public boolean isValid() {
     List<String> errorList = new ArrayList<>();
+
     if (title.getText().length() == 0) {
       title.addStyleName("isWrong");
       titleError.setText(messages.mandatoryField());
@@ -335,61 +346,63 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
       titleError.setVisible(false);
     }
 
-    if (disposalActions.getSelectedValue().length() == 0) {
-      disposalActions.addStyleName("isWrong");
-      disposalActionsError.setText(messages.mandatoryField());
-      disposalActionsError.setVisible(true);
-      Window.scrollTo(disposalActions.getAbsoluteLeft(), disposalActions.getAbsoluteTop());
-      errorList.add(messages.isAMandatoryField(messages.disposalScheduleActionCol()));
-    } else {
-      disposalActions.removeStyleName("isWrong");
-      disposalActionsError.setVisible(false);
-    }
-
-    if (disposalActions.getSelectedValue() != DisposalActionCode.RETAIN_PERMANENTLY.toString()) {
-      if (retentionTriggerElementId.getValue().length() == 0) {
-        retentionTriggerElementId.addStyleName("isWrong");
-        retentionTriggerElementIdError.setText(messages.mandatoryField());
-        retentionTriggerElementIdError.setVisible(true);
-        Window.scrollTo(retentionTriggerElementId.getAbsoluteLeft(), retentionTriggerElementId.getAbsoluteTop());
-        errorList.add(messages.isAMandatoryField(messages.disposalScheduleRetentionTriggerElementId()));
+    if (!editmode) {
+      if (disposalActions.getSelectedValue().length() == 0) {
+        disposalActions.addStyleName("isWrong");
+        disposalActionsError.setText(messages.mandatoryField());
+        disposalActionsError.setVisible(true);
+        Window.scrollTo(disposalActions.getAbsoluteLeft(), disposalActions.getAbsoluteTop());
+        errorList.add(messages.isAMandatoryField(messages.disposalScheduleActionCol()));
       } else {
-        retentionTriggerElementId.removeStyleName("isWrong");
-        retentionTriggerElementIdError.setVisible(false);
+        disposalActions.removeStyleName("isWrong");
+        disposalActionsError.setVisible(false);
       }
 
-      if (retentionTriggers.getSelectedValue().length() == 0) {
-        retentionTriggers.addStyleName("isWrong");
-        retentionTriggersError.setText(messages.mandatoryField());
-        retentionTriggersError.setVisible(true);
-        Window.scrollTo(retentionTriggers.getAbsoluteLeft(), retentionTriggers.getAbsoluteTop());
-        errorList.add(messages.isAMandatoryField(messages.disposalScheduleRetentionTriggerCode()));
-      } else {
-        retentionTriggers.removeStyleName("isWrong");
-        retentionTriggersError.setVisible(false);
-      }
-
-      if (retentionPeriodIntervals.getSelectedValue().length() == 0) {
-        retentionPeriodIntervals.addStyleName("isWrong");
-        retentionPeriodIntervalsError.setText(messages.mandatoryField());
-        retentionPeriodIntervalsError.setVisible(true);
-        Window.scrollTo(retentionPeriodIntervals.getAbsoluteLeft(), retentionPeriodIntervals.getAbsoluteTop());
-        errorList.add(messages.isAMandatoryField(messages.disposalScheduleRetentionPeriodInterval()));
-      } else {
-        retentionPeriodIntervals.removeStyleName("isWrong");
-        retentionPeriodIntervalsError.setVisible(false);
-      }
-
-      if (retentionPeriodDuration.isVisible()) {
-        if (!isNumberValid(retentionPeriodDuration.getText())) {
-          retentionPeriodDuration.addStyleName("isWrong");
-          retentionPeriodDurationError.setText(messages.mandatoryField());
-          retentionPeriodDurationError.setVisible(true);
-          Window.scrollTo(retentionPeriodDuration.getAbsoluteLeft(), retentionPeriodDuration.getAbsoluteTop());
-          errorList.add(messages.disposalScheduleRetentionPeriodNotValidFormat());
+      if (disposalActions.getSelectedValue() != DisposalActionCode.RETAIN_PERMANENTLY.toString()) {
+        if (retentionTriggerElementId.getValue().length() == 0) {
+          retentionTriggerElementId.addStyleName("isWrong");
+          retentionTriggerElementIdError.setText(messages.mandatoryField());
+          retentionTriggerElementIdError.setVisible(true);
+          Window.scrollTo(retentionTriggerElementId.getAbsoluteLeft(), retentionTriggerElementId.getAbsoluteTop());
+          errorList.add(messages.isAMandatoryField(messages.disposalScheduleRetentionTriggerElementId()));
         } else {
-          retentionPeriodDuration.removeStyleName("isWrong");
-          retentionPeriodDurationError.setVisible(false);
+          retentionTriggerElementId.removeStyleName("isWrong");
+          retentionTriggerElementIdError.setVisible(false);
+        }
+
+        if (retentionTriggers.getSelectedValue().length() == 0) {
+          retentionTriggers.addStyleName("isWrong");
+          retentionTriggersError.setText(messages.mandatoryField());
+          retentionTriggersError.setVisible(true);
+          Window.scrollTo(retentionTriggers.getAbsoluteLeft(), retentionTriggers.getAbsoluteTop());
+          errorList.add(messages.isAMandatoryField(messages.disposalScheduleRetentionTriggerCode()));
+        } else {
+          retentionTriggers.removeStyleName("isWrong");
+          retentionTriggersError.setVisible(false);
+        }
+
+        if (retentionPeriodIntervals.getSelectedValue().length() == 0) {
+          retentionPeriodIntervals.addStyleName("isWrong");
+          retentionPeriodIntervalsError.setText(messages.mandatoryField());
+          retentionPeriodIntervalsError.setVisible(true);
+          Window.scrollTo(retentionPeriodIntervals.getAbsoluteLeft(), retentionPeriodIntervals.getAbsoluteTop());
+          errorList.add(messages.isAMandatoryField(messages.disposalScheduleRetentionPeriodInterval()));
+        } else {
+          retentionPeriodIntervals.removeStyleName("isWrong");
+          retentionPeriodIntervalsError.setVisible(false);
+        }
+
+        if (retentionPeriodDuration.isVisible()) {
+          if (!isNumberValid(retentionPeriodDuration.getText())) {
+            retentionPeriodDuration.addStyleName("isWrong");
+            retentionPeriodDurationError.setText(messages.mandatoryField());
+            retentionPeriodDurationError.setVisible(true);
+            Window.scrollTo(retentionPeriodDuration.getAbsoluteLeft(), retentionPeriodDuration.getAbsoluteTop());
+            errorList.add(messages.disposalScheduleRetentionPeriodNotValidFormat());
+          } else {
+            retentionPeriodDuration.removeStyleName("isWrong");
+            retentionPeriodDurationError.setVisible(false);
+          }
         }
       }
     }
@@ -412,31 +425,16 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
     return isNumber;
   }
 
-  public boolean isTitleReadOnly() {
-    return title.isReadOnly();
-  }
-
-  public void setTitleReadOnly(boolean readonly) {
-    title.setReadOnly(readonly);
-  }
-
-  public boolean isMandateReadOnly() {
-    return mandate.isReadOnly();
-  }
-
-  public void setMandateReadOnly(boolean readonly) {
-    mandate.setReadOnly(readonly);
-  }
-
-  @Override
-  public void setVisible(boolean visible) {
-    super.setVisible(visible);
-  }
-
   public void clear() {
     title.setText("");
     description.setText("");
     mandate.setText("");
+    notes.setText("");
+    disposalActions.setSelectedIndex(0);
+    retentionTriggerElementId.setText("");
+    retentionTriggers.setSelectedIndex(0);
+    retentionPeriodIntervals.setSelectedIndex(0);
+    retentionPeriodDuration.setText("");
   }
 
   public boolean isEditmode() {
