@@ -17,7 +17,6 @@ import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.DisposalScheduleNotValidException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -170,7 +169,6 @@ public class DisposalScheduleTest {
 
     // Associate AIP with Disposal schedule
     aip.setDisposalScheduleId(disposalSchedule.getId());
-    aip.setDisposalScheduleName("NORMAL");
     // aip.setDestructionOn(new Date());
     aip.setDestructionApprovedBy(RodaConstants.ADMIN);
     model.updateAIP(aip, RodaConstants.ADMIN);
