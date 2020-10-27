@@ -30,6 +30,8 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
 
   private static final Set<DisposalConfirmationReportAction> POSSIBLE_ACTIONS_FOR_RECOVERED = new HashSet<>();
 
+  private static final Set<DisposalConfirmationReportAction> POSSIBLE_ACTIONS_FOR_DELETED = POSSIBLE_ACTIONS_FOR_RECOVERED;
+
   public enum DisposalConfirmationReportAction implements Action<DisposalConfirmationMetadata> {
     DESTROY(), DELETE_REPORT(), REMOVE_FROM_BIN(), RECOVER_FROM_BIN();
 
@@ -76,6 +78,8 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
         return hasPermissions(action) && POSSIBLE_ACTIONS_FOR_APPROVED.contains(action);
       case RESTORED:
         return hasPermissions(action) && POSSIBLE_ACTIONS_FOR_RECOVERED.contains(action);
+      case PERMANENTLY_DELETED:
+        return hasPermissions(action) && POSSIBLE_ACTIONS_FOR_DELETED.contains(action);
       default:
         return false;
     }
