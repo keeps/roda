@@ -76,6 +76,7 @@ import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
@@ -127,6 +128,8 @@ import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.json.Json;
+
 /**
  * Class that "relates" Model & Storage
  * 
@@ -143,6 +146,7 @@ public class ModelService extends ModelObservable {
   private final EventsManager eventsManager;
   private final NodeType nodeType;
   private Object logFileLock = new Object();
+  private Object disposalConfirmationAIPFileLock = new Object();
   private String instanceId = "";
   private long entryLogLineNumber = -1;
 
@@ -3491,6 +3495,18 @@ public class ModelService extends ModelObservable {
     }
 
     return ret;
+  }
+
+  public void addAIPEntry(String disposalConfirmationId, DisposalConfirmationAIPEntry entry) throws RequestNotValidException {
+    boolean writeIsAllowed = RodaCoreFactory.checkIfWriteIsAllowed(nodeType);
+
+    synchronized (disposalConfirmationAIPFileLock) {
+
+      DefaultStoragePath storagePath = DefaultStoragePath.parse(ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId));
+
+
+      //JsonUtils.appendObjectToFile(entry,);
+    }
   }
 
   public DisposalConfirmationMetadata createDisposalConfirmationMetadata(

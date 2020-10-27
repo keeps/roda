@@ -71,7 +71,6 @@ public class Disposals extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-
       // delegate
       return BrowserHelper.updateDisposalSchedule(disposalSchedule, user);
     } catch (RODAException e) {
@@ -142,7 +141,6 @@ public class Disposals extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-
       // delegate
       return BrowserHelper.updateDisposalHold(disposalHold, user);
     } catch (RODAException e) {
@@ -181,10 +179,9 @@ public class Disposals extends RodaWuiController {
     return null;
   }
 
-  public static DisposalConfirmationMetadata createDisposalConfirmation(User user,
-    DisposalConfirmationMetadata confirmationMetadata, SelectedItems<IndexedAIP> objects)
-    throws AuthorizationDeniedException, AlreadyExistsException, NotFoundException, GenericException,
-    RequestNotValidException {
+  public static Job createDisposalConfirmation(User user, DisposalConfirmationMetadata confirmationMetadata,
+    SelectedItems<IndexedAIP> objects) throws AuthorizationDeniedException, AlreadyExistsException, NotFoundException,
+    GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -202,7 +199,10 @@ public class Disposals extends RodaWuiController {
 
       // Create the disposal confirmation metadata (storage & index)
 
-      return BrowserHelper.createDisposalConfirmationMetadata(confirmationMetadata, user);
+      DisposalConfirmationMetadata disposalConfirmationMetadata = BrowserHelper
+        .createDisposalConfirmationMetadata(confirmationMetadata, user);
+
+      return BrowserHelper.createDisposalConfirmationReport(user, objects, disposalConfirmationMetadata.getId());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;

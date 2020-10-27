@@ -38,6 +38,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
@@ -405,4 +406,6 @@ public interface BrowserService extends RemoteService {
 
   Job changeDisposalSchedule(SelectedItems<IndexedAIP> selected, String disposalScheduleId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  Job createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, DisposalConfirmationMetadata metadata) throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException, AlreadyExistsException;
 }

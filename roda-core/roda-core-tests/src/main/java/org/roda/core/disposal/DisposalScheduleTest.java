@@ -9,7 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 
 import org.roda.core.CorporaConstants;
@@ -18,13 +17,12 @@ import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.DisposalScheduleNotValidException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -172,7 +170,8 @@ public class DisposalScheduleTest {
 
     // Associate AIP with Disposal schedule
     aip.setDisposalScheduleId(disposalSchedule.getId());
-    //aip.setDestructionOn(new Date());
+    aip.setDisposalScheduleName("NORMAL");
+    // aip.setDestructionOn(new Date());
     aip.setDestructionApprovedBy(RodaConstants.ADMIN);
     model.updateAIP(aip, RodaConstants.ADMIN);
     index.commitAIPs();
