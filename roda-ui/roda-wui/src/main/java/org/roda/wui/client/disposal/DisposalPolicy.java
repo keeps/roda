@@ -13,6 +13,7 @@ import org.roda.wui.client.common.lists.utils.BasicTablePanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.hold.CreateDisposalHold;
+import org.roda.wui.client.disposal.hold.EditDisposalHold;
 import org.roda.wui.client.disposal.hold.ShowDisposalHold;
 import org.roda.wui.client.disposal.schedule.CreateDisposalSchedule;
 import org.roda.wui.client.disposal.schedule.ShowDisposalSchedule;
@@ -423,6 +424,8 @@ public class DisposalPolicy extends Composite {
       ShowDisposalHold.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(ShowDisposalSchedule.RESOLVER.getHistoryToken())) {
       ShowDisposalSchedule.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (historyTokens.get(0).equals(EditDisposalHold.RESOLVER.getHistoryToken())) {
+      EditDisposalHold.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     }
   }
 }

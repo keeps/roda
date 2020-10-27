@@ -25,6 +25,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
+import org.roda.wui.client.disposal.Disposal;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
@@ -55,29 +56,17 @@ public class DisposalHoldDataPanel extends Composite implements HasValueChangeHa
 
   private boolean editmode;
 
-  // has to be true to detected new field changes
-  private boolean changed = true;
+  private boolean changed = false;
   private boolean checked = false;
 
   @UiField
   HTML errors;
 
-  public DisposalHoldDataPanel(boolean visible, boolean editmode) {
-
+  public DisposalHoldDataPanel(DisposalHold disposalHold, boolean editmode) {
     initWidget(uiBinder.createAndBindUi(this));
 
     this.editmode = editmode;
-    super.setVisible(visible);
-
     errors.setVisible(false);
-
-    ValueChangeHandler<String> valueChangedHandler = new ValueChangeHandler<String>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<String> event) {
-        onChange();
-      }
-    };
 
     ChangeHandler changeHandler = new ChangeHandler() {
 
@@ -87,17 +76,21 @@ public class DisposalHoldDataPanel extends Composite implements HasValueChangeHa
       }
     };
 
-    KeyUpHandler keyUpHandler = new KeyUpHandler() {
+    title.addChangeHandler(changeHandler);
+    description.addChangeHandler(changeHandler);
+    mandate.addChangeHandler(changeHandler);
+    notes.addChangeHandler(changeHandler);
 
-      @Override
-      public void onKeyUp(KeyUpEvent event) {
-        onChange();
-      }
-    };
+    if(editmode){
+      setDiposalHold(disposalHold);
+    }
   }
 
   public void setDiposalHold(DisposalHold disposalHold) {
     this.title.setText(disposalHold.getTitle());
+    this.description.setText(disposalHold.getDescription());
+    this.mandate.setText(disposalHold.getMandate());
+    this.notes.setText(disposalHold.getScopeNotes());
   }
 
   public DisposalHold getDisposalHold() {
@@ -132,31 +125,11 @@ public class DisposalHoldDataPanel extends Composite implements HasValueChangeHa
     return errorList.isEmpty() ? true : false;
   }
 
-  public boolean isTitleReadOnly() {
-    return title.isReadOnly();
-  }
-
-  public void setTitleReadOnly(boolean readonly) {
-    title.setReadOnly(readonly);
-  }
-
-  public boolean isMandateReadOnly() {
-    return mandate.isReadOnly();
-  }
-
-  public void setMandateReadOnly(boolean readonly) {
-    mandate.setReadOnly(readonly);
-  }
-
-  @Override
-  public void setVisible(boolean visible) {
-    super.setVisible(visible);
-  }
-
   public void clear() {
     title.setText("");
     description.setText("");
     mandate.setText("");
+    notes.setText("");
   }
 
   public boolean isEditmode() {

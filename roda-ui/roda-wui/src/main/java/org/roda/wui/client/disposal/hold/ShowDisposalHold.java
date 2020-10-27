@@ -5,11 +5,13 @@ import java.util.List;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.DisposalPolicy;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -147,8 +149,15 @@ public class ShowDisposalHold extends Composite {
     Button editHoldBtn = new Button();
     editHoldBtn.addStyleName("btn btn-block btn-edit");
     editHoldBtn.setText(messages.editButton());
+    if(PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_UPDATE_DISPOSAL_HOLD)){
+      editHoldBtn.addClickHandler(new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent clickEvent) {
+          HistoryUtils.newHistory(EditDisposalHold.RESOLVER,disposalHold.getId());
+        }
+      });
+    }
     buttonsPanel.add(editHoldBtn);
-
 
     Button liftHoldBtn = new Button();
     liftHoldBtn.addStyleName("btn btn-block btn-danger btn-ban");
@@ -174,7 +183,7 @@ public class ShowDisposalHold extends Composite {
     return instance;
   }
 
-  void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
+  public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
 
       BrowserService.Util.getInstance().retrieveDisposalHold(historyTokens.get(0), new AsyncCallback<DisposalHold>() {

@@ -2053,8 +2053,12 @@ public interface ClientMessages extends Messages {
 
   String newDisposalScheduleTitle();
 
+  String editDisposalScheduleTitle();
+
   String newDisposalHoldTitle();
 
+  String editDisposalHoldTitle();
+  
   String createDisposalScheduleFailure(String reason);
 
   String createDisposalScheduleAlreadyExists(String title);
