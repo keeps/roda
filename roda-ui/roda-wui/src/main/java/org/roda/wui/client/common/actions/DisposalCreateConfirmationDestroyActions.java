@@ -8,6 +8,7 @@ import java.util.Set;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
@@ -118,7 +119,40 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
             @Override
             public void onSuccess(Boolean result) {
               if (result) {
+                BrowserService.Util.getInstance().createDisposalConfirmationReport(selectedItemsList,
+                  new DisposalConfirmationMetadata(), new ActionAsyncCallback<Job>(callback) {
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      callback.onFailure(caught);
+                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                    }
 
+                    @Override
+                    public void onSuccess(Job job) {
+                      Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+
+                        @Override
+                        public void onFailure(Throwable caught) {
+                          Timer timer = new Timer() {
+                            @Override
+                            public void run() {
+                              Toast.showInfo(messages.changeDisposalScheduleSuccessTitle(),
+                                messages.changeDisposalScheduleSuccessMessage(size));
+                              doActionCallbackUpdated();
+                            }
+                          };
+
+                          timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                        }
+
+                        @Override
+                        public void onSuccess(final Void nothing) {
+                          doActionCallbackNone();
+                          HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                        }
+                      });
+                    }
+                  });
               } else {
                 doActionCallbackNone();
               }

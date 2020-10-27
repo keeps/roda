@@ -29,6 +29,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
@@ -306,4 +307,6 @@ public interface BrowserServiceAsync {
   void deleteDisposalHold(String disposalHoldId, AsyncCallback<Void> async);
 
   void changeDisposalSchedule(SelectedItems<IndexedAIP> selected, String disposalScheduleId, AsyncCallback<Job> async);
+
+  void createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, DisposalConfirmationMetadata metadata, AsyncCallback<Job> async);
 }

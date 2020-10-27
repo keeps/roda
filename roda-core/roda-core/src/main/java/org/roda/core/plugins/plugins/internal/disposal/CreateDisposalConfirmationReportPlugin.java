@@ -1,0 +1,212 @@
+package org.roda.core.plugins.plugins.internal.disposal;
+
+import static org.roda.core.data.common.RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE;
+import static org.roda.core.data.common.RodaConstants.PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID;
+import static org.roda.core.data.common.RodaConstants.PreservationEventType;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.index.IndexService;
+import org.roda.core.model.ModelService;
+import org.roda.core.plugins.AbstractPlugin;
+import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAObjectsProcessingLogic;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.storage.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * @author Miguel Guimarães <mguimaraes@keep.pt>
+ */
+public class CreateDisposalConfirmationReportPlugin extends AbstractPlugin<AIP> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(CreateDisposalConfirmationReportPlugin.class);
+
+  private String disposalScheduleId;
+
+  private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
+  static {
+    pluginParameters.put(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID,
+      new PluginParameter(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID, "Disposal schedule id",
+        PluginParameter.PluginParameterType.STRING, "", true, false, "Disposal schedule identifier"));
+  }
+
+  @Override
+  public List<PluginParameter> getParameters() {
+    ArrayList<PluginParameter> parameters = new ArrayList<>();
+    parameters.add(pluginParameters.get(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID));
+    return parameters;
+  }
+
+  @Override
+  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
+    if (parameters.containsKey(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID)) {
+      disposalScheduleId = parameters.get(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID);
+    }
+  }
+
+  @Override
+  public String getVersionImpl() {
+    return "1.0";
+  }
+
+  public static String getStaticName() {
+    return "Create disposal confirmation report";
+  }
+
+  @Override
+  public String getName() {
+    return getStaticName();
+  }
+
+  public static String getStaticDescription() {
+    return "";
+  }
+
+  @Override
+  public String getDescription() {
+    return getStaticDescription();
+  }
+
+  @Override
+  public PreservationEventType getPreservationEventType() {
+    return PreservationEventType.POLICY_ASSIGNMENT;
+  }
+
+  @Override
+  public String getPreservationEventDescription() {
+    return "Create disposal confirmation report";
+  }
+
+  @Override
+  public String getPreservationEventSuccessMessage() {
+    return "AIP was successfully associated to disposal confirmation report";
+  }
+
+  @Override
+  public String getPreservationEventFailureMessage() {
+    return "Failed to associate AIP to disposal confirmation report";
+  }
+
+  @Override
+  public void init() throws PluginException {
+    // do nothing
+  }
+
+  @Override
+  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
+    // do nothing
+    return null;
+  }
+
+  @Override
+  public Report execute(IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> liteList) throws PluginException {
+    return PluginHelper.processObjects(this,
+      (RODAObjectsProcessingLogic<AIP>) (index1, model1, storage1, report, cachedJob, jobPluginInfo, plugin,
+        objects) -> processAIP(model1, index1, report, jobPluginInfo, cachedJob, objects),
+      index, model, storage, liteList);
+  }
+
+  private void processAIP(ModelService model, IndexService index, Report report, JobPluginInfo jobPluginInfo,
+    Job cachedJob, List<AIP> aips) {
+
+    // try {
+    for (AIP aip : aips) {
+      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
+      LOGGER.debug("Processing AIP {}", aip.getId());
+
+
+
+      // aip.setDisposalScheduleId(disposalScheduleId);
+      // try {
+      // model.updateAIP(aip, cachedJob.getUsername());
+      // disposalSchedule.incrementNumberOfAIPsByOne();
+      // reportItem.setPluginState(PluginState.SUCCESS);
+      // reportItem.setPluginDetails("Apply disposal schedule: " +
+      // disposalScheduleId);
+      // jobPluginInfo.incrementObjectsProcessedWithSuccess();
+      //
+      // } catch (NotFoundException | RequestNotValidException |
+      // AuthorizationDeniedException e) {
+      // LOGGER.error("Error applying disposal schedule {} to {}: {}",
+      // disposalScheduleId, aip.getId(), e.getMessage(),
+      // e);
+      // jobPluginInfo.incrementObjectsProcessedWithFailure();
+      // reportItem.setPluginState(PluginState.FAILURE)
+      // .setPluginDetails("Error applying disposal schedule " + aip.getId() + ": " +
+      // e.getMessage());
+      // } finally {
+      // report.addReport(reportItem);
+      // PluginHelper.updatePartialJobReport(this, model, reportItem, true,
+      // cachedJob);
+      // }
+      //
+      // try {
+      // PluginHelper.createPluginEvent(this, aip.getId(), model, index, null, null,
+      // reportItem.getPluginState(), "",
+      // true, cachedJob);
+      // } catch (ValidationException | RequestNotValidException | NotFoundException |
+      // GenericException
+      // | AuthorizationDeniedException | AlreadyExistsException e) {
+      // LOGGER.error("Error creating event: {}", e.getMessage(), e);
+      // }
+    }
+    // } catch (GenericException e) {
+    // report.setPluginState(PluginState.FAILURE)
+    // .setPluginDetails("Failed to create disposal confirmation report");
+    // }
+  }
+
+  @Override
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+    // do nothing
+    return null;
+  }
+
+  @Override
+  public void shutdown() {
+    // do nothing
+  }
+
+  @Override
+  public List<Class<AIP>> getObjectClasses() {
+    return Collections.singletonList(AIP.class);
+  }
+
+  @Override
+  public PluginType getType() {
+    return PluginType.AIP_TO_AIP;
+  }
+
+  @Override
+  public List<String> getCategories() {
+    return Collections.singletonList(PLUGIN_CATEGORY_NOT_LISTABLE);
+  }
+
+  @Override
+  public Plugin<AIP> cloneMe() {
+    return new CreateDisposalConfirmationReportPlugin();
+  }
+
+  @Override
+  public boolean areParameterValuesValid() {
+    return true;
+  }
+}
