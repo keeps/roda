@@ -579,6 +579,7 @@ public final class RodaConstants {
    * Disposal Confirmation
    */
   public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME = "metadata.json";
+  public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME = "aips.json";
 
   public static final String STORAGE_HISTORY_CONTAINER_DATA = "data";
   public static final String STORAGE_HISTORY_CONTAINER_METADATA = "metadata";
@@ -950,7 +951,8 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_INCLUDE_SCHEMAS = "parameter.include_schemas";
   public static final String PLUGIN_PARAMS_INCLUDE_DOCUMENTATION = "parameter.include_documentation";
 
-  public static final String PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID = "paramter.disposal_schedule_id";
+  public static final String PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID = "parameter.disposal_schedule_id";
+  public static final String PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID = "parameter.disposal_schedule_id";
 
   public static final String PLUGIN_CATEGORY_CONVERSION = "conversion";
   public static final String PLUGIN_CATEGORY_CHARACTERIZATION = "characterization";
