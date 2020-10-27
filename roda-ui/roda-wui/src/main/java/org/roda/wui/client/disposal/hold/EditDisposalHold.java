@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.roda.core.data.exceptions.DisposalHoldAlreadyExistsException;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.disposal.DisposalPolicy;
@@ -28,13 +29,26 @@ import config.i18n.client.ClientMessages;
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
  */
-public class CreateDisposalHold extends Composite {
+public class EditDisposalHold extends Composite {
+
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      CreateDisposalHold createDisposalHold = new CreateDisposalHold(new DisposalHold());
-      callback.onSuccess(createDisposalHold);
+      if (historyTokens.size() == 1) {
+        BrowserService.Util.getInstance().retrieveDisposalHold(historyTokens.get(0), new AsyncCallback<DisposalHold>() {
+          @Override
+          public void onFailure(Throwable caught) {
+            callback.onFailure(caught);
+          }
+
+          @Override
+          public void onSuccess(DisposalHold result) {
+            EditDisposalHold panel = new EditDisposalHold(result);
+            callback.onSuccess(panel);
+          }
+        });
+      }
     }
 
     @Override
@@ -49,18 +63,27 @@ public class CreateDisposalHold extends Composite {
 
     @Override
     public String getHistoryToken() {
-      return "create_disposal_hold";
+      return "edit_disposal_hold";
     }
   };
 
-  interface MyUiBinder extends UiBinder<Widget, CreateDisposalHold> {
+  interface MyUiBinder extends UiBinder<Widget, EditDisposalHold> {
   }
 
-  private static CreateDisposalHold.MyUiBinder uiBinder = GWT.create(CreateDisposalHold.MyUiBinder.class);
+  private static EditDisposalHold instance = null;
+
+  private static EditDisposalHold.MyUiBinder uiBinder = GWT.create(EditDisposalHold.MyUiBinder.class);
 
   private DisposalHold disposalHold;
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+
+  public static EditDisposalHold getInstance() {
+    if (instance == null) {
+      instance = new EditDisposalHold();
+    }
+    return instance;
+  }
 
   @UiField
   Button buttonApply;
@@ -71,9 +94,13 @@ public class CreateDisposalHold extends Composite {
   @UiField(provided = true)
   DisposalHoldDataPanel disposalHoldDataPanel;
 
-  public CreateDisposalHold(DisposalHold disposalHold) {
+  public EditDisposalHold(){
+      initWidget(uiBinder.createAndBindUi(this));
+  }
+
+  public EditDisposalHold(DisposalHold disposalHold) {
     this.disposalHold = disposalHold;
-    this.disposalHoldDataPanel = new DisposalHoldDataPanel(disposalHold, false);
+    this.disposalHoldDataPanel = new DisposalHoldDataPanel(disposalHold, true);
 
     initWidget(uiBinder.createAndBindUi(this));
   }
@@ -86,10 +113,13 @@ public class CreateDisposalHold extends Composite {
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
-    if (disposalHoldDataPanel.isValid()) {
-      disposalHold = disposalHoldDataPanel.getDisposalHold();
-      BrowserServiceImpl.Util.getInstance().createDisposalHold(disposalHold, new AsyncCallback<DisposalHold>() {
-
+    if(disposalHoldDataPanel.isChanged() && disposalHoldDataPanel.isValid()) {
+      DisposalHold disposalHoldUpdated = disposalHoldDataPanel.getDisposalHold();
+      disposalHold.setTitle(disposalHoldUpdated.getTitle());
+      disposalHold.setMandate(disposalHoldUpdated.getMandate());
+      disposalHold.setDescription(disposalHoldUpdated.getDescription());
+      disposalHold.setScopeNotes(disposalHoldUpdated.getScopeNotes());
+      BrowserServiceImpl.Util.getInstance().updateDisposalHold(disposalHold, new AsyncCallback<DisposalHold>() {
         @Override
         public void onFailure(Throwable caught) {
           errorMessage(caught);
@@ -100,16 +130,14 @@ public class CreateDisposalHold extends Composite {
           HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
         }
       });
+    }else{
+      HistoryUtils.newHistory(ShowDisposalHold.RESOLVER,disposalHold.getId());
     }
 
   }
 
   @UiHandler("buttonCancel")
   void buttonCancelHandler(ClickEvent e) {
-    cancel();
-  }
-
-  private void cancel() {
     HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
   }
 
@@ -120,5 +148,4 @@ public class CreateDisposalHold extends Composite {
       Toast.showError(messages.createDisposalHoldFailure(caught.getMessage()));
     }
   }
-
 }
