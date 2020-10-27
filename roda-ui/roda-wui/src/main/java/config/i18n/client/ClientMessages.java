@@ -1993,6 +1993,10 @@ public interface ClientMessages extends Messages {
 
   String disposalPolicyTitle();
 
+  String disposalSchedulesTitle();
+
+  String disposalHoldsTitle();
+
   String disposalDestroyedRecordsTitle();
 
   String disposalConfirmationsTitle();
