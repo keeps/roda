@@ -75,7 +75,7 @@ public class CreateDisposalSchedule extends Composite {
   public CreateDisposalSchedule(DisposalSchedule disposalSchedule) {
     this.disposalSchedule = disposalSchedule;
 
-    this.disposalScheduleDataPanel = new DisposalScheduleDataPanel(true, false);
+    this.disposalScheduleDataPanel = new DisposalScheduleDataPanel(disposalSchedule, false);
     this.disposalScheduleDataPanel.setDisposalSchedule(disposalSchedule);
 
     initWidget(uiBinder.createAndBindUi(this));

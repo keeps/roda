@@ -35,7 +35,7 @@
                     <ui:text from='{messages.disposalScheduleNotes}' />
                 </g:Label>
                 <g:TextArea title="{messages.disposalScheduleNotes}" ui:field="notes" addStyleNames="disposalScopeNotes form-textbox" />
-                <g:Label addStyleNames="form-label">
+                <g:Label ui:field="disposalActionsLabel" addStyleNames="form-label">
                     <ui:text from='{messages.disposalScheduleActionCol}' />
                 </g:Label>
                 <g:Label ui:field="disposalActionsError" addStyleNames="form-label-error"></g:Label>
