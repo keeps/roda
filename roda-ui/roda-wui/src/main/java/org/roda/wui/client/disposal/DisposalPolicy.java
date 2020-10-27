@@ -161,7 +161,7 @@ public class DisposalPolicy extends Composite {
     contentDisposalSchedulesTable.addStyleName("basicTable");
     // Disposal schedules table
     if (disposalSchedules.getObjects().isEmpty()) {
-      Label label = new HTML(SafeHtmlUtils.fromSafeConstant(messages.noItemsToDisplayPreFilters(messages.someOfAObject(disposalSchedules.getClass().getName())));
+      Label label = new HTML(SafeHtmlUtils.fromSafeConstant(messages.noItemsToDisplayPreFilters(messages.someOfAObject(disposalSchedules.getClass().getName()))));
       label.addStyleName("basicTableEmpty");
       contentDisposalSchedulesTable.add(label);
     } else {

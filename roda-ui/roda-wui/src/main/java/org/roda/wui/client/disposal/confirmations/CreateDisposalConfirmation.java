@@ -91,7 +91,8 @@ public class CreateDisposalConfirmation extends Composite {
   public CreateDisposalConfirmation() {
     ListBuilder<IndexedAIP> overdueRecordsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
       new AsyncTableCellOptions<>(IndexedAIP.class, "DisposalOverdueRecords_aip").withSummary(messages.listOfAIPs())
-        .withFilter(SHOW_RECORDS_TO_DESTROY).withActionable(DisposalCreateConfirmationDestroyActions.get())
+        //.withFilter(SHOW_RECORDS_TO_DESTROY)
+          .withActionable(DisposalCreateConfirmationDestroyActions.get())
         .bindOpener());
     overdueRecordsSearch = new SearchWrapper(false).createListAndSearchPanel(overdueRecordsListBuilder);
 
@@ -107,7 +108,8 @@ public class CreateDisposalConfirmation extends Composite {
     destroyScheduleOpt.addValueChangeHandler(valueChangeEvent -> {
       ListBuilder<IndexedAIP> overdueRecordsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
         new AsyncTableCellOptions<>(IndexedAIP.class, "DisposalOverdueRecords_aip").withSummary(messages.listOfAIPs())
-          .withFilter(SHOW_RECORDS_TO_DESTROY).withActionable(DisposalCreateConfirmationDestroyActions.get())
+          //.withFilter(SHOW_RECORDS_TO_DESTROY)
+            .withActionable(DisposalCreateConfirmationDestroyActions.get())
           .bindOpener());
       content.remove(overdueRecordsSearch);
       overdueRecordsSearch = new SearchWrapper(false).createListAndSearchPanel(overdueRecordsListBuilder);
@@ -118,7 +120,9 @@ public class CreateDisposalConfirmation extends Composite {
     reviewScheduleOpt.addValueChangeHandler(valueChangeEvent -> {
       ListBuilder<IndexedAIP> overdueRecordsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
         new AsyncTableCellOptions<>(IndexedAIP.class, "DisposalOverdueRecords_aip").withSummary(messages.listOfAIPs())
-          .withFilter(SHOW_RECORDS_TO_REVIEW).withActionable(DisposalCreateConfirmationReviewActions.get())
+
+            //.withFilter(SHOW_RECORDS_TO_REVIEW)
+            .withActionable(DisposalCreateConfirmationReviewActions.get())
           .bindOpener());
       content.remove(overdueRecordsSearch);
       overdueRecordsSearch = new SearchWrapper(false).createListAndSearchPanel(overdueRecordsListBuilder);

@@ -3502,8 +3502,9 @@ public class ModelService extends ModelObservable {
 
     synchronized (disposalConfirmationAIPFileLock) {
 
-      DefaultStoragePath storagePath = DefaultStoragePath.parse(ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId));
+      DefaultStoragePath confirmationPath = DefaultStoragePath.parse(ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId));
 
+      Path entityPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);
 
       //JsonUtils.appendObjectToFile(entry,);
     }
