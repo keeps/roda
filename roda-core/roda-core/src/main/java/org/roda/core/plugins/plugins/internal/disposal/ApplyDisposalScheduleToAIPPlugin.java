@@ -100,12 +100,12 @@ public class ApplyDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Disposal schedule was successfully applied to AIP";
+    return "";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Failed to apply the disposal schedule to AIP";
+    return "";
   }
 
   @Override
@@ -143,6 +143,7 @@ public class ApplyDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
       }
 
       for (AIP aip : aips) {
+        String outcomeText = "";
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
         PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
         LOGGER.debug("Processing AIP {}", aip.getId());
@@ -154,21 +155,24 @@ public class ApplyDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
           reportItem.setPluginState(PluginState.SUCCESS);
           reportItem.setPluginDetails("Apply disposal schedule: " + disposalScheduleId);
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
-
+          outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule("was successfully applied to AIP",
+            disposalSchedule.getId(), disposalSchedule.getTitle());
         } catch (NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
           LOGGER.error("Error applying disposal schedule {} to {}: {}", disposalScheduleId, aip.getId(), e.getMessage(),
             e);
           jobPluginInfo.incrementObjectsProcessedWithFailure();
           reportItem.setPluginState(PluginState.FAILURE)
             .setPluginDetails("Error applying disposal schedule " + aip.getId() + ": " + e.getMessage());
+          outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(" failed to be applied to AIP",
+            disposalSchedule.getId(), disposalSchedule.getTitle());
         } finally {
           report.addReport(reportItem);
           PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
         }
 
         try {
-          PluginHelper.createPluginEvent(this, aip.getId(), model, index, null, null, reportItem.getPluginState(), "",
-            true, cachedJob);
+          PluginHelper.createPluginEvent(this, aip.getId(), model, index, null, null, reportItem.getPluginState(),
+            outcomeText, true, cachedJob);
         } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
           | AuthorizationDeniedException | AlreadyExistsException e) {
           LOGGER.error("Error creating event: {}", e.getMessage(), e);

@@ -71,12 +71,12 @@ public class DisposalScheduleRemoverPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Disposal schedule removal was successful";
+    return "";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Disposal schedule removal failed";
+    return "";
   }
 
   @Override
@@ -103,12 +103,14 @@ public class DisposalScheduleRemoverPlugin extends AbstractPlugin<AIP> {
   private void processAIP(ModelService model, IndexService index, Report report, JobPluginInfo jobPluginInfo,
     Job cachedJob, List<AIP> objects) {
     for (AIP aip : objects) {
+      String outcomeText = "";
+      DisposalSchedule disposalSchedule = null;
       Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
       PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
       LOGGER.debug("Processing AIP {}", aip.getId());
       String disposalScheduleId = aip.getDisposalScheduleId();
       try {
-        DisposalSchedule disposalSchedule = model.retrieveDisposalSchedule(disposalScheduleId);
+        disposalSchedule = model.retrieveDisposalSchedule(disposalScheduleId);
         disposalSchedule.decreaseNumberOfAIPsByOne();
         aip.setDisposalScheduleId(null);
 
@@ -119,23 +121,27 @@ public class DisposalScheduleRemoverPlugin extends AbstractPlugin<AIP> {
         reportItem.setPluginDetails("Remove disposal schedule: " + disposalScheduleId);
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
 
+        outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(" was successfully disassociated from AIP",
+          disposalSchedule.getId(), disposalSchedule.getTitle());
+
       } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-        LOGGER.error("Error removing disposal schedule {} to {}: {}", disposalScheduleId, aip.getId(), e.getMessage(),
-          e);
+        LOGGER.error("Error removing disposal schedule {} from AIP {}: {}", disposalScheduleId, aip.getId(),
+          e.getMessage(), e);
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         reportItem.setPluginState(PluginState.FAILURE)
           .setPluginDetails("Error removing disposal schedule " + aip.getId() + ": " + e.getMessage());
 
+        PluginHelper.createOutcomeTextForDisposalSchedule("failed to be applied to AIP", disposalScheduleId, null);
       } finally {
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
       }
 
       try {
-        PluginHelper.createPluginEvent(this, aip.getId(), model, index, null, null, reportItem.getPluginState(), "",
-            true, cachedJob);
+        PluginHelper.createPluginEvent(this, aip.getId(), model, index, null, null, reportItem.getPluginState(),
+          outcomeText, true, cachedJob);
       } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
-          | AuthorizationDeniedException | AlreadyExistsException e) {
+        | AuthorizationDeniedException | AlreadyExistsException e) {
         LOGGER.error("Error creating event: {}", e.getMessage(), e);
       }
     }
