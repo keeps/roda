@@ -258,22 +258,13 @@ public class DisposalConfirmationMetadata implements IsModelObject, IsIndexed, H
     return Collections.singletonList(RodaConstants.INDEX_UUID);
   }
 
-  /**
-   * Return fields as they are indexed
-   *
-   * @return
-   */
+  @JsonIgnore
   @Override
   public Map<String, Object> getFields() {
     return fields;
   }
 
-  /**
-   * Set fields as they are indexed
-   *
-   * @param fields
-   * @return
-   */
+  @JsonIgnore
   @Override
   public void setFields(Map<String, Object> fields) {
     this.fields = fields;

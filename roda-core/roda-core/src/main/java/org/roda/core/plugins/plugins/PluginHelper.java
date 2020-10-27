@@ -1735,6 +1735,20 @@ public final class PluginHelper {
     }
   }
 
+  public static String createOutcomeTextForDisposalSchedule(String actionMessage, String disposalScheduleId,
+    String disposalScheduleTitle) {
+    StringBuilder outcomeText = new StringBuilder("Disposal schedule");
+
+    if (StringUtils.isNotBlank(disposalScheduleTitle)) {
+      outcomeText.append(" '").append(disposalScheduleTitle).append("'");
+    }
+
+    outcomeText.append(" (").append(disposalScheduleId).append(") ");
+    outcomeText.append(actionMessage);
+
+    return outcomeText.toString();
+  }
+
   public static String createOutcomeTextForAIP(IndexedAIP item, String actionMessage) {
     SimpleDateFormat format = new SimpleDateFormat(RodaConstants.SIMPLE_DATE_FORMATTER);
     StringBuilder outcomeText = new StringBuilder("Archival Information Package [id: ").append(item.getId());
