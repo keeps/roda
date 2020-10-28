@@ -3476,7 +3476,7 @@ public class ModelService extends ModelObservable {
 
     // check if the disposal schedule was used to destroy an AIP
     // if so, block the action and keep the disposal schedule
-    if (retrieveDisposalSchedule(disposalScheduleId).getDestroyedTimestamp() == null) {
+    if (retrieveDisposalSchedule(disposalScheduleId).getFirstTimeUsed() == null) {
       // remove it from storage
       storage.deleteResource(disposalSchedulePath);
     } else {

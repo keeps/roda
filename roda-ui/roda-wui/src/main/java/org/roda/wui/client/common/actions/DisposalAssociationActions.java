@@ -81,7 +81,7 @@ public class DisposalAssociationActions extends AbstractActionable<IndexedAIP> {
     BrowserService.Util.getInstance().listDisposalSchedules(new ActionNoAsyncCallback<DisposalSchedules>(callback) {
       @Override
       public void onSuccess(DisposalSchedules schedules) {
-        schedules.getObjects().removeIf(schedule -> DisposalScheduleState.ARCHIVED.equals(schedule.getState()));
+        schedules.getObjects().removeIf(schedule -> DisposalScheduleState.INACTIVE.equals(schedule.getState()));
         DisposalDialogs.showDisposalScheduleSelection(messages.disposalScheduleSelectionDialogTitle(), schedules,
           new ActionNoAsyncCallback<DisposalSchedule>(callback) {
             @Override
