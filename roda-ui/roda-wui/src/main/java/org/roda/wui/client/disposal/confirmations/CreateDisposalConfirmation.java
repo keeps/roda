@@ -6,6 +6,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.DisposalCreateConfirmationDestroyActions;
 import org.roda.wui.client.common.actions.DisposalCreateConfirmationReviewActions;
@@ -34,9 +35,13 @@ import config.i18n.client.ClientMessages;
  */
 public class CreateDisposalConfirmation extends Composite {
   private static final Filter SHOW_RECORDS_TO_REVIEW = new Filter(
-    new SimpleFilterParameter(RodaConstants.AIP_TITLE, "collection 1"));
+    new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_ACTION, DisposalActionCode.REVIEW.name())
+  // ,new EmptyKeyFilterParameter(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID)
+  );
   private static final Filter SHOW_RECORDS_TO_DESTROY = new Filter(
-    new SimpleFilterParameter(RodaConstants.AIP_TITLE, "IM393564.7z"));
+    new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_ACTION, DisposalActionCode.DESTROY.name())
+  // ,new EmptyKeyFilterParameter(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID)
+  );
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
     @Override
@@ -91,9 +96,8 @@ public class CreateDisposalConfirmation extends Composite {
   public CreateDisposalConfirmation() {
     ListBuilder<IndexedAIP> overdueRecordsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
       new AsyncTableCellOptions<>(IndexedAIP.class, "DisposalOverdueRecords_aip").withSummary(messages.listOfAIPs())
-        //.withFilter(SHOW_RECORDS_TO_DESTROY)
-          .withActionable(DisposalCreateConfirmationDestroyActions.get())
-        .bindOpener());
+        .withFilter(SHOW_RECORDS_TO_DESTROY).withActionable(DisposalCreateConfirmationDestroyActions.get())
+        .withJustActive(true).bindOpener());
     overdueRecordsSearch = new SearchWrapper(false).createListAndSearchPanel(overdueRecordsListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
@@ -108,9 +112,8 @@ public class CreateDisposalConfirmation extends Composite {
     destroyScheduleOpt.addValueChangeHandler(valueChangeEvent -> {
       ListBuilder<IndexedAIP> overdueRecordsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
         new AsyncTableCellOptions<>(IndexedAIP.class, "DisposalOverdueRecords_aip").withSummary(messages.listOfAIPs())
-          //.withFilter(SHOW_RECORDS_TO_DESTROY)
-            .withActionable(DisposalCreateConfirmationDestroyActions.get())
-          .bindOpener());
+          .withFilter(SHOW_RECORDS_TO_DESTROY).withActionable(DisposalCreateConfirmationDestroyActions.get())
+          .withJustActive(true).bindOpener());
       content.remove(overdueRecordsSearch);
       overdueRecordsSearch = new SearchWrapper(false).createListAndSearchPanel(overdueRecordsListBuilder);
       content.add(overdueRecordsSearch);
@@ -120,10 +123,8 @@ public class CreateDisposalConfirmation extends Composite {
     reviewScheduleOpt.addValueChangeHandler(valueChangeEvent -> {
       ListBuilder<IndexedAIP> overdueRecordsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
         new AsyncTableCellOptions<>(IndexedAIP.class, "DisposalOverdueRecords_aip").withSummary(messages.listOfAIPs())
-
-            //.withFilter(SHOW_RECORDS_TO_REVIEW)
-            .withActionable(DisposalCreateConfirmationReviewActions.get())
-          .bindOpener());
+          .withFilter(SHOW_RECORDS_TO_REVIEW).withActionable(DisposalCreateConfirmationReviewActions.get())
+          .withJustActive(true).bindOpener());
       content.remove(overdueRecordsSearch);
       overdueRecordsSearch = new SearchWrapper(false).createListAndSearchPanel(overdueRecordsListBuilder);
       content.add(overdueRecordsSearch);

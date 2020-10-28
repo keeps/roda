@@ -14,12 +14,12 @@ public class DisposalConfirmationAIPEntry implements IsModelObject {
   private static final long serialVersionUID = 3298601603286113188L;
 
   private String aipId;
-  private String aipName;
+  private String aipTitle;
   private String aipLevel;
   private String aipCollection;
   private Date aipCreationDate;
   private Date aipOverdueDate;
-  private int aipNumberOfFiles;
+  private long aipNumberOfFiles;
   private long aipSize;
   private String aipDisposalScheduleId;
   private List<String> aipDisposalHoldIds;
@@ -46,12 +46,12 @@ public class DisposalConfirmationAIPEntry implements IsModelObject {
     this.aipId = aipId;
   }
 
-  public String getAipName() {
-    return aipName;
+  public String getAipTitle() {
+    return aipTitle;
   }
 
-  public void setAipName(String aipName) {
-    this.aipName = aipName;
+  public void setAipTitle(String aipTitle) {
+    this.aipTitle = aipTitle;
   }
 
   public String getAipLevel() {
@@ -86,11 +86,11 @@ public class DisposalConfirmationAIPEntry implements IsModelObject {
     this.aipOverdueDate = aipOverdueDate;
   }
 
-  public int getAipNumberOfFiles() {
+  public long getAipNumberOfFiles() {
     return aipNumberOfFiles;
   }
 
-  public void setAipNumberOfFiles(int aipNumberOfFiles) {
+  public void setAipNumberOfFiles(long aipNumberOfFiles) {
     this.aipNumberOfFiles = aipNumberOfFiles;
   }
 
@@ -126,7 +126,7 @@ public class DisposalConfirmationAIPEntry implements IsModelObject {
       return false;
     DisposalConfirmationAIPEntry that = (DisposalConfirmationAIPEntry) o;
     return getAipNumberOfFiles() == that.getAipNumberOfFiles() && getAipSize() == that.getAipSize()
-      && Objects.equals(getAipId(), that.getAipId()) && Objects.equals(getAipName(), that.getAipName())
+      && Objects.equals(getAipId(), that.getAipId()) && Objects.equals(getAipTitle(), that.getAipTitle())
       && Objects.equals(getAipLevel(), that.getAipLevel())
       && Objects.equals(getAipCollection(), that.getAipCollection())
       && Objects.equals(getAipCreationDate(), that.getAipCreationDate())
@@ -137,13 +137,13 @@ public class DisposalConfirmationAIPEntry implements IsModelObject {
 
   @Override
   public int hashCode() {
-    return Objects.hash(getAipId(), getAipName(), getAipLevel(), getAipCollection(), getAipCreationDate(),
+    return Objects.hash(getAipId(), getAipTitle(), getAipLevel(), getAipCollection(), getAipCreationDate(),
       getAipOverdueDate(), getAipNumberOfFiles(), getAipSize(), getAipDisposalScheduleId(), getAipDisposalHoldIds());
   }
 
   @Override
   public String toString() {
-    return "DisposalConfirmationAIPEntry{" + "aipId='" + aipId + '\'' + ", aipName='" + aipName + '\'' + ", aipLevel='"
+    return "DisposalConfirmationAIPEntry{" + "aipId='" + aipId + '\'' + ", aipName='" + aipTitle + '\'' + ", aipLevel='"
       + aipLevel + '\'' + ", aipCollection='" + aipCollection + '\'' + ", aipCreationDate=" + aipCreationDate
       + ", aipOverdueDate=" + aipOverdueDate + ", aipNumberOfFiles=" + aipNumberOfFiles + ", aipSize=" + aipSize
       + ", aipDisposalScheduleId='" + aipDisposalScheduleId + '\'' + ", aipDisposalHoldIds=" + aipDisposalHoldIds + '}';
