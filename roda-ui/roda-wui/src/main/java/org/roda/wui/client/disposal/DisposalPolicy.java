@@ -12,6 +12,7 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
+import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.disposal.hold.CreateDisposalHold;
 import org.roda.wui.client.disposal.hold.EditDisposalHold;
 import org.roda.wui.client.disposal.hold.ShowDisposalHold;
@@ -106,6 +107,15 @@ public class DisposalPolicy extends Composite {
 
   @UiField
   FlowPanel newDisposalHold;
+
+  @UiField
+  FlowPanel contentFlowPanel;
+
+  @UiField
+  FlowPanel sidebarFlowPanel;
+
+  @UiField
+  FlowPanel buttonsPanel;
 
   private DisposalSchedules disposalSchedules;
   private DisposalHolds disposalHolds;
@@ -209,15 +219,23 @@ public class DisposalPolicy extends Composite {
     }
   }
 
-  private void initButtons() {
-    initNewDisposalScheduleButton();
-    initNewDisposalHoldButton();
+  private boolean initSidebarButtons(FlowPanel panel) {
+    boolean hasCreatedNewScheduleBtn = initNewDisposalScheduleButton(panel,true);
+    boolean hasCreatedNewHoldBtn = initNewDisposalHoldButton(panel,true);
+
+    if (hasCreatedNewScheduleBtn || hasCreatedNewHoldBtn) {
+      return true;
+    }
+    return false;
   }
 
-  private void initNewDisposalScheduleButton() {
+  private boolean initNewDisposalScheduleButton(FlowPanel panel, boolean isGroup) {
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_SCHEDULE)) {
       Button newDisposalScheduleBtn = new Button();
       newDisposalScheduleBtn.addStyleName("btn btn-plus");
+      if(isGroup){
+        newDisposalScheduleBtn.addStyleName("btn-block");
+      }
       newDisposalScheduleBtn.setText(messages.newDisposalScheduleTitle());
       newDisposalScheduleBtn.addClickHandler(new ClickHandler() {
 
@@ -226,14 +244,19 @@ public class DisposalPolicy extends Composite {
           HistoryUtils.newHistory(CreateDisposalSchedule.RESOLVER);
         }
       });
-      newDisposalSchedule.add(newDisposalScheduleBtn);
+      panel.add(newDisposalScheduleBtn);
+      return true;
     }
+    return false;
   }
 
-  private void initNewDisposalHoldButton() {
+  private boolean initNewDisposalHoldButton(FlowPanel panel, boolean isGroup) {
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_HOLD)) {
       Button newDisposalHoldBtn = new Button();
       newDisposalHoldBtn.addStyleName("btn btn-plus");
+      if(isGroup){
+        newDisposalHoldBtn.addStyleName("btn-block");
+      }
       newDisposalHoldBtn.setText(messages.newDisposalHoldTitle());
       newDisposalHoldBtn.addClickHandler(new ClickHandler() {
 
@@ -243,13 +266,23 @@ public class DisposalPolicy extends Composite {
             CreateDisposalHold.RESOLVER.getHistoryToken());
         }
       });
-      newDisposalHold.add(newDisposalHoldBtn);
+      panel.add(newDisposalHoldBtn);
+      return true;
     }
+    return false;
   }
 
   private DisposalPolicy() {
     initWidget(uiBinder.createAndBindUi(this));
     disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
+  }
+
+  private void initSidebar() {
+    if (initSidebarButtons(buttonsPanel)) {
+      SidebarUtils.showSidebar(contentFlowPanel, sidebarFlowPanel);
+    } else {
+      SidebarUtils.hideSidebar(contentFlowPanel, sidebarFlowPanel);
+    }
   }
 
   private DisposalPolicy(DisposalSchedules disposalSchedules) {
@@ -258,10 +291,14 @@ public class DisposalPolicy extends Composite {
     contentDisposalHoldsTable.setVisible(false);
     newDisposalHold.setVisible(false);
 
-    initButtons();
+    initSidebar();
 
     // Disposal schedules table
     createDisposalSchedulesPanel(disposalSchedules);
+
+    // create buttons under tables
+    initNewDisposalScheduleButton(newDisposalSchedule,false);
+    initNewDisposalHoldButton(newDisposalHold,false);
 
     disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
   }
@@ -272,10 +309,14 @@ public class DisposalPolicy extends Composite {
     contentDisposalSchedulesTable.setVisible(false);
     newDisposalSchedule.setVisible(false);
 
-    initButtons();
+    initSidebar();
 
     // Disposal holds table
     createDisposalHoldsPanel(disposalHolds);
+
+    // create buttons under tables
+    initNewDisposalScheduleButton(newDisposalSchedule,false);
+    initNewDisposalHoldButton(newDisposalHold,false);
 
     disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
   }
@@ -285,13 +326,17 @@ public class DisposalPolicy extends Composite {
     this.disposalSchedules = disposalSchedules;
     this.disposalHolds = disposalHolds;
 
-    initButtons();
+    initSidebar();
 
     // Disposal schedules table
     createDisposalSchedulesPanel(disposalSchedules);
 
     // Disposal holds table
     createDisposalHoldsPanel(disposalHolds);
+
+    // create buttons under tables
+    initNewDisposalScheduleButton(newDisposalSchedule,false);
+    initNewDisposalHoldButton(newDisposalHold,false);
 
     disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
   }
