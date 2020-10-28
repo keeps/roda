@@ -8,6 +8,7 @@ import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
+import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
@@ -374,6 +375,8 @@ public class DisposalPolicy extends Composite {
           public String getValue(DisposalSchedule schedule) {
             if (schedule.getRetentionPeriodDuration() == null && schedule.getRetentionPeriodIntervalCode() == null) {
               return "";
+            }else if (schedule.getRetentionPeriodIntervalCode() == RetentionPeriodIntervalCode.NO_RETENTION_PERIOD){
+              return schedule.getRetentionPeriodIntervalCode().toString();
             } else {
               String value = schedule.getRetentionPeriodDuration().toString() + " "
                 + schedule.getRetentionPeriodIntervalCode().toString().toLowerCase();
