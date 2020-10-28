@@ -1060,16 +1060,23 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public Job changeDisposalSchedule(SelectedItems<IndexedAIP> selected, String disposalScheduleId)
+  public Job associateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, String disposalScheduleId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Disposals.changeDisposalSchedule(user, selected, disposalScheduleId);
+    return Disposals.associateDisposalSchedule(user, selectedItems, disposalScheduleId);
+  }
+
+  @Override
+  public Job disassociateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Disposals.disassociateDisposalSchedule(user, selectedItems);
   }
 
   @Override
   public Job createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems,
-    DisposalConfirmationMetadata metadata) throws AuthorizationDeniedException, RequestNotValidException,
-    GenericException, NotFoundException, AlreadyExistsException {
+    DisposalConfirmationMetadata metadata)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Disposals.createDisposalConfirmation(user, metadata, selectedItems);
   }

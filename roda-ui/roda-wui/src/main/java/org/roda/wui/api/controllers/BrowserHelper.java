@@ -147,9 +147,9 @@ import org.roda.core.plugins.plugins.internal.DeleteRODAObjectPlugin;
 import org.roda.core.plugins.plugins.internal.MovePlugin;
 import org.roda.core.plugins.plugins.internal.UpdateIncidencesPlugin;
 import org.roda.core.plugins.plugins.internal.UpdatePermissionsPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.ApplyDisposalScheduleToAIPPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.AssociateDisposalScheduleToAIPPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.CreateDisposalConfirmationPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.DisposalScheduleRemoverPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.DisassociateDisposalScheduleToAIPPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.BinaryVersion;
@@ -3356,23 +3356,26 @@ public class BrowserHelper {
     RodaCoreFactory.getModelService().deleteDisposalConfirmation(disposalConfirmationId);
   }
 
-  public static Job changeDisposalSchedule(User user, SelectedItems<IndexedAIP> selected, String disposalScheduleId)
+  public static Job disassociateDisposalSchedule(User user, SelectedItems<IndexedAIP> selected)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+      return createAndExecuteInternalJob("Remove disposal schedule", selected, DisassociateDisposalScheduleToAIPPlugin.class,
+        user, Collections.emptyMap(), "Could not execute change disposal schedule action");
+  }
+
+  public static Job associateDisposalSchedule(User user, SelectedItems<IndexedAIP> selected, String disposalScheduleId)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID, disposalScheduleId);
 
-    if (disposalScheduleId == null) {
-      return createAndExecuteInternalJob("Remove disposal schedule", selected, DisposalScheduleRemoverPlugin.class,
-        user, Collections.emptyMap(), "Could not execute change disposal schedule action");
-    } else {
-      return createAndExecuteInternalJob("Change disposal schedule", selected, ApplyDisposalScheduleToAIPPlugin.class,
-        user, pluginParameters, "Could not execute change disposal schedule action");
-    }
+    return createAndExecuteInternalJob("Change disposal schedule", selected, AssociateDisposalScheduleToAIPPlugin.class,
+      user, pluginParameters, "Could not execute change disposal schedule action");
   }
 
-  public static Job createDisposalConfirmationReport(User user, SelectedItems<IndexedAIP> selectedItems) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
-//    Map<String, String> pluginParameters = new HashMap<>();
-//    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID, disposalConfirmationId);
+  public static Job createDisposalConfirmationReport(User user, SelectedItems<IndexedAIP> selectedItems)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    // Map<String, String> pluginParameters = new HashMap<>();
+    // pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID,
+    // disposalConfirmationId);
 
     return createAndExecuteInternalJob("Create disposal confirmation report", selectedItems,
       CreateDisposalConfirmationPlugin.class, user, Collections.emptyMap(),
