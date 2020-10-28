@@ -1735,6 +1735,12 @@ public final class PluginHelper {
     }
   }
 
+  public static String createOutcomeTextForDisposalConfirmation(String actionMessage, String disposalConfirmationId, String aipId) {
+    StringBuilder outcomeText = new StringBuilder("The AIP '");
+    outcomeText.append(aipId).append("' ").append(actionMessage).append(" '").append(disposalConfirmationId).append("'");
+    return outcomeText.toString();
+  }
+
   public static String createOutcomeTextForDisposalSchedule(String actionMessage, String disposalScheduleId,
     String disposalScheduleTitle) {
     StringBuilder outcomeText = new StringBuilder("Disposal schedule");

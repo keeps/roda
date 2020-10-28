@@ -24,7 +24,7 @@ import org.roda.core.index.IndexService;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-public class CreateDisposalConfirmationPluginUtils {
+public class DisposalConfirmationPluginUtils {
 
   public static DisposalConfirmationMetadata getDisposalConfirmationMetadata(String confirmationId, String title, long storageSize,
     Set<String> disposalHolds, Set<String> disposalSchedules, long numberOfAIPs, long numberOfCollection) {

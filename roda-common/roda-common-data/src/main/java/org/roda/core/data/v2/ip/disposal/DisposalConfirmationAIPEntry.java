@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.roda.core.data.v2.IsModelObject;
 
 /**
@@ -24,6 +25,7 @@ public class DisposalConfirmationAIPEntry implements IsModelObject {
   private String aipDisposalScheduleId;
   private List<String> aipDisposalHoldIds;
 
+  @JsonIgnore
   @Override
   public int getClassVersion() {
     return 1;

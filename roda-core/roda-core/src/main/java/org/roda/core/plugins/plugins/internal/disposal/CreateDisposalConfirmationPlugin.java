@@ -1,24 +1,32 @@
 package org.roda.core.plugins.plugins.internal.disposal;
 
 import static org.roda.core.data.common.RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE;
+import static org.roda.core.data.common.RodaConstants.PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE;
 import static org.roda.core.data.common.RodaConstants.PreservationEventType;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -38,34 +46,29 @@ import org.slf4j.LoggerFactory;
 public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(CreateDisposalConfirmationPlugin.class);
 
-  // private String disposalConfirmationId;
-  //
-  // private static final Map<String, PluginParameter> pluginParameters = new
-  // HashMap<>();
-  // static {
-  // pluginParameters.put(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID,
-  // new PluginParameter(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID, "Disposal
-  // confirmation id",
-  // PluginParameter.PluginParameterType.STRING, "", true, false, "Disposal
-  // confirmation identifier"));
-  // }
+  private String title;
 
-  // @Override
-  // public List<PluginParameter> getParameters() {
-  // ArrayList<PluginParameter> parameters = new ArrayList<>();
-  // parameters.add(pluginParameters.get(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID));
-  // return parameters;
-  // }
-  //
-  // @Override
-  // public void setParameterValues(Map<String, String> parameters) throws
-  // InvalidParameterException {
-  // super.setParameterValues(parameters);
-  // if (parameters.containsKey(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID)) {
-  // disposalConfirmationId =
-  // parameters.get(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID);
-  // }
-  // }
+  private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
+  static {
+    pluginParameters.put(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE,
+      new PluginParameter(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE, "Disposal confirmation title",
+        PluginParameter.PluginParameterType.STRING, "", true, false, "Disposal confirmation report title"));
+  }
+
+  @Override
+  public List<PluginParameter> getParameters() {
+    ArrayList<PluginParameter> parameters = new ArrayList<>();
+    parameters.add(pluginParameters.get(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE));
+    return parameters;
+  }
+
+  @Override
+  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
+    if (parameters.containsKey(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE)) {
+      title = parameters.get(PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE);
+    }
+  }
 
   @Override
   public String getVersionImpl() {
@@ -102,12 +105,12 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "AIP was successfully associated to disposal confirmation report";
+    return "";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Failed to associate AIP to disposal confirmation report";
+    return "";
   }
 
   @Override
@@ -141,13 +144,14 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
     long numberOfCollection = 0L;
 
     for (AIP aip : aips) {
+      String outcomeText;
       Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
       PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
       LOGGER.debug("Processing AIP {}", aip.getId());
 
       try {
-        // Fetch the AIP information to crystallize in the report
-        DisposalConfirmationAIPEntry entry = CreateDisposalConfirmationPluginUtils.getAIPEntryFromAIP(index, aip,
+        // Fetch the AIP information to crystallize in the confirmation report
+        DisposalConfirmationAIPEntry entry = DisposalConfirmationPluginUtils.getAIPEntryFromAIP(index, aip,
           disposalSchedules, disposalHolds);
         model.addAIPEntry(confirmationId, entry);
 
@@ -166,36 +170,43 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
           numberOfCollection++;
         }
 
-      } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-        e.printStackTrace();
+        // Copy disposal schedules
+        model.copyDisposalScheduleToConfirmationReport(confirmationId, disposalSchedules);
+
+        // Copy disposal holds
+        model.copyDisposalHoldToConfirmationReport(confirmationId, disposalHolds);
+
+        // create report metadata
+        model.createDisposalConfirmationMetadata(
+          DisposalConfirmationPluginUtils.getDisposalConfirmationMetadata(confirmationId, title, storageSize,
+            disposalHolds, disposalSchedules, aips.size(), numberOfCollection),
+          cachedJob.getUsername());
+
+        reportItem.setPluginState(PluginState.SUCCESS);
+        reportItem.setPluginDetails("Add AIP to disposal confirmation report: " + confirmationId);
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmation(
+          "was successfully added to disposal confirmation", confirmationId, aip.getId());
+      } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
+        | AlreadyExistsException e) {
+        LOGGER.error("Error creating disposal confirmation {}: {}", confirmationId, e.getMessage(), e);
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+        reportItem.setPluginState(PluginState.FAILURE)
+          .setPluginDetails("Error creating disposal confirmation " + confirmationId + ": " + e.getMessage());
+        outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmation(
+          "failed to be added to disposal confirmation", confirmationId, aip.getId());
+      } finally {
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
       }
-    }
 
-    // Copy disposal schedules
-    try {
-      model.copyDisposalScheduleToConfirmationReport(confirmationId, disposalSchedules);
-    } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException
-      | AlreadyExistsException e) {
-      e.printStackTrace();
-    }
-
-    // Copy disposal holds
-    try {
-      model.copyDisposalHoldToConfirmationReport(confirmationId, disposalHolds);
-    } catch (RequestNotValidException | NotFoundException | AuthorizationDeniedException | GenericException
-      | AlreadyExistsException e) {
-      e.printStackTrace();
-    }
-
-    // create report metadata
-    try {
-      model.createDisposalConfirmationMetadata(
-        CreateDisposalConfirmationPluginUtils.getDisposalConfirmationMetadata(confirmationId, "test", storageSize,
-          disposalHolds, disposalSchedules, aips.size(), numberOfCollection),
-        cachedJob.getUsername());
-    } catch (RequestNotValidException | NotFoundException | GenericException | AlreadyExistsException
-      | AuthorizationDeniedException e) {
-      e.printStackTrace();
+      try {
+        PluginHelper.createPluginEvent(this, aip.getId(), model, index, null, null, reportItem.getPluginState(),
+          outcomeText, true, cachedJob);
+      } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+        | AuthorizationDeniedException | AlreadyExistsException e) {
+        LOGGER.error("Error creating event: {}", e.getMessage(), e);
+      }
     }
   }
 
