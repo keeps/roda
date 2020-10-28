@@ -20,6 +20,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -103,6 +104,9 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
   // retention period duration
 
   @UiField
+  FlowPanel retentionPeriodDurationPanel;
+
+  @UiField
   Label retentionPeriodDurationLabel;
 
   @UiField
@@ -170,6 +174,9 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
         } else {
           retentionPeriodIntervalsLabel.setVisible(true);
           retentionPeriodIntervals.setVisible(true);
+
+          retentionPeriodDurationLabel.setVisible(true);
+          retentionPeriodDuration.setVisible(true);
         }
       }
     };
@@ -178,12 +185,14 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
       @Override
       public void onChange(ChangeEvent event) {
         if (retentionPeriodIntervals.getSelectedValue()
-          .equals(RetentionPeriodIntervalCode.NO_RETENTION_PERIOD.toString())
-          || retentionPeriodIntervals.getSelectedValue().equals("")) {
+          .equals(RetentionPeriodIntervalCode.NO_RETENTION_PERIOD.toString())) {
+          retentionPeriodDurationPanel.removeStyleName("col_2");
           retentionPeriodDurationLabel.setVisible(false);
           retentionPeriodDuration.setVisible(false);
           retentionPeriodDuration.setValue("");
         } else {
+          retentionPeriodDurationPanel.addStyleName("col_2");
+          retentionPeriodDurationLabel.setVisible(true);
           retentionPeriodDurationLabel.setVisible(true);
           retentionPeriodDuration.setVisible(true);
         }
@@ -277,14 +286,17 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
     disposalSchedule.setDescription(description.getText());
     disposalSchedule.setMandate(mandate.getText());
     disposalSchedule.setScopeNotes(notes.getText());
-    if(!editmode) {
+    if (!editmode) {
       disposalSchedule.setActionCode(getDisposalActionCode(disposalActions.getSelectedValue()));
       if (getDisposalActionCode(disposalActions.getSelectedValue()) != DisposalActionCode.RETAIN_PERMANENTLY) {
         disposalSchedule.setRetentionTriggerElementId(retentionTriggerElementId.getValue());
         disposalSchedule.setRetentionTriggerCode(getRetentionTriggerCode(retentionTriggers.getSelectedValue()));
         disposalSchedule
-                .setRetentionPeriodIntervalCode(getRetentionPeriodIntervalCode(retentionTriggers.getSelectedValue()));
-        disposalSchedule.setRetentionPeriodDuration(Integer.parseInt(retentionPeriodDuration.getText()));
+          .setRetentionPeriodIntervalCode(getRetentionPeriodIntervalCode(retentionPeriodIntervals.getSelectedValue()));
+        if (retentionPeriodDurationLabel.isVisible() && getRetentionPeriodIntervalCode(
+                retentionPeriodIntervals.getSelectedValue()) != RetentionPeriodIntervalCode.NO_RETENTION_PERIOD) {
+          disposalSchedule.setRetentionPeriodDuration(Integer.parseInt(retentionPeriodDuration.getText()));
+        }
       }
     }
     return disposalSchedule;
@@ -392,7 +404,7 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
           retentionPeriodIntervalsError.setVisible(false);
         }
 
-        if (retentionPeriodDuration.isVisible()) {
+        if (retentionPeriodDurationLabel.isVisible()) {
           if (!isNumberValid(retentionPeriodDuration.getText())) {
             retentionPeriodDuration.addStyleName("isWrong");
             retentionPeriodDurationError.setText(messages.mandatoryField());

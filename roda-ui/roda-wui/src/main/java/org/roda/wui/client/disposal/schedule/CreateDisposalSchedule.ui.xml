@@ -13,7 +13,6 @@
                 <common:TitlePanel text="{messages.newDisposalScheduleTitle}" iconClass="DisposalConfirmations"/>
                 <u:DisposalScheduleDataPanel ui:field="disposalScheduleDataPanel" />
             </g:FlowPanel>
-
             <g:FlowPanel addStyleNames="col_2 last sidebar">
                 <g:FlowPanel addStyleNames="sticky-flow">
                     <g:FlowPanel addStyleNames="sticky-padding">
