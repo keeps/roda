@@ -2,33 +2,29 @@ package org.roda.wui.client.disposal.schedule;
 
 import java.util.List;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.ui.Button;
-import org.roda.core.data.exceptions.DisposalHoldAlreadyExistsException;
 import org.roda.core.data.exceptions.DisposalScheduleAlreadyExistsException;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.disposal.DisposalPolicy;
-import org.roda.wui.client.disposal.hold.DisposalHoldDataPanel;
-import org.roda.wui.client.disposal.hold.ShowDisposalHold;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.widgets.Toast;
+import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
-import org.roda.wui.common.client.widgets.Toast;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
@@ -99,7 +95,7 @@ public class EditDisposalSchedule extends Composite {
   @UiField(provided = true)
   DisposalScheduleDataPanel disposalScheduleDataPanel;
 
-  public EditDisposalSchedule(){
+  public EditDisposalSchedule() {
     initWidget(uiBinder.createAndBindUi(this));
   }
 
@@ -118,31 +114,32 @@ public class EditDisposalSchedule extends Composite {
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
-    if(disposalScheduleDataPanel.isChanged() && disposalScheduleDataPanel.isValid()) {
+    if (disposalScheduleDataPanel.isChanged() && disposalScheduleDataPanel.isValid()) {
       DisposalSchedule disposalScheduleUpdated = disposalScheduleDataPanel.getDisposalSchedule();
       disposalSchedule.setTitle(disposalScheduleUpdated.getTitle());
       disposalSchedule.setMandate(disposalScheduleUpdated.getMandate());
       disposalSchedule.setDescription(disposalScheduleUpdated.getDescription());
       disposalSchedule.setScopeNotes(disposalScheduleUpdated.getScopeNotes());
-      BrowserServiceImpl.Util.getInstance().updateDisposalSchedule(disposalSchedule, new AsyncCallback<DisposalSchedule>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          errorMessage(caught);
-        }
+      BrowserServiceImpl.Util.getInstance().updateDisposalSchedule(disposalSchedule,
+        new AsyncCallback<DisposalSchedule>() {
+          @Override
+          public void onFailure(Throwable caught) {
+            errorMessage(caught);
+          }
 
-        @Override
-        public void onSuccess(DisposalSchedule disposalSchedule) {
-          HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
-        }
-      });
-    }else{
-      HistoryUtils.newHistory(ShowDisposalSchedule.RESOLVER,disposalSchedule.getId());
+          @Override
+          public void onSuccess(DisposalSchedule disposalSchedule) {
+            HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+          }
+        });
+    } else {
+      HistoryUtils.newHistory(ShowDisposalSchedule.RESOLVER, disposalSchedule.getId());
     }
   }
 
   @UiHandler("buttonCancel")
   void buttonCancelHandler(ClickEvent e) {
-    HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+    HistoryUtils.newHistory(ShowDisposalSchedule.RESOLVER, disposalSchedule.getId());
   }
 
   private void errorMessage(Throwable caught) {
