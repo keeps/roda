@@ -16,9 +16,6 @@ import java.util.List;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
-import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
-import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
-import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.notifications.NotificationState;
@@ -2053,7 +2050,7 @@ public interface ClientMessages extends Messages {
   String newDisposalScheduleTitle();
 
   String newDisposalHoldTitle();
-  
+
   String createDisposalScheduleFailure(String reason);
 
   String createDisposalScheduleAlreadyExists(String title);
@@ -2092,9 +2089,11 @@ public interface ClientMessages extends Messages {
 
   String newDisposalConfirmationButton();
 
-  String removeDisposalScheduleButton();
-
   String createDisposalScheduleButton();
+
+  String disassociateDisposalScheduleButton();
+
+  String associateDisposalScheduleButton();
 
   String disposalScheduleSelectionDialogTitle();
 
@@ -2110,17 +2109,13 @@ public interface ClientMessages extends Messages {
 
   String createDisposalConfirmationReportDialogMessage(Long size);
 
-  String changeDisposalScheduleDialogTitle();
+  String associateDisposalScheduleDialogTitle();
 
-  String changeDisposalScheduleDialogMessage(Long size);
-
-  String changeDisposalScheduleSuccessTitle();
-
-  String changeDisposalScheduleSuccessMessage(Long size);
+  String associateDisposalScheduleDialogMessage(Long size);
 
   String disposalPolicyAIPWithoutAssociation();
 
-  String disposalPolicyAIPDueForDestruction(String duration,String code);
+  String disposalPolicyAIPDueForDestruction(String duration, String code);
 
   String disposalSchedule();
 
@@ -2133,6 +2128,6 @@ public interface ClientMessages extends Messages {
   String disposalDisposalAction();
 
   String disposalDisposalStatus();
-  
+
   String disposalScheduleRetentionPeriodNotValidFormat();
 }

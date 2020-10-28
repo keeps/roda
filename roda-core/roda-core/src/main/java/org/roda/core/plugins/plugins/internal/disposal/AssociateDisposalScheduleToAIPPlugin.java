@@ -38,8 +38,8 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-public class ApplyDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(ApplyDisposalScheduleToAIPPlugin.class);
+public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(AssociateDisposalScheduleToAIPPlugin.class);
 
   private String disposalScheduleId;
 
@@ -220,7 +220,7 @@ public class ApplyDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public Plugin<AIP> cloneMe() {
-    return new ApplyDisposalScheduleToAIPPlugin();
+    return new AssociateDisposalScheduleToAIPPlugin();
   }
 
   @Override

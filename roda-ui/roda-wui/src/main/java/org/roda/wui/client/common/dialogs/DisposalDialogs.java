@@ -36,8 +36,8 @@ public class DisposalDialogs {
 
     FlowPanel layout = new FlowPanel();
     Button cancelButton = new Button(messages.cancelButton());
-    Button changeScheduleButton = new Button(messages.applyDisposalScheduleButton());
-    Button noScheduleButton = new Button(messages.removeDisposalScheduleButton());
+    Button changeScheduleButton = new Button(messages.associateDisposalScheduleButton());
+    Button noScheduleButton = new Button(messages.disassociateDisposalScheduleButton());
     Button newScheduleButton = new Button(messages.createDisposalScheduleButton());
     FlowPanel footer = new FlowPanel();
 
