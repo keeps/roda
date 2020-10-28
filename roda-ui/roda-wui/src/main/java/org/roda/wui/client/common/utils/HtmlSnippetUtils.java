@@ -85,7 +85,7 @@ public class HtmlSnippetUtils {
         case ACTIVE:
           b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
           break;
-        case ARCHIVED:
+        case INACTIVE:
         default:
           b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT));
           break;

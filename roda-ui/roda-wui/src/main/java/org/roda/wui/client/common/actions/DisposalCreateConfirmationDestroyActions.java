@@ -171,7 +171,7 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
           @Override
           public void onSuccess(DisposalSchedules schedules) {
             // Show the active disposal schedules only
-            schedules.getObjects().removeIf(schedule -> DisposalScheduleState.ARCHIVED.equals(schedule.getState()));
+            schedules.getObjects().removeIf(schedule -> DisposalScheduleState.INACTIVE.equals(schedule.getState()));
             DisposalDialogs.showDisposalScheduleSelection(messages.disposalScheduleSelectionDialogTitle(), schedules,
               new ActionNoAsyncCallback<DisposalSchedule>(callback) {
                 @Override

@@ -436,7 +436,7 @@ public interface ClientMessages extends Messages {
 
   String liftButton();
 
-  String discontinueButton();
+  String deactivateButton();
 
   String saveButton();
 
@@ -2140,4 +2140,6 @@ public interface ClientMessages extends Messages {
   String disposalAssociationDescription();
 
   String disposalScheduleRetentionPeriodNotValidFormat();
+
+  String disposalScheduleListAips();
 }

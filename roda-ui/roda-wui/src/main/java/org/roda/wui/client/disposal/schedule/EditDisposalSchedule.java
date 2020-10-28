@@ -147,7 +147,7 @@ public class EditDisposalSchedule extends Composite {
 
   private void errorMessage(Throwable caught) {
     if (caught instanceof DisposalScheduleAlreadyExistsException) {
-      Toast.showError(messages.createDisposalHoldAlreadyExists(disposalSchedule.getTitle()));
+      Toast.showError(messages.createDisposalScheduleAlreadyExists(disposalSchedule.getTitle()));
     } else {
       Toast.showError(messages.createDisposalScheduleFailure(caught.getMessage()));
     }
