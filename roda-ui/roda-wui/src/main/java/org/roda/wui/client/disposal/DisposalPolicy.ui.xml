@@ -8,7 +8,7 @@
     <g:FlowPanel styleName="wui-disposal-policy" addStyleNames="wrapper skip_padding">
 
         <g:FlowPanel addStyleNames="row full_width skip_padding">
-            <g:FlowPanel addStyleNames="col_12">
+            <g:FlowPanel ui:field="contentFlowPanel" addStyleNames="col_10">
                 <common:TitlePanel text="{messages.disposalPolicyTitle}" iconClass="DisposalPolicy"/>
                 <g:FlowPanel addStyleNames="page-description" ui:field="disposalPolicyDescription"></g:FlowPanel>
                 <g:FlowPanel ui:field="contentDisposalSchedulesTable">
@@ -18,6 +18,16 @@
                 <g:FlowPanel ui:field="contentDisposalHoldsTable">
                 </g:FlowPanel>
                 <g:FlowPanel ui:field="newDisposalHold">
+                </g:FlowPanel>
+            </g:FlowPanel>
+            <g:FlowPanel ui:field="sidebarFlowPanel" addStyleNames="col_2 last sidebar">
+                <g:FlowPanel addStyleNames="sticky-flow">
+                    <g:FlowPanel addStyleNames="sticky-padding">
+                        <g:Label addStyleNames="h4">
+                            <ui:text from="{messages.actions}"/>
+                        </g:Label>
+                        <g:FlowPanel ui:field="buttonsPanel"></g:FlowPanel>
+                    </g:FlowPanel>
                 </g:FlowPanel>
             </g:FlowPanel>
         </g:FlowPanel>
