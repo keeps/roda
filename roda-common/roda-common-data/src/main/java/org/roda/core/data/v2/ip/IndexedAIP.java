@@ -78,6 +78,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState {
   private String disposalAction = null;
   private Date overdueDate = null;
   private boolean disposalHoldStatus = false;
+  private String disposalConfirmationId = null;
 
   /**
    * Constructs an empty (<strong>invalid</strong>) {@link IndexedAIP}.
@@ -98,7 +99,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState {
       other.getNumberOfSubmissionFiles(), other.getNumberOfDocumentationFiles(), other.getNumberOfSchemaFiles(),
       other.getHasRepresentations(), other.getGhost(), other.getDisposalScheduleId(), other.getDisposalScheduleName(),
       other.getDisposalRetentionPeriod(), other.getDisposalHoldsId(), other.getDestructionOn(),
-      other.getDestructionApprovedBy());
+      other.getDestructionApprovedBy(), other.getDisposalConfirmationId());
   }
 
   /**
@@ -117,7 +118,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState {
     Date dateFinal, String description, String parentID, List<String> ancestors, Permissions permissions,
     Long numberOfSubmissionFiles, Long numberOfDocumentationFiles, Long numberOfSchemaFiles, Boolean hasRepresentations,
     Boolean ghost, String disposalScheduleId, String disposalScheduleName, String disposalRetentionPeriod,
-    List<String> disposalHoldsId, Date destructionOn, String destructionApprovedBy) {
+    List<String> disposalHoldsId, Date destructionOn, String destructionApprovedBy, String disposalConfirmationId) {
     super();
     this.id = id;
     this.state = state;
@@ -141,6 +142,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState {
     this.disposalHoldsId = disposalHoldsId;
     this.destructionOn = destructionOn;
     this.destructionApprovedBy = destructionApprovedBy;
+    this.disposalConfirmationId = disposalConfirmationId;
   }
 
   public Long getNumberOfSubmissionFiles() {
@@ -449,6 +451,15 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState {
 
   public IndexedAIP setDisposalHoldStatus(boolean disposalHoldStatus) {
     this.disposalHoldStatus = disposalHoldStatus;
+    return this;
+  }
+
+  public String getDisposalConfirmationId() {
+    return disposalConfirmationId;
+  }
+
+  public IndexedAIP setDisposalConfirmationId(String disposalConfirmationId) {
+    this.disposalConfirmationId = disposalConfirmationId;
     return this;
   }
 

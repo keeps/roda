@@ -105,6 +105,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     fields.add(new Field(RodaConstants.AIP_DISPOSAL_ACTION, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.AIP_OVERDUE_DATE, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, Field.TYPE_BOOLEAN));
+    fields.add(new Field(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID, Field.TYPE_STRING));
 
     fields.add(SolrCollection.getSortFieldOf(RodaConstants.AIP_TITLE));
 
@@ -142,6 +143,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     doc.addField(RodaConstants.AIP_DESTRUCTED_APPROVED_BY, aip.getDestructionApprovedBy());
     doc.addField(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, !aip.getDisposalHoldAssociation().isEmpty()
       && aip.getDisposalHoldAssociation().stream().anyMatch(dh -> dh.getLiftedOn() == null));
+    doc.addField(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID, aip.getDisposalConfirmationId());
 
     doc.addField(RodaConstants.INGEST_SIP_IDS, aip.getIngestSIPIds());
     doc.addField(RodaConstants.INGEST_JOB_ID, aip.getIngestJobId());
@@ -282,6 +284,8 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     final Date overdueDate = SolrUtils.objectToDate(doc.get(RodaConstants.AIP_OVERDUE_DATE));
     final Boolean disposalHoldStatus = SolrUtils.objectToBoolean(doc.get(RodaConstants.AIP_DISPOSAL_HOLD_STATUS),
       Boolean.FALSE);
+    final String disposalConfirmationId = SolrUtils
+      .objectToString(doc.get(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID), "");
 
     String level;
     if (ghost) {
@@ -315,6 +319,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     ret.setDisposalAction(disposalAction);
     ret.setOverdueDate(overdueDate);
     ret.setDisposalHoldStatus(disposalHoldStatus);
+    ret.setDisposalConfirmationId(disposalConfirmationId);
 
     return ret;
   }
