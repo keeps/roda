@@ -872,14 +872,22 @@ public final class ModelUtils {
       disposalScheduleId + RodaConstants.JOB_FILE_EXTENSION);
   }
 
-/*  public static StoragePath getDisposalConfirmationStoragePath(String disposalConfirmationId)
+  public static StoragePath getDisposalConfirmationStoragePath(String disposalConfirmationId)
     throws RequestNotValidException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISPOSAL_CONFIRMATION, disposalConfirmationId,
-      RodaConstants.STORAGE_CONTAINER_DISPOSAL_CONFIRMATION_METADATA_SUFFIX + RodaConstants.JOB_FILE_EXTENSION);
-  }*/
-
-  public static StoragePath getDisposalConfirmationStoragePath(String disposalConfirmationId) throws RequestNotValidException {
     return DefaultStoragePath.parse(getDisposalConfirmationPath(disposalConfirmationId));
+  }
+
+  public static StoragePath getDisposalConfirmationSchedulesStoragePath(String disposalConfirmationId,
+    String disposalScheduleId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(getDisposalConfirmationStoragePath(disposalConfirmationId),
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES,
+      disposalScheduleId + RodaConstants.JOB_FILE_EXTENSION);
+  }
+
+  public static StoragePath getDisposalConfirmationHoldsStoragePath(String disposalConfirmationId,
+    String disposalHoldId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(getDisposalConfirmationStoragePath(disposalConfirmationId),
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS, disposalHoldId + RodaConstants.JOB_FILE_EXTENSION);
   }
 
   private static List<String> getDisposalConfirmationPath(String confirmationId) {

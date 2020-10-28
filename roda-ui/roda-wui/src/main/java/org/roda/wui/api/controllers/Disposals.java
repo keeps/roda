@@ -199,10 +199,10 @@ public class Disposals extends RodaWuiController {
 
       // Create the disposal confirmation metadata (storage & index)
 
-      DisposalConfirmationMetadata disposalConfirmationMetadata = BrowserHelper
-        .createDisposalConfirmationMetadata(confirmationMetadata, user);
+     /* DisposalConfirmationMetadata disposalConfirmationMetadata = BrowserHelper
+        .createDisposalConfirmationMetadata(confirmationMetadata, user);*/
 
-      return BrowserHelper.createDisposalConfirmationReport(user, objects, disposalConfirmationMetadata.getId());
+      return BrowserHelper.createDisposalConfirmationReport(user, objects);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;

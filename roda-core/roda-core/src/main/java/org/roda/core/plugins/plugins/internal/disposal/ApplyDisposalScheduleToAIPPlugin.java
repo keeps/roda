@@ -143,7 +143,7 @@ public class ApplyDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
       }
 
       for (AIP aip : aips) {
-        String outcomeText = "";
+        String outcomeText;
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
         PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
         LOGGER.debug("Processing AIP {}", aip.getId());
