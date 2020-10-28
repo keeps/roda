@@ -31,6 +31,7 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
@@ -306,10 +307,13 @@ public interface BrowserServiceAsync {
 
   void deleteDisposalHold(String disposalHoldId, AsyncCallback<Void> async);
 
-  void associateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, String disposalScheduleId, AsyncCallback<Job> async);
+  void associateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, String disposalScheduleId,
+    AsyncCallback<Job> async);
 
   void disassociateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, AsyncCallback<Job> async);
 
   void createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, DisposalConfirmationMetadata metadata,
     AsyncCallback<Job> async);
+
+  void listDisposalHoldsAssociation(String aipId, AsyncCallback<List<DisposalHoldAssociation>> async);
 }

@@ -18,6 +18,8 @@ public class DisposalHoldAssociation implements IsModelObject {
   private String id;
   private Date associatedOn;
   private String associatedBy;
+  private Date liftedOn;
+  private String liftedBy;
 
   @JsonIgnore
   @Override
@@ -50,6 +52,22 @@ public class DisposalHoldAssociation implements IsModelObject {
     this.associatedBy = associatedBy;
   }
 
+  public Date getLiftedOn() {
+    return liftedOn;
+  }
+
+  public void setLiftedOn(Date liftedOn) {
+    this.liftedOn = liftedOn;
+  }
+
+  public String getLiftedBy() {
+    return liftedBy;
+  }
+
+  public void setLiftedBy(String liftedBy) {
+    this.liftedBy = liftedBy;
+  }
+
   public DisposalHoldAssociation() {
     super();
   }
@@ -68,17 +86,18 @@ public class DisposalHoldAssociation implements IsModelObject {
       return false;
     DisposalHoldAssociation that = (DisposalHoldAssociation) o;
     return Objects.equals(id, that.id) && Objects.equals(associatedOn, that.associatedOn)
-      && Objects.equals(associatedBy, that.associatedBy);
+      && Objects.equals(associatedBy, that.associatedBy) && Objects.equals(liftedOn, that.liftedOn)
+      && Objects.equals(liftedBy, that.liftedBy);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, associatedOn, associatedBy);
+    return Objects.hash(id, associatedOn, associatedBy, liftedOn, liftedBy);
   }
 
   @Override
   public String toString() {
     return "DisposalHoldAssociation{" + "id='" + id + '\'' + ", associatedOn=" + associatedOn + ", associatedBy='"
-      + associatedBy + '\'' + '}';
+      + associatedBy + '\'' + ", liftedOn=" + liftedOn + ", liftedBy='" + liftedBy + '\'' + '}';
   }
 }

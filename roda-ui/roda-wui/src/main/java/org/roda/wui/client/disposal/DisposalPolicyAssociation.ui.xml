@@ -8,45 +8,57 @@
     <g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
         <g:FlowPanel addStyleNames="row full_width skip_padding">
             <g:FlowPanel addStyleNames="col_10 content" ui:field="content">
-                <common:TitlePanel iconClass="DisposalPolicy" ui:field="titlePanel"/>
-                <g:FlowPanel addStyleNames="page-description" ui:field="disposalPolicyAIPDescription"></g:FlowPanel>
-                <g:FlowPanel addStyleNames="wui-data-panel">
+                <common:TitlePanel ui:field="titlePanel"/>
+                <g:FlowPanel addStyleNames="page-description" ui:field="disposalPolicyAIPDescription">
+                    <g:Label>
+                            <ui:text from='{messages.disposalAssociationDescription}'/>
+                    </g:Label>
+                </g:FlowPanel>
+                <g:Label styleName="h5">
+                        <ui:text from='{messages.showDisposalScheduleTitle}'/>
+                </g:Label>
+                <g:FlowPanel addStyleNames="wui-data-panel" ui:field="disposalSchedule">
                     <g:FlowPanel styleName="field">
                         <g:Label styleName="label">
-                            <ui:text from='{messages.disposalSchedule}'/>
+                            <ui:text from='{messages.disposalScheduleTitle}'/>
                         </g:Label>
                         <g:Label styleName="value" ui:field="disposalName"/>
                     </g:FlowPanel>
                     <g:FlowPanel styleName="field">
                         <g:Label styleName="label">
-                            <ui:text from='{messages.disposalRetentionStartDate}'/>
+                            <ui:text from='{messages.disposalRetentionStartDateLabel}'/>
                         </g:Label>
                         <g:Label styleName="value" ui:field="disposalRetentionStartDate"/>
                     </g:FlowPanel>
                     <g:FlowPanel styleName="field">
                         <g:Label styleName="label">
-                            <ui:text from='{messages.disposalRetentionDueDate}'/>
+                            <ui:text from='{messages.disposalRetentionDueDateLabel}'/>
                         </g:Label>
                         <g:Label styleName="value" ui:field="disposalRetentionDueDate"/>
                     </g:FlowPanel>
                     <g:FlowPanel styleName="field">
                         <g:Label styleName="label">
-                            <ui:text from='{messages.disposalRetentionPeriod}'/>
+                            <ui:text from='{messages.disposalRetentionPeriodLabel}'/>
                         </g:Label>
                         <g:Label styleName="value" ui:field="disposalRetentionPeriod"/>
                     </g:FlowPanel>
                     <g:FlowPanel styleName="field">
                         <g:Label styleName="label">
-                            <ui:text from='{messages.disposalDisposalAction}'/>
+                            <ui:text from='{messages.disposalDisposalActionLabel}'/>
                         </g:Label>
                         <g:Label styleName="value" ui:field="disposalDisposalAction"/>
                     </g:FlowPanel>
                     <g:FlowPanel styleName="field">
                         <g:Label styleName="label">
-                            <ui:text from='{messages.disposalDisposalStatus}'/>
+                            <ui:text from='{messages.disposalDisposalStatusLabel}'/>
                         </g:Label>
                         <g:Label styleName="value" ui:field="disposalDisposalStatus"/>
                     </g:FlowPanel>
+                </g:FlowPanel>
+                <g:FlowPanel addStyleNames="wui-data-panel" ui:field="disposalHolds">
+                    <g:Label styleName="h5">
+                            <ui:text from='{messages.showDisposalHoldTitle}'/>
+                    </g:Label>
                     <g:FlowPanel ui:field="disposalHoldsPanel" />
                 </g:FlowPanel>
             </g:FlowPanel>
