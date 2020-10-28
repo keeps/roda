@@ -8,8 +8,6 @@ import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -25,7 +23,6 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
-import org.roda.wui.client.disposal.Disposal;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
@@ -81,12 +78,12 @@ public class DisposalHoldDataPanel extends Composite implements HasValueChangeHa
     mandate.addChangeHandler(changeHandler);
     notes.addChangeHandler(changeHandler);
 
-    if(editmode){
-      setDiposalHold(disposalHold);
+    if (editmode) {
+      setDisposalHold(disposalHold);
     }
   }
 
-  public void setDiposalHold(DisposalHold disposalHold) {
+  public void setDisposalHold(DisposalHold disposalHold) {
     this.title.setText(disposalHold.getTitle());
     this.description.setText(disposalHold.getDescription());
     this.mandate.setText(disposalHold.getMandate());

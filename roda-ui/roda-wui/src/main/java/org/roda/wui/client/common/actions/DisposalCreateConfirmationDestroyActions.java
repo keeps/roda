@@ -21,6 +21,7 @@ import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.DisposalDialogs;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
+import org.roda.wui.client.disposal.DisposalConfirmations;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -119,8 +120,10 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
             @Override
             public void onSuccess(Boolean result) {
               if (result) {
+                DisposalConfirmationMetadata confirmationMetadata = new DisposalConfirmationMetadata();
+                confirmationMetadata.setTitle("Test");
                 BrowserService.Util.getInstance().createDisposalConfirmationReport(selectedItemsList,
-                  new DisposalConfirmationMetadata(), new ActionAsyncCallback<Job>(callback) {
+                  confirmationMetadata, new ActionAsyncCallback<Job>(callback) {
                     @Override
                     public void onFailure(Throwable caught) {
                       callback.onFailure(caught);
@@ -136,14 +139,8 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
                           Toast.showInfo(messages.runningInBackgroundTitle(),
                             messages.runningInBackgroundDescription());
 
-                          Timer timer = new Timer() {
-                            @Override
-                            public void run() {
-                              doActionCallbackUpdated();
-                            }
-                          };
-
-                          timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                          doActionCallbackUpdated();
+                          HistoryUtils.newHistory(DisposalConfirmations.RESOLVER);
                         }
 
                         @Override

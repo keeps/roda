@@ -83,6 +83,12 @@ public class DisposalConfirmations extends Composite {
     searchPanel = new DisposalConfirmationSearch("Disposal_confirmations");
 
     initWidget(uiBinder.createAndBindUi(this));
+
+    final DisposalConfirmationActions confirmationActions = DisposalConfirmationActions.get();
+    SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, confirmationActions.hasAnyRoles());
+    actionsSidebar.setWidget(new ActionableWidgetBuilder<>(confirmationActions)
+      .buildListWithObjects(new ActionableObject<>(DisposalConfirmationMetadata.class)));
+
     disposalConfirmationDescription.add(new HTMLWidgetWrapper("DisposalConfirmationDescription.html"));
   }
 
@@ -100,11 +106,7 @@ public class DisposalConfirmations extends Composite {
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty()) {
-      final DisposalConfirmationActions confirmationActions = DisposalConfirmationActions.get();
-      SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, confirmationActions.hasAnyRoles());
-      instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(confirmationActions)
-        .buildListWithObjects(new ActionableObject<>(DisposalConfirmationMetadata.class)));
-      callback.onSuccess(instance);
+      callback.onSuccess(this);
     } else {
       String basePage = historyTokens.remove(0);
       if (ShowDisposalConfirmation.RESOLVER.getHistoryToken().equals(basePage)) {
@@ -113,5 +115,11 @@ public class DisposalConfirmations extends Composite {
         CreateDisposalConfirmation.RESOLVER.resolve(historyTokens, callback);
       }
     }
+  }
+
+  @Override
+  protected void onAttach() {
+    super.onAttach();
+    instance.searchPanel.refresh();
   }
 }

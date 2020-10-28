@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
-import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 
 public final class RodaConstants {
 
@@ -581,9 +580,8 @@ public final class RodaConstants {
   public static final String STORAGE_CONTAINER_DISPOSAL_CONFIRMATION = "disposal-confirmation";
   public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME = "metadata.json";
   public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME = "aips.json";
-  public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES = "diposal-schedules";
-  public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS = "diposal-holds";
-
+  public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES = "disposal-schedules";
+  public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS = "disposal-holds";
 
   public static final String STORAGE_HISTORY_CONTAINER_DATA = "data";
   public static final String STORAGE_HISTORY_CONTAINER_METADATA = "metadata";
@@ -692,7 +690,6 @@ public final class RodaConstants {
   public static final String AIP_DISPOSAL_HOLD_STATUS = "disposalHoldStatus";
   public static final String AIP_OVERDUE_DATE = "overdueDate";
   public static final String AIP_DISPOSAL_CONFIRMATION_ID = "disposalConfirmationID";
-
 
   // AIP types
   public static final String AIP_TYPE_MIXED = "MIXED";
@@ -868,8 +865,7 @@ public final class RodaConstants {
   public static final String DISPOSAL_CONFIRMATION_NUMBER_OF_COLLECTIONS = "numberOfCollections";
   public static final String DISPOSAL_CONFIRMATION_STATE = "state";
   public static final String DISPOSAL_CONFIRMATION_TITLE = "title";
-  public static final String DISPOSAL_CONFIRMATION_SIZE = "size";
-
+  public static final String DISPOSAL_CONFIRMATION_STORAGE_SIZE = "size";
 
   /* Disposal related parameters */
   public static final String DISPOSAL_HOLD_FILE_EXTENSION = ".json";
@@ -957,7 +953,8 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_INCLUDE_DOCUMENTATION = "parameter.include_documentation";
 
   public static final String PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID = "parameter.disposal_schedule_id";
-  public static final String PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID = "parameter.disposal_schedule_id";
+  public static final String PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID = "parameter.disposal_confirmation_id";
+  public static final String PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE = "parameter.disposal_confirmation_title";
 
   public static final String PLUGIN_CATEGORY_CONVERSION = "conversion";
   public static final String PLUGIN_CATEGORY_CHARACTERIZATION = "characterization";

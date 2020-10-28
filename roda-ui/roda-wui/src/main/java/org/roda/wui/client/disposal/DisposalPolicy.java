@@ -2,7 +2,6 @@ package org.roda.wui.client.disposal;
 
 import java.util.List;
 
-import com.google.gwt.user.client.ui.ScrollPanel;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
@@ -121,12 +120,8 @@ public class DisposalPolicy extends Composite {
 
   @UiField
   FlowPanel sidebarFlowPanel;
-
   @UiField
   FlowPanel buttonsPanel;
-
-  private DisposalSchedules disposalSchedules;
-  private DisposalHolds disposalHolds;
 
   private static void loadDisposalSchedulesAndHolds(AsyncCallback<Widget> callback) {
     BrowserService.Util.getInstance().listDisposalSchedules(new AsyncCallback<DisposalSchedules>() {
@@ -258,10 +253,7 @@ public class DisposalPolicy extends Composite {
     boolean hasCreatedNewScheduleBtn = initNewDisposalScheduleButton(panel, true);
     boolean hasCreatedNewHoldBtn = initNewDisposalHoldButton(panel, true);
 
-    if (hasCreatedNewScheduleBtn || hasCreatedNewHoldBtn) {
-      return true;
-    }
-    return false;
+    return hasCreatedNewScheduleBtn || hasCreatedNewHoldBtn;
   }
 
   private boolean initNewDisposalScheduleButton(FlowPanel panel, boolean isGroup) {
@@ -322,7 +314,6 @@ public class DisposalPolicy extends Composite {
 
   private DisposalPolicy(DisposalSchedules disposalSchedules) {
     initWidget(uiBinder.createAndBindUi(this));
-    this.disposalSchedules = disposalSchedules;
     contentDisposalHoldsTable.setVisible(false);
     newDisposalHold.setVisible(false);
 
@@ -343,7 +334,6 @@ public class DisposalPolicy extends Composite {
 
   private DisposalPolicy(DisposalHolds disposalHolds) {
     initWidget(uiBinder.createAndBindUi(this));
-    this.disposalHolds = disposalHolds;
     contentDisposalSchedulesTable.setVisible(false);
     newDisposalSchedule.setVisible(false);
 
@@ -364,8 +354,6 @@ public class DisposalPolicy extends Composite {
 
   private DisposalPolicy(DisposalSchedules disposalSchedules, DisposalHolds disposalHolds) {
     initWidget(uiBinder.createAndBindUi(this));
-    this.disposalSchedules = disposalSchedules;
-    this.disposalHolds = disposalHolds;
 
     initSidebar();
 

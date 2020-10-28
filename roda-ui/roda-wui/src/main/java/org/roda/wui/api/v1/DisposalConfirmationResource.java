@@ -6,8 +6,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -103,34 +101,50 @@ public class DisposalConfirmationResource {
     return Response.ok(disposalConfirmationMetadata, mediaType).build();
   }
 
-  /*@POST
-  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
-  @ApiOperation(value = "Create disposal confirmation", notes = "Create a new disposal confirmation", response = DisposalConfirmationMetadata.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DisposalConfirmationMetadata.class),
-    @ApiResponse(code = 409, message = "Already exists", response = ApiResponseMessage.class)})
-  public Response createDisposalConfirmation(DisposalConfirmationMetadata metadata,
-    @ApiParam(value = "Choose format in which to get the disposal confirmation", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-    @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
-    throws RODAException {
-    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+  /*
+   * @POST
+   * 
+   * @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+   * 
+   * @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam
+   * = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
+   * 
+   * @ApiOperation(value = "Create disposal confirmation", notes =
+   * "Create a new disposal confirmation", response =
+   * DisposalConfirmationMetadata.class)
+   * 
+   * @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response =
+   * DisposalConfirmationMetadata.class),
+   * 
+   * @ApiResponse(code = 409, message = "Already exists", response =
+   * ApiResponseMessage.class)}) public Response
+   * createDisposalConfirmation(DisposalConfirmationMetadata metadata,
+   * 
+   * @ApiParam(value = "Choose format in which to get the disposal confirmation",
+   * allowableValues =
+   * RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.
+   * API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+   * 
+   * @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.
+   * API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName) throws RODAException
+   * { String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+   * 
+   * // get user User user = UserUtility.getApiUser(request);
+   * 
+   * // delegate action to controller DisposalConfirmationMetadata
+   * disposalConfirmationMetadata = Disposals.createDisposalConfirmation(user,
+   * metadata); return Response.ok(disposalConfirmationMetadata,
+   * mediaType).build(); }
+   */
 
-    // get user
-    User user = UserUtility.getApiUser(request);
-
-    // delegate action to controller
-    DisposalConfirmationMetadata disposalConfirmationMetadata = Disposals.createDisposalConfirmation(user,
-      metadata);
-    return Response.ok(disposalConfirmationMetadata, mediaType).build();
-  }*/
-
-  @DELETE
+  /*@DELETE
   @Path("/{" + RodaConstants.API_PATH_PARAM_DISPOSAL_CONFIRMATION_ID + "}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
   @ApiOperation(value = "Delete disposal confirmation", notes = "Delete disposal confirmation", response = Void.class)
   @ApiResponses(value = {@ApiResponse(code = 204, message = "OK", response = Void.class),
-    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class),
+    @ApiResponse(code = 405, message = "Operation not allowed", response = ApiResponseMessage.class)})
 
   public Response deleteDisposalConfirmation(
     @ApiParam(value = "The ID of the disposal confirmation to delete.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_DISPOSAL_CONFIRMATION_ID) String disposalConfirmationId,
@@ -148,5 +162,5 @@ public class DisposalConfirmationResource {
 
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Disposal confirmation deleted"), mediaType)
       .build();
-  }
+  }*/
 }
