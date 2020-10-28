@@ -148,7 +148,7 @@ import org.roda.core.plugins.plugins.internal.MovePlugin;
 import org.roda.core.plugins.plugins.internal.UpdateIncidencesPlugin;
 import org.roda.core.plugins.plugins.internal.UpdatePermissionsPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.ApplyDisposalScheduleToAIPPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.CreateDisposalConfirmationReportPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.CreateDisposalConfirmationPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.DisposalScheduleRemoverPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
@@ -3370,13 +3370,12 @@ public class BrowserHelper {
     }
   }
 
-  public static Job createDisposalConfirmationReport(User user, SelectedItems<IndexedAIP> selectedItems,
-    String disposalConfirmationId) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID, disposalConfirmationId);
+  public static Job createDisposalConfirmationReport(User user, SelectedItems<IndexedAIP> selectedItems) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+//    Map<String, String> pluginParameters = new HashMap<>();
+//    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID, disposalConfirmationId);
 
     return createAndExecuteInternalJob("Create disposal confirmation report", selectedItems,
-      CreateDisposalConfirmationReportPlugin.class, user, pluginParameters,
+      CreateDisposalConfirmationPlugin.class, user, Collections.emptyMap(),
       "Could not execute create disposal confirmation report action");
   }
 

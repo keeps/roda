@@ -2,6 +2,7 @@ package org.roda.core.data.v2.ip.disposal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -182,6 +183,16 @@ public class DisposalConfirmationMetadata implements IsModelObject, IsIndexed, H
 
   public void setDisposalHoldIds(List<String> disposalHoldIds) {
     this.disposalHoldIds = disposalHoldIds;
+  }
+
+  @JsonIgnore
+  public void addDisposalHoldIds(Collection<String> disposalHoldIds) {
+    this.disposalHoldIds.addAll(disposalHoldIds);
+  }
+
+  @JsonIgnore
+  public void addDisposalScheduleIds(Collection<String> disposalScheduleIds) {
+    this.disposalScheduleIds.addAll(disposalScheduleIds);
   }
 
   @Override

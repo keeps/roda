@@ -574,13 +574,16 @@ public final class RodaConstants {
   public static final String STORAGE_CONTAINER_REPRESENTATION_INFORMATION = "representation-information";
   public static final String STORAGE_CONTAINER_DISPOSAL_HOLD = "disposal-hold";
   public static final String STORAGE_CONTAINER_DISPOSAL_SCHEDULE = "disposal-schedule";
-  public static final String STORAGE_CONTAINER_DISPOSAL_CONFIRMATION = "disposal-confirmation";
 
   /*
    * Disposal Confirmation
    */
+  public static final String STORAGE_CONTAINER_DISPOSAL_CONFIRMATION = "disposal-confirmation";
   public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME = "metadata.json";
   public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME = "aips.json";
+  public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES = "diposal-schedules";
+  public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS = "diposal-holds";
+
 
   public static final String STORAGE_HISTORY_CONTAINER_DATA = "data";
   public static final String STORAGE_HISTORY_CONTAINER_METADATA = "metadata";
