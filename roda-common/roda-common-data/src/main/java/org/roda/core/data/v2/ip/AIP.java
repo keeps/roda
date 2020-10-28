@@ -64,13 +64,13 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions) {
     this(id, parentId, type, state, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>(),
       new AIPFormat(), new ArrayList<Relationship>(), new Date(), null, new Date(), null, null,
-      new ArrayList<DisposalHoldAssociation>(), new Date(), null, null);
+      new ArrayList<DisposalHoldAssociation>(), null, null, null);
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions, String createdBy) {
     this(id, parentId, type, state, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>(),
       new AIPFormat(), new ArrayList<Relationship>(), new Date(), createdBy, new Date(), createdBy, null,
-      new ArrayList<DisposalHoldAssociation>(), new Date(), null, null);
+      new ArrayList<DisposalHoldAssociation>(), null, null, null);
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions,
