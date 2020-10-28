@@ -87,6 +87,7 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
@@ -149,6 +150,7 @@ import org.roda.core.plugins.plugins.internal.UpdateIncidencesPlugin;
 import org.roda.core.plugins.plugins.internal.UpdatePermissionsPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.AssociateDisposalScheduleToAIPPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.CreateDisposalConfirmationPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.DeleteDisposalConfirmationPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.DisassociateDisposalScheduleToAIPPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
@@ -3351,15 +3353,21 @@ public class BrowserHelper {
     return RodaCoreFactory.getModelService().createDisposalConfirmationMetadata(confirmationMetadata, user.getName());
   }
 
-  public static void deleteDisposalConfirmation(String disposalConfirmationId) throws GenericException,
-    RequestNotValidException, NotFoundException, AuthorizationDeniedException, IllegalOperationException {
-    RodaCoreFactory.getModelService().deleteDisposalConfirmation(disposalConfirmationId);
+  public static Job deleteDisposalConfirmation(User user, String disposalConfirmationId, String details)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID, disposalConfirmationId);
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
+    return createAndExecuteInternalJob("Delete disposal confirmation report", SelectedItemsNone.create(),
+      DeleteDisposalConfirmationPlugin.class, user, pluginParameters,
+      "Could not execute delete disposal confirmation report");
   }
 
   public static Job disassociateDisposalSchedule(User user, SelectedItems<IndexedAIP> selected)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
-      return createAndExecuteInternalJob("Remove disposal schedule", selected, DisassociateDisposalScheduleToAIPPlugin.class,
-        user, Collections.emptyMap(), "Could not execute change disposal schedule action");
+    return createAndExecuteInternalJob("Remove disposal schedule", selected,
+      DisassociateDisposalScheduleToAIPPlugin.class, user, Collections.emptyMap(),
+      "Could not execute change disposal schedule action");
   }
 
   public static Job associateDisposalSchedule(User user, SelectedItems<IndexedAIP> selected, String disposalScheduleId)
@@ -3371,24 +3379,14 @@ public class BrowserHelper {
       user, pluginParameters, "Could not execute change disposal schedule action");
   }
 
-  public static Job createDisposalConfirmationReport(User user, SelectedItems<IndexedAIP> selectedItems)
+  public static Job createDisposalConfirmationReport(User user, SelectedItems<IndexedAIP> selectedItems, String title)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
-    // Map<String, String> pluginParameters = new HashMap<>();
-    // pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID,
-    // disposalConfirmationId);
+     Map<String, String> pluginParameters = new HashMap<>();
+     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE,
+         title);
 
     return createAndExecuteInternalJob("Create disposal confirmation report", selectedItems,
-      CreateDisposalConfirmationPlugin.class, user, Collections.emptyMap(),
+      CreateDisposalConfirmationPlugin.class, user, pluginParameters,
       "Could not execute create disposal confirmation report action");
   }
-
-  // public static Job destroyOverdueAIPs(User user, SelectedItems<IndexedAIP>
-  // selected)
-  // throws AuthorizationDeniedException, GenericException,
-  // RequestNotValidException, NotFoundException {
-  // Map<String, String> pluginParameters = new HashMap<>();
-  // return createAndExecuteJob("Destroy overdue AIPs", selected,
-  // DeleteRODAObjectPlugin.class, PluginType.AIP_TO_AIP,
-  // user, pluginParameters, "Could not execute overdue AIP destruction action");
-  // }
 }

@@ -52,10 +52,10 @@ public class DisposalConfirmationList extends AsyncTableCell<DisposalConfirmatio
   private TextColumn<DisposalConfirmationMetadata> sizeColumn;
 
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
-    RodaConstants.DISPOSAL_CONFIRMATION_TITLE,
-      RodaConstants.DISPOSAL_COFIRMATION_ID, RodaConstants.DISPOSAL_CONFIRMATION_CREATED_BY,
-    RodaConstants.DISPOSAL_CONFIRMATION_STATE, RodaConstants.DISPOSAL_CONFIRMATION_CREATED_ON,
-    RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_AIPS, RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_COLLECTIONS);
+    RodaConstants.DISPOSAL_CONFIRMATION_TITLE, RodaConstants.DISPOSAL_COFIRMATION_ID,
+    RodaConstants.DISPOSAL_CONFIRMATION_CREATED_BY, RodaConstants.DISPOSAL_CONFIRMATION_STATE,
+    RodaConstants.DISPOSAL_CONFIRMATION_CREATED_ON, RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_AIPS,
+    RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_COLLECTIONS, RodaConstants.DISPOSAL_CONFIRMATION_STORAGE_SIZE);
 
   @Override
   protected void adjustOptions(AsyncTableCellOptions<DisposalConfirmationMetadata> options) {
@@ -117,7 +117,7 @@ public class DisposalConfirmationList extends AsyncTableCell<DisposalConfirmatio
 
       @Override
       public String getValue(DisposalConfirmationMetadata confirmation) {
-        return confirmation != null ? Humanize.readableFileSize(21334343L) : "";
+        return confirmation != null ? Humanize.readableFileSize(confirmation.getSize()) : "";
       }
     };
 
@@ -149,7 +149,7 @@ public class DisposalConfirmationList extends AsyncTableCell<DisposalConfirmatio
     columnSortingKeyMap.put(createdOnColumn, Collections.singletonList(RodaConstants.DISPOSAL_CONFIRMATION_CREATED_ON));
     columnSortingKeyMap.put(createdByColumn, Collections.singletonList(RodaConstants.DISPOSAL_CONFIRMATION_CREATED_BY));
     columnSortingKeyMap.put(stateColumn, Collections.singletonList(RodaConstants.DISPOSAL_CONFIRMATION_STATE));
-    columnSortingKeyMap.put(sizeColumn, Collections.singletonList(RodaConstants.DISPOSAL_CONFIRMATION_SIZE));
+    columnSortingKeyMap.put(sizeColumn, Collections.singletonList(RodaConstants.DISPOSAL_CONFIRMATION_STORAGE_SIZE));
     columnSortingKeyMap.put(numberOfAIPsColumn,
       Collections.singletonList(RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_AIPS));
     columnSortingKeyMap.put(numberOfCollectionColumn,

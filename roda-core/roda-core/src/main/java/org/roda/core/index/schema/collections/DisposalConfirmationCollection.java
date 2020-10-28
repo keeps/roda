@@ -70,7 +70,7 @@ public class DisposalConfirmationCollection
     fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_STATE, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_AIPS, Field.TYPE_LONG));
     fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_COLLECTIONS, Field.TYPE_LONG));
-    fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_SIZE, Field.TYPE_LONG));
+    fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_STORAGE_SIZE, Field.TYPE_LONG));
 
     return fields;
   }
@@ -95,7 +95,7 @@ public class DisposalConfirmationCollection
     doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_APPROVER, confirmation.getApprover());
     doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_AIPS, confirmation.getNumberOfAIPs());
     doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_COLLECTIONS, confirmation.getNumberOfCollections());
-    doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_SIZE, confirmation.getSize());
+    doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_STORAGE_SIZE, confirmation.getSize());
 
     return doc;
   }
@@ -127,7 +127,7 @@ public class DisposalConfirmationCollection
       .setNumberOfAIPs(SolrUtils.objectToLong(doc.get(RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_AIPS), 0L));
     confirmation.setNumberOfCollections(
       SolrUtils.objectToLong(doc.get(RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_COLLECTIONS), 0L));
-    confirmation.setSize(SolrUtils.objectToLong(doc.get(RodaConstants.DISPOSAL_CONFIRMATION_SIZE), 0L));
+    confirmation.setSize(SolrUtils.objectToLong(doc.get(RodaConstants.DISPOSAL_CONFIRMATION_STORAGE_SIZE), 0L));
 
     return confirmation;
   }

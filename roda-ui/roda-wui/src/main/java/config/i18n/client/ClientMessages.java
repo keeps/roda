@@ -2145,4 +2145,7 @@ public interface ClientMessages extends Messages {
 
   String disposalHoldListAips();
 
+  String deleteConfirmationReportDialogTitle();
+
+  String deleteConfirmationReportDialogMessage();
 }

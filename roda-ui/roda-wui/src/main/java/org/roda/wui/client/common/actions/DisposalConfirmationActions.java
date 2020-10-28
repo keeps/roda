@@ -81,8 +81,8 @@ public class DisposalConfirmationActions extends AbstractActionable<DisposalConf
     // management
     ActionableGroup<DisposalConfirmationMetadata> actionsGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
 
-    actionsGroup.addButton(messages.newDisposalConfirmationButton(), DisposalConfirmationAction.NEW, ActionImpact.NONE,
-      "btn-plus-circle");
+    actionsGroup.addButton(messages.newDisposalConfirmationButton(), DisposalConfirmationAction.NEW,
+      ActionImpact.UPDATED, "btn-plus-circle");
 
     confirmationActionableBundle.addGroup(actionsGroup);
 

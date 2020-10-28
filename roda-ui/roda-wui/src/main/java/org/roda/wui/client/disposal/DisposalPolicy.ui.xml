@@ -7,7 +7,7 @@
     <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
     <g:FlowPanel styleName="wui-disposal-policy" addStyleNames="wrapper skip_padding">
         <g:FlowPanel addStyleNames="row full_width skip_padding">
-            <g:FlowPanel ui:field="contentFlowPanel" addStyleNames="col_10">
+            <g:FlowPanel ui:field="contentFlowPanel" addStyleNames="col_10 content">
                 <common:TitlePanel text="{messages.disposalPolicyTitle}" iconClass="DisposalPolicy"/>
                 <g:FlowPanel addStyleNames="page-description" ui:field="disposalPolicyDescription"></g:FlowPanel>
                 <g:FlowPanel ui:field="disposalSchedulesDescription">
@@ -29,7 +29,7 @@
                         <g:Label addStyleNames="h4">
                             <ui:text from="{messages.actions}"/>
                         </g:Label>
-                        <g:FlowPanel ui:field="buttonsPanel"></g:FlowPanel>
+                        <g:FlowPanel ui:field="buttonsPanel"/>
                     </g:FlowPanel>
                 </g:FlowPanel>
             </g:FlowPanel>
