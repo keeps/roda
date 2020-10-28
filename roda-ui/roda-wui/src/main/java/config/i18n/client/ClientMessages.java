@@ -2123,15 +2123,13 @@ public interface ClientMessages extends Messages {
 
   String disposalRetentionPeriodLabel();
 
-  String disposalDisposalActionLabel();
+  String disposalActionLabel();
 
-  String disposalDisposalStatusLabel();
+  String disposalStatusLabel();
 
   String disposalHoldStatusLabel();
 
   String disposalAssociationDescription();
-
-  String disposalDisposalStatus();
 
   String disposalScheduleRetentionPeriodNotValidFormat();
 }
