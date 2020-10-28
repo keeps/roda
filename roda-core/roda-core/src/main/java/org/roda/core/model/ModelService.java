@@ -3603,4 +3603,9 @@ public class ModelService extends ModelObservable {
         + ". Reason: This confirmation state is " + metadata.getState().toString() + " and cannot be deleted");
     }
   }
+
+  public List<DisposalHoldAssociation> listDisposalHoldsAssociation(String aipId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    return ResourceParseUtils.getAIPMetadata(getStorage(), aipId).getDisposalHoldAssociation();
+  }
 }

@@ -40,6 +40,7 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
@@ -405,10 +406,15 @@ public interface BrowserService extends RemoteService {
     IllegalOperationException, GenericException, RequestNotValidException;
 
   Job associateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, String disposalScheduleId)
-      throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  Job disassociateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems) throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+  Job disassociateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   Job createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, DisposalConfirmationMetadata metadata)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
+
+  List<DisposalHoldAssociation> listDisposalHoldsAssociation(String aipId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
 }

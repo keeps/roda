@@ -2115,17 +2115,21 @@ public interface ClientMessages extends Messages {
 
   String disposalPolicyAIPWithoutAssociation();
 
-  String disposalPolicyAIPDueForDestruction(String duration, String code);
+  String disposalPolicyAIPDueForDestruction(String duration, String onHold);
 
-  String disposalSchedule();
+  String disposalRetentionStartDateLabel();
 
-  String disposalRetentionStartDate();
+  String disposalRetentionDueDateLabel();
 
-  String disposalRetentionDueDate();
+  String disposalRetentionPeriodLabel();
 
-  String disposalRetentionPeriod();
+  String disposalDisposalActionLabel();
 
-  String disposalDisposalAction();
+  String disposalDisposalStatusLabel();
+
+  String disposalHoldStatusLabel();
+
+  String disposalAssociationDescription();
 
   String disposalDisposalStatus();
 

@@ -684,14 +684,14 @@ public final class RodaConstants {
 
   public static final String AIP_DISPOSAL_SCHEDULE_ID = "disposalScheduleId";
   public static final String AIP_DISPOSAL_SCHEDULE_NAME = "disposalScheduleName";
-  public static final String AIP_DISPOSAL_SCHEDULE_PERIOD_CODE = "disposalSchedulePeriodCode";
-  public static final String AIP_DISPOSAL_SCHEDULE_PERIOD_DURATION = "disposalSchedulePeriodDuration";
+  public static final String AIP_DISPOSAL_SCHEDULE_RETENTION_PERIOD = "disposalScheduleRetentionPeriod";
   public static final String AIP_DISPOSAL_HOLDS_ID = "disposalHoldsId";
   public static final String AIP_DESTRUCTED_ON = "destructedOn";
   public static final String AIP_DESTRUCTED_APPROVED_BY = "destructionApprovedBy";
   public static final String AIP_DISPOSAL_ACTION = "disposalAction";
   public static final String AIP_DISPOSAL_HOLD_STATUS = "disposalHoldStatus";
   public static final String AIP_OVERDUE_DATE = "overdueDate";
+
 
   // AIP types
   public static final String AIP_TYPE_MIXED = "MIXED";

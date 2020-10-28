@@ -496,8 +496,8 @@ public class BrowseAIP extends Composite {
     String disposalScheduleId = bundle.getAip().getDisposalScheduleId();
     String message = messages.disposalPolicyAIPWithoutAssociation();
     if (disposalScheduleId != null && bundle.getAip().getOverdueDate() != null) {
-      message = messages.disposalPolicyAIPDueForDestruction(bundle.getAip().getDisposalRetentionPeriodDuration(),
-        bundle.getAip().getDisposalRetentionPeriodCode());
+      message = messages.disposalPolicyAIPDueForDestruction(bundle.getAip().getDisposalRetentionPeriod(),
+        bundle.getAip().isDisposalHoldStatus() ? messages.disposalHoldStatusLabel() : null);
     }
     Anchor disposalPolicyLink = new Anchor(message,
       HistoryUtils.createHistoryHashLink(DisposalPolicyAssociation.RESOLVER, aip.getId()));
