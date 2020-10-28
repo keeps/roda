@@ -691,6 +691,7 @@ public final class RodaConstants {
   public static final String AIP_DISPOSAL_ACTION = "disposalAction";
   public static final String AIP_DISPOSAL_HOLD_STATUS = "disposalHoldStatus";
   public static final String AIP_OVERDUE_DATE = "overdueDate";
+  public static final String AIP_DISPOSAL_CONFIRMATION_ID = "disposalConfirmationID";
 
 
   // AIP types

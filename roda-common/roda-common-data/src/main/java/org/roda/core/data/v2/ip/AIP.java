@@ -55,6 +55,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
   private List<DisposalHoldAssociation> disposalHoldAssociation = new ArrayList<>();
   private Date destructionOn = null;
   private String destructionApprovedBy = null;
+  private String disposalConfirmationId = null;
 
   public AIP() {
     super();
@@ -63,20 +64,20 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions) {
     this(id, parentId, type, state, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>(),
       new AIPFormat(), new ArrayList<Relationship>(), new Date(), null, new Date(), null, null,
-      new ArrayList<DisposalHoldAssociation>(), new Date(), null);
+      new ArrayList<DisposalHoldAssociation>(), new Date(), null, null);
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions, String createdBy) {
     this(id, parentId, type, state, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>(),
       new AIPFormat(), new ArrayList<Relationship>(), new Date(), createdBy, new Date(), createdBy, null,
-      new ArrayList<DisposalHoldAssociation>(), new Date(), null);
+      new ArrayList<DisposalHoldAssociation>(), new Date(), null, null);
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions,
     List<DescriptiveMetadata> descriptiveMetadata, List<Representation> representations, AIPFormat format,
     List<Relationship> relationships, Date createdOn, String createdBy, Date updatedOn, String updatedBy,
     String disposalScheduleId, List<DisposalHoldAssociation> disposalHoldAssociation, Date destructionOn,
-    String destructionApprovedBy) {
+    String destructionApprovedBy, String disposalConfirmationId) {
     super();
     this.id = id;
     this.parentId = parentId;
@@ -98,6 +99,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
     this.disposalHoldAssociation = disposalHoldAssociation;
     this.destructionOn = destructionOn;
     this.destructionApprovedBy = destructionApprovedBy;
+    this.disposalConfirmationId = disposalConfirmationId;
   }
 
   @JsonIgnore
@@ -288,6 +290,14 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
 
   public void setDestructionApprovedBy(String destructionApprovedBy) {
     this.destructionApprovedBy = destructionApprovedBy;
+  }
+
+  public String getDisposalConfirmationId() {
+    return disposalConfirmationId;
+  }
+
+  public void setDisposalConfirmationId(String disposalConfirmationId) {
+    this.disposalConfirmationId = disposalConfirmationId;
   }
 
   public AIPFormat getFormat() {

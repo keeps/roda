@@ -3,6 +3,7 @@ package org.roda.wui.client.disposal.confirmations;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -36,11 +37,11 @@ import config.i18n.client.ClientMessages;
 public class CreateDisposalConfirmation extends Composite {
   private static final Filter SHOW_RECORDS_TO_REVIEW = new Filter(
     new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_ACTION, DisposalActionCode.REVIEW.name())
-  // ,new EmptyKeyFilterParameter(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID)
+   ,new EmptyKeyFilterParameter(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID)
   );
   private static final Filter SHOW_RECORDS_TO_DESTROY = new Filter(
     new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_ACTION, DisposalActionCode.DESTROY.name())
-  // ,new EmptyKeyFilterParameter(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID)
+   ,new EmptyKeyFilterParameter(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID)
   );
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
