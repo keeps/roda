@@ -71,8 +71,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState {
 
   private String disposalScheduleId = null;
   private String disposalScheduleName = null;
-  private String disposalRetentionPeriodCode = null;
-  private String disposalRetentionPeriodDuration = null;
+  private String disposalRetentionPeriod = null;
   private List<String> disposalHoldsId = new ArrayList<>();
   private Date destructionOn = null;
   private String destructionApprovedBy = null;
@@ -98,8 +97,8 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState {
       other.getDateFinal(), other.getDescription(), other.getParentID(), other.getAncestors(), other.getPermissions(),
       other.getNumberOfSubmissionFiles(), other.getNumberOfDocumentationFiles(), other.getNumberOfSchemaFiles(),
       other.getHasRepresentations(), other.getGhost(), other.getDisposalScheduleId(), other.getDisposalScheduleName(),
-      other.getDisposalRetentionPeriodCode(), other.getDisposalRetentionPeriodDuration(), other.getDisposalHoldsId(),
-      other.getDestructionOn(), other.getDestructionApprovedBy());
+      other.getDisposalRetentionPeriod(), other.getDisposalHoldsId(), other.getDestructionOn(),
+      other.getDestructionApprovedBy());
   }
 
   /**
@@ -117,9 +116,8 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState {
   public IndexedAIP(String id, AIPState state, String type, String level, String title, Date dateInitial,
     Date dateFinal, String description, String parentID, List<String> ancestors, Permissions permissions,
     Long numberOfSubmissionFiles, Long numberOfDocumentationFiles, Long numberOfSchemaFiles, Boolean hasRepresentations,
-    Boolean ghost, String disposalScheduleId, String disposalScheduleName, String disposalRetentionPeriodCode,
-    String disposalRetentionPeriodDuration, List<String> disposalHoldsId, Date destructionOn,
-    String destructionApprovedBy) {
+    Boolean ghost, String disposalScheduleId, String disposalScheduleName, String disposalRetentionPeriod,
+    List<String> disposalHoldsId, Date destructionOn, String destructionApprovedBy) {
     super();
     this.id = id;
     this.state = state;
@@ -139,8 +137,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState {
     this.ghost = ghost;
     this.disposalScheduleId = disposalScheduleId;
     this.disposalScheduleName = disposalScheduleName;
-    this.disposalRetentionPeriodCode = disposalRetentionPeriodCode;
-    this.disposalRetentionPeriodDuration = disposalRetentionPeriodDuration;
+    this.disposalRetentionPeriod = disposalRetentionPeriod;
     this.disposalHoldsId = disposalHoldsId;
     this.destructionOn = destructionOn;
     this.destructionApprovedBy = destructionApprovedBy;
@@ -392,21 +389,12 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState {
     return this;
   }
 
-  public String getDisposalRetentionPeriodCode() {
-    return disposalRetentionPeriodCode;
+  public String getDisposalRetentionPeriod() {
+    return disposalRetentionPeriod;
   }
 
-  public IndexedAIP setDisposalRetentionPeriodCode(String disposalRetentionPeriodCode) {
-    this.disposalRetentionPeriodCode = disposalRetentionPeriodCode;
-    return this;
-  }
-
-  public String getDisposalRetentionPeriodDuration() {
-    return disposalRetentionPeriodDuration;
-  }
-
-  public IndexedAIP setDisposalRetentionPeriodDuration(String disposalRetentionPeriodDuration) {
-    this.disposalRetentionPeriodDuration = disposalRetentionPeriodDuration;
+  public IndexedAIP setDisposalRetentionPeriod(String disposalRetentionPeriod) {
+    this.disposalRetentionPeriod = disposalRetentionPeriod;
     return this;
   }
 

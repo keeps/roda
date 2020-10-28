@@ -61,6 +61,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
@@ -3478,6 +3479,26 @@ public class Browser extends RodaWuiController {
     } finally {
       // register action
       controllerAssistant.registerAction(user, holdId, state, RodaConstants.DISPOSAL_HOLD_ID, holdId);
+    }
+  }
+
+  public static List<DisposalHoldAssociation> listDisposalHoldsAssociation(User user, String aipId)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().listDisposalHoldsAssociation(aipId);
+    } catch (NotFoundException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state);
     }
   }
 }

@@ -9,7 +9,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
@@ -190,18 +192,23 @@ public class DisposalHoldTest {
 
     model.createDisposalHoldAssociation(aip.getId(), disposalHold.getId(), new Date(), RodaConstants.ADMIN);
     model.createDisposalHoldAssociation(aip.getId(), disposalHold2.getId(), new Date(), RodaConstants.ADMIN);
+    AIP updatedAIP = model.updateAIP(aip, RodaConstants.ADMIN);
 
     index.commitAIPs();
 
     // Retrieve AIP
     final IndexedAIP indexedAip = index.retrieve(IndexedAIP.class, aipId, new ArrayList<>());
+    List<String> retrievedDisposalHoldIds = indexedAip.getDisposalHoldsId();
     ArrayList<String> disposalHoldsAssociationsIds = new ArrayList<>();
 
-    for (DisposalHoldAssociation dhAssociation : aip.getDisposalHoldAssociation()) {
+    for (DisposalHoldAssociation dhAssociation : updatedAIP.getDisposalHoldAssociation()) {
       disposalHoldsAssociationsIds.add(dhAssociation.getId());
     }
 
-    assertEquals(disposalHoldsAssociationsIds, indexedAip.getDisposalHoldsId());
+    Collections.sort(disposalHoldsAssociationsIds);
+    Collections.sort(retrievedDisposalHoldIds);
+
+    assertEquals(disposalHoldsAssociationsIds, retrievedDisposalHoldIds);
   }
 
   private DisposalHold createDisposalHold() {
