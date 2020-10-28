@@ -306,7 +306,10 @@ public interface BrowserServiceAsync {
 
   void deleteDisposalHold(String disposalHoldId, AsyncCallback<Void> async);
 
-  void changeDisposalSchedule(SelectedItems<IndexedAIP> selected, String disposalScheduleId, AsyncCallback<Job> async);
+  void associateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, String disposalScheduleId, AsyncCallback<Job> async);
 
-  void createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, DisposalConfirmationMetadata metadata, AsyncCallback<Job> async);
+  void disassociateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, AsyncCallback<Job> async);
+
+  void createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, DisposalConfirmationMetadata metadata,
+    AsyncCallback<Job> async);
 }

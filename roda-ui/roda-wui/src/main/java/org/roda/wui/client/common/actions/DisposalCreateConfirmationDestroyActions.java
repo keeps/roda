@@ -133,11 +133,12 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
 
                         @Override
                         public void onFailure(Throwable caught) {
+                          Toast.showInfo(messages.runningInBackgroundTitle(),
+                            messages.runningInBackgroundDescription());
+
                           Timer timer = new Timer() {
                             @Override
                             public void run() {
-                              Toast.showInfo(messages.changeDisposalScheduleSuccessTitle(),
-                                messages.changeDisposalScheduleSuccessMessage(size));
                               doActionCallbackUpdated();
                             }
                           };
@@ -183,50 +184,91 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
                   // the result can be null, if null treat as removing the disposal schedule
 
                   Dialogs.showConfirmDialog(
-                    disposalSchedule != null ? messages.changeDisposalScheduleDialogTitle()
+                    disposalSchedule != null ? messages.associateDisposalScheduleDialogTitle()
                       : messages.dissociateDisposalScheduleDialogTitle(),
-                    disposalSchedule != null ? messages.changeDisposalScheduleDialogMessage(size)
+                    disposalSchedule != null ? messages.associateDisposalScheduleDialogMessage(size)
                       : messages.dissociateDisposalScheduleDialogMessage(size),
                     messages.dialogNo(), messages.dialogYes(), new ActionNoAsyncCallback<Boolean>(callback) {
                       @Override
                       public void onSuccess(Boolean result) {
                         if (result) {
-                          BrowserService.Util.getInstance().changeDisposalSchedule(items,
-                            disposalSchedule == null ? null : disposalSchedule.getId(),
-                            new ActionAsyncCallback<Job>(callback) {
+                          if (disposalSchedule == null) {
+                            BrowserService.Util.getInstance().disassociateDisposalSchedule(items,
+                              new ActionAsyncCallback<Job>(callback) {
 
-                              @Override
-                              public void onFailure(Throwable caught) {
-                                callback.onFailure(caught);
-                                HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                              }
+                                @Override
+                                public void onFailure(Throwable caught) {
+                                  callback.onFailure(caught);
+                                  HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                                }
 
-                              @Override
-                              public void onSuccess(Job job) {
-                                Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+                                @Override
+                                public void onSuccess(Job job) {
+                                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(),
+                                    new AsyncCallback<Void>() {
 
-                                  @Override
-                                  public void onFailure(Throwable caught) {
-                                    Timer timer = new Timer() {
                                       @Override
-                                      public void run() {
-                                        Toast.showInfo(messages.changeDisposalScheduleSuccessTitle(),
-                                          messages.changeDisposalScheduleSuccessMessage(size));
-                                        doActionCallbackUpdated();
+                                      public void onFailure(Throwable caught) {
+                                        Toast.showInfo(messages.runningInBackgroundTitle(),
+                                          messages.runningInBackgroundDescription());
+
+                                        Timer timer = new Timer() {
+                                          @Override
+                                          public void run() {
+                                            doActionCallbackUpdated();
+                                          }
+                                        };
+
+                                        timer.schedule(RodaConstants.ACTION_TIMEOUT);
                                       }
-                                    };
 
-                                    timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                                  }
+                                      @Override
+                                      public void onSuccess(final Void nothing) {
+                                        doActionCallbackNone();
+                                        HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                                      }
+                                    });
+                                }
+                              });
+                          } else {
+                            BrowserService.Util.getInstance().associateDisposalSchedule(items, disposalSchedule.getId(),
+                              new ActionAsyncCallback<Job>(callback) {
 
-                                  @Override
-                                  public void onSuccess(final Void nothing) {
-                                    doActionCallbackNone();
-                                    HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-                                  }
-                                });
-                              }
-                            });
+                                @Override
+                                public void onFailure(Throwable caught) {
+                                  callback.onFailure(caught);
+                                  HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                                }
+
+                                @Override
+                                public void onSuccess(Job job) {
+                                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(),
+                                    new AsyncCallback<Void>() {
+
+                                      @Override
+                                      public void onFailure(Throwable caught) {
+                                        Toast.showInfo(messages.runningInBackgroundTitle(),
+                                          messages.runningInBackgroundDescription());
+
+                                        Timer timer = new Timer() {
+                                          @Override
+                                          public void run() {
+                                            doActionCallbackUpdated();
+                                          }
+                                        };
+
+                                        timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                                      }
+
+                                      @Override
+                                      public void onSuccess(final Void nothing) {
+                                        doActionCallbackNone();
+                                        HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                                      }
+                                    });
+                                }
+                              });
+                          }
                         } else {
                           doActionCallbackNone();
                         }
