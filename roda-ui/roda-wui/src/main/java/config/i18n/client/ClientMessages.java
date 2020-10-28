@@ -2142,4 +2142,7 @@ public interface ClientMessages extends Messages {
   String disposalScheduleRetentionPeriodNotValidFormat();
 
   String disposalScheduleListAips();
+
+  String disposalHoldListAips();
+
 }

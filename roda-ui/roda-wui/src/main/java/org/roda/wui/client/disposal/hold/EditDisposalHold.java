@@ -94,8 +94,8 @@ public class EditDisposalHold extends Composite {
   @UiField(provided = true)
   DisposalHoldDataPanel disposalHoldDataPanel;
 
-  public EditDisposalHold(){
-      initWidget(uiBinder.createAndBindUi(this));
+  public EditDisposalHold() {
+    initWidget(uiBinder.createAndBindUi(this));
   }
 
   public EditDisposalHold(DisposalHold disposalHold) {
@@ -113,7 +113,7 @@ public class EditDisposalHold extends Composite {
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
-    if(disposalHoldDataPanel.isChanged() && disposalHoldDataPanel.isValid()) {
+    if (disposalHoldDataPanel.isChanged() && disposalHoldDataPanel.isValid()) {
       DisposalHold disposalHoldUpdated = disposalHoldDataPanel.getDisposalHold();
       disposalHold.setTitle(disposalHoldUpdated.getTitle());
       disposalHold.setMandate(disposalHoldUpdated.getMandate());
@@ -130,15 +130,15 @@ public class EditDisposalHold extends Composite {
           HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
         }
       });
-    }else{
-      HistoryUtils.newHistory(ShowDisposalHold.RESOLVER,disposalHold.getId());
+    } else {
+      HistoryUtils.newHistory(ShowDisposalHold.RESOLVER, disposalHold.getId());
     }
 
   }
 
   @UiHandler("buttonCancel")
   void buttonCancelHandler(ClickEvent e) {
-    HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+    HistoryUtils.newHistory(ShowDisposalHold.RESOLVER, disposalHold.getId());
   }
 
   private void errorMessage(Throwable caught) {

@@ -57,6 +57,11 @@
                         </g:FlowPanel>
                     </g:FlowPanel>
                 </g:FlowPanel>
+                <g:FlowPanel>
+                    <g:FlowPanel ui:field="aipListTitle">
+                    </g:FlowPanel>
+                    <g:SimplePanel ui:field="aipsListCard" addStyleNames="card representationsCard"/>
+                </g:FlowPanel>
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="col_2 last sidebar">
                 <g:FlowPanel addStyleNames="sticky-flow">
