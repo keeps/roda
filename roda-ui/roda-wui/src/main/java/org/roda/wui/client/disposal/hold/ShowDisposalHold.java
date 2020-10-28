@@ -5,11 +5,20 @@ import java.util.List;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.SimplePanel;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
+import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
+import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.DisposalPolicy;
@@ -105,6 +114,12 @@ public class ShowDisposalHold extends Composite {
   @UiField
   FlowPanel buttonsPanel;
 
+  @UiField
+  FlowPanel aipListTitle;
+
+  @UiField
+  SimplePanel aipsListCard;
+
   public ShowDisposalHold() {
     this.disposalHold = new DisposalHold();
   }
@@ -143,6 +158,27 @@ public class ShowDisposalHold extends Composite {
     disposalHoldNotesKey.setVisible(StringUtils.isNotBlank(disposalHold.getScopeNotes()));
 
     disposalHoldStateValue.setHTML(HtmlSnippetUtils.getDisposalHoldStateHtml(disposalHold));
+
+    // Records with this schedule
+
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
+      Label aipTitle = new Label();
+      aipTitle.addStyleName("h5");
+      aipTitle.setText(messages.disposalHoldListAips());
+      aipListTitle.add(aipTitle);
+
+      ListBuilder<IndexedAIP> aipsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
+              new AsyncTableCellOptions<>(IndexedAIP.class, "ShowDisposalHold_aips")
+                      .withFilter(
+                              new Filter(new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLDS_ID, disposalHold.getId())))
+                      .withSummary(messages.listOfAIPs()).bindOpener());
+
+      SearchWrapper aipsSearchWrapper = new SearchWrapper(false).createListAndSearchPanel(aipsListBuilder);
+      aipsListCard.setWidget(aipsSearchWrapper);
+      aipsListCard.setVisible(true);
+    } else {
+      aipsListCard.setVisible(false);
+    }
   }
 
   public void initButtons(){
