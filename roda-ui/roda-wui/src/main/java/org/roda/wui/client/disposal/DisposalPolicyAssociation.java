@@ -235,7 +235,7 @@ public class DisposalPolicyAssociation extends Composite {
   private BasicTablePanel<DisposalHold> getBasicTablePanelForDisposalHolds(DisposalHolds disposalHolds,
     List<DisposalHoldAssociation> disposalHoldAssociations) {
     Label headerHolds = new Label();
-    HTMLPanel info = new HTMLPanel("");
+    HTMLPanel info = new HTMLPanel(SafeHtmlUtils.EMPTY_SAFE_HTML);
 
     if (disposalHolds.getObjects().isEmpty()) {
       return new BasicTablePanel<>(headerHolds, messages.noItemsToDisplayPreFilters("disposal holds"));

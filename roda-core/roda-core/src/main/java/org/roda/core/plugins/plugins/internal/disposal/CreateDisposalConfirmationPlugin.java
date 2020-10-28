@@ -153,8 +153,8 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
 
         // Mark the AIP as "on confirmation" so they cannot be added to another
         // confirmation
-        // aip.setOnConfirmationReport(true);
-        // model.updateAIP(aip, cachedJob.getUsername());
+        aip.setDisposalConfirmationId(confirmationId);
+        model.updateAIP(aip, cachedJob.getUsername());
 
         // increment the storage size
         storageSize += entry.getAipSize();
@@ -166,7 +166,7 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
           numberOfCollection++;
         }
 
-      } catch (RequestNotValidException | GenericException | NotFoundException e) {
+      } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
         e.printStackTrace();
       }
     }
