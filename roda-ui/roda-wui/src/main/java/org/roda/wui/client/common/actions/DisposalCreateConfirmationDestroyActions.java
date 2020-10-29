@@ -45,7 +45,7 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
 
   public enum DisposalCreateConfirmationDestroyAction implements Action<IndexedAIP> {
     DESTROY(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_CONFIRMATION),
-    CHANGE_SCHEDULE(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_CONFIRMATION);
+    CHANGE_SCHEDULE(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_SCHEDULE);
 
     private List<String> methods;
 
