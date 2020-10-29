@@ -217,9 +217,8 @@ public class Disposals extends RodaWuiController {
 
   }
 
-  public static Job deleteDisposalConfirmation(User user, String disposalConfirmationId, String details)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
-    IllegalOperationException {
+  public static Job deleteDisposalConfirmation(User user, SelectedItems<DisposalConfirmationMetadata> selectedItems,
+    String details) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -229,14 +228,13 @@ public class Disposals extends RodaWuiController {
 
     try {
       // delegate
-      return BrowserHelper.deleteDisposalConfirmation(user, disposalConfirmationId, details);
+      return BrowserHelper.deleteDisposalConfirmation(user, selectedItems, details);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
-      controllerAssistant.registerAction(user, disposalConfirmationId, state,
-        RodaConstants.CONTROLLER_DISPOSAL_CONFIRMATION_ID_PARAM, disposalConfirmationId);
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems);
     }
   }
 

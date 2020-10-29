@@ -179,6 +179,9 @@ public final class LiteRODAObjectFactory {
     } else if (object instanceof Group) {
       Group o = (Group) object;
       ret = get(Group.class, Arrays.asList(o.getName()), false);
+    } else if (object instanceof DisposalConfirmationMetadata) {
+      DisposalConfirmationMetadata o = (DisposalConfirmationMetadata) object;
+      ret = get(DisposalConfirmationMetadata.class, Arrays.asList(o.getId()), false);
     }
 
     if (!ret.isPresent()) {
@@ -212,7 +215,8 @@ public final class LiteRODAObjectFactory {
       }
     } else if (objectClass == Report.class || objectClass == Representation.class) {
       ret = create(objectClass, 2, ids);
-    } else if (objectClass == TransferredResource.class || objectClass == PreservationMetadata.class || objectClass == DisposalConfirmationMetadata.class) {
+    } else if (objectClass == TransferredResource.class || objectClass == PreservationMetadata.class
+      || objectClass == DisposalConfirmationMetadata.class) {
       ret = create(objectClass, ids.size(), ids);
     }
 

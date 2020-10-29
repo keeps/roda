@@ -87,7 +87,6 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
-import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
@@ -3353,13 +3352,10 @@ public class BrowserHelper {
     return RodaCoreFactory.getModelService().createDisposalConfirmationMetadata(confirmationMetadata, user.getName());
   }
 
-  public static Job deleteDisposalConfirmation(User user, String disposalConfirmationId, String details)
+  public static Job deleteDisposalConfirmation(User user, SelectedItems<DisposalConfirmationMetadata> selectedItems, String details)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID, disposalConfirmationId);
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, details);
-    return createAndExecuteInternalJob("Delete disposal confirmation report", SelectedItemsNone.create(),
-      DeleteDisposalConfirmationPlugin.class, user, pluginParameters,
+    return createAndExecuteInternalJob("Delete disposal confirmation report", selectedItems,
+      DeleteDisposalConfirmationPlugin.class, user, Collections.emptyMap(),
       "Could not execute delete disposal confirmation report");
   }
 
@@ -3381,9 +3377,8 @@ public class BrowserHelper {
 
   public static Job createDisposalConfirmationReport(User user, SelectedItems<IndexedAIP> selectedItems, String title)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
-     Map<String, String> pluginParameters = new HashMap<>();
-     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE,
-         title);
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE, title);
 
     return createAndExecuteInternalJob("Create disposal confirmation report", selectedItems,
       CreateDisposalConfirmationPlugin.class, user, pluginParameters,

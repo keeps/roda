@@ -414,7 +414,9 @@ public interface BrowserService extends RemoteService {
   Job createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, DisposalConfirmationMetadata metadata)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
 
-  Job deleteDisposalConfirmationReport(String disposalConfirmationId, String details) throws NotFoundException, AuthorizationDeniedException, IllegalOperationException, GenericException, RequestNotValidException;
+  Job deleteDisposalConfirmationReport(SelectedItems<DisposalConfirmationMetadata> selectedItems, String details)
+    throws NotFoundException, AuthorizationDeniedException, GenericException,
+    RequestNotValidException;
 
   List<DisposalHoldAssociation> listDisposalHoldsAssociation(String aipId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
