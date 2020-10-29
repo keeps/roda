@@ -99,13 +99,19 @@ public class DisposalPolicy extends Composite {
   FlowPanel disposalPolicyDescription;
 
   @UiField
-  FlowPanel contentDisposalSchedulesTable;
+  FlowPanel disposalSchedulesDescription;
+
+  @UiField
+  FlowPanel disposalHoldsDescription;
+
+  @UiField
+  ScrollPanel contentDisposalSchedulesTable;
 
   @UiField
   FlowPanel newDisposalSchedule;
 
   @UiField
-  FlowPanel contentDisposalHoldsTable;
+  ScrollPanel contentDisposalHoldsTable;
 
   @UiField
   FlowPanel newDisposalHold;
@@ -171,6 +177,30 @@ public class DisposalPolicy extends Composite {
     });
   }
 
+  private void createDisposalSchedulesDescription() {
+    Label header = new Label(messages.disposalSchedulesTitle());
+    header.addStyleName("h5");
+
+    HTMLPanel info = new HTMLPanel("");
+    info.add(new HTMLWidgetWrapper("DisposalScheduleDescription.html"));
+
+    disposalSchedulesDescription.add(header);
+    disposalSchedulesDescription.add(info);
+
+  }
+
+  private void createDisposalHoldsDescription() {
+    Label header = new Label(messages.disposalHoldsTitle());
+    header.addStyleName("h5");
+
+    HTMLPanel info = new HTMLPanel("");
+    info.add(new HTMLWidgetWrapper("DisposalHoldDescription.html"));
+
+    disposalHoldsDescription.add(header);
+    disposalHoldsDescription.add(info);
+
+  }
+
   private void createDisposalSchedulesPanel(DisposalSchedules disposalSchedules) {
     contentDisposalSchedulesTable.addStyleName("basicTable");
     // Disposal schedules table
@@ -194,6 +224,8 @@ public class DisposalPolicy extends Composite {
 
       schedulesPanel.add(tableSchedules);
       contentDisposalSchedulesTable.add(schedulesPanel);
+      contentDisposalSchedulesTable.addStyleName("disposalPolicyScrollPanel");
+
     }
   }
 
@@ -218,12 +250,13 @@ public class DisposalPolicy extends Composite {
 
       holdsPanel.add(tableHolds);
       contentDisposalHoldsTable.add(holdsPanel);
+      contentDisposalHoldsTable.addStyleName("disposalPolicyScrollPanel");
     }
   }
 
   private boolean initSidebarButtons(FlowPanel panel) {
-    boolean hasCreatedNewScheduleBtn = initNewDisposalScheduleButton(panel,true);
-    boolean hasCreatedNewHoldBtn = initNewDisposalHoldButton(panel,true);
+    boolean hasCreatedNewScheduleBtn = initNewDisposalScheduleButton(panel, true);
+    boolean hasCreatedNewHoldBtn = initNewDisposalHoldButton(panel, true);
 
     if (hasCreatedNewScheduleBtn || hasCreatedNewHoldBtn) {
       return true;
@@ -235,7 +268,7 @@ public class DisposalPolicy extends Composite {
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_SCHEDULE)) {
       Button newDisposalScheduleBtn = new Button();
       newDisposalScheduleBtn.addStyleName("btn btn-plus");
-      if(isGroup){
+      if (isGroup) {
         newDisposalScheduleBtn.addStyleName("btn-block");
       }
       newDisposalScheduleBtn.setText(messages.newDisposalScheduleTitle());
@@ -256,7 +289,7 @@ public class DisposalPolicy extends Composite {
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_HOLD)) {
       Button newDisposalHoldBtn = new Button();
       newDisposalHoldBtn.addStyleName("btn btn-plus");
-      if(isGroup){
+      if (isGroup) {
         newDisposalHoldBtn.addStyleName("btn-block");
       }
       newDisposalHoldBtn.setText(messages.newDisposalHoldTitle());
@@ -274,17 +307,17 @@ public class DisposalPolicy extends Composite {
     return false;
   }
 
-  private DisposalPolicy() {
-    initWidget(uiBinder.createAndBindUi(this));
-    disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
-  }
-
   private void initSidebar() {
     if (initSidebarButtons(buttonsPanel)) {
       SidebarUtils.showSidebar(contentFlowPanel, sidebarFlowPanel);
     } else {
       SidebarUtils.hideSidebar(contentFlowPanel, sidebarFlowPanel);
     }
+  }
+
+  private DisposalPolicy() {
+    initWidget(uiBinder.createAndBindUi(this));
+    disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
   }
 
   private DisposalPolicy(DisposalSchedules disposalSchedules) {
@@ -295,12 +328,15 @@ public class DisposalPolicy extends Composite {
 
     initSidebar();
 
+    // Create disposal schedules description
+    createDisposalSchedulesDescription();
+
     // Disposal schedules table
     createDisposalSchedulesPanel(disposalSchedules);
 
     // create buttons under tables
-    initNewDisposalScheduleButton(newDisposalSchedule,false);
-    initNewDisposalHoldButton(newDisposalHold,false);
+    initNewDisposalScheduleButton(newDisposalSchedule, false);
+    initNewDisposalHoldButton(newDisposalHold, false);
 
     disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
   }
@@ -313,12 +349,15 @@ public class DisposalPolicy extends Composite {
 
     initSidebar();
 
+    // Create disposal holds description
+    createDisposalHoldsDescription();
+
     // Disposal holds table
     createDisposalHoldsPanel(disposalHolds);
 
     // create buttons under tables
-    initNewDisposalScheduleButton(newDisposalSchedule,false);
-    initNewDisposalHoldButton(newDisposalHold,false);
+    initNewDisposalScheduleButton(newDisposalSchedule, false);
+    initNewDisposalHoldButton(newDisposalHold, false);
 
     disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
   }
@@ -330,6 +369,12 @@ public class DisposalPolicy extends Composite {
 
     initSidebar();
 
+    // Create disposal schedules description
+    createDisposalSchedulesDescription();
+
+    // Create disposal holds description
+    createDisposalHoldsDescription();
+
     // Disposal schedules table
     createDisposalSchedulesPanel(disposalSchedules);
 
@@ -337,24 +382,18 @@ public class DisposalPolicy extends Composite {
     createDisposalHoldsPanel(disposalHolds);
 
     // create buttons under tables
-    initNewDisposalScheduleButton(newDisposalSchedule,false);
-    initNewDisposalHoldButton(newDisposalHold,false);
+    initNewDisposalScheduleButton(newDisposalSchedule, false);
+    initNewDisposalHoldButton(newDisposalHold, false);
 
     disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
   }
 
   private BasicTablePanel<DisposalSchedule> getBasicTablePanelForDisposalSchedules(
     DisposalSchedules disposalSchedules) {
-    Label header = new Label(messages.disposalSchedulesTitle());
-    header.addStyleName("h5");
-
-    HTMLPanel info = new HTMLPanel("");
-    info.add(new HTMLWidgetWrapper("DisposalScheduleDescription.html"));
-
     if (disposalSchedules.getObjects().isEmpty()) {
-      return new BasicTablePanel<>(header, messages.noItemsToDisplayPreFilters(messages.disposalSchedulesTitle()));
+      return new BasicTablePanel<>(messages.noItemsToDisplayPreFilters(messages.disposalSchedulesTitle()));
     } else {
-      return new BasicTablePanel<DisposalSchedule>(header, info, disposalSchedules.getObjects().iterator(),
+      return new BasicTablePanel<DisposalSchedule>(disposalSchedules.getObjects().iterator(),
 
         new BasicTablePanel.ColumnInfo<>(messages.disposalScheduleTitle(), 15, new TextColumn<DisposalSchedule>() {
           @Override
@@ -375,7 +414,7 @@ public class DisposalPolicy extends Composite {
           public String getValue(DisposalSchedule schedule) {
             if (schedule.getRetentionPeriodDuration() == null && schedule.getRetentionPeriodIntervalCode() == null) {
               return "";
-            }else if (schedule.getRetentionPeriodIntervalCode() == RetentionPeriodIntervalCode.NO_RETENTION_PERIOD){
+            } else if (schedule.getRetentionPeriodIntervalCode() == RetentionPeriodIntervalCode.NO_RETENTION_PERIOD) {
               return schedule.getRetentionPeriodIntervalCode().toString();
             } else {
               String value = schedule.getRetentionPeriodDuration().toString() + " "
@@ -413,16 +452,10 @@ public class DisposalPolicy extends Composite {
   }
 
   private BasicTablePanel<DisposalHold> getBasicTablePanelForDisposalHolds(DisposalHolds disposalHolds) {
-    Label headerHolds = new Label(messages.disposalHoldsTitle());
-    headerHolds.addStyleName("h5");
-
-    HTMLPanel info = new HTMLPanel("");
-    info.add(new HTMLWidgetWrapper("DisposalHoldDescription.html"));
-
     if (disposalHolds.getObjects().isEmpty()) {
-      return new BasicTablePanel<>(headerHolds, messages.noItemsToDisplayPreFilters(messages.disposalHoldsTitle()));
+      return new BasicTablePanel<>(messages.noItemsToDisplayPreFilters(messages.disposalHoldsTitle()));
     } else {
-      return new BasicTablePanel<DisposalHold>(headerHolds, info, disposalHolds.getObjects().iterator(),
+      return new BasicTablePanel<DisposalHold>(disposalHolds.getObjects().iterator(),
 
         new BasicTablePanel.ColumnInfo<>(messages.disposalHoldTitle(), 15, new TextColumn<DisposalHold>() {
           @Override

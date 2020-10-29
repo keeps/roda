@@ -52,7 +52,7 @@
                 </g:Label>
                 <g:ListBox addStyleNames="form-textbox" ui:field="retentionTriggers"/>
                 <g:Label ui:field="retentionTriggersError" addStyleNames="form-label-error"></g:Label>
-                <g:FlowPanel addStyleNames="row full_width no_padding">
+                <g:FlowPanel>
                     <g:FlowPanel ui:field="retentionPeriodDurationPanel" addStyleNames="col_2">
                         <g:Label addStyleNames="form-label" ui:field="retentionPeriodDurationLabel">
                             <ui:text from='{messages.disposalScheduleRetentionPeriodDuration}'/>
