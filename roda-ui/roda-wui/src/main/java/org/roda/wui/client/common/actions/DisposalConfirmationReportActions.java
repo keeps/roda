@@ -121,7 +121,8 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
 
                 @Override
                 public void onSuccess(final String details) {
-                  BrowserService.Util.getInstance().deleteDisposalConfirmationReport(report.getId(), details,
+                  BrowserService.Util.getInstance().deleteDisposalConfirmationReport(
+                    objectToSelectedItems(report, DisposalConfirmationMetadata.class), details,
                     new ActionAsyncCallback<Job>(callback) {
 
                       @Override

@@ -148,7 +148,8 @@ public class DisposalConfirmationList extends AsyncTableCell<DisposalConfirmatio
     columnSortingKeyMap.put(titleColumn, Collections.singletonList(RodaConstants.DISPOSAL_CONFIRMATION_TITLE));
     columnSortingKeyMap.put(createdOnColumn, Collections.singletonList(RodaConstants.DISPOSAL_CONFIRMATION_CREATED_ON));
     columnSortingKeyMap.put(createdByColumn, Collections.singletonList(RodaConstants.DISPOSAL_CONFIRMATION_CREATED_BY));
-    columnSortingKeyMap.put(stateColumn, Collections.singletonList(RodaConstants.DISPOSAL_CONFIRMATION_STATE));
+    columnSortingKeyMap.put(stateColumn,
+      Arrays.asList(RodaConstants.DISPOSAL_CONFIRMATION_STATE, RodaConstants.DISPOSAL_CONFIRMATION_CREATED_ON));
     columnSortingKeyMap.put(sizeColumn, Collections.singletonList(RodaConstants.DISPOSAL_CONFIRMATION_STORAGE_SIZE));
     columnSortingKeyMap.put(numberOfAIPsColumn,
       Collections.singletonList(RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_AIPS));
