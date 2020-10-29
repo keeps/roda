@@ -424,7 +424,8 @@ public interface BrowserService extends RemoteService {
   void deleteDisposalHold(String disposalHoldId) throws NotFoundException, AuthorizationDeniedException,
     IllegalOperationException, GenericException, RequestNotValidException;
 
-  Job associateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, String disposalScheduleId)
+  Job associateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, String disposalScheduleId,
+    Boolean applyToHierarchy, Boolean overwriteAll)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   Job disassociateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems)

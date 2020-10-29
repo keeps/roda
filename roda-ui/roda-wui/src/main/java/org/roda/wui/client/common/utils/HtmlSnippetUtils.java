@@ -119,6 +119,19 @@ public class HtmlSnippetUtils {
     return ret;
   }
 
+  public static SafeHtml getDisposalHoldStatusHTML(Boolean onHold){
+    SafeHtmlBuilder b = new SafeHtmlBuilder();
+    if (onHold){
+      b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING));
+      b.append(SafeHtmlUtils.fromString(messages.disposalOnHoldStatusLabel()));
+    } else {
+      b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
+      b.append(SafeHtmlUtils.fromString(messages.disposalClearStatusLabel()));
+    }
+    b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+    return b.toSafeHtml();
+  }
+
   public static SafeHtml getJobStateHtml(Job job) {
     SafeHtml ret = null;
     if (job != null) {

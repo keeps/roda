@@ -10,6 +10,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
@@ -22,6 +24,10 @@ import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -29,11 +35,14 @@ import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.ip.disposal.RetentionTriggerCode;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceTest;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.plugins.plugins.internal.disposal.schedule.AssociateDisposalScheduleToAIPPlugin;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -180,6 +189,53 @@ public class DisposalScheduleTest {
     assertEquals(aip.getDestroyedOn(), indexedAip.getDestructionOn());
     assertEquals(aip.getDestroyedBy(), indexedAip.getDestructionApprovedBy());
   }
+
+  @Test
+  public void testDisposalScheduleRecursiveAssociation() throws RequestNotValidException, AuthorizationDeniedException, ValidationException, NotFoundException, GenericException, AlreadyExistsException {
+    // generate AIP ID
+    final String parentId = IdUtils.createUUID();
+    final String childId = IdUtils.createUUID();
+    final String grandsonId = IdUtils.createUUID();
+
+    // Create AIPs
+    AIP parentAIP = model.createAIP(parentId, corporaService,
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+      RodaConstants.ADMIN);
+    AIP childAIP = model.createAIP(childId, corporaService,
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+      RodaConstants.ADMIN);
+    AIP grandsonAIP = model.createAIP(grandsonId, corporaService,
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+      RodaConstants.ADMIN);
+
+    model.updateAIP(parentAIP, RodaConstants.ADMIN);
+    model.updateAIP(childAIP, RodaConstants.ADMIN);
+    model.updateAIP(grandsonAIP, RodaConstants.ADMIN);
+    //Create hierarchy
+    model.moveAIP(childId, parentId, RodaConstants.ADMIN);
+    model.moveAIP(grandsonId, parentId, RodaConstants.ADMIN);
+    index.commitAIPs();
+
+    // Generate Disposal
+    DisposalSchedule disposalSchedule = createDisposalSchedule();
+
+    //Associate disposal schedule to parentAip
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ID, parentId));
+    SelectedItemsFilter<IndexedAIP> selectedItems = new SelectedItemsFilter<>(filter, IndexedAIP.class.getName(),
+      Boolean.FALSE);
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID, disposalSchedule.getId());
+    Job job = TestsHelper.executeJob(AssociateDisposalScheduleToAIPPlugin.class, pluginParameters, PluginType.INTERNAL, (SelectedItems) selectedItems);
+    index.commitAIPs();
+    //assertEquals(3, job.getJobStats().getSourceObjectsCount());
+
+    AIP retrieveChildAIP = model.retrieveAIP(childId);
+    AIP retrieveGrandSonAIP = model.retrieveAIP(grandsonId);
+    assertEquals(disposalSchedule.getId(), retrieveChildAIP.getDisposalScheduleId());
+    assertEquals(disposalSchedule.getId(), retrieveGrandSonAIP.getDisposalScheduleId());
+  }
+
+
 
   private DisposalSchedule createDisposalSchedule() throws AlreadyExistsException, AuthorizationDeniedException,
     GenericException, NotFoundException, RequestNotValidException {

@@ -19,6 +19,7 @@ import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.DisposalDialogs;
+import org.roda.wui.client.common.dialogs.utils.DisposalScheduleDialogsResult;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.disposal.confirmations.CreateDisposalConfirmationDataPanel;
 import org.roda.wui.client.ingest.process.ShowJob;
@@ -140,14 +141,17 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
             // Show the active disposal schedules only
             schedules.getObjects().removeIf(schedule -> DisposalScheduleState.INACTIVE.equals(schedule.getState()));
             DisposalDialogs.showDisposalScheduleSelection(messages.disposalScheduleSelectionDialogTitle(), schedules,
-              new ActionNoAsyncCallback<DisposalSchedule>(callback) {
+              new ActionNoAsyncCallback<DisposalScheduleDialogsResult>(callback) {
                 @Override
                 public void onFailure(Throwable caught) {
                   doActionCallbackNone();
                 }
 
                 @Override
-                public void onSuccess(DisposalSchedule disposalSchedule) {
+                public void onSuccess(DisposalScheduleDialogsResult result) {
+                  DisposalSchedule disposalSchedule = result.getDisposalSchedule();
+                  Boolean applyToHierarchy = result.isApplyToHierarchy();
+                  Boolean overwriteAll = result.isOverwriteAll();
                   // the result can be null, if null treat as removing the disposal schedule
 
                   Dialogs.showConfirmDialog(
@@ -199,7 +203,7 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
                               });
                           } else {
                             BrowserService.Util.getInstance().associateDisposalSchedule(items, disposalSchedule.getId(),
-                              new ActionAsyncCallback<Job>(callback) {
+                                applyToHierarchy, overwriteAll, new ActionAsyncCallback<Job>(callback) {
 
                                 @Override
                                 public void onFailure(Throwable caught) {
