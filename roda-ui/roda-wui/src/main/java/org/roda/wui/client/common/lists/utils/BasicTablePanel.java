@@ -59,6 +59,31 @@ public class BasicTablePanel<C> extends Composite {
   }
 
   @SafeVarargs
+  public BasicTablePanel(Iterator<C> rowItems, ColumnInfo<C>... columns) {
+    this(GWT.create(MyCellTableResources.class), rowItems, columns);
+  }
+
+  @SafeVarargs
+  public BasicTablePanel(CellTable.Resources resources, Iterator<C> rowItems,
+                         ColumnInfo<C>... columns) {
+    initWidget(uiBinder.createAndBindUi(this));
+
+    display = createTable(resources, rowItems, columns);
+    selectionModel = new SingleSelectionModel<>();
+    display.setSelectionModel(selectionModel);
+
+    displayScroll = new ScrollPanel(display);
+    displayScrollWrapper = new SimplePanel(displayScroll);
+    displayScrollWrapper.addStyleName("my-asyncdatagrid-display-scroll-wrapper");
+    table.setWidget(displayScrollWrapper);
+
+    displayScroll.addScrollHandler(event -> handleScrollChanges());
+    handleScrollChanges();
+  }
+
+
+
+  @SafeVarargs
   public BasicTablePanel(Widget headerContent, Widget infoContent, CellTable.Resources resources, Iterator<C> rowItems,
     ColumnInfo<C>... columns) {
     initWidget(uiBinder.createAndBindUi(this));
@@ -97,6 +122,22 @@ public class BasicTablePanel<C> extends Composite {
     table.setVisible(false);
     selectionModel = null;
   }
+
+  public BasicTablePanel(String infoContent) {
+    initWidget(uiBinder.createAndBindUi(this));
+
+    SafeHtmlBuilder b = new SafeHtmlBuilder();
+    b.append(SafeHtmlUtils.fromSafeConstant("<div class=\"field\">"));
+    b.append(SafeHtmlUtils.fromSafeConstant("<div class=\"label\">"));
+    b.append(SafeHtmlUtils.fromString(infoContent));
+    b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
+    b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
+    info.setWidget(new HTMLPanel(b.toSafeHtml()));
+
+    table.setVisible(false);
+    selectionModel = null;
+  }
+
 
   @Override
   public void setVisible(boolean visible) {
