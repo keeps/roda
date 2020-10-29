@@ -113,7 +113,7 @@ public class DisposalScheduleTest {
     assertFalse(Files.exists(FSUtils.getEntityPath(storagePath, disposalScheduleStoragePath)));
   }
 
-/*  @Test
+@Test
   public void testDisposalScheduleDeletionWhenUsed() throws AuthorizationDeniedException, RequestNotValidException,
     NotFoundException, GenericException, AlreadyExistsException {
     DisposalSchedule disposalSchedule = createDisposalSchedule();
@@ -128,7 +128,7 @@ public class DisposalScheduleTest {
     }
 
     assertTrue(Files.exists(FSUtils.getEntityPath(storagePath, disposalScheduleStoragePath)));
-  }*/
+  }
 
   @Test
   public void testDisposalScheduleAipAssociation() throws AuthorizationDeniedException, RequestNotValidException,
