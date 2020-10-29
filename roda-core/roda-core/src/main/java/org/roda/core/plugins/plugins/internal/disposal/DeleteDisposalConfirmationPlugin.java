@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
 public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalConfirmationMetadata> {
   private static final Logger LOGGER = LoggerFactory.getLogger(DeleteDisposalConfirmationPlugin.class);
   private static final String EVENT_DESCRIPTION = "The process of updating an object of the repository";
+
   private String details;
 
   private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
