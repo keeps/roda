@@ -31,6 +31,7 @@ public class DisposalConfirmationAIPEntry implements IsModelObject {
     return 1;
   }
 
+  @JsonIgnore
   @Override
   public String getId() {
     return aipId;

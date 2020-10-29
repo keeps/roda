@@ -170,30 +170,18 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
           numberOfCollection++;
         }
 
-        // Copy disposal schedules
-        model.copyDisposalScheduleToConfirmationReport(confirmationId, disposalSchedules);
-
-        // Copy disposal holds
-        model.copyDisposalHoldToConfirmationReport(confirmationId, disposalHolds);
-
-        // create report metadata
-        model.createDisposalConfirmationMetadata(
-          DisposalConfirmationPluginUtils.getDisposalConfirmationMetadata(confirmationId, title, storageSize,
-            disposalHolds, disposalSchedules, aips.size(), numberOfCollection),
-          cachedJob.getUsername());
-
         reportItem.setPluginState(PluginState.SUCCESS);
-        reportItem.setPluginDetails("Add AIP to disposal confirmation report: " + confirmationId);
+        reportItem
+          .setPluginDetails("Add AIP '" + aip.getId() + "' to disposal confirmation report '" + confirmationId + ")");
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmation(
+        outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationCreation(
           "was successfully added to disposal confirmation", confirmationId, aip.getId());
-      } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
-        | AlreadyExistsException e) {
+      } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
         LOGGER.error("Error creating disposal confirmation {}: {}", confirmationId, e.getMessage(), e);
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         reportItem.setPluginState(PluginState.FAILURE)
           .setPluginDetails("Error creating disposal confirmation " + confirmationId + ": " + e.getMessage());
-        outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmation(
+        outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationCreation(
           "failed to be added to disposal confirmation", confirmationId, aip.getId());
       } finally {
         report.addReport(reportItem);
@@ -207,6 +195,45 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
         | AuthorizationDeniedException | AlreadyExistsException e) {
         LOGGER.error("Error creating event: {}", e.getMessage(), e);
       }
+    }
+
+    // Copy disposal schedules
+    try {
+      model.copyDisposalScheduleToConfirmationReport(confirmationId, disposalSchedules);
+    } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException
+      | AlreadyExistsException e) {
+      LOGGER.error("Failed to copy disposal schedules", e);
+      report.addPluginDetails("Failed to copy disposal schedule elements");
+    }
+
+    // Copy disposal holds
+    try {
+      model.copyDisposalHoldToConfirmationReport(confirmationId, disposalHolds);
+    } catch (RequestNotValidException | NotFoundException | AuthorizationDeniedException | GenericException
+      | AlreadyExistsException e) {
+      LOGGER.error("Failed to copy disposal holds", e);
+      report.addPluginDetails("Failed to copy disposal hold elements");
+    }
+
+    // create disposal confirmation report metadata
+    try {
+      model.createDisposalConfirmationMetadata(
+        DisposalConfirmationPluginUtils.getDisposalConfirmationMetadata(confirmationId, title, storageSize,
+          disposalHolds, disposalSchedules, aips.size(), numberOfCollection),
+        cachedJob.getUsername());
+
+      model.createRepositoryEvent(PreservationEventType.CREATION, getPreservationEventDescription(),
+        PluginState.SUCCESS, "The disposal confirmation report " + confirmationId + " has been created.", "",
+        cachedJob.getUsername(), true);
+    } catch (RequestNotValidException | NotFoundException | GenericException | AlreadyExistsException
+      | AuthorizationDeniedException e) {
+      LOGGER.error("Failed to create disposal confirmation metadata file", e);
+      report.setPluginState(PluginState.FAILURE)
+        .setPluginDetails("Failed to create disposal confirmation metadata file: " + e.getMessage());
+
+      model.createRepositoryEvent(PreservationEventType.CREATION, getPreservationEventDescription(),
+        PluginState.FAILURE, "The disposal confirmation report " + confirmationId + " was not created.", "",
+        cachedJob.getUsername(), true);
     }
   }
 

@@ -317,5 +317,5 @@ public interface BrowserServiceAsync {
 
   void listDisposalHoldsAssociation(String aipId, AsyncCallback<List<DisposalHoldAssociation>> async);
 
-  void deleteDisposalConfirmationReport(String disposalConfirmationId, String details, AsyncCallback<Job> async);
+  void deleteDisposalConfirmationReport(SelectedItems<DisposalConfirmationMetadata> selectedItems, String details, AsyncCallback<Job> async);
 }

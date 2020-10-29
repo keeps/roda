@@ -1,8 +1,10 @@
 package org.roda.wui.client.disposal.confirmations;
 
+import java.util.Date;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -21,6 +23,7 @@ import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -35,11 +38,19 @@ import config.i18n.client.ClientMessages;
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public class CreateDisposalConfirmation extends Composite {
+
+  private static final DateTimeFormat formatter = DateTimeFormat.getFormat(RodaConstants.SIMPLE_DATE_FORMATTER);
+
   private static final Filter SHOW_RECORDS_TO_REVIEW = new Filter(
     new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_ACTION, DisposalActionCode.REVIEW.name()),
+    new DateIntervalFilterParameter(RodaConstants.AIP_OVERDUE_DATE, RodaConstants.AIP_OVERDUE_DATE, null,
+      formatter.parse(formatter.format(new Date()))),
     new EmptyKeyFilterParameter(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID));
+
   private static final Filter SHOW_RECORDS_TO_DESTROY = new Filter(
     new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_ACTION, DisposalActionCode.DESTROY.name()),
+    new DateIntervalFilterParameter(RodaConstants.AIP_OVERDUE_DATE, RodaConstants.AIP_OVERDUE_DATE, null,
+      formatter.parse(formatter.format(new Date()))),
     new EmptyKeyFilterParameter(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID));
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
@@ -95,8 +106,7 @@ public class CreateDisposalConfirmation extends Composite {
   public CreateDisposalConfirmation() {
     ListBuilder<IndexedAIP> overdueRecordsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
       new AsyncTableCellOptions<>(IndexedAIP.class, "DisposalOverdueRecords_aip").withSummary(messages.listOfAIPs())
-        /*.withFilter(SHOW_RECORDS_TO_DESTROY)*/
-          .withActionable(DisposalCreateConfirmationDestroyActions.get())
+        .withFilter(SHOW_RECORDS_TO_DESTROY).withActionable(DisposalCreateConfirmationDestroyActions.get())
         .withJustActive(true).bindOpener());
     overdueRecordsSearch = new SearchWrapper(false).createListAndSearchPanel(overdueRecordsListBuilder);
 
@@ -130,4 +140,5 @@ public class CreateDisposalConfirmation extends Composite {
       content.add(overdueRecordsSearch);
     });
   }
+
 }
