@@ -27,7 +27,7 @@ public class DisposalCreateConfirmationReviewActions extends AbstractActionable<
     Collections.singletonList(DisposalCreateConfirmationReviewAction.CHANGE_SCHEDULE));
 
   public enum DisposalCreateConfirmationReviewAction implements Action<IndexedAIP> {
-    CHANGE_SCHEDULE(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_CONFIRMATION);
+    CHANGE_SCHEDULE(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_SCHEDULE);
 
     private List<String> methods;
 
@@ -75,8 +75,8 @@ public class DisposalCreateConfirmationReviewActions extends AbstractActionable<
     // management
     ActionableGroup<IndexedAIP> actionsGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
 
-    actionsGroup.addButton(messages.changeDisposalScheduleActionTitle(), DisposalCreateConfirmationReviewAction.CHANGE_SCHEDULE, ActionImpact.NONE,
-      "btn-edit");
+    actionsGroup.addButton(messages.changeDisposalScheduleActionTitle(),
+      DisposalCreateConfirmationReviewAction.CHANGE_SCHEDULE, ActionImpact.NONE, "btn-edit");
 
     confirmationActionableBundle.addGroup(actionsGroup);
 

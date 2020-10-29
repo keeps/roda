@@ -2148,4 +2148,8 @@ public interface ClientMessages extends Messages {
   String deleteConfirmationReportDialogTitle();
 
   String deleteConfirmationReportDialogMessage();
+
+  String deleteConfirmationReportSuccessTitle();
+
+  String deleteConfirmationReportSuccessMessage();
 }

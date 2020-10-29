@@ -1,5 +1,7 @@
 package org.roda.wui.client.common.actions;
 
+import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_DELETE_DISPOSAL_CONFIRMATION;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -13,6 +15,7 @@ import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.disposal.confirmations.ShowDisposalConfirmation;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
@@ -41,7 +44,7 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
   private static final Set<DisposalConfirmationReportAction> POSSIBLE_ACTIONS_FOR_DELETED = POSSIBLE_ACTIONS_FOR_RECOVERED;
 
   public enum DisposalConfirmationReportAction implements Action<DisposalConfirmationMetadata> {
-    DESTROY(), DELETE_REPORT(), REMOVE_FROM_BIN(), RECOVER_FROM_BIN();
+    DESTROY(), DELETE_REPORT(PERMISSION_METHOD_DELETE_DISPOSAL_CONFIRMATION), REMOVE_FROM_BIN(), RECOVER_FROM_BIN();
 
     private List<String> methods;
 
@@ -131,8 +134,10 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
 
                           @Override
                           public void onFailure(Throwable caught) {
-                            Toast.showInfo(messages.removingSuccessTitle(), messages.removingSuccessMessage(1L));
+                            Toast.showInfo(messages.deleteConfirmationReportSuccessTitle(),
+                              messages.deleteConfirmationReportSuccessMessage());
                             doActionCallbackDestroyed();
+                            HistoryUtils.newHistory(ShowDisposalConfirmation.RESOLVER);
                           }
 
                           @Override
