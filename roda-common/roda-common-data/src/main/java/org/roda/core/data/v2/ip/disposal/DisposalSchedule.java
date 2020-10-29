@@ -171,7 +171,7 @@ public class DisposalSchedule implements IsModelObject, HasId {
   }
 
   public void setFirstTimeUsed(Date firstTimeUsed) {
-    if(this.firstTimeUsed != null){
+    if(this.firstTimeUsed == null){
       this.firstTimeUsed = firstTimeUsed;
     }
   }
