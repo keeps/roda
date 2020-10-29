@@ -322,7 +322,7 @@ public interface BrowserServiceAsync {
   void deleteDisposalHold(String disposalHoldId, AsyncCallback<Void> async);
 
   void associateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, String disposalScheduleId,
-    AsyncCallback<Job> async);
+                                 Boolean applyToHierarchy, Boolean overwriteAll, AsyncCallback<Job> async);
 
   void disassociateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, AsyncCallback<Job> async);
 

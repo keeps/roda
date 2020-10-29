@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.gwt.user.client.Timer;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -40,6 +41,7 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.DisposalDialogs;
 import org.roda.wui.client.common.dialogs.RepresentationDialogs;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
+import org.roda.wui.client.common.dialogs.utils.DisposalScheduleDialogsResult;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.process.ShowJob;
@@ -56,7 +58,6 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeUri;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -746,15 +747,18 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
             // Show the active disposal schedules only
             schedules.getObjects().removeIf(schedule -> DisposalScheduleState.INACTIVE.equals(schedule.getState()));
             DisposalDialogs.showDisposalScheduleSelection(messages.disposalScheduleSelectionDialogTitle(), schedules,
-              new ActionNoAsyncCallback<DisposalSchedule>(callback) {
+              new ActionNoAsyncCallback<DisposalScheduleDialogsResult>(callback) {
                 @Override
                 public void onFailure(Throwable caught) {
                   doActionCallbackNone();
                 }
 
                 @Override
-                public void onSuccess(DisposalSchedule disposalSchedule) {
+                public void onSuccess(DisposalScheduleDialogsResult result) {
                   // the result can be null, if null treat as removing the disposal schedule
+                  DisposalSchedule disposalSchedule = result.getDisposalSchedule();
+                  Boolean applyToHierarchy = result.isApplyToHierarchy();
+                  Boolean overwriteAll = result.isOverwriteAll();
 
                   Dialogs.showConfirmDialog(
                     disposalSchedule != null ? messages.associateDisposalScheduleDialogTitle()
@@ -768,7 +772,6 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                           if (disposalSchedule == null) {
                             BrowserService.Util.getInstance().disassociateDisposalSchedule(aips,
                               new ActionAsyncCallback<Job>(callback) {
-
                                 @Override
                                 public void onFailure(Throwable caught) {
                                   callback.onFailure(caught);
@@ -805,7 +808,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                               });
                           } else {
                             BrowserService.Util.getInstance().associateDisposalSchedule(aips, disposalSchedule.getId(),
-                              new ActionAsyncCallback<Job>(callback) {
+                                applyToHierarchy, overwriteAll, new ActionAsyncCallback<Job>(callback) {
 
                                 @Override
                                 public void onFailure(Throwable caught) {
