@@ -3371,10 +3371,13 @@ public class BrowserHelper {
       "Could not execute disassociate disposal schedule action");
   }
 
-  public static Job associateDisposalSchedule(User user, SelectedItems<IndexedAIP> selected, String disposalScheduleId)
+  public static Job associateDisposalSchedule(User user, SelectedItems<IndexedAIP> selected, String disposalScheduleId,
+    Boolean applyToHierarchy, Boolean overwriteAll)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID, disposalScheduleId);
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RECURSIVE, applyToHierarchy.toString());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RECURSIVE, overwriteAll.toString());
 
     return createAndExecuteInternalJob("Associate disposal schedule", selected,
       AssociateDisposalScheduleToAIPPlugin.class, user, pluginParameters,

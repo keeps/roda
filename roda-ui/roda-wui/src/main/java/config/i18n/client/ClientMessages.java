@@ -2165,6 +2165,8 @@ public interface ClientMessages extends Messages {
 
   String associateDisposalScheduleDialogMessage(Long size);
 
+  String overwriteAllDisposalDialogCheckBox();
+
   String disposalPolicyAIPWithoutAssociation();
 
   String disposalPolicyAIPDueForDestruction(String duration, String onHold);
@@ -2177,9 +2179,21 @@ public interface ClientMessages extends Messages {
 
   String disposalActionLabel();
 
-  String disposalStatusLabel();
+  String holdStatusLabel();
 
-  String disposalHoldStatusLabel();
+  String addDisposalHoldButton();
+
+  String disposalHoldAssociatedOnLabel();
+
+  String disposalHoldAssociatedByLabel();
+
+  String disposalHoldLiftedOnLabel();
+
+  String disposalHoldLiftedByLabel();
+
+  String disposalOnHoldStatusLabel();
+
+  String disposalClearStatusLabel();
 
   String disposalAssociationDescription();
 

@@ -50,16 +50,17 @@
                     </g:FlowPanel>
                     <g:FlowPanel styleName="field">
                         <g:Label styleName="label">
-                            <ui:text from='{messages.disposalStatusLabel}'/>
+                            <ui:text from='{messages.holdStatusLabel}'/>
                         </g:Label>
-                        <g:Label styleName="value" ui:field="disposalDisposalStatus"/>
+                        <g:HTML styleName="value" ui:field="disposalDisposalStatus" />
                     </g:FlowPanel>
                 </g:FlowPanel>
                 <g:FlowPanel addStyleNames="wui-data-panel" ui:field="disposalHolds">
                     <g:Label styleName="h5">
                             <ui:text from='{messages.showDisposalHoldTitle}'/>
                     </g:Label>
-                    <g:FlowPanel ui:field="disposalHoldsPanel" />
+                    <g:FlowPanel ui:field="disposalHoldsPanel" addStyleNames="basicTable"/>
+                    <g:Button ui:field="addDisposalHoldBtn" addStyleNames="btn btn-plus"/>
                 </g:FlowPanel>
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="col_2 last sidebar">

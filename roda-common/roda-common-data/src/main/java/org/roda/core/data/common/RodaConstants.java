@@ -961,6 +961,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_INCLUDE_DOCUMENTATION = "parameter.include_documentation";
 
   public static final String PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID = "parameter.disposal_schedule_id";
+  public static final String PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_ALL = "parameter.disposal_schedule_overwrite_all";
 
   public static final String PLUGIN_PARAMS_DISPOSAL_HOLD_ID = "parameter.disposal_hold_id";
 

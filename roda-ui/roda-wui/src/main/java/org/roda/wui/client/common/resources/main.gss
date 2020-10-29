@@ -7248,6 +7248,21 @@ span.code {
     color: #999;
     margin-top: 2px;
 }
-.disposalRuleOperator {
+
+.disposal-dialogs-checkbox {
+    margin-right: 10px
+}
+
+.disposal-dialogs-checkbox input[type="checkbox"]{
+    vertical-align: middle;
+}
+
+.disposal-dialogs-checkbox input[type="checkbox"]:disabled{
+    border-color:#ccc;
+}
+
+.disposal-dialogs-checkbox input[type="checkbox"]:disabled + label{
+    color: #ccc;
+}.disposalRuleOperator {
     text-align: center;
 }

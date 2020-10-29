@@ -241,7 +241,8 @@ public class Disposals extends RodaWuiController {
     }
   }
 
-  public static Job associateDisposalSchedule(User user, SelectedItems<IndexedAIP> selected, String disposalScheduleId)
+  public static Job associateDisposalSchedule(User user, SelectedItems<IndexedAIP> selected, String disposalScheduleId,
+    Boolean applyToHierarchy, Boolean overwriteAll)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -251,7 +252,7 @@ public class Disposals extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
     try {
       // delegate
-      return BrowserHelper.associateDisposalSchedule(user, selected, disposalScheduleId);
+      return BrowserHelper.associateDisposalSchedule(user, selected, disposalScheduleId, applyToHierarchy, overwriteAll);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;

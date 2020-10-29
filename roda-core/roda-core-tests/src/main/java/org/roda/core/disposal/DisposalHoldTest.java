@@ -192,7 +192,7 @@ public class DisposalHoldTest {
 
     model.createDisposalHoldAssociation(aip.getId(), disposalHold.getId(), new Date(), RodaConstants.ADMIN);
     model.createDisposalHoldAssociation(aip.getId(), disposalHold2.getId(), new Date(), RodaConstants.ADMIN);
-    AIP updatedAIP = model.updateAIP(aip, RodaConstants.ADMIN);
+    AIP updatedAIP = model.retrieveAIP(aip.getId());
 
     index.commitAIPs();
 
