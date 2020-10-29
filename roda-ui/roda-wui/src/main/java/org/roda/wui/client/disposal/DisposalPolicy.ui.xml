@@ -6,21 +6,24 @@
 
     <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
     <g:FlowPanel styleName="wui-disposal-policy" addStyleNames="wrapper skip_padding">
-
         <g:FlowPanel addStyleNames="row full_width skip_padding">
             <g:FlowPanel ui:field="contentFlowPanel" addStyleNames="col_10">
                 <common:TitlePanel text="{messages.disposalPolicyTitle}" iconClass="DisposalPolicy"/>
                 <g:FlowPanel addStyleNames="page-description" ui:field="disposalPolicyDescription"></g:FlowPanel>
-                <g:FlowPanel ui:field="contentDisposalSchedulesTable">
+                <g:FlowPanel ui:field="disposalSchedulesDescription">
                 </g:FlowPanel>
+                <g:ScrollPanel ui:field="contentDisposalSchedulesTable">
+                </g:ScrollPanel>
                 <g:FlowPanel ui:field="newDisposalSchedule">
                 </g:FlowPanel>
-                <g:FlowPanel ui:field="contentDisposalHoldsTable">
+                <g:FlowPanel ui:field="disposalHoldsDescription">
                 </g:FlowPanel>
+                <g:ScrollPanel ui:field="contentDisposalHoldsTable">
+                </g:ScrollPanel>
                 <g:FlowPanel ui:field="newDisposalHold">
                 </g:FlowPanel>
             </g:FlowPanel>
-            <g:FlowPanel ui:field="sidebarFlowPanel" addStyleNames="col_2 last sidebar">
+            <g:FlowPanel ui:field="sidebarFlowPanel" addStyleNames="col_2 last sidebar contentPanel">
                 <g:FlowPanel addStyleNames="sticky-flow">
                     <g:FlowPanel addStyleNames="sticky-padding">
                         <g:Label addStyleNames="h4">
