@@ -5,6 +5,7 @@ import org.roda.core.data.exceptions.DisposalScheduleNotValidException;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.ip.disposal.RetentionTriggerCode;
 import org.roda.wui.common.client.tools.StringUtils;
@@ -24,9 +25,15 @@ public class DisposalsHelper {
 
   public static void validateDisposalSchedule(DisposalSchedule disposalSchedule)
     throws DisposalScheduleNotValidException {
+    
     if (StringUtils.isBlank(disposalSchedule.getTitle())) {
       throw new DisposalScheduleNotValidException("The disposal schedule title is mandatory");
     }
+
+    if(!isNumberOfAIPsValid(disposalSchedule.getNumberOfAIPUnder(), disposalSchedule.getState())){
+      throw new DisposalScheduleNotValidException("The disposal schedule can not be deactivated" );
+    }
+    
     if (!isDisposalActionValid(disposalSchedule.getActionCode())) {
       throw new DisposalScheduleNotValidException("The disposal action code is not valid");
     }
@@ -46,6 +53,13 @@ public class DisposalsHelper {
       disposalSchedule.getRetentionPeriodIntervalCode(), disposalSchedule.getRetentionPeriodDuration())) {
       throw new DisposalScheduleNotValidException("The retention period duration is not valid.");
     }
+  }
+
+  private static boolean isNumberOfAIPsValid(Long numberOfAIPUnder, DisposalScheduleState state) {
+    if(numberOfAIPUnder > 0 && state.equals(DisposalScheduleState.INACTIVE)){
+      return false;
+    }
+    return true;
   }
 
   private static boolean isNumberValid(String string) {
