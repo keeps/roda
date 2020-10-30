@@ -409,7 +409,7 @@ public class DisposalPolicy extends Composite {
           }
         }),
 
-        new BasicTablePanel.ColumnInfo<>(messages.disposalSchedulePeriod(), 8, new TextColumn<DisposalSchedule>() {
+        new BasicTablePanel.ColumnInfo<>(messages.disposalSchedulePeriod(), 12, new TextColumn<DisposalSchedule>() {
           @Override
           public String getValue(DisposalSchedule schedule) {
             if (schedule.getRetentionPeriodDuration() == null && schedule.getRetentionPeriodIntervalCode() == null) {
@@ -424,14 +424,14 @@ public class DisposalPolicy extends Composite {
           }
         }),
 
-        new BasicTablePanel.ColumnInfo<>(messages.disposalScheduleActionCol(), 8, new TextColumn<DisposalSchedule>() {
+        new BasicTablePanel.ColumnInfo<>(messages.disposalScheduleActionCol(), 12, new TextColumn<DisposalSchedule>() {
           @Override
           public String getValue(DisposalSchedule schedule) {
             return messages.disposalScheduleAction(schedule.getActionCode().toString());
           }
         }),
 
-        new BasicTablePanel.ColumnInfo<>(messages.disposalScheduleNumberOfAIPs(), 8,
+        new BasicTablePanel.ColumnInfo<>(messages.disposalScheduleNumberOfAIPs(), 12,
           new TextColumn<DisposalSchedule>() {
 
             @Override
@@ -440,7 +440,7 @@ public class DisposalPolicy extends Composite {
             }
           }),
 
-        new BasicTablePanel.ColumnInfo<>(messages.disposalScheduleStateCol(), 8,
+        new BasicTablePanel.ColumnInfo<>(messages.disposalScheduleStateCol(), 12,
           new Column<DisposalSchedule, SafeHtml>(new SafeHtmlCell()) {
             @Override
             public SafeHtml getValue(DisposalSchedule schedule) {
@@ -471,14 +471,14 @@ public class DisposalPolicy extends Composite {
           }
         }),
 
-        new BasicTablePanel.ColumnInfo<>(messages.disposalHoldNumberOfAIPs(), 8, new TextColumn<DisposalHold>() {
+        new BasicTablePanel.ColumnInfo<>(messages.disposalHoldNumberOfAIPs(), 12, new TextColumn<DisposalHold>() {
           @Override
           public String getValue(DisposalHold hold) {
             return String.valueOf(hold.getActiveAIPs().size());
           }
         }),
 
-        new BasicTablePanel.ColumnInfo<>(messages.disposalHoldStateCol(), 8,
+        new BasicTablePanel.ColumnInfo<>(messages.disposalHoldStateCol(), 12,
           new Column<DisposalHold, SafeHtml>(new SafeHtmlCell()) {
             @Override
             public SafeHtml getValue(DisposalHold hold) {

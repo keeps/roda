@@ -2,16 +2,13 @@ package org.roda.wui.client.disposal.hold;
 
 import java.util.List;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.SimplePanel;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.DisposalHoldAlreadyExistsException;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
+import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
@@ -27,15 +24,21 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.wui.common.client.widgets.Toast;
+import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -161,17 +164,17 @@ public class ShowDisposalHold extends Composite {
 
     // Records with this schedule
 
-    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
+    if (disposalHold.getState().equals(DisposalHoldState.ACTIVE)
+      && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
       Label aipTitle = new Label();
       aipTitle.addStyleName("h5");
       aipTitle.setText(messages.disposalHoldListAips());
       aipListTitle.add(aipTitle);
 
       ListBuilder<IndexedAIP> aipsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
-              new AsyncTableCellOptions<>(IndexedAIP.class, "ShowDisposalHold_aips")
-                      .withFilter(
-                              new Filter(new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLDS_ID, disposalHold.getId())))
-                      .withSummary(messages.listOfAIPs()).bindOpener());
+        new AsyncTableCellOptions<>(IndexedAIP.class, "ShowDisposalHold_aips")
+          .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLDS_ID, disposalHold.getId())))
+          .withSummary(messages.listOfAIPs()).bindOpener());
 
       SearchWrapper aipsSearchWrapper = new SearchWrapper(false).createListAndSearchPanel(aipsListBuilder);
       aipsListCard.setWidget(aipsSearchWrapper);
@@ -179,26 +182,52 @@ public class ShowDisposalHold extends Composite {
     } else {
       aipsListCard.setVisible(false);
     }
+
   }
 
-  public void initButtons(){
-    Button editHoldBtn = new Button();
-    editHoldBtn.addStyleName("btn btn-block btn-edit");
-    editHoldBtn.setText(messages.editButton());
-    if(PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_UPDATE_DISPOSAL_HOLD)){
+  public void initButtons() {
+
+    if (disposalHold.getState().equals(DisposalHoldState.ACTIVE)
+      && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_UPDATE_DISPOSAL_HOLD)) {
+      Button editHoldBtn = new Button();
+      editHoldBtn.addStyleName("btn btn-block btn-edit");
+      editHoldBtn.setText(messages.editButton());
       editHoldBtn.addClickHandler(new ClickHandler() {
         @Override
         public void onClick(ClickEvent clickEvent) {
-          HistoryUtils.newHistory(EditDisposalHold.RESOLVER,disposalHold.getId());
+          HistoryUtils.newHistory(EditDisposalHold.RESOLVER, disposalHold.getId());
         }
       });
-    }
-    buttonsPanel.add(editHoldBtn);
 
-    Button liftHoldBtn = new Button();
-    liftHoldBtn.addStyleName("btn btn-block btn-danger btn-ban");
-    liftHoldBtn.setText(messages.liftButton());
-    buttonsPanel.add(liftHoldBtn);
+      buttonsPanel.add(editHoldBtn);
+
+      Button liftHoldBtn = new Button();
+      liftHoldBtn.addStyleName("btn btn-block btn-danger btn-ban");
+      liftHoldBtn.setText(messages.liftButton());
+      if (disposalHold.getActiveAIPs().size() == 0) {
+        liftHoldBtn.addClickHandler(new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent clickEvent) {
+            GWT.log("entrei");
+            disposalHold.setState(DisposalHoldState.LIFTED);
+            BrowserServiceImpl.Util.getInstance().updateDisposalHold(disposalHold, new AsyncCallback<DisposalHold>() {
+              @Override
+              public void onFailure(Throwable caught) {
+                errorMessage(caught);
+              }
+
+              @Override
+              public void onSuccess(DisposalHold disposalHold) {
+                HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+              }
+            });
+          }
+        });
+      }else{
+        // TODO -> plugin to lift hold in all AIPs
+      }
+      buttonsPanel.add(liftHoldBtn);
+    }
 
     Button backBtn = new Button();
     backBtn.setText(messages.backButton());
@@ -217,6 +246,14 @@ public class ShowDisposalHold extends Composite {
       instance = new ShowDisposalHold();
     }
     return instance;
+  }
+
+  private void errorMessage(Throwable caught) {
+    if (caught instanceof DisposalHoldAlreadyExistsException) {
+      Toast.showError(messages.createDisposalHoldAlreadyExists(disposalHold.getTitle()));
+    } else {
+      Toast.showError(messages.createDisposalHoldFailure(caught.getMessage()));
+    }
   }
 
   public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {

@@ -127,7 +127,7 @@ public class EditDisposalHold extends Composite {
 
         @Override
         public void onSuccess(DisposalHold disposalHold) {
-          HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+          HistoryUtils.newHistory(ShowDisposalHold.RESOLVER, disposalHold.getId());
         }
       });
     } else {
