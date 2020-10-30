@@ -144,9 +144,8 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
     long numberOfCollection = 0L;
 
     for (AIP aip : aips) {
+      PluginState state = PluginState.SUCCESS;
       String outcomeText;
-      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
-      PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
       LOGGER.debug("Processing AIP {}", aip.getId());
 
       try {
@@ -170,27 +169,26 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
           numberOfCollection++;
         }
 
-        reportItem.setPluginState(PluginState.SUCCESS);
-        reportItem
-          .setPluginDetails("Add AIP '" + aip.getId() + "' to disposal confirmation report '" + confirmationId + ")");
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
         outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationCreation(
           "was successfully added to disposal confirmation", confirmationId, aip.getId());
       } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
         LOGGER.error("Error creating disposal confirmation {}: {}", confirmationId, e.getMessage(), e);
+        state = PluginState.FAILURE;
         jobPluginInfo.incrementObjectsProcessedWithFailure();
-        reportItem.setPluginState(PluginState.FAILURE)
+        reportItem.setPluginState(state)
           .setPluginDetails("Error creating disposal confirmation " + confirmationId + ": " + e.getMessage());
         outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationCreation(
           "failed to be added to disposal confirmation", confirmationId, aip.getId());
-      } finally {
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
       }
 
       try {
-        PluginHelper.createPluginEvent(this, aip.getId(), model, index, null, null, reportItem.getPluginState(),
-          outcomeText, true, cachedJob);
+        PluginHelper.createPluginEvent(this, aip.getId(), model, index, null, null, state, outcomeText, true,
+          cachedJob);
       } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
         | AuthorizationDeniedException | AlreadyExistsException e) {
         LOGGER.error("Error creating event: {}", e.getMessage(), e);
