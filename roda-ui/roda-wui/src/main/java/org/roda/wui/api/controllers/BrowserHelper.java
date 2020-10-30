@@ -150,6 +150,7 @@ import org.roda.core.plugins.plugins.internal.UpdatePermissionsPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.AssociateDisposalScheduleToAIPPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.CreateDisposalConfirmationPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.DeleteDisposalConfirmationPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.DestroyRecordsInDisposalConfirmationPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.DisassociateDisposalScheduleToAIPPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
@@ -172,6 +173,7 @@ import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
+import org.roda.wui.client.browse.bundle.DisposalConfirmationExtraBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
@@ -3352,8 +3354,8 @@ public class BrowserHelper {
     return RodaCoreFactory.getModelService().createDisposalConfirmationMetadata(confirmationMetadata, user.getName());
   }
 
-  public static Job deleteDisposalConfirmation(User user, SelectedItems<DisposalConfirmationMetadata> selectedItems, String details)
-    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+  public static Job deleteDisposalConfirmation(User user, SelectedItems<DisposalConfirmationMetadata> selectedItems,
+    String details) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     return createAndExecuteInternalJob("Delete disposal confirmation report", selectedItems,
       DeleteDisposalConfirmationPlugin.class, user, Collections.emptyMap(),
       "Could not execute delete disposal confirmation report");
@@ -3383,5 +3385,59 @@ public class BrowserHelper {
     return createAndExecuteInternalJob("Create disposal confirmation report", selectedItems,
       CreateDisposalConfirmationPlugin.class, user, pluginParameters,
       "Could not execute create disposal confirmation report action");
+  }
+
+  public static DisposalConfirmationExtraBundle retrieveDisposalConfirmationExtraBundle() {
+    String template = null;
+
+      try (InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(
+          RodaConstants.DISPOSAL_CONFIRMATION_INFORMATION_TEMPLATE_FOLDER + "/" + RodaConstants.DISPOSAL_CONFIRMATION_EXTRA_METADATA_FILE)) {
+        template = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
+      } catch (IOException e) {
+        LOGGER.error("Error getting template from stream", e);
+      }
+
+      Set<MetadataValue> values = ServerTools.transform(template);
+
+      try {
+        User user = RodaCoreFactory.getModelService().retrieveUser("name");
+        String userExtra = user.getExtra();
+
+        if (userExtra != null && !values.isEmpty()) {
+          for (MetadataValue mv : values) {
+            // clear the auto-generated values
+            // mv.set("value", null);
+            String xpathRaw = mv.get("xpath");
+            if (xpathRaw != null && xpathRaw.length() > 0) {
+              String[] xpaths = xpathRaw.split("##%##");
+              String value;
+              List<String> allValues = new ArrayList<>();
+              for (String xpath : xpaths) {
+                allValues.addAll(ServerTools.applyXpath(userExtra, xpath));
+              }
+              // if any of the values is different, concatenate all values in a
+              // string, otherwise return the value
+              boolean allEqual = allValues.stream().allMatch(s -> s.trim().equals(allValues.get(0).trim()));
+              if (allEqual && !allValues.isEmpty()) {
+                value = allValues.get(0);
+              } else {
+                value = String.join(" / ", allValues);
+              }
+              mv.set("value", value.trim());
+            }
+          }
+        }
+
+      } catch (GenericException e) {
+        // do nothing
+      }
+
+      return new DisposalConfirmationExtraBundle(values);
+  }
+
+  public static Job destroyRecordsInDisposalConfirmation(User user,
+    SelectedItemsList<DisposalConfirmationMetadata> selectedItems) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    return createAndExecuteInternalJob("Destroy records from disposal confirmation report", selectedItems,
+      DestroyRecordsInDisposalConfirmationPlugin.class, user, Collections.emptyMap(), "Could not execute destruction of records in disposal confirmation report action");
   }
 }

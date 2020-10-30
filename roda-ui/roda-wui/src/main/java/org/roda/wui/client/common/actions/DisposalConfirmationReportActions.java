@@ -1,6 +1,9 @@
 package org.roda.wui.client.common.actions;
 
 import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_DELETE_DISPOSAL_CONFIRMATION;
+import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION;
+import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_PERMANENTLY_DELETE_RECORDS_DISPOSAL_CONFIRMATION;
+import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_RECOVER_RECORDS_DISPOSAL_CONFIRMATION;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -17,6 +20,7 @@ import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.disposal.confirmations.ShowDisposalConfirmation;
 import org.roda.wui.client.ingest.process.ShowJob;
+import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -44,7 +48,10 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
   private static final Set<DisposalConfirmationReportAction> POSSIBLE_ACTIONS_FOR_DELETED = POSSIBLE_ACTIONS_FOR_RECOVERED;
 
   public enum DisposalConfirmationReportAction implements Action<DisposalConfirmationMetadata> {
-    DESTROY(), DELETE_REPORT(PERMISSION_METHOD_DELETE_DISPOSAL_CONFIRMATION), REMOVE_FROM_BIN(), RECOVER_FROM_BIN();
+    DESTROY(PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION),
+    DELETE_REPORT(PERMISSION_METHOD_DELETE_DISPOSAL_CONFIRMATION),
+    REMOVE_FROM_BIN(PERMISSION_METHOD_PERMANENTLY_DELETE_RECORDS_DISPOSAL_CONFIRMATION),
+    RECOVER_FROM_BIN(PERMISSION_METHOD_RECOVER_RECORDS_DISPOSAL_CONFIRMATION);
 
     private List<String> methods;
 
@@ -100,6 +107,7 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
   public void act(Action<DisposalConfirmationMetadata> action, DisposalConfirmationMetadata object,
     AsyncCallback<ActionImpact> callback) {
     if (DisposalConfirmationReportAction.DESTROY.equals(action)) {
+      destroyDisposalConfirmationContent(object, callback);
     } else if (DisposalConfirmationReportAction.DELETE_REPORT.equals(action)) {
       deleteDisposalConfirmationReport(object, callback);
     } else if (DisposalConfirmationReportAction.REMOVE_FROM_BIN.equals(action)) {
@@ -107,6 +115,45 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
     } else {
       unsupportedAction(action, callback);
     }
+  }
+
+  private void destroyDisposalConfirmationContent(DisposalConfirmationMetadata report,
+    AsyncCallback<ActionImpact> callback) {
+    Dialogs.showConfirmDialog(messages.deleteConfirmationReportDialogTitle(),
+      messages.deleteConfirmationReportDialogMessage(), messages.dialogNo(), messages.dialogYes(),
+      new ActionNoAsyncCallback<Boolean>(callback) {
+        @Override
+        public void onSuccess(Boolean result) {
+          if (result) {
+            BrowserService.Util.getInstance().destroyRecordsInDisposalConfirmationReport(
+              objectToSelectedItems(report, DisposalConfirmationMetadata.class),
+              new ActionAsyncCallback<Job>(callback) {
+
+                @Override
+                public void onSuccess(Job result) {
+                  Dialogs.showJobRedirectDialog("BLA BLA BLA", new AsyncCallback<Void>() {
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      Toast.showInfo(messages.deleteConfirmationReportSuccessTitle(),
+                        messages.deleteConfirmationReportSuccessMessage());
+                      doActionCallbackUpdated();
+                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                    }
+
+                    @Override
+                    public void onSuccess(final Void nothing) {
+                      doActionCallbackUpdated();
+                      HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                    }
+                  });
+                }
+              });
+          } else {
+            doActionCallbackNone();
+          }
+        }
+      });
   }
 
   private void deleteDisposalConfirmationReport(DisposalConfirmationMetadata report,
@@ -176,7 +223,7 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
     reportGroup.addButton(messages.deleteDisposalConfirmationReport(), DisposalConfirmationReportAction.DELETE_REPORT,
       ActionImpact.DESTROYED, "btn-cancel");
     disposalBinGroup.addButton(messages.permanentlyDeleteFromBinButton(),
-      DisposalConfirmationReportAction.REMOVE_FROM_BIN, ActionImpact.DESTROYED, "btn-times-circle");
+      DisposalConfirmationReportAction.REMOVE_FROM_BIN, ActionImpact.UPDATED, "btn-times-circle");
     disposalBinGroup.addButton(messages.recoverFromBinButton(), DisposalConfirmationReportAction.RECOVER_FROM_BIN,
       ActionImpact.UPDATED, "btn-history");
 
