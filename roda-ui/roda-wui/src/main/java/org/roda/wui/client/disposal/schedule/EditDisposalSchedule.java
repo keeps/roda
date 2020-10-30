@@ -129,7 +129,7 @@ public class EditDisposalSchedule extends Composite {
 
           @Override
           public void onSuccess(DisposalSchedule disposalSchedule) {
-            HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+            HistoryUtils.newHistory(ShowDisposalSchedule.RESOLVER, disposalSchedule.getId());
           }
         });
     } else {
