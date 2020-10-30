@@ -7,10 +7,13 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.DisposalConfirmationActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
+import org.roda.wui.client.common.lists.DisposalConfirmationList;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
+import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.disposal.confirmations.CreateDisposalConfirmation;
 import org.roda.wui.client.disposal.confirmations.ShowDisposalConfirmation;
-import org.roda.wui.client.search.DisposalConfirmationSearch;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -65,7 +68,7 @@ public class DisposalConfirmations extends Composite {
   FlowPanel disposalConfirmationDescription;
 
   @UiField(provided = true)
-  DisposalConfirmationSearch searchPanel;
+  SearchWrapper searchWrapper;
 
   @UiField
   SimplePanel actionsSidebar;
@@ -80,7 +83,12 @@ public class DisposalConfirmations extends Composite {
    * Create a disposal confirmation page
    */
   public DisposalConfirmations() {
-    searchPanel = new DisposalConfirmationSearch("Disposal_confirmations");
+    ListBuilder<DisposalConfirmationMetadata> disposalConfirmationListBuilder = new ListBuilder<>(
+      () -> new DisposalConfirmationList(),
+      new AsyncTableCellOptions<>(DisposalConfirmationMetadata.class, "Disposal_confirmations").bindOpener()
+        .withAutoUpdate(5000));
+
+    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(disposalConfirmationListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -100,8 +108,14 @@ public class DisposalConfirmations extends Composite {
   public static DisposalConfirmations getInstance() {
     if (instance == null) {
       instance = new DisposalConfirmations();
+    } else {
+      instance.refresh();
     }
     return instance;
+  }
+
+  private void refresh() {
+    searchWrapper.refreshCurrentList();
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
@@ -115,11 +129,5 @@ public class DisposalConfirmations extends Composite {
         CreateDisposalConfirmation.RESOLVER.resolve(historyTokens, callback);
       }
     }
-  }
-
-  @Override
-  protected void onAttach() {
-    super.onAttach();
-    instance.searchPanel.refresh();
   }
 }

@@ -128,11 +128,6 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
   }
 
   @Override
-  public List<Class<DisposalConfirmationMetadata>> getObjectClasses() {
-    return Collections.singletonList(DisposalConfirmationMetadata.class);
-  }
-
-  @Override
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
     // do nothing
@@ -235,6 +230,11 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
   @Override
   public void shutdown() {
     // do nothing
+  }
+
+  @Override
+  public List<Class<DisposalConfirmationMetadata>> getObjectClasses() {
+    return Collections.singletonList(DisposalConfirmationMetadata.class);
   }
 
   @Override

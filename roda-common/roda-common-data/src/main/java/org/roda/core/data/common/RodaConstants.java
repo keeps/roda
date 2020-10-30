@@ -1389,8 +1389,10 @@ public final class RodaConstants {
   public static final String METADATA_TEMPLATE_EXTENSION = ".xml.hbs";
   public static final String USERS_TEMPLATE_FOLDER = "users";
   public static final String METADATA_REPRESENTATION_INFORMATION_TEMPLATE_FOLDER = "representation-information/templates";
+  public static final String DISPOSAL_CONFIRMATION_INFORMATION_TEMPLATE_FOLDER = "disposal";
 
   public static final String USER_EXTRA_METADATA_FILE = "user_extra.xml.hbs";
+  public static final String DISPOSAL_CONFIRMATION_EXTRA_METADATA_FILE = "disposal_confirmation_extra.xml.hbs";
 
   public static final String DEFAULT_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
@@ -1594,6 +1596,9 @@ public final class RodaConstants {
 
   public static final String PERMISSION_METHOD_CREATE_DISPOSAL_CONFIRMATION = "org.roda.wui.api.controllers.Disposals.createDisposalConfirmation";
   public static final String PERMISSION_METHOD_DELETE_DISPOSAL_CONFIRMATION = "org.roda.wui.api.controllers.Disposals.deleteDisposalConfirmation";
+  public static final String PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION = "org.roda.wui.api.controllers.Disposals.destroyRecordsInDisposalConfirmationReport";
+  public static final String PERMISSION_METHOD_RECOVER_RECORDS_DISPOSAL_CONFIRMATION = "org.roda.wui.api.controllers.Disposals.recoverRecordsInDisposalConfirmationReport";
+  public static final String PERMISSION_METHOD_PERMANENTLY_DELETE_RECORDS_DISPOSAL_CONFIRMATION = "org.roda.wui.api.controllers.Disposals.permanentlyDeleteRecordsInDisposalConfirmationReport";
 
   public static final String PERMISSION_METHOD_LIST_DISPOSAL_SCHEDULES = "org.roda.wui.api.controllers.Browser.listDisposalSchedules";
   public static final String PERMISSION_METHOD_LIST_DISPOSAL_HOLDS = "org.roda.wui.api.controllers.Browser.listDisposalHolds";

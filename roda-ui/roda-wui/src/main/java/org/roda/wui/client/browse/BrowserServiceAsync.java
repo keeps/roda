@@ -21,6 +21,7 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -49,10 +50,12 @@ import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
+import org.roda.wui.client.browse.bundle.DisposalConfirmationExtraBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
+import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
@@ -317,5 +320,11 @@ public interface BrowserServiceAsync {
 
   void listDisposalHoldsAssociation(String aipId, AsyncCallback<List<DisposalHoldAssociation>> async);
 
-  void deleteDisposalConfirmationReport(SelectedItems<DisposalConfirmationMetadata> selectedItems, String details, AsyncCallback<Job> async);
+  void deleteDisposalConfirmationReport(SelectedItems<DisposalConfirmationMetadata> selectedItems, String details,
+    AsyncCallback<Job> async);
+
+  void destroyRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmationMetadata> selectedItems,
+                                                  AsyncCallback<Job> async);
+
+  void retrieveDisposalConfirmationExtraBundle(AsyncCallback<DisposalConfirmationExtraBundle> async);
 }
