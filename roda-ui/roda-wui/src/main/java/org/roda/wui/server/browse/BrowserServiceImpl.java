@@ -94,6 +94,7 @@ import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
+import org.roda.wui.client.browse.bundle.DisposalConfirmationExtraBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
@@ -1083,10 +1084,23 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
+  public DisposalConfirmationExtraBundle retrieveDisposalConfirmationExtraBundle() throws RODAException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Disposals.retrieveDisposalConfirmationExtraBundle(user);
+  }
+
+  @Override
   public Job deleteDisposalConfirmationReport(SelectedItems<DisposalConfirmationMetadata> selectedItems, String details)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Disposals.deleteDisposalConfirmation(user, selectedItems, details);
+  }
+
+  @Override
+  public Job destroyRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmationMetadata> selectedItems)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Disposals.destroyRecordsInDisposalConfirmation(user, selectedItems);
   }
 
   @Override

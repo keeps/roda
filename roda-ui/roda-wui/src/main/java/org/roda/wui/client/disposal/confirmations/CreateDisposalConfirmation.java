@@ -57,7 +57,7 @@ public class CreateDisposalConfirmation extends Composite {
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
       CreateDisposalConfirmation createDisposalConfirmation = new CreateDisposalConfirmation();
-      callback.onSuccess(createDisposalConfirmation);
+      createDisposalConfirmation.resolve(historyTokens, callback);
     }
 
     @Override
@@ -76,7 +76,6 @@ public class CreateDisposalConfirmation extends Composite {
     }
   };
 
-  private static CreateDisposalConfirmation instance = null;
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   interface MyUiBinder extends UiBinder<Widget, CreateDisposalConfirmation> {
@@ -141,4 +140,14 @@ public class CreateDisposalConfirmation extends Composite {
     });
   }
 
+  private void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    if (historyTokens.isEmpty()) {
+      callback.onSuccess(this);
+    } else {
+      String basePage = historyTokens.remove(0);
+      if (CreateDisposalConfirmationDataPanel.RESOLVER.getHistoryToken().equals(basePage)) {
+        CreateDisposalConfirmationDataPanel.RESOLVER.resolve(historyTokens, callback);
+      }
+    }
+  }
 }

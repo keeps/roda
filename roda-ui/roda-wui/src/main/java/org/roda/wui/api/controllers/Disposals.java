@@ -9,6 +9,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
@@ -16,6 +17,7 @@ import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.client.browse.bundle.DisposalConfirmationExtraBundle;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
 
@@ -201,20 +203,19 @@ public class Disposals extends RodaWuiController {
     }
   }
 
-  public static void destroyAIP(User user, String disposalConfirmationId)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+  public static DisposalConfirmationExtraBundle retrieveDisposalConfirmationExtraBundle(User user) throws AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user);
 
     LogEntryState state = LogEntryState.SUCCESS;
-
-    // fetch the overdue AIPs
-    // create the job to destroy the overdue AIPs
-
-    // return BrowserHelper.destroyOverdueAIPs(user, null);
-
+    try {
+      return BrowserHelper.retrieveDisposalConfirmationExtraBundle();
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state);
+    }
   }
 
   public static Job deleteDisposalConfirmation(User user, SelectedItems<DisposalConfirmationMetadata> selectedItems,
@@ -278,4 +279,31 @@ public class Disposals extends RodaWuiController {
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selected);
     }
   }
+
+  public static Job destroyRecordsInDisposalConfirmation(User user,
+    SelectedItemsList<DisposalConfirmationMetadata> selectedItems)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+    try {
+      // delegate
+      return BrowserHelper.destroyRecordsInDisposalConfirmation(user, selectedItems);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems);
+    }
+  }
+
+  public static void recoverRecordsInDisposalConfirmationReport() {
+
+  }
+
+  public static void permanentlyDeleteRecordsInDisposalConfirmationReport() {}
 }
