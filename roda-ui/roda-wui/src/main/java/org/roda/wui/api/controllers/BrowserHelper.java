@@ -105,6 +105,7 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataList;
@@ -3440,4 +3441,29 @@ public class BrowserHelper {
     return createAndExecuteInternalJob("Destroy records from disposal confirmation report", selectedItems,
       DestroyRecordsInDisposalConfirmationPlugin.class, user, Collections.emptyMap(), "Could not execute destruction of records in disposal confirmation report action");
   }
+  // public static Job destroyOverdueAIPs(User user, SelectedItems<IndexedAIP>
+  // selected)
+  // throws AuthorizationDeniedException, GenericException,
+  // RequestNotValidException, NotFoundException {
+  // Map<String, String> pluginParameters = new HashMap<>();
+  // return createAndExecuteJob("Destroy overdue AIPs", selected,
+  // DeleteRODAObjectPlugin.class, PluginType.AIP_TO_AIP,
+  // user, pluginParameters, "Could not execute overdue AIP destruction action");
+  // }
+
+  public static DisposalRule createDisposalRule(DisposalRule disposalRule, User user) throws GenericException,
+    AuthorizationDeniedException, AlreadyExistsException, NotFoundException, RequestNotValidException {
+    return RodaCoreFactory.getModelService().createDisposalRule(disposalRule, user.getName());
+  }
+
+  public static DisposalRule updateDisposalRule(DisposalRule disposalRule, User user)
+    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
+    return RodaCoreFactory.getModelService().updateDisposalRule(disposalRule, user.getName());
+  }
+
+  public static void deleteDisposalRule(String disposalRuleId) throws GenericException, RequestNotValidException,
+    NotFoundException, AuthorizationDeniedException, IllegalOperationException {
+    RodaCoreFactory.getModelService().deleteDisposalRule(disposalRuleId);
+  }
+
 }

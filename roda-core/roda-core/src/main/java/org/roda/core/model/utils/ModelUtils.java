@@ -705,6 +705,10 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DIP);
   }
 
+  public static StoragePath getDisposalRuleContainerPath() throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISPOSAL_RULE);
+  }
+
   public static StoragePath getDisposalScheduleContainerPath() throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISPOSAL_SCHEDULE);
   }
@@ -865,6 +869,11 @@ public final class ModelUtils {
     } else {
       return inputClass;
     }
+  }
+
+  public static StoragePath getDisposalRuleStoragePath(String disposalRuleId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISPOSAL_RULE,
+            disposalRuleId + RodaConstants.JOB_FILE_EXTENSION);
   }
 
   public static StoragePath getDisposalScheduleStoragePath(String disposalScheduleId) throws RequestNotValidException {

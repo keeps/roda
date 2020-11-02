@@ -165,6 +165,8 @@ public final class RodaConstants {
   public static final String RODA_OBJECT_OTHER_METADATA = "other_metadata";
   public static final String RODA_OBJECT_MEMBER = "member";
   public static final String RODA_OBJECT_REPRESENTATION_INFORMATION = "representation_information";
+  public static final String RODA_OBJECT_DISPOSAL_RULES = "disposal_rules";
+  public static final String RODA_OBJECT_DISPOSAL_RULE = "disposal_rule";
   public static final String RODA_OBJECT_DISPOSAL_SCHEDULE = "disposal_schedule";
   public static final String RODA_OBJECT_DISPOSAL_SCHEDULES = "disposal_schedules";
   public static final String RODA_OBJECT_DISPOSAL_HOLD = "disposal_hold";
@@ -334,6 +336,7 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_DIP_FILE_ID = "dip_file_id";
   public static final String API_PATH_PARAM_DIP_FILE_UUID = "dip_file_uuid";
   public static final String API_PATH_PARAM_REPRESENTATION_INFORMATION_ID = "representation_information_id";
+  public static final String API_PATH_PARAM_DISPOSAL_RULE_ID = "disposal_rule_id";
   public static final String API_PATH_PARAM_DISPOSAL_SCHEDULE_ID = "disposal_schedule_id";
   public static final String API_PATH_PARAM_DISPOSAL_HOLD_ID = "disposal_hold_id";
   public static final String API_PATH_PARAM_DISPOSAL_CONFIRMATION_ID = "disposal_confirmation_id";
@@ -422,6 +425,9 @@ public final class RodaConstants {
   public static final String CONTROLLER_DIP_FILE_ID_PARAM = "dipFileId";
   public static final String CONTROLLER_DIP_FILE_UUID_PARAM = "dipFileUUID";
   public static final String CONTROLLER_AGENT_ID_PARAM = "agentId";
+
+  public static final String CONTROLLER_DISPOSAL_RULE_PARAM = RODA_OBJECT_DISPOSAL_RULE;
+  public static final String CONTROLLER_DISPOSAL_RULE_ID_PARAM = "disposalRuleId";
 
   public static final String CONTROLLER_DISPOSAL_SCHEDULE_PARAM = RODA_OBJECT_DISPOSAL_SCHEDULE;
   public static final String CONTROLLER_DISPOSAL_SCHEDULE_ID_PARAM = "disposalScheduleId";
@@ -573,6 +579,7 @@ public final class RodaConstants {
   public static final String STORAGE_CONTAINER_REPRESENTATION_INFORMATION = "representation-information";
   public static final String STORAGE_CONTAINER_DISPOSAL_HOLD = "disposal-hold";
   public static final String STORAGE_CONTAINER_DISPOSAL_SCHEDULE = "disposal-schedule";
+  public static final String STORAGE_CONTAINER_DISPOSAL_RULE = "disposal-rule";
 
   /*
    * Disposal Confirmation
@@ -1214,6 +1221,9 @@ public final class RodaConstants {
   public static final String PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER = "linkingAgentIdentifier";
   public static final String PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER = "linkingOutcomeObjectIdentifier";
   public static final String PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER = "linkingSourceObjectIdentifier";
+
+  /* Disposal Rule */
+  public static final String DISPOSAL_RULE_ID = "id";
 
   /* Disposal Schedule */
   public static final String DISPOSAL_SCHEDULE_ID = "id";
