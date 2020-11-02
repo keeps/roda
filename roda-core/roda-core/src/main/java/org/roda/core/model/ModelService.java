@@ -81,6 +81,8 @@ import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
+import org.roda.core.data.v2.ip.disposal.DisposalRule;
+import org.roda.core.data.v2.ip.disposal.DisposalRules;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -3608,4 +3610,85 @@ public class ModelService extends ModelObservable {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     return ResourceParseUtils.getAIPMetadata(getStorage(), aipId).getDisposalHoldAssociation();
   }
+
+  /************************************
+   * Disposal rule related
+   ************************************/
+
+  public DisposalRule createDisposalRule(DisposalRule disposalRule, String createdBy) throws RequestNotValidException,
+    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    if (disposalRule.getId() == null) {
+      disposalRule.setId(IdUtils.createUUID());
+    }
+
+    disposalRule.setCreatedBy(createdBy);
+    disposalRule.setCreatedOn(new Date());
+    disposalRule.setUpdatedBy(createdBy);
+    disposalRule.setUpdatedOn(new Date());
+
+    String disposalRuleAsJson = JsonUtils.getJsonFromObject(disposalRule);
+    StoragePath disposalRulePath = ModelUtils.getDisposalRuleStoragePath(disposalRule.getId());
+    storage.createBinary(disposalRulePath, new StringContentPayload(disposalRuleAsJson), false);
+
+    return disposalRule;
+  }
+
+  public DisposalRule updateDisposalRule(DisposalRule disposalRule, String updatedBy)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    disposalRule.setUpdatedOn(new Date());
+    disposalRule.setUpdatedBy(updatedBy);
+
+    String disposalRuleAsJson = JsonUtils.getJsonFromObject(disposalRule);
+    StoragePath disposalRulePath = ModelUtils.getDisposalRuleStoragePath(disposalRule.getId());
+    storage.updateBinaryContent(disposalRulePath, new StringContentPayload(disposalRuleAsJson), false, false);
+
+    return disposalRule;
+  }
+
+  public void deleteDisposalRule(String disposalRuleId) throws NotFoundException, GenericException,
+    AuthorizationDeniedException, RequestNotValidException, IllegalOperationException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    StoragePath disposalRulePath = ModelUtils.getDisposalRuleStoragePath(disposalRuleId);
+    storage.deleteResource(disposalRulePath);
+  }
+
+  public DisposalRule retrieveDisposalRule(String disposalRuleId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    StoragePath disposalRulePath = ModelUtils.getDisposalRuleStoragePath(disposalRuleId);
+    Binary binary = storage.getBinary(disposalRulePath);
+    DisposalRule ret;
+
+    try (InputStream inputStream = binary.getContent().createInputStream()) {
+      ret = JsonUtils.getObjectFromJson(inputStream, DisposalRule.class);
+    } catch (IOException | GenericException e) {
+      throw new GenericException("Error reading disposal rule: " + disposalRuleId, e);
+    }
+
+    return ret;
+  }
+
+  public DisposalRules listDisposalRules()
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
+    StoragePath disposalRuleContainerPath = ModelUtils.getDisposalRuleContainerPath();
+    DisposalRules disposalRules = new DisposalRules();
+
+    try {
+      CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(disposalRuleContainerPath, false);
+      for (Resource resource : iterable) {
+        DisposalRule rule = ResourceParseUtils.convertResourceToObject(resource, DisposalRule.class);
+        disposalRules.addObject(rule);
+      }
+      disposalRules.sortRules();
+    } catch (NotFoundException e) {
+      return disposalRules;
+    }
+
+    return disposalRules;
+  }
+
 }

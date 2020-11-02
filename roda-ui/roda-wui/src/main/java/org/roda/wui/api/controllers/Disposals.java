@@ -13,6 +13,7 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
@@ -282,22 +283,11 @@ public class Disposals extends RodaWuiController {
 
   public static Job destroyRecordsInDisposalConfirmation(User user,
     SelectedItemsList<DisposalConfirmationMetadata> selectedItems)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    LogEntryState state = LogEntryState.SUCCESS;
+        LogEntryState state = LogEntryState.SUCCESS;
     try {
       // delegate
       return BrowserHelper.destroyRecordsInDisposalConfirmation(user, selectedItems);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems);
+            controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems);
     }
   }
 
@@ -306,4 +296,75 @@ public class Disposals extends RodaWuiController {
   }
 
   public static void permanentlyDeleteRecordsInDisposalConfirmationReport() {}
+  
+  public static DisposalRule createDisposalRule(User user, DisposalRule disposalRule) throws GenericException,
+    AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // validate disposal rule
+    // DisposalsHelper.validateDisposalRule(disposalRule);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return BrowserHelper.createDisposalRule(disposalRule, user);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_DISPOSAL_RULE_PARAM, disposalRule);
+    }
+  }
+
+  public static DisposalRule updateDisposalRule(User user, DisposalRule disposalRule)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    // validate disposal rule
+    // DisposalsHelper.validateDisposalRule(disposalRule);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // delegate
+      return BrowserHelper.updateDisposalRule(disposalRule, user);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, disposalRule.getId(), state,
+        RodaConstants.CONTROLLER_DISPOSAL_RULE_PARAM, disposalRule);
+    }
+  }
+
+  public static void deleteDisposalRule(User user, String disposalRuleId) throws RequestNotValidException,
+    GenericException, NotFoundException, AuthorizationDeniedException, IllegalOperationException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // delegate
+      BrowserHelper.deleteDisposalRule(disposalRuleId);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, disposalRuleId, state, RodaConstants.CONTROLLER_DISPOSAL_RULE_ID_PARAM,
+        disposalRuleId);
+    }
+  }
+
 }

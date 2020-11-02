@@ -47,12 +47,6 @@ import java.util.stream.Collectors;
 
 import javax.xml.validation.Schema;
 
-import com.codahale.metrics.JmxReporter;
-import com.codahale.metrics.MetricRegistry;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-
 import org.apache.commons.configuration.CombinedConfiguration;
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
@@ -148,6 +142,12 @@ import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.codahale.metrics.JmxReporter;
+import com.codahale.metrics.MetricRegistry;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -1420,7 +1420,7 @@ public class RodaCoreFactory {
       }
 
       // stop prometheus metrics server
-      if(prometheusMetricsServer != null) {
+      if (prometheusMetricsServer != null) {
         prometheusMetricsServer.stop();
       }
 
@@ -1532,9 +1532,9 @@ public class RodaCoreFactory {
    * exist already.
    * 
    * @param rodaConfig
-   *                     roda configuration
+   *          roda configuration
    * @throws GenericException
-   *                            if something unexpected happens creating roles.
+   *           if something unexpected happens creating roles.
    */
   private static void createRoles(final Configuration rodaConfig) throws GenericException {
     final Iterator<String> keys = rodaConfig.getKeys("core.roles");
