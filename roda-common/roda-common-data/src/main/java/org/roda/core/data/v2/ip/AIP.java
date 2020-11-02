@@ -56,6 +56,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
   private Date destructionOn = null;
   private String destructionApprovedBy = null;
   private String disposalConfirmationId = null;
+  private AIPDisposalFlow disposalFlow = null;
 
   public AIP() {
     super();
@@ -64,20 +65,20 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions) {
     this(id, parentId, type, state, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>(),
       new AIPFormat(), new ArrayList<Relationship>(), new Date(), null, new Date(), null, null,
-      new ArrayList<DisposalHoldAssociation>(), null, null, null);
+      new ArrayList<DisposalHoldAssociation>(), null, null, null, null);
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions, String createdBy) {
     this(id, parentId, type, state, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>(),
       new AIPFormat(), new ArrayList<Relationship>(), new Date(), createdBy, new Date(), createdBy, null,
-      new ArrayList<DisposalHoldAssociation>(), null, null, null);
+      new ArrayList<DisposalHoldAssociation>(), null, null, null, null);
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions,
     List<DescriptiveMetadata> descriptiveMetadata, List<Representation> representations, AIPFormat format,
     List<Relationship> relationships, Date createdOn, String createdBy, Date updatedOn, String updatedBy,
     String disposalScheduleId, List<DisposalHoldAssociation> disposalHoldAssociation, Date destructionOn,
-    String destructionApprovedBy, String disposalConfirmationId) {
+    String destructionApprovedBy, String disposalConfirmationId, AIPDisposalFlow disposalFlow) {
     super();
     this.id = id;
     this.parentId = parentId;
@@ -100,6 +101,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
     this.destructionOn = destructionOn;
     this.destructionApprovedBy = destructionApprovedBy;
     this.disposalConfirmationId = disposalConfirmationId;
+    this.disposalFlow = disposalFlow;
   }
 
   @JsonIgnore
@@ -360,6 +362,14 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
     this.updatedBy = updatedBy;
   }
 
+  public AIPDisposalFlow getDisposalFlow() {
+    return disposalFlow;
+  }
+
+  public void setDisposalFlow(AIPDisposalFlow disposalFlow) {
+    this.disposalFlow = disposalFlow;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -398,6 +408,9 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
       return false;
     if (destructionOn != null ? !destructionOn.equals(aip.destructionOn) : aip.destructionOn != null)
       return false;
+    if (disposalFlow != null ? !disposalFlow.equals(aip.disposalFlow)
+      : aip.disposalFlow != null)
+      return false;
     return destructionApprovedBy != null ? destructionApprovedBy.equals(aip.destructionApprovedBy)
       : aip.destructionApprovedBy == null;
 
@@ -419,6 +432,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
     result = 31 * result + (disposalHoldAssociation != null ? disposalHoldAssociation.hashCode() : 0);
     result = 31 * result + (destructionOn != null ? destructionOn.hashCode() : 0);
     result = 31 * result + (destructionApprovedBy != null ? destructionApprovedBy.hashCode() : 0);
+    result = 31 * result + (disposalFlow != null ? disposalFlow.hashCode() : 0);
     return result;
   }
 
@@ -431,7 +445,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
       + ", format=" + format + ", relationships=" + relationships + ", createdOn=" + createdOn + ", createdBy='"
       + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\'' + ", disposalScheduleId='"
       + disposalScheduleId + '\'' + ", disposalHoldAssociation=" + disposalHoldAssociation + ", destructionOn="
-      + destructionOn + ", destructionApprovedBy='" + destructionApprovedBy + '\'' + '}';
+      + destructionOn + ", destructionApprovedBy='" + destructionApprovedBy + '\'' + ", disposalConfirmationId='"
+      + disposalConfirmationId + '\'' + ", disposalUpdateStatus=" + disposalFlow + '}';
   }
-
 }

@@ -1,29 +1,31 @@
 package org.roda.core.data.v2.ip.disposal;
 
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
-import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.ip.HasId;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 @javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_RULE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DisposalRule implements IsModelObject, HasId {
+public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRule> {
 
-  private static final long serialVersionUID = 2641907966434061053L;
-  private static final int VERSION = 1;
+  private static final int VERSION = 0;
+  private static final long serialVersionUID = 247288959307666429L;
 
   private String id;
   private String title;
 
-  private Pair<String, String> ruleKey;
+  private String key;
+  private String value;
 
   private String disposalScheduleId;
 
@@ -56,12 +58,20 @@ public class DisposalRule implements IsModelObject, HasId {
     this.title = title;
   }
 
-  public Pair<String, String> getRuleKey() {
-    return ruleKey;
+  public String getKey() {
+    return key;
   }
 
-  public void setRuleKey(Pair<String, String> ruleKey) {
-    this.ruleKey = ruleKey;
+  public void setKey(String key) {
+    this.key = key;
+  }
+
+  public String getValue() {
+    return value;
+  }
+
+  public void setValue(String value) {
+    this.value = value;
   }
 
   public String getDisposalScheduleId() {
@@ -112,12 +122,6 @@ public class DisposalRule implements IsModelObject, HasId {
     this.updatedBy = updatedBy;
   }
 
-  @JsonIgnore
-  @Override
-  public int getClassVersion() {
-    return VERSION;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -125,21 +129,34 @@ public class DisposalRule implements IsModelObject, HasId {
     if (o == null || getClass() != o.getClass())
       return false;
     DisposalRule that = (DisposalRule) o;
-    return Objects.equals(id, that.id) && Objects.equals(title, that.title) && Objects.equals(ruleKey, that.ruleKey)
-      && Objects.equals(disposalScheduleId, that.disposalScheduleId) && Objects.equals(order, that.order)
-      && Objects.equals(createdOn, that.createdOn) && Objects.equals(createdBy, that.createdBy)
-      && Objects.equals(updatedOn, that.updatedOn) && Objects.equals(updatedBy, that.updatedBy);
+    return Objects.equals(id, that.id) && Objects.equals(title, that.title) && Objects.equals(key, that.key)
+      && Objects.equals(value, that.value) && Objects.equals(disposalScheduleId, that.disposalScheduleId)
+      && Objects.equals(order, that.order) && Objects.equals(createdOn, that.createdOn)
+      && Objects.equals(createdBy, that.createdBy) && Objects.equals(updatedOn, that.updatedOn)
+      && Objects.equals(updatedBy, that.updatedBy);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, title, ruleKey, disposalScheduleId, order, createdOn, createdBy, updatedOn, updatedBy);
+    return Objects.hash(id, title, key, value, disposalScheduleId, order, createdOn, createdBy, updatedOn, updatedBy);
   }
 
   @Override
   public String toString() {
-    return "DisposalRule{" + "id='" + id + '\'' + ", title='" + title + '\'' + ", ruleKey=" + ruleKey
-      + ", disposalScheduleId='" + disposalScheduleId + '\'' + ", order=" + order + ", createdOn=" + createdOn
-      + ", createdBy='" + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\'' + '}';
+    return "DisposalRule{" + "id='" + id + '\'' + ", title='" + title + '\'' + ", key='" + key + '\'' + ", value='"
+      + value + '\'' + ", disposalScheduleId='" + disposalScheduleId + '\'' + ", order=" + order + ", createdOn="
+      + createdOn + ", createdBy='" + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\''
+      + '}';
+  }
+
+  @JsonIgnore
+  @Override
+  public int getClassVersion() {
+    return VERSION;
+  }
+
+  @Override
+  public int compareTo(DisposalRule otherRule) {
+    return Integer.compare(this.getOrder(),otherRule.getOrder());
   }
 }
