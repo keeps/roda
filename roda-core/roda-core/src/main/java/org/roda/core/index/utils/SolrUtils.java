@@ -100,6 +100,7 @@ import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPDisposalFlow;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
@@ -644,6 +645,18 @@ public class SolrUtils {
         ret = (String) object;
       } else {
         LOGGER.warn("Could not convert Solr object to string, unsupported class: {}", object.getClass().getName());
+      }
+    }
+    return ret;
+  }
+
+  public static AIPDisposalFlow objectToDisposalFlow(Object object, AIPDisposalFlow defaultValue) {
+    AIPDisposalFlow ret = defaultValue;
+    if (object != null) {
+      if (object instanceof AIPDisposalFlow) {
+        ret = AIPDisposalFlow.valueOf(object.toString());
+      } else {
+        LOGGER.warn("Could not convert Solr object to AIPDisposalFlow, unsupported class: {}", object.getClass().getName());
       }
     }
     return ret;
