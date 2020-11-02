@@ -3683,7 +3683,7 @@ public class ModelService extends ModelObservable {
         DisposalRule rule = ResourceParseUtils.convertResourceToObject(resource, DisposalRule.class);
         disposalRules.addObject(rule);
       }
-      disposalRules.sortRules();
+      Collections.sort(disposalRules.getObjects());
     } catch (NotFoundException e) {
       return disposalRules;
     }

@@ -24,6 +24,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPDisposalFlow;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.index.IndexingAdditionalInfo;
@@ -106,6 +107,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     fields.add(new Field(RodaConstants.AIP_OVERDUE_DATE, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, Field.TYPE_BOOLEAN));
     fields.add(new Field(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.AIP_DISPOSAL_FLOW, Field.TYPE_STRING));
 
     fields.add(SolrCollection.getSortFieldOf(RodaConstants.AIP_TITLE));
 
@@ -144,6 +146,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     doc.addField(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, !aip.getDisposalHoldAssociation().isEmpty()
       && aip.getDisposalHoldAssociation().stream().anyMatch(dh -> dh.getLiftedOn() == null));
     doc.addField(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID, aip.getDisposalConfirmationId());
+    doc.addField(RodaConstants.AIP_DISPOSAL_FLOW, aip.getDisposalFlow());
 
     doc.addField(RodaConstants.INGEST_SIP_IDS, aip.getIngestSIPIds());
     doc.addField(RodaConstants.INGEST_JOB_ID, aip.getIngestJobId());
@@ -286,6 +289,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
       Boolean.FALSE);
     final String disposalConfirmationId = SolrUtils
       .objectToString(doc.get(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID), "");
+    //final AIPDisposalFlow disposalFlow = SolrUtils.objectToDisposalFlow(doc.get(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID), null);
 
     String level;
     if (ghost) {
@@ -320,6 +324,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     ret.setOverdueDate(overdueDate);
     ret.setDisposalHoldStatus(disposalHoldStatus);
     ret.setDisposalConfirmationId(disposalConfirmationId);
+    //ret.setDisposalFlow(disposalFlow);
 
     return ret;
   }

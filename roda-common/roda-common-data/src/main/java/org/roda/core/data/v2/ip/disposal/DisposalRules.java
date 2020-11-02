@@ -49,9 +49,4 @@ public class DisposalRules implements RODAObjectList<DisposalRule> {
     this.disposalRuleList.add(disposalRule);
   }
 
-  public void sortRules(){
-    disposalRuleList = disposalRuleList.stream()
-            .sorted(Comparator.comparing(DisposalRule::getOrder))
-            .collect(Collectors.toList());
-  }
 }

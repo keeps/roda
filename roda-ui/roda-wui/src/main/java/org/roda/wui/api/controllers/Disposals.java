@@ -282,12 +282,23 @@ public class Disposals extends RodaWuiController {
   }
 
   public static Job destroyRecordsInDisposalConfirmation(User user,
-    SelectedItemsList<DisposalConfirmationMetadata> selectedItems)
-        LogEntryState state = LogEntryState.SUCCESS;
+                                                         SelectedItemsList<DisposalConfirmationMetadata> selectedItems)
+          throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
     try {
       // delegate
       return BrowserHelper.destroyRecordsInDisposalConfirmation(user, selectedItems);
-            controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems);
     }
   }
 

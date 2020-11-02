@@ -15,7 +15,6 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
@@ -26,6 +25,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceTest;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +74,7 @@ public class DisposalRuleTest {
   @AfterClass
   public void tearDown() throws Exception {
     RodaCoreFactory.shutdown();
-    // FSUtils.deletePath(basePath);
+    FSUtils.deletePath(basePath);
   }
 
   @AfterMethod
@@ -113,13 +113,15 @@ public class DisposalRuleTest {
   private DisposalRule createDisposalRule() throws AlreadyExistsException, AuthorizationDeniedException,
     GenericException, NotFoundException, RequestNotValidException {
     String title = "Normal";
-    Pair<String, String> ruleKey = new Pair<>("metadataKey", "metadataValue");
+    String key = "metadataKey";
+    String value = "metadataValue";
     String createdBy = "admin";
     Integer order = 1;
 
     DisposalRule rule = new DisposalRule();
     rule.setTitle(title);
-    rule.setRuleKey(ruleKey);
+    rule.setKey(key);
+    rule.setValue(value);
     rule.setOrder(order);
 
     return model.createDisposalRule(rule, createdBy);
