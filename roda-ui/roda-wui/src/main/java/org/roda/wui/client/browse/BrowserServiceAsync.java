@@ -34,6 +34,8 @@ import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
+import org.roda.core.data.v2.ip.disposal.DisposalRule;
+import org.roda.core.data.v2.ip.disposal.DisposalRules;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.jobs.Job;
@@ -289,6 +291,16 @@ public interface BrowserServiceAsync {
     AsyncCallback<RepresentationInformationExtraBundle> asyncCallback);
 
   void retrieveSharedProperties(String localeName, AsyncCallback<Map<String, List<String>>> asyncCallback);
+
+  void createDisposalRule(DisposalRule rule, AsyncCallback<DisposalRule> async);
+
+  void retrieveDisposalRule(String disposalRuleId, AsyncCallback<DisposalRule> async);
+
+  void listDisposalRules(AsyncCallback<DisposalRules> async);
+
+  void updateDisposalRule(DisposalRule rule, AsyncCallback<DisposalRule> async);
+
+  void deleteDisposalRule(String disposalRuleId, AsyncCallback<Void> async);
 
   void createDisposalSchedule(DisposalSchedule schedule, AsyncCallback<DisposalSchedule> async);
 

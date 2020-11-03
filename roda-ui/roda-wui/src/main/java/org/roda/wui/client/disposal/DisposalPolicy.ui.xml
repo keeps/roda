@@ -10,17 +10,23 @@
             <g:FlowPanel ui:field="contentFlowPanel" addStyleNames="col_10 content">
                 <common:TitlePanel text="{messages.disposalPolicyTitle}" iconClass="DisposalPolicy"/>
                 <g:FlowPanel addStyleNames="page-description" ui:field="disposalPolicyDescription"></g:FlowPanel>
+                <g:FlowPanel ui:field="disposalRulesDescription">
+                </g:FlowPanel>
+                <g:ScrollPanel ui:field="disposalRulesTablePanel">
+                </g:ScrollPanel>
+                <g:FlowPanel ui:field="disposalRulesButtonsPanel">
+                </g:FlowPanel>
                 <g:FlowPanel ui:field="disposalSchedulesDescription">
                 </g:FlowPanel>
-                <g:ScrollPanel ui:field="contentDisposalSchedulesTable">
+                <g:ScrollPanel ui:field="disposalSchedulesTablePanel">
                 </g:ScrollPanel>
-                <g:FlowPanel ui:field="newDisposalSchedule">
+                <g:FlowPanel ui:field="disposalSchedulesButtonsPanel">
                 </g:FlowPanel>
                 <g:FlowPanel ui:field="disposalHoldsDescription">
                 </g:FlowPanel>
-                <g:ScrollPanel ui:field="contentDisposalHoldsTable">
+                <g:ScrollPanel ui:field="disposalHoldsTablePanel">
                 </g:ScrollPanel>
-                <g:FlowPanel ui:field="newDisposalHold">
+                <g:FlowPanel ui:field="disposalHoldsButtonsPanel">
                 </g:FlowPanel>
             </g:FlowPanel>
             <g:FlowPanel ui:field="sidebarFlowPanel" addStyleNames="col_2 last sidebar contentPanel">
@@ -29,7 +35,7 @@
                         <g:Label addStyleNames="h4">
                             <ui:text from="{messages.actions}"/>
                         </g:Label>
-                        <g:FlowPanel ui:field="buttonsPanel"/>
+                        <g:FlowPanel ui:field="sidebarButtonsPanel"/>
                     </g:FlowPanel>
                 </g:FlowPanel>
             </g:FlowPanel>

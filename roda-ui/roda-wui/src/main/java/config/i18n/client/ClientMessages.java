@@ -1993,6 +1993,8 @@ public interface ClientMessages extends Messages {
 
   String disposalPolicyTitle();
 
+  String disposalRulesTitle();
+
   String disposalSchedulesTitle();
 
   String disposalHoldsTitle();
@@ -2004,6 +2006,16 @@ public interface ClientMessages extends Messages {
   String createDisposalConfirmationTitle();
 
   String disposalNewConfirmationAction();
+
+  String disposalRuleTitle();
+
+  String disposalRuleScheduleName();
+
+  String disposalRuleKey();
+
+  String disposalRuleValue();
+
+  String disposalRuleOrder();
 
   String disposalScheduleTitle();
 
@@ -2051,6 +2063,8 @@ public interface ClientMessages extends Messages {
 
   String disposalHoldState(@Select String state);
 
+  String newDisposalRuleTitle();
+
   String newDisposalScheduleTitle();
 
   String editDisposalScheduleTitle();
@@ -2058,7 +2072,7 @@ public interface ClientMessages extends Messages {
   String newDisposalHoldTitle();
 
   String editDisposalHoldTitle();
-  
+
   String createDisposalScheduleFailure(String reason);
 
   String createDisposalScheduleAlreadyExists(String title);

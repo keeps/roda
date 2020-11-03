@@ -1598,6 +1598,8 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_UPDATE_USER = "org.roda.wui.api.controllers.UserManagement.updateUser";
   public static final String PERMISSION_METHOD_DELETE_USER = "org.roda.wui.api.controllers.UserManagement.deleteUser";
 
+  public static final String PERMISSION_METHOD_CREATE_DISPOSAL_RULE = "org.roda.wui.api.controllers.Disposals.createDisposalRule";
+
   public static final String PERMISSION_METHOD_CREATE_DISPOSAL_SCHEDULE = "org.roda.wui.api.controllers.Disposals.createDisposalSchedule";
   public static final String PERMISSION_METHOD_UPDATE_DISPOSAL_SCHEDULE = "org.roda.wui.api.controllers.Disposals.updateDisposalSchedule";
   public static final String PERMISSION_METHOD_ASSOCIATE_DISPOSAL_SCHEDULE = "org.roda.wui.api.controllers.Disposals.associateDisposalSchedule";
@@ -1612,6 +1614,7 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_RECOVER_RECORDS_DISPOSAL_CONFIRMATION = "org.roda.wui.api.controllers.Disposals.recoverRecordsInDisposalConfirmationReport";
   public static final String PERMISSION_METHOD_PERMANENTLY_DELETE_RECORDS_DISPOSAL_CONFIRMATION = "org.roda.wui.api.controllers.Disposals.permanentlyDeleteRecordsInDisposalConfirmationReport";
 
+  public static final String PERMISSION_METHOD_LIST_DISPOSAL_RULES = "org.roda.wui.api.controllers.Browser.listDisposalRules";
   public static final String PERMISSION_METHOD_LIST_DISPOSAL_SCHEDULES = "org.roda.wui.api.controllers.Browser.listDisposalSchedules";
   public static final String PERMISSION_METHOD_LIST_DISPOSAL_HOLDS = "org.roda.wui.api.controllers.Browser.listDisposalHolds";
 
