@@ -23,6 +23,8 @@ public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRu
   private String id;
   private String title;
 
+  private String description;
+
   private String key;
   private String value;
 
@@ -56,6 +58,14 @@ public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRu
 
   public void setTitle(String title) {
     this.title = title;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 
   public String getKey() {
@@ -137,7 +147,8 @@ public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRu
     if (o == null || getClass() != o.getClass())
       return false;
     DisposalRule that = (DisposalRule) o;
-    return Objects.equals(id, that.id) && Objects.equals(title, that.title) && Objects.equals(key, that.key)
+    return Objects.equals(id, that.id) && Objects.equals(title, that.title)
+      && Objects.equals(description, that.description) && Objects.equals(key, that.key)
       && Objects.equals(value, that.value) && Objects.equals(disposalScheduleId, that.disposalScheduleId)
       && Objects.equals(disposalScheduleName, that.disposalScheduleName) && Objects.equals(order, that.order)
       && Objects.equals(createdOn, that.createdOn) && Objects.equals(createdBy, that.createdBy)
@@ -146,16 +157,16 @@ public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRu
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, title, key, value, disposalScheduleId, disposalScheduleName, order, createdOn, createdBy,
-      updatedOn, updatedBy);
+    return Objects.hash(id, title, description, key, value, disposalScheduleId, disposalScheduleName, order, createdOn,
+      createdBy, updatedOn, updatedBy);
   }
 
   @Override
   public String toString() {
-    return "DisposalRule{" + "id='" + id + '\'' + ", title='" + title + '\'' + ", key='" + key + '\'' + ", value='"
-      + value + '\'' + ", disposalScheduleId='" + disposalScheduleId + '\'' + ", disposalScheduleName='"
-      + disposalScheduleName + '\'' + ", order=" + order + ", createdOn=" + createdOn + ", createdBy='" + createdBy
-      + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\'' + '}';
+    return "DisposalRule{" + "id='" + id + '\'' + ", title='" + title + '\'' + ", description='" + description + '\''
+      + ", key='" + key + '\'' + ", value='" + value + '\'' + ", disposalScheduleId='" + disposalScheduleId + '\''
+      + ", disposalScheduleName='" + disposalScheduleName + '\'' + ", order=" + order + ", createdOn=" + createdOn
+      + ", createdBy='" + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\'' + '}';
   }
 
   @JsonIgnore

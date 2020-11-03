@@ -208,7 +208,6 @@ public class ShowDisposalHold extends Composite {
         liftHoldBtn.addClickHandler(new ClickHandler() {
           @Override
           public void onClick(ClickEvent clickEvent) {
-            GWT.log("entrei");
             disposalHold.setState(DisposalHoldState.LIFTED);
             BrowserServiceImpl.Util.getInstance().updateDisposalHold(disposalHold, new AsyncCallback<DisposalHold>() {
               @Override
