@@ -63,6 +63,8 @@ import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
+import org.roda.core.data.v2.ip.disposal.DisposalRule;
+import org.roda.core.data.v2.ip.disposal.DisposalRules;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.jobs.Job;
@@ -147,8 +149,43 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
+  public DisposalRule createDisposalRule(DisposalRule rule) throws AuthorizationDeniedException,
+          AlreadyExistsException, NotFoundException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Disposals.createDisposalRule(user, rule);
+  }
+
+  @Override
+  public DisposalRule retrieveDisposalRule(String disposalRuleId)
+          throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.retrieveDisposalRule(user, disposalRuleId);
+  }
+
+  @Override
+  public DisposalRules listDisposalRules()
+          throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.listDisposalRules(user);
+  }
+
+  @Override
+  public DisposalRule updateDisposalRule(DisposalRule rule)
+          throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Disposals.updateDisposalRule(user, rule);
+  }
+
+  @Override
+  public void deleteDisposalRule(String disposalRuleId) throws NotFoundException, AuthorizationDeniedException,
+          IllegalOperationException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Disposals.deleteDisposalRule(user, disposalRuleId);
+  }
+
+  @Override
   public DisposalSchedule createDisposalSchedule(DisposalSchedule schedule) throws AuthorizationDeniedException,
-    AlreadyExistsException, NotFoundException, GenericException, RequestNotValidException {
+          AlreadyExistsException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Disposals.createDisposalSchedule(user, schedule);
   }

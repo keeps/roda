@@ -43,6 +43,8 @@ import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
+import org.roda.core.data.v2.ip.disposal.DisposalRule;
+import org.roda.core.data.v2.ip.disposal.DisposalRules;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.jobs.Job;
@@ -376,6 +378,21 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   Map<String, List<String>> retrieveSharedProperties(String localeName);
+
+  DisposalRule createDisposalRule(DisposalRule rule) throws AuthorizationDeniedException,
+          AlreadyExistsException, NotFoundException, GenericException, RequestNotValidException;
+
+  DisposalRule retrieveDisposalRule(String disposalRuleId)
+          throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  DisposalRules listDisposalRules()
+          throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException;
+
+  DisposalRule updateDisposalRule(DisposalRule rule)
+          throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  void deleteDisposalRule(String disposalRuleId) throws NotFoundException, AuthorizationDeniedException,
+          IllegalOperationException, GenericException, RequestNotValidException;
 
   DisposalSchedule createDisposalSchedule(DisposalSchedule schedule) throws AuthorizationDeniedException,
     AlreadyExistsException, NotFoundException, GenericException, RequestNotValidException;
