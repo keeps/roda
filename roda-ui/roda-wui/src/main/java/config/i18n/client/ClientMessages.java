@@ -438,6 +438,8 @@ public interface ClientMessages extends Messages {
 
   String deactivateButton();
 
+  String nextButton();
+
   String saveButton();
 
   String addButton();
@@ -2009,6 +2011,10 @@ public interface ClientMessages extends Messages {
 
   String disposalRuleTitle();
 
+  String disposalRuleIdentifier();
+
+  String disposalRuleDescription();
+
   String disposalRuleScheduleName();
 
   String disposalRuleKey();
@@ -2065,6 +2071,8 @@ public interface ClientMessages extends Messages {
 
   String newDisposalRuleTitle();
 
+  String editDisposalRuleTitle();
+
   String newDisposalScheduleTitle();
 
   String editDisposalScheduleTitle();
@@ -2073,6 +2081,10 @@ public interface ClientMessages extends Messages {
 
   String editDisposalHoldTitle();
 
+  String createDisposalRuleFailure(String reason);
+
+  String createDisposalRuleAlreadyExists(String title);
+
   String createDisposalScheduleFailure(String reason);
 
   String createDisposalScheduleAlreadyExists(String title);
@@ -2080,6 +2092,10 @@ public interface ClientMessages extends Messages {
   String createDisposalHoldFailure(String reason);
 
   String createDisposalHoldAlreadyExists(String title);
+
+  String changeRulesOrder();
+
+  String showDisposalRuleTitle();
 
   String showDisposalHoldTitle();
 

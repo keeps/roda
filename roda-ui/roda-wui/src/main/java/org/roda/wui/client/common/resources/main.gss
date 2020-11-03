@@ -7193,3 +7193,12 @@ span.code {
     width: 100%;
     max-height: 30vh;
 }
+
+.changeRulesOrder {
+    margin-left: 2vh;
+}
+
+.disposalRuleScheduleName {
+    cursor: pointer;
+    color: #5bbeff;
+}
