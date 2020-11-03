@@ -1,6 +1,5 @@
 package org.roda.core.data.v2.ip.disposal;
 
-import java.util.Comparator;
 import java.util.Date;
 import java.util.Objects;
 
@@ -28,6 +27,7 @@ public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRu
   private String value;
 
   private String disposalScheduleId;
+  private String disposalScheduleName;
 
   private Integer order;
 
@@ -82,6 +82,14 @@ public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRu
     this.disposalScheduleId = disposalScheduleId;
   }
 
+  public String getDisposalScheduleName() {
+    return disposalScheduleName;
+  }
+
+  public void setDisposalScheduleName(String disposalScheduleName) {
+    this.disposalScheduleName = disposalScheduleName;
+  }
+
   public Integer getOrder() {
     return order;
   }
@@ -131,22 +139,23 @@ public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRu
     DisposalRule that = (DisposalRule) o;
     return Objects.equals(id, that.id) && Objects.equals(title, that.title) && Objects.equals(key, that.key)
       && Objects.equals(value, that.value) && Objects.equals(disposalScheduleId, that.disposalScheduleId)
-      && Objects.equals(order, that.order) && Objects.equals(createdOn, that.createdOn)
-      && Objects.equals(createdBy, that.createdBy) && Objects.equals(updatedOn, that.updatedOn)
-      && Objects.equals(updatedBy, that.updatedBy);
+      && Objects.equals(disposalScheduleName, that.disposalScheduleName) && Objects.equals(order, that.order)
+      && Objects.equals(createdOn, that.createdOn) && Objects.equals(createdBy, that.createdBy)
+      && Objects.equals(updatedOn, that.updatedOn) && Objects.equals(updatedBy, that.updatedBy);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, title, key, value, disposalScheduleId, order, createdOn, createdBy, updatedOn, updatedBy);
+    return Objects.hash(id, title, key, value, disposalScheduleId, disposalScheduleName, order, createdOn, createdBy,
+      updatedOn, updatedBy);
   }
 
   @Override
   public String toString() {
     return "DisposalRule{" + "id='" + id + '\'' + ", title='" + title + '\'' + ", key='" + key + '\'' + ", value='"
-      + value + '\'' + ", disposalScheduleId='" + disposalScheduleId + '\'' + ", order=" + order + ", createdOn="
-      + createdOn + ", createdBy='" + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\''
-      + '}';
+      + value + '\'' + ", disposalScheduleId='" + disposalScheduleId + '\'' + ", disposalScheduleName='"
+      + disposalScheduleName + '\'' + ", order=" + order + ", createdOn=" + createdOn + ", createdBy='" + createdBy
+      + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\'' + '}';
   }
 
   @JsonIgnore
@@ -157,6 +166,6 @@ public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRu
 
   @Override
   public int compareTo(DisposalRule otherRule) {
-    return Integer.compare(this.getOrder(),otherRule.getOrder());
+    return Integer.compare(this.getOrder(), otherRule.getOrder());
   }
 }
