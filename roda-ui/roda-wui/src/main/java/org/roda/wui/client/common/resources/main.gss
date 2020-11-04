@@ -906,6 +906,24 @@ pre code {
     content: "\f055";
 }
 
+
+.btn-top:after {
+    content: "\f102";
+}
+
+
+.btn-up:after {
+    content: "\f077";
+}
+
+.btn-down:after {
+    content: "\f078";
+}
+
+.btn-bottom:after {
+    content: "\f103";
+}
+
 .btn-envelope:after {
     content: "\f0e0";
 }
@@ -7198,7 +7216,14 @@ span.code {
     margin-left: 2vh;
 }
 
-.disposalRuleScheduleName {
+.addCursorPointer {
     cursor: pointer;
-    color: #5bbeff;
+}
+
+.orderButtons {
+    width: 10%;
+}
+
+.alignButtonsPanel{
+    margin-top: 2rem;
 }

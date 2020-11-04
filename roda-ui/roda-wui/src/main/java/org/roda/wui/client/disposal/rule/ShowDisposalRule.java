@@ -140,7 +140,7 @@ public class ShowDisposalRule extends Composite {
 
     disposalRuleScheduleName.setHTML(disposalRule.getDisposalScheduleName());
     disposalRuleScheduleLabel.setVisible(StringUtils.isNotBlank(disposalRule.getDisposalScheduleName()));
-    disposalRuleScheduleName.addStyleName("disposalRuleScheduleName");
+    disposalRuleScheduleName.addStyleName("btn-link addCursorPointer");
     disposalRuleScheduleName.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent clickEvent) {
