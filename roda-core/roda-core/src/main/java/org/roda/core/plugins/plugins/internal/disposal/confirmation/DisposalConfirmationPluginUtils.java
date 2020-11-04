@@ -28,8 +28,7 @@ import org.roda.core.index.IndexService;
 public class DisposalConfirmationPluginUtils {
 
   public static DisposalConfirmation getDisposalConfirmation(String confirmationId, String title, long storageSize,
-    Set<String> disposalHolds, Set<String> disposalSchedules, long numberOfAIPs, long numberOfCollection,
-    Map<String, String> extraFields) {
+    Set<String> disposalHolds, Set<String> disposalSchedules, long numberOfAIPs, Map<String, String> extraFields) {
 
     DisposalConfirmation confirmationMetadata = new DisposalConfirmation();
     confirmationMetadata.setId(confirmationId);
@@ -38,7 +37,6 @@ public class DisposalConfirmationPluginUtils {
     confirmationMetadata.addDisposalHoldIds(disposalHolds);
     confirmationMetadata.addDisposalScheduleIds(disposalSchedules);
     confirmationMetadata.setNumberOfAIPs(numberOfAIPs);
-    confirmationMetadata.setNumberOfCollections(numberOfCollection);
     confirmationMetadata.setExtraFields(extraFields);
 
     return confirmationMetadata;

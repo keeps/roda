@@ -21,6 +21,7 @@ import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
+import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
@@ -63,7 +64,7 @@ public class DisposalConfirmationTest {
   @AfterClass
   public void tearDown() throws Exception {
     RodaCoreFactory.shutdown();
-    // FSUtils.deletePath(basePath);
+    FSUtils.deletePath(basePath);
   }
 
   @AfterMethod
@@ -75,17 +76,14 @@ public class DisposalConfirmationTest {
   public void testDisposalConfirmationCreation() throws AuthorizationDeniedException, GenericException,
     NotFoundException, RequestNotValidException, AlreadyExistsException {
 
-    DisposalConfirmation confirmation = model.createDisposalConfirmation(createDisposalConfirmation(),
-      "admin");
+    DisposalConfirmation confirmation = model.createDisposalConfirmation(createDisposalConfirmation(), "admin");
 
-    model.createDisposalConfirmation(createDisposalConfirmation(DisposalConfirmationState.PENDING),
-        "mguimaraes");
+    model.createDisposalConfirmation(createDisposalConfirmation(DisposalConfirmationState.PENDING), "mguimaraes");
 
-    model.createDisposalConfirmation(createDisposalConfirmation(DisposalConfirmationState.RESTORED),
-        "lfaria");
+    model.createDisposalConfirmation(createDisposalConfirmation(DisposalConfirmationState.RESTORED), "lfaria");
 
-    DisposalConfirmation retrievedConfirmation = SolrUtils.retrieve(solrClient,
-      DisposalConfirmation.class, confirmation.getId(), new ArrayList<>());
+    DisposalConfirmation retrievedConfirmation = SolrUtils.retrieve(solrClient, DisposalConfirmation.class,
+      confirmation.getId(), new ArrayList<>());
 
     assertEquals(confirmation, retrievedConfirmation);
   }
@@ -93,8 +91,7 @@ public class DisposalConfirmationTest {
   @Test(expectedExceptions = NotFoundException.class)
   public void testDisposalConfirmationPendingDeletion() throws AlreadyExistsException, AuthorizationDeniedException,
     GenericException, NotFoundException, RequestNotValidException, IllegalOperationException {
-    DisposalConfirmation confirmation = model.createDisposalConfirmation(createDisposalConfirmation(),
-      "admin");
+    DisposalConfirmation confirmation = model.createDisposalConfirmation(createDisposalConfirmation(), "admin");
 
     model.deleteDisposalConfirmation(confirmation.getId());
 
@@ -119,7 +116,6 @@ public class DisposalConfirmationTest {
     DisposalConfirmation confirmation = new DisposalConfirmation();
     confirmation.setTitle("Confirmation");
     confirmation.setNumberOfAIPs(100L);
-    confirmation.setNumberOfCollections(1L);
     confirmation.setState(state);
     confirmation.setSize(12346234L);
 

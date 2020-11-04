@@ -24,8 +24,7 @@ import org.roda.core.index.utils.SolrUtils;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-public class DisposalConfirmationCollection
-  extends AbstractSolrCollection<DisposalConfirmation, DisposalConfirmation> {
+public class DisposalConfirmationCollection extends AbstractSolrCollection<DisposalConfirmation, DisposalConfirmation> {
   @Override
   public Class<DisposalConfirmation> getIndexClass() {
     return DisposalConfirmation.class;
@@ -70,7 +69,6 @@ public class DisposalConfirmationCollection
     fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_RESTORED_BY, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_STATE, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_AIPS, Field.TYPE_LONG));
-    fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_COLLECTIONS, Field.TYPE_LONG));
     fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_STORAGE_SIZE, Field.TYPE_LONG));
 
     return fields;
@@ -96,15 +94,13 @@ public class DisposalConfirmationCollection
       SolrUtils.formatDateWithMillis(confirmation.getRestoredOn()));
     doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_STATE, confirmation.getState().toString());
     doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_AIPS, confirmation.getNumberOfAIPs());
-    doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_COLLECTIONS, confirmation.getNumberOfCollections());
     doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_STORAGE_SIZE, confirmation.getSize());
 
     return doc;
   }
 
   @Override
-  public DisposalConfirmation fromSolrDocument(SolrDocument doc, List<String> fieldsToReturn)
-    throws GenericException {
+  public DisposalConfirmation fromSolrDocument(SolrDocument doc, List<String> fieldsToReturn) throws GenericException {
 
     final DisposalConfirmation confirmation = super.fromSolrDocument(doc, fieldsToReturn);
 
@@ -132,8 +128,6 @@ public class DisposalConfirmationCollection
     }
     confirmation
       .setNumberOfAIPs(SolrUtils.objectToLong(doc.get(RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_AIPS), 0L));
-    confirmation.setNumberOfCollections(
-      SolrUtils.objectToLong(doc.get(RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_COLLECTIONS), 0L));
     confirmation.setSize(SolrUtils.objectToLong(doc.get(RodaConstants.DISPOSAL_CONFIRMATION_STORAGE_SIZE), 0L));
 
     return confirmation;

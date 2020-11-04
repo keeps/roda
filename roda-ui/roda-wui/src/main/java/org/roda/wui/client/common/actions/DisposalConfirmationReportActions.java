@@ -105,33 +105,33 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
 
   @Override
   public void act(Action<DisposalConfirmation> action, DisposalConfirmation object,
-                  AsyncCallback<ActionImpact> callback) {
+    AsyncCallback<ActionImpact> callback) {
     if (DisposalConfirmationReportAction.DESTROY.equals(action)) {
       destroyDisposalConfirmationContent(object, callback);
     } else if (DisposalConfirmationReportAction.DELETE_REPORT.equals(action)) {
       deleteDisposalConfirmationReport(object, callback);
     } else if (DisposalConfirmationReportAction.REMOVE_FROM_BIN.equals(action)) {
+      permanentlyDeleteDisposalConfirmationReport(object, callback);
     } else if (DisposalConfirmationReportAction.RECOVER_FROM_BIN.equals(action)) {
     } else {
       unsupportedAction(action, callback);
     }
   }
 
-  private void destroyDisposalConfirmationContent(DisposalConfirmation report,
-                                                  AsyncCallback<ActionImpact> callback) {
-    Dialogs.showConfirmDialog(messages.deleteConfirmationReportDialogTitle(),
-      messages.deleteConfirmationReportDialogMessage(), messages.dialogNo(), messages.dialogYes(),
-      new ActionNoAsyncCallback<Boolean>(callback) {
+  private void permanentlyDeleteDisposalConfirmationReport(DisposalConfirmation confirmation,
+    AsyncCallback<ActionImpact> callback) {
+    Dialogs.showConfirmDialog("Permanently delete the records from disposal bin",
+      "Are you sure you want to permanently delete the records from disposal bin? This action can not be undone once executed.",
+      messages.dialogNo(), messages.dialogYes(), new ActionNoAsyncCallback<Boolean>(callback) {
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            BrowserService.Util.getInstance().destroyRecordsInDisposalConfirmationReport(
-              objectToSelectedItems(report, DisposalConfirmation.class),
-              new ActionAsyncCallback<Job>(callback) {
+            BrowserService.Util.getInstance().permanentlyDeleteRecordsInDisposalConfirmationReport(
+              objectToSelectedItems(confirmation, DisposalConfirmation.class), new ActionAsyncCallback<Job>(callback) {
 
                 @Override
                 public void onSuccess(Job result) {
-                  Dialogs.showJobRedirectDialog("BLA BLA BLA", new AsyncCallback<Void>() {
+                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
                     @Override
                     public void onFailure(Throwable caught) {
@@ -156,8 +156,44 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
       });
   }
 
-  private void deleteDisposalConfirmationReport(DisposalConfirmation report,
-                                                AsyncCallback<ActionImpact> callback) {
+  private void destroyDisposalConfirmationContent(DisposalConfirmation report, AsyncCallback<ActionImpact> callback) {
+    Dialogs.showConfirmDialog(messages.deleteConfirmationReportDialogTitle(),
+      messages.deleteConfirmationReportDialogMessage(), messages.dialogNo(), messages.dialogYes(),
+      new ActionNoAsyncCallback<Boolean>(callback) {
+        @Override
+        public void onSuccess(Boolean result) {
+          if (result) {
+            BrowserService.Util.getInstance().destroyRecordsInDisposalConfirmationReport(
+              objectToSelectedItems(report, DisposalConfirmation.class), new ActionAsyncCallback<Job>(callback) {
+
+                @Override
+                public void onSuccess(Job result) {
+                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      Toast.showInfo(messages.deleteConfirmationReportSuccessTitle(),
+                        messages.deleteConfirmationReportSuccessMessage());
+                      doActionCallbackUpdated();
+                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                    }
+
+                    @Override
+                    public void onSuccess(final Void nothing) {
+                      doActionCallbackUpdated();
+                      HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                    }
+                  });
+                }
+              });
+          } else {
+            doActionCallbackNone();
+          }
+        }
+      });
+  }
+
+  private void deleteDisposalConfirmationReport(DisposalConfirmation report, AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.deleteConfirmationReportDialogTitle(),
       messages.deleteConfirmationReportDialogMessage(), messages.dialogNo(), messages.dialogYes(),
       new ActionNoAsyncCallback<Boolean>(callback) {
@@ -210,20 +246,18 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
 
     // SCHEDULE
     ActionableGroup<DisposalConfirmation> scheduleGroup = new ActionableGroup<>("Schedule");
+    scheduleGroup.addButton(messages.applyDisposalScheduleButton(), DisposalConfirmationReportAction.DESTROY,
+      ActionImpact.UPDATED, "btn-times-circle");
 
     // REPORT
     ActionableGroup<DisposalConfirmation> reportGroup = new ActionableGroup<>("Report");
-
-    // DISPOSAL BIN
-    ActionableGroup<DisposalConfirmation> disposalBinGroup = new ActionableGroup<>(
-      messages.sidebarDisposalBinTitle());
-
-    scheduleGroup.addButton(messages.applyDisposalScheduleButton(), DisposalConfirmationReportAction.DESTROY,
-      ActionImpact.UPDATED, "btn-times-circle");
     reportGroup.addButton(messages.deleteDisposalConfirmationReport(), DisposalConfirmationReportAction.DELETE_REPORT,
       ActionImpact.DESTROYED, "btn-cancel");
+
+    // DISPOSAL BIN
+    ActionableGroup<DisposalConfirmation> disposalBinGroup = new ActionableGroup<>(messages.sidebarDisposalBinTitle());
     disposalBinGroup.addButton(messages.permanentlyDeleteFromBinButton(),
-      DisposalConfirmationReportAction.REMOVE_FROM_BIN, ActionImpact.UPDATED, "btn-times-circle");
+      DisposalConfirmationReportAction.REMOVE_FROM_BIN, ActionImpact.DESTROYED, "btn-trash-alt");
     disposalBinGroup.addButton(messages.recoverFromBinButton(), DisposalConfirmationReportAction.RECOVER_FROM_BIN,
       ActionImpact.UPDATED, "btn-history");
 

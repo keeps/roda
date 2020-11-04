@@ -24,6 +24,8 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
+import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
@@ -41,7 +43,7 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.DisposalDialogs;
 import org.roda.wui.client.common.dialogs.RepresentationDialogs;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
-import org.roda.wui.client.common.dialogs.utils.DisposalScheduleDialogsResult;
+import org.roda.wui.client.common.dialogs.utils.DisposalHoldDialogResult;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.process.ShowJob;
@@ -58,6 +60,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeUri;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -81,7 +84,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   private static final Set<AipAction> POSSIBLE_ACTIONS_ON_SINGLE_AIP = new HashSet<>(Arrays.asList(AipAction.DOWNLOAD,
     AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE, AipAction.NEW_PROCESS,
     AipAction.DOWNLOAD_EVENTS, AipAction.DOWNLOAD_DOCUMENTATION, AipAction.DOWNLOAD_SUBMISSIONS, AipAction.CHANGE_TYPE,
-    AipAction.ASSOCIATE_DISPOSAL_SCHEDULE, AipAction.APPLY_DISPOSAL_HOLD, AipAction.LIFT_DISPOSAL_HOLD));
+    AipAction.ASSOCIATE_DISPOSAL_SCHEDULE, AipAction.ASSOCIATE_DISPOSAL_HOLD));
 
   private static final Set<AipAction> POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS = new HashSet<>(
     Arrays.asList(AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE, AipAction.NEW_PROCESS,
@@ -110,8 +113,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     APPRAISAL_REJECT(RodaConstants.PERMISSION_METHOD_APPRAISAL), DOWNLOAD_DOCUMENTATION(),
     CHANGE_TYPE(RodaConstants.PERMISSION_METHOD_CHANGE_AIP_TYPE),
     ASSOCIATE_DISPOSAL_SCHEDULE(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_SCHEDULE),
-    APPLY_DISPOSAL_HOLD(RodaConstants.PERMISSION_METHOD_APPLY_DISPOSAL_HOLD),
-    LIFT_DISPOSAL_HOLD(RodaConstants.PERMISSION_METHOD_APPLY_DISPOSAL_HOLD);
+    ASSOCIATE_DISPOSAL_HOLD(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_HOLD);
 
     private List<String> methods;
 
@@ -244,7 +246,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
       changeType(aip, callback);
     } else if (AipAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action)) {
       associateDisposalSchedule(aip, callback);
-    } else if (AipAction.APPLY_DISPOSAL_HOLD.equals(action)) {
+    } else if (AipAction.ASSOCIATE_DISPOSAL_HOLD.equals(action)) {
       applyDisposalHold(aip, callback);
     } else {
       unsupportedAction(action, callback);
@@ -269,8 +271,6 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
       changeType(aips, callback);
     } else if (AipAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action)) {
       associateDisposalSchedule(aips, callback);
-    } else if (AipAction.APPLY_DISPOSAL_HOLD.equals(action)) {
-      applyDisposalHold(aips, callback);
     } else {
       unsupportedAction(action, callback);
     }
@@ -866,15 +866,69 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     ClientSelectedItemsUtils.size(IndexedAIP.class, aips, new ActionNoAsyncCallback<Long>(callback) {
       @Override
       public void onSuccess(final Long size) {
-        BrowserService.Util.getInstance().applyDisposalHold(aips, "0af77a74-8998-4995-ba65-5df91ca38e4c",
-          new ActionAsyncCallback<Job>(callback) {
-            @Override
-            public void onSuccess(Job job) {
-              HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-            }
-          });
+        BrowserService.Util.getInstance().listDisposalHolds(new ActionNoAsyncCallback<DisposalHolds>(callback) {
+          @Override
+          public void onSuccess(DisposalHolds holds) {
+            holds.getObjects().removeIf(p -> DisposalHoldState.LIFTED.equals(p.getState()));
+            DisposalDialogs.showDisposalHoldSelection(messages.disposalHoldSelectionDialogTitle(), holds,
+              new ActionNoAsyncCallback<DisposalHoldDialogResult>(callback) {
+                @Override
+                public void onFailure(Throwable caught) {
+                  doActionCallbackNone();
+                }
 
-        doActionCallbackNone();
+                @Override
+                public void onSuccess(DisposalHoldDialogResult holdDialogResult) {
+                  Dialogs.showConfirmDialog(messages.applyDisposalHoldDialogTitle(),
+                    messages.applyDisposalHoldDialogMessage(), messages.dialogNo(), messages.dialogYes(),
+                    new ActionNoAsyncCallback<Boolean>(callback) {
+                      @Override
+                      public void onSuccess(Boolean result) {
+                        if (result) {
+                          BrowserService.Util.getInstance().applyDisposalHold(aips,
+                            holdDialogResult.getDisposalHold().getId(), new ActionAsyncCallback<Job>(callback) {
+                              @Override
+                              public void onFailure(Throwable caught) {
+                                callback.onFailure(caught);
+                                HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                              }
+
+                              @Override
+                              public void onSuccess(Job job) {
+                                Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+
+                                  @Override
+                                  public void onFailure(Throwable caught) {
+                                    Toast.showInfo(messages.runningInBackgroundTitle(),
+                                      messages.runningInBackgroundDescription());
+
+                                    Timer timer = new Timer() {
+                                      @Override
+                                      public void run() {
+                                        doActionCallbackUpdated();
+                                      }
+                                    };
+
+                                    timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                                  }
+
+                                  @Override
+                                  public void onSuccess(final Void nothing) {
+                                    doActionCallbackNone();
+                                    HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                                  }
+                                });
+                              }
+                            });
+                        } else {
+                          doActionCallbackNone();
+                        }
+                      }
+                    });
+                }
+              });
+          }
+        });
       }
     });
   }
@@ -921,8 +975,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     ActionableGroup<IndexedAIP> disposalGroup = new ActionableGroup<>(messages.disposalTitle());
     disposalGroup.addButton(messages.associateDisposalScheduleButton(), AipAction.ASSOCIATE_DISPOSAL_SCHEDULE,
       ActionImpact.NONE, "fas fa-calendar");
-    disposalGroup.addButton("Apply disposal hold", AipAction.APPLY_DISPOSAL_HOLD, ActionImpact.NONE, "fas fa-lock");
-    disposalGroup.addButton("Lift disposal hold", AipAction.LIFT_DISPOSAL_HOLD, ActionImpact.NONE, "fas fa-unlock");
+    disposalGroup.addButton(messages.associateDisposalHoldButton(), AipAction.ASSOCIATE_DISPOSAL_HOLD,
+      ActionImpact.NONE, "fas fa-lock");
 
     aipActionableBundle.addGroup(managementGroup).addGroup(disposalGroup).addGroup(preservationGroup)
       .addGroup(appraisalGroup).addGroup(downloadGroup);

@@ -337,9 +337,12 @@ public interface BrowserServiceAsync {
   void destroyRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems,
                                                   AsyncCallback<Job> async);
 
+  void permanentlyDeleteRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems,
+                                                            AsyncCallback<Job> async);
+
   void retrieveDisposalConfirmationExtraBundle(AsyncCallback<DisposalConfirmationExtraBundle> async);
 
   void applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, AsyncCallback<Job> async);
 
-  void liftDisposalHold(SelectedItems<DisposalHold> selectedItems, AsyncCallback<Job> async);
+  void liftDisposalHold(SelectedItems<IndexedAIP> selectedItems, AsyncCallback<Job> async);
 }

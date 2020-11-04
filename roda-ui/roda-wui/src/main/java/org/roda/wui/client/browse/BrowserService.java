@@ -434,7 +434,8 @@ public interface BrowserService extends RemoteService {
   Job applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  Job liftDisposalHold(SelectedItems<DisposalHold> selectedItems) throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+  Job liftDisposalHold(SelectedItems<IndexedAIP> selectedItems)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   Job createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, String title,
     DisposalConfirmationExtraBundle metadata)
@@ -447,6 +448,8 @@ public interface BrowserService extends RemoteService {
 
   Job destroyRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
+
+  Job permanentlyDeleteRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems) throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   List<DisposalHoldAssociation> listDisposalHoldsAssociation(String aipId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;

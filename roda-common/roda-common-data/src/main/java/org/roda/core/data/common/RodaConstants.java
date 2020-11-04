@@ -870,7 +870,6 @@ public final class RodaConstants {
   public static final String DISPOSAL_CONFIRMATION_RESTORED_ON = "restoredOn";
   public static final String DISPOSAL_CONFIRMATION_RESTORED_BY = "restoredBy";
   public static final String DISPOSAL_CONFIRMATION_NUMBER_OF_AIPS = "numberOfAIPs";
-  public static final String DISPOSAL_CONFIRMATION_NUMBER_OF_COLLECTIONS = "numberOfCollections";
   public static final String DISPOSAL_CONFIRMATION_STATE = "state";
   public static final String DISPOSAL_CONFIRMATION_TITLE = "title";
   public static final String DISPOSAL_CONFIRMATION_EXTRA_INFO = "extraInformation";
@@ -1620,7 +1619,7 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_CREATE_DISPOSAL_HOLD = "org.roda.wui.api.controllers.Disposals.createDisposalHold";
   public static final String PERMISSION_METHOD_DELETE_DISPOSAL_HOLD = "org.roda.wui.api.controllers.Disposals.deleteDisposalHold";
   public static final String PERMISSION_METHOD_UPDATE_DISPOSAL_HOLD = "org.roda.wui.api.controllers.Disposals.updateDisposalHold";
-  public static final String PERMISSION_METHOD_APPLY_DISPOSAL_HOLD = "org.roda.wui.api.controllers.Disposals.applyDisposalHold";
+  public static final String PERMISSION_METHOD_ASSOCIATE_DISPOSAL_HOLD = "org.roda.wui.api.controllers.Disposals.applyDisposalHold";
 
   public static final String PERMISSION_METHOD_CREATE_DISPOSAL_CONFIRMATION = "org.roda.wui.api.controllers.Disposals.createDisposalConfirmation";
   public static final String PERMISSION_METHOD_DELETE_DISPOSAL_CONFIRMATION = "org.roda.wui.api.controllers.Disposals.deleteDisposalConfirmation";
