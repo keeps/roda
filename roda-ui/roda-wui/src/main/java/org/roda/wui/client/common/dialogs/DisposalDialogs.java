@@ -4,7 +4,14 @@ import com.google.gwt.user.client.ui.CheckBox;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.wui.client.common.dialogs.utils.DisposalScheduleDialogsResult;
+import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalHolds;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
+import org.roda.wui.client.common.dialogs.utils.DisposalHoldDialogResult;
+import org.roda.wui.client.common.dialogs.utils.DisposalHoldDialogResult.ActionType;
 import org.roda.wui.client.common.lists.utils.TooltipTextColumn;
+import org.roda.wui.client.disposal.hold.CreateDisposalHold;
 import org.roda.wui.client.disposal.schedule.CreateDisposalSchedule;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.MyCellTableResources;
@@ -33,6 +40,125 @@ public class DisposalDialogs {
   private static Boolean applyToHierarchy = true;
   private static Boolean overwriteAll = false;
 
+  public static void showDisposalHoldSelection(String title, DisposalHolds holds,
+    final AsyncCallback<DisposalHoldDialogResult> callback) {
+    final DialogBox dialogBox = new DialogBox(false, true);
+    dialogBox.setText(title);
+
+    FlowPanel layout = new FlowPanel();
+    Button clearHoldsButton = new Button(messages.clearDisposalHoldButton());
+    Button overrideDisposalHoldButton = new Button(messages.overrideDisposalHoldButton());
+    Button cancelButton = new Button(messages.cancelButton());
+    Button selectHoldButton = new Button(messages.applyDisposalHoldButton());
+    Button newHoldButton = new Button(messages.createDisposalHoldButton());
+    FlowPanel footer = new FlowPanel();
+
+    overrideDisposalHoldButton.setEnabled(false);
+    selectHoldButton.setEnabled(false);
+    selectHoldButton.getElement().getStyle().setMarginRight(10, Style.Unit.PX);
+    clearHoldsButton.getElement().getStyle().setMarginRight(10, Style.Unit.PX);
+    overrideDisposalHoldButton.getElement().getStyle().setMarginRight(10, Style.Unit.PX);
+    newHoldButton.getElement().getStyle().setFloat(Style.Float.LEFT);
+    dialogBox.setWidget(layout);
+
+    CellTable<DisposalHold> table = new CellTable<>(Integer.MAX_VALUE,
+      (MyCellTableResources) GWT.create(MyCellTableResources.class));
+
+    table.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.DISABLED);
+
+    final ScrollPanel displayScroll = new ScrollPanel(table);
+    displayScroll.setSize("100%", "80vh");
+    final SimplePanel displayScrollWrapper = new SimplePanel(displayScroll);
+    displayScrollWrapper.addStyleName("disposal-schedules-modal-table");
+
+    final SingleSelectionModel<DisposalHold> singleSelectionModel = new SingleSelectionModel<>();
+    singleSelectionModel.addSelectionChangeHandler(event -> {
+      singleSelectionModel.setSelected(singleSelectionModel.getSelectedObject(), true);
+      selectHoldButton.setEnabled(true);
+      overrideDisposalHoldButton.setEnabled(true);
+    });
+
+    table.setSelectionModel(singleSelectionModel);
+
+    table.addColumn(new TooltipTextColumn<DisposalHold>() {
+      @Override
+      public String getValue(DisposalHold disposalHold) {
+        return disposalHold != null && disposalHold.getTitle() != null ? disposalHold.getTitle() : "";
+      }
+    }, messages.disposalScheduleTitle());
+
+    table.addColumn(new TooltipTextColumn<DisposalHold>() {
+      @Override
+      public String getValue(DisposalHold disposalHold) {
+        return disposalHold != null && disposalHold.getMandate() != null ? disposalHold.getMandate() : "";
+      }
+    }, messages.disposalScheduleMandate());
+
+    // Create a list data provider.
+    final ListDataProvider<DisposalHold> dataProvider = new ListDataProvider<>(holds.getObjects());
+
+    // Add the table to the dataProvider.
+    dataProvider.addDataDisplay(table);
+
+    layout.add(displayScrollWrapper);
+    layout.add(footer);
+
+    dialogBox.setGlassEnabled(true);
+    dialogBox.setAnimationEnabled(false);
+
+    cancelButton.addClickHandler(event -> {
+      dialogBox.hide();
+      callback.onFailure(null);
+    });
+
+    selectHoldButton.addClickHandler(clickEvent -> {
+      dialogBox.hide();
+      DisposalHoldDialogResult result = new DisposalHoldDialogResult(ActionType.ASSOCIATE,
+        singleSelectionModel.getSelectedObject());
+      callback.onSuccess(result);
+    });
+
+    newHoldButton.addClickHandler(clickEvent -> {
+      dialogBox.hide();
+      callback.onFailure(null);
+      HistoryUtils.newHistory(CreateDisposalHold.RESOLVER);
+    });
+
+    overrideDisposalHoldButton.addClickHandler(clickEvent -> {
+      dialogBox.hide();
+      DisposalHoldDialogResult result = new DisposalHoldDialogResult(ActionType.OVERRIDE,
+        singleSelectionModel.getSelectedObject());
+      callback.onSuccess(result);
+    });
+
+    clearHoldsButton.addClickHandler(clickEvent -> {
+      dialogBox.hide();
+      DisposalHoldDialogResult result = new DisposalHoldDialogResult(ActionType.CLEAR);
+      callback.onSuccess(result);
+    });
+
+    cancelButton.addStyleName("btn btn-link");
+    selectHoldButton.addStyleName("btn btn-play");
+    clearHoldsButton.addStyleName("btn btn-danger btn-ban");
+    overrideDisposalHoldButton.addStyleName("btn btn-play");
+    newHoldButton.addStyleName("btn btn-plus");
+    table.addStyleName("my-asyncdatagrid-display");
+
+    layout.addStyleName("wui-dialog-layout");
+    footer.addStyleName("wui-dialog-layout-footer");
+    footer.add(newHoldButton);
+
+    footer.add(clearHoldsButton);
+    footer.add(overrideDisposalHoldButton);
+    footer.add(selectHoldButton);
+
+    footer.add(cancelButton);
+
+    dialogBox.setWidget(layout);
+    dialogBox.center();
+    dialogBox.show();
+  }
+
   public static void showDisposalScheduleSelection(String title, DisposalSchedules schedules,
     final AsyncCallback<DisposalScheduleDialogsResult> callback) {
     final DialogBox dialogBox = new DialogBox(false, true);
@@ -47,9 +173,8 @@ public class DisposalDialogs {
     CheckBox overwriteAllCheckBox = new CheckBox(messages.overwriteAllDisposalDialogCheckBox());
     FlowPanel footer = new FlowPanel();
 
-    footer.add(cancelButton);
     changeScheduleButton.setEnabled(false);
-    changeScheduleButton.getElement().getStyle().setMarginRight(10, Style.Unit.PX);
+    noScheduleButton.getElement().getStyle().setMarginRight(10, Style.Unit.PX);
     newScheduleButton.getElement().getStyle().setFloat(Style.Float.LEFT);
     dialogBox.setWidget(layout);
 
@@ -169,6 +294,7 @@ public class DisposalDialogs {
     footer.add(overwriteAllCheckBox);
     footer.add(changeScheduleButton);
     footer.add(noScheduleButton);
+    footer.add(changeScheduleButton);
     footer.add(cancelButton);
 
     dialogBox.setWidget(layout);

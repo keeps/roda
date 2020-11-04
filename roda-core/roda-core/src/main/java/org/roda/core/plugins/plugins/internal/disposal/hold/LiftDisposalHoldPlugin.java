@@ -4,7 +4,9 @@ import java.util.Collections;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
@@ -13,6 +15,7 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.jobs.Job;
@@ -111,10 +114,12 @@ public class LiftDisposalHoldPlugin extends AbstractPlugin<DisposalHold> {
       IndexResult<IndexedAIP> result = index.find(IndexedAIP.class, filter, Sorter.NONE, new Sublist(0, RodaConstants.DEFAULT_PAGINATION_VALUE),
           Facets.NONE, Collections.emptyList());
 
-      for (IndexedAIP aip : result.getResults()) {
-        
+      for (IndexedAIP indexedAIP : result.getResults()) {
+        AIP aip = model.retrieveAIP(indexedAIP.getId());
+
+
       }
-    } catch (GenericException | RequestNotValidException e) {
+    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
       e.printStackTrace();
     }
 

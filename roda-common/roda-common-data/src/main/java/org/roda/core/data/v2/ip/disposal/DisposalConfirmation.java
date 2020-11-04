@@ -43,7 +43,6 @@ public class DisposalConfirmation implements IsModelObject, IsIndexed, HasId {
 
   private Long size = null;
   private Long numberOfAIPs = null;
-  private Long numberOfCollections = null;
 
   private List<String> disposalScheduleIds;
   private List<String> disposalHoldIds;
@@ -104,14 +103,6 @@ public class DisposalConfirmation implements IsModelObject, IsIndexed, HasId {
 
   public void setNumberOfAIPs(Long numberOfAIPs) {
     this.numberOfAIPs = numberOfAIPs;
-  }
-
-  public Long getNumberOfCollections() {
-    return numberOfCollections;
-  }
-
-  public void setNumberOfCollections(Long numberOfCollections) {
-    this.numberOfCollections = numberOfCollections;
   }
 
   public DisposalConfirmationState getState() {
@@ -209,7 +200,6 @@ public class DisposalConfirmation implements IsModelObject, IsIndexed, HasId {
       && Objects.equals(restoredOn, that.restoredOn) && Objects.equals(restoredBy, that.restoredBy)
       && Objects.equals(extraFields, that.extraFields) && Objects.equals(size, that.size)
       && Objects.equals(numberOfAIPs, that.numberOfAIPs)
-      && Objects.equals(numberOfCollections, that.numberOfCollections)
       && Objects.equals(disposalScheduleIds, that.disposalScheduleIds)
       && Objects.equals(disposalHoldIds, that.disposalHoldIds) && Objects.equals(fields, that.fields);
   }
@@ -217,7 +207,7 @@ public class DisposalConfirmation implements IsModelObject, IsIndexed, HasId {
   @Override
   public int hashCode() {
     return Objects.hash(id, title, state, createdOn, createdBy, executedOn, executedBy, restoredOn, restoredBy,
-      extraFields, size, numberOfAIPs, numberOfCollections, disposalScheduleIds, disposalHoldIds, fields);
+      extraFields, size, numberOfAIPs, disposalScheduleIds, disposalHoldIds, fields);
   }
 
   @Override
@@ -226,8 +216,7 @@ public class DisposalConfirmation implements IsModelObject, IsIndexed, HasId {
       + ", createdOn=" + createdOn + ", createdBy='" + createdBy + '\'' + ", executedOn=" + executedOn
       + ", executedBy='" + executedBy + '\'' + ", restoredOn=" + restoredOn + ", restoredBy='" + restoredBy + '\''
       + ", extraFields=" + extraFields + ", size=" + size + ", numberOfAIPs=" + numberOfAIPs + ", numberOfCollections="
-      + numberOfCollections + ", disposalScheduleIds=" + disposalScheduleIds + ", disposalHoldIds=" + disposalHoldIds
-      + ", fields=" + fields + '}';
+      + disposalScheduleIds + ", disposalHoldIds=" + disposalHoldIds + ", fields=" + fields + '}';
   }
 
   @JsonIgnore
@@ -244,7 +233,7 @@ public class DisposalConfirmation implements IsModelObject, IsIndexed, HasId {
   @Override
   public List<String> toCsvHeaders() {
     return Arrays.asList("id", "title", "createdOn", "createdBy", "executedOn", "executedBy", "approver",
-      "numberOfAIPs", "numberOfCollections", "size");
+      "numberOfAIPs", "size");
   }
 
   /**
@@ -254,8 +243,7 @@ public class DisposalConfirmation implements IsModelObject, IsIndexed, HasId {
    */
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(id, title, createdOn, createdBy, executedOn, executedBy, numberOfAIPs,
-      numberOfCollections, size);
+    return Arrays.asList(id, title, createdOn, createdBy, executedOn, executedBy, numberOfAIPs, size);
   }
 
   /**

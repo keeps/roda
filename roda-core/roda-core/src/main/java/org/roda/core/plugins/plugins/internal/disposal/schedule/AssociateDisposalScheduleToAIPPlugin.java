@@ -28,7 +28,6 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPDisposalFlow;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -66,11 +65,12 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID, "Disposal schedule id",
         PluginParameter.PluginParameterType.STRING, "", true, false, "Disposal schedule identifier"));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RECURSIVE,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_RECURSIVE, "Recursive mode", PluginParameter.PluginParameterType.BOOLEAN, "true",
-        true, false, "Execute in recursive mode."));
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_RECURSIVE, "Recursive mode",
+        PluginParameter.PluginParameterType.BOOLEAN, "true", true, false, "Execute in recursive mode."));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_ALL,
-        new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_ALL, "Overwrite mode", PluginParameter.PluginParameterType.BOOLEAN, "true",
-            true, false, "Overwrite all descendants disposal schedules."));
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_ALL, "Overwrite mode",
+        PluginParameter.PluginParameterType.BOOLEAN, "true", true, false,
+        "Overwrite all descendants disposal schedules."));
   }
 
   @Override
@@ -266,7 +266,7 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
 
         try {
           AIP aipChildren = model.retrieveAIP(indexedAIP.getId());
-          if (!overwriteAll && !aipChildren.getDisposalScheduleId().isEmpty()){
+          if (!overwriteAll && !aipChildren.getDisposalScheduleId().isEmpty()) {
             break;
           }
           reportItem.setPluginState(PluginState.SUCCESS);
@@ -302,7 +302,6 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
     }
 
   }
-
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {

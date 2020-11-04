@@ -167,7 +167,7 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
           String aipId = aipEntry.getAipId();
           AIP aip = model.retrieveAIP(aipId);
 
-          processAIP(aip, model, report, jobPluginInfo, cachedJob, disposalConfirmationId);
+          processAIP(aip, model, report, jobPluginInfo, cachedJob, confirmation);
         }
       }
 
@@ -175,7 +175,7 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
       model.deleteDisposalConfirmation(disposalConfirmationId);
 
       outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationEvent("was successfully deleted",
-        disposalConfirmationId);
+        confirmation.getTitle(), disposalConfirmationId);
     } catch (RequestNotValidException | AuthorizationDeniedException | GenericException | NotFoundException
       | IOException | IllegalOperationException e) {
       LOGGER.error("Error deleting disposal confirmation {}: {}", disposalConfirmationId, e.getMessage(), e);
@@ -183,7 +183,7 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
       report.setPluginState(PluginState.FAILURE)
         .setPluginDetails("Error deleting disposal confirmation " + disposalConfirmationId + ": " + e.getMessage());
       outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationEvent("failed to delete",
-        disposalConfirmationId);
+        confirmation.getTitle(), disposalConfirmationId);
     }
 
     model.createRepositoryEvent(RodaConstants.PreservationEventType.DELETION, getPreservationEventDescription(),
@@ -191,20 +191,23 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
   }
 
   private void processAIP(AIP aip, ModelService model, Report report, JobPluginInfo jobPluginInfo, Job cachedJob,
-    String disposalConfirmationId) {
+    DisposalConfirmation disposalConfirmationReport) {
     aip.setDisposalConfirmationId(null);
     PluginState state = PluginState.SUCCESS;
     Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
     try {
       model.updateAIP(aip, cachedJob.getUsername());
-      reportItem.setPluginState(state).setPluginDetails("AIP '" + aip.getId()
-        + "' was successfully withdraw from the disposal confirmation: '" + disposalConfirmationId + "'");
+      reportItem.setPluginState(state)
+        .setPluginDetails("AIP '" + aip.getId() + "' was successfully withdraw from the disposal confirmation '"
+          + disposalConfirmationReport.getTitle() + "' (" + disposalConfirmationReport.getId() + ")");
       jobPluginInfo.incrementObjectsProcessedWithSuccess();
     } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
       state = PluginState.FAILURE;
-      reportItem.addPluginDetails("Could not withdraw AIP '" + aip.getId() + "' from the disposal confirmation '"
-        + disposalConfirmationId + "': " + e.getMessage()).setPluginState(state);
+      reportItem
+        .addPluginDetails("Could not withdraw AIP '" + aip.getId() + "' from the disposal confirmation '"
+          + disposalConfirmationReport.getTitle() + "' (" + disposalConfirmationReport.getId() + "): " + e.getMessage())
+        .setPluginState(state);
       jobPluginInfo.incrementObjectsProcessedWithFailure();
     }
 
@@ -212,10 +215,12 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
 
     if (state.equals(PluginState.SUCCESS)) {
       outcomeText = "Archival Information Package [id: " + aip.getId()
-        + "] has been withdraw from disposal confirmation '" + disposalConfirmationId + "'";
+        + "] has been withdrawn from disposal confirmation '" + disposalConfirmationReport.getTitle() + "' ("
+        + disposalConfirmationReport.getId() + ")";
     } else {
       outcomeText = "Archival Information Package [id: " + aip.getId()
-        + "] has not been withdraw from disposal confirmation '" + disposalConfirmationId + "'";
+        + "] has not been withdrawn from disposal confirmation '" + disposalConfirmationReport.getTitle() + "' ("
+        + disposalConfirmationReport.getId() + ")";
     }
 
     report.addReport(reportItem);
