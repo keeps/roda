@@ -2,7 +2,7 @@ package org.roda.wui.client.disposal;
 
 import java.util.List;
 
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.DisposalConfirmationActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
@@ -83,9 +83,9 @@ public class DisposalConfirmations extends Composite {
    * Create a disposal confirmation page
    */
   public DisposalConfirmations() {
-    ListBuilder<DisposalConfirmationMetadata> disposalConfirmationListBuilder = new ListBuilder<>(
+    ListBuilder<DisposalConfirmation> disposalConfirmationListBuilder = new ListBuilder<>(
       () -> new DisposalConfirmationList(),
-      new AsyncTableCellOptions<>(DisposalConfirmationMetadata.class, "Disposal_confirmations").bindOpener()
+      new AsyncTableCellOptions<>(DisposalConfirmation.class, "Disposal_confirmations").bindOpener()
         .withAutoUpdate(5000));
 
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(disposalConfirmationListBuilder);
@@ -95,7 +95,7 @@ public class DisposalConfirmations extends Composite {
     final DisposalConfirmationActions confirmationActions = DisposalConfirmationActions.get();
     SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, confirmationActions.hasAnyRoles());
     actionsSidebar.setWidget(new ActionableWidgetBuilder<>(confirmationActions)
-      .buildListWithObjects(new ActionableObject<>(DisposalConfirmationMetadata.class)));
+      .buildListWithObjects(new ActionableObject<>(DisposalConfirmation.class)));
 
     disposalConfirmationDescription.add(new HTMLWidgetWrapper("DisposalConfirmationDescription.html"));
   }

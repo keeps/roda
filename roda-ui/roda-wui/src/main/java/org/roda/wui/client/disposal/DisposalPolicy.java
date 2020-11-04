@@ -105,6 +105,8 @@ public class DisposalPolicy extends Composite {
   private DisposalSchedules disposalSchedules;
   private DisposalHolds disposalHolds;
 
+  private Long aipCounter;
+
   @UiField
   FlowPanel disposalPolicyDescription;
 
@@ -487,12 +489,8 @@ public class DisposalPolicy extends Composite {
           editRulesOrderBtn.addStyleName("changeRulesOrder");
         }
         editRulesOrderBtn.setText(messages.changeRulesOrder());
-        editRulesOrderBtn.addClickHandler(new ClickHandler() {
-          @Override
-          public void onClick(ClickEvent event) {
-            HistoryUtils.newHistory(DisposalPolicy.RESOLVER, OrderDisposalRules.RESOLVER.getHistoryToken());
-          }
-        });
+        editRulesOrderBtn.addClickHandler(
+          event -> HistoryUtils.newHistory(DisposalPolicy.RESOLVER, OrderDisposalRules.RESOLVER.getHistoryToken()));
         panel.add(editRulesOrderBtn);
       }
       ret = true;

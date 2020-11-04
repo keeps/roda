@@ -3,8 +3,6 @@ package org.roda.wui.api.v1;
 import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -23,10 +21,9 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
-import org.roda.wui.api.controllers.Disposals;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 
@@ -51,9 +48,9 @@ public class DisposalConfirmationResource {
   @GET
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
-  @ApiOperation(value = "List disposal confirmations", notes = "Gets a list of disposal confirmations.", response = DisposalConfirmationMetadata.class, responseContainer = "List")
+  @ApiOperation(value = "List disposal confirmations", notes = "Gets a list of disposal confirmations.", response = DisposalConfirmation.class, responseContainer = "List")
   @ApiResponses(value = {
-    @ApiResponse(code = 200, message = "Successful response", response = DisposalConfirmationMetadata.class, responseContainer = "List"),
+    @ApiResponse(code = 200, message = "Successful response", response = DisposalConfirmation.class, responseContainer = "List"),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
   public Response listDisposalConfirmations(
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
@@ -69,11 +66,11 @@ public class DisposalConfirmationResource {
     // delegate action to controller
     boolean justActive = false;
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
-    IndexResult<DisposalConfirmationMetadata> result = Browser.find(DisposalConfirmationMetadata.class, Filter.NULL,
+    IndexResult<DisposalConfirmation> result = Browser.find(DisposalConfirmation.class, Filter.NULL,
       Sorter.NONE, new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive,
       new ArrayList<>());
 
-    return Response.ok(ApiUtils.indexedResultToRODAObjectList(DisposalConfirmationMetadata.class, result), mediaType)
+    return Response.ok(ApiUtils.indexedResultToRODAObjectList(DisposalConfirmation.class, result), mediaType)
       .build();
   }
 
@@ -81,8 +78,8 @@ public class DisposalConfirmationResource {
   @Path("/{" + RodaConstants.API_PATH_PARAM_DISPOSAL_CONFIRMATION_ID + "}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
-  @ApiOperation(value = "Get Disposal confirmation", notes = "Get disposal confirmation", response = DisposalConfirmationMetadata.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DisposalConfirmationMetadata.class),
+  @ApiOperation(value = "Get Disposal confirmation", notes = "Get disposal confirmation", response = DisposalConfirmation.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DisposalConfirmation.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
   public Response retrieveDisposalConfirmation(
     @ApiParam(value = "The ID of the disposal confirmation to retrieve.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_DISPOSAL_CONFIRMATION_ID) String confirmationId,
@@ -95,72 +92,9 @@ public class DisposalConfirmationResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    DisposalConfirmationMetadata disposalConfirmationMetadata = Browser.retrieve(user,
-      DisposalConfirmationMetadata.class, confirmationId, new ArrayList<>());
+    DisposalConfirmation disposalConfirmation = Browser.retrieve(user,
+      DisposalConfirmation.class, confirmationId, new ArrayList<>());
 
-    return Response.ok(disposalConfirmationMetadata, mediaType).build();
+    return Response.ok(disposalConfirmation, mediaType).build();
   }
-
-  /*
-   * @POST
-   * 
-   * @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-   * 
-   * @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam
-   * = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
-   * 
-   * @ApiOperation(value = "Create disposal confirmation", notes =
-   * "Create a new disposal confirmation", response =
-   * DisposalConfirmationMetadata.class)
-   * 
-   * @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response =
-   * DisposalConfirmationMetadata.class),
-   * 
-   * @ApiResponse(code = 409, message = "Already exists", response =
-   * ApiResponseMessage.class)}) public Response
-   * createDisposalConfirmation(DisposalConfirmationMetadata metadata,
-   * 
-   * @ApiParam(value = "Choose format in which to get the disposal confirmation",
-   * allowableValues =
-   * RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.
-   * API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-   * 
-   * @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.
-   * API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName) throws RODAException
-   * { String mediaType = ApiUtils.getMediaType(acceptFormat, request);
-   * 
-   * // get user User user = UserUtility.getApiUser(request);
-   * 
-   * // delegate action to controller DisposalConfirmationMetadata
-   * disposalConfirmationMetadata = Disposals.createDisposalConfirmation(user,
-   * metadata); return Response.ok(disposalConfirmationMetadata,
-   * mediaType).build(); }
-   */
-
-  /*@DELETE
-  @Path("/{" + RodaConstants.API_PATH_PARAM_DISPOSAL_CONFIRMATION_ID + "}")
-  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
-  @ApiOperation(value = "Delete disposal confirmation", notes = "Delete disposal confirmation", response = Void.class)
-  @ApiResponses(value = {@ApiResponse(code = 204, message = "OK", response = Void.class),
-    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class),
-    @ApiResponse(code = 405, message = "Operation not allowed", response = ApiResponseMessage.class)})
-
-  public Response deleteDisposalConfirmation(
-    @ApiParam(value = "The ID of the disposal confirmation to delete.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_DISPOSAL_CONFIRMATION_ID) String disposalConfirmationId,
-    @ApiParam(value = "Reason to delete disposal confirmation", required = true) @FormParam(RodaConstants.API_QUERY_PARAM_DETAILS) String details,
-    @ApiParam(value = "Choose format in which to get the response", allowableValues = RodaConstants.API_DELETE_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-    @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
-    throws RODAException {
-    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
-
-    // get user
-    User user = UserUtility.getApiUser(request);
-
-    // delegate action to controller
-    Disposals.deleteDisposalConfirmation(user, disposalConfirmationId);
-
-    return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Disposal confirmation deleted"), mediaType)
-      .build();
-  }*/
 }

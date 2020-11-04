@@ -944,6 +944,10 @@ pre code {
     content: "\f019";
 }
 
+.btn-disposal-schedule:after {
+    content: "\f133";
+}
+
 .btn-view:after {
     content: "\f01d";
 }
@@ -7239,6 +7243,11 @@ span.code {
     padding: 5px 10px;
 }
 
+.wui-create-disposal-confirmation-data .wui-disposal-confirmation-data-note {
+    font-size: 8pt;
+    color: #999;
+    margin-top: 2px;
+}
 .disposalRuleOperator {
     text-align: center;
 }

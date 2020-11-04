@@ -24,7 +24,6 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPDisposalFlow;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.index.IndexingAdditionalInfo;
@@ -101,8 +100,8 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     fields.add(new Field(RodaConstants.AIP_DISPOSAL_SCHEDULE_NAME, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.AIP_DISPOSAL_SCHEDULE_RETENTION_PERIOD, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.AIP_DISPOSAL_HOLDS_ID, Field.TYPE_STRING).setMultiValued(true));
-    fields.add(new Field(RodaConstants.AIP_DESTRUCTED_ON, Field.TYPE_DATE));
-    fields.add(new Field(RodaConstants.AIP_DESTRUCTED_APPROVED_BY, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.AIP_DESTROYED_ON, Field.TYPE_DATE));
+    fields.add(new Field(RodaConstants.AIP_DESTROYED_BY, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.AIP_DISPOSAL_ACTION, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.AIP_OVERDUE_DATE, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, Field.TYPE_BOOLEAN));
@@ -139,10 +138,10 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     doc.addField(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID, aip.getDisposalScheduleId());
     doc.addField(RodaConstants.AIP_DISPOSAL_HOLDS_ID,
       aip.getDisposalHoldAssociation().stream().map(dh -> dh.getId()).collect(Collectors.toList()));
-    if (aip.getDestructionOn() != null) {
-      doc.addField(RodaConstants.AIP_DESTRUCTED_ON, aip.getDestructionOn());
+    if (aip.getDestroyedOn() != null) {
+      doc.addField(RodaConstants.AIP_DESTROYED_ON, aip.getDestroyedOn());
     }
-    doc.addField(RodaConstants.AIP_DESTRUCTED_APPROVED_BY, aip.getDestructionApprovedBy());
+    doc.addField(RodaConstants.AIP_DESTROYED_BY, aip.getDestroyedBy());
     doc.addField(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, !aip.getDisposalHoldAssociation().isEmpty()
       && aip.getDisposalHoldAssociation().stream().anyMatch(dh -> dh.getLiftedOn() == null));
     doc.addField(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID, aip.getDisposalConfirmationId());
@@ -281,8 +280,8 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     final String disposalSchedulePeriod = SolrUtils
       .objectToString(doc.get(RodaConstants.AIP_DISPOSAL_SCHEDULE_RETENTION_PERIOD), "");
     final List<String> disposalHoldsId = SolrUtils.objectToListString(doc.get(RodaConstants.AIP_DISPOSAL_HOLDS_ID));
-    final Date destructedOn = SolrUtils.objectToDate(doc.get(RodaConstants.AIP_DESTRUCTED_ON));
-    final String destructedApprovedBy = SolrUtils.objectToString(doc.get(RodaConstants.AIP_DESTRUCTED_APPROVED_BY), "");
+    final Date destructedOn = SolrUtils.objectToDate(doc.get(RodaConstants.AIP_DESTROYED_ON));
+    final String destructedApprovedBy = SolrUtils.objectToString(doc.get(RodaConstants.AIP_DESTROYED_BY), "");
     final String disposalAction = SolrUtils.objectToString(doc.get(RodaConstants.AIP_DISPOSAL_ACTION), "");
     final Date overdueDate = SolrUtils.objectToDate(doc.get(RodaConstants.AIP_OVERDUE_DATE));
     final Boolean disposalHoldStatus = SolrUtils.objectToBoolean(doc.get(RodaConstants.AIP_DISPOSAL_HOLD_STATUS),

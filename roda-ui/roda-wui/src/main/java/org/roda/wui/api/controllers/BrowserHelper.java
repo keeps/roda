@@ -103,7 +103,7 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
@@ -148,11 +148,13 @@ import org.roda.core.plugins.plugins.internal.DeleteRODAObjectPlugin;
 import org.roda.core.plugins.plugins.internal.MovePlugin;
 import org.roda.core.plugins.plugins.internal.UpdateIncidencesPlugin;
 import org.roda.core.plugins.plugins.internal.UpdatePermissionsPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.AssociateDisposalScheduleToAIPPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.CreateDisposalConfirmationPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.DeleteDisposalConfirmationPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.DestroyRecordsInDisposalConfirmationPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.DisassociateDisposalScheduleToAIPPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.confirmation.CreateDisposalConfirmationPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.confirmation.DeleteDisposalConfirmationPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.confirmation.DestroyRecordsInDisposalConfirmationPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.hold.ApplyDisposalHoldToAIPPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.hold.LiftDisposalHoldPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.schedule.AssociateDisposalScheduleToAIPPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.schedule.DisassociateDisposalScheduleToAIPPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.BinaryVersion;
@@ -3349,13 +3351,13 @@ public class BrowserHelper {
     RodaCoreFactory.getModelService().deleteDisposalHold(disposalHoldId);
   }
 
-  public static DisposalConfirmationMetadata createDisposalConfirmationMetadata(
-    DisposalConfirmationMetadata confirmationMetadata, User user) throws AlreadyExistsException,
-    AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    return RodaCoreFactory.getModelService().createDisposalConfirmationMetadata(confirmationMetadata, user.getName());
+  public static DisposalConfirmation createDisposalConfirmation(DisposalConfirmation confirmationMetadata, User user)
+    throws AlreadyExistsException, AuthorizationDeniedException, GenericException, NotFoundException,
+    RequestNotValidException {
+    return RodaCoreFactory.getModelService().createDisposalConfirmation(confirmationMetadata, user.getName());
   }
 
-  public static Job deleteDisposalConfirmation(User user, SelectedItems<DisposalConfirmationMetadata> selectedItems,
+  public static Job deleteDisposalConfirmation(User user, SelectedItems<DisposalConfirmation> selectedItems,
     String details) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     return createAndExecuteInternalJob("Delete disposal confirmation report", selectedItems,
       DeleteDisposalConfirmationPlugin.class, user, Collections.emptyMap(),
@@ -3364,9 +3366,9 @@ public class BrowserHelper {
 
   public static Job disassociateDisposalSchedule(User user, SelectedItems<IndexedAIP> selected)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
-    return createAndExecuteInternalJob("Remove disposal schedule", selected,
+    return createAndExecuteInternalJob("Disassociate disposal schedule", selected,
       DisassociateDisposalScheduleToAIPPlugin.class, user, Collections.emptyMap(),
-      "Could not execute change disposal schedule action");
+      "Could not execute disassociate disposal schedule action");
   }
 
   public static Job associateDisposalSchedule(User user, SelectedItems<IndexedAIP> selected, String disposalScheduleId)
@@ -3374,14 +3376,20 @@ public class BrowserHelper {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID, disposalScheduleId);
 
-    return createAndExecuteInternalJob("Change disposal schedule", selected, AssociateDisposalScheduleToAIPPlugin.class,
-      user, pluginParameters, "Could not execute change disposal schedule action");
+    return createAndExecuteInternalJob("Associate disposal schedule", selected,
+      AssociateDisposalScheduleToAIPPlugin.class, user, pluginParameters,
+      "Could not execute associate disposal schedule action");
   }
 
-  public static Job createDisposalConfirmationReport(User user, SelectedItems<IndexedAIP> selectedItems, String title)
+  public static Job createDisposalConfirmationReport(User user, SelectedItems<IndexedAIP> selectedItems, String title,
+    DisposalConfirmationExtraBundle confirmationMetadata)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Map<String, String> extraInformation = DisposalsHelper.getDisposalConfirmationExtra(confirmationMetadata);
+    String extraInformationJson = JsonUtils.getJsonFromObject(extraInformation);
+
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE, title);
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_EXTRA_INFO, extraInformationJson);
 
     return createAndExecuteInternalJob("Create disposal confirmation report", selectedItems,
       CreateDisposalConfirmationPlugin.class, user, pluginParameters,
@@ -3391,65 +3399,59 @@ public class BrowserHelper {
   public static DisposalConfirmationExtraBundle retrieveDisposalConfirmationExtraBundle() {
     String template = null;
 
-      try (InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(
-          RodaConstants.DISPOSAL_CONFIRMATION_INFORMATION_TEMPLATE_FOLDER + "/" + RodaConstants.DISPOSAL_CONFIRMATION_EXTRA_METADATA_FILE)) {
-        template = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
-      } catch (IOException e) {
-        LOGGER.error("Error getting template from stream", e);
-      }
+    try (InputStream templateStream = RodaCoreFactory
+      .getConfigurationFileAsStream(RodaConstants.DISPOSAL_CONFIRMATION_INFORMATION_TEMPLATE_FOLDER + "/"
+        + RodaConstants.DISPOSAL_CONFIRMATION_EXTRA_METADATA_FILE)) {
+      template = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
+    } catch (IOException e) {
+      LOGGER.error("Error getting template from stream", e);
+    }
 
-      Set<MetadataValue> values = ServerTools.transform(template);
+    Set<MetadataValue> values = ServerTools.transform(template);
 
-      try {
-        User user = RodaCoreFactory.getModelService().retrieveUser("name");
-        String userExtra = user.getExtra();
+    try {
+      User user = RodaCoreFactory.getModelService().retrieveUser("name");
+      String userExtra = user.getExtra();
 
-        if (userExtra != null && !values.isEmpty()) {
-          for (MetadataValue mv : values) {
-            // clear the auto-generated values
-            // mv.set("value", null);
-            String xpathRaw = mv.get("xpath");
-            if (xpathRaw != null && xpathRaw.length() > 0) {
-              String[] xpaths = xpathRaw.split("##%##");
-              String value;
-              List<String> allValues = new ArrayList<>();
-              for (String xpath : xpaths) {
-                allValues.addAll(ServerTools.applyXpath(userExtra, xpath));
-              }
-              // if any of the values is different, concatenate all values in a
-              // string, otherwise return the value
-              boolean allEqual = allValues.stream().allMatch(s -> s.trim().equals(allValues.get(0).trim()));
-              if (allEqual && !allValues.isEmpty()) {
-                value = allValues.get(0);
-              } else {
-                value = String.join(" / ", allValues);
-              }
-              mv.set("value", value.trim());
+      if (userExtra != null && !values.isEmpty()) {
+        for (MetadataValue mv : values) {
+          // clear the auto-generated values
+          // mv.set("value", null);
+          String xpathRaw = mv.get("xpath");
+          if (xpathRaw != null && xpathRaw.length() > 0) {
+            String[] xpaths = xpathRaw.split("##%##");
+            String value;
+            List<String> allValues = new ArrayList<>();
+            for (String xpath : xpaths) {
+              allValues.addAll(ServerTools.applyXpath(userExtra, xpath));
             }
+            // if any of the values is different, concatenate all values in a
+            // string, otherwise return the value
+            boolean allEqual = allValues.stream().allMatch(s -> s.trim().equals(allValues.get(0).trim()));
+            if (allEqual && !allValues.isEmpty()) {
+              value = allValues.get(0);
+            } else {
+              value = String.join(" / ", allValues);
+            }
+            mv.set("value", value.trim());
           }
         }
-
-      } catch (GenericException e) {
-        // do nothing
       }
 
-      return new DisposalConfirmationExtraBundle(values);
+    } catch (GenericException e) {
+      // do nothing
+    }
+
+    return new DisposalConfirmationExtraBundle(values);
   }
 
   public static Job destroyRecordsInDisposalConfirmation(User user,
-    SelectedItemsList<DisposalConfirmationMetadata> selectedItems) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    SelectedItemsList<DisposalConfirmation> selectedItems)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     return createAndExecuteInternalJob("Destroy records from disposal confirmation report", selectedItems,
-      DestroyRecordsInDisposalConfirmationPlugin.class, user, Collections.emptyMap(), "Could not execute destruction of records in disposal confirmation report action");
+      DestroyRecordsInDisposalConfirmationPlugin.class, user, Collections.emptyMap(),
+      "Could not execute destruction of records in disposal confirmation report action");
   }
-  // public static Job destroyOverdueAIPs(User user, SelectedItems<IndexedAIP>
-  // selected)
-  // throws AuthorizationDeniedException, GenericException,
-  // RequestNotValidException, NotFoundException {
-  // Map<String, String> pluginParameters = new HashMap<>();
-  // return createAndExecuteJob("Destroy overdue AIPs", selected,
-  // DeleteRODAObjectPlugin.class, PluginType.AIP_TO_AIP,
-  // user, pluginParameters, "Could not execute overdue AIP destruction action");
-  // }
 
   public static DisposalRule createDisposalRule(DisposalRule disposalRule, User user) throws GenericException,
     AuthorizationDeniedException, AlreadyExistsException, NotFoundException, RequestNotValidException {
@@ -3466,4 +3468,17 @@ public class BrowserHelper {
     RodaCoreFactory.getModelService().deleteDisposalRule(disposalRuleId);
   }
 
+  public static Job applyDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, disposalHoldId);
+
+    return createAndExecuteInternalJob("Apply disposal hold", items, ApplyDisposalHoldToAIPPlugin.class, user,
+      pluginParameters, "Could not execute apply disposal hold action");
+  }
+
+  public static Job liftDisposalHold(User user, SelectedItems<DisposalHold> items) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    return createAndExecuteInternalJob("Lift disposal hold", items, LiftDisposalHoldPlugin.class, user,
+        Collections.emptyMap(), "Could not execute lift disposal hold action");
+  }
 }

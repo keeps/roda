@@ -39,7 +39,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
@@ -379,20 +379,20 @@ public interface BrowserService extends RemoteService {
 
   Map<String, List<String>> retrieveSharedProperties(String localeName);
 
-  DisposalRule createDisposalRule(DisposalRule rule) throws AuthorizationDeniedException,
-          AlreadyExistsException, NotFoundException, GenericException, RequestNotValidException;
+  DisposalRule createDisposalRule(DisposalRule rule) throws AuthorizationDeniedException, AlreadyExistsException,
+    NotFoundException, GenericException, RequestNotValidException;
 
   DisposalRule retrieveDisposalRule(String disposalRuleId)
-          throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   DisposalRules listDisposalRules()
-          throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException;
+    throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException;
 
   DisposalRule updateDisposalRule(DisposalRule rule)
-          throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   void deleteDisposalRule(String disposalRuleId) throws NotFoundException, AuthorizationDeniedException,
-          IllegalOperationException, GenericException, RequestNotValidException;
+    IllegalOperationException, GenericException, RequestNotValidException;
 
   DisposalSchedule createDisposalSchedule(DisposalSchedule schedule) throws AuthorizationDeniedException,
     AlreadyExistsException, NotFoundException, GenericException, RequestNotValidException;
@@ -430,15 +430,21 @@ public interface BrowserService extends RemoteService {
   Job disassociateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  Job createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, DisposalConfirmationMetadata metadata)
+  Job applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  Job liftDisposalHold(SelectedItems<DisposalHold> selectedItems) throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  Job createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, String title,
+    DisposalConfirmationExtraBundle metadata)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
 
   DisposalConfirmationExtraBundle retrieveDisposalConfirmationExtraBundle() throws RODAException;
 
-  Job deleteDisposalConfirmationReport(SelectedItems<DisposalConfirmationMetadata> selectedItems, String details)
+  Job deleteDisposalConfirmationReport(SelectedItems<DisposalConfirmation> selectedItems, String details)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException;
 
-  Job destroyRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmationMetadata> selectedItems)
+  Job destroyRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   List<DisposalHoldAssociation> listDisposalHoldsAssociation(String aipId)

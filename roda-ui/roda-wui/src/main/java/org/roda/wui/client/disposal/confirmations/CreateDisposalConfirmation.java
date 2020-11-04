@@ -8,9 +8,12 @@ import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.DisposalCreateConfirmationDestroyActions;
 import org.roda.wui.client.common.actions.DisposalCreateConfirmationReviewActions;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
@@ -56,8 +59,7 @@ public class CreateDisposalConfirmation extends Composite {
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-      CreateDisposalConfirmation createDisposalConfirmation = new CreateDisposalConfirmation();
-      createDisposalConfirmation.resolve(historyTokens, callback);
+      getInstance().resolve(historyTokens, callback);
     }
 
     @Override
@@ -99,14 +101,43 @@ public class CreateDisposalConfirmation extends Composite {
   @UiField
   FlowPanel content;
 
+  private static CreateDisposalConfirmation instance;
+  private SelectedItems<IndexedAIP> selected = null;
+
+  private final AsyncCallback<Actionable.ActionImpact> listActionableCallback = new NoAsyncCallback<Actionable.ActionImpact>() {
+    @Override
+    public void onSuccess(Actionable.ActionImpact impact) {
+      if (impact.equals(Actionable.ActionImpact.UPDATED)) {
+        selected = overdueRecordsSearch.getSelectedItems(IndexedAIP.class);
+      }
+    }
+  };
+
+  public static CreateDisposalConfirmation getInstance() {
+    if (instance == null) {
+      instance = new CreateDisposalConfirmation();
+    }
+
+    return instance;
+  }
+
+  public SelectedItems<IndexedAIP> getSelected() {
+    return selected;
+  }
+
+  public void clear() {
+    instance = null;
+    selected = null;
+  }
+
   /**
    * Create a new panel to create a disposal confirmation
    */
-  public CreateDisposalConfirmation() {
+  private CreateDisposalConfirmation() {
     ListBuilder<IndexedAIP> overdueRecordsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
       new AsyncTableCellOptions<>(IndexedAIP.class, "DisposalOverdueRecords_aip").withSummary(messages.listOfAIPs())
         .withFilter(SHOW_RECORDS_TO_DESTROY).withActionable(DisposalCreateConfirmationDestroyActions.get())
-        .withJustActive(true).bindOpener());
+        .withActionableCallback(listActionableCallback).withJustActive(true).bindOpener());
     overdueRecordsSearch = new SearchWrapper(false).createListAndSearchPanel(overdueRecordsListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
@@ -122,7 +153,7 @@ public class CreateDisposalConfirmation extends Composite {
       ListBuilder<IndexedAIP> overdueRecordsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
         new AsyncTableCellOptions<>(IndexedAIP.class, "DisposalOverdueRecords_aip").withSummary(messages.listOfAIPs())
           .withFilter(SHOW_RECORDS_TO_DESTROY).withActionable(DisposalCreateConfirmationDestroyActions.get())
-          .withJustActive(true).bindOpener());
+          .withActionableCallback(listActionableCallback).withJustActive(true).bindOpener());
       content.remove(overdueRecordsSearch);
       overdueRecordsSearch = new SearchWrapper(false).createListAndSearchPanel(overdueRecordsListBuilder);
       content.add(overdueRecordsSearch);
@@ -133,7 +164,7 @@ public class CreateDisposalConfirmation extends Composite {
       ListBuilder<IndexedAIP> overdueRecordsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
         new AsyncTableCellOptions<>(IndexedAIP.class, "DisposalOverdueRecords_aip").withSummary(messages.listOfAIPs())
           .withFilter(SHOW_RECORDS_TO_REVIEW).withActionable(DisposalCreateConfirmationReviewActions.get())
-          .withJustActive(true).bindOpener());
+          .withActionableCallback(listActionableCallback).withJustActive(true).bindOpener());
       content.remove(overdueRecordsSearch);
       overdueRecordsSearch = new SearchWrapper(false).createListAndSearchPanel(overdueRecordsListBuilder);
       content.add(overdueRecordsSearch);

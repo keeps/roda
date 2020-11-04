@@ -1,4 +1,4 @@
-package org.roda.core.plugins.plugins.internal.disposal;
+package org.roda.core.plugins.plugins.internal.disposal.confirmation;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,10 +19,9 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -45,9 +44,9 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalConfirmationMetadata> {
+public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalConfirmation> {
   private static final Logger LOGGER = LoggerFactory.getLogger(DeleteDisposalConfirmationPlugin.class);
-  private static final String EVENT_DESCRIPTION = "The process of updating an object of the repository";
+  private static final String EVENT_DESCRIPTION = "Disposal confirmation withdraw";
 
   private String details;
 
@@ -80,7 +79,7 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
   }
 
   public static String getStaticName() {
-    return "Delete disposal confirmation";
+    return "Delete disposal confirmation report";
   }
 
   @Override
@@ -137,10 +136,10 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<DisposalConfirmationMetadata>() {
+    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<DisposalConfirmation>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        JobPluginInfo jobPluginInfo, Plugin<DisposalConfirmationMetadata> plugin, DisposalConfirmationMetadata object) {
+        JobPluginInfo jobPluginInfo, Plugin<DisposalConfirmation> plugin, DisposalConfirmation object) {
         processDisposalConfirmation(index, model, storage, report, jobPluginInfo, cachedJob, object);
 
       }
@@ -148,34 +147,33 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
   }
 
   private void processDisposalConfirmation(IndexService index, ModelService model, StorageService storage,
-    Report report, JobPluginInfo jobPluginInfo, Job cachedJob, DisposalConfirmationMetadata confirmationMetadata) {
-    String disposalConfirmationId = confirmationMetadata.getId();
+    Report report, JobPluginInfo jobPluginInfo, Job cachedJob, DisposalConfirmation confirmation) {
+    String disposalConfirmationId = confirmation.getId();
 
-    LOGGER.debug("Processing disposal confirmation {}", confirmationMetadata.getId());
+    LOGGER.debug("Processing disposal confirmation {}", confirmation.getId());
+    jobPluginInfo.setSourceObjectsCount(confirmation.getNumberOfAIPs().intValue());
 
     String outcomeText;
     try {
       StoragePath disposalConfirmationAIPsPath = ModelUtils.getDisposalConfirmationAIPsPath(disposalConfirmationId);
       Binary binary = storage.getBinary(disposalConfirmationAIPsPath);
 
-      BufferedReader reader = new BufferedReader(new InputStreamReader(binary.getContent().createInputStream()));
+      try (BufferedReader reader = new BufferedReader(new InputStreamReader(binary.getContent().createInputStream()))) {
+        while (reader.ready()) {
+          String aipEntryJson = reader.readLine();
+          DisposalConfirmationAIPEntry aipEntry = JsonUtils.getObjectFromJson(aipEntryJson,
+            DisposalConfirmationAIPEntry.class);
 
-      while (reader.ready()) {
-        String aipEntryJson = reader.readLine();
-        DisposalConfirmationAIPEntry aipEntry = JsonUtils.getObjectFromJson(aipEntryJson,
-          DisposalConfirmationAIPEntry.class);
+          String aipId = aipEntry.getAipId();
+          AIP aip = model.retrieveAIP(aipId);
 
-        String aipId = aipEntry.getAipId();
-        AIP aip = model.retrieveAIP(aipId);
-
-        processAIP(aip, model, report, cachedJob, disposalConfirmationId);
+          processAIP(aip, model, report, jobPluginInfo, cachedJob, disposalConfirmationId);
+        }
       }
 
       // Delete folder and notify
       model.deleteDisposalConfirmation(disposalConfirmationId);
 
-      report.setPluginState(PluginState.SUCCESS);
-      jobPluginInfo.incrementObjectsProcessedWithSuccess();
       outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationEvent("was successfully deleted",
         disposalConfirmationId);
     } catch (RequestNotValidException | AuthorizationDeniedException | GenericException | NotFoundException
@@ -192,30 +190,36 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
       report.getPluginState(), outcomeText, details, cachedJob.getUsername(), true);
   }
 
-  private void processAIP(AIP aip, ModelService model, Report report, Job cachedJob, String disposalConfirmationId) {
+  private void processAIP(AIP aip, ModelService model, Report report, JobPluginInfo jobPluginInfo, Job cachedJob,
+    String disposalConfirmationId) {
     aip.setDisposalConfirmationId(null);
     PluginState state = PluginState.SUCCESS;
-
+    Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
     try {
       model.updateAIP(aip, cachedJob.getUsername());
+      reportItem.setPluginState(state).setPluginDetails("AIP '" + aip.getId()
+        + "' was successfully withdraw from the disposal confirmation: '" + disposalConfirmationId + "'");
+      jobPluginInfo.incrementObjectsProcessedWithSuccess();
     } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
       state = PluginState.FAILURE;
-      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
-      reportItem.addPluginDetails("Could not remove the disposal confirmation from AIP: " + e.getMessage())
-        .setPluginState(state);
-      report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
+      reportItem.addPluginDetails("Could not withdraw AIP '" + aip.getId() + "' from the disposal confirmation '"
+        + disposalConfirmationId + "': " + e.getMessage()).setPluginState(state);
+      jobPluginInfo.incrementObjectsProcessedWithFailure();
     }
 
     String outcomeText;
 
     if (state.equals(PluginState.SUCCESS)) {
       outcomeText = "Archival Information Package [id: " + aip.getId()
-        + "] has been disassociate from disposal confirmation '" + disposalConfirmationId + "'";
+        + "] has been withdraw from disposal confirmation '" + disposalConfirmationId + "'";
     } else {
       outcomeText = "Archival Information Package [id: " + aip.getId()
-        + "] has not been disassociate from disposal confirmation '" + disposalConfirmationId + "'";
+        + "] has not been withdraw from disposal confirmation '" + disposalConfirmationId + "'";
     }
+
+    report.addReport(reportItem);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
 
     model.createUpdateAIPEvent(aip.getId(), null, null, null, RodaConstants.PreservationEventType.UPDATE,
       EVENT_DESCRIPTION, state, outcomeText, details, cachedJob.getUsername(), true);
@@ -233,8 +237,8 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
   }
 
   @Override
-  public List<Class<DisposalConfirmationMetadata>> getObjectClasses() {
-    return Collections.singletonList(DisposalConfirmationMetadata.class);
+  public List<Class<DisposalConfirmation>> getObjectClasses() {
+    return Collections.singletonList(DisposalConfirmation.class);
   }
 
   @Override
@@ -243,7 +247,7 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
   }
 
   @Override
-  public Plugin<DisposalConfirmationMetadata> cloneMe() {
+  public Plugin<DisposalConfirmation> cloneMe() {
     return new DeleteDisposalConfirmationPlugin();
   }
 

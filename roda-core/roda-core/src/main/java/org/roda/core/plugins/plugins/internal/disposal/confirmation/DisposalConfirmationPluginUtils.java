@@ -1,8 +1,9 @@
-package org.roda.core.plugins.plugins.internal.disposal;
+package org.roda.core.plugins.plugins.internal.disposal.confirmation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
@@ -16,8 +17,8 @@ import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.index.IndexService;
 
@@ -26,10 +27,11 @@ import org.roda.core.index.IndexService;
  */
 public class DisposalConfirmationPluginUtils {
 
-  public static DisposalConfirmationMetadata getDisposalConfirmationMetadata(String confirmationId, String title, long storageSize,
-    Set<String> disposalHolds, Set<String> disposalSchedules, long numberOfAIPs, long numberOfCollection) {
+  public static DisposalConfirmation getDisposalConfirmation(String confirmationId, String title, long storageSize,
+    Set<String> disposalHolds, Set<String> disposalSchedules, long numberOfAIPs, long numberOfCollection,
+    Map<String, String> extraFields) {
 
-    DisposalConfirmationMetadata confirmationMetadata = new DisposalConfirmationMetadata();
+    DisposalConfirmation confirmationMetadata = new DisposalConfirmation();
     confirmationMetadata.setId(confirmationId);
     confirmationMetadata.setTitle(title);
     confirmationMetadata.setSize(storageSize);
@@ -37,6 +39,7 @@ public class DisposalConfirmationPluginUtils {
     confirmationMetadata.addDisposalScheduleIds(disposalSchedules);
     confirmationMetadata.setNumberOfAIPs(numberOfAIPs);
     confirmationMetadata.setNumberOfCollections(numberOfCollection);
+    confirmationMetadata.setExtraFields(extraFields);
 
     return confirmationMetadata;
   }

@@ -171,7 +171,7 @@ public class DisposalSchedule implements IsModelObject, HasId {
   }
 
   public void setFirstTimeUsed(Date firstTimeUsed) {
-    if(this.firstTimeUsed == null){
+    if (this.firstTimeUsed == null) {
       this.firstTimeUsed = firstTimeUsed;
     }
   }
@@ -258,17 +258,16 @@ public class DisposalSchedule implements IsModelObject, HasId {
       && Objects.equals(retentionTriggerElementId, that.retentionTriggerElementId)
       && retentionPeriodIntervalCode == that.retentionPeriodIntervalCode
       && Objects.equals(retentionPeriodDuration, that.retentionPeriodDuration)
-      && Objects.equals(firstTimeUsed, that.firstTimeUsed)
-      && Objects.equals(numberOfAIPUnder, that.numberOfAIPUnder) && Objects.equals(createdOn, that.createdOn)
-      && Objects.equals(createdBy, that.createdBy) && Objects.equals(updatedOn, that.updatedOn)
-      && Objects.equals(updatedBy, that.updatedBy) && state == that.state;
+      && Objects.equals(firstTimeUsed, that.firstTimeUsed) && Objects.equals(numberOfAIPUnder, that.numberOfAIPUnder)
+      && Objects.equals(createdOn, that.createdOn) && Objects.equals(createdBy, that.createdBy)
+      && Objects.equals(updatedOn, that.updatedOn) && Objects.equals(updatedBy, that.updatedBy) && state == that.state;
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(id, title, description, mandate, scopeNotes, actionCode, retentionTriggerCode,
-      retentionTriggerElementId, retentionPeriodIntervalCode, retentionPeriodDuration, firstTimeUsed,
-      numberOfAIPUnder, createdOn, createdBy, updatedOn, updatedBy, state);
+      retentionTriggerElementId, retentionPeriodIntervalCode, retentionPeriodDuration, firstTimeUsed, numberOfAIPUnder,
+      createdOn, createdBy, updatedOn, updatedBy, state);
   }
 
   @Override
@@ -277,8 +276,8 @@ public class DisposalSchedule implements IsModelObject, HasId {
       + '\'' + ", mandate='" + mandate + '\'' + ", scopeNotes='" + scopeNotes + '\'' + ", actionCode=" + actionCode
       + ", retentionTriggerCode=" + retentionTriggerCode + ", retentionTriggerElementId='" + retentionTriggerElementId
       + '\'' + ", retentionPeriodIntervalCode=" + retentionPeriodIntervalCode + ", retentionPeriodDuration="
-      + retentionPeriodDuration + ", destroyedTimestamp=" + firstTimeUsed + ", numberOfAIPUnder="
-      + numberOfAIPUnder + ", createdOn=" + createdOn + ", createdBy='" + createdBy + '\'' + ", updatedOn=" + updatedOn
-      + ", updatedBy='" + updatedBy + '\'' + ", state=" + state + '}';
+      + retentionPeriodDuration + ", destroyedTimestamp=" + firstTimeUsed + ", numberOfAIPUnder=" + numberOfAIPUnder
+      + ", createdOn=" + createdOn + ", createdBy='" + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='"
+      + updatedBy + '\'' + ", state=" + state + '}';
   }
 }
