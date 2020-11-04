@@ -2,7 +2,6 @@ package org.roda.core.plugins.plugins.internal.disposal.hold;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,7 +17,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -144,8 +142,16 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
 
     if (disposalHold == null) {
       LOGGER.error("Failed to retrieve disposal hold from model");
-      report.setPluginState(PluginState.FAILURE).setPluginDetails("Failed to retrieve disposal hold " + disposalHoldId);
-      jobPluginInfo.setSourceObjectsProcessedWithFailure(jobPluginInfo.getSourceObjectsCount());
+
+      for (AIP aip : aips) {
+        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
+        reportItem.setPluginState(PluginState.FAILURE)
+          .setPluginDetails("Failed to retrieve disposal hold " + disposalHoldId);
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
+      }
     } else {
       for (AIP aip : aips) {
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
@@ -177,11 +183,14 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
             outcomeText = "Applying disposal hold to AIP '" + aip.getId()
               + "' was skipped because it is already on the same disposal hold";
           } else {
-            aip.addDisposalHold(createDisposalHoldAssociation(cachedJob.getUsername()));
+            aip.addDisposalHold(
+              DisposalHoldPluginUtils.createDisposalHoldAssociation(disposalHoldId, cachedJob.getUsername()));
 
             try {
               model.updateAIP(aip, cachedJob.getUsername());
               disposalHold.addAIPtoActiveAIPs(aip.getId());
+              model.updateDisposalHold(disposalHold, cachedJob.getUsername());
+
               jobPluginInfo.incrementObjectsProcessedWithSuccess();
 
               reportItem.setPluginState(state)
@@ -212,23 +221,7 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
           LOGGER.error("Error creating event: {}", e.getMessage(), e);
         }
       }
-
-      try {
-        model.updateDisposalHold(disposalHold, cachedJob.getUsername());
-      } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
-        LOGGER.error("Failed to update disposal hold {}", disposalHoldId);
-        report.setPluginState(PluginState.FAILURE).setPluginDetails("Failed to update disposal hold " + disposalHoldId);
-      }
     }
-  }
-
-  private DisposalHoldAssociation createDisposalHoldAssociation(String associatedBy) {
-    DisposalHoldAssociation disposalHoldAssociation = new DisposalHoldAssociation();
-    disposalHoldAssociation.setAssociatedOn(new Date());
-    disposalHoldAssociation.setAssociatedBy(associatedBy);
-    disposalHoldAssociation.setId(disposalHoldId);
-
-    return disposalHoldAssociation;
   }
 
   @Override

@@ -48,14 +48,13 @@ public class DisposalConfirmationList extends AsyncTableCell<DisposalConfirmatio
   private TextColumn<DisposalConfirmation> createdByColumn;
   private Column<DisposalConfirmation, SafeHtml> stateColumn;
   private TextColumn<DisposalConfirmation> numberOfAIPsColumn;
-  private TextColumn<DisposalConfirmation> numberOfCollectionColumn;
   private TextColumn<DisposalConfirmation> sizeColumn;
 
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.DISPOSAL_CONFIRMATION_TITLE, RodaConstants.DISPOSAL_COFIRMATION_ID,
     RodaConstants.DISPOSAL_CONFIRMATION_CREATED_BY, RodaConstants.DISPOSAL_CONFIRMATION_STATE,
     RodaConstants.DISPOSAL_CONFIRMATION_CREATED_ON, RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_AIPS,
-    RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_COLLECTIONS, RodaConstants.DISPOSAL_CONFIRMATION_STORAGE_SIZE);
+    RodaConstants.DISPOSAL_CONFIRMATION_STORAGE_SIZE);
 
   @Override
   protected void adjustOptions(AsyncTableCellOptions<DisposalConfirmation> options) {
@@ -106,13 +105,6 @@ public class DisposalConfirmationList extends AsyncTableCell<DisposalConfirmatio
       }
     };
 
-    numberOfCollectionColumn = new TextColumn<DisposalConfirmation>() {
-      @Override
-      public String getValue(DisposalConfirmation confirmation) {
-        return Long.toString(confirmation.getNumberOfCollections());
-      }
-    };
-
     sizeColumn = new TextColumn<DisposalConfirmation>() {
 
       @Override
@@ -126,7 +118,6 @@ public class DisposalConfirmationList extends AsyncTableCell<DisposalConfirmatio
     createdByColumn.setSortable(true);
     stateColumn.setSortable(true);
     numberOfAIPsColumn.setSortable(true);
-    numberOfCollectionColumn.setSortable(true);
     sizeColumn.setSortable(true);
 
     addColumn(titleColumn, messages.disposalConfirmationTitle(), false, false);
@@ -134,7 +125,6 @@ public class DisposalConfirmationList extends AsyncTableCell<DisposalConfirmatio
     addColumn(createdByColumn, messages.disposalConfirmationCreationBy(), false, false, 10);
     addColumn(stateColumn, messages.disposalConfirmationStatus(), false, false, 8);
     addColumn(numberOfAIPsColumn, messages.disposalConfirmationAIPs(), false, false, 5);
-    addColumn(numberOfCollectionColumn, messages.disposalConfirmationCollections(), false, false, 8);
     addColumn(sizeColumn, messages.disposalConfirmationSize(), false, false, 8);
 
     // default sorting
@@ -153,8 +143,6 @@ public class DisposalConfirmationList extends AsyncTableCell<DisposalConfirmatio
     columnSortingKeyMap.put(sizeColumn, Collections.singletonList(RodaConstants.DISPOSAL_CONFIRMATION_STORAGE_SIZE));
     columnSortingKeyMap.put(numberOfAIPsColumn,
       Collections.singletonList(RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_AIPS));
-    columnSortingKeyMap.put(numberOfCollectionColumn,
-      Collections.singletonList(RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_COLLECTIONS));
     return createSorter(columnSortList, columnSortingKeyMap);
   }
 

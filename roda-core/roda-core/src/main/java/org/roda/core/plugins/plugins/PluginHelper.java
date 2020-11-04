@@ -1741,8 +1741,14 @@ public final class PluginHelper {
   }
 
   public static String createOutcomeTextForDisposalConfirmationEvent(String actionMessage,
-    String disposalConfirmationId) {
-    return "The disposal confirmation '" + disposalConfirmationId + " ' " + actionMessage;
+    String disposalConfirmationTitle, String disposalConfirmationId) {
+    return "The disposal confirmation '" + disposalConfirmationTitle + " ' (" + disposalConfirmationId + ") "
+      + actionMessage;
+  }
+
+  public static String createOutcomeTextForDisposalHold(String actionMessage, String disposalHoldId,
+    String disposalHoldTitle) {
+    return createOutcomeTextForDisposal("Disposal hold", actionMessage, disposalHoldId, disposalHoldTitle);
   }
 
   public static String createOutcomeTextForDisposalHold(String actionMessage, String disposalHoldId, String disposalHoldTitle) {

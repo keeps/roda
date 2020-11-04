@@ -5,8 +5,7 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.LiteOptionalWithCause;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -25,7 +24,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<DisposalHold> {
+public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(LiftDisposalHoldFromAIPPlugin.class);
 
   @Override
@@ -85,17 +84,23 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<DisposalHold> 
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<DisposalHold>() {
+    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        JobPluginInfo jobPluginInfo, Plugin<DisposalHold> plugin, DisposalHold object) {
-        processDisposalHold(index, model, report, cachedJob, jobPluginInfo, object);
+        JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
+        processAIP(index, model, report, cachedJob, jobPluginInfo, object);
       }
     }, index, model, storage, liteList);
   }
 
-  private void processDisposalHold(IndexService index, ModelService model, Report report, Job cachedJob,
-    JobPluginInfo jobPluginInfo, DisposalHold disposalHold) {
+  private void processAIP(IndexService index, ModelService model, Report report, Job cachedJob,
+    JobPluginInfo jobPluginInfo, AIP aip) {
+
+
+
+    // lift AIP
+
+    // move AIP to inactive list
 
   }
 
@@ -111,8 +116,8 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<DisposalHold> 
   }
 
   @Override
-  public List<Class<DisposalHold>> getObjectClasses() {
-    return Collections.singletonList(DisposalHold.class);
+  public List<Class<AIP>> getObjectClasses() {
+    return Collections.singletonList(AIP.class);
   }
 
   @Override
@@ -126,7 +131,7 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<DisposalHold> 
   }
 
   @Override
-  public Plugin<DisposalHold> cloneMe() {
+  public Plugin<AIP> cloneMe() {
     return new LiftDisposalHoldFromAIPPlugin();
   }
 

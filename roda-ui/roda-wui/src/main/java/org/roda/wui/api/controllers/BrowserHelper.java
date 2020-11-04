@@ -150,9 +150,10 @@ import org.roda.core.plugins.plugins.internal.UpdateIncidencesPlugin;
 import org.roda.core.plugins.plugins.internal.UpdatePermissionsPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.confirmation.CreateDisposalConfirmationPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.confirmation.DeleteDisposalConfirmationPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.confirmation.DestroyRecordsInDisposalConfirmationPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.confirmation.DestroyRecordsPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.confirmation.PermanentlyDeleteRecordsPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.hold.ApplyDisposalHoldToAIPPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.hold.LiftDisposalHoldPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.hold.LiftDisposalHoldFromAIPPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.schedule.AssociateDisposalScheduleToAIPPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.schedule.DisassociateDisposalScheduleToAIPPlugin;
 import org.roda.core.storage.Binary;
@@ -3452,8 +3453,15 @@ public class BrowserHelper {
     SelectedItemsList<DisposalConfirmation> selectedItems)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     return createAndExecuteInternalJob("Destroy records from disposal confirmation report", selectedItems,
-      DestroyRecordsInDisposalConfirmationPlugin.class, user, Collections.emptyMap(),
+      DestroyRecordsPlugin.class, user, Collections.emptyMap(),
       "Could not execute destruction of records in disposal confirmation report action");
+  }
+
+  public static Job permanentlyDeleteRecordsInDisposalConfirmation(User user,
+                                                                   SelectedItemsList<DisposalConfirmation> selectedItems) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    return createAndExecuteInternalJob("Permanently delete records from disposal bin", selectedItems,
+        PermanentlyDeleteRecordsPlugin.class, user, Collections.emptyMap(),
+        "Could not execute permanent deletion of records in disposal bin action");
   }
 
   public static DisposalRule createDisposalRule(DisposalRule disposalRule, User user) throws GenericException,
@@ -3480,8 +3488,9 @@ public class BrowserHelper {
       pluginParameters, "Could not execute apply disposal hold action");
   }
 
-  public static Job liftDisposalHold(User user, SelectedItems<DisposalHold> items) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
-    return createAndExecuteInternalJob("Lift disposal hold", items, LiftDisposalHoldPlugin.class, user,
-        Collections.emptyMap(), "Could not execute lift disposal hold action");
+  public static Job liftDisposalHold(User user, SelectedItems<IndexedAIP> items)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    return createAndExecuteInternalJob("Lift disposal hold", items, LiftDisposalHoldFromAIPPlugin.class, user,
+      Collections.emptyMap(), "Could not execute lift disposal hold action");
   }
 }

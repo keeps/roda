@@ -2217,4 +2217,20 @@ public interface ClientMessages extends Messages {
   String disposalConfirmationDataNote();
 
   String disposalTitle();
+
+  String disposalHoldSelectionDialogTitle();
+
+  String applyDisposalHoldDialogTitle();
+
+  String applyDisposalHoldDialogMessage();
+
+  String applyDisposalHoldButton();
+
+  String createDisposalHoldButton();
+
+  String associateDisposalHoldButton();
+
+  String clearDisposalHoldButton();
+
+  String overrideDisposalHoldButton();
 }
