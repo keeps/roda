@@ -2009,6 +2009,8 @@ public interface ClientMessages extends Messages {
 
   String createDisposalConfirmationTitle();
 
+  String createDisposalConfirmationExtraInformationTitle();
+
   String disposalNewConfirmationAction();
 
   String disposalRuleTitle();
@@ -2149,7 +2151,7 @@ public interface ClientMessages extends Messages {
 
   String changeDisposalScheduleActionTitle();
 
-  String confirmDisposalScheduleActionTitle();
+  String createDisposalConfirmationActionTitle();
 
   String dissociateDisposalScheduleDialogTitle();
 
@@ -2197,4 +2199,8 @@ public interface ClientMessages extends Messages {
 
   // disposal confirmation data panel
   String disposalConfirmationDataPanelTitle();
+
+  String disposalConfirmationDataNote();
+
+  String disposalTitle();
 }

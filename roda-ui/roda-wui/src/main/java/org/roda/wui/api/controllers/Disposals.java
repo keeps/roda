@@ -11,7 +11,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
@@ -178,12 +178,12 @@ public class Disposals extends RodaWuiController {
     }
   }
 
-  public static DisposalConfirmationMetadata recoverDisposalConfirmation(User user, String disposalConfirmationId) {
+  public static DisposalConfirmation recoverDisposalConfirmation(User user, String disposalConfirmationId) {
     return null;
   }
 
-  public static Job createDisposalConfirmation(User user, DisposalConfirmationMetadata confirmationMetadata,
-    SelectedItems<IndexedAIP> objects)
+  public static Job createDisposalConfirmation(User user, String title,
+    DisposalConfirmationExtraBundle confirmationMetadata, SelectedItems<IndexedAIP> objects)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -193,7 +193,7 @@ public class Disposals extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      return BrowserHelper.createDisposalConfirmationReport(user, objects, confirmationMetadata.getTitle());
+      return BrowserHelper.createDisposalConfirmationReport(user, objects, title, confirmationMetadata);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -204,7 +204,8 @@ public class Disposals extends RodaWuiController {
     }
   }
 
-  public static DisposalConfirmationExtraBundle retrieveDisposalConfirmationExtraBundle(User user) throws AuthorizationDeniedException {
+  public static DisposalConfirmationExtraBundle retrieveDisposalConfirmationExtraBundle(User user)
+    throws AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -219,7 +220,7 @@ public class Disposals extends RodaWuiController {
     }
   }
 
-  public static Job deleteDisposalConfirmation(User user, SelectedItems<DisposalConfirmationMetadata> selectedItems,
+  public static Job deleteDisposalConfirmation(User user, SelectedItems<DisposalConfirmation> selectedItems,
     String details) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -281,9 +282,9 @@ public class Disposals extends RodaWuiController {
     }
   }
 
-  public static Job destroyRecordsInDisposalConfirmation(User user,
-                                                         SelectedItemsList<DisposalConfirmationMetadata> selectedItems)
-          throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+  public static Job destroyRecordsInDisposalConfirmationReport(User user,
+    SelectedItemsList<DisposalConfirmation> selectedItems)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -306,8 +307,50 @@ public class Disposals extends RodaWuiController {
 
   }
 
-  public static void permanentlyDeleteRecordsInDisposalConfirmationReport() {}
-  
+  public static void permanentlyDeleteRecordsInDisposalConfirmationReport() {
+  }
+
+  public static Job applyDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+    try {
+      // delegate
+      return BrowserHelper.applyDisposalHold(user, items, disposalHoldId);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, items,
+        RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId);
+    }
+  }
+
+  public static Job liftDisposalHold(User user, SelectedItems<DisposalHold> items)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+    try {
+      // delegate
+      return BrowserHelper.liftDisposalHold(user, items);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, items);
+    }
+  }
+
   public static DisposalRule createDisposalRule(User user, DisposalRule disposalRule) throws GenericException,
     AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};

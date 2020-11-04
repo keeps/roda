@@ -60,7 +60,7 @@ public class FormUtilities {
   public static void create(FlowPanel panel, Set<MetadataValue> bundle, boolean addStyle,
     final Callable<Void> onChange) {
     for (MetadataValue mv : bundle) {
-      boolean mandatory = (mv.get("mandatory") != null && "true".equalsIgnoreCase(mv.get("mandatory"))) ? true : false;
+      boolean mandatory = mv.get("mandatory") != null && "true".equalsIgnoreCase(mv.get("mandatory"));
 
       if (mv.get("hidden") != null && "true".equals(mv.get("hidden"))) {
         continue;
@@ -544,8 +544,7 @@ public class FormUtilities {
     if (values != null) {
       for (MetadataValue mv : values) {
         String value = mv.get("value");
-        boolean mandatory = (mv.get("mandatory") != null && "true".equalsIgnoreCase(mv.get("mandatory"))) ? true
-          : false;
+        boolean mandatory = mv.get("mandatory") != null && "true".equalsIgnoreCase(mv.get("mandatory"));
         if (mandatory && (value == null || "".equals(value.trim()))) {
           String labels = mv.get("l");
           errors.add(messages.isAMandatoryField(labels));

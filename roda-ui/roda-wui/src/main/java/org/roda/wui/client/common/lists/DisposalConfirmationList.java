@@ -16,7 +16,7 @@ import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.sort.Sorter;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -40,16 +40,16 @@ import config.i18n.client.ClientMessages;
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  *
  */
-public class DisposalConfirmationList extends AsyncTableCell<DisposalConfirmationMetadata> {
+public class DisposalConfirmationList extends AsyncTableCell<DisposalConfirmation> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private TextColumn<DisposalConfirmationMetadata> titleColumn;
-  private Column<DisposalConfirmationMetadata, Date> createdOnColumn;
-  private TextColumn<DisposalConfirmationMetadata> createdByColumn;
-  private Column<DisposalConfirmationMetadata, SafeHtml> stateColumn;
-  private TextColumn<DisposalConfirmationMetadata> numberOfAIPsColumn;
-  private TextColumn<DisposalConfirmationMetadata> numberOfCollectionColumn;
-  private TextColumn<DisposalConfirmationMetadata> sizeColumn;
+  private TextColumn<DisposalConfirmation> titleColumn;
+  private Column<DisposalConfirmation, Date> createdOnColumn;
+  private TextColumn<DisposalConfirmation> createdByColumn;
+  private Column<DisposalConfirmation, SafeHtml> stateColumn;
+  private TextColumn<DisposalConfirmation> numberOfAIPsColumn;
+  private TextColumn<DisposalConfirmation> numberOfCollectionColumn;
+  private TextColumn<DisposalConfirmation> sizeColumn;
 
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.DISPOSAL_CONFIRMATION_TITLE, RodaConstants.DISPOSAL_COFIRMATION_ID,
@@ -58,38 +58,38 @@ public class DisposalConfirmationList extends AsyncTableCell<DisposalConfirmatio
     RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_COLLECTIONS, RodaConstants.DISPOSAL_CONFIRMATION_STORAGE_SIZE);
 
   @Override
-  protected void adjustOptions(AsyncTableCellOptions<DisposalConfirmationMetadata> options) {
+  protected void adjustOptions(AsyncTableCellOptions<DisposalConfirmation> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
 
   @Override
-  protected void configureDisplay(CellTable<DisposalConfirmationMetadata> display) {
+  protected void configureDisplay(CellTable<DisposalConfirmation> display) {
 
-    titleColumn = new TextColumn<DisposalConfirmationMetadata>() {
+    titleColumn = new TextColumn<DisposalConfirmation>() {
       @Override
-      public String getValue(DisposalConfirmationMetadata confirmation) {
+      public String getValue(DisposalConfirmation confirmation) {
         return confirmation != null ? confirmation.getTitle() : null;
       }
     };
 
-    createdByColumn = new TextColumn<DisposalConfirmationMetadata>() {
+    createdByColumn = new TextColumn<DisposalConfirmation>() {
       @Override
-      public String getValue(DisposalConfirmationMetadata confirmation) {
+      public String getValue(DisposalConfirmation confirmation) {
         return confirmation != null ? confirmation.getCreatedBy() : null;
       }
     };
 
-    createdOnColumn = new Column<DisposalConfirmationMetadata, Date>(
+    createdOnColumn = new Column<DisposalConfirmation, Date>(
       new DateCell(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
       @Override
-      public Date getValue(DisposalConfirmationMetadata confirmation) {
+      public Date getValue(DisposalConfirmation confirmation) {
         return confirmation != null ? confirmation.getCreatedOn() : null;
       }
     };
 
-    stateColumn = new Column<DisposalConfirmationMetadata, SafeHtml>(new SafeHtmlCell()) {
+    stateColumn = new Column<DisposalConfirmation, SafeHtml>(new SafeHtmlCell()) {
       @Override
-      public SafeHtml getValue(DisposalConfirmationMetadata confirmation) {
+      public SafeHtml getValue(DisposalConfirmation confirmation) {
         SafeHtml ret = null;
         if (confirmation != null) {
           ret = HtmlSnippetUtils.getDisposalConfirmationStateHTML(confirmation.getState());
@@ -99,24 +99,24 @@ public class DisposalConfirmationList extends AsyncTableCell<DisposalConfirmatio
       }
     };
 
-    numberOfAIPsColumn = new TextColumn<DisposalConfirmationMetadata>() {
+    numberOfAIPsColumn = new TextColumn<DisposalConfirmation>() {
       @Override
-      public String getValue(DisposalConfirmationMetadata confirmation) {
+      public String getValue(DisposalConfirmation confirmation) {
         return Long.toString(confirmation.getNumberOfAIPs());
       }
     };
 
-    numberOfCollectionColumn = new TextColumn<DisposalConfirmationMetadata>() {
+    numberOfCollectionColumn = new TextColumn<DisposalConfirmation>() {
       @Override
-      public String getValue(DisposalConfirmationMetadata confirmation) {
+      public String getValue(DisposalConfirmation confirmation) {
         return Long.toString(confirmation.getNumberOfCollections());
       }
     };
 
-    sizeColumn = new TextColumn<DisposalConfirmationMetadata>() {
+    sizeColumn = new TextColumn<DisposalConfirmation>() {
 
       @Override
-      public String getValue(DisposalConfirmationMetadata confirmation) {
+      public String getValue(DisposalConfirmation confirmation) {
         return confirmation != null ? Humanize.readableFileSize(confirmation.getSize()) : "";
       }
     };
@@ -143,7 +143,7 @@ public class DisposalConfirmationList extends AsyncTableCell<DisposalConfirmatio
 
   @Override
   protected Sorter getSorter(ColumnSortList columnSortList) {
-    Map<Column<DisposalConfirmationMetadata, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
+    Map<Column<DisposalConfirmation, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
 
     columnSortingKeyMap.put(titleColumn, Collections.singletonList(RodaConstants.DISPOSAL_CONFIRMATION_TITLE));
     columnSortingKeyMap.put(createdOnColumn, Collections.singletonList(RodaConstants.DISPOSAL_CONFIRMATION_CREATED_ON));
@@ -159,7 +159,7 @@ public class DisposalConfirmationList extends AsyncTableCell<DisposalConfirmatio
   }
 
   @Override
-  protected ProvidesKey<DisposalConfirmationMetadata> getKeyProvider() {
-    return DisposalConfirmationMetadata::getId;
+  protected ProvidesKey<DisposalConfirmation> getKeyProvider() {
+    return DisposalConfirmation::getId;
   }
 }

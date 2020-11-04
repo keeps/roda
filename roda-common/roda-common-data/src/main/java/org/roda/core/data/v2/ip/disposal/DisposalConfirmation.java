@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_CONFIRMATION_METADATA)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DisposalConfirmationMetadata implements IsModelObject, IsIndexed, HasId {
+public class DisposalConfirmation implements IsModelObject, IsIndexed, HasId {
   private static final long serialVersionUID = 1429757961220532837L;
 
   private String id;
@@ -39,7 +39,7 @@ public class DisposalConfirmationMetadata implements IsModelObject, IsIndexed, H
   private Date restoredOn = null;
   private String restoredBy = null;
 
-  private String approver = null;
+  private Map<String, String> extraFields;
 
   private Long size = null;
   private Long numberOfAIPs = null;
@@ -50,12 +50,13 @@ public class DisposalConfirmationMetadata implements IsModelObject, IsIndexed, H
 
   private Map<String, Object> fields;
 
-  public DisposalConfirmationMetadata() {
+  public DisposalConfirmation() {
     super();
     state = DisposalConfirmationState.PENDING;
-    disposalScheduleIds = new ArrayList<String>();
-    disposalHoldIds = new ArrayList<String>();
+    disposalScheduleIds = new ArrayList<>();
+    disposalHoldIds = new ArrayList<>();
     fields = new HashMap<>();
+    extraFields = new HashMap<>();
   }
 
   @JsonIgnore
@@ -89,12 +90,12 @@ public class DisposalConfirmationMetadata implements IsModelObject, IsIndexed, H
     this.createdBy = createdBy;
   }
 
-  public String getApprover() {
-    return approver;
+  public Map<String, String> getExtraFields() {
+    return extraFields;
   }
 
-  public void setApprover(String approver) {
-    this.approver = approver;
+  public void setExtraFields(Map<String, String> extraFields) {
+    this.extraFields = extraFields;
   }
 
   public Long getNumberOfAIPs() {
@@ -201,34 +202,32 @@ public class DisposalConfirmationMetadata implements IsModelObject, IsIndexed, H
       return true;
     if (o == null || getClass() != o.getClass())
       return false;
-    DisposalConfirmationMetadata that = (DisposalConfirmationMetadata) o;
-    return Objects.equals(getId(), that.getId()) && Objects.equals(getTitle(), that.getTitle())
-      && getState() == that.getState() && Objects.equals(getCreatedOn(), that.getCreatedOn())
-      && Objects.equals(getCreatedBy(), that.getCreatedBy()) && Objects.equals(getExecutedOn(), that.getExecutedOn())
-      && Objects.equals(getExecutedBy(), that.getExecutedBy()) && Objects.equals(getRestoredOn(), that.getRestoredOn())
-      && Objects.equals(getRestoredBy(), that.getRestoredBy()) && Objects.equals(getApprover(), that.getApprover())
-      && Objects.equals(getSize(), that.getSize()) && Objects.equals(getNumberOfAIPs(), that.getNumberOfAIPs())
-      && Objects.equals(getNumberOfCollections(), that.getNumberOfCollections())
-      && Objects.equals(getDisposalScheduleIds(), that.getDisposalScheduleIds())
-      && Objects.equals(getDisposalHoldIds(), that.getDisposalHoldIds())
-      && Objects.equals(getFields(), that.getFields());
+    DisposalConfirmation that = (DisposalConfirmation) o;
+    return Objects.equals(id, that.id) && Objects.equals(title, that.title) && state == that.state
+      && Objects.equals(createdOn, that.createdOn) && Objects.equals(createdBy, that.createdBy)
+      && Objects.equals(executedOn, that.executedOn) && Objects.equals(executedBy, that.executedBy)
+      && Objects.equals(restoredOn, that.restoredOn) && Objects.equals(restoredBy, that.restoredBy)
+      && Objects.equals(extraFields, that.extraFields) && Objects.equals(size, that.size)
+      && Objects.equals(numberOfAIPs, that.numberOfAIPs)
+      && Objects.equals(numberOfCollections, that.numberOfCollections)
+      && Objects.equals(disposalScheduleIds, that.disposalScheduleIds)
+      && Objects.equals(disposalHoldIds, that.disposalHoldIds) && Objects.equals(fields, that.fields);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(getId(), getTitle(), getState(), getCreatedOn(), getCreatedBy(), getExecutedOn(),
-      getExecutedBy(), getRestoredOn(), getRestoredBy(), getApprover(), getSize(), getNumberOfAIPs(),
-      getNumberOfCollections(), getDisposalScheduleIds(), getDisposalHoldIds(), getFields());
+    return Objects.hash(id, title, state, createdOn, createdBy, executedOn, executedBy, restoredOn, restoredBy,
+      extraFields, size, numberOfAIPs, numberOfCollections, disposalScheduleIds, disposalHoldIds, fields);
   }
 
   @Override
   public String toString() {
-    return "DisposalConfirmationMetadata{" + "id='" + id + '\'' + ", title='" + title + '\'' + ", state=" + state
+    return "DisposalConfirmation{" + "id='" + id + '\'' + ", title='" + title + '\'' + ", state=" + state
       + ", createdOn=" + createdOn + ", createdBy='" + createdBy + '\'' + ", executedOn=" + executedOn
       + ", executedBy='" + executedBy + '\'' + ", restoredOn=" + restoredOn + ", restoredBy='" + restoredBy + '\''
-      + ", approver='" + approver + '\'' + ", size=" + size + ", numberOfAIPs=" + numberOfAIPs
-      + ", numberOfCollections=" + numberOfCollections + ", disposalScheduleIds=" + disposalScheduleIds
-      + ", disposalHoldIds=" + disposalHoldIds + ", fields=" + fields + '}';
+      + ", extraFields=" + extraFields + ", size=" + size + ", numberOfAIPs=" + numberOfAIPs + ", numberOfCollections="
+      + numberOfCollections + ", disposalScheduleIds=" + disposalScheduleIds + ", disposalHoldIds=" + disposalHoldIds
+      + ", fields=" + fields + '}';
   }
 
   @JsonIgnore
@@ -255,7 +254,7 @@ public class DisposalConfirmationMetadata implements IsModelObject, IsIndexed, H
    */
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(id, title, createdOn, createdBy, executedOn, executedBy, approver, numberOfAIPs,
+    return Arrays.asList(id, title, createdOn, createdBy, executedOn, executedBy, numberOfAIPs,
       numberOfCollections, size);
   }
 

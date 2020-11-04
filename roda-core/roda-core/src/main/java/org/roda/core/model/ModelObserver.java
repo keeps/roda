@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.v2.ip.*;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -130,7 +130,7 @@ public interface ModelObserver {
 
   public ReturnWithExceptions<Void, ModelObserver> dipFileDeleted(String dipId, List<String> path, String fileId);
 
-  public ReturnWithExceptions<Void, ModelObserver> disposalConfirmationCreateOrUpdate(DisposalConfirmationMetadata confirmation);
+  public ReturnWithExceptions<Void, ModelObserver> disposalConfirmationCreateOrUpdate(DisposalConfirmation confirmation);
 
   public ReturnWithExceptions<Void, ModelObserver> disposalConfirmationDeleted(String confirmationId, boolean commit);
 }

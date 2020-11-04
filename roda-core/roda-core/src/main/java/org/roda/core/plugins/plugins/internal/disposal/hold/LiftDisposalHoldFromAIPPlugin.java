@@ -1,11 +1,12 @@
-package org.roda.core.plugins.plugins.internal.disposal;
+package org.roda.core.plugins.plugins.internal.disposal.hold;
 
 import java.util.Collections;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.LiteOptionalWithCause;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -24,8 +25,8 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-public class DestroyRecordsInDisposalConfirmationPlugin extends AbstractPlugin<DisposalConfirmationMetadata> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(DestroyRecordsInDisposalConfirmationPlugin.class);
+public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<DisposalHold> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(LiftDisposalHoldFromAIPPlugin.class);
 
   @Override
   public String getVersionImpl() {
@@ -33,7 +34,7 @@ public class DestroyRecordsInDisposalConfirmationPlugin extends AbstractPlugin<D
   }
 
   public static String getStaticName() {
-    return "Destroy records under disposal confirmation report";
+    return "Lift disposal hold from AIP";
   }
 
   @Override
@@ -52,12 +53,12 @@ public class DestroyRecordsInDisposalConfirmationPlugin extends AbstractPlugin<D
 
   @Override
   public RodaConstants.PreservationEventType getPreservationEventType() {
-    return RodaConstants.PreservationEventType.DELETION;
+    return RodaConstants.PreservationEventType.POLICY_ASSIGNMENT;
   }
 
   @Override
   public String getPreservationEventDescription() {
-    return "Create disposal confirmation report";
+    return "Lief disposal hold from AIP";
   }
 
   @Override
@@ -78,33 +79,23 @@ public class DestroyRecordsInDisposalConfirmationPlugin extends AbstractPlugin<D
   @Override
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-    // do nothing
-    return null;
+    return new Report();
   }
 
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<DisposalConfirmationMetadata>() {
+    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<DisposalHold>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        JobPluginInfo jobPluginInfo, Plugin<DisposalConfirmationMetadata> plugin, DisposalConfirmationMetadata object) {
-          processDisposalConfirmation();
+        JobPluginInfo jobPluginInfo, Plugin<DisposalHold> plugin, DisposalHold object) {
+        processDisposalHold(index, model, report, cachedJob, jobPluginInfo, object);
       }
     }, index, model, storage, liteList);
   }
 
-  private void processDisposalConfirmation() {
-    // Get disposal confirmation AIPs
-
-    // Iterate over the AIP
-    // - Make a copy to disposal bin
-    // - Apply a stylesheet over the aip metadata
-    // - remove the AIP metadata according to configurations
-    // - Mark the AIP as residual
-  }
-
-  private void processAIP() {
+  private void processDisposalHold(IndexService index, ModelService model, Report report, Job cachedJob,
+    JobPluginInfo jobPluginInfo, DisposalHold disposalHold) {
 
   }
 
@@ -120,8 +111,13 @@ public class DestroyRecordsInDisposalConfirmationPlugin extends AbstractPlugin<D
   }
 
   @Override
-  public List<Class<DisposalConfirmationMetadata>> getObjectClasses() {
-    return Collections.singletonList(DisposalConfirmationMetadata.class);
+  public List<Class<DisposalHold>> getObjectClasses() {
+    return Collections.singletonList(DisposalHold.class);
+  }
+
+  @Override
+  public PluginType getType() {
+    return PluginType.AIP_TO_AIP;
   }
 
   @Override
@@ -130,13 +126,8 @@ public class DestroyRecordsInDisposalConfirmationPlugin extends AbstractPlugin<D
   }
 
   @Override
-  public Plugin<DisposalConfirmationMetadata> cloneMe() {
-    return new DestroyRecordsInDisposalConfirmationPlugin();
-  }
-
-  @Override
-  public PluginType getType() {
-    return PluginType.INTERNAL;
+  public Plugin<DisposalHold> cloneMe() {
+    return new LiftDisposalHoldFromAIPPlugin();
   }
 
   @Override

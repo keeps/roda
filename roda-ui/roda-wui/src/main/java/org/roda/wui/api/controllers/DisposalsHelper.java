@@ -1,5 +1,9 @@
 package org.roda.wui.api.controllers;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import org.roda.core.data.exceptions.DisposalHoldNotValidException;
 import org.roda.core.data.exceptions.DisposalScheduleNotValidException;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
@@ -8,14 +12,21 @@ import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.ip.disposal.RetentionTriggerCode;
+import org.roda.wui.client.browse.MetadataValue;
+import org.roda.wui.client.browse.bundle.DisposalConfirmationExtraBundle;
 import org.roda.wui.common.client.tools.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 public class DisposalsHelper {
+  private static final Logger LOGGER = LoggerFactory.getLogger(DisposalsHelper.class);
+
   public DisposalsHelper() {
-  };
+    // do nothing
+  }
 
   public static void validateDisposalHold(DisposalHold disposalHold) throws DisposalHoldNotValidException {
     if (StringUtils.isBlank(disposalHold.getTitle())) {
@@ -25,15 +36,15 @@ public class DisposalsHelper {
 
   public static void validateDisposalSchedule(DisposalSchedule disposalSchedule)
     throws DisposalScheduleNotValidException {
-    
+
     if (StringUtils.isBlank(disposalSchedule.getTitle())) {
       throw new DisposalScheduleNotValidException("The disposal schedule title is mandatory");
     }
 
-    if(!isNumberOfAIPsValid(disposalSchedule.getNumberOfAIPUnder(), disposalSchedule.getState())){
-      throw new DisposalScheduleNotValidException("The disposal schedule can not be deactivated" );
+    if (!isNumberOfAIPsValid(disposalSchedule.getNumberOfAIPUnder(), disposalSchedule.getState())) {
+      throw new DisposalScheduleNotValidException("The disposal schedule can not be deactivated");
     }
-    
+
     if (!isDisposalActionValid(disposalSchedule.getActionCode())) {
       throw new DisposalScheduleNotValidException("The disposal action code is not valid");
     }
@@ -41,7 +52,8 @@ public class DisposalsHelper {
       throw new DisposalScheduleNotValidException("The retention trigger is not valid");
     }
 
-    if (!isRetentionTriggerElementIdValid(disposalSchedule.getActionCode(), disposalSchedule.getRetentionTriggerElementId())) {
+    if (!isRetentionTriggerElementIdValid(disposalSchedule.getActionCode(),
+      disposalSchedule.getRetentionTriggerElementId())) {
       throw new DisposalScheduleNotValidException("The retention trigger element id is not valid");
     }
 
@@ -56,7 +68,7 @@ public class DisposalsHelper {
   }
 
   private static boolean isNumberOfAIPsValid(Long numberOfAIPUnder, DisposalScheduleState state) {
-    if(numberOfAIPUnder > 0 && state.equals(DisposalScheduleState.INACTIVE)){
+    if (numberOfAIPUnder > 0 && state.equals(DisposalScheduleState.INACTIVE)) {
       return false;
     }
     return true;
@@ -109,7 +121,7 @@ public class DisposalsHelper {
   }
 
   private static boolean isRetentionTriggerElementIdValid(DisposalActionCode actionCode,
-                                                 String retentionTriggerElementId) {
+    String retentionTriggerElementId) {
     if (actionCode.equals(DisposalActionCode.RETAIN_PERMANENTLY)) {
       return retentionTriggerElementId == null;
     } else {
@@ -123,5 +135,26 @@ public class DisposalsHelper {
         || actionCode.equals(DisposalActionCode.REVIEW);
     }
     return false;
+  }
+
+  public static Map<String, String> getDisposalConfirmationExtra(DisposalConfirmationExtraBundle extra) {
+    Map<String, String> data = new HashMap<>();
+
+    if (extra != null) {
+      Set<MetadataValue> values = extra.getValues();
+      if (values != null) {
+        values.forEach(metadataValue -> {
+          String val = metadataValue.get("value");
+          if (val != null) {
+            val = val.replaceAll("\\s", "");
+            if (!"".equals(val)) {
+              data.put(metadataValue.get("name"), metadataValue.get("value"));
+            }
+          }
+        });
+      }
+    }
+
+    return data;
   }
 }

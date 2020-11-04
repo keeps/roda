@@ -16,34 +16,34 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 @javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_CONFIRMATIONS_METADATA)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DisposalConfirmations implements RODAObjectList<DisposalConfirmationMetadata> {
+public class DisposalConfirmations implements RODAObjectList<DisposalConfirmation> {
   private static final long serialVersionUID = -690695513750502079L;
-  private List<DisposalConfirmationMetadata> disposalConfirmationMetadataList;
+  private List<DisposalConfirmation> disposalConfirmationList;
 
   public DisposalConfirmations() {
     super();
-    disposalConfirmationMetadataList = new ArrayList<>();
+    disposalConfirmationList = new ArrayList<>();
   }
 
-  public DisposalConfirmations(List<DisposalConfirmationMetadata> disposalConfirmationMetadataList) {
+  public DisposalConfirmations(List<DisposalConfirmation> disposalConfirmationList) {
     super();
-    this.disposalConfirmationMetadataList = disposalConfirmationMetadataList;
+    this.disposalConfirmationList = disposalConfirmationList;
   }
 
   @Override
   @JsonProperty(value = RodaConstants.RODA_OBJECT_DISPOSAL_CONFIRMATIONS_METADATA)
   @XmlElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_CONFIRMATION_METADATA)
-  public List<DisposalConfirmationMetadata> getObjects() {
-    return disposalConfirmationMetadataList;
+  public List<DisposalConfirmation> getObjects() {
+    return disposalConfirmationList;
   }
 
   @Override
-  public void setObjects(List<DisposalConfirmationMetadata> disposalConfirmationMetadataList) {
-    this.disposalConfirmationMetadataList = disposalConfirmationMetadataList;
+  public void setObjects(List<DisposalConfirmation> disposalConfirmationList) {
+    this.disposalConfirmationList = disposalConfirmationList;
   }
 
   @Override
-  public void addObject(DisposalConfirmationMetadata confirmation) {
-    this.disposalConfirmationMetadataList.add(confirmation);
+  public void addObject(DisposalConfirmation confirmation) {
+    this.disposalConfirmationList.add(confirmation);
   }
 }

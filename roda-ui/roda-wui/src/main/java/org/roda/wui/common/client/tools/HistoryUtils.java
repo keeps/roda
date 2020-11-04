@@ -23,7 +23,7 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.IndexedReport;
@@ -411,8 +411,8 @@ public class HistoryUtils {
     } else if (object instanceof LogEntry) {
       LogEntry logEntry = (LogEntry) object;
       HistoryUtils.newHistory(ShowLogEntry.RESOLVER, logEntry.getUUID());
-    } else if (object instanceof DisposalConfirmationMetadata) {
-      DisposalConfirmationMetadata confirmationMetadata = (DisposalConfirmationMetadata) object;
+    } else if (object instanceof DisposalConfirmation) {
+      DisposalConfirmation confirmationMetadata = (DisposalConfirmation) object;
       path = HistoryUtils.getHistory(ShowDisposalConfirmation.RESOLVER.getHistoryPath(),
         confirmationMetadata.getUUID());
     } else {

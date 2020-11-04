@@ -248,6 +248,7 @@ public final class RodaConstants {
   public static final String CORE_DIP_FOLDER = "dip";
   public static final String CORE_DIP_FILE_FOLDER = "dipfile";
   public static final String CORE_REPRESENTATION_INFORMATION_FOLDER = "representation-information";
+  public static final String CORE_DISPOSAL_BIN_FOLDER = "disposal-bin";
 
   public static final String CORE_I18N_CLIENT_FOLDER = "client";
   public static final String CORE_I18_GWT_XML_FILE = "I18N.gwt.xml";
@@ -433,7 +434,7 @@ public final class RodaConstants {
   public static final String CONTROLLER_DISPOSAL_SCHEDULE_ID_PARAM = "disposalScheduleId";
 
   public static final String CONTROLLER_DISPOSAL_HOLD_PARAM = RODA_OBJECT_DISPOSAL_HOLD;
-  public static final String CONTROLLER_DISPOSAL_HOLD_ID_PARAM = "disposalScheduleId";
+  public static final String CONTROLLER_DISPOSAL_HOLD_ID_PARAM = "disposalHoldId";
 
   public static final String CONTROLLER_DISPOSAL_CONFIRMATION_METADATA_PARAM = RODA_OBJECT_DISPOSAL_CONFIRMATION_METADATA;
   public static final String CONTROLLER_DISPOSAL_CONFIRMATION_ID_PARAM = "disposalConfirmationId";
@@ -691,8 +692,8 @@ public final class RodaConstants {
   public static final String AIP_DISPOSAL_SCHEDULE_NAME = "disposalScheduleName";
   public static final String AIP_DISPOSAL_SCHEDULE_RETENTION_PERIOD = "disposalScheduleRetentionPeriod";
   public static final String AIP_DISPOSAL_HOLDS_ID = "disposalHoldsId";
-  public static final String AIP_DESTRUCTED_ON = "destructedOn";
-  public static final String AIP_DESTRUCTED_APPROVED_BY = "destructionApprovedBy";
+  public static final String AIP_DESTROYED_ON = "destroyedOn";
+  public static final String AIP_DESTROYED_BY = "destroyedBy";
   public static final String AIP_DISPOSAL_ACTION = "disposalAction";
   public static final String AIP_DISPOSAL_HOLD_STATUS = "disposalHoldStatus";
   public static final String AIP_OVERDUE_DATE = "overdueDate";
@@ -862,7 +863,6 @@ public final class RodaConstants {
   public static final String JOB_HAS_SKIPPED = "hasSkipped";
   public static final String JOB_FILE_EXTENSION = ".json";
 
-  public static final String DISPOSAL_CONFIRMATION_APPROVER = "approver";
   public static final String DISPOSAL_CONFIRMATION_CREATED_ON = "createdOn";
   public static final String DISPOSAL_CONFIRMATION_CREATED_BY = "createdBy";
   public static final String DISPOSAL_CONFIRMATION_EXECUTED_ON = "executedOn";
@@ -873,6 +873,7 @@ public final class RodaConstants {
   public static final String DISPOSAL_CONFIRMATION_NUMBER_OF_COLLECTIONS = "numberOfCollections";
   public static final String DISPOSAL_CONFIRMATION_STATE = "state";
   public static final String DISPOSAL_CONFIRMATION_TITLE = "title";
+  public static final String DISPOSAL_CONFIRMATION_EXTRA_INFO = "extraInformation";
   public static final String DISPOSAL_CONFIRMATION_STORAGE_SIZE = "size";
 
   /* Disposal related parameters */
@@ -961,8 +962,12 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_INCLUDE_DOCUMENTATION = "parameter.include_documentation";
 
   public static final String PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID = "parameter.disposal_schedule_id";
+
+  public static final String PLUGIN_PARAMS_DISPOSAL_HOLD_ID = "parameter.disposal_hold_id";
+
   public static final String PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID = "parameter.disposal_confirmation_id";
   public static final String PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE = "parameter.disposal_confirmation_title";
+  public static final String PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_EXTRA_INFO = "parameter.disposal_confirmation_extra";
 
   public static final String PLUGIN_CATEGORY_CONVERSION = "conversion";
   public static final String PLUGIN_CATEGORY_CHARACTERIZATION = "characterization";
@@ -1401,7 +1406,7 @@ public final class RodaConstants {
   public static final String METADATA_TEMPLATE_EXTENSION = ".xml.hbs";
   public static final String USERS_TEMPLATE_FOLDER = "users";
   public static final String METADATA_REPRESENTATION_INFORMATION_TEMPLATE_FOLDER = "representation-information/templates";
-  public static final String DISPOSAL_CONFIRMATION_INFORMATION_TEMPLATE_FOLDER = "disposal";
+  public static final String DISPOSAL_CONFIRMATION_INFORMATION_TEMPLATE_FOLDER = "disposal/templates";
 
   public static final String USER_EXTRA_METADATA_FILE = "user_extra.xml.hbs";
   public static final String DISPOSAL_CONFIRMATION_EXTRA_METADATA_FILE = "disposal_confirmation_extra.xml.hbs";
@@ -1614,6 +1619,7 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_CREATE_DISPOSAL_HOLD = "org.roda.wui.api.controllers.Disposals.createDisposalHold";
   public static final String PERMISSION_METHOD_DELETE_DISPOSAL_HOLD = "org.roda.wui.api.controllers.Disposals.deleteDisposalHold";
   public static final String PERMISSION_METHOD_UPDATE_DISPOSAL_HOLD = "org.roda.wui.api.controllers.Disposals.updateDisposalHold";
+  public static final String PERMISSION_METHOD_APPLY_DISPOSAL_HOLD = "org.roda.wui.api.controllers.Disposals.applyDisposalHold";
 
   public static final String PERMISSION_METHOD_CREATE_DISPOSAL_CONFIRMATION = "org.roda.wui.api.controllers.Disposals.createDisposalConfirmation";
   public static final String PERMISSION_METHOD_DELETE_DISPOSAL_CONFIRMATION = "org.roda.wui.api.controllers.Disposals.deleteDisposalConfirmation";

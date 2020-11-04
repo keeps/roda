@@ -30,7 +30,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
@@ -57,7 +57,6 @@ import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
-import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
@@ -327,16 +326,20 @@ public interface BrowserServiceAsync {
 
   void disassociateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, AsyncCallback<Job> async);
 
-  void createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, DisposalConfirmationMetadata metadata,
+  void createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, String title, DisposalConfirmationExtraBundle metadata,
     AsyncCallback<Job> async);
 
   void listDisposalHoldsAssociation(String aipId, AsyncCallback<List<DisposalHoldAssociation>> async);
 
-  void deleteDisposalConfirmationReport(SelectedItems<DisposalConfirmationMetadata> selectedItems, String details,
-    AsyncCallback<Job> async);
+  void deleteDisposalConfirmationReport(SelectedItems<DisposalConfirmation> selectedItems, String details,
+                                        AsyncCallback<Job> async);
 
-  void destroyRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmationMetadata> selectedItems,
+  void destroyRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems,
                                                   AsyncCallback<Job> async);
 
   void retrieveDisposalConfirmationExtraBundle(AsyncCallback<DisposalConfirmationExtraBundle> async);
+
+  void applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, AsyncCallback<Job> async);
+
+  void liftDisposalHold(SelectedItems<DisposalHold> selectedItems, AsyncCallback<Job> async);
 }

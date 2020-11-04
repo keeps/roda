@@ -1,7 +1,7 @@
 {{!-- uncomment the following fields to add more properties to the user --}}
 
 {{~field name="approvedBy" 		        order="10" type="list" options="[\"ID Card\",\"Passport\",\"Citizen Card\"]" label="{'en': 'Approved by', 'pt_PT': 'Aprovado por'}" xpath="//*:approvedBy/string()"~}}
-{{~field name="approvedOn" 				order="20" type="date" label="{'en': 'Approved on', 'pt_PT': 'Aprovado em'}" xpath="//*:approvedOn/string()"~}}
+{{~field name="approvedOn" 				order="20" type="date" mandatory="true" label="{'en': 'Approved on', 'pt_PT': 'Aprovado em'}" xpath="//*:approvedOn/string()"~}}
 
 <?xml version="1.0"?>
 

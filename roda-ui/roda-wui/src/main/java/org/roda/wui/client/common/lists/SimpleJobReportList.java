@@ -189,6 +189,10 @@ public class SimpleJobReportList extends AsyncTableCell<IndexedReport> {
               ret = SafeHtmlUtils.fromSafeConstant(
                 "<span class='label-warning'>" + messages.pluginStateMessage(PluginState.PARTIAL_SUCCESS) + "</span>");
               break;
+            case SKIPPED:
+              ret = SafeHtmlUtils.fromSafeConstant(
+                  "<span class='label-warning'>" + messages.pluginStateMessage(PluginState.SKIPPED) + "</span>");
+              break;
             case FAILURE:
             default:
               ret = SafeHtmlUtils.fromSafeConstant(

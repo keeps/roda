@@ -48,7 +48,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
@@ -1165,13 +1165,13 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> disposalConfirmationCreateOrUpdate(
-    DisposalConfirmationMetadata confirmation) {
-    return SolrUtils.create2(index, this, DisposalConfirmationMetadata.class, confirmation);
+    DisposalConfirmation confirmation) {
+    return SolrUtils.create2(index, this, DisposalConfirmation.class, confirmation);
   }
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> disposalConfirmationDeleted(String confirmationId, boolean commit) {
-    return deleteDocumentFromIndex(DisposalConfirmationMetadata.class, confirmationId);
+    return deleteDocumentFromIndex(DisposalConfirmation.class, confirmationId);
   }
 
 }

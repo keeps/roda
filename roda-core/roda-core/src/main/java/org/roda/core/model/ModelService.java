@@ -64,6 +64,8 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIP;
@@ -75,8 +77,8 @@ import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
@@ -105,6 +107,7 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.events.EventsManager;
+import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.iterables.LogEntryFileSystemIterable;
 import org.roda.core.model.iterables.LogEntryStorageIterable;
 import org.roda.core.model.utils.ModelUtils;
@@ -157,7 +160,7 @@ public class ModelService extends ModelObservable {
 
     if (RodaCoreFactory.checkIfWriteIsAllowed(nodeType)) {
       ensureAllContainersExist();
-      ensureAllDiretoriesExist();
+      ensureAllDirectoriesExist();
     }
   }
 
@@ -190,7 +193,7 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  private void ensureAllDiretoriesExist() {
+  private void ensureAllDirectoriesExist() {
     try {
       createDirectoryIfNotExists(
         DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION, RodaConstants.STORAGE_DIRECTORY_AGENTS));
@@ -3460,6 +3463,11 @@ public class ModelService extends ModelObservable {
       CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(disposalScheduleContainerPath, false);
       for (Resource resource : iterable) {
         DisposalSchedule schedule = ResourceParseUtils.convertResourceToObject(resource, DisposalSchedule.class);
+
+        Long count = SolrUtils.count(RodaCoreFactory.getSolr(), IndexedAIP.class, new Filter(
+            new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID, schedule.getId())));
+        schedule.setNumberOfAIPUnder(count);
+
         disposalSchedules.addObject(schedule);
       }
 
@@ -3490,16 +3498,16 @@ public class ModelService extends ModelObservable {
   /**********************************
    * Disposal confirmation related
    **********************************/
-  public DisposalConfirmationMetadata retrieveDisposalConfirmationMetadata(String disposalConfirmationId)
+  public DisposalConfirmation retrieveDisposalConfirmation(String disposalConfirmationId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(
       ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId),
       RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME);
     Binary binary = storage.getBinary(metadataStoragePath);
-    DisposalConfirmationMetadata ret;
+    DisposalConfirmation ret;
 
     try (InputStream inputStream = binary.getContent().createInputStream()) {
-      ret = JsonUtils.getObjectFromJson(inputStream, DisposalConfirmationMetadata.class);
+      ret = JsonUtils.getObjectFromJson(inputStream, DisposalConfirmation.class);
     } catch (IOException | GenericException e) {
       throw new GenericException("Error reading disposal confirmation: " + disposalConfirmationId, e);
     }
@@ -3542,6 +3550,21 @@ public class ModelService extends ModelObservable {
     JsonUtils.appendObjectToFile(entry, aipsFile);
   }
 
+  public DisposalConfirmation updateDisposalConfirmation(DisposalConfirmation disposalConfirmation)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    String disposalConfirmationAsJson = JsonUtils.getJsonFromObject(disposalConfirmation);
+    DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(
+        ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmation.getId()),
+        RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME);
+    storage.updateBinaryContent(metadataStoragePath, new StringContentPayload(disposalConfirmationAsJson), false,
+      false);
+
+    notifyDisposalConfirmationCreatedOrUpdated(disposalConfirmation).failOnError();
+    return disposalConfirmation;
+  }
+
   public void copyDisposalScheduleToConfirmationReport(String disposalConfirmationId, Set<String> disposalScheduleIds)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException,
     AlreadyExistsException {
@@ -3564,28 +3587,28 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public DisposalConfirmationMetadata createDisposalConfirmationMetadata(
-    DisposalConfirmationMetadata disposalConfirmationMetadata, String createdBy) throws RequestNotValidException,
+  public DisposalConfirmation createDisposalConfirmation(
+      DisposalConfirmation disposalConfirmation, String createdBy) throws RequestNotValidException,
     NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    if (disposalConfirmationMetadata.getId() == null) {
-      disposalConfirmationMetadata.setId(IdUtils.createUUID());
+    if (disposalConfirmation.getId() == null) {
+      disposalConfirmation.setId(IdUtils.createUUID());
     }
 
-    disposalConfirmationMetadata.setCreatedBy(createdBy);
-    disposalConfirmationMetadata.setCreatedOn(new Date());
+    disposalConfirmation.setCreatedBy(createdBy);
+    disposalConfirmation.setCreatedOn(new Date());
 
-    String disposalConfirmationAsJson = JsonUtils.getJsonFromObject(disposalConfirmationMetadata);
+    String disposalConfirmationAsJson = JsonUtils.getJsonFromObject(disposalConfirmation);
 
     DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(
-      ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationMetadata.getId()),
+      ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmation.getId()),
       RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME);
 
     storage.createBinary(metadataStoragePath, new StringContentPayload(disposalConfirmationAsJson), false);
-    notifyDisposalConfirmationCreatedOrUpdated(disposalConfirmationMetadata).failOnError();
+    notifyDisposalConfirmationCreatedOrUpdated(disposalConfirmation).failOnError();
 
-    return disposalConfirmationMetadata;
+    return disposalConfirmation;
   }
 
   public void deleteDisposalConfirmation(String disposalConfirmationId) throws AuthorizationDeniedException,
@@ -3593,7 +3616,7 @@ public class ModelService extends ModelObservable {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     StoragePath disposalSchedulePath = ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId);
-    DisposalConfirmationMetadata metadata = retrieveDisposalConfirmationMetadata(disposalConfirmationId);
+    DisposalConfirmation metadata = retrieveDisposalConfirmation(disposalConfirmationId);
 
     // check if the disposal confirmation is pending
     // if so the disposal confirmation can be deleted from the system
@@ -3690,5 +3713,9 @@ public class ModelService extends ModelObservable {
 
     return disposalRules;
   }
+
+  /************************************
+   * Disposal bin related
+   ************************************/
 
 }

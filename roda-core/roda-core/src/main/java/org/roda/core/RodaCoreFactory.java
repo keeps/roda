@@ -113,6 +113,8 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.user.Group;
@@ -179,6 +181,7 @@ public class RodaCoreFactory {
   private static Path configPath;
   private static Path workingDirectoryPath;
   private static Path reportDirectoryPath;
+  private static Path disposalBinDirectoryPath;
   private static Path exampleConfigPath;
   private static Path defaultPath;
 
@@ -230,6 +233,22 @@ public class RodaCoreFactory {
       @Override
       public Messages load(Locale locale) throws Exception {
         return new Messages(locale, getConfigPath().resolve(RodaConstants.CORE_I18N_FOLDER));
+      }
+    });
+
+  private static LoadingCache<String, DisposalSchedule> DISPOSAL_SCHEDULE_CACHE = CacheBuilder.newBuilder()
+    .build(new CacheLoader<String, DisposalSchedule>() {
+      @Override
+      public DisposalSchedule load(String disposalScheduleId) throws Exception {
+        return model.retrieveDisposalSchedule(disposalScheduleId);
+      }
+    });
+
+  private static LoadingCache<String, DisposalHold> DISPOSAL_HOLD_CACHE = CacheBuilder.newBuilder()
+    .expireAfterWrite(10, TimeUnit.MINUTES).build(new CacheLoader<String, DisposalHold>() {
+      @Override
+      public DisposalHold load(String disposalHoldId) throws Exception {
+        return model.retrieveDisposalHold(disposalHoldId);
       }
     });
 
@@ -450,6 +469,9 @@ public class RodaCoreFactory {
         instantiateStorageAndModel();
         LOGGER.debug("Finished instantiating storage & model");
 
+        // initialize disposal bin directory
+        initializeDisposalBinDirectory();
+
         // instantiate solr and index service
         instantiateSolrAndIndexService(nodeType);
         LOGGER.debug("Finished instantiating solr & index");
@@ -504,6 +526,17 @@ public class RodaCoreFactory {
         migrationMode ? "(migration mode)"
           : (instantiatedWithoutErrors ? "with success!"
             : "with some errors!!! See logs because these errors might cause instability in the system."));
+    }
+  }
+
+  private static void initializeDisposalBinDirectory() {
+    try {
+      String disposalBinFolder = getConfigurationString("disposal_bin.folder", RodaConstants.CORE_DISPOSAL_BIN_FOLDER);
+      disposalBinDirectoryPath = getDataPath().resolve(disposalBinFolder);
+      Files.createDirectories(disposalBinDirectoryPath);
+    } catch (IOException e) {
+      throw new RuntimeException(
+        "Unable to create RODA Disposal bin DIRECTORY " + disposalBinDirectoryPath + ". Aborting...", e);
     }
   }
 
@@ -1662,6 +1695,10 @@ public class RodaCoreFactory {
     return reportDirectoryPath;
   }
 
+  public static Path getDisposalBinDirectoryPath() {
+    return disposalBinDirectoryPath;
+  }
+
   public static Path getDataPath() {
     return dataPath;
   }
@@ -1898,6 +1935,8 @@ public class RodaCoreFactory {
     RODA_SCHEMAS_CACHE.invalidateAll();
     I18N_CACHE.invalidateAll();
     SHARED_PROPERTIES_CACHE.invalidateAll();
+    DISPOSAL_SCHEDULE_CACHE.invalidateAll();
+    DISPOSAL_HOLD_CACHE.invalidateAll();
     processPreservationEventTypeProperties();
 
     LOGGER.info("Reloaded roda configurations after file change!");
@@ -2050,6 +2089,24 @@ public class RodaCoreFactory {
       }
 
       rodaPropertiesCache.put(cacheName, newCacheEntry);
+    }
+  }
+
+  public static DisposalSchedule getDisposalSchedule(String disposalScheduleId) {
+    try {
+      return DISPOSAL_SCHEDULE_CACHE.get(disposalScheduleId);
+    } catch (ExecutionException e) {
+      LOGGER.debug("Could not get disposal schedule", e);
+      return null;
+    }
+  }
+
+  public static DisposalHold getDisposalHold(String disposalHoldId) {
+    try {
+      return DISPOSAL_HOLD_CACHE.get(disposalHoldId);
+    } catch (ExecutionException e) {
+      LOGGER.debug("Could not get disposal hold", e);
+      return null;
     }
   }
 

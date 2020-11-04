@@ -12,11 +12,11 @@ import java.util.List;
 
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.index.IndexService;
 import org.roda.core.plugins.Plugin;
 
-public class ReindexDisposalConfirmationPlugin extends ReindexRodaEntityPlugin<DisposalConfirmationMetadata> {
+public class ReindexDisposalConfirmationPlugin extends ReindexRodaEntityPlugin<DisposalConfirmation> {
 
   @Override
   public String getName() {
@@ -29,13 +29,13 @@ public class ReindexDisposalConfirmationPlugin extends ReindexRodaEntityPlugin<D
   }
 
   @Override
-  public Plugin<DisposalConfirmationMetadata> cloneMe() {
+  public Plugin<DisposalConfirmation> cloneMe() {
     return new ReindexDisposalConfirmationPlugin();
   }
 
   @Override
-  public List<Class<DisposalConfirmationMetadata>> getObjectClasses() {
-    return Collections.singletonList(DisposalConfirmationMetadata.class);
+  public List<Class<DisposalConfirmation>> getObjectClasses() {
+    return Collections.singletonList(DisposalConfirmation.class);
   }
 
   @Override

@@ -5,11 +5,11 @@
              xmlns:common="urn:import:org.roda.wui.client.common">
 
     <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
-    <g:FlowPanel styleName="wui-create-disposal-confirmation" addStyleNames="wrapper skip_padding">
+    <g:FlowPanel styleName="wui-create-disposal-confirmation-data" addStyleNames="wrapper skip_padding">
 
         <g:FlowPanel addStyleNames="row full_width skip_padding">
             <g:FlowPanel addStyleNames="col_10 content" ui:field="content">
-                <common:TitlePanel text="{messages.createDisposalConfirmationTitle}" iconClass="DisposalConfirmations"/>
+                <common:TitlePanel text="{messages.createDisposalConfirmationExtraInformationTitle}" iconClass="DisposalConfirmations"/>
                 <g:FlowPanel addStyleNames="page-description" ui:field="createDisposalConfirmationFormDescription"/>
                 <g:FlowPanel addStyleNames="wui-error-panel">
                     <g:HTML ui:field="errors"/>
@@ -21,6 +21,9 @@
                 <g:TextBox title="{messages.disposalConfirmationDataPanelTitle}" ui:field="title" addStyleNames="form-textbox"/>
                 <g:Label ui:field="titleError" addStyleNames="form-label-error"/>
                 <g:FlowPanel ui:field="extra"/>
+                <g:Label styleName="wui-disposal-confirmation-data-note">
+                    <ui:text from="{messages.disposalConfirmationDataNote}" />
+                </g:Label>
             </g:FlowPanel>
 
             <g:FlowPanel addStyleNames="col_2 last sidebar" ui:field="sidebarFlowPanel">

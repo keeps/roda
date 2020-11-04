@@ -43,7 +43,7 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -409,7 +409,7 @@ public class ResourceParseUtils {
     return classToReturn.equals(File.class) || classToReturn.equals(AIP.class)
       || classToReturn.equals(Representation.class) || classToReturn.equals(TransferredResource.class)
       || classToReturn.equals(DIPFile.class) || classToReturn.equals(DIP.class)
-      || classToReturn.equals(DisposalConfirmationMetadata.class);
+      || classToReturn.equals(DisposalConfirmation.class);
   }
 
   @FunctionalInterface
