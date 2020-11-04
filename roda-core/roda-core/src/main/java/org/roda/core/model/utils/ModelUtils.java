@@ -10,6 +10,7 @@ package org.roda.core.model.utils;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,7 +37,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -787,7 +788,7 @@ public final class ModelUtils {
       return getDisposalScheduleContainerPath();
     } else if (clazz.equals(DisposalHold.class)) {
       return getDisposalHoldContainerPath();
-    } else if (clazz.equals(DisposalConfirmationMetadata.class)) {
+    } else if (clazz.equals(DisposalConfirmation.class)) {
       return getDisposalConfirmationContainerPath();
     } else {
       throw new RequestNotValidException("Unknown class for getting container path: " + clazz.getName());

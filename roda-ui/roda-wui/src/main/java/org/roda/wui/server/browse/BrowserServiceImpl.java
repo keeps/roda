@@ -59,7 +59,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
@@ -149,43 +149,43 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public DisposalRule createDisposalRule(DisposalRule rule) throws AuthorizationDeniedException,
-          AlreadyExistsException, NotFoundException, GenericException, RequestNotValidException {
+  public DisposalRule createDisposalRule(DisposalRule rule) throws AuthorizationDeniedException, AlreadyExistsException,
+    NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Disposals.createDisposalRule(user, rule);
   }
 
   @Override
   public DisposalRule retrieveDisposalRule(String disposalRuleId)
-          throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.retrieveDisposalRule(user, disposalRuleId);
   }
 
   @Override
   public DisposalRules listDisposalRules()
-          throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException {
+    throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.listDisposalRules(user);
   }
 
   @Override
   public DisposalRule updateDisposalRule(DisposalRule rule)
-          throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Disposals.updateDisposalRule(user, rule);
   }
 
   @Override
   public void deleteDisposalRule(String disposalRuleId) throws NotFoundException, AuthorizationDeniedException,
-          IllegalOperationException, GenericException, RequestNotValidException {
+    IllegalOperationException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Disposals.deleteDisposalRule(user, disposalRuleId);
   }
 
   @Override
   public DisposalSchedule createDisposalSchedule(DisposalSchedule schedule) throws AuthorizationDeniedException,
-          AlreadyExistsException, NotFoundException, GenericException, RequestNotValidException {
+    AlreadyExistsException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Disposals.createDisposalSchedule(user, schedule);
   }
@@ -1113,11 +1113,25 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public Job createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems,
-    DisposalConfirmationMetadata metadata)
+  public Job applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalScheduleId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Disposals.applyDisposalHold(user, selectedItems, disposalScheduleId);
+  }
+
+  @Override
+  public Job liftDisposalHold(SelectedItems<DisposalHold> selectedItems)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Disposals.liftDisposalHold(user, selectedItems);
+  }
+
+  @Override
+  public Job createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, String title,
+    DisposalConfirmationExtraBundle metadata)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Disposals.createDisposalConfirmation(user, metadata, selectedItems);
+    return Disposals.createDisposalConfirmation(user, title, metadata, selectedItems);
   }
 
   @Override
@@ -1127,17 +1141,17 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public Job deleteDisposalConfirmationReport(SelectedItems<DisposalConfirmationMetadata> selectedItems, String details)
+  public Job deleteDisposalConfirmationReport(SelectedItems<DisposalConfirmation> selectedItems, String details)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Disposals.deleteDisposalConfirmation(user, selectedItems, details);
   }
 
   @Override
-  public Job destroyRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmationMetadata> selectedItems)
+  public Job destroyRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Disposals.destroyRecordsInDisposalConfirmation(user, selectedItems);
+    return Disposals.destroyRecordsInDisposalConfirmationReport(user, selectedItems);
   }
 
   @Override

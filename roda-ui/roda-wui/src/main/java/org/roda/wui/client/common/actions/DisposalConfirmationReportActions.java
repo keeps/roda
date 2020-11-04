@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
@@ -33,7 +33,7 @@ import config.i18n.client.ClientMessages;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-public class DisposalConfirmationReportActions extends AbstractActionable<DisposalConfirmationMetadata> {
+public class DisposalConfirmationReportActions extends AbstractActionable<DisposalConfirmation> {
   private static final DisposalConfirmationReportActions INSTANCE = new DisposalConfirmationReportActions();
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -47,7 +47,7 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
 
   private static final Set<DisposalConfirmationReportAction> POSSIBLE_ACTIONS_FOR_DELETED = POSSIBLE_ACTIONS_FOR_RECOVERED;
 
-  public enum DisposalConfirmationReportAction implements Action<DisposalConfirmationMetadata> {
+  public enum DisposalConfirmationReportAction implements Action<DisposalConfirmation> {
     DESTROY(PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION),
     DELETE_REPORT(PERMISSION_METHOD_DELETE_DISPOSAL_CONFIRMATION),
     REMOVE_FROM_BIN(PERMISSION_METHOD_PERMANENTLY_DELETE_RECORDS_DISPOSAL_CONFIRMATION),
@@ -78,17 +78,17 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
   }
 
   @Override
-  public Action<DisposalConfirmationMetadata> actionForName(String name) {
+  public Action<DisposalConfirmation> actionForName(String name) {
     return DisposalConfirmationReportAction.valueOf(name);
   }
 
   @Override
-  public boolean canAct(Action<DisposalConfirmationMetadata> action) {
+  public boolean canAct(Action<DisposalConfirmation> action) {
     return hasPermissions(action);
   }
 
   @Override
-  public boolean canAct(Action<DisposalConfirmationMetadata> action, DisposalConfirmationMetadata object) {
+  public boolean canAct(Action<DisposalConfirmation> action, DisposalConfirmation object) {
     switch (object.getState()) {
       case PENDING:
         return hasPermissions(action) && POSSIBLE_ACTIONS_FOR_PENDING.contains(action);
@@ -104,8 +104,8 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
   }
 
   @Override
-  public void act(Action<DisposalConfirmationMetadata> action, DisposalConfirmationMetadata object,
-    AsyncCallback<ActionImpact> callback) {
+  public void act(Action<DisposalConfirmation> action, DisposalConfirmation object,
+                  AsyncCallback<ActionImpact> callback) {
     if (DisposalConfirmationReportAction.DESTROY.equals(action)) {
       destroyDisposalConfirmationContent(object, callback);
     } else if (DisposalConfirmationReportAction.DELETE_REPORT.equals(action)) {
@@ -117,8 +117,8 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
     }
   }
 
-  private void destroyDisposalConfirmationContent(DisposalConfirmationMetadata report,
-    AsyncCallback<ActionImpact> callback) {
+  private void destroyDisposalConfirmationContent(DisposalConfirmation report,
+                                                  AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.deleteConfirmationReportDialogTitle(),
       messages.deleteConfirmationReportDialogMessage(), messages.dialogNo(), messages.dialogYes(),
       new ActionNoAsyncCallback<Boolean>(callback) {
@@ -126,7 +126,7 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
         public void onSuccess(Boolean result) {
           if (result) {
             BrowserService.Util.getInstance().destroyRecordsInDisposalConfirmationReport(
-              objectToSelectedItems(report, DisposalConfirmationMetadata.class),
+              objectToSelectedItems(report, DisposalConfirmation.class),
               new ActionAsyncCallback<Job>(callback) {
 
                 @Override
@@ -156,8 +156,8 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
       });
   }
 
-  private void deleteDisposalConfirmationReport(DisposalConfirmationMetadata report,
-    AsyncCallback<ActionImpact> callback) {
+  private void deleteDisposalConfirmationReport(DisposalConfirmation report,
+                                                AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.deleteConfirmationReportDialogTitle(),
       messages.deleteConfirmationReportDialogMessage(), messages.dialogNo(), messages.dialogYes(),
       new ActionNoAsyncCallback<Boolean>(callback) {
@@ -172,7 +172,7 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
                 @Override
                 public void onSuccess(final String details) {
                   BrowserService.Util.getInstance().deleteDisposalConfirmationReport(
-                    objectToSelectedItems(report, DisposalConfirmationMetadata.class), details,
+                    objectToSelectedItems(report, DisposalConfirmation.class), details,
                     new ActionAsyncCallback<Job>(callback) {
 
                       @Override
@@ -205,17 +205,17 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
   }
 
   @Override
-  public ActionableBundle<DisposalConfirmationMetadata> createActionsBundle() {
-    ActionableBundle<DisposalConfirmationMetadata> confirmationActionableBundle = new ActionableBundle<>();
+  public ActionableBundle<DisposalConfirmation> createActionsBundle() {
+    ActionableBundle<DisposalConfirmation> confirmationActionableBundle = new ActionableBundle<>();
 
     // SCHEDULE
-    ActionableGroup<DisposalConfirmationMetadata> scheduleGroup = new ActionableGroup<>("Schedule");
+    ActionableGroup<DisposalConfirmation> scheduleGroup = new ActionableGroup<>("Schedule");
 
     // REPORT
-    ActionableGroup<DisposalConfirmationMetadata> reportGroup = new ActionableGroup<>("Report");
+    ActionableGroup<DisposalConfirmation> reportGroup = new ActionableGroup<>("Report");
 
     // DISPOSAL BIN
-    ActionableGroup<DisposalConfirmationMetadata> disposalBinGroup = new ActionableGroup<>(
+    ActionableGroup<DisposalConfirmation> disposalBinGroup = new ActionableGroup<>(
       messages.sidebarDisposalBinTitle());
 
     scheduleGroup.addButton(messages.applyDisposalScheduleButton(), DisposalConfirmationReportAction.DESTROY,

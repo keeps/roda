@@ -3,7 +3,7 @@ package org.roda.wui.client.disposal.confirmations;
 import java.util.Collections;
 import java.util.List;
 
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.DisposalConfirmationReportActions;
@@ -84,15 +84,15 @@ public class ShowDisposalConfirmation extends Composite {
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
       String confirmationId = historyTokens.get(0);
-      BrowserService.Util.getInstance().retrieve(DisposalConfirmationMetadata.class.getName(), confirmationId,
-        Collections.emptyList(), new AsyncCallback<DisposalConfirmationMetadata>() {
+      BrowserService.Util.getInstance().retrieve(DisposalConfirmation.class.getName(), confirmationId,
+        Collections.emptyList(), new AsyncCallback<DisposalConfirmation>() {
           @Override
           public void onFailure(Throwable throwable) {
 
           }
 
           @Override
-          public void onSuccess(DisposalConfirmationMetadata confirmation) {
+          public void onSuccess(DisposalConfirmation confirmation) {
             final DisposalConfirmationReportActions confirmationActions = DisposalConfirmationReportActions.get();
             instance = new ShowDisposalConfirmation();
             SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, confirmationActions.hasAnyRoles());

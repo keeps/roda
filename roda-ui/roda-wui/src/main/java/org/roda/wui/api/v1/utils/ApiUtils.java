@@ -57,7 +57,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representations;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmations;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Report;
@@ -405,11 +405,11 @@ public class ApiUtils {
     } else if (objectClass.equals(IndexedReport.class)) {
       List<Report> reports = result.getResults().stream().map(report -> (Report) report).collect(Collectors.toList());
       ret = new org.roda.core.data.v2.jobs.Reports(reports);
-    } else if (objectClass.equals(DisposalConfirmationMetadata.class)) {
+    } else if (objectClass.equals(DisposalConfirmation.class)) {
       DisposalConfirmations confirmations = new DisposalConfirmations();
       for (T object : result.getResults()) {
-        DisposalConfirmationMetadata confirmation = (DisposalConfirmationMetadata) object;
-        confirmations.addObject(RodaCoreFactory.getModelService().retrieveDisposalConfirmationMetadata(confirmation.getId()));
+        DisposalConfirmation confirmation = (DisposalConfirmation) object;
+        confirmations.addObject(RodaCoreFactory.getModelService().retrieveDisposalConfirmation(confirmation.getId()));
       }
       ret = confirmations;
     } else {

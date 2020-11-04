@@ -59,7 +59,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent.PreservationMetadataEventClass;
@@ -305,7 +305,7 @@ public class IndexService {
     return ret;
   }
 
-  public ReturnWithExceptions<Void, ModelObserver> reindexDisposalConfirmation(DisposalConfirmationMetadata confirmation) {
+  public ReturnWithExceptions<Void, ModelObserver> reindexDisposalConfirmation(DisposalConfirmation confirmation) {
     ReturnWithExceptions<Void, ModelObserver> ret = RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseReturn(nodeType);
     if (ret.isEmpty()) {
       ret = observer.disposalConfirmationCreateOrUpdate(confirmation);
@@ -546,8 +546,8 @@ public class IndexService {
       return reindexDIP(DIP.class.cast(object));
     } else if (DIPFile.class.equals(objectClass)) {
       return reindexDIPFile(DIPFile.class.cast(object));
-    } else if (DisposalConfirmationMetadata.class.equals(objectClass)) {
-      return reindexDisposalConfirmation(DisposalConfirmationMetadata.class.cast(object));
+    } else if (DisposalConfirmation.class.equals(objectClass)) {
+      return reindexDisposalConfirmation(DisposalConfirmation.class.cast(object));
     } else {
       LOGGER.error("Error trying to reindex an unconfigured object class: {}", objectClass.getName());
       ReturnWithExceptions<Void, ModelObserver> exceptions = new ReturnWithExceptions<>();

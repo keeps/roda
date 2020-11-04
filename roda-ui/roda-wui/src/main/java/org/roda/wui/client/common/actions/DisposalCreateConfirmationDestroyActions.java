@@ -8,7 +8,6 @@ import java.util.Set;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.disposal.DisposalConfirmationMetadata;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
@@ -21,7 +20,7 @@ import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.DisposalDialogs;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
-import org.roda.wui.client.disposal.DisposalConfirmations;
+import org.roda.wui.client.disposal.confirmations.CreateDisposalConfirmationDataPanel;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -120,37 +119,8 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
             @Override
             public void onSuccess(Boolean result) {
               if (result) {
-                DisposalConfirmationMetadata confirmationMetadata = new DisposalConfirmationMetadata();
-                confirmationMetadata.setTitle("Test");
-                BrowserService.Util.getInstance().createDisposalConfirmationReport(selectedItemsList,
-                  confirmationMetadata, new ActionAsyncCallback<Job>(callback) {
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      callback.onFailure(caught);
-                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                    }
-
-                    @Override
-                    public void onSuccess(Job job) {
-                      Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
-
-                        @Override
-                        public void onFailure(Throwable caught) {
-                          Toast.showInfo(messages.runningInBackgroundTitle(),
-                            messages.runningInBackgroundDescription());
-
-                          doActionCallbackUpdated();
-                          HistoryUtils.newHistory(DisposalConfirmations.RESOLVER);
-                        }
-
-                        @Override
-                        public void onSuccess(final Void nothing) {
-                          doActionCallbackNone();
-                          HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-                        }
-                      });
-                    }
-                  });
+                doActionCallbackUpdated();
+                HistoryUtils.newHistory(CreateDisposalConfirmationDataPanel.RESOLVER);
               } else {
                 doActionCallbackNone();
               }
@@ -286,8 +256,8 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
     // management
     ActionableGroup<IndexedAIP> actionsGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
 
-    actionsGroup.addButton(messages.confirmDisposalScheduleActionTitle(),
-      DisposalCreateConfirmationDestroyAction.DESTROY, ActionImpact.NONE, "btn-plus-circle");
+    actionsGroup.addButton(messages.createDisposalConfirmationActionTitle(),
+      DisposalCreateConfirmationDestroyAction.DESTROY, ActionImpact.UPDATED, "btn-plus-circle");
 
     actionsGroup.addButton(messages.changeDisposalScheduleActionTitle(),
       DisposalCreateConfirmationDestroyAction.CHANGE_SCHEDULE, ActionImpact.UPDATED, "btn-edit");

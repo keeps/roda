@@ -144,8 +144,8 @@ public class DisposalScheduleTest {
 
     // Associate AIP with Disposal schedule
     aip.setDisposalScheduleId(disposalSchedule.getId());
-    aip.setDestructionOn(new Date());
-    aip.setDestructionApprovedBy(RodaConstants.ADMIN);
+    aip.setDestroyedOn(new Date());
+    aip.setDestroyedBy(RodaConstants.ADMIN);
     AIP updatedAIP = model.updateAIP(aip, RodaConstants.ADMIN);
 
     // check it is connected
@@ -170,15 +170,15 @@ public class DisposalScheduleTest {
     // Associate AIP with Disposal schedule
     aip.setDisposalScheduleId(disposalSchedule.getId());
     // aip.setDestructionOn(new Date());
-    aip.setDestructionApprovedBy(RodaConstants.ADMIN);
+    aip.setDestroyedBy(RodaConstants.ADMIN);
     model.updateAIP(aip, RodaConstants.ADMIN);
     index.commitAIPs();
 
     // Retrieve AIP
     final IndexedAIP indexedAip = index.retrieve(IndexedAIP.class, aipId, new ArrayList<>());
     assertEquals(aip.getDisposalScheduleId(), indexedAip.getDisposalScheduleId());
-    assertEquals(aip.getDestructionOn(), indexedAip.getDestructionOn());
-    assertEquals(aip.getDestructionApprovedBy(), indexedAip.getDestructionApprovedBy());
+    assertEquals(aip.getDestroyedOn(), indexedAip.getDestructionOn());
+    assertEquals(aip.getDestroyedBy(), indexedAip.getDestructionApprovedBy());
   }
 
   private DisposalSchedule createDisposalSchedule() throws AlreadyExistsException, AuthorizationDeniedException,

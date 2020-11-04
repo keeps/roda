@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_AIP)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
+public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasDisposal {
 
   private static final long serialVersionUID = 430629679119752757L;
   private static final int VERSION = 1;
@@ -53,8 +53,8 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
 
   private String disposalScheduleId = null;
   private List<DisposalHoldAssociation> disposalHoldAssociation = new ArrayList<>();
-  private Date destructionOn = null;
-  private String destructionApprovedBy = null;
+  private Date destroyedOn = null;
+  private String destroyedBy = null;
   private String disposalConfirmationId = null;
   private AIPDisposalFlow disposalFlow = null;
 
@@ -98,8 +98,8 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
 
     this.disposalScheduleId = disposalScheduleId;
     this.disposalHoldAssociation = disposalHoldAssociation;
-    this.destructionOn = destructionOn;
-    this.destructionApprovedBy = destructionApprovedBy;
+    this.destroyedOn = destructionOn;
+    this.destroyedBy = destructionApprovedBy;
     this.disposalConfirmationId = disposalConfirmationId;
     this.disposalFlow = disposalFlow;
   }
@@ -278,20 +278,20 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
     return this;
   }
 
-  public Date getDestructionOn() {
-    return destructionOn;
+  public Date getDestroyedOn() {
+    return destroyedOn;
   }
 
-  public void setDestructionOn(Date destructionOn) {
-    this.destructionOn = destructionOn;
+  public void setDestroyedOn(Date destroyedOn) {
+    this.destroyedOn = destroyedOn;
   }
 
-  public String getDestructionApprovedBy() {
-    return destructionApprovedBy;
+  public String getDestroyedBy() {
+    return destroyedBy;
   }
 
-  public void setDestructionApprovedBy(String destructionApprovedBy) {
-    this.destructionApprovedBy = destructionApprovedBy;
+  public void setDestroyedBy(String destroyedBy) {
+    this.destroyedBy = destroyedBy;
   }
 
   public String getDisposalConfirmationId() {
@@ -370,6 +370,16 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
     this.disposalFlow = disposalFlow;
   }
 
+  @JsonIgnore
+  public boolean isAIPOnHold(String disposalHoldId) {
+    for (DisposalHoldAssociation association : getDisposalHoldAssociation()) {
+      if (association.getId().equals(disposalHoldId) && association.getLiftedOn() == null) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -406,13 +416,13 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
     if (disposalHoldAssociation != null ? !disposalHoldAssociation.equals(aip.disposalHoldAssociation)
       : aip.disposalHoldAssociation != null)
       return false;
-    if (destructionOn != null ? !destructionOn.equals(aip.destructionOn) : aip.destructionOn != null)
+    if (destroyedOn != null ? !destroyedOn.equals(aip.destroyedOn) : aip.destroyedOn != null)
       return false;
     if (disposalFlow != null ? !disposalFlow.equals(aip.disposalFlow)
       : aip.disposalFlow != null)
       return false;
-    return destructionApprovedBy != null ? destructionApprovedBy.equals(aip.destructionApprovedBy)
-      : aip.destructionApprovedBy == null;
+    return destroyedBy != null ? destroyedBy.equals(aip.destroyedBy)
+      : aip.destroyedBy == null;
 
   }
 
@@ -430,8 +440,8 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
     result = 31 * result + (ghost != null ? ghost.hashCode() : 0);
     result = 31 * result + (disposalScheduleId != null ? disposalScheduleId.hashCode() : 0);
     result = 31 * result + (disposalHoldAssociation != null ? disposalHoldAssociation.hashCode() : 0);
-    result = 31 * result + (destructionOn != null ? destructionOn.hashCode() : 0);
-    result = 31 * result + (destructionApprovedBy != null ? destructionApprovedBy.hashCode() : 0);
+    result = 31 * result + (destroyedOn != null ? destroyedOn.hashCode() : 0);
+    result = 31 * result + (destroyedBy != null ? destroyedBy.hashCode() : 0);
     result = 31 * result + (disposalFlow != null ? disposalFlow.hashCode() : 0);
     return result;
   }
@@ -445,7 +455,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
       + ", format=" + format + ", relationships=" + relationships + ", createdOn=" + createdOn + ", createdBy='"
       + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\'' + ", disposalScheduleId='"
       + disposalScheduleId + '\'' + ", disposalHoldAssociation=" + disposalHoldAssociation + ", destructionOn="
-      + destructionOn + ", destructionApprovedBy='" + destructionApprovedBy + '\'' + ", disposalConfirmationId='"
+      + destroyedOn + ", destructionApprovedBy='" + destroyedBy + '\'' + ", disposalConfirmationId='"
       + disposalConfirmationId + '\'' + ", disposalUpdateStatus=" + disposalFlow + '}';
   }
 }
