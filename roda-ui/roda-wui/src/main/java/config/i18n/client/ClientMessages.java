@@ -1997,6 +1997,8 @@ public interface ClientMessages extends Messages {
 
   String disposalRulesTitle();
 
+  String orderDisposalRulesTitle();
+
   String disposalSchedulesTitle();
 
   String disposalHoldsTitle();

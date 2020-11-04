@@ -49,4 +49,35 @@ public class DisposalRules implements RODAObjectList<DisposalRule> {
     this.disposalRuleList.add(disposalRule);
   }
 
+  public void sortRules() {
+    disposalRuleList = disposalRuleList.stream().sorted(Comparator.comparing(DisposalRule::getOrder))
+      .collect(Collectors.toList());
+  }
+
+  public void incrementOrder(int index) {
+    for (int i = index; i < disposalRuleList.size(); i++) {
+      disposalRuleList.get(i).setOrder(i);
+    }
+  }
+
+  public void decrementOrder(int startInterval, int endLimit) {
+    for (int i = startInterval; i < endLimit; i++) {
+      disposalRuleList.get(i).setOrder(i);
+    }
+  }
+
+  public void moveToTop(DisposalRule disposalRule) {
+    disposalRule.setOrder(0);
+    disposalRuleList.remove(disposalRule);
+    disposalRuleList.add(0, disposalRule);
+    incrementOrder(1);
+  }
+
+  public void moveToBottom(DisposalRule disposalRule, int startInterval) {
+    int lastIndex = disposalRuleList.size() - 1;
+    disposalRule.setOrder(lastIndex);
+    disposalRuleList.remove(disposalRule);
+    disposalRuleList.add(disposalRule);
+    decrementOrder(startInterval,lastIndex--);
+  }
 }

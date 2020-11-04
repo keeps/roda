@@ -21,6 +21,7 @@ import org.roda.wui.client.disposal.hold.EditDisposalHold;
 import org.roda.wui.client.disposal.hold.ShowDisposalHold;
 import org.roda.wui.client.disposal.rule.CreateDisposalRule;
 import org.roda.wui.client.disposal.rule.EditDisposalRule;
+import org.roda.wui.client.disposal.rule.OrderDisposalRules;
 import org.roda.wui.client.disposal.rule.ShowDisposalRule;
 import org.roda.wui.client.disposal.schedule.CreateDisposalSchedule;
 import org.roda.wui.client.disposal.schedule.EditDisposalSchedule;
@@ -294,7 +295,7 @@ public class DisposalPolicy extends Composite {
 
     HTMLPanel info = new HTMLPanel("");
     info.add(new HTMLWidgetWrapper("DisposalScheduleDescription.html"));
-
+    info.addStyleName("page-description");
     disposalSchedulesDescription.add(header);
     disposalSchedulesDescription.add(info);
 
@@ -306,6 +307,7 @@ public class DisposalPolicy extends Composite {
 
     HTMLPanel info = new HTMLPanel("");
     info.add(new HTMLWidgetWrapper("DisposalHoldDescription.html"));
+    info.addStyleName("page-description");
 
     disposalHoldsDescription.add(header);
     disposalHoldsDescription.add(info);
@@ -318,6 +320,7 @@ public class DisposalPolicy extends Composite {
 
     HTMLPanel info = new HTMLPanel("");
     info.add(new HTMLWidgetWrapper("DisposalRuleDescription.html"));
+    info.addStyleName("page-description");
 
     disposalRulesDescription.add(header);
     disposalRulesDescription.add(info);
@@ -403,6 +406,7 @@ public class DisposalPolicy extends Composite {
   }
 
   private boolean initSidebarButtons(FlowPanel panel) {
+
     boolean hasCreatedRuleBtns = initDisposalRuleButtons(panel,  true);
     boolean hasCreatedScheduleBtns = initDisposalScheduleButtons(panel, true);
     boolean hasCreatedHoldBtns = initDisposalHoldButtons(panel, true);
@@ -484,8 +488,7 @@ public class DisposalPolicy extends Composite {
         editRulesOrderBtn.addClickHandler(new ClickHandler() {
           @Override
           public void onClick(ClickEvent event) {
-            // TODO
-            // HistoryUtils.newHistory(DisposalPolicy.RESOLVER, CreateDisposalRule.RESOLVER.getHistoryToken());
+            HistoryUtils.newHistory(DisposalPolicy.RESOLVER, OrderDisposalRules.RESOLVER.getHistoryToken());
           }
         });
         panel.add(editRulesOrderBtn);
@@ -537,11 +540,6 @@ public class DisposalPolicy extends Composite {
     // Disposal holds table
     createDisposalHoldsPanel(disposalHolds);
 
-    // create buttons under tables
-    initDisposalScheduleButtons(disposalSchedulesButtonsPanel, false);
-    initDisposalHoldButtons(disposalHoldsButtonsPanel, false);
-    initDisposalRuleButtons(disposalRulesButtonsPanel, false);
-
     disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
   }
 
@@ -565,11 +563,6 @@ public class DisposalPolicy extends Composite {
 
     // Disposal holds table
     createDisposalHoldsPanel(disposalHolds);
-
-    // create buttons under tables
-    initDisposalScheduleButtons(disposalSchedulesButtonsPanel, false);
-    initDisposalHoldButtons(disposalHoldsButtonsPanel, false);
-    initDisposalRuleButtons(disposalRulesButtonsPanel, false);
 
     disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
   }
@@ -595,11 +588,6 @@ public class DisposalPolicy extends Composite {
     // Disposal schedules table
     createDisposalSchedulesPanel(disposalSchedules);
 
-    // create buttons under tables
-    initDisposalScheduleButtons(disposalSchedulesButtonsPanel, false);
-    initDisposalHoldButtons(disposalHoldsButtonsPanel, false);
-    initDisposalRuleButtons(disposalRulesButtonsPanel, false);
-
     disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
   }
 
@@ -624,11 +612,6 @@ public class DisposalPolicy extends Composite {
     // Disposal holds table
     createDisposalHoldsPanel(disposalHolds);
 
-    // create buttons under tables
-    initDisposalScheduleButtons(disposalSchedulesButtonsPanel, false);
-    initDisposalHoldButtons(disposalHoldsButtonsPanel, false);
-    initDisposalRuleButtons(disposalRulesButtonsPanel, false);
-
     disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
   }
 
@@ -647,11 +630,6 @@ public class DisposalPolicy extends Composite {
 
     // Disposal schedules table
     createDisposalSchedulesPanel(disposalSchedules);
-
-    // create buttons under tables
-    initDisposalScheduleButtons(disposalSchedulesButtonsPanel, false);
-    initDisposalHoldButtons(disposalHoldsButtonsPanel, false);
-    initDisposalRuleButtons(disposalRulesButtonsPanel, false);
 
     disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
   }
@@ -672,11 +650,6 @@ public class DisposalPolicy extends Composite {
     // Disposal holds table
     createDisposalHoldsPanel(disposalHolds);
 
-    // create buttons under tables
-    initDisposalScheduleButtons(disposalSchedulesButtonsPanel, false);
-    initDisposalHoldButtons(disposalHoldsButtonsPanel, false);
-    initDisposalRuleButtons(disposalRulesButtonsPanel, false);
-
     disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
   }
 
@@ -695,11 +668,6 @@ public class DisposalPolicy extends Composite {
 
     // Disposal holds table
     createDisposalRulesPanel(disposalRules);
-
-    // create buttons under tables
-    initDisposalScheduleButtons(disposalSchedulesButtonsPanel, false);
-    initDisposalHoldButtons(disposalHoldsButtonsPanel, false);
-    initDisposalRuleButtons(disposalRulesButtonsPanel, false);
 
     disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
   }
@@ -831,10 +799,10 @@ public class DisposalPolicy extends Composite {
           }
         }),
 
-        new BasicTablePanel.ColumnInfo<>(messages.disposalRuleOrder(), 12, new TextColumn<DisposalRule>() {
+        new BasicTablePanel.ColumnInfo<>(messages.disposalRuleScheduleName(), 12, new TextColumn<DisposalRule>() {
           @Override
           public String getValue(DisposalRule rule) {
-            return rule.getOrder().toString();
+            return rule.getDisposalScheduleName();
           }
         }));
     }
@@ -881,6 +849,8 @@ public class DisposalPolicy extends Composite {
       ShowDisposalRule.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(EditDisposalRule.RESOLVER.getHistoryToken())) {
       EditDisposalRule.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (historyTokens.get(0).equals(OrderDisposalRules.RESOLVER.getHistoryToken())) {
+      OrderDisposalRules.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     }
   }
 }
