@@ -164,8 +164,6 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
     disposalRule.setDisposalScheduleName(disposalSchedulesList.getSelectedItemText());
     disposalRule.setKey(key.getText());
     disposalRule.setValue(value.getText());
-    // TODO -> remove
-    disposalRule.setOrder(1);
     return disposalRule;
   }
 
