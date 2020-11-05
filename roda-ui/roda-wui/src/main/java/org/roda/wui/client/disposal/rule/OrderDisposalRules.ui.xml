@@ -2,6 +2,7 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:u="urn:import:org.roda.wui.client.disposal.rule"
              xmlns:common="urn:import:org.roda.wui.client.common">
 
     <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
@@ -13,19 +14,7 @@
                     <common:TitlePanel text="{messages.disposalRulesTitle}" iconClass="DisposalRule"/>
                     <g:FlowPanel addStyleNames="page-description"
                                  ui:field="orderDisposalRulesDescription"></g:FlowPanel>
-                    <g:FlowPanel addStyleNames="row full_width skip_padding">
-                        <g:FlowPanel addStyleNames="col_10">
-                            <g:FlowPanel ui:field="orderDisposalRulesTablePanel">
-                            </g:FlowPanel>
-                        </g:FlowPanel>
-                        <g:FlowPanel addStyleNames="col_2 orderButtons">
-                            <g:FlowPanel addStyleNames="sticky-flow">
-                                <g:FlowPanel addStyleNames="sticky-padding">
-                                    <g:FlowPanel addStyleNames="alignButtonsPanel" ui:field="orderButtonsPanel"></g:FlowPanel>
-                                </g:FlowPanel>
-                            </g:FlowPanel>
-                        </g:FlowPanel>
-                    </g:FlowPanel>
+                    <u:OrderDisposalRulesDataPanel ui:field="disposalRulesDataPanel"/>
                 </g:FlowPanel>
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="col_2 last sidebar contentPanel">
