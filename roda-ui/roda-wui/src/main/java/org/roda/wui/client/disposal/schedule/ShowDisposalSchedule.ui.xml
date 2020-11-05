@@ -16,7 +16,7 @@
                                 <g:Label addStyleNames="browseItemHeader">
                                     <ui:text from='{messages.showDisposalScheduleTitle}' />
                                 </g:Label>
-                                <common:TitlePanel icon="fa fa-info-circle" ui:field="title" />
+                                <common:TitlePanel iconClass="DisposalSchedule" ui:field="title" />
                                 <g:Label addStyleNames="browseItemId" ui:field="disposalScheduleId"
                                          title="{messages.disposalScheduleIdentifier}" />
                                 <g:Label addStyleNames="browseItemId" ui:field="dateCreated"/>

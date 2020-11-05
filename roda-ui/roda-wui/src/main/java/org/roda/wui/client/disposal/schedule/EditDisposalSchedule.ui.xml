@@ -10,7 +10,7 @@
     <g:FlowPanel styleName="wui-representation-information-network" addStyleNames="wrapper skip_padding">
         <g:FlowPanel addStyleNames="row full_width skip_padding">
             <g:FlowPanel addStyleNames="col_10 content" ui:field="content">
-                <common:TitlePanel text="{messages.editDisposalScheduleTitle}" iconClass="DisposalConfirmations"/>
+                <common:TitlePanel text="{messages.editDisposalScheduleTitle}" iconClass="DisposalSchedule"/>
                 <u:DisposalScheduleDataPanel ui:field="disposalScheduleDataPanel" />
             </g:FlowPanel>
 
