@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.roda.core.data.exceptions.DisposalRuleAlreadyExistsException;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
+import org.roda.core.data.v2.ip.disposal.DisposalRules;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.wui.client.browse.BrowserService;
@@ -45,8 +46,17 @@ public class CreateDisposalRule extends Composite {
 
         @Override
         public void onSuccess(DisposalSchedules disposalSchedules) {
-          CreateDisposalRule createDisposalRule = new CreateDisposalRule(new DisposalRule(), disposalSchedules);
-          callback.onSuccess(createDisposalRule);
+          BrowserService.Util.getInstance().listDisposalRules(new AsyncCallback<DisposalRules>() {
+            @Override
+            public void onFailure(Throwable throwable) {
+            }
+
+            @Override
+            public void onSuccess(DisposalRules disposalRules) {
+              CreateDisposalRule createDisposalRule = new CreateDisposalRule(new DisposalRule(), disposalSchedules, disposalRules);
+              callback.onSuccess(createDisposalRule);
+            }
+          });
         }
       });
 
@@ -74,6 +84,7 @@ public class CreateDisposalRule extends Composite {
   private static CreateDisposalRule.MyUiBinder uiBinder = GWT.create(CreateDisposalRule.MyUiBinder.class);
 
   private DisposalRule disposalRule;
+  private DisposalRules disposalRules;
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -86,8 +97,9 @@ public class CreateDisposalRule extends Composite {
   @UiField(provided = true)
   DisposalRuleDataPanel disposalRuleDataPanel;
 
-  public CreateDisposalRule(DisposalRule disposalRule, DisposalSchedules disposalSchedules) {
+  public CreateDisposalRule(DisposalRule disposalRule, DisposalSchedules disposalSchedules, DisposalRules disposalRules) {
     this.disposalRule = disposalRule;
+    this.disposalRules = disposalRules;
 
     this.disposalRuleDataPanel = new DisposalRuleDataPanel(disposalRule, disposalSchedules, false);
     this.disposalRuleDataPanel.setDisposalRule(disposalRule);
@@ -105,6 +117,7 @@ public class CreateDisposalRule extends Composite {
   void buttonApplyHandler(ClickEvent e) {
     if (disposalRuleDataPanel.isValid()) {
       disposalRule = disposalRuleDataPanel.getDisposalRule();
+      disposalRule.setOrder(disposalRules.getObjects().size());
       BrowserServiceImpl.Util.getInstance().createDisposalRule(disposalRule,
         new AsyncCallback<DisposalRule>() {
 
