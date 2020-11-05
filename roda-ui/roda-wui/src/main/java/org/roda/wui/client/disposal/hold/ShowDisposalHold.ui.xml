@@ -16,7 +16,7 @@
                                 <g:Label addStyleNames="browseItemHeader">
                                     <ui:text from='{messages.showDisposalHoldTitle}' />
                                 </g:Label>
-                                <common:TitlePanel icon="fa fa-info-circle" ui:field="title" />
+                                <common:TitlePanel iconClass="DisposalHold" ui:field="title" />
                                 <g:Label addStyleNames="browseItemId" ui:field="disposalHoldId"
                                          title="{messages.disposalHoldIdentifier}" />
                                 <g:Label addStyleNames="browseItemId" ui:field="dateCreated"/>
