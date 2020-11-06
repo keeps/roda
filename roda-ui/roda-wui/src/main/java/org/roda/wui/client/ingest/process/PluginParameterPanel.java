@@ -627,4 +627,6 @@ public class PluginParameterPanel extends Composite {
     return parameter;
   }
 
+  public FlowPanel getLayout() { return layout;}
+
 }

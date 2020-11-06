@@ -2019,11 +2019,13 @@ public interface ClientMessages extends Messages {
 
   String disposalRuleScheduleName();
 
-  String disposalRuleKey();
+  String disposalRuleType();
 
-  String disposalRuleValue();
+  String disposalRuleTypeValue(@Select String action);
 
   String disposalRuleOrder();
+
+  String addMetadataField();
 
   String disposalScheduleTitle();
 

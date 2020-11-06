@@ -120,8 +120,6 @@ public class DisposalRuleTest {
 
     DisposalRule rule = new DisposalRule();
     rule.setTitle(title);
-    rule.setKey(key);
-    rule.setValue(value);
     rule.setOrder(order);
 
     return model.createDisposalRule(rule, createdBy);
