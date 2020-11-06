@@ -5,17 +5,16 @@ import java.util.List;
 import org.roda.core.data.exceptions.DisposalRuleAlreadyExistsException;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalRules;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.disposal.Disposal;
 import org.roda.wui.client.disposal.DisposalPolicy;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
+import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -28,7 +27,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
@@ -53,7 +51,8 @@ public class CreateDisposalRule extends Composite {
 
             @Override
             public void onSuccess(DisposalRules disposalRules) {
-              CreateDisposalRule createDisposalRule = new CreateDisposalRule(new DisposalRule(), disposalSchedules, disposalRules);
+              CreateDisposalRule createDisposalRule = new CreateDisposalRule(new DisposalRule(), disposalSchedules,
+                disposalRules);
               callback.onSuccess(createDisposalRule);
             }
           });
@@ -89,7 +88,7 @@ public class CreateDisposalRule extends Composite {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
-  Button buttonNext;
+  Button buttonSave;
 
   @UiField
   Button buttonCancel;
@@ -97,7 +96,8 @@ public class CreateDisposalRule extends Composite {
   @UiField(provided = true)
   DisposalRuleDataPanel disposalRuleDataPanel;
 
-  public CreateDisposalRule(DisposalRule disposalRule, DisposalSchedules disposalSchedules, DisposalRules disposalRules) {
+  public CreateDisposalRule(DisposalRule disposalRule, DisposalSchedules disposalSchedules,
+    DisposalRules disposalRules) {
     this.disposalRule = disposalRule;
     this.disposalRules = disposalRules;
 
@@ -113,25 +113,24 @@ public class CreateDisposalRule extends Composite {
     JavascriptUtils.stickSidebar();
   }
 
-  @UiHandler("buttonNext")
+  @UiHandler("buttonSave")
   void buttonApplyHandler(ClickEvent e) {
     if (disposalRuleDataPanel.isValid()) {
       disposalRule = disposalRuleDataPanel.getDisposalRule();
       disposalRule.setOrder(disposalRules.getObjects().size());
-      BrowserServiceImpl.Util.getInstance().createDisposalRule(disposalRule,
-        new AsyncCallback<DisposalRule>() {
+      BrowserServiceImpl.Util.getInstance().createDisposalRule(disposalRule, new AsyncCallback<DisposalRule>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            errorMessage(caught);
-          }
+        @Override
+        public void onFailure(Throwable caught) {
+          errorMessage(caught);
+        }
 
-          @Override
-          public void onSuccess(DisposalRule createdDisposalSchedule) {
-            HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
-          }
+        @Override
+        public void onSuccess(DisposalRule createdDisposalSchedule) {
+          HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+        }
 
-        });
+      });
     }
   }
 

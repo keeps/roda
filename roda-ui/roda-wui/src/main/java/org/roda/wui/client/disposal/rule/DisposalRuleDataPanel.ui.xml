@@ -2,6 +2,7 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:p="urn:import:org.roda.wui.client.ingest.process"
 >
 
     <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
@@ -27,16 +28,26 @@
                     <ui:text from='{messages.disposalRuleDescription}'/>
                 </g:Label>
                 <g:TextArea title="{messages.disposalRuleDescription}" ui:field="description"
-                           addStyleNames="form-textbox disposalScopeNotes"/>
+                            addStyleNames="form-textbox disposalRuleDescription"/>
                 <g:Label addStyleNames="form-label" ui:field="disposalSchedulesListLabel"></g:Label>
                 <g:Label ui:field="disposalSchedulesListError" addStyleNames="form-label-error"></g:Label>
                 <g:ListBox addStyleNames="form-textbox" ui:field="disposalSchedulesList"/>
-                <g:Label addStyleNames="form-label" ui:field="keyLabel"></g:Label>
-                <g:Label ui:field="keyError" addStyleNames="form-label-error"></g:Label>
-                <g:TextBox addStyleNames="form-textbox" ui:field="key"/>
-                <g:Label addStyleNames="form-label" ui:field="valueLabel"></g:Label>
-                <g:Label ui:field="valueError" addStyleNames="form-label-error"></g:Label>
-                <g:TextBox addStyleNames="form-textbox" ui:field="value"/>
+                <g:Label ui:field="ruleTypeListLabel" addStyleNames="form-label"></g:Label>
+                <g:Label ui:field="ruleTypeListError" addStyleNames="form-label-error"></g:Label>
+                <g:ListBox addStyleNames="form-textbox" ui:field="ruleTypeList"/>
+                <p:PluginParameterPanel ui:field="pluginParameterPanel"></p:PluginParameterPanel>
+                <g:FlowPanel addStyleNames="searchAdvancedPanel" ui:field="metadataFieldsPanel">
+                    <g:FlowPanel styleName="searchAdvancedPanelButtons"
+                                 ui:field="metadataFieldsPanelButtons">
+                        <g:Button styleName="btn btn-plus advancedAddButton"
+                                  ui:field="metadataFieldsAddField">
+                            <ui:text from='{messages.addMetadataField}'/>
+                        </g:Button>
+                        <g:Button styleName="btn btn-refresh advancedSearchCleanButton" ui:field="metadataFieldsClean">
+                            <ui:text from='{messages.clearButton}'/>
+                        </g:Button>
+                    </g:FlowPanel>
+                </g:FlowPanel>
             </g:FlowPanel>
         </g:FlowPanel>
     </g:FlowPanel>

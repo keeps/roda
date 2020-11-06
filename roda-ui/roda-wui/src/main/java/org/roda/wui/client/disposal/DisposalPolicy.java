@@ -407,7 +407,7 @@ public class DisposalPolicy extends Composite {
 
   private boolean initSidebarButtons(FlowPanel panel) {
 
-    boolean hasCreatedRuleBtns = initDisposalRuleButtons(panel,  true);
+    boolean hasCreatedRuleBtns = initDisposalRuleButtons(panel, true);
     boolean hasCreatedScheduleBtns = initDisposalScheduleButtons(panel, true);
     boolean hasCreatedHoldBtns = initDisposalHoldButtons(panel, true);
 
@@ -476,12 +476,12 @@ public class DisposalPolicy extends Composite {
       });
       panel.add(newDisposalRuleBtn);
 
-      if(disposalRules != null && disposalRules.getObjects().size() > 0){
+      if (disposalRules != null && disposalRules.getObjects().size() > 0) {
         Button editRulesOrderBtn = new Button();
         editRulesOrderBtn.addStyleName("btn btn-edit");
         if (isGroup) {
           editRulesOrderBtn.addStyleName("btn-block");
-        }else{
+        } else {
           editRulesOrderBtn.addStyleName("changeRulesOrder");
         }
         editRulesOrderBtn.setText(messages.changeRulesOrder());
@@ -514,6 +514,7 @@ public class DisposalPolicy extends Composite {
 
   private DisposalPolicy(DisposalSchedules disposalSchedules, DisposalHolds disposalHolds,
     DisposalRules disposalRules) {
+
     this.disposalRules = disposalRules;
     this.disposalSchedules = disposalSchedules;
     this.disposalHolds = disposalHolds;
@@ -785,17 +786,10 @@ public class DisposalPolicy extends Composite {
           }
         }),
 
-        new BasicTablePanel.ColumnInfo<>(messages.disposalRuleKey(), 12, new TextColumn<DisposalRule>() {
+        new BasicTablePanel.ColumnInfo<>(messages.disposalRuleType(), 12, new TextColumn<DisposalRule>() {
           @Override
           public String getValue(DisposalRule rule) {
-            return rule.getKey();
-          }
-        }),
-
-        new BasicTablePanel.ColumnInfo<>(messages.disposalRuleValue(), 12, new TextColumn<DisposalRule>() {
-          @Override
-          public String getValue(DisposalRule rule) {
-            return rule.getValue();
+            return messages.disposalRuleTypeValue(rule.getType().toString());
           }
         }),
 

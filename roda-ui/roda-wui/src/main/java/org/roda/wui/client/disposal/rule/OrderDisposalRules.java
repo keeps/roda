@@ -252,21 +252,19 @@ public class OrderDisposalRules extends Composite {
           }
         }),
 
-        new BasicTablePanel.ColumnInfo<>(messages.disposalRuleKey(), 12, new TextColumn<DisposalRule>() {
+        new BasicTablePanel.ColumnInfo<>(messages.disposalRuleType(), 12, new TextColumn<DisposalRule>() {
           @Override
           public String getValue(DisposalRule rule) {
-            return rule.getKey();
+            return messages.disposalRuleTypeValue(rule.getType().toString());
           }
         }),
 
-        new BasicTablePanel.ColumnInfo<>(messages.disposalRuleValue(), 12, new TextColumn<DisposalRule>() {
+        new BasicTablePanel.ColumnInfo<>(messages.disposalRuleScheduleName(), 12, new TextColumn<DisposalRule>() {
           @Override
           public String getValue(DisposalRule rule) {
-            return rule.getValue();
+            return rule.getDisposalScheduleName();
           }
-        })
-
-      );
+        }));
     }
   }
 

@@ -93,18 +93,6 @@ public class ShowDisposalRule extends Composite {
   HTML disposalRuleScheduleName;
 
   @UiField
-  Label disposalRuleKeyLabel;
-
-  @UiField
-  HTML disposalRuleKey;
-
-  @UiField
-  Label disposalRuleValueLabel;
-
-  @UiField
-  HTML disposalRuleValue;
-
-  @UiField
   FlowPanel buttonsPanel;
 
   public ShowDisposalRule() {
@@ -147,13 +135,6 @@ public class ShowDisposalRule extends Composite {
         HistoryUtils.newHistory(ShowDisposalSchedule.RESOLVER, disposalRule.getDisposalScheduleId());
       }
     });
-
-
-    disposalRuleKey.setHTML(disposalRule.getKey());
-    disposalRuleKeyLabel.setVisible(StringUtils.isNotBlank(disposalRule.getKey()));
-
-    disposalRuleValue.setHTML(disposalRule.getValue());
-    disposalRuleValueLabel.setVisible(StringUtils.isNotBlank(disposalRule.getValue()));
 
   }
 

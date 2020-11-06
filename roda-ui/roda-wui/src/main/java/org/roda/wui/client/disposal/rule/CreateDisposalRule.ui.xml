@@ -21,8 +21,8 @@
                         <g:Label addStyleNames="h4">
                             <ui:text from="{messages.actions}"/>
                         </g:Label>
-                        <g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonNext">
-                            <ui:text from='{messages.nextButton}'/>
+                        <g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonSave">
+                            <ui:text from='{messages.saveButton}'/>
                         </g:Button>
                         <g:Button addStyleNames="btn btn-block btn-default btn-times-circle" ui:field="buttonCancel">
                             <ui:text from='{messages.cancelButton}'/>
