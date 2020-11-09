@@ -7166,6 +7166,7 @@ span.code {
 }
 
 .basicTable{
+    border-left: 5px solid COLOR_PRIMARY;
     margin-top: 1rem;
     margin-bottom: 1rem;
 }
@@ -7230,4 +7231,10 @@ span.code {
 
 .disposalRuleDescription{
     min-height: 25rem;
+}
+
+.disposalRuleMetadataField {
+    border-left: 5px solid COLOR_PRIMARY;
+    margin-top: 15px;
+    padding: 5px 10px;
 }

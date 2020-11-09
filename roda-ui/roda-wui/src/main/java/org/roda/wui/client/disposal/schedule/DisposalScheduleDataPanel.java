@@ -256,20 +256,20 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
     List<DisposalActionCode> disposalActionCodes = Arrays.asList(DisposalActionCode.values());
     disposalActions.addItem("", "");
     for (DisposalActionCode actionCode : disposalActionCodes) {
-      disposalActions.addItem(actionCode.toString(), actionCode.toString());
+      disposalActions.addItem(messages.disposalScheduleAction(actionCode.toString()), actionCode.toString());
     }
 
     List<RetentionTriggerCode> retentionTriggerCodes = Arrays.asList(RetentionTriggerCode.values());
     retentionTriggers.addItem("", "");
     for (RetentionTriggerCode retentionTriggerCode : retentionTriggerCodes) {
-      retentionTriggers.addItem(retentionTriggerCode.toString(), retentionTriggerCode.toString());
+      retentionTriggers.addItem(messages.disposalScheduleRetentionTriggerCodeValue(retentionTriggerCode.toString()), retentionTriggerCode.toString());
     }
 
     List<RetentionPeriodIntervalCode> retentionPeriodIntervalCodes = Arrays
       .asList(RetentionPeriodIntervalCode.values());
     retentionPeriodIntervals.addItem("", "");
     for (RetentionPeriodIntervalCode retentionPeriodIntervalCode : retentionPeriodIntervalCodes) {
-      retentionPeriodIntervals.addItem(retentionPeriodIntervalCode.toString(), retentionPeriodIntervalCode.toString());
+      retentionPeriodIntervals.addItem(messages.disposalScheduleRetentionPeriodIntervalValue(retentionPeriodIntervalCode.toString()), retentionPeriodIntervalCode.toString());
     }
   }
 

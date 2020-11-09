@@ -192,14 +192,15 @@ public class ShowDisposalSchedule extends Composite {
     notesValue.setHTML(disposalSchedule.getScopeNotes());
     notesLabel.setVisible(StringUtils.isNotBlank(disposalSchedule.getScopeNotes()));
 
-    disposalActionsValue.setHTML(disposalSchedule.getActionCode().toString());
+    disposalActionsValue.setHTML(messages.disposalScheduleAction(disposalSchedule.getActionCode().toString()));
     disposalActionsLabel.setVisible(StringUtils.isNotBlank(disposalSchedule.getActionCode().toString()));
 
     if (disposalSchedule.getRetentionTriggerCode() == null) {
       retentionTriggersValue.setHTML("");
       retentionTriggersLabel.setVisible(false);
     } else {
-      retentionTriggersValue.setHTML(disposalSchedule.getRetentionTriggerCode().toString());
+      retentionTriggersValue.setHTML(
+        messages.disposalScheduleRetentionTriggerCodeValue(disposalSchedule.getRetentionTriggerCode().toString()));
       retentionTriggersLabel.setVisible(StringUtils.isNotBlank(disposalSchedule.getRetentionTriggerCode().toString()));
     }
 
@@ -212,7 +213,7 @@ public class ShowDisposalSchedule extends Composite {
       retentionPeriodLabel.setVisible(true);
     } else {
       String retentionPeriod = disposalSchedule.getRetentionPeriodDuration().toString() + " "
-        + disposalSchedule.getRetentionPeriodIntervalCode().toString();
+        + messages.disposalScheduleRetentionPeriodIntervalValue(disposalSchedule.getRetentionPeriodIntervalCode().toString());
       retentionPeriodValue.setHTML(retentionPeriod);
       retentionPeriodLabel.setVisible(true);
     }

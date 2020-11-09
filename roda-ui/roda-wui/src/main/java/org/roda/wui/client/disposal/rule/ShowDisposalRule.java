@@ -1,10 +1,18 @@
 package org.roda.wui.client.disposal.rule;
 
 import java.util.List;
+import java.util.Map;
 
+import com.google.gwt.dom.client.UListElement;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.ibm.icu.text.LocaleDisplayNames;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.DisposalHoldAlreadyExistsException;
+import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
+import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
+import org.roda.core.data.v2.ip.disposal.DisposalRuleType;
+import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
@@ -93,6 +101,17 @@ public class ShowDisposalRule extends Composite {
   HTML disposalRuleScheduleName;
 
   @UiField
+  Label disposalRuleTypeLabel;
+
+  @UiField
+  FlowPanel disposalRuleType;
+
+  // Metadata Values (in case of type == METADATA_FIELD)
+
+  @UiField
+  FlowPanel metadataValuesPanel;
+
+  @UiField
   FlowPanel buttonsPanel;
 
   public ShowDisposalRule() {
@@ -136,6 +155,57 @@ public class ShowDisposalRule extends Composite {
       }
     });
 
+    if (disposalRule.getType().equals(DisposalRuleType.IS_CHILD_OF)) {
+      disposalRuleTypeLabel.setVisible(StringUtils.isNotBlank(disposalRule.getType().toString()));
+      HTML type = new HTML();
+      String ruleType = messages.disposalRuleTypeValue(disposalRule.getType().toString()) + " "
+        + disposalRule.getIsChildOf();
+      type.setHTML(ruleType);
+      type.addStyleName("btn-link addCursorPointer");
+      type.addClickHandler(new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent clickEvent) {
+          HistoryUtils.newHistory(BrowseTop.RESOLVER, disposalRule.getIsChildOf());
+        }
+      });
+      disposalRuleType.insert(type, 0);
+      metadataValuesPanel.setVisible(false);
+    } else if (disposalRule.getType().equals(DisposalRuleType.METADATA_FIELD)) {
+      disposalRuleTypeLabel.setVisible(StringUtils.isNotBlank(disposalRule.getType().toString()));
+      HTML typeValue = new HTML();
+      typeValue.setText(messages.disposalRuleTypeValue(disposalRule.getType().toString()));
+      disposalRuleType.add(typeValue);
+
+
+      Label metadataLabel = new Label();
+      metadataLabel.setText(messages.disposalRuleMetadataField());
+      metadataLabel.addStyleName("label");
+      metadataValuesPanel.add(metadataLabel);
+
+      FlowPanel metadataPanel = new FlowPanel();
+      metadataPanel.addStyleName("value");
+      String list = "<ul>";
+      for (Map.Entry<String, FilterParameter> entry : disposalRule.getMetadataFields().entrySet()) {
+        String parameterValue = getParameterValue(entry.getValue());
+        String text = entry.getKey() + " is " + parameterValue;
+        list += "<li>" + text + "</li>";
+      }
+      list += "</ul>";
+      HTMLPanel listPanel = new HTMLPanel(list);
+      metadataPanel.add(listPanel);
+      metadataValuesPanel.add(metadataPanel);
+    }
+  }
+
+  private String getParameterValue(FilterParameter value) {
+    String ret = "";
+
+    if(value instanceof BasicSearchFilterParameter){
+      BasicSearchFilterParameter basicSearchFilterParameter = (BasicSearchFilterParameter) value;
+      ret = basicSearchFilterParameter.getValue();
+    }
+
+    return ret;
   }
 
   public void initButtons() {
@@ -159,13 +229,12 @@ public class ShowDisposalRule extends Composite {
       removeRuleBtn.addClickHandler(new ClickHandler() {
         @Override
         public void onClick(ClickEvent clickEvent) {
-          // TODO
           /*
            * BrowserServiceImpl.Util.getInstance().updateDisposalHold(disposalHold, new
            * AsyncCallback<DisposalHold>() {
-           * 
+           *
            * @Override public void onFailure(Throwable caught) { errorMessage(caught); }
-           * 
+           *
            * @Override public void onSuccess(DisposalHold disposalHold) {
            * HistoryUtils.newHistory(DisposalPolicy.RESOLVER); } });
            */

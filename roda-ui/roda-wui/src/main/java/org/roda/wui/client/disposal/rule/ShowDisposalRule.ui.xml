@@ -38,6 +38,16 @@
                                 <g:HTML styleName="value"
                                         ui:field="disposalRuleScheduleName"/>
                             </g:FlowPanel>
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label"
+                                         ui:field="disposalRuleTypeLabel">
+                                    <ui:text from='{messages.disposalRuleType}'/>
+                                </g:Label>
+                                <g:FlowPanel styleName="value"
+                                        ui:field="disposalRuleType"/>
+                            </g:FlowPanel>
+                            <g:FlowPanel styleName="field" ui:field="metadataValuesPanel">
+                            </g:FlowPanel>
                         </g:FlowPanel>
                     </g:FlowPanel>
                 </g:FlowPanel>
