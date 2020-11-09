@@ -141,7 +141,17 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
 
     if (editmode) {
       setDisposalRule(disposalRule);
+      setEditMode();
     }
+  }
+
+  private void setEditMode() {
+    errors.setVisible(false);
+    pluginParameterPanel.setVisible(false);
+    metadataFieldsPanel.setVisible(false);
+
+    ruleTypeList.setVisible(false);
+    ruleTypeListLabel.setVisible(false);
   }
 
   private void initMetadataFieldPanel() {
@@ -209,7 +219,7 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
     List<DisposalRuleType> disposalRuleTypes = Arrays.asList(DisposalRuleType.values());
     ruleTypeList.addItem("", "");
     for (DisposalRuleType ruleType : disposalRuleTypes) {
-      ruleTypeList.addItem(ruleType.toString(), ruleType.toString());
+      ruleTypeList.addItem(messages.disposalRuleTypeValue(ruleType.toString()), ruleType.toString());
     }
   }
 
@@ -239,17 +249,23 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
 
   public DisposalRule getDisposalRule() {
     DisposalRule disposalRule = new DisposalRule();
-    disposalRule.setTitle(title.getText());
-    disposalRule.setDescription(description.getText());
-    disposalRule.setDisposalScheduleId(disposalSchedulesList.getSelectedValue());
-    disposalRule.setDisposalScheduleName(disposalSchedulesList.getSelectedItemText());
-    if(disposalRuleType!= null ) {
-      disposalRule.setType(disposalRuleType);
-      if (disposalRuleType.equals(DisposalRuleType.IS_CHILD_OF)) {
-        disposalRule.setIsChildOf(isChildOfValue);
-      } else {
-        disposalRule.setMetadataFields(metadataFieldsValues);
+    if(!editmode) {
+      disposalRule.setTitle(title.getText());
+      disposalRule.setDescription(description.getText());
+      disposalRule.setDisposalScheduleId(disposalSchedulesList.getSelectedValue());
+      disposalRule.setDisposalScheduleName(disposalSchedulesList.getSelectedItemText());
+      if (disposalRuleType != null) {
+        disposalRule.setType(disposalRuleType);
+        if (disposalRuleType.equals(DisposalRuleType.IS_CHILD_OF)) {
+          disposalRule.setIsChildOf(isChildOfValue);
+        } else {
+          disposalRule.setMetadataFields(metadataFieldsValues);
+        }
       }
+    }else{
+      disposalRule.setTitle(title.getText());
+      disposalRule.setDescription(description.getText());
+      disposalRule.setDisposalScheduleId(disposalSchedulesList.getSelectedValue());
     }
     return disposalRule;
   }
@@ -349,26 +365,29 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
       disposalSchedulesListError.setVisible(false);
     }
 
-    if (!isRuleTypeValid()) {
-      ruleTypeList.addStyleName("isWrong");
-      ruleTypeListError.setText(messages.mandatoryField());
-      ruleTypeListError.setVisible(true);
-      Window.scrollTo(ruleTypeList.getAbsoluteLeft(), ruleTypeList.getAbsoluteTop());
-      errorList.add(messages.isAMandatoryField(messages.disposalRuleType()));
-    } else {
-      ruleTypeList.removeStyleName("isWrong");
-      ruleTypeListError.setVisible(false);
-    }
+    if(!editmode) {
 
-    if(!isRuleTypeValueValid()){
-      ruleTypeList.addStyleName("isWrong");
-      ruleTypeListError.setText(messages.mandatoryField());
-      ruleTypeListError.setVisible(true);
-      Window.scrollTo(ruleTypeList.getAbsoluteLeft(), ruleTypeList.getAbsoluteTop());
-      errorList.add(messages.isAMandatoryField(messages.disposalRuleType()));
-    }else {
-      ruleTypeList.removeStyleName("isWrong");
-      ruleTypeListError.setVisible(false);
+      if (!isRuleTypeValid()) {
+        ruleTypeList.addStyleName("isWrong");
+        ruleTypeListError.setText(messages.mandatoryField());
+        ruleTypeListError.setVisible(true);
+        Window.scrollTo(ruleTypeList.getAbsoluteLeft(), ruleTypeList.getAbsoluteTop());
+        errorList.add(messages.isAMandatoryField(messages.disposalRuleType()));
+      } else {
+        ruleTypeList.removeStyleName("isWrong");
+        ruleTypeListError.setVisible(false);
+      }
+
+      if (!isRuleTypeValueValid()) {
+        ruleTypeList.addStyleName("isWrong");
+        ruleTypeListError.setText(messages.mandatoryField());
+        ruleTypeListError.setVisible(true);
+        Window.scrollTo(ruleTypeList.getAbsoluteLeft(), ruleTypeList.getAbsoluteTop());
+        errorList.add(messages.isAMandatoryField(messages.disposalRuleType()));
+      } else {
+        ruleTypeList.removeStyleName("isWrong");
+        ruleTypeListError.setVisible(false);
+      }
     }
 
     checked = true;

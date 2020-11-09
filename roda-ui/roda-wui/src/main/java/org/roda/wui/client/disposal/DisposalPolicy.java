@@ -328,8 +328,8 @@ public class DisposalPolicy extends Composite {
   }
 
   private void createDisposalSchedulesPanel(DisposalSchedules disposalSchedules) {
+    disposalSchedulesTablePanel.addStyleName("basicTable-border");
     disposalSchedulesTablePanel.addStyleName("basicTable");
-    // Disposal schedules table
     if (disposalSchedules.getObjects().isEmpty()) {
       Label label = new HTML(
         SafeHtmlUtils.fromSafeConstant(messages.noItemsToDisplayPreFilters(messages.disposalSchedulesTitle())));
@@ -357,6 +357,7 @@ public class DisposalPolicy extends Composite {
 
   private void createDisposalHoldsPanel(DisposalHolds disposalHolds) {
     disposalHoldsTablePanel.addStyleName("basicTable");
+    disposalHoldsTablePanel.addStyleName("basicTable-border");
     if (disposalHolds.getObjects().isEmpty()) {
       Label label = new HTML(
         SafeHtmlUtils.fromSafeConstant(messages.noItemsToDisplayPreFilters(messages.disposalHoldsTitle())));
@@ -382,6 +383,7 @@ public class DisposalPolicy extends Composite {
 
   private void createDisposalRulesPanel(DisposalRules disposalRules) {
     disposalRulesTablePanel.addStyleName("basicTable");
+    disposalRulesTablePanel.addStyleName("basicTable-border");
     if (disposalRules.getObjects().isEmpty()) {
       Label label = new HTML(
         SafeHtmlUtils.fromSafeConstant(messages.noItemsToDisplayPreFilters(messages.disposalRulesTitle())));

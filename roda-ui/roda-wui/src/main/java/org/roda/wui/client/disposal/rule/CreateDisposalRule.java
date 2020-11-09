@@ -2,6 +2,7 @@ package org.roda.wui.client.disposal.rule;
 
 import java.util.List;
 
+import io.swagger.models.Model;
 import org.roda.core.data.exceptions.DisposalRuleAlreadyExistsException;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalRules;
