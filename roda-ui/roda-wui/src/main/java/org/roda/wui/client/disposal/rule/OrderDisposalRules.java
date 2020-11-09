@@ -209,7 +209,6 @@ public class OrderDisposalRules extends Composite {
   }
 
   private void createDisposalRulesPanel() {
-    orderDisposalRulesTablePanel.addStyleName("basicTable");
     if (disposalRules.getObjects().isEmpty()) {
       Label label = new HTML(
         SafeHtmlUtils.fromSafeConstant(messages.noItemsToDisplayPreFilters(messages.disposalRulesTitle())));

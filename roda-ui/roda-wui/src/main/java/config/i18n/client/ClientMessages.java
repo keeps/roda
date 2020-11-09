@@ -2025,6 +2025,8 @@ public interface ClientMessages extends Messages {
 
   String disposalRuleOrder();
 
+  String disposalRuleMetadataField();
+
   String addMetadataField();
 
   String disposalScheduleTitle();
@@ -2047,7 +2049,11 @@ public interface ClientMessages extends Messages {
 
   String disposalScheduleRetentionTriggerCode();
 
+  String disposalScheduleRetentionTriggerCodeValue(@Select String trigger);
+
   String disposalScheduleRetentionPeriodInterval();
+
+  String disposalScheduleRetentionPeriodIntervalValue(@Select String interval);
 
   String disposalScheduleRetentionPeriodDuration();
 
