@@ -7265,4 +7265,10 @@ span.code {
     color: #ccc;
 }.disposalRuleOperator {
     text-align: center;
+.disposalRuleOperator {
+    text-align: center;
+}
+
+.childOfLabel{
+    width: 100%;
 }

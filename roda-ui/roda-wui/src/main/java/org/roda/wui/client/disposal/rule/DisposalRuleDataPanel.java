@@ -6,6 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.disposal.ConditionType;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
@@ -95,12 +102,17 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
   ListBox fieldsList;
 
   @UiField
+  Label fieldsOperator;
+
+  @UiField
   TextBox fieldValue;
 
   // IS_CHILD_OF
 
   @UiField(provided = true)
   PluginParameterPanel pluginParameterPanel;
+
+  private HorizontalPanel childOfPanel = new HorizontalPanel();
 
   private DisposalRule disposalRule;
   private DisposalSchedules disposalSchedules;
@@ -151,7 +163,39 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
       fieldsList.setSelectedIndex(selectedConditionIndex);
       fieldValue.setText(disposalRule.getConditionValue());
     }else{
-      //TODO
+      conditionLabel.setVisible(true);
+      conditionLabel.setText(messages.conditionAtualParent());
+
+      conditionPanel.setVisible(true);
+      fieldsList.setVisible(false);
+      fieldsOperator.setVisible(false);
+      fieldValue.setVisible(false);
+
+      Label childOfLabel = new Label();
+
+      Anchor anchor = new Anchor(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-remove\"></i>"));
+      anchor.addStyleName("toolbarLink toolbarLinkSmall");
+      anchor.addClickHandler(new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent clickEvent) {
+          conditionLabel.setVisible(false);
+          conditionLabel.setText(messages.disposalRuleCondition());
+          conditionPanel.setVisible(false);
+          pluginParameterPanel.setVisible(true);
+          childOfPanel.clear();
+        }
+      });
+
+      String parent = disposalRule.getConditionValue() + " (" + disposalRule.getConditionKey() + ")";
+      childOfLabel.setText(parent);
+      childOfLabel.addStyleName("itemText value");
+
+      childOfPanel.add(childOfLabel);
+      childOfPanel.setCellWidth(childOfLabel, "100%");
+
+      childOfPanel.add(anchor);
+
+      conditionPanel.add(childOfPanel);
     }
 
   }
@@ -270,10 +314,15 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
           pluginParameterPanel.setVisible(true);
           conditionPanel.setVisible(false);
         } else if (typeList.getSelectedValue().equals(ConditionType.METADATA_FIELD.toString())) {
+          childOfPanel.setVisible(false);
           conditionLabel.setVisible(true);
           pluginParameterPanel.setVisible(false);
           conditionPanel.setVisible(true);
+          fieldsList.setVisible(true);
+          fieldsOperator.setVisible(true);
+          fieldValue.setVisible(true);
         } else {
+          childOfPanel.setVisible(false);
           conditionLabel.setVisible(false);
           pluginParameterPanel.setVisible(false);
           conditionPanel.setVisible(false);
