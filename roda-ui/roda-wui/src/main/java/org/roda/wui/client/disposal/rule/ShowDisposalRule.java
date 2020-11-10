@@ -3,15 +3,13 @@ package org.roda.wui.client.disposal.rule;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.dom.client.UListElement;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.ibm.icu.text.LocaleDisplayNames;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.DisposalHoldAlreadyExistsException;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
+import org.roda.core.data.v2.ip.disposal.ConditionType;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
-import org.roda.core.data.v2.ip.disposal.DisposalRuleType;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.TitlePanel;
@@ -155,22 +153,22 @@ public class ShowDisposalRule extends Composite {
       }
     });
 
-    if (disposalRule.getType().equals(DisposalRuleType.IS_CHILD_OF)) {
+    if (disposalRule.getType().equals(ConditionType.IS_CHILD_OF)) {
       disposalRuleTypeLabel.setVisible(StringUtils.isNotBlank(disposalRule.getType().toString()));
       HTML type = new HTML();
       String ruleType = messages.disposalRuleTypeValue(disposalRule.getType().toString()) + " "
-        + disposalRule.getIsChildOf();
+        + disposalRule.getConditionKey();
       type.setHTML(ruleType);
       type.addStyleName("btn-link addCursorPointer");
       type.addClickHandler(new ClickHandler() {
         @Override
         public void onClick(ClickEvent clickEvent) {
-          HistoryUtils.newHistory(BrowseTop.RESOLVER, disposalRule.getIsChildOf());
+          HistoryUtils.newHistory(BrowseTop.RESOLVER, disposalRule.getConditionKey());
         }
       });
       disposalRuleType.insert(type, 0);
       metadataValuesPanel.setVisible(false);
-    } else if (disposalRule.getType().equals(DisposalRuleType.METADATA_FIELD)) {
+    } else if (disposalRule.getType().equals(ConditionType.METADATA_FIELD)) {
       disposalRuleTypeLabel.setVisible(StringUtils.isNotBlank(disposalRule.getType().toString()));
       HTML typeValue = new HTML();
       typeValue.setText(messages.disposalRuleTypeValue(disposalRule.getType().toString()));
@@ -178,21 +176,11 @@ public class ShowDisposalRule extends Composite {
 
 
       Label metadataLabel = new Label();
-      metadataLabel.setText(messages.disposalRuleMetadataField());
+      metadataLabel.setText(messages.disposalRuleCondition());
       metadataLabel.addStyleName("label");
       metadataValuesPanel.add(metadataLabel);
 
       FlowPanel metadataPanel = new FlowPanel();
-      metadataPanel.addStyleName("value");
-      String list = "<ul>";
-      for (Map.Entry<String, FilterParameter> entry : disposalRule.getMetadataFields().entrySet()) {
-        String parameterValue = getParameterValue(entry.getValue());
-        String text = entry.getKey() + " is " + parameterValue;
-        list += "<li>" + text + "</li>";
-      }
-      list += "</ul>";
-      HTMLPanel listPanel = new HTMLPanel(list);
-      metadataPanel.add(listPanel);
       metadataValuesPanel.add(metadataPanel);
     }
   }

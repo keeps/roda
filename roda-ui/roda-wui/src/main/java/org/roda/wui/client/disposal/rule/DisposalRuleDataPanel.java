@@ -5,39 +5,35 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.MissingResourceException;
 
+import com.google.gwt.user.client.ui.FlowPanel;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.filter.FilterParameter;
-import org.roda.core.data.v2.index.filter.OrFiltersParameters;
-import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.disposal.ConditionType;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
-import org.roda.core.data.v2.ip.disposal.DisposalRuleType;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.wui.client.common.search.AdvancedSearchFieldsPanel;
-import org.roda.wui.client.common.search.SearchFieldPanel;
-import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.search.SearchField;
+import org.roda.wui.client.common.utils.Tree;
 import org.roda.wui.client.ingest.process.PluginParameterPanel;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextArea;
@@ -78,35 +74,38 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
   @UiField
   Label disposalSchedulesListError;
 
-  // disposal rule type
+  // condition type
 
   @UiField
-  Label ruleTypeListLabel;
+  Label typeListLabel;
 
   @UiField
-  ListBox ruleTypeList;
+  ListBox typeList;
 
   @UiField
-  Label ruleTypeListError;
+  Label typeListError;
+
+  // condition
+
+  @UiField
+  Label conditionLabel;
+
+  @UiField
+  FlowPanel conditionPanel;
+
+  @UiField
+  Label conditionError;
+
+  @UiField
+  ListBox fieldsList;
+
+  @UiField
+  TextBox fieldValue;
 
   // IS_CHILD_OF
 
   @UiField(provided = true)
   PluginParameterPanel pluginParameterPanel;
-
-  // METADATA_FIELD
-
-  @UiField
-  FlowPanel metadataFieldsPanel;
-
-  @UiField
-  FlowPanel metadataFieldsPanelButtons;
-
-  @UiField
-  Button metadataFieldsAddField;
-
-  @UiField
-  Button metadataFieldsClean;
 
   private AdvancedSearchFieldsPanel metadataFields;
 
@@ -115,9 +114,9 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
   private boolean editmode;
   private int selectedScheduleIndex;
 
-  DisposalRuleType disposalRuleType = null;
-  private String isChildOfValue = null;
-  private Map<String, FilterParameter> metadataFieldsValues = null;
+  ConditionType conditionType = null;
+  private String conditionKey;
+  private String conditionValue;
 
   private boolean changed = false;
   private boolean checked = false;
@@ -127,76 +126,36 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
 
   public DisposalRuleDataPanel(DisposalRule disposalRule, DisposalSchedules disposalSchedules, boolean editmode) {
     initPluginParameterPanel();
-
     initWidget(uiBinder.createAndBindUi(this));
-    initMetadataFieldPanel();
 
     this.editmode = editmode;
     this.disposalRule = disposalRule;
     this.disposalSchedules = disposalSchedules;
 
-    initFields();
+    initDisposalSchedulesList();
+    initTypeList();
+    initConditionList();
     initHandlers();
-    setInitialState();
-
     if (editmode) {
       setDisposalRule(disposalRule);
       setEditMode();
+    }else{
+      setInitialState();
     }
   }
 
   private void setEditMode() {
     errors.setVisible(false);
     pluginParameterPanel.setVisible(false);
-    metadataFieldsPanel.setVisible(false);
-
-    ruleTypeList.setVisible(false);
-    ruleTypeListLabel.setVisible(false);
-  }
-
-  private void initMetadataFieldPanel() {
-    metadataFields = new AdvancedSearchFieldsPanel(IndexedAIP.class.getSimpleName(), keyCode -> {
-    });
-    metadataFieldsPanel.insert(metadataFields, 0);
+    typeList.setVisible(false);
+    typeListLabel.setVisible(false);
   }
 
   private void setInitialState() {
     errors.setVisible(false);
+    conditionLabel.setVisible(false);
+    conditionPanel.setVisible(false);
     pluginParameterPanel.setVisible(false);
-    metadataFieldsPanel.setVisible(false);
-  }
-
-  private void initHandlers() {
-    ChangeHandler changeHandler = new ChangeHandler() {
-
-      @Override
-      public void onChange(ChangeEvent event) {
-        DisposalRuleDataPanel.this.onChange();
-      }
-    };
-
-    title.addChangeHandler(changeHandler);
-    description.addChangeHandler(changeHandler);
-    disposalSchedulesList.addChangeHandler(changeHandler);
-
-    ChangeHandler ruleTypeListChangeHandler = new ChangeHandler() {
-      @Override
-      public void onChange(ChangeEvent event) {
-        if (ruleTypeList.getSelectedValue().equals(DisposalRuleType.IS_CHILD_OF.toString())) {
-          pluginParameterPanel.setVisible(true);
-          metadataFieldsPanel.setVisible(false);
-        } else if (ruleTypeList.getSelectedValue().equals(DisposalRuleType.METADATA_FIELD.toString())) {
-          pluginParameterPanel.setVisible(false);
-          metadataFieldsPanel.setVisible(true);
-        } else {
-          pluginParameterPanel.setVisible(false);
-          metadataFieldsPanel.setVisible(false);
-        }
-      }
-    };
-
-    ruleTypeList.addChangeHandler(ruleTypeListChangeHandler);
-
   }
 
   private void initPluginParameterPanel() {
@@ -206,24 +165,17 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
     pluginParameterPanel.getLayout().removeStyleName("plugin-options-parameter");
   }
 
-  private void initFields() {
-    disposalSchedulesListLabel.setText(messages.disposalRuleScheduleName());
-    initDisposalSchedulesList();
-
-    ruleTypeListLabel.setText(messages.disposalRuleType());
-    initTypeList();
-
-  }
-
   private void initTypeList() {
-    List<DisposalRuleType> disposalRuleTypes = Arrays.asList(DisposalRuleType.values());
-    ruleTypeList.addItem("", "");
-    for (DisposalRuleType ruleType : disposalRuleTypes) {
-      ruleTypeList.addItem(messages.disposalRuleTypeValue(ruleType.toString()), ruleType.toString());
+    typeListLabel.setText(messages.disposalRuleType());
+    List<ConditionType> conditionTypes = Arrays.asList(ConditionType.values());
+    typeList.addItem("", "");
+    for (ConditionType ruleType : conditionTypes) {
+      typeList.addItem(messages.disposalRuleTypeValue(ruleType.toString()), ruleType.toString());
     }
   }
 
   private void initDisposalSchedulesList() {
+    disposalSchedulesListLabel.setText(messages.disposalRuleScheduleName());
     disposalSchedulesList.addItem("", "");
     if (!editmode) {
       for (DisposalSchedule schedule : disposalSchedules.getObjects()) {
@@ -241,6 +193,65 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
     }
   }
 
+  private static Map<String,String> getConditionsFromConfig() {
+    Map<String,String> conditions = new HashMap<>();
+    List<String> fields = ConfigurationManager.getStringList(RodaConstants.DISPOSAL_RULE_CONDITION_PREFIX);
+    for (String field : fields) {
+      String fieldName = ConfigurationManager.getString(RodaConstants.DISPOSAL_RULE_CONDITION_PREFIX ,field, RodaConstants.DISPOSAL_RULE_CONDITION_FIELD);
+      String fieldType = ConfigurationManager.getString(RodaConstants.DISPOSAL_RULE_CONDITION_PREFIX ,field, RodaConstants.DISPOSAL_RULE_CONDITION_TYPE);
+      String fieldLabelI18N = ConfigurationManager.getString(RodaConstants.DISPOSAL_RULE_CONDITION_PREFIX, field, RodaConstants.DISPOSAL_RULE_CONDITION_I18N);
+
+      if (fieldName != null && fieldType != null && fieldLabelI18N != null) {
+        conditions.put(fieldName,fieldLabelI18N);
+      }
+    }
+    return conditions;
+  }
+
+  private void initConditionList() {
+    Map<String,String> list = getConditionsFromConfig();
+    fieldsList.addItem("","");
+    for (Map.Entry<String,String> entry : list.entrySet()){
+      fieldsList.addItem(entry.getKey(),entry.getKey());
+    }
+  }
+
+  private void initHandlers() {
+    ChangeHandler changeHandler = new ChangeHandler() {
+
+      @Override
+      public void onChange(ChangeEvent event) {
+        DisposalRuleDataPanel.this.onChange();
+      }
+    };
+
+    title.addChangeHandler(changeHandler);
+    description.addChangeHandler(changeHandler);
+    disposalSchedulesList.addChangeHandler(changeHandler);
+
+    ChangeHandler typeListChangeHandler = new ChangeHandler() {
+      @Override
+      public void onChange(ChangeEvent event) {
+        if (typeList.getSelectedValue().equals(ConditionType.IS_CHILD_OF.toString())) {
+          conditionLabel.setVisible(false);
+          pluginParameterPanel.setVisible(true);
+          conditionPanel.setVisible(false);
+        } else if (typeList.getSelectedValue().equals(ConditionType.METADATA_FIELD.toString())) {
+          conditionLabel.setVisible(true);
+          pluginParameterPanel.setVisible(false);
+          conditionPanel.setVisible(true);
+        } else {
+          conditionLabel.setVisible(false);
+          pluginParameterPanel.setVisible(false);
+          conditionPanel.setVisible(false);
+        }
+      }
+    };
+
+    typeList.addChangeHandler(typeListChangeHandler);
+
+  }
+
   public void setDisposalRule(DisposalRule disposalRule) {
     this.title.setText(disposalRule.getTitle());
     this.description.setText(disposalRule.getDescription());
@@ -254,14 +265,13 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
       disposalRule.setDescription(description.getText());
       disposalRule.setDisposalScheduleId(disposalSchedulesList.getSelectedValue());
       disposalRule.setDisposalScheduleName(disposalSchedulesList.getSelectedItemText());
-      if (disposalRuleType != null) {
-        disposalRule.setType(disposalRuleType);
-        if (disposalRuleType.equals(DisposalRuleType.IS_CHILD_OF)) {
-          disposalRule.setIsChildOf(isChildOfValue);
-        } else {
-          disposalRule.setMetadataFields(metadataFieldsValues);
-        }
+      if(typeList.getSelectedValue().equals(ConditionType.IS_CHILD_OF.toString())){
+        disposalRule.setType(ConditionType.IS_CHILD_OF);
+      }else{
+        disposalRule.setType(ConditionType.METADATA_FIELD);
       }
+      disposalRule.setConditionKey(conditionKey);
+      disposalRule.setConditionValue(conditionValue);
     }else{
       disposalRule.setTitle(title.getText());
       disposalRule.setDescription(description.getText());
@@ -270,70 +280,16 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
     return disposalRule;
   }
 
-  private boolean isRuleTypeValueValid() {
-    boolean ret = false;
-    if (disposalRuleType.equals(DisposalRuleType.METADATA_FIELD)) {
-      setMetadataFields();
-      ret = metadataFieldsValues.size() > 0;
-    } else if (disposalRuleType.equals(DisposalRuleType.IS_CHILD_OF)) {
-      setIsChildOf();
-      ret = StringUtils.isNotBlank(isChildOfValue);
+
+  private boolean isConditionValid() {
+    if (conditionType.equals(ConditionType.METADATA_FIELD)) {
+      conditionKey = fieldsList.getSelectedValue();
+      conditionValue = fieldValue.getValue();
+    } else if (conditionType.equals(ConditionType.IS_CHILD_OF)) {
+      conditionKey = pluginParameterPanel.getValue();
+      conditionValue = pluginParameterPanel.getAipTitle();
     }
-    return ret;
-  }
-
-  private void setIsChildOf() {
-    isChildOfValue = pluginParameterPanel.getValue();
-  }
-
-  private void setMetadataFields() {
-    metadataFieldsValues = new HashMap<>();
-    if (this.metadataFieldsPanel.isVisible()) {
-      for (int i = 0; i < metadataFields.getWidgetCount(); i++) {
-        if (metadataFields.getWidget(i) instanceof SearchFieldPanel) {
-          SearchFieldPanel searchAdvancedFieldPanel = (SearchFieldPanel) metadataFields.getWidget(i);
-          String searchFieldId = searchAdvancedFieldPanel.getSearchField().getId();
-          FilterParameter oldFilterParameter = metadataFieldsValues.get(searchFieldId);
-          FilterParameter filterParameter = searchAdvancedFieldPanel.getFilter();
-
-          if (filterParameter instanceof SimpleFilterParameter) {
-            SimpleFilterParameter parameter = (SimpleFilterParameter) filterParameter;
-            if (RodaConstants.AIP_LEVEL.equals(parameter.getName())
-              && RodaConstants.NONE_SELECTED_LEVEL.equals(parameter.getValue())) {
-              filterParameter = null;
-            }
-          }
-
-          if (filterParameter != null) {
-            if (oldFilterParameter != null) {
-              if (oldFilterParameter instanceof OrFiltersParameters) {
-                List<FilterParameter> filterParameters = ((OrFiltersParameters) oldFilterParameter).getValues();
-                filterParameters.add(filterParameter);
-                ((OrFiltersParameters) oldFilterParameter).setValues(filterParameters);
-                metadataFieldsValues.put(searchFieldId, oldFilterParameter);
-              } else {
-                List<FilterParameter> filterParameters = new ArrayList<>();
-                filterParameters.add(oldFilterParameter);
-                filterParameters.add(filterParameter);
-                metadataFieldsValues.put(searchFieldId, new OrFiltersParameters(filterParameters));
-              }
-            } else {
-              metadataFieldsValues.put(searchFieldId, filterParameter);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  @UiHandler("metadataFieldsAddField")
-  void handleMetadataFieldsAdd(ClickEvent e) {
-    metadataFields.addSearchFieldPanel();
-  }
-
-  @UiHandler("metadataFieldsClean")
-  void handleMetadataFieldsClean(ClickEvent e) {
-    JavascriptUtils.cleanAdvancedSearch();
+    return StringUtils.isNotBlank(conditionKey) && StringUtils.isNotBlank(conditionValue);
   }
 
   /**
@@ -366,27 +322,38 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
     }
 
     if(!editmode) {
-
-      if (!isRuleTypeValid()) {
-        ruleTypeList.addStyleName("isWrong");
-        ruleTypeListError.setText(messages.mandatoryField());
-        ruleTypeListError.setVisible(true);
-        Window.scrollTo(ruleTypeList.getAbsoluteLeft(), ruleTypeList.getAbsoluteTop());
+      if (typeList.getSelectedValue().length() == 0) {
+        typeList.addStyleName("isWrong");
+        typeListError.setText(messages.mandatoryField());
+        typeListError.setVisible(true);
+        Window.scrollTo(typeList.getAbsoluteLeft(), typeList.getAbsoluteTop());
         errorList.add(messages.isAMandatoryField(messages.disposalRuleType()));
       } else {
-        ruleTypeList.removeStyleName("isWrong");
-        ruleTypeListError.setVisible(false);
-      }
+        conditionType = ConditionType.valueOf(typeList.getSelectedValue());
+        typeList.removeStyleName("isWrong");
+        typeListError.setVisible(false);
 
-      if (!isRuleTypeValueValid()) {
-        ruleTypeList.addStyleName("isWrong");
-        ruleTypeListError.setText(messages.mandatoryField());
-        ruleTypeListError.setVisible(true);
-        Window.scrollTo(ruleTypeList.getAbsoluteLeft(), ruleTypeList.getAbsoluteTop());
-        errorList.add(messages.isAMandatoryField(messages.disposalRuleType()));
-      } else {
-        ruleTypeList.removeStyleName("isWrong");
-        ruleTypeListError.setVisible(false);
+        if (!isConditionValid()) {
+          GWT.log("entrei");
+          if(conditionType.equals(ConditionType.IS_CHILD_OF)){
+            pluginParameterPanel.addStyleName("isWrong");
+            Window.scrollTo(pluginParameterPanel.getAbsoluteLeft(), pluginParameterPanel.getAbsoluteTop());
+          }else {
+            GWT.log("panados");
+            conditionPanel.addStyleName("isWrong");
+            Window.scrollTo(conditionPanel.getAbsoluteLeft(), conditionPanel.getAbsoluteTop());
+          }
+          conditionError.setText(messages.mandatoryField());
+          conditionError.setVisible(true);
+          errorList.add(messages.isAMandatoryField(messages.disposalRuleType()));
+        } else {
+          if(conditionType.equals(ConditionType.IS_CHILD_OF)){
+            pluginParameterPanel.removeStyleName("isWrong");
+          }else {
+            conditionPanel.removeStyleName("isWrong");
+          }
+          conditionError.setVisible(false);
+        }
       }
     }
 
@@ -395,21 +362,6 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
     return errorList.isEmpty() ? true : false;
   }
 
-  private boolean isRuleTypeValid() {
-    if (ruleTypeList.getSelectedValue().equals(DisposalRuleType.IS_CHILD_OF.toString())) {
-      disposalRuleType = DisposalRuleType.IS_CHILD_OF;
-      return true;
-    } else if (ruleTypeList.getSelectedValue().equals(DisposalRuleType.METADATA_FIELD.toString())) {
-      disposalRuleType = DisposalRuleType.METADATA_FIELD;
-      return true;
-    }
-    return false;
-  }
-
-  public void clear() {
-    title.setText("");
-    description.setText("");
-  }
 
   public boolean isEditmode() {
     return editmode;

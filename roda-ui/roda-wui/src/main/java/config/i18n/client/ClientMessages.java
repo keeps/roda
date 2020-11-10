@@ -2025,7 +2025,9 @@ public interface ClientMessages extends Messages {
 
   String disposalRuleOrder();
 
-  String disposalRuleMetadataField();
+  String disposalRuleCondition();
+
+  String disposalRuleIs();
 
   String addMetadataField();
 
