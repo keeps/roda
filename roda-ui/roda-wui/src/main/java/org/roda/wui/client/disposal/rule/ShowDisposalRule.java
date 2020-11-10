@@ -102,12 +102,17 @@ public class ShowDisposalRule extends Composite {
   Label disposalRuleTypeLabel;
 
   @UiField
-  FlowPanel disposalRuleType;
+  HTML disposalRuleType;
 
-  // Metadata Values (in case of type == METADATA_FIELD)
+  // Conditions
 
   @UiField
-  FlowPanel metadataValuesPanel;
+  Label conditionsLabel;
+
+  @UiField
+  FlowPanel conditionsPanel;
+
+  // Sidebar
 
   @UiField
   FlowPanel buttonsPanel;
@@ -153,47 +158,29 @@ public class ShowDisposalRule extends Composite {
       }
     });
 
+    disposalRuleType.setHTML(messages.disposalRuleTypeValue(disposalRule.getType().toString()));
+    disposalRuleTypeLabel.setVisible(StringUtils.isNotBlank(disposalRule.getType().toString()));
+
+    conditionsLabel.setVisible(true);
+    HTML condition = new HTML();
     if (disposalRule.getType().equals(ConditionType.IS_CHILD_OF)) {
-      disposalRuleTypeLabel.setVisible(StringUtils.isNotBlank(disposalRule.getType().toString()));
-      HTML type = new HTML();
-      String ruleType = messages.disposalRuleTypeValue(disposalRule.getType().toString()) + " "
-        + disposalRule.getConditionKey();
-      type.setHTML(ruleType);
-      type.addStyleName("btn-link addCursorPointer");
-      type.addClickHandler(new ClickHandler() {
+      String conditionTxt = messages.disposalRuleTypeValue(disposalRule.getType().toString()) + " "
+        + disposalRule.getConditionValue() + " (" + disposalRule.getConditionKey() + ")";
+      condition.setHTML(conditionTxt);
+      condition.addStyleName("btn-link addCursorPointer");
+      condition.addClickHandler(new ClickHandler() {
         @Override
         public void onClick(ClickEvent clickEvent) {
           HistoryUtils.newHistory(BrowseTop.RESOLVER, disposalRule.getConditionKey());
         }
       });
-      disposalRuleType.insert(type, 0);
-      metadataValuesPanel.setVisible(false);
+      conditionsPanel.add(condition);
     } else if (disposalRule.getType().equals(ConditionType.METADATA_FIELD)) {
-      disposalRuleTypeLabel.setVisible(StringUtils.isNotBlank(disposalRule.getType().toString()));
-      HTML typeValue = new HTML();
-      typeValue.setText(messages.disposalRuleTypeValue(disposalRule.getType().toString()));
-      disposalRuleType.add(typeValue);
-
-
-      Label metadataLabel = new Label();
-      metadataLabel.setText(messages.disposalRuleCondition());
-      metadataLabel.addStyleName("label");
-      metadataValuesPanel.add(metadataLabel);
-
-      FlowPanel metadataPanel = new FlowPanel();
-      metadataValuesPanel.add(metadataPanel);
+      String conditionTxt = disposalRule.getConditionKey() + " " + messages.disposalRuleIs() + " "
+              + disposalRule.getConditionValue();
+      condition.setHTML(conditionTxt);
+      conditionsPanel.add(condition);
     }
-  }
-
-  private String getParameterValue(FilterParameter value) {
-    String ret = "";
-
-    if(value instanceof BasicSearchFilterParameter){
-      BasicSearchFilterParameter basicSearchFilterParameter = (BasicSearchFilterParameter) value;
-      ret = basicSearchFilterParameter.getValue();
-    }
-
-    return ret;
   }
 
   public void initButtons() {
