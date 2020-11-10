@@ -47,7 +47,7 @@
                         </g:ListBox>
                     </g:FlowPanel>
                     <g:FlowPanel addStyleNames="disposalRuleOperator col_1">
-                        <g:Label addStyleNames="form-label">
+                        <g:Label addStyleNames="form-label" ui:field="fieldsOperator">
                             <ui:text from='{messages.disposalRuleIs}'/>
                         </g:Label>
                     </g:FlowPanel>

@@ -2241,4 +2241,5 @@ public interface ClientMessages extends Messages {
   String disposalHoldAssociatedOn();
 
   String disposalHoldLiftedOn();
+  String conditionAtualParent();
 }
