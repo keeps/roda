@@ -1121,6 +1121,13 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
+  public Job clearDisposalHolds(SelectedItems<IndexedAIP> selectedItems)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Disposals.clearDisposalHold(user, selectedItems);
+  }
+
+  @Override
   public Job liftDisposalHold(SelectedItems<IndexedAIP> selectedItems)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());

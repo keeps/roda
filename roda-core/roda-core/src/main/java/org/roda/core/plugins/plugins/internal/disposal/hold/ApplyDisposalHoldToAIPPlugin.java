@@ -2,6 +2,7 @@ package org.roda.core.plugins.plugins.internal.disposal.hold;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -188,7 +189,7 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
 
             try {
               model.updateAIP(aip, cachedJob.getUsername());
-              disposalHold.addAIPtoActiveAIPs(aip.getId());
+              disposalHold.setFirstTimeUsed(new Date());
               model.updateDisposalHold(disposalHold, cachedJob.getUsername());
 
               jobPluginInfo.incrementObjectsProcessedWithSuccess();

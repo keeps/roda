@@ -77,8 +77,8 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions,
     List<DescriptiveMetadata> descriptiveMetadata, List<Representation> representations, AIPFormat format,
     List<Relationship> relationships, Date createdOn, String createdBy, Date updatedOn, String updatedBy,
-    String disposalScheduleId, List<DisposalHoldAssociation> disposalHoldAssociation, Date destructionOn,
-    String destructionApprovedBy, String disposalConfirmationId, AIPDisposalFlow disposalFlow) {
+    String disposalScheduleId, List<DisposalHoldAssociation> disposalHoldAssociation, Date destroyedOn,
+    String destroyedBy, String disposalConfirmationId, AIPDisposalFlow disposalFlow) {
     super();
     this.id = id;
     this.parentId = parentId;
@@ -98,8 +98,8 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
 
     this.disposalScheduleId = disposalScheduleId;
     this.disposalHoldAssociation = disposalHoldAssociation;
-    this.destroyedOn = destructionOn;
-    this.destroyedBy = destructionApprovedBy;
+    this.destroyedOn = destroyedOn;
+    this.destroyedBy = destroyedBy;
     this.disposalConfirmationId = disposalConfirmationId;
     this.disposalFlow = disposalFlow;
   }
@@ -418,11 +418,9 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
       return false;
     if (destroyedOn != null ? !destroyedOn.equals(aip.destroyedOn) : aip.destroyedOn != null)
       return false;
-    if (disposalFlow != null ? !disposalFlow.equals(aip.disposalFlow)
-      : aip.disposalFlow != null)
+    if (disposalFlow != null ? !disposalFlow.equals(aip.disposalFlow) : aip.disposalFlow != null)
       return false;
-    return destroyedBy != null ? destroyedBy.equals(aip.destroyedBy)
-      : aip.destroyedBy == null;
+    return destroyedBy != null ? destroyedBy.equals(aip.destroyedBy) : aip.destroyedBy == null;
 
   }
 
@@ -454,8 +452,8 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
       + ", ingestJobId='" + ingestJobId + '\'' + ", ingestUpdateJobIds=" + ingestUpdateJobIds + ", ghost=" + ghost
       + ", format=" + format + ", relationships=" + relationships + ", createdOn=" + createdOn + ", createdBy='"
       + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\'' + ", disposalScheduleId='"
-      + disposalScheduleId + '\'' + ", disposalHoldAssociation=" + disposalHoldAssociation + ", destructionOn="
-      + destroyedOn + ", destructionApprovedBy='" + destroyedBy + '\'' + ", disposalConfirmationId='"
-      + disposalConfirmationId + '\'' + ", disposalUpdateStatus=" + disposalFlow + '}';
+      + disposalScheduleId + '\'' + ", disposalHoldAssociation=" + disposalHoldAssociation + ", destroyedOn="
+      + destroyedOn + ", destroyedBy='" + destroyedBy + '\'' + ", disposalConfirmationId='" + disposalConfirmationId
+      + '\'' + ", disposalUpdateStatus=" + disposalFlow + '}';
   }
 }

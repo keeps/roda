@@ -39,7 +39,7 @@ public class DisposalSchedule implements IsModelObject, HasId {
   // prevent this disposal from being deleted
   private Date firstTimeUsed = null;
 
-  private Long numberOfAIPUnder = 0L;
+  private Long apiCounter;
 
   private Date createdOn = null;
   private String createdBy = null;
@@ -51,7 +51,7 @@ public class DisposalSchedule implements IsModelObject, HasId {
   public DisposalSchedule() {
     super();
     this.state = DisposalScheduleState.ACTIVE;
-    this.numberOfAIPUnder = 0L;
+    this.apiCounter = 0L;
   }
 
   public DisposalSchedule(String id, String title, String description, String mandate, String scopeNotes,
@@ -70,7 +70,7 @@ public class DisposalSchedule implements IsModelObject, HasId {
     this.retentionPeriodIntervalCode = retentionPeriodIntervalCode;
     this.retentionPeriodDuration = retentionPeriodDuration;
     this.state = DisposalScheduleState.ACTIVE;
-    this.numberOfAIPUnder = 0L;
+    this.apiCounter = 0L;
 
     this.createdOn = createdOn;
     this.createdBy = createdBy;
@@ -176,12 +176,12 @@ public class DisposalSchedule implements IsModelObject, HasId {
     }
   }
 
-  public Long getNumberOfAIPUnder() {
-    return numberOfAIPUnder;
+  public Long getApiCounter() {
+    return apiCounter;
   }
 
-  public void setNumberOfAIPUnder(Long numberOfAIPUnder) {
-    this.numberOfAIPUnder = numberOfAIPUnder;
+  public void setApiCounter(Long apiCounter) {
+    this.apiCounter = apiCounter;
   }
 
   public Date getCreatedOn() {
@@ -224,26 +224,6 @@ public class DisposalSchedule implements IsModelObject, HasId {
     this.state = state;
   }
 
-  @JsonIgnore
-  public void incrementNumberOfAIPsByOne() {
-    incrementNumberOfAIPs(1);
-  }
-
-  @JsonIgnore
-  public void decreaseNumberOfAIPsByOne() {
-    decreaseNumberOfAIPs(1);
-  }
-
-  @JsonIgnore
-  public void incrementNumberOfAIPs(int number) {
-    this.numberOfAIPUnder += number;
-  }
-
-  @JsonIgnore
-  public void decreaseNumberOfAIPs(int number) {
-    this.numberOfAIPUnder -= number;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -258,7 +238,7 @@ public class DisposalSchedule implements IsModelObject, HasId {
       && Objects.equals(retentionTriggerElementId, that.retentionTriggerElementId)
       && retentionPeriodIntervalCode == that.retentionPeriodIntervalCode
       && Objects.equals(retentionPeriodDuration, that.retentionPeriodDuration)
-      && Objects.equals(firstTimeUsed, that.firstTimeUsed) && Objects.equals(numberOfAIPUnder, that.numberOfAIPUnder)
+      && Objects.equals(firstTimeUsed, that.firstTimeUsed) && Objects.equals(apiCounter, that.apiCounter)
       && Objects.equals(createdOn, that.createdOn) && Objects.equals(createdBy, that.createdBy)
       && Objects.equals(updatedOn, that.updatedOn) && Objects.equals(updatedBy, that.updatedBy) && state == that.state;
   }
@@ -266,7 +246,7 @@ public class DisposalSchedule implements IsModelObject, HasId {
   @Override
   public int hashCode() {
     return Objects.hash(id, title, description, mandate, scopeNotes, actionCode, retentionTriggerCode,
-      retentionTriggerElementId, retentionPeriodIntervalCode, retentionPeriodDuration, firstTimeUsed, numberOfAIPUnder,
+      retentionTriggerElementId, retentionPeriodIntervalCode, retentionPeriodDuration, firstTimeUsed, apiCounter,
       createdOn, createdBy, updatedOn, updatedBy, state);
   }
 
@@ -276,7 +256,7 @@ public class DisposalSchedule implements IsModelObject, HasId {
       + '\'' + ", mandate='" + mandate + '\'' + ", scopeNotes='" + scopeNotes + '\'' + ", actionCode=" + actionCode
       + ", retentionTriggerCode=" + retentionTriggerCode + ", retentionTriggerElementId='" + retentionTriggerElementId
       + '\'' + ", retentionPeriodIntervalCode=" + retentionPeriodIntervalCode + ", retentionPeriodDuration="
-      + retentionPeriodDuration + ", destroyedTimestamp=" + firstTimeUsed + ", numberOfAIPUnder=" + numberOfAIPUnder
+      + retentionPeriodDuration + ", destroyedTimestamp=" + firstTimeUsed + ", numberOfAIPUnder=" + apiCounter
       + ", createdOn=" + createdOn + ", createdBy='" + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='"
       + updatedBy + '\'' + ", state=" + state + '}';
   }

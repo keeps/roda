@@ -73,8 +73,8 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
   private String disposalScheduleName = null;
   private String disposalRetentionPeriod = null;
   private List<String> disposalHoldsId = new ArrayList<>();
-  private Date destructionOn = null;
-  private String destructionApprovedBy = null;
+  private Date destroyedOn = null;
+  private String destroyedBy = null;
   private String disposalAction = null;
   private Date overdueDate = null;
   private boolean disposalHoldStatus = false;
@@ -99,8 +99,8 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
       other.getDateFinal(), other.getDescription(), other.getParentID(), other.getAncestors(), other.getPermissions(),
       other.getNumberOfSubmissionFiles(), other.getNumberOfDocumentationFiles(), other.getNumberOfSchemaFiles(),
       other.getHasRepresentations(), other.getGhost(), other.getDisposalScheduleId(), other.getDisposalScheduleName(),
-      other.getDisposalRetentionPeriod(), other.getDisposalHoldsId(), other.getDestructionOn(),
-      other.getDestructionApprovedBy(), other.getDisposalConfirmationId(), other.getDisposalFlow());
+      other.getDisposalRetentionPeriod(), other.getDisposalHoldsId(), other.getDestroyedOn(), other.getDestroyedBy(),
+      other.getDisposalConfirmationId(), other.getDisposalFlow());
   }
 
   /**
@@ -119,7 +119,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
     Date dateFinal, String description, String parentID, List<String> ancestors, Permissions permissions,
     Long numberOfSubmissionFiles, Long numberOfDocumentationFiles, Long numberOfSchemaFiles, Boolean hasRepresentations,
     Boolean ghost, String disposalScheduleId, String disposalScheduleName, String disposalRetentionPeriod,
-    List<String> disposalHoldsId, Date destructionOn, String destructionApprovedBy, String disposalConfirmationId,
+    List<String> disposalHoldsId, Date destroyedOn, String destroyedBy, String disposalConfirmationId,
     AIPDisposalFlow disposalFlow) {
     super();
     this.id = id;
@@ -142,8 +142,8 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
     this.disposalScheduleName = disposalScheduleName;
     this.disposalRetentionPeriod = disposalRetentionPeriod;
     this.disposalHoldsId = disposalHoldsId;
-    this.destructionOn = destructionOn;
-    this.destructionApprovedBy = destructionApprovedBy;
+    this.destroyedOn = destroyedOn;
+    this.destroyedBy = destroyedBy;
     this.disposalConfirmationId = disposalConfirmationId;
     this.disposalFlow = disposalFlow;
   }
@@ -412,21 +412,21 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
     return this;
   }
 
-  public Date getDestructionOn() {
-    return destructionOn;
+  public Date getDestroyedOn() {
+    return destroyedOn;
   }
 
-  public IndexedAIP setDestructionOn(Date destructionOn) {
-    this.destructionOn = destructionOn;
+  public IndexedAIP setDestroyedOn(Date destroyedOn) {
+    this.destroyedOn = destroyedOn;
     return this;
   }
 
-  public String getDestructionApprovedBy() {
-    return destructionApprovedBy;
+  public String getDestroyedBy() {
+    return destroyedBy;
   }
 
-  public IndexedAIP setDestructionApprovedBy(String destructionApprovedBy) {
-    this.destructionApprovedBy = destructionApprovedBy;
+  public IndexedAIP setDestroyedBy(String destroyedBy) {
+    this.destroyedBy = destroyedBy;
     return this;
   }
 
@@ -573,13 +573,11 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
       return false;
     if (disposalHoldsId != null ? !disposalHoldsId.equals(that.disposalHoldsId) : that.disposalHoldsId != null)
       return false;
-    if (destructionOn != null ? !destructionOn.equals(that.destructionOn) : that.destructionOn != null)
+    if (destroyedOn != null ? !destroyedOn.equals(that.destroyedOn) : that.destroyedOn != null)
       return false;
-    if (disposalFlow != null ? !disposalFlow.equals(that.disposalFlow)
-      : that.disposalFlow != null)
+    if (disposalFlow != null ? !disposalFlow.equals(that.disposalFlow) : that.disposalFlow != null)
       return false;
-    return destructionApprovedBy != null ? destructionApprovedBy.equals(that.destructionApprovedBy)
-      : that.destructionApprovedBy == null;
+    return destroyedBy != null ? destroyedBy.equals(that.destroyedBy) : that.destroyedBy == null;
 
   }
 
@@ -605,8 +603,8 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
     result = 31 * result + (disposalScheduleId != null ? disposalScheduleId.hashCode() : 0);
     result = 31 * result + (disposalScheduleName != null ? disposalScheduleName.hashCode() : 0);
     result = 31 * result + (disposalHoldsId != null ? disposalHoldsId.hashCode() : 0);
-    result = 31 * result + (destructionOn != null ? destructionOn.hashCode() : 0);
-    result = 31 * result + (destructionApprovedBy != null ? destructionApprovedBy.hashCode() : 0);
+    result = 31 * result + (destroyedOn != null ? destroyedOn.hashCode() : 0);
+    result = 31 * result + (destroyedBy != null ? destroyedBy.hashCode() : 0);
     result = 31 * result + (disposalFlow != null ? disposalFlow.hashCode() : 0);
     return result;
   }
@@ -623,8 +621,8 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
       + ", ingestJobId='" + ingestJobId + '\'' + ", ingestUpdateJobIds=" + ingestUpdateJobIds + ", allIngestJobIds="
       + allIngestJobIds + ", fields=" + fields + ", disposalScheduleId='" + disposalScheduleId + '\''
       + ", disposalScheduleName='" + disposalScheduleName + '\'' + ", disposalRetentionPeriod='"
-      + disposalRetentionPeriod + '\'' + ", disposalHoldsId=" + disposalHoldsId + ", destructionOn=" + destructionOn
-      + ", destructionApprovedBy='" + destructionApprovedBy + '\'' + ", disposalAction='" + disposalAction + '\''
+      + disposalRetentionPeriod + '\'' + ", disposalHoldsId=" + disposalHoldsId + ", destroyedOn=" + destroyedOn
+      + ", destroyedBy='" + destroyedBy + '\'' + ", disposalAction='" + disposalAction + '\''
       + ", overdueDate=" + overdueDate + ", disposalHoldStatus=" + disposalHoldStatus + ", disposalConfirmationId='"
       + disposalConfirmationId + '\'' + ", disposalFlow=" + disposalFlow + '}';
   }
@@ -635,7 +633,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
       "ancestors", "permissions", "numberOfSubmissionFiles", "numberOfDocumentationFiles", "numberOfSchemaFiles",
       "hasRepresentations", "ghost", "ingestSIPId", "ingestJobId", "ingestUpdateJobIds", "allIngestJobIds", "createdOn",
       "createdBy", "updatedOn", "updatedBy", "disposalScheduleId", "disposalScheduleName", "disposalHoldsId",
-      "destructionOn", "destructionApprovedBy", "disposalFlow");
+      "destroyedOn", "destroyedBy", "disposalFlow");
   }
 
   @Override
@@ -643,7 +641,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
     return Arrays.asList(id, state, type, level, title, dateInitial, dateFinal, description, parentID, ancestors,
       permissions, numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles, hasRepresentations, ghost,
       ingestSIPIds, ingestJobId, ingestUpdateJobIds, allIngestJobIds, createdOn, createdBy, updatedOn, updatedBy,
-      disposalScheduleId, disposalScheduleName, disposalHoldsId, destructionOn, destructionApprovedBy, disposalFlow);
+      disposalScheduleId, disposalScheduleName, disposalHoldsId, destroyedOn, destroyedBy, disposalFlow);
   }
 
   @JsonIgnore

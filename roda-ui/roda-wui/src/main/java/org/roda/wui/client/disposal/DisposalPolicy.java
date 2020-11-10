@@ -11,6 +11,7 @@ import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -102,10 +103,6 @@ public class DisposalPolicy extends Composite {
   }
 
   private DisposalRules disposalRules;
-  private DisposalSchedules disposalSchedules;
-  private DisposalHolds disposalHolds;
-
-  private Long aipCounter;
 
   @UiField
   FlowPanel disposalPolicyDescription;
@@ -120,7 +117,6 @@ public class DisposalPolicy extends Composite {
   FlowPanel sidebarButtonsPanel;
 
   // Disposal Rules
-
   @UiField
   FlowPanel disposalRulesDescription;
 
@@ -131,7 +127,6 @@ public class DisposalPolicy extends Composite {
   FlowPanel disposalRulesButtonsPanel;
 
   // Disposal Schedules
-
   @UiField
   FlowPanel disposalSchedulesDescription;
 
@@ -142,7 +137,6 @@ public class DisposalPolicy extends Composite {
   FlowPanel disposalSchedulesButtonsPanel;
 
   // Disposal Holds
-
   @UiField
   FlowPanel disposalHoldsDescription;
 
@@ -153,25 +147,13 @@ public class DisposalPolicy extends Composite {
   FlowPanel disposalHoldsButtonsPanel;
 
   private static void loadAll(AsyncCallback<Widget> callback) {
-    BrowserService.Util.getInstance().listDisposalSchedules(new AsyncCallback<DisposalSchedules>() {
-      @Override
-      public void onFailure(Throwable throwable) {
-      }
-
+    BrowserService.Util.getInstance().listDisposalSchedules(new NoAsyncCallback<DisposalSchedules>() {
       @Override
       public void onSuccess(DisposalSchedules disposalSchedules) {
-        BrowserService.Util.getInstance().listDisposalHolds(new AsyncCallback<DisposalHolds>() {
-          @Override
-          public void onFailure(Throwable throwable) {
-          }
-
+        BrowserService.Util.getInstance().listDisposalHolds(new NoAsyncCallback<DisposalHolds>() {
           @Override
           public void onSuccess(DisposalHolds disposalHolds) {
-            BrowserService.Util.getInstance().listDisposalRules(new AsyncCallback<DisposalRules>() {
-              @Override
-              public void onFailure(Throwable throwable) {
-              }
-
+            BrowserService.Util.getInstance().listDisposalRules(new NoAsyncCallback<DisposalRules>() {
               @Override
               public void onSuccess(DisposalRules disposalRules) {
                 callback.onSuccess(new DisposalPolicy(disposalSchedules, disposalHolds, disposalRules));
@@ -184,21 +166,12 @@ public class DisposalPolicy extends Composite {
   }
 
   private static void loadDisposalSchedulesAndHolds(AsyncCallback<Widget> callback) {
-    BrowserService.Util.getInstance().listDisposalSchedules(new AsyncCallback<DisposalSchedules>() {
-      @Override
-      public void onFailure(Throwable throwable) {
-      }
-
+    BrowserService.Util.getInstance().listDisposalSchedules(new NoAsyncCallback<DisposalSchedules>() {
       @Override
       public void onSuccess(DisposalSchedules disposalSchedules) {
-        BrowserService.Util.getInstance().listDisposalHolds(new AsyncCallback<DisposalHolds>() {
-          @Override
-          public void onFailure(Throwable throwable) {
-          }
-
+        BrowserService.Util.getInstance().listDisposalHolds(new NoAsyncCallback<DisposalHolds>() {
           @Override
           public void onSuccess(DisposalHolds disposalHolds) {
-
             callback.onSuccess(new DisposalPolicy(disposalSchedules, disposalHolds));
           }
         });
@@ -207,21 +180,12 @@ public class DisposalPolicy extends Composite {
   }
 
   private static void loadDisposalSchedulesAndRules(AsyncCallback<Widget> callback) {
-    BrowserService.Util.getInstance().listDisposalSchedules(new AsyncCallback<DisposalSchedules>() {
-      @Override
-      public void onFailure(Throwable throwable) {
-      }
-
+    BrowserService.Util.getInstance().listDisposalSchedules(new NoAsyncCallback<DisposalSchedules>() {
       @Override
       public void onSuccess(DisposalSchedules disposalSchedules) {
-        BrowserService.Util.getInstance().listDisposalRules(new AsyncCallback<DisposalRules>() {
-          @Override
-          public void onFailure(Throwable throwable) {
-          }
-
+        BrowserService.Util.getInstance().listDisposalRules(new NoAsyncCallback<DisposalRules>() {
           @Override
           public void onSuccess(DisposalRules disposalRules) {
-
             callback.onSuccess(new DisposalPolicy(disposalSchedules, disposalRules));
           }
         });
@@ -230,21 +194,12 @@ public class DisposalPolicy extends Composite {
   }
 
   private static void loadDisposalHoldsAndRules(AsyncCallback<Widget> callback) {
-    BrowserService.Util.getInstance().listDisposalRules(new AsyncCallback<DisposalRules>() {
-      @Override
-      public void onFailure(Throwable throwable) {
-      }
-
+    BrowserService.Util.getInstance().listDisposalRules(new NoAsyncCallback<DisposalRules>() {
       @Override
       public void onSuccess(DisposalRules disposalRules) {
-        BrowserService.Util.getInstance().listDisposalHolds(new AsyncCallback<DisposalHolds>() {
-          @Override
-          public void onFailure(Throwable throwable) {
-          }
-
+        BrowserService.Util.getInstance().listDisposalHolds(new NoAsyncCallback<DisposalHolds>() {
           @Override
           public void onSuccess(DisposalHolds disposalHolds) {
-
             callback.onSuccess(new DisposalPolicy(disposalHolds, disposalRules));
           }
         });
@@ -253,11 +208,7 @@ public class DisposalPolicy extends Composite {
   }
 
   private static void loadDisposalSchedules(AsyncCallback<Widget> callback) {
-    BrowserService.Util.getInstance().listDisposalSchedules(new AsyncCallback<DisposalSchedules>() {
-      @Override
-      public void onFailure(Throwable throwable) {
-      }
-
+    BrowserService.Util.getInstance().listDisposalSchedules(new NoAsyncCallback<DisposalSchedules>() {
       @Override
       public void onSuccess(DisposalSchedules disposalSchedules) {
         callback.onSuccess(new DisposalPolicy(disposalSchedules));
@@ -266,11 +217,7 @@ public class DisposalPolicy extends Composite {
   }
 
   private static void loadDisposalHolds(AsyncCallback<Widget> callback) {
-    BrowserService.Util.getInstance().listDisposalHolds(new AsyncCallback<DisposalHolds>() {
-      @Override
-      public void onFailure(Throwable throwable) {
-      }
-
+    BrowserService.Util.getInstance().listDisposalHolds(new NoAsyncCallback<DisposalHolds>() {
       @Override
       public void onSuccess(DisposalHolds disposalHolds) {
         callback.onSuccess(new DisposalPolicy(disposalHolds));
@@ -279,11 +226,7 @@ public class DisposalPolicy extends Composite {
   }
 
   private static void loadDisposalRules(AsyncCallback<Widget> callback) {
-    BrowserService.Util.getInstance().listDisposalRules(new AsyncCallback<DisposalRules>() {
-      @Override
-      public void onFailure(Throwable throwable) {
-      }
-
+    BrowserService.Util.getInstance().listDisposalRules(new NoAsyncCallback<DisposalRules>() {
       @Override
       public void onSuccess(DisposalRules disposalRules) {
         callback.onSuccess(new DisposalPolicy(disposalRules));
@@ -516,8 +459,6 @@ public class DisposalPolicy extends Composite {
     DisposalRules disposalRules) {
 
     this.disposalRules = disposalRules;
-    this.disposalSchedules = disposalSchedules;
-    this.disposalHolds = disposalHolds;
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -546,8 +487,6 @@ public class DisposalPolicy extends Composite {
 
   private DisposalPolicy(DisposalSchedules disposalSchedules, DisposalHolds disposalHolds) {
     initWidget(uiBinder.createAndBindUi(this));
-    this.disposalSchedules = disposalSchedules;
-    this.disposalHolds = disposalHolds;
     disposalRulesTablePanel.setVisible(false);
     disposalRulesButtonsPanel.setVisible(false);
 
@@ -571,7 +510,6 @@ public class DisposalPolicy extends Composite {
   private DisposalPolicy(DisposalSchedules disposalSchedules, DisposalRules disposalRules) {
     initWidget(uiBinder.createAndBindUi(this));
     this.disposalRules = disposalRules;
-    this.disposalSchedules = disposalSchedules;
     disposalHoldsTablePanel.setVisible(false);
     disposalHoldsButtonsPanel.setVisible(false);
 
@@ -595,7 +533,6 @@ public class DisposalPolicy extends Composite {
   private DisposalPolicy(DisposalHolds disposalHolds, DisposalRules disposalRules) {
     initWidget(uiBinder.createAndBindUi(this));
     this.disposalRules = disposalRules;
-    this.disposalHolds = disposalHolds;
     disposalSchedulesTablePanel.setVisible(false);
     disposalSchedulesButtonsPanel.setVisible(false);
 
@@ -618,7 +555,6 @@ public class DisposalPolicy extends Composite {
 
   private DisposalPolicy(DisposalSchedules disposalSchedules) {
     initWidget(uiBinder.createAndBindUi(this));
-    this.disposalSchedules = disposalSchedules;
     disposalHoldsTablePanel.setVisible(false);
     disposalHoldsButtonsPanel.setVisible(false);
     disposalRulesTablePanel.setVisible(false);
@@ -636,7 +572,6 @@ public class DisposalPolicy extends Composite {
   }
 
   private DisposalPolicy(DisposalHolds disposalHolds) {
-    this.disposalHolds = disposalHolds;
     initWidget(uiBinder.createAndBindUi(this));
     disposalSchedulesTablePanel.setVisible(false);
     disposalSchedulesButtonsPanel.setVisible(false);
@@ -702,9 +637,8 @@ public class DisposalPolicy extends Composite {
             } else if (schedule.getRetentionPeriodIntervalCode() == RetentionPeriodIntervalCode.NO_RETENTION_PERIOD) {
               return schedule.getRetentionPeriodIntervalCode().toString();
             } else {
-              String value = schedule.getRetentionPeriodDuration().toString() + " "
+              return schedule.getRetentionPeriodDuration().toString() + " "
                 + schedule.getRetentionPeriodIntervalCode().toString().toLowerCase();
-              return value;
             }
           }
         }),
@@ -721,7 +655,7 @@ public class DisposalPolicy extends Composite {
 
             @Override
             public String getValue(DisposalSchedule schedule) {
-              return schedule.getNumberOfAIPUnder().toString();
+              return schedule.getApiCounter().toString();
             }
           }),
 
@@ -759,7 +693,7 @@ public class DisposalPolicy extends Composite {
         new BasicTablePanel.ColumnInfo<>(messages.disposalHoldNumberOfAIPs(), 12, new TextColumn<DisposalHold>() {
           @Override
           public String getValue(DisposalHold hold) {
-            return String.valueOf(hold.getActiveAIPs().size());
+            return String.valueOf(hold.getApiCounter());
           }
         }),
 
