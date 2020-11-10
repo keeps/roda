@@ -7238,3 +7238,7 @@ span.code {
     margin-top: 15px;
     padding: 5px 10px;
 }
+
+.disposalRuleOperator {
+    text-align: center;
+}

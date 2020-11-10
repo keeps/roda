@@ -1,12 +1,10 @@
 package org.roda.core.data.v2.ip.disposal;
 
 import java.util.Date;
-import java.util.Map;
 import java.util.Objects;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
-import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.ip.HasId;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -27,10 +25,11 @@ public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRu
 
   private String description;
 
-  private DisposalRuleType type;
+  private ConditionType type;
 
-  private String isChildOf;
-  private Map<String, FilterParameter> metadataFields = null;
+  // condition
+  private String conditionKey;
+  private String conditionValue;
 
   private String disposalScheduleId;
   private String disposalScheduleName;
@@ -72,11 +71,11 @@ public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRu
     this.description = description;
   }
 
-  public DisposalRuleType getType() {
+  public ConditionType getType() {
     return type;
   }
 
-  public void setType(DisposalRuleType type) {
+  public void setType(ConditionType type) {
     this.type = type;
   }
 
@@ -136,20 +135,20 @@ public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRu
     this.updatedBy = updatedBy;
   }
 
-  public String getIsChildOf() {
-    return isChildOf;
+  public String getConditionKey() {
+    return conditionKey;
   }
 
-  public void setIsChildOf(String isChildOf) {
-    this.isChildOf = isChildOf;
+  public void setConditionKey(String conditionKey) {
+    this.conditionKey = conditionKey;
   }
 
-  public Map<String, FilterParameter> getMetadataFields() {
-    return metadataFields;
+  public String getConditionValue() {
+    return conditionValue;
   }
 
-  public void setMetadataFields(Map<String, FilterParameter> metadataFields) {
-    this.metadataFields = metadataFields;
+  public void setConditionValue(String conditionValue) {
+    this.conditionValue = conditionValue;
   }
 
   @Override
@@ -160,8 +159,8 @@ public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRu
       return false;
     DisposalRule that = (DisposalRule) o;
     return Objects.equals(id, that.id) && Objects.equals(title, that.title)
-      && Objects.equals(description, that.description) && type == that.type && Objects.equals(isChildOf, that.isChildOf)
-      && Objects.equals(metadataFields, that.metadataFields)
+      && Objects.equals(description, that.description) && type == that.type
+      && Objects.equals(conditionKey, that.conditionKey) && Objects.equals(conditionValue, that.conditionValue)
       && Objects.equals(disposalScheduleId, that.disposalScheduleId)
       && Objects.equals(disposalScheduleName, that.disposalScheduleName) && Objects.equals(order, that.order)
       && Objects.equals(createdOn, that.createdOn) && Objects.equals(createdBy, that.createdBy)
@@ -170,17 +169,17 @@ public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRu
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, title, description, type, isChildOf, metadataFields, disposalScheduleId,
+    return Objects.hash(id, title, description, type, conditionKey, conditionValue, disposalScheduleId,
       disposalScheduleName, order, createdOn, createdBy, updatedOn, updatedBy);
   }
 
   @Override
   public String toString() {
     return "DisposalRule{" + "id='" + id + '\'' + ", title='" + title + '\'' + ", description='" + description + '\''
-      + ", type=" + type + ", isChildOf=" + isChildOf + ", metadataFields=" + metadataFields + ", disposalScheduleId='"
-      + disposalScheduleId + '\'' + ", disposalScheduleName='" + disposalScheduleName + '\'' + ", order=" + order
-      + ", createdOn=" + createdOn + ", createdBy='" + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='"
-      + updatedBy + '\'' + '}';
+      + ", type=" + type + ", conditionKey='" + conditionKey + '\'' + ", conditionValue='" + conditionValue + '\''
+      + ", disposalScheduleId='" + disposalScheduleId + '\'' + ", disposalScheduleName='" + disposalScheduleName + '\''
+      + ", order=" + order + ", createdOn=" + createdOn + ", createdBy='" + createdBy + '\'' + ", updatedOn="
+      + updatedOn + ", updatedBy='" + updatedBy + '\'' + '}';
   }
 
   @JsonIgnore
