@@ -43,10 +43,16 @@
                                          ui:field="disposalRuleTypeLabel">
                                     <ui:text from='{messages.disposalRuleType}'/>
                                 </g:Label>
-                                <g:FlowPanel styleName="value"
+                                <g:HTML styleName="value"
                                         ui:field="disposalRuleType"/>
                             </g:FlowPanel>
-                            <g:FlowPanel styleName="field" ui:field="metadataValuesPanel">
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label"
+                                         ui:field="conditionsLabel">
+                                    <ui:text from='{messages.disposalRuleCondition}'/>
+                                </g:Label>
+                                <g:FlowPanel styleName="value"
+                                        ui:field="conditionsPanel"/>
                             </g:FlowPanel>
                         </g:FlowPanel>
                     </g:FlowPanel>
