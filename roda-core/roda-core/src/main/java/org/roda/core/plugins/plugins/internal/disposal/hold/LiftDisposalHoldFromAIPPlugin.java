@@ -1,9 +1,14 @@
 package org.roda.core.plugins.plugins.internal.disposal.hold;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.Job;
@@ -14,7 +19,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.RODAObjectProcessingLogic;
+import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
@@ -84,23 +89,31 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<AIP>() {
+    return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<AIP>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, AIP object) {
-        processAIP(index, model, report, cachedJob, jobPluginInfo, object);
+        JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, List<AIP> objects) {
+        processAIP(index, model, report, cachedJob, jobPluginInfo, objects);
       }
     }, index, model, storage, liteList);
   }
 
   private void processAIP(IndexService index, ModelService model, Report report, Job cachedJob,
-    JobPluginInfo jobPluginInfo, AIP aip) {
+    JobPluginInfo jobPluginInfo, List<AIP> aips) {
 
+    for (AIP aip : aips) {
+      // lift Holds
+      aip.getDisposalHoldAssociation().forEach(association -> {
+        association.setLiftedOn(new Date());
+        association.setLiftedBy(cachedJob.getUsername());
+      });
 
-
-    // lift AIP
-
-    // move AIP to inactive list
+      try {
+        model.updateAIP(aip, cachedJob.getUsername());
+      } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
+        e.printStackTrace();
+      }
+    }
 
   }
 

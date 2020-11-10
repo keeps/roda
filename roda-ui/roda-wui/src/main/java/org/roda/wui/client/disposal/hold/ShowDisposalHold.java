@@ -204,25 +204,22 @@ public class ShowDisposalHold extends Composite {
       Button liftHoldBtn = new Button();
       liftHoldBtn.addStyleName("btn btn-block btn-danger btn-ban");
       liftHoldBtn.setText(messages.liftButton());
-      if (disposalHold.getActiveAIPs().size() == 0) {
-        liftHoldBtn.addClickHandler(new ClickHandler() {
-          @Override
-          public void onClick(ClickEvent clickEvent) {
-            disposalHold.setState(DisposalHoldState.LIFTED);
-            BrowserServiceImpl.Util.getInstance().updateDisposalHold(disposalHold, new AsyncCallback<DisposalHold>() {
-              @Override
-              public void onFailure(Throwable caught) {
-                errorMessage(caught);
-              }
+      if (disposalHold.getFirstTimeUsed() == null) {
+        liftHoldBtn.addClickHandler(clickEvent -> {
+          disposalHold.setState(DisposalHoldState.LIFTED);
+          BrowserServiceImpl.Util.getInstance().updateDisposalHold(disposalHold, new AsyncCallback<DisposalHold>() {
+            @Override
+            public void onFailure(Throwable caught) {
+              errorMessage(caught);
+            }
 
-              @Override
-              public void onSuccess(DisposalHold disposalHold) {
-                HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
-              }
-            });
-          }
+            @Override
+            public void onSuccess(DisposalHold disposalHold) {
+              HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+            }
+          });
         });
-      }else{
+      } else {
         // TODO -> plugin to lift hold in all AIPs
       }
       buttonsPanel.add(liftHoldBtn);

@@ -3318,7 +3318,7 @@ public class ModelService extends ModelObservable {
 
     DisposalHold disposalHold = retrieveDisposalHold(disposalHoldId);
 
-    if (disposalHold.getActiveAIPs().isEmpty() && disposalHold.getInactiveAIPs().isEmpty()) {
+    if (disposalHold.getFirstTimeUsed() == null) {
       StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
       storage.deleteResource(disposalHoldPath);
     } else {
@@ -3336,6 +3336,11 @@ public class ModelService extends ModelObservable {
       CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(disposalHoldContainerPath, false);
       for (Resource resource : iterable) {
         DisposalHold hold = ResourceParseUtils.convertResourceToObject(resource, DisposalHold.class);
+
+        Long count = SolrUtils.count(RodaCoreFactory.getSolr(), IndexedAIP.class, new Filter(
+            new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLDS_ID, hold.getId())));
+        hold.setApiCounter(count);
+
         disposalHolds.addObject(hold);
       }
     } catch (NotFoundException e) {
@@ -3466,12 +3471,13 @@ public class ModelService extends ModelObservable {
 
         Long count = SolrUtils.count(RodaCoreFactory.getSolr(), IndexedAIP.class, new Filter(
             new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID, schedule.getId())));
-        schedule.setNumberOfAIPUnder(count);
+        schedule.setApiCounter(count);
 
         disposalSchedules.addObject(schedule);
       }
 
     } catch (NotFoundException e) {
+      LOGGER.error("Could not find any disposal schedules to list: {}", e.getMessage(), e);
       return disposalSchedules;
     }
 

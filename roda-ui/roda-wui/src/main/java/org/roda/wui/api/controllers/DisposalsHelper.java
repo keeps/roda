@@ -41,7 +41,7 @@ public class DisposalsHelper {
       throw new DisposalScheduleNotValidException("The disposal schedule title is mandatory");
     }
 
-    if (!isNumberOfAIPsValid(disposalSchedule.getNumberOfAIPUnder(), disposalSchedule.getState())) {
+    if (!isNumberOfAIPsValid(disposalSchedule.getApiCounter(), disposalSchedule.getState())) {
       throw new DisposalScheduleNotValidException("The disposal schedule can not be deactivated");
     }
 

@@ -20,6 +20,8 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
+import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
@@ -96,6 +98,20 @@ public class HtmlSnippetUtils {
       ret = b.toSafeHtml();
     }
     return ret;
+  }
+
+  public static SafeHtml getDisposalHoldStateHtml(DisposalHoldAssociation disposalHoldAssociation) {
+    SafeHtmlBuilder b = new SafeHtmlBuilder();
+    if (disposalHoldAssociation.getLiftedOn() != null) {
+      b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT));
+      b.append(SafeHtmlUtils.fromString(messages.disposalHoldState(DisposalHoldState.LIFTED.toString())));
+    } else {
+      b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
+      b.append(SafeHtmlUtils.fromString(messages.disposalHoldState(DisposalHoldState.ACTIVE.toString())));
+    }
+    b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+
+    return b.toSafeHtml();
   }
 
   public static SafeHtml getDisposalHoldStateHtml(DisposalHold disposalHold) {
@@ -567,6 +583,7 @@ public class HtmlSnippetUtils {
         break;
     }
 
-    return SafeHtmlUtils.fromSafeConstant("<span class='" + labelClass + "'>" + messages.disposalConfirmationState(state) + CLOSE_SPAN);
+    return SafeHtmlUtils
+      .fromSafeConstant("<span class='" + labelClass + "'>" + messages.disposalConfirmationState(state) + CLOSE_SPAN);
   }
 }

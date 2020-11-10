@@ -1784,16 +1784,13 @@ public final class PluginHelper {
     return createOutcomeTextForDisposal("Disposal hold", actionMessage, disposalHoldId, disposalHoldTitle);
   }
 
-  public static String createOutcomeTextForDisposalHold(String actionMessage, String disposalHoldId, String disposalHoldTitle) {
-    return createOutcomeTextForDisposal("Disposal hold", actionMessage, disposalHoldId, disposalHoldTitle);
-  }
-
   public static String createOutcomeTextForDisposalSchedule(String actionMessage, String disposalScheduleId,
     String disposalScheduleTitle) {
     return createOutcomeTextForDisposal("Disposal schedule", actionMessage, disposalScheduleId, disposalScheduleTitle);
   }
 
-  private static String createOutcomeTextForDisposal(String type, String actionMessage, String disposalId, String disposalTitle) {
+  private static String createOutcomeTextForDisposal(String type, String actionMessage, String disposalId,
+    String disposalTitle) {
     StringBuilder outcomeText = new StringBuilder(type);
 
     if (StringUtils.isNotBlank(disposalTitle)) {

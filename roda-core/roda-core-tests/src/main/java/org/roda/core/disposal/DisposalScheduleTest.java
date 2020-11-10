@@ -186,8 +186,8 @@ public class DisposalScheduleTest {
     // Retrieve AIP
     final IndexedAIP indexedAip = index.retrieve(IndexedAIP.class, aipId, new ArrayList<>());
     assertEquals(aip.getDisposalScheduleId(), indexedAip.getDisposalScheduleId());
-    assertEquals(aip.getDestroyedOn(), indexedAip.getDestructionOn());
-    assertEquals(aip.getDestroyedBy(), indexedAip.getDestructionApprovedBy());
+    assertEquals(aip.getDestroyedOn(), indexedAip.getDestroyedOn());
+    assertEquals(aip.getDestroyedBy(), indexedAip.getDestroyedBy());
   }
 
   @Test
