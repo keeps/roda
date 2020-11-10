@@ -273,7 +273,6 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
           reportItem.setPluginDetails("Apply disposal schedule: " + disposalScheduleId);
           aipChildren.setDisposalScheduleId(aipParent.getDisposalScheduleId());
           model.updateAIP(aipChildren, cachedJob.getUsername());
-          disposalSchedule.incrementNumberOfAIPsByOne();
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
           outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule("was successfully applied to AIP",
             disposalSchedule.getId(), disposalSchedule.getTitle());

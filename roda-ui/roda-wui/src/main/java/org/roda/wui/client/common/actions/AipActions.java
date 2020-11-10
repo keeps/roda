@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.google.gwt.user.client.Timer;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -44,6 +43,7 @@ import org.roda.wui.client.common.dialogs.DisposalDialogs;
 import org.roda.wui.client.common.dialogs.RepresentationDialogs;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.dialogs.utils.DisposalHoldDialogResult;
+import org.roda.wui.client.common.dialogs.utils.DisposalScheduleDialogsResult;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.process.ShowJob;
@@ -178,18 +178,6 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState())) {
       return hasPermissions(action, aip.getPermissions())
         && (POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action) || APPRAISAL_ACTIONS.contains(action));
-    } else if (action.equals(AipAction.LIFT_DISPOSAL_HOLD)) {
-      if (aip.isDisposalHoldStatus()) {
-        return hasPermissions(action, aip.getPermissions()) && POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action);
-      } else {
-        return false;
-      }
-    } else if (action.equals(AipAction.APPLY_DISPOSAL_HOLD)) {
-      if (!aip.isDisposalHoldStatus()) {
-        return hasPermissions(action, aip.getPermissions()) && POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action);
-      } else {
-        return false;
-      }
     } else {
       return hasPermissions(action, aip.getPermissions()) && POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action);
     }
@@ -808,7 +796,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                               });
                           } else {
                             BrowserService.Util.getInstance().associateDisposalSchedule(aips, disposalSchedule.getId(),
-                                applyToHierarchy, overwriteAll, new ActionAsyncCallback<Job>(callback) {
+                              applyToHierarchy, overwriteAll, new ActionAsyncCallback<Job>(callback) {
 
                                 @Override
                                 public void onFailure(Throwable caught) {
@@ -878,59 +866,119 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                 }
 
                 @Override
-                public void onSuccess(DisposalHoldDialogResult holdDialogResult) {
-                  Dialogs.showConfirmDialog(messages.applyDisposalHoldDialogTitle(),
-                    messages.applyDisposalHoldDialogMessage(), messages.dialogNo(), messages.dialogYes(),
-                    new ActionNoAsyncCallback<Boolean>(callback) {
-                      @Override
-                      public void onSuccess(Boolean result) {
-                        if (result) {
-                          BrowserService.Util.getInstance().applyDisposalHold(aips,
-                            holdDialogResult.getDisposalHold().getId(), new ActionAsyncCallback<Job>(callback) {
-                              @Override
-                              public void onFailure(Throwable caught) {
-                                callback.onFailure(caught);
-                                HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                              }
-
-                              @Override
-                              public void onSuccess(Job job) {
-                                Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
-
-                                  @Override
-                                  public void onFailure(Throwable caught) {
-                                    Toast.showInfo(messages.runningInBackgroundTitle(),
-                                      messages.runningInBackgroundDescription());
-
-                                    Timer timer = new Timer() {
-                                      @Override
-                                      public void run() {
-                                        doActionCallbackUpdated();
-                                      }
-                                    };
-
-                                    timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                                  }
-
-                                  @Override
-                                  public void onSuccess(final Void nothing) {
-                                    doActionCallbackNone();
-                                    HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-                                  }
-                                });
-                              }
-                            });
-                        } else {
-                          doActionCallbackNone();
-                        }
-                      }
-                    });
+                public void onSuccess(DisposalHoldDialogResult result) {
+                  if (DisposalHoldDialogResult.ActionType.CLEAR.equals(result.getActionType())) {
+                    clearDisposalHolds(aips, callback);
+                  } else if (DisposalHoldDialogResult.ActionType.ASSOCIATE.equals(result.getActionType())) {
+                    applyDisposalHold(aips, result, callback);
+                  } else if (DisposalHoldDialogResult.ActionType.OVERRIDE.equals(result.getActionType())) {
+                    overrideDisposalHolds(aips, result, callback);
+                  }
                 }
               });
           }
         });
       }
     });
+  }
+
+  private void overrideDisposalHolds(final SelectedItems<IndexedAIP> aips, DisposalHoldDialogResult holdDialogResult,
+    final AsyncCallback<ActionImpact> callback) {
+
+  }
+
+  private void applyDisposalHold(final SelectedItems<IndexedAIP> aips, DisposalHoldDialogResult holdDialogResult,
+    final AsyncCallback<ActionImpact> callback) {
+    Dialogs.showConfirmDialog(messages.applyDisposalHoldDialogTitle(), messages.applyDisposalHoldDialogMessage(),
+      messages.dialogNo(), messages.dialogYes(), new ActionNoAsyncCallback<Boolean>(callback) {
+        @Override
+        public void onSuccess(Boolean result) {
+          if (result) {
+            BrowserService.Util.getInstance().applyDisposalHold(aips, holdDialogResult.getDisposalHold().getId(),
+              new ActionAsyncCallback<Job>(callback) {
+                @Override
+                public void onFailure(Throwable caught) {
+                  callback.onFailure(caught);
+                  HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                }
+
+                @Override
+                public void onSuccess(Job job) {
+                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+
+                      Timer timer = new Timer() {
+                        @Override
+                        public void run() {
+                          doActionCallbackUpdated();
+                        }
+                      };
+
+                      timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                    }
+
+                    @Override
+                    public void onSuccess(final Void nothing) {
+                      doActionCallbackNone();
+                      HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                    }
+                  });
+                }
+              });
+          } else {
+            doActionCallbackNone();
+          }
+        }
+      });
+  }
+
+  private void clearDisposalHolds(final SelectedItems<IndexedAIP> aips, final AsyncCallback<ActionImpact> callback) {
+    Dialogs.showConfirmDialog(messages.clearDisposalHoldDialogTitle(), messages.clearDisposalHoldDialogMessage(),
+      messages.dialogNo(), messages.dialogYes(), new ActionNoAsyncCallback<Boolean>(callback) {
+        @Override
+        public void onSuccess(Boolean result) {
+          if (result) {
+            BrowserService.Util.getInstance().clearDisposalHolds(aips, new ActionAsyncCallback<Job>(callback) {
+              @Override
+              public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+                HistoryUtils.newHistory(InternalProcess.RESOLVER);
+              }
+
+              @Override
+              public void onSuccess(Job job) {
+                Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+
+                    Timer timer = new Timer() {
+                      @Override
+                      public void run() {
+                        doActionCallbackUpdated();
+                      }
+                    };
+
+                    timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                  }
+
+                  @Override
+                  public void onSuccess(final Void nothing) {
+                    doActionCallbackNone();
+                    HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                  }
+                });
+              }
+            });
+          } else {
+            doActionCallbackNone();
+          }
+        }
+      });
   }
 
   @Override

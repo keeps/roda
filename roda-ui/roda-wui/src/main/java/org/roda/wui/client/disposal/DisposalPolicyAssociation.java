@@ -2,9 +2,9 @@ package org.roda.wui.client.disposal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
-import com.google.gwt.user.client.ui.Button;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
@@ -12,18 +12,24 @@ import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
+import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.DisposalAssociationActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
+import org.roda.wui.client.common.dialogs.DisposalDialogs;
+import org.roda.wui.client.common.dialogs.utils.DisposalHoldDialogResult;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
-import org.roda.wui.client.disposal.hold.CreateDisposalHold;
 import org.roda.wui.client.disposal.hold.ShowDisposalHold;
+import org.roda.wui.client.main.BreadcrumbItem;
+import org.roda.wui.client.main.BreadcrumbUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
@@ -36,6 +42,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -45,9 +52,11 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
-import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 public class DisposalPolicyAssociation extends Composite {
+  private static final List<String> aipFieldsToReturn = new ArrayList<>(
+    Arrays.asList(RodaConstants.INDEX_AIP, RodaConstants.AIP_TITLE, RodaConstants.AIP_DISPOSAL_SCHEDULE_NAME));
+
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
     @Override
     public String getHistoryToken() {
@@ -68,20 +77,18 @@ public class DisposalPolicyAssociation extends Composite {
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 2) {
         final String aipId = historyTokens.get(1);
-
-        List<String> fieldsToReturn = new ArrayList<>();
-        fieldsToReturn.addAll(
-          Arrays.asList(RodaConstants.INDEX_AIP, RodaConstants.AIP_TITLE, RodaConstants.AIP_DISPOSAL_SCHEDULE_NAME));
         BrowserService.Util.getInstance().retrieveBrowseAIPBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
-          fieldsToReturn, new AsyncCallback<BrowseAIPBundle>() {
-            @Override
-            public void onFailure(Throwable throwable) {
-
-            }
-
+          aipFieldsToReturn, new NoAsyncCallback<BrowseAIPBundle>() {
             @Override
             public void onSuccess(BrowseAIPBundle bundle) {
-              callback.onSuccess(new DisposalPolicyAssociation(bundle));
+              BrowserService.Util.getInstance().listDisposalHoldsAssociation(bundle.getAip().getId(),
+                new NoAsyncCallback<List<DisposalHoldAssociation>>() {
+                  @Override
+                  public void onSuccess(List<DisposalHoldAssociation> disposalHoldAssociations) {
+                    callback.onSuccess(new DisposalPolicyAssociation(bundle, disposalHoldAssociations));
+                  }
+                });
+
             }
           });
       }
@@ -91,6 +98,9 @@ public class DisposalPolicyAssociation extends Composite {
   private static DisposalPolicyAssociation instance = null;
   private List<DisposalHold> disposalHoldList = new ArrayList<>();
   private IndexedAIP aip;
+
+  @UiField
+  NavigationToolbar<IndexedAIP> navigationToolbar;
 
   @UiField
   FlowPanel disposalPolicyAIPDescription;
@@ -135,7 +145,7 @@ public class DisposalPolicyAssociation extends Composite {
   private static DisposalPolicyAssociation.MyUiBinder uiBinder = GWT.create(DisposalPolicyAssociation.MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  public DisposalPolicyAssociation(BrowseAIPBundle bundle) {
+  public DisposalPolicyAssociation(BrowseAIPBundle bundle, List<DisposalHoldAssociation> disposalHoldAssociations) {
     initWidget(uiBinder.createAndBindUi(this));
 
     actionableWidgetBuilder = new ActionableWidgetBuilder<>(DisposalAssociationActions.get());
@@ -144,9 +154,22 @@ public class DisposalPolicyAssociation extends Composite {
     titlePanel.setText(aip.getTitle());
     titlePanel.setIcon(DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), false));
 
+    // NAVIGATION TOOLBAR
+    navigationToolbar.withObject(aip);
+    navigationToolbar.withoutButtons();
+    navigationToolbar.withPermissions(aip.getPermissions());
+    navigationToolbar.build();
+
+    BreadcrumbItem item = new BreadcrumbItem(messages.disposalPolicyTitle(),
+      () -> HistoryUtils.newHistory(DisposalPolicyAssociation.RESOLVER, aip.getId()));
+    List<BreadcrumbItem> aipBreadcrumbs = BreadcrumbUtils.getAipBreadcrumbs(bundle.getAIPAncestors(), bundle.getAip());
+    aipBreadcrumbs.add(item);
+    navigationToolbar.updateBreadcrumb(bundle);
+    navigationToolbar.updateBreadcrumbPath(aipBreadcrumbs);
 
     if (aip.getDisposalScheduleId() == null || aip.getDisposalScheduleId().isEmpty()) {
-      Label label = new HTML(SafeHtmlUtils.fromSafeConstant(messages.noItemsToDisplayPreFilters(messages.showDisposalScheduleTitle())));
+      Label label = new HTML(
+        SafeHtmlUtils.fromSafeConstant(messages.noItemsToDisplayPreFilters(messages.showDisposalScheduleTitle())));
       label.addStyleName("disposalSchedulesEmpty");
       disposalSchedule.clear();
       disposalSchedule.add(label);
@@ -156,49 +179,25 @@ public class DisposalPolicyAssociation extends Composite {
       if (aip.getOverdueDate() != null) {
         disposalRetentionDueDate.setText(aip.getOverdueDate().toString());
       }
-      disposalRetentionPeriod
-        .setText(aip.getDisposalRetentionPeriod());
+      disposalRetentionPeriod.setText(aip.getDisposalRetentionPeriod());
       disposalDisposalAction.setText(aip.getDisposalAction());
-      GWT.log("status " + aip.isDisposalHoldStatus());
-      disposalDisposalStatus.setHTML(HtmlSnippetUtils.getDisposalHoldStatusHTML(aip.isDisposalHoldStatus()));
+
+      if (aip.isDisposalHoldStatus()) {
+        disposalDisposalStatus.setText("On Hold");
+      } else {
+        disposalDisposalStatus.setText("CLEAR");
+      }
     }
-
-    if (aip.getDisposalHoldsId().isEmpty()) {
-      Label label = new HTML(SafeHtmlUtils.fromSafeConstant(messages.noItemsToDisplayPreFilters(messages.showDisposalHoldTitle())));
-      label.addStyleName("disposalSchedulesEmpty");
-      disposalHoldsPanel.clear();
-      disposalHoldsPanel.add(label);
-    } else {
-      BrowserService.Util.getInstance().listDisposalHoldsAssociation(aip.getId(),
-        new AsyncCallback<List<DisposalHoldAssociation>>() {
-          @Override
-          public void onFailure(Throwable throwable) {
-            GWT.log("Fail");
-          }
-
-          @Override
-          public void onSuccess(List<DisposalHoldAssociation> disposalHoldAssociations) {
-            fetchDisposalHolds(aip.getDisposalHoldsId(), disposalHoldAssociations);
-          }
-        });
-    }
-
-    addDisposalHoldBtn.setText(messages.addDisposalHoldButton());
-    addDisposalHoldBtn.addClickHandler(event -> CreateDisposalHold.RESOLVER.getHistoryToken());
 
     actionsSidebar
       .setWidget(actionableWidgetBuilder.withBackButton().buildListWithObjects(new ActionableObject<>(aip)));
+
+    fetchDisposalHolds(disposalHoldAssociations);
   }
 
-  private void fetchDisposalHolds(List<String> disposalHoldsId,
-    List<DisposalHoldAssociation> disposalHoldAssociations) {
-    for (String disposalHoldId : disposalHoldsId) {
-      BrowserService.Util.getInstance().retrieveDisposalHold(disposalHoldId, new AsyncCallback<DisposalHold>() {
-        @Override
-        public void onFailure(Throwable throwable) {
-
-        }
-
+  private void fetchDisposalHolds(List<DisposalHoldAssociation> disposalHoldAssociations) {
+    for (DisposalHoldAssociation association : disposalHoldAssociations) {
+      BrowserService.Util.getInstance().retrieveDisposalHold(association.getId(), new NoAsyncCallback<DisposalHold>() {
         @Override
         public void onSuccess(DisposalHold disposalHold) {
           disposalHoldList.add(disposalHold);
@@ -210,98 +209,94 @@ public class DisposalPolicyAssociation extends Composite {
 
   private void refreshDisposalHoldList(List<DisposalHoldAssociation> disposalHoldAssociations) {
     DisposalHolds disposalHolds = new DisposalHolds(disposalHoldList);
-    BasicTablePanel<DisposalHold> tableHolds = getBasicTablePanelForDisposalHolds(disposalHolds,
+    BasicTablePanel<DisposalHoldAssociation> tableHolds = getBasicTablePanelForDisposalHolds(disposalHolds,
       disposalHoldAssociations);
     tableHolds.getSelectionModel().addSelectionChangeHandler(event -> {
-      DisposalHold selectedHold = tableHolds.getSelectionModel().getSelectedObject();
-      if (selectedHold != null) {
-        tableHolds.getSelectionModel().clear();
-        List<String> path = HistoryUtils.getHistory(ShowDisposalHold.RESOLVER.getHistoryPath(), selectedHold.getId());
+      DisposalHoldAssociation selectedObject = tableHolds.getSelectionModel().getSelectedObject();
+      if (selectedObject != null) {
+        List<String> path = HistoryUtils.getHistory(ShowDisposalHold.RESOLVER.getHistoryPath(), selectedObject.getId());
         HistoryUtils.newHistory(path);
       }
     });
     disposalHoldsPanel.clear();
     disposalHoldsPanel.add(tableHolds);
+    disposalHoldsPanel.add(associateDisposalHoldButton());
   }
 
-  private BasicTablePanel<DisposalHold> getBasicTablePanelForDisposalHolds(DisposalHolds disposalHolds,
+  private Button associateDisposalHoldButton() {
+    Button associateDisposalHoldButton = new Button();
+    associateDisposalHoldButton.addStyleName("btn btn-plus");
+    associateDisposalHoldButton.setText(messages.associateDisposalHoldButton());
+    associateDisposalHoldButton.addClickHandler(clickEvent -> {
+      BrowserService.Util.getInstance().listDisposalHolds(new NoAsyncCallback<DisposalHolds>() {
+        @Override
+        public void onSuccess(DisposalHolds holds) {
+          DisposalDialogs.showDisposalHoldSelection("", holds, new NoAsyncCallback<DisposalHoldDialogResult>() {
+            @Override
+            public void onSuccess(DisposalHoldDialogResult result) {
+
+            }
+          });
+        }
+      });
+
+    });
+    return associateDisposalHoldButton;
+  }
+
+  private BasicTablePanel<DisposalHoldAssociation> getBasicTablePanelForDisposalHolds(DisposalHolds disposalHolds,
     List<DisposalHoldAssociation> disposalHoldAssociations) {
     Label headerHolds = new Label();
     HTMLPanel info = new HTMLPanel(SafeHtmlUtils.EMPTY_SAFE_HTML);
 
-    if (disposalHolds.getObjects().isEmpty()) {
-      return new BasicTablePanel<>(headerHolds, messages.noItemsToDisplayPreFilters("disposal holds"));
+    disposalHoldAssociations.sort(Comparator.comparing(DisposalHoldAssociation::getAssociatedOn));
+
+    if (disposalHoldAssociations.isEmpty()) {
+      return new BasicTablePanel<>(headerHolds, messages.noItemsToDisplayPreFilters(messages.disposalHoldsTitle()));
     } else {
-      return new BasicTablePanel<DisposalHold>(headerHolds, info, disposalHolds.getObjects().iterator(),
+      return new BasicTablePanel<DisposalHoldAssociation>(headerHolds, info, disposalHoldAssociations.iterator(),
 
-        new BasicTablePanel.ColumnInfo<>(messages.disposalHoldTitle(), 15, new TextColumn<DisposalHold>() {
+        new BasicTablePanel.ColumnInfo<>(messages.disposalHoldTitle(), 15, new TextColumn<DisposalHoldAssociation>() {
           @Override
-          public String getValue(DisposalHold hold) {
-            return hold.getTitle();
-          }
-        }),
-
-        new BasicTablePanel.ColumnInfo<>(messages.disposalHoldAssociatedOnLabel(), 15, new TextColumn<DisposalHold>() {
-          @Override
-          public String getValue(DisposalHold hold) {
-            DisposalHoldAssociation association = disposalHoldAssociations.stream()
-              .filter(disposalHoldAssociation -> hold.getId().equals(disposalHoldAssociation.getId())).findAny()
-              .orElse(null);
-            if (association != null && association.getAssociatedOn() != null) {
-              return association.getAssociatedOn().toString();
+          public String getValue(DisposalHoldAssociation association) {
+            DisposalHold hold = disposalHolds.findDisposalHold(association.getId());
+            if (hold != null && hold.getTitle() != null) {
+              return hold.getTitle();
             } else {
-              return null;
+              return "";
             }
           }
         }),
 
-        new BasicTablePanel.ColumnInfo<>(messages.disposalHoldAssociatedByLabel(), 15, new TextColumn<DisposalHold>() {
-          @Override
-          public String getValue(DisposalHold hold) {
-            DisposalHoldAssociation association = disposalHoldAssociations.stream()
-              .filter(disposalHoldAssociation -> hold.getId().equals(disposalHoldAssociation.getId())).findAny()
-              .orElse(null);
-            if (association != null && association.getAssociatedBy() != null) {
-              return association.getAssociatedBy();
-            } else {
-              return null;
+        new BasicTablePanel.ColumnInfo<DisposalHoldAssociation>(messages.disposalHoldAssociatedOn(), 15,
+          new TextColumn<DisposalHoldAssociation>() {
+            @Override
+            public String getValue(DisposalHoldAssociation association) {
+              if (association != null && association.getAssociatedOn() != null) {
+                return Humanize.formatDate(association.getAssociatedOn());
+              } else {
+                return "";
+              }
             }
-          }
-        }),
+          }),
 
-        new BasicTablePanel.ColumnInfo<>(messages.disposalHoldLiftedOnLabel(), 15, new TextColumn<DisposalHold>() {
-          @Override
-          public String getValue(DisposalHold hold) {
-            DisposalHoldAssociation association = disposalHoldAssociations.stream()
-              .filter(disposalHoldAssociation -> hold.getId().equals(disposalHoldAssociation.getId())).findAny()
-              .orElse(null);
-            if (association != null && association.getLiftedOn() != null) {
-              return association.getLiftedOn().toString();
-            } else {
-              return null;
+        new BasicTablePanel.ColumnInfo<DisposalHoldAssociation>(messages.disposalHoldLiftedOn(), 15,
+          new TextColumn<DisposalHoldAssociation>() {
+            @Override
+            public String getValue(DisposalHoldAssociation association) {
+              if (association != null && association.getLiftedOn() != null) {
+                return Humanize.formatDate(association.getLiftedOn());
+              } else {
+                return "";
+              }
             }
-          }
-        }),
-
-        new BasicTablePanel.ColumnInfo<>(messages.disposalHoldLiftedByLabel(), 15, new TextColumn<DisposalHold>() {
-          @Override
-          public String getValue(DisposalHold hold) {
-            DisposalHoldAssociation association = disposalHoldAssociations.stream()
-              .filter(disposalHoldAssociation -> hold.getId().equals(disposalHoldAssociation.getId())).findAny()
-              .orElse(null);
-            if (association != null && association.getLiftedBy() != null) {
-              return association.getLiftedBy();
-            } else {
-              return null;
-            }
-          }
-        }),
+          }),
 
         new BasicTablePanel.ColumnInfo<>(messages.disposalHoldStateCol(), 8,
-          new Column<DisposalHold, SafeHtml>(new SafeHtmlCell()) {
+          new Column<DisposalHoldAssociation, SafeHtml>(new SafeHtmlCell()) {
             @Override
-            public SafeHtml getValue(DisposalHold hold) {
-              return HtmlSnippetUtils.getDisposalHoldStateHtml(hold);
+            public SafeHtml getValue(DisposalHoldAssociation association) {
+              return HtmlSnippetUtils.getDisposalHoldStateHtml(association);
             }
           }));
     }

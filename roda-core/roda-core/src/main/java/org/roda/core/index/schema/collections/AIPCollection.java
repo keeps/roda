@@ -25,7 +25,10 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.IndexingAdditionalInfo.Flags;
 import org.roda.core.index.schema.AbstractSolrCollection;
@@ -136,8 +139,8 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     doc.addField(RodaConstants.AIP_UPDATED_BY, aip.getUpdatedBy());
 
     doc.addField(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID, aip.getDisposalScheduleId());
-    doc.addField(RodaConstants.AIP_DISPOSAL_HOLDS_ID,
-      aip.getDisposalHoldAssociation().stream().map(dh -> dh.getId()).collect(Collectors.toList()));
+    doc.addField(RodaConstants.AIP_DISPOSAL_HOLDS_ID, aip.getDisposalHoldAssociation().stream()
+      .filter(p -> p.getLiftedOn() == null).map(DisposalHoldAssociation::getId).collect(Collectors.toList()));
     if (aip.getDestroyedOn() != null) {
       doc.addField(RodaConstants.AIP_DESTROYED_ON, aip.getDestroyedOn());
     }
@@ -151,12 +154,12 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     doc.addField(RodaConstants.INGEST_JOB_ID, aip.getIngestJobId());
     doc.addField(RodaConstants.INGEST_UPDATE_JOB_IDS, aip.getIngestUpdateJobIds());
 
-    List<String> descriptiveMetadataIds = aip.getDescriptiveMetadata().stream().map(dm -> dm.getId())
+    List<String> descriptiveMetadataIds = aip.getDescriptiveMetadata().stream().map(DescriptiveMetadata::getId)
       .collect(Collectors.toList());
 
     doc.addField(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID, descriptiveMetadataIds);
 
-    List<String> representationIds = aip.getRepresentations().stream().map(r -> r.getId()).collect(Collectors.toList());
+    List<String> representationIds = aip.getRepresentations().stream().map(Representation::getId).collect(Collectors.toList());
     doc.addField(RodaConstants.AIP_REPRESENTATION_ID, representationIds);
     doc.addField(RodaConstants.AIP_HAS_REPRESENTATIONS, !representationIds.isEmpty());
 
@@ -280,15 +283,17 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     final String disposalSchedulePeriod = SolrUtils
       .objectToString(doc.get(RodaConstants.AIP_DISPOSAL_SCHEDULE_RETENTION_PERIOD), "");
     final List<String> disposalHoldsId = SolrUtils.objectToListString(doc.get(RodaConstants.AIP_DISPOSAL_HOLDS_ID));
-    final Date destructedOn = SolrUtils.objectToDate(doc.get(RodaConstants.AIP_DESTROYED_ON));
-    final String destructedApprovedBy = SolrUtils.objectToString(doc.get(RodaConstants.AIP_DESTROYED_BY), "");
+    final Date destroyedOn = SolrUtils.objectToDate(doc.get(RodaConstants.AIP_DESTROYED_ON));
+    final String destroyedBy = SolrUtils.objectToString(doc.get(RodaConstants.AIP_DESTROYED_BY), "");
     final String disposalAction = SolrUtils.objectToString(doc.get(RodaConstants.AIP_DISPOSAL_ACTION), "");
     final Date overdueDate = SolrUtils.objectToDate(doc.get(RodaConstants.AIP_OVERDUE_DATE));
     final Boolean disposalHoldStatus = SolrUtils.objectToBoolean(doc.get(RodaConstants.AIP_DISPOSAL_HOLD_STATUS),
       Boolean.FALSE);
-    final String disposalConfirmationId = SolrUtils
-      .objectToString(doc.get(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID), "");
-    //final AIPDisposalFlow disposalFlow = SolrUtils.objectToDisposalFlow(doc.get(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID), null);
+    final String disposalConfirmationId = SolrUtils.objectToString(doc.get(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID),
+      "");
+    // final AIPDisposalFlow disposalFlow =
+    // SolrUtils.objectToDisposalFlow(doc.get(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID),
+    // null);
 
     String level;
     if (ghost) {
@@ -317,13 +322,13 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     ret.setDisposalScheduleName(disposalScheduleName);
     ret.setDisposalRetentionPeriod(disposalSchedulePeriod);
     ret.setDisposalHoldsId(disposalHoldsId);
-    ret.setDestructionOn(destructedOn);
-    ret.setDestructionApprovedBy(destructedApprovedBy);
+    ret.setDestroyedOn(destroyedOn);
+    ret.setDestroyedBy(destroyedBy);
     ret.setDisposalAction(disposalAction);
     ret.setOverdueDate(overdueDate);
     ret.setDisposalHoldStatus(disposalHoldStatus);
     ret.setDisposalConfirmationId(disposalConfirmationId);
-    //ret.setDisposalFlow(disposalFlow);
+    // ret.setDisposalFlow(disposalFlow);
 
     return ret;
   }

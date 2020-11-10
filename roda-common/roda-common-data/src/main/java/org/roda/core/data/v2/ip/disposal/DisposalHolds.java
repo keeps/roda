@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.RODAObjectList;
 
@@ -45,5 +46,16 @@ public class DisposalHolds implements RODAObjectList<DisposalHold> {
   @Override
   public void addObject(DisposalHold disposalHold) {
     this.disposalHoldList.add(disposalHold);
+  }
+
+  @JsonIgnore
+  public DisposalHold findDisposalHold(final String disposalHoldId) {
+    for (DisposalHold hold : disposalHoldList) {
+      if (hold.getId().equals(disposalHoldId)) {
+        return hold;
+      }
+    }
+
+    return null;
   }
 }

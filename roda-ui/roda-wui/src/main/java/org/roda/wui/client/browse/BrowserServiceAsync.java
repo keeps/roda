@@ -57,6 +57,7 @@ import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
+import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
@@ -345,4 +346,6 @@ public interface BrowserServiceAsync {
   void applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, AsyncCallback<Job> async);
 
   void liftDisposalHold(SelectedItems<IndexedAIP> selectedItems, AsyncCallback<Job> async);
+
+  void clearDisposalHolds(SelectedItems<IndexedAIP> selectedItems, AsyncCallback<Job> async);
 }

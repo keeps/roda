@@ -2233,4 +2233,12 @@ public interface ClientMessages extends Messages {
   String clearDisposalHoldButton();
 
   String overrideDisposalHoldButton();
+
+  String clearDisposalHoldDialogTitle();
+
+  String clearDisposalHoldDialogMessage();
+
+  String disposalHoldAssociatedOn();
+
+  String disposalHoldLiftedOn();
 }

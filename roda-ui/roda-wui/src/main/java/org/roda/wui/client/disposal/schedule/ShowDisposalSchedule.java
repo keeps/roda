@@ -259,7 +259,7 @@ public class ShowDisposalSchedule extends Composite {
       }
       buttonsPanel.add(editScheduleBtn);
 
-      if (disposalSchedule.getNumberOfAIPUnder() == 0
+      if (disposalSchedule.getApiCounter() == 0
         && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_UPDATE_DISPOSAL_SCHEDULE)) {
         Button removeScheduleBtn = new Button();
         removeScheduleBtn.addStyleName("btn btn-block btn-danger btn-ban");

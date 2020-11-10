@@ -123,7 +123,7 @@ public class DisposalHoldTest {
     DisposalHold disposalHold = createDisposalHold();
     disposalHold = model.createDisposalHold(disposalHold, "admin");
 
-    disposalHold.addAIPtoActiveAIPs(IdUtils.createUUID());
+    disposalHold.setFirstTimeUsed(new Date());
 
     model.updateDisposalHold(disposalHold, "admin");
     StoragePath disposalScheduleStoragePath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
@@ -141,17 +141,15 @@ public class DisposalHoldTest {
     DisposalHold disposalHold = createDisposalHold();
     disposalHold = model.createDisposalHold(disposalHold, "admin");
 
-    disposalHold.addAIPtoActiveAIPs(IdUtils.createUUID());
+    disposalHold.setFirstTimeUsed(new Date());
 
     model.updateDisposalHold(disposalHold, "admin");
 
-    disposalHold.liftAllAIPs();
+
+    // TODO change test to use the plugin to lift the hold
     model.updateDisposalHold(disposalHold, "admin");
 
     DisposalHold retrievedDisposalHold = model.retrieveDisposalHold(disposalHold.getId());
-    assertTrue(retrievedDisposalHold.getActiveAIPs().isEmpty());
-    assertFalse(retrievedDisposalHold.getInactiveAIPs().isEmpty());
-    assertEquals(retrievedDisposalHold.getInactiveAIPs().size(), 1);
   }
 
   public void testDisposalHoldAIPAssociation() throws AuthorizationDeniedException, AlreadyExistsException,

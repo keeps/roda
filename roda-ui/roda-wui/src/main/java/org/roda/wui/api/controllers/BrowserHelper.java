@@ -3493,4 +3493,10 @@ public class BrowserHelper {
     return createAndExecuteInternalJob("Lift disposal hold", items, LiftDisposalHoldFromAIPPlugin.class, user,
       Collections.emptyMap(), "Could not execute lift disposal hold action");
   }
+
+  public static Job clearDisposalHolds(User user, SelectedItems<IndexedAIP> items)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    return createAndExecuteInternalJob("Lift disposal holds from AIP", items, LiftDisposalHoldFromAIPPlugin.class, user,
+      Collections.emptyMap(), "Could not execute lift disposal hold action");
+  }
 }
