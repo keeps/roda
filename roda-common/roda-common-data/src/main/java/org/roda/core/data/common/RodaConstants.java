@@ -1417,6 +1417,10 @@ public final class RodaConstants {
   public static final String DISPOSAL_RULE_CONDITION_TYPE = "type";
   public static final String DISPOSAL_RULE_CONDITION_I18N = "i18n";
 
+  public static final String DISPOSAL_SCHEDULE_ELEMENT_PREFIX = "ui.disposal.schedule.elements";
+  public static final String DISPOSAL_SCHEDULE_ELEMENT_FIELD = "field";
+  public static final String DISPOSAL_SCHEDULE_ELEMENT_TYPE = "type";
+
   /* Template Constants */
   public static final String INGEST_EMAIL_TEMPLATE = "ingestion-template.vm";
   public static final String GENERIC_EMAIL_TEMPLATE = "generic-template.vm";
