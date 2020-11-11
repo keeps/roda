@@ -7259,8 +7259,8 @@ span.code {
 
 .disposal-dialogs-checkbox input[type="checkbox"]:disabled + label{
     color: #ccc;
-}.disposalRuleOperator {
-    text-align: center;
+}
+
 .disposalRuleOperator {
     text-align: center;
 }
