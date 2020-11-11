@@ -24,6 +24,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPDisposalFlow;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
@@ -159,7 +160,8 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
 
     doc.addField(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID, descriptiveMetadataIds);
 
-    List<String> representationIds = aip.getRepresentations().stream().map(Representation::getId).collect(Collectors.toList());
+    List<String> representationIds = aip.getRepresentations().stream().map(Representation::getId)
+      .collect(Collectors.toList());
     doc.addField(RodaConstants.AIP_REPRESENTATION_ID, representationIds);
     doc.addField(RodaConstants.AIP_HAS_REPRESENTATIONS, !representationIds.isEmpty());
 
@@ -291,9 +293,8 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
       Boolean.FALSE);
     final String disposalConfirmationId = SolrUtils.objectToString(doc.get(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID),
       "");
-    // final AIPDisposalFlow disposalFlow =
-    // SolrUtils.objectToDisposalFlow(doc.get(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID),
-    // null);
+    final AIPDisposalFlow disposalFlow = SolrUtils
+      .objectToDisposalFlow(doc.get(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID), null);
 
     String level;
     if (ghost) {
@@ -328,7 +329,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     ret.setOverdueDate(overdueDate);
     ret.setDisposalHoldStatus(disposalHoldStatus);
     ret.setDisposalConfirmationId(disposalConfirmationId);
-    // ret.setDisposalFlow(disposalFlow);
+    ret.setDisposalFlow(disposalFlow);
 
     return ret;
   }
