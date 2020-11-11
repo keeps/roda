@@ -278,8 +278,8 @@ public class DisposalPolicy extends Composite {
     disposalSchedulesTablePanel.addStyleName("basicTable-border");
     disposalSchedulesTablePanel.addStyleName("basicTable");
     if (disposalSchedules.getObjects().isEmpty()) {
-      Label label = new HTML(
-        SafeHtmlUtils.fromSafeConstant(messages.noItemsToDisplayPreFilters(messages.disposalSchedulesTitle())));
+      String someOfAObject = messages.someOfAObject(disposalSchedules.getClass().getName());
+      Label label = new HTML(SafeHtmlUtils.fromSafeConstant(messages.noItemsToDisplayPreFilters(someOfAObject)));
       label.addStyleName("basicTableEmpty");
       disposalSchedulesTablePanel.add(label);
     } else {
@@ -306,8 +306,8 @@ public class DisposalPolicy extends Composite {
     disposalHoldsTablePanel.addStyleName("basicTable");
     disposalHoldsTablePanel.addStyleName("basicTable-border");
     if (disposalHolds.getObjects().isEmpty()) {
-      Label label = new HTML(
-        SafeHtmlUtils.fromSafeConstant(messages.noItemsToDisplayPreFilters(messages.disposalHoldsTitle())));
+      String someOfAObject = messages.someOfAObject(disposalHolds.getClass().getName());
+      Label label = new HTML(SafeHtmlUtils.fromSafeConstant(messages.noItemsToDisplayPreFilters(someOfAObject)));
       label.addStyleName("basicTableEmpty");
       disposalHoldsTablePanel.add(label);
     } else {
@@ -332,8 +332,8 @@ public class DisposalPolicy extends Composite {
     disposalRulesTablePanel.addStyleName("basicTable");
     disposalRulesTablePanel.addStyleName("basicTable-border");
     if (disposalRules.getObjects().isEmpty()) {
-      Label label = new HTML(
-        SafeHtmlUtils.fromSafeConstant(messages.noItemsToDisplayPreFilters(messages.disposalRulesTitle())));
+      String someOfAObject = messages.someOfAObject(disposalRules.getClass().getName());
+      Label label = new HTML(SafeHtmlUtils.fromSafeConstant(messages.noItemsToDisplayPreFilters(someOfAObject)));
       label.addStyleName("basicTableEmpty");
       disposalRulesTablePanel.add(label);
     } else {

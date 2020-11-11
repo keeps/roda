@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.common.utils;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -17,7 +18,9 @@ import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
@@ -38,9 +41,11 @@ import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.RepresentationInformationHelper;
 import org.roda.wui.client.planning.RepresentationInformationAssociations;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.json.client.JSONException;
 import com.google.gwt.json.client.JSONObject;
@@ -54,6 +59,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.UIObject;
 
 import config.i18n.client.ClientMessages;
@@ -135,9 +141,9 @@ public class HtmlSnippetUtils {
     return ret;
   }
 
-  public static SafeHtml getDisposalHoldStatusHTML(Boolean onHold){
+  public static SafeHtml getDisposalHoldStatusHTML(Boolean onHold) {
     SafeHtmlBuilder b = new SafeHtmlBuilder();
-    if (onHold){
+    if (onHold) {
       b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING));
       b.append(SafeHtmlUtils.fromString(messages.disposalOnHoldStatusLabel()));
     } else {
@@ -269,9 +275,11 @@ public class HtmlSnippetUtils {
     }
 
     if (value) {
-      pluginMandatoryHTML = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + "Mandatory" + CLOSE_SPAN);
+      pluginMandatoryHTML = SafeHtmlUtils
+        .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + messages.mandatoryPlugin() + CLOSE_SPAN);
     } else {
-      pluginMandatoryHTML = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + "Optional" + CLOSE_SPAN);
+      pluginMandatoryHTML = SafeHtmlUtils
+        .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + messages.optionalPlugin() + CLOSE_SPAN);
     }
 
     return pluginMandatoryHTML;
@@ -585,5 +593,38 @@ public class HtmlSnippetUtils {
 
     return SafeHtmlUtils
       .fromSafeConstant("<span class='" + labelClass + "'>" + messages.disposalConfirmationState(state) + CLOSE_SPAN);
+  }
+
+  public static SimplePanel getNoItemsToDisplay(String object) {
+    Label label = new HTML(SafeHtmlUtils.fromSafeConstant(messages.noItemsToDisplayPreFilters(object)));
+    label.addStyleName("table-empty-inner-label");
+
+    SimplePanel panel = new SimplePanel();
+    panel.addStyleName("table-empty-inner");
+    panel.add(label);
+
+    return panel;
+  }
+
+  public static SafeHtml getDisposalScheduleActionHtml(String disposalAction) {
+    String labelClass;
+
+    switch (disposalAction) {
+      case "DESTROY":
+        labelClass = "label-danger";
+        break;
+      case "RETAIN_PERMANENTLY":
+        labelClass = "label-info";
+        break;
+      case "REVIEW":
+        labelClass = "label-warning";
+        break;
+      default:
+        labelClass = "label-default";
+        break;
+    }
+
+    return SafeHtmlUtils.fromSafeConstant(
+      "<span class='" + labelClass + "'>" + messages.disposalScheduleActionCode(disposalAction) + CLOSE_SPAN);
   }
 }

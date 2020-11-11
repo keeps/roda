@@ -46,7 +46,7 @@ import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
-import org.roda.wui.client.disposal.DisposalPolicyAssociation;
+import org.roda.wui.client.disposal.association.DisposalPolicyAssociation;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.common.client.tools.ConfigurationManager;

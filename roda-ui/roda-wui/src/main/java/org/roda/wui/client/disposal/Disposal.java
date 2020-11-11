@@ -4,11 +4,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.disposal.association.DisposalPolicyAssociation;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 

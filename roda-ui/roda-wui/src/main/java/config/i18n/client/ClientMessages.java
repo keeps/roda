@@ -1859,6 +1859,10 @@ public interface ClientMessages extends Messages {
 
   /************* TO BE ORGANIZED *************************/
 
+  String mandatoryPlugin();
+
+  String optionalPlugin();
+
   String aipLevel();
 
   SafeHtml defaultColumnHeader(@Select String field);
@@ -2131,8 +2135,6 @@ public interface ClientMessages extends Messages {
 
   String disposalConfirmationAIPs();
 
-  String disposalConfirmationCollections();
-
   String disposalConfirmationSize();
 
   String disposalConfirmationState(@Select DisposalConfirmationState state);
@@ -2201,8 +2203,6 @@ public interface ClientMessages extends Messages {
 
   String disposalClearStatusLabel();
 
-  String disposalAssociationDescription();
-
   String disposalScheduleRetentionPeriodNotValidFormat();
 
   String disposalScheduleListAips();
@@ -2248,7 +2248,7 @@ public interface ClientMessages extends Messages {
 
   String disposalHoldLiftedOn();
 
-  String conditionAtualParent();
+  String conditionActualParent();
 
   String editRulesOrder();
 
@@ -2258,4 +2258,31 @@ public interface ClientMessages extends Messages {
 
   String confirmChangeRulesOrder();
 
+  String disposalScheduleAssociationInformationTitle();
+
+  String disposalScheduleActionCode(@Select String disposalAction);
+
+  String disposalScheduleAssociationTitle();
+
+  String disposalConfirmationAssociationInformationTitle();
+
+  String disposalConfirmationAssociationTitle();
+
+  String disposalHoldsAssociationInformationTitle();
+
+  String disposalPolicyActionSummary(@Select String action);
+
+  String disposalPolicyScheduleSummary(String action, String temporal);
+
+  String disposalPolicyScheduleYearSummary(@PluralCount int duration);
+
+  String disposalPolicyScheduleMonthSummary(@PluralCount int duration);
+
+  String disposalPolicyScheduleDaySummary(@PluralCount int duration);
+
+  String disposalPolicyHoldSummary();
+
+  String disposalPolicyConfirmationSummary();
+
+  String disposalPolicySummaryReady(String action);
 }

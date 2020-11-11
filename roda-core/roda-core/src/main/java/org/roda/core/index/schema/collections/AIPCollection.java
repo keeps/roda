@@ -293,8 +293,8 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
       Boolean.FALSE);
     final String disposalConfirmationId = SolrUtils.objectToString(doc.get(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID),
       "");
-    final AIPDisposalFlow disposalFlow = SolrUtils
-      .objectToDisposalFlow(doc.get(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID), null);
+    AIPDisposalFlow aipDisposalFlow = SolrUtils
+        .objectToEnum(doc.get(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID), AIPDisposalFlow.class, null);
 
     String level;
     if (ghost) {
@@ -329,7 +329,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     ret.setOverdueDate(overdueDate);
     ret.setDisposalHoldStatus(disposalHoldStatus);
     ret.setDisposalConfirmationId(disposalConfirmationId);
-    ret.setDisposalFlow(disposalFlow);
+    ret.setDisposalFlow(aipDisposalFlow);
 
     return ret;
   }

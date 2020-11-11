@@ -9,11 +9,32 @@ package org.roda.wui.client.common.utils;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
+import java.util.Date;
+
 public class JavascriptUtils {
 
   private JavascriptUtils() {
     // do nothing
   }
+
+  public static native JavaScriptObject durationInYMD(String futureDate) /*-{
+      var todayDate = $wnd.moment();
+      var disposalDate = $wnd.moment(futureDate);
+
+      var differenceInYears = todayDate.diff(disposalDate, 'years');
+
+      if (differenceInYears < 1) {
+          var differenceInMonths = todayDate.diff(disposalDate, 'months');
+          if (differenceInMonths < 1) {
+              var differenceInDays = todayDate.diff(disposalDate, 'days');
+                  return { "diff": differenceInDays, "unit": "days" };
+          } else {
+              return { "diff": differenceInMonths, "unit": "months" };
+          }
+      } else {
+          return { "diff": differenceInYears, "unit": "years" };
+      }
+  }-*/;
 
   public static native void runHighlighter() /*-{
     $wnd.jQuery('pre code').each(function(i, block) {
@@ -363,14 +384,14 @@ public class JavascriptUtils {
   public static native int pdfDipViewerBottomPosition() /*-{
     var mainBottom = Math.floor($wnd.jQuery('.main').offset().top
         + $wnd.jQuery('.main').outerHeight(true));
-        
+
     var footerTop;
     if ($wnd.jQuery('.footer').length) {
       footerTop = Math.floor($wnd.jQuery('.footer').offset().top);
     } else {
       footerTop = mainBottom;
     }
-    
+
     var spacing = Math.floor($wnd.jQuery(
         'div.bitstreamPreview.viewRepresentationFilePreview')
         .outerHeight(true))

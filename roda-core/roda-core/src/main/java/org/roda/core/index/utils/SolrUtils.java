@@ -650,18 +650,6 @@ public class SolrUtils {
     return ret;
   }
 
-  public static AIPDisposalFlow objectToDisposalFlow(Object object, AIPDisposalFlow defaultValue) {
-    AIPDisposalFlow ret = defaultValue;
-    if (object != null) {
-      if (object instanceof AIPDisposalFlow) {
-        ret = AIPDisposalFlow.valueOf(object.toString());
-      } else {
-        LOGGER.warn("Could not convert Solr object to AIPDisposalFlow, unsupported class: {}", object.getClass().getName());
-      }
-    }
-    return ret;
-  }
-
   public static <E extends Enum<E>> String formatEnum(E enumValue) {
     return enumValue.name();
   }
