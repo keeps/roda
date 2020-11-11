@@ -274,8 +274,13 @@ public class OrderDisposalRules extends Composite {
   }
 
   @UiHandler("buttonSave")
-  void buttonApplyHandler(ClickEvent e) {
+  void buttonSaveHandler(ClickEvent e) {
     // TODO
+  }
+
+  @UiHandler("buttonCreate")
+  void buttonCreateHandler(ClickEvent e) {
+    HistoryUtils.newHistory(DisposalPolicy.RESOLVER, CreateDisposalRule.RESOLVER.getHistoryToken());
   }
 
   @UiHandler("buttonCancel")

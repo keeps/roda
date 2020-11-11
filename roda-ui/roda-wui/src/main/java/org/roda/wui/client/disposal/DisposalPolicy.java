@@ -352,17 +352,21 @@ public class DisposalPolicy extends Composite {
     }
   }
 
-  private boolean initSidebarButtons(FlowPanel panel) {
-
-    boolean hasCreatedRuleBtns = initDisposalRuleButtons(panel, true);
-    boolean hasCreatedScheduleBtns = initDisposalScheduleButtons(panel, true);
-    boolean hasCreatedHoldBtns = initDisposalHoldButtons(panel, true);
+  private boolean initSidebarButtons(FlowPanel sidebar) {
+    boolean hasCreatedScheduleBtns = initDisposalScheduleButtons(sidebar, true, true);
+    boolean hasCreatedHoldBtns = initDisposalHoldButtons(sidebar, true, true);
+    boolean hasCreatedRuleBtns = initDisposalRuleButtons(sidebar, true, true);
 
     return hasCreatedRuleBtns || hasCreatedScheduleBtns || hasCreatedHoldBtns;
   }
 
-  private boolean initDisposalScheduleButtons(FlowPanel panel, boolean isGroup) {
+  private boolean initDisposalScheduleButtons(FlowPanel panel, boolean isGroup, boolean isSidebar) {
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_SCHEDULE)) {
+      if (isSidebar) {
+        Label label = new Label();
+        label.setText(messages.disposalSchedulesTitle());
+        panel.add(label);
+      }
       Button newDisposalScheduleBtn = new Button();
       newDisposalScheduleBtn.addStyleName("btn btn-plus");
       if (isGroup) {
@@ -382,8 +386,14 @@ public class DisposalPolicy extends Composite {
     return false;
   }
 
-  private boolean initDisposalHoldButtons(FlowPanel panel, boolean isGroup) {
+  private boolean initDisposalHoldButtons(FlowPanel panel, boolean isGroup, boolean isSidebar) {
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_HOLD)) {
+      if (isSidebar) {
+        Label label = new Label();
+        label.setText(messages.disposalHoldsTitle());
+        label.addStyleName("sidebarDisposalLabels");
+        panel.add(label);
+      }
       Button newDisposalHoldBtn = new Button();
       newDisposalHoldBtn.addStyleName("btn btn-plus");
       if (isGroup) {
@@ -404,40 +414,57 @@ public class DisposalPolicy extends Composite {
     return false;
   }
 
-  private boolean initDisposalRuleButtons(FlowPanel panel, boolean isGroup) {
+  private boolean initDisposalRuleButtons(FlowPanel panel, boolean isGroup, boolean isSidebar) {
     boolean ret = false;
 
-    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_RULE)) {
-      Button newDisposalRuleBtn = new Button();
-      newDisposalRuleBtn.addStyleName("btn btn-plus");
-      if (isGroup) {
-        newDisposalRuleBtn.addStyleName("btn-block");
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_UPDATE_DISPOSAL_RULE)
+            && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_RULE)) {
+      if (isSidebar) {
+        Label label = new Label();
+        label.setText(messages.disposalRulesTitle());
+        label.addStyleName("sidebarDisposalLabels");
+        panel.add(label);
       }
-      newDisposalRuleBtn.setText(messages.newDisposalRuleTitle());
-      newDisposalRuleBtn.addClickHandler(new ClickHandler() {
-
+      Button editRulesOrderBtn = new Button();
+      editRulesOrderBtn.addStyleName("btn btn-edit");
+      if (isGroup) {
+        editRulesOrderBtn.addStyleName("btn-block");
+      }
+      editRulesOrderBtn.setText(messages.editRules());
+      editRulesOrderBtn.addClickHandler(new ClickHandler() {
         @Override
         public void onClick(ClickEvent event) {
-          HistoryUtils.newHistory(DisposalPolicy.RESOLVER, CreateDisposalRule.RESOLVER.getHistoryToken());
+          HistoryUtils.newHistory(DisposalPolicy.RESOLVER, OrderDisposalRules.RESOLVER.getHistoryToken());
         }
       });
-      panel.add(newDisposalRuleBtn);
-
-      if (disposalRules != null && disposalRules.getObjects().size() > 0) {
-        Button editRulesOrderBtn = new Button();
-        editRulesOrderBtn.addStyleName("btn btn-edit");
-        if (isGroup) {
-          editRulesOrderBtn.addStyleName("btn-block");
-        } else {
-          editRulesOrderBtn.addStyleName("changeRulesOrder");
-        }
-        editRulesOrderBtn.setText(messages.changeRulesOrder());
-        editRulesOrderBtn.addClickHandler(
-          event -> HistoryUtils.newHistory(DisposalPolicy.RESOLVER, OrderDisposalRules.RESOLVER.getHistoryToken()));
-        panel.add(editRulesOrderBtn);
-      }
+      panel.add(editRulesOrderBtn);
       ret = true;
     }
+
+    // TODO -> add new rule to apply rules
+    // if(PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_APPLY_DISPOSAL_RULE)){
+    if (!ret && isSidebar) {
+      Label label = new Label();
+      label.setText(messages.disposalRulesTitle());
+      label.addStyleName("sidebarDisposalLabels");
+      panel.add(label);
+    }
+    Button applyRules = new Button();
+    applyRules.addStyleName("btn btn-play");
+    if (isGroup) {
+      applyRules.addStyleName("btn-block");
+    }
+    applyRules.setText(messages.applyRules());
+    applyRules.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent event) {
+        //TODO
+        HistoryUtils.newHistory(DisposalPolicy.RESOLVER, OrderDisposalRules.RESOLVER.getHistoryToken());
+      }
+    });
+    panel.add(applyRules);
+    ret = true;
+  //}
 
     return ret;
   }
@@ -712,6 +739,14 @@ public class DisposalPolicy extends Composite {
       return new BasicTablePanel<>(messages.noItemsToDisplayPreFilters(messages.disposalRulesTitle()));
     } else {
       return new BasicTablePanel<DisposalRule>(disposalRules.getObjects().iterator(),
+
+        new BasicTablePanel.ColumnInfo<>(messages.disposalRuleOrder(), 4, new TextColumn<DisposalRule>() {
+          @Override
+          public String getValue(DisposalRule rule) {
+            Integer showOrder = rule.getOrder() + 1;
+            return showOrder.toString();
+          }
+        }),
 
         new BasicTablePanel.ColumnInfo<>(messages.disposalRuleTitle(), 0, new TextColumn<DisposalRule>() {
           @Override

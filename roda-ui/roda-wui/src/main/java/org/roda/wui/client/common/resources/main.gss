@@ -7217,10 +7217,6 @@ span.code {
     max-height: 30vh;
 }
 
-.changeRulesOrder {
-    margin-left: 2vh;
-}
-
 .addCursorPointer {
     cursor: pointer;
 }
@@ -7271,4 +7267,8 @@ span.code {
 
 .childOfLabel{
     width: 100%;
+}
+
+.sidebarDisposalLabels{
+    margin-top: 2rem;
 }
