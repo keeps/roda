@@ -442,6 +442,8 @@ public interface ClientMessages extends Messages {
 
   String saveButton();
 
+  String saveAndApplyRulesButton();
+
   String addButton();
 
   String confirmButton();
@@ -2107,7 +2109,9 @@ public interface ClientMessages extends Messages {
 
   String createDisposalHoldAlreadyExists(String title);
 
-  String changeRulesOrder();
+  String editRules();
+
+  String applyRules();
 
   String showDisposalRuleTitle();
 
@@ -2242,4 +2246,6 @@ public interface ClientMessages extends Messages {
 
   String disposalHoldLiftedOn();
   String conditionAtualParent();
+
+  String editRulesOrder();
 }
