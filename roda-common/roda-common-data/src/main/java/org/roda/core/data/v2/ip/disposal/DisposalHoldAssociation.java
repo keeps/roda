@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_HOLD_ASSOCIATION)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DisposalHoldAssociation implements IsModelObject {
+public class DisposalHoldAssociation implements IsModelObject, Comparable<DisposalHoldAssociation> {
 
   private static final long serialVersionUID = 8625888155159274971L;
 
@@ -99,5 +99,10 @@ public class DisposalHoldAssociation implements IsModelObject {
   public String toString() {
     return "DisposalHoldAssociation{" + "id='" + id + '\'' + ", associatedOn=" + associatedOn + ", associatedBy='"
       + associatedBy + '\'' + ", liftedOn=" + liftedOn + ", liftedBy='" + liftedBy + '\'' + '}';
+  }
+
+  @Override
+  public int compareTo(DisposalHoldAssociation association) {
+    return this.getAssociatedOn().compareTo(association.getAssociatedOn());
   }
 }

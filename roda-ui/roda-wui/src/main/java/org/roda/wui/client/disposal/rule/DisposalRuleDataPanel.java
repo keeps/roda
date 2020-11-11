@@ -10,8 +10,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.disposal.ConditionType;
@@ -165,7 +163,7 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
       fieldValue.setText(disposalRule.getConditionValue());
     }else{
       conditionLabel.setVisible(true);
-      conditionLabel.setText(messages.conditionAtualParent());
+      conditionLabel.setText(messages.conditionActualParent());
 
       conditionPanel.setVisible(true);
       fieldsList.setVisible(false);

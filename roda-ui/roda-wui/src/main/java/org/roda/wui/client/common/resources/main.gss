@@ -7272,3 +7272,22 @@ span.code {
 .sidebarDisposalLabels{
     margin-top: 2rem;
 }
+
+.disposal-policy-summary {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.disposal-policy-summary-icon {
+    display: inline;
+    padding-right: 1rem;
+}
+
+.disposal-policy-summary-icon div {
+    display: inline-block;
+}
+
+.disposal-policy-summary-text {
+    display: inline;
+    vertical-align: bottom;
+}
