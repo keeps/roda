@@ -448,6 +448,10 @@ public interface ClientMessages extends Messages {
 
   String confirmButton();
 
+  String applyButton();
+
+  String applyToRepositoryButton();
+
   String applyAllButton();
 
   String stopButton();
@@ -2245,7 +2249,13 @@ public interface ClientMessages extends Messages {
   String disposalHoldAssociatedOn();
 
   String disposalHoldLiftedOn();
+
   String conditionAtualParent();
 
   String editRulesOrder();
+
+  String applyRulesToRepository();
+
+  String applyRulesToIngest();
+
 }

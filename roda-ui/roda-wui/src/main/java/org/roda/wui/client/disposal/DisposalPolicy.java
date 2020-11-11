@@ -2,6 +2,7 @@ package org.roda.wui.client.disposal;
 
 import java.util.List;
 
+import org.checkerframework.checker.units.qual.A;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
@@ -13,6 +14,7 @@ import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.ApplyDisposalRulesDialog;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
@@ -459,7 +461,8 @@ public class DisposalPolicy extends Composite {
       @Override
       public void onClick(ClickEvent event) {
         //TODO
-        HistoryUtils.newHistory(DisposalPolicy.RESOLVER, OrderDisposalRules.RESOLVER.getHistoryToken());
+        ApplyDisposalRulesDialog applyDisposalRulesDialog = new ApplyDisposalRulesDialog(messages.applyRules());
+
       }
     });
     panel.add(applyRules);
