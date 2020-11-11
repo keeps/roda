@@ -45,7 +45,7 @@
                 <g:Label addStyleNames="form-label" ui:field="retentionTriggerElementIdLabel">
                     <ui:text from='{messages.disposalScheduleRetentionTriggerElementId}'/>
                 </g:Label>
-                <g:TextBox addStyleNames="form-textbox" ui:field="retentionTriggerElementId"/>
+                <g:ListBox addStyleNames="form-textbox" ui:field="retentionTriggerElementIdList"/>
                 <g:Label ui:field="retentionTriggerElementIdError" addStyleNames="form-label-error"></g:Label>
                 <g:Label addStyleNames="form-label" ui:field="retentionTriggersLabel">
                     <ui:text from='{messages.disposalScheduleRetentionTriggerCode}'/>
