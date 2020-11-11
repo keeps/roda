@@ -5,16 +5,23 @@ import java.util.Map;
 import java.util.Set;
 
 import org.roda.core.data.exceptions.DisposalHoldNotValidException;
+import org.roda.core.data.exceptions.DisposalRuleNotValidException;
 import org.roda.core.data.exceptions.DisposalScheduleNotValidException;
+import org.roda.core.data.v2.ip.disposal.ConditionType;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.ip.disposal.RetentionTriggerCode;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.bundle.DisposalConfirmationExtraBundle;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.wui.server.browse.BrowserServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +33,40 @@ public class DisposalsHelper {
 
   public DisposalsHelper() {
     // do nothing
+  }
+
+  public static void validateDisposalRule(DisposalRule disposalRule, DisposalSchedules disposalSchedules) throws DisposalRuleNotValidException {
+    if (StringUtils.isBlank(disposalRule.getTitle())) {
+      throw new DisposalRuleNotValidException("The disposal rule title is mandatory");
+    }
+
+    if (!isConditionTypeValid(disposalRule.getType())) {
+      throw new DisposalRuleNotValidException("The disposal rule condition type is not valid");
+    }
+
+    if (!isRuleScheduleValid(disposalRule,disposalSchedules)){
+      throw new DisposalRuleNotValidException("The disposal rule schedule is not valid");
+    }
+
+  }
+
+  private static boolean isConditionTypeValid(ConditionType type) {
+    if (StringUtils.isNotBlank(type.toString())) {
+      return type.equals(ConditionType.IS_CHILD_OF) || type.equals(ConditionType.METADATA_FIELD);
+    }
+    return false;
+  }
+
+  private static boolean isRuleScheduleValid(DisposalRule rule, DisposalSchedules disposalSchedules) {
+    boolean ret = false;
+
+    for (DisposalSchedule schedule : disposalSchedules.getObjects()) {
+      if (schedule.getId().equals(rule.getDisposalScheduleId())
+        && schedule.getState().equals(DisposalScheduleState.ACTIVE)) {
+        ret = true;
+      }
+    }
+    return ret;
   }
 
   public static void validateDisposalHold(DisposalHold disposalHold) throws DisposalHoldNotValidException {

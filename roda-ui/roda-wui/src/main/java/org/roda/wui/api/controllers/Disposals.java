@@ -15,12 +15,15 @@ import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.bundle.DisposalConfirmationExtraBundle;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
+
+import java.io.IOException;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -391,14 +394,15 @@ public class Disposals extends RodaWuiController {
   }
 
   public static DisposalRule createDisposalRule(User user, DisposalRule disposalRule) throws GenericException,
-    AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException {
+          AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException, IOException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
     controllerAssistant.checkRoles(user);
 
     // validate disposal rule
-    // DisposalsHelper.validateDisposalRule(disposalRule);
+    DisposalSchedules schedules = Browser.listDisposalSchedules(user);
+    DisposalsHelper.validateDisposalRule(disposalRule,schedules);
 
     LogEntryState state = LogEntryState.SUCCESS;
 

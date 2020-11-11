@@ -380,7 +380,7 @@ public interface BrowserService extends RemoteService {
   Map<String, List<String>> retrieveSharedProperties(String localeName);
 
   DisposalRule createDisposalRule(DisposalRule rule) throws AuthorizationDeniedException, AlreadyExistsException,
-    NotFoundException, GenericException, RequestNotValidException;
+          NotFoundException, GenericException, RequestNotValidException, IOException;
 
   DisposalRule retrieveDisposalRule(String disposalRuleId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;

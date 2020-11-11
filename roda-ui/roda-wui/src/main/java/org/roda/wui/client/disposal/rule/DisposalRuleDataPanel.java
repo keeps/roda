@@ -17,6 +17,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.disposal.ConditionType;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.wui.client.ingest.process.PluginParameterPanel;
@@ -239,7 +240,9 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
     disposalSchedulesList.addItem("", "");
     if (!editmode) {
       for (DisposalSchedule schedule : disposalSchedules.getObjects()) {
-        disposalSchedulesList.addItem(schedule.getTitle(), schedule.getId());
+        if(schedule.getState().equals(DisposalScheduleState.ACTIVE)) {
+          disposalSchedulesList.addItem(schedule.getTitle(), schedule.getId());
+        }
       }
     } else {
       int index = 1;

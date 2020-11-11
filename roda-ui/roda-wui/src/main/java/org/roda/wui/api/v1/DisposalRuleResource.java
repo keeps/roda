@@ -102,7 +102,7 @@ public class DisposalRuleResource {
   public Response createRule(DisposalRule rule,
     @ApiParam(value = "Choose format in which to get the disposal rule", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
     @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
-    throws RODAException {
+          throws RODAException, IOException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
