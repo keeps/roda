@@ -7,14 +7,16 @@
  */
 package org.roda.wui.common.client.tools;
 
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
-import com.google.gwt.i18n.client.TimeZone;
 import org.roda.core.data.common.RodaConstants;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.i18n.client.TimeZone;
 
 import config.i18n.client.ClientMessages;
 

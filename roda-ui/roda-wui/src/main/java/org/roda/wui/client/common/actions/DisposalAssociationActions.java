@@ -34,7 +34,7 @@ public class DisposalAssociationActions extends AbstractActionable<IndexedAIP> {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public enum DisposalAssociationAction implements Action<IndexedAIP> {
-    EDIT();
+    EDIT(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_SCHEDULE);
 
     private List<String> methods;
 
@@ -67,7 +67,11 @@ public class DisposalAssociationActions extends AbstractActionable<IndexedAIP> {
 
   @Override
   public boolean canAct(Action<IndexedAIP> action, ActionableObject<IndexedAIP> object) {
-    return hasPermissions(action);
+    if (object.getObject().getDisposalConfirmationId() == null) {
+      return hasPermissions(action);
+    } else {
+      return false;
+    }
   }
 
   @Override
@@ -132,7 +136,7 @@ public class DisposalAssociationActions extends AbstractActionable<IndexedAIP> {
                 });
               } else {
                 BrowserService.Util.getInstance().associateDisposalSchedule(aip, disposalSchedule.getId(),
-                    applyToHierarchy, overwriteAll, new AsyncCallback<Job>() {
+                  applyToHierarchy, overwriteAll, new AsyncCallback<Job>() {
                     @Override
                     public void onFailure(Throwable caught) {
                       callback.onFailure(caught);
@@ -175,8 +179,9 @@ public class DisposalAssociationActions extends AbstractActionable<IndexedAIP> {
   @Override
   public ActionableBundle<IndexedAIP> createActionsBundle() {
     ActionableBundle<IndexedAIP> disposalAssociationActionableBundle = new ActionableBundle<>();
+
     ActionableGroup<IndexedAIP> managementGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
-    managementGroup.addButton(messages.editButton(), DisposalAssociationAction.EDIT, ActionImpact.UPDATED, "btn-edit");
+    managementGroup.addButton(messages.associateDisposalScheduleButton(), DisposalAssociationAction.EDIT, ActionImpact.UPDATED, "btn-edit");
 
     disposalAssociationActionableBundle.addGroup(managementGroup);
     return disposalAssociationActionableBundle;
