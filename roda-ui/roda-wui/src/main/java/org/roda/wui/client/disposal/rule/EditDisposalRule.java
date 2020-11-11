@@ -126,7 +126,6 @@ public class EditDisposalRule extends Composite {
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
-    // TODO -> update old schedule and new schedule
     if (disposalRuleDataPanel.isChanged() && disposalRuleDataPanel.isValid()) {
       DisposalRule disposalRuleUpdated = disposalRuleDataPanel.getDisposalRule();
       disposalRule.setTitle(disposalRuleUpdated.getTitle());

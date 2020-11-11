@@ -7,6 +7,7 @@ import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalRules;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.disposal.DisposalPolicy;
@@ -34,6 +35,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
+import org.roda.wui.server.browse.BrowserServiceImpl;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
@@ -275,8 +277,32 @@ public class OrderDisposalRules extends Composite {
 
   @UiHandler("buttonSave")
   void buttonSaveHandler(ClickEvent e) {
-    // TODO
+    Dialogs.showConfirmDialog(messages.saveButton(), messages.confirmChangeRulesOrder(), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<Boolean>() {
+      @Override
+      public void onFailure(Throwable throwable) {
+
+      }
+
+      @Override
+      public void onSuccess(Boolean aBoolean) {
+        for(DisposalRule rule: disposalRules.getObjects()){
+          BrowserServiceImpl.Util.getInstance().updateDisposalRule(rule, new AsyncCallback<DisposalRule>() {
+            @Override
+            public void onFailure(Throwable caught) {
+              errorMessage(caught);
+            }
+
+            @Override
+            public void onSuccess(DisposalRule disposalRule) {
+
+            }
+          });
+          HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+        }
+      }
+    });
   }
+
 
   @UiHandler("buttonCreate")
   void buttonCreateHandler(ClickEvent e) {
