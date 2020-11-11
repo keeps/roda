@@ -442,8 +442,6 @@ public interface ClientMessages extends Messages {
 
   String saveButton();
 
-  String saveAndApplyRulesButton();
-
   String addButton();
 
   String confirmButton();
@@ -2257,5 +2255,7 @@ public interface ClientMessages extends Messages {
   String applyRulesToRepository();
 
   String applyRulesToIngest();
+
+  String confirmChangeRulesOrder();
 
 }
