@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.roda.core.data.exceptions.DisposalHoldAlreadyExistsException;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.disposal.DisposalPolicy;
@@ -88,13 +89,7 @@ public class CreateDisposalHold extends Composite {
   void buttonApplyHandler(ClickEvent e) {
     if (disposalHoldDataPanel.isValid()) {
       disposalHold = disposalHoldDataPanel.getDisposalHold();
-      BrowserServiceImpl.Util.getInstance().createDisposalHold(disposalHold, new AsyncCallback<DisposalHold>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          errorMessage(caught);
-        }
-
+      BrowserServiceImpl.Util.getInstance().createDisposalHold(disposalHold, new NoAsyncCallback<DisposalHold>() {
         @Override
         public void onSuccess(DisposalHold disposalHold) {
           HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
@@ -111,14 +106,6 @@ public class CreateDisposalHold extends Composite {
 
   private void cancel() {
     HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
-  }
-
-  private void errorMessage(Throwable caught) {
-    if (caught instanceof DisposalHoldAlreadyExistsException) {
-      Toast.showError(messages.createDisposalHoldAlreadyExists(disposalHold.getTitle()));
-    } else {
-      Toast.showError(messages.createDisposalHoldFailure(caught.getMessage()));
-    }
   }
 
 }

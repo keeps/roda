@@ -20,8 +20,6 @@ public class ApplyDisposalRulesDialog {
 
   public ApplyDisposalRulesDialog(String title) {
       FlowPanel layout = new FlowPanel();
-      FlowPanel applyToRepositoryPanel = new FlowPanel();
-      FlowPanel applyToIngestRulesPanel = new FlowPanel();
       FlowPanel footer = new FlowPanel();
       final DialogBox dialogBox = new DialogBox(false, true);
       dialogBox.setText(title);
@@ -31,46 +29,27 @@ public class ApplyDisposalRulesDialog {
       footer.addStyleName("wui-dialog-layout-footer");
 
       Button cancelButton = new Button(messages.cancelButton());
-      cancelButton.addStyleName("btn btn-link");
+      cancelButton.addStyleName("btn btn-link apply-rules-btn");
       cancelButton.addClickHandler(event -> {
           dialogBox.hide();
       });
 
-      Label label = new Label();
-      label.setText(messages.applyRulesToRepository());
-      label.addStyleName("h5");
-
       HTMLPanel info = new HTMLPanel("");
-      info.add(new HTMLWidgetWrapper("ApplyRulesToRepository.html"));
+      info.add(new HTMLWidgetWrapper("ApplyDisposalRules.html"));
       info.addStyleName("page-description");
 
       Button apply = new Button();
       apply.setText(messages.applyToRepositoryButton());
-      apply.addStyleName("btn btn-danger btn-play");
-
-      applyToRepositoryPanel.add(label);
-      applyToRepositoryPanel.add(info);
-      applyToRepositoryPanel.add(apply);
-
-      Label labelIngest = new Label();
-      labelIngest.setText(messages.applyRulesToIngest());
-      labelIngest.addStyleName("h5");
-
-      HTMLPanel infoIngest = new HTMLPanel("");
-      infoIngest.add(new HTMLWidgetWrapper("ApplyRulesToIngest.html"));
-      infoIngest.addStyleName("page-description");
+      apply.addStyleName("btn btn-danger btn-play apply-rules-btn");
 
       Button applyIngest = new Button();
       applyIngest.setText(messages.applyButton());
-      applyIngest.addStyleName("btn btn-play");
+      applyIngest.addStyleName("btn btn-play apply-rules-btn");
 
-      applyToIngestRulesPanel.add(labelIngest);
-      applyToIngestRulesPanel.add(infoIngest);
-      applyToIngestRulesPanel.add(applyIngest);
-
-      layout.add(applyToRepositoryPanel);
-      layout.add(applyToIngestRulesPanel);
+      footer.add(apply);
+      footer.add(applyIngest);
       footer.add(cancelButton);
+      layout.add(info);
       layout.add(footer);
 
       dialogBox.setGlassEnabled(true);

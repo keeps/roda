@@ -11,6 +11,7 @@ import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
@@ -212,8 +213,8 @@ public class ShowDisposalSchedule extends Composite {
       retentionPeriodValue.setHTML(disposalSchedule.getRetentionPeriodIntervalCode().toString());
       retentionPeriodLabel.setVisible(true);
     } else {
-      String retentionPeriod = disposalSchedule.getRetentionPeriodDuration().toString() + " "
-        + messages.disposalScheduleRetentionPeriodIntervalValue(disposalSchedule.getRetentionPeriodIntervalCode().toString());
+      String retentionPeriod = disposalSchedule.getRetentionPeriodDuration().toString() + " " + messages
+        .disposalScheduleRetentionPeriodIntervalValue(disposalSchedule.getRetentionPeriodIntervalCode().toString());
       retentionPeriodValue.setHTML(retentionPeriod);
       retentionPeriodLabel.setVisible(true);
     }
@@ -250,39 +251,27 @@ public class ShowDisposalSchedule extends Composite {
       editScheduleBtn.addStyleName("btn btn-block btn-edit");
       editScheduleBtn.setText(messages.editButton());
       if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_UPDATE_DISPOSAL_SCHEDULE)) {
-        editScheduleBtn.addClickHandler(new ClickHandler() {
-          @Override
-          public void onClick(ClickEvent clickEvent) {
-            HistoryUtils.newHistory(EditDisposalSchedule.RESOLVER, disposalSchedule.getId());
-          }
-        });
+        editScheduleBtn.addClickHandler(
+          clickEvent -> HistoryUtils.newHistory(EditDisposalSchedule.RESOLVER, disposalSchedule.getId()));
       }
       buttonsPanel.add(editScheduleBtn);
 
       if (disposalSchedule.getApiCounter() == 0
         && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_UPDATE_DISPOSAL_SCHEDULE)) {
-        Button removeScheduleBtn = new Button();
-        removeScheduleBtn.addStyleName("btn btn-block btn-danger btn-ban");
-        removeScheduleBtn.setText(messages.deactivateButton());
-        removeScheduleBtn.addClickHandler(new ClickHandler() {
-          @Override
-          public void onClick(ClickEvent clickEvent) {
-            disposalSchedule.setState(DisposalScheduleState.INACTIVE);
-            BrowserServiceImpl.Util.getInstance().updateDisposalSchedule(disposalSchedule,
-              new AsyncCallback<DisposalSchedule>() {
-                @Override
-                public void onFailure(Throwable caught) {
-                  errorMessage(caught);
-                }
-
-                @Override
-                public void onSuccess(DisposalSchedule disposalSchedule) {
-                  HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
-                }
-              });
-          }
+        Button deactivateScheduleButton = new Button();
+        deactivateScheduleButton.addStyleName("btn btn-block btn-danger btn-ban");
+        deactivateScheduleButton.setText(messages.deactivateButton());
+        deactivateScheduleButton.addClickHandler(clickEvent -> {
+          disposalSchedule.setState(DisposalScheduleState.INACTIVE);
+          BrowserServiceImpl.Util.getInstance().updateDisposalSchedule(disposalSchedule,
+            new NoAsyncCallback<DisposalSchedule>() {
+              @Override
+              public void onSuccess(DisposalSchedule disposalSchedule) {
+                HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+              }
+            });
         });
-        buttonsPanel.add(removeScheduleBtn);
+        buttonsPanel.add(deactivateScheduleButton);
       }
     }
 
@@ -298,24 +287,10 @@ public class ShowDisposalSchedule extends Composite {
     buttonsPanel.add(backBtn);
 
   }
-
-  private void errorMessage(Throwable caught) {
-    if (caught instanceof DisposalScheduleAlreadyExistsException) {
-      Toast.showError(messages.createDisposalScheduleAlreadyExists(disposalSchedule.getTitle()));
-    } else {
-      Toast.showError(messages.createDisposalScheduleFailure(caught.getMessage()));
-    }
-  }
-
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
       BrowserService.Util.getInstance().retrieveDisposalSchedule(historyTokens.get(0),
-        new AsyncCallback<DisposalSchedule>() {
-          @Override
-          public void onFailure(Throwable caught) {
-            callback.onFailure(caught);
-          }
-
+        new NoAsyncCallback<DisposalSchedule>() {
           @Override
           public void onSuccess(DisposalSchedule result) {
             ShowDisposalSchedule panel = new ShowDisposalSchedule(result);

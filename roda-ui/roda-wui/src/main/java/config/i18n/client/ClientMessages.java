@@ -2037,7 +2037,7 @@ public interface ClientMessages extends Messages {
 
   String disposalRuleCondition();
 
-  String disposalRuleIs();
+  String disposalRuleConditionOperator();
 
   String addMetadataField();
 
@@ -2228,7 +2228,7 @@ public interface ClientMessages extends Messages {
 
   String applyDisposalHoldDialogTitle();
 
-  String applyDisposalHoldDialogMessage();
+  String applyDisposalHoldDialogMessage(@PluralCount int size);
 
   String applyDisposalHoldButton();
 
@@ -2242,7 +2242,7 @@ public interface ClientMessages extends Messages {
 
   String clearDisposalHoldDialogTitle();
 
-  String clearDisposalHoldDialogMessage();
+  String clearDisposalHoldDialogMessage(@PluralCount int size);
 
   String disposalHoldAssociatedOn();
 
@@ -2252,11 +2252,9 @@ public interface ClientMessages extends Messages {
 
   String editRulesOrder();
 
-  String applyRulesToRepository();
-
-  String applyRulesToIngest();
-
   String confirmChangeRulesOrder();
+
+  String confirmDeleteRule(String title);
 
   String disposalScheduleAssociationInformationTitle();
 
@@ -2285,4 +2283,8 @@ public interface ClientMessages extends Messages {
   String disposalPolicyConfirmationSummary();
 
   String disposalPolicySummaryReady(String action);
+
+  String disposalPolicyNoScheduleSummary();
+
+  String permanentlyRetained();
 }

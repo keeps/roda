@@ -3,14 +3,16 @@
 
     <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
     <g:FlowPanel addStyleNames="wui-disposal-holds-panel" ui:field="disposalHoldsPanel">
-        <g:FlowPanel addStyleNames="panel">
+        <g:FlowPanel addStyleNames="panel" ui:field="panel">
             <g:FlowPanel addStyleNames="panel-heading">
                 <g:Label addStyleNames="panel-title">
                     <ui:text from='{messages.disposalHoldsAssociationInformationTitle}'/>
                 </g:Label>
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="panel-body" ui:field="panelBody"/>
-
         </g:FlowPanel>
+        <g:Button addStyleNames="btn btn-plus" ui:field="associateDisposalHoldButton">
+            <ui:text from='{messages.associateDisposalHoldButton}'/>
+        </g:Button>
     </g:FlowPanel>
 </ui:UiBinder>

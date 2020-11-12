@@ -6,6 +6,7 @@ import org.roda.core.data.exceptions.DisposalHoldAlreadyExistsException;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.disposal.DisposalPolicy;
@@ -37,12 +38,7 @@ public class EditDisposalHold extends Composite {
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
-        BrowserService.Util.getInstance().retrieveDisposalHold(historyTokens.get(0), new AsyncCallback<DisposalHold>() {
-          @Override
-          public void onFailure(Throwable caught) {
-            callback.onFailure(caught);
-          }
-
+        BrowserService.Util.getInstance().retrieveDisposalHold(historyTokens.get(0), new NoAsyncCallback<DisposalHold>() {
           @Override
           public void onSuccess(DisposalHold result) {
             if (DisposalHoldState.LIFTED.equals(result.getState())) {
@@ -124,12 +120,7 @@ public class EditDisposalHold extends Composite {
       disposalHold.setMandate(disposalHoldUpdated.getMandate());
       disposalHold.setDescription(disposalHoldUpdated.getDescription());
       disposalHold.setScopeNotes(disposalHoldUpdated.getScopeNotes());
-      BrowserServiceImpl.Util.getInstance().updateDisposalHold(disposalHold, new AsyncCallback<DisposalHold>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          errorMessage(caught);
-        }
-
+      BrowserServiceImpl.Util.getInstance().updateDisposalHold(disposalHold, new NoAsyncCallback<DisposalHold>() {
         @Override
         public void onSuccess(DisposalHold disposalHold) {
           HistoryUtils.newHistory(ShowDisposalHold.RESOLVER, disposalHold.getId());
@@ -146,11 +137,4 @@ public class EditDisposalHold extends Composite {
     HistoryUtils.newHistory(ShowDisposalHold.RESOLVER, disposalHold.getId());
   }
 
-  private void errorMessage(Throwable caught) {
-    if (caught instanceof DisposalHoldAlreadyExistsException) {
-      Toast.showError(messages.createDisposalHoldAlreadyExists(disposalHold.getTitle()));
-    } else {
-      Toast.showError(messages.createDisposalHoldFailure(caught.getMessage()));
-    }
-  }
 }

@@ -3277,6 +3277,10 @@ public class ModelService extends ModelObservable {
       throw new GenericException("Error reading disposal hold: " + disposalHoldId, e);
     }
 
+    Long count = SolrUtils.count(RodaCoreFactory.getSolr(), IndexedAIP.class, new Filter(
+        new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLDS_ID, ret.getId())));
+    ret.setAipCounter(count);
+
     return ret;
   }
 
@@ -3349,7 +3353,7 @@ public class ModelService extends ModelObservable {
 
         Long count = SolrUtils.count(RodaCoreFactory.getSolr(), IndexedAIP.class, new Filter(
             new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLDS_ID, hold.getId())));
-        hold.setApiCounter(count);
+        hold.setAipCounter(count);
 
         disposalHolds.addObject(hold);
       }
@@ -3472,6 +3476,10 @@ public class ModelService extends ModelObservable {
     } catch (IOException | GenericException e) {
       throw new GenericException("Error reading disposal schedule: " + disposalScheduleId, e);
     }
+
+    Long count = SolrUtils.count(RodaCoreFactory.getSolr(), IndexedAIP.class, new Filter(
+        new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID, ret.getId())));
+    ret.setApiCounter(count);
 
     return ret;
   }
@@ -3696,7 +3704,7 @@ public class ModelService extends ModelObservable {
   }
 
   public void deleteDisposalRule(String disposalRuleId) throws NotFoundException, GenericException,
-    AuthorizationDeniedException, RequestNotValidException, IllegalOperationException {
+    AuthorizationDeniedException, RequestNotValidException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     StoragePath disposalRulePath = ModelUtils.getDisposalRuleStoragePath(disposalRuleId);

@@ -209,12 +209,7 @@ public class ShowDisposalHold extends Composite {
       liftHoldBtn.addClickHandler(clickEvent -> {
         if (disposalHold.getFirstTimeUsed() == null) {
           disposalHold.setState(DisposalHoldState.LIFTED);
-          BrowserServiceImpl.Util.getInstance().updateDisposalHold(disposalHold, new AsyncCallback<DisposalHold>() {
-            @Override
-            public void onFailure(Throwable caught) {
-              errorMessage(caught);
-            }
-
+          BrowserServiceImpl.Util.getInstance().updateDisposalHold(disposalHold, new NoAsyncCallback<DisposalHold>() {
             @Override
             public void onSuccess(DisposalHold disposalHold) {
               HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
@@ -296,12 +291,7 @@ public class ShowDisposalHold extends Composite {
   private void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
 
-      BrowserService.Util.getInstance().retrieveDisposalHold(historyTokens.get(0), new AsyncCallback<DisposalHold>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          callback.onFailure(caught);
-        }
-
+      BrowserService.Util.getInstance().retrieveDisposalHold(historyTokens.get(0), new NoAsyncCallback<DisposalHold>() {
         @Override
         public void onSuccess(DisposalHold result) {
           ShowDisposalHold panel = new ShowDisposalHold(result);

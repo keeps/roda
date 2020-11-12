@@ -27,7 +27,7 @@
                     <g:Label addStyleNames="value" ui:field="disposalRetentionDueDate"/>
                 </g:FlowPanel>
                 <g:FlowPanel addStyleNames="field">
-                    <g:Label addStyleNames="label">
+                    <g:Label addStyleNames="label" ui:field="retentionPeriodLabel">
                         <ui:text from='{messages.disposalRetentionPeriodLabel}'/>
                     </g:Label>
                     <g:Label addStyleNames="value" ui:field="disposalRetentionPeriod"/>

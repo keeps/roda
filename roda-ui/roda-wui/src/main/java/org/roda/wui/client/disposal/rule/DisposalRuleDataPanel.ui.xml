@@ -17,30 +17,30 @@
         <g:FlowPanel addStyleNames="row full_width no_padding">
             <g:FlowPanel addStyleNames="wui-data-panel">
                 <g:FlowPanel addStyleNames="wui-error-panel">
-                    <g:HTML ui:field="errors"></g:HTML>
+                    <g:HTML ui:field="errors"/>
                 </g:FlowPanel>
                 <g:Label addStyleNames="form-label">
                     <ui:text from='{messages.disposalRuleTitle}'/>
                 </g:Label>
                 <g:TextBox title="{messages.disposalRuleTitle}" ui:field="title" addStyleNames="form-textbox"/>
-                <g:Label ui:field="titleError" addStyleNames="form-label-error"></g:Label>
+                <g:Label ui:field="titleError" addStyleNames="form-label-error"/>
                 <g:Label addStyleNames="form-label">
                     <ui:text from='{messages.disposalRuleDescription}'/>
                 </g:Label>
                 <g:TextArea title="{messages.disposalRuleDescription}" ui:field="description"
                             addStyleNames="form-textbox disposalRuleDescription"/>
-                <g:Label addStyleNames="form-label" ui:field="disposalSchedulesListLabel"></g:Label>
-                <g:Label ui:field="disposalSchedulesListError" addStyleNames="form-label-error"></g:Label>
+                <g:Label addStyleNames="form-label" ui:field="disposalSchedulesListLabel"/>
+                <g:Label ui:field="disposalSchedulesListError" addStyleNames="form-label-error"/>
                 <g:ListBox addStyleNames="form-textbox" ui:field="disposalSchedulesList"/>
 
-                <g:Label ui:field="typeListLabel" addStyleNames="form-label"></g:Label>
-                <g:Label ui:field="typeListError" addStyleNames="form-label-error"></g:Label>
+                <g:Label ui:field="typeListLabel" addStyleNames="form-label"/>
+                <g:Label ui:field="typeListError" addStyleNames="form-label-error"/>
                 <g:ListBox addStyleNames="form-textbox" ui:field="typeList"/>
 
                 <g:Label ui:field="conditionLabel" addStyleNames="form-label">
                     <ui:text from='{messages.disposalRuleCondition}'/>
                 </g:Label>
-                <g:Label ui:field="conditionError" addStyleNames="form-label-error"></g:Label>
+                <g:Label ui:field="conditionError" addStyleNames="form-label-error"/>
                 <g:FlowPanel ui:field="conditionPanel">
                     <g:FlowPanel addStyleNames="col_2">
                         <g:ListBox addStyleNames="form-textbox" ui:field="fieldsList">
@@ -48,7 +48,7 @@
                     </g:FlowPanel>
                     <g:FlowPanel addStyleNames="disposalRuleOperator col_1">
                         <g:Label addStyleNames="form-label" ui:field="fieldsOperator">
-                            <ui:text from='{messages.disposalRuleIs}'/>
+                            <ui:text from='{messages.disposalRuleConditionOperator}'/>
                         </g:Label>
                     </g:FlowPanel>
                     <g:FlowPanel addStyleNames="col_3">
@@ -56,7 +56,7 @@
                                    addStyleNames="form-textbox"/>
                     </g:FlowPanel>
                 </g:FlowPanel>
-                <p:PluginParameterPanel ui:field="pluginParameterPanel"></p:PluginParameterPanel>
+                <p:PluginParameterPanel ui:field="pluginParameterPanel"/>
             </g:FlowPanel>
         </g:FlowPanel>
     </g:FlowPanel>

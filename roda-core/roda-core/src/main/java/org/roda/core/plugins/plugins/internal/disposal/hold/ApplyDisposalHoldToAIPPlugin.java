@@ -58,7 +58,7 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE, "Override disposal holds",
         PluginParameter.PluginParameterType.BOOLEAN, "false", true, false,
-        "Replace current disposal holds for the selected"));
+        "Lift all disposal holds associated and apply the selected disposal hold"));
   }
 
   @Override

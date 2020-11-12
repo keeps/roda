@@ -2,8 +2,8 @@ package org.roda.wui.client.disposal;
 
 import java.util.List;
 
-import org.checkerframework.checker.units.qual.A;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.ip.disposal.ConditionType;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
@@ -419,9 +419,31 @@ public class DisposalPolicy extends Composite {
   private boolean initDisposalRuleButtons(FlowPanel panel, boolean isGroup, boolean isSidebar) {
     boolean ret = false;
 
-    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_UPDATE_DISPOSAL_RULE)
-            && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_RULE)) {
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_RULE)) {
+      Button createRuleBtn = new Button();
       if (isSidebar) {
+        Label label = new Label();
+        label.setText(messages.disposalRulesTitle());
+        label.addStyleName("sidebarDisposalLabels");
+        panel.add(label);
+      }
+      createRuleBtn.addStyleName("btn btn-plus");
+      if (isGroup) {
+        createRuleBtn.addStyleName("btn-block");
+      }
+      createRuleBtn.setText(messages.newDisposalRuleTitle());
+      createRuleBtn.addClickHandler(new ClickHandler() {
+        @Override
+        public void onClick(ClickEvent event) {
+          HistoryUtils.newHistory(DisposalPolicy.RESOLVER, CreateDisposalRule.RESOLVER.getHistoryToken());
+        }
+      });
+      panel.add(createRuleBtn);
+      ret = true;
+    }
+
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_UPDATE_DISPOSAL_RULE)) {
+      if (isSidebar && !ret) {
         Label label = new Label();
         label.setText(messages.disposalRulesTitle());
         label.addStyleName("sidebarDisposalLabels");
@@ -443,31 +465,27 @@ public class DisposalPolicy extends Composite {
       ret = true;
     }
 
-    // TODO -> add new rule to apply rules
-    // if(PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_APPLY_DISPOSAL_RULE)){
-    if (!ret && isSidebar) {
-      Label label = new Label();
-      label.setText(messages.disposalRulesTitle());
-      label.addStyleName("sidebarDisposalLabels");
-      panel.add(label);
-    }
-    Button applyRules = new Button();
-    applyRules.addStyleName("btn btn-play");
-    if (isGroup) {
-      applyRules.addStyleName("btn-block");
-    }
-    applyRules.setText(messages.applyRules());
-    applyRules.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
-        //TODO
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_SCHEDULE)) {
+      if (!ret && isSidebar) {
+        Label label = new Label();
+        label.setText(messages.disposalRulesTitle());
+        label.addStyleName("sidebarDisposalLabels");
+        panel.add(label);
+      }
+      Button applyRules = new Button();
+      applyRules.addStyleName("btn btn-play");
+      if (isGroup) {
+        applyRules.addStyleName("btn-block");
+      }
+      applyRules.setText(messages.applyRules());
+      applyRules.addClickHandler(event -> {
+        // TODO
         ApplyDisposalRulesDialog applyDisposalRulesDialog = new ApplyDisposalRulesDialog(messages.applyRules());
 
-      }
-    });
-    panel.add(applyRules);
-    ret = true;
-  //}
+      });
+      panel.add(applyRules);
+      ret = true;
+    }
 
     return ret;
   }
@@ -723,7 +741,7 @@ public class DisposalPolicy extends Composite {
         new BasicTablePanel.ColumnInfo<>(messages.disposalHoldNumberOfAIPs(), 12, new TextColumn<DisposalHold>() {
           @Override
           public String getValue(DisposalHold hold) {
-            return String.valueOf(hold.getApiCounter());
+            return String.valueOf(hold.getAipCounter());
           }
         }),
 
@@ -762,6 +780,20 @@ public class DisposalPolicy extends Composite {
           @Override
           public String getValue(DisposalRule rule) {
             return messages.disposalRuleTypeValue(rule.getType().toString());
+          }
+        }),
+
+        new BasicTablePanel.ColumnInfo<>(messages.disposalRuleCondition(), 24, new TextColumn<DisposalRule>() {
+          @Override
+          public String getValue(DisposalRule rule) {
+            String condition = "";
+            if (rule.getType().equals(ConditionType.METADATA_FIELD)) {
+              condition = rule.getConditionKey() + " " + messages.disposalRuleConditionOperator() + " "
+                + rule.getConditionValue();
+            } else {
+              condition = rule.getConditionValue();
+            }
+            return messages.disposalRuleTypeValue(condition);
           }
         }),
 

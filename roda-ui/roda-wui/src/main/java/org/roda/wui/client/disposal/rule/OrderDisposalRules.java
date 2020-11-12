@@ -3,9 +3,11 @@ package org.roda.wui.client.disposal.rule;
 import java.util.List;
 
 import org.roda.core.data.exceptions.DisposalRuleAlreadyExistsException;
+import org.roda.core.data.v2.ip.disposal.ConditionType;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalRules;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
@@ -20,7 +22,6 @@ import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -31,7 +32,6 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -46,11 +46,7 @@ public class OrderDisposalRules extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      BrowserService.Util.getInstance().listDisposalRules(new AsyncCallback<DisposalRules>() {
-        @Override
-        public void onFailure(Throwable throwable) {
-        }
-
+      BrowserService.Util.getInstance().listDisposalRules(new NoAsyncCallback<DisposalRules>() {
         @Override
         public void onSuccess(DisposalRules disposalRules) {
           OrderDisposalRules orderDisposalRules = new OrderDisposalRules(disposalRules);
@@ -81,8 +77,6 @@ public class OrderDisposalRules extends Composite {
 
   private static OrderDisposalRules.MyUiBinder uiBinder = GWT.create(OrderDisposalRules.MyUiBinder.class);
 
-  private DisposalRule disposalRule;
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
@@ -100,7 +94,7 @@ public class OrderDisposalRules extends Composite {
   @UiField
   Button buttonCancel;
 
-  private DisposalRules disposalRules;
+  private final DisposalRules disposalRules;
   private DisposalRule selectedRule;
   private int selectedIndex;
   private BasicTablePanel<DisposalRule> tableRules;
@@ -122,92 +116,76 @@ public class OrderDisposalRules extends Composite {
   }
 
   private void createTopButton() {
-    Button topbtn = new Button();
-    topbtn.setText("top");
-    topbtn.addStyleName("btn btn-block btn-default btn-top");
-    topbtn.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent clickEvent) {
-        if (selectedRule != null && selectedIndex != 0) {
-          orderDisposalRulesTablePanel.clear();
-          disposalRules.moveToTop(selectedRule);
-          disposalRules.sortRules();
-          createDisposalRulesPanel();
-          tableRules.getSelectionModel().setSelected(selectedRule, true);
-        }
+    Button buttonTop = new Button();
+    buttonTop.setText("top");
+    buttonTop.addStyleName("btn btn-block btn-default btn-top");
+    buttonTop.addClickHandler(clickEvent -> {
+      if (selectedRule != null && selectedIndex != 0) {
+        orderDisposalRulesTablePanel.clear();
+        disposalRules.moveToTop(selectedRule);
+        disposalRules.sortRules();
+        createDisposalRulesPanel();
+        tableRules.getSelectionModel().setSelected(selectedRule, true);
       }
     });
-    orderButtonsPanel.add(topbtn);
+    orderButtonsPanel.add(buttonTop);
   }
 
   private void createUpButton() {
-    Button upbtn = new Button();
-    upbtn.setText("up");
-    upbtn.addStyleName("btn btn-block btn-default btn-up");
-    upbtn.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent clickEvent) {
-        int previousIndex = selectedIndex - 1;
-        if (selectedRule != null && previousIndex >= 0) {
-          disposalRules.getObjects().get(previousIndex).setOrder(selectedIndex);
-          selectedRule.setOrder(previousIndex);
-          orderDisposalRulesTablePanel.clear();
-          disposalRules.sortRules();
-          createDisposalRulesPanel();
-          tableRules.getSelectionModel().setSelected(selectedRule, true);
-        }
+    Button buttonUp = new Button();
+    buttonUp.setText("up");
+    buttonUp.addStyleName("btn btn-block btn-default btn-up");
+    buttonUp.addClickHandler(clickEvent -> {
+      int previousIndex = selectedIndex - 1;
+      if (selectedRule != null && previousIndex >= 0) {
+        disposalRules.getObjects().get(previousIndex).setOrder(selectedIndex);
+        selectedRule.setOrder(previousIndex);
+        orderDisposalRulesTablePanel.clear();
+        disposalRules.sortRules();
+        createDisposalRulesPanel();
+        tableRules.getSelectionModel().setSelected(selectedRule, true);
       }
     });
-    orderButtonsPanel.add(upbtn);
+    orderButtonsPanel.add(buttonUp);
   }
 
   private void createDownButton() {
-    Button downbtn = new Button();
-    downbtn.setText("down");
-    downbtn.addStyleName("btn btn-block btn-default btn-down");
-    downbtn.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent clickEvent) {
-        int nextIndex = selectedIndex + 1;
-        if (selectedRule != null && nextIndex < disposalRules.getObjects().size()) {
-          disposalRules.getObjects().get(nextIndex).setOrder(selectedIndex);
-          selectedRule.setOrder(nextIndex);
-          orderDisposalRulesTablePanel.clear();
-          disposalRules.sortRules();
-          createDisposalRulesPanel();
-          tableRules.getSelectionModel().setSelected(selectedRule, true);
-        }
+    Button buttonDown = new Button();
+    buttonDown.setText("down");
+    buttonDown.addStyleName("btn btn-block btn-default btn-down");
+    buttonDown.addClickHandler(clickEvent -> {
+      int nextIndex = selectedIndex + 1;
+      if (selectedRule != null && nextIndex < disposalRules.getObjects().size()) {
+        disposalRules.getObjects().get(nextIndex).setOrder(selectedIndex);
+        selectedRule.setOrder(nextIndex);
+        orderDisposalRulesTablePanel.clear();
+        disposalRules.sortRules();
+        createDisposalRulesPanel();
+        tableRules.getSelectionModel().setSelected(selectedRule, true);
       }
     });
-    orderButtonsPanel.add(downbtn);
+    orderButtonsPanel.add(buttonDown);
   }
 
   private void createBottomButton() {
-    Button bottombtn = new Button();
-    bottombtn.setText("bottom");
-    bottombtn.addStyleName("btn btn-block btn-default btn-bottom");
-    bottombtn.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent clickEvent) {
-        int lastIndex = disposalRules.getObjects().size() - 1;
-        if (selectedRule != null && selectedIndex != lastIndex) {
-          orderDisposalRulesTablePanel.clear();
-          disposalRules.moveToBottom(selectedRule, selectedIndex);
-          disposalRules.sortRules();
-          createDisposalRulesPanel();
-          tableRules.getSelectionModel().setSelected(selectedRule, true);
-        }
+    Button buttonBottom = new Button();
+    buttonBottom.setText("bottom");
+    buttonBottom.addStyleName("btn btn-block btn-default btn-bottom");
+    buttonBottom.addClickHandler(clickEvent -> {
+      int lastIndex = disposalRules.getObjects().size() - 1;
+      if (selectedRule != null && selectedIndex != lastIndex) {
+        orderDisposalRulesTablePanel.clear();
+        disposalRules.moveToBottom(selectedRule, selectedIndex);
+        disposalRules.sortRules();
+        createDisposalRulesPanel();
+        tableRules.getSelectionModel().setSelected(selectedRule, true);
       }
     });
-    orderButtonsPanel.add(bottombtn);
+    orderButtonsPanel.add(buttonBottom);
   }
 
   private void createDescription() {
-    HTMLPanel info = new HTMLPanel("");
-    info.add(new HTMLWidgetWrapper("OrderDisposalRulesDescription.html"));
-
-    orderDisposalRulesDescription.add(info);
-
+    orderDisposalRulesDescription.add(new HTMLWidgetWrapper("OrderDisposalRulesDescription.html"));
   }
 
   private void createDisposalRulesPanel() {
@@ -258,6 +236,18 @@ public class OrderDisposalRules extends Composite {
           public String getValue(DisposalRule rule) {
             return messages.disposalRuleTypeValue(rule.getType().toString());
           }
+        }), new BasicTablePanel.ColumnInfo<>(messages.disposalRuleCondition(), 24, new TextColumn<DisposalRule>() {
+          @Override
+          public String getValue(DisposalRule rule) {
+            String condition = "";
+            if (rule.getType().equals(ConditionType.METADATA_FIELD)) {
+              condition = rule.getConditionKey() + " " + messages.disposalRuleConditionOperator() + " "
+                + rule.getConditionValue();
+            } else {
+              condition = rule.getConditionValue();
+            }
+            return messages.disposalRuleTypeValue(condition);
+          }
         }),
 
         new BasicTablePanel.ColumnInfo<>(messages.disposalRuleScheduleName(), 12, new TextColumn<DisposalRule>() {
@@ -277,20 +267,11 @@ public class OrderDisposalRules extends Composite {
 
   @UiHandler("buttonSave")
   void buttonSaveHandler(ClickEvent e) {
-    Dialogs.showConfirmDialog(messages.saveButton(), messages.confirmChangeRulesOrder(), messages.cancelButton(),
-      messages.confirmButton(), new AsyncCallback<Boolean>() {
-        @Override
-        public void onFailure(Throwable throwable) {
-
-        }
+    Dialogs.showConfirmDialog(messages.saveButton(), messages.confirmChangeRulesOrder(), messages.dialogNo(),
+      messages.dialogYes(), new NoAsyncCallback<Boolean>() {
         @Override
         public void onSuccess(Boolean aBoolean) {
-          BrowserServiceImpl.Util.getInstance().updateDisposalRules(disposalRules, new AsyncCallback<Void>() {
-            @Override
-            public void onFailure(Throwable caught) {
-              errorMessage(caught);
-            }
-
+          BrowserServiceImpl.Util.getInstance().updateDisposalRules(disposalRules, new NoAsyncCallback<Void>() {
             @Override
             public void onSuccess(Void unused) {
               HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
@@ -300,21 +281,9 @@ public class OrderDisposalRules extends Composite {
       });
   }
 
-  @UiHandler("buttonCreate")
-  void buttonCreateHandler(ClickEvent e) {
-    HistoryUtils.newHistory(DisposalPolicy.RESOLVER, CreateDisposalRule.RESOLVER.getHistoryToken());
-  }
-
   @UiHandler("buttonCancel")
   void buttonCancelHandler(ClickEvent e) {
     HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
   }
 
-  private void errorMessage(Throwable caught) {
-    if (caught instanceof DisposalRuleAlreadyExistsException) {
-      Toast.showError(messages.createDisposalRuleAlreadyExists(disposalRule.getTitle()));
-    } else {
-      Toast.showError(messages.createDisposalRuleFailure(caught.getMessage()));
-    }
-  }
 }

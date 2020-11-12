@@ -122,12 +122,7 @@ public class EditDisposalSchedule extends Composite {
       disposalSchedule.setDescription(disposalScheduleUpdated.getDescription());
       disposalSchedule.setScopeNotes(disposalScheduleUpdated.getScopeNotes());
       BrowserServiceImpl.Util.getInstance().updateDisposalSchedule(disposalSchedule,
-        new AsyncCallback<DisposalSchedule>() {
-          @Override
-          public void onFailure(Throwable caught) {
-            errorMessage(caught);
-          }
-
+        new NoAsyncCallback<DisposalSchedule>() {
           @Override
           public void onSuccess(DisposalSchedule disposalSchedule) {
             HistoryUtils.newHistory(ShowDisposalSchedule.RESOLVER, disposalSchedule.getId());
@@ -141,14 +136,6 @@ public class EditDisposalSchedule extends Composite {
   @UiHandler("buttonCancel")
   void buttonCancelHandler(ClickEvent e) {
     HistoryUtils.newHistory(ShowDisposalSchedule.RESOLVER, disposalSchedule.getId());
-  }
-
-  private void errorMessage(Throwable caught) {
-    if (caught instanceof DisposalScheduleAlreadyExistsException) {
-      Toast.showError(messages.createDisposalScheduleAlreadyExists(disposalSchedule.getTitle()));
-    } else {
-      Toast.showError(messages.createDisposalScheduleFailure(caught.getMessage()));
-    }
   }
 
 }

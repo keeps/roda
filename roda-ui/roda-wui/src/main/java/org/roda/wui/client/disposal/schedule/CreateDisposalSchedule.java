@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.roda.core.data.exceptions.DisposalScheduleAlreadyExistsException;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.disposal.DisposalPolicy;
@@ -93,13 +94,7 @@ public class CreateDisposalSchedule extends Composite {
       disposalSchedule = disposalScheduleDataPanel.getDisposalSchedule();
 
       BrowserServiceImpl.Util.getInstance().createDisposalSchedule(disposalSchedule,
-        new AsyncCallback<DisposalSchedule>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            errorMessage(caught);
-          }
-
+        new NoAsyncCallback<DisposalSchedule>() {
           @Override
           public void onSuccess(DisposalSchedule createdDisposalSchedule) {
             HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
@@ -115,16 +110,7 @@ public class CreateDisposalSchedule extends Composite {
   }
 
   private void cancel() {
-    // TODO
     HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
-  }
-
-  private void errorMessage(Throwable caught) {
-    if (caught instanceof DisposalScheduleAlreadyExistsException) {
-      Toast.showError(messages.createDisposalScheduleAlreadyExists(disposalSchedule.getTitle()));
-    } else {
-      Toast.showError(messages.createDisposalScheduleFailure(caught.getMessage()));
-    }
   }
 
 }
