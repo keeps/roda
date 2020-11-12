@@ -23,6 +23,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -58,7 +59,7 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
   private String disposalScheduleId;
   private static Set<String> previousDisposalSchedules;
   private boolean recursive = true;
-  private boolean overwriteAll = true;
+  private boolean overwriteAll = false;
 
   private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
@@ -70,7 +71,7 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
         PluginParameter.PluginParameterType.BOOLEAN, "true", true, false, "Execute in recursive mode."));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_ALL,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_ALL, "Overwrite mode",
-        PluginParameter.PluginParameterType.BOOLEAN, "true", true, false,
+        PluginParameter.PluginParameterType.BOOLEAN, "false", true, false,
         "Overwrite all descendants disposal schedules."));
   }
 
@@ -167,7 +168,9 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
     Job cachedJob, List<AIP> aips) {
     LOGGER.debug("Associating disposal schedule {}", disposalScheduleId);
     previousDisposalSchedules = new HashSet<>();
-    calculateResourcesCounter(index, jobPluginInfo, aips);
+    if (recursive) {
+      calculateResourcesCounter(index, jobPluginInfo, aips);
+    }
 
     // Uses cache to retrieve the disposal schedule
     DisposalSchedule disposalSchedule = RodaCoreFactory.getDisposalSchedule(disposalScheduleId);
@@ -252,7 +255,14 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
   private void calculateResourcesCounter(IndexService index, JobPluginInfo jobPluginInfo, List<AIP> aips) {
     try {
       ArrayList<String> ancestorList = aips.stream().map(AIP::getId).collect(Collectors.toCollection(ArrayList::new));
-      Filter ancestorFilter = new Filter(new OneOfManyFilterParameter(RodaConstants.AIP_ANCESTORS, ancestorList));
+      Filter ancestorFilter;
+      if (!overwriteAll) {
+        ancestorFilter = new Filter();
+        ancestorFilter.add(new OneOfManyFilterParameter(RodaConstants.AIP_ANCESTORS, ancestorList));
+        ancestorFilter.add(new EmptyKeyFilterParameter(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID));
+      } else {
+        ancestorFilter = new Filter(new OneOfManyFilterParameter(RodaConstants.AIP_ANCESTORS, ancestorList));
+      }
       int resourceCounter = index.count(IndexedAIP.class, ancestorFilter).intValue();
       jobPluginInfo.setSourceObjectsCount(resourceCounter + aips.size());
     } catch (GenericException | RequestNotValidException e) {
@@ -262,7 +272,14 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
 
   private void processChildren(ModelService model, IndexService index, Job cachedJob, AIP aipParent,
     DisposalSchedule disposalSchedule, JobPluginInfo jobPluginInfo, Report report) {
-    Filter ancestorFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipParent.getId()));
+    Filter ancestorFilter;
+    if (!overwriteAll) {
+      ancestorFilter = new Filter();
+      ancestorFilter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipParent.getId()));
+      ancestorFilter.add(new EmptyKeyFilterParameter(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID));
+    } else {
+      ancestorFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipParent.getId()));
+    }
     try (IterableIndexResult<IndexedAIP> result = index.findAll(IndexedAIP.class, ancestorFilter, false,
       Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID))) {
 
@@ -274,12 +291,10 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
 
         try {
           AIP aipChildren = model.retrieveAIP(indexedAIP.getId());
-          if (!overwriteAll && !aipChildren.getDisposalScheduleId().isEmpty()) {
-            break;
-          }
           reportItem.setPluginState(PluginState.SUCCESS);
           reportItem.setPluginDetails("Apply disposal schedule: " + disposalScheduleId);
           aipChildren.setDisposalScheduleId(aipParent.getDisposalScheduleId());
+          aipChildren.setDisposalFlow(AIPDisposalFlow.MANUAL);
           model.updateAIP(aipChildren, cachedJob.getUsername());
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
           outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule("was successfully applied to AIP",

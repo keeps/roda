@@ -5,12 +5,18 @@ import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 /**
  * @author Gabriel Barros <gbarrps@keep.pt>
  */
-public class DisposalScheduleDialogsResult {
-  DisposalSchedule disposalSchedule;
-  Boolean applyToHierarchy;
-  Boolean overwriteAll;
+public class DisposalScheduleDialogResult {
+  public enum ActionType {
+    CLEAR, ASSOCIATE
+  }
 
-  public DisposalScheduleDialogsResult(DisposalSchedule disposalSchedule, Boolean applyToHierarchy, Boolean overwriteAll) {
+  private ActionType actionType;
+  private DisposalSchedule disposalSchedule;
+  private Boolean applyToHierarchy;
+  private Boolean overwriteAll;
+
+  public DisposalScheduleDialogResult(ActionType actionType, DisposalSchedule disposalSchedule, Boolean applyToHierarchy, Boolean overwriteAll) {
+    this.actionType = actionType;
     this.disposalSchedule = disposalSchedule;
     this.applyToHierarchy = applyToHierarchy;
     this.overwriteAll = overwriteAll;
@@ -38,5 +44,9 @@ public class DisposalScheduleDialogsResult {
 
   public void setOverwriteAll(Boolean overwriteAll) {
     this.overwriteAll = overwriteAll;
+  }
+
+  public ActionType getActionType() {
+    return actionType;
   }
 }

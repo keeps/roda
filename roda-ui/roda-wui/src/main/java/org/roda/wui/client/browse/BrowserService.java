@@ -431,7 +431,7 @@ public interface BrowserService extends RemoteService {
     Boolean applyToHierarchy, Boolean overwriteAll)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  Job disassociateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems)
+  Job disassociateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, Boolean applyToHierarchy)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   Job applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean override)
