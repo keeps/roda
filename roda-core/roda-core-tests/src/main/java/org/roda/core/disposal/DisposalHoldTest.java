@@ -8,10 +8,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
@@ -25,11 +22,9 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceTest;
@@ -39,7 +34,6 @@ import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
-import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
@@ -86,7 +80,7 @@ public class DisposalHoldTest {
   @AfterClass
   public void tearDown() throws Exception {
     RodaCoreFactory.shutdown();
-    //FSUtils.deletePath(basePath);
+    // FSUtils.deletePath(basePath);
   }
 
   @AfterMethod
@@ -119,7 +113,7 @@ public class DisposalHoldTest {
 
   @Test
   public void testDisposalHoldDeletionWhenUsed() throws AuthorizationDeniedException, RequestNotValidException,
-    NotFoundException, GenericException, AlreadyExistsException {
+    NotFoundException, GenericException, AlreadyExistsException, IllegalOperationException {
     DisposalHold disposalHold = createDisposalHold();
     disposalHold = model.createDisposalHold(disposalHold, "admin");
 
@@ -143,17 +137,13 @@ public class DisposalHoldTest {
 
     disposalHold.setFirstTimeUsed(new Date());
 
-    model.updateDisposalHold(disposalHold, "admin");
-
-
     // TODO change test to use the plugin to lift the hold
-    model.updateDisposalHold(disposalHold, "admin");
 
     DisposalHold retrievedDisposalHold = model.retrieveDisposalHold(disposalHold.getId());
   }
 
   public void testDisposalHoldAIPAssociation() throws AuthorizationDeniedException, AlreadyExistsException,
-          NotFoundException, GenericException, RequestNotValidException, ValidationException {
+    NotFoundException, GenericException, RequestNotValidException, ValidationException {
 
     // generate AIP ID
     final String aipId = CorporaConstants.SOURCE_AIP_ID;
@@ -164,8 +154,10 @@ public class DisposalHoldTest {
     DisposalHold disposalHold = model.createDisposalHold(createDisposalHold(), RodaConstants.ADMIN);
     DisposalHold disposalHold2 = model.createDisposalHold(createDisposalHold(), RodaConstants.ADMIN);
 
-    DisposalHoldAssociation disposalHoldAssociation = model.createDisposalHoldAssociation(aip.getId(), disposalHold.getId(), new Date(), RodaConstants.ADMIN);
-    DisposalHoldAssociation disposalHoldAssociation2 = model.createDisposalHoldAssociation(aip.getId(), disposalHold2.getId(), new Date(), RodaConstants.ADMIN);
+    DisposalHoldAssociation disposalHoldAssociation = model.createDisposalHoldAssociation(aip.getId(),
+      disposalHold.getId(), new Date(), RodaConstants.ADMIN);
+    DisposalHoldAssociation disposalHoldAssociation2 = model.createDisposalHoldAssociation(aip.getId(),
+      disposalHold2.getId(), new Date(), RodaConstants.ADMIN);
 
     // check it is connected
     AIP retrievedAIP = model.retrieveAIP(aip.getId());
@@ -173,42 +165,44 @@ public class DisposalHoldTest {
     assertEquals(retrievedAIP.getDisposalHoldAssociation().get(1), disposalHoldAssociation2);
   }
 
-    @Test
- /* public void testDisposalHoldsAipIndexAssociation() throws GenericException, AuthorizationDeniedException,
-    ValidationException, AlreadyExistsException, RequestNotValidException, NotFoundException {
-    // generate AIP ID
-    final String aipId = IdUtils.createUUID();
-
-    // Create AIP
-    final AIP aip = model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
-      RodaConstants.ADMIN);
-
-    // generate disposal hold
-    DisposalHold disposalHold = model.createDisposalHold(createDisposalHold(), RodaConstants.ADMIN);
-    DisposalHold disposalHold2 = model.createDisposalHold(createDisposalHold(), RodaConstants.ADMIN);
-
-    model.createDisposalHoldAssociation(aip.getId(), disposalHold.getId(), new Date(), RodaConstants.ADMIN);
-    model.createDisposalHoldAssociation(aip.getId(), disposalHold2.getId(), new Date(), RodaConstants.ADMIN);
-    AIP updatedAIP = model.retrieveAIP(aip.getId());
-
-    index.commitAIPs();
-
-    // Retrieve AIP
-    final IndexedAIP indexedAip = index.retrieve(IndexedAIP.class, aipId, new ArrayList<>());
-    List<String> retrievedDisposalHoldIds = indexedAip.getDisposalHoldsId();
-    ArrayList<String> disposalHoldsAssociationsIds = new ArrayList<>();
-
-    for (DisposalHoldAssociation dhAssociation : updatedAIP.getDisposalHoldAssociation()) {
-      disposalHoldsAssociationsIds.add(dhAssociation.getId());
-    }
-
-    Collections.sort(disposalHoldsAssociationsIds);
-    Collections.sort(retrievedDisposalHoldIds);
-
-    assertEquals(disposalHoldsAssociationsIds, retrievedDisposalHoldIds);
-  }
-*/
+  @Test
+  /*
+   * public void testDisposalHoldsAipIndexAssociation() throws GenericException,
+   * AuthorizationDeniedException, ValidationException, AlreadyExistsException,
+   * RequestNotValidException, NotFoundException { // generate AIP ID final String
+   * aipId = IdUtils.createUUID();
+   * 
+   * // Create AIP final AIP aip = model.createAIP(aipId, corporaService,
+   * DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER,
+   * CorporaConstants.SOURCE_AIP_ID), RodaConstants.ADMIN);
+   * 
+   * // generate disposal hold DisposalHold disposalHold =
+   * model.createDisposalHold(createDisposalHold(), RodaConstants.ADMIN);
+   * DisposalHold disposalHold2 = model.createDisposalHold(createDisposalHold(),
+   * RodaConstants.ADMIN);
+   * 
+   * model.createDisposalHoldAssociation(aip.getId(), disposalHold.getId(), new
+   * Date(), RodaConstants.ADMIN);
+   * model.createDisposalHoldAssociation(aip.getId(), disposalHold2.getId(), new
+   * Date(), RodaConstants.ADMIN); AIP updatedAIP =
+   * model.retrieveAIP(aip.getId());
+   * 
+   * index.commitAIPs();
+   * 
+   * // Retrieve AIP final IndexedAIP indexedAip =
+   * index.retrieve(IndexedAIP.class, aipId, new ArrayList<>()); List<String>
+   * retrievedDisposalHoldIds = indexedAip.getDisposalHoldsId(); ArrayList<String>
+   * disposalHoldsAssociationsIds = new ArrayList<>();
+   * 
+   * for (DisposalHoldAssociation dhAssociation :
+   * updatedAIP.getDisposalHoldAssociation()) {
+   * disposalHoldsAssociationsIds.add(dhAssociation.getId()); }
+   * 
+   * Collections.sort(disposalHoldsAssociationsIds);
+   * Collections.sort(retrievedDisposalHoldIds);
+   * 
+   * assertEquals(disposalHoldsAssociationsIds, retrievedDisposalHoldIds); }
+   */
   private DisposalHold createDisposalHold() {
     String title = "Process in court of law";
     String description = "Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Sed diam.";

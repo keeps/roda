@@ -124,7 +124,7 @@ public class DisposalScheduleTest {
 
 @Test
   public void testDisposalScheduleDeletionWhenUsed() throws AuthorizationDeniedException, RequestNotValidException,
-    NotFoundException, GenericException, AlreadyExistsException {
+    NotFoundException, GenericException, AlreadyExistsException, IllegalOperationException {
     DisposalSchedule disposalSchedule = createDisposalSchedule();
     disposalSchedule.setFirstTimeUsed(new Date());
 
