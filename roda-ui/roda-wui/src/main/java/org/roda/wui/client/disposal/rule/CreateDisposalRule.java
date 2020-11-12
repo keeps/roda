@@ -103,7 +103,6 @@ public class CreateDisposalRule extends Composite {
     this.disposalRules = disposalRules;
 
     this.disposalRuleDataPanel = new DisposalRuleDataPanel(disposalRule, disposalSchedules, false);
-    this.disposalRuleDataPanel.setDisposalRule(disposalRule);
 
     initWidget(uiBinder.createAndBindUi(this));
   }

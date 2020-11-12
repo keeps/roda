@@ -335,10 +335,6 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
 
   }
 
-  public void setDisposalRule(DisposalRule disposalRule) {
-
-  }
-
   public DisposalRule getDisposalRule() {
     DisposalRule disposalRule = new DisposalRule();
     disposalRule.setTitle(title.getText());
@@ -409,12 +405,10 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
         typeListError.setVisible(false);
 
         if (!isConditionValid()) {
-          GWT.log("entrei");
           if (conditionType.equals(ConditionType.IS_CHILD_OF)) {
             pluginParameterPanel.addStyleName("isWrong");
             Window.scrollTo(pluginParameterPanel.getAbsoluteLeft(), pluginParameterPanel.getAbsoluteTop());
           } else {
-            GWT.log("panados");
             conditionPanel.addStyleName("isWrong");
             Window.scrollTo(conditionPanel.getAbsoluteLeft(), conditionPanel.getAbsoluteTop());
           }
