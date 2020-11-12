@@ -57,7 +57,6 @@ import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
-import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
@@ -300,6 +299,8 @@ public interface BrowserServiceAsync {
 
   void updateDisposalRule(DisposalRule rule, AsyncCallback<DisposalRule> async);
 
+  void updateDisposalRules(DisposalRules rules, AsyncCallback<Void> async);
+
   void deleteDisposalRule(String disposalRuleId, AsyncCallback<Void> async);
 
   void createDisposalSchedule(DisposalSchedule schedule, AsyncCallback<DisposalSchedule> async);
@@ -323,23 +324,23 @@ public interface BrowserServiceAsync {
   void deleteDisposalHold(String disposalHoldId, AsyncCallback<Void> async);
 
   void associateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, String disposalScheduleId,
-                                 Boolean applyToHierarchy, Boolean overwriteAll, AsyncCallback<Job> async);
+    Boolean applyToHierarchy, Boolean overwriteAll, AsyncCallback<Job> async);
 
   void disassociateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, AsyncCallback<Job> async);
 
-  void createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, String title, DisposalConfirmationExtraBundle metadata,
-    AsyncCallback<Job> async);
+  void createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, String title,
+    DisposalConfirmationExtraBundle metadata, AsyncCallback<Job> async);
 
   void listDisposalHoldsAssociation(String aipId, AsyncCallback<List<DisposalHoldAssociation>> async);
 
   void deleteDisposalConfirmationReport(SelectedItems<DisposalConfirmation> selectedItems, String details,
-                                        AsyncCallback<Job> async);
+    AsyncCallback<Job> async);
 
   void destroyRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems,
-                                                  AsyncCallback<Job> async);
+    AsyncCallback<Job> async);
 
   void permanentlyDeleteRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems,
-                                                            AsyncCallback<Job> async);
+    AsyncCallback<Job> async);
 
   void retrieveDisposalConfirmationExtraBundle(AsyncCallback<DisposalConfirmationExtraBundle> async);
 
