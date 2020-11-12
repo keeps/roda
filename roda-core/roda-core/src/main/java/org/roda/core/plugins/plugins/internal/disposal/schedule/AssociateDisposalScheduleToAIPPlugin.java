@@ -215,7 +215,7 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
 
             reportItem.setPluginState(state)
-              .setPluginDetails("Disposal schedule '" + disposalScheduleId + "' was successfully associated to AIP");
+              .setPluginDetails("Disposal schedule '" + disposalSchedule.getTitle() + "' (" + disposalScheduleId + ") was successfully associated to AIP");
 
             outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule("was successfully associated to AIP",
               disposalSchedule.getId(), disposalSchedule.getTitle());
@@ -229,7 +229,7 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
             state = PluginState.FAILURE;
             jobPluginInfo.incrementObjectsProcessedWithFailure();
             reportItem.setPluginState(state)
-              .setPluginDetails("Error associating disposal schedule " + aip.getId() + ": " + e.getMessage());
+              .setPluginDetails("Error associating disposal schedule '" + disposalSchedule.getTitle() + "' (" + disposalScheduleId + ") to AIP '" + aip.getId() + "': " + e.getMessage());
             outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(" failed to be associated to AIP",
               disposalSchedule.getId(), disposalSchedule.getTitle());
           }

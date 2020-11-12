@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.gwt.user.client.ui.HTML;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.browse.BrowserService;
@@ -18,7 +17,6 @@ import org.roda.wui.client.common.actions.DisposalAssociationActions;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.utils.DisposalPolicyUtils;
-import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.disposal.Disposal;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbUtils;
@@ -39,7 +37,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
-public class DisposalPolicyAssociation extends Composite {
+public class DisposalPolicyAssociationPanel extends Composite {
   private static final List<String> fieldsToReturn = new ArrayList<>(
     Arrays.asList(RodaConstants.INDEX_AIP, RodaConstants.AIP_TITLE, RodaConstants.AIP_DISPOSAL_SCHEDULE_NAME));
 
@@ -67,7 +65,7 @@ public class DisposalPolicyAssociation extends Composite {
           fieldsToReturn, new NoAsyncCallback<BrowseAIPBundle>() {
             @Override
             public void onSuccess(BrowseAIPBundle bundle) {
-              callback.onSuccess(new DisposalPolicyAssociation(bundle));
+              callback.onSuccess(new DisposalPolicyAssociationPanel(bundle));
             }
           });
       }
@@ -102,13 +100,14 @@ public class DisposalPolicyAssociation extends Composite {
 
   ActionableWidgetBuilder<IndexedAIP> actionableWidgetBuilder;
 
-  interface MyUiBinder extends UiBinder<Widget, DisposalPolicyAssociation> {
+  interface MyUiBinder extends UiBinder<Widget, DisposalPolicyAssociationPanel> {
   }
 
-  private static DisposalPolicyAssociation.MyUiBinder uiBinder = GWT.create(DisposalPolicyAssociation.MyUiBinder.class);
+  private static DisposalPolicyAssociationPanel.MyUiBinder uiBinder = GWT
+    .create(DisposalPolicyAssociationPanel.MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  public DisposalPolicyAssociation(BrowseAIPBundle bundle) {
+  public DisposalPolicyAssociationPanel(BrowseAIPBundle bundle) {
     disposalConfirmationPanel = new DisposalConfirmationPanel(bundle.getAip().getDisposalConfirmationId());
 
     retentionPeriodPanel = new RetentionPeriodPanel(bundle.getAip());
@@ -134,7 +133,7 @@ public class DisposalPolicyAssociation extends Composite {
     disposalPolicySummaryPanel.setText(DisposalPolicyUtils.getDisposalPolicySummaryText(aip));
 
     BreadcrumbItem item = new BreadcrumbItem(messages.disposalPolicyTitle(),
-      () -> HistoryUtils.newHistory(DisposalPolicyAssociation.RESOLVER, aip.getId()));
+      () -> HistoryUtils.newHistory(DisposalPolicyAssociationPanel.RESOLVER, aip.getId()));
     List<BreadcrumbItem> aipBreadcrumbs = BreadcrumbUtils.getAipBreadcrumbs(bundle.getAIPAncestors(), bundle.getAip());
     aipBreadcrumbs.add(item);
     navigationToolbar.updateBreadcrumb(bundle);

@@ -75,8 +75,7 @@
                                          ui:field="stateLabel">
                                     <ui:text from='{messages.disposalScheduleStateCol}' />
                                 </g:Label>
-                                <g:HTML styleName="value"
-                                        ui:field="stateValue" />
+                                <g:HTML ui:field="stateValue" />
                             </g:FlowPanel>
                         </g:FlowPanel>
                     </g:FlowPanel>

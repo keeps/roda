@@ -606,17 +606,17 @@ public class HtmlSnippetUtils {
     return panel;
   }
 
-  public static SafeHtml getDisposalScheduleActionHtml(String disposalAction) {
+  public static SafeHtml getDisposalScheduleActionHtml(DisposalActionCode disposalAction) {
     String labelClass;
 
     switch (disposalAction) {
-      case "DESTROY":
+      case DESTROY:
         labelClass = "label-danger";
         break;
-      case "RETAIN_PERMANENTLY":
+      case RETAIN_PERMANENTLY:
         labelClass = "label-info";
         break;
-      case "REVIEW":
+      case REVIEW:
         labelClass = "label-warning";
         break;
       default:
@@ -625,6 +625,6 @@ public class HtmlSnippetUtils {
     }
 
     return SafeHtmlUtils.fromSafeConstant(
-      "<span class='" + labelClass + "'>" + messages.disposalScheduleActionCode(disposalAction) + CLOSE_SPAN);
+      "<span class='" + labelClass + "'>" + messages.disposalScheduleActionCode(disposalAction.name()) + CLOSE_SPAN);
   }
 }

@@ -5,7 +5,6 @@ import java.util.Date;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.core.client.GWT;
@@ -45,43 +44,48 @@ public class DisposalPolicyUtils {
       builder.append(messages.disposalPolicyConfirmationSummary());
     } else {
       if (aip.getDisposalScheduleId() != null) {
-        JavaScriptObject javaScriptObject = JavascriptUtils.durationInYMD(Humanize.formatDate(aip.getOverdueDate()));
-        JSONObject jsonObject = new JSONObject(javaScriptObject);
-        String duration = jsonObject.get("diff").toString();
-        String timeUnit = jsonObject.get("unit").isString().stringValue();
+        if (DisposalActionCode.DESTROY.equals(aip.getDisposalAction())
+          || DisposalActionCode.REVIEW.equals(aip.getDisposalAction())) {
 
-        if (DisposalActionCode.DESTROY.name().equals(aip.getDisposalAction())
-          || DisposalActionCode.REVIEW.name().equals(aip.getDisposalAction())) {
+          JavaScriptObject javaScriptObject = JavascriptUtils.durationInYMD(Humanize.formatDate(aip.getOverdueDate()));
+          JSONObject jsonObject = new JSONObject(javaScriptObject);
+          String duration = jsonObject.get("diff").toString();
+          String timeUnit = jsonObject.get("unit").isString().stringValue();
+
           if (aip.getOverdueDate().after(new Date())) {
             switch (timeUnit) {
               case "years":
                 builder.append(
-                  messages.disposalPolicyScheduleSummary(messages.disposalPolicyActionSummary(aip.getDisposalAction()),
+                  messages.disposalPolicyScheduleSummary(messages.disposalPolicyActionSummary(aip.getDisposalAction().name()),
                     messages.disposalPolicyScheduleYearSummary(Integer.parseInt(duration))));
                 break;
               case "months":
                 builder.append(
-                  messages.disposalPolicyScheduleSummary(messages.disposalPolicyActionSummary(aip.getDisposalAction()),
+                  messages.disposalPolicyScheduleSummary(messages.disposalPolicyActionSummary(aip.getDisposalAction().name()),
                     messages.disposalPolicyScheduleMonthSummary(Integer.parseInt(duration))));
                 break;
               case "days":
                 builder.append(
-                  messages.disposalPolicyScheduleSummary(messages.disposalPolicyActionSummary(aip.getDisposalAction()),
+                  messages.disposalPolicyScheduleSummary(messages.disposalPolicyActionSummary(aip.getDisposalAction().name()),
                     messages.disposalPolicyScheduleDaySummary(Integer.parseInt(duration))));
                 break;
             }
           } else {
             builder.append(
-              messages.disposalPolicySummaryReady(messages.disposalPolicyActionSummary(aip.getDisposalAction())));
+              messages.disposalPolicySummaryReady(messages.disposalPolicyActionSummary(aip.getDisposalAction().name())));
           }
-        } else if (DisposalActionCode.RETAIN_PERMANENTLY.name().equals(aip.getDisposalAction())) {
-
+        } else if (DisposalActionCode.RETAIN_PERMANENTLY.equals(aip.getDisposalAction())) {
+          builder.append("This intellectual entity will be permanently retained");
         }
-        builder.append(" ");
-      } else if (aip.isDisposalHoldStatus()) {
-        builder.append(messages.disposalPolicyHoldSummary());
+
       } else {
-        builder.append("No disposal policy associated with this intellectual entity");
+        builder.append(messages.disposalPolicyNoScheduleSummary());
+
+        if (aip.isDisposalHoldStatus()) {
+          builder.append(" ").append(messages.disposalPolicyHoldSummary());
+        } else {
+          return "No disposal policy associated with this intellectual entity";
+        }
       }
     }
 

@@ -44,9 +44,10 @@ import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.DisposalPolicyUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
-import org.roda.wui.client.disposal.association.DisposalPolicyAssociation;
+import org.roda.wui.client.disposal.association.DisposalPolicyAssociationPanel;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.common.client.tools.ConfigurationManager;
@@ -493,14 +494,15 @@ public class BrowseAIP extends Composite {
   }
 
   private void updateDisposalInformation(BrowseAIPBundle bundle) {
-    String disposalScheduleId = bundle.getAip().getDisposalScheduleId();
+/*    String disposalScheduleId = bundle.getAip().getDisposalScheduleId();
     String message = messages.disposalPolicyAIPWithoutAssociation();
     if (disposalScheduleId != null && bundle.getAip().getOverdueDate() != null) {
       message = messages.disposalPolicyAIPDueForDestruction(bundle.getAip().getDisposalRetentionPeriod(),
         bundle.getAip().isDisposalHoldStatus() ? messages.disposalOnHoldStatusLabel() : "");
-    }
-    Anchor disposalPolicyLink = new Anchor(message,
-      HistoryUtils.createHistoryHashLink(DisposalPolicyAssociation.RESOLVER, aip.getId()));
+    }*/
+
+    Anchor disposalPolicyLink = new Anchor(DisposalPolicyUtils.getDisposalPolicySummaryText(aip),
+      HistoryUtils.createHistoryHashLink(DisposalPolicyAssociationPanel.RESOLVER, aip.getId()));
     disposalPolicy.add(disposalPolicyLink);
   }
 

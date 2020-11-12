@@ -8,6 +8,7 @@ import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalRules;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.disposal.DisposalPolicy;
@@ -38,18 +39,10 @@ public class CreateDisposalRule extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      BrowserService.Util.getInstance().listDisposalSchedules(new AsyncCallback<DisposalSchedules>() {
-        @Override
-        public void onFailure(Throwable throwable) {
-        }
-
+      BrowserService.Util.getInstance().listDisposalSchedules(new NoAsyncCallback<DisposalSchedules>() {
         @Override
         public void onSuccess(DisposalSchedules disposalSchedules) {
-          BrowserService.Util.getInstance().listDisposalRules(new AsyncCallback<DisposalRules>() {
-            @Override
-            public void onFailure(Throwable throwable) {
-            }
-
+          BrowserService.Util.getInstance().listDisposalRules(new NoAsyncCallback<DisposalRules>() {
             @Override
             public void onSuccess(DisposalRules disposalRules) {
               CreateDisposalRule createDisposalRule = new CreateDisposalRule(new DisposalRule(), disposalSchedules,
@@ -118,13 +111,7 @@ public class CreateDisposalRule extends Composite {
     if (disposalRuleDataPanel.isValid()) {
       disposalRule = disposalRuleDataPanel.getDisposalRule();
       disposalRule.setOrder(disposalRules.getObjects().size());
-      BrowserServiceImpl.Util.getInstance().createDisposalRule(disposalRule, new AsyncCallback<DisposalRule>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          errorMessage(caught);
-        }
-
+      BrowserServiceImpl.Util.getInstance().createDisposalRule(disposalRule, new NoAsyncCallback<DisposalRule>() {
         @Override
         public void onSuccess(DisposalRule createdDisposalSchedule) {
           HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
@@ -139,11 +126,4 @@ public class CreateDisposalRule extends Composite {
     HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
   }
 
-  private void errorMessage(Throwable caught) {
-    if (caught instanceof DisposalRuleAlreadyExistsException) {
-      Toast.showError(messages.createDisposalRuleAlreadyExists(disposalRule.getTitle()));
-    } else {
-      Toast.showError(messages.createDisposalRuleFailure(caught.getMessage()));
-    }
-  }
 }

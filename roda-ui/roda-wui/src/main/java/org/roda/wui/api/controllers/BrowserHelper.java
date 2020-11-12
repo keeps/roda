@@ -3475,7 +3475,7 @@ public class BrowserHelper {
   }
 
   public static void deleteDisposalRule(String disposalRuleId) throws GenericException, RequestNotValidException,
-    NotFoundException, AuthorizationDeniedException, IllegalOperationException {
+    NotFoundException, AuthorizationDeniedException {
     RodaCoreFactory.getModelService().deleteDisposalRule(disposalRuleId);
   }
 

@@ -6,11 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.disposal.ConditionType;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
@@ -23,18 +18,20 @@ import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextArea;
@@ -111,11 +108,11 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
   @UiField(provided = true)
   PluginParameterPanel pluginParameterPanel;
 
-  private HorizontalPanel childOfPanel = new HorizontalPanel();
+  private final HorizontalPanel childOfPanel = new HorizontalPanel();
 
-  private DisposalRule disposalRule;
-  private DisposalSchedules disposalSchedules;
-  private boolean editmode;
+  private final DisposalRule disposalRule;
+  private final DisposalSchedules disposalSchedules;
+  private final boolean editMode;
 
   ConditionType conditionType = null;
   private String conditionKey;
@@ -131,11 +128,11 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
   @UiField
   HTML errors;
 
-  public DisposalRuleDataPanel(DisposalRule disposalRule, DisposalSchedules disposalSchedules, boolean editmode) {
+  public DisposalRuleDataPanel(DisposalRule disposalRule, DisposalSchedules disposalSchedules, boolean editMode) {
     initPluginParameterPanel();
     initWidget(uiBinder.createAndBindUi(this));
 
-    this.editmode = editmode;
+    this.editMode = editMode;
     this.disposalRule = disposalRule;
     this.disposalSchedules = disposalSchedules;
 
@@ -144,7 +141,7 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
     initTypeList();
     initConditionList();
     initHandlers();
-    if (editmode) {
+    if (editMode) {
       initEditMode();
     }
   }
@@ -156,12 +153,12 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
     this.disposalSchedulesList.setSelectedIndex(selectedScheduleIndex);
     this.typeList.setSelectedIndex(selectedTypeIndex);
 
-    if(disposalRule.getType().equals(ConditionType.METADATA_FIELD)){
+    if (disposalRule.getType().equals(ConditionType.METADATA_FIELD)) {
       conditionLabel.setVisible(true);
       conditionPanel.setVisible(true);
       fieldsList.setSelectedIndex(selectedConditionIndex);
       fieldValue.setText(disposalRule.getConditionValue());
-    }else{
+    } else {
       conditionLabel.setVisible(true);
       conditionLabel.setText(messages.conditionActualParent());
 
@@ -174,15 +171,12 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
 
       Anchor anchor = new Anchor(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-remove\"></i>"));
       anchor.addStyleName("toolbarLink toolbarLinkSmall");
-      anchor.addClickHandler(new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent clickEvent) {
-          conditionLabel.setVisible(false);
-          conditionLabel.setText(messages.disposalRuleCondition());
-          conditionPanel.setVisible(false);
-          pluginParameterPanel.setVisible(true);
-          childOfPanel.clear();
-        }
+      anchor.addClickHandler(clickEvent -> {
+        conditionLabel.setVisible(false);
+        conditionLabel.setText(messages.disposalRuleCondition());
+        conditionPanel.setVisible(false);
+        pluginParameterPanel.setVisible(true);
+        childOfPanel.clear();
       });
 
       String parent = disposalRule.getConditionValue() + " (" + disposalRule.getConditionKey() + ")";
@@ -217,15 +211,15 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
     typeListLabel.setText(messages.disposalRuleType());
     List<ConditionType> conditionTypes = Arrays.asList(ConditionType.values());
     typeList.addItem("", "");
-    if(!editmode) {
+    if (!editMode) {
       for (ConditionType ruleType : conditionTypes) {
         typeList.addItem(messages.disposalRuleTypeValue(ruleType.toString()), ruleType.toString());
       }
-    }else{
+    } else {
       int index = 1;
       for (ConditionType ruleType : conditionTypes) {
         typeList.addItem(messages.disposalRuleTypeValue(ruleType.toString()), ruleType.toString());
-        if(ruleType.equals(disposalRule.getType())){
+        if (ruleType.equals(disposalRule.getType())) {
           selectedTypeIndex = index;
         }
         index++;
@@ -236,9 +230,9 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
   private void initDisposalSchedulesList() {
     disposalSchedulesListLabel.setText(messages.disposalRuleScheduleName());
     disposalSchedulesList.addItem("", "");
-    if (!editmode) {
+    if (!editMode) {
       for (DisposalSchedule schedule : disposalSchedules.getObjects()) {
-        if(schedule.getState().equals(DisposalScheduleState.ACTIVE)) {
+        if (schedule.getState().equals(DisposalScheduleState.ACTIVE)) {
           disposalSchedulesList.addItem(schedule.getTitle(), schedule.getId());
         }
       }
@@ -275,15 +269,15 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
   private void initConditionList() {
     Map<String, String> list = getConditionsFromConfig();
     fieldsList.addItem("", "");
-    if(!editmode) {
+    if (!editMode) {
       for (Map.Entry<String, String> entry : list.entrySet()) {
         fieldsList.addItem(entry.getKey(), entry.getKey());
       }
-    }else{
+    } else {
       int index = 1;
       for (Map.Entry<String, String> entry : list.entrySet()) {
         fieldsList.addItem(entry.getKey(), entry.getKey());
-        if(entry.getKey().equals(disposalRule.getConditionKey())){
+        if (entry.getKey().equals(disposalRule.getConditionKey())) {
           selectedConditionIndex = index;
         }
         index++;
@@ -292,13 +286,7 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
   }
 
   private void initHandlers() {
-    ChangeHandler changeHandler = new ChangeHandler() {
-
-      @Override
-      public void onChange(ChangeEvent event) {
-        DisposalRuleDataPanel.this.onChange();
-      }
-    };
+    ChangeHandler changeHandler = event -> DisposalRuleDataPanel.this.onChange();
 
     title.addChangeHandler(changeHandler);
     description.addChangeHandler(changeHandler);
@@ -307,27 +295,24 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
     fieldsList.addChangeHandler(changeHandler);
     fieldValue.addChangeHandler(changeHandler);
 
-    ChangeHandler typeListChangeHandler = new ChangeHandler() {
-      @Override
-      public void onChange(ChangeEvent event) {
-        if (typeList.getSelectedValue().equals(ConditionType.IS_CHILD_OF.toString())) {
-          conditionLabel.setVisible(false);
-          pluginParameterPanel.setVisible(true);
-          conditionPanel.setVisible(false);
-        } else if (typeList.getSelectedValue().equals(ConditionType.METADATA_FIELD.toString())) {
-          childOfPanel.setVisible(false);
-          conditionLabel.setVisible(true);
-          pluginParameterPanel.setVisible(false);
-          conditionPanel.setVisible(true);
-          fieldsList.setVisible(true);
-          fieldsOperator.setVisible(true);
-          fieldValue.setVisible(true);
-        } else {
-          childOfPanel.setVisible(false);
-          conditionLabel.setVisible(false);
-          pluginParameterPanel.setVisible(false);
-          conditionPanel.setVisible(false);
-        }
+    ChangeHandler typeListChangeHandler = event -> {
+      if (typeList.getSelectedValue().equals(ConditionType.IS_CHILD_OF.toString())) {
+        conditionLabel.setVisible(false);
+        pluginParameterPanel.setVisible(true);
+        conditionPanel.setVisible(false);
+      } else if (typeList.getSelectedValue().equals(ConditionType.METADATA_FIELD.toString())) {
+        childOfPanel.setVisible(false);
+        conditionLabel.setVisible(true);
+        pluginParameterPanel.setVisible(false);
+        conditionPanel.setVisible(true);
+        fieldsList.setVisible(true);
+        fieldsOperator.setVisible(true);
+        fieldValue.setVisible(true);
+      } else {
+        childOfPanel.setVisible(false);
+        conditionLabel.setVisible(false);
+        pluginParameterPanel.setVisible(false);
+        conditionPanel.setVisible(false);
       }
     };
 
@@ -392,7 +377,7 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
       disposalSchedulesListError.setVisible(false);
     }
 
-    if (!editmode) {
+    if (!editMode) {
       if (typeList.getSelectedValue().length() == 0) {
         typeList.addStyleName("isWrong");
         typeListError.setText(messages.mandatoryField());
@@ -428,11 +413,11 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
 
     checked = true;
 
-    return errorList.isEmpty() ? true : false;
+    return errorList.isEmpty();
   }
 
-  public boolean isEditmode() {
-    return editmode;
+  public boolean isEditMode() {
+    return editMode;
   }
 
   public boolean isChanged() {
