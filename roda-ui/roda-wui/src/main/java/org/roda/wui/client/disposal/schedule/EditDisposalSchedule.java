@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.roda.core.data.exceptions.DisposalScheduleAlreadyExistsException;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.disposal.DisposalPolicy;
@@ -37,16 +39,15 @@ public class EditDisposalSchedule extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         BrowserService.Util.getInstance().retrieveDisposalSchedule(historyTokens.get(0),
-          new AsyncCallback<DisposalSchedule>() {
-            @Override
-            public void onFailure(Throwable caught) {
-              callback.onFailure(caught);
-            }
-
+          new NoAsyncCallback<DisposalSchedule>() {
             @Override
             public void onSuccess(DisposalSchedule result) {
-              EditDisposalSchedule panel = new EditDisposalSchedule(result);
-              callback.onSuccess(panel);
+              if (DisposalScheduleState.INACTIVE.equals(result.getState())) {
+                HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+              } else {
+                EditDisposalSchedule panel = new EditDisposalSchedule(result);
+                callback.onSuccess(panel);
+              }
             }
           });
       }

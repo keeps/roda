@@ -14,6 +14,7 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -191,7 +192,7 @@ public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP>
               processChildren(model, index, cachedJob, aip, disposalSchedule, jobPluginInfo, report);
             }
 
-          } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+          } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException | IllegalOperationException e) {
             LOGGER.error("Error disassociating disposal schedule {} from AIP {}: {}", disposalScheduleId, aip.getId(),
               e.getMessage(), e);
             state = PluginState.FAILURE;
@@ -250,7 +251,7 @@ public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP>
 
           outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(" was successfully disassociated from AIP",
             disposalSchedule.getId(), disposalSchedule.getTitle());
-        } catch (AuthorizationDeniedException | NotFoundException e) {
+        } catch (AuthorizationDeniedException | NotFoundException | IllegalOperationException e) {
           LOGGER.error("Error removing disposal schedule {} from AIP {}: {}", disposalSchedule.getId(),
             indexedAIP.getId(), e.getMessage(), e);
           jobPluginInfo.incrementObjectsProcessedWithFailure();

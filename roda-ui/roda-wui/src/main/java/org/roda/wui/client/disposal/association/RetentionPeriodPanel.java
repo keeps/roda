@@ -53,11 +53,8 @@ public class RetentionPeriodPanel extends Composite {
 
   public RetentionPeriodPanel(IndexedAIP aip) {
     initWidget(uiBinder.createAndBindUi(this));
-    if (aip.getDisposalScheduleId() == null || aip.getDisposalScheduleId().isEmpty()) {
-      SimplePanel noItemsToDisplay = HtmlSnippetUtils
-        .getNoItemsToDisplay(messages.oneOfAObject(DisposalSchedule.class.getName()));
+    if (aip.getDisposalScheduleId() == null) {
       retentionPeriodPanel.clear();
-      retentionPeriodPanel.add(noItemsToDisplay);
     } else {
       Anchor scheduleLink = new Anchor(aip.getDisposalScheduleName(),
         HistoryUtils.createHistoryHashLink(ShowDisposalSchedule.RESOLVER, aip.getDisposalScheduleId()));

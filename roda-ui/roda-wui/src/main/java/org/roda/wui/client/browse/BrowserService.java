@@ -407,7 +407,7 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException;
 
   DisposalSchedule updateDisposalSchedule(DisposalSchedule schedule)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+      throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IllegalOperationException;
 
   void deleteDisposalSchedule(String disposalScheduleId) throws NotFoundException, AuthorizationDeniedException,
     IllegalOperationException, GenericException, RequestNotValidException;
@@ -422,7 +422,7 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException;
 
   DisposalHold updateDisposalHold(DisposalHold hold)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+      throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IllegalOperationException;
 
   void deleteDisposalHold(String disposalHoldId) throws NotFoundException, AuthorizationDeniedException,
     IllegalOperationException, GenericException, RequestNotValidException;
@@ -434,13 +434,10 @@ public interface BrowserService extends RemoteService {
   Job disassociateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  Job applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId)
+  Job applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean override)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  Job clearDisposalHolds(SelectedItems<IndexedAIP> selectedItems)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
-
-  Job liftDisposalHold(SelectedItems<IndexedAIP> selectedItems)
+  Job liftDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean clearAll)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   Job createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, String title,

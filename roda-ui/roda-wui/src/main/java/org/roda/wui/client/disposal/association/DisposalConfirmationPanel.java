@@ -9,9 +9,10 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.disposal.confirmations.ShowDisposalConfirmation;
-import org.roda.wui.client.disposal.schedule.ShowDisposalSchedule;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -19,6 +20,8 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -41,6 +44,12 @@ public class DisposalConfirmationPanel extends Composite {
 
   @UiField
   FlowPanel confirmationInfo;
+
+  @UiField
+  Label disposalConfirmationCreationDate;
+
+  @UiField
+  HTML disposalConfirmationStatus;
 
   private DisposalConfirmation disposalConfirmation;
 
@@ -67,5 +76,10 @@ public class DisposalConfirmationPanel extends Composite {
       HistoryUtils.createHistoryHashLink(ShowDisposalConfirmation.RESOLVER, disposalConfirmation.getId()));
 
     confirmationInfo.add(confirmationLink);
+
+    disposalConfirmationCreationDate.setText(Humanize.formatDate(disposalConfirmation.getCreatedOn()));
+
+    disposalConfirmationStatus
+      .setHTML(HtmlSnippetUtils.getDisposalConfirmationStateHTML(disposalConfirmation.getState()));
   }
 }
