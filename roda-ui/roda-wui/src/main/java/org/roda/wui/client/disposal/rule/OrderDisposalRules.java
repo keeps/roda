@@ -284,4 +284,11 @@ public class OrderDisposalRules extends Composite {
     HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
   }
 
+  private void errorMessage(Throwable caught) {
+    if (caught instanceof DisposalRuleAlreadyExistsException) {
+      Toast.showError(messages.createDisposalRuleAlreadyExists(selectedRule.getTitle()));
+    } else {
+      Toast.showError(messages.createDisposalRuleFailure(caught.getMessage()));
+    }
+  }
 }

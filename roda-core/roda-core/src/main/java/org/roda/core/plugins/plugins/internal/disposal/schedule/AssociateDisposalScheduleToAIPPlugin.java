@@ -68,7 +68,7 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
         PluginParameter.PluginParameterType.STRING, "", true, false, "Disposal schedule identifier"));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RECURSIVE,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_RECURSIVE, "Recursive mode",
-        PluginParameter.PluginParameterType.BOOLEAN, "true", true, false, "Execute in recursive mode."));
+        PluginParameter.PluginParameterType.BOOLEAN, "true", true, false, "Associate the schedule to descendants"));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_ALL,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_ALL, "Overwrite mode",
         PluginParameter.PluginParameterType.BOOLEAN, "false", true, false,
@@ -217,8 +217,8 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
 
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
 
-            reportItem.setPluginState(state)
-              .setPluginDetails("Disposal schedule '" + disposalSchedule.getTitle() + "' (" + disposalScheduleId + ") was successfully associated to AIP");
+            reportItem.setPluginState(state).setPluginDetails("Disposal schedule '" + disposalSchedule.getTitle()
+              + "' (" + disposalScheduleId + ") was successfully associated to AIP");
 
             outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule("was successfully associated to AIP",
               disposalSchedule.getId(), disposalSchedule.getTitle());
@@ -232,7 +232,8 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
             state = PluginState.FAILURE;
             jobPluginInfo.incrementObjectsProcessedWithFailure();
             reportItem.setPluginState(state)
-              .setPluginDetails("Error associating disposal schedule '" + disposalSchedule.getTitle() + "' (" + disposalScheduleId + ") to AIP '" + aip.getId() + "': " + e.getMessage());
+              .setPluginDetails("Error associating disposal schedule '" + disposalSchedule.getTitle() + "' ("
+                + disposalScheduleId + ") to AIP '" + aip.getId() + "': " + e.getMessage());
             outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(" failed to be associated to AIP",
               disposalSchedule.getId(), disposalSchedule.getTitle());
           }

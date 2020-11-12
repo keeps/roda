@@ -26,7 +26,7 @@ public class DisposalPolicyUtils {
   public static String getDisposalPolicySummaryText(IndexedAIP aip) {
     if (AIPState.ACTIVE.equals(aip.getState())) {
       return getDisposalPolicySummaryForActiveAIP(aip);
-    } else if (AIPState.RESIDUAL.equals(aip.getState())) {
+    } else if (AIPState.DESTROYED.equals(aip.getState())) {
       return getDisposalPolicySummaryForResidualAIP(aip);
     }
 
@@ -34,7 +34,7 @@ public class DisposalPolicyUtils {
   }
 
   private static String getDisposalPolicySummaryForResidualAIP(IndexedAIP aip) {
-    return "";
+    return messages.disposalPolicyDestroyedAIPSummary(Humanize.formatDate(aip.getDestroyedOn()));
   }
 
   private static String getDisposalPolicySummaryForActiveAIP(IndexedAIP aip) {
@@ -75,7 +75,7 @@ public class DisposalPolicyUtils {
               messages.disposalPolicySummaryReady(messages.disposalPolicyActionSummary(aip.getDisposalAction().name())));
           }
         } else if (DisposalActionCode.RETAIN_PERMANENTLY.equals(aip.getDisposalAction())) {
-          builder.append("This intellectual entity will be permanently retained");
+          builder.append(messages.disposalPolicyRetainPermanently());
         }
 
       } else {
@@ -84,7 +84,7 @@ public class DisposalPolicyUtils {
         if (aip.isDisposalHoldStatus()) {
           builder.append(" ").append(messages.disposalPolicyHoldSummary());
         } else {
-          return "No disposal policy associated with this intellectual entity";
+          return messages.disposalPolicyNone();
         }
       }
     }

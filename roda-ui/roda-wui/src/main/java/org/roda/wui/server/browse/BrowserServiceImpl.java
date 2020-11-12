@@ -190,6 +190,12 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Disposals.deleteDisposalRule(user, disposalRuleId);
   }
 
+  public Job applyDisposalRules()
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Disposals.applyDisposalRules(user);
+  }
+
   @Override
   public DisposalSchedule createDisposalSchedule(DisposalSchedule schedule) throws AuthorizationDeniedException,
     AlreadyExistsException, NotFoundException, GenericException, RequestNotValidException {

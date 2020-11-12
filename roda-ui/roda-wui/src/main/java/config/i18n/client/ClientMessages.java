@@ -2065,6 +2065,8 @@ public interface ClientMessages extends Messages {
 
   String disposalScheduleRetentionPeriodInterval();
 
+  String retentionPeriod(@PluralCount int duration, @Select String interval);
+
   String disposalScheduleRetentionPeriodIntervalValue(@Select String interval);
 
   String disposalScheduleRetentionPeriodDuration();
@@ -2179,10 +2181,6 @@ public interface ClientMessages extends Messages {
 
   String overwriteAllDisposalDialogDescription();
 
-  String disposalPolicyAIPWithoutAssociation();
-
-  String disposalPolicyAIPDueForDestruction(String duration, String onHold);
-
   String disposalRetentionStartDateLabel();
 
   String disposalRetentionDueDateLabel();
@@ -2293,4 +2291,10 @@ public interface ClientMessages extends Messages {
   String disposalPolicyNoScheduleSummary();
 
   String permanentlyRetained();
+
+  String disposalPolicyRetainPermanently();
+
+  String disposalPolicyNone();
+
+  String disposalPolicyDestroyedAIPSummary(String destroyedOn);
 }

@@ -85,6 +85,7 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.SortParameter;
@@ -154,6 +155,7 @@ import org.roda.core.plugins.plugins.internal.disposal.confirmation.DestroyRecor
 import org.roda.core.plugins.plugins.internal.disposal.confirmation.PermanentlyDeleteRecordsPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.hold.ApplyDisposalHoldToAIPPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.hold.LiftDisposalHoldFromAIPPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.rules.ApplyDisposalRulesPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.schedule.AssociateDisposalScheduleToAIPPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.schedule.DisassociateDisposalScheduleToAIPPlugin;
 import org.roda.core.storage.Binary;
@@ -3328,7 +3330,8 @@ public class BrowserHelper {
   }
 
   public static DisposalSchedule updateDisposalSchedule(DisposalSchedule disposalSchedule, User user)
-      throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException, IllegalOperationException {
+    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException,
+    IllegalOperationException {
     return RodaCoreFactory.getModelService().updateDisposalSchedule(disposalSchedule, user.getName());
   }
 
@@ -3342,8 +3345,8 @@ public class BrowserHelper {
     return RodaCoreFactory.getModelService().createDisposalHold(disposalHold, user.getName());
   }
 
-  public static DisposalHold updateDisposalHold(DisposalHold disposalHold, User user)
-      throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException, IllegalOperationException {
+  public static DisposalHold updateDisposalHold(DisposalHold disposalHold, User user) throws GenericException,
+    AuthorizationDeniedException, NotFoundException, RequestNotValidException, IllegalOperationException {
     return RodaCoreFactory.getModelService().updateDisposalHold(disposalHold, user.getName());
   }
 
@@ -3483,7 +3486,8 @@ public class BrowserHelper {
     RodaCoreFactory.getModelService().deleteDisposalRule(disposalRuleId);
   }
 
-  public static Job applyDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId, boolean override)
+  public static Job applyDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId,
+    boolean override)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, disposalHoldId);
@@ -3493,13 +3497,19 @@ public class BrowserHelper {
       pluginParameters, "Could not execute apply disposal hold action");
   }
 
-  public static Job liftDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId, boolean clearAll)
+  public static Job liftDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId,
+    boolean clearAll)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, disposalHoldId);
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_LIFT_ALL, Boolean.toString(clearAll));
 
     return createAndExecuteInternalJob("Lift disposal hold", items, LiftDisposalHoldFromAIPPlugin.class, user,
-        pluginParameters, "Could not execute lift disposal hold action");
+      pluginParameters, "Could not execute lift disposal hold action");
+  }
+
+  public static Job applyDisposalRules(User user) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    return createAndExecuteInternalJob("Apply disposal rules to repository", SelectedItemsAll.create(AIP.class.getName()),
+      ApplyDisposalRulesPlugin.class, user, Collections.emptyMap(), "Could not execute apply disposal rules to repository");
   }
 }
