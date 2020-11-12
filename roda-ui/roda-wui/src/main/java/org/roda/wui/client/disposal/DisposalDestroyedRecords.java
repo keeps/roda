@@ -1,6 +1,5 @@
 package org.roda.wui.client.disposal;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
@@ -9,7 +8,6 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
@@ -79,7 +77,7 @@ public class DisposalDestroyedRecords extends Composite {
 
     ListBuilder<IndexedAIP> aipChildrenListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
       new AsyncTableCellOptions<>(IndexedAIP.class, "DisposalDestroyedRecords_aip")
-        .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.RESIDUAL.name())))
+        .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.DESTROYED.name())))
         .withSummary(messages.listOfAIPs()).bindOpener());
 
     disposalDestroyedRecordsSearch = new SearchWrapper(false).createListAndSearchPanel(aipChildrenListBuilder);

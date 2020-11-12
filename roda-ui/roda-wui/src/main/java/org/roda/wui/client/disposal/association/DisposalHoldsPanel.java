@@ -97,6 +97,8 @@ public class DisposalHoldsPanel extends Composite {
     if (!onDisposalConfirmation) {
       PermissionClientUtils.bindPermission(associateDisposalHoldButton, null,
         RodaConstants.PERMISSION_METHOD_ASSOCIATE_DISPOSAL_HOLD);
+    } else {
+      associateDisposalHoldButton.setVisible(false);
     }
   }
 

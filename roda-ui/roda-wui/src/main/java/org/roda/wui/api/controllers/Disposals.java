@@ -377,8 +377,9 @@ public class Disposals extends RodaWuiController {
       throw e;
     } finally {
       // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, items, RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId
-      , RodaConstants.CONTROLLER_DISPOSAL_HOLD_LIFT_ALL, clearAll);
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, items,
+        RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId,
+        RodaConstants.CONTROLLER_DISPOSAL_HOLD_LIFT_ALL, clearAll);
     }
   }
 
@@ -474,6 +475,27 @@ public class Disposals extends RodaWuiController {
       // register action
       controllerAssistant.registerAction(user, disposalRuleId, state, RodaConstants.CONTROLLER_DISPOSAL_RULE_ID_PARAM,
         disposalRuleId);
+    }
+  }
+
+  public static Job applyDisposalRules(User user)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    // controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // delegate
+      return BrowserHelper.applyDisposalRules(user);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state);
     }
   }
 }

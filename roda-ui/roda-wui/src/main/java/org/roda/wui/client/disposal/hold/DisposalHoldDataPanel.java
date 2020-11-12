@@ -119,7 +119,7 @@ public class DisposalHoldDataPanel extends Composite implements HasValueChangeHa
 
     checked = true;
 
-    return errorList.isEmpty() ? true : false;
+    return errorList.isEmpty();
   }
 
   public void clear() {

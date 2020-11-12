@@ -18,15 +18,15 @@ public class JavascriptUtils {
   }
 
   public static native JavaScriptObject durationInYMD(String futureDate) /*-{
-      var todayDate = $wnd.moment();
-      var disposalDate = $wnd.moment(futureDate);
+      var todayDate = $wnd.moment().startOf('day');
+      var disposalDate = $wnd.moment(futureDate).startOf('day');
 
-      var differenceInYears = todayDate.diff(disposalDate, 'years');
+      var differenceInYears = Math.abs(todayDate.diff(disposalDate, 'years'));
 
       if (differenceInYears < 1) {
-          var differenceInMonths = todayDate.diff(disposalDate, 'months');
+          var differenceInMonths = Math.abs(todayDate.diff(disposalDate, 'months'));
           if (differenceInMonths < 1) {
-              var differenceInDays = todayDate.diff(disposalDate, 'days');
+              var differenceInDays = Math.abs(todayDate.diff(disposalDate, 'days'));
                   return { "diff": differenceInDays, "unit": "days" };
           } else {
               return { "diff": differenceInMonths, "unit": "months" };

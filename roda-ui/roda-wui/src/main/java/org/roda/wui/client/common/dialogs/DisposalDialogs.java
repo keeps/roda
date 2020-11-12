@@ -222,8 +222,10 @@ public class DisposalDialogs {
       @Override
       public String getValue(DisposalSchedule disposalSchedule) {
         return disposalSchedule != null && disposalSchedule.getRetentionPeriodDuration() != null
-          ? disposalSchedule.getRetentionPeriodDuration() + " " + disposalSchedule.getRetentionPeriodIntervalCode()
-          : "";
+          && disposalSchedule.getRetentionPeriodIntervalCode() != null
+            ? messages.retentionPeriod(disposalSchedule.getRetentionPeriodDuration(),
+              disposalSchedule.getRetentionPeriodIntervalCode().name())
+            : "";
       }
     }, messages.disposalSchedulePeriod());
 

@@ -303,6 +303,8 @@ public interface BrowserServiceAsync {
 
   void deleteDisposalRule(String disposalRuleId, AsyncCallback<Void> async);
 
+  void applyDisposalRules(AsyncCallback<Job> async);
+
   void createDisposalSchedule(DisposalSchedule schedule, AsyncCallback<DisposalSchedule> async);
 
   void retrieveDisposalSchedule(String disposalScheduleId, AsyncCallback<DisposalSchedule> async);

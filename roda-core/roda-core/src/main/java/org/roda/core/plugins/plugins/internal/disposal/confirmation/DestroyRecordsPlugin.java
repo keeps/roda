@@ -122,6 +122,7 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
     String disposalConfirmationId = disposalConfirmationReport.getId();
     String outcomeText;
     PluginState state = PluginState.SUCCESS;
+    Date executionDate = new Date();
     try {
       StoragePath disposalConfirmationAIPsPath = ModelUtils.getDisposalConfirmationAIPsPath(disposalConfirmationId);
       Binary binary = storage.getBinary(disposalConfirmationAIPsPath);
@@ -152,17 +153,13 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
           PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
 
           try {
-            aip.setDestroyedOn(disposalConfirmationReport.getExecutedOn());
-            aip.setDestroyedBy(disposalConfirmationReport.getExecutedBy());
-
-            // aip.getDescriptiveMetadata().removeIf(p -> p.getType().equals("ead"));
+            aip.setDestroyedOn(executionDate);
+            aip.setDestroyedBy(cachedJob.getUsername());
 
             // Mark the AIP as residual
-            aip.setState(AIPState.RESIDUAL);
+            aip.setState(AIPState.DESTROYED);
 
             // Apply a stylesheet over the aip metadata
-
-            // add preservation event
 
             // remove the AIP files according to the configuration
 
@@ -180,6 +177,7 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
             jobPluginInfo.incrementObjectsProcessedWithFailure();
           }
 
+          // add preservation event
           if (state.equals(PluginState.SUCCESS)) {
             outcomeText = "Archival Information Package [id: " + aip.getId()
               + "] has been destroyed with disposal confirmation '" + disposalConfirmationReport.getTitle() + "' ("
@@ -201,7 +199,7 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
       // Mark disposal confirmation as APPROVED
       disposalConfirmationReport.setState(DisposalConfirmationState.APPROVED);
       disposalConfirmationReport.setExecutedBy(cachedJob.getUsername());
-      disposalConfirmationReport.setExecutedOn(new Date());
+      disposalConfirmationReport.setExecutedOn(executionDate);
       model.updateDisposalConfirmation(disposalConfirmationReport);
 
     } catch (IOException | RequestNotValidException | GenericException | AuthorizationDeniedException

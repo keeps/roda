@@ -290,7 +290,6 @@ public class ShowDisposalHold extends Composite {
 
   private void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
-
       BrowserService.Util.getInstance().retrieveDisposalHold(historyTokens.get(0), new NoAsyncCallback<DisposalHold>() {
         @Override
         public void onSuccess(DisposalHold result) {

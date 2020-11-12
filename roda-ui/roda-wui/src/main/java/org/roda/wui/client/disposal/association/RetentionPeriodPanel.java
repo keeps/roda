@@ -2,10 +2,10 @@ package org.roda.wui.client.disposal.association;
 
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.disposal.schedule.ShowDisposalSchedule;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -15,11 +15,9 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
-import org.roda.wui.common.client.tools.Humanize;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -73,7 +71,7 @@ public class RetentionPeriodPanel extends Composite {
         disposalRetentionPeriod.setVisible(false);
       } else {
         disposalRetentionDueDate.setText(Humanize.formatDate(aip.getOverdueDate()));
-        disposalRetentionPeriod.setText(aip.getDisposalRetentionPeriod());
+        disposalRetentionPeriod.setText(messages.retentionPeriod(aip.getRetentionPeriodDuration(), aip.getRetentionPeriodInterval().name()));
       }
 
       disposalDisposalAction.setHTML(HtmlSnippetUtils.getDisposalScheduleActionHtml(aip.getDisposalAction()));

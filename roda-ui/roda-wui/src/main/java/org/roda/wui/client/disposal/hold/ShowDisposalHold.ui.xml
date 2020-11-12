@@ -14,44 +14,44 @@
                         <g:FlowPanel addStyleNames="wui-data-panel">
                             <g:FlowPanel styleName="browseItemPanelWithMargin">
                                 <g:Label addStyleNames="browseItemHeader">
-                                    <ui:text from='{messages.showDisposalHoldTitle}' />
+                                    <ui:text from='{messages.showDisposalHoldTitle}'/>
                                 </g:Label>
-                                <common:TitlePanel iconClass="DisposalHold" ui:field="title" />
+                                <common:TitlePanel iconClass="DisposalHold" ui:field="title"/>
                                 <g:Label addStyleNames="browseItemId" ui:field="disposalHoldId"
-                                         title="{messages.disposalHoldIdentifier}" />
+                                         title="{messages.disposalHoldIdentifier}"/>
                                 <g:Label addStyleNames="browseItemId" ui:field="dateCreated"/>
                                 <g:Label addStyleNames="browseItemId" ui:field="dateUpdated"/>
                             </g:FlowPanel>
                             <g:FlowPanel styleName="field">
                                 <g:Label styleName="label"
                                          ui:field="disposalHoldDescriptionKey">
-                                    <ui:text from='{messages.disposalHoldDescription}' />
+                                    <ui:text from='{messages.disposalHoldDescription}'/>
                                 </g:Label>
                                 <g:HTML styleName="value"
-                                        ui:field="disposalHoldDescriptionValue" />
+                                        ui:field="disposalHoldDescriptionValue"/>
                             </g:FlowPanel>
                             <g:FlowPanel styleName="field">
                                 <g:Label styleName="label"
                                          ui:field="disposalHoldMandateKey">
-                                    <ui:text from='{messages.disposalHoldMandate}' />
+                                    <ui:text from='{messages.disposalHoldMandate}'/>
                                 </g:Label>
                                 <g:HTML styleName="value"
-                                        ui:field="disposalHoldMandateValue" />
+                                        ui:field="disposalHoldMandateValue"/>
                             </g:FlowPanel>
                             <g:FlowPanel styleName="field">
                                 <g:Label styleName="label"
                                          ui:field="disposalHoldNotesKey">
-                                    <ui:text from='{messages.disposalHoldNotes}' />
+                                    <ui:text from='{messages.disposalHoldNotes}'/>
                                 </g:Label>
                                 <g:HTML styleName="value"
-                                        ui:field="disposalHoldNotesValue" />
+                                        ui:field="disposalHoldNotesValue"/>
                             </g:FlowPanel>
                             <g:FlowPanel styleName="field">
                                 <g:Label styleName="label"
                                          ui:field="disposalHoldStateKey">
-                                    <ui:text from='{messages.disposalHoldStateCol}' />
+                                    <ui:text from='{messages.disposalHoldStateCol}'/>
                                 </g:Label>
-                                <g:HTML ui:field="disposalHoldStateValue" />
+                                <g:HTML ui:field="disposalHoldStateValue"/>
                             </g:FlowPanel>
                         </g:FlowPanel>
                     </g:FlowPanel>
