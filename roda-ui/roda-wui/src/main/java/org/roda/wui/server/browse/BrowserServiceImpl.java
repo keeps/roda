@@ -184,8 +184,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void deleteDisposalRule(String disposalRuleId) throws NotFoundException, AuthorizationDeniedException,
-    IllegalOperationException, GenericException, RequestNotValidException {
+  public void deleteDisposalRule(String disposalRuleId)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Disposals.deleteDisposalRule(user, disposalRuleId);
   }

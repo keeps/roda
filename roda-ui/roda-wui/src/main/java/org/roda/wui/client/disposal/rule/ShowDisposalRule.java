@@ -1,19 +1,16 @@
 package org.roda.wui.client.disposal.rule;
 
 import java.util.List;
-import java.util.Map;
 
-import com.google.gwt.user.client.ui.HTMLPanel;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.DisposalHoldAlreadyExistsException;
-import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
-import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.ip.disposal.ConditionType;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.DisposalPolicy;
 import org.roda.wui.client.disposal.schedule.ShowDisposalSchedule;
@@ -22,7 +19,7 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.StringUtils;
-import org.roda.wui.common.client.widgets.Toast;
+import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -176,8 +173,8 @@ public class ShowDisposalRule extends Composite {
       });
       conditionsPanel.add(condition);
     } else if (disposalRule.getType().equals(ConditionType.METADATA_FIELD)) {
-      String conditionTxt = disposalRule.getConditionKey() + " " + messages.disposalRuleIs() + " "
-              + disposalRule.getConditionValue();
+      String conditionTxt = disposalRule.getConditionKey() + " " + messages.disposalRuleConditionOperator() + " "
+        + disposalRule.getConditionValue();
       condition.setHTML(conditionTxt);
       conditionsPanel.add(condition);
     }
@@ -204,15 +201,20 @@ public class ShowDisposalRule extends Composite {
       removeRuleBtn.addClickHandler(new ClickHandler() {
         @Override
         public void onClick(ClickEvent clickEvent) {
-          /*
-           * BrowserServiceImpl.Util.getInstance().updateDisposalHold(disposalHold, new
-           * AsyncCallback<DisposalHold>() {
-           *
-           * @Override public void onFailure(Throwable caught) { errorMessage(caught); }
-           *
-           * @Override public void onSuccess(DisposalHold disposalHold) {
-           * HistoryUtils.newHistory(DisposalPolicy.RESOLVER); } });
-           */
+          Dialogs.showConfirmDialog(messages.saveButton(), messages.confirmDeleteRule(disposalRule.getTitle()), messages.dialogNo(),
+            messages.dialogYes(), new NoAsyncCallback<Boolean>() {
+              @Override
+              public void onSuccess(Boolean aBoolean) {
+                BrowserServiceImpl.Util.getInstance().deleteDisposalRule(disposalRule.getId(),
+                  new NoAsyncCallback<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                      HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+                    }
+                  });
+              }
+            });
+
         }
       });
 
@@ -238,22 +240,9 @@ public class ShowDisposalRule extends Composite {
     return instance;
   }
 
-  private void errorMessage(Throwable caught) {
-    if (caught instanceof DisposalHoldAlreadyExistsException) {
-      Toast.showError(messages.createDisposalRuleAlreadyExists(disposalRule.getTitle()));
-    } else {
-      Toast.showError(messages.createDisposalRuleFailure(caught.getMessage()));
-    }
-  }
-
   public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
-      BrowserService.Util.getInstance().retrieveDisposalRule(historyTokens.get(0), new AsyncCallback<DisposalRule>() {
-        @Override
-        public void onFailure(Throwable caught) {
-          callback.onFailure(caught);
-        }
-
+      BrowserService.Util.getInstance().retrieveDisposalRule(historyTokens.get(0), new NoAsyncCallback<DisposalRule>() {
         @Override
         public void onSuccess(DisposalRule result) {
           ShowDisposalRule panel = new ShowDisposalRule(result);

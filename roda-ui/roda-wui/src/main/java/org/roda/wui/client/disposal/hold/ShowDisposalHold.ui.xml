@@ -51,8 +51,7 @@
                                          ui:field="disposalHoldStateKey">
                                     <ui:text from='{messages.disposalHoldStateCol}' />
                                 </g:Label>
-                                <g:HTML styleName="value"
-                                        ui:field="disposalHoldStateValue" />
+                                <g:HTML ui:field="disposalHoldStateValue" />
                             </g:FlowPanel>
                         </g:FlowPanel>
                     </g:FlowPanel>

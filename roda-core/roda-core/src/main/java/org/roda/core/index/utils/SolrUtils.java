@@ -46,8 +46,8 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.SolrRequest.METHOD;
-import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -100,7 +100,6 @@ import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPDisposalFlow;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
@@ -113,7 +112,6 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
-import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
@@ -1608,6 +1606,10 @@ public class SolrUtils {
   }
 
   public static Date getOverdueDate(DisposalSchedule disposalSchedule, AIP aip) {
+    if (DisposalActionCode.RETAIN_PERMANENTLY.equals(disposalSchedule.getActionCode())) {
+      return null;
+    }
+
     Date overDueDate = null;
     Integer retentionPeriodDuration = disposalSchedule.getRetentionPeriodDuration();
     Calendar cal = Calendar.getInstance();

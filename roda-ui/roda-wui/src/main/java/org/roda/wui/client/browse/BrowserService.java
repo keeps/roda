@@ -394,8 +394,8 @@ public interface BrowserService extends RemoteService {
   void updateDisposalRules(DisposalRules rules)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  void deleteDisposalRule(String disposalRuleId) throws NotFoundException, AuthorizationDeniedException,
-    IllegalOperationException, GenericException, RequestNotValidException;
+  void deleteDisposalRule(String disposalRuleId)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException;
 
   DisposalSchedule createDisposalSchedule(DisposalSchedule schedule) throws AuthorizationDeniedException,
     AlreadyExistsException, NotFoundException, GenericException, RequestNotValidException;
@@ -406,8 +406,8 @@ public interface BrowserService extends RemoteService {
   DisposalSchedules listDisposalSchedules()
     throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException;
 
-  DisposalSchedule updateDisposalSchedule(DisposalSchedule schedule)
-      throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IllegalOperationException;
+  DisposalSchedule updateDisposalSchedule(DisposalSchedule schedule) throws AuthorizationDeniedException,
+    NotFoundException, GenericException, RequestNotValidException, IllegalOperationException;
 
   void deleteDisposalSchedule(String disposalScheduleId) throws NotFoundException, AuthorizationDeniedException,
     IllegalOperationException, GenericException, RequestNotValidException;
@@ -421,8 +421,8 @@ public interface BrowserService extends RemoteService {
   DisposalHolds listDisposalHolds()
     throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException;
 
-  DisposalHold updateDisposalHold(DisposalHold hold)
-      throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IllegalOperationException;
+  DisposalHold updateDisposalHold(DisposalHold hold) throws AuthorizationDeniedException, NotFoundException,
+    GenericException, RequestNotValidException, IllegalOperationException;
 
   void deleteDisposalHold(String disposalHoldId) throws NotFoundException, AuthorizationDeniedException,
     IllegalOperationException, GenericException, RequestNotValidException;

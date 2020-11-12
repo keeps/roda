@@ -46,13 +46,14 @@ public class DisposalHold implements IsModelObject {
   // prevent this disposal hold from being deleted
   private Date firstTimeUsed = null;
 
-  private Long apiCounter;
+  private Long aipCounter;
 
   private DisposalHoldState state;
 
   public DisposalHold() {
     super();
     this.state = DisposalHoldState.ACTIVE;
+    this.aipCounter = 0L;
   }
 
   public DisposalHold(String disposalHoldId, String title, String description, String mandate, String scopeNotes) {
@@ -62,6 +63,7 @@ public class DisposalHold implements IsModelObject {
     this.mandate = mandate;
     this.scopeNotes = scopeNotes;
     this.state = DisposalHoldState.ACTIVE;
+    this.aipCounter = 0L;
   }
 
   @JsonIgnore
@@ -183,12 +185,12 @@ public class DisposalHold implements IsModelObject {
     this.state = state;
   }
 
-  public Long getApiCounter() {
-    return apiCounter;
+  public Long getAipCounter() {
+    return aipCounter;
   }
 
-  public void setApiCounter(Long apiCounter) {
-    this.apiCounter = apiCounter;
+  public void setAipCounter(Long aipCounter) {
+    this.aipCounter = aipCounter;
   }
 
   public Date getFirstTimeUsed() {
@@ -215,13 +217,13 @@ public class DisposalHold implements IsModelObject {
       && Objects.equals(updatedBy, that.updatedBy) && Objects.equals(originatedOn, that.originatedOn)
       && Objects.equals(originatedBy, that.originatedBy) && Objects.equals(liftedOn, that.liftedOn)
       && Objects.equals(liftedBy, that.liftedBy) && Objects.equals(firstTimeUsed, that.firstTimeUsed)
-      && Objects.equals(apiCounter, that.apiCounter) && state == that.state;
+      && Objects.equals(aipCounter, that.aipCounter) && state == that.state;
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(id, title, description, mandate, scopeNotes, createdOn, createdBy, updatedOn, updatedBy,
-      originatedOn, originatedBy, liftedOn, liftedBy, firstTimeUsed, apiCounter, state);
+      originatedOn, originatedBy, liftedOn, liftedBy, firstTimeUsed, aipCounter, state);
   }
 
   @Override
@@ -230,7 +232,7 @@ public class DisposalHold implements IsModelObject {
       + ", mandate='" + mandate + '\'' + ", scopeNotes='" + scopeNotes + '\'' + ", createdOn=" + createdOn
       + ", createdBy='" + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\''
       + ", originatedOn=" + originatedOn + ", originatedBy='" + originatedBy + '\'' + ", liftedOn=" + liftedOn
-      + ", liftedBy='" + liftedBy + '\'' + ", firstTimeUsed=" + firstTimeUsed + ", apiCounter=" + apiCounter
+      + ", liftedBy='" + liftedBy + '\'' + ", firstTimeUsed=" + firstTimeUsed + ", aipCounter=" + aipCounter
       + ", state=" + state + '}';
   }
 }

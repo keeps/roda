@@ -88,7 +88,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
   private static final Set<AipAction> POSSIBLE_ACTIONS_ON_MULTIPLE_AIPS = new HashSet<>(
     Arrays.asList(AipAction.MOVE_IN_HIERARCHY, AipAction.UPDATE_PERMISSIONS, AipAction.REMOVE, AipAction.NEW_PROCESS,
-      AipAction.CHANGE_TYPE, AipAction.ASSOCIATE_DISPOSAL_SCHEDULE));
+      AipAction.CHANGE_TYPE, AipAction.ASSOCIATE_DISPOSAL_SCHEDULE, AipAction.ASSOCIATE_DISPOSAL_HOLD));
 
   private static final Set<AipAction> APPRAISAL_ACTIONS = new HashSet<>(
     Arrays.asList(AipAction.APPRAISAL_ACCEPT, AipAction.APPRAISAL_REJECT));
@@ -259,6 +259,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
       changeType(aips, callback);
     } else if (AipAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action)) {
       associateDisposalSchedule(aips, callback);
+    } else if (AipAction.ASSOCIATE_DISPOSAL_HOLD.equals(action)) {
+      manageDisposalHold(aips, callback);
     } else {
       unsupportedAction(action, callback);
     }
@@ -868,11 +870,11 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                 @Override
                 public void onSuccess(DisposalHoldDialogResult result) {
                   if (DisposalHoldDialogResult.ActionType.CLEAR.equals(result.getActionType())) {
-                    clearDisposalHolds(aips, callback);
+                    clearDisposalHolds(aips, size, callback);
                   } else if (DisposalHoldDialogResult.ActionType.ASSOCIATE.equals(result.getActionType())) {
-                    applyDisposalHold(aips, result, false, callback);
+                    applyDisposalHold(aips, size, result, false, callback);
                   } else if (DisposalHoldDialogResult.ActionType.OVERRIDE.equals(result.getActionType())) {
-                    applyDisposalHold(aips, result, true, callback);
+                    applyDisposalHold(aips, size, result, true, callback);
                   }
                 }
               });
@@ -882,15 +884,16 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     });
   }
 
-  private void applyDisposalHold(final SelectedItems<IndexedAIP> aips, DisposalHoldDialogResult holdDialogResult, boolean override,
-                                  final AsyncCallback<ActionImpact> callback) {
-    Dialogs.showConfirmDialog(messages.applyDisposalHoldDialogTitle(), messages.applyDisposalHoldDialogMessage(),
-      messages.dialogNo(), messages.dialogYes(), new ActionNoAsyncCallback<Boolean>(callback) {
+  private void applyDisposalHold(final SelectedItems<IndexedAIP> aips, final Long size,
+    DisposalHoldDialogResult holdDialogResult, boolean override, final AsyncCallback<ActionImpact> callback) {
+    Dialogs.showConfirmDialog(messages.applyDisposalHoldDialogTitle(),
+      messages.applyDisposalHoldDialogMessage(size.intValue()), messages.dialogNo(), messages.dialogYes(),
+      new ActionNoAsyncCallback<Boolean>(callback) {
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            BrowserService.Util.getInstance().applyDisposalHold(aips, holdDialogResult.getDisposalHold().getId(), override,
-              new ActionAsyncCallback<Job>(callback) {
+            BrowserService.Util.getInstance().applyDisposalHold(aips, holdDialogResult.getDisposalHold().getId(),
+              override, new ActionAsyncCallback<Job>(callback) {
                 @Override
                 public void onFailure(Throwable caught) {
                   callback.onFailure(caught);
@@ -930,45 +933,48 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
       });
   }
 
-  private void clearDisposalHolds(final SelectedItems<IndexedAIP> aips, final AsyncCallback<ActionImpact> callback) {
-    Dialogs.showConfirmDialog(messages.clearDisposalHoldDialogTitle(), messages.clearDisposalHoldDialogMessage(),
-      messages.dialogNo(), messages.dialogYes(), new ActionNoAsyncCallback<Boolean>(callback) {
+  private void clearDisposalHolds(final SelectedItems<IndexedAIP> aips, final Long size,
+    final AsyncCallback<ActionImpact> callback) {
+    Dialogs.showConfirmDialog(messages.clearDisposalHoldDialogTitle(),
+      messages.clearDisposalHoldDialogMessage(size.intValue()), messages.dialogNo(), messages.dialogYes(),
+      new ActionNoAsyncCallback<Boolean>(callback) {
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            BrowserService.Util.getInstance().liftDisposalHold(aips, null, true, new ActionAsyncCallback<Job>(callback) {
-              @Override
-              public void onFailure(Throwable caught) {
-                callback.onFailure(caught);
-                HistoryUtils.newHistory(InternalProcess.RESOLVER);
-              }
+            BrowserService.Util.getInstance().liftDisposalHold(aips, null, true,
+              new ActionAsyncCallback<Job>(callback) {
+                @Override
+                public void onFailure(Throwable caught) {
+                  callback.onFailure(caught);
+                  HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                }
 
-              @Override
-              public void onSuccess(Job job) {
-                Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+                @Override
+                public void onSuccess(Job job) {
+                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
 
-                    Timer timer = new Timer() {
-                      @Override
-                      public void run() {
-                        doActionCallbackUpdated();
-                      }
-                    };
+                      Timer timer = new Timer() {
+                        @Override
+                        public void run() {
+                          doActionCallbackUpdated();
+                        }
+                      };
 
-                    timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                  }
+                      timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                    }
 
-                  @Override
-                  public void onSuccess(final Void nothing) {
-                    doActionCallbackNone();
-                    HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-                  }
-                });
-              }
-            });
+                    @Override
+                    public void onSuccess(final Void nothing) {
+                      doActionCallbackNone();
+                      HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                    }
+                  });
+                }
+              });
           } else {
             doActionCallbackNone();
           }

@@ -20,6 +20,7 @@ import org.roda.core.data.v2.index.IsIndexed;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 
 /**
  * This class contains the indexed information about an AIP.
@@ -75,7 +76,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
   private List<String> disposalHoldsId = new ArrayList<>();
   private Date destroyedOn = null;
   private String destroyedBy = null;
-  private String disposalAction = null;
+  private DisposalActionCode disposalAction = null;
   private Date overdueDate = null;
   private boolean disposalHoldStatus = false;
   private String disposalConfirmationId = null;
@@ -430,11 +431,11 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
     return this;
   }
 
-  public String getDisposalAction() {
+  public DisposalActionCode getDisposalAction() {
     return disposalAction;
   }
 
-  public IndexedAIP setDisposalAction(String disposalAction) {
+  public IndexedAIP setDisposalAction(DisposalActionCode disposalAction) {
     this.disposalAction = disposalAction;
     return this;
   }

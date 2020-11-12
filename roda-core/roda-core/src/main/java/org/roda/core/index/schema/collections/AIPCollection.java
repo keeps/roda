@@ -27,6 +27,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPDisposalFlow;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -231,9 +232,11 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
       preCalculatedFields.put(RodaConstants.AIP_ANCESTORS, ancestors);
       if (disposalSchedule != null) {
         preCalculatedFields.put(RodaConstants.AIP_DISPOSAL_SCHEDULE_NAME, disposalSchedule.getTitle());
-        preCalculatedFields.put(RodaConstants.AIP_DISPOSAL_SCHEDULE_RETENTION_PERIOD,
-          disposalSchedule.getRetentionPeriodDuration().toString() + " "
-            + disposalSchedule.getRetentionPeriodIntervalCode().name());
+        if (!disposalSchedule.getActionCode().equals(DisposalActionCode.RETAIN_PERMANENTLY)) {
+          preCalculatedFields.put(RodaConstants.AIP_DISPOSAL_SCHEDULE_RETENTION_PERIOD,
+            disposalSchedule.getRetentionPeriodDuration().toString() + " "
+              + disposalSchedule.getRetentionPeriodIntervalCode().name());
+        }
         preCalculatedFields.put(RodaConstants.AIP_DISPOSAL_ACTION, disposalSchedule.getActionCode().name());
         preCalculatedFields.put(RodaConstants.AIP_OVERDUE_DATE, overdueDate);
       }
@@ -287,14 +290,15 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     final List<String> disposalHoldsId = SolrUtils.objectToListString(doc.get(RodaConstants.AIP_DISPOSAL_HOLDS_ID));
     final Date destroyedOn = SolrUtils.objectToDate(doc.get(RodaConstants.AIP_DESTROYED_ON));
     final String destroyedBy = SolrUtils.objectToString(doc.get(RodaConstants.AIP_DESTROYED_BY), "");
-    final String disposalAction = SolrUtils.objectToString(doc.get(RodaConstants.AIP_DISPOSAL_ACTION), "");
+    final DisposalActionCode disposalAction = SolrUtils.objectToEnum(doc.get(RodaConstants.AIP_DISPOSAL_ACTION),
+      DisposalActionCode.class, null);
     final Date overdueDate = SolrUtils.objectToDate(doc.get(RodaConstants.AIP_OVERDUE_DATE));
     final Boolean disposalHoldStatus = SolrUtils.objectToBoolean(doc.get(RodaConstants.AIP_DISPOSAL_HOLD_STATUS),
       Boolean.FALSE);
     final String disposalConfirmationId = SolrUtils.objectToString(doc.get(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID),
       null);
-    AIPDisposalFlow aipDisposalFlow = SolrUtils
-        .objectToEnum(doc.get(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID), AIPDisposalFlow.class, null);
+    AIPDisposalFlow aipDisposalFlow = SolrUtils.objectToEnum(doc.get(RodaConstants.AIP_DISPOSAL_FLOW),
+      AIPDisposalFlow.class, null);
 
     String level;
     if (ghost) {
