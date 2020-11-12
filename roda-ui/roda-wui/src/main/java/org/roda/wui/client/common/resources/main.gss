@@ -7209,7 +7209,7 @@ span.code {
 
 .disposal-schedules-modal-table {
     margin-bottom: 10px;
-    min-height: 80vh;
+    min-height: 70vh;
 }
 
 .disposalPolicyScrollPanel {
@@ -7245,10 +7245,6 @@ span.code {
     margin-top: 2px;
 }
 
-.disposal-dialogs-checkbox {
-    margin-right: 10px
-}
-
 .disposal-dialogs-checkbox input[type="checkbox"]{
     vertical-align: middle;
 }
@@ -7259,6 +7255,10 @@ span.code {
 
 .disposal-dialogs-checkbox input[type="checkbox"]:disabled + label{
     color: #ccc;
+}
+
+.disposal-dialogs-checkbox + .form-help{
+    font-size: 1.5rem;
 }
 
 .disposalRuleOperator {

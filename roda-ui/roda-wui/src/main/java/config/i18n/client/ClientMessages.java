@@ -2173,7 +2173,11 @@ public interface ClientMessages extends Messages {
 
   String associateDisposalScheduleDialogMessage(Long size);
 
+  String applyToHierarchyDisposalDialogDescription();
+
   String overwriteAllDisposalDialogCheckBox();
+
+  String overwriteAllDisposalDialogDescription();
 
   String disposalPolicyAIPWithoutAssociation();
 
