@@ -436,6 +436,7 @@ public final class RodaConstants {
   public static final String CONTROLLER_DISPOSAL_HOLD_PARAM = RODA_OBJECT_DISPOSAL_HOLD;
   public static final String CONTROLLER_DISPOSAL_HOLD_ID_PARAM = "disposalHoldId";
   public static final String CONTROLLER_DISPOSAL_HOLD_OVERRIDE_PARAM = "overrideDisposalHolds";
+  public static final String CONTROLLER_DISPOSAL_HOLD_LIFT_ALL = "liftDisposalHold";
 
   public static final String CONTROLLER_DISPOSAL_CONFIRMATION_METADATA_PARAM = RODA_OBJECT_DISPOSAL_CONFIRMATION_METADATA;
   public static final String CONTROLLER_DISPOSAL_CONFIRMATION_ID_PARAM = "disposalConfirmationId";
