@@ -297,24 +297,26 @@ public class BrowseAIP extends Composite {
     aipState.setVisible(!justActive);
 
     // NAVIGATION TOOLBAR
-    navigationToolbar.withObject(aip);
-    navigationToolbar.withPermissions(aip.getPermissions());
-    navigationToolbar.withActionImpactHandler(Actionable.ActionImpact.DESTROYED, () -> {
-      if (StringUtils.isNotBlank(aip.getParentID())) {
-        HistoryUtils.newHistory(BrowseTop.RESOLVER, aip.getParentID());
-      } else {
-        HistoryUtils.newHistory(BrowseTop.RESOLVER);
-      }
-    });
-    navigationToolbar.withActionImpactHandler(Actionable.ActionImpact.UPDATED,
-      () -> refresh(aipId, new NoAsyncCallback<>()));
-    navigationToolbar.build();
+    if (justActive) {
+      navigationToolbar.withObject(aip);
+      navigationToolbar.withPermissions(aip.getPermissions());
+      navigationToolbar.withActionImpactHandler(Actionable.ActionImpact.DESTROYED, () -> {
+        if (StringUtils.isNotBlank(aip.getParentID())) {
+          HistoryUtils.newHistory(BrowseTop.RESOLVER, aip.getParentID());
+        } else {
+          HistoryUtils.newHistory(BrowseTop.RESOLVER);
+        }
+      });
+      navigationToolbar.withActionImpactHandler(Actionable.ActionImpact.UPDATED,
+          () -> refresh(aipId, new NoAsyncCallback<>()));
+      navigationToolbar.build();
+    }
 
     // IDENTIFICATION
     updateSectionIdentification(bundle);
 
     // DISPOSAL
-    updateDisposalInformation(bundle);
+    updateDisposalInformation();
 
     // DESCRIPTIVE METADATA
     updateSectionDescriptiveMetadata(bundle);
@@ -493,14 +495,7 @@ public class BrowseAIP extends Composite {
     }
   }
 
-  private void updateDisposalInformation(BrowseAIPBundle bundle) {
-/*    String disposalScheduleId = bundle.getAip().getDisposalScheduleId();
-    String message = messages.disposalPolicyAIPWithoutAssociation();
-    if (disposalScheduleId != null && bundle.getAip().getOverdueDate() != null) {
-      message = messages.disposalPolicyAIPDueForDestruction(bundle.getAip().getDisposalRetentionPeriod(),
-        bundle.getAip().isDisposalHoldStatus() ? messages.disposalOnHoldStatusLabel() : "");
-    }*/
-
+  private void updateDisposalInformation() {
     Anchor disposalPolicyLink = new Anchor(DisposalPolicyUtils.getDisposalPolicySummaryText(aip),
       HistoryUtils.createHistoryHashLink(DisposalPolicyAssociationPanel.RESOLVER, aip.getId()));
     disposalPolicy.add(disposalPolicyLink);
@@ -534,13 +529,15 @@ public class BrowseAIP extends Composite {
             }
 
             // Edit link
-            if (PermissionClientUtils.hasPermissions(aip.getPermissions(),
-              RodaConstants.PERMISSION_METHOD_UPDATE_DESCRIPTIVE_METADATA_FILE)) {
-              String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId,
-                escapedDescId);
-              String editLinkHtml = "<a href='" + editLink
-                + "' class='toolbarLink' id='aipEditDescriptiveMetadata'><i class='fa fa-edit'></i></a>";
-              b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
+            if (!AIPState.DESTROYED.equals(aip.getState())) {
+              if (PermissionClientUtils.hasPermissions(aip.getPermissions(),
+                  RodaConstants.PERMISSION_METHOD_UPDATE_DESCRIPTIVE_METADATA_FILE)) {
+                String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId,
+                    escapedDescId);
+                String editLinkHtml = "<a href='" + editLink
+                    + "' class='toolbarLink' id='aipEditDescriptiveMetadata'><i class='fa fa-edit'></i></a>";
+                b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
+              }
             }
 
             // Download link
