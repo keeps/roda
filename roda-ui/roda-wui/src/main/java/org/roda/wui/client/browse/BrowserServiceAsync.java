@@ -344,9 +344,7 @@ public interface BrowserServiceAsync {
 
   void retrieveDisposalConfirmationExtraBundle(AsyncCallback<DisposalConfirmationExtraBundle> async);
 
-  void applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, AsyncCallback<Job> async);
+  void applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean override, AsyncCallback<Job> async);
 
-  void liftDisposalHold(SelectedItems<IndexedAIP> selectedItems, AsyncCallback<Job> async);
-
-  void clearDisposalHolds(SelectedItems<IndexedAIP> selectedItems, AsyncCallback<Job> async);
+  void liftDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean clearAll, AsyncCallback<Job> async);
 }

@@ -6,12 +6,16 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.DisposalHoldAlreadyExistsException;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
@@ -19,6 +23,8 @@ import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.DisposalPolicy;
+import org.roda.wui.client.ingest.process.ShowJob;
+import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -28,10 +34,9 @@ import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -192,20 +197,17 @@ public class ShowDisposalHold extends Composite {
       Button editHoldBtn = new Button();
       editHoldBtn.addStyleName("btn btn-block btn-edit");
       editHoldBtn.setText(messages.editButton());
-      editHoldBtn.addClickHandler(new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent clickEvent) {
-          HistoryUtils.newHistory(EditDisposalHold.RESOLVER, disposalHold.getId());
-        }
-      });
+      editHoldBtn
+        .addClickHandler(clickEvent -> HistoryUtils.newHistory(EditDisposalHold.RESOLVER, disposalHold.getId()));
 
       buttonsPanel.add(editHoldBtn);
 
       Button liftHoldBtn = new Button();
       liftHoldBtn.addStyleName("btn btn-block btn-danger btn-ban");
       liftHoldBtn.setText(messages.liftButton());
-      if (disposalHold.getFirstTimeUsed() == null) {
-        liftHoldBtn.addClickHandler(clickEvent -> {
+
+      liftHoldBtn.addClickHandler(clickEvent -> {
+        if (disposalHold.getFirstTimeUsed() == null) {
           disposalHold.setState(DisposalHoldState.LIFTED);
           BrowserServiceImpl.Util.getInstance().updateDisposalHold(disposalHold, new AsyncCallback<DisposalHold>() {
             @Override
@@ -218,22 +220,52 @@ public class ShowDisposalHold extends Composite {
               HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
             }
           });
-        });
-      } else {
-        // TODO -> plugin to lift hold in all AIPs
-      }
+        } else {
+          Filter filter = new Filter(
+            new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLDS_ID, disposalHold.getId()));
+          SelectedItemsFilter<IndexedAIP> selectedItemsFilter = new SelectedItemsFilter<>(filter,
+            IndexedAIP.class.getName(), true);
+          BrowserService.Util.getInstance().liftDisposalHold(selectedItemsFilter, disposalHold.getId(), false,
+            new AsyncCallback<Job>() {
+              @Override
+              public void onFailure(Throwable throwable) {
+                HistoryUtils.newHistory(InternalProcess.RESOLVER);
+              }
+
+              @Override
+              public void onSuccess(Job job) {
+                Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+
+                    Timer timer = new Timer() {
+                      @Override
+                      public void run() {
+                        refresh();
+                      }
+                    };
+
+                    timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                  }
+
+                  @Override
+                  public void onSuccess(final Void nothing) {
+                    HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                  }
+                });
+              }
+            });
+        }
+      });
       buttonsPanel.add(liftHoldBtn);
     }
 
     Button backBtn = new Button();
     backBtn.setText(messages.backButton());
     backBtn.addStyleName("btn btn-block btn-default btn-times-circle");
-    backBtn.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent clickEvent) {
-        HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
-      }
-    });
+    backBtn.addClickHandler(clickEvent -> HistoryUtils.newHistory(DisposalPolicy.RESOLVER));
     buttonsPanel.add(backBtn);
   }
 
@@ -252,7 +284,16 @@ public class ShowDisposalHold extends Composite {
     }
   }
 
-  public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
+  private void refresh() {
+    BrowserService.Util.getInstance().retrieveDisposalHold(disposalHold.getId(), new NoAsyncCallback<DisposalHold>() {
+      @Override
+      public void onSuccess(DisposalHold result) {
+        disposalHold = result;
+      }
+    });
+  }
+
+  private void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
 
       BrowserService.Util.getInstance().retrieveDisposalHold(historyTokens.get(0), new AsyncCallback<DisposalHold>() {

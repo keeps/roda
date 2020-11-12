@@ -212,8 +212,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public DisposalSchedule updateDisposalSchedule(DisposalSchedule schedule)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+  public DisposalSchedule updateDisposalSchedule(DisposalSchedule schedule) throws AuthorizationDeniedException,
+    NotFoundException, GenericException, RequestNotValidException, IllegalOperationException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Disposals.updateDisposalSchedule(user, schedule);
   }
@@ -247,8 +247,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public DisposalHold updateDisposalHold(DisposalHold hold)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+  public DisposalHold updateDisposalHold(DisposalHold hold) throws AuthorizationDeniedException, NotFoundException,
+    GenericException, RequestNotValidException, IllegalOperationException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Disposals.updateDisposalHold(user, hold);
   }
@@ -1121,24 +1121,17 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public Job applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalScheduleId)
+  public Job applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalScheduleId, boolean override)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Disposals.applyDisposalHold(user, selectedItems, disposalScheduleId);
+    return Disposals.applyDisposalHold(user, selectedItems, disposalScheduleId, override);
   }
 
   @Override
-  public Job clearDisposalHolds(SelectedItems<IndexedAIP> selectedItems)
+  public Job liftDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean clearAll)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Disposals.clearDisposalHold(user, selectedItems);
-  }
-
-  @Override
-  public Job liftDisposalHold(SelectedItems<IndexedAIP> selectedItems)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return Disposals.liftDisposalHold(user, selectedItems);
+    return Disposals.liftDisposalHold(user, selectedItems, disposalHoldId, clearAll);
   }
 
   @Override

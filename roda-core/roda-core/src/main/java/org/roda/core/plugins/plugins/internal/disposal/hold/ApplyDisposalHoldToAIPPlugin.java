@@ -1,5 +1,7 @@
 package org.roda.core.plugins.plugins.internal.disposal.hold;
 
+import static org.roda.core.data.common.RodaConstants.PreservationEventType.POLICY_ASSIGNMENT;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -12,6 +14,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -43,6 +46,7 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ApplyDisposalHoldToAIPPlugin.class);
 
   private String disposalHoldId;
+  private boolean override;
 
   private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
@@ -50,12 +54,18 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, "Disposal hold id",
         PluginParameter.PluginParameterType.STRING, "", true, false, "Disposal hold identifier"));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE, "Override disposal holds",
+        PluginParameter.PluginParameterType.BOOLEAN, "false", true, false,
+        "Replace current disposal holds for the selected"));
   }
 
   @Override
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> parameters = new ArrayList<>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE));
     return parameters;
   }
 
@@ -64,6 +74,10 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
     super.setParameterValues(parameters);
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID)) {
       disposalHoldId = parameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID);
+    }
+
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE)) {
+      override = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE));
     }
   }
 
@@ -92,7 +106,7 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public RodaConstants.PreservationEventType getPreservationEventType() {
-    return RodaConstants.PreservationEventType.POLICY_ASSIGNMENT;
+    return POLICY_ASSIGNMENT;
   }
 
   @Override
@@ -142,7 +156,7 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
     DisposalHold disposalHold = RodaCoreFactory.getDisposalHold(disposalHoldId);
 
     if (disposalHold == null) {
-      LOGGER.error("Failed to retrieve disposal hold from model");
+      LOGGER.error("Failed to retrieve disposal hold {} from model", disposalHoldId);
 
       for (AIP aip : aips) {
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
@@ -164,8 +178,9 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
 
         if (aip.getDisposalConfirmationId() != null) {
           state = PluginState.FAILURE;
-          LOGGER.error("Error applying disposal hold to AIP '" + aip.getId()
-            + "': This AIP is part of a disposal confirmation report and an hold cannot be applied");
+          LOGGER.error(
+            "Error applying disposal hold {} to AIP '{}': This AIP is part of a disposal confirmation report and an hold cannot be applied",
+            disposalHoldId, aip.getId());
           jobPluginInfo.incrementObjectsProcessedWithFailure();
           reportItem.setPluginState(state).setPluginDetails("Error applying disposal hold to AIP '" + aip.getId()
             + "': This AIP is part of a disposal confirmation report and an hold cannot be applied");
@@ -174,39 +189,23 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
               + "'; This AIP is part of a disposal confirmation report and an hold cannot be applied",
             disposalHoldId, null);
         } else {
-          // check if AIP is already under the disposal hold
-          if (aip.isAIPOnHold(disposalHoldId)) {
-            LOGGER.info("Applying disposal hold to AIP '" + aip.getId()
-              + "' was skipped because it is already on the same disposal hold");
-            jobPluginInfo.incrementObjectsProcessed(state);
-            reportItem.setPluginState(state).setPluginDetails("Applying disposal hold to AIP '" + aip.getId()
-              + "' was skipped because it is already on the same disposal hold");
-            outcomeText = "Applying disposal hold to AIP '" + aip.getId()
-              + "' was skipped because it is already on the same disposal hold";
+          if (override) {
+
+            DisposalHoldPluginUtils.liftAllDisposalHoldsFromAIP(model, state, aip, cachedJob, reportItem);
+
+            outcomeText = applyDisposalHold(aip, cachedJob, model, disposalHold, state, reportItem, jobPluginInfo);
           } else {
-            aip.addDisposalHold(
-              DisposalHoldPluginUtils.createDisposalHoldAssociation(disposalHoldId, cachedJob.getUsername()));
-
-            try {
-              model.updateAIP(aip, cachedJob.getUsername());
-              disposalHold.setFirstTimeUsed(new Date());
-              model.updateDisposalHold(disposalHold, cachedJob.getUsername());
-
-              jobPluginInfo.incrementObjectsProcessedWithSuccess();
-
-              reportItem.setPluginState(state)
-                .setPluginDetails("Disposal hold '" + disposalHoldId + "' was successfully applied to AIP");
-
-              outcomeText = PluginHelper.createOutcomeTextForDisposalHold("was successfully applied to AIP",
-                disposalHoldId, disposalHold.getTitle());
-            } catch (NotFoundException | RequestNotValidException | AuthorizationDeniedException | GenericException e) {
-              LOGGER.error("Error applying disposal hold {} to {}: {}", disposalHoldId, aip.getId(), e.getMessage(), e);
-              state = PluginState.FAILURE;
-              jobPluginInfo.incrementObjectsProcessedWithFailure();
-              reportItem.setPluginState(state)
-                .setPluginDetails("Error associating disposal schedule " + aip.getId() + ": " + e.getMessage());
-              outcomeText = PluginHelper.createOutcomeTextForDisposalHold(" failed to be applied to AIP",
-                disposalHoldId, disposalHold.getTitle());
+            // check if AIP is already under the disposal hold
+            if (aip.isAIPOnHold(disposalHoldId)) {
+              state = PluginState.SKIPPED;
+              LOGGER.info("Applying disposal hold '{}' to AIP '{}' was skipped because it is already on the same disposal hold", disposalHoldId, aip.getId());
+              jobPluginInfo.incrementObjectsProcessed(state);
+              reportItem.setPluginState(state).setPluginDetails("Applying disposal hold to AIP '" + aip.getId()
+                + "' was skipped because it is already on the same disposal hold");
+              outcomeText = "Applying disposal hold to AIP '" + aip.getId()
+                + "' was skipped because it is already on the same disposal hold";
+            } else {
+              outcomeText = applyDisposalHold(aip, cachedJob, model, disposalHold, state, reportItem, jobPluginInfo);
             }
           }
         }
@@ -222,6 +221,36 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
           LOGGER.error("Error creating event: {}", e.getMessage(), e);
         }
       }
+    }
+  }
+
+  private String applyDisposalHold(AIP aip, Job cachedJob, ModelService model, DisposalHold disposalHold,
+    PluginState state, Report reportItem, JobPluginInfo jobPluginInfo) {
+    aip.addDisposalHold(DisposalHoldPluginUtils.createDisposalHoldAssociation(disposalHoldId, cachedJob.getUsername()));
+
+    try {
+      model.updateAIP(aip, cachedJob.getUsername());
+
+      if (disposalHold.getFirstTimeUsed() == null) {
+        disposalHold.setFirstTimeUsed(new Date());
+        model.updateDisposalHold(disposalHold, cachedJob.getUsername());
+      }
+
+      reportItem.setPluginState(state).addPluginDetails("Disposal hold '" + disposalHold.getTitle() + "' ("
+        + disposalHoldId + ") was successfully applied to AIP '" + aip.getId() + "'");
+
+      jobPluginInfo.incrementObjectsProcessedWithSuccess();
+      return PluginHelper.createOutcomeTextForDisposalHold("was successfully applied to AIP", disposalHoldId,
+        disposalHold.getTitle());
+    } catch (NotFoundException | RequestNotValidException | AuthorizationDeniedException | GenericException
+      | IllegalOperationException e) {
+      LOGGER.error("Error applying disposal hold {} to {}: {}", disposalHoldId, aip.getId(), e.getMessage(), e);
+      state = PluginState.FAILURE;
+      jobPluginInfo.incrementObjectsProcessedWithFailure();
+      reportItem.setPluginState(state)
+        .addPluginDetails("Error associating disposal hold " + aip.getId() + ": " + e.getMessage());
+      return PluginHelper.createOutcomeTextForDisposalHold(" failed to be applied to AIP", disposalHoldId,
+        disposalHold.getTitle());
     }
   }
 

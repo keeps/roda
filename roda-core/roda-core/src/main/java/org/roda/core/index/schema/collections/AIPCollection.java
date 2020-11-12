@@ -280,7 +280,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     final String createdBy = SolrUtils.objectToString(doc.get(RodaConstants.AIP_CREATED_BY), "");
     final Date updatedOn = SolrUtils.objectToDate(doc.get(RodaConstants.AIP_UPDATED_ON));
     final String updatedBy = SolrUtils.objectToString(doc.get(RodaConstants.AIP_UPDATED_BY), "");
-    final String disposalScheduleId = SolrUtils.objectToString(doc.get(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID), "");
+    final String disposalScheduleId = SolrUtils.objectToString(doc.get(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID), null);
     final String disposalScheduleName = SolrUtils.objectToString(doc.get(RodaConstants.AIP_DISPOSAL_SCHEDULE_NAME), "");
     final String disposalSchedulePeriod = SolrUtils
       .objectToString(doc.get(RodaConstants.AIP_DISPOSAL_SCHEDULE_RETENTION_PERIOD), "");
@@ -292,7 +292,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     final Boolean disposalHoldStatus = SolrUtils.objectToBoolean(doc.get(RodaConstants.AIP_DISPOSAL_HOLD_STATUS),
       Boolean.FALSE);
     final String disposalConfirmationId = SolrUtils.objectToString(doc.get(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID),
-      "");
+      null);
     AIPDisposalFlow aipDisposalFlow = SolrUtils
         .objectToEnum(doc.get(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID), AIPDisposalFlow.class, null);
 

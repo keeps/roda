@@ -1,17 +1,26 @@
 package org.roda.core.plugins.plugins.internal.disposal.hold;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IllegalOperationException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -31,6 +40,43 @@ import org.slf4j.LoggerFactory;
  */
 public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(LiftDisposalHoldFromAIPPlugin.class);
+
+  private String disposalHoldId;
+  private Boolean clearAll;
+
+  private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
+
+  static {
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, "Disposal hold id",
+        PluginParameter.PluginParameterType.STRING, "", true, false, "Disposal hold identifier"));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_LIFT_ALL,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_LIFT_ALL, "Lift all holds",
+        PluginParameter.PluginParameterType.BOOLEAN, "false", true, false,
+        "Lift all disposal holds associated to AIP"));
+  }
+
+  @Override
+  public List<PluginParameter> getParameters() {
+    ArrayList<PluginParameter> parameters = new ArrayList<>();
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_LIFT_ALL));
+    return parameters;
+  }
+
+  @Override
+  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
+
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID)) {
+      disposalHoldId = parameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID);
+    }
+
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_LIFT_ALL)) {
+      clearAll = Boolean.valueOf(parameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_LIFT_ALL));
+    }
+  }
 
   @Override
   public String getVersionImpl() {
@@ -62,7 +108,7 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Lief disposal hold from AIP";
+    return "Lift disposal hold from AIP";
   }
 
   @Override
@@ -102,19 +148,58 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
     JobPluginInfo jobPluginInfo, List<AIP> aips) {
 
     for (AIP aip : aips) {
-      // lift Holds
-      aip.getDisposalHoldAssociation().forEach(association -> {
-        association.setLiftedOn(new Date());
-        association.setLiftedBy(cachedJob.getUsername());
-      });
+      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
 
-      try {
-        model.updateAIP(aip, cachedJob.getUsername());
-      } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-        e.printStackTrace();
+      PluginState state = PluginState.SUCCESS;
+      LOGGER.debug("Processing AIP {}", aip.getId());
+
+      if (clearAll) {
+        try {
+          // lift disposal holds
+          DisposalHoldPluginUtils.liftAllDisposalHoldsFromAIP(model, state, aip, cachedJob, reportItem);
+
+          model.updateAIP(aip, cachedJob.getUsername());
+
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          reportItem.setPluginState(state);
+        } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
+          LOGGER.error("Error lifting all disposal holds from {}: {}", aip.getId(), e.getMessage(), e);
+          state = PluginState.FAILURE;
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+          reportItem.setPluginState(state)
+            .setPluginDetails("Error lifting all disposal holds from AIP '" + aip.getId() + "': " + e.getMessage());
+        }
+      } else {
+        try {
+          DisposalHoldPluginUtils.liftDisposalHoldFromAIP(model, state, aip, disposalHoldId, cachedJob, reportItem);
+          model.updateAIP(aip, cachedJob.getUsername());
+
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          reportItem.setPluginState(state);
+        } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
+          LOGGER.error("Error lifting disposal hold '{}' from '{}': {}", disposalHoldId, aip.getId(), e.getMessage(), e);
+          state = PluginState.FAILURE;
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+          reportItem.setPluginState(state).setPluginDetails(
+            "Error lifting disposal hold '" + disposalHoldId + "' from AIP '" + aip.getId() + "': " + e.getMessage());
+        }
       }
+
+      report.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
     }
 
+    if (StringUtils.isNotBlank(disposalHoldId)) {
+      try {
+        DisposalHold disposalHold = model.retrieveDisposalHold(disposalHoldId);
+        disposalHold.setState(DisposalHoldState.LIFTED);
+        model.updateDisposalHold(disposalHold, cachedJob.getUsername());
+      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
+        | IllegalOperationException e) {
+        LOGGER.error("Unable to update disposal hold {}: {}", disposalHoldId, e.getMessage(), e);
+      }
+    }
   }
 
   @Override
