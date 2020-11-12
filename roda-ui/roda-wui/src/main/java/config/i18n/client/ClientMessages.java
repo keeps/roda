@@ -2193,6 +2193,8 @@ public interface ClientMessages extends Messages {
 
   String overwriteAllDisposalDialogDescription();
 
+  String disposalPolicyAIPWithoutAssociation();
+
   String disposalRetentionStartDateLabel();
 
   String disposalRetentionDueDateLabel();
