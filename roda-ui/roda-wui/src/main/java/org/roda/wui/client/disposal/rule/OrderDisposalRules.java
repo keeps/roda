@@ -16,6 +16,7 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
+import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -35,7 +36,6 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
@@ -277,32 +277,28 @@ public class OrderDisposalRules extends Composite {
 
   @UiHandler("buttonSave")
   void buttonSaveHandler(ClickEvent e) {
-    Dialogs.showConfirmDialog(messages.saveButton(), messages.confirmChangeRulesOrder(), messages.cancelButton(), messages.confirmButton(), new AsyncCallback<Boolean>() {
-      @Override
-      public void onFailure(Throwable throwable) {
+    Dialogs.showConfirmDialog(messages.saveButton(), messages.confirmChangeRulesOrder(), messages.cancelButton(),
+      messages.confirmButton(), new AsyncCallback<Boolean>() {
+        @Override
+        public void onFailure(Throwable throwable) {
 
-      }
-
-      @Override
-      public void onSuccess(Boolean aBoolean) {
-        for(DisposalRule rule: disposalRules.getObjects()){
-          BrowserServiceImpl.Util.getInstance().updateDisposalRule(rule, new AsyncCallback<DisposalRule>() {
+        }
+        @Override
+        public void onSuccess(Boolean aBoolean) {
+          BrowserServiceImpl.Util.getInstance().updateDisposalRules(disposalRules, new AsyncCallback<Void>() {
             @Override
             public void onFailure(Throwable caught) {
               errorMessage(caught);
             }
 
             @Override
-            public void onSuccess(DisposalRule disposalRule) {
-
+            public void onSuccess(Void unused) {
+              HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
             }
           });
-          HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
         }
-      }
-    });
+      });
   }
-
 
   @UiHandler("buttonCreate")
   void buttonCreateHandler(ClickEvent e) {

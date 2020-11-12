@@ -1615,6 +1615,8 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_UPDATE_DISPOSAL_RULE = "org.roda.wui.api.controllers.Disposals.updateDisposalRule";
   public static final String PERMISSION_METHOD_DELETE_DISPOSAL_RULE = "org.roda.wui.api.controllers.Disposals.deleteDisposalRule";
 
+  public static final String PERMISSION_METHOD_UPDATE_DISPOSAL_RULES = "org.roda.wui.api.controllers.Disposals.updateDisposalRules";
+
   public static final String PERMISSION_METHOD_CREATE_DISPOSAL_SCHEDULE = "org.roda.wui.api.controllers.Disposals.createDisposalSchedule";
   public static final String PERMISSION_METHOD_UPDATE_DISPOSAL_SCHEDULE = "org.roda.wui.api.controllers.Disposals.updateDisposalSchedule";
   public static final String PERMISSION_METHOD_ASSOCIATE_DISPOSAL_SCHEDULE = "org.roda.wui.api.controllers.Disposals.associateDisposalSchedule";

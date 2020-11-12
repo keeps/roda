@@ -1,5 +1,7 @@
 package org.roda.wui.api.controllers;
 
+import java.io.IOException;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -23,8 +25,6 @@ import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.bundle.DisposalConfirmationExtraBundle;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
-
-import java.io.IOException;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -256,7 +256,8 @@ public class Disposals extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
     try {
       // delegate
-      return BrowserHelper.associateDisposalSchedule(user, selected, disposalScheduleId, applyToHierarchy, overwriteAll);
+      return BrowserHelper.associateDisposalSchedule(user, selected, disposalScheduleId, applyToHierarchy,
+        overwriteAll);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -395,7 +396,7 @@ public class Disposals extends RodaWuiController {
   }
 
   public static DisposalRule createDisposalRule(User user, DisposalRule disposalRule) throws GenericException,
-          AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException, IOException {
+    AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException, IOException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -403,7 +404,7 @@ public class Disposals extends RodaWuiController {
 
     // validate disposal rule
     DisposalSchedules schedules = Browser.listDisposalSchedules(user);
-    DisposalsHelper.validateDisposalRule(disposalRule,schedules);
+    DisposalsHelper.validateDisposalRule(disposalRule, schedules);
 
     LogEntryState state = LogEntryState.SUCCESS;
 
@@ -440,6 +441,30 @@ public class Disposals extends RodaWuiController {
       // register action
       controllerAssistant.registerAction(user, disposalRule.getId(), state,
         RodaConstants.CONTROLLER_DISPOSAL_RULE_PARAM, disposalRule);
+    }
+  }
+
+  public static void updateDisposalRules(User user, DisposalRules disposalRules)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    for (DisposalRule disposalRule : disposalRules.getObjects()) {
+      try {
+        // delegate
+        BrowserHelper.updateDisposalRule(disposalRule, user);
+      } catch (RODAException e) {
+        state = LogEntryState.FAILURE;
+        throw e;
+      } finally {
+        // register action
+        controllerAssistant.registerAction(user, disposalRule.getId(), state,
+          RodaConstants.CONTROLLER_DISPOSAL_RULE_PARAM, disposalRule);
+      }
     }
   }
 
