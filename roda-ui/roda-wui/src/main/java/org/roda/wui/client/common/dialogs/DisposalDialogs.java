@@ -6,7 +6,7 @@ import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.wui.client.common.dialogs.utils.DisposalHoldDialogResult;
 import org.roda.wui.client.common.dialogs.utils.DisposalHoldDialogResult.ActionType;
-import org.roda.wui.client.common.dialogs.utils.DisposalScheduleDialogsResult;
+import org.roda.wui.client.common.dialogs.utils.DisposalScheduleDialogResult;
 import org.roda.wui.client.common.lists.utils.TooltipTextColumn;
 import org.roda.wui.client.disposal.hold.CreateDisposalHold;
 import org.roda.wui.client.disposal.schedule.CreateDisposalSchedule;
@@ -25,12 +25,15 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
 
 import config.i18n.client.ClientMessages;
+
+;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -160,9 +163,11 @@ public class DisposalDialogs {
   }
 
   public static void showDisposalScheduleSelection(String title, DisposalSchedules schedules,
-    final AsyncCallback<DisposalScheduleDialogsResult> callback) {
+    final AsyncCallback<DisposalScheduleDialogResult> callback) {
     final DialogBox dialogBox = new DialogBox(false, true);
     dialogBox.setText(title);
+    applyToHierarchy = true;
+    overwriteAll = false;
 
     FlowPanel layout = new FlowPanel();
     Button cancelButton = new Button(messages.cancelButton());
@@ -170,7 +175,10 @@ public class DisposalDialogs {
     Button noScheduleButton = new Button(messages.disassociateDisposalScheduleButton());
     Button newScheduleButton = new Button(messages.createDisposalScheduleButton());
     CheckBox applyToHierarchyCheckBox = new CheckBox(messages.applyAllButton());
+    Label applyToHierarchyDescription = new Label(messages.applyToHierarchyDisposalDialogDescription());
     CheckBox overwriteAllCheckBox = new CheckBox(messages.overwriteAllDisposalDialogCheckBox());
+    Label overwriteAllDescription = new Label(messages.overwriteAllDisposalDialogDescription());
+    FlowPanel options = new FlowPanel();
     FlowPanel footer = new FlowPanel();
 
     changeScheduleButton.setEnabled(false);
@@ -184,7 +192,7 @@ public class DisposalDialogs {
     table.setKeyboardSelectionPolicy(HasKeyboardSelectionPolicy.KeyboardSelectionPolicy.DISABLED);
 
     final ScrollPanel displayScroll = new ScrollPanel(table);
-    displayScroll.setSize("100%", "80vh");
+    displayScroll.setSize("100%", "70vh");
     final SimplePanel displayScrollWrapper = new SimplePanel(displayScroll);
     displayScrollWrapper.addStyleName("disposal-schedules-modal-table");
 
@@ -235,6 +243,7 @@ public class DisposalDialogs {
     dataProvider.addDataDisplay(table);
 
     layout.add(displayScrollWrapper);
+    layout.add(options);
     layout.add(footer);
 
     dialogBox.setGlassEnabled(true);
@@ -247,14 +256,18 @@ public class DisposalDialogs {
 
     noScheduleButton.addClickHandler(clickEvent -> {
       dialogBox.hide();
-      callback.onSuccess(new DisposalScheduleDialogsResult(null, applyToHierarchy, overwriteAll));
+      DisposalScheduleDialogResult result = new DisposalScheduleDialogResult(
+        DisposalScheduleDialogResult.ActionType.CLEAR, singleSelectionModel.getSelectedObject(), applyToHierarchy,
+        overwriteAll);
+      callback.onSuccess(result);
     });
 
     changeScheduleButton.addClickHandler(clickEvent -> {
       dialogBox.hide();
       GWT.log(applyToHierarchy.toString());
-      DisposalScheduleDialogsResult result = new DisposalScheduleDialogsResult(singleSelectionModel.getSelectedObject(),
-        applyToHierarchy, overwriteAll);
+      DisposalScheduleDialogResult result = new DisposalScheduleDialogResult(
+        DisposalScheduleDialogResult.ActionType.ASSOCIATE, singleSelectionModel.getSelectedObject(), applyToHierarchy,
+        overwriteAll);
       callback.onSuccess(result);
     });
 
@@ -265,7 +278,8 @@ public class DisposalDialogs {
     });
 
     applyToHierarchyCheckBox.setValue(true);
-    applyToHierarchyCheckBox.addStyleName("disposal-dialogs-checkbox");
+    applyToHierarchyCheckBox.addStyleName("disposal-dialogs-checkbox form-checkbox");
+    applyToHierarchyDescription.addStyleName("form-help");
     applyToHierarchyCheckBox.addValueChangeHandler(valueChangeEvent -> {
       applyToHierarchy = valueChangeEvent.getValue();
       if (applyToHierarchy) {
@@ -273,13 +287,17 @@ public class DisposalDialogs {
       } else {
         overwriteAllCheckBox.setEnabled(false);
         overwriteAllCheckBox.setValue(false);
+        overwriteAll = false;
+        GWT.log("overwriteAll: " + overwriteAll);
       }
     });
 
     overwriteAllCheckBox.setValue(false);
-    overwriteAllCheckBox.addStyleName("disposal-dialogs-checkbox");
+    overwriteAllCheckBox.addStyleName("disposal-dialogs-checkbox form-checkbox");
+    overwriteAllDescription.addStyleName("form-help");
     overwriteAllCheckBox.addValueChangeHandler(valueChangeEvent -> {
       overwriteAll = valueChangeEvent.getValue();
+      GWT.log("onchange overwriteAll: " + overwriteAll);
     });
 
     cancelButton.addStyleName("btn btn-link");
@@ -289,10 +307,12 @@ public class DisposalDialogs {
     table.addStyleName("my-asyncdatagrid-display");
 
     layout.addStyleName("wui-dialog-layout");
+    options.add(applyToHierarchyCheckBox);
+    options.add(applyToHierarchyDescription);
+    options.add(overwriteAllCheckBox);
+    options.add(overwriteAllDescription);
     footer.addStyleName("wui-dialog-layout-footer");
     footer.add(newScheduleButton);
-    footer.add(applyToHierarchyCheckBox);
-    footer.add(overwriteAllCheckBox);
     footer.add(changeScheduleButton);
     footer.add(noScheduleButton);
     footer.add(changeScheduleButton);

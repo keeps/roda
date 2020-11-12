@@ -19,7 +19,7 @@ import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.DisposalDialogs;
-import org.roda.wui.client.common.dialogs.utils.DisposalScheduleDialogsResult;
+import org.roda.wui.client.common.dialogs.utils.DisposalScheduleDialogResult;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.disposal.confirmations.CreateDisposalConfirmationDataPanel;
 import org.roda.wui.client.ingest.process.ShowJob;
@@ -131,8 +131,9 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
     });
   }
 
-  private void changeDisposalSchedule(SelectedItems<IndexedAIP> items, AsyncCallback<ActionImpact> callback) {
-    ClientSelectedItemsUtils.size(IndexedAIP.class, items, new ActionNoAsyncCallback<Long>(callback) {
+  private void changeDisposalSchedule(final SelectedItems<IndexedAIP> aips,
+    final AsyncCallback<ActionImpact> callback) {
+    ClientSelectedItemsUtils.size(IndexedAIP.class, aips, new ActionNoAsyncCallback<Long>(callback) {
       @Override
       public void onSuccess(final Long size) {
         BrowserService.Util.getInstance().listDisposalSchedules(new ActionNoAsyncCallback<DisposalSchedules>(callback) {
@@ -141,116 +142,130 @@ public class DisposalCreateConfirmationDestroyActions extends AbstractActionable
             // Show the active disposal schedules only
             schedules.getObjects().removeIf(schedule -> DisposalScheduleState.INACTIVE.equals(schedule.getState()));
             DisposalDialogs.showDisposalScheduleSelection(messages.disposalScheduleSelectionDialogTitle(), schedules,
-              new ActionNoAsyncCallback<DisposalScheduleDialogsResult>(callback) {
+              new ActionNoAsyncCallback<DisposalScheduleDialogResult>(callback) {
                 @Override
                 public void onFailure(Throwable caught) {
                   doActionCallbackNone();
                 }
 
                 @Override
-                public void onSuccess(DisposalScheduleDialogsResult result) {
-                  DisposalSchedule disposalSchedule = result.getDisposalSchedule();
-                  Boolean applyToHierarchy = result.isApplyToHierarchy();
-                  Boolean overwriteAll = result.isOverwriteAll();
-                  // the result can be null, if null treat as removing the disposal schedule
-
-                  Dialogs.showConfirmDialog(
-                    disposalSchedule != null ? messages.associateDisposalScheduleDialogTitle()
-                      : messages.dissociateDisposalScheduleDialogTitle(),
-                    disposalSchedule != null ? messages.associateDisposalScheduleDialogMessage(size)
-                      : messages.dissociateDisposalScheduleDialogMessage(size),
-                    messages.dialogNo(), messages.dialogYes(), new ActionNoAsyncCallback<Boolean>(callback) {
-                      @Override
-                      public void onSuccess(Boolean result) {
-                        if (result) {
-                          if (disposalSchedule == null) {
-                            BrowserService.Util.getInstance().disassociateDisposalSchedule(items,
-                              new ActionAsyncCallback<Job>(callback) {
-
-                                @Override
-                                public void onFailure(Throwable caught) {
-                                  callback.onFailure(caught);
-                                  HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                                }
-
-                                @Override
-                                public void onSuccess(Job job) {
-                                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(),
-                                    new AsyncCallback<Void>() {
-
-                                      @Override
-                                      public void onFailure(Throwable caught) {
-                                        Toast.showInfo(messages.runningInBackgroundTitle(),
-                                          messages.runningInBackgroundDescription());
-
-                                        Timer timer = new Timer() {
-                                          @Override
-                                          public void run() {
-                                            doActionCallbackUpdated();
-                                          }
-                                        };
-
-                                        timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                                      }
-
-                                      @Override
-                                      public void onSuccess(final Void nothing) {
-                                        doActionCallbackNone();
-                                        HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-                                      }
-                                    });
-                                }
-                              });
-                          } else {
-                            BrowserService.Util.getInstance().associateDisposalSchedule(items, disposalSchedule.getId(),
-                                applyToHierarchy, overwriteAll, new ActionAsyncCallback<Job>(callback) {
-
-                                @Override
-                                public void onFailure(Throwable caught) {
-                                  callback.onFailure(caught);
-                                  HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                                }
-
-                                @Override
-                                public void onSuccess(Job job) {
-                                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(),
-                                    new AsyncCallback<Void>() {
-
-                                      @Override
-                                      public void onFailure(Throwable caught) {
-                                        Toast.showInfo(messages.runningInBackgroundTitle(),
-                                          messages.runningInBackgroundDescription());
-
-                                        Timer timer = new Timer() {
-                                          @Override
-                                          public void run() {
-                                            doActionCallbackUpdated();
-                                          }
-                                        };
-
-                                        timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                                      }
-
-                                      @Override
-                                      public void onSuccess(final Void nothing) {
-                                        doActionCallbackNone();
-                                        HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-                                      }
-                                    });
-                                }
-                              });
-                          }
-                        } else {
-                          doActionCallbackNone();
-                        }
-                      }
-                    });
+                public void onSuccess(DisposalScheduleDialogResult result) {
+                  if (DisposalScheduleDialogResult.ActionType.ASSOCIATE.equals(result.getActionType())) {
+                    associateDisposalSchedule(aips, size, result, callback);
+                  } else if (DisposalScheduleDialogResult.ActionType.CLEAR.equals(result.getActionType())) {
+                    disassociateDisposalSchedule(aips, size, result, callback);
+                  }
                 }
               });
           }
         });
       }
     });
+  }
+
+  private void disassociateDisposalSchedule(SelectedItems<IndexedAIP> aips, Long size,
+    DisposalScheduleDialogResult dialogResult, AsyncCallback<ActionImpact> callback) {
+    Boolean applyToHierarchy = dialogResult.isApplyToHierarchy();
+
+    Dialogs.showConfirmDialog(messages.dissociateDisposalScheduleDialogTitle(),
+      messages.dissociateDisposalScheduleDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
+      new ActionNoAsyncCallback<Boolean>(callback) {
+        @Override
+        public void onSuccess(Boolean result) {
+          if (result) {
+            BrowserService.Util.getInstance().disassociateDisposalSchedule(aips, applyToHierarchy,
+              new ActionAsyncCallback<Job>(callback) {
+                @Override
+                public void onFailure(Throwable caught) {
+                  callback.onFailure(caught);
+                  HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                }
+
+                @Override
+                public void onSuccess(Job job) {
+                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+
+                      Timer timer = new Timer() {
+                        @Override
+                        public void run() {
+                          doActionCallbackUpdated();
+                        }
+                      };
+
+                      timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                    }
+
+                    @Override
+                    public void onSuccess(final Void nothing) {
+                      doActionCallbackNone();
+                      HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                    }
+                  });
+                }
+              });
+          } else {
+            doActionCallbackNone();
+          }
+        }
+      });
+  }
+
+  private void associateDisposalSchedule(SelectedItems<IndexedAIP> aips, Long size,
+    DisposalScheduleDialogResult dialogResult, AsyncCallback<ActionImpact> callback) {
+    DisposalSchedule disposalSchedule = dialogResult.getDisposalSchedule();
+    Boolean applyToHierarchy = dialogResult.isApplyToHierarchy();
+    Boolean overwriteAll = dialogResult.isOverwriteAll();
+
+    Dialogs.showConfirmDialog(messages.associateDisposalScheduleDialogTitle(),
+      messages.associateDisposalScheduleDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
+      new ActionNoAsyncCallback<Boolean>(callback) {
+        @Override
+        public void onSuccess(Boolean result) {
+          if (result) {
+            BrowserService.Util.getInstance().associateDisposalSchedule(aips, disposalSchedule.getId(),
+              applyToHierarchy, overwriteAll, new ActionAsyncCallback<Job>(callback) {
+
+                @Override
+                public void onFailure(Throwable caught) {
+                  callback.onFailure(caught);
+                  HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                }
+
+                @Override
+                public void onSuccess(Job job) {
+                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+
+                      Timer timer = new Timer() {
+                        @Override
+                        public void run() {
+                          doActionCallbackUpdated();
+                        }
+                      };
+
+                      timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                    }
+
+                    @Override
+                    public void onSuccess(final Void nothing) {
+                      doActionCallbackNone();
+                      HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                    }
+                  });
+                }
+              });
+          } else {
+            doActionCallbackNone();
+          }
+        }
+      });
   }
 
   @Override

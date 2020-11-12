@@ -141,7 +141,9 @@ public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP>
 
   private void processAIP(ModelService model, IndexService index, Report report, JobPluginInfo jobPluginInfo,
     Job cachedJob, List<AIP> objects) {
-    calculateResourcesCounter(index, jobPluginInfo, objects);
+    if (recursive) {
+      calculateResourcesCounter(index, jobPluginInfo, objects);
+    }
     for (AIP aip : objects) {
       PluginState state = PluginState.SUCCESS;
       String outcomeText;
@@ -188,11 +190,8 @@ public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP>
 
             outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(" was successfully disassociated from AIP",
               disposalSchedule.getId(), disposalSchedule.getTitle());
-            if (recursive) {
-              processChildren(model, index, cachedJob, aip, disposalSchedule, jobPluginInfo, report);
-            }
-
-          } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException | IllegalOperationException e) {
+          } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
+            | IllegalOperationException e) {
             LOGGER.error("Error disassociating disposal schedule {} from AIP {}: {}", disposalScheduleId, aip.getId(),
               e.getMessage(), e);
             state = PluginState.FAILURE;
@@ -208,6 +207,10 @@ public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP>
       report.addReport(reportItem);
       PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
 
+      if (recursive) {
+        processChildren(model, index, cachedJob, aip, jobPluginInfo, report);
+      }
+
       try {
         PluginHelper.createPluginEvent(this, aip.getId(), model, index, null, null, state, outcomeText, true,
           cachedJob);
@@ -222,6 +225,7 @@ public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP>
     try {
       ArrayList<String> ancestorList = aips.stream().map(AIP::getId).collect(Collectors.toCollection(ArrayList::new));
       Filter ancestorFilter = new Filter(new OneOfManyFilterParameter(RodaConstants.AIP_ANCESTORS, ancestorList));
+      ;
       int resourceCounter = index.count(IndexedAIP.class, ancestorFilter).intValue();
       jobPluginInfo.setSourceObjectsCount(resourceCounter + aips.size());
     } catch (GenericException | RequestNotValidException e) {
@@ -230,40 +234,70 @@ public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP>
   }
 
   private void processChildren(ModelService model, IndexService index, Job cachedJob, AIP aipParent,
-    DisposalSchedule disposalSchedule, JobPluginInfo jobPluginInfo, Report report) {
+    JobPluginInfo jobPluginInfo, Report report) {
     Filter ancestorFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipParent.getId()));
     try (IterableIndexResult<IndexedAIP> result = index.findAll(IndexedAIP.class, ancestorFilter, false,
-      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID))) {
+      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID, RodaConstants.AIP_DISPOSAL_SCHEDULE_ID,
+        RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID))) {
       for (IndexedAIP indexedAIP : result) {
-        String outcomeText = "";
+        PluginState state = PluginState.SUCCESS;
+        String outcomeText;
+        DisposalSchedule disposalSchedule;
+
+        LOGGER.debug("Processing children AIP {}", indexedAIP.getId());
         Report reportItem = PluginHelper.initPluginReportItem(this, indexedAIP.getId(), AIP.class);
         PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
-        LOGGER.debug("Processing children AIP {}", indexedAIP.getId());
-        try {
-          AIP aipChildren = model.retrieveAIP(indexedAIP.getId());
-          aipChildren.setDisposalScheduleId(null);
-          model.updateDisposalSchedule(disposalSchedule, cachedJob.getUsername());
-          model.updateAIP(aipChildren, cachedJob.getUsername());
+        String disposalScheduleId = indexedAIP.getDisposalScheduleId();
 
-          reportItem.setPluginState(PluginState.SUCCESS);
-          reportItem.setPluginDetails("Remove disposal schedule: " + disposalSchedule.getId());
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        if (disposalScheduleId == null) {
+          state = PluginState.SKIPPED;
+          LOGGER.info("Disposal schedule disassociation was skipped because AIP '" + indexedAIP.getId()
+            + "' is not associated with any disposal schedule");
+          jobPluginInfo.incrementObjectsProcessed(state);
+          reportItem.setPluginState(state).setPluginDetails("Disposal schedule disassociation was skipped because AIP '"
+            + indexedAIP.getId() + "' is not associated with any disposal schedule");
+          outcomeText = "Disposal schedule disassociation was skipped because AIP '" + indexedAIP.getId()
+            + "' is not associated with any disposal schedule";
+        } else {
+          if (indexedAIP.getDisposalConfirmationId() == null || indexedAIP.getDisposalConfirmationId().isEmpty()) {
+            try {
+              disposalSchedule = model.retrieveDisposalSchedule(disposalScheduleId);
+              AIP aipChildren = model.retrieveAIP(indexedAIP.getId());
+              aipChildren.setDisposalScheduleId(null);
+              model.updateDisposalSchedule(disposalSchedule, cachedJob.getUsername());
+              model.updateAIP(aipChildren, cachedJob.getUsername());
 
-          outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(" was successfully disassociated from AIP",
-            disposalSchedule.getId(), disposalSchedule.getTitle());
-        } catch (AuthorizationDeniedException | NotFoundException | IllegalOperationException e) {
-          LOGGER.error("Error removing disposal schedule {} from AIP {}: {}", disposalSchedule.getId(),
-            indexedAIP.getId(), e.getMessage(), e);
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-          reportItem.setPluginState(PluginState.FAILURE)
-            .setPluginDetails("Error removing disposal schedule " + indexedAIP.getId() + ": " + e.getMessage());
+              reportItem.setPluginState(PluginState.SUCCESS);
+              reportItem.setPluginDetails("Remove disposal schedule: " + disposalSchedule.getId());
+              jobPluginInfo.incrementObjectsProcessedWithSuccess();
 
-          PluginHelper.createOutcomeTextForDisposalSchedule("failed to be applied to AIP", disposalSchedule.getId(),
-            null);
-        } finally {
-          report.addReport(reportItem);
-          PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
+              outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(
+                " was successfully disassociated from AIP", disposalSchedule.getId(), disposalSchedule.getTitle());
+            } catch (AuthorizationDeniedException | NotFoundException | IllegalOperationException e) {
+              LOGGER.error("Error removing disposal schedule {} from AIP {}: {}", disposalScheduleId,
+                indexedAIP.getId(), e.getMessage(), e);
+              jobPluginInfo.incrementObjectsProcessedWithFailure();
+              reportItem.setPluginState(PluginState.FAILURE)
+                .setPluginDetails("Error removing disposal schedule " + indexedAIP.getId() + ": " + e.getMessage());
+              outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(
+                "failed to be disassociate from AIP '" + indexedAIP.getId() + "'", disposalScheduleId, null);
+            }
+          } else {
+            state = PluginState.FAILURE;
+            LOGGER.error("Error disassociation disposal schedule from AIP '" + indexedAIP.getId()
+              + "': This AIP is part of a disposal confirmation report and the schedule cannot be changed");
+            jobPluginInfo.incrementObjectsProcessedWithFailure();
+            reportItem.setPluginState(state)
+              .setPluginDetails("Error disassociating disposal schedule from AIP '" + indexedAIP.getId()
+                + "': This AIP is part of a disposal confirmation report and the schedule cannot be changed");
+            outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(
+              "failed to be disassociate from AIP '" + indexedAIP.getId()
+                + "'; This AIP is part of a disposal confirmation report and the schedule cannot be changed",
+              disposalScheduleId, null);
+          }
         }
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
 
         try {
           PluginHelper.createPluginEvent(this, indexedAIP.getId(), model, index, null, null,

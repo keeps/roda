@@ -3365,10 +3365,13 @@ public class BrowserHelper {
       "Could not execute delete disposal confirmation report");
   }
 
-  public static Job disassociateDisposalSchedule(User user, SelectedItems<IndexedAIP> selected)
+  public static Job disassociateDisposalSchedule(User user, SelectedItems<IndexedAIP> selected,
+    Boolean applyToHierarchy)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RECURSIVE, applyToHierarchy.toString());
     return createAndExecuteInternalJob("Disassociate disposal schedule", selected,
-      DisassociateDisposalScheduleToAIPPlugin.class, user, Collections.emptyMap(),
+      DisassociateDisposalScheduleToAIPPlugin.class, user, pluginParameters,
       "Could not execute disassociate disposal schedule action");
   }
 
@@ -3378,7 +3381,7 @@ public class BrowserHelper {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID, disposalScheduleId);
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RECURSIVE, applyToHierarchy.toString());
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RECURSIVE, overwriteAll.toString());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_ALL, overwriteAll.toString());
 
     return createAndExecuteInternalJob("Associate disposal schedule", selected,
       AssociateDisposalScheduleToAIPPlugin.class, user, pluginParameters,
@@ -3458,10 +3461,11 @@ public class BrowserHelper {
   }
 
   public static Job permanentlyDeleteRecordsInDisposalConfirmation(User user,
-                                                                   SelectedItemsList<DisposalConfirmation> selectedItems) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    SelectedItemsList<DisposalConfirmation> selectedItems)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     return createAndExecuteInternalJob("Permanently delete records from disposal bin", selectedItems,
-        PermanentlyDeleteRecordsPlugin.class, user, Collections.emptyMap(),
-        "Could not execute permanent deletion of records in disposal bin action");
+      PermanentlyDeleteRecordsPlugin.class, user, Collections.emptyMap(),
+      "Could not execute permanent deletion of records in disposal bin action");
   }
 
   public static DisposalRule createDisposalRule(DisposalRule disposalRule, User user) throws GenericException,
