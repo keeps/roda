@@ -82,10 +82,12 @@ import org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
+import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalRules;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
@@ -3299,8 +3301,16 @@ public class ModelService extends ModelObservable {
   }
 
   public DisposalHold updateDisposalHold(DisposalHold disposalHold, String updatedBy)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+      throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException, IllegalOperationException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    // Check if disposal hold is ACTIVE to update
+    DisposalHold currentDisposalHold = retrieveDisposalHold(disposalHold.getId());
+    if (DisposalHoldState.LIFTED.equals(currentDisposalHold.getState())) {
+      throw new IllegalOperationException("Error updating disposal hold: " + currentDisposalHold.getId()
+          + ". Reason: Disposal hold is lifted therefore can not change its content");
+    }
+
     disposalHold.setUpdatedOn(new Date());
     disposalHold.setUpdatedBy(updatedBy);
 
@@ -3431,8 +3441,15 @@ public class ModelService extends ModelObservable {
   }
 
   public DisposalSchedule updateDisposalSchedule(DisposalSchedule disposalSchedule, String updatedBy)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+      throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException, IllegalOperationException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    // Check if disposal schedule is ACTIVE to update
+    DisposalSchedule currentDisposalSchedule = retrieveDisposalSchedule(disposalSchedule.getId());
+    if (DisposalScheduleState.INACTIVE.equals(currentDisposalSchedule.getState())) {
+      throw new IllegalOperationException("Error updating disposal schedule: " + currentDisposalSchedule.getId()
+          + ". Reason: Disposal schedule is inactive therefore can not change its content");
+    }
 
     disposalSchedule.setUpdatedOn(new Date());
     disposalSchedule.setUpdatedBy(updatedBy);

@@ -18,6 +18,7 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -172,10 +173,16 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
     DisposalSchedule disposalSchedule = RodaCoreFactory.getDisposalSchedule(disposalScheduleId);
 
     if (disposalSchedule == null) {
-      LOGGER.error("Failed to retrieve disposal schedule from model");
-      report.setPluginState(PluginState.FAILURE)
-        .setPluginDetails("Failed to retrieve disposal schedule " + disposalScheduleId);
-      jobPluginInfo.setSourceObjectsProcessedWithFailure(jobPluginInfo.getSourceObjectsCount());
+      LOGGER.error("Failed to retrieve disposal schedule {} from model", disposalScheduleId);
+      for (AIP aip : aips) {
+        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
+        reportItem.setPluginState(PluginState.FAILURE)
+          .setPluginDetails("Failed to retrieve disposal schedule " + disposalScheduleId);
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
+      }
     } else {
       for (AIP aip : aips) {
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
@@ -215,7 +222,8 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
             if (recursive) {
               processChildren(model, index, cachedJob, aip, disposalSchedule, jobPluginInfo, report);
             }
-          } catch (NotFoundException | RequestNotValidException | AuthorizationDeniedException | GenericException e) {
+          } catch (NotFoundException | RequestNotValidException | AuthorizationDeniedException | GenericException
+            | IllegalOperationException e) {
             LOGGER.error("Error associating disposal schedule {} to {}: {}", disposalScheduleId, aip.getId(),
               e.getMessage(), e);
             state = PluginState.FAILURE;

@@ -235,7 +235,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     } else if (AipAction.ASSOCIATE_DISPOSAL_SCHEDULE.equals(action)) {
       associateDisposalSchedule(aip, callback);
     } else if (AipAction.ASSOCIATE_DISPOSAL_HOLD.equals(action)) {
-      applyDisposalHold(aip, callback);
+      manageDisposalHold(aip, callback);
     } else {
       unsupportedAction(action, callback);
     }
@@ -846,11 +846,11 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     });
   }
 
-  private void applyDisposalHold(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
-    applyDisposalHold(objectToSelectedItems(aip, IndexedAIP.class), callback);
+  private void manageDisposalHold(final IndexedAIP aip, final AsyncCallback<ActionImpact> callback) {
+    manageDisposalHold(objectToSelectedItems(aip, IndexedAIP.class), callback);
   }
 
-  private void applyDisposalHold(final SelectedItems<IndexedAIP> aips, final AsyncCallback<ActionImpact> callback) {
+  private void manageDisposalHold(final SelectedItems<IndexedAIP> aips, final AsyncCallback<ActionImpact> callback) {
     ClientSelectedItemsUtils.size(IndexedAIP.class, aips, new ActionNoAsyncCallback<Long>(callback) {
       @Override
       public void onSuccess(final Long size) {
@@ -870,9 +870,9 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                   if (DisposalHoldDialogResult.ActionType.CLEAR.equals(result.getActionType())) {
                     clearDisposalHolds(aips, callback);
                   } else if (DisposalHoldDialogResult.ActionType.ASSOCIATE.equals(result.getActionType())) {
-                    applyDisposalHold(aips, result, callback);
+                    applyDisposalHold(aips, result, false, callback);
                   } else if (DisposalHoldDialogResult.ActionType.OVERRIDE.equals(result.getActionType())) {
-                    overrideDisposalHolds(aips, result, callback);
+                    applyDisposalHold(aips, result, true, callback);
                   }
                 }
               });
@@ -882,19 +882,14 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
     });
   }
 
-  private void overrideDisposalHolds(final SelectedItems<IndexedAIP> aips, DisposalHoldDialogResult holdDialogResult,
-    final AsyncCallback<ActionImpact> callback) {
-
-  }
-
-  private void applyDisposalHold(final SelectedItems<IndexedAIP> aips, DisposalHoldDialogResult holdDialogResult,
-    final AsyncCallback<ActionImpact> callback) {
+  private void applyDisposalHold(final SelectedItems<IndexedAIP> aips, DisposalHoldDialogResult holdDialogResult, boolean override,
+                                  final AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.applyDisposalHoldDialogTitle(), messages.applyDisposalHoldDialogMessage(),
       messages.dialogNo(), messages.dialogYes(), new ActionNoAsyncCallback<Boolean>(callback) {
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            BrowserService.Util.getInstance().applyDisposalHold(aips, holdDialogResult.getDisposalHold().getId(),
+            BrowserService.Util.getInstance().applyDisposalHold(aips, holdDialogResult.getDisposalHold().getId(), override,
               new ActionAsyncCallback<Job>(callback) {
                 @Override
                 public void onFailure(Throwable caught) {
@@ -941,7 +936,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            BrowserService.Util.getInstance().clearDisposalHolds(aips, new ActionAsyncCallback<Job>(callback) {
+            BrowserService.Util.getInstance().liftDisposalHold(aips, null, true, new ActionAsyncCallback<Job>(callback) {
               @Override
               public void onFailure(Throwable caught) {
                 callback.onFailure(caught);

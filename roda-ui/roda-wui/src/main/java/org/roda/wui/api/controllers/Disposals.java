@@ -66,7 +66,7 @@ public class Disposals extends RodaWuiController {
   }
 
   public static DisposalSchedule updateDisposalSchedule(User user, DisposalSchedule disposalSchedule)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException, IllegalOperationException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -136,7 +136,7 @@ public class Disposals extends RodaWuiController {
   }
 
   public static DisposalHold updateDisposalHold(User user, DisposalHold disposalHold)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException, IllegalOperationException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -334,7 +334,7 @@ public class Disposals extends RodaWuiController {
     }
   }
 
-  public static Job applyDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId)
+  public static Job applyDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId, boolean override)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -344,18 +344,18 @@ public class Disposals extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
     try {
       // delegate
-      return BrowserHelper.applyDisposalHold(user, items, disposalHoldId);
+      return BrowserHelper.applyDisposalHold(user, items, disposalHoldId, override);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, items,
-        RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId);
+        RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId, RodaConstants.CONTROLLER_DISPOSAL_HOLD_OVERRIDE_PARAM, override);
     }
   }
 
-  public static Job clearDisposalHold(User user, SelectedItems<IndexedAIP> selectedItems)
+  public static Job liftDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId, boolean clearAll)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -365,27 +365,7 @@ public class Disposals extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
     try {
       // delegate
-      return BrowserHelper.clearDisposalHolds(user, selectedItems);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, selectedItems);
-    }
-  }
-
-  public static Job liftDisposalHold(User user, SelectedItems<IndexedAIP> items)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-    try {
-      // delegate
-      return BrowserHelper.liftDisposalHold(user, items);
+      return BrowserHelper.liftDisposalHold(user, items, disposalHoldId, clearAll);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;

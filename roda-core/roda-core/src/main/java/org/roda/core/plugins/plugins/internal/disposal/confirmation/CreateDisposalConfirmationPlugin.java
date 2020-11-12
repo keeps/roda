@@ -176,6 +176,16 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
           "failed to be added to disposal confirmation", title, aip.getId());
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
+      } else if (aip.onHold()) {
+        LOGGER.error("Error creating disposal confirmation {}: AIP '{}' is currently with one or more holds applied",
+          confirmationId, aip.getId());
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+        reportItem.setPluginState(state)
+          .setPluginDetails("AIP '" + aip.getId() + "' is currently with one or more holds applied");
+        outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationCreation(
+          "failed to be added to disposal confirmation", title, aip.getId());
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
       } else {
         try {
           // Fetch the AIP information to crystallize in the confirmation report

@@ -5,6 +5,7 @@ import java.util.Date;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.core.client.GWT;
@@ -43,13 +44,12 @@ public class DisposalPolicyUtils {
     if (aip.getDisposalConfirmationId() != null) {
       builder.append(messages.disposalPolicyConfirmationSummary());
     } else {
-
-      JavaScriptObject javaScriptObject = JavascriptUtils.durationInYMD(Humanize.formatDate(aip.getOverdueDate()));
-      JSONObject jsonObject = new JSONObject(javaScriptObject);
-      String duration = jsonObject.get("diff").toString();
-      String timeUnit = jsonObject.get("unit").isString().stringValue();
-
       if (aip.getDisposalScheduleId() != null) {
+        JavaScriptObject javaScriptObject = JavascriptUtils.durationInYMD(Humanize.formatDate(aip.getOverdueDate()));
+        JSONObject jsonObject = new JSONObject(javaScriptObject);
+        String duration = jsonObject.get("diff").toString();
+        String timeUnit = jsonObject.get("unit").isString().stringValue();
+
         if (DisposalActionCode.DESTROY.name().equals(aip.getDisposalAction())
           || DisposalActionCode.REVIEW.name().equals(aip.getDisposalAction())) {
           if (aip.getOverdueDate().after(new Date())) {
@@ -78,10 +78,10 @@ public class DisposalPolicyUtils {
 
         }
         builder.append(" ");
-      }
-
-      if (aip.isDisposalHoldStatus()) {
+      } else if (aip.isDisposalHoldStatus()) {
         builder.append(messages.disposalPolicyHoldSummary());
+      } else {
+        builder.append("No disposal policy associated with this intellectual entity");
       }
     }
 

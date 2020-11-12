@@ -380,6 +380,17 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
     return false;
   }
 
+  @JsonIgnore
+  public boolean onHold() {
+    for (DisposalHoldAssociation association : getDisposalHoldAssociation()) {
+      if (association.getLiftedOn() == null) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o)

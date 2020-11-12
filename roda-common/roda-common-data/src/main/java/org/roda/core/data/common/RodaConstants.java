@@ -434,6 +434,7 @@ public final class RodaConstants {
 
   public static final String CONTROLLER_DISPOSAL_HOLD_PARAM = RODA_OBJECT_DISPOSAL_HOLD;
   public static final String CONTROLLER_DISPOSAL_HOLD_ID_PARAM = "disposalHoldId";
+  public static final String CONTROLLER_DISPOSAL_HOLD_OVERRIDE_PARAM = "overrideDisposalHolds";
 
   public static final String CONTROLLER_DISPOSAL_CONFIRMATION_METADATA_PARAM = RODA_OBJECT_DISPOSAL_CONFIRMATION_METADATA;
   public static final String CONTROLLER_DISPOSAL_CONFIRMATION_ID_PARAM = "disposalConfirmationId";
@@ -963,6 +964,8 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_ALL = "parameter.disposal_schedule_overwrite_all";
 
   public static final String PLUGIN_PARAMS_DISPOSAL_HOLD_ID = "parameter.disposal_hold_id";
+  public static final String PLUGIN_PARAMS_DISPOSAL_HOLD_LIFT_ALL = "parameter.clear_all";
+  public static final String PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE = "parameter.override";
 
   public static final String PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID = "parameter.disposal_confirmation_id";
   public static final String PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE = "parameter.disposal_confirmation_title";

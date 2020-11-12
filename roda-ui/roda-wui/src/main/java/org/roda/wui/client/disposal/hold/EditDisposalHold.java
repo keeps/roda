@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.roda.core.data.exceptions.DisposalHoldAlreadyExistsException;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -44,8 +45,12 @@ public class EditDisposalHold extends Composite {
 
           @Override
           public void onSuccess(DisposalHold result) {
-            EditDisposalHold panel = new EditDisposalHold(result);
-            callback.onSuccess(panel);
+            if (DisposalHoldState.LIFTED.equals(result.getState())) {
+              HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+            } else {
+              EditDisposalHold panel = new EditDisposalHold(result);
+              callback.onSuccess(panel);
+            }
           }
         });
       }

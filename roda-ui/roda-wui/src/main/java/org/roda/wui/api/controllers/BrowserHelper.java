@@ -3328,7 +3328,7 @@ public class BrowserHelper {
   }
 
   public static DisposalSchedule updateDisposalSchedule(DisposalSchedule disposalSchedule, User user)
-    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
+      throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException, IllegalOperationException {
     return RodaCoreFactory.getModelService().updateDisposalSchedule(disposalSchedule, user.getName());
   }
 
@@ -3343,7 +3343,7 @@ public class BrowserHelper {
   }
 
   public static DisposalHold updateDisposalHold(DisposalHold disposalHold, User user)
-    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
+      throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException, IllegalOperationException {
     return RodaCoreFactory.getModelService().updateDisposalHold(disposalHold, user.getName());
   }
 
@@ -3479,24 +3479,23 @@ public class BrowserHelper {
     RodaCoreFactory.getModelService().deleteDisposalRule(disposalRuleId);
   }
 
-  public static Job applyDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId)
+  public static Job applyDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId, boolean override)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, disposalHoldId);
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE, Boolean.toString(override));
 
     return createAndExecuteInternalJob("Apply disposal hold", items, ApplyDisposalHoldToAIPPlugin.class, user,
       pluginParameters, "Could not execute apply disposal hold action");
   }
 
-  public static Job liftDisposalHold(User user, SelectedItems<IndexedAIP> items)
+  public static Job liftDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId, boolean clearAll)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
-    return createAndExecuteInternalJob("Lift disposal hold", items, LiftDisposalHoldFromAIPPlugin.class, user,
-      Collections.emptyMap(), "Could not execute lift disposal hold action");
-  }
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, disposalHoldId);
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_LIFT_ALL, Boolean.toString(clearAll));
 
-  public static Job clearDisposalHolds(User user, SelectedItems<IndexedAIP> items)
-    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
-    return createAndExecuteInternalJob("Lift disposal holds from AIP", items, LiftDisposalHoldFromAIPPlugin.class, user,
-      Collections.emptyMap(), "Could not execute lift disposal hold action");
+    return createAndExecuteInternalJob("Lift disposal hold", items, LiftDisposalHoldFromAIPPlugin.class, user,
+        pluginParameters, "Could not execute lift disposal hold action");
   }
 }
