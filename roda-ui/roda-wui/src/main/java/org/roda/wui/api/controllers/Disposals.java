@@ -66,7 +66,8 @@ public class Disposals extends RodaWuiController {
   }
 
   public static DisposalSchedule updateDisposalSchedule(User user, DisposalSchedule disposalSchedule)
-      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException, IllegalOperationException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
+    IllegalOperationException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -136,7 +137,8 @@ public class Disposals extends RodaWuiController {
   }
 
   public static DisposalHold updateDisposalHold(User user, DisposalHold disposalHold)
-      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException, IllegalOperationException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
+    IllegalOperationException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -334,7 +336,8 @@ public class Disposals extends RodaWuiController {
     }
   }
 
-  public static Job applyDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId, boolean override)
+  public static Job applyDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId,
+    boolean override)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -351,11 +354,13 @@ public class Disposals extends RodaWuiController {
     } finally {
       // register action
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, items,
-        RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId, RodaConstants.CONTROLLER_DISPOSAL_HOLD_OVERRIDE_PARAM, override);
+        RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId,
+        RodaConstants.CONTROLLER_DISPOSAL_HOLD_OVERRIDE_PARAM, override);
     }
   }
 
-  public static Job liftDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId, boolean clearAll)
+  public static Job liftDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId,
+    boolean clearAll)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -371,7 +376,8 @@ public class Disposals extends RodaWuiController {
       throw e;
     } finally {
       // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, items);
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, items, RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId
+      , RodaConstants.CONTROLLER_DISPOSAL_HOLD_LIFT_ALL, clearAll);
     }
   }
 
