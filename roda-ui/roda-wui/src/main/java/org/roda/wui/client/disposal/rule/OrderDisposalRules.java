@@ -2,7 +2,6 @@ package org.roda.wui.client.disposal.rule;
 
 import java.util.List;
 
-import org.roda.core.data.exceptions.DisposalRuleAlreadyExistsException;
 import org.roda.core.data.v2.ip.disposal.ConditionType;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalRules;
@@ -12,12 +11,11 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.disposal.DisposalPolicy;
+import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
-import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
