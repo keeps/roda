@@ -11,6 +11,7 @@ import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.dialogs.DisposalDialogs;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.client.disposal.schedule.ShowDisposalSchedule;
@@ -201,20 +202,35 @@ public class ShowDisposalRule extends Composite {
       removeRuleBtn.addClickHandler(new ClickHandler() {
         @Override
         public void onClick(ClickEvent clickEvent) {
-          Dialogs.showConfirmDialog(messages.saveButton(), messages.confirmDeleteRule(disposalRule.getTitle()), messages.dialogNo(),
-            messages.dialogYes(), new NoAsyncCallback<Boolean>() {
+          Dialogs.showConfirmDialog(messages.removeButton(), messages.confirmDeleteRule(disposalRule.getTitle()),
+            messages.dialogNo(), messages.dialogYes(), new NoAsyncCallback<Boolean>() {
               @Override
               public void onSuccess(Boolean aBoolean) {
-                BrowserServiceImpl.Util.getInstance().deleteDisposalRule(disposalRule.getId(),
-                  new NoAsyncCallback<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                      HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
-                    }
-                  });
+                if (aBoolean) {
+                  BrowserServiceImpl.Util.getInstance().deleteDisposalRule(disposalRule.getId(),
+                    new NoAsyncCallback<Void>() {
+                      @Override
+                      public void onSuccess(Void unused) {
+                        Dialogs.showConfirmDialog(messages.applyRules(), messages.applyRulesAfterAction(),
+                          messages.dialogNo(), messages.dialogYes(), new NoAsyncCallback<Boolean>() {
+                            @Override
+                            public void onSuccess(Boolean aBoolean) {
+                              HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+                              if (aBoolean) {
+                                DisposalDialogs.showApplyRules(messages.applyRules(), new NoAsyncCallback<Void>() {
+                                  @Override
+                                  public void onSuccess(Void unused) {
+                                    // TODO
+                                  }
+                                });
+                              }
+                            }
+                          });
+                      }
+                    });
+                }
               }
             });
-
         }
       });
 

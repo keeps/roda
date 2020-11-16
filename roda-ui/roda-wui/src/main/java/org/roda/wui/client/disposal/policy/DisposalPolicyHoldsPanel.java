@@ -2,10 +2,14 @@ package org.roda.wui.client.disposal.policy;
 
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
+import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.hold.ShowDisposalHold;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -48,10 +52,7 @@ public class DisposalPolicyHoldsPanel extends Composite {
   @UiField
   ScrollPanel disposalHoldsTablePanel;
 
-  @UiField
-  FlowPanel disposalHoldsButtonsPanel;
-
-  private void createDisposalHoldsDescription() {
+  private void createDisposalHoldsDescription(FlowPanel disposalHoldsDescription) {
     Label header = new Label(messages.disposalHoldsTitle());
     header.addStyleName("h5");
 
@@ -61,10 +62,9 @@ public class DisposalPolicyHoldsPanel extends Composite {
 
     disposalHoldsDescription.add(header);
     disposalHoldsDescription.add(info);
-
   }
 
-  private void createDisposalHoldsPanel(DisposalHolds disposalHolds) {
+  private void createDisposalHoldsPanel(ScrollPanel disposalHoldsTablePanel, DisposalHolds disposalHolds) {
     disposalHoldsTablePanel.addStyleName("basicTable");
     disposalHoldsTablePanel.addStyleName("basicTable-border");
     if (disposalHolds.getObjects().isEmpty()) {
@@ -92,16 +92,23 @@ public class DisposalPolicyHoldsPanel extends Composite {
 
   public DisposalPolicyHoldsPanel() {
     initWidget(uiBinder.createAndBindUi(this));
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_HOLDS)) {
+      BrowserService.Util.getInstance().listDisposalHolds(new NoAsyncCallback<DisposalHolds>() {
+        @Override
+        public void onSuccess(DisposalHolds disposalHolds) {
+          init(disposalHoldsDescription, disposalHoldsTablePanel, disposalHolds);
+        }
+      });
+    }
   }
 
-  public DisposalPolicyHoldsPanel(DisposalHolds disposalHolds) {
-    initWidget(uiBinder.createAndBindUi(this));
-
+  private void init(FlowPanel disposalHoldsDescription, ScrollPanel disposalHoldsTablePanel,
+    DisposalHolds disposalHolds) {
     // Create disposal holds description
-    createDisposalHoldsDescription();
+    createDisposalHoldsDescription(disposalHoldsDescription);
 
     // Disposal holds table
-    createDisposalHoldsPanel(disposalHolds);
+    createDisposalHoldsPanel(disposalHoldsTablePanel, disposalHolds);
   }
 
   private BasicTablePanel<DisposalHold> getBasicTablePanelForDisposalHolds(DisposalHolds disposalHolds) {

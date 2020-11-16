@@ -3,10 +3,7 @@ package org.roda.wui.client.disposal.policy;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.ip.disposal.DisposalHolds;
-import org.roda.core.data.v2.ip.disposal.DisposalRules;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
-import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.DisposalDialogs;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
@@ -239,8 +236,12 @@ public class DisposalPolicy extends Composite {
       applyRules.setText(messages.applyRules());
       applyRules.addClickHandler(event -> {
         // TODO
-        DisposalDialogs.showApplyRules(messages.applyRules());
-
+        DisposalDialogs.showApplyRules(messages.applyRules(), new NoAsyncCallback<Void>() {
+          @Override
+          public void onSuccess(Void unused) {
+            // TODO
+          }
+        });
       });
       panel.add(applyRules);
       ret = true;
@@ -262,55 +263,14 @@ public class DisposalPolicy extends Composite {
     this.disposalPolicyHoldsPanel = new DisposalPolicyHoldsPanel();
     this.disposalPolicyRulesPanel = new DisposalPolicyRulesPanel();
     initWidget(uiBinder.createAndBindUi(this));
-    disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
-  }
-
-  private DisposalPolicy(DisposalSchedules disposalSchedules, DisposalHolds disposalHolds, DisposalRules disposalRules) {
-    this.disposalPolicySchedulesPanel = new DisposalPolicySchedulesPanel(disposalSchedules);
-    this.disposalPolicyHoldsPanel = new DisposalPolicyHoldsPanel(disposalHolds);
-    this.disposalPolicyRulesPanel = new DisposalPolicyRulesPanel(disposalRules);
-
-    initWidget(uiBinder.createAndBindUi(this));
     initSidebar();
     disposalPolicyDescription.add(new HTMLWidgetWrapper("DisposalPolicyDescription.html"));
   }
 
-  //TODO
-
-  private void load(AsyncCallback<Widget> callback) {
-    BrowserService.Util.getInstance().listDisposalSchedules(new AsyncCallback<DisposalSchedules>() {
-      @Override
-      public void onFailure(Throwable throwable) {
-      }
-      @Override
-      public void onSuccess(DisposalSchedules disposalSchedules) {
-        BrowserService.Util.getInstance().listDisposalHolds(new AsyncCallback<DisposalHolds>() {
-          @Override
-          public void onFailure(Throwable throwable) {
-
-          }
-          @Override
-          public void onSuccess(DisposalHolds disposalHolds) {
-            BrowserService.Util.getInstance().listDisposalRules(new AsyncCallback<DisposalRules>() {
-              @Override
-              public void onFailure(Throwable throwable) {
-              }
-              // Disposal Schedules, holds and rules
-              @Override
-              public void onSuccess(DisposalRules disposalRules) {
-                DisposalPolicy disposalPolicy = new DisposalPolicy(disposalSchedules, disposalHolds, disposalRules);
-                callback.onSuccess(disposalPolicy);
-              }
-            });
-          }
-        });
-      }
-    });
-  }
-
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty()) {
-      load(callback);
+      DisposalPolicy disposalPolicy = new DisposalPolicy();
+      callback.onSuccess(disposalPolicy);
     } else if (historyTokens.get(0).equals(CreateDisposalSchedule.RESOLVER.getHistoryToken())) {
       CreateDisposalSchedule.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(CreateDisposalHold.RESOLVER.getHistoryToken())) {

@@ -303,7 +303,7 @@ public class DisposalDialogs {
     dialogBox.show();
   }
 
-  public static void showApplyRules(String title) {
+  public static void showApplyRules(String title,  AsyncCallback<Void> callback) {
     FlowPanel layout = new FlowPanel();
     FlowPanel footer = new FlowPanel();
     final DialogBox dialogBox = new DialogBox(false, true);
@@ -317,6 +317,7 @@ public class DisposalDialogs {
     cancelButton.addStyleName("btn btn-link apply-rules-btn");
     cancelButton.addClickHandler(event -> {
       dialogBox.hide();
+      callback.onFailure(null);
     });
 
     HTMLPanel info = new HTMLPanel("");
