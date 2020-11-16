@@ -49,21 +49,19 @@ public class DisposalsHelper {
 
   private static boolean isConditionTypeValid(ConditionType type) {
     if (StringUtils.isNotBlank(type.toString())) {
-      return type.equals(ConditionType.IS_CHILD_OF) || type.equals(ConditionType.METADATA_FIELD);
+      return ConditionType.IS_CHILD_OF.equals(type) || ConditionType.METADATA_FIELD.equals(type);
     }
     return false;
   }
 
   private static boolean isRuleScheduleValid(DisposalRule rule, DisposalSchedules disposalSchedules) {
-    boolean ret = false;
-
     for (DisposalSchedule schedule : disposalSchedules.getObjects()) {
       if (schedule.getId().equals(rule.getDisposalScheduleId())
-        && schedule.getState().equals(DisposalScheduleState.ACTIVE)) {
-        ret = true;
+        && DisposalScheduleState.ACTIVE.equals(schedule.getState())) {
+        return true;
       }
     }
-    return ret;
+    return false;
   }
 
   public static void validateDisposalHold(DisposalHold disposalHold) throws DisposalHoldNotValidException {
@@ -103,10 +101,7 @@ public class DisposalsHelper {
   }
 
   private static boolean isNumberOfAIPsValid(Long numberOfAIPUnder, DisposalScheduleState state) {
-    if (numberOfAIPUnder > 0 && state.equals(DisposalScheduleState.INACTIVE)) {
-      return false;
-    }
-    return true;
+    return numberOfAIPUnder <= 0 || !DisposalScheduleState.INACTIVE.equals(state);
   }
 
   private static boolean isNumberValid(String string) {
@@ -133,7 +128,7 @@ public class DisposalsHelper {
 
   private static boolean isRetentionPeriodIntervalValid(DisposalActionCode actionCode,
     RetentionPeriodIntervalCode retentionPeriodIntervalCode) {
-    if (actionCode.equals(DisposalActionCode.RETAIN_PERMANENTLY)) {
+    if (DisposalActionCode.RETAIN_PERMANENTLY.equals(actionCode)) {
       return retentionPeriodIntervalCode == null;
     } else {
       return retentionPeriodIntervalCode.equals(RetentionPeriodIntervalCode.NO_RETENTION_PERIOD)
@@ -146,7 +141,7 @@ public class DisposalsHelper {
 
   private static boolean isRetentionTriggerElementIdValid(DisposalActionCode actionCode,
     String retentionTriggerElementId) {
-    if (actionCode.equals(DisposalActionCode.RETAIN_PERMANENTLY)) {
+    if (DisposalActionCode.RETAIN_PERMANENTLY.equals(actionCode)) {
       return retentionTriggerElementId == null;
     } else {
       return StringUtils.isNotBlank(retentionTriggerElementId);
@@ -155,8 +150,8 @@ public class DisposalsHelper {
 
   private static boolean isDisposalActionValid(DisposalActionCode actionCode) {
     if (StringUtils.isNotBlank(actionCode.toString())) {
-      return actionCode.equals(DisposalActionCode.RETAIN_PERMANENTLY) || actionCode.equals(DisposalActionCode.DESTROY)
-        || actionCode.equals(DisposalActionCode.REVIEW);
+      return DisposalActionCode.RETAIN_PERMANENTLY.equals(actionCode) || DisposalActionCode.DESTROY.equals(actionCode)
+        || DisposalActionCode.REVIEW.equals(actionCode);
     }
     return false;
   }

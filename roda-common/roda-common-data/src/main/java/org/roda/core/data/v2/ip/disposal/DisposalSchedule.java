@@ -220,17 +220,16 @@ public class DisposalSchedule implements IsModelObject, HasId {
       return true;
     if (o == null || getClass() != o.getClass())
       return false;
-    DisposalSchedule schedule = (DisposalSchedule) o;
-    return Objects.equals(id, schedule.id) && Objects.equals(title, schedule.title)
-      && Objects.equals(description, schedule.description) && Objects.equals(mandate, schedule.mandate)
-      && Objects.equals(scopeNotes, schedule.scopeNotes) && actionCode == schedule.actionCode
-      && Objects.equals(retentionTriggerElementId, schedule.retentionTriggerElementId)
-      && retentionPeriodIntervalCode == schedule.retentionPeriodIntervalCode
-      && Objects.equals(retentionPeriodDuration, schedule.retentionPeriodDuration)
-      && Objects.equals(firstTimeUsed, schedule.firstTimeUsed) && Objects.equals(apiCounter, schedule.apiCounter)
-      && Objects.equals(createdOn, schedule.createdOn) && Objects.equals(createdBy, schedule.createdBy)
-      && Objects.equals(updatedOn, schedule.updatedOn) && Objects.equals(updatedBy, schedule.updatedBy)
-      && state == schedule.state;
+    DisposalSchedule that = (DisposalSchedule) o;
+    return Objects.equals(id, that.id) && Objects.equals(title, that.title)
+      && Objects.equals(description, that.description) && Objects.equals(mandate, that.mandate)
+      && Objects.equals(scopeNotes, that.scopeNotes) && actionCode == that.actionCode
+      && Objects.equals(retentionTriggerElementId, that.retentionTriggerElementId)
+      && retentionPeriodIntervalCode == that.retentionPeriodIntervalCode
+      && Objects.equals(retentionPeriodDuration, that.retentionPeriodDuration)
+      && Objects.equals(firstTimeUsed, that.firstTimeUsed) && Objects.equals(apiCounter, that.apiCounter)
+      && Objects.equals(createdOn, that.createdOn) && Objects.equals(createdBy, that.createdBy)
+      && Objects.equals(updatedOn, that.updatedOn) && Objects.equals(updatedBy, that.updatedBy) && state == that.state;
   }
 
   @Override
@@ -245,8 +244,8 @@ public class DisposalSchedule implements IsModelObject, HasId {
     return "DisposalSchedule{" + "id='" + id + '\'' + ", title='" + title + '\'' + ", description='" + description
       + '\'' + ", mandate='" + mandate + '\'' + ", scopeNotes='" + scopeNotes + '\'' + ", actionCode=" + actionCode
       + ", retentionTriggerElementId='" + retentionTriggerElementId + '\'' + ", retentionPeriodIntervalCode="
-      + retentionPeriodIntervalCode + ", retentionPeriodDuration=" + retentionPeriodDuration + ", firstTimeUsed="
-      + firstTimeUsed + ", apiCounter=" + apiCounter + ", createdOn=" + createdOn + ", createdBy='" + createdBy + '\''
-      + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\'' + ", state=" + state + '}';
+      + retentionPeriodIntervalCode + ", retentionPeriodDuration=" + retentionPeriodDuration + ", destroyedTimestamp="
+      + firstTimeUsed + ", numberOfAIPUnder=" + apiCounter + ", createdOn=" + createdOn + ", createdBy='" + createdBy
+      + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\'' + ", state=" + state + '}';
   }
 }

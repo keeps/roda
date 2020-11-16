@@ -1176,6 +1176,13 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
+  public Job recoverRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Disposals.recoverRecordsInDisposalConfirmationReport(user, selectedItems);
+  }
+
+  @Override
   public List<DisposalHoldAssociation> listDisposalHoldsAssociation(String aipId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());

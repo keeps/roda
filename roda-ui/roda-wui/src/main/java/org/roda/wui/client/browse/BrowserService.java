@@ -457,6 +457,8 @@ public interface BrowserService extends RemoteService {
   Job permanentlyDeleteRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
+  Job recoverRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems) throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
   List<DisposalHoldAssociation> listDisposalHoldsAssociation(String aipId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 

@@ -20,6 +20,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
@@ -120,6 +121,7 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
       if (disposalRules.getObjects().isEmpty()) {
         // Apply default disposal schedule ???
         applyDefaultDisposalSchedule = true;
+        // SKIP
       }
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | IOException e) {
       LOGGER.error("Failed to obtain disposal rules: {}", e.getMessage(), e);

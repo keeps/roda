@@ -46,7 +46,7 @@ public class DisposalHold implements IsModelObject {
   // prevent this disposal hold from being deleted
   private Date firstTimeUsed = null;
 
-  private Long apiCounter = 0L;
+  private Long aipCounter;
 
   private DisposalHoldState state;
 

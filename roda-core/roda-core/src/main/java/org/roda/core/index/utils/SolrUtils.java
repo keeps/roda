@@ -19,6 +19,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -59,6 +60,7 @@ import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.handler.loader.XMLLoader;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
@@ -105,6 +107,7 @@ import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.HasPermissionFilters;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
@@ -1605,7 +1608,8 @@ public class SolrUtils {
     }
   }
 
-  public static Date getOverdueDate(DisposalSchedule disposalSchedule, AIP aip) {
+  public static Date getOverdueDate(DisposalSchedule disposalSchedule, AIP aip)
+    throws NotFoundException, GenericException {
     if (DisposalActionCode.RETAIN_PERMANENTLY.equals(disposalSchedule.getActionCode())) {
       return null;
     }
@@ -1614,15 +1618,8 @@ public class SolrUtils {
     Integer retentionPeriodDuration = disposalSchedule.getRetentionPeriodDuration();
     Calendar cal = Calendar.getInstance();
 
-    /*if (disposalSchedule.getRetentionTriggerCode() != null) {
-      // TODO: change this
-      switch (disposalSchedule.getRetentionTriggerCode()) {
-        case FROM_NOW:
-        case FROM_RECORD_ORIGINATED_DATE:
-        case FROM_RECORD_METADATA_DATE:
-          cal.setTime(aip.getCreatedOn());
-      }
-    }*/
+    IndexedAIP retrieve = retrieve(RodaCoreFactory.getSolr(), IndexedAIP.class, aip.getId(),
+      Collections.singletonList(disposalSchedule.getRetentionTriggerElementId()));
 
     if (!disposalSchedule.getRetentionPeriodIntervalCode().equals(RetentionPeriodIntervalCode.NO_RETENTION_PERIOD)) {
       switch (disposalSchedule.getRetentionPeriodIntervalCode()) {
@@ -1640,9 +1637,9 @@ public class SolrUtils {
     return overDueDate;
   }
 
-  public static DisposalSchedule getDisposalSchedule(AIP aip, List<String> ancestors, ModelService model)
+  public static DisposalSchedule getDisposalSchedule(AIP aip, ModelService model)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException {
-    DisposalSchedule disposalSchedule = null;
+    DisposalSchedule disposalSchedule;
     try {
       disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
     } catch (NotFoundException e) {

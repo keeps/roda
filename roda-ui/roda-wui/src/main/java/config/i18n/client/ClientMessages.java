@@ -2297,4 +2297,20 @@ public interface ClientMessages extends Messages {
   String disposalPolicyNone();
 
   String disposalPolicyDestroyedAIPSummary(String destroyedOn);
+
+  String permanentlyDeleteConfirmDialogTitle();
+
+  String permanentlyDeleteConfirmDialogMessage();
+
+  String recoverDestroyedRecordsConfirmDialogTitle();
+
+  String recoverDestroyedRecordsConfirmDialogMessage();
+
+  String recoverDestroyedRecordsSuccessTitle();
+
+  String recoverDestroyedRecordsSuccessMessage();
+
+  String permanentlyDeleteRecordsSuccessTitle();
+
+  String permanentlyDeleteRecordsSuccessMessage();
 }

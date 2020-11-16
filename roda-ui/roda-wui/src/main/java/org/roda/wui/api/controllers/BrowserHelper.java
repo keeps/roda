@@ -153,6 +153,7 @@ import org.roda.core.plugins.plugins.internal.disposal.confirmation.CreateDispos
 import org.roda.core.plugins.plugins.internal.disposal.confirmation.DeleteDisposalConfirmationPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.confirmation.DestroyRecordsPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.confirmation.PermanentlyDeleteRecordsPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.confirmation.RecoverRecordsPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.hold.ApplyDisposalHoldToAIPPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.hold.LiftDisposalHoldFromAIPPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.rules.ApplyDisposalRulesPlugin;
@@ -3471,6 +3472,13 @@ public class BrowserHelper {
       "Could not execute permanent deletion of records in disposal bin action");
   }
 
+  public static Job recoverRecordsInDisposalConfirmation(User user,
+    SelectedItemsList<DisposalConfirmation> selectedItems)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    return createAndExecuteInternalJob("Recover destroyed records from disposal bin", selectedItems,
+      RecoverRecordsPlugin.class, user, Collections.emptyMap(), "Could not execute recover of destroyed records from disposal bin action");
+  }
+
   public static DisposalRule createDisposalRule(DisposalRule disposalRule, User user) throws GenericException,
     AuthorizationDeniedException, AlreadyExistsException, NotFoundException, RequestNotValidException {
     return RodaCoreFactory.getModelService().createDisposalRule(disposalRule, user.getName());
@@ -3508,8 +3516,10 @@ public class BrowserHelper {
       pluginParameters, "Could not execute lift disposal hold action");
   }
 
-  public static Job applyDisposalRules(User user) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
-    return createAndExecuteInternalJob("Apply disposal rules to repository", SelectedItemsAll.create(AIP.class.getName()),
-      ApplyDisposalRulesPlugin.class, user, Collections.emptyMap(), "Could not execute apply disposal rules to repository");
+  public static Job applyDisposalRules(User user)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    return createAndExecuteInternalJob("Apply disposal rules to repository",
+      SelectedItemsAll.create(AIP.class.getName()), ApplyDisposalRulesPlugin.class, user, Collections.emptyMap(),
+      "Could not execute apply disposal rules to repository");
   }
 }
