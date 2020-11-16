@@ -19,7 +19,6 @@ import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
-import org.roda.core.data.v2.ip.disposal.RetentionTriggerCode;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceTest;
@@ -132,7 +131,6 @@ public class DisposalRuleTest {
     String mandate = "Pellentesque imperdiet nunc dolor.";
     String scopeNotes = "Praesent laoreet lacus leo, vitae consectetur nulla maximus non. Ut.";
     DisposalActionCode actionCode = DisposalActionCode.DESTROY;
-    RetentionTriggerCode triggerCode = RetentionTriggerCode.FROM_NOW;
     String retentionTriggerElementId = "";
     RetentionPeriodIntervalCode periodIntervalCode = RetentionPeriodIntervalCode.YEARS;
     int retentionPeriodDuration = 10;
@@ -144,7 +142,6 @@ public class DisposalRuleTest {
     schedule.setMandate(mandate);
     schedule.setScopeNotes(scopeNotes);
     schedule.setActionCode(actionCode);
-    schedule.setRetentionTriggerCode(triggerCode);
     schedule.setRetentionTriggerElementId(retentionTriggerElementId);
     schedule.setRetentionPeriodIntervalCode(periodIntervalCode);
     schedule.setRetentionPeriodDuration(retentionPeriodDuration);
