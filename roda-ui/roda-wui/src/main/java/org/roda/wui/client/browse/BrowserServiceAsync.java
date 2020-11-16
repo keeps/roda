@@ -352,4 +352,6 @@ public interface BrowserServiceAsync {
 
   void liftDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean clearAll,
     AsyncCallback<Job> async);
+
+  void recoverRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems, AsyncCallback<Job> async);
 }

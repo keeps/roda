@@ -263,14 +263,14 @@ public class IndexModelObserver implements ModelObserver {
 
   private ReturnWithExceptions<Void, ModelObserver> indexDisposalScheduleInAIP(AIP aip, List<String> ancestors) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    DisposalSchedule disposalSchedule = null;
+    DisposalSchedule disposalSchedule;
     try {
-      disposalSchedule = SolrUtils.getDisposalSchedule(aip, ancestors, model);
+      disposalSchedule = SolrUtils.getDisposalSchedule(aip, model);
       if (disposalSchedule != null) {
         Date overdueDate = SolrUtils.getOverdueDate(disposalSchedule, aip);
         indexAIP(aip, ancestors, disposalSchedule, overdueDate).addTo(ret);
       }
-    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException e) {
       LOGGER.error("Cannot index disposal schedule in AIP: {}", aip.getId(), e);
       ret.add(e);
     }

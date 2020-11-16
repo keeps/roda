@@ -74,7 +74,7 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
 
   @Override
   public RodaConstants.PreservationEventType getPreservationEventType() {
-    return RodaConstants.PreservationEventType.DELETION;
+    return RodaConstants.PreservationEventType.DESTRUCTION;
   }
 
   @Override
@@ -119,6 +119,13 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
   private void processDisposalConfirmation(IndexService index, ModelService model, StorageService storage,
     Report report, Job cachedJob, JobPluginInfo jobPluginInfo, DisposalConfirmation disposalConfirmationReport) {
 
+    // iterate over the AIP list
+    // mark the AIP as going to be destroyed
+    // add executedOn and executedBy on the AIP
+    // Mark the AIP as residual
+    // Apply stylesheet over the descriptive metadata
+    // remove descriptive metadata
+    //
     String disposalConfirmationId = disposalConfirmationReport.getId();
     String outcomeText;
     PluginState state = PluginState.SUCCESS;
@@ -135,10 +142,13 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
           DisposalConfirmationAIPEntry aipEntry = JsonUtils.getObjectFromJson(aipEntryJson,
             DisposalConfirmationAIPEntry.class);
 
-          String aipId = aipEntry.getAipId();
+          AIP aip = model.retrieveAIP(aipEntry.getAipId());
+
+          Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
+          PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
 
           // Make a copy to disposal bin before update
-          StoragePath aipStoragePath = ModelUtils.getAIPStoragePath(aipId);
+          StoragePath aipStoragePath = ModelUtils.getAIPStoragePath(aip.getId());
           Path aipPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), aipStoragePath);
 
           // disposal-bin/<disposalConfirmationId>/aip/<aipId>
@@ -146,11 +156,6 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
             .resolve(RodaConstants.CORE_AIP_FOLDER).resolve(aipStoragePath.getName());
 
           FSUtils.copy(aipPath, disposalBinPath, false);
-
-          AIP aip = model.retrieveAIP(aipId);
-
-          Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
-          PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
 
           try {
             aip.setDestroyedOn(executionDate);
@@ -191,8 +196,8 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
           report.addReport(reportItem);
           PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
 
-          model.createUpdateAIPEvent(aip.getId(), null, null, null, RodaConstants.PreservationEventType.DELETION,
-            EVENT_DESCRIPTION, state, outcomeText, null, cachedJob.getUsername(), true);
+          model.createUpdateAIPEvent(aip.getId(), null, null, null, getPreservationEventType(),
+              EVENT_DESCRIPTION, state, outcomeText, "", cachedJob.getUsername(), true);
         }
       }
 
@@ -204,16 +209,12 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
 
     } catch (IOException | RequestNotValidException | GenericException | AuthorizationDeniedException
       | NotFoundException | AlreadyExistsException e) {
-      LOGGER.error("Error destroying intellectual entities of disposal confirmation {}: {}", disposalConfirmationId,
-        e.getMessage(), e);
+      LOGGER.error("Error destroying intellectual entities on disposal confirmation '{}' ({}): {}",
+        disposalConfirmationReport.getTitle(), disposalConfirmationId, e.getMessage(), e);
       jobPluginInfo.incrementObjectsProcessedWithFailure();
       report.setPluginState(PluginState.FAILURE).setPluginDetails(
-        "Error destroying intellectual entities of disposal confirmation " + disposalConfirmationReport.getTitle()
+        "Error destroying intellectual entities on disposal confirmation '" + disposalConfirmationReport.getTitle()
           + "' (" + disposalConfirmationReport.getId() + "): " + e.getMessage());
-      // outcomeText =
-      // PluginHelper.createOutcomeTextForDisposalConfirmationEvent("failed to
-      // delete",
-      // disposalConfirmationId);
     }
   }
 

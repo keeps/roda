@@ -164,7 +164,7 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
           reportItem.setPluginState(state);
         } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-          LOGGER.error("Error lifting all disposal holds from {}: {}", aip.getId(), e.getMessage(), e);
+          LOGGER.error("Error lifting all disposal holds from '{}': {}", aip.getId(), e.getMessage(), e);
           state = PluginState.FAILURE;
           jobPluginInfo.incrementObjectsProcessedWithFailure();
           reportItem.setPluginState(state)

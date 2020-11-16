@@ -194,7 +194,7 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
           model.addAIPEntry(confirmationId, entry);
 
           // Mark the AIP as "on confirmation" so they cannot be added to another
-          // confirmation
+          // disposal confirmation
           aip.setDisposalConfirmationId(confirmationId);
           model.updateAIP(aip, cachedJob.getUsername());
 
