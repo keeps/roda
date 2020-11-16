@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.disposal.association.DisposalPolicyAssociationPanel;
+import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;

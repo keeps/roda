@@ -23,7 +23,7 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.disposal.Disposal;
 import org.roda.wui.client.disposal.DisposalConfirmations;
 import org.roda.wui.client.disposal.DisposalDestroyedRecords;
-import org.roda.wui.client.disposal.DisposalPolicy;
+import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.preingest.PreIngest;
