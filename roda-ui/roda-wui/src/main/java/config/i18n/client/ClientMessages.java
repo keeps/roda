@@ -2256,6 +2256,8 @@ public interface ClientMessages extends Messages {
 
   String confirmDeleteRule(String title);
 
+  String applyRulesAfterAction();
+
   String disposalScheduleAssociationInformationTitle();
 
   String disposalScheduleActionCode(@Select String disposalAction);
