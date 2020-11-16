@@ -16,13 +16,13 @@
         <g:FlowPanel addStyleNames="row full_width no_padding">
             <g:FlowPanel addStyleNames="wui-data-panel">
                 <g:FlowPanel addStyleNames="wui-error-panel">
-                    <g:HTML ui:field="errors"></g:HTML>
+                    <g:HTML ui:field="errors"/>
                 </g:FlowPanel>
                 <g:Label addStyleNames="form-label">
                     <ui:text from='{messages.disposalScheduleTitle}'/>
                 </g:Label>
                 <g:TextBox title="{messages.disposalScheduleTitle}" ui:field="title" addStyleNames="form-textbox"/>
-                <g:Label ui:field="titleError" addStyleNames="form-label-error"></g:Label>
+                <g:Label ui:field="titleError" addStyleNames="form-label-error"/>
                 <g:Label addStyleNames="form-label">
                     <ui:text from='{messages.disposalScheduleDescription}'/>
                 </g:Label>
@@ -40,18 +40,13 @@
                 <g:Label ui:field="disposalActionsLabel" addStyleNames="form-label">
                     <ui:text from='{messages.disposalScheduleActionCol}'/>
                 </g:Label>
-                <g:Label ui:field="disposalActionsError" addStyleNames="form-label-error"></g:Label>
+                <g:Label ui:field="disposalActionsError" addStyleNames="form-label-error"/>
                 <g:ListBox addStyleNames="form-textbox" ui:field="disposalActions"/>
                 <g:Label addStyleNames="form-label" ui:field="retentionTriggerElementIdLabel">
                     <ui:text from='{messages.disposalScheduleRetentionTriggerElementId}'/>
                 </g:Label>
                 <g:ListBox addStyleNames="form-textbox" ui:field="retentionTriggerElementIdList"/>
-                <g:Label ui:field="retentionTriggerElementIdError" addStyleNames="form-label-error"></g:Label>
-                <g:Label addStyleNames="form-label" ui:field="retentionTriggersLabel">
-                    <ui:text from='{messages.disposalScheduleRetentionTriggerCode}'/>
-                </g:Label>
-                <g:ListBox addStyleNames="form-textbox" ui:field="retentionTriggers"/>
-                <g:Label ui:field="retentionTriggersError" addStyleNames="form-label-error"></g:Label>
+                <g:Label ui:field="retentionTriggerElementIdError" addStyleNames="form-label-error"/>
                 <g:FlowPanel>
                     <g:FlowPanel ui:field="retentionPeriodDurationPanel" addStyleNames="col_2">
                         <g:Label addStyleNames="form-label" ui:field="retentionPeriodDurationLabel">
@@ -59,14 +54,14 @@
                         </g:Label>
                         <g:TextBox title="{messages.disposalScheduleRetentionPeriodDuration}"
                                    ui:field="retentionPeriodDuration" addStyleNames="form-textbox"/>
-                        <g:Label ui:field="retentionPeriodDurationError" addStyleNames="form-label-error"></g:Label>
+                        <g:Label ui:field="retentionPeriodDurationError" addStyleNames="form-label-error"/>
                     </g:FlowPanel>
                     <g:FlowPanel addStyleNames="col_2">
                         <g:Label addStyleNames="form-label" ui:field="retentionPeriodIntervalsLabel">
                             <ui:text from='{messages.disposalScheduleRetentionPeriodInterval}'/>
                         </g:Label>
                         <g:ListBox addStyleNames="form-textbox" ui:field="retentionPeriodIntervals"/>
-                        <g:Label ui:field="retentionPeriodIntervalsError" addStyleNames="form-label-error"></g:Label>
+                        <g:Label ui:field="retentionPeriodIntervalsError" addStyleNames="form-label-error"/>
                     </g:FlowPanel>
                 </g:FlowPanel>
             </g:FlowPanel>

@@ -30,7 +30,6 @@ public class DisposalSchedule implements IsModelObject, HasId {
   private String scopeNotes;
 
   private DisposalActionCode actionCode;
-  private RetentionTriggerCode retentionTriggerCode;
   private String retentionTriggerElementId;
   private RetentionPeriodIntervalCode retentionPeriodIntervalCode;
   private Integer retentionPeriodDuration;
@@ -55,7 +54,7 @@ public class DisposalSchedule implements IsModelObject, HasId {
   }
 
   public DisposalSchedule(String id, String title, String description, String mandate, String scopeNotes,
-    DisposalActionCode actionCode, RetentionTriggerCode retentionTriggerCode, String retentionTriggerElementId,
+    DisposalActionCode actionCode, String retentionTriggerElementId,
     RetentionPeriodIntervalCode retentionPeriodIntervalCode, Integer retentionPeriodDuration, Date createdOn,
     String createdBy) {
     super();
@@ -65,7 +64,6 @@ public class DisposalSchedule implements IsModelObject, HasId {
     this.mandate = mandate;
     this.scopeNotes = scopeNotes;
     this.actionCode = actionCode;
-    this.retentionTriggerCode = retentionTriggerCode;
     this.retentionTriggerElementId = retentionTriggerElementId;
     this.retentionPeriodIntervalCode = retentionPeriodIntervalCode;
     this.retentionPeriodDuration = retentionPeriodDuration;
@@ -132,14 +130,6 @@ public class DisposalSchedule implements IsModelObject, HasId {
 
   public void setActionCode(DisposalActionCode actionCode) {
     this.actionCode = actionCode;
-  }
-
-  public RetentionTriggerCode getRetentionTriggerCode() {
-    return retentionTriggerCode;
-  }
-
-  public void setRetentionTriggerCode(RetentionTriggerCode retentionTriggerCode) {
-    this.retentionTriggerCode = retentionTriggerCode;
   }
 
   public String getRetentionTriggerElementId() {
@@ -230,34 +220,33 @@ public class DisposalSchedule implements IsModelObject, HasId {
       return true;
     if (o == null || getClass() != o.getClass())
       return false;
-    DisposalSchedule that = (DisposalSchedule) o;
-    return Objects.equals(id, that.id) && Objects.equals(title, that.title)
-      && Objects.equals(description, that.description) && Objects.equals(mandate, that.mandate)
-      && Objects.equals(scopeNotes, that.scopeNotes) && actionCode == that.actionCode
-      && retentionTriggerCode == that.retentionTriggerCode
-      && Objects.equals(retentionTriggerElementId, that.retentionTriggerElementId)
-      && retentionPeriodIntervalCode == that.retentionPeriodIntervalCode
-      && Objects.equals(retentionPeriodDuration, that.retentionPeriodDuration)
-      && Objects.equals(firstTimeUsed, that.firstTimeUsed) && Objects.equals(apiCounter, that.apiCounter)
-      && Objects.equals(createdOn, that.createdOn) && Objects.equals(createdBy, that.createdBy)
-      && Objects.equals(updatedOn, that.updatedOn) && Objects.equals(updatedBy, that.updatedBy) && state == that.state;
+    DisposalSchedule schedule = (DisposalSchedule) o;
+    return Objects.equals(id, schedule.id) && Objects.equals(title, schedule.title)
+      && Objects.equals(description, schedule.description) && Objects.equals(mandate, schedule.mandate)
+      && Objects.equals(scopeNotes, schedule.scopeNotes) && actionCode == schedule.actionCode
+      && Objects.equals(retentionTriggerElementId, schedule.retentionTriggerElementId)
+      && retentionPeriodIntervalCode == schedule.retentionPeriodIntervalCode
+      && Objects.equals(retentionPeriodDuration, schedule.retentionPeriodDuration)
+      && Objects.equals(firstTimeUsed, schedule.firstTimeUsed) && Objects.equals(apiCounter, schedule.apiCounter)
+      && Objects.equals(createdOn, schedule.createdOn) && Objects.equals(createdBy, schedule.createdBy)
+      && Objects.equals(updatedOn, schedule.updatedOn) && Objects.equals(updatedBy, schedule.updatedBy)
+      && state == schedule.state;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, title, description, mandate, scopeNotes, actionCode, retentionTriggerCode,
-      retentionTriggerElementId, retentionPeriodIntervalCode, retentionPeriodDuration, firstTimeUsed, apiCounter,
-      createdOn, createdBy, updatedOn, updatedBy, state);
+    return Objects.hash(id, title, description, mandate, scopeNotes, actionCode, retentionTriggerElementId,
+      retentionPeriodIntervalCode, retentionPeriodDuration, firstTimeUsed, apiCounter, createdOn, createdBy, updatedOn,
+      updatedBy, state);
   }
 
   @Override
   public String toString() {
     return "DisposalSchedule{" + "id='" + id + '\'' + ", title='" + title + '\'' + ", description='" + description
       + '\'' + ", mandate='" + mandate + '\'' + ", scopeNotes='" + scopeNotes + '\'' + ", actionCode=" + actionCode
-      + ", retentionTriggerCode=" + retentionTriggerCode + ", retentionTriggerElementId='" + retentionTriggerElementId
-      + '\'' + ", retentionPeriodIntervalCode=" + retentionPeriodIntervalCode + ", retentionPeriodDuration="
-      + retentionPeriodDuration + ", destroyedTimestamp=" + firstTimeUsed + ", numberOfAIPUnder=" + apiCounter
-      + ", createdOn=" + createdOn + ", createdBy='" + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='"
-      + updatedBy + '\'' + ", state=" + state + '}';
+      + ", retentionTriggerElementId='" + retentionTriggerElementId + '\'' + ", retentionPeriodIntervalCode="
+      + retentionPeriodIntervalCode + ", retentionPeriodDuration=" + retentionPeriodDuration + ", firstTimeUsed="
+      + firstTimeUsed + ", apiCounter=" + apiCounter + ", createdOn=" + createdOn + ", createdBy='" + createdBy + '\''
+      + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\'' + ", state=" + state + '}';
   }
 }
