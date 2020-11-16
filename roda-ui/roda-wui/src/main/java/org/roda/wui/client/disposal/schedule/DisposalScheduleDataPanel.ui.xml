@@ -8,7 +8,7 @@
 
     <ui:style>
         .section {
-        margin-top: 20px;
+            margin-top: 20px;
         }
     </ui:style>
 

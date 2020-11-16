@@ -113,16 +113,54 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
     } else if (DisposalConfirmationReportAction.REMOVE_FROM_BIN.equals(action)) {
       permanentlyDeleteDisposalConfirmationReport(object, callback);
     } else if (DisposalConfirmationReportAction.RECOVER_FROM_BIN.equals(action)) {
+      recoverDestroyedRecord(object, callback);
     } else {
       unsupportedAction(action, callback);
     }
   }
 
+  private void recoverDestroyedRecord(DisposalConfirmation confirmation, AsyncCallback<ActionImpact> callback) {
+    Dialogs.showConfirmDialog(messages.recoverDestroyedRecordsConfirmDialogTitle(),
+        messages.recoverDestroyedRecordsConfirmDialogMessage(), messages.dialogNo(), messages.dialogYes(),
+        new ActionNoAsyncCallback<Boolean>(callback) {
+          @Override
+          public void onSuccess(Boolean result) {
+            if (result) {
+              BrowserService.Util.getInstance().recoverRecordsInDisposalConfirmationReport(
+                  objectToSelectedItems(confirmation, DisposalConfirmation.class), new ActionAsyncCallback<Job>(callback) {
+
+                    @Override
+                    public void onSuccess(Job result) {
+                      Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+
+                        @Override
+                        public void onFailure(Throwable caught) {
+                          Toast.showInfo(messages.recoverDestroyedRecordsSuccessTitle(),
+                              messages.recoverDestroyedRecordsSuccessMessage());
+                          doActionCallbackUpdated();
+                          HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                        }
+
+                        @Override
+                        public void onSuccess(final Void nothing) {
+                          doActionCallbackUpdated();
+                          HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
+                        }
+                      });
+                    }
+                  });
+            } else {
+              doActionCallbackNone();
+            }
+          }
+        });
+  }
+
   private void permanentlyDeleteDisposalConfirmationReport(DisposalConfirmation confirmation,
     AsyncCallback<ActionImpact> callback) {
-    Dialogs.showConfirmDialog("Permanently delete the records from disposal bin",
-      "Are you sure you want to permanently delete the records from disposal bin? This action can not be undone once executed.",
-      messages.dialogNo(), messages.dialogYes(), new ActionNoAsyncCallback<Boolean>(callback) {
+    Dialogs.showConfirmDialog(messages.permanentlyDeleteConfirmDialogTitle(),
+      messages.permanentlyDeleteConfirmDialogMessage(), messages.dialogNo(), messages.dialogYes(),
+      new ActionNoAsyncCallback<Boolean>(callback) {
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
@@ -135,8 +173,8 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
 
                     @Override
                     public void onFailure(Throwable caught) {
-                      Toast.showInfo(messages.deleteConfirmationReportSuccessTitle(),
-                        messages.deleteConfirmationReportSuccessMessage());
+                      Toast.showInfo(messages.permanentlyDeleteRecordsSuccessTitle(),
+                        messages.permanentlyDeleteRecordsSuccessMessage());
                       doActionCallbackUpdated();
                       HistoryUtils.newHistory(InternalProcess.RESOLVER);
                     }

@@ -30,8 +30,6 @@ import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -198,7 +196,7 @@ public class ShowDisposalSchedule extends Composite {
     disposalActionsValue.setHTML(messages.disposalScheduleAction(disposalSchedule.getActionCode().toString()));
     disposalActionsLabel.setVisible(StringUtils.isNotBlank(disposalSchedule.getActionCode().toString()));
 
-    if (disposalSchedule.getRetentionTriggerElementId()== null) {
+    if (disposalSchedule.getRetentionTriggerElementId() == null) {
       retentionTriggersValue.setHTML("");
       retentionTriggersLabel.setVisible(false);
     } else {
@@ -215,8 +213,8 @@ public class ShowDisposalSchedule extends Composite {
       retentionPeriodValue.setHTML(disposalSchedule.getRetentionPeriodIntervalCode().toString());
       retentionPeriodLabel.setVisible(true);
     } else {
-      String retentionPeriod = messages
-        .retentionPeriod(disposalSchedule.getRetentionPeriodDuration(), disposalSchedule.getRetentionPeriodIntervalCode().toString());
+      String retentionPeriod = messages.retentionPeriod(disposalSchedule.getRetentionPeriodDuration(),
+        disposalSchedule.getRetentionPeriodIntervalCode().toString());
       retentionPeriodValue.setHTML(retentionPeriod);
       retentionPeriodLabel.setVisible(true);
     }
@@ -280,12 +278,7 @@ public class ShowDisposalSchedule extends Composite {
     Button backBtn = new Button();
     backBtn.setText(messages.backButton());
     backBtn.addStyleName("btn btn-block btn-default btn-times-circle");
-    backBtn.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent clickEvent) {
-        HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
-      }
-    });
+    backBtn.addClickHandler(clickEvent -> HistoryUtils.newHistory(DisposalPolicy.RESOLVER));
     buttonsPanel.add(backBtn);
 
   }

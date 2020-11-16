@@ -1290,7 +1290,8 @@ public final class RodaConstants {
     FIXITY_CHECK("fixity check"), VALIDATION("validation"), CAPTURE("capture"), REPLICATION("replication"),
     MESSAGE_DIGEST_CALCULATION("message digest calculation"), VIRUS_CHECK("virus check"),
     DIGITAL_SIGNATURE_VALIDATION("digital signature validation"), COMPRESSION("compression"), DELETION("deletion"),
-    MIGRATION("migration"), INGESTION("ingestion"), DECRYPTION("decryption"), UPDATE("update"),
+    DESTRUCTION("destruction"), MIGRATION("migration"), INGESTION("ingestion"), DECRYPTION("decryption"),
+    UPDATE("update"),
     // extra types...
     WELLFORMEDNESS_CHECK("wellformedness check"), UNPACKING("unpacking"), METADATA_EXTRACTION("metadata extraction"),
     ACCESSION("accession"), AUTHORIZATION_CHECK("authorization check"), FORMAT_IDENTIFICATION("format identification"),
