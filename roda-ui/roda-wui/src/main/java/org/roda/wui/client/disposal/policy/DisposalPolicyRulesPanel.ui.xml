@@ -7,6 +7,5 @@
     <g:FlowPanel>
         <g:FlowPanel ui:field="disposalRulesDescription"/>
         <g:ScrollPanel ui:field="disposalRulesTablePanel"/>
-        <g:FlowPanel ui:field="disposalRulesButtonsPanel"/>
     </g:FlowPanel>
 </ui:UiBinder>

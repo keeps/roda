@@ -8,6 +8,5 @@
     <g:FlowPanel>
         <g:FlowPanel ui:field="disposalSchedulesDescription"/>
         <g:ScrollPanel ui:field="disposalSchedulesTablePanel"/>
-        <g:FlowPanel ui:field="disposalSchedulesButtonsPanel"/>
     </g:FlowPanel>
 </ui:UiBinder>

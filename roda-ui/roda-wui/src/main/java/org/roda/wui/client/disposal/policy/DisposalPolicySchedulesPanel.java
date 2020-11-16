@@ -2,11 +2,15 @@ package org.roda.wui.client.disposal.policy;
 
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
+import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.schedule.ShowDisposalSchedule;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -50,10 +54,7 @@ public class DisposalPolicySchedulesPanel extends Composite {
   @UiField
   ScrollPanel disposalSchedulesTablePanel;
 
-  @UiField
-  FlowPanel disposalSchedulesButtonsPanel;
-
-  private void createDisposalSchedulesDescription() {
+  private void createDisposalSchedulesDescription(FlowPanel disposalSchedulesDescription) {
     Label header = new Label(messages.disposalSchedulesTitle());
     header.addStyleName("h5");
 
@@ -65,7 +66,8 @@ public class DisposalPolicySchedulesPanel extends Composite {
 
   }
 
-  private void createDisposalSchedulesPanel(DisposalSchedules disposalSchedules) {
+  private void createDisposalSchedulesPanel(ScrollPanel disposalSchedulesTablePanel,
+    DisposalSchedules disposalSchedules) {
     disposalSchedulesTablePanel.addStyleName("basicTable-border");
     disposalSchedulesTablePanel.addStyleName("basicTable");
     if (disposalSchedules.getObjects().isEmpty()) {
@@ -95,17 +97,23 @@ public class DisposalPolicySchedulesPanel extends Composite {
 
   public DisposalPolicySchedulesPanel() {
     initWidget(uiBinder.createAndBindUi(this));
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_SCHEDULES)) {
+      BrowserService.Util.getInstance().listDisposalSchedules(new NoAsyncCallback<DisposalSchedules>() {
+        @Override
+        public void onSuccess(DisposalSchedules disposalSchedules) {
+          init(disposalSchedulesDescription, disposalSchedulesTablePanel, disposalSchedules);
+        }
+      });
+    }
   }
 
-  public DisposalPolicySchedulesPanel(DisposalSchedules disposalSchedules) {
-    initWidget(uiBinder.createAndBindUi(this));
-
+  private void init(FlowPanel disposalSchedulesDescription, ScrollPanel disposalSchedulesTablePanel,
+    DisposalSchedules disposalSchedules) {
     // Create disposal schedules description
-    createDisposalSchedulesDescription();
+    createDisposalSchedulesDescription(disposalSchedulesDescription);
 
     // Disposal schedules table
-    createDisposalSchedulesPanel(disposalSchedules);
-
+    createDisposalSchedulesPanel(disposalSchedulesTablePanel, disposalSchedules);
   }
 
   private BasicTablePanel<DisposalSchedule> getBasicTablePanelForDisposalSchedules(

@@ -2,10 +2,16 @@ package org.roda.wui.client.disposal.policy;
 
 import java.util.List;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.disposal.ConditionType;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalRules;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
+import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
+import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.rule.ShowDisposalRule;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -45,10 +51,7 @@ public class DisposalPolicyRulesPanel extends Composite {
   @UiField
   ScrollPanel disposalRulesTablePanel;
 
-  @UiField
-  FlowPanel disposalRulesButtonsPanel;
-
-  private void createDisposalRulesDescription() {
+  private void createDisposalRulesDescription(FlowPanel disposalRulesDescription) {
     Label header = new Label(messages.disposalRulesTitle());
     header.addStyleName("h5");
 
@@ -61,7 +64,7 @@ public class DisposalPolicyRulesPanel extends Composite {
 
   }
 
-  private void createDisposalRulesPanel(DisposalRules disposalRules) {
+  private void createDisposalRulesPanel(ScrollPanel disposalRulesTablePanel,DisposalRules disposalRules) {
     disposalRulesTablePanel.addStyleName("basicTable");
     disposalRulesTablePanel.addStyleName("basicTable-border");
     if (disposalRules.getObjects().isEmpty()) {
@@ -89,16 +92,22 @@ public class DisposalPolicyRulesPanel extends Composite {
 
   public DisposalPolicyRulesPanel() {
     initWidget(uiBinder.createAndBindUi(this));
+    if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_LIST_DISPOSAL_RULES)) {
+      BrowserService.Util.getInstance().listDisposalRules(new NoAsyncCallback<DisposalRules>() {
+        @Override
+        public void onSuccess(DisposalRules disposalRules) {
+          init(disposalRulesDescription, disposalRulesTablePanel, disposalRules);
+        }
+      });
+    }
   }
 
-  public DisposalPolicyRulesPanel(DisposalRules disposalRules) {
-    initWidget(uiBinder.createAndBindUi(this));
+  private void init(FlowPanel disposalRulesDescription, ScrollPanel disposalRulesTablePanel, DisposalRules disposalRules) {
+    // Create disposal rules description
+    createDisposalRulesDescription(disposalRulesDescription);
 
-    // Create disposal holds description
-    createDisposalRulesDescription();
-
-    // Disposal holds table
-    createDisposalRulesPanel(disposalRules);
+    // Disposal rules table
+    createDisposalRulesPanel(disposalRulesTablePanel, disposalRules);
 
   }
 
