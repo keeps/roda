@@ -7,6 +7,8 @@ import org.roda.core.data.exceptions.DisposalScheduleAlreadyExistsException;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.disposal.DisposalRule;
+import org.roda.core.data.v2.ip.disposal.DisposalRules;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
@@ -82,6 +84,7 @@ public class ShowDisposalSchedule extends Composite {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private DisposalSchedule disposalSchedule;
+  private DisposalRules disposalRules;
 
   public static ShowDisposalSchedule getInstance() {
     if (instance == null) {
@@ -160,9 +163,10 @@ public class ShowDisposalSchedule extends Composite {
     this.disposalSchedule = new DisposalSchedule();
   }
 
-  public ShowDisposalSchedule(final DisposalSchedule disposalSchedule) {
+  public ShowDisposalSchedule(final DisposalSchedule disposalSchedule, final DisposalRules disposalRules) {
     instance = this;
     this.disposalSchedule = disposalSchedule;
+    this.disposalRules = disposalRules;
 
     initWidget(uiBinder.createAndBindUi(this));
     initElements();
@@ -256,7 +260,7 @@ public class ShowDisposalSchedule extends Composite {
       }
       buttonsPanel.add(editScheduleBtn);
 
-      if (disposalSchedule.getApiCounter() == 0
+      if (!isScheduleInRule() && disposalSchedule.getApiCounter() == 0
         && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_UPDATE_DISPOSAL_SCHEDULE)) {
         Button deactivateScheduleButton = new Button();
         deactivateScheduleButton.addStyleName("btn btn-block btn-danger btn-ban");
@@ -287,14 +291,30 @@ public class ShowDisposalSchedule extends Composite {
     buttonsPanel.add(backBtn);
 
   }
+
+  private boolean isScheduleInRule() {
+    boolean ret = false;
+    for(DisposalRule rule: disposalRules.getObjects()){
+      if(rule.getDisposalScheduleId().equals(disposalSchedule.getId())){
+        ret = true;
+      }
+    }
+    return ret;
+  }
+
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
       BrowserService.Util.getInstance().retrieveDisposalSchedule(historyTokens.get(0),
         new NoAsyncCallback<DisposalSchedule>() {
           @Override
-          public void onSuccess(DisposalSchedule result) {
-            ShowDisposalSchedule panel = new ShowDisposalSchedule(result);
-            callback.onSuccess(panel);
+          public void onSuccess(DisposalSchedule disposalSchedule) {
+            BrowserService.Util.getInstance().listDisposalRules(new NoAsyncCallback<DisposalRules>() {
+              @Override
+              public void onSuccess(DisposalRules disposalRules) {
+                ShowDisposalSchedule panel = new ShowDisposalSchedule(disposalSchedule, disposalRules);
+                callback.onSuccess(panel);
+              }
+            });
           }
         });
     }
