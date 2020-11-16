@@ -15,13 +15,9 @@ import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
-import org.roda.core.data.v2.ip.disposal.RetentionTriggerCode;
-import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.bundle.DisposalConfirmationExtraBundle;
-import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.common.client.tools.StringUtils;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +31,8 @@ public class DisposalsHelper {
     // do nothing
   }
 
-  public static void validateDisposalRule(DisposalRule disposalRule, DisposalSchedules disposalSchedules) throws DisposalRuleNotValidException {
+  public static void validateDisposalRule(DisposalRule disposalRule, DisposalSchedules disposalSchedules)
+    throws DisposalRuleNotValidException {
     if (StringUtils.isBlank(disposalRule.getTitle())) {
       throw new DisposalRuleNotValidException("The disposal rule title is mandatory");
     }
@@ -44,7 +41,7 @@ public class DisposalsHelper {
       throw new DisposalRuleNotValidException("The disposal rule condition type is not valid");
     }
 
-    if (!isRuleScheduleValid(disposalRule,disposalSchedules)){
+    if (!isRuleScheduleValid(disposalRule, disposalSchedules)) {
       throw new DisposalRuleNotValidException("The disposal rule schedule is not valid");
     }
 
@@ -88,9 +85,6 @@ public class DisposalsHelper {
 
     if (!isDisposalActionValid(disposalSchedule.getActionCode())) {
       throw new DisposalScheduleNotValidException("The disposal action code is not valid");
-    }
-    if (!isRetentionTriggerValid(disposalSchedule.getActionCode(), disposalSchedule.getRetentionTriggerCode())) {
-      throw new DisposalScheduleNotValidException("The retention trigger is not valid");
     }
 
     if (!isRetentionTriggerElementIdValid(disposalSchedule.getActionCode(),
@@ -147,17 +141,6 @@ public class DisposalsHelper {
         || retentionPeriodIntervalCode.equals(RetentionPeriodIntervalCode.WEEKS)
         || retentionPeriodIntervalCode.equals(RetentionPeriodIntervalCode.MONTHS)
         || retentionPeriodIntervalCode.equals(RetentionPeriodIntervalCode.YEARS);
-    }
-  }
-
-  private static boolean isRetentionTriggerValid(DisposalActionCode actionCode,
-    RetentionTriggerCode retentionTriggerCode) {
-    if (actionCode.equals(DisposalActionCode.RETAIN_PERMANENTLY)) {
-      return retentionTriggerCode == null;
-    } else {
-      return retentionTriggerCode.equals(RetentionTriggerCode.FROM_NOW)
-        || retentionTriggerCode.equals(RetentionTriggerCode.FROM_RECORD_METADATA_DATE)
-        || retentionTriggerCode.equals(RetentionTriggerCode.FROM_RECORD_ORIGINATED_DATE);
     }
   }
 

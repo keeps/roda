@@ -198,13 +198,13 @@ public class ShowDisposalSchedule extends Composite {
     disposalActionsValue.setHTML(messages.disposalScheduleAction(disposalSchedule.getActionCode().toString()));
     disposalActionsLabel.setVisible(StringUtils.isNotBlank(disposalSchedule.getActionCode().toString()));
 
-    if (disposalSchedule.getRetentionTriggerCode() == null) {
+    if (disposalSchedule.getRetentionTriggerElementId()== null) {
       retentionTriggersValue.setHTML("");
       retentionTriggersLabel.setVisible(false);
     } else {
       retentionTriggersValue.setHTML(
-        messages.disposalScheduleRetentionTriggerCodeValue(disposalSchedule.getRetentionTriggerCode().toString()));
-      retentionTriggersLabel.setVisible(StringUtils.isNotBlank(disposalSchedule.getRetentionTriggerCode().toString()));
+        messages.disposalScheduleRetentionTriggerElementId());
+      retentionTriggersLabel.setVisible(StringUtils.isNotBlank(disposalSchedule.getRetentionTriggerElementId().toString()));
     }
 
     if (disposalSchedule.getRetentionPeriodIntervalCode() == null) {

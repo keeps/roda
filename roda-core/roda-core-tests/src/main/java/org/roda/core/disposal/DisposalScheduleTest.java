@@ -34,7 +34,6 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
-import org.roda.core.data.v2.ip.disposal.RetentionTriggerCode;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.validation.ValidationException;
@@ -94,7 +93,7 @@ public class DisposalScheduleTest {
   @AfterClass
   public void tearDown() throws Exception {
     RodaCoreFactory.shutdown();
-    //FSUtils.deletePath(basePath);
+    // FSUtils.deletePath(basePath);
   }
 
   @AfterMethod
@@ -122,7 +121,7 @@ public class DisposalScheduleTest {
     assertFalse(Files.exists(FSUtils.getEntityPath(storagePath, disposalScheduleStoragePath)));
   }
 
-@Test
+  @Test
   public void testDisposalScheduleDeletionWhenUsed() throws AuthorizationDeniedException, RequestNotValidException,
     NotFoundException, GenericException, AlreadyExistsException, IllegalOperationException {
     DisposalSchedule disposalSchedule = createDisposalSchedule();
@@ -191,7 +190,8 @@ public class DisposalScheduleTest {
   }
 
   @Test
-  public void testDisposalScheduleRecursiveAssociation() throws RequestNotValidException, AuthorizationDeniedException, ValidationException, NotFoundException, GenericException, AlreadyExistsException {
+  public void testDisposalScheduleRecursiveAssociation() throws RequestNotValidException, AuthorizationDeniedException,
+    ValidationException, NotFoundException, GenericException, AlreadyExistsException {
     // generate AIP ID
     final String parentId = IdUtils.createUUID();
     final String childId = IdUtils.createUUID();
@@ -211,7 +211,7 @@ public class DisposalScheduleTest {
     model.updateAIP(parentAIP, RodaConstants.ADMIN);
     model.updateAIP(childAIP, RodaConstants.ADMIN);
     model.updateAIP(grandsonAIP, RodaConstants.ADMIN);
-    //Create hierarchy
+    // Create hierarchy
     model.moveAIP(childId, parentId, RodaConstants.ADMIN);
     model.moveAIP(grandsonId, parentId, RodaConstants.ADMIN);
     index.commitAIPs();
@@ -219,23 +219,22 @@ public class DisposalScheduleTest {
     // Generate Disposal
     DisposalSchedule disposalSchedule = createDisposalSchedule();
 
-    //Associate disposal schedule to parentAip
+    // Associate disposal schedule to parentAip
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ID, parentId));
     SelectedItemsFilter<IndexedAIP> selectedItems = new SelectedItemsFilter<>(filter, IndexedAIP.class.getName(),
       Boolean.FALSE);
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID, disposalSchedule.getId());
-    Job job = TestsHelper.executeJob(AssociateDisposalScheduleToAIPPlugin.class, pluginParameters, PluginType.INTERNAL, (SelectedItems) selectedItems);
+    Job job = TestsHelper.executeJob(AssociateDisposalScheduleToAIPPlugin.class, pluginParameters, PluginType.INTERNAL,
+      (SelectedItems) selectedItems);
     index.commitAIPs();
-    //assertEquals(3, job.getJobStats().getSourceObjectsCount());
+    // assertEquals(3, job.getJobStats().getSourceObjectsCount());
 
     AIP retrieveChildAIP = model.retrieveAIP(childId);
     AIP retrieveGrandSonAIP = model.retrieveAIP(grandsonId);
     assertEquals(disposalSchedule.getId(), retrieveChildAIP.getDisposalScheduleId());
     assertEquals(disposalSchedule.getId(), retrieveGrandSonAIP.getDisposalScheduleId());
   }
-
-
 
   private DisposalSchedule createDisposalSchedule() throws AlreadyExistsException, AuthorizationDeniedException,
     GenericException, NotFoundException, RequestNotValidException {
@@ -244,7 +243,6 @@ public class DisposalScheduleTest {
     String mandate = "Pellentesque imperdiet nunc dolor.";
     String scopeNotes = "Praesent laoreet lacus leo, vitae consectetur nulla maximus non. Ut.";
     DisposalActionCode actionCode = DisposalActionCode.DESTROY;
-    RetentionTriggerCode triggerCode = RetentionTriggerCode.FROM_NOW;
     String retentionTriggerElementId = "";
     RetentionPeriodIntervalCode periodIntervalCode = RetentionPeriodIntervalCode.YEARS;
     int retentionPeriodDuration = 10;
@@ -256,7 +254,6 @@ public class DisposalScheduleTest {
     schedule.setMandate(mandate);
     schedule.setScopeNotes(scopeNotes);
     schedule.setActionCode(actionCode);
-    schedule.setRetentionTriggerCode(triggerCode);
     schedule.setRetentionTriggerElementId(retentionTriggerElementId);
     schedule.setRetentionPeriodIntervalCode(periodIntervalCode);
     schedule.setRetentionPeriodDuration(retentionPeriodDuration);

@@ -1614,7 +1614,7 @@ public class SolrUtils {
     Integer retentionPeriodDuration = disposalSchedule.getRetentionPeriodDuration();
     Calendar cal = Calendar.getInstance();
 
-    if (disposalSchedule.getRetentionTriggerCode() != null) {
+    /*if (disposalSchedule.getRetentionTriggerCode() != null) {
       // TODO: change this
       switch (disposalSchedule.getRetentionTriggerCode()) {
         case FROM_NOW:
@@ -1622,7 +1622,7 @@ public class SolrUtils {
         case FROM_RECORD_METADATA_DATE:
           cal.setTime(aip.getCreatedOn());
       }
-    }
+    }*/
 
     if (!disposalSchedule.getRetentionPeriodIntervalCode().equals(RetentionPeriodIntervalCode.NO_RETENTION_PERIOD)) {
       switch (disposalSchedule.getRetentionPeriodIntervalCode()) {
