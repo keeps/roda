@@ -691,8 +691,6 @@ public final class RodaConstants {
 
   public static final String AIP_DISPOSAL_SCHEDULE_ID = "disposalScheduleId";
   public static final String AIP_DISPOSAL_SCHEDULE_NAME = "disposalScheduleName";
-  public static final String AIP_DISPOSAL_SCHEDULE_RETENTION_PERIOD_DURATION = "retentionPeriodDuration";
-  public static final String AIP_DISPOSAL_SCHEDULE_RETENTION_PERIOD_INTERVAL = "retentionPeriodInterval";
   public static final String AIP_DISPOSAL_HOLDS_ID = "disposalHoldsId";
   public static final String AIP_DESTROYED_ON = "destroyedOn";
   public static final String AIP_DESTROYED_BY = "destroyedBy";
@@ -700,7 +698,12 @@ public final class RodaConstants {
   public static final String AIP_DISPOSAL_HOLD_STATUS = "disposalHoldStatus";
   public static final String AIP_OVERDUE_DATE = "overdueDate";
   public static final String AIP_DISPOSAL_CONFIRMATION_ID = "disposalConfirmationID";
-  public static final String AIP_DISPOSAL_FLOW = "disposalFlow";
+  public static final String AIP_DISPOSAL_SCHEDULE_ASSOCIATION_TYPE = "disposalScheduleAssociationType";
+  public static final String AIP_DISPOSAL_RETENTION_PERIOD_START_DATE = "retentionPeriodStartDate";
+  public static final String AIP_DISPOSAL_RETENTION_PERIOD_DURATION = "retentionPeriodDuration";
+  public static final String AIP_DISPOSAL_RETENTION_PERIOD_INTERVAL = "retentionPeriodInterval";
+  public static final String AIP_DISPOSAL_RETENTION_PERIOD_DETAILS = "retentionPeriodDetails";
+  public static final String AIP_DISPOSAL_RETENTION_PERIOD_CALCULATION = "retentionPeriodCalculation";
 
   // AIP types
   public static final String AIP_TYPE_MIXED = "MIXED";

@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +19,7 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
@@ -29,6 +29,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.RetentionPeriodCalculationException;
 import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsModelObject;
@@ -48,7 +49,6 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -117,7 +117,7 @@ public class IndexModelObserver implements ModelObserver {
         if (ret.isEmpty()) {
           indexPreservationsEvents(aip.getId(), null).addTo(ret);
           if (ret.isEmpty()) {
-            indexDisposalScheduleInAIP(aip, ancestors);
+            indexRetentionPeriod(aip, ancestors).addTo(ret);
           }
         }
       }
@@ -134,8 +134,8 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private ReturnWithExceptions<Void, ModelObserver> indexAIP(final AIP aip, final List<String> ancestors,
-    DisposalSchedule disposalSchedule, Date overdueDate) {
-    return indexAIP(aip, ancestors, false, disposalSchedule, overdueDate);
+    DisposalSchedule disposalSchedule, Map<String, String> retentionPeriodCalculation) {
+    return indexAIP(aip, ancestors, false, disposalSchedule, retentionPeriodCalculation);
   }
 
   private ReturnWithExceptions<Void, ModelObserver> indexAIP(final AIP aip, final List<String> ancestors,
@@ -144,11 +144,11 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private ReturnWithExceptions<Void, ModelObserver> indexAIP(final AIP aip, final List<String> ancestors,
-    boolean safemode, DisposalSchedule disposalSchedule, Date overdueDate) {
+    boolean safemode, DisposalSchedule disposalSchedule, Map<String, String> retentionPeriodCalculation) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
     SolrUtils.create2(index, (ModelObserver) this, IndexedAIP.class, aip,
-      new AIPCollection.Info(ancestors, safemode, disposalSchedule, overdueDate)).addTo(ret);
+      new AIPCollection.Info(ancestors, safemode, disposalSchedule, retentionPeriodCalculation)).addTo(ret);
 
     // if there was an error indexing, try in safe mode
     if (!ret.isEmpty()) {
@@ -261,19 +261,26 @@ public class IndexModelObserver implements ModelObserver {
     return ret;
   }
 
-  private ReturnWithExceptions<Void, ModelObserver> indexDisposalScheduleInAIP(AIP aip, List<String> ancestors) {
+  private ReturnWithExceptions<Void, ModelObserver> indexRetentionPeriod(final AIP aip, final List<String> ancestors) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
-    DisposalSchedule disposalSchedule;
-    try {
-      disposalSchedule = SolrUtils.getDisposalSchedule(aip, model);
-      if (disposalSchedule != null) {
-        Date overdueDate = SolrUtils.getOverdueDate(disposalSchedule, aip);
-        indexAIP(aip, ancestors, disposalSchedule, overdueDate).addTo(ret);
+
+    if (aip.getDisposalScheduleId() != null) {
+      try {
+        DisposalSchedule disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
+
+        Map<String, String> retentionPeriod = SolrUtils.getOverdueDate(disposalSchedule, aip);
+        indexAIP(aip, ancestors, disposalSchedule, retentionPeriod).addTo(ret);
+        if (StringUtils.isNotBlank(retentionPeriod.get(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_DETAILS))) {
+          throw new RetentionPeriodCalculationException(
+            retentionPeriod.get(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_DETAILS));
+        }
+      } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException
+        | RetentionPeriodCalculationException e) {
+        LOGGER.error("Cannot index retention period", e);
+        ret.add(e);
       }
-    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException e) {
-      LOGGER.error("Cannot index disposal schedule in AIP: {}", aip.getId(), e);
-      ret.add(e);
     }
+
     return ret;
   }
 

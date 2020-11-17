@@ -196,7 +196,7 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
             outcomeText = applyDisposalHold(aip, cachedJob, model, disposalHold, state, reportItem, jobPluginInfo);
           } else {
             // check if AIP is already under the disposal hold
-            if (aip.isAIPOnHold(disposalHoldId)) {
+            if (aip.isOnHold(disposalHoldId)) {
               state = PluginState.SKIPPED;
               LOGGER.info("Applying disposal hold '{}' to AIP '{}' was skipped because it is already on the same disposal hold", disposalHoldId, aip.getId());
               jobPluginInfo.incrementObjectsProcessed(state);

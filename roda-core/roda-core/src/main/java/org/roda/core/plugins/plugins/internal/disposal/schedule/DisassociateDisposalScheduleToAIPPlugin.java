@@ -23,7 +23,7 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPDisposalFlow;
+import org.roda.core.data.v2.ip.AIPDisposalScheduleAssociationType;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.jobs.Job;
@@ -179,7 +179,7 @@ public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP>
           try {
             disposalSchedule = model.retrieveDisposalSchedule(disposalScheduleId);
             aip.setDisposalScheduleId(null);
-            aip.setDisposalFlow(AIPDisposalFlow.MANUAL);
+            aip.setScheduleAssociationType(AIPDisposalScheduleAssociationType.MANUAL);
 
             model.updateDisposalSchedule(disposalSchedule, cachedJob.getUsername());
             model.updateAIP(aip, cachedJob.getUsername());
