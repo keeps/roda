@@ -325,7 +325,7 @@ public class DisposalDialogs {
     dialogBox.show();
   }
 
-  public static void showApplyRules(String title,  AsyncCallback<Void> callback) {
+  public static void showApplyRules(String title,  AsyncCallback<Boolean> callback) {
     FlowPanel layout = new FlowPanel();
     FlowPanel footer = new FlowPanel();
     final DialogBox dialogBox = new DialogBox(false, true);
@@ -346,16 +346,24 @@ public class DisposalDialogs {
     info.add(new HTMLWidgetWrapper("ApplyDisposalRules.html"));
     info.addStyleName("page-description");
 
-    Button apply = new Button();
-    apply.setText(messages.applyToRepositoryButton());
-    apply.addStyleName("btn btn-danger btn-play apply-rules-btn");
+    Button applyToManualInclusiveButton = new Button();
+    applyToManualInclusiveButton.setText(messages.applyToRepositoryButton());
+    applyToManualInclusiveButton.addStyleName("btn btn-danger btn-play apply-rules-btn");
+    applyToManualInclusiveButton.addClickHandler(clickEvent -> {
+      dialogBox.hide();
+      callback.onSuccess(true);
+    });
 
-    Button applyIngest = new Button();
-    applyIngest.setText(messages.applyButton());
-    applyIngest.addStyleName("btn btn-play apply-rules-btn");
+    Button applyToManualExclusiveButton = new Button();
+    applyToManualExclusiveButton.setText(messages.applyButton());
+    applyToManualExclusiveButton.addStyleName("btn btn-play apply-rules-btn");
+    applyToManualExclusiveButton.addClickHandler(event -> {
+      dialogBox.hide();
+      callback.onSuccess(false);
+    });
 
-    footer.add(apply);
-    footer.add(applyIngest);
+    footer.add(applyToManualInclusiveButton);
+    footer.add(applyToManualExclusiveButton);
     footer.add(cancelButton);
     layout.add(info);
     layout.add(footer);

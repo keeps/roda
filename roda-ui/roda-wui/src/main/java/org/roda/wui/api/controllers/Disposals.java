@@ -495,7 +495,7 @@ public class Disposals extends RodaWuiController {
     }
   }
 
-  public static Job applyDisposalRules(User user)
+  public static Job applyDisposalRules(User user, boolean applyToManuallyInclusive)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -506,7 +506,7 @@ public class Disposals extends RodaWuiController {
 
     try {
       // delegate
-      return BrowserHelper.applyDisposalRules(user);
+      return BrowserHelper.applyDisposalRules(user, applyToManuallyInclusive);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;

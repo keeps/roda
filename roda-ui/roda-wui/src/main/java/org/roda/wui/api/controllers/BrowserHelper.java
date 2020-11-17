@@ -3516,10 +3516,12 @@ public class BrowserHelper {
       pluginParameters, "Could not execute lift disposal hold action");
   }
 
-  public static Job applyDisposalRules(User user)
+  public static Job applyDisposalRules(User user, boolean applyToManuallyInclusive)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_MANUAL, Boolean.toString(applyToManuallyInclusive));
     return createAndExecuteInternalJob("Apply disposal rules to repository",
-      SelectedItemsAll.create(AIP.class.getName()), ApplyDisposalRulesPlugin.class, user, Collections.emptyMap(),
+      SelectedItemsAll.create(AIP.class.getName()), ApplyDisposalRulesPlugin.class, user, pluginParameters,
       "Could not execute apply disposal rules to repository");
   }
 }

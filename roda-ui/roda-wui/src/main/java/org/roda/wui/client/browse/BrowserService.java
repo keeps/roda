@@ -397,7 +397,7 @@ public interface BrowserService extends RemoteService {
   void deleteDisposalRule(String disposalRuleId)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException;
 
-  Job applyDisposalRules() throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+  Job applyDisposalRules(boolean applyToManuallyInclusive) throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   DisposalSchedule createDisposalSchedule(DisposalSchedule schedule) throws AuthorizationDeniedException,
     AlreadyExistsException, NotFoundException, GenericException, RequestNotValidException;
