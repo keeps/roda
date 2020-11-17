@@ -2,25 +2,31 @@ package org.roda.core.plugins.plugins.internal.disposal.rules;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.common.XMLUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPDisposalScheduleAssociationType;
 import org.roda.core.data.v2.ip.disposal.ConditionType;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalRules;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
@@ -39,7 +45,32 @@ import org.slf4j.LoggerFactory;
 public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ApplyDisposalRulesPlugin.class);
 
-  private boolean applyDefaultDisposalSchedule;
+  private boolean overrideManualAssociations = false;
+
+  private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
+
+  static {
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_MANUAL,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_MANUAL, "Override disposal schedule",
+        PluginParameter.PluginParameterType.BOOLEAN, "false", true, false,
+        "Overrides disposal schedules associated manually"));
+  }
+
+  @Override
+  public List<PluginParameter> getParameters() {
+    ArrayList<PluginParameter> parameters = new ArrayList<>();
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_MANUAL));
+    return parameters;
+  }
+
+  @Override
+  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_MANUAL)) {
+      overrideManualAssociations = Boolean
+        .parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_MANUAL));
+    }
+  }
 
   @Override
   public String getVersionImpl() {
@@ -111,25 +142,44 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
   private void processAIP(List<AIP> aips, ModelService model, Report report, Job cachedJob,
     JobPluginInfo jobPluginInfo) {
 
-    boolean applyDefaultDisposalSchedule = false;
     boolean ruleApplied = false;
     DisposalRules disposalRules = new DisposalRules();
     // Get disposal rules
     try {
       disposalRules = model.listDisposalRules();
-
       if (disposalRules.getObjects().isEmpty()) {
-        // Apply default disposal schedule ???
-        applyDefaultDisposalSchedule = true;
-        // SKIP
+        for (AIP aip : aips) {
+          Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
+          PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
+          reportItem.setPluginState(PluginState.SKIPPED)
+            .setPluginDetails("Skipping associating disposal schedule to AIP '" + aip.getId()
+              + "' due to no disposal rule being present in the repository");
+          jobPluginInfo.incrementObjectsProcessedWithSkipped();
+          report.addReport(reportItem);
+          PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
+        }
       }
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | IOException e) {
       LOGGER.error("Failed to obtain disposal rules: {}", e.getMessage(), e);
-      // FAIL ???
+      for (AIP aip : aips) {
+        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
+        reportItem.setPluginState(PluginState.FAILURE)
+            .setPluginDetails("Failure to obtain disposal rules");
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
+      }
     }
 
     for (AIP aip : aips) {
-      if (applyDefaultDisposalSchedule) {
+      if (AIPDisposalScheduleAssociationType.MANUAL.equals(aip.getScheduleAssociationType()) && overrideManualAssociations) {
+        // Apply the disposal schedule
+      } else {
+        // skip the event
+      }
+
+      if (overrideManualAssociations) {
 
       } else {
         for (DisposalRule rule : disposalRules.getObjects()) {

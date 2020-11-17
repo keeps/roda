@@ -1,13 +1,20 @@
 package org.roda.wui.client.common.dialogs.utils;
 
+import java.io.Serializable;
+
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 
 /**
  * @author Gabriel Barros <gbarrps@keep.pt>
  */
-public class DisposalScheduleDialogResult {
+public class DisposalScheduleDialogResult implements Serializable {
+  private static final long serialVersionUID = -967014998203940151L;
+
   public enum ActionType {
     CLEAR, ASSOCIATE
+  }
+
+  public DisposalScheduleDialogResult() {
   }
 
   private ActionType actionType;
@@ -15,7 +22,8 @@ public class DisposalScheduleDialogResult {
   private Boolean applyToHierarchy;
   private Boolean overwriteAll;
 
-  public DisposalScheduleDialogResult(ActionType actionType, DisposalSchedule disposalSchedule, Boolean applyToHierarchy, Boolean overwriteAll) {
+  public DisposalScheduleDialogResult(ActionType actionType, DisposalSchedule disposalSchedule,
+    Boolean applyToHierarchy, Boolean overwriteAll) {
     this.actionType = actionType;
     this.disposalSchedule = disposalSchedule;
     this.applyToHierarchy = applyToHierarchy;

@@ -115,6 +115,24 @@ public class JobStats implements Serializable {
   }
 
   /**
+   * Increments by one the number of objects processed with skip & decrements
+   * by the same amount the number of objects being processed
+   */
+  public void incrementObjectsProcessedWithSkipped() {
+    this.sourceObjectsProcessedWithSkipped += 1;
+    this.sourceObjectsBeingProcessed -= 1;
+  }
+
+  /**
+   * Increments by one the number of objects processed with skip & decrements
+   * by the same amount the number of objects being processed
+   */
+  public void incrementObjectsProcessedWithSkipped(int count) {
+    this.sourceObjectsProcessedWithSkipped += count;
+    this.sourceObjectsBeingProcessed -= count;
+  }
+
+  /**
    * Increments by one the number of objects processed with failure & decrements
    * by the same amount the number of objects being processed
    */
