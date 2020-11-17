@@ -5,6 +5,7 @@ import java.util.Date;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
+import org.roda.core.data.v2.ip.disposal.RetentionPeriodCalculation;
 import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.core.client.GWT;
@@ -39,6 +40,10 @@ public class DisposalPolicyUtils {
 
   private static String getDisposalPolicySummaryForActiveAIP(IndexedAIP aip) {
     StringBuilder builder = new StringBuilder();
+
+    if (RetentionPeriodCalculation.ERROR.equals(aip.getRetentionPeriodState())) {
+      return "Retention period failed to be calculated";
+    }
 
     if (aip.getDisposalConfirmationId() != null) {
       builder.append(messages.disposalPolicyConfirmationSummary());
@@ -81,7 +86,7 @@ public class DisposalPolicyUtils {
       } else {
         builder.append(messages.disposalPolicyNoScheduleSummary());
 
-        if (aip.isDisposalHoldStatus()) {
+        if (aip.isOnHold()) {
           builder.append(" ").append(messages.disposalPolicyHoldSummary());
         } else {
           return messages.disposalPolicyNone();

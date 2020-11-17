@@ -56,7 +56,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
   private Date destroyedOn = null;
   private String destroyedBy = null;
   private String disposalConfirmationId = null;
-  private AIPDisposalFlow disposalFlow = null;
+  private AIPDisposalScheduleAssociationType scheduleAssociationType = null;
 
   public AIP() {
     super();
@@ -78,7 +78,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
     List<DescriptiveMetadata> descriptiveMetadata, List<Representation> representations, AIPFormat format,
     List<Relationship> relationships, Date createdOn, String createdBy, Date updatedOn, String updatedBy,
     String disposalScheduleId, List<DisposalHoldAssociation> disposalHoldAssociation, Date destroyedOn,
-    String destroyedBy, String disposalConfirmationId, AIPDisposalFlow disposalFlow) {
+    String destroyedBy, String disposalConfirmationId, AIPDisposalScheduleAssociationType scheduleAssociationType) {
     super();
     this.id = id;
     this.parentId = parentId;
@@ -101,7 +101,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
     this.destroyedOn = destroyedOn;
     this.destroyedBy = destroyedBy;
     this.disposalConfirmationId = disposalConfirmationId;
-    this.disposalFlow = disposalFlow;
+    this.scheduleAssociationType = scheduleAssociationType;
   }
 
   @JsonIgnore
@@ -362,16 +362,16 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
     this.updatedBy = updatedBy;
   }
 
-  public AIPDisposalFlow getDisposalFlow() {
-    return disposalFlow;
+  public AIPDisposalScheduleAssociationType getScheduleAssociationType() {
+    return scheduleAssociationType;
   }
 
-  public void setDisposalFlow(AIPDisposalFlow disposalFlow) {
-    this.disposalFlow = disposalFlow;
+  public void setScheduleAssociationType(AIPDisposalScheduleAssociationType scheduleAssociationType) {
+    this.scheduleAssociationType = scheduleAssociationType;
   }
 
   @JsonIgnore
-  public boolean isAIPOnHold(String disposalHoldId) {
+  public boolean isOnHold(String disposalHoldId) {
     for (DisposalHoldAssociation association : getDisposalHoldAssociation()) {
       if (association.getId().equals(disposalHoldId) && association.getLiftedOn() == null) {
         return true;
@@ -429,7 +429,8 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
       return false;
     if (destroyedOn != null ? !destroyedOn.equals(aip.destroyedOn) : aip.destroyedOn != null)
       return false;
-    if (disposalFlow != null ? !disposalFlow.equals(aip.disposalFlow) : aip.disposalFlow != null)
+    if (scheduleAssociationType != null ? !scheduleAssociationType.equals(aip.scheduleAssociationType)
+      : aip.scheduleAssociationType != null)
       return false;
     return destroyedBy != null ? destroyedBy.equals(aip.destroyedBy) : aip.destroyedBy == null;
 
@@ -451,7 +452,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
     result = 31 * result + (disposalHoldAssociation != null ? disposalHoldAssociation.hashCode() : 0);
     result = 31 * result + (destroyedOn != null ? destroyedOn.hashCode() : 0);
     result = 31 * result + (destroyedBy != null ? destroyedBy.hashCode() : 0);
-    result = 31 * result + (disposalFlow != null ? disposalFlow.hashCode() : 0);
+    result = 31 * result + (scheduleAssociationType != null ? scheduleAssociationType.hashCode() : 0);
     return result;
   }
 
@@ -465,6 +466,6 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
       + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\'' + ", disposalScheduleId='"
       + disposalScheduleId + '\'' + ", disposalHoldAssociation=" + disposalHoldAssociation + ", destroyedOn="
       + destroyedOn + ", destroyedBy='" + destroyedBy + '\'' + ", disposalConfirmationId='" + disposalConfirmationId
-      + '\'' + ", disposalUpdateStatus=" + disposalFlow + '}';
+      + '\'' + ", scheduleAssociationType=" + scheduleAssociationType + '}';
   }
 }

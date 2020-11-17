@@ -2,6 +2,7 @@ package org.roda.wui.client.disposal.association;
 
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
+import org.roda.core.data.v2.ip.disposal.RetentionPeriodCalculation;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.disposal.schedule.ShowDisposalSchedule;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -48,6 +49,12 @@ public class RetentionPeriodPanel extends Composite {
   Label disposalRetentionPeriod;
 
   @UiField
+  Label retentionOverdueDateLabel;
+
+  @UiField
+  Label disposalAssociationType;
+
+  @UiField
   HTML disposalDisposalAction;
 
   @UiField
@@ -55,28 +62,59 @@ public class RetentionPeriodPanel extends Composite {
 
   public RetentionPeriodPanel(IndexedAIP aip) {
     initWidget(uiBinder.createAndBindUi(this));
+
     if (aip.getDisposalScheduleId() == null) {
       retentionPeriodPanel.clear();
     } else {
-      Anchor scheduleLink = new Anchor(aip.getDisposalScheduleName(),
-        HistoryUtils.createHistoryHashLink(ShowDisposalSchedule.RESOLVER, aip.getDisposalScheduleId()));
-
-      scheduleInfo.add(scheduleLink);
-
-      disposalRetentionStartDate.setText(Humanize.formatDate(aip.getCreatedOn()));
-
-      if (DisposalActionCode.RETAIN_PERMANENTLY.equals(aip.getDisposalAction())) {
-        disposalRetentionDueDate.setText(messages.permanentlyRetained());
-        retentionPeriodLabel.setVisible(false);
-        disposalRetentionPeriod.setVisible(false);
+      if (RetentionPeriodCalculation.SUCCESS.equals(aip.getRetentionPeriodState())) {
+        handleRetentionCorrectCalculation(aip);
       } else {
-        disposalRetentionDueDate.setText(Humanize.formatDate(aip.getOverdueDate()));
-        disposalRetentionPeriod.setText(messages.retentionPeriod(aip.getRetentionPeriodDuration(), aip.getRetentionPeriodInterval().name()));
+        handleRetentionFailedCalculation(aip);
       }
 
-      disposalDisposalAction.setHTML(HtmlSnippetUtils.getDisposalScheduleActionHtml(aip.getDisposalAction()));
-
-      disposalDisposalStatus.setHTML(HtmlSnippetUtils.getDisposalHoldStatusHTML(aip.isDisposalHoldStatus()));
+      handleRetentionPeriodCommonInformation(aip);
     }
   }
+
+  private void handleRetentionPeriodCommonInformation(final IndexedAIP aip) {
+    Anchor scheduleLink = new Anchor(aip.getDisposalScheduleName(),
+      HistoryUtils.createHistoryHashLink(ShowDisposalSchedule.RESOLVER, aip.getDisposalScheduleId()));
+
+    scheduleInfo.add(scheduleLink);
+
+    disposalAssociationType.setText(messages.disposalScheduleAssociationType(aip.getScheduleAssociationType().name()));
+
+    disposalDisposalAction.setHTML(HtmlSnippetUtils.getDisposalScheduleActionHtml(aip.getDisposalAction()));
+
+    disposalDisposalStatus.setHTML(HtmlSnippetUtils.getDisposalHoldStatusHTML(aip.isOnHold()));
+  }
+
+  private void handleRetentionFailedCalculation(final IndexedAIP aip) {
+    if (DisposalActionCode.RETAIN_PERMANENTLY.equals(aip.getDisposalAction())) {
+      disposalRetentionDueDate.setText(messages.permanentlyRetained());
+      retentionPeriodLabel.setVisible(false);
+      disposalRetentionPeriod.setVisible(false);
+    } else {
+      retentionPeriodLabel.setVisible(false);
+      retentionOverdueDateLabel.setVisible(false);
+      disposalRetentionDueDate.setVisible(false);
+      disposalRetentionPeriod.setVisible(false);
+      disposalRetentionStartDate.setText(aip.getRetentionPeriodDetails());
+    }
+  }
+
+  private void handleRetentionCorrectCalculation(final IndexedAIP aip) {
+    disposalRetentionStartDate.setText(Humanize.formatDate(aip.getRetentionPeriodStartDate()));
+
+    if (DisposalActionCode.RETAIN_PERMANENTLY.equals(aip.getDisposalAction())) {
+      disposalRetentionDueDate.setText(messages.permanentlyRetained());
+      retentionPeriodLabel.setVisible(false);
+      disposalRetentionPeriod.setVisible(false);
+    } else {
+      disposalRetentionDueDate.setText(Humanize.formatDate(aip.getOverdueDate()));
+      disposalRetentionPeriod
+        .setText(messages.retentionPeriod(aip.getRetentionPeriodDuration(), aip.getRetentionPeriodInterval().name()));
+    }
+  }
+
 }

@@ -3468,6 +3468,9 @@ public class ModelService extends ModelObservable {
 
   public DisposalSchedule retrieveDisposalSchedule(String disposalScheduleId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    if (disposalScheduleId == null) {
+      throw new GenericException("Error retrieving disposal schedule identifier must not be null");
+    }
     StoragePath disposalSchedulePath = ModelUtils.getDisposalScheduleStoragePath(disposalScheduleId);
     Binary binary = storage.getBinary(disposalSchedulePath);
     DisposalSchedule ret;
