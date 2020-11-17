@@ -33,7 +33,7 @@
                         </g:Button>
                     </g:FlowPanel>
                     <g:FlowPanel addStyleNames="sticky-padding">
-                        <g:Label addStyleNames="h4">
+                        <g:Label addStyleNames="h4" ui:field="orderButtonsLabel">
                             <ui:text from="{messages.editRulesOrder}"/>
                         </g:Label>
                         <g:FlowPanel ui:field="orderButtonsPanel"/>

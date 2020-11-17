@@ -84,6 +84,9 @@ public class OrderDisposalRules extends Composite {
   FlowPanel orderDisposalRulesTablePanel;
 
   @UiField
+  Label orderButtonsLabel;
+
+  @UiField
   FlowPanel orderButtonsPanel;
 
   @UiField
@@ -102,7 +105,14 @@ public class OrderDisposalRules extends Composite {
     this.disposalRules = disposalRules;
     createDescription();
     createDisposalRulesPanel();
-    createOrderButtons();
+    if(disposalRules.getObjects().isEmpty()){
+      buttonSave.setVisible(false);
+      orderButtonsLabel.setVisible(false);
+    }else{
+      buttonSave.setVisible(true);
+      orderButtonsLabel.setVisible(true);
+      createOrderButtons();
+    }
   }
 
   private void createOrderButtons() {
