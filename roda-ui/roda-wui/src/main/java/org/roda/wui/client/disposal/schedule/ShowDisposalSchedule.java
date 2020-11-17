@@ -12,6 +12,7 @@ import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.DisposalPolicySummaryPanel;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
@@ -93,6 +94,9 @@ public class ShowDisposalSchedule extends Composite {
   TitlePanel title;
 
   @UiField
+  DisposalPolicySummaryPanel usedInRulePanel;
+
+  @UiField
   Label disposalScheduleId;
 
   @UiField
@@ -171,6 +175,13 @@ public class ShowDisposalSchedule extends Composite {
 
   public void initElements() {
     title.setText(disposalSchedule.getTitle());
+
+    if(isScheduleInRule()){
+      usedInRulePanel.setIcon("fas fa-info-circle");
+      usedInRulePanel.setText(messages.disposalScheduleUsedInRule());
+    }else{
+      usedInRulePanel.setVisible(false);
+    }
 
     disposalScheduleId.setText(messages.disposalScheduleIdentifier() + ": " + disposalSchedule.getId());
 

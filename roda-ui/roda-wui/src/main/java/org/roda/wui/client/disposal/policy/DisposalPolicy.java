@@ -235,7 +235,6 @@ public class DisposalPolicy extends Composite {
       }
       applyRules.setText(messages.applyRules());
       applyRules.addClickHandler(event -> {
-        // TODO
         DisposalDialogs.showApplyRules(messages.applyRules(), new NoAsyncCallback<Void>() {
           @Override
           public void onSuccess(Void unused) {
