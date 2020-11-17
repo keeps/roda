@@ -3,6 +3,8 @@ package org.roda.wui.client.disposal.policy;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.DisposalDialogs;
@@ -235,10 +237,20 @@ public class DisposalPolicy extends Composite {
       }
       applyRules.setText(messages.applyRules());
       applyRules.addClickHandler(event -> {
-        DisposalDialogs.showApplyRules(messages.applyRules(), new NoAsyncCallback<Void>() {
+        DisposalDialogs.showApplyRules(messages.applyRules(), new NoAsyncCallback<Boolean>() {
           @Override
-          public void onSuccess(Void unused) {
-            // TODO
+          public void onSuccess(Boolean applyToManuallyInclusive) {
+            BrowserService.Util.getInstance().applyDisposalRules(applyToManuallyInclusive, new AsyncCallback<Job>() {
+              @Override
+              public void onFailure(Throwable throwable) {
+
+              }
+
+              @Override
+              public void onSuccess(Job job) {
+
+              }
+            });
           }
         });
       });

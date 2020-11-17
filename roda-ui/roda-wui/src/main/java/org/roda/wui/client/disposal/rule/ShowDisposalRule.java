@@ -217,9 +217,9 @@ public class ShowDisposalRule extends Composite {
                             public void onSuccess(Boolean aBoolean) {
                               HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
                               if (aBoolean) {
-                                DisposalDialogs.showApplyRules(messages.applyRules(), new NoAsyncCallback<Void>() {
+                                DisposalDialogs.showApplyRules(messages.applyRules(), new NoAsyncCallback<Boolean>() {
                                   @Override
-                                  public void onSuccess(Void unused) {
+                                  public void onSuccess(Boolean applyToManuallyInclusive) {
                                     // TODO
                                   }
                                 });

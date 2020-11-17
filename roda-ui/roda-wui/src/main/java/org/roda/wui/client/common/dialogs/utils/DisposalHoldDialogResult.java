@@ -9,6 +9,8 @@ import org.roda.core.data.v2.ip.disposal.DisposalHold;
  */
 public class DisposalHoldDialogResult implements Serializable {
 
+  private static final long serialVersionUID = 2998935986470083956L;
+
   public enum ActionType {
     OVERRIDE, CLEAR, ASSOCIATE
   }
