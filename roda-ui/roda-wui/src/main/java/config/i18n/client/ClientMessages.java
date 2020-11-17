@@ -2077,6 +2077,8 @@ public interface ClientMessages extends Messages {
 
   String disposalScheduleState(@Select String state);
 
+  String disposalScheduleUsedInRule();
+
   String disposalHoldIdentifier();
 
   String disposalHoldTitle();
