@@ -238,7 +238,7 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
     }
   }
 
-  private static List<Pair<String, String>> getElementsFromConfig() {
+  private List<Pair<String, String>> getElementsFromConfig() {
     List<Pair<String, String>> elements = new ArrayList<>();
     String classSimpleName = IndexedAIP.class.getSimpleName();
     List<String> fields = ConfigurationManager.getStringList(RodaConstants.SEARCH_FIELD_PREFIX, classSimpleName);
@@ -246,7 +246,7 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
     for (String field : fields) {
       String fieldPrefix = RodaConstants.SEARCH_FIELD_PREFIX + '.' + classSimpleName + '.' + field;
       String fieldType = ConfigurationManager.getString(fieldPrefix, RodaConstants.SEARCH_FIELD_TYPE);
-      String fieldsNames = ConfigurationManager.getString(fieldPrefix, RodaConstants.SEARCH_FIELD_FIELDS);
+      String fieldsNames =ConfigurationManager.getString(fieldPrefix, RodaConstants.SEARCH_FIELD_FIELDS);
 
       if ((RodaConstants.SEARCH_FIELD_TYPE_DATE.equals(fieldType)
         || RodaConstants.SEARCH_FIELD_TYPE_DATE_INTERVAL.equals(fieldType))) {
@@ -258,12 +258,23 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
           // do nothing;
         }
 
-        Pair<String, String> pair = new Pair<>(fieldsNames, translation);
+        Pair<String, String> pair = new Pair<>(parseFieldsNames(fieldsNames),translation);
         elements.add(pair);
       }
 
     }
     return elements;
+  }
+
+  private String parseFieldsNames(String fieldsNames) {
+    if (fieldsNames.contains(",")) {
+      String[] split = fieldsNames.split(",");
+      if (split.length == 2) {
+        return split[1];
+      }
+    }
+
+    return fieldsNames;
   }
 
   public void setDisposalSchedule(DisposalSchedule disposalSchedule) {

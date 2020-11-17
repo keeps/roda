@@ -28,7 +28,7 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPDisposalFlow;
+import org.roda.core.data.v2.ip.AIPDisposalScheduleAssociationType;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.jobs.Job;
@@ -208,7 +208,7 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
         } else {
           previousDisposalSchedules.add(aip.getDisposalScheduleId());
           aip.setDisposalScheduleId(disposalScheduleId);
-          aip.setDisposalFlow(AIPDisposalFlow.MANUAL);
+          aip.setScheduleAssociationType(AIPDisposalScheduleAssociationType.MANUAL);
           try {
             model.updateAIP(aip, cachedJob.getUsername());
             disposalSchedule.setFirstTimeUsed(new Date());
@@ -295,7 +295,7 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
           reportItem.setPluginState(PluginState.SUCCESS);
           reportItem.setPluginDetails("Apply disposal schedule: " + disposalScheduleId);
           aipChildren.setDisposalScheduleId(aipParent.getDisposalScheduleId());
-          aipChildren.setDisposalFlow(AIPDisposalFlow.MANUAL);
+          aipChildren.setScheduleAssociationType(AIPDisposalScheduleAssociationType.MANUAL);
           model.updateAIP(aipChildren, cachedJob.getUsername());
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
           outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule("was successfully applied to AIP",

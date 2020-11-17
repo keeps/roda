@@ -21,7 +21,7 @@
                     <g:Label addStyleNames="value" ui:field="disposalRetentionStartDate"/>
                 </g:FlowPanel>
                 <g:FlowPanel addStyleNames="field">
-                    <g:Label addStyleNames="label">
+                    <g:Label addStyleNames="label" ui:field="retentionOverdueDateLabel">
                         <ui:text from='{messages.disposalRetentionDueDateLabel}'/>
                     </g:Label>
                     <g:Label addStyleNames="value" ui:field="disposalRetentionDueDate"/>
@@ -31,6 +31,12 @@
                         <ui:text from='{messages.disposalRetentionPeriodLabel}'/>
                     </g:Label>
                     <g:Label addStyleNames="value" ui:field="disposalRetentionPeriod"/>
+                </g:FlowPanel>
+                <g:FlowPanel addStyleNames="field">
+                    <g:Label addStyleNames="label">
+                        <ui:text from='{messages.disposalScheduleAssociationTypeLabel}'/>
+                    </g:Label>
+                    <g:Label addStyleNames="value" ui:field="disposalAssociationType"/>
                 </g:FlowPanel>
                 <g:FlowPanel addStyleNames="field">
                     <g:Label addStyleNames="label">
@@ -45,7 +51,6 @@
                     <g:HTML ui:field="disposalDisposalStatus"/>
                 </g:FlowPanel>
             </g:FlowPanel>
-
         </g:FlowPanel>
     </g:FlowPanel>
 </ui:UiBinder>

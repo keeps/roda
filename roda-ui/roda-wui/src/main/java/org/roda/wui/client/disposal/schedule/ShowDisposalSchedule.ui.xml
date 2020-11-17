@@ -58,7 +58,7 @@
                             <g:FlowPanel styleName="field">
                                 <g:Label styleName="label"
                                          ui:field="retentionTriggersLabel">
-                                    <ui:text from='{messages.disposalScheduleRetentionTriggerCode}' />
+                                    <ui:text from='{messages.disposalScheduleRetentionTriggerElementId}' />
                                 </g:Label>
                                 <g:HTML styleName="value"
                                         ui:field="retentionTriggersValue" />

@@ -3,7 +3,6 @@ package org.roda.wui.client.disposal.rule;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.MissingResourceException;
 
 import org.roda.core.data.common.RodaConstants;
@@ -278,14 +277,9 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
   }
 
   private static boolean isWhiteList(String fieldsName) {
-    boolean ret = false;
     List<String> whitelistFields = ConfigurationManager.getStringList(RodaConstants.DISPOSAL_RULE_WHITELIST_CONDITION);
-    for (String field : whitelistFields) {
-      if (field.equals(fieldsName)) {
-        ret = true;
-      }
-    }
-    return ret;
+
+    return whitelistFields.contains(fieldsName);
   }
 
   private void initConditionList() {

@@ -115,6 +115,7 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.disposal.RetentionPeriodCalculation;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
@@ -1608,10 +1609,12 @@ public class SolrUtils {
     }
   }
 
-  public static Date getOverdueDate(DisposalSchedule disposalSchedule, AIP aip)
+  public static Map<String, String> getOverdueDate(DisposalSchedule disposalSchedule, AIP aip)
     throws NotFoundException, GenericException {
+    Map<String, String> values = new HashMap<>();
+
     if (DisposalActionCode.RETAIN_PERMANENTLY.equals(disposalSchedule.getActionCode())) {
-      return null;
+      return values;
     }
 
     Date overDueDate = null;
@@ -1621,20 +1624,46 @@ public class SolrUtils {
     IndexedAIP retrieve = retrieve(RodaCoreFactory.getSolr(), IndexedAIP.class, aip.getId(),
       Collections.singletonList(disposalSchedule.getRetentionTriggerElementId()));
 
+    Object o = retrieve.getFields().get(disposalSchedule.getRetentionTriggerElementId());
+
+    if (o == null) {
+      values.put(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_DETAILS, "Retention period start date is missing");
+      values.put(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_CALCULATION, RetentionPeriodCalculation.ERROR.name());
+      return values;
+    }
+
+    if (o instanceof Date) {
+      Date retentionPeriodStartDate = (Date) o;
+      cal.setTime(retentionPeriodStartDate);
+    } else {
+      values.put(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_DETAILS, "Retention period start must be of date type");
+      values.put(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_CALCULATION, RetentionPeriodCalculation.ERROR.name());
+      return values;
+    }
+
     if (!disposalSchedule.getRetentionPeriodIntervalCode().equals(RetentionPeriodIntervalCode.NO_RETENTION_PERIOD)) {
       switch (disposalSchedule.getRetentionPeriodIntervalCode()) {
         case YEARS:
           cal.add(Calendar.YEAR, retentionPeriodDuration);
+          break;
         case MONTHS:
           cal.add(Calendar.MONTH, retentionPeriodDuration);
+          break;
         case WEEKS:
           cal.add(Calendar.WEEK_OF_MONTH, retentionPeriodDuration);
+          break;
         case DAYS:
           cal.add(Calendar.DATE, retentionPeriodDuration);
+          break;
       }
       overDueDate = cal.getTime();
     }
-    return overDueDate;
+
+    values.put(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_START_DATE, formatDate(objectToDate(o)));
+    values.put(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_CALCULATION, RetentionPeriodCalculation.SUCCESS.name());
+    values.put(RodaConstants.AIP_OVERDUE_DATE, formatDate(overDueDate));
+
+    return values;
   }
 
   public static DisposalSchedule getDisposalSchedule(AIP aip, ModelService model)
