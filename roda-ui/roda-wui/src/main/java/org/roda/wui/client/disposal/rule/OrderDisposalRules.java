@@ -105,10 +105,10 @@ public class OrderDisposalRules extends Composite {
     this.disposalRules = disposalRules;
     createDescription();
     createDisposalRulesPanel();
-    if(disposalRules.getObjects().isEmpty()){
+    if (disposalRules.getObjects().isEmpty()) {
       buttonSave.setVisible(false);
       orderButtonsLabel.setVisible(false);
-    }else{
+    } else {
       buttonSave.setVisible(true);
       orderButtonsLabel.setVisible(true);
       createOrderButtons();
