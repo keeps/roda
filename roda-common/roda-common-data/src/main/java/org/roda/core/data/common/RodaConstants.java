@@ -1419,14 +1419,7 @@ public final class RodaConstants {
 
   public static final String DEFAULT_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-  public static final String DISPOSAL_RULE_CONDITION_PREFIX = "ui.disposal.rule.conditions";
-  public static final String DISPOSAL_RULE_CONDITION_FIELD = "field";
-  public static final String DISPOSAL_RULE_CONDITION_TYPE = "type";
-  public static final String DISPOSAL_RULE_CONDITION_I18N = "i18n";
-
-  public static final String DISPOSAL_SCHEDULE_ELEMENT_PREFIX = "ui.disposal.schedule.elements";
-  public static final String DISPOSAL_SCHEDULE_ELEMENT_FIELD = "field";
-  public static final String DISPOSAL_SCHEDULE_ELEMENT_TYPE = "type";
+  public static final String DISPOSAL_RULE_WHITELIST_CONDITION = "ui.disposal.rule.whitelist.condition";
 
   /* Template Constants */
   public static final String INGEST_EMAIL_TEMPLATE = "ingestion-template.vm";

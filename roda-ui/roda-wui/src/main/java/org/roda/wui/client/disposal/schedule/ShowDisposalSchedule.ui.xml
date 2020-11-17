@@ -17,6 +17,7 @@
                                     <ui:text from='{messages.showDisposalScheduleTitle}' />
                                 </g:Label>
                                 <common:TitlePanel iconClass="DisposalSchedule" ui:field="title" />
+                                <common:DisposalPolicySummaryPanel ui:field="usedInRulePanel" />
                                 <g:Label addStyleNames="browseItemId" ui:field="disposalScheduleId"
                                          title="{messages.disposalScheduleIdentifier}" />
                                 <g:Label addStyleNames="browseItemId" ui:field="dateCreated"/>

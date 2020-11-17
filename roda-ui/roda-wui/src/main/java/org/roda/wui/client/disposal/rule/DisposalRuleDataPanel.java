@@ -2,11 +2,13 @@ package org.roda.wui.client.disposal.rule;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.MissingResourceException;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.ConditionType;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
@@ -248,36 +250,56 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
     }
   }
 
-  private static Map<String, String> getConditionsFromConfig() {
-    Map<String, String> conditions = new HashMap<>();
-    List<String> fields = ConfigurationManager.getStringList(RodaConstants.DISPOSAL_RULE_CONDITION_PREFIX);
-    for (String field : fields) {
-      String fieldName = ConfigurationManager.getString(RodaConstants.DISPOSAL_RULE_CONDITION_PREFIX, field,
-        RodaConstants.DISPOSAL_RULE_CONDITION_FIELD);
-      String fieldType = ConfigurationManager.getString(RodaConstants.DISPOSAL_RULE_CONDITION_PREFIX, field,
-        RodaConstants.DISPOSAL_RULE_CONDITION_TYPE);
-      String fieldLabelI18N = ConfigurationManager.getString(RodaConstants.DISPOSAL_RULE_CONDITION_PREFIX, field,
-        RodaConstants.DISPOSAL_RULE_CONDITION_I18N);
+  private static List<Pair<String, String>> getElementsFromConfig() {
+    List<Pair<String, String>> elements = new ArrayList<>();
+    String classSimpleName = IndexedAIP.class.getSimpleName();
+    List<String> fields = ConfigurationManager.getStringList(RodaConstants.SEARCH_FIELD_PREFIX, classSimpleName);
 
-      if (fieldName != null && fieldType != null && fieldLabelI18N != null) {
-        conditions.put(fieldName, fieldLabelI18N);
+    for (String field : fields) {
+      String fieldPrefix = RodaConstants.SEARCH_FIELD_PREFIX + '.' + classSimpleName + '.' + field;
+      String fieldType = ConfigurationManager.getString(fieldPrefix, RodaConstants.SEARCH_FIELD_TYPE);
+      String fieldsName = ConfigurationManager.getString(fieldPrefix, RodaConstants.SEARCH_FIELD_FIELDS);
+
+      if (RodaConstants.SEARCH_FIELD_TYPE_TEXT.equals(fieldType) && isWhiteList(field)) {
+        String fieldLabelI18N = ConfigurationManager.getString(fieldPrefix, RodaConstants.SEARCH_FIELD_I18N);
+        String translation = fieldLabelI18N;
+        try {
+          translation = ConfigurationManager.getTranslation(fieldLabelI18N);
+        } catch (MissingResourceException e) {
+          // do nothing;
+        }
+
+        Pair<String, String> pair = new Pair<>(fieldsName, translation);
+        elements.add(pair);
+      }
+
+    }
+    return elements;
+  }
+
+  private static boolean isWhiteList(String fieldsName) {
+    boolean ret = false;
+    List<String> whitelistFields = ConfigurationManager.getStringList(RodaConstants.DISPOSAL_RULE_WHITELIST_CONDITION);
+    for (String field : whitelistFields) {
+      if (field.equals(fieldsName)) {
+        ret = true;
       }
     }
-    return conditions;
+    return ret;
   }
 
   private void initConditionList() {
-    Map<String, String> list = getConditionsFromConfig();
+    List<Pair<String, String>> conditionList = getElementsFromConfig();
     fieldsList.addItem("", "");
     if (!editMode) {
-      for (Map.Entry<String, String> entry : list.entrySet()) {
-        fieldsList.addItem(entry.getKey(), entry.getKey());
+      for (Pair<String, String> value : conditionList) {
+        fieldsList.addItem(value.getSecond(), value.getFirst());
       }
     } else {
       int index = 1;
-      for (Map.Entry<String, String> entry : list.entrySet()) {
-        fieldsList.addItem(entry.getKey(), entry.getKey());
-        if (entry.getKey().equals(disposalRule.getConditionKey())) {
+      for (Pair<String, String> value : conditionList) {
+        fieldsList.addItem(value.getSecond(), value.getFirst());
+        if (value.getSecond().equals(disposalRule.getConditionKey())) {
           selectedConditionIndex = index;
         }
         index++;
