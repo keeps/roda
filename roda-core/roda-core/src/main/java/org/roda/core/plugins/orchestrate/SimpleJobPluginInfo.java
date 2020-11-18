@@ -26,6 +26,7 @@ public class SimpleJobPluginInfo extends JobPluginInfo {
     this.setSourceObjectsWaitingToBeProcessed(jobPluginInfo.getSourceObjectsWaitingToBeProcessed());
     this.setSourceObjectsProcessedWithSuccess(jobPluginInfo.getSourceObjectsProcessedWithSuccess());
     this.setSourceObjectsProcessedWithFailure(jobPluginInfo.getSourceObjectsProcessedWithFailure());
+    this.setSourceObjectsProcessedWithSkipped(jobPluginInfo.getSourceObjectsProcessedWithSkipped());
   }
 
   @Override
@@ -42,10 +43,12 @@ public class SimpleJobPluginInfo extends JobPluginInfo {
     int sourceObjectsBeingProcessed = 0;
     int sourceObjectsProcessedWithSuccess = 0;
     int sourceObjectsProcessedWithFailure = 0;
+    int sourceObjectsProcessedWithSkipped = 0;
     for (JobPluginInfo jpi : jobInfos.values()) {
       SimpleJobPluginInfo pluginInfo = (SimpleJobPluginInfo) jpi;
       sourceObjectsProcessedWithSuccess += pluginInfo.getSourceObjectsProcessedWithSuccess();
       sourceObjectsProcessedWithFailure += pluginInfo.getSourceObjectsProcessedWithFailure();
+      sourceObjectsProcessedWithSkipped += pluginInfo.getSourceObjectsProcessedWithSkipped();
       sourceObjectsBeingProcessed += pluginInfo.getSourceObjectsBeingProcessed();
       sourceObjectsCount += pluginInfo.getSourceObjectsCount();
     }
@@ -55,14 +58,16 @@ public class SimpleJobPluginInfo extends JobPluginInfo {
     // unknown
     int newPercentage = 100;
     if (sourceObjectsCount > 0) {
-      newPercentage = Math
-        .round((((sourceObjectsProcessedWithSuccess + sourceObjectsProcessedWithFailure) * 100) / sourceObjectsCount));
+      newPercentage = Math.round(
+        (((sourceObjectsProcessedWithSuccess + sourceObjectsProcessedWithSkipped + sourceObjectsProcessedWithFailure)
+          * 100) / sourceObjectsCount));
     }
     infoUpdated.setCompletionPercentage(newPercentage);
     infoUpdated.setSourceObjectsCount(sourceObjectsCount);
     infoUpdated.setSourceObjectsBeingProcessed(sourceObjectsBeingProcessed);
     infoUpdated.setSourceObjectsProcessedWithSuccess(sourceObjectsProcessedWithSuccess);
     infoUpdated.setSourceObjectsProcessedWithFailure(sourceObjectsProcessedWithFailure);
+    infoUpdated.setSourceObjectsProcessedWithSkipped(sourceObjectsProcessedWithSkipped);
     return infoUpdated;
   }
 

@@ -23,7 +23,6 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPDisposalScheduleAssociationType;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.jobs.Job;
@@ -156,8 +155,9 @@ public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP>
 
       if (disposalScheduleId == null) {
         state = PluginState.SKIPPED;
-        LOGGER.info("Disposal schedule disassociation was skipped because AIP '" + aip.getId()
-          + "' is not associated with any disposal schedule");
+        LOGGER.info(
+          "Disposal schedule disassociation was skipped because AIP '{}' is not associated with any disposal schedule",
+          aip.getId());
         jobPluginInfo.incrementObjectsProcessed(state);
         reportItem.setPluginState(state).setPluginDetails("Disposal schedule disassociation was skipped because AIP '"
           + aip.getId() + "' is not associated with any disposal schedule");
@@ -166,8 +166,9 @@ public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP>
       } else {
         if (aip.getDisposalConfirmationId() != null) {
           state = PluginState.FAILURE;
-          LOGGER.error("Error disassociation disposal schedule from AIP '" + aip.getId()
-            + "': This AIP is part of a disposal confirmation report and the schedule cannot be changed");
+          LOGGER.error(
+            "Error disassociation disposal schedule from AIP '{}': This AIP is part of a disposal confirmation report and the schedule cannot be changed",
+            aip.getId());
           jobPluginInfo.incrementObjectsProcessedWithFailure();
           reportItem.setPluginState(state).setPluginDetails("Error disassociating disposal schedule from AIP '"
             + aip.getId() + "': This AIP is part of a disposal confirmation report and the schedule cannot be changed");
@@ -179,7 +180,7 @@ public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP>
           try {
             disposalSchedule = model.retrieveDisposalSchedule(disposalScheduleId);
             aip.setDisposalScheduleId(null);
-            aip.setScheduleAssociationType(AIPDisposalScheduleAssociationType.MANUAL);
+            aip.setScheduleAssociationType(null);
 
             model.updateDisposalSchedule(disposalSchedule, cachedJob.getUsername());
             model.updateAIP(aip, cachedJob.getUsername());
@@ -225,7 +226,6 @@ public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP>
     try {
       ArrayList<String> ancestorList = aips.stream().map(AIP::getId).collect(Collectors.toCollection(ArrayList::new));
       Filter ancestorFilter = new Filter(new OneOfManyFilterParameter(RodaConstants.AIP_ANCESTORS, ancestorList));
-      ;
       int resourceCounter = index.count(IndexedAIP.class, ancestorFilter).intValue();
       jobPluginInfo.setSourceObjectsCount(resourceCounter + aips.size());
     } catch (GenericException | RequestNotValidException e) {
@@ -251,8 +251,9 @@ public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP>
 
         if (disposalScheduleId == null) {
           state = PluginState.SKIPPED;
-          LOGGER.info("Disposal schedule disassociation was skipped because AIP '" + indexedAIP.getId()
-            + "' is not associated with any disposal schedule");
+          LOGGER.info(
+            "Disposal schedule disassociation was skipped because AIP '{}' is not associated with any disposal schedule",
+            indexedAIP.getId());
           jobPluginInfo.incrementObjectsProcessed(state);
           reportItem.setPluginState(state).setPluginDetails("Disposal schedule disassociation was skipped because AIP '"
             + indexedAIP.getId() + "' is not associated with any disposal schedule");
@@ -284,8 +285,9 @@ public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP>
             }
           } else {
             state = PluginState.FAILURE;
-            LOGGER.error("Error disassociation disposal schedule from AIP '" + indexedAIP.getId()
-              + "': This AIP is part of a disposal confirmation report and the schedule cannot be changed");
+            LOGGER.error(
+              "Error disassociation disposal schedule from AIP '{}': This AIP is part of a disposal confirmation report and the schedule cannot be changed",
+              indexedAIP.getId());
             jobPluginInfo.incrementObjectsProcessedWithFailure();
             reportItem.setPluginState(state)
               .setPluginDetails("Error disassociating disposal schedule from AIP '" + indexedAIP.getId()

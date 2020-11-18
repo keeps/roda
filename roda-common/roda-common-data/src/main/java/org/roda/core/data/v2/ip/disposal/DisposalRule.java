@@ -17,8 +17,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRule> {
 
-  private static final int VERSION = 0;
-  private static final long serialVersionUID = 247288959307666429L;
+  private static final int VERSION = 1;
+  private static final long serialVersionUID = 6903251340335265336L;
 
   private String id;
   private String title;

@@ -42,7 +42,7 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(LiftDisposalHoldFromAIPPlugin.class);
 
   private String disposalHoldId;
-  private Boolean clearAll;
+  private boolean clearAll;
 
   private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
@@ -74,7 +74,7 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
     }
 
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_LIFT_ALL)) {
-      clearAll = Boolean.valueOf(parameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_LIFT_ALL));
+      clearAll = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_LIFT_ALL));
     }
   }
 

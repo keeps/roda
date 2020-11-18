@@ -915,6 +915,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_DO_FILE_FORMAT_IDENTIFICATION = "parameter.do_file_format_identification";
   public static final String PLUGIN_PARAMS_DO_PDFTOPDFA_CONVERSION = "parameter.do_pdf_to_pdfa_conversion";
   public static final String PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK = "parameter.do_producer_authorization_check";
+  public static final String PLUGIN_PARAMS_DO_APPLY_DISPOSAL_RULES = "parameter.do_apply_disposal_rules";
   public static final String PLUGIN_PARAMS_DO_AUTO_ACCEPT = "parameter.do_auto_accept";
   public static final String PLUGIN_PARAMS_EMAIL_NOTIFICATION = "parameter.email_notification";
   public static final String PLUGIN_PARAMS_NOTIFICATION_WHEN_FAILED = "parameter.notification_when_failed";

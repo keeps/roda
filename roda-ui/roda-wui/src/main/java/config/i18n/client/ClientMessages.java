@@ -2062,8 +2062,6 @@ public interface ClientMessages extends Messages {
 
   String disposalScheduleRetentionTriggerElementId();
 
-  String disposalScheduleRetentionTriggerCode();
-
   String disposalScheduleRetentionTriggerCodeValue(@Select String trigger);
 
   String disposalScheduleRetentionPeriodInterval();

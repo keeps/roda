@@ -9,7 +9,7 @@
                     <ui:text from='{messages.disposalConfirmationAssociationInformationTitle}'/>
                 </g:Label>
             </g:FlowPanel>
-            <g:FlowPanel addStyleNames="panel-body">
+            <g:FlowPanel addStyleNames="panel-body" ui:field="content">
                 <g:FlowPanel addStyleNames="field" ui:field="confirmationInfo">
                     <g:Label addStyleNames="label">
                         <ui:text from='{messages.disposalConfirmationAssociationTitle}'/>
@@ -20,12 +20,6 @@
                         <ui:text from='{messages.disposalConfirmationCreationDate}'/>
                     </g:Label>
                     <g:Label addStyleNames="value" ui:field="disposalConfirmationCreationDate"/>
-                </g:FlowPanel>
-                <g:FlowPanel addStyleNames="field">
-                    <g:Label addStyleNames="label">
-                        <ui:text from='{messages.disposalConfirmationStatus}'/>
-                    </g:Label>
-                    <g:HTML ui:field="disposalConfirmationStatus"/>
                 </g:FlowPanel>
             </g:FlowPanel>
 

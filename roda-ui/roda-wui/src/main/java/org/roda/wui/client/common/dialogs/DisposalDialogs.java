@@ -220,11 +220,13 @@ public class DisposalDialogs {
     table.addColumn(new TextColumn<DisposalSchedule>() {
       @Override
       public String getValue(DisposalSchedule disposalSchedule) {
-        return disposalSchedule != null && disposalSchedule.getRetentionPeriodDuration() != null
-          && disposalSchedule.getRetentionPeriodIntervalCode() != null
-            ? messages.retentionPeriod(disposalSchedule.getRetentionPeriodDuration(),
-              disposalSchedule.getRetentionPeriodIntervalCode().name())
-            : "";
+        if (disposalSchedule.getRetentionPeriodIntervalCode() != null && disposalSchedule.getRetentionPeriodDuration() == null) {
+          return messages.retentionPeriod(0, disposalSchedule.getRetentionPeriodIntervalCode().name());
+        } else if (disposalSchedule.getRetentionPeriodIntervalCode() != null) {
+          return messages.retentionPeriod(disposalSchedule.getRetentionPeriodDuration(), disposalSchedule.getRetentionPeriodIntervalCode().name());
+        } else {
+          return "";
+        }
       }
     }, messages.disposalSchedulePeriod());
 

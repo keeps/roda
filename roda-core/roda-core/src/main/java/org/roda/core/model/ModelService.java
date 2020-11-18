@@ -1265,7 +1265,7 @@ public class ModelService extends ModelObservable {
         outcomeState, builder.toString(), "", Collections.singletonList(IdUtils.getUserAgentId(agentName)), notify);
     } catch (ValidationException | AlreadyExistsException | GenericException | NotFoundException
       | RequestNotValidException | AuthorizationDeniedException e1) {
-      LOGGER.error("Could not create an event for: " + eventDescription, e1);
+      LOGGER.error("Could not create an event for: {}", eventDescription, e1);
     }
   }
 
