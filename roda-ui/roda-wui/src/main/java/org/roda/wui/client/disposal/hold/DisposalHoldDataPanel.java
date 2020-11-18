@@ -65,13 +65,7 @@ public class DisposalHoldDataPanel extends Composite implements HasValueChangeHa
     this.editmode = editmode;
     errors.setVisible(false);
 
-    ChangeHandler changeHandler = new ChangeHandler() {
-
-      @Override
-      public void onChange(ChangeEvent event) {
-        DisposalHoldDataPanel.this.onChange();
-      }
-    };
+    ChangeHandler changeHandler = event -> DisposalHoldDataPanel.this.onChange();
 
     title.addChangeHandler(changeHandler);
     description.addChangeHandler(changeHandler);

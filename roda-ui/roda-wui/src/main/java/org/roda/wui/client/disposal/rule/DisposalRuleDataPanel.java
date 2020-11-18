@@ -84,7 +84,7 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
   @UiField
   Label typeListError;
 
-  // condition
+  // METADATA_FIELD
 
   @UiField
   Label conditionLabel;
@@ -157,13 +157,14 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
     if (disposalRule.getType().equals(ConditionType.METADATA_FIELD)) {
       conditionLabel.setVisible(true);
       conditionPanel.setVisible(true);
+
       fieldsList.setSelectedIndex(selectedConditionIndex);
       fieldValue.setText(disposalRule.getConditionValue());
     } else {
       conditionLabel.setVisible(true);
       conditionLabel.setText(messages.conditionActualParent());
-
       conditionPanel.setVisible(true);
+
       fieldsList.setVisible(false);
       fieldsOperator.setVisible(false);
       fieldValue.setVisible(false);
@@ -278,7 +279,6 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
 
   private static boolean isWhiteList(String fieldsName) {
     List<String> whitelistFields = ConfigurationManager.getStringList(RodaConstants.DISPOSAL_RULE_WHITELIST_CONDITION);
-
     return whitelistFields.contains(fieldsName);
   }
 
@@ -293,7 +293,7 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
       int index = 1;
       for (Pair<String, String> value : conditionList) {
         fieldsList.addItem(value.getSecond(), value.getFirst());
-        if (value.getSecond().equals(disposalRule.getConditionKey())) {
+        if (value.getFirst().equals(disposalRule.getConditionKey())) {
           selectedConditionIndex = index;
         }
         index++;
@@ -304,26 +304,23 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
   private void initHandlers() {
     ChangeHandler changeHandler = event -> DisposalRuleDataPanel.this.onChange();
 
-    title.addChangeHandler(changeHandler);
-    description.addChangeHandler(changeHandler);
-    disposalSchedulesList.addChangeHandler(changeHandler);
-    typeList.addChangeHandler(changeHandler);
-    fieldsList.addChangeHandler(changeHandler);
-    fieldValue.addChangeHandler(changeHandler);
-
     ChangeHandler typeListChangeHandler = event -> {
       if (typeList.getSelectedValue().equals(ConditionType.IS_CHILD_OF.toString())) {
         conditionLabel.setVisible(false);
-        pluginParameterPanel.setVisible(true);
         conditionPanel.setVisible(false);
+
+        pluginParameterPanel.setVisible(true);
       } else if (typeList.getSelectedValue().equals(ConditionType.METADATA_FIELD.toString())) {
-        childOfPanel.setVisible(false);
         conditionLabel.setVisible(true);
-        pluginParameterPanel.setVisible(false);
+        conditionLabel.setText(messages.disposalRuleCondition());
         conditionPanel.setVisible(true);
+
         fieldsList.setVisible(true);
         fieldsOperator.setVisible(true);
         fieldValue.setVisible(true);
+
+        childOfPanel.setVisible(false);
+        pluginParameterPanel.setVisible(false);
       } else {
         childOfPanel.setVisible(false);
         conditionLabel.setVisible(false);
@@ -331,6 +328,13 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
         conditionPanel.setVisible(false);
       }
     };
+
+    title.addChangeHandler(changeHandler);
+    description.addChangeHandler(changeHandler);
+    disposalSchedulesList.addChangeHandler(changeHandler);
+    fieldsList.addChangeHandler(changeHandler);
+    fieldValue.addChangeHandler(changeHandler);
+    typeList.addChangeHandler(changeHandler);
 
     typeList.addChangeHandler(typeListChangeHandler);
 
@@ -358,8 +362,13 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
       conditionKey = fieldsList.getSelectedValue();
       conditionValue = fieldValue.getValue();
     } else if (conditionType.equals(ConditionType.IS_CHILD_OF)) {
-      conditionKey = pluginParameterPanel.getValue();
-      conditionValue = pluginParameterPanel.getAipTitle();
+      if (pluginParameterPanel.isVisible()) {
+        conditionKey = pluginParameterPanel.getValue();
+        conditionValue = pluginParameterPanel.getAipTitle();
+      } else if(!pluginParameterPanel.isVisible() && editMode) {
+        conditionKey = disposalRule.getConditionKey();
+        conditionValue = disposalRule.getConditionValue();
+      }
     }
     return StringUtils.isNotBlank(conditionKey) && StringUtils.isNotBlank(conditionValue);
   }
@@ -393,42 +402,40 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
       disposalSchedulesListError.setVisible(false);
     }
 
-    if (!editMode) {
-      if (typeList.getSelectedValue().length() == 0) {
-        typeList.addStyleName("isWrong");
-        typeListError.setText(messages.mandatoryField());
-        typeListError.setVisible(true);
-        Window.scrollTo(typeList.getAbsoluteLeft(), typeList.getAbsoluteTop());
+    if (typeList.getSelectedValue().length() == 0) {
+      typeList.addStyleName("isWrong");
+      typeListError.setText(messages.mandatoryField());
+      typeListError.setVisible(true);
+      Window.scrollTo(typeList.getAbsoluteLeft(), typeList.getAbsoluteTop());
+      errorList.add(messages.isAMandatoryField(messages.disposalRuleType()));
+    } else {
+
+      conditionType = ConditionType.valueOf(typeList.getSelectedValue());
+      typeList.removeStyleName("isWrong");
+      typeListError.setVisible(false);
+
+      if (!isConditionValid()) {
+        if (conditionType.equals(ConditionType.IS_CHILD_OF)) {
+          pluginParameterPanel.addStyleName("isWrong");
+          Window.scrollTo(pluginParameterPanel.getAbsoluteLeft(), pluginParameterPanel.getAbsoluteTop());
+        } else {
+          conditionPanel.addStyleName("isWrong");
+          Window.scrollTo(conditionPanel.getAbsoluteLeft(), conditionPanel.getAbsoluteTop());
+        }
+        conditionError.setText(messages.mandatoryField());
+        conditionError.setVisible(true);
         errorList.add(messages.isAMandatoryField(messages.disposalRuleType()));
       } else {
-        conditionType = ConditionType.valueOf(typeList.getSelectedValue());
-        typeList.removeStyleName("isWrong");
-        typeListError.setVisible(false);
-
-        if (!isConditionValid()) {
-          if (conditionType.equals(ConditionType.IS_CHILD_OF)) {
-            pluginParameterPanel.addStyleName("isWrong");
-            Window.scrollTo(pluginParameterPanel.getAbsoluteLeft(), pluginParameterPanel.getAbsoluteTop());
-          } else {
-            conditionPanel.addStyleName("isWrong");
-            Window.scrollTo(conditionPanel.getAbsoluteLeft(), conditionPanel.getAbsoluteTop());
-          }
-          conditionError.setText(messages.mandatoryField());
-          conditionError.setVisible(true);
-          errorList.add(messages.isAMandatoryField(messages.disposalRuleType()));
+        if (conditionType.equals(ConditionType.IS_CHILD_OF)) {
+          pluginParameterPanel.removeStyleName("isWrong");
         } else {
-          if (conditionType.equals(ConditionType.IS_CHILD_OF)) {
-            pluginParameterPanel.removeStyleName("isWrong");
-          } else {
-            conditionPanel.removeStyleName("isWrong");
-          }
-          conditionError.setVisible(false);
+          conditionPanel.removeStyleName("isWrong");
         }
+        conditionError.setVisible(false);
       }
     }
 
     checked = true;
-
     return errorList.isEmpty();
   }
 
