@@ -428,6 +428,7 @@ public final class RodaConstants {
 
   public static final String CONTROLLER_DISPOSAL_RULE_PARAM = RODA_OBJECT_DISPOSAL_RULE;
   public static final String CONTROLLER_DISPOSAL_RULE_ID_PARAM = "disposalRuleId";
+  public static final String CONTROLLER_DISPOSAL_RULE_OVERRIDE_MANUAL_PARAM = "overrideManual";
 
   public static final String CONTROLLER_DISPOSAL_SCHEDULE_PARAM = RODA_OBJECT_DISPOSAL_SCHEDULE;
   public static final String CONTROLLER_DISPOSAL_SCHEDULE_ID_PARAM = "disposalScheduleId";
