@@ -243,7 +243,7 @@ public class DisposalScheduleTest {
     String mandate = "Pellentesque imperdiet nunc dolor.";
     String scopeNotes = "Praesent laoreet lacus leo, vitae consectetur nulla maximus non. Ut.";
     DisposalActionCode actionCode = DisposalActionCode.DESTROY;
-    String retentionTriggerElementId = "";
+    String retentionTriggerElementId = "dateFinal";
     RetentionPeriodIntervalCode periodIntervalCode = RetentionPeriodIntervalCode.YEARS;
     int retentionPeriodDuration = 10;
     String createdBy = "admin";
