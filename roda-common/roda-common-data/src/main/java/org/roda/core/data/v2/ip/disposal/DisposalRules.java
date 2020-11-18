@@ -1,9 +1,8 @@
 package org.roda.core.data.v2.ip.disposal;
 
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlElement;
 
@@ -50,8 +49,7 @@ public class DisposalRules implements RODAObjectList<DisposalRule> {
   }
 
   public void sortRules() {
-    disposalRuleList = disposalRuleList.stream().sorted(Comparator.comparing(DisposalRule::getOrder))
-      .collect(Collectors.toList());
+    Collections.sort(disposalRuleList);
   }
 
   public void incrementOrder(int index) {
@@ -78,6 +76,6 @@ public class DisposalRules implements RODAObjectList<DisposalRule> {
     disposalRule.setOrder(lastIndex);
     disposalRuleList.remove(disposalRule);
     disposalRuleList.add(disposalRule);
-    decrementOrder(startInterval,lastIndex--);
+    decrementOrder(startInterval, lastIndex--);
   }
 }

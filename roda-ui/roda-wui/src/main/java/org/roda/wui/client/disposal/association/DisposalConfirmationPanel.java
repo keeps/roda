@@ -7,6 +7,7 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
@@ -15,6 +16,7 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
@@ -49,7 +51,7 @@ public class DisposalConfirmationPanel extends Composite {
   Label disposalConfirmationCreationDate;
 
   @UiField
-  HTML disposalConfirmationStatus;
+  FlowPanel content;
 
   private DisposalConfirmation disposalConfirmation;
 
@@ -79,7 +81,49 @@ public class DisposalConfirmationPanel extends Composite {
 
     disposalConfirmationCreationDate.setText(Humanize.formatDate(disposalConfirmation.getCreatedOn()));
 
-    disposalConfirmationStatus
-      .setHTML(HtmlSnippetUtils.getDisposalConfirmationStateHTML(disposalConfirmation.getState()));
+    if (DisposalConfirmationState.APPROVED.equals(disposalConfirmation.getState())
+      || DisposalConfirmationState.PERMANENTLY_DELETED.equals(disposalConfirmation.getState())) {
+      content.add(getFlowPanelWithLabel("Executed on", Humanize.formatDate(disposalConfirmation.getExecutedOn())));
+      content.add(getFlowPanelWithLabel("Executed by", disposalConfirmation.getExecutedBy()));
+    } else if (DisposalConfirmationState.RESTORED.equals(disposalConfirmation.getState())) {
+      content.add(getFlowPanelWithLabel("Restored on", Humanize.formatDate(disposalConfirmation.getRestoredOn())));
+      content.add(getFlowPanelWithLabel("Restored by", disposalConfirmation.getRestoredBy()));
+    }
+
+    content.add(getFlowPanelWithHTML(messages.disposalConfirmationStatus(),
+      HtmlSnippetUtils.getDisposalConfirmationStateHTML(disposalConfirmation.getState())));
+  }
+
+  private FlowPanel getFlowPanelWithLabel(String labelText, String messageText) {
+    FlowPanel panel = new FlowPanel();
+    panel.addStyleName("field");
+
+    Label label = new Label(labelText);
+    label.addStyleName("label");
+
+    Label value = new Label(messageText);
+    value.addStyleName("value");
+
+    panel.add(label);
+    panel.add(value);
+
+    return panel;
+  }
+
+  private FlowPanel getFlowPanelWithHTML(String labelText, SafeHtml message) {
+    FlowPanel panel = new FlowPanel();
+    panel.addStyleName("field");
+
+    Label label = new Label(labelText);
+    label.addStyleName("label");
+
+    HTML value = new HTML();
+    value.setHTML(message);
+    value.addStyleName("value");
+
+    panel.add(label);
+    panel.add(value);
+
+    return panel;
   }
 }

@@ -23,6 +23,7 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -147,6 +148,13 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
           Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
           PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
 
+          outcomeText = "Archival Information Package [id: " + aip.getId()
+              + "] has been destroyed with disposal confirmation '" + disposalConfirmationReport.getTitle() + "' ("
+              + disposalConfirmationReport.getId() + ")";
+
+          model.createEvent(aip.getId(), null, null, null, RodaConstants.PreservationEventType.DESTRUCTION,
+              EVENT_DESCRIPTION, null, null, PluginState.SUCCESS, outcomeText, "", cachedJob.getUsername(), true);
+
           // Make a copy to disposal bin before update
           StoragePath aipStoragePath = ModelUtils.getAIPStoragePath(aip.getId());
           Path aipPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), aipStoragePath);
@@ -161,10 +169,13 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
             aip.setDestroyedOn(executionDate);
             aip.setDestroyedBy(cachedJob.getUsername());
 
-            // Mark the AIP as residual
+            // Mark the AIP as destroyed
             aip.setState(AIPState.DESTROYED);
 
             // Apply a stylesheet over the aip metadata
+            aip.getDescriptiveMetadata().clear();
+
+            aip.getRepresentations().clear();
 
             // remove the AIP files according to the configuration
 

@@ -559,7 +559,7 @@ public class ShowJob extends Composite {
       b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
     }
     if (job.getJobStats().getSourceObjectsProcessedWithSkipped() > 0) {
-      b.append(SafeHtmlUtils.fromSafeConstant("&nbsp;<span class='label-default'>"));
+      b.append(SafeHtmlUtils.fromSafeConstant("&nbsp;<span class='label-warning'>"));
       b.append(messages.showJobProgressSkippedCount(job.getJobStats().getSourceObjectsProcessedWithSkipped()));
       b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
     }
