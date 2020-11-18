@@ -142,6 +142,8 @@ public class DisposalPolicySchedulesPanel extends Composite {
           public String getValue(DisposalSchedule schedule) {
             if (schedule.getRetentionPeriodDuration() == null && schedule.getRetentionPeriodIntervalCode() == null) {
               return "";
+            } else if(schedule.getRetentionPeriodIntervalCode().equals(RetentionPeriodIntervalCode.NO_RETENTION_PERIOD)){
+              return messages.retentionPeriod(0,schedule.getRetentionPeriodIntervalCode().toString());
             } else {
               return messages.retentionPeriod(schedule.getRetentionPeriodDuration(),schedule.getRetentionPeriodIntervalCode().toString());
             }
