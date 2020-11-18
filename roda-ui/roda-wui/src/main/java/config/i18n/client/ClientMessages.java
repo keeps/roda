@@ -449,7 +449,9 @@ public interface ClientMessages extends Messages {
 
   String applyButton();
 
-  String applyToRepositoryButton();
+  String overrideManualAppliedSchedulesButton();
+
+  String applyDisposalRulesButton();
 
   String applyAllButton();
 
@@ -2259,9 +2261,9 @@ public interface ClientMessages extends Messages {
 
   String confirmChangeRulesOrder();
 
-  String confirmDeleteRule(String title);
+  String deleteDisposalRuleDialogTitle();
 
-  String applyRulesAfterAction();
+  String deleteDisposalRuleDialogMessage(String title);
 
   String disposalScheduleAssociationInformationTitle();
 
@@ -2320,4 +2322,14 @@ public interface ClientMessages extends Messages {
   String disposalScheduleAssociationTypeLabel();
 
   String disposalScheduleAssociationType(@Select String type);
+
+  String applyDisposalRulesDialogTitle();
+
+  String applyDisposalRulesDialogMessage();
+
+  String applyDisposalRulesDialogExplanation();
+
+  String deleteDisposalRuleSuccessTitle();
+
+  String deleteDisposalRuleSuccessMessage(String title);
 }

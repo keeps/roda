@@ -149,13 +149,12 @@ public class DisposalDialogs {
 
     layout.addStyleName("wui-dialog-layout");
     footer.addStyleName("wui-dialog-layout-footer");
-    footer.add(newHoldButton);
 
+    footer.add(newHoldButton);
+    footer.add(cancelButton);
     footer.add(clearHoldsButton);
     footer.add(overrideDisposalHoldButton);
     footer.add(selectHoldButton);
-
-    footer.add(cancelButton);
 
     dialogBox.setWidget(layout);
     dialogBox.center();
@@ -315,17 +314,16 @@ public class DisposalDialogs {
     options.add(overwriteAllDescription);
     footer.addStyleName("wui-dialog-layout-footer");
     footer.add(newScheduleButton);
-    footer.add(changeScheduleButton);
+    footer.add(cancelButton);
     footer.add(noScheduleButton);
     footer.add(changeScheduleButton);
-    footer.add(cancelButton);
 
     dialogBox.setWidget(layout);
     dialogBox.center();
     dialogBox.show();
   }
 
-  public static void showApplyRules(String title,  AsyncCallback<Boolean> callback) {
+  public static void showApplyRules(String title, AsyncCallback<Boolean> callback) {
     FlowPanel layout = new FlowPanel();
     FlowPanel footer = new FlowPanel();
     final DialogBox dialogBox = new DialogBox(false, true);
@@ -336,36 +334,37 @@ public class DisposalDialogs {
     footer.addStyleName("wui-dialog-layout-footer");
 
     Button cancelButton = new Button(messages.cancelButton());
-    cancelButton.addStyleName("btn btn-link apply-rules-btn");
+    cancelButton.addStyleName("btn btn-link");
     cancelButton.addClickHandler(event -> {
       dialogBox.hide();
       callback.onFailure(null);
     });
 
-    HTMLPanel info = new HTMLPanel("");
-    info.add(new HTMLWidgetWrapper("ApplyDisposalRules.html"));
-    info.addStyleName("page-description");
+    Label messageLabel = new Label(messages.applyDisposalRulesDialogExplanation());
+    messageLabel.addStyleName("wui-dialog-message");
 
     Button applyToManualInclusiveButton = new Button();
-    applyToManualInclusiveButton.setText(messages.applyToRepositoryButton());
-    applyToManualInclusiveButton.addStyleName("btn btn-danger btn-play apply-rules-btn");
+    applyToManualInclusiveButton.setText(messages.overrideManualAppliedSchedulesButton());
+    applyToManualInclusiveButton.addStyleName("btn btn-danger btn-play");
+    applyToManualInclusiveButton.getElement().getStyle().setMarginRight(10, Style.Unit.PX);
     applyToManualInclusiveButton.addClickHandler(clickEvent -> {
       dialogBox.hide();
       callback.onSuccess(true);
     });
 
     Button applyToManualExclusiveButton = new Button();
-    applyToManualExclusiveButton.setText(messages.applyButton());
-    applyToManualExclusiveButton.addStyleName("btn btn-play apply-rules-btn");
+    applyToManualExclusiveButton.setText(messages.applyDisposalRulesButton());
+    applyToManualExclusiveButton.addStyleName("btn btn-play");
     applyToManualExclusiveButton.addClickHandler(event -> {
       dialogBox.hide();
       callback.onSuccess(false);
     });
 
+    footer.add(cancelButton);
     footer.add(applyToManualInclusiveButton);
     footer.add(applyToManualExclusiveButton);
-    footer.add(cancelButton);
-    layout.add(info);
+
+    layout.add(messageLabel);
     layout.add(footer);
 
     dialogBox.setGlassEnabled(true);
