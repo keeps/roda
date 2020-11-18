@@ -308,7 +308,7 @@ public class BrowseAIP extends Composite {
         }
       });
       navigationToolbar.withActionImpactHandler(Actionable.ActionImpact.UPDATED,
-          () -> refresh(aipId, new NoAsyncCallback<>()));
+        () -> refresh(aipId, new NoAsyncCallback<>()));
       navigationToolbar.build();
     }
 
@@ -322,23 +322,27 @@ public class BrowseAIP extends Composite {
     updateSectionDescriptiveMetadata(bundle);
 
     // REPRESENTATIONS
-    if (bundle.getRepresentationCount() == 0) {
+    if (bundle.getRepresentationCount() == 0 && aip.getState().equals(AIPState.ACTIVE)) {
       addRepresentation.setWidget(new ActionableWidgetBuilder<>(representationActions).buildListWithObjects(
         new ActionableObject<>(IndexedRepresentation.class),
         Collections.singletonList(RepresentationActions.RepresentationAction.NEW)));
     }
 
-    addRepresentation.setVisible(bundle.getRepresentationCount() == 0);
+    addRepresentation.setVisible(bundle.getRepresentationCount() == 0 && aip.getState().equals(AIPState.ACTIVE));
 
     // AIP CHILDREN
-    if (bundle.getChildAIPCount() > 0) {
-      LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
-    } else {
-      addChildAip.setWidget(new ActionableWidgetBuilder<>(aipActions).buildListWithObjects(
-        new ActionableObject<>(IndexedAIP.class), Collections.singletonList(AipActions.AipAction.NEW_CHILD_AIP_BELOW)));
-    }
+    if (aip.getState().equals(AIPState.ACTIVE)) {
 
-    addChildAip.setVisible(bundle.getChildAIPCount() == 0);
+      if (bundle.getChildAIPCount() > 0) {
+        LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
+      } else {
+        addChildAip.setWidget(
+          new ActionableWidgetBuilder<>(aipActions).buildListWithObjects(new ActionableObject<>(IndexedAIP.class),
+            Collections.singletonList(AipActions.AipAction.NEW_CHILD_AIP_BELOW)));
+      }
+
+      addChildAip.setVisible(bundle.getChildAIPCount() == 0);
+    }
 
     keyboardFocus.setFocus(true);
   }
@@ -385,7 +389,7 @@ public class BrowseAIP extends Composite {
     });
 
     if (PermissionClientUtils.hasPermissions(aip.getPermissions(),
-      RodaConstants.PERMISSION_METHOD_CREATE_DESCRIPTIVE_METADATA_FILE)) {
+      RodaConstants.PERMISSION_METHOD_CREATE_DESCRIPTIVE_METADATA_FILE) && aip.getState().equals(AIPState.ACTIVE)) {
       final int addTabIndex = descriptiveMetadata.getWidgetCount();
       FlowPanel addTab = new FlowPanel();
       addTab.add(new HTML(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-plus-circle\"></i>")));
@@ -531,11 +535,11 @@ public class BrowseAIP extends Composite {
             // Edit link
             if (!AIPState.DESTROYED.equals(aip.getState())) {
               if (PermissionClientUtils.hasPermissions(aip.getPermissions(),
-                  RodaConstants.PERMISSION_METHOD_UPDATE_DESCRIPTIVE_METADATA_FILE)) {
+                RodaConstants.PERMISSION_METHOD_UPDATE_DESCRIPTIVE_METADATA_FILE)) {
                 String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId,
-                    escapedDescId);
+                  escapedDescId);
                 String editLinkHtml = "<a href='" + editLink
-                    + "' class='toolbarLink' id='aipEditDescriptiveMetadata'><i class='fa fa-edit'></i></a>";
+                  + "' class='toolbarLink' id='aipEditDescriptiveMetadata'><i class='fa fa-edit'></i></a>";
                 b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
               }
             }
