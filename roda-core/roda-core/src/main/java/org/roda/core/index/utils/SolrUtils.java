@@ -1656,8 +1656,8 @@ public class SolrUtils {
           cal.add(Calendar.DATE, retentionPeriodDuration);
           break;
       }
-      overDueDate = cal.getTime();
     }
+    overDueDate = cal.getTime();
 
     values.put(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_START_DATE, formatDate(objectToDate(o)));
     values.put(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_CALCULATION, RetentionPeriodCalculation.SUCCESS.name());

@@ -3,6 +3,7 @@ package org.roda.wui.client.disposal.association;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodCalculation;
+import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.disposal.schedule.ShowDisposalSchedule;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -112,8 +113,14 @@ public class RetentionPeriodPanel extends Composite {
       disposalRetentionPeriod.setVisible(false);
     } else {
       disposalRetentionDueDate.setText(Humanize.formatDate(aip.getOverdueDate()));
-      disposalRetentionPeriod
-        .setText(messages.retentionPeriod(aip.getRetentionPeriodDuration(), aip.getRetentionPeriodInterval().name()));
+
+      if (aip.getRetentionPeriodInterval().equals(RetentionPeriodIntervalCode.NO_RETENTION_PERIOD)) {
+        disposalRetentionPeriod.setText(messages.retentionPeriod(0, aip.getRetentionPeriodInterval().name()));
+      } else {
+        disposalRetentionPeriod
+          .setText(messages.retentionPeriod(aip.getRetentionPeriodDuration(), aip.getRetentionPeriodInterval().name()));
+      }
+
     }
   }
 
