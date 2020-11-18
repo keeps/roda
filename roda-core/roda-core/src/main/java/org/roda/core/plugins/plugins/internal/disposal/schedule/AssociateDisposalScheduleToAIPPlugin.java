@@ -6,10 +6,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.roda.core.RodaCoreFactory;
@@ -57,7 +55,6 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(AssociateDisposalScheduleToAIPPlugin.class);
 
   private String disposalScheduleId;
-  private static Set<String> previousDisposalSchedules;
   private boolean recursive = true;
   private boolean overwriteAll = false;
 
@@ -68,7 +65,8 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
         PluginParameter.PluginParameterType.STRING, "", true, false, "Disposal schedule identifier"));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RECURSIVE,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_RECURSIVE, "Recursive mode",
-        PluginParameter.PluginParameterType.BOOLEAN, "true", true, false, "Associate the schedule to descendants"));
+        PluginParameter.PluginParameterType.BOOLEAN, "true", true, false,
+        "Associates the disposal schedule to descendants"));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_ALL,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_ALL, "Overwrite mode",
         PluginParameter.PluginParameterType.BOOLEAN, "false", true, false,
@@ -115,7 +113,7 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "";
+    return "Associates a disposal schedule to a AIP";
   }
 
   @Override
@@ -167,7 +165,6 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
   private void processAIP(ModelService model, IndexService index, Report report, JobPluginInfo jobPluginInfo,
     Job cachedJob, List<AIP> aips) {
     LOGGER.debug("Associating disposal schedule {}", disposalScheduleId);
-    previousDisposalSchedules = new HashSet<>();
     if (recursive) {
       calculateResourcesCounter(index, jobPluginInfo, aips);
     }
@@ -196,8 +193,9 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
 
         if (aip.getDisposalConfirmationId() != null) {
           state = PluginState.FAILURE;
-          LOGGER.error("Error associating disposal schedule to AIP '" + aip.getId()
-            + "': This AIP is part of a disposal confirmation report and the schedule cannot be changed");
+          LOGGER.error(
+            "Error associating disposal schedule to AIP {}': This AIP is part of a disposal confirmation report and the schedule cannot be changed",
+            aip.getId());
           jobPluginInfo.incrementObjectsProcessedWithFailure();
           reportItem.setPluginState(state).setPluginDetails("Error associating disposal schedule to AIP '" + aip.getId()
             + "': This AIP is part of a disposal confirmation report and the schedule cannot be changed");
@@ -206,7 +204,6 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
               + "'; This AIP is part of a disposal confirmation report and the schedule cannot be changed",
             disposalScheduleId, null);
         } else {
-          previousDisposalSchedules.add(aip.getDisposalScheduleId());
           aip.setDisposalScheduleId(disposalScheduleId);
           aip.setScheduleAssociationType(AIPDisposalScheduleAssociationType.MANUAL);
           try {

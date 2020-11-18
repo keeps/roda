@@ -386,7 +386,7 @@ public class Report implements IsModelObject, HasId {
     }
 
     setPluginState(ReportUtils.calculatePluginState(getPluginState(), report.getPluginState(), report.getPluginIsMandatory()));
-    //setPluginState(report.getPluginState());
+
     if (!"".equals(report.getPluginDetails()) && !getPluginDetails().equals(report.getPluginDetails())) {
       setPluginDetails(
         (!"".equals(getPluginDetails()) ? getPluginDetails() + lineSeparator : "") + report.getPluginDetails());

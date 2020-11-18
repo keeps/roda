@@ -30,8 +30,8 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
-import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodCalculation;
+import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.IndexingAdditionalInfo.Flags;
@@ -319,8 +319,8 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
       .objectToDate(doc.get(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_START_DATE));
     final String retentionPeriodDetails = SolrUtils
       .objectToString(doc.get(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_DETAILS), null);
-    final RetentionPeriodCalculation retentionPeriodCalculation = SolrUtils
-      .objectToEnum(doc.get(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_CALCULATION), RetentionPeriodCalculation.class, null);
+    final RetentionPeriodCalculation retentionPeriodCalculation = SolrUtils.objectToEnum(
+      doc.get(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_CALCULATION), RetentionPeriodCalculation.class, null);
 
     String level;
     if (ghost) {

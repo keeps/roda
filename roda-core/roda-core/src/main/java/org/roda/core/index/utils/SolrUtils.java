@@ -1613,6 +1613,10 @@ public class SolrUtils {
     throws NotFoundException, GenericException {
     Map<String, String> values = new HashMap<>();
 
+    if (AIPState.DESTROYED.equals(aip.getState())) {
+      return values;
+    }
+
     if (DisposalActionCode.RETAIN_PERMANENTLY.equals(disposalSchedule.getActionCode())) {
       return values;
     }

@@ -1,15 +1,15 @@
 package org.roda.core.plugins.plugins.internal.disposal.rules;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-import org.roda.core.common.XMLUtility;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -18,7 +18,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPDisposalScheduleAssociationType;
-import org.roda.core.data.v2.ip.disposal.ConditionType;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalRules;
 import org.roda.core.data.v2.jobs.Job;
@@ -26,6 +25,7 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -34,7 +34,6 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +52,7 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_MANUAL,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_MANUAL, "Override disposal schedule",
         PluginParameter.PluginParameterType.BOOLEAN, "false", true, false,
-        "Overrides disposal schedules associated manually"));
+        "Overrides disposal schedules manually associated"));
   }
 
   @Override
@@ -78,7 +77,7 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticName() {
-    return "Associate disposal schedule";
+    return "Disposal schedule association via disposal rule";
   }
 
   @Override
@@ -107,12 +106,17 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "";
+    return "Disposal schedule successfully associated to AIP via disposal rule";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "";
+    return "Failed to associate disposal schedule to AIP via disposal rule";
+  }
+
+  @Override
+  public String getPreservationEventSkippedMessage() {
+    return "Skipped disposal schedule association to AIP via disposal rule";
   }
 
   @Override
@@ -134,91 +138,117 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, List<AIP> objects) {
-        processAIP(objects, model, report, cachedJob, jobPluginInfo);
+        processAIP(objects, index, model, report, cachedJob, jobPluginInfo);
       }
     }, index, model, storage, liteList);
   }
 
-  private void processAIP(List<AIP> aips, ModelService model, Report report, Job cachedJob,
+  private void processAIP(List<AIP> aips, IndexService index, ModelService model, Report report, Job cachedJob,
     JobPluginInfo jobPluginInfo) {
-
-    boolean ruleApplied = false;
-    DisposalRules disposalRules = new DisposalRules();
-    // Get disposal rules
     try {
-      disposalRules = model.listDisposalRules();
+      DisposalRules disposalRules = model.listDisposalRules();
+      Collections.sort(disposalRules.getObjects());
+
       if (disposalRules.getObjects().isEmpty()) {
-        for (AIP aip : aips) {
-          Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
-          PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
-          reportItem.setPluginState(PluginState.SKIPPED)
-            .setPluginDetails("Skipping associating disposal schedule to AIP '" + aip.getId()
-              + "' due to no disposal rule being present in the repository");
-          jobPluginInfo.incrementObjectsProcessedWithSkipped();
-          report.addReport(reportItem);
-          PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
-        }
+        processEmptyDisposalRules(aips, model, report, cachedJob, jobPluginInfo);
+      } else {
+        processDisposalRules(aips, disposalRules, index, model, report, cachedJob, jobPluginInfo);
       }
+
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | IOException e) {
       LOGGER.error("Failed to obtain disposal rules: {}", e.getMessage(), e);
       for (AIP aip : aips) {
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
         PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
-        reportItem.setPluginState(PluginState.FAILURE)
-            .setPluginDetails("Failure to obtain disposal rules");
+        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Failure to obtain disposal rules");
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
       }
     }
+  }
 
+  private void processEmptyDisposalRules(List<AIP> aips, ModelService model, Report report, Job cachedJob,
+    JobPluginInfo jobPluginInfo) {
     for (AIP aip : aips) {
-      if (AIPDisposalScheduleAssociationType.MANUAL.equals(aip.getScheduleAssociationType()) && overrideManualAssociations) {
-        // Apply the disposal schedule
-      } else {
-        // skip the event
-      }
+      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
+      reportItem.setPluginState(PluginState.SKIPPED).setPluginDetails("Skipping associating disposal schedule to AIP '"
+        + aip.getId() + "' due to no disposal rule being present in the repository");
+      jobPluginInfo.incrementObjectsProcessedWithSkipped();
+      report.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
+    }
+  }
 
-      if (overrideManualAssociations) {
+  private void processDisposalRules(List<AIP> aips, DisposalRules disposalRules, IndexService index, ModelService model,
+    Report report, Job cachedJob, JobPluginInfo jobPluginInfo) {
+    for (AIP aip : aips) {
+      LOGGER.debug("Processing AIP: {}", aip.getId());
 
-      } else {
-        for (DisposalRule rule : disposalRules.getObjects()) {
-          if (!ruleApplied) {
-            if (ConditionType.IS_CHILD_OF.equals(rule.getType())) {
-              ruleApplied = true;
-              if (aip.getParentId() != null && aip.getParentId().equals(rule.getConditionKey())) {
+      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
+      PluginState state = PluginState.SUCCESS;
+      Optional<DisposalRule> disposalRuleUsed;
+      String outcomeDetailsText = "";
 
-              }
-              String conditionValue = rule.getConditionValue();
+      try {
+        // Check if manual associated schedules are to be overridden
+        if (AIPDisposalScheduleAssociationType.MANUAL.equals(aip.getScheduleAssociationType())
+          && !overrideManualAssociations) {
+          state = PluginState.SKIPPED;
+          outcomeDetailsText = "Skipping associating disposal schedule to AIP '" + aip.getId()
+            + "' because the disposal schedule was manually associated";
+          reportItem.setPluginState(state).setPluginDetails(outcomeDetailsText);
+          jobPluginInfo.incrementObjectsProcessedWithSkipped();
+        } else {
+          disposalRuleUsed = ApplyDisposalRulesPluginUtils.applyRule(aip, disposalRules, index);
 
-            } else if (ConditionType.METADATA_FIELD.equals(rule.getType())) {
-              ruleApplied = true;
-
-              aip.getDescriptiveMetadata().forEach(descriptiveMetadata -> {
-                try {
-                  Binary binary = model.retrieveDescriptiveMetadataBinary(descriptiveMetadata.getAipId(),
-                    descriptiveMetadata.getId());
-
-                  InputStream inputStream = binary.getContent().createInputStream();
-
-                  XMLUtility.getString(inputStream, "//language");
-
-                } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
-                  | IOException e) {
-                  e.printStackTrace();
-                }
-
-              });
+          if (disposalRuleUsed.isPresent()) {
+            // Schedule was applied
+            try {
+              model.updateAIP(aip, cachedJob.getUsername());
+              outcomeDetailsText = "Disposal schedule '" + disposalRuleUsed.get().getDisposalScheduleName()
+                + "' was successfully associated to AIP '" + aip.getId() + "' via disposal rule '"
+                + disposalRuleUsed.get().getTitle() + "'";
+              reportItem.setPluginState(state).setPluginDetails(outcomeDetailsText);
+              jobPluginInfo.incrementObjectsProcessedWithSuccess();
+            } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
+              LOGGER.error("Failed to associate disposal schedule to AIP {}: {}", aip.getId(), e.getMessage(), e);
+              state = PluginState.FAILURE;
+              reportItem.setPluginState(state).setPluginDetails(
+                "Failed to associate disposal schedule to AIP '" + aip.getId() + "': '" + e.getMessage() + "'");
+              jobPluginInfo.incrementObjectsProcessedWithFailure();
             }
+
+          } else {
+            state = PluginState.SKIPPED;
+            outcomeDetailsText = "The AIP '" + aip.getId()
+              + "' did not match any disposal rule therefore the disposal schedule association was skipped";
+            reportItem.setPluginState(state).setPluginDetails(outcomeDetailsText);
+            jobPluginInfo.incrementObjectsProcessedWithSkipped();
           }
+
         }
+      } catch (GenericException | NotFoundException e) {
+        LOGGER.error("Failed to obtain index version of AIP '{}'", aip.getId(), e);
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+        state = PluginState.FAILURE;
+        reportItem.setPluginState(state)
+          .setPluginDetails("Error matching disposal rules to AIP '" + aip.getId() + "': " + e.getMessage());
       }
 
-      if (!ruleApplied) {
+      report.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
 
+      try {
+        PluginHelper.createPluginEvent(this, aip.getId(), model, index, null, null, state, outcomeDetailsText, true,
+          cachedJob);
+      } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+        | AuthorizationDeniedException | AlreadyExistsException e) {
+        LOGGER.error("Error creating event: {}", e.getMessage(), e);
       }
     }
-
   }
 
   @Override

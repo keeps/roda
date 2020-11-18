@@ -169,7 +169,11 @@ public class HtmlSnippetUtils {
         } else if (job.getJobStats().getSourceObjectsProcessedWithSuccess() > 0) {
           ret = SafeHtmlUtils
             .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
-        } else {
+        } else if (job.getJobStats().getSourceObjectsProcessedWithSuccess() == 0 && job.getJobStats().getSourceObjectsProcessedWithSkipped() > 0) {
+          ret = SafeHtmlUtils
+              .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
+        }
+        else {
           ret = SafeHtmlUtils
             .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.showJobStatusCompleted() + CLOSE_SPAN);
         }
