@@ -215,7 +215,9 @@ public class ShowDisposalSchedule extends Composite {
       retentionPeriodLabel.setVisible(false);
     } else if (disposalSchedule.getRetentionPeriodIntervalCode()
       .equals(RetentionPeriodIntervalCode.NO_RETENTION_PERIOD)) {
-      retentionPeriodValue.setHTML(disposalSchedule.getRetentionPeriodIntervalCode().toString());
+      String retentionPeriod = messages.retentionPeriod(0,
+              disposalSchedule.getRetentionPeriodIntervalCode().toString());
+      retentionPeriodValue.setHTML(retentionPeriod);
       retentionPeriodLabel.setVisible(true);
     } else {
       String retentionPeriod = messages.retentionPeriod(disposalSchedule.getRetentionPeriodDuration(),
