@@ -7291,7 +7291,3 @@ span.code {
     display: inline;
     vertical-align: bottom;
 }
-
-.apply-rules-btn{
-    margin: 1rem;
-}

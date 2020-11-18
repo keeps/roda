@@ -473,8 +473,8 @@ public class Disposals extends RodaWuiController {
     }
   }
 
-  public static void deleteDisposalRule(User user, String disposalRuleId) throws RequestNotValidException,
-    GenericException, NotFoundException, AuthorizationDeniedException {
+  public static void deleteDisposalRule(User user, String disposalRuleId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -500,7 +500,7 @@ public class Disposals extends RodaWuiController {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
-    // controllerAssistant.checkRoles(user);
+    controllerAssistant.checkRoles(user);
 
     LogEntryState state = LogEntryState.SUCCESS;
 
@@ -512,7 +512,8 @@ public class Disposals extends RodaWuiController {
       throw e;
     } finally {
       // register action
-      controllerAssistant.registerAction(user, state);
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_DISPOSAL_RULE_OVERRIDE_MANUAL_PARAM,
+        applyToManuallyInclusive);
     }
   }
 }

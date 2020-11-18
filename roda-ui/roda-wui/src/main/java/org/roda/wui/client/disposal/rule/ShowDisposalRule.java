@@ -10,8 +10,8 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.DisposalRuleActions;
 import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.common.dialogs.DisposalDialogs;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.client.disposal.schedule.ShowDisposalSchedule;
@@ -20,6 +20,7 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
@@ -199,40 +200,24 @@ public class ShowDisposalRule extends Composite {
       Button removeRuleBtn = new Button();
       removeRuleBtn.addStyleName("btn btn-block btn-danger btn-ban");
       removeRuleBtn.setText(messages.removeButton());
-      removeRuleBtn.addClickHandler(new ClickHandler() {
-        @Override
-        public void onClick(ClickEvent clickEvent) {
-          Dialogs.showConfirmDialog(messages.removeButton(), messages.confirmDeleteRule(disposalRule.getTitle()),
-            messages.dialogNo(), messages.dialogYes(), new NoAsyncCallback<Boolean>() {
-              @Override
-              public void onSuccess(Boolean aBoolean) {
-                if (aBoolean) {
-                  BrowserServiceImpl.Util.getInstance().deleteDisposalRule(disposalRule.getId(),
-                    new NoAsyncCallback<Void>() {
-                      @Override
-                      public void onSuccess(Void unused) {
-                        Dialogs.showConfirmDialog(messages.applyRules(), messages.applyRulesAfterAction(),
-                          messages.dialogNo(), messages.dialogYes(), new NoAsyncCallback<Boolean>() {
-                            @Override
-                            public void onSuccess(Boolean aBoolean) {
-                              HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
-                              if (aBoolean) {
-                                DisposalDialogs.showApplyRules(messages.applyRules(), new NoAsyncCallback<Boolean>() {
-                                  @Override
-                                  public void onSuccess(Boolean applyToManuallyInclusive) {
-                                    // TODO
-                                  }
-                                });
-                              }
-                            }
-                          });
-                      }
-                    });
-                }
-              }
-            });
-        }
-      });
+      removeRuleBtn.addClickHandler(clickEvent -> Dialogs.showConfirmDialog(messages.deleteDisposalRuleDialogTitle(),
+        messages.deleteDisposalRuleDialogMessage(disposalRule.getTitle()), messages.dialogNo(), messages.dialogYes(),
+        new NoAsyncCallback<Boolean>() {
+          @Override
+          public void onSuccess(Boolean confirm) {
+            if (confirm) {
+              BrowserServiceImpl.Util.getInstance().deleteDisposalRule(disposalRule.getId(),
+                new NoAsyncCallback<Void>() {
+                  @Override
+                  public void onSuccess(Void unused) {
+                    Toast.showInfo(messages.deleteDisposalRuleSuccessTitle(),
+                      messages.deleteDisposalRuleSuccessMessage(disposalRule.getTitle()));
+                    DisposalRuleActions.applyDisposalRulesAction();
+                  }
+                });
+            }
+          }
+        }));
 
       buttonsPanel.add(removeRuleBtn);
     }
@@ -240,12 +225,7 @@ public class ShowDisposalRule extends Composite {
     Button backBtn = new Button();
     backBtn.setText(messages.backButton());
     backBtn.addStyleName("btn btn-block btn-default btn-times-circle");
-    backBtn.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent clickEvent) {
-        HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
-      }
-    });
+    backBtn.addClickHandler(event -> HistoryUtils.newHistory(DisposalPolicy.RESOLVER));
     buttonsPanel.add(backBtn);
   }
 
