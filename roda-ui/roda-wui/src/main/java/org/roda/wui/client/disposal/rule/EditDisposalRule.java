@@ -114,18 +114,30 @@ public class EditDisposalRule extends Composite {
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
     if (disposalRuleDataPanel.isChanged() && disposalRuleDataPanel.isValid()) {
+      boolean runApplyRulesPlugin = false;
       DisposalRule disposalRuleUpdated = disposalRuleDataPanel.getDisposalRule();
       disposalRule.setTitle(disposalRuleUpdated.getTitle());
       disposalRule.setDescription(disposalRuleUpdated.getDescription());
       disposalRule.setDisposalScheduleId(disposalRuleUpdated.getDisposalScheduleId());
       disposalRule.setDisposalScheduleName(disposalRuleUpdated.getDisposalScheduleName());
+
+      if(!disposalRule.getType().equals(disposalRuleUpdated.getType())){
+        runApplyRulesPlugin = true;
+      }
       disposalRule.setType(disposalRuleUpdated.getType());
 
+
       if(disposalRuleUpdated.getConditionKey() != null){
+        if(!disposalRule.getConditionKey().equals(disposalRuleUpdated.getConditionKey())){
+          runApplyRulesPlugin = true;
+        }
         disposalRule.setConditionKey(disposalRuleUpdated.getConditionKey());
       }
 
       if(disposalRuleUpdated.getConditionValue() != null){
+        if(!disposalRule.getConditionValue().equals(disposalRuleUpdated.getConditionValue())){
+          runApplyRulesPlugin = true;
+        }
         disposalRule.setConditionValue(disposalRuleUpdated.getConditionValue());
       }
 

@@ -2341,5 +2341,7 @@ public interface ClientMessages extends Messages {
 
   String deleteDisposalRuleSuccessMessage(String title);
 
+  String updateDisposalRulesOrderSuccessTitle();
 
+  String updateDisposalRulesOrderSuccessMessage();
 }
