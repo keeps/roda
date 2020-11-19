@@ -90,7 +90,6 @@ import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
-import org.roda.wui.client.browse.bundle.DisposalConfirmationExtraBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
@@ -1116,6 +1115,9 @@ public class Browser extends RodaWuiController {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, aip);
 
+      // check state
+      controllerAssistant.checkAIPstate(aip);
+
       String name = fileName;
       if (name.contains(".")) {
         name = name.substring(name.lastIndexOf('.'));
@@ -1123,6 +1125,7 @@ public class Browser extends RodaWuiController {
 
       // delegate
       BrowserHelper.createOrUpdateOtherMetadataFile(aipId, representationId, null, null, type, name, is);
+
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -1184,6 +1187,9 @@ public class Browser extends RodaWuiController {
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, aip);
+
+      // check state
+      controllerAssistant.checkAIPstate(aip);
 
       // delegate
       BrowserHelper.deleteOtherMetadataFile(aipId, representationId, null, null, suffix, type);
@@ -1249,6 +1255,9 @@ public class Browser extends RodaWuiController {
         IndexedAIP parentAip = BrowserHelper.retrieve(IndexedAIP.class, parentId,
           RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
         controllerAssistant.checkObjectPermissions(user, parentAip);
+
+        // check state
+        controllerAssistant.checkAIPstate(parentAip);
       }
 
       // delegate
@@ -1312,6 +1321,10 @@ public class Browser extends RodaWuiController {
         IndexedAIP parentSDO = BrowserHelper.retrieve(IndexedAIP.class, parentId,
           RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
         controllerAssistant.checkObjectPermissions(user, parentSDO);
+
+        // check state
+        controllerAssistant.checkAIPstate(parentSDO);
+
         Permissions parentPermissions = parentSDO.getPermissions();
 
         for (String name : parentPermissions.getUsernames()) {
@@ -1352,6 +1365,9 @@ public class Browser extends RodaWuiController {
       IndexedAIP indexedAip = BrowserHelper.retrieve(IndexedAIP.class, aip.getId(),
         RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, indexedAip);
+
+      // check state
+      controllerAssistant.checkAIPstate(indexedAip);
 
       // delegate
       return BrowserHelper.updateAIP(user, aip);
@@ -1445,6 +1461,9 @@ public class Browser extends RodaWuiController {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, aip);
 
+      // check state
+      controllerAssistant.checkAIPstate(aip);
+
       // delegate
       return BrowserHelper.createDescriptiveMetadataFile(aipId, representationId, metadataId, metadataType,
         metadataVersion, metadataPayload);
@@ -1474,6 +1493,9 @@ public class Browser extends RodaWuiController {
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, aip);
+
+      // check state
+      controllerAssistant.checkAIPstate(aip);
 
       // delegate
       Map<String, String> properties = new HashMap<>();
@@ -1505,6 +1527,9 @@ public class Browser extends RodaWuiController {
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, aip);
+
+      // check state
+      controllerAssistant.checkAIPstate(aip);
 
       // delegate
       BrowserHelper.deleteDescriptiveMetadataFile(aipId, representationId, metadataId);
@@ -1560,6 +1585,9 @@ public class Browser extends RodaWuiController {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, aip);
 
+      // check state
+      controllerAssistant.checkAIPstate(aip);
+
       // delegate
       return BrowserHelper.createRepresentation(user, aipId, representationId, type, details);
     } catch (RODAException e) {
@@ -1574,7 +1602,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static Representation updateRepresentation(User user, Representation representation)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -1586,6 +1614,9 @@ public class Browser extends RodaWuiController {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId(),
         RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, aip);
+
+      // check state
+      controllerAssistant.checkAIPstate(aip);
 
       // delegate
       return BrowserHelper.updateRepresentation(representation);
@@ -1644,6 +1675,9 @@ public class Browser extends RodaWuiController {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, aip);
 
+      // check state
+      controllerAssistant.checkAIPstate(aip);
+
       // delegate
       Map<String, String> properties = new HashMap<>();
       properties.put(RodaConstants.VERSION_USER, user.getId());
@@ -1673,6 +1707,12 @@ public class Browser extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
+      IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+      controllerAssistant.checkObjectPermissions(user, aip);
+
+      // check state
+      controllerAssistant.checkAIPstate(aip);
+
       IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
         IdUtils.getRepresentationId(aipId, representationId), RodaConstants.REPRESENTATION_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, representation);
@@ -1710,6 +1750,9 @@ public class Browser extends RodaWuiController {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, aip);
 
+      // check state
+      controllerAssistant.checkAIPstate(aip);
+
       // delegate
       Map<String, String> properties = new HashMap<>();
       properties.put(RodaConstants.VERSION_USER, user.getId());
@@ -1740,6 +1783,12 @@ public class Browser extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
+      IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+      controllerAssistant.checkObjectPermissions(user, aip);
+
+      // check state
+      controllerAssistant.checkAIPstate(aip);
+
       IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
         IdUtils.getRepresentationId(aipId, representationId), RodaConstants.REPRESENTATION_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, representation);
@@ -2602,6 +2651,9 @@ public class Browser extends RodaWuiController {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, aip);
 
+      // check state
+      controllerAssistant.checkAIPstate(aip);
+
       // delegate
       Path file = Files.createTempFile("descriptive", ".tmp");
       Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
@@ -2635,6 +2687,9 @@ public class Browser extends RodaWuiController {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, file.getAipId(),
         RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, aip);
+
+      // check state
+      controllerAssistant.checkAIPstate(aip);
 
       // delegate
       Path temp = Files.createTempFile("descriptive", ".tmp");
