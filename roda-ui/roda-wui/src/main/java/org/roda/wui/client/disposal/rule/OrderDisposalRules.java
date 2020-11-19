@@ -8,6 +8,7 @@ import org.roda.core.data.v2.ip.disposal.DisposalRules;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.DisposalRuleActions;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -16,6 +17,7 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
+import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
@@ -282,7 +284,9 @@ public class OrderDisposalRules extends Composite {
           BrowserServiceImpl.Util.getInstance().updateDisposalRules(disposalRules, new NoAsyncCallback<Void>() {
             @Override
             public void onSuccess(Void unused) {
-              HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+              Toast.showInfo(messages.updateDisposalRulesOrderSuccessTitle(),
+                      messages.updateDisposalRulesOrderSuccessMessage());
+              DisposalRuleActions.applyDisposalRulesAction();
             }
           });
         }
