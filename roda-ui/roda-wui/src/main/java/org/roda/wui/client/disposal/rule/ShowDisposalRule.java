@@ -5,6 +5,7 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.disposal.ConditionType;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
+import org.roda.core.data.v2.ip.disposal.DisposalRules;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
@@ -212,7 +213,23 @@ public class ShowDisposalRule extends Composite {
                   public void onSuccess(Void unused) {
                     Toast.showInfo(messages.deleteDisposalRuleSuccessTitle(),
                       messages.deleteDisposalRuleSuccessMessage(disposalRule.getTitle()));
-                    DisposalRuleActions.applyDisposalRulesAction();
+                    BrowserService.Util.getInstance().listDisposalRules(new NoAsyncCallback<DisposalRules>() {
+                      @Override
+                      public void onSuccess(DisposalRules disposalRules) {
+                        int index = 0;
+                        for (DisposalRule disposalRule : disposalRules.getObjects()) {
+                          disposalRule.setOrder(index);
+                          index++;
+                        }
+                        BrowserServiceImpl.Util.getInstance().updateDisposalRules(disposalRules,
+                          new NoAsyncCallback<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                              DisposalRuleActions.applyDisposalRulesAction();
+                            }
+                          });
+                      }
+                    });
                   }
                 });
             }
