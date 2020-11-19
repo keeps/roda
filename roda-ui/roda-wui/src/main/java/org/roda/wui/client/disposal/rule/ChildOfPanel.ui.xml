@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:p="urn:import:org.roda.wui.client.ingest.process"
+>
+    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
+
+    <g:FlowPanel>
+        <g:Label ui:field="editPanelLabel" addStyleNames="form-label"/>
+        <g:HorizontalPanel ui:field="editPanel"/>
+        <g:Label ui:field="pluginParameterPanelError" addStyleNames="form-label-error"/>
+        <p:PluginParameterPanel ui:field="pluginParameterPanel"/>
+    </g:FlowPanel>
+</ui:UiBinder>
