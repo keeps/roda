@@ -120,8 +120,15 @@ public class EditDisposalRule extends Composite {
       disposalRule.setDisposalScheduleId(disposalRuleUpdated.getDisposalScheduleId());
       disposalRule.setDisposalScheduleName(disposalRuleUpdated.getDisposalScheduleName());
       disposalRule.setType(disposalRuleUpdated.getType());
-      disposalRule.setConditionKey(disposalRuleUpdated.getConditionKey());
-      disposalRule.setConditionValue(disposalRuleUpdated.getConditionValue());
+
+      if(disposalRuleUpdated.getConditionKey() != null){
+        disposalRule.setConditionKey(disposalRuleUpdated.getConditionKey());
+      }
+
+      if(disposalRuleUpdated.getConditionValue() != null){
+        disposalRule.setConditionValue(disposalRuleUpdated.getConditionValue());
+      }
+
       BrowserServiceImpl.Util.getInstance().updateDisposalRule(disposalRule, new NoAsyncCallback<DisposalRule>() {
         @Override
         public void onSuccess(DisposalRule disposalRule) {

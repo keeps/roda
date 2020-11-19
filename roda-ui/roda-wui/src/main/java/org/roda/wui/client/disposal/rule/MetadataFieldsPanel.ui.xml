@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+>
+    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
+    <g:FlowPanel>
+        <g:Label ui:field="metadataFieldLabel" addStyleNames="form-label"/>
+        <g:Label ui:field="metadataFieldError" addStyleNames="form-label-error"/>
+        <g:FlowPanel>
+            <g:FlowPanel addStyleNames="col_2">
+
+                <g:ListBox addStyleNames="form-textbox" ui:field="fieldsList"/>
+            </g:FlowPanel>
+            <g:FlowPanel addStyleNames="disposalRuleOperator col_1">
+                <g:Label addStyleNames="form-label" ui:field="fieldsOperator"/>
+            </g:FlowPanel>
+            <g:FlowPanel addStyleNames="col_3">
+                <g:TextBox ui:field="fieldValue" addStyleNames="form-textbox"/>
+            </g:FlowPanel>
+        </g:FlowPanel>
+    </g:FlowPanel>
+</ui:UiBinder>
