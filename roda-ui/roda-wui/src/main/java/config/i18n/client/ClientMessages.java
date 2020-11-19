@@ -13,7 +13,6 @@ package config.i18n.client;
 import java.util.Date;
 import java.util.List;
 
-import org.roda.core.data.v2.ip.AIPDisposalScheduleAssociationType;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
@@ -2344,4 +2343,6 @@ public interface ClientMessages extends Messages {
   String updateDisposalRulesOrderSuccessTitle();
 
   String updateDisposalRulesOrderSuccessMessage();
+
+  String confirmEditRuleMessage();
 }
