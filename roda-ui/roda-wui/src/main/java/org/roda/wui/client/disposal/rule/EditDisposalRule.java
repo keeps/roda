@@ -2,11 +2,14 @@ package org.roda.wui.client.disposal.rule;
 
 import java.util.List;
 
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.DisposalRuleActions;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.common.client.HistoryResolver;
@@ -36,18 +39,19 @@ public class EditDisposalRule extends Composite {
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
-        BrowserService.Util.getInstance().retrieveDisposalRule(historyTokens.get(0), new NoAsyncCallback<DisposalRule>() {
-          @Override
-          public void onSuccess(DisposalRule disposalRule) {
-            BrowserService.Util.getInstance().listDisposalSchedules(new NoAsyncCallback<DisposalSchedules>() {
-              @Override
-              public void onSuccess(DisposalSchedules disposalSchedules) {
-                EditDisposalRule panel = new EditDisposalRule(disposalRule, disposalSchedules);
-                callback.onSuccess(panel);
-              }
-            });
-          }
-        });
+        BrowserService.Util.getInstance().retrieveDisposalRule(historyTokens.get(0),
+          new NoAsyncCallback<DisposalRule>() {
+            @Override
+            public void onSuccess(DisposalRule disposalRule) {
+              BrowserService.Util.getInstance().listDisposalSchedules(new NoAsyncCallback<DisposalSchedules>() {
+                @Override
+                public void onSuccess(DisposalSchedules disposalSchedules) {
+                  EditDisposalRule panel = new EditDisposalRule(disposalRule, disposalSchedules);
+                  callback.onSuccess(panel);
+                }
+              });
+            }
+          });
       }
     }
 
@@ -100,7 +104,7 @@ public class EditDisposalRule extends Composite {
 
   public EditDisposalRule(DisposalRule disposalRule, DisposalSchedules disposalSchedules) {
     this.disposalRule = disposalRule;
-    this.disposalRuleDataPanel = new DisposalRuleDataPanel(disposalRule, disposalSchedules,true);
+    this.disposalRuleDataPanel = new DisposalRuleDataPanel(disposalRule, disposalSchedules, true);
 
     initWidget(uiBinder.createAndBindUi(this));
   }
@@ -118,39 +122,60 @@ public class EditDisposalRule extends Composite {
       DisposalRule disposalRuleUpdated = disposalRuleDataPanel.getDisposalRule();
       disposalRule.setTitle(disposalRuleUpdated.getTitle());
       disposalRule.setDescription(disposalRuleUpdated.getDescription());
+
+      if (!disposalRule.getDisposalScheduleId().equals(disposalRuleUpdated.getDisposalScheduleId())
+        && !disposalRule.getDisposalScheduleName().equals(disposalRuleUpdated.getDisposalScheduleName())) {
+        runApplyRulesPlugin = true;
+      }
       disposalRule.setDisposalScheduleId(disposalRuleUpdated.getDisposalScheduleId());
       disposalRule.setDisposalScheduleName(disposalRuleUpdated.getDisposalScheduleName());
 
-      if(!disposalRule.getType().equals(disposalRuleUpdated.getType())){
+      if (!disposalRule.getType().equals(disposalRuleUpdated.getType())) {
         runApplyRulesPlugin = true;
       }
       disposalRule.setType(disposalRuleUpdated.getType());
 
-
-      if(disposalRuleUpdated.getConditionKey() != null){
-        if(!disposalRule.getConditionKey().equals(disposalRuleUpdated.getConditionKey())){
+      if (disposalRuleUpdated.getConditionKey() != null) {
+        if (!disposalRule.getConditionKey().equals(disposalRuleUpdated.getConditionKey())) {
           runApplyRulesPlugin = true;
         }
         disposalRule.setConditionKey(disposalRuleUpdated.getConditionKey());
       }
 
-      if(disposalRuleUpdated.getConditionValue() != null){
-        if(!disposalRule.getConditionValue().equals(disposalRuleUpdated.getConditionValue())){
+      if (disposalRuleUpdated.getConditionValue() != null) {
+        if (!disposalRule.getConditionValue().equals(disposalRuleUpdated.getConditionValue())) {
           runApplyRulesPlugin = true;
         }
         disposalRule.setConditionValue(disposalRuleUpdated.getConditionValue());
       }
 
-      BrowserServiceImpl.Util.getInstance().updateDisposalRule(disposalRule, new NoAsyncCallback<DisposalRule>() {
-        @Override
-        public void onSuccess(DisposalRule disposalRule) {
-          HistoryUtils.newHistory(ShowDisposalRule.RESOLVER, disposalRule.getId());
-        }
-      });
+      if (!runApplyRulesPlugin) {
+        BrowserServiceImpl.Util.getInstance().updateDisposalRule(disposalRule, new NoAsyncCallback<DisposalRule>() {
+          @Override
+          public void onSuccess(DisposalRule disposalRule) {
+            HistoryUtils.newHistory(ShowDisposalRule.RESOLVER, disposalRule.getId());
+          }
+        });
+      } else {
+        Dialogs.showConfirmDialog(messages.saveButton(), messages.confirmEditRuleMessage(), messages.dialogNo(),
+          messages.dialogYes(), new NoAsyncCallback<Boolean>() {
+            @Override
+            public void onSuccess(Boolean confirm) {
+              if (confirm) {
+                BrowserServiceImpl.Util.getInstance().updateDisposalRule(disposalRule,
+                  new NoAsyncCallback<DisposalRule>() {
+                    @Override
+                    public void onSuccess(DisposalRule disposalRule) {
+                      DisposalRuleActions.applyDisposalRulesAction();
+                    }
+                  });
+              }
+            }
+          });
+      }
     } else {
       HistoryUtils.newHistory(ShowDisposalRule.RESOLVER, disposalRule.getId());
     }
-
   }
 
   @UiHandler("buttonCancel")
