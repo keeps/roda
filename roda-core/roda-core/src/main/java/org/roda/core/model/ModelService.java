@@ -472,6 +472,17 @@ public class ModelService extends ModelObservable {
     return aip;
   }
 
+  public AIP destroyAIP(AIP aip, String updatedBy)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    aip.setUpdatedBy(updatedBy);
+    aip.setUpdatedOn(new Date());
+    updateAIPMetadata(aip);
+    notifyAipDestroyed(aip).failOnError();
+    return aip;
+  }
+
   public AIP updateAIP(AIP aip, String updatedBy)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
@@ -3278,8 +3289,8 @@ public class ModelService extends ModelObservable {
       throw new GenericException("Error reading disposal hold: " + disposalHoldId, e);
     }
 
-    Long count = SolrUtils.count(RodaCoreFactory.getSolr(), IndexedAIP.class, new Filter(
-        new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLDS_ID, ret.getId())));
+    Long count = SolrUtils.count(RodaCoreFactory.getSolr(), IndexedAIP.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLDS_ID, ret.getId())));
     ret.setAipCounter(count);
 
     return ret;
@@ -3305,15 +3316,15 @@ public class ModelService extends ModelObservable {
     return disposalHold;
   }
 
-  public DisposalHold updateDisposalHold(DisposalHold disposalHold, String updatedBy)
-      throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException, IllegalOperationException {
+  public DisposalHold updateDisposalHold(DisposalHold disposalHold, String updatedBy) throws RequestNotValidException,
+    NotFoundException, GenericException, AuthorizationDeniedException, IllegalOperationException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     // Check if disposal hold is ACTIVE to update
     DisposalHold currentDisposalHold = retrieveDisposalHold(disposalHold.getId());
     if (DisposalHoldState.LIFTED.equals(currentDisposalHold.getState())) {
       throw new IllegalOperationException("Error updating disposal hold: " + currentDisposalHold.getId()
-          + ". Reason: Disposal hold is lifted therefore can not change its content");
+        + ". Reason: Disposal hold is lifted therefore can not change its content");
     }
 
     disposalHold.setUpdatedOn(new Date());
@@ -3352,8 +3363,8 @@ public class ModelService extends ModelObservable {
       for (Resource resource : iterable) {
         DisposalHold hold = ResourceParseUtils.convertResourceToObject(resource, DisposalHold.class);
 
-        Long count = SolrUtils.count(RodaCoreFactory.getSolr(), IndexedAIP.class, new Filter(
-            new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLDS_ID, hold.getId())));
+        Long count = SolrUtils.count(RodaCoreFactory.getSolr(), IndexedAIP.class,
+          new Filter(new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLDS_ID, hold.getId())));
         hold.setAipCounter(count);
 
         disposalHolds.addObject(hold);
@@ -3446,14 +3457,15 @@ public class ModelService extends ModelObservable {
   }
 
   public DisposalSchedule updateDisposalSchedule(DisposalSchedule disposalSchedule, String updatedBy)
-      throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException, IllegalOperationException {
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
+    IllegalOperationException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     // Check if disposal schedule is ACTIVE to update
     DisposalSchedule currentDisposalSchedule = retrieveDisposalSchedule(disposalSchedule.getId());
     if (DisposalScheduleState.INACTIVE.equals(currentDisposalSchedule.getState())) {
       throw new IllegalOperationException("Error updating disposal schedule: " + currentDisposalSchedule.getId()
-          + ". Reason: Disposal schedule is inactive therefore can not change its content");
+        + ". Reason: Disposal schedule is inactive therefore can not change its content");
     }
 
     disposalSchedule.setUpdatedOn(new Date());
@@ -3481,8 +3493,8 @@ public class ModelService extends ModelObservable {
       throw new GenericException("Error reading disposal schedule: " + disposalScheduleId, e);
     }
 
-    Long count = SolrUtils.count(RodaCoreFactory.getSolr(), IndexedAIP.class, new Filter(
-        new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID, ret.getId())));
+    Long count = SolrUtils.count(RodaCoreFactory.getSolr(), IndexedAIP.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID, ret.getId())));
     ret.setApiCounter(count);
 
     return ret;
@@ -3498,8 +3510,8 @@ public class ModelService extends ModelObservable {
       for (Resource resource : iterable) {
         DisposalSchedule schedule = ResourceParseUtils.convertResourceToObject(resource, DisposalSchedule.class);
 
-        Long count = SolrUtils.count(RodaCoreFactory.getSolr(), IndexedAIP.class, new Filter(
-            new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID, schedule.getId())));
+        Long count = SolrUtils.count(RodaCoreFactory.getSolr(), IndexedAIP.class,
+          new Filter(new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID, schedule.getId())));
         schedule.setApiCounter(count);
 
         disposalSchedules.addObject(schedule);
@@ -3591,8 +3603,8 @@ public class ModelService extends ModelObservable {
 
     String disposalConfirmationAsJson = JsonUtils.getJsonFromObject(disposalConfirmation);
     DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(
-        ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmation.getId()),
-        RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME);
+      ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmation.getId()),
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME);
     storage.updateBinaryContent(metadataStoragePath, new StringContentPayload(disposalConfirmationAsJson), false,
       false);
 
@@ -3622,9 +3634,9 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public DisposalConfirmation createDisposalConfirmation(
-      DisposalConfirmation disposalConfirmation, String createdBy) throws RequestNotValidException,
-    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
+  public DisposalConfirmation createDisposalConfirmation(DisposalConfirmation disposalConfirmation, String createdBy)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     if (disposalConfirmation.getId() == null) {
@@ -3707,8 +3719,8 @@ public class ModelService extends ModelObservable {
     return disposalRule;
   }
 
-  public void deleteDisposalRule(String disposalRuleId) throws NotFoundException, GenericException,
-    AuthorizationDeniedException, RequestNotValidException {
+  public void deleteDisposalRule(String disposalRuleId)
+    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     StoragePath disposalRulePath = ModelUtils.getDisposalRuleStoragePath(disposalRuleId);
