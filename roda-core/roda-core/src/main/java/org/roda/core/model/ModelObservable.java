@@ -72,6 +72,10 @@ public abstract class ModelObservable {
     return notifyObserversSafely(observer -> observer.aipUpdated(aip));
   }
 
+  public ReturnWithExceptionsWrapper notifyAipDestroyed(AIP aip) {
+    return notifyObserversSafely(observer -> observer.aipDestroyed(aip));
+  }
+
   public ReturnWithExceptionsWrapper notifyAipMoved(AIP aip, String oldParentId, String newParentId) {
     return notifyObserversSafely(observer -> observer.aipMoved(aip, oldParentId, newParentId));
   }
