@@ -893,7 +893,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
                 @Override
                 public void onSuccess(DisposalHoldDialogResult result) {
                   if (DisposalHoldDialogResult.ActionType.CLEAR.equals(result.getActionType())) {
-                    clearDisposalHolds(aips, size, callback);
+                    clearDisposalHolds(aips, size, result.isApplyToHierarchy(), callback);
                   } else if (DisposalHoldDialogResult.ActionType.ASSOCIATE.equals(result.getActionType())) {
                     applyDisposalHold(aips, size, result, false, callback);
                   } else if (DisposalHoldDialogResult.ActionType.OVERRIDE.equals(result.getActionType())) {
@@ -916,7 +916,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
         public void onSuccess(Boolean result) {
           if (result) {
             BrowserService.Util.getInstance().applyDisposalHold(aips, holdDialogResult.getDisposalHold().getId(),
-              override, new ActionAsyncCallback<Job>(callback) {
+              holdDialogResult.isApplyToHierarchy(), override, new ActionAsyncCallback<Job>(callback) {
                 @Override
                 public void onFailure(Throwable caught) {
                   callback.onFailure(caught);
@@ -956,7 +956,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
       });
   }
 
-  private void clearDisposalHolds(final SelectedItems<IndexedAIP> aips, final Long size,
+  private void clearDisposalHolds(final SelectedItems<IndexedAIP> aips, final Long size, boolean applyToHierarchy,
     final AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.clearDisposalHoldDialogTitle(),
       messages.clearDisposalHoldDialogMessage(size.intValue()), messages.dialogNo(), messages.dialogYes(),
@@ -964,7 +964,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            BrowserService.Util.getInstance().liftDisposalHold(aips, null, true,
+            BrowserService.Util.getInstance().liftDisposalHold(aips, null, applyToHierarchy, true,
               new ActionAsyncCallback<Job>(callback) {
                 @Override
                 public void onFailure(Throwable caught) {

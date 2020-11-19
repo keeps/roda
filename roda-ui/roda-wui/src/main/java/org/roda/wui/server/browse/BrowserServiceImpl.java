@@ -1127,17 +1127,19 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public Job applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalScheduleId, boolean override)
+  public Job applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalScheduleId,
+    boolean applyToHierarchy, boolean override)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Disposals.applyDisposalHold(user, selectedItems, disposalScheduleId, override);
+    return Disposals.applyDisposalHold(user, selectedItems, disposalScheduleId, applyToHierarchy, override);
   }
 
   @Override
-  public Job liftDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean clearAll)
+  public Job liftDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean applyToHierarchy,
+    boolean clearAll)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Disposals.liftDisposalHold(user, selectedItems, disposalHoldId, clearAll);
+    return Disposals.liftDisposalHold(user, selectedItems, disposalHoldId, applyToHierarchy, clearAll);
   }
 
   @Override

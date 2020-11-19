@@ -29,6 +29,8 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPDisposalScheduleAssociationType;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalAIPMetadata;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalScheduleAIPMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -156,10 +158,13 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-    return PluginHelper.processObjects(this,
-      (RODAObjectsProcessingLogic<AIP>) (index1, model1, storage1, report, cachedJob, jobPluginInfo, plugin,
-        objects) -> processAIP(model1, index1, report, jobPluginInfo, cachedJob, objects),
-      index, model, storage, liteList);
+    return PluginHelper.processObjects(this, (RODAObjectsProcessingLogic<AIP>) (index1, model1, storage1, report,
+      cachedJob, jobPluginInfo, plugin, objects) -> {
+      if (recursive) {
+        calculateResourcesCounter(index, jobPluginInfo, objects);
+      }
+      processAIP(model1, index1, report, jobPluginInfo, cachedJob, objects);
+    }, index, model, storage, liteList);
   }
 
   private void processAIP(ModelService model, IndexService index, Report report, JobPluginInfo jobPluginInfo,
@@ -171,7 +176,6 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
 
     // Uses cache to retrieve the disposal schedule
     DisposalSchedule disposalSchedule = RodaCoreFactory.getDisposalSchedule(disposalScheduleId);
-
     if (disposalSchedule == null) {
       LOGGER.error("Failed to retrieve disposal schedule {} from model", disposalScheduleId);
       for (AIP aip : aips) {
@@ -185,13 +189,16 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
       }
     } else {
       for (AIP aip : aips) {
+        LOGGER.debug("Processing AIP {}", aip.getId());
         Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
         PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
         PluginState state = PluginState.SUCCESS;
         String outcomeText;
-        LOGGER.debug("Processing AIP {}", aip.getId());
+        DisposalAIPMetadata currentDisposal = aip.getDisposal();
 
-        if (aip.getDisposalConfirmationId() != null) {
+        if (currentDisposal != null && currentDisposal.getConfirmation() != null
+          && currentDisposal.getConfirmation().getId() != null) {
+          // Error cannot associate a disposal if already exist a disposal confirmation
           state = PluginState.FAILURE;
           LOGGER.error(
             "Error associating disposal schedule to AIP {}': This AIP is part of a disposal confirmation report and the schedule cannot be changed",
@@ -204,14 +211,8 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
               + "'; This AIP is part of a disposal confirmation report and the schedule cannot be changed",
             disposalScheduleId, null);
         } else {
-          aip.setDisposalScheduleId(disposalScheduleId);
-          aip.setScheduleAssociationType(AIPDisposalScheduleAssociationType.MANUAL);
           try {
-            model.updateAIP(aip, cachedJob.getUsername());
-            disposalSchedule.setFirstTimeUsed(new Date());
-
-            model.updateDisposalSchedule(disposalSchedule, cachedJob.getUsername());
-
+            applyDisposalSchedule(model, cachedJob, aip, disposalSchedule);
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
 
             reportItem.setPluginState(state).setPluginDetails("Disposal schedule '" + disposalSchedule.getTitle()
@@ -222,7 +223,7 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
             if (recursive) {
               processChildren(model, index, cachedJob, aip, disposalSchedule, jobPluginInfo, report);
             }
-          } catch (NotFoundException | RequestNotValidException | AuthorizationDeniedException | GenericException
+          } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException
             | IllegalOperationException e) {
             LOGGER.error("Error associating disposal schedule {} to {}: {}", disposalScheduleId, aip.getId(),
               e.getMessage(), e);
@@ -236,9 +237,6 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
           }
         }
 
-        report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
-
         try {
           PluginHelper.createPluginEvent(this, aip.getId(), model, index, null, null, state, outcomeText, true,
             cachedJob);
@@ -247,24 +245,6 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
           LOGGER.error("Error creating event: {}", e.getMessage(), e);
         }
       }
-    }
-  }
-
-  private void calculateResourcesCounter(IndexService index, JobPluginInfo jobPluginInfo, List<AIP> aips) {
-    try {
-      ArrayList<String> ancestorList = aips.stream().map(AIP::getId).collect(Collectors.toCollection(ArrayList::new));
-      Filter ancestorFilter;
-      if (!overwriteAll) {
-        ancestorFilter = new Filter();
-        ancestorFilter.add(new OneOfManyFilterParameter(RodaConstants.AIP_ANCESTORS, ancestorList));
-        ancestorFilter.add(new EmptyKeyFilterParameter(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID));
-      } else {
-        ancestorFilter = new Filter(new OneOfManyFilterParameter(RodaConstants.AIP_ANCESTORS, ancestorList));
-      }
-      int resourceCounter = index.count(IndexedAIP.class, ancestorFilter).intValue();
-      jobPluginInfo.setSourceObjectsCount(resourceCounter + aips.size());
-    } catch (GenericException | RequestNotValidException e) {
-      // do nothing
     }
   }
 
@@ -288,16 +268,17 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
         LOGGER.debug("Processing children AIP {}", indexedAIP.getId());
 
         try {
-          AIP aipChildren = model.retrieveAIP(indexedAIP.getId());
-          reportItem.setPluginState(PluginState.SUCCESS);
-          reportItem.setPluginDetails("Apply disposal schedule: " + disposalScheduleId);
-          aipChildren.setDisposalScheduleId(aipParent.getDisposalScheduleId());
-          aipChildren.setScheduleAssociationType(AIPDisposalScheduleAssociationType.MANUAL);
-          model.updateAIP(aipChildren, cachedJob.getUsername());
+          AIP aip = model.retrieveAIP(indexedAIP.getId());
+          applyDisposalSchedule(model, cachedJob, aip, disposalSchedule);
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
-          outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule("was successfully applied to AIP",
+          reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails("Disposal schedule '"
+            + disposalSchedule.getTitle() + "' (" + disposalScheduleId + ") was successfully associated to AIP");
+          outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule("was successfully associated to AIP",
             disposalSchedule.getId(), disposalSchedule.getTitle());
-        } catch (NotFoundException | AuthorizationDeniedException e) {
+          if (recursive) {
+            processChildren(model, index, cachedJob, aip, disposalSchedule, jobPluginInfo, report);
+          }
+        } catch (NotFoundException | AuthorizationDeniedException | IllegalOperationException e) {
           LOGGER.debug("Can't associate disposal schedule to child. It wasn't found.", e);
           jobPluginInfo.incrementObjectsProcessedWithFailure();
           reportItem.setPluginState(PluginState.FAILURE)
@@ -320,7 +301,45 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
     } catch (IOException | GenericException | RequestNotValidException e) {
       LOGGER.error("Error getting children AIPs when associate to a disposal schedule", e);
     }
+  }
 
+  private void applyDisposalSchedule(ModelService model, Job cachedJob, AIP aip, DisposalSchedule disposalSchedule)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException,
+    IllegalOperationException {
+    DisposalAIPMetadata disposalAIPMetadata;
+    DisposalScheduleAIPMetadata disposalScheduleAIPMetadata = DisposalSchedulePluginUtils
+      .createDisposalScheduleAIPMetadata(disposalSchedule, cachedJob.getUsername(),
+        AIPDisposalScheduleAssociationType.MANUAL);
+
+    if (aip.getDisposal() == null) {
+      disposalAIPMetadata = new DisposalAIPMetadata();
+    } else {
+      disposalAIPMetadata = aip.getDisposal();
+    }
+
+    disposalAIPMetadata.setSchedule(disposalScheduleAIPMetadata);
+    aip.setDisposal(disposalAIPMetadata);
+    model.updateAIP(aip, cachedJob.getUsername());
+    disposalSchedule.setFirstTimeUsed(new Date());
+    model.updateDisposalSchedule(disposalSchedule, cachedJob.getUsername());
+  }
+
+  private void calculateResourcesCounter(IndexService index, JobPluginInfo jobPluginInfo, List<AIP> aips) {
+    try {
+      ArrayList<String> ancestorList = aips.stream().map(AIP::getId).collect(Collectors.toCollection(ArrayList::new));
+      Filter ancestorFilter;
+      if (!overwriteAll) {
+        ancestorFilter = new Filter();
+        ancestorFilter.add(new OneOfManyFilterParameter(RodaConstants.AIP_ANCESTORS, ancestorList));
+        ancestorFilter.add(new EmptyKeyFilterParameter(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID));
+      } else {
+        ancestorFilter = new Filter(new OneOfManyFilterParameter(RodaConstants.AIP_ANCESTORS, ancestorList));
+      }
+      int resourceCounter = index.count(IndexedAIP.class, ancestorFilter).intValue();
+      jobPluginInfo.setSourceObjectsCount(resourceCounter + aips.size());
+    } catch (GenericException | RequestNotValidException e) {
+      // do nothing
+    }
   }
 
   @Override

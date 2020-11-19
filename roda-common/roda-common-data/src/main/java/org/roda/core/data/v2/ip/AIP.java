@@ -14,6 +14,7 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalAIPMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -51,8 +52,11 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
   private Date updatedOn = null;
   private String updatedBy = null;
 
+  private DisposalAIPMetadata disposal;
+
   private String disposalScheduleId = null;
   private List<DisposalHoldAssociation> disposalHoldAssociation = new ArrayList<>();
+  private List<DisposalHoldAssociation> transitiveDisposalHoldAssociation = new ArrayList<>();
   private Date destroyedOn = null;
   private String destroyedBy = null;
   private String disposalConfirmationId = null;
@@ -65,20 +69,21 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions) {
     this(id, parentId, type, state, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>(),
       new AIPFormat(), new ArrayList<Relationship>(), new Date(), null, new Date(), null, null,
-      new ArrayList<DisposalHoldAssociation>(), null, null, null, null);
+      new ArrayList<DisposalHoldAssociation>(), new ArrayList<DisposalHoldAssociation>(), null, null, null);
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions, String createdBy) {
     this(id, parentId, type, state, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>(),
       new AIPFormat(), new ArrayList<Relationship>(), new Date(), createdBy, new Date(), createdBy, null,
-      new ArrayList<DisposalHoldAssociation>(), null, null, null, null);
+      new ArrayList<DisposalHoldAssociation>(), new ArrayList<DisposalHoldAssociation>(), null, null, null);
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions,
     List<DescriptiveMetadata> descriptiveMetadata, List<Representation> representations, AIPFormat format,
     List<Relationship> relationships, Date createdOn, String createdBy, Date updatedOn, String updatedBy,
-    String disposalScheduleId, List<DisposalHoldAssociation> disposalHoldAssociation, Date destroyedOn,
-    String destroyedBy, String disposalConfirmationId, AIPDisposalScheduleAssociationType scheduleAssociationType) {
+    String disposalScheduleId, List<DisposalHoldAssociation> disposalHoldAssociation,
+    List<DisposalHoldAssociation> transitiveDisposalHoldAssociation, Date destroyedOn, String destroyedBy,
+    String disposalConfirmationId) {
     super();
     this.id = id;
     this.parentId = parentId;
@@ -96,8 +101,11 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
     this.updatedOn = updatedOn;
     this.updatedBy = updatedBy;
 
+    this.disposal = disposal;
+
     this.disposalScheduleId = disposalScheduleId;
     this.disposalHoldAssociation = disposalHoldAssociation;
+    this.transitiveDisposalHoldAssociation = transitiveDisposalHoldAssociation;
     this.destroyedOn = destroyedOn;
     this.destroyedBy = destroyedBy;
     this.disposalConfirmationId = disposalConfirmationId;
@@ -278,6 +286,29 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
     return this;
   }
 
+  public List<DisposalHoldAssociation> getTransitiveDisposalHoldAssociation() {
+    return transitiveDisposalHoldAssociation;
+  }
+
+  public void setTransitiveDisposalHoldAssociation(List<DisposalHoldAssociation> transitiveDisposalHoldAssociation) {
+    this.transitiveDisposalHoldAssociation = transitiveDisposalHoldAssociation;
+  }
+
+  @JsonIgnore
+  public DisposalHoldAssociation getDisposalHoldAssociationByID(String disposalHoldId) {
+    for (DisposalHoldAssociation holdAssociation : disposalHoldAssociation) {
+      if (holdAssociation.getId().equals(disposalHoldId)) {
+        return holdAssociation;
+      }
+    }
+    return null;
+  }
+
+  @JsonIgnore
+  public void addTransitiveDisposalHoldAssociation(DisposalHoldAssociation transitiveDisposalHoldAssociation) {
+    this.transitiveDisposalHoldAssociation.add(transitiveDisposalHoldAssociation);
+  }
+
   public Date getDestroyedOn() {
     return destroyedOn;
   }
@@ -364,6 +395,14 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
 
   public AIPDisposalScheduleAssociationType getScheduleAssociationType() {
     return scheduleAssociationType;
+  }
+
+  public DisposalAIPMetadata getDisposal() {
+    return disposal;
+  }
+
+  public void setDisposal(DisposalAIPMetadata disposal) {
+    this.disposal = disposal;
   }
 
   public void setScheduleAssociationType(AIPDisposalScheduleAssociationType scheduleAssociationType) {

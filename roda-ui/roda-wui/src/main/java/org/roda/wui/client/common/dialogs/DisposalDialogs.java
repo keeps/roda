@@ -48,12 +48,15 @@ public class DisposalDialogs {
     dialogBox.setText(title);
 
     FlowPanel layout = new FlowPanel();
+    CheckBox applyToHierarchyCheckBox = new CheckBox(messages.applyAllButton());
+    Label applyToHierarchyDescription = new Label(messages.applyToHierarchyDisposalDialogDescription());
     Button clearHoldsButton = new Button(messages.clearDisposalHoldButton());
     Button overrideDisposalHoldButton = new Button(messages.overrideDisposalHoldButton());
     Button cancelButton = new Button(messages.cancelButton());
     Button selectHoldButton = new Button(messages.applyDisposalHoldButton());
     Button newHoldButton = new Button(messages.createDisposalHoldButton());
     FlowPanel footer = new FlowPanel();
+    FlowPanel options = new FlowPanel();
 
     overrideDisposalHoldButton.setEnabled(false);
     selectHoldButton.setEnabled(false);
@@ -103,10 +106,18 @@ public class DisposalDialogs {
     dataProvider.addDataDisplay(table);
 
     layout.add(displayScrollWrapper);
+    layout.add(options);
     layout.add(footer);
 
     dialogBox.setGlassEnabled(true);
     dialogBox.setAnimationEnabled(false);
+
+    applyToHierarchyCheckBox.setValue(true);
+    applyToHierarchyCheckBox.addStyleName("disposal-dialogs-checkbox form-checkbox");
+    applyToHierarchyDescription.addStyleName("form-help");
+    applyToHierarchyCheckBox.addValueChangeHandler(valueChangeEvent -> {
+      applyToHierarchy = valueChangeEvent.getValue();
+    });
 
     cancelButton.addClickHandler(event -> {
       dialogBox.hide();
@@ -116,7 +127,7 @@ public class DisposalDialogs {
     selectHoldButton.addClickHandler(clickEvent -> {
       dialogBox.hide();
       DisposalHoldDialogResult result = new DisposalHoldDialogResult(ActionType.ASSOCIATE,
-        singleSelectionModel.getSelectedObject());
+        singleSelectionModel.getSelectedObject(), applyToHierarchy);
       callback.onSuccess(result);
     });
 
@@ -129,13 +140,13 @@ public class DisposalDialogs {
     overrideDisposalHoldButton.addClickHandler(clickEvent -> {
       dialogBox.hide();
       DisposalHoldDialogResult result = new DisposalHoldDialogResult(ActionType.OVERRIDE,
-        singleSelectionModel.getSelectedObject());
+        singleSelectionModel.getSelectedObject(), applyToHierarchy);
       callback.onSuccess(result);
     });
 
     clearHoldsButton.addClickHandler(clickEvent -> {
       dialogBox.hide();
-      DisposalHoldDialogResult result = new DisposalHoldDialogResult(ActionType.CLEAR);
+      DisposalHoldDialogResult result = new DisposalHoldDialogResult(ActionType.CLEAR, applyToHierarchy);
       callback.onSuccess(result);
     });
 
@@ -145,6 +156,9 @@ public class DisposalDialogs {
     overrideDisposalHoldButton.addStyleName("btn btn-play");
     newHoldButton.addStyleName("btn btn-plus");
     table.addStyleName("my-asyncdatagrid-display");
+
+    options.add(applyToHierarchyCheckBox);
+    options.add(applyToHierarchyDescription);
 
     layout.addStyleName("wui-dialog-layout");
     footer.addStyleName("wui-dialog-layout-footer");
@@ -266,7 +280,6 @@ public class DisposalDialogs {
 
     changeScheduleButton.addClickHandler(clickEvent -> {
       dialogBox.hide();
-      GWT.log(applyToHierarchy.toString());
       DisposalScheduleDialogResult result = new DisposalScheduleDialogResult(
         DisposalScheduleDialogResult.ActionType.ASSOCIATE, singleSelectionModel.getSelectedObject(), applyToHierarchy,
         overwriteAll);
@@ -290,7 +303,6 @@ public class DisposalDialogs {
         overwriteAllCheckBox.setEnabled(false);
         overwriteAllCheckBox.setValue(false);
         overwriteAll = false;
-        GWT.log("overwriteAll: " + overwriteAll);
       }
     });
 
@@ -299,7 +311,6 @@ public class DisposalDialogs {
     overwriteAllDescription.addStyleName("form-help");
     overwriteAllCheckBox.addValueChangeHandler(valueChangeEvent -> {
       overwriteAll = valueChangeEvent.getValue();
-      GWT.log("onchange overwriteAll: " + overwriteAll);
     });
 
     cancelButton.addStyleName("btn btn-link");
