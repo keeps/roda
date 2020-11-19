@@ -220,7 +220,6 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
                 "Failed to associate disposal schedule to AIP '" + aip.getId() + "': '" + e.getMessage() + "'");
               jobPluginInfo.incrementObjectsProcessedWithFailure();
             }
-
           } else {
             state = PluginState.SKIPPED;
             outcomeDetailsText = "The AIP '" + aip.getId()

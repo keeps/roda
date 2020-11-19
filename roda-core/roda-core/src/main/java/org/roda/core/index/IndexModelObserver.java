@@ -329,6 +329,28 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
+  public ReturnWithExceptions<Void, ModelObserver> aipDestroyed(AIP aip) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+
+    Map<String, Object> fieldsToUpdate = new HashMap<>();
+
+    fieldsToUpdate.put(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(aip.getState()));
+    fieldsToUpdate.put(RodaConstants.AIP_DESTROYED_ON, SolrUtils.formatDate(aip.getDestroyedOn()));
+    fieldsToUpdate.put(RodaConstants.AIP_DESTROYED_BY, aip.getDestroyedBy());
+
+    // change AIP
+    SolrUtils.update(index, IndexedAIP.class, aip.getId(), fieldsToUpdate, (ModelObserver) this).addTo(ret);
+
+    if (ret.isEmpty()) {
+      // change Representations, Files & Preservation events
+      representationsStateUpdated(aip).addTo(ret);
+      preservationEventsStateUpdated(aip).addTo(ret);
+    }
+
+    return ret;
+  }
+
+  @Override
   public ReturnWithExceptions<Void, ModelObserver> aipStateUpdated(AIP aip) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 

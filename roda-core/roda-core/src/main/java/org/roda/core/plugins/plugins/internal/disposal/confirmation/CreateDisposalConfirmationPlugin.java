@@ -154,7 +154,6 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
     Set<String> disposalHolds = new HashSet<>();
     String confirmationId = IdUtils.createUUID();
     long storageSize = 0L;
-    long numberOfCollection = 0L;
 
     for (AIP aip : aips) {
       PluginState state = PluginState.SUCCESS;
@@ -165,9 +164,9 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
 
       // Validates if the AIP can be assigned to a disposal confirmation
       if (aip.getDisposalConfirmationId() != null) {
-        LOGGER.error("Error creating disposal confirmation {}: {}", confirmationId,
-          "AIP '" + aip.getId() + "' marked as already assigned to a disposal confirmation '" + title + "' ("
-            + aip.getDisposalConfirmationId() + ")");
+        LOGGER.error(
+          "Error creating disposal confirmation {}: AIP '{}' marked as already assigned to a disposal confirmation '{}'",
+          confirmationId, aip.getId(), aip.getDisposalConfirmationId());
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         reportItem.setPluginState(state)
           .setPluginDetails("AIP '" + aip.getId() + "' is already assigned to a disposal confirmation '" + title + "' ("
@@ -264,6 +263,16 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
       model.createRepositoryEvent(getPreservationEventType(), getPreservationEventDescription(), PluginState.FAILURE,
         getPreservationEventFailureMessage(), confirmationId, cachedJob.getUsername(), true);
     }
+  }
+
+  private boolean validateAIPAssign(AIP aip) {
+    if (aip.getDisposalConfirmationId() != null) {
+
+    } else if (aip.onHold()) {
+
+    }
+
+    return false;
   }
 
   @Override
