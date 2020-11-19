@@ -288,6 +288,7 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
     // if index object has disposal hold status, add status field
     if (HAS_DISPOSAL.contains(options.getClassToReturn())) {
       fieldsToReturn.add(RodaConstants.AIP_DISPOSAL_HOLD_STATUS);
+      fieldsToReturn.add(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID);
     }
 
     // nested collections
