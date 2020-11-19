@@ -179,18 +179,23 @@ public class DisassociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP>
         } else {
           try {
             disposalSchedule = model.retrieveDisposalSchedule(disposalScheduleId);
-            aip.setDisposalScheduleId(null);
-            aip.setScheduleAssociationType(null);
+            if(aip.getDisposal() != null){
+              aip.getDisposal().setSchedule(null);
+              model.updateDisposalSchedule(disposalSchedule, cachedJob.getUsername());
+              model.updateAIP(aip, cachedJob.getUsername());
+              reportItem.setPluginState(state).setPluginDetails(
+                  "Disposal schedule '" + disposalScheduleId + "' was successfully disassociated from AIP");
 
-            model.updateDisposalSchedule(disposalSchedule, cachedJob.getUsername());
-            model.updateAIP(aip, cachedJob.getUsername());
-
+              outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(" was successfully disassociated from AIP",
+                  disposalSchedule.getId(), disposalSchedule.getTitle());
+            } else {
+              state = PluginState.SKIPPED;
+              reportItem.setPluginState(state).setPluginDetails(
+                  "Disposal schedule '" + disposalScheduleId + "' does not exist on this AIP");
+              outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(" does not exist on this AIP",
+                  disposalSchedule.getId(), disposalSchedule.getTitle());
+            }
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
-            reportItem.setPluginState(state).setPluginDetails(
-              "Disposal schedule '" + disposalScheduleId + "' was successfully disassociated from AIP");
-
-            outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(" was successfully disassociated from AIP",
-              disposalSchedule.getId(), disposalSchedule.getTitle());
           } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
             | IllegalOperationException e) {
             LOGGER.error("Error disassociating disposal schedule {} from AIP {}: {}", disposalScheduleId, aip.getId(),

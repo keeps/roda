@@ -220,7 +220,7 @@ public class ShowDisposalHold extends Composite {
             new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLDS_ID, disposalHold.getId()));
           SelectedItemsFilter<IndexedAIP> selectedItemsFilter = new SelectedItemsFilter<>(filter,
             IndexedAIP.class.getName(), true);
-          BrowserService.Util.getInstance().liftDisposalHold(selectedItemsFilter, disposalHold.getId(), false,
+          BrowserService.Util.getInstance().liftDisposalHold(selectedItemsFilter, disposalHold.getId(), false, false,
             new AsyncCallback<Job>() {
               @Override
               public void onFailure(Throwable throwable) {

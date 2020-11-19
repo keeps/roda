@@ -436,10 +436,12 @@ public interface BrowserService extends RemoteService {
   Job disassociateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, Boolean applyToHierarchy)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  Job applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean override)
+  Job applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean applyToHierarchy,
+    boolean override)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  Job liftDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean clearAll)
+  Job liftDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean applyToHierarchy,
+    boolean clearAll)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   Job createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, String title,

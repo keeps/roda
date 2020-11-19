@@ -74,6 +74,11 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
 
   private String disposalScheduleId = null;
   private String disposalScheduleName = null;
+  private String disposalRetentionPeriod = null;
+  private List<String> disposalHoldsId = new ArrayList<>();
+  private List<String> transitiveDisposalHoldsId = new ArrayList<>();
+  private Date destroyedOn = null;
+  private String destroyedBy = null;
   private DisposalActionCode disposalAction = null;
   private AIPDisposalScheduleAssociationType scheduleAssociationType = null;
 
@@ -84,12 +89,9 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
   private String retentionPeriodDetails = null;
   private RetentionPeriodCalculation retentionPeriodCalculation = null;
 
-  private List<String> disposalHoldsId = new ArrayList<>();
   private boolean onHold = false;
 
   private String disposalConfirmationId = null;
-  private Date destroyedOn = null;
-  private String destroyedBy = null;
 
   /**
    * Constructs an empty (<strong>invalid</strong>) {@link IndexedAIP}.
@@ -111,8 +113,8 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
       other.getHasRepresentations(), other.getGhost(), other.getDisposalScheduleId(), other.getDisposalScheduleName(),
       other.getRetentionPeriodDuration(), other.getRetentionPeriodInterval(), other.getRetentionPeriodStartDate(),
       other.getRetentionPeriodDetails(), other.getRetentionPeriodState(), other.getDisposalHoldsId(),
-      other.getDestroyedOn(), other.getDestroyedBy(), other.getDisposalConfirmationId(),
-      other.getScheduleAssociationType());
+      other.getTransitiveDisposalHoldsId(), other.getDestroyedOn(), other.getDestroyedBy(),
+      other.getDisposalConfirmationId(), other.getScheduleAssociationType());
   }
 
   /**
@@ -128,12 +130,13 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
    * @param parentID
    */
   public IndexedAIP(String id, AIPState state, String type, String level, String title, Date dateInitial,
-                    Date dateFinal, String description, String parentID, List<String> ancestors, Permissions permissions,
-                    Long numberOfSubmissionFiles, Long numberOfDocumentationFiles, Long numberOfSchemaFiles, Boolean hasRepresentations,
-                    Boolean ghost, String disposalScheduleId, String disposalScheduleName, Integer retentionPeriodDuration,
-                    RetentionPeriodIntervalCode retentionPeriodInterval, Date retentionPeriodStartDate, String retentionPeriodDetails,
-                    RetentionPeriodCalculation retentionPeriodCalculation, List<String> disposalHoldsId, Date destroyedOn, String destroyedBy,
-                    String disposalConfirmationId, AIPDisposalScheduleAssociationType scheduleAssociationType) {
+    Date dateFinal, String description, String parentID, List<String> ancestors, Permissions permissions,
+    Long numberOfSubmissionFiles, Long numberOfDocumentationFiles, Long numberOfSchemaFiles, Boolean hasRepresentations,
+    Boolean ghost, String disposalScheduleId, String disposalScheduleName, Integer retentionPeriodDuration,
+    RetentionPeriodIntervalCode retentionPeriodInterval, Date retentionPeriodStartDate, String retentionPeriodDetails,
+    RetentionPeriodCalculation retentionPeriodCalculation, List<String> disposalHoldsId,
+    List<String> transitiveDisposalHoldsId, Date destroyedOn, String destroyedBy, String disposalConfirmationId,
+    AIPDisposalScheduleAssociationType scheduleAssociationType) {
     super();
     this.id = id;
     this.state = state;
@@ -159,6 +162,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
     this.retentionPeriodDetails = retentionPeriodDetails;
     this.retentionPeriodCalculation = retentionPeriodCalculation;
     this.disposalHoldsId = disposalHoldsId;
+    this.transitiveDisposalHoldsId = transitiveDisposalHoldsId;
     this.destroyedOn = destroyedOn;
     this.destroyedBy = destroyedBy;
     this.disposalConfirmationId = disposalConfirmationId;
@@ -434,6 +438,15 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
 
   public IndexedAIP setDisposalHoldsId(List<String> disposalHoldsId) {
     this.disposalHoldsId = disposalHoldsId;
+    return this;
+  }
+
+  public List<String> getTransitiveDisposalHoldsId() {
+    return transitiveDisposalHoldsId;
+  }
+
+  public IndexedAIP setTransitiveDisposalHoldsId(List<String> transitiveDisposalHoldsId) {
+    this.transitiveDisposalHoldsId = transitiveDisposalHoldsId;
     return this;
   }
 

@@ -3489,16 +3489,17 @@ public class BrowserHelper {
     return RodaCoreFactory.getModelService().updateDisposalRule(disposalRule, user.getName());
   }
 
-  public static void deleteDisposalRule(String disposalRuleId) throws GenericException, RequestNotValidException,
-    NotFoundException, AuthorizationDeniedException {
+  public static void deleteDisposalRule(String disposalRuleId)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     RodaCoreFactory.getModelService().deleteDisposalRule(disposalRuleId);
   }
 
   public static Job applyDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId,
-    boolean override)
+    boolean applyToHierarchy, boolean override)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, disposalHoldId);
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RECURSIVE, Boolean.toString(applyToHierarchy));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE, Boolean.toString(override));
 
     return createAndExecuteInternalJob("Apply disposal hold", items, ApplyDisposalHoldToAIPPlugin.class, user,
@@ -3506,10 +3507,11 @@ public class BrowserHelper {
   }
 
   public static Job liftDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId,
-    boolean clearAll)
+    boolean applyToHierarchy, boolean clearAll)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, disposalHoldId);
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RECURSIVE, Boolean.toString(applyToHierarchy));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_LIFT_ALL, Boolean.toString(clearAll));
 
     return createAndExecuteInternalJob("Lift disposal hold", items, LiftDisposalHoldFromAIPPlugin.class, user,

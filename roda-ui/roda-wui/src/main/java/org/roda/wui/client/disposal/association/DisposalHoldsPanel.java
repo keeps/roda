@@ -67,7 +67,6 @@ public class DisposalHoldsPanel extends Composite {
   @UiField
   FlowPanel panel;
 
-
   @UiField
   Button associateDisposalHoldButton;
 
@@ -140,7 +139,7 @@ public class DisposalHoldsPanel extends Composite {
               SelectedItems<IndexedAIP> items = new SelectedItemsList<>(Collections.singletonList(indexedAip.getUUID()),
                 indexedAip.getClass().getName());
               if (DisposalHoldDialogResult.ActionType.CLEAR.equals(result.getActionType())) {
-                clearDisposalHolds(items);
+                clearDisposalHolds(items, result.isApplyToHierarchy());
               } else if (DisposalHoldDialogResult.ActionType.ASSOCIATE.equals(result.getActionType())) {
                 applyDisposalHold(items, result, false);
               } else if (DisposalHoldDialogResult.ActionType.OVERRIDE.equals(result.getActionType())) {
@@ -152,13 +151,13 @@ public class DisposalHoldsPanel extends Composite {
     });
   }
 
-  private void clearDisposalHolds(final SelectedItems<IndexedAIP> aips) {
+  private void clearDisposalHolds(final SelectedItems<IndexedAIP> aips, boolean applyToHierarchy) {
     Dialogs.showConfirmDialog(messages.clearDisposalHoldDialogTitle(), messages.clearDisposalHoldDialogMessage(1),
       messages.dialogNo(), messages.dialogYes(), new NoAsyncCallback<Boolean>() {
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            BrowserService.Util.getInstance().liftDisposalHold(aips, null, true, new AsyncCallback<Job>() {
+            BrowserService.Util.getInstance().liftDisposalHold(aips, null, applyToHierarchy, true, new AsyncCallback<Job>() {
               @Override
               public void onFailure(Throwable caught) {
                 HistoryUtils.newHistory(InternalProcess.RESOLVER);
@@ -202,7 +201,7 @@ public class DisposalHoldsPanel extends Composite {
         public void onSuccess(Boolean result) {
           if (result) {
             BrowserService.Util.getInstance().applyDisposalHold(aips, holdDialogResult.getDisposalHold().getId(),
-              override, new AsyncCallback<Job>() {
+              holdDialogResult.isApplyToHierarchy(), override, new AsyncCallback<Job>() {
                 @Override
                 public void onFailure(Throwable caught) {
                   HistoryUtils.newHistory(InternalProcess.RESOLVER);
