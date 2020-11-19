@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.MissingResourceException;
 
-import com.google.gwt.event.dom.client.ChangeHandler;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -14,6 +13,7 @@ import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;

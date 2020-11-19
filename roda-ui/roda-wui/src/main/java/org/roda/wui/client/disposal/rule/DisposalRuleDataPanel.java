@@ -78,11 +78,9 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
   @UiField(provided = true)
   ChildOfPanel childOfPanel;
 
-
   private final DisposalRule disposalRule;
   private final DisposalSchedules disposalSchedules;
   private final boolean editMode;
-
 
   private int selectedScheduleIndex;
   private int selectedTypeIndex;
@@ -94,8 +92,10 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
   HTML errors;
 
   public DisposalRuleDataPanel(DisposalRule disposalRule, DisposalSchedules disposalSchedules, boolean editMode) {
-    metadataFieldsPanel = new MetadataFieldsPanel(disposalRule.getConditionKey(),disposalRule.getConditionValue(), editMode,  disposalRule);
-    childOfPanel = new ChildOfPanel(disposalRule.getConditionKey(),disposalRule.getConditionValue(), editMode, disposalRule);
+    metadataFieldsPanel = new MetadataFieldsPanel(disposalRule.getConditionKey(), disposalRule.getConditionValue(),
+      editMode, disposalRule);
+    childOfPanel = new ChildOfPanel(disposalRule.getConditionKey(), disposalRule.getConditionValue(), editMode,
+      disposalRule);
     initWidget(uiBinder.createAndBindUi(this));
 
     errors.setVisible(false);
@@ -111,7 +111,7 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
 
     initHandlers();
 
-    if(editMode){
+    if (editMode) {
       setEditMode();
     }
 
@@ -126,11 +126,10 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
 
     if (disposalRule.getType().equals(ConditionType.METADATA_FIELD)) {
       metadataFieldsPanel.setVisible(true);
-    }else{
+    } else {
       childOfPanel.setVisible(true);
     }
   }
-
 
   private void initConditionTypeList() {
     conditionTypeListLabel.setText(messages.disposalRuleType());
@@ -216,8 +215,8 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
       disposalRule.setConditionValue(metadataFieldsPanel.getValue().getSecond());
     } else {
       disposalRule.setType(ConditionType.IS_CHILD_OF);
-      GWT.log("AQUI: " + childOfPanel.getValue() );
-      if(childOfPanel.getValue() != null) {
+      GWT.log("AQUI: " + childOfPanel.getValue());
+      if (childOfPanel.getValue() != null) {
         disposalRule.setConditionKey(childOfPanel.getValue().getFirst());
         disposalRule.setConditionValue(childOfPanel.getValue().getSecond());
       }
@@ -259,11 +258,11 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
       conditionTypeList.removeStyleName("isWrong");
       conditionTypeListError.setVisible(false);
 
-      if(conditionTypeList.getSelectedValue().equals(ConditionType.METADATA_FIELD) && !metadataFieldsPanel.isValid()){
+      if (conditionTypeList.getSelectedValue().equals(ConditionType.METADATA_FIELD) && !metadataFieldsPanel.isValid()) {
         errorList.add(messages.isAMandatoryField(messages.disposalRuleCondition()));
       }
 
-      if (conditionTypeList.getSelectedValue().equals(ConditionType.IS_CHILD_OF) && !childOfPanel.isValid()){
+      if (conditionTypeList.getSelectedValue().equals(ConditionType.IS_CHILD_OF) && !childOfPanel.isValid()) {
         errorList.add(messages.isAMandatoryField(messages.disposalRuleCondition()));
       }
     }
@@ -279,11 +278,11 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
   public boolean isChanged() {
     boolean conditionChanged = false;
 
-    if(conditionTypeList.getSelectedValue().equals(ConditionType.METADATA_FIELD.name())){
+    if (conditionTypeList.getSelectedValue().equals(ConditionType.METADATA_FIELD.name())) {
       conditionChanged = metadataFieldsPanel.isChanged();
     }
 
-    if(conditionTypeList.getSelectedValue().equals(ConditionType.IS_CHILD_OF.name())){
+    if (conditionTypeList.getSelectedValue().equals(ConditionType.IS_CHILD_OF.name())) {
       conditionChanged = childOfPanel.isChanged();
     }
 
