@@ -165,6 +165,13 @@ public final class RodaConstants {
   public static final String RODA_OBJECT_OTHER_METADATA = "other_metadata";
   public static final String RODA_OBJECT_MEMBER = "member";
   public static final String RODA_OBJECT_REPRESENTATION_INFORMATION = "representation_information";
+  public static final String RODA_OBJECT_DISPOSAL_AIP_METADATA = "disposal_aip_metadata";
+  public static final String RODA_OBJECT_DISPOSAL_SCHEDULE_AIP_METADATA = "disposal_schedule_aip_metadata";
+  public static final String RODA_OBJECT_DISPOSAL_HOLD_AIP_METADATA = "disposal_schedule_hold_aip_metadata";
+  public static final String RODA_OBJECT_DISPOSAL_HOLDS_AIP_METADATA = "disposal_schedule_holds_aip_metadata";
+  public static final String RODA_OBJECT_DISPOSAL_CONFIRMATION_AIP_METADATA = "disposal_schedule_confirmation_aip_metadata";
+  public static final String RODA_OBJECT_DISPOSAL_DESTRUCTION_AIP_METADATA = "disposal_schedule_destruction_aip_metadata";
+  public static final String RODA_OBJECT_DISPOSAL_TRANSITIVE_HOLD_AIP_METADATA = "disposal_transitive_hold_aip_metadata";
   public static final String RODA_OBJECT_DISPOSAL_RULES = "disposal_rules";
   public static final String RODA_OBJECT_DISPOSAL_RULE = "disposal_rule";
   public static final String RODA_OBJECT_DISPOSAL_SCHEDULE = "disposal_schedule";
@@ -694,6 +701,7 @@ public final class RodaConstants {
   public static final String AIP_DISPOSAL_SCHEDULE_ID = "disposalScheduleId";
   public static final String AIP_DISPOSAL_SCHEDULE_NAME = "disposalScheduleName";
   public static final String AIP_DISPOSAL_HOLDS_ID = "disposalHoldsId";
+  public static final String AIP_TRANSITIVE_DISPOSAL_HOLDS_ID = "transitiveDisposalHoldsId";
   public static final String AIP_DESTROYED_ON = "destroyedOn";
   public static final String AIP_DESTROYED_BY = "destroyedBy";
   public static final String AIP_DISPOSAL_ACTION = "disposalAction";

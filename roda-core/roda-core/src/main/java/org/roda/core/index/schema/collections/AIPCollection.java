@@ -105,6 +105,10 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
 
     fields.add(new Field(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.AIP_DISPOSAL_SCHEDULE_NAME, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.AIP_DISPOSAL_HOLDS_ID, Field.TYPE_STRING).setMultiValued(true));
+    fields.add(new Field(RodaConstants.AIP_TRANSITIVE_DISPOSAL_HOLDS_ID, Field.TYPE_STRING).setMultiValued(true));
+    fields.add(new Field(RodaConstants.AIP_DESTROYED_ON, Field.TYPE_DATE));
+    fields.add(new Field(RodaConstants.AIP_DESTROYED_BY, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.AIP_DISPOSAL_ACTION, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.AIP_DISPOSAL_SCHEDULE_ASSOCIATION_TYPE, Field.TYPE_STRING));
 
@@ -153,6 +157,8 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     doc.addField(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID, aip.getDisposalScheduleId());
     doc.addField(RodaConstants.AIP_DISPOSAL_HOLDS_ID, aip.getDisposalHoldAssociation().stream()
       .filter(p -> p.getLiftedOn() == null).map(DisposalHoldAssociation::getId).collect(Collectors.toList()));
+    doc.addField(RodaConstants.AIP_TRANSITIVE_DISPOSAL_HOLDS_ID, aip.getTransitiveDisposalHoldAssociation().stream()
+        .filter(p -> p.getLiftedOn() == null).map(DisposalHoldAssociation::getId).collect(Collectors.toList()));
     if (aip.getDestroyedOn() != null) {
       doc.addField(RodaConstants.AIP_DESTROYED_ON, aip.getDestroyedOn());
     }
@@ -304,6 +310,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     final RetentionPeriodIntervalCode retentionPeriodInterval = SolrUtils.objectToEnum(
       doc.get(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_INTERVAL), RetentionPeriodIntervalCode.class, null);
     final List<String> disposalHoldsId = SolrUtils.objectToListString(doc.get(RodaConstants.AIP_DISPOSAL_HOLDS_ID));
+    final List<String> transitiveDisposalHoldsId = SolrUtils.objectToListString(doc.get(RodaConstants.AIP_TRANSITIVE_DISPOSAL_HOLDS_ID));
     final Date destroyedOn = SolrUtils.objectToDate(doc.get(RodaConstants.AIP_DESTROYED_ON));
     final String destroyedBy = SolrUtils.objectToString(doc.get(RodaConstants.AIP_DESTROYED_BY), "");
     final DisposalActionCode disposalAction = SolrUtils.objectToEnum(doc.get(RodaConstants.AIP_DISPOSAL_ACTION),
@@ -353,6 +360,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     ret.setRetentionPeriodStartDate(retentionPeriodStartDate);
     ret.setRetentionPeriodState(retentionPeriodCalculation);
     ret.setDisposalHoldsId(disposalHoldsId);
+    ret.setTransitiveDisposalHoldsId(transitiveDisposalHoldsId);
     ret.setDestroyedOn(destroyedOn);
     ret.setDestroyedBy(destroyedBy);
     ret.setDisposalAction(disposalAction);
