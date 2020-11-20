@@ -49,43 +49,9 @@ public class DisposalPolicyUtils {
       builder.append(messages.disposalPolicyConfirmationSummary());
     } else {
       if (aip.getDisposalScheduleId() != null) {
-        if (DisposalActionCode.DESTROY.equals(aip.getDisposalAction())
-          || DisposalActionCode.REVIEW.equals(aip.getDisposalAction())) {
-
-          JavaScriptObject javaScriptObject = JavascriptUtils.durationInYMD(Humanize.formatDate(aip.getOverdueDate()));
-          JSONObject jsonObject = new JSONObject(javaScriptObject);
-          String duration = jsonObject.get("diff").toString();
-          String timeUnit = jsonObject.get("unit").isString().stringValue();
-
-          if (aip.getOverdueDate().after(new Date())) {
-            switch (timeUnit) {
-              case "years":
-                builder.append(
-                  messages.disposalPolicyScheduleSummary(messages.disposalPolicyActionSummary(aip.getDisposalAction().name()),
-                    messages.disposalPolicyScheduleYearSummary(Integer.parseInt(duration))));
-                break;
-              case "months":
-                builder.append(
-                  messages.disposalPolicyScheduleSummary(messages.disposalPolicyActionSummary(aip.getDisposalAction().name()),
-                    messages.disposalPolicyScheduleMonthSummary(Integer.parseInt(duration))));
-                break;
-              case "days":
-                builder.append(
-                  messages.disposalPolicyScheduleSummary(messages.disposalPolicyActionSummary(aip.getDisposalAction().name()),
-                    messages.disposalPolicyScheduleDaySummary(Integer.parseInt(duration))));
-                break;
-            }
-          } else {
-            builder.append(
-              messages.disposalPolicySummaryReady(messages.disposalPolicyActionSummary(aip.getDisposalAction().name())));
-          }
-        } else if (DisposalActionCode.RETAIN_PERMANENTLY.equals(aip.getDisposalAction())) {
-          builder.append(messages.disposalPolicyRetainPermanently());
-        }
-
+        onSchedule(aip, builder);
       } else {
         builder.append(messages.disposalPolicyNoScheduleSummary());
-
         if (aip.isOnHold()) {
           builder.append(" ").append(messages.disposalPolicyHoldSummary());
         } else {
@@ -95,5 +61,47 @@ public class DisposalPolicyUtils {
     }
 
     return builder.toString();
+  }
+
+  private static void onSchedule(IndexedAIP aip, StringBuilder builder) {
+    if (DisposalActionCode.DESTROY.equals(aip.getDisposalAction())
+      || DisposalActionCode.REVIEW.equals(aip.getDisposalAction())) {
+
+      JavaScriptObject javaScriptObject = JavascriptUtils.durationInYMD(Humanize.formatDate(aip.getOverdueDate()));
+      JSONObject jsonObject = new JSONObject(javaScriptObject);
+      String duration = jsonObject.get("diff").toString();
+      String timeUnit = jsonObject.get("unit").isString().stringValue();
+
+      if (aip.getOverdueDate().after(new Date())) {
+        switch (timeUnit) {
+          case "years":
+            builder.append(messages.disposalPolicyScheduleSummary(
+              messages.disposalPolicyActionSummary(aip.getDisposalAction().name()),
+              messages.disposalPolicyScheduleYearSummary(Integer.parseInt(duration))));
+            break;
+          case "months":
+            builder.append(messages.disposalPolicyScheduleSummary(
+              messages.disposalPolicyActionSummary(aip.getDisposalAction().name()),
+              messages.disposalPolicyScheduleMonthSummary(Integer.parseInt(duration))));
+            break;
+          case "days":
+            builder.append(messages.disposalPolicyScheduleSummary(
+              messages.disposalPolicyActionSummary(aip.getDisposalAction().name()),
+              messages.disposalPolicyScheduleDaySummary(Integer.parseInt(duration))));
+            break;
+          default:
+            break;
+        }
+      } else {
+        if (aip.isOnHold()) {
+          builder.append(messages.disposalPolicyHoldSummary());
+        } else {
+          builder.append(
+            messages.disposalPolicySummaryReady(messages.disposalPolicyActionSummary(aip.getDisposalAction().name())));
+        }
+      }
+    } else if (DisposalActionCode.RETAIN_PERMANENTLY.equals(aip.getDisposalAction())) {
+      builder.append(messages.disposalPolicyRetainPermanently());
+    }
   }
 }
