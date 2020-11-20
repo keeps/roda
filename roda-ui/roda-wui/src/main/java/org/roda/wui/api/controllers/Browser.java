@@ -1118,6 +1118,9 @@ public class Browser extends RodaWuiController {
       // check state
       controllerAssistant.checkAIPstate(aip);
 
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
+
       String name = fileName;
       if (name.contains(".")) {
         name = name.substring(name.lastIndexOf('.'));
@@ -1191,6 +1194,9 @@ public class Browser extends RodaWuiController {
       // check state
       controllerAssistant.checkAIPstate(aip);
 
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
+
       // delegate
       BrowserHelper.deleteOtherMetadataFile(aipId, representationId, null, null, suffix, type);
     } catch (RODAException e) {
@@ -1258,6 +1264,9 @@ public class Browser extends RodaWuiController {
 
         // check state
         controllerAssistant.checkAIPstate(parentAip);
+
+        // check if AIP is in a disposal confirmation
+        controllerAssistant.checkIfAIPInConfirmation(parentAip);
       }
 
       // delegate
@@ -1325,6 +1334,9 @@ public class Browser extends RodaWuiController {
         // check state
         controllerAssistant.checkAIPstate(parentSDO);
 
+        // check if AIP is in a disposal confirmation
+        controllerAssistant.checkIfAIPInConfirmation(parentSDO);
+
         Permissions parentPermissions = parentSDO.getPermissions();
 
         for (String name : parentPermissions.getUsernames()) {
@@ -1368,6 +1380,9 @@ public class Browser extends RodaWuiController {
 
       // check state
       controllerAssistant.checkAIPstate(indexedAip);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(indexedAip);
 
       // delegate
       return BrowserHelper.updateAIP(user, aip);
@@ -1464,6 +1479,9 @@ public class Browser extends RodaWuiController {
       // check state
       controllerAssistant.checkAIPstate(aip);
 
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
+
       // delegate
       return BrowserHelper.createDescriptiveMetadataFile(aipId, representationId, metadataId, metadataType,
         metadataVersion, metadataPayload);
@@ -1496,6 +1514,9 @@ public class Browser extends RodaWuiController {
 
       // check state
       controllerAssistant.checkAIPstate(aip);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
 
       // delegate
       Map<String, String> properties = new HashMap<>();
@@ -1530,6 +1551,9 @@ public class Browser extends RodaWuiController {
 
       // check state
       controllerAssistant.checkAIPstate(aip);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
 
       // delegate
       BrowserHelper.deleteDescriptiveMetadataFile(aipId, representationId, metadataId);
@@ -1588,6 +1612,9 @@ public class Browser extends RodaWuiController {
       // check state
       controllerAssistant.checkAIPstate(aip);
 
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
+
       // delegate
       return BrowserHelper.createRepresentation(user, aipId, representationId, type, details);
     } catch (RODAException e) {
@@ -1617,6 +1644,9 @@ public class Browser extends RodaWuiController {
 
       // check state
       controllerAssistant.checkAIPstate(aip);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
 
       // delegate
       return BrowserHelper.updateRepresentation(representation);
@@ -1678,6 +1708,9 @@ public class Browser extends RodaWuiController {
       // check state
       controllerAssistant.checkAIPstate(aip);
 
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
+
       // delegate
       Map<String, String> properties = new HashMap<>();
       properties.put(RodaConstants.VERSION_USER, user.getId());
@@ -1712,6 +1745,9 @@ public class Browser extends RodaWuiController {
 
       // check state
       controllerAssistant.checkAIPstate(aip);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
 
       IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
         IdUtils.getRepresentationId(aipId, representationId), RodaConstants.REPRESENTATION_FIELDS_TO_RETURN);
@@ -1753,6 +1789,9 @@ public class Browser extends RodaWuiController {
       // check state
       controllerAssistant.checkAIPstate(aip);
 
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
+
       // delegate
       Map<String, String> properties = new HashMap<>();
       properties.put(RodaConstants.VERSION_USER, user.getId());
@@ -1788,6 +1827,9 @@ public class Browser extends RodaWuiController {
 
       // check state
       controllerAssistant.checkAIPstate(aip);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
 
       IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
         IdUtils.getRepresentationId(aipId, representationId), RodaConstants.REPRESENTATION_FIELDS_TO_RETURN);
@@ -2654,6 +2696,9 @@ public class Browser extends RodaWuiController {
       // check state
       controllerAssistant.checkAIPstate(aip);
 
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
+
       // delegate
       Path file = Files.createTempFile("descriptive", ".tmp");
       Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
@@ -2690,6 +2735,9 @@ public class Browser extends RodaWuiController {
 
       // check state
       controllerAssistant.checkAIPstate(aip);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
 
       // delegate
       Path temp = Files.createTempFile("descriptive", ".tmp");
