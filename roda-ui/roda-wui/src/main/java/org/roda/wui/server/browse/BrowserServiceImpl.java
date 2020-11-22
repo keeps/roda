@@ -61,12 +61,12 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalRules;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobMixIn;
 import org.roda.core.data.v2.jobs.PluginInfo;
@@ -1127,19 +1127,17 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public Job applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalScheduleId,
-    boolean applyToHierarchy, boolean override)
+  public Job applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalScheduleId, boolean override)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Disposals.applyDisposalHold(user, selectedItems, disposalScheduleId, applyToHierarchy, override);
+    return Disposals.applyDisposalHold(user, selectedItems, disposalScheduleId, override);
   }
 
   @Override
-  public Job liftDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean applyToHierarchy,
-    boolean clearAll)
+  public Job liftDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean clearAll)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Disposals.liftDisposalHold(user, selectedItems, disposalHoldId, applyToHierarchy, clearAll);
+    return Disposals.liftDisposalHold(user, selectedItems, disposalHoldId, clearAll);
   }
 
   @Override
@@ -1185,7 +1183,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public List<DisposalHoldAssociation> listDisposalHoldsAssociation(String aipId)
+  public List<DisposalHoldAIPMetadata> listDisposalHoldsAssociation(String aipId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.listDisposalHoldsAssociation(user, aipId);

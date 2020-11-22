@@ -3476,7 +3476,8 @@ public class BrowserHelper {
     SelectedItemsList<DisposalConfirmation> selectedItems)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     return createAndExecuteInternalJob("Recover destroyed records from disposal bin", selectedItems,
-      RestoreRecordsPlugin.class, user, Collections.emptyMap(), "Could not execute recover of destroyed records from disposal bin action");
+      RestoreRecordsPlugin.class, user, Collections.emptyMap(),
+      "Could not execute recover of destroyed records from disposal bin action");
   }
 
   public static DisposalRule createDisposalRule(DisposalRule disposalRule, User user) throws GenericException,
@@ -3495,11 +3496,10 @@ public class BrowserHelper {
   }
 
   public static Job applyDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId,
-    boolean applyToHierarchy, boolean override)
+    boolean override)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, disposalHoldId);
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RECURSIVE, Boolean.toString(applyToHierarchy));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE, Boolean.toString(override));
 
     return createAndExecuteInternalJob("Apply disposal hold", items, ApplyDisposalHoldToAIPPlugin.class, user,
@@ -3507,11 +3507,10 @@ public class BrowserHelper {
   }
 
   public static Job liftDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId,
-    boolean applyToHierarchy, boolean clearAll)
+    boolean clearAll)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, disposalHoldId);
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RECURSIVE, Boolean.toString(applyToHierarchy));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_LIFT_ALL, Boolean.toString(clearAll));
 
     return createAndExecuteInternalJob("Lift disposal hold", items, LiftDisposalHoldFromAIPPlugin.class, user,
@@ -3521,7 +3520,8 @@ public class BrowserHelper {
   public static Job applyDisposalRules(User user, boolean applyToManuallyInclusive)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_MANUAL, Boolean.toString(applyToManuallyInclusive));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_MANUAL,
+      Boolean.toString(applyToManuallyInclusive));
     return createAndExecuteInternalJob("Apply disposal rules to repository",
       SelectedItemsAll.create(AIP.class.getName()), ApplyDisposalRulesPlugin.class, user, pluginParameters,
       "Could not execute apply disposal rules to repository");

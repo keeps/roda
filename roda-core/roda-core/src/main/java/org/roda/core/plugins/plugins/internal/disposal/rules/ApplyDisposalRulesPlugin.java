@@ -194,7 +194,7 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
 
       try {
         // Check if manual associated schedules are to be overridden
-        if (AIPDisposalScheduleAssociationType.MANUAL.equals(aip.getScheduleAssociationType())
+        if (AIPDisposalScheduleAssociationType.MANUAL.equals(aip.getDisposalScheduleAssociationType())
           && !overrideManualAssociations) {
           state = PluginState.SKIPPED;
           outcomeDetailsText = "Skipping associating disposal schedule to AIP '" + aip.getId()

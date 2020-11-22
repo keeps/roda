@@ -9,8 +9,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -23,7 +23,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
-import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
@@ -58,7 +57,6 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
 
   private String disposalHoldId;
   private boolean override;
-  private boolean recursive;
 
   private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
@@ -66,10 +64,6 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, "Disposal hold id",
         PluginParameter.PluginParameterType.STRING, "", true, false, "Disposal hold identifier"));
-
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RECURSIVE,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_RECURSIVE, "Recursive mode",
-        PluginParameter.PluginParameterType.BOOLEAN, "true", true, false, "Execute in recursive mode."));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE, "Override disposal holds",
@@ -82,7 +76,6 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> parameters = new ArrayList<>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID));
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_RECURSIVE));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE));
     return parameters;
   }
@@ -92,10 +85,6 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
     super.setParameterValues(parameters);
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID)) {
       disposalHoldId = parameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID);
-    }
-
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_RECURSIVE)) {
-      recursive = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_RECURSIVE));
     }
 
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE)) {
@@ -165,106 +154,15 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, List<AIP> objects) {
+        calculateResourcesCounter(index, jobPluginInfo, objects);
         processAIP(index, model, objects, report, jobPluginInfo, cachedJob);
       }
     }, index, model, storage, liteList);
   }
 
-  private void oldprocessAIP(IndexService index, ModelService model, List<AIP> aips, Report report,
-    JobPluginInfo jobPluginInfo, Job cachedJob) {
-    LOGGER.debug("Applying disposal hold {}", disposalHoldId);
-    if (recursive) {
-      calculateResourcesCounter(index, jobPluginInfo, aips);
-    }
-
-    // Uses cache to retrieve the disposal hold
-    DisposalHold disposalHold = RodaCoreFactory.getDisposalHold(disposalHoldId);
-
-    if (disposalHold == null) {
-      LOGGER.error("Failed to retrieve disposal hold {} from model", disposalHoldId);
-
-      for (AIP aip : aips) {
-        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
-        PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
-        reportItem.setPluginState(PluginState.FAILURE)
-          .setPluginDetails("Failed to retrieve disposal hold " + disposalHoldId);
-        jobPluginInfo.incrementObjectsProcessedWithFailure();
-        report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
-      }
-    } else {
-      for (AIP aip : aips) {
-        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
-        PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
-
-        PluginState state = PluginState.SUCCESS;
-        String outcomeText;
-        LOGGER.debug("Processing AIP {}", aip.getId());
-
-        if (aip.getDisposalConfirmationId() != null) {
-          state = PluginState.FAILURE;
-          LOGGER.error(
-            "Error applying disposal hold {} to AIP '{}': This AIP is part of a disposal confirmation report and an hold cannot be applied",
-            disposalHoldId, aip.getId());
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-          reportItem.setPluginState(state).setPluginDetails("Error applying disposal hold to AIP '" + aip.getId()
-            + "': This AIP is part of a disposal confirmation report and an hold cannot be applied");
-          outcomeText = PluginHelper.createOutcomeTextForDisposalHold(
-            "failed to be applied to AIP '" + aip.getId()
-              + "'; This AIP is part of a disposal confirmation report and an hold cannot be applied",
-            disposalHoldId, null);
-        } else {
-          if (override) {
-
-            DisposalHoldPluginUtils.liftAllDisposalHoldsFromAIP(model, state, aip, cachedJob, reportItem);
-
-            outcomeText = applyDisposalHold(aip, cachedJob, model, disposalHold, state, reportItem, jobPluginInfo,
-              null);
-          } else {
-            // check if AIP is already under the disposal hold
-            if (aip.isOnHold(disposalHoldId)) {
-              state = PluginState.SKIPPED;
-              LOGGER.info(
-                "Applying disposal hold '{}' to AIP '{}' was skipped because it is already on the same disposal hold",
-                disposalHoldId, aip.getId());
-              jobPluginInfo.incrementObjectsProcessed(state);
-              reportItem.setPluginState(state).setPluginDetails("Applying disposal hold to AIP '" + aip.getId()
-                + "' was skipped because it is already on the same disposal hold");
-              outcomeText = "Applying disposal hold to AIP '" + aip.getId()
-                + "' was skipped because it is already on the same disposal hold";
-            } else {
-              outcomeText = applyDisposalHold(aip, cachedJob, model, disposalHold, state, reportItem, jobPluginInfo,
-                null);
-            }
-          }
-        }
-
-        report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
-
-        try {
-          PluginHelper.createPluginEvent(this, aip.getId(), model, index, null, null, state, outcomeText, true,
-            cachedJob);
-        } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
-          | AuthorizationDeniedException | AlreadyExistsException e) {
-          LOGGER.error("Error creating event: {}", e.getMessage(), e);
-        }
-
-        applyDisposalTransitiveHolds(model, index, cachedJob, aip, disposalHold, jobPluginInfo, report);
-        // if (recursive) {
-        // processChildren(model, index, cachedJob, aip, disposalHold, jobPluginInfo,
-        // report);
-        // }
-      }
-    }
-  }
-
   private void processAIP(IndexService index, ModelService model, List<AIP> aips, Report report,
     JobPluginInfo jobPluginInfo, Job cachedJob) {
     LOGGER.debug("Applying disposal hold {}", disposalHoldId);
-    if (recursive) {
-      calculateResourcesCounter(index, jobPluginInfo, aips);
-    }
 
     // Uses cache to retrieve the disposal hold
     DisposalHold disposalHold = RodaCoreFactory.getDisposalHold(disposalHoldId);
@@ -290,9 +188,7 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
         String outcomeText;
         LOGGER.debug("Processing AIP {}", aip.getId());
 
-        DisposalAIPMetadata currentDisposal = aip.getDisposal();
-
-        if (currentDisposal != null && currentDisposal.getConfirmation() != null) {
+        if (StringUtils.isNotBlank(aip.getDisposalConfirmationId())) {
           state = PluginState.FAILURE;
           LOGGER.error(
             "Error applying disposal hold {} to AIP '{}': This AIP is part of a disposal confirmation report and an hold cannot be applied",
@@ -443,11 +339,17 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
 
   private void calculateResourcesCounter(IndexService index, JobPluginInfo jobPluginInfo, List<AIP> aips) {
     try {
-      ArrayList<String> ancestorList = aips.stream().map(AIP::getId).collect(Collectors.toCollection(ArrayList::new));
-      Filter ancestorFilter = new Filter(new OneOfManyFilterParameter(RodaConstants.AIP_ANCESTORS, ancestorList));
-      int resourceCounter = index.count(IndexedAIP.class, ancestorFilter).intValue();
-      jobPluginInfo.incrementObjectsCount(resourceCounter);
-    } catch (GenericException | RequestNotValidException e) {
+      for (AIP aip : aips) {
+        final IndexedAIP indexedAip = index.retrieve(IndexedAIP.class, aip.getId(), new ArrayList<>());
+        List<FilterParameter> ancestorsList = new ArrayList<>();
+        for (String ancestor : indexedAip.getAncestors()) {
+          ancestorsList.add(new SimpleFilterParameter(RodaConstants.INDEX_UUID, ancestor));
+        }
+        ancestorsList.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
+        Filter ancestorsFilter = new Filter(new OrFiltersParameters(ancestorsList));
+        jobPluginInfo.incrementObjectsCount(index.count(IndexedAIP.class, ancestorsFilter).intValue());
+      }
+    } catch (GenericException | RequestNotValidException | NotFoundException e) {
       // do nothing
     }
   }

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -170,9 +171,6 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
   private void processAIP(ModelService model, IndexService index, Report report, JobPluginInfo jobPluginInfo,
     Job cachedJob, List<AIP> aips) {
     LOGGER.debug("Associating disposal schedule {}", disposalScheduleId);
-    if (recursive) {
-      calculateResourcesCounter(index, jobPluginInfo, aips);
-    }
 
     // Uses cache to retrieve the disposal schedule
     DisposalSchedule disposalSchedule = RodaCoreFactory.getDisposalSchedule(disposalScheduleId);
@@ -194,10 +192,8 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
         PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
         PluginState state = PluginState.SUCCESS;
         String outcomeText;
-        DisposalAIPMetadata currentDisposal = aip.getDisposal();
 
-        if (currentDisposal != null && currentDisposal.getConfirmation() != null
-          && currentDisposal.getConfirmation().getId() != null) {
+        if (StringUtils.isNotBlank(aip.getDisposalConfirmationId())) {
           // Error cannot associate a disposal if already exist a disposal confirmation
           state = PluginState.FAILURE;
           LOGGER.error(
@@ -214,10 +210,8 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
           try {
             applyDisposalSchedule(model, cachedJob, aip, disposalSchedule);
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
-
             reportItem.setPluginState(state).setPluginDetails("Disposal schedule '" + disposalSchedule.getTitle()
               + "' (" + disposalScheduleId + ") was successfully associated to AIP");
-
             outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule("was successfully associated to AIP",
               disposalSchedule.getId(), disposalSchedule.getTitle());
             if (recursive) {
@@ -234,6 +228,9 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
                 + disposalScheduleId + ") to AIP '" + aip.getId() + "': " + e.getMessage());
             outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule(" failed to be associated to AIP",
               disposalSchedule.getId(), disposalSchedule.getTitle());
+          } finally {
+            report.addReport(reportItem);
+            PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
           }
         }
 
@@ -275,9 +272,6 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
             + disposalSchedule.getTitle() + "' (" + disposalScheduleId + ") was successfully associated to AIP");
           outcomeText = PluginHelper.createOutcomeTextForDisposalSchedule("was successfully associated to AIP",
             disposalSchedule.getId(), disposalSchedule.getTitle());
-          if (recursive) {
-            processChildren(model, index, cachedJob, aip, disposalSchedule, jobPluginInfo, report);
-          }
         } catch (NotFoundException | AuthorizationDeniedException | IllegalOperationException e) {
           LOGGER.debug("Can't associate disposal schedule to child. It wasn't found.", e);
           jobPluginInfo.incrementObjectsProcessedWithFailure();
@@ -336,7 +330,7 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
         ancestorFilter = new Filter(new OneOfManyFilterParameter(RodaConstants.AIP_ANCESTORS, ancestorList));
       }
       int resourceCounter = index.count(IndexedAIP.class, ancestorFilter).intValue();
-      jobPluginInfo.setSourceObjectsCount(resourceCounter + aips.size());
+      jobPluginInfo.incrementObjectsCount(resourceCounter);
     } catch (GenericException | RequestNotValidException e) {
       // do nothing
     }

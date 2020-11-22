@@ -11,7 +11,6 @@ import org.roda.wui.client.common.lists.utils.TooltipTextColumn;
 import org.roda.wui.client.disposal.hold.CreateDisposalHold;
 import org.roda.wui.client.disposal.schedule.CreateDisposalSchedule;
 import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.MyCellTableResources;
 
 import com.google.gwt.core.client.GWT;
@@ -48,8 +47,6 @@ public class DisposalDialogs {
     dialogBox.setText(title);
 
     FlowPanel layout = new FlowPanel();
-    CheckBox applyToHierarchyCheckBox = new CheckBox(messages.applyAllButton());
-    Label applyToHierarchyDescription = new Label(messages.applyToHierarchyDisposalDialogDescription());
     Button clearHoldsButton = new Button(messages.clearDisposalHoldButton());
     Button overrideDisposalHoldButton = new Button(messages.overrideDisposalHoldButton());
     Button cancelButton = new Button(messages.cancelButton());
@@ -112,13 +109,6 @@ public class DisposalDialogs {
     dialogBox.setGlassEnabled(true);
     dialogBox.setAnimationEnabled(false);
 
-    applyToHierarchyCheckBox.setValue(true);
-    applyToHierarchyCheckBox.addStyleName("disposal-dialogs-checkbox form-checkbox");
-    applyToHierarchyDescription.addStyleName("form-help");
-    applyToHierarchyCheckBox.addValueChangeHandler(valueChangeEvent -> {
-      applyToHierarchy = valueChangeEvent.getValue();
-    });
-
     cancelButton.addClickHandler(event -> {
       dialogBox.hide();
       callback.onFailure(null);
@@ -127,7 +117,7 @@ public class DisposalDialogs {
     selectHoldButton.addClickHandler(clickEvent -> {
       dialogBox.hide();
       DisposalHoldDialogResult result = new DisposalHoldDialogResult(ActionType.ASSOCIATE,
-        singleSelectionModel.getSelectedObject(), applyToHierarchy);
+        singleSelectionModel.getSelectedObject());
       callback.onSuccess(result);
     });
 
@@ -140,13 +130,13 @@ public class DisposalDialogs {
     overrideDisposalHoldButton.addClickHandler(clickEvent -> {
       dialogBox.hide();
       DisposalHoldDialogResult result = new DisposalHoldDialogResult(ActionType.OVERRIDE,
-        singleSelectionModel.getSelectedObject(), applyToHierarchy);
+        singleSelectionModel.getSelectedObject());
       callback.onSuccess(result);
     });
 
     clearHoldsButton.addClickHandler(clickEvent -> {
       dialogBox.hide();
-      DisposalHoldDialogResult result = new DisposalHoldDialogResult(ActionType.CLEAR, applyToHierarchy);
+      DisposalHoldDialogResult result = new DisposalHoldDialogResult(ActionType.CLEAR);
       callback.onSuccess(result);
     });
 
@@ -156,9 +146,6 @@ public class DisposalDialogs {
     overrideDisposalHoldButton.addStyleName("btn btn-play");
     newHoldButton.addStyleName("btn btn-plus");
     table.addStyleName("my-asyncdatagrid-display");
-
-    options.add(applyToHierarchyCheckBox);
-    options.add(applyToHierarchyDescription);
 
     layout.addStyleName("wui-dialog-layout");
     footer.addStyleName("wui-dialog-layout-footer");
@@ -233,10 +220,12 @@ public class DisposalDialogs {
     table.addColumn(new TextColumn<DisposalSchedule>() {
       @Override
       public String getValue(DisposalSchedule disposalSchedule) {
-        if (disposalSchedule.getRetentionPeriodIntervalCode() != null && disposalSchedule.getRetentionPeriodDuration() == null) {
+        if (disposalSchedule.getRetentionPeriodIntervalCode() != null
+          && disposalSchedule.getRetentionPeriodDuration() == null) {
           return messages.retentionPeriod(0, disposalSchedule.getRetentionPeriodIntervalCode().name());
         } else if (disposalSchedule.getRetentionPeriodIntervalCode() != null) {
-          return messages.retentionPeriod(disposalSchedule.getRetentionPeriodDuration(), disposalSchedule.getRetentionPeriodIntervalCode().name());
+          return messages.retentionPeriod(disposalSchedule.getRetentionPeriodDuration(),
+            disposalSchedule.getRetentionPeriodIntervalCode().name());
         } else {
           return "";
         }

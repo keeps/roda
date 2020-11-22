@@ -29,6 +29,7 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalDestructionAIPMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -226,8 +227,9 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
         Collections.singletonList("-r"));
 
       aip.setState(AIPState.DESTROY_PROCESSING);
-      aip.setDestroyedOn(executionDate);
-      aip.setDestroyedBy(cachedJob.getUsername());
+      DisposalDestructionAIPMetadata destruction = aip.getDisposal().getConfirmation().getDestruction();
+      destruction.setDestructionBy(cachedJob.getUsername());
+      destruction.setDestructionOn(executionDate);
 
       // Apply stylesheet to descriptive metadata
       for (DescriptiveMetadata metadata : aip.getDescriptiveMetadata()) {

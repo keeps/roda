@@ -51,6 +51,9 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalAIPMetadata;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalConfirmationAIPMetadata;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalScheduleAIPMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
@@ -348,8 +351,12 @@ public class IndexModelObserver implements ModelObserver {
           preservationEventsStateUpdated(aip).addTo(ret);
           if (ret.isEmpty()) {
             fieldsToUpdate.clear();
-            fieldsToUpdate.put(RodaConstants.AIP_DESTROYED_ON, SolrUtils.formatDate(aip.getDestroyedOn()));
-            fieldsToUpdate.put(RodaConstants.AIP_DESTROYED_BY, aip.getDestroyedBy());
+            if (aip.getDisposalConfirmationId() != null) {
+              DisposalConfirmationAIPMetadata confirmation = aip.getDisposal().getConfirmation();
+              fieldsToUpdate.put(RodaConstants.AIP_DESTROYED_ON,
+                SolrUtils.formatDate(confirmation.getDestruction().getDestructionOn()));
+              fieldsToUpdate.put(RodaConstants.AIP_DESTROYED_BY, confirmation.getDestruction().getDestructionBy());
+            }
           }
         }
       }
@@ -618,9 +625,10 @@ public class IndexModelObserver implements ModelObserver {
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
       DisposalSchedule disposalSchedule = null;
       Map<String, String> retentionPeriodCalculation = null;
-      if (aip.getDisposalScheduleId() != null) {
-        disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
-        retentionPeriodCalculation = SolrUtils.getRetentionPeriod(disposalSchedule, aip);
+
+      if (StringUtils.isNotBlank(aip.getDisposalScheduleId())) {
+          disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
+          retentionPeriodCalculation = SolrUtils.getRetentionPeriod(disposalSchedule, aip);
       }
 
       if (descriptiveMetadata.isFromAIP()) {

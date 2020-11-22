@@ -13,8 +13,8 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
-import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalAIPMetadata;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -54,36 +54,24 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
 
   private DisposalAIPMetadata disposal;
 
-  private String disposalScheduleId = null;
-  private List<DisposalHoldAssociation> disposalHoldAssociation = new ArrayList<>();
-  private List<DisposalHoldAssociation> transitiveDisposalHoldAssociation = new ArrayList<>();
-  private Date destroyedOn = null;
-  private String destroyedBy = null;
-  private String disposalConfirmationId = null;
-  private AIPDisposalScheduleAssociationType scheduleAssociationType = null;
-
   public AIP() {
     super();
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions) {
     this(id, parentId, type, state, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>(),
-      new AIPFormat(), new ArrayList<Relationship>(), new Date(), null, new Date(), null, null,
-      new ArrayList<DisposalHoldAssociation>(), new ArrayList<DisposalHoldAssociation>(), null, null, null);
+      new AIPFormat(), new ArrayList<Relationship>(), new Date(), null, new Date(), null, null);
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions, String createdBy) {
     this(id, parentId, type, state, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>(),
-      new AIPFormat(), new ArrayList<Relationship>(), new Date(), createdBy, new Date(), createdBy, null,
-      new ArrayList<DisposalHoldAssociation>(), new ArrayList<DisposalHoldAssociation>(), null, null, null);
+      new AIPFormat(), new ArrayList<Relationship>(), new Date(), createdBy, new Date(), createdBy, null);
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions,
     List<DescriptiveMetadata> descriptiveMetadata, List<Representation> representations, AIPFormat format,
     List<Relationship> relationships, Date createdOn, String createdBy, Date updatedOn, String updatedBy,
-    String disposalScheduleId, List<DisposalHoldAssociation> disposalHoldAssociation,
-    List<DisposalHoldAssociation> transitiveDisposalHoldAssociation, Date destroyedOn, String destroyedBy,
-    String disposalConfirmationId) {
+    DisposalAIPMetadata disposal) {
     super();
     this.id = id;
     this.parentId = parentId;
@@ -102,14 +90,6 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
     this.updatedBy = updatedBy;
 
     this.disposal = disposal;
-
-    this.disposalScheduleId = disposalScheduleId;
-    this.disposalHoldAssociation = disposalHoldAssociation;
-    this.transitiveDisposalHoldAssociation = transitiveDisposalHoldAssociation;
-    this.destroyedOn = destroyedOn;
-    this.destroyedBy = destroyedBy;
-    this.disposalConfirmationId = disposalConfirmationId;
-    this.scheduleAssociationType = scheduleAssociationType;
   }
 
   @JsonIgnore
@@ -264,75 +244,6 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
     }
   }
 
-  public String getDisposalScheduleId() {
-    return disposalScheduleId;
-  }
-
-  public void setDisposalScheduleId(String disposalScheduleId) {
-    this.disposalScheduleId = disposalScheduleId;
-  }
-
-  public List<DisposalHoldAssociation> getDisposalHoldAssociation() {
-    return disposalHoldAssociation;
-  }
-
-  public AIP setDisposalHoldsId(List<DisposalHoldAssociation> disposalHoldAssociation) {
-    this.disposalHoldAssociation = disposalHoldAssociation;
-    return this;
-  }
-
-  public AIP addDisposalHold(DisposalHoldAssociation disposalHoldAssociation) {
-    this.disposalHoldAssociation.add(disposalHoldAssociation);
-    return this;
-  }
-
-  public List<DisposalHoldAssociation> getTransitiveDisposalHoldAssociation() {
-    return transitiveDisposalHoldAssociation;
-  }
-
-  public void setTransitiveDisposalHoldAssociation(List<DisposalHoldAssociation> transitiveDisposalHoldAssociation) {
-    this.transitiveDisposalHoldAssociation = transitiveDisposalHoldAssociation;
-  }
-
-  @JsonIgnore
-  public DisposalHoldAssociation getDisposalHoldAssociationByID(String disposalHoldId) {
-    for (DisposalHoldAssociation holdAssociation : disposalHoldAssociation) {
-      if (holdAssociation.getId().equals(disposalHoldId)) {
-        return holdAssociation;
-      }
-    }
-    return null;
-  }
-
-  @JsonIgnore
-  public void addTransitiveDisposalHoldAssociation(DisposalHoldAssociation transitiveDisposalHoldAssociation) {
-    this.transitiveDisposalHoldAssociation.add(transitiveDisposalHoldAssociation);
-  }
-
-  public Date getDestroyedOn() {
-    return destroyedOn;
-  }
-
-  public void setDestroyedOn(Date destroyedOn) {
-    this.destroyedOn = destroyedOn;
-  }
-
-  public String getDestroyedBy() {
-    return destroyedBy;
-  }
-
-  public void setDestroyedBy(String destroyedBy) {
-    this.destroyedBy = destroyedBy;
-  }
-
-  public String getDisposalConfirmationId() {
-    return disposalConfirmationId;
-  }
-
-  public void setDisposalConfirmationId(String disposalConfirmationId) {
-    this.disposalConfirmationId = disposalConfirmationId;
-  }
-
   public AIPFormat getFormat() {
     return format;
   }
@@ -393,10 +304,6 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
     this.updatedBy = updatedBy;
   }
 
-  public AIPDisposalScheduleAssociationType getScheduleAssociationType() {
-    return scheduleAssociationType;
-  }
-
   public DisposalAIPMetadata getDisposal() {
     return disposal;
   }
@@ -405,29 +312,60 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
     this.disposal = disposal;
   }
 
-  public void setScheduleAssociationType(AIPDisposalScheduleAssociationType scheduleAssociationType) {
-    this.scheduleAssociationType = scheduleAssociationType;
+  @JsonIgnore
+  public DisposalHoldAIPMetadata findHold(String disposalHoldId) {
+    if(disposal != null) {
+      return disposal.findHold(disposalHoldId);
+    }
+    return null;
   }
 
   @JsonIgnore
-  public boolean isOnHold(String disposalHoldId) {
-    for (DisposalHoldAssociation association : getDisposalHoldAssociation()) {
-      if (association.getId().equals(disposalHoldId) && association.getLiftedOn() == null) {
-        return true;
-      }
+  public boolean isAIPOnHold(String disposalHoldId) {
+    if(disposal != null) {
+      return disposal.isAIPOnHold(disposalHoldId);
     }
     return false;
   }
 
   @JsonIgnore
-  public boolean onHold() {
-    for (DisposalHoldAssociation association : getDisposalHoldAssociation()) {
-      if (association.getLiftedOn() == null) {
-        return true;
-      }
+  public boolean onHold(){
+    if(disposal != null) {
+      return disposal.onHold();
     }
-
     return false;
+  }
+
+  @JsonIgnore
+  public List<DisposalHoldAIPMetadata> getHolds(){
+    if(disposal != null) {
+      return disposal.getHolds();
+    }
+    return null;
+  }
+
+  @JsonIgnore
+  public String getDisposalScheduleId() {
+    if(disposal != null) {
+      return disposal.getDisposalScheduleId();
+    }
+    return null;
+  }
+
+  @JsonIgnore
+  public String getDisposalConfirmationId() {
+    if(disposal != null) {
+      return disposal.getDisposalConfirmationId();
+    }
+    return null;
+  }
+
+  @JsonIgnore
+  public AIPDisposalScheduleAssociationType getDisposalScheduleAssociationType(){
+    if(disposal != null) {
+      return disposal.getDisposalScheduleAssociationType();
+    }
+    return null;
   }
 
   @Override
@@ -460,18 +398,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
       return false;
     if (ghost != null ? !ghost.equals(aip.ghost) : aip.ghost != null)
       return false;
-    if (disposalScheduleId != null ? !disposalScheduleId.equals(aip.disposalScheduleId)
-      : aip.disposalScheduleId != null)
-      return false;
-    if (disposalHoldAssociation != null ? !disposalHoldAssociation.equals(aip.disposalHoldAssociation)
-      : aip.disposalHoldAssociation != null)
-      return false;
-    if (destroyedOn != null ? !destroyedOn.equals(aip.destroyedOn) : aip.destroyedOn != null)
-      return false;
-    if (scheduleAssociationType != null ? !scheduleAssociationType.equals(aip.scheduleAssociationType)
-      : aip.scheduleAssociationType != null)
-      return false;
-    return destroyedBy != null ? destroyedBy.equals(aip.destroyedBy) : aip.destroyedBy == null;
+    return disposal != null ? disposal.equals(aip.disposal) : aip.disposal == null;
 
   }
 
@@ -487,11 +414,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
     result = 31 * result + (ingestSIPIds != null ? ingestSIPIds.hashCode() : 0);
     result = 31 * result + (ingestJobId != null ? ingestJobId.hashCode() : 0);
     result = 31 * result + (ghost != null ? ghost.hashCode() : 0);
-    result = 31 * result + (disposalScheduleId != null ? disposalScheduleId.hashCode() : 0);
-    result = 31 * result + (disposalHoldAssociation != null ? disposalHoldAssociation.hashCode() : 0);
-    result = 31 * result + (destroyedOn != null ? destroyedOn.hashCode() : 0);
-    result = 31 * result + (destroyedBy != null ? destroyedBy.hashCode() : 0);
-    result = 31 * result + (scheduleAssociationType != null ? scheduleAssociationType.hashCode() : 0);
+    result = 31 * result + (disposal != null ? disposal.hashCode() : 0);
     return result;
   }
 
@@ -502,9 +425,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
       + representations + ", ingestSIPUUID='" + ingestSIPUUID + '\'' + ", ingestSIPIds=" + ingestSIPIds
       + ", ingestJobId='" + ingestJobId + '\'' + ", ingestUpdateJobIds=" + ingestUpdateJobIds + ", ghost=" + ghost
       + ", format=" + format + ", relationships=" + relationships + ", createdOn=" + createdOn + ", createdBy='"
-      + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\'' + ", disposalScheduleId='"
-      + disposalScheduleId + '\'' + ", disposalHoldAssociation=" + disposalHoldAssociation + ", destroyedOn="
-      + destroyedOn + ", destroyedBy='" + destroyedBy + '\'' + ", disposalConfirmationId='" + disposalConfirmationId
-      + '\'' + ", scheduleAssociationType=" + scheduleAssociationType + '}';
+      + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\'' + ", disposal='" + disposal
+      + '}';
   }
 }
