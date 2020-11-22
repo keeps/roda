@@ -29,11 +29,14 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPDisposalScheduleAssociationType;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalAIPMetadata;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalScheduleAIPMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.validation.ValidationException;
@@ -151,9 +154,11 @@ public class DisposalScheduleTest {
     DisposalSchedule disposalSchedule = createDisposalSchedule();
 
     // Associate AIP with Disposal schedule
-    aip.setDisposalScheduleId(disposalSchedule.getId());
-    aip.setDestroyedOn(new Date());
-    aip.setDestroyedBy(RodaConstants.ADMIN);
+    DisposalAIPMetadata disposal = new DisposalAIPMetadata();
+    disposal.setSchedule(new DisposalScheduleAIPMetadata());
+    disposal.getSchedule().setId(disposalSchedule.getId());
+    aip.setDisposal(disposal);
+
     AIP updatedAIP = model.updateAIP(aip, RodaConstants.ADMIN);
 
     // check it is connected
@@ -176,17 +181,18 @@ public class DisposalScheduleTest {
     DisposalSchedule disposalSchedule = createDisposalSchedule();
 
     // Associate AIP with Disposal schedule
-    aip.setDisposalScheduleId(disposalSchedule.getId());
-    // aip.setDestructionOn(new Date());
-    aip.setDestroyedBy(RodaConstants.ADMIN);
+    DisposalAIPMetadata disposal = new DisposalAIPMetadata();
+    aip.setDisposal(disposal);
+    disposal.setSchedule(new DisposalScheduleAIPMetadata());
+    disposal.getSchedule().setId(disposalSchedule.getId());
+    disposal.getSchedule().setAssociationType(AIPDisposalScheduleAssociationType.MANUAL);
+
     model.updateAIP(aip, RodaConstants.ADMIN);
     index.commitAIPs();
 
     // Retrieve AIP
     final IndexedAIP indexedAip = index.retrieve(IndexedAIP.class, aipId, new ArrayList<>());
     assertEquals(aip.getDisposalScheduleId(), indexedAip.getDisposalScheduleId());
-    assertEquals(aip.getDestroyedOn(), indexedAip.getDestroyedOn());
-    assertEquals(aip.getDestroyedBy(), indexedAip.getDestroyedBy());
   }
 
   @Test

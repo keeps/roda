@@ -12,6 +12,8 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.ConditionType;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalRules;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalAIPMetadata;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalScheduleAIPMetadata;
 import org.roda.core.index.IndexService;
 
 /**
@@ -42,8 +44,15 @@ public class ApplyDisposalRulesPluginUtils {
 
   private static Optional<DisposalRule> conditionTypeChildOf(AIP aip, DisposalRule rule) {
     if (aip.getParentId() != null && aip.getParentId().equals(rule.getConditionKey())) {
-      aip.setDisposalScheduleId(rule.getDisposalScheduleId());
-      aip.setScheduleAssociationType(AIPDisposalScheduleAssociationType.RULES);
+      DisposalAIPMetadata disposal = aip.getDisposal();
+      if(disposal ==  null) {
+        disposal = new DisposalAIPMetadata();
+        disposal.setSchedule(new DisposalScheduleAIPMetadata());
+      } else if(disposal.getSchedule() == null ) {
+        disposal.setSchedule(new DisposalScheduleAIPMetadata());
+      }
+      disposal.getSchedule().setId(rule.getDisposalScheduleId());
+      disposal.getSchedule().setAssociationType(AIPDisposalScheduleAssociationType.RULES);
 
       return Optional.of(rule);
     }
@@ -62,8 +71,15 @@ public class ApplyDisposalRulesPluginUtils {
     String metadataValue = (String) o;
 
     if (metadataValue != null && metadataValue.equals(rule.getConditionValue())) {
-      aip.setDisposalScheduleId(rule.getDisposalScheduleId());
-      aip.setScheduleAssociationType(AIPDisposalScheduleAssociationType.RULES);
+      DisposalAIPMetadata disposal = aip.getDisposal();
+      if(disposal ==  null) {
+        disposal = new DisposalAIPMetadata();
+        disposal.setSchedule(new DisposalScheduleAIPMetadata());
+      } else if(disposal.getSchedule() == null ) {
+        disposal.setSchedule(new DisposalScheduleAIPMetadata());
+      }
+      disposal.getSchedule().setId(rule.getDisposalScheduleId());
+      disposal.getSchedule().setAssociationType(AIPDisposalScheduleAssociationType.RULES);
       return Optional.of(rule);
     }
 

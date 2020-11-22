@@ -8,9 +8,9 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
@@ -18,7 +18,6 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.DisposalDialogs;
 import org.roda.wui.client.common.dialogs.utils.DisposalHoldDialogResult;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
-import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.hold.ShowDisposalHold;
 import org.roda.wui.client.ingest.process.ShowJob;
@@ -27,15 +26,12 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.widgets.Toast;
 
-import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -78,15 +74,15 @@ public class DisposalHoldsPanel extends Composite {
     this.indexedAip = indexedAip;
 
     BrowserService.Util.getInstance().listDisposalHoldsAssociation(indexedAip.getId(),
-      new NoAsyncCallback<List<DisposalHoldAssociation>>() {
+      new NoAsyncCallback<List<DisposalHoldAIPMetadata>>() {
         @Override
-        public void onSuccess(List<DisposalHoldAssociation> disposalHoldAssociations) {
+        public void onSuccess(List<DisposalHoldAIPMetadata> disposalHoldAssociations) {
           init(indexedAip.getDisposalConfirmationId() != null, disposalHoldAssociations);
         }
       });
   }
 
-  private void init(boolean onDisposalConfirmation, List<DisposalHoldAssociation> disposalHoldAssociations) {
+  private void init(boolean onDisposalConfirmation, List<DisposalHoldAIPMetadata> disposalHoldAssociations) {
     if (disposalHoldAssociations.isEmpty()) {
       disposalHoldsPanel.remove(panel);
     } else {
@@ -101,8 +97,8 @@ public class DisposalHoldsPanel extends Composite {
     }
   }
 
-  private void createDisposalHoldsTable(List<DisposalHoldAssociation> disposalHoldAssociations) {
-    for (DisposalHoldAssociation association : disposalHoldAssociations) {
+  private void createDisposalHoldsTable(List<DisposalHoldAIPMetadata> disposalHoldAssociations) {
+    for (DisposalHoldAIPMetadata association : disposalHoldAssociations) {
       BrowserService.Util.getInstance().retrieveDisposalHold(association.getId(), new NoAsyncCallback<DisposalHold>() {
         @Override
         public void onSuccess(DisposalHold disposalHold) {
@@ -113,11 +109,11 @@ public class DisposalHoldsPanel extends Composite {
     }
   }
 
-  private void getDisposalHoldList(List<DisposalHoldAssociation> disposalHoldAssociations) {
+  private void getDisposalHoldList(List<DisposalHoldAIPMetadata> disposalHoldAssociations) {
     panelBody.clear();
-    BasicTablePanel<DisposalHoldAssociation> tableHolds = getBasicTablePanelForDisposalHolds(disposalHoldAssociations);
+    BasicTablePanel<DisposalHoldAIPMetadata> tableHolds = getBasicTablePanelForDisposalHolds(disposalHoldAssociations);
     tableHolds.getSelectionModel().addSelectionChangeHandler(event -> {
-      DisposalHoldAssociation selectedObject = tableHolds.getSelectionModel().getSelectedObject();
+      DisposalHoldAIPMetadata selectedObject = tableHolds.getSelectionModel().getSelectedObject();
       if (selectedObject != null) {
         List<String> path = HistoryUtils.getHistory(ShowDisposalHold.RESOLVER.getHistoryPath(), selectedObject.getId());
         HistoryUtils.newHistory(path);
@@ -139,7 +135,7 @@ public class DisposalHoldsPanel extends Composite {
               SelectedItems<IndexedAIP> items = new SelectedItemsList<>(Collections.singletonList(indexedAip.getUUID()),
                 indexedAip.getClass().getName());
               if (DisposalHoldDialogResult.ActionType.CLEAR.equals(result.getActionType())) {
-                clearDisposalHolds(items, result.isApplyToHierarchy());
+                clearDisposalHolds(items);
               } else if (DisposalHoldDialogResult.ActionType.ASSOCIATE.equals(result.getActionType())) {
                 applyDisposalHold(items, result, false);
               } else if (DisposalHoldDialogResult.ActionType.OVERRIDE.equals(result.getActionType())) {
@@ -151,13 +147,13 @@ public class DisposalHoldsPanel extends Composite {
     });
   }
 
-  private void clearDisposalHolds(final SelectedItems<IndexedAIP> aips, boolean applyToHierarchy) {
+  private void clearDisposalHolds(final SelectedItems<IndexedAIP> aips) {
     Dialogs.showConfirmDialog(messages.clearDisposalHoldDialogTitle(), messages.clearDisposalHoldDialogMessage(1),
       messages.dialogNo(), messages.dialogYes(), new NoAsyncCallback<Boolean>() {
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            BrowserService.Util.getInstance().liftDisposalHold(aips, null, applyToHierarchy, true, new AsyncCallback<Job>() {
+            BrowserService.Util.getInstance().liftDisposalHold(aips, null, true, new AsyncCallback<Job>() {
               @Override
               public void onFailure(Throwable caught) {
                 HistoryUtils.newHistory(InternalProcess.RESOLVER);
@@ -201,7 +197,7 @@ public class DisposalHoldsPanel extends Composite {
         public void onSuccess(Boolean result) {
           if (result) {
             BrowserService.Util.getInstance().applyDisposalHold(aips, holdDialogResult.getDisposalHold().getId(),
-              holdDialogResult.isApplyToHierarchy(), override, new AsyncCallback<Job>() {
+              override, new AsyncCallback<Job>() {
                 @Override
                 public void onFailure(Throwable caught) {
                   HistoryUtils.newHistory(InternalProcess.RESOLVER);
@@ -239,26 +235,26 @@ public class DisposalHoldsPanel extends Composite {
 
   private void refresh() {
     BrowserService.Util.getInstance().listDisposalHoldsAssociation(indexedAip.getId(),
-      new NoAsyncCallback<List<DisposalHoldAssociation>>() {
+      new NoAsyncCallback<List<DisposalHoldAIPMetadata>>() {
         @Override
-        public void onSuccess(List<DisposalHoldAssociation> disposalHoldAssociations) {
+        public void onSuccess(List<DisposalHoldAIPMetadata> disposalHoldAssociations) {
           init(indexedAip.getDisposalConfirmationId() != null, disposalHoldAssociations);
         }
       });
   }
 
-  private BasicTablePanel<DisposalHoldAssociation> getBasicTablePanelForDisposalHolds(
-    List<DisposalHoldAssociation> disposalHoldAssociations) {
+  private BasicTablePanel<DisposalHoldAIPMetadata> getBasicTablePanelForDisposalHolds(
+    List<DisposalHoldAIPMetadata> disposalHoldAssociations) {
     Label headerHolds = new Label();
     HTMLPanel info = new HTMLPanel(SafeHtmlUtils.EMPTY_SAFE_HTML);
 
     disposalHoldAssociations.sort(Collections.reverseOrder());
 
-    return new BasicTablePanel<DisposalHoldAssociation>(headerHolds, info, disposalHoldAssociations.iterator(),
+    return new BasicTablePanel<DisposalHoldAIPMetadata>(headerHolds, info, disposalHoldAssociations.iterator(),
 
-      new BasicTablePanel.ColumnInfo<>(messages.disposalHoldTitle(), 15, new TextColumn<DisposalHoldAssociation>() {
+      new BasicTablePanel.ColumnInfo<>(messages.disposalHoldTitle(), 15, new TextColumn<DisposalHoldAIPMetadata>() {
         @Override
-        public String getValue(DisposalHoldAssociation association) {
+        public String getValue(DisposalHoldAIPMetadata association) {
           DisposalHold hold = disposalHoldList.findDisposalHold(association.getId());
           if (hold != null && hold.getTitle() != null) {
             return hold.getTitle();
@@ -268,36 +264,38 @@ public class DisposalHoldsPanel extends Composite {
         }
       }),
 
-      new BasicTablePanel.ColumnInfo<DisposalHoldAssociation>(messages.disposalHoldAssociatedOn(), 15,
-        new TextColumn<DisposalHoldAssociation>() {
+      new BasicTablePanel.ColumnInfo<DisposalHoldAIPMetadata>(messages.disposalHoldAssociatedOn(), 15,
+        new TextColumn<DisposalHoldAIPMetadata>() {
           @Override
-          public String getValue(DisposalHoldAssociation association) {
+          public String getValue(DisposalHoldAIPMetadata association) {
             if (association != null && association.getAssociatedOn() != null) {
               return Humanize.formatDate(association.getAssociatedOn());
             } else {
               return "";
             }
           }
-        }),
-
-      new BasicTablePanel.ColumnInfo<DisposalHoldAssociation>(messages.disposalHoldLiftedOn(), 15,
-        new TextColumn<DisposalHoldAssociation>() {
-          @Override
-          public String getValue(DisposalHoldAssociation association) {
-            if (association != null && association.getLiftedOn() != null) {
-              return Humanize.formatDate(association.getLiftedOn());
-            } else {
-              return "";
-            }
-          }
-        }),
-
-      new BasicTablePanel.ColumnInfo<>(messages.disposalHoldStateCol(), 8,
-        new Column<DisposalHoldAssociation, SafeHtml>(new SafeHtmlCell()) {
-          @Override
-          public SafeHtml getValue(DisposalHoldAssociation association) {
-            return HtmlSnippetUtils.getDisposalHoldStateHtml(association);
-          }
         }));
+
+    // new
+    // BasicTablePanel.ColumnInfo<DisposalHoldAIPMetadata>(messages.disposalHoldLiftedOn(),
+    // 15,
+    // new TextColumn<DisposalHoldAIPMetadata>() {
+    // @Override
+    // public String getValue(DisposalHoldAIPMetadata association) {
+    // if (association != null && association.getLiftedOn() != null) {
+    // return Humanize.formatDate(association.getLiftedOn());
+    // } else {
+    // return "";
+    // }
+    // }
+    // }),
+    //
+    // new BasicTablePanel.ColumnInfo<>(messages.disposalHoldStateCol(), 8,
+    // new Column<DisposalHoldAIPMetadata, SafeHtml>(new SafeHtmlCell()) {
+    // @Override
+    // public SafeHtml getValue(DisposalHoldAIPMetadata association) {
+    // return HtmlSnippetUtils.getDisposalHoldStateHtml(association);
+    // }
+    // }));
   }
 }

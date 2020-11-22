@@ -17,7 +17,7 @@ public class DisposalSchedulePluginUtils {
     disposalScheduleAIPMetadata.setId(disposalSchedule.getId());
     disposalScheduleAIPMetadata.setAssociatedBy(associatedBy);
     disposalScheduleAIPMetadata.setAssociatedOn(new Date());
-    disposalScheduleAIPMetadata.setFlow(flow);
+    disposalScheduleAIPMetadata.setAssociationType(flow);
 
     return disposalScheduleAIPMetadata;
   }

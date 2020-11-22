@@ -206,7 +206,9 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
 
       // reindex the AIP
       AIP aip = model.retrieveAIP(aipEntry.getAipId());
-      aip.setDisposalConfirmationId(null);
+      if(aip.getDisposal() != null) {
+        aip.getDisposal().setConfirmation(null);
+      }
 
       model.updateAIP(aip, cachedJob.getUsername());
       index.reindexAIP(aip);

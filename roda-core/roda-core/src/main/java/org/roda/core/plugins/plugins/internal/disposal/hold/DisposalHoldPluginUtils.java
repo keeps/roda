@@ -2,13 +2,13 @@ package org.roda.core.plugins.plugins.internal.disposal.hold;
 
 import static org.roda.core.data.common.RodaConstants.PreservationEventType.POLICY_ASSIGNMENT;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalAIPMetadata;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
@@ -22,16 +22,8 @@ import org.roda.core.model.ModelService;
  */
 public class DisposalHoldPluginUtils {
 
-  public static DisposalHoldAssociation createDisposalHoldAssociation(String disposalHoldId, String associatedBy) {
-    DisposalHoldAssociation disposalHoldAssociation = new DisposalHoldAssociation();
-    disposalHoldAssociation.setAssociatedOn(new Date());
-    disposalHoldAssociation.setAssociatedBy(associatedBy);
-    disposalHoldAssociation.setId(disposalHoldId);
-
-    return disposalHoldAssociation;
-  }
-
-  public static void addDisposalHoldAIPMetadata(AIP aip, String disposalHoldId, String associatedBy, DisposalTransitiveHoldAIPMetadata transitiveHold) {
+  public static void addDisposalHoldAIPMetadata(AIP aip, String disposalHoldId, String associatedBy,
+    DisposalTransitiveHoldAIPMetadata transitiveHold) {
     DisposalAIPMetadata disposal;
     if (aip.getDisposal() != null) {
       disposal = aip.getDisposal();
@@ -41,7 +33,7 @@ public class DisposalHoldPluginUtils {
     }
 
     DisposalHoldAIPMetadata disposalHoldAIPMetadata = disposal.findHold(disposalHoldId);
-    if(disposalHoldAIPMetadata == null) {
+    if (disposalHoldAIPMetadata == null) {
       disposalHoldAIPMetadata = new DisposalHoldAIPMetadata();
       disposalHoldAIPMetadata.setId(disposalHoldId);
       disposalHoldAIPMetadata.setAssociatedOn(new Date());
@@ -49,7 +41,7 @@ public class DisposalHoldPluginUtils {
       disposal.addDisposalHold(disposalHoldAIPMetadata);
     }
     if (transitiveHold != null) {
-      if(disposalHoldAIPMetadata.findTransitiveAip(transitiveHold.getAipId()) == null){
+      if (disposalHoldAIPMetadata.findTransitiveAip(transitiveHold.getAipId()) == null) {
         disposalHoldAIPMetadata.addTransitiveAip(transitiveHold);
       }
     }
@@ -57,45 +49,53 @@ public class DisposalHoldPluginUtils {
 
   public static void liftDisposalHoldFromAIP(ModelService model, PluginState state, AIP aip, String disposalHoldId,
     Job cachedJob, Report reportItem) {
-    for (DisposalHoldAssociation association : aip.getDisposalHoldAssociation()) {
-      if (disposalHoldId.equals(association.getId()) && association.getLiftedOn() == null) {
-        String outcomeLiftText = liftHold(association, cachedJob.getUsername(), aip.getId(), reportItem);
+    DisposalAIPMetadata disposal = aip.getDisposal();
+    if (disposal != null) {
+      List<DisposalHoldAIPMetadata> holds = disposal.getHolds();
+      for (DisposalHoldAIPMetadata hold : new ArrayList<>(holds)) {
+        if (hold.getTransitive() == null && disposalHoldId.equals(hold.getId())) {
+          String outcomeLiftText = liftHold(hold, disposal, aip.getId(), reportItem);
 
-        model.createEvent(aip.getId(), null, null, null, POLICY_ASSIGNMENT,
-          LiftDisposalHoldFromAIPPlugin.getStaticName(), null, null, state, outcomeLiftText, "",
-          cachedJob.getUsername(), true);
+          model.createEvent(aip.getId(), null, null, null, POLICY_ASSIGNMENT,
+              LiftDisposalHoldFromAIPPlugin.getStaticName(), null, null, state, outcomeLiftText, "",
+              cachedJob.getUsername(), true);
+        }
       }
+      
     }
   }
 
   public static void liftTransitiveDisposalHoldFromAIP(ModelService model, PluginState state, AIP aip,
-    String disposalHoldId, Job cachedJob, Report reportItem,
-    List<DisposalHoldAssociation> transitiveDisposalHoldAssociationList) {
+    String disposalHoldId, Job cachedJob, Report reportItem) {
+    DisposalAIPMetadata disposal = aip.getDisposal();
+    if (disposal != null) {
+      List<DisposalHoldAIPMetadata> holds = disposal.getHolds();
+      for (DisposalHoldAIPMetadata hold : new ArrayList<>(holds)) {
+        if (hold.getTransitive() != null && disposalHoldId.equals(hold.getId())) {
+          holds.remove(hold);
+          String outcomeLiftText = liftHold(hold, disposal, aip.getId(), reportItem);
 
-    for (DisposalHoldAssociation disposalHoldAssociation : transitiveDisposalHoldAssociationList) {
-      aip.getTransitiveDisposalHoldAssociation().removeIf(d -> d.getId().equals(disposalHoldAssociation.getId()));
-    }
-
-    for (DisposalHoldAssociation association : transitiveDisposalHoldAssociationList) {
-      if (disposalHoldId.equals(association.getId()) && association.getLiftedOn() == null) {
-        String outcomeLiftText = liftHold(association, cachedJob.getUsername(), aip.getId(), reportItem);
-
-        model.createEvent(aip.getId(), null, null, null, POLICY_ASSIGNMENT,
-          LiftDisposalHoldFromAIPPlugin.getStaticName(), null, null, state, outcomeLiftText, "",
-          cachedJob.getUsername(), true);
+          model.createEvent(aip.getId(), null, null, null, POLICY_ASSIGNMENT,
+            LiftDisposalHoldFromAIPPlugin.getStaticName(), null, null, state, outcomeLiftText, "",
+            cachedJob.getUsername(), true);
+        }
       }
     }
   }
 
   public static void liftAllDisposalHoldsFromAIP(ModelService model, PluginState state, AIP aip, Job cachedJob,
     Report reportItem) {
-    for (DisposalHoldAssociation association : aip.getDisposalHoldAssociation()) {
-      if (association.getLiftedOn() == null) {
-        String outcomeLiftText = liftHold(association, cachedJob.getUsername(), aip.getId(), reportItem);
+    DisposalAIPMetadata disposal = aip.getDisposal();
+    if (disposal != null) {
+      List<DisposalHoldAIPMetadata> holds = disposal.getHolds();
+      for (DisposalHoldAIPMetadata hold : new ArrayList<>(holds)) {
+        if (hold.getTransitive() == null) {
+          String outcomeLiftText = liftHold(hold, disposal, aip.getId(), reportItem);
 
-        model.createEvent(aip.getId(), null, null, null, POLICY_ASSIGNMENT,
-          LiftDisposalHoldFromAIPPlugin.getStaticName(), null, null, state, outcomeLiftText, "",
-          cachedJob.getUsername(), true);
+          model.createEvent(aip.getId(), null, null, null, POLICY_ASSIGNMENT,
+            LiftDisposalHoldFromAIPPlugin.getStaticName(), null, null, state, outcomeLiftText, "",
+            cachedJob.getUsername(), true);
+        }
       }
     }
   }
@@ -131,17 +131,17 @@ public class DisposalHoldPluginUtils {
     return outcomeLiftText;
   }
 
-  private static String liftHold(DisposalHoldAssociation association, String liftedBy, String aipId,
-    Report reportItem) {
-    association.setLiftedOn(new Date());
-    association.setLiftedBy(liftedBy);
+  private static String liftHold(DisposalHoldAIPMetadata disposalHold, DisposalAIPMetadata disposal,
+                                 String aipId, Report reportItem) {
 
-    // Uses cache to retrieve the disposal hold
-    DisposalHold liftedHold = RodaCoreFactory.getDisposalHold(association.getId());
+    disposal.getHolds().remove(disposalHold);
+    DisposalHold liftedHold = RodaCoreFactory.getDisposalHold(disposalHold.getId());
     String outcomeLiftText;
     if (liftedHold == null) {
-      outcomeLiftText = "Disposal hold '" + association.getId() + "' was successfully lifted from AIP '" + aipId + "'";
-      reportItem.addPluginDetails("Disposal hold '" + association.getId() + "' was successfully lifted from AIP\n");
+      outcomeLiftText = "Disposal hold '" + disposalHold.getId() + "' was successfully lifted from AIP '"
+        + aipId + "'";
+      reportItem
+        .addPluginDetails("Disposal hold '" + disposalHold.getId() + "' was successfully lifted from AIP\n");
     } else {
       outcomeLiftText = "Disposal hold '" + liftedHold.getTitle() + "' (" + liftedHold.getId()
         + ") was successfully lifted from AIP '" + aipId + "'";

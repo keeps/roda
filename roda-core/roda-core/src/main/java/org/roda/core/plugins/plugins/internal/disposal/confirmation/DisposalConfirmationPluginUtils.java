@@ -9,11 +9,9 @@ import java.util.Set;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -24,15 +22,9 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry;
-import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
-import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.PluginState;
-import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
 import org.roda.core.index.IndexService;
-import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
-import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.rsync.RsyncUtils;
 import org.roda.core.util.CommandException;
@@ -98,7 +90,7 @@ public class DisposalConfirmationPluginUtils {
     entry.setAipDisposalScheduleId(aip.getDisposalScheduleId());
     disposalSchedules.add(aip.getDisposalScheduleId());
 
-    entry.setAipDisposalHoldIds(getDisposalHoldIds(aip.getDisposalHoldAssociation()));
+    entry.setAipDisposalHoldIds(getDisposalHoldIds(aip.getDisposal().getHolds()));
     disposalHolds.addAll(entry.getAipDisposalHoldIds());
 
     getStorageSizeInBytesForAIP(indexService, aip.getId(), entry);
@@ -106,10 +98,10 @@ public class DisposalConfirmationPluginUtils {
     return entry;
   }
 
-  private static List<String> getDisposalHoldIds(List<DisposalHoldAssociation> disposalHoldAssociation) {
+  private static List<String> getDisposalHoldIds(List<DisposalHoldAIPMetadata> disposalHoldAssociation) {
     List<String> holdIds = new ArrayList<>();
 
-    for (DisposalHoldAssociation holdAssociation : disposalHoldAssociation) {
+    for (DisposalHoldAIPMetadata holdAssociation : disposalHoldAssociation) {
       holdIds.add(holdAssociation.getId());
     }
 
