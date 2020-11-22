@@ -1670,7 +1670,11 @@ public class SolrUtils {
     throws RequestNotValidException, GenericException, AuthorizationDeniedException {
     DisposalSchedule disposalSchedule;
     try {
-      disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
+      if(StringUtils.isNoneBlank(aip.getDisposalScheduleId())){
+        disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
+      } else {
+        return null;
+      }
     } catch (NotFoundException e) {
       return null;
     }

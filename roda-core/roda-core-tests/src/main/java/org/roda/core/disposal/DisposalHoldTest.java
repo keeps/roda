@@ -24,7 +24,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalAIPMetadata;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceTest;
@@ -154,15 +154,15 @@ public class DisposalHoldTest {
     DisposalHold disposalHold = model.createDisposalHold(createDisposalHold(), RodaConstants.ADMIN);
     DisposalHold disposalHold2 = model.createDisposalHold(createDisposalHold(), RodaConstants.ADMIN);
 
-    DisposalHoldAssociation disposalHoldAssociation = model.createDisposalHoldAssociation(aip.getId(),
-      disposalHold.getId(), new Date(), RodaConstants.ADMIN);
-    DisposalHoldAssociation disposalHoldAssociation2 = model.createDisposalHoldAssociation(aip.getId(),
+    DisposalAIPMetadata disposalHoldAssociation = model.createDisposalHoldAssociation(aip.getId(), disposalHold.getId(),
+      new Date(), RodaConstants.ADMIN);
+    DisposalAIPMetadata disposalHoldAssociation2 = model.createDisposalHoldAssociation(aip.getId(),
       disposalHold2.getId(), new Date(), RodaConstants.ADMIN);
 
     // check it is connected
     AIP retrievedAIP = model.retrieveAIP(aip.getId());
-    assertEquals(retrievedAIP.getDisposalHoldAssociation().get(0), disposalHoldAssociation);
-    assertEquals(retrievedAIP.getDisposalHoldAssociation().get(1), disposalHoldAssociation2);
+    assertEquals(retrievedAIP.getHolds().get(0), disposalHoldAssociation.getHolds().get(0));
+    assertEquals(retrievedAIP.getHolds().get(1), disposalHoldAssociation2.getHolds().get(1));
   }
 
   @Test

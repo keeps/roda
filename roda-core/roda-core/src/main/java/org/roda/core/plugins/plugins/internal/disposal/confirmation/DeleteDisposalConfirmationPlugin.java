@@ -189,7 +189,7 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
 
   private void processAIP(AIP aip, ModelService model, Report report, JobPluginInfo jobPluginInfo, Job cachedJob,
     DisposalConfirmation disposalConfirmationReport) {
-    aip.setDisposalConfirmationId(null);
+    aip.getDisposal().setConfirmation(null);
     PluginState state = PluginState.SUCCESS;
     Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);

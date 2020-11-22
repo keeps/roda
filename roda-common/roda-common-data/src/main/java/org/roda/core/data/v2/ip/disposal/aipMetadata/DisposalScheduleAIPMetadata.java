@@ -21,7 +21,7 @@ public class DisposalScheduleAIPMetadata implements IsModelObject {
   private String id;
   private String associatedBy;
   private Date associatedOn;
-  private AIPDisposalScheduleAssociationType flow;
+  private AIPDisposalScheduleAssociationType associationType;
 
   public DisposalScheduleAIPMetadata() {
   }
@@ -46,12 +46,12 @@ public class DisposalScheduleAIPMetadata implements IsModelObject {
     this.associatedOn = associatedOn;
   }
 
-  public AIPDisposalScheduleAssociationType getFlow() {
-    return flow;
+  public AIPDisposalScheduleAssociationType getAssociationType() {
+    return associationType;
   }
 
-  public void setFlow(AIPDisposalScheduleAssociationType flow) {
-    this.flow = flow;
+  public void setAssociationType(AIPDisposalScheduleAssociationType associationType) {
+    this.associationType = associationType;
   }
 
   @JsonIgnore
@@ -80,7 +80,7 @@ public class DisposalScheduleAIPMetadata implements IsModelObject {
       return false;
     if (!Objects.equals(associatedOn, that.associatedOn))
       return false;
-    return flow == that.flow;
+    return associationType == that.associationType;
   }
 
   @Override
@@ -88,13 +88,13 @@ public class DisposalScheduleAIPMetadata implements IsModelObject {
     int result = id != null ? id.hashCode() : 0;
     result = 31 * result + (associatedBy != null ? associatedBy.hashCode() : 0);
     result = 31 * result + (associatedOn != null ? associatedOn.hashCode() : 0);
-    result = 31 * result + (flow != null ? flow.hashCode() : 0);
+    result = 31 * result + (associationType != null ? associationType.hashCode() : 0);
     return result;
   }
 
   @Override
   public String toString() {
     return "DisposalScheduleAIPMetadata{" + "id='" + id + '\'' + ", associatedBy='" + associatedBy + '\''
-      + ", associatedOn='" + associatedOn + '\'' + ", flow=" + flow + '}';
+      + ", associatedOn='" + associatedOn + '\'' + ", flow=" + associationType + '}';
   }
 }

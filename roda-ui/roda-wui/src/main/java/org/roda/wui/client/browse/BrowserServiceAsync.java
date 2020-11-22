@@ -32,12 +32,12 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalRules;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -334,7 +334,7 @@ public interface BrowserServiceAsync {
   void createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, String title,
     DisposalConfirmationExtraBundle metadata, AsyncCallback<Job> async);
 
-  void listDisposalHoldsAssociation(String aipId, AsyncCallback<List<DisposalHoldAssociation>> async);
+  void listDisposalHoldsAssociation(String aipId, AsyncCallback<List<DisposalHoldAIPMetadata>> async);
 
   void deleteDisposalConfirmationReport(SelectedItems<DisposalConfirmation> selectedItems, String details,
     AsyncCallback<Job> async);
@@ -347,11 +347,12 @@ public interface BrowserServiceAsync {
 
   void retrieveDisposalConfirmationExtraBundle(AsyncCallback<DisposalConfirmationExtraBundle> async);
 
-  void applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean applyToHierarchy,
-    boolean override, AsyncCallback<Job> async);
+  void applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean override,
+    AsyncCallback<Job> async);
 
-  void recoverRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems, AsyncCallback<Job> async);
+  void recoverRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems,
+    AsyncCallback<Job> async);
 
-  void liftDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean applyToHierarchy,
-    boolean clearAll, AsyncCallback<Job> async);
+  void liftDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean clearAll,
+    AsyncCallback<Job> async);
 }

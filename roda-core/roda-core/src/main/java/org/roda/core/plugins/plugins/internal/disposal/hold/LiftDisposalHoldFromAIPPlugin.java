@@ -1,6 +1,5 @@
 package org.roda.core.plugins.plugins.internal.disposal.hold;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,8 +25,8 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -54,7 +53,6 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
 
   private String disposalHoldId;
   private boolean clearAll;
-  private boolean recursive;
 
   private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
@@ -62,10 +60,6 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, "Disposal hold id",
         PluginParameter.PluginParameterType.STRING, "", true, false, "Disposal hold identifier"));
-
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RECURSIVE,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_RECURSIVE, "Recursive mode",
-        PluginParameter.PluginParameterType.BOOLEAN, "true", true, false, "Execute in recursive mode."));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_LIFT_ALL,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_LIFT_ALL, "Lift all holds",
@@ -77,7 +71,6 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> parameters = new ArrayList<>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID));
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_RECURSIVE));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_LIFT_ALL));
     return parameters;
   }
@@ -88,10 +81,6 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
 
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID)) {
       disposalHoldId = parameters.get(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID);
-    }
-
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_RECURSIVE)) {
-      recursive = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_RECURSIVE));
     }
 
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_LIFT_ALL)) {
@@ -160,6 +149,7 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, List<AIP> objects) {
+        calculateResourcesCounter(index, jobPluginInfo, objects);
         processAIP(index, model, report, cachedJob, jobPluginInfo, objects);
       }
     }, index, model, storage, liteList);
@@ -167,9 +157,6 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
 
   private void processAIP(IndexService index, ModelService model, Report report, Job cachedJob,
     JobPluginInfo jobPluginInfo, List<AIP> aips) {
-    if (recursive) {
-      calculateResourcesCounter(index, jobPluginInfo, aips);
-    }
 
     for (AIP aip : aips) {
       Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
@@ -183,7 +170,7 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
           // lift disposal holds
           DisposalHoldPluginUtils.liftAllDisposalHoldsFromAIP(model, state, aip, cachedJob, reportItem);
           liftDisposalTransitiveHold(model, index, cachedJob, aip, jobPluginInfo, report,
-            aip.getTransitiveDisposalHoldAssociation());
+            aip.getHolds());
           model.updateAIP(aip, cachedJob.getUsername());
 
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
@@ -199,8 +186,7 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
         try {
           DisposalHoldPluginUtils.liftDisposalHoldFromAIP(model, state, aip, disposalHoldId, cachedJob, reportItem);
           model.updateAIP(aip, cachedJob.getUsername());
-          DisposalHoldAssociation transitiveDisposalHoldAssociationByID = aip
-            .getDisposalHoldAssociationByID(disposalHoldId);
+          DisposalHoldAIPMetadata transitiveDisposalHoldAssociationByID = aip.findHold(disposalHoldId);
           liftDisposalTransitiveHold(model, index, cachedJob, aip, jobPluginInfo, report,
             Arrays.asList(transitiveDisposalHoldAssociationByID));
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
@@ -217,10 +203,6 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
 
       report.addReport(reportItem);
       PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
-
-      // if (recursive) {
-      // processChildren(model, index, cachedJob, aip, jobPluginInfo, report);
-      // }
     }
 
     if (StringUtils.isNotBlank(disposalHoldId)) {
@@ -236,7 +218,7 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
   }
 
   private void liftDisposalTransitiveHold(ModelService model, IndexService index, Job cachedJob, AIP aip,
-    JobPluginInfo jobPluginInfo, Report report, List<DisposalHoldAssociation> transitiveDisposalHoldAssociationList) {
+    JobPluginInfo jobPluginInfo, Report report, List<DisposalHoldAIPMetadata> transitiveDisposalHoldAssociationList) {
     try {
       final IndexedAIP indexedAip = index.retrieve(IndexedAIP.class, aip.getId(), new ArrayList<>());
       List<FilterParameter> ancestorsList = new ArrayList<>();
@@ -261,7 +243,7 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
             LOGGER.debug("Processing transitive AIP {}", aip.getId());
             try {
               DisposalHoldPluginUtils.liftTransitiveDisposalHoldFromAIP(model, state, aipChildren, disposalHoldId,
-                cachedJob, reportItem, transitiveDisposalHoldAssociationList);
+                cachedJob, reportItem);
               model.updateAIP(aipChildren, cachedJob.getUsername());
 
               jobPluginInfo.incrementObjectsProcessedWithSuccess();

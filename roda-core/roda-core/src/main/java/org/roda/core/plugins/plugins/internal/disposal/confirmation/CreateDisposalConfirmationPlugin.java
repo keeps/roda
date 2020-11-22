@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -24,6 +25,7 @@ import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalConfirmationAIPMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -163,10 +165,10 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
       LOGGER.debug("Processing AIP {}", aip.getId());
 
       // Validates if the AIP can be assigned to a disposal confirmation
-      if (aip.getDisposalConfirmationId() != null) {
+      if (StringUtils.isNotBlank(aip.getDisposalConfirmationId())) {
         LOGGER.error(
           "Error creating disposal confirmation {}: AIP '{}' marked as already assigned to a disposal confirmation '{}'",
-          confirmationId, aip.getId(), aip.getDisposalConfirmationId());
+        confirmationId, aip.getId(), aip.getDisposalConfirmationId());
         state = PluginState.FAILURE;
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         reportItem.setPluginState(state)
@@ -196,7 +198,9 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
 
           // Mark the AIP as "on confirmation" so they cannot be added to another
           // disposal confirmation
-          aip.setDisposalConfirmationId(confirmationId);
+          DisposalConfirmationAIPMetadata disposalConfirmationAIPMetadata = new DisposalConfirmationAIPMetadata();
+          aip.getDisposal().setConfirmation(disposalConfirmationAIPMetadata);
+          disposalConfirmationAIPMetadata.setId(confirmationId);
           model.updateAIP(aip, cachedJob.getUsername());
 
           // increment the storage size
@@ -205,7 +209,7 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
           reportItem.setPluginState(state)
             .setPluginDetails("AIP '" + aip.getId() + "' was successfully assigned to disposal confirmation '" + title
-              + "' (" + aip.getDisposalConfirmationId() + ")");
+              + "' (" + disposalConfirmationAIPMetadata.getId() + ")");
 
           outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationCreation(
             "was successfully assign to disposal confirmation", confirmationId, aip.getId());
@@ -216,7 +220,7 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
           jobPluginInfo.incrementObjectsProcessedWithFailure();
           reportItem.setPluginState(state)
             .setPluginDetails("Failed to assign AIP '" + aip.getId() + "' to disposal confirmation '" + title + "' ("
-              + aip.getDisposalConfirmationId() + "): " + e.getMessage());
+              + confirmationId + "): " + e.getMessage());
           outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationCreation(
             "failed to be assigned to disposal confirmation", title, aip.getId());
           report.addReport(reportItem);

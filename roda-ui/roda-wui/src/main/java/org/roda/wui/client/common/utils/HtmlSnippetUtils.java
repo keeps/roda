@@ -7,7 +7,6 @@
  */
 package org.roda.wui.client.common.utils;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -16,10 +15,8 @@ import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPDisposalScheduleAssociationType;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
@@ -42,11 +39,9 @@ import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.RepresentationInformationHelper;
 import org.roda.wui.client.planning.RepresentationInformationAssociations;
 import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.json.client.JSONException;
 import com.google.gwt.json.client.JSONObject;
@@ -169,11 +164,11 @@ public class HtmlSnippetUtils {
         } else if (job.getJobStats().getSourceObjectsProcessedWithSuccess() > 0) {
           ret = SafeHtmlUtils
             .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
-        } else if (job.getJobStats().getSourceObjectsProcessedWithSuccess() == 0 && job.getJobStats().getSourceObjectsProcessedWithSkipped() > 0) {
+        } else if (job.getJobStats().getSourceObjectsProcessedWithSuccess() == 0
+          && job.getJobStats().getSourceObjectsProcessedWithSkipped() > 0) {
           ret = SafeHtmlUtils
-              .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
-        }
-        else {
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
+        } else {
           ret = SafeHtmlUtils
             .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.showJobStatusCompleted() + CLOSE_SPAN);
         }

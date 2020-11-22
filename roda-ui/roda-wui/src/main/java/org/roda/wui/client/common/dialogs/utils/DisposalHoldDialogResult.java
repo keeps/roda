@@ -17,20 +17,17 @@ public class DisposalHoldDialogResult implements Serializable {
 
   private ActionType actionType;
   private DisposalHold disposalHold;
-  private boolean applyToHierarchy;
 
   public DisposalHoldDialogResult() {
   }
 
-  public DisposalHoldDialogResult(ActionType actionType, boolean applyToHierarchy) {
+  public DisposalHoldDialogResult(ActionType actionType) {
     this.actionType = actionType;
-    this.applyToHierarchy = applyToHierarchy;
   }
 
-  public DisposalHoldDialogResult(ActionType actionType, DisposalHold disposalHold, boolean applyToHierarchy) {
+  public DisposalHoldDialogResult(ActionType actionType, DisposalHold disposalHold) {
     this.actionType = actionType;
     this.disposalHold = disposalHold;
-    this.applyToHierarchy = applyToHierarchy;
   }
 
   public void setActionType(ActionType actionType) {
@@ -47,13 +44,5 @@ public class DisposalHoldDialogResult implements Serializable {
 
   public DisposalHold getDisposalHold() {
     return disposalHold;
-  }
-
-  public boolean isApplyToHierarchy() {
-    return applyToHierarchy;
-  }
-
-  public void setApplyToHierarchy(Boolean applyToHierarchy) {
-    this.applyToHierarchy = applyToHierarchy;
   }
 }

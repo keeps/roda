@@ -1,6 +1,7 @@
 package org.roda.core.data.v2.ip.disposal.aipMetadata;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Objects;
 
 import org.roda.core.data.common.RodaConstants;
@@ -16,17 +17,17 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class DisposalDestructionAIPMetadata implements Serializable {
   private static final long serialVersionUID = 3434965815309088344L;
 
-  private String destructionOn;
+  private Date destructionOn;
   private String destructionBy;
 
   public DisposalDestructionAIPMetadata() {
   }
 
-  public String getDestructionOn() {
+  public Date getDestructionOn() {
     return destructionOn;
   }
 
-  public void setDestructionOn(String destructionOn) {
+  public void setDestructionOn(Date destructionOn) {
     this.destructionOn = destructionOn;
   }
 

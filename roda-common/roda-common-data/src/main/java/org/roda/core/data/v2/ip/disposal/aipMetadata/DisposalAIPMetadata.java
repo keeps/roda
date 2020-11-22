@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.roda.core.data.common.RodaConstants;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.roda.core.data.v2.ip.AIPDisposalScheduleAssociationType;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 
 /**
@@ -102,9 +103,11 @@ public class DisposalAIPMetadata implements Serializable {
 
   @JsonIgnore
   public boolean isAIPOnHold(String disposalHoldId) {
-    for (DisposalHoldAIPMetadata hold : holds) {
-      if (hold.getId().equals(disposalHoldId)) {
-        return true;
+    if(holds != null) {
+      for (DisposalHoldAIPMetadata hold : holds) {
+        if (hold.getId().equals(disposalHoldId)) {
+          return true;
+        }
       }
     }
     return false;
@@ -113,5 +116,29 @@ public class DisposalAIPMetadata implements Serializable {
   @JsonIgnore
   public boolean onHold() {
     return !holds.isEmpty();
+  }
+
+  @JsonIgnore
+  public String getDisposalScheduleId() {
+    if(schedule != null) {
+      return schedule.getId();
+    }
+    return null;
+  }
+
+  @JsonIgnore
+  public String getDisposalConfirmationId() {
+    if(confirmation != null) {
+      return confirmation.getId();
+    }
+    return null;
+  }
+
+  @JsonIgnore
+  public AIPDisposalScheduleAssociationType getDisposalScheduleAssociationType(){
+    if(schedule != null){
+      return schedule.getAssociationType();
+    }
+    return null;
   }
 }
