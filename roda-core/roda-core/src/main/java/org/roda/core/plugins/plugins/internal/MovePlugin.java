@@ -39,6 +39,7 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -144,64 +145,106 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     }, index, model, storage, liteList);
   }
 
+  private void updateReport(ModelService model, Report reportItem, JobPluginInfo jobPluginInfo, Report report, Job job,
+    String entityName, String entityId, String disposalType, String parentId) {
+
+    reportItem.setPluginState(PluginState.FAILURE);
+
+    if (entityName.equals(AIP.class.getSimpleName())) {
+      reportItem.addPluginDetails("Could not delete " + entityName + " [id: " + entityId
+        + "] due to be associated to a disposal " + disposalType);
+    } else {
+      reportItem.addPluginDetails("Could not delete " + entityName + " [id: " + entityId + "] due to parent AIP [id: "
+        + parentId + "] be associated to a disposal " + disposalType);
+    }
+
+    report.addReport(reportItem);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+    jobPluginInfo.incrementObjectsProcessed(reportItem.getPluginState());
+    String outcomeText;
+
+    if (entityName.equals(AIP.class.getSimpleName())) {
+      outcomeText = entityName + " [id: " + entityId
+        + "] has not been manually deleted due to be associated to a disposal " + disposalType;
+    } else {
+      outcomeText = entityName + " [id: " + entityId + "] has not been manually deleted due to parent AIP [id: "
+        + parentId + "] be associated to a disposal " + disposalType;
+    }
+
+    List<LinkingIdentifier> sources = new ArrayList<>();
+    sources.add(PluginHelper.getLinkingIdentifier(entityId, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+
+    model.createUpdateAIPEvent(entityId, null, null, null, PreservationEventType.UPDATE, EVENT_DESCRIPTION,
+      PluginState.FAILURE, outcomeText, details, job.getUsername(), true);
+  }
+
   private void processAIP(ModelService model, IndexService index, Report report, JobPluginInfo jobPluginInfo, Job job,
     AIP aip) {
     PluginState state = PluginState.SUCCESS;
+    Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
 
-    if (!aip.getId().equals(destinationId)) {
-      LOGGER.debug("Moving AIP {} under {}", aip.getId(), destinationId);
+    if (StringUtils.isNotBlank(aip.getDisposalConfirmationId())) {
+      updateReport(model, reportItem, jobPluginInfo, report, job, AIP.class.getSimpleName(), aip.getId(),
+        "confirmation", null);
+    } else if (aip.onHold()) {
+      updateReport(model, reportItem, jobPluginInfo, report, job, AIP.class.getSimpleName(), aip.getId(), "hold", null);
+    } else {
 
-      try {
-        IndexResult<IndexedAIP> result = new IndexResult<>();
+      if (!aip.getId().equals(destinationId)) {
+        LOGGER.debug("Moving AIP {} under {}", aip.getId(), destinationId);
 
-        if (destinationId != null) {
-          Filter filter = new Filter();
-          filter.add(new SimpleFilterParameter(RodaConstants.INDEX_UUID, destinationId));
-          filter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
-          result = index.find(IndexedAIP.class, filter, Sorter.NONE, new Sublist(0, 1),
-            Arrays.asList(RodaConstants.INDEX_UUID));
-        }
+        try {
+          IndexResult<IndexedAIP> result = new IndexResult<>();
 
-        if (destinationId == null || result.getResults().isEmpty()) {
-          model.moveAIP(aip.getId(), destinationId, job.getUsername());
-        } else {
+          if (destinationId != null) {
+            Filter filter = new Filter();
+            filter.add(new SimpleFilterParameter(RodaConstants.INDEX_UUID, destinationId));
+            filter.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
+            result = index.find(IndexedAIP.class, filter, Sorter.NONE, new Sublist(0, 1),
+              Arrays.asList(RodaConstants.INDEX_UUID));
+          }
+
+          if (destinationId == null || result.getResults().isEmpty()) {
+            model.moveAIP(aip.getId(), destinationId, job.getUsername());
+          } else {
+            state = PluginState.FAILURE;
+            reportItem.addPluginDetails("Could not move AIP because the destination is a sublevel")
+              .setPluginState(state);
+            report.addReport(reportItem);
+            PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+          }
+        } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
           state = PluginState.FAILURE;
-          Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
-          reportItem.addPluginDetails("Could not move AIP because the destination is a sublevel").setPluginState(state);
+          reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
+          reportItem.addPluginDetails("Could not move AIP: " + e.getMessage()).setPluginState(state);
           report.addReport(reportItem);
           PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
         }
-      } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-        state = PluginState.FAILURE;
-        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
-        reportItem.addPluginDetails("Could not move AIP: " + e.getMessage()).setPluginState(state);
-        report.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }
+
+      String outcomeText = "";
+
+      try {
+        IndexedAIP item = index.retrieve(IndexedAIP.class, aip.getId(),
+          Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_TITLE));
+
+        if (state.equals(PluginState.SUCCESS)) {
+          outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has been manually moved");
+        } else {
+          outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has not been manually moved");
+        }
+      } catch (NotFoundException | GenericException e1) {
+        if (state.equals(PluginState.SUCCESS)) {
+          outcomeText = "Archival Information Package [id: " + aip.getId() + "] has been manually moved";
+        } else {
+          outcomeText = "Archival Information Package [id: " + aip.getId() + "] has not been manually moved";
+        }
+      }
+
+      jobPluginInfo.incrementObjectsProcessed(state);
+      model.createUpdateAIPEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE, EVENT_DESCRIPTION, state,
+        outcomeText, details, job.getUsername(), true);
     }
-
-    String outcomeText = "";
-
-    try {
-      IndexedAIP item = index.retrieve(IndexedAIP.class, aip.getId(),
-        Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_TITLE));
-
-      if (state.equals(PluginState.SUCCESS)) {
-        outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has been manually moved");
-      } else {
-        outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has not been manually moved");
-      }
-    } catch (NotFoundException | GenericException e1) {
-      if (state.equals(PluginState.SUCCESS)) {
-        outcomeText = "Archival Information Package [id: " + aip.getId() + "] has been manually moved";
-      } else {
-        outcomeText = "Archival Information Package [id: " + aip.getId() + "] has not been manually moved";
-      }
-    }
-
-    jobPluginInfo.incrementObjectsProcessed(state);
-    model.createUpdateAIPEvent(aip.getId(), null, null, null, PreservationEventType.UPDATE, EVENT_DESCRIPTION, state,
-      outcomeText, details, job.getUsername(), true);
   }
 
   private void processFile(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
