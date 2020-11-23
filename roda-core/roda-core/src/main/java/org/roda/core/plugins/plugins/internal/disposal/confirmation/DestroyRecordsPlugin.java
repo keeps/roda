@@ -76,9 +76,9 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
 
   public static String getStaticDescription() {
     return "Destroys records under a disposal confirmation report moving "
-      + "them to a disposal bin structure so they can be later on recover or "
-      + "permanently remove from the storage. This process marks the AIP as "
-      + "destroyed and a PREMIS event is recorded after finising the task.";
+      + "them to a disposal bin structure so they can be later on restored or "
+      + "permanently deleted from the storage. This process marks the AIP as "
+      + "destroyed and a PREMIS event is recorded after finishing the task.";
   }
 
   @Override
@@ -121,17 +121,15 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<DisposalConfirmation>() {
-      @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        JobPluginInfo jobPluginInfo, Plugin<DisposalConfirmation> plugin, DisposalConfirmation object) {
-        processDisposalConfirmation(index, model, storage, report, cachedJob, jobPluginInfo, object);
-      }
-    }, index, model, storage, liteList);
+    return PluginHelper.processObjects(this,
+      (RODAObjectProcessingLogic<DisposalConfirmation>) (indexService, modelService, storageService, report, cachedJob,
+        jobPluginInfo, plugin,
+        object) -> processDisposalConfirmation(modelService, storageService, report, cachedJob, jobPluginInfo, object),
+      index, model, storage, liteList);
   }
 
-  private void processDisposalConfirmation(IndexService index, ModelService model, StorageService storage,
-    Report report, Job cachedJob, JobPluginInfo jobPluginInfo, DisposalConfirmation disposalConfirmation) {
+  private void processDisposalConfirmation(ModelService model, StorageService storage, Report report, Job cachedJob,
+    JobPluginInfo jobPluginInfo, DisposalConfirmation disposalConfirmation) {
 
     // iterate over the AIP list
     // copy the AIP using rsync to the disposal bin and another place
@@ -156,37 +154,42 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
         // Iterate over the AIP
         while (reader.ready()) {
           String aipEntryJson = reader.readLine();
-          preProcessAIP(aipEntryJson, disposalConfirmation, index, model, cachedJob, report, jobPluginInfo);
+          preProcessAIP(aipEntryJson, disposalConfirmation, model, cachedJob, report, jobPluginInfo);
         }
-
-        DisposalConfirmationState disposalConfirmationState = DisposalConfirmationState.APPROVED;
-
-        if (!processedWithErrors) {
-          disposalConfirmation.setExecutedOn(executionDate);
-          disposalConfirmation.setExecutedBy(cachedJob.getUsername());
-        } else {
-          disposalConfirmationState = DisposalConfirmationState.EXECUTION_FAILED;
-        }
-        disposalConfirmation.setState(disposalConfirmationState);
-        model.updateDisposalConfirmation(disposalConfirmation);
       }
     } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException
       | IOException e) {
-      LOGGER.error("Error destroying intellectual entities of disposal confirmation '{}' ({}): {}",
+      LOGGER.error("Failed to destroy intellectual entities of disposal confirmation '{}' ({}): {}",
         disposalConfirmation.getTitle(), disposalConfirmationId, e.getMessage(), e);
       Report reportItem = PluginHelper.initPluginReportItem(this, disposalConfirmation.getId(),
         DisposalConfirmation.class);
       jobPluginInfo.incrementObjectsProcessedWithFailure();
       reportItem.setPluginState(PluginState.FAILURE)
-        .setPluginDetails("Error destroying intellectual entities on disposal confirmation '"
+        .setPluginDetails("Failed to destroy intellectual entities on disposal confirmation '"
           + disposalConfirmation.getTitle() + "' (" + disposalConfirmation.getId() + "): " + e.getMessage());
       report.addReport(reportItem);
       PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
+      processedWithErrors = true;
+    }
+
+    DisposalConfirmationState disposalConfirmationState = DisposalConfirmationState.APPROVED;
+
+    if (!processedWithErrors) {
+      disposalConfirmation.setExecutedOn(executionDate);
+      disposalConfirmation.setExecutedBy(cachedJob.getUsername());
+    } else {
+      disposalConfirmationState = DisposalConfirmationState.EXECUTION_FAILED;
+    }
+    disposalConfirmation.setState(disposalConfirmationState);
+    try {
+      model.updateDisposalConfirmation(disposalConfirmation);
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+      LOGGER.error("Failed to update disposal confirmation '{}': {}", disposalConfirmation.getId(), e.getMessage(), e);
     }
   }
 
-  private void preProcessAIP(String aipEntryJson, DisposalConfirmation disposalConfirmation, IndexService index,
-    ModelService model, Job cachedJob, Report report, JobPluginInfo jobPluginInfo) {
+  private void preProcessAIP(String aipEntryJson, DisposalConfirmation disposalConfirmation, ModelService model,
+    Job cachedJob, Report report, JobPluginInfo jobPluginInfo) {
     try {
       DisposalConfirmationAIPEntry aipEntry = JsonUtils.getObjectFromJson(aipEntryJson,
         DisposalConfirmationAIPEntry.class);
