@@ -1638,15 +1638,6 @@ public class Browser extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId(),
-        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
-      controllerAssistant.checkObjectPermissions(user, aip);
-
-      // check state
-      controllerAssistant.checkAIPstate(aip);
-
-      // check if AIP is in a disposal confirmation
-      controllerAssistant.checkIfAIPInConfirmation(aip);
 
       // delegate
       return BrowserHelper.updateRepresentation(representation);
@@ -2729,15 +2720,6 @@ public class Browser extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, file.getAipId(),
-        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
-      controllerAssistant.checkObjectPermissions(user, aip);
-
-      // check state
-      controllerAssistant.checkAIPstate(aip);
-
-      // check if AIP is in a disposal confirmation
-      controllerAssistant.checkIfAIPInConfirmation(aip);
 
       // delegate
       Path temp = Files.createTempFile("descriptive", ".tmp");
