@@ -591,6 +591,8 @@ public class HtmlSnippetUtils {
       case PERMANENTLY_DELETED:
         labelClass = "label-danger";
         break;
+      case EXECUTION_FAILED:
+        labelClass = "label-danger";
       default:
         labelClass = "label-default";
         break;

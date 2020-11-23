@@ -153,7 +153,7 @@ import org.roda.core.plugins.plugins.internal.disposal.confirmation.CreateDispos
 import org.roda.core.plugins.plugins.internal.disposal.confirmation.DeleteDisposalConfirmationPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.confirmation.DestroyRecordsPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.confirmation.PermanentlyDeleteRecordsPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.confirmation.RecoverRecordsPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.confirmation.RestoreRecordsPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.hold.ApplyDisposalHoldToAIPPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.hold.LiftDisposalHoldFromAIPPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.rules.ApplyDisposalRulesPlugin;
@@ -3476,7 +3476,7 @@ public class BrowserHelper {
     SelectedItemsList<DisposalConfirmation> selectedItems)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     return createAndExecuteInternalJob("Recover destroyed records from disposal bin", selectedItems,
-      RecoverRecordsPlugin.class, user, Collections.emptyMap(), "Could not execute recover of destroyed records from disposal bin action");
+      RestoreRecordsPlugin.class, user, Collections.emptyMap(), "Could not execute recover of destroyed records from disposal bin action");
   }
 
   public static DisposalRule createDisposalRule(DisposalRule disposalRule, User user) throws GenericException,

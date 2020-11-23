@@ -110,7 +110,7 @@ public class PermanentlyDeleteRecordsPlugin extends AbstractPlugin<DisposalConfi
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
     PluginState state = PluginState.SUCCESS;
     try {
-      // disposal-bin/<disposalConfirmationId>/aip/<aipId>
+      // disposal-bin/<disposalConfirmationId>/*
       Path disposalBinPath = RodaCoreFactory.getDisposalBinDirectoryPath().resolve(confirmation.getId());
       FSUtils.deletePath(disposalBinPath);
 

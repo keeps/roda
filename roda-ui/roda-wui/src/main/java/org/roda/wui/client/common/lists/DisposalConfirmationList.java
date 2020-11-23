@@ -123,7 +123,7 @@ public class DisposalConfirmationList extends AsyncTableCell<DisposalConfirmatio
     addColumn(titleColumn, messages.disposalConfirmationTitle(), false, false);
     addColumn(createdOnColumn, messages.disposalConfirmationCreationDate(), false, false, 12);
     addColumn(createdByColumn, messages.disposalConfirmationCreationBy(), false, false, 10);
-    addColumn(stateColumn, messages.disposalConfirmationStatus(), false, false, 8);
+    addColumn(stateColumn, messages.disposalConfirmationStatus(), false, false, 9);
     addColumn(numberOfAIPsColumn, messages.disposalConfirmationAIPs(), false, false, 5);
     addColumn(sizeColumn, messages.disposalConfirmationSize(), false, false, 8);
 
