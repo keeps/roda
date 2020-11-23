@@ -136,18 +136,15 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<DisposalConfirmation>() {
-      @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        JobPluginInfo jobPluginInfo, Plugin<DisposalConfirmation> plugin, DisposalConfirmation object) {
-        processDisposalConfirmation(index, model, storage, report, jobPluginInfo, cachedJob, object);
-
-      }
-    }, index, model, storage, liteList);
+    return PluginHelper.processObjects(this,
+      (RODAObjectProcessingLogic<DisposalConfirmation>) (indexService, modelService, storageService, report, cachedJob,
+        jobPluginInfo, plugin,
+        object) -> processDisposalConfirmation(modelService, storageService, report, jobPluginInfo, cachedJob, object),
+      index, model, storage, liteList);
   }
 
-  private void processDisposalConfirmation(IndexService index, ModelService model, StorageService storage,
-    Report report, JobPluginInfo jobPluginInfo, Job cachedJob, DisposalConfirmation confirmation) {
+  private void processDisposalConfirmation(ModelService model, StorageService storage, Report report,
+    JobPluginInfo jobPluginInfo, Job cachedJob, DisposalConfirmation confirmation) {
     String disposalConfirmationId = confirmation.getId();
 
     LOGGER.debug("Processing disposal confirmation {}", confirmation.getId());
