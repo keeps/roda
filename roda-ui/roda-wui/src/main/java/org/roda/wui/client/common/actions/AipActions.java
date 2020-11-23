@@ -177,8 +177,14 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
       return hasPermissions(action, aip.getPermissions()) && APPRAISAL_ACTIONS.contains(action);
     } else if (AIPState.UNDER_APPRAISAL.equals(aip.getState())) {
       return hasPermissions(action, aip.getPermissions())
-          && (POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action) || APPRAISAL_ACTIONS.contains(action));
-    } else if (action.equals(AipAction.REMOVE) && (aip.isOnHold() || StringUtils.isNotBlank(aip.getDisposalScheduleId()))) {
+        && (POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action) || APPRAISAL_ACTIONS.contains(action));
+    } else if (action.equals(AipAction.REMOVE)
+      && (aip.isOnHold() || StringUtils.isNotBlank(aip.getDisposalScheduleId()))) {
+      return false;
+    } else if (StringUtils.isNotBlank(aip.getDisposalConfirmationId()) && (action.equals(AipAction.MOVE_IN_HIERARCHY)
+      || action.equals(AipAction.ASSOCIATE_DISPOSAL_SCHEDULE) || action.equals(AipAction.ASSOCIATE_DISPOSAL_HOLD))) {
+      return false;
+    } else if (action.equals(AipAction.MOVE_IN_HIERARCHY) && aip.isOnHold()) {
       return false;
     } else {
       return hasPermissions(action, aip.getPermissions()) && POSSIBLE_ACTIONS_ON_SINGLE_AIP.contains(action);
