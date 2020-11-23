@@ -92,6 +92,9 @@ public class DisposalPolicyUtils {
           default:
             break;
         }
+        if (aip.isOnHold()) {
+          builder.append(" ").append(messages.disposalPolicyHoldSummary());
+        }
       } else {
         if (aip.isOnHold()) {
           builder.append(messages.disposalPolicyHoldSummary());
