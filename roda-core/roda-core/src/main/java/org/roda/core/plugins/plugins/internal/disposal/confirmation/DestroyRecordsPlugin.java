@@ -46,7 +46,6 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.storage.rsync.RsyncUtils;
 import org.roda.core.util.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +56,9 @@ import org.slf4j.LoggerFactory;
 public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
   private static final Logger LOGGER = LoggerFactory.getLogger(DestroyRecordsPlugin.class);
   private static final String EVENT_DESCRIPTION = "AIP destroyed by disposal confirmation";
+
+  private boolean processedWithErrors = false;
+  private final Date executionDate = new Date();
 
   @Override
   public String getVersionImpl() {
@@ -73,7 +75,10 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
   }
 
   public static String getStaticDescription() {
-    return "";
+    return "Destroys records under a disposal confirmation report moving "
+      + "them to a disposal bin structure so they can be later on recover or "
+      + "permanently remove from the storage. This process marks the AIP as "
+      + "destroyed and a PREMIS event is recorded after finising the task.";
   }
 
   @Override
@@ -126,7 +131,7 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
   }
 
   private void processDisposalConfirmation(IndexService index, ModelService model, StorageService storage,
-    Report report, Job cachedJob, JobPluginInfo jobPluginInfo, DisposalConfirmation disposalConfirmationReport) {
+    Report report, Job cachedJob, JobPluginInfo jobPluginInfo, DisposalConfirmation disposalConfirmation) {
 
     // iterate over the AIP list
     // copy the AIP using rsync to the disposal bin and another place
@@ -137,118 +142,155 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
     // add preservation event
     // copy the preservation event using rsync to the disposal bin
 
-    // IF any of this steps fails for any AIP recover the original AIP and mark
-    // every AIP as failed in the disposal confirmation
+    // IF any of this steps fails for any AIP the process continues and destroys as
+    // much as it can
 
-    String disposalConfirmationId = disposalConfirmationReport.getId();
-    String outcomeText;
-    PluginState state = PluginState.SUCCESS;
-    Date executionDate = new Date();
+    String disposalConfirmationId = disposalConfirmation.getId();
 
     try {
       StoragePath disposalConfirmationAIPsPath = ModelUtils.getDisposalConfirmationAIPsPath(disposalConfirmationId);
       Binary binary = storage.getBinary(disposalConfirmationAIPsPath);
 
       try (BufferedReader reader = new BufferedReader(new InputStreamReader(binary.getContent().createInputStream()))) {
-        jobPluginInfo.setSourceObjectsCount(disposalConfirmationReport.getNumberOfAIPs().intValue());
+        jobPluginInfo.setSourceObjectsCount(disposalConfirmation.getNumberOfAIPs().intValue());
         // Iterate over the AIP
         while (reader.ready()) {
           String aipEntryJson = reader.readLine();
-
-          try {
-            processAIP(aipEntryJson, disposalConfirmationReport, executionDate, model, cachedJob);
-          } catch (CommandException e) {
-            e.printStackTrace();
-          }
-
+          preProcessAIP(aipEntryJson, disposalConfirmation, index, model, cachedJob, report, jobPluginInfo);
         }
 
-        disposalConfirmationReport.setExecutedOn(executionDate);
-        disposalConfirmationReport.setExecutedBy(cachedJob.getUsername());
-        disposalConfirmationReport.setState(DisposalConfirmationState.APPROVED);
+        DisposalConfirmationState disposalConfirmationState = DisposalConfirmationState.APPROVED;
 
-        model.updateDisposalConfirmation(disposalConfirmationReport);
-
-      } catch (IOException e) {
-        LOGGER.error("Error destroying intellectual entities of disposal confirmation '{}' ({}): {}",
-          disposalConfirmationReport.getTitle(), disposalConfirmationId, e.getMessage(), e);
-        jobPluginInfo.incrementObjectsProcessedWithFailure();
-        report.setPluginState(PluginState.FAILURE).setPluginDetails(
-          "Error destroying intellectual entities on disposal confirmation '" + disposalConfirmationReport.getTitle()
-            + "' (" + disposalConfirmationReport.getId() + "): " + e.getMessage());
+        if (!processedWithErrors) {
+          disposalConfirmation.setExecutedOn(executionDate);
+          disposalConfirmation.setExecutedBy(cachedJob.getUsername());
+        } else {
+          disposalConfirmationState = DisposalConfirmationState.EXECUTION_FAILED;
+        }
+        disposalConfirmation.setState(disposalConfirmationState);
+        model.updateDisposalConfirmation(disposalConfirmation);
       }
-    } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
+    } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException
+      | IOException e) {
       LOGGER.error("Error destroying intellectual entities of disposal confirmation '{}' ({}): {}",
-        disposalConfirmationReport.getTitle(), disposalConfirmationId, e.getMessage(), e);
+        disposalConfirmation.getTitle(), disposalConfirmationId, e.getMessage(), e);
+      Report reportItem = PluginHelper.initPluginReportItem(this, disposalConfirmation.getId(),
+        DisposalConfirmation.class);
       jobPluginInfo.incrementObjectsProcessedWithFailure();
-      report.setPluginState(PluginState.FAILURE).setPluginDetails(
-        "Error destroying intellectual entities on disposal confirmation '" + disposalConfirmationReport.getTitle()
-          + "' (" + disposalConfirmationReport.getId() + "): " + e.getMessage());
+      reportItem.setPluginState(PluginState.FAILURE)
+        .setPluginDetails("Error destroying intellectual entities on disposal confirmation '"
+          + disposalConfirmation.getTitle() + "' (" + disposalConfirmation.getId() + "): " + e.getMessage());
+      report.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
     }
   }
 
-  private void processAIP(String aipEntryJson, DisposalConfirmation disposalConfirmation, Date executionDate,
-    ModelService model, Job cachedJob) throws GenericException, AuthorizationDeniedException, NotFoundException,
-    RequestNotValidException, CommandException, IOException {
+  private void preProcessAIP(String aipEntryJson, DisposalConfirmation disposalConfirmation, IndexService index,
+    ModelService model, Job cachedJob, Report report, JobPluginInfo jobPluginInfo) {
+    try {
+      DisposalConfirmationAIPEntry aipEntry = JsonUtils.getObjectFromJson(aipEntryJson,
+        DisposalConfirmationAIPEntry.class);
+      AIP aip = model.retrieveAIP(aipEntry.getAipId());
+      processAIP(aip, disposalConfirmation, model, cachedJob, report, jobPluginInfo);
+    } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
+      LOGGER.error("Failed to pre-process the AIP entry '{}': {}", aipEntryJson, e.getMessage(), e);
+      processedWithErrors = true;
+      jobPluginInfo.incrementObjectsProcessedWithFailure();
+      Report reportItem = PluginHelper.initPluginReportItem(this, disposalConfirmation.getId(),
+        DisposalConfirmation.class);
+      reportItem.setPluginState(PluginState.FAILURE)
+        .setPluginDetails("Failed to pre-process the AIP entry '" + aipEntryJson + "' from disposal confirmation '"
+          + disposalConfirmation.getTitle() + "' (" + disposalConfirmation.getId() + "): " + e.getMessage());
+      report.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
+    }
+  }
 
-    DisposalConfirmationAIPEntry aipEntry = JsonUtils.getObjectFromJson(aipEntryJson,
-      DisposalConfirmationAIPEntry.class);
-    AIP aip = model.retrieveAIP(aipEntry.getAipId());
+  private void processAIP(AIP aip, DisposalConfirmation disposalConfirmation, ModelService model, Job cachedJob,
+    Report report, JobPluginInfo jobPluginInfo) {
+
+    LOGGER.debug("Processing AIP {}", aip.getId());
 
     Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
 
-    copyAIP(aip, disposalConfirmation.getId(), Collections.singletonList("-r"));
+    PluginState pluginState = PluginState.SUCCESS;
+    String outcomeText;
 
-    aip.setState(AIPState.DESTROYED);
-    aip.setDestroyedOn(executionDate);
-    aip.setDestroyedBy(cachedJob.getUsername());
+    try {
+      // Copy AIP to disposal bin
+      DisposalConfirmationPluginUtils.copyAIPToDisposalBin(aip, disposalConfirmation.getId(),
+        Collections.singletonList("-r"));
 
-    // Stylesheet
-    for (DescriptiveMetadata metadata : aip.getDescriptiveMetadata()) {
-      Binary binary = model.retrieveDescriptiveMetadataBinary(aip.getId(), metadata.getId());
+      aip.setState(AIPState.DESTROY_PROCESSING);
+      aip.setDestroyedOn(executionDate);
+      aip.setDestroyedBy(cachedJob.getUsername());
 
-      StoragePath descriptiveMetadataStoragePath = ModelUtils.getDescriptiveMetadataStoragePath(metadata);
-      Path descriptiveMetadataPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(),
-        descriptiveMetadataStoragePath);
+      // Apply stylesheet to descriptive metadata
+      for (DescriptiveMetadata metadata : aip.getDescriptiveMetadata()) {
+        Binary binary = model.retrieveDescriptiveMetadataBinary(aip.getId(), metadata.getId());
 
-      Reader reader = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CROSSWALKS_DISSEMINATION_HTML_PATH,
-        metadata.getType(), metadata.getVersion(), Collections.emptyMap());
+        StoragePath descriptiveMetadataStoragePath = ModelUtils.getDescriptiveMetadataStoragePath(metadata);
+        Path descriptiveMetadataPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(),
+          descriptiveMetadataStoragePath);
 
-      ReaderInputStream readerInputStream = new ReaderInputStream(reader, StandardCharsets.UTF_8);
+        Reader reader = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CROSSWALKS_DISSEMINATION_HTML_PATH,
+          metadata.getType(), metadata.getVersion(), Collections.emptyMap());
 
-      FileUtils.copyInputStreamToFile(readerInputStream, descriptiveMetadataPath.toFile());
+        ReaderInputStream readerInputStream = new ReaderInputStream(reader, StandardCharsets.UTF_8);
+
+        FileUtils.copyInputStreamToFile(readerInputStream, descriptiveMetadataPath.toFile());
+      }
+
+      // remove all representations
+      for (Representation representation : aip.getRepresentations()) {
+        model.deleteRepresentation(aip.getId(), representation.getId());
+      }
+      aip.getRepresentations().clear();
+
+      // destroy the AIP
+      model.destroyAIP(aip, cachedJob.getUsername());
+
+      // Change the AIP from destroying to destroy
+      aip.setState(AIPState.DESTROYED);
+      model.updateAIPState(aip, cachedJob.getUsername());
+
+      outcomeText = "Archival Information Package [id: " + aip.getId()
+        + "] has been destroyed with disposal confirmation '" + disposalConfirmation.getTitle() + "' ("
+        + disposalConfirmation.getId() + ")";
+
+      reportItem.setPluginDetails(outcomeText);
+
+    } catch (IOException | CommandException | RequestNotValidException | GenericException | AuthorizationDeniedException
+      | NotFoundException e) {
+      LOGGER.error("Failed to destroy AIP '{}': {}", aip.getId(), e.getMessage(), e);
+      pluginState = PluginState.FAILURE;
+      outcomeText = "Archival Information Package [id: " + aip.getId()
+        + "] has not been destroyed with disposal confirmation '" + disposalConfirmation.getTitle() + "' ("
+        + disposalConfirmation.getId() + ")";
+      reportItem.setPluginDetails(outcomeText + ": " + e.getMessage());
+      processedWithErrors = true;
     }
-
-    // Representation
-    for (Representation representation : aip.getRepresentations()) {
-      model.deleteRepresentation(aip.getId(), representation.getId());
-    }
-    aip.getRepresentations().clear();
-
-    model.destroyAIP(aip, cachedJob.getUsername());
-
-    String outcomeText = "Archival Information Package [id: " + aip.getId()
-      + "] has been destroyed with disposal confirmation '" + disposalConfirmation.getTitle() + "' ("
-      + disposalConfirmation.getId() + ")";
 
     model.createEvent(aip.getId(), null, null, null, RodaConstants.PreservationEventType.DESTRUCTION, EVENT_DESCRIPTION,
-      null, null, PluginState.SUCCESS, outcomeText, "", cachedJob.getUsername(), true);
+      null, null, pluginState, outcomeText, "", cachedJob.getUsername(), true);
 
-    copyAIP(aip, disposalConfirmation.getId(), Arrays.asList("-r", "--ignore-existing"));
-  }
+    // copy the preservation event to the AIP in the disposal bin
+    // using the --ignore-existing flag in the rsync process, copying only the new
+    // preservation event, leaving the remaining AIP structure intact
+    try {
+      DisposalConfirmationPluginUtils.copyAIPToDisposalBin(aip, disposalConfirmation.getId(),
+        Arrays.asList("-r", "--ignore-existing"));
+    } catch (RequestNotValidException | GenericException | CommandException e) {
+      LOGGER.error("Failed to copy preservation event: {}", e.getMessage(), e);
+    }
 
-  private void copyAIP(AIP aip, String disposalConfirmationId, List<String> rsyncOptions)
-    throws RequestNotValidException, GenericException, CommandException {
-    // Make a copy to disposal bin before update
-    StoragePath aipStoragePath = ModelUtils.getAIPStoragePath(aip.getId());
-    Path aipPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), aipStoragePath);
+    jobPluginInfo.incrementObjectsProcessed(pluginState);
 
-    // disposal-bin/<disposalConfirmationId>/aip/<aipId>
-    Path disposalBinPath = RodaCoreFactory.getDisposalBinDirectoryPath().resolve(disposalConfirmationId)
-      .resolve(RodaConstants.CORE_AIP_FOLDER).resolve(aipStoragePath.getName());
+    reportItem.setPluginState(pluginState);
+    report.addReport(reportItem);
 
-    RsyncUtils.executeRsync(aipPath, disposalBinPath, rsyncOptions);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
   }
 
   @Override

@@ -1609,7 +1609,7 @@ public class SolrUtils {
     }
   }
 
-  public static Map<String, String> getOverdueDate(DisposalSchedule disposalSchedule, AIP aip)
+  public static Map<String, String> getRetentionPeriod(DisposalSchedule disposalSchedule, AIP aip)
     throws NotFoundException, GenericException {
     Map<String, String> values = new HashMap<>();
 
@@ -1617,7 +1617,7 @@ public class SolrUtils {
       return values;
     }
 
-    Date overDueDate = null;
+    Date overDueDate;
     Integer retentionPeriodDuration = disposalSchedule.getRetentionPeriodDuration();
     Calendar cal = Calendar.getInstance();
 

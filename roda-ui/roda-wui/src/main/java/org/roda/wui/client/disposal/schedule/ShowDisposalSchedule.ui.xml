@@ -93,7 +93,7 @@
                         <g:Label addStyleNames="h4">
                             <ui:text from="{messages.actions}"/>
                         </g:Label>
-                        <g:FlowPanel ui:field="buttonsPanel"></g:FlowPanel>
+                        <g:FlowPanel ui:field="buttonsPanel"/>
                     </g:FlowPanel>
                 </g:FlowPanel>
             </g:FlowPanel>

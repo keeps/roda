@@ -165,6 +165,12 @@ public interface ClientMessages extends Messages {
 
   String sidebarDisposalBinTitle();
 
+  String sidebarDisposalScheduleTitle();
+
+  String sidebarDisposalConfirmationReportTitle();
+
+  String sidebarDisposalConfirmationTitle();
+
   String sidebarRepresentationInformationTitle();
 
   String sidebarRisksTitle();
@@ -2150,6 +2156,10 @@ public interface ClientMessages extends Messages {
 
   String permanentlyDeleteFromBinButton();
 
+  String reExecuteDisposalDestroyActionButton();
+
+  String recoverDisposalConfirmationExecutionFailedButton();
+
   String recoverFromBinButton();
 
   String newDisposalConfirmationButton();
@@ -2330,4 +2340,6 @@ public interface ClientMessages extends Messages {
   String deleteDisposalRuleSuccessTitle();
 
   String deleteDisposalRuleSuccessMessage(String title);
+
+
 }
