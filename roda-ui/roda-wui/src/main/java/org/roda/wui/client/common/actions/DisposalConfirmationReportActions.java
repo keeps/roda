@@ -47,11 +47,16 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
 
   private static final Set<DisposalConfirmationReportAction> POSSIBLE_ACTIONS_FOR_DELETED = POSSIBLE_ACTIONS_FOR_RECOVERED;
 
+  private static final Set<DisposalConfirmationReportAction> POSSIBLE_ACTIONS_FOR_EXECUTION_FAILED = new HashSet<>(
+    Arrays.asList(DisposalConfirmationReportAction.RE_EXECUTE, DisposalConfirmationReportAction.RECOVER_STATE));
+
   public enum DisposalConfirmationReportAction implements Action<DisposalConfirmation> {
     DESTROY(PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION),
     DELETE_REPORT(PERMISSION_METHOD_DELETE_DISPOSAL_CONFIRMATION),
     REMOVE_FROM_BIN(PERMISSION_METHOD_PERMANENTLY_DELETE_RECORDS_DISPOSAL_CONFIRMATION),
-    RECOVER_FROM_BIN(PERMISSION_METHOD_RECOVER_RECORDS_DISPOSAL_CONFIRMATION);
+    RECOVER_FROM_BIN(PERMISSION_METHOD_RECOVER_RECORDS_DISPOSAL_CONFIRMATION),
+    RE_EXECUTE(PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION),
+    RECOVER_STATE(PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION);
 
     private List<String> methods;
 
@@ -98,6 +103,8 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
         return hasPermissions(action) && POSSIBLE_ACTIONS_FOR_RECOVERED.contains(action);
       case PERMANENTLY_DELETED:
         return hasPermissions(action) && POSSIBLE_ACTIONS_FOR_DELETED.contains(action);
+      case EXECUTION_FAILED:
+        return hasPermissions(action) && POSSIBLE_ACTIONS_FOR_EXECUTION_FAILED.contains(action);
       default:
         return false;
     }
@@ -114,46 +121,58 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
       permanentlyDeleteDisposalConfirmationReport(object, callback);
     } else if (DisposalConfirmationReportAction.RECOVER_FROM_BIN.equals(action)) {
       recoverDestroyedRecord(object, callback);
+    } else if (DisposalConfirmationReportAction.RE_EXECUTE.equals(action)) {
+      reExecuteDisposalConfirmation(object, callback);
+    } else if (DisposalConfirmationReportAction.RECOVER_STATE.equals(action)) {
+      recoverDisposalConfirmationExecutionFailed(object, callback);
     } else {
       unsupportedAction(action, callback);
     }
   }
 
+  private void reExecuteDisposalConfirmation(DisposalConfirmation confirmation, AsyncCallback<ActionImpact> callback) {
+
+  }
+
+  private void recoverDisposalConfirmationExecutionFailed(DisposalConfirmation confirmation,
+    AsyncCallback<ActionImpact> callback) {
+  }
+
   private void recoverDestroyedRecord(DisposalConfirmation confirmation, AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.recoverDestroyedRecordsConfirmDialogTitle(),
-        messages.recoverDestroyedRecordsConfirmDialogMessage(), messages.dialogNo(), messages.dialogYes(),
-        new ActionNoAsyncCallback<Boolean>(callback) {
-          @Override
-          public void onSuccess(Boolean result) {
-            if (result) {
-              BrowserService.Util.getInstance().recoverRecordsInDisposalConfirmationReport(
-                  objectToSelectedItems(confirmation, DisposalConfirmation.class), new ActionAsyncCallback<Job>(callback) {
+      messages.recoverDestroyedRecordsConfirmDialogMessage(), messages.dialogNo(), messages.dialogYes(),
+      new ActionNoAsyncCallback<Boolean>(callback) {
+        @Override
+        public void onSuccess(Boolean result) {
+          if (result) {
+            BrowserService.Util.getInstance().recoverRecordsInDisposalConfirmationReport(
+              objectToSelectedItems(confirmation, DisposalConfirmation.class), new ActionAsyncCallback<Job>(callback) {
+
+                @Override
+                public void onSuccess(Job result) {
+                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
                     @Override
-                    public void onSuccess(Job result) {
-                      Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+                    public void onFailure(Throwable caught) {
+                      Toast.showInfo(messages.recoverDestroyedRecordsSuccessTitle(),
+                        messages.recoverDestroyedRecordsSuccessMessage());
+                      doActionCallbackUpdated();
+                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                    }
 
-                        @Override
-                        public void onFailure(Throwable caught) {
-                          Toast.showInfo(messages.recoverDestroyedRecordsSuccessTitle(),
-                              messages.recoverDestroyedRecordsSuccessMessage());
-                          doActionCallbackUpdated();
-                          HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                        }
-
-                        @Override
-                        public void onSuccess(final Void nothing) {
-                          doActionCallbackUpdated();
-                          HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
-                        }
-                      });
+                    @Override
+                    public void onSuccess(final Void nothing) {
+                      doActionCallbackUpdated();
+                      HistoryUtils.newHistory(ShowJob.RESOLVER, result.getId());
                     }
                   });
-            } else {
-              doActionCallbackNone();
-            }
+                }
+              });
+          } else {
+            doActionCallbackNone();
           }
-        });
+        }
+      });
   }
 
   private void permanentlyDeleteDisposalConfirmationReport(DisposalConfirmation confirmation,
@@ -283,23 +302,34 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
     ActionableBundle<DisposalConfirmation> confirmationActionableBundle = new ActionableBundle<>();
 
     // SCHEDULE
-    ActionableGroup<DisposalConfirmation> scheduleGroup = new ActionableGroup<>("Schedule");
+    ActionableGroup<DisposalConfirmation> scheduleGroup = new ActionableGroup<>(
+      messages.sidebarDisposalScheduleTitle());
     scheduleGroup.addButton(messages.applyDisposalScheduleButton(), DisposalConfirmationReportAction.DESTROY,
-      ActionImpact.UPDATED, "btn-times-circle");
+      ActionImpact.UPDATED, "btn-trash-alt");
 
     // REPORT
-    ActionableGroup<DisposalConfirmation> reportGroup = new ActionableGroup<>("Report");
+    ActionableGroup<DisposalConfirmation> reportGroup = new ActionableGroup<>(
+      messages.sidebarDisposalConfirmationReportTitle());
     reportGroup.addButton(messages.deleteDisposalConfirmationReport(), DisposalConfirmationReportAction.DELETE_REPORT,
       ActionImpact.DESTROYED, "btn-cancel");
+
+    // DISPOSAL CONFIRMATION
+    ActionableGroup<DisposalConfirmation> confirmationGroup = new ActionableGroup<>(
+      messages.sidebarDisposalConfirmationTitle());
+    confirmationGroup.addButton(messages.reExecuteDisposalDestroyActionButton(),
+      DisposalConfirmationReportAction.RE_EXECUTE, ActionImpact.UPDATED, "btn-play-circle");
+    confirmationGroup.addButton(messages.recoverDisposalConfirmationExecutionFailedButton(),
+      DisposalConfirmationReportAction.RECOVER_STATE, ActionImpact.UPDATED, "btn-history");
 
     // DISPOSAL BIN
     ActionableGroup<DisposalConfirmation> disposalBinGroup = new ActionableGroup<>(messages.sidebarDisposalBinTitle());
     disposalBinGroup.addButton(messages.permanentlyDeleteFromBinButton(),
-      DisposalConfirmationReportAction.REMOVE_FROM_BIN, ActionImpact.DESTROYED, "btn-trash-alt");
+      DisposalConfirmationReportAction.REMOVE_FROM_BIN, ActionImpact.DESTROYED, "btn-eraser");
     disposalBinGroup.addButton(messages.recoverFromBinButton(), DisposalConfirmationReportAction.RECOVER_FROM_BIN,
       ActionImpact.UPDATED, "btn-history");
 
-    confirmationActionableBundle.addGroup(scheduleGroup).addGroup(reportGroup).addGroup(disposalBinGroup);
+    confirmationActionableBundle.addGroup(scheduleGroup).addGroup(reportGroup).addGroup(confirmationGroup)
+      .addGroup(disposalBinGroup);
 
     return confirmationActionableBundle;
   }

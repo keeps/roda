@@ -289,7 +289,7 @@ public class MovePlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
     Report reportItem = PluginHelper.initPluginReportItem(this, resourceId, objectClass);
     reportItem
       .addPluginDetails("Could not move transferred resource " + resourceId
-        + " due to inapropriate move operation. A likely scenario is a move operation of a parent to a child.")
+        + " due to inappropriate move operation. A likely scenario is a move operation of a parent to a child.")
       .setPluginState(PluginState.FAILURE);
     report.addReport(reportItem);
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);

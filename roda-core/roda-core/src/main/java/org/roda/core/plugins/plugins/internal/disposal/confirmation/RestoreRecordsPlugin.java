@@ -1,5 +1,8 @@
 package org.roda.core.plugins.plugins.internal.disposal.confirmation;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -10,19 +13,23 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +37,10 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-public class RecoverRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(RecoverRecordsPlugin.class);
+public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(RestoreRecordsPlugin.class);
+
+  private boolean processedWithErrors = false;
 
   @Override
   public String getVersionImpl() {
@@ -103,14 +112,50 @@ public class RecoverRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
   private void processDisposalConfirmation(IndexService index, ModelService model, StorageService storage,
     Report report, Job cachedJob, JobPluginInfo jobPluginInfo, DisposalConfirmation disposalConfirmation) {
 
-    disposalConfirmation.setState(DisposalConfirmationState.RESTORED);
-    disposalConfirmation.setRestoredOn(new Date());
-    disposalConfirmation.setRestoredBy(cachedJob.getUsername());
     try {
-      model.updateDisposalConfirmation(disposalConfirmation);
-    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
-      e.printStackTrace();
+      StoragePath disposalConfirmationAIPsPath = ModelUtils
+        .getDisposalConfirmationAIPsPath(disposalConfirmation.getId());
+      Binary binary = storage.getBinary(disposalConfirmationAIPsPath);
+
+      try (BufferedReader reader = new BufferedReader(new InputStreamReader(binary.getContent().createInputStream()))) {
+        jobPluginInfo.setSourceObjectsCount(disposalConfirmation.getNumberOfAIPs().intValue());
+        // Iterate over the AIP
+        while (reader.ready()) {
+          String aipEntryJson = reader.readLine();
+
+        }
+
+      } catch (IOException e) {
+        LOGGER.error("Error reading the disposal confirmation '{}' ({}): {}", disposalConfirmation.getTitle(),
+          disposalConfirmation.getId(), e.getMessage(), e);
+        rollbackChanges();
+      }
+
+      if (!processedWithErrors) {
+        disposalConfirmation.setState(DisposalConfirmationState.RESTORED);
+        disposalConfirmation.setRestoredOn(new Date());
+        disposalConfirmation.setRestoredBy(cachedJob.getUsername());
+        try {
+          model.updateDisposalConfirmation(disposalConfirmation);
+        } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+          LOGGER.error("Failed to update disposal confirmation '{}' ({}): {}", disposalConfirmation.getTitle(),
+            disposalConfirmation.getId(), e.getMessage(), e);
+        }
+      }
+    } catch (RequestNotValidException | AuthorizationDeniedException | GenericException | NotFoundException e) {
+      LOGGER.error("Error reading the disposal confirmation '{}' ({}): {}", disposalConfirmation.getTitle(),
+        disposalConfirmation.getId(), e.getMessage(), e);
+      Report reportItem = PluginHelper.initPluginReportItem(this, disposalConfirmation.getId(),
+        DisposalConfirmation.class);
+      reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Error reading the disposal confirmation '"
+        + disposalConfirmation.getTitle() + "' (" + disposalConfirmation.getId() + "): " + e.getMessage());
+      jobPluginInfo.incrementObjectsProcessedWithFailure();
+      report.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
     }
+  }
+
+  private void rollbackChanges() {
 
   }
 
@@ -137,7 +182,7 @@ public class RecoverRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
 
   @Override
   public Plugin<DisposalConfirmation> cloneMe() {
-    return new RecoverRecordsPlugin();
+    return new RestoreRecordsPlugin();
   }
 
   @Override
