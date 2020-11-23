@@ -3,18 +3,23 @@ package org.roda.core.plugins.plugins.internal.disposal.confirmation;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -31,6 +36,8 @@ import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.util.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
   private static final Logger LOGGER = LoggerFactory.getLogger(RestoreRecordsPlugin.class);
+  private static final String EVENT_DESCRIPTION = "AIP recovered from disposal bin";
 
   private boolean processedWithErrors = false;
 
@@ -48,7 +56,7 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
   }
 
   public static String getStaticName() {
-    return "Recover records under disposal confirmation report";
+    return "Restore records under disposal confirmation report";
   }
 
   @Override
@@ -72,7 +80,7 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Recover records under disposal confirmation report";
+    return "Restore records under disposal confirmation report";
   }
 
   @Override
@@ -100,13 +108,11 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> liteList) throws PluginException {
-    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<DisposalConfirmation>() {
-      @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        JobPluginInfo jobPluginInfo, Plugin<DisposalConfirmation> plugin, DisposalConfirmation object) {
-        processDisposalConfirmation(index, model, storage, report, cachedJob, jobPluginInfo, object);
-      }
-    }, index, model, storage, liteList);
+    return PluginHelper.processObjects(this,
+      (RODAObjectProcessingLogic<DisposalConfirmation>) (indexService, modelService, storageService, report, cachedJob,
+        jobPluginInfo, plugin, object) -> processDisposalConfirmation(indexService, modelService, storageService,
+          report, cachedJob, jobPluginInfo, object),
+      index, model, storage, liteList);
   }
 
   private void processDisposalConfirmation(IndexService index, ModelService model, StorageService storage,
@@ -123,40 +129,114 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
         while (reader.ready()) {
           String aipEntryJson = reader.readLine();
 
-        }
-
-      } catch (IOException e) {
-        LOGGER.error("Error reading the disposal confirmation '{}' ({}): {}", disposalConfirmation.getTitle(),
-          disposalConfirmation.getId(), e.getMessage(), e);
-        rollbackChanges();
-      }
-
-      if (!processedWithErrors) {
-        disposalConfirmation.setState(DisposalConfirmationState.RESTORED);
-        disposalConfirmation.setRestoredOn(new Date());
-        disposalConfirmation.setRestoredBy(cachedJob.getUsername());
-        try {
-          model.updateDisposalConfirmation(disposalConfirmation);
-        } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
-          LOGGER.error("Failed to update disposal confirmation '{}' ({}): {}", disposalConfirmation.getTitle(),
-            disposalConfirmation.getId(), e.getMessage(), e);
+          preProcessAIP(aipEntryJson, disposalConfirmation, index, model, cachedJob, report, jobPluginInfo);
         }
       }
-    } catch (RequestNotValidException | AuthorizationDeniedException | GenericException | NotFoundException e) {
-      LOGGER.error("Error reading the disposal confirmation '{}' ({}): {}", disposalConfirmation.getTitle(),
+    } catch (RequestNotValidException | AuthorizationDeniedException | GenericException | NotFoundException
+      | IOException e) {
+      LOGGER.error("Fail to restore disposal confirmation '{}' ({}) records: {}", disposalConfirmation.getTitle(),
         disposalConfirmation.getId(), e.getMessage(), e);
       Report reportItem = PluginHelper.initPluginReportItem(this, disposalConfirmation.getId(),
         DisposalConfirmation.class);
-      reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Error reading the disposal confirmation '"
-        + disposalConfirmation.getTitle() + "' (" + disposalConfirmation.getId() + "): " + e.getMessage());
+      reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Fail to restore the disposal confirmation '"
+        + disposalConfirmation.getTitle() + "' (" + disposalConfirmation.getId() + ") records: " + e.getMessage());
       jobPluginInfo.incrementObjectsProcessedWithFailure();
+      report.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
+    }
+
+    DisposalConfirmationState disposalConfirmationState = DisposalConfirmationState.RESTORED;
+
+    if (!processedWithErrors) {
+      disposalConfirmation.setRestoredOn(new Date());
+      disposalConfirmation.setRestoredBy(cachedJob.getUsername());
+      // disposal-bin/<disposalConfirmationId>/*
+      Path disposalBinPath = RodaCoreFactory.getDisposalBinDirectoryPath().resolve(disposalConfirmation.getId());
+      try {
+        FSUtils.deletePath(disposalBinPath);
+      } catch (NotFoundException | GenericException e) {
+        LOGGER.error("Failed to delete disposal confirmation from disposal bin: {}", e.getMessage(), e);
+      }
+    } else {
+      disposalConfirmationState = DisposalConfirmationState.EXECUTION_FAILED;
+    }
+    disposalConfirmation.setState(disposalConfirmationState);
+    try {
+      model.updateDisposalConfirmation(disposalConfirmation);
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+      LOGGER.error("Failed to update disposal confirmation '{}': {}", disposalConfirmation.getId(), e.getMessage(), e);
+    }
+  }
+
+  private void preProcessAIP(String aipEntryJson, DisposalConfirmation disposalConfirmation, IndexService index,
+    ModelService model, Job cachedJob, Report report, JobPluginInfo jobPluginInfo) {
+    try {
+      DisposalConfirmationAIPEntry aipEntry = JsonUtils.getObjectFromJson(aipEntryJson,
+        DisposalConfirmationAIPEntry.class);
+      processAIP(aipEntry, disposalConfirmation, index, model, cachedJob, report, jobPluginInfo);
+    } catch (GenericException e) {
+      LOGGER.error("Failed to pre-process the AIP entry '{}': {}", aipEntryJson, e.getMessage(), e);
+      processedWithErrors = true;
+      jobPluginInfo.incrementObjectsProcessedWithFailure();
+      Report reportItem = PluginHelper.initPluginReportItem(this, disposalConfirmation.getId(),
+        DisposalConfirmation.class);
+      reportItem.setPluginState(PluginState.FAILURE)
+        .setPluginDetails("Failed to pre-process the AIP entry '" + aipEntryJson + "' from disposal confirmation '"
+          + disposalConfirmation.getTitle() + "' (" + disposalConfirmation.getId() + "): " + e.getMessage());
       report.addReport(reportItem);
       PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
     }
   }
 
-  private void rollbackChanges() {
+  private void processAIP(DisposalConfirmationAIPEntry aipEntry, DisposalConfirmation disposalConfirmation,
+    IndexService index, ModelService model, Job cachedJob, Report report, JobPluginInfo jobPluginInfo) {
 
+    LOGGER.debug("Processing AIP entry {}", aipEntry.getAipId());
+
+    Report reportItem = PluginHelper.initPluginReportItem(this, aipEntry.getAipId(), AIP.class);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
+
+    PluginState pluginState = PluginState.SUCCESS;
+    String outcomeText;
+
+    try {
+      // Copy AIP from disposal bin to storage
+      DisposalConfirmationPluginUtils.copyAIPFromDisposalBin(aipEntry.getAipId(), disposalConfirmation.getId(),
+        Collections.singletonList("-r"));
+
+      // reindex the AIP
+      AIP aip = model.retrieveAIP(aipEntry.getAipId());
+      aip.setDisposalConfirmationId(null);
+
+      model.updateAIP(aip, cachedJob.getUsername());
+      index.reindexAIP(aip);
+
+      outcomeText = "Archival Information Package [id: " + aip.getId()
+        + "] has been recovered from disposal bin under confirmation '" + disposalConfirmation.getTitle() + "' ("
+        + disposalConfirmation.getId() + ")";
+
+      reportItem.setPluginDetails(outcomeText);
+
+    } catch (CommandException | RequestNotValidException | GenericException | NotFoundException
+      | AuthorizationDeniedException e) {
+      LOGGER.error("Failed to recover AIP '{}': {}", aipEntry.getAipId(), e.getMessage(), e);
+      pluginState = PluginState.FAILURE;
+      outcomeText = "Archival Information Package [id: " + aipEntry.getAipId()
+        + "] has not been recovered from disposal bin under disposal confirmation '" + disposalConfirmation.getTitle()
+        + "' (" + disposalConfirmation.getId() + ")";
+      reportItem.setPluginDetails(outcomeText + ": " + e.getMessage());
+      processedWithErrors = true;
+    }
+
+    model.createEvent(aipEntry.getAipId(), null, null, null, RodaConstants.PreservationEventType.RECOVERY,
+      EVENT_DESCRIPTION, null, null, pluginState, outcomeText, "", cachedJob.getUsername(), true);
+
+    jobPluginInfo.incrementObjectsProcessed(pluginState);
+
+    reportItem.setPluginState(pluginState);
+    report.addReport(reportItem);
+
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
   }
 
   @Override

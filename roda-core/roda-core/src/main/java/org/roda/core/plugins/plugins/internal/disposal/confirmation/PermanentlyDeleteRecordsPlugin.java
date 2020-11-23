@@ -123,6 +123,8 @@ public class PermanentlyDeleteRecordsPlugin extends AbstractPlugin<DisposalConfi
       LOGGER.error("Failed to permanently delete the records under disposal confirmation '{}' ({}): {}",
         confirmation.getTitle(), confirmation.getId(), e.getMessage(), e);
       state = PluginState.FAILURE;
+      reportItem
+        .setPluginDetails("Failed to permanently delete records under disposal confirmation: " + e.getMessage());
     }
 
     jobPluginInfo.incrementObjectsProcessed(state);
