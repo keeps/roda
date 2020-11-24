@@ -270,7 +270,6 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
     }
 
     // Make disposal holds as a jsonl
-
     try {
       for (String disposalHoldId : disposalHolds) {
         DisposalHold disposalHold = model.retrieveDisposalHold(disposalHoldId);
