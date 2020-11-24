@@ -263,6 +263,7 @@ public final class RodaConstants {
 
   public static final String CORE_CROSSWALKS_INGEST = "crosswalks/ingest/";
   public static final String CORE_CROSSWALKS_INGEST_OTHER = "crosswalks/ingest/other/";
+  public static final String CORE_DISPOSAL_METADATA_TRANSFORMERS = "disposal/destruction/";
 
   public static final String PREMIS_METADATA_TYPE = "premis";
   public static final String PREMIS_METADATA_VERSION = "3";
@@ -598,9 +599,9 @@ public final class RodaConstants {
    */
   public static final String STORAGE_CONTAINER_DISPOSAL_CONFIRMATION = "disposal-confirmation";
   public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME = "metadata.json";
-  public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME = "aips.json";
-  public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES = "disposal-schedules";
-  public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS = "disposal-holds";
+  public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME = "aips.jsonl";
+  public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES_FILENAME = "schedules.jsonl";
+  public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME = "holds.jsonl";
 
   public static final String STORAGE_HISTORY_CONTAINER_DATA = "data";
   public static final String STORAGE_HISTORY_CONTAINER_METADATA = "metadata";
@@ -1435,7 +1436,7 @@ public final class RodaConstants {
 
   public static final String DEFAULT_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-  public static final String DISPOSAL_RULE_WHITELIST_CONDITION = "ui.disposal.rule.whitelist.condition";
+  public static final String DISPOSAL_RULE_BLACKLIST_CONDITION = "ui.disposal.rule.blacklist.condition";
 
   /* Template Constants */
   public static final String INGEST_EMAIL_TEMPLATE = "ingestion-template.vm";

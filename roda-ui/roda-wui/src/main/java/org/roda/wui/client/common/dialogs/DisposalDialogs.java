@@ -1,5 +1,6 @@
 package org.roda.wui.client.common.dialogs;
 
+import com.google.gwt.user.client.ui.HTML;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
@@ -341,7 +342,7 @@ public class DisposalDialogs {
       callback.onFailure(null);
     });
 
-    Label messageLabel = new Label(messages.applyDisposalRulesDialogExplanation());
+    HTML messageLabel = new HTML(messages.applyDisposalRulesDialogExplanation());
     messageLabel.addStyleName("wui-dialog-message");
 
     Button applyToManualInclusiveButton = new Button();

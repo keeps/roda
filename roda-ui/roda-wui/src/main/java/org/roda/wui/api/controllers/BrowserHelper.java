@@ -3314,16 +3314,6 @@ public class BrowserHelper {
     model.importLogEntries(inputStream, filename);
   }
 
-  protected static void validateGetDisposalScheduleParams(String acceptFormat) throws RequestNotValidException {
-    if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
-      && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSONP.equals(acceptFormat)
-      && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
-      throw new RequestNotValidException("Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT
-        + "' value. Expected values: " + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON,
-          RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSONP, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML));
-    }
-  }
-
   public static DisposalSchedule createDisposalSchedule(DisposalSchedule disposalSchedule, User user)
     throws GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException,
     RequestNotValidException {

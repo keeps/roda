@@ -188,7 +188,7 @@ public interface ClientMessages extends Messages {
 
   SafeHtml notFoundErrorMessage(String id);
 
-  SafeHtml genericErrorTitle();
+SafeHtml genericErrorTitle();
 
   SafeHtml genericErrorMessage(String message);
 
@@ -1895,6 +1895,8 @@ public interface ClientMessages extends Messages {
 
   String mandatoryField();
 
+  String numberIsRequired();
+
   String isAMandatoryField(String field);
 
   String passwordIsTooSmall();
@@ -2336,7 +2338,7 @@ public interface ClientMessages extends Messages {
 
   String applyDisposalRulesDialogMessage();
 
-  String applyDisposalRulesDialogExplanation();
+  SafeHtml applyDisposalRulesDialogExplanation();
 
   String deleteDisposalRuleSuccessTitle();
 
@@ -2347,4 +2349,12 @@ public interface ClientMessages extends Messages {
   String updateDisposalRulesOrderSuccessMessage();
 
   String confirmEditRuleMessage();
+
+  String disposalPolicyRetentionPeriodCalculationError();
+
+  String disposalConfirmationShowRecordsToDestroy();
+
+  String disposalConfirmationShowRecordsToReview();
+
+  String disposalConfirmationShowRecordsRetentionPeriodCalculationError();
 }

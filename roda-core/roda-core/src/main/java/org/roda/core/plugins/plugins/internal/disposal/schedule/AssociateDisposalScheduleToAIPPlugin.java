@@ -66,10 +66,11 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID, "Disposal schedule id",
         PluginParameter.PluginParameterType.STRING, "", true, false, "Disposal schedule identifier"));
+
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RECURSIVE,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_RECURSIVE, "Recursive mode",
-        PluginParameter.PluginParameterType.BOOLEAN, "true", true, false,
-        "Associates the disposal schedule to descendants"));
+        PluginParameter.PluginParameterType.BOOLEAN, "true", true, false, "Execute in recursive mode."));
+
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_ALL,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_ALL, "Overwrite mode",
         PluginParameter.PluginParameterType.BOOLEAN, "false", true, false,
@@ -255,7 +256,7 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
     } else {
       ancestorFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipParent.getId()));
     }
-    try (IterableIndexResult<IndexedAIP> result = index.findAll(IndexedAIP.class, ancestorFilter, false,
+    try (IterableIndexResult<IndexedAIP> result = index.findAll(IndexedAIP.class, ancestorFilter, true,
       Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID))) {
 
       for (IndexedAIP indexedAIP : result) {

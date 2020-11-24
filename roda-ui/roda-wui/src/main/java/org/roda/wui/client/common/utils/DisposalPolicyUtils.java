@@ -42,7 +42,7 @@ public class DisposalPolicyUtils {
     StringBuilder builder = new StringBuilder();
 
     if (RetentionPeriodCalculation.ERROR.equals(aip.getRetentionPeriodState())) {
-      return "Retention period failed to be calculated";
+      return messages.disposalPolicyRetentionPeriodCalculationError();
     }
 
     if (aip.getDisposalConfirmationId() != null) {
@@ -51,9 +51,8 @@ public class DisposalPolicyUtils {
       if (aip.getDisposalScheduleId() != null) {
         onSchedule(aip, builder);
       } else {
-        builder.append(messages.disposalPolicyNoScheduleSummary());
         if (aip.isOnHold()) {
-          builder.append(" ").append(messages.disposalPolicyHoldSummary());
+          builder.append(messages.disposalPolicyHoldSummary());
         } else {
           return messages.disposalPolicyNone();
         }

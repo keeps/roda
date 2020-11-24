@@ -129,7 +129,7 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
         while (reader.ready()) {
           String aipEntryJson = reader.readLine();
 
-          preProcessAIP(aipEntryJson, disposalConfirmation, index, model, cachedJob, report, jobPluginInfo);
+          processAipEntry(aipEntryJson, disposalConfirmation, index, model, cachedJob, report, jobPluginInfo);
         }
       }
     } catch (RequestNotValidException | AuthorizationDeniedException | GenericException | NotFoundException
@@ -168,20 +168,20 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
     }
   }
 
-  private void preProcessAIP(String aipEntryJson, DisposalConfirmation disposalConfirmation, IndexService index,
-    ModelService model, Job cachedJob, Report report, JobPluginInfo jobPluginInfo) {
+  private void processAipEntry(String aipEntryJson, DisposalConfirmation disposalConfirmation, IndexService index,
+                               ModelService model, Job cachedJob, Report report, JobPluginInfo jobPluginInfo) {
     try {
       DisposalConfirmationAIPEntry aipEntry = JsonUtils.getObjectFromJson(aipEntryJson,
         DisposalConfirmationAIPEntry.class);
       processAIP(aipEntry, disposalConfirmation, index, model, cachedJob, report, jobPluginInfo);
     } catch (GenericException e) {
-      LOGGER.error("Failed to pre-process the AIP entry '{}': {}", aipEntryJson, e.getMessage(), e);
+      LOGGER.error("Failed to process the AIP entry '{}': {}", aipEntryJson, e.getMessage(), e);
       processedWithErrors = true;
       jobPluginInfo.incrementObjectsProcessedWithFailure();
       Report reportItem = PluginHelper.initPluginReportItem(this, disposalConfirmation.getId(),
         DisposalConfirmation.class);
       reportItem.setPluginState(PluginState.FAILURE)
-        .setPluginDetails("Failed to pre-process the AIP entry '" + aipEntryJson + "' from disposal confirmation '"
+        .setPluginDetails("Failed to process the AIP entry '" + aipEntryJson + "' from disposal confirmation '"
           + disposalConfirmation.getTitle() + "' (" + disposalConfirmation.getId() + "): " + e.getMessage());
       report.addReport(reportItem);
       PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);

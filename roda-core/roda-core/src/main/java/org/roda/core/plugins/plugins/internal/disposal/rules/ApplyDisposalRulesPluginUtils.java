@@ -21,7 +21,8 @@ import org.roda.core.index.IndexService;
  */
 public class ApplyDisposalRulesPluginUtils {
 
-  private ApplyDisposalRulesPluginUtils() {}
+  private ApplyDisposalRulesPluginUtils() {
+  }
 
   public static Optional<DisposalRule> applyRule(AIP aip, DisposalRules disposalRules, IndexService index)
     throws NotFoundException, GenericException {
@@ -44,16 +45,8 @@ public class ApplyDisposalRulesPluginUtils {
 
   private static Optional<DisposalRule> conditionTypeChildOf(AIP aip, DisposalRule rule) {
     if (aip.getParentId() != null && aip.getParentId().equals(rule.getConditionKey())) {
-      DisposalAIPMetadata disposal = aip.getDisposal();
-      if(disposal ==  null) {
-        disposal = new DisposalAIPMetadata();
-        disposal.setSchedule(new DisposalScheduleAIPMetadata());
-      } else if(disposal.getSchedule() == null ) {
-        disposal.setSchedule(new DisposalScheduleAIPMetadata());
-      }
-      disposal.getSchedule().setId(rule.getDisposalScheduleId());
-      disposal.getSchedule().setAssociationType(AIPDisposalScheduleAssociationType.RULES);
-
+      DisposalAIPMetadata disposal = getDisposalAipMetadata(aip, rule);
+      aip.setDisposal(disposal);
       return Optional.of(rule);
     }
 
@@ -71,18 +64,25 @@ public class ApplyDisposalRulesPluginUtils {
     String metadataValue = (String) o;
 
     if (metadataValue != null && metadataValue.equals(rule.getConditionValue())) {
-      DisposalAIPMetadata disposal = aip.getDisposal();
-      if(disposal ==  null) {
-        disposal = new DisposalAIPMetadata();
-        disposal.setSchedule(new DisposalScheduleAIPMetadata());
-      } else if(disposal.getSchedule() == null ) {
-        disposal.setSchedule(new DisposalScheduleAIPMetadata());
-      }
-      disposal.getSchedule().setId(rule.getDisposalScheduleId());
-      disposal.getSchedule().setAssociationType(AIPDisposalScheduleAssociationType.RULES);
+      DisposalAIPMetadata disposal = getDisposalAipMetadata(aip, rule);
+      aip.setDisposal(disposal);
       return Optional.of(rule);
     }
 
     return Optional.empty();
+  }
+
+  private static DisposalAIPMetadata getDisposalAipMetadata(AIP aip, DisposalRule rule) {
+    DisposalAIPMetadata disposal = aip.getDisposal();
+    if (disposal == null) {
+      disposal = new DisposalAIPMetadata();
+      disposal.setSchedule(new DisposalScheduleAIPMetadata());
+    } else if (disposal.getSchedule() == null) {
+      disposal.setSchedule(new DisposalScheduleAIPMetadata());
+    }
+    disposal.getSchedule().setId(rule.getDisposalScheduleId());
+    disposal.getSchedule().setAssociationType(AIPDisposalScheduleAssociationType.RULES);
+
+    return disposal;
   }
 }
