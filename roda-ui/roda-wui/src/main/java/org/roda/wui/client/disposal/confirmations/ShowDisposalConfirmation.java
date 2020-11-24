@@ -18,11 +18,13 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -89,12 +91,21 @@ public class ShowDisposalConfirmation extends Composite {
         Collections.emptyList(), new NoAsyncCallback<DisposalConfirmation>() {
           @Override
           public void onSuccess(DisposalConfirmation confirmation) {
-            final DisposalConfirmationReportActions confirmationActions = DisposalConfirmationReportActions.get();
-            instance = new ShowDisposalConfirmation();
-            SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, confirmationActions.hasAnyRoles());
-            instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(confirmationActions).withBackButton()
-              .buildListWithObjects(new ActionableObject<>(confirmation)));
-            callback.onSuccess(instance);
+            BrowserService.Util.getInstance().retrieveDisposalConfirmationReport(confirmationId,
+              new NoAsyncCallback<String>() {
+                @Override
+                public void onSuccess(String report) {
+                  final DisposalConfirmationReportActions confirmationActions = DisposalConfirmationReportActions.get();
+                  instance = new ShowDisposalConfirmation();
+                  SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, confirmationActions.hasAnyRoles());
+                  instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(confirmationActions).withBackButton()
+                    .buildListWithObjects(new ActionableObject<>(confirmation)));
+                  HTML reportHtml = new HTML(SafeHtmlUtils.fromSafeConstant(report));
+                  instance.contentFlowPanel.add(reportHtml);
+                  callback.onSuccess(instance);
+                }
+              });
+
           }
         });
     } else {
