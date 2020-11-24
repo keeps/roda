@@ -33,7 +33,7 @@ import config.i18n.client.ClientMessages;
  */
 public class DisposalConfirmationPanel extends Composite {
   private static final List<String> fieldsToReturn = new ArrayList<>(
-    Arrays.asList(RodaConstants.DISPOSAL_COFIRMATION_ID, RodaConstants.DISPOSAL_CONFIRMATION_TITLE));
+    Arrays.asList(RodaConstants.DISPOSAL_CONFIRMATION_ID, RodaConstants.DISPOSAL_CONFIRMATION_TITLE));
 
   interface MyUiBinder extends UiBinder<Widget, DisposalConfirmationPanel> {
   }

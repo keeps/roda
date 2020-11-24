@@ -1188,4 +1188,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.listDisposalHoldsAssociation(user, aipId);
   }
+
+  @Override
+  public String retrieveDisposalConfirmationReport(String confirmationId) throws RODAException, IOException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Disposals.retrieveDisposalConfirmationReport(user, confirmationId);
+  }
+
 }
