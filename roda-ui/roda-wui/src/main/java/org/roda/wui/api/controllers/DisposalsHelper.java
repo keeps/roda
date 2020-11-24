@@ -1,12 +1,39 @@
 package org.roda.wui.api.controllers;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Helper;
+import com.github.jknack.handlebars.Options;
+import com.github.jknack.handlebars.Template;
+import com.google.gson.Gson;
+import org.apache.commons.io.IOUtils;
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.HandlebarsUtility;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.DisposalHoldNotValidException;
 import org.roda.core.data.exceptions.DisposalRuleNotValidException;
 import org.roda.core.data.exceptions.DisposalScheduleNotValidException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.ip.disposal.ConditionType;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
@@ -15,8 +42,14 @@ import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
+import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.util.CommandException;
+import org.roda.core.util.CommandUtility;
 import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.bundle.DisposalConfirmationExtraBundle;
+import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -176,4 +209,105 @@ public class DisposalsHelper {
 
     return data;
   }
+
+  public static Path getDisposalConfirmationMetadataPath(String confirmationId) throws RequestNotValidException {
+    DefaultStoragePath confirmationPath = DefaultStoragePath
+      .parse(ModelUtils.getDisposalConfirmationStoragePath(confirmationId));
+
+    Path entityPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);
+
+    Path metadataFile = entityPath.resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME);
+
+    return metadataFile;
+  }
+
+  public static Path getDisposalConfirmationAIPsPath(String confirmationId) throws RequestNotValidException {
+    DefaultStoragePath confirmationPath = DefaultStoragePath
+      .parse(ModelUtils.getDisposalConfirmationStoragePath(confirmationId));
+
+    Path entityPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);
+
+    Path aipsFile = entityPath.resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME);
+
+    return aipsFile;
+  }
+
+  public static Path getDisposalConfirmationSchedulesPath(String confirmationId) throws RequestNotValidException {
+    DefaultStoragePath confirmationPath = DefaultStoragePath
+      .parse(ModelUtils.getDisposalConfirmationStoragePath(confirmationId));
+
+    Path entityPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);
+
+    Path schedulesFile = entityPath.resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES_FILENAME);
+
+    return schedulesFile;
+  }
+
+  public static Path getDisposalConfirmationHoldsPath(String confirmationId) throws RequestNotValidException {
+    DefaultStoragePath confirmationPath = DefaultStoragePath
+      .parse(ModelUtils.getDisposalConfirmationStoragePath(confirmationId));
+
+    Path entityPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);
+
+    Path holdsFile = entityPath.resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME);
+
+    return holdsFile;
+  }
+
+  public static String createDisposalConfirmationReport(String confirmationId)
+          throws RODAException, IOException {
+    String jqCommandTemplate = RodaCoreFactory
+      .getRodaConfigurationAsString("core.confirmation.generate.report.command");
+
+    Path metadataPath = getDisposalConfirmationMetadataPath(confirmationId);
+    Path aipsPath = getDisposalConfirmationAIPsPath(confirmationId);
+    Path schedulesPath = getDisposalConfirmationSchedulesPath(confirmationId);
+    Path holdsPath = getDisposalConfirmationHoldsPath(confirmationId);
+
+    Map<String, String> values = new HashMap<>();
+
+    values.put("metadataFile", metadataPath.toString());
+    values.put("aipsFile", aipsPath.toString());
+    values.put("schedulesFile", schedulesPath.toString());
+    values.put("holdsFile", holdsPath.toString());
+
+    String jqCommandParams = HandlebarsUtility.executeHandlebars(jqCommandTemplate, values);
+
+    List<String> jqCommand = new ArrayList<>();
+    for (String param : jqCommandParams.split(" ")) {
+      jqCommand.add(param);
+    }
+
+    String output = null;
+    try {
+      output = CommandUtility.execute(jqCommand);
+    } catch (CommandException e) {
+      throw new RODAException(e);
+    }
+
+    ObjectMapper mapper = new ObjectMapper();
+    Map<String, Object> confirmationValues = new ObjectMapper().readValue(output, HashMap.class);
+
+    InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(
+            RodaConstants.DISPOSAL_CONFIRMATION_INFORMATION_TEMPLATE_FOLDER + "/disposal_confirmation_report_css.html.hbs");
+    String reportTemplate = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
+
+    //String report = HandlebarsUtility.executeHandlebars(reportTemplate, confirmationValues);
+    Handlebars handlebars = new Handlebars();
+    handlebars.registerHelper("humanize", new Helper<Long>() {
+      @Override
+      public Object apply(Long value, Options options) throws IOException {
+        ZonedDateTime date = Instant.ofEpochMilli(value).atZone(ZoneOffset.UTC);
+        String result = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(date);
+        return result;
+      }
+    });
+    Template template = handlebars.compileInline(reportTemplate);
+    String report = template.apply(confirmationValues);
+
+
+
+    return report;
+  }
+
 }

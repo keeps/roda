@@ -516,4 +516,25 @@ public class Disposals extends RodaWuiController {
         applyToManuallyInclusive);
     }
   }
+
+  public static String retrieveDisposalConfirmationReport(User user, String confirmationId)
+    throws RODAException, IOException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return DisposalsHelper.createDisposalConfirmationReport(confirmationId);
+    } catch (RODAException | IOException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_DISPOSAL_CONFIRMATION_ID_PARAM,
+        confirmationId);
+    }
+  }
 }

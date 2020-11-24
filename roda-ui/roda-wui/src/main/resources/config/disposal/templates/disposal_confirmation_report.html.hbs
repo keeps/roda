@@ -1,0 +1,125 @@
+<div>
+	<h1>Disposal report nrº {{metadata.id}}</h1>
+	<p>
+		This disposal agreement created by {{metadata.createdBy}} on {{metadata.createdOn}}, was
+		approved on {{metadata.extraFields.approvedOn}} and signed by {{metadata.extraFields.approvedBy}},
+		on the date defined below, allowing the destruction of {{metadata.numberOfAIPs}} records.
+	</p>
+
+	<hr>
+	{{#if aips.length}}
+	<h5>List of records to be destroyed</h5>
+	<table>
+		<thead>
+			<tr>
+				<th>Level</th>
+				<th>Name</th>
+				<th>Collection</th>
+				<th>Nr files</th>
+				<th>Size</th>
+				<th>Schedule id</th>
+				<th>Hold id</th>
+			</tr>
+		</thead>
+		<tbody>
+			{{#each aips}}
+			<tr>
+				<td>{{aipLevel}}</td>
+				<td>{{aipTitle}}</td>
+				<td>{{aipCollection}}</td>
+				<td>{{aipNumberOfFiles}}</td>
+				<td>{{aipSize}}</td>
+				<td>{{aipDisposalScheduleId}}</td>
+				<td>{{aipDisposalHoldIds}}</td>
+			</tr>
+			{{/each}}
+		</tbody>
+	</table>
+	{{/if}}
+
+	<hr>
+
+	{{#if schedules.length}}
+
+	<h5>Description of disposal schedules associated to a record</h5>
+
+	{{#each schedules}}
+
+	<div>
+		<div>
+			<div>Disposal Schedule</div>
+			<div>
+				<div>{{title}}</div>
+			</div>
+			<div>Identifier: {{id}}
+			</div>
+			<div>Created on {{createdOn}} UTC by {{createdBy}}</div>
+			<div>Updated on {{updatedOn}} UTC by {{updatedBy}}</div>
+		</div>
+		<div>
+			<div>Description</div>
+			<div>{{description}}</div>
+		</div>
+		<div>
+			<div>Mandate</div>
+			<div>{{mandate}}</div>
+		</div>
+		<div>
+			<div>Scope notes</div>
+			<div>{{scopeNotes}}</div>
+		</div>
+		<div>
+			<div>Action</div>
+			<div>{{actionCode}}</div>
+		</div>
+		<div>
+			<div>Retention trigger element identifier</div>
+			<div>{{retentionTriggerElementId}}</div>
+		</div>
+		<div>
+			<div>Retention period</div>
+			<div>{{retentionPeriodDuration}} {{retentionPeriodIntervalCode}} </div>
+		</div>
+	</div>
+	{{/each}}
+
+	{{/if}}
+
+	<hr>
+
+	{{#if holds.length}}
+
+	<h5>Description of disposal holds associated to a record</h5>
+
+	{{#each holds}}
+
+	<div>
+		<div>
+			<div>Disposal hold</div>
+			<div>
+				<div>{{title}}</div>
+			</div>
+			<div>Identifier:{{id}}
+			</div>
+			<div>Created on {{createdOn}} UTC by {{createdBy}}</div>
+			<div>Updated on {{updatedOn}} UTC by {{updatedBy}}</div>
+		</div>
+		<div>
+			<div>Description:</div>
+			<div>{{description}}</div>
+		</div>
+		<div>
+			<div>Mandate:</div>
+			<div>{{mandate}}</div>
+		</div>
+		<div>
+			<div>Scope notes:</div>
+			<div>{{scopeNotes}}</div>
+		</div>
+	</div>
+
+	{{/each}}
+
+	{{/if}}
+
+</div>
