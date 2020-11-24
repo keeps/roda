@@ -4,20 +4,29 @@
              xmlns:g="urn:import:com.google.gwt.user.client.ui"
 >
     <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
-    <g:FlowPanel>
-        <g:Label ui:field="metadataFieldLabel" addStyleNames="form-label"/>
-        <g:Label ui:field="metadataFieldError" addStyleNames="form-label-error"/>
-        <g:FlowPanel>
-            <g:FlowPanel addStyleNames="col_2">
 
+    <ui:style>
+        .group {
+            display: flex;
+        }
+    </ui:style>
+
+    <g:FlowPanel addStyleNames="wui-user-data">
+        <g:Label ui:field="metadataFieldLabel" addStyleNames="form-label">
+            <ui:text from='{messages.disposalRuleCondition}'/>
+            *
+        </g:Label>
+        <g:FlowPanel styleName="{style.group}">
+            <g:FlowPanel addStyleNames="col_2">
                 <g:ListBox addStyleNames="form-textbox" ui:field="fieldsList"/>
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="disposalRuleOperator col_1">
                 <g:Label addStyleNames="form-label" ui:field="fieldsOperator"/>
             </g:FlowPanel>
-            <g:FlowPanel addStyleNames="col_3">
+            <g:FlowPanel addStyleNames="col_12">
                 <g:TextBox ui:field="fieldValue" addStyleNames="form-textbox"/>
             </g:FlowPanel>
         </g:FlowPanel>
+        <g:Label ui:field="metadataFieldError" addStyleNames="form-label-error"/>
     </g:FlowPanel>
 </ui:UiBinder>

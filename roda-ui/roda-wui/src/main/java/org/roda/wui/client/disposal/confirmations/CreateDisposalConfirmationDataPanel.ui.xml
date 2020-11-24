@@ -5,7 +5,7 @@
              xmlns:common="urn:import:org.roda.wui.client.common">
 
     <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
-    <g:FlowPanel styleName="wui-create-disposal-confirmation-data" addStyleNames="wrapper skip_padding">
+    <g:FlowPanel styleName="wui-create-disposal-confirmation-data wui-user-data" addStyleNames="wrapper skip_padding">
 
         <g:FlowPanel addStyleNames="row full_width skip_padding">
             <g:FlowPanel addStyleNames="col_10 content" ui:field="content">

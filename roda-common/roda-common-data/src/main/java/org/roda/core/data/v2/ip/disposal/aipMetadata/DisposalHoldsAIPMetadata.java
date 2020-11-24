@@ -56,7 +56,7 @@ public class DisposalHoldsAIPMetadata implements RODAObjectList<DisposalHoldAIPM
   }
 
   @JsonIgnore
-  public boolean isEmpty(){
+  public boolean isEmpty() {
     return disposalHoldAIPMetadataList.isEmpty();
   }
 

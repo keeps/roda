@@ -14,6 +14,7 @@ import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -33,6 +34,8 @@ import config.i18n.client.ClientMessages;
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 public class MetadataFieldsPanel extends Composite implements HasValueChangeHandlers<Pair<String, String>> {
+
+  public static final String IS_WRONG = "isWrong";
 
   interface MyUiBinder extends UiBinder<Widget, MetadataFieldsPanel> {
   }
@@ -61,7 +64,6 @@ public class MetadataFieldsPanel extends Composite implements HasValueChangeHand
   private final boolean editMode;
 
   private String conditionKey;
-  private String conditionValue;
 
   private int selectedConditionIndex;
 
@@ -71,12 +73,10 @@ public class MetadataFieldsPanel extends Composite implements HasValueChangeHand
   public MetadataFieldsPanel(String conditionKey, String conditionValue, boolean editMode, DisposalRule disposalRule) {
     initWidget(uiBinder.createAndBindUi(this));
 
-    metadataFieldLabel.setText(messages.disposalRuleCondition());
     fieldsOperator.setText(messages.disposalRuleConditionOperator());
 
     this.editMode = editMode;
     this.conditionKey = conditionKey;
-    this.conditionValue = conditionValue;
 
     initList();
     initHandler();
@@ -90,8 +90,11 @@ public class MetadataFieldsPanel extends Composite implements HasValueChangeHand
   private void initHandler() {
     ChangeHandler changeHandler = event -> MetadataFieldsPanel.this.onChange();
 
+    KeyUpHandler keyUpHandler = event -> MetadataFieldsPanel.this.onChange();
+
     fieldsList.addChangeHandler(changeHandler);
     fieldValue.addChangeHandler(changeHandler);
+    fieldValue.addKeyUpHandler(keyUpHandler);
   }
 
   private static List<Pair<String, String>> getElementsFromConfig() {
@@ -104,13 +107,13 @@ public class MetadataFieldsPanel extends Composite implements HasValueChangeHand
       String fieldType = ConfigurationManager.getString(fieldPrefix, RodaConstants.SEARCH_FIELD_TYPE);
       String fieldsName = ConfigurationManager.getString(fieldPrefix, RodaConstants.SEARCH_FIELD_FIELDS);
 
-      if (RodaConstants.SEARCH_FIELD_TYPE_TEXT.equals(fieldType) && isWhiteList(field)) {
+      if (RodaConstants.SEARCH_FIELD_TYPE_TEXT.equals(fieldType) && showField(field)) {
         String fieldLabelI18N = ConfigurationManager.getString(fieldPrefix, RodaConstants.SEARCH_FIELD_I18N);
         String translation = fieldLabelI18N;
         try {
           translation = ConfigurationManager.getTranslation(fieldLabelI18N);
         } catch (MissingResourceException e) {
-          // do nothing;
+          // do nothing
         }
 
         Pair<String, String> pair = new Pair<>(fieldsName, translation);
@@ -121,9 +124,9 @@ public class MetadataFieldsPanel extends Composite implements HasValueChangeHand
     return elements;
   }
 
-  private static boolean isWhiteList(String fieldsName) {
-    List<String> whitelistFields = ConfigurationManager.getStringList(RodaConstants.DISPOSAL_RULE_WHITELIST_CONDITION);
-    return whitelistFields.contains(fieldsName);
+  private static boolean showField(String fieldsName) {
+    List<String> blackList = ConfigurationManager.getStringList(RodaConstants.DISPOSAL_RULE_BLACKLIST_CONDITION);
+    return !blackList.contains(fieldsName);
   }
 
   private void initList() {
@@ -148,27 +151,26 @@ public class MetadataFieldsPanel extends Composite implements HasValueChangeHand
   public boolean isValid() {
     List<String> errorList = new ArrayList<>();
 
-    if (fieldsList.getSelectedValue().length() == 0) {
-      fieldsList.addStyleName("isWrong");
+    if (fieldsList.getSelectedIndex() == 0) {
+      fieldsList.addStyleName(IS_WRONG);
+      fieldValue.addStyleName(IS_WRONG);
       metadataFieldError.setText(messages.mandatoryField());
       metadataFieldError.setVisible(true);
       Window.scrollTo(fieldsList.getAbsoluteLeft(), fieldsList.getAbsoluteTop());
-      errorList.add(messages.isAMandatoryField("TO DO"));
-
+      errorList.add(messages.isAMandatoryField(messages.disposalRuleCondition()));
     } else {
-      fieldsList.removeStyleName("isWrong");
-      metadataFieldError.setVisible(false);
-    }
-
-    if (StringUtils.isBlank(fieldValue.getText())) {
-      fieldValue.addStyleName("isWrong");
-      metadataFieldError.setText(messages.mandatoryField());
-      metadataFieldError.setVisible(true);
-      Window.scrollTo(fieldValue.getAbsoluteLeft(), fieldValue.getAbsoluteTop());
-      errorList.add(messages.isAMandatoryField("TO DO"));
-    } else {
-      fieldValue.removeStyleName("isWrong");
-      metadataFieldError.setVisible(false);
+      if (StringUtils.isBlank(fieldValue.getText())) {
+        fieldsList.removeStyleName(IS_WRONG);
+        fieldValue.addStyleName(IS_WRONG);
+        metadataFieldError.setText(messages.mandatoryField());
+        metadataFieldError.setVisible(true);
+        Window.scrollTo(fieldValue.getAbsoluteLeft(), fieldValue.getAbsoluteTop());
+        errorList.add(messages.isAMandatoryField(messages.disposalRuleCondition()));
+      } else {
+        fieldsList.removeStyleName(IS_WRONG);
+        fieldValue.removeStyleName(IS_WRONG);
+        metadataFieldError.setVisible(false);
+      }
     }
 
     checked = true;

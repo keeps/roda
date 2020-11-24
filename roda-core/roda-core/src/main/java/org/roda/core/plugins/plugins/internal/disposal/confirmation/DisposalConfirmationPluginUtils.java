@@ -1,5 +1,6 @@
 package org.roda.core.plugins.plugins.internal.disposal.confirmation;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,6 +25,7 @@ import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.rsync.RsyncUtils;
@@ -73,24 +75,53 @@ public class DisposalConfirmationPluginUtils {
     return confirmationMetadata;
   }
 
+  public static List<DisposalConfirmationAIPEntry> getAIPEntryFromAIPChildren(IndexService index, AIP aip,
+    Set<String> disposalSchedules, Set<String> disposalHolds) throws GenericException, RequestNotValidException {
+    List<DisposalConfirmationAIPEntry> entries = new ArrayList<>();
+
+    Filter ancestorFilter;
+    ancestorFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
+
+    try (IterableIndexResult<IndexedAIP> result = index.findAll(IndexedAIP.class, ancestorFilter, true,
+      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID, RodaConstants.AIP_LEVEL, RodaConstants.AIP_TITLE,
+        RodaConstants.AIP_OVERDUE_DATE))) {
+
+      for (IndexedAIP indexedAIP : result) {
+        entries.add(createDisposalConfirmationAIPEntry(index, indexedAIP, aip, disposalSchedules, disposalHolds));
+
+      }
+    } catch (IOException e) {
+      throw new GenericException(e);
+    }
+
+    return entries;
+  }
+
   public static DisposalConfirmationAIPEntry getAIPEntryFromAIP(IndexService indexService, AIP aip,
     Set<String> disposalSchedules, Set<String> disposalHolds)
     throws GenericException, RequestNotValidException, NotFoundException {
-    DisposalConfirmationAIPEntry entry = new DisposalConfirmationAIPEntry();
 
     IndexedAIP indexedAIP = indexService.retrieve(IndexedAIP.class, aip.getId(),
       Arrays.asList(RodaConstants.AIP_LEVEL, RodaConstants.AIP_TITLE, RodaConstants.AIP_OVERDUE_DATE));
 
+    return createDisposalConfirmationAIPEntry(indexService, indexedAIP, aip, disposalSchedules, disposalHolds);
+  }
+
+  private static DisposalConfirmationAIPEntry createDisposalConfirmationAIPEntry(IndexService indexService,
+    final IndexedAIP indexedAIP, final AIP aip, Set<String> disposalSchedules, Set<String> disposalHolds)
+    throws GenericException, RequestNotValidException {
+    DisposalConfirmationAIPEntry entry = new DisposalConfirmationAIPEntry();
+
     entry.setAipId(aip.getId());
     entry.setAipLevel(indexedAIP.getLevel());
     entry.setAipTitle(indexedAIP.getTitle());
-    entry.setAipCreationDate(aip.getCreatedOn());
+    entry.setAipCreationDate(indexedAIP.getCreatedOn());
     entry.setAipOverdueDate(indexedAIP.getOverdueDate());
 
-    entry.setAipDisposalScheduleId(aip.getDisposalScheduleId());
-    disposalSchedules.add(aip.getDisposalScheduleId());
+    entry.setAipDisposalScheduleId(indexedAIP.getDisposalScheduleId());
+    disposalSchedules.add(indexedAIP.getDisposalScheduleId());
 
-    entry.setAipDisposalHoldIds(getDisposalHoldIds(aip.getDisposal().getHolds()));
+    entry.setAipDisposalHoldIds(getDisposalHoldIds(aip.getHolds()));
     disposalHolds.addAll(entry.getAipDisposalHoldIds());
 
     getStorageSizeInBytesForAIP(indexService, aip.getId(), entry);
@@ -101,8 +132,10 @@ public class DisposalConfirmationPluginUtils {
   private static List<String> getDisposalHoldIds(List<DisposalHoldAIPMetadata> disposalHoldAssociation) {
     List<String> holdIds = new ArrayList<>();
 
-    for (DisposalHoldAIPMetadata holdAssociation : disposalHoldAssociation) {
-      holdIds.add(holdAssociation.getId());
+    if (disposalHoldAssociation != null) {
+      for (DisposalHoldAIPMetadata holdAssociation : disposalHoldAssociation) {
+        holdIds.add(holdAssociation.getId());
+      }
     }
 
     return holdIds;

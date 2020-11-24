@@ -228,8 +228,13 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
 
       aip.setState(AIPState.DESTROY_PROCESSING);
       DisposalDestructionAIPMetadata destruction = aip.getDisposal().getConfirmation().getDestruction();
+      if (destruction == null) {
+        destruction = new DisposalDestructionAIPMetadata();
+      }
+
       destruction.setDestructionBy(cachedJob.getUsername());
       destruction.setDestructionOn(executionDate);
+      aip.getDisposal().getConfirmation().setDestruction(destruction);
 
       // Apply stylesheet to descriptive metadata
       for (DescriptiveMetadata metadata : aip.getDescriptiveMetadata()) {
@@ -239,7 +244,7 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
         Path descriptiveMetadataPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(),
           descriptiveMetadataStoragePath);
 
-        Reader reader = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CROSSWALKS_DISSEMINATION_HTML_PATH,
+        Reader reader = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CORE_DISPOSAL_METADATA_TRANSFORMERS,
           metadata.getType(), metadata.getVersion(), Collections.emptyMap());
 
         ReaderInputStream readerInputStream = new ReaderInputStream(reader, StandardCharsets.UTF_8);
@@ -260,9 +265,8 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
       aip.setState(AIPState.DESTROYED);
       model.updateAIPState(aip, cachedJob.getUsername());
 
-      outcomeText = "Archival Information Package [id: " + aip.getId()
-        + "] has been destroyed with disposal confirmation '" + disposalConfirmation.getTitle() + "' ("
-        + disposalConfirmation.getId() + ")";
+      outcomeText = "AIP '" + aip.getId() + "' has been destroyed with disposal confirmation '"
+        + disposalConfirmation.getTitle() + "' (" + disposalConfirmation.getId() + ")";
 
       reportItem.setPluginDetails(outcomeText);
 
@@ -270,9 +274,8 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
       | NotFoundException e) {
       LOGGER.error("Failed to destroy AIP '{}': {}", aip.getId(), e.getMessage(), e);
       pluginState = PluginState.FAILURE;
-      outcomeText = "Archival Information Package [id: " + aip.getId()
-        + "] has not been destroyed with disposal confirmation '" + disposalConfirmation.getTitle() + "' ("
-        + disposalConfirmation.getId() + ")";
+      outcomeText = "AIP '" + aip.getId() + "' has not been destroyed with disposal confirmation '"
+        + disposalConfirmation.getTitle() + "' (" + disposalConfirmation.getId() + ")";
       reportItem.setPluginDetails(outcomeText + ": " + e.getMessage());
       processedWithErrors = true;
     }

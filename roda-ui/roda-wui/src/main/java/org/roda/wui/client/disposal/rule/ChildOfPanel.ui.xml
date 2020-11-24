@@ -7,9 +7,15 @@
     <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
 
     <g:FlowPanel>
-        <g:Label ui:field="editPanelLabel" addStyleNames="form-label"/>
+        <g:FlowPanel addStyleNames="wui-error-panel">
+            <g:HTML ui:field="errors"/>
+        </g:FlowPanel>
+        <g:Label ui:field="editPanelLabel" addStyleNames="form-label">
+            <ui:text from='{messages.conditionActualParent}'/>
+            *
+        </g:Label>
         <g:HorizontalPanel ui:field="editPanel"/>
-        <g:Label ui:field="pluginParameterPanelError" addStyleNames="form-label-error"/>
         <p:PluginParameterPanel ui:field="pluginParameterPanel"/>
+        <g:Label ui:field="pluginParameterPanelError" addStyleNames="form-label-error"/>
     </g:FlowPanel>
 </ui:UiBinder>

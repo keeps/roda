@@ -27,6 +27,7 @@ public class DisposalAIPMetadata implements Serializable {
   private DisposalConfirmationAIPMetadata confirmation;
 
   public DisposalAIPMetadata() {
+    holds = new ArrayList<>();
   }
 
   public DisposalScheduleAIPMetadata getSchedule() {

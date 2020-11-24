@@ -7200,6 +7200,7 @@ span.code {
     background-color: #e7e7e7;
     border-color: #ddd;
     cursor: pointer;
+    margin-right: 10px
 }
 
 .disposal-confirmation-select input[type=radio]:checked + label {
@@ -7244,6 +7245,17 @@ span.code {
     color: #999;
     margin-top: 2px;
 }
+
+.wui-required-fields-note {
+    font-size: 8pt;
+    color: #999;
+    margin-top: 2px;
+}
+
+.wui-cursor-not-allowed {
+    cursor: not-allowed;
+}
+
 
 .disposal-dialogs-checkbox input[type="checkbox"]{
     vertical-align: middle;
