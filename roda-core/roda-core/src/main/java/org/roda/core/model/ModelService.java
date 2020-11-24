@@ -153,6 +153,8 @@ public class ModelService extends ModelObservable {
   private String instanceId = "";
   private long entryLogLineNumber = -1;
   private long entryAIPLineNumber = -1;
+  private long entryDisposalScheduleLineNumber = -1;
+  private long entryDisposalHoldLineNumber = -1;
 
   public ModelService(StorageService storage, EventsManager eventsManager, NodeType nodeType, String instanceId) {
     super(LOGGER);
@@ -3363,11 +3365,6 @@ public class ModelService extends ModelObservable {
       CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(disposalHoldContainerPath, false);
       for (Resource resource : iterable) {
         DisposalHold hold = ResourceParseUtils.convertResourceToObject(resource, DisposalHold.class);
-
-        Long count = SolrUtils.count(RodaCoreFactory.getSolr(), IndexedAIP.class,
-          new Filter(new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLDS_ID, hold.getId())));
-        hold.setAipCounter(count);
-
         disposalHolds.addObject(hold);
       }
     } catch (NotFoundException e) {
@@ -3378,7 +3375,7 @@ public class ModelService extends ModelObservable {
   }
 
   public DisposalAIPMetadata createDisposalHoldAssociation(String aipId, String disposalHoldId, Date associatedOn,
-                                                           String associatedBy)
+    String associatedBy)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
 
     final DisposalHold disposalHold = retrieveDisposalHold(disposalHoldId);
@@ -3389,7 +3386,7 @@ public class ModelService extends ModelObservable {
     // update AIP metadata
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
     DisposalAIPMetadata disposal = aip.getDisposal();
-    if(disposal == null) {
+    if (disposal == null) {
       disposal = new DisposalAIPMetadata();
       aip.setDisposal(disposal);
     }
@@ -3501,11 +3498,6 @@ public class ModelService extends ModelObservable {
       CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(disposalScheduleContainerPath, false);
       for (Resource resource : iterable) {
         DisposalSchedule schedule = ResourceParseUtils.convertResourceToObject(resource, DisposalSchedule.class);
-
-        Long count = SolrUtils.count(RodaCoreFactory.getSolr(), IndexedAIP.class,
-          new Filter(new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID, schedule.getId())));
-        schedule.setApiCounter(count);
-
         disposalSchedules.addObject(schedule);
       }
 
@@ -3552,6 +3544,76 @@ public class ModelService extends ModelObservable {
     }
 
     return ret;
+  }
+
+  public void addDisposalHoldEntry(String disposalConfirmationId, DisposalHold disposalHold)
+    throws RequestNotValidException, GenericException {
+    DefaultStoragePath confirmationPath = DefaultStoragePath
+      .parse(ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId));
+    Path entityPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);
+    Path disposalHoldFile = entityPath.resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME);
+
+    // ensuring parent exists
+    Path parent = disposalHoldFile.getParent();
+    if (!FSUtils.exists(parent)) {
+      try {
+        Files.createDirectories(parent);
+      } catch (IOException e) {
+        throw new GenericException("Error creating parent folder structure to write aips into", e);
+      }
+    }
+
+    // verify if file exists and if not creates
+    if (!FSUtils.exists(disposalHoldFile)) {
+      entryDisposalHoldLineNumber = 1;
+      try {
+        Files.createFile(disposalHoldFile);
+      } catch (IOException e) {
+        throw new GenericException("Error creating file to write schedules into", e);
+      }
+    } else if (entryDisposalHoldLineNumber == -1) {
+      // recalculate entryDisposalHoldLineNumber as file exists but no value is set
+      // memory
+      entryDisposalHoldLineNumber = JsonUtils.calculateNumberOfLines(disposalHoldFile) + 1;
+    }
+
+    JsonUtils.appendObjectToFile(disposalHold, disposalHoldFile);
+  }
+
+  public void addDisposalScheduleEntry(String disposalConfirmationId, DisposalSchedule disposalSchedule)
+    throws RequestNotValidException, GenericException {
+    DefaultStoragePath confirmationPath = DefaultStoragePath
+      .parse(ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId));
+    Path entityPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);
+    Path disposalSchedulesFile = entityPath
+      .resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES_FILENAME);
+
+    // ensuring parent exists
+    Path parent = disposalSchedulesFile.getParent();
+    if (!FSUtils.exists(parent)) {
+      try {
+        Files.createDirectories(parent);
+      } catch (IOException e) {
+        throw new GenericException("Error creating parent folder structure to write aips into", e);
+      }
+    }
+
+    // verify if file exists and if not creates
+    if (!FSUtils.exists(disposalSchedulesFile)) {
+      entryDisposalScheduleLineNumber = 1;
+      try {
+        Files.createFile(disposalSchedulesFile);
+      } catch (IOException e) {
+        throw new GenericException("Error creating file to write schedules into", e);
+      }
+    } else if (entryDisposalScheduleLineNumber == -1) {
+      // recalculate entryDisposalScheduleLineNumber as file exists but no value is
+      // set
+      // memory
+      entryDisposalScheduleLineNumber = JsonUtils.calculateNumberOfLines(disposalSchedulesFile) + 1;
+    }
+
+    JsonUtils.appendObjectToFile(disposalSchedule, disposalSchedulesFile);
   }
 
   public void addAIPEntry(String disposalConfirmationId, DisposalConfirmationAIPEntry entry)
@@ -3602,28 +3664,6 @@ public class ModelService extends ModelObservable {
 
     notifyDisposalConfirmationCreatedOrUpdated(disposalConfirmation).failOnError();
     return disposalConfirmation;
-  }
-
-  public void copyDisposalScheduleToConfirmationReport(String disposalConfirmationId, Set<String> disposalScheduleIds)
-    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException,
-    AlreadyExistsException {
-    for (String disposalScheduleId : disposalScheduleIds) {
-      StoragePath disposalSchedulePath = ModelUtils.getDisposalScheduleStoragePath(disposalScheduleId);
-      StoragePath disposalConfirmationStoragePath = ModelUtils
-        .getDisposalConfirmationSchedulesStoragePath(disposalConfirmationId, disposalScheduleId);
-      storage.copy(getStorage(), disposalSchedulePath, disposalConfirmationStoragePath);
-    }
-  }
-
-  public void copyDisposalHoldToConfirmationReport(String disposalConfirmationId, Set<String> disposalHoldIds)
-    throws RequestNotValidException, NotFoundException, AuthorizationDeniedException, GenericException,
-    AlreadyExistsException {
-    for (String disposalHoldId : disposalHoldIds) {
-      StoragePath disposalHoldStoragePath = ModelUtils.getDisposalHoldStoragePath(disposalHoldId);
-      StoragePath disposalConfirmationHoldsStoragePath = ModelUtils
-        .getDisposalConfirmationHoldsStoragePath(disposalConfirmationId, disposalHoldId);
-      storage.copy(getStorage(), disposalHoldStoragePath, disposalConfirmationHoldsStoragePath);
-    }
   }
 
   public DisposalConfirmation createDisposalConfirmation(DisposalConfirmation disposalConfirmation, String createdBy)

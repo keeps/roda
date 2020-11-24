@@ -8,6 +8,7 @@
 package org.roda.core.data.v2.ip;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -60,12 +61,12 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions) {
     this(id, parentId, type, state, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>(),
-      new AIPFormat(), new ArrayList<Relationship>(), new Date(), null, new Date(), null, null);
+      new AIPFormat(), new ArrayList<Relationship>(), new Date(), null, new Date(), null, new DisposalAIPMetadata());
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions, String createdBy) {
     this(id, parentId, type, state, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>(),
-      new AIPFormat(), new ArrayList<Relationship>(), new Date(), createdBy, new Date(), createdBy, null);
+      new AIPFormat(), new ArrayList<Relationship>(), new Date(), createdBy, new Date(), createdBy, new DisposalAIPMetadata());
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions,
@@ -314,7 +315,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
 
   @JsonIgnore
   public DisposalHoldAIPMetadata findHold(String disposalHoldId) {
-    if(disposal != null) {
+    if (disposal != null) {
       return disposal.findHold(disposalHoldId);
     }
     return null;
@@ -322,23 +323,23 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
 
   @JsonIgnore
   public boolean isAIPOnHold(String disposalHoldId) {
-    if(disposal != null) {
+    if (disposal != null) {
       return disposal.isAIPOnHold(disposalHoldId);
     }
     return false;
   }
 
   @JsonIgnore
-  public boolean onHold(){
-    if(disposal != null) {
+  public boolean onHold() {
+    if (disposal != null) {
       return disposal.onHold();
     }
     return false;
   }
 
   @JsonIgnore
-  public List<DisposalHoldAIPMetadata> getHolds(){
-    if(disposal != null) {
+  public List<DisposalHoldAIPMetadata> getHolds() {
+    if (disposal != null) {
       return disposal.getHolds();
     }
     return null;
@@ -346,7 +347,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
 
   @JsonIgnore
   public String getDisposalScheduleId() {
-    if(disposal != null) {
+    if (disposal != null) {
       return disposal.getDisposalScheduleId();
     }
     return null;
@@ -354,15 +355,15 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
 
   @JsonIgnore
   public String getDisposalConfirmationId() {
-    if(disposal != null) {
+    if (disposal != null) {
       return disposal.getDisposalConfirmationId();
     }
     return null;
   }
 
   @JsonIgnore
-  public AIPDisposalScheduleAssociationType getDisposalScheduleAssociationType(){
-    if(disposal != null) {
+  public AIPDisposalScheduleAssociationType getDisposalScheduleAssociationType() {
+    if (disposal != null) {
       return disposal.getDisposalScheduleAssociationType();
     }
     return null;

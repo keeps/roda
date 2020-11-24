@@ -131,13 +131,6 @@ public class DisposalPolicyHoldsPanel extends Composite {
           }
         }),
 
-        new BasicTablePanel.ColumnInfo<>(messages.disposalHoldNumberOfAIPs(), 12, new TextColumn<DisposalHold>() {
-          @Override
-          public String getValue(DisposalHold hold) {
-            return String.valueOf(hold.getAipCounter());
-          }
-        }),
-
         new BasicTablePanel.ColumnInfo<>(messages.disposalHoldStateCol(), 12,
           new Column<DisposalHold, SafeHtml>(new SafeHtmlCell()) {
             @Override

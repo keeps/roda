@@ -125,7 +125,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     fields.add(new Field(RodaConstants.AIP_OVERDUE_DATE, Field.TYPE_DATE));
 
     fields.add(new Field(RodaConstants.AIP_DISPOSAL_HOLDS_ID, Field.TYPE_STRING).setMultiValued(true));
-    fields.add(new Field(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, Field.TYPE_BOOLEAN));
+    fields.add(new Field(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, Field.TYPE_BOOLEAN).setDefaultValue("false"));
 
     fields.add(new Field(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.AIP_DESTROYED_ON, Field.TYPE_DATE));

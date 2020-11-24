@@ -893,19 +893,6 @@ public final class ModelUtils {
       RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME);
   }
 
-  public static StoragePath getDisposalConfirmationSchedulesStoragePath(String disposalConfirmationId,
-    String disposalScheduleId) throws RequestNotValidException {
-    return DefaultStoragePath.parse(getDisposalConfirmationStoragePath(disposalConfirmationId),
-      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES,
-      disposalScheduleId + RodaConstants.JOB_FILE_EXTENSION);
-  }
-
-  public static StoragePath getDisposalConfirmationHoldsStoragePath(String disposalConfirmationId,
-    String disposalHoldId) throws RequestNotValidException {
-    return DefaultStoragePath.parse(getDisposalConfirmationStoragePath(disposalConfirmationId),
-      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS, disposalHoldId + RodaConstants.JOB_FILE_EXTENSION);
-  }
-
   private static List<String> getDisposalConfirmationPath(String confirmationId) {
     return Arrays.asList(RodaConstants.STORAGE_CONTAINER_DISPOSAL_CONFIRMATION, confirmationId);
   }

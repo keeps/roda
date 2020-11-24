@@ -25,6 +25,7 @@ public class DisposalHoldAIPMetadata implements IsModelObject {
   private List<DisposalTransitiveHoldAIPMetadata> transitive;
 
   public DisposalHoldAIPMetadata() {
+    transitive = new ArrayList<>();
   }
 
   public void setId(String id) {
@@ -65,9 +66,9 @@ public class DisposalHoldAIPMetadata implements IsModelObject {
 
   @JsonIgnore
   public DisposalTransitiveHoldAIPMetadata findTransitiveAip(String aipId) {
-    if(transitive != null) {
+    if (transitive != null) {
       for (DisposalTransitiveHoldAIPMetadata transitiveHoldAIPMetadata : transitive) {
-        if (transitiveHoldAIPMetadata.getAipId().equals(aipId)){
+        if (transitiveHoldAIPMetadata.getAipId().equals(aipId)) {
           return transitiveHoldAIPMetadata;
         }
       }

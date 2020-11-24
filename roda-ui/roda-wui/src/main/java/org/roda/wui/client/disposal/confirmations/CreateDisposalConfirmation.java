@@ -11,6 +11,7 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
+import org.roda.core.data.v2.ip.disposal.RetentionPeriodCalculation;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
@@ -58,6 +59,9 @@ public class CreateDisposalConfirmation extends Composite {
     new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, Boolean.FALSE.toString()),
     new EmptyKeyFilterParameter(RodaConstants.AIP_DISPOSAL_CONFIRMATION_ID));
 
+  private static final Filter SHOW_RECORDS_WITH_RETENTION_PERIOD_ERRORS = new Filter(new SimpleFilterParameter(
+    RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_CALCULATION, RetentionPeriodCalculation.ERROR.name()));
+
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
@@ -99,6 +103,9 @@ public class CreateDisposalConfirmation extends Composite {
 
   @UiField
   RadioButton reviewScheduleOpt;
+
+  @UiField
+  RadioButton retentionCalculationFailedOpt;
 
   @UiField
   FlowPanel content;
@@ -150,7 +157,7 @@ public class CreateDisposalConfirmation extends Composite {
   }
 
   private void configureDisposalAction() {
-    destroyScheduleOpt.setText("Show records to destroy");
+    destroyScheduleOpt.setText(messages.disposalConfirmationShowRecordsToDestroy());
     destroyScheduleOpt.addValueChangeHandler(valueChangeEvent -> {
       ListBuilder<IndexedAIP> overdueRecordsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
         new AsyncTableCellOptions<>(IndexedAIP.class, "DisposalOverdueRecords_aip").withSummary(messages.listOfAIPs())
@@ -161,12 +168,22 @@ public class CreateDisposalConfirmation extends Composite {
       content.add(overdueRecordsSearch);
     });
 
-    reviewScheduleOpt.setText("Show records to review");
+    reviewScheduleOpt.setText(messages.disposalConfirmationShowRecordsToReview());
     reviewScheduleOpt.addValueChangeHandler(valueChangeEvent -> {
       ListBuilder<IndexedAIP> overdueRecordsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
         new AsyncTableCellOptions<>(IndexedAIP.class, "DisposalOverdueRecords_aip").withSummary(messages.listOfAIPs())
           .withFilter(SHOW_RECORDS_TO_REVIEW).withActionable(DisposalCreateConfirmationReviewActions.get())
           .withActionableCallback(listActionableCallback).withJustActive(true).bindOpener());
+      content.remove(overdueRecordsSearch);
+      overdueRecordsSearch = new SearchWrapper(false).createListAndSearchPanel(overdueRecordsListBuilder);
+      content.add(overdueRecordsSearch);
+    });
+
+    retentionCalculationFailedOpt.setText(messages.disposalConfirmationShowRecordsRetentionPeriodCalculationError());
+    retentionCalculationFailedOpt.addValueChangeHandler(valueChangeEvent -> {
+      ListBuilder<IndexedAIP> overdueRecordsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
+        new AsyncTableCellOptions<>(IndexedAIP.class, "DisposalOverdueRecords_aip").withSummary(messages.listOfAIPs())
+          .withFilter(SHOW_RECORDS_WITH_RETENTION_PERIOD_ERRORS).withJustActive(true).bindOpener());
       content.remove(overdueRecordsSearch);
       overdueRecordsSearch = new SearchWrapper(false).createListAndSearchPanel(overdueRecordsListBuilder);
       content.add(overdueRecordsSearch);

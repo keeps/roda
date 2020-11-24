@@ -3,6 +3,7 @@ package org.roda.wui.client.disposal.rule;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.user.client.ui.HTML;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.ip.disposal.ConditionType;
@@ -32,6 +33,8 @@ import config.i18n.client.ClientMessages;
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 public class ChildOfPanel extends Composite implements HasValueChangeHandlers<Pair<String, String>> {
+
+  public static final String IS_WRONG = "isWrong";
 
   interface MyUiBinder extends UiBinder<Widget, ChildOfPanel> {
   }
@@ -69,7 +72,6 @@ public class ChildOfPanel extends Composite implements HasValueChangeHandlers<Pa
     this.aipName = aipName;
 
     if (editMode && disposalRule.getType().equals(ConditionType.IS_CHILD_OF)) {
-      editPanelLabel.setText(messages.conditionActualParent());
       editPanel.setVisible(true);
       pluginParameterPanel.setVisible(false);
       setEditPanel();
@@ -119,14 +121,13 @@ public class ChildOfPanel extends Composite implements HasValueChangeHandlers<Pa
       String aipId = pluginParameterPanel.getValue();
       String aipName = pluginParameterPanel.getAipTitle();
       if (StringUtils.isBlank(aipId) || StringUtils.isBlank(aipName)) {
-        pluginParameterPanel.addStyleName("isWrong");
+        pluginParameterPanel.addStyleName(IS_WRONG);
         pluginParameterPanelError.setText(messages.mandatoryField());
         pluginParameterPanelError.setVisible(true);
         Window.scrollTo(pluginParameterPanel.getAbsoluteLeft(), pluginParameterPanel.getAbsoluteTop());
-        errorList.add(messages.isAMandatoryField("TO DO"));
-
+        errorList.add(messages.isAMandatoryField(messages.selectParentTitle()));
       } else {
-        pluginParameterPanel.removeStyleName("isWrong");
+        pluginParameterPanel.removeStyleName(IS_WRONG);
         pluginParameterPanelError.setVisible(false);
       }
     }

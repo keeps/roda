@@ -132,7 +132,6 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
   }
 
   private void initConditionTypeList() {
-    conditionTypeListLabel.setText(messages.disposalRuleType());
     List<ConditionType> conditionTypes = Arrays.asList(ConditionType.values());
     conditionTypeList.addItem("", "");
     if (!editMode) {
@@ -152,7 +151,6 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
   }
 
   private void initDisposalSchedulesList() {
-    disposalSchedulesListLabel.setText(messages.disposalRuleScheduleName());
     disposalSchedulesList.addItem("", "");
     if (!editMode) {
       for (DisposalSchedule schedule : disposalSchedules.getObjects()) {
@@ -258,16 +256,29 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
       conditionTypeList.removeStyleName("isWrong");
       conditionTypeListError.setVisible(false);
 
-      if (conditionTypeList.getSelectedValue().equals(ConditionType.METADATA_FIELD) && !metadataFieldsPanel.isValid()) {
+      if (conditionTypeList.getSelectedValue().equals(ConditionType.METADATA_FIELD.name()) && !metadataFieldsPanel.isValid()) {
         errorList.add(messages.isAMandatoryField(messages.disposalRuleCondition()));
       }
 
-      if (conditionTypeList.getSelectedValue().equals(ConditionType.IS_CHILD_OF) && !childOfPanel.isValid()) {
+      if (conditionTypeList.getSelectedValue().equals(ConditionType.IS_CHILD_OF.name()) && !childOfPanel.isValid()) {
         errorList.add(messages.isAMandatoryField(messages.disposalRuleCondition()));
       }
     }
 
     checked = true;
+
+    if (!errorList.isEmpty()) {
+      errors.setVisible(true);
+      StringBuilder errorString = new StringBuilder();
+      for (String error : errorList) {
+        errorString.append("<span class='error'>").append(error).append("</span>");
+        errorString.append("<br/>");
+      }
+      errors.setHTML(errorString.toString());
+    } else {
+      errors.setVisible(false);
+    }
+
     return errorList.isEmpty();
   }
 

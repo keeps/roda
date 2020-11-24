@@ -10,9 +10,13 @@
         .section {
             margin-top: 20px;
         }
+
+        .group {
+            display: flex;
+        }
     </ui:style>
 
-    <g:FlowPanel styleName="wui-disposal-schedule-data" addStyleNames="wrapper skip_padding">
+    <g:FlowPanel styleName="wui-disposal-schedule-data wui-user-data" addStyleNames="wrapper skip_padding">
         <g:FlowPanel addStyleNames="row full_width no_padding">
             <g:FlowPanel addStyleNames="wui-data-panel">
                 <g:FlowPanel addStyleNames="wui-error-panel">
@@ -20,50 +24,60 @@
                 </g:FlowPanel>
                 <g:Label addStyleNames="form-label">
                     <ui:text from='{messages.disposalScheduleTitle}'/>
+                    *
                 </g:Label>
                 <g:TextBox title="{messages.disposalScheduleTitle}" ui:field="title" addStyleNames="form-textbox"/>
                 <g:Label ui:field="titleError" addStyleNames="form-label-error"/>
+
                 <g:Label addStyleNames="form-label">
                     <ui:text from='{messages.disposalScheduleDescription}'/>
                 </g:Label>
                 <g:TextBox title="{messages.disposalScheduleDescription}" ui:field="description"
                            addStyleNames="form-textbox"/>
+
                 <g:Label addStyleNames="form-label">
                     <ui:text from='{messages.disposalScheduleMandate}'/>
                 </g:Label>
                 <g:TextBox title="{messages.disposalScheduleMandate}" ui:field="mandate" addStyleNames="form-textbox"/>
+
                 <g:Label addStyleNames="form-label">
                     <ui:text from='{messages.disposalScheduleNotes}'/>
                 </g:Label>
                 <g:TextArea title="{messages.disposalScheduleNotes}" ui:field="notes"
                             addStyleNames="disposalScopeNotes form-textbox"/>
+
                 <g:Label ui:field="disposalActionsLabel" addStyleNames="form-label">
                     <ui:text from='{messages.disposalScheduleActionCol}'/>
+                    *
                 </g:Label>
-                <g:Label ui:field="disposalActionsError" addStyleNames="form-label-error"/>
                 <g:ListBox addStyleNames="form-textbox" ui:field="disposalActions"/>
+                <g:Label ui:field="disposalActionsError" addStyleNames="form-label-error"/>
+
                 <g:Label addStyleNames="form-label" ui:field="retentionTriggerElementIdLabel">
                     <ui:text from='{messages.disposalScheduleRetentionTriggerElementId}'/>
+                    *
                 </g:Label>
                 <g:ListBox addStyleNames="form-textbox" ui:field="retentionTriggerElementIdList"/>
                 <g:Label ui:field="retentionTriggerElementIdError" addStyleNames="form-label-error"/>
-                <g:FlowPanel>
-                    <g:FlowPanel ui:field="retentionPeriodDurationPanel" addStyleNames="col_2">
-                        <g:Label addStyleNames="form-label" ui:field="retentionPeriodDurationLabel">
-                            <ui:text from='{messages.disposalScheduleRetentionPeriodDuration}'/>
-                        </g:Label>
+
+                <g:Label addStyleNames="form-label" ui:field="retentionPeriodDurationLabel">
+                    <ui:text from='{messages.disposalScheduleRetentionPeriodDuration}'/>
+                    *
+                </g:Label>
+                <g:FlowPanel addStyleNames="{style.group}">
+                    <g:FlowPanel addStyleNames="col_2">
                         <g:TextBox title="{messages.disposalScheduleRetentionPeriodDuration}"
                                    ui:field="retentionPeriodDuration" addStyleNames="form-textbox"/>
-                        <g:Label ui:field="retentionPeriodDurationError" addStyleNames="form-label-error"/>
                     </g:FlowPanel>
                     <g:FlowPanel addStyleNames="col_2">
-                        <g:Label addStyleNames="form-label" ui:field="retentionPeriodIntervalsLabel">
-                            <ui:text from='{messages.disposalScheduleRetentionPeriodInterval}'/>
-                        </g:Label>
                         <g:ListBox addStyleNames="form-textbox" ui:field="retentionPeriodIntervals"/>
-                        <g:Label ui:field="retentionPeriodIntervalsError" addStyleNames="form-label-error"/>
                     </g:FlowPanel>
                 </g:FlowPanel>
+                <g:Label ui:field="retentionPeriodDurationError" addStyleNames="form-label-error"/>
+
+                <g:Label styleName="wui-required-fields-note">
+                    <ui:text from="{messages.disposalConfirmationDataNote}"/>
+                </g:Label>
             </g:FlowPanel>
         </g:FlowPanel>
     </g:FlowPanel>

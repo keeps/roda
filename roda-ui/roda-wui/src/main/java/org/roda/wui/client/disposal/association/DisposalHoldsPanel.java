@@ -275,27 +275,5 @@ public class DisposalHoldsPanel extends Composite {
             }
           }
         }));
-
-    // new
-    // BasicTablePanel.ColumnInfo<DisposalHoldAIPMetadata>(messages.disposalHoldLiftedOn(),
-    // 15,
-    // new TextColumn<DisposalHoldAIPMetadata>() {
-    // @Override
-    // public String getValue(DisposalHoldAIPMetadata association) {
-    // if (association != null && association.getLiftedOn() != null) {
-    // return Humanize.formatDate(association.getLiftedOn());
-    // } else {
-    // return "";
-    // }
-    // }
-    // }),
-    //
-    // new BasicTablePanel.ColumnInfo<>(messages.disposalHoldStateCol(), 8,
-    // new Column<DisposalHoldAIPMetadata, SafeHtml>(new SafeHtmlCell()) {
-    // @Override
-    // public SafeHtml getValue(DisposalHoldAIPMetadata association) {
-    // return HtmlSnippetUtils.getDisposalHoldStateHtml(association);
-    // }
-    // }));
   }
 }

@@ -157,15 +157,6 @@ public class DisposalPolicySchedulesPanel extends Composite {
           }
         }),
 
-        new BasicTablePanel.ColumnInfo<>(messages.disposalScheduleNumberOfAIPs(), 12,
-          new TextColumn<DisposalSchedule>() {
-
-            @Override
-            public String getValue(DisposalSchedule schedule) {
-              return schedule.getApiCounter().toString();
-            }
-          }),
-
         new BasicTablePanel.ColumnInfo<>(messages.disposalScheduleStateCol(), 12,
           new Column<DisposalSchedule, SafeHtml>(new SafeHtmlCell()) {
             @Override
