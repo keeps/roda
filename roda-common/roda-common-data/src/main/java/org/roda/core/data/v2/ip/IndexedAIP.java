@@ -73,6 +73,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
   private Map<String, Object> fields = new HashMap<>();
 
   private String disposalScheduleId = null;
+  private List<String> transitiveDisposalSchedulesId = new ArrayList<>();
   private String disposalScheduleName = null;
   private String disposalRetentionPeriod = null;
   private List<String> disposalHoldsId = new ArrayList<>();
@@ -111,9 +112,9 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
       other.getDateFinal(), other.getDescription(), other.getParentID(), other.getAncestors(), other.getPermissions(),
       other.getNumberOfSubmissionFiles(), other.getNumberOfDocumentationFiles(), other.getNumberOfSchemaFiles(),
       other.getHasRepresentations(), other.getGhost(), other.getDisposalScheduleId(), other.getDisposalScheduleName(),
-      other.getRetentionPeriodDuration(), other.getRetentionPeriodInterval(), other.getRetentionPeriodStartDate(),
-      other.getRetentionPeriodDetails(), other.getRetentionPeriodState(), other.getDisposalHoldsId(),
-      other.getTransitiveDisposalHoldsId(), other.getDestroyedOn(), other.getDestroyedBy(),
+      other.getTransitiveDisposalSchedulesId(), other.getRetentionPeriodDuration(), other.getRetentionPeriodInterval(),
+      other.getRetentionPeriodStartDate(), other.getRetentionPeriodDetails(), other.getRetentionPeriodState(),
+      other.getDisposalHoldsId(), other.getTransitiveDisposalHoldsId(), other.getDestroyedOn(), other.getDestroyedBy(),
       other.getDisposalConfirmationId(), other.getScheduleAssociationType());
   }
 
@@ -132,9 +133,9 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
   public IndexedAIP(String id, AIPState state, String type, String level, String title, Date dateInitial,
     Date dateFinal, String description, String parentID, List<String> ancestors, Permissions permissions,
     Long numberOfSubmissionFiles, Long numberOfDocumentationFiles, Long numberOfSchemaFiles, Boolean hasRepresentations,
-    Boolean ghost, String disposalScheduleId, String disposalScheduleName, Integer retentionPeriodDuration,
-    RetentionPeriodIntervalCode retentionPeriodInterval, Date retentionPeriodStartDate, String retentionPeriodDetails,
-    RetentionPeriodCalculation retentionPeriodCalculation, List<String> disposalHoldsId,
+    Boolean ghost, String disposalScheduleId, String disposalScheduleName, List<String> transitiveDisposalSchedulesId,
+    Integer retentionPeriodDuration, RetentionPeriodIntervalCode retentionPeriodInterval, Date retentionPeriodStartDate,
+    String retentionPeriodDetails, RetentionPeriodCalculation retentionPeriodCalculation, List<String> disposalHoldsId,
     List<String> transitiveDisposalHoldsId, Date destroyedOn, String destroyedBy, String disposalConfirmationId,
     AIPDisposalScheduleAssociationType scheduleAssociationType) {
     super();
@@ -156,6 +157,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
     this.ghost = ghost;
     this.disposalScheduleId = disposalScheduleId;
     this.disposalScheduleName = disposalScheduleName;
+    this.transitiveDisposalSchedulesId = transitiveDisposalSchedulesId;
     this.retentionPeriodDuration = retentionPeriodDuration;
     this.retentionPeriodInterval = retentionPeriodInterval;
     this.retentionPeriodStartDate = retentionPeriodStartDate;
@@ -408,6 +410,15 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
 
   public String getDisposalScheduleName() {
     return disposalScheduleName;
+  }
+
+  public List<String> getTransitiveDisposalSchedulesId() {
+    return transitiveDisposalSchedulesId;
+  }
+
+  public IndexedAIP setTransitiveDisposalSchedulesId(List<String> transitiveDisposalSchedulesId) {
+    this.transitiveDisposalSchedulesId = transitiveDisposalSchedulesId;
+    return this;
   }
 
   public IndexedAIP setDisposalScheduleName(String disposalScheduleName) {
