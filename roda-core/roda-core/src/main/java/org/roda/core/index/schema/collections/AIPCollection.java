@@ -34,6 +34,7 @@ import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalConfirmationAIPMetadata;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalScheduleAIPMetadata;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveScheduleAIPMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.IndexingAdditionalInfo.Flags;
@@ -107,6 +108,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
 
     fields.add(new Field(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.AIP_DISPOSAL_SCHEDULE_NAME, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.AIP_TRANSITIVE_DISPOSAL_SCHEDULES_ID, Field.TYPE_STRING).setMultiValued(true));
     fields.add(new Field(RodaConstants.AIP_DISPOSAL_HOLDS_ID, Field.TYPE_STRING).setMultiValued(true));
     fields.add(new Field(RodaConstants.AIP_TRANSITIVE_DISPOSAL_HOLDS_ID, Field.TYPE_STRING).setMultiValued(true));
     fields.add(new Field(RodaConstants.AIP_DESTROYED_ON, Field.TYPE_DATE));
@@ -161,6 +163,11 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
         DisposalScheduleAIPMetadata schedule = aip.getDisposal().getSchedule();
         doc.addField(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID, schedule.getId());
         doc.addField(RodaConstants.AIP_DISPOSAL_SCHEDULE_ASSOCIATION_TYPE, schedule.getAssociationType().name());
+        if(schedule.getTransitive() != null){
+          doc.addField(RodaConstants.AIP_TRANSITIVE_DISPOSAL_SCHEDULES_ID,
+              schedule.getTransitive().stream().filter(p -> p.getAipId() != null)
+                  .map(DisposalTransitiveScheduleAIPMetadata::getAipId).collect(Collectors.toList()));
+        }
       }
 
       if (aip.getDisposal().getHolds() != null) {
@@ -317,6 +324,8 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     final String updatedBy = SolrUtils.objectToString(doc.get(RodaConstants.AIP_UPDATED_BY), "");
     final String disposalScheduleId = SolrUtils.objectToString(doc.get(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID), null);
     final String disposalScheduleName = SolrUtils.objectToString(doc.get(RodaConstants.AIP_DISPOSAL_SCHEDULE_NAME), "");
+    final List<String> transitiveDisposalSchedulesId = SolrUtils
+      .objectToListString(doc.get(RodaConstants.AIP_TRANSITIVE_DISPOSAL_SCHEDULES_ID));
     final Integer retentionPeriodDuration = SolrUtils
       .objectToInteger(doc.get(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_DURATION), null);
     final RetentionPeriodIntervalCode retentionPeriodInterval = SolrUtils.objectToEnum(
@@ -367,6 +376,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
       .setAllUpdateJobIds(allIngestJobIds);
     ret.setDisposalScheduleId(disposalScheduleId);
     ret.setDisposalScheduleName(disposalScheduleName);
+    ret.setTransitiveDisposalSchedulesId(transitiveDisposalSchedulesId);
     ret.setRetentionPeriodDuration(retentionPeriodDuration);
     ret.setRetentionPeriodInterval(retentionPeriodInterval);
     ret.setRetentionPeriodDetails(retentionPeriodDetails);

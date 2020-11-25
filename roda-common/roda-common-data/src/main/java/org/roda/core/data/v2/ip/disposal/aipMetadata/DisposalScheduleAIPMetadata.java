@@ -1,6 +1,8 @@
 package org.roda.core.data.v2.ip.disposal.aipMetadata;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import org.roda.core.data.common.RodaConstants;
@@ -22,6 +24,7 @@ public class DisposalScheduleAIPMetadata implements IsModelObject {
   private String associatedBy;
   private Date associatedOn;
   private AIPDisposalScheduleAssociationType associationType;
+  private List<DisposalTransitiveScheduleAIPMetadata> transitive;
 
   public DisposalScheduleAIPMetadata() {
   }
@@ -52,6 +55,34 @@ public class DisposalScheduleAIPMetadata implements IsModelObject {
 
   public void setAssociationType(AIPDisposalScheduleAssociationType associationType) {
     this.associationType = associationType;
+  }
+
+  public List<DisposalTransitiveScheduleAIPMetadata> getTransitive() {
+    return transitive;
+  }
+
+  public void setTransitive(List<DisposalTransitiveScheduleAIPMetadata> transitive) {
+    this.transitive = transitive;
+  }
+
+  @JsonIgnore
+  public void addTransitiveAip(DisposalTransitiveScheduleAIPMetadata transitiveAip) {
+    if (transitive == null) {
+      transitive = new ArrayList<>();
+    }
+    this.transitive.add(transitiveAip);
+  }
+
+  @JsonIgnore
+  public DisposalTransitiveScheduleAIPMetadata findTransitiveAip(String aipId) {
+    if(transitive != null) {
+      for (DisposalTransitiveScheduleAIPMetadata transitiveScheduleAIPMetadata : transitive) {
+        if (transitiveScheduleAIPMetadata.getAipId().equals(aipId)){
+          return transitiveScheduleAIPMetadata;
+        }
+      }
+    }
+    return null;
   }
 
   @JsonIgnore
