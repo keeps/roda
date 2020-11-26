@@ -1646,7 +1646,7 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_CREATE_DISPOSAL_CONFIRMATION = "org.roda.wui.api.controllers.Disposals.createDisposalConfirmation";
   public static final String PERMISSION_METHOD_DELETE_DISPOSAL_CONFIRMATION = "org.roda.wui.api.controllers.Disposals.deleteDisposalConfirmation";
   public static final String PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION = "org.roda.wui.api.controllers.Disposals.destroyRecordsInDisposalConfirmationReport";
-  public static final String PERMISSION_METHOD_RECOVER_RECORDS_DISPOSAL_CONFIRMATION = "org.roda.wui.api.controllers.Disposals.recoverRecordsInDisposalConfirmationReport";
+  public static final String PERMISSION_METHOD_RESTORE_RECORDS_DISPOSAL_CONFIRMATION = "org.roda.wui.api.controllers.Disposals.restoreRecordsInDisposalConfirmationReport";
   public static final String PERMISSION_METHOD_PERMANENTLY_DELETE_RECORDS_DISPOSAL_CONFIRMATION = "org.roda.wui.api.controllers.Disposals.permanentlyDeleteRecordsInDisposalConfirmationReport";
   public static final String PERMISSION_METHOD_RETRIEVE_DISPOSAL_CONFIRMATION_REPORT = "org.roda.wui.api.controllers.Disposals.retrieveDisposalConfirmationReport";
 

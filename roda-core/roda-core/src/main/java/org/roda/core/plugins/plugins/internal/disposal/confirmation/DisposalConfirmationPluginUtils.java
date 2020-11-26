@@ -37,6 +37,14 @@ public class DisposalConfirmationPluginUtils {
   private DisposalConfirmationPluginUtils() {
   }
 
+  public static boolean aipExistsInDisposalBin(String aipId, String disposalConfirmationId) {
+    // disposal-bin/<disposalConfirmationId>/aip/<aipId>
+    Path disposalBinPath = RodaCoreFactory.getDisposalBinDirectoryPath().resolve(disposalConfirmationId)
+      .resolve(RodaConstants.CORE_AIP_FOLDER).resolve(aipId);
+
+    return FSUtils.exists(disposalBinPath);
+  }
+
   public static void copyAIPToDisposalBin(AIP aip, String disposalConfirmationId, List<String> rsyncOptions)
     throws RequestNotValidException, GenericException, CommandException {
     StoragePath aipStoragePath = ModelUtils.getAIPStoragePath(aip.getId());
