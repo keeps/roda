@@ -5,6 +5,7 @@ import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_DESTROY_
 import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_PERMANENTLY_DELETE_RECORDS_DISPOSAL_CONFIRMATION;
 import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_RECOVER_RECORDS_DISPOSAL_CONFIRMATION;
 import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_RETRIEVE_DISPOSAL_CONFIRMATION_REPORT;
+import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_RESTORE_RECORDS_DISPOSAL_CONFIRMATION;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -19,6 +20,7 @@ import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.disposal.DisposalConfirmations;
 import org.roda.wui.client.disposal.confirmations.ShowDisposalConfirmation;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.InternalProcess;
@@ -44,7 +46,7 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
 
   private static final Set<DisposalConfirmationReportAction> POSSIBLE_ACTIONS_FOR_APPROVED = new HashSet<>(
     Arrays.asList(DisposalConfirmationReportAction.PRINT, DisposalConfirmationReportAction.REMOVE_FROM_BIN,
-      DisposalConfirmationReportAction.RECOVER_FROM_BIN));
+      DisposalConfirmationReportAction.RESTORE_FROM_BIN));
 
   private static final Set<DisposalConfirmationReportAction> POSSIBLE_ACTIONS_FOR_RECOVERED = new HashSet<>();
 
@@ -58,7 +60,7 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
     DESTROY(PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION),
     DELETE_REPORT(PERMISSION_METHOD_DELETE_DISPOSAL_CONFIRMATION),
     REMOVE_FROM_BIN(PERMISSION_METHOD_PERMANENTLY_DELETE_RECORDS_DISPOSAL_CONFIRMATION),
-    RECOVER_FROM_BIN(PERMISSION_METHOD_RECOVER_RECORDS_DISPOSAL_CONFIRMATION),
+    RESTORE_FROM_BIN(PERMISSION_METHOD_RESTORE_RECORDS_DISPOSAL_CONFIRMATION),
     RE_EXECUTE(PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION),
     RECOVER_STATE(PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION);
 
@@ -123,8 +125,8 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
       deleteDisposalConfirmationReport(object, callback);
     } else if (DisposalConfirmationReportAction.REMOVE_FROM_BIN.equals(action)) {
       permanentlyDeleteDisposalConfirmationReport(object, callback);
-    } else if (DisposalConfirmationReportAction.RECOVER_FROM_BIN.equals(action)) {
-      recoverDestroyedRecord(object, callback);
+    } else if (DisposalConfirmationReportAction.RESTORE_FROM_BIN.equals(action)) {
+      restoreDestroyedRecord(object, callback);
     } else if (DisposalConfirmationReportAction.RE_EXECUTE.equals(action)) {
       reExecuteDisposalConfirmation(object, callback);
     } else if (DisposalConfirmationReportAction.RECOVER_STATE.equals(action)) {
@@ -147,9 +149,6 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
 
   private void recoverDisposalConfirmationExecutionFailed(DisposalConfirmation confirmation,
     AsyncCallback<ActionImpact> callback) {
-  }
-
-  private void recoverDestroyedRecord(DisposalConfirmation confirmation, AsyncCallback<ActionImpact> callback) {
     Dialogs.showConfirmDialog(messages.recoverDestroyedRecordsConfirmDialogTitle(),
       messages.recoverDestroyedRecordsConfirmDialogMessage(), messages.dialogNo(), messages.dialogYes(),
       new ActionNoAsyncCallback<Boolean>(callback) {
@@ -158,6 +157,41 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
           if (result) {
             BrowserService.Util.getInstance().recoverRecordsInDisposalConfirmationReport(
               objectToSelectedItems(confirmation, DisposalConfirmation.class), new ActionAsyncCallback<Job>(callback) {
+                @Override
+                public void onSuccess(Job job) {
+                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      Toast.showInfo(messages.recoverDestroyedRecordsSuccessTitle(),
+                        messages.recoverDestroyedRecordsSuccessMessage());
+                      doActionCallbackUpdated();
+                      HistoryUtils.newHistory(DisposalConfirmations.RESOLVER);
+                    }
+
+                    @Override
+                    public void onSuccess(final Void nothing) {
+                      doActionCallbackUpdated();
+                      HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                    }
+                  });
+                }
+              });
+          } else {
+            doActionCallbackNone();
+          }
+        }
+      });
+  }
+
+  private void restoreDestroyedRecord(DisposalConfirmation confirmation, AsyncCallback<ActionImpact> callback) {
+    Dialogs.showConfirmDialog(messages.restoreDestroyedRecordsConfirmDialogTitle(),
+      messages.restoreDestroyedRecordsConfirmDialogMessage(), messages.dialogNo(), messages.dialogYes(),
+      new ActionNoAsyncCallback<Boolean>(callback) {
+        @Override
+        public void onSuccess(Boolean result) {
+          if (result) {
+            BrowserService.Util.getInstance().restoreRecordsInDisposalConfirmationReport(
+              objectToSelectedItems(confirmation, DisposalConfirmation.class), new ActionAsyncCallback<Job>(callback) {
 
                 @Override
                 public void onSuccess(Job result) {
@@ -165,8 +199,8 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
 
                     @Override
                     public void onFailure(Throwable caught) {
-                      Toast.showInfo(messages.recoverDestroyedRecordsSuccessTitle(),
-                        messages.recoverDestroyedRecordsSuccessMessage());
+                      Toast.showInfo(messages.restoreDestroyedRecordsSuccessTitle(),
+                        messages.restoreDestroyedRecordsSuccessMessage());
                       doActionCallbackUpdated();
                       HistoryUtils.newHistory(InternalProcess.RESOLVER);
                     }
@@ -338,7 +372,7 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
     ActionableGroup<DisposalConfirmation> disposalBinGroup = new ActionableGroup<>(messages.sidebarDisposalBinTitle());
     disposalBinGroup.addButton(messages.permanentlyDeleteFromBinButton(),
       DisposalConfirmationReportAction.REMOVE_FROM_BIN, ActionImpact.DESTROYED, "btn-eraser");
-    disposalBinGroup.addButton(messages.recoverFromBinButton(), DisposalConfirmationReportAction.RECOVER_FROM_BIN,
+    disposalBinGroup.addButton(messages.restoreFromBinButton(), DisposalConfirmationReportAction.RESTORE_FROM_BIN,
       ActionImpact.UPDATED, "btn-history");
 
     confirmationActionableBundle.addGroup(scheduleGroup).addGroup(reportGroup).addGroup(confirmationGroup)

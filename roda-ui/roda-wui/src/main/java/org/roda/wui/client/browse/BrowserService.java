@@ -461,6 +461,8 @@ public interface BrowserService extends RemoteService {
   Job recoverRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
+  Job restoreRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems) throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
+
   List<DisposalHoldAIPMetadata> listDisposalHoldsAssociation(String aipId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 

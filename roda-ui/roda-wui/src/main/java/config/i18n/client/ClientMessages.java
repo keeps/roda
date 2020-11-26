@@ -2163,7 +2163,7 @@ SafeHtml genericErrorTitle();
 
   String recoverDisposalConfirmationExecutionFailedButton();
 
-  String recoverFromBinButton();
+  String restoreFromBinButton();
 
   String newDisposalConfirmationButton();
 
@@ -2319,6 +2319,14 @@ SafeHtml genericErrorTitle();
   String permanentlyDeleteConfirmDialogTitle();
 
   String permanentlyDeleteConfirmDialogMessage();
+
+  String restoreDestroyedRecordsConfirmDialogTitle();
+
+  String restoreDestroyedRecordsConfirmDialogMessage();
+
+  String restoreDestroyedRecordsSuccessTitle();
+
+  String restoreDestroyedRecordsSuccessMessage();
 
   String recoverDestroyedRecordsConfirmDialogTitle();
 

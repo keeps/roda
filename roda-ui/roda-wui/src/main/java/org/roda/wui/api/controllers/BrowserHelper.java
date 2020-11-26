@@ -153,6 +153,7 @@ import org.roda.core.plugins.plugins.internal.disposal.confirmation.CreateDispos
 import org.roda.core.plugins.plugins.internal.disposal.confirmation.DeleteDisposalConfirmationPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.confirmation.DestroyRecordsPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.confirmation.PermanentlyDeleteRecordsPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.confirmation.RecoverDisposalConfirmationExecutionFailedPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.confirmation.RestoreRecordsPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.hold.ApplyDisposalHoldToAIPPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.hold.LiftDisposalHoldFromAIPPlugin;
@@ -3462,12 +3463,20 @@ public class BrowserHelper {
       "Could not execute permanent deletion of records in disposal bin action");
   }
 
-  public static Job recoverRecordsInDisposalConfirmation(User user,
+  public static Job restoreRecordsInDisposalConfirmation(User user,
     SelectedItemsList<DisposalConfirmation> selectedItems)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
-    return createAndExecuteInternalJob("Recover destroyed records from disposal bin", selectedItems,
+    return createAndExecuteInternalJob("Restore destroyed records from disposal bin", selectedItems,
       RestoreRecordsPlugin.class, user, Collections.emptyMap(),
-      "Could not execute recover of destroyed records from disposal bin action");
+      "Could not execute restoration of destroyed records from disposal bin action");
+  }
+
+  public static Job recoverDisposalConfirmationExecutionFailed(User user,
+    SelectedItemsList<DisposalConfirmation> selectedItems)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    return createAndExecuteInternalJob("Recover disposal confirmation from a failure state", selectedItems,
+        RecoverDisposalConfirmationExecutionFailedPlugin.class, user, Collections.emptyMap(),
+      "Could not execute recover the disposal confirmation from a previous faulty state");
   }
 
   public static DisposalRule createDisposalRule(DisposalRule disposalRule, User user) throws GenericException,
