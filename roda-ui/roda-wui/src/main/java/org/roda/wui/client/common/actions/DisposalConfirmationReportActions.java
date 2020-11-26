@@ -4,6 +4,7 @@ import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_DELETE_D
 import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION;
 import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_PERMANENTLY_DELETE_RECORDS_DISPOSAL_CONFIRMATION;
 import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_RECOVER_RECORDS_DISPOSAL_CONFIRMATION;
+import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_RETRIEVE_DISPOSAL_CONFIRMATION_REPORT;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -38,10 +39,12 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private static final Set<DisposalConfirmationReportAction> POSSIBLE_ACTIONS_FOR_PENDING = new HashSet<>(
-    Arrays.asList(DisposalConfirmationReportAction.DESTROY, DisposalConfirmationReportAction.DELETE_REPORT));
+    Arrays.asList(DisposalConfirmationReportAction.PRINT, DisposalConfirmationReportAction.DESTROY,
+      DisposalConfirmationReportAction.DELETE_REPORT));
 
   private static final Set<DisposalConfirmationReportAction> POSSIBLE_ACTIONS_FOR_APPROVED = new HashSet<>(
-    Arrays.asList(DisposalConfirmationReportAction.REMOVE_FROM_BIN, DisposalConfirmationReportAction.RECOVER_FROM_BIN));
+    Arrays.asList(DisposalConfirmationReportAction.PRINT, DisposalConfirmationReportAction.REMOVE_FROM_BIN,
+      DisposalConfirmationReportAction.RECOVER_FROM_BIN));
 
   private static final Set<DisposalConfirmationReportAction> POSSIBLE_ACTIONS_FOR_RECOVERED = new HashSet<>();
 
@@ -51,6 +54,7 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
     Arrays.asList(DisposalConfirmationReportAction.RE_EXECUTE, DisposalConfirmationReportAction.RECOVER_STATE));
 
   public enum DisposalConfirmationReportAction implements Action<DisposalConfirmation> {
+    PRINT(PERMISSION_METHOD_RETRIEVE_DISPOSAL_CONFIRMATION_REPORT),
     DESTROY(PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION),
     DELETE_REPORT(PERMISSION_METHOD_DELETE_DISPOSAL_CONFIRMATION),
     REMOVE_FROM_BIN(PERMISSION_METHOD_PERMANENTLY_DELETE_RECORDS_DISPOSAL_CONFIRMATION),
@@ -125,9 +129,16 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
       reExecuteDisposalConfirmation(object, callback);
     } else if (DisposalConfirmationReportAction.RECOVER_STATE.equals(action)) {
       recoverDisposalConfirmationExecutionFailed(object, callback);
+    } else if (DisposalConfirmationReportAction.PRINT.equals(action)) {
+      retrieveDisposalConfirmationReportForPrint(object, callback);
     } else {
       unsupportedAction(action, callback);
     }
+  }
+
+  private void retrieveDisposalConfirmationReportForPrint(DisposalConfirmation object,
+    AsyncCallback<ActionImpact> callback) {
+
   }
 
   private void reExecuteDisposalConfirmation(DisposalConfirmation confirmation, AsyncCallback<ActionImpact> callback) {
@@ -310,8 +321,10 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
     // REPORT
     ActionableGroup<DisposalConfirmation> reportGroup = new ActionableGroup<>(
       messages.sidebarDisposalConfirmationReportTitle());
+    reportGroup.addButton(messages.printButton(), DisposalConfirmationReportAction.PRINT, ActionImpact.NONE,
+      "btn-print");
     reportGroup.addButton(messages.deleteDisposalConfirmationReport(), DisposalConfirmationReportAction.DELETE_REPORT,
-      ActionImpact.DESTROYED, "btn-cancel");
+      ActionImpact.DESTROYED, "btn-remove");
 
     // DISPOSAL CONFIRMATION
     ActionableGroup<DisposalConfirmation> confirmationGroup = new ActionableGroup<>(

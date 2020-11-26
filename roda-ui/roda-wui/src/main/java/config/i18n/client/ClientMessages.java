@@ -496,6 +496,8 @@ SafeHtml genericErrorTitle();
 
   String inspectButton();
 
+  String printButton();
+
   /*** Identify formats ***/
 
   String identifyFormatsButton();
