@@ -152,9 +152,6 @@ public class ModelService extends ModelObservable {
   private Object logFileLock = new Object();
   private String instanceId = "";
   private long entryLogLineNumber = -1;
-  private long entryAIPLineNumber = -1;
-  private long entryDisposalScheduleLineNumber = -1;
-  private long entryDisposalHoldLineNumber = -1;
 
   public ModelService(StorageService storage, EventsManager eventsManager, NodeType nodeType, String instanceId) {
     super(LOGGER);
@@ -3548,10 +3545,8 @@ public class ModelService extends ModelObservable {
 
   public void addDisposalHoldEntry(String disposalConfirmationId, DisposalHold disposalHold)
     throws RequestNotValidException, GenericException {
-    DefaultStoragePath confirmationPath = DefaultStoragePath
-      .parse(ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId));
-    Path entityPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);
-    Path disposalHoldFile = entityPath.resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME);
+    Path disposalHoldFile = ModelUtils.getDisposalConfirmationElementPath(disposalConfirmationId,
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME);
 
     // ensuring parent exists
     Path parent = disposalHoldFile.getParent();
@@ -3559,22 +3554,17 @@ public class ModelService extends ModelObservable {
       try {
         Files.createDirectories(parent);
       } catch (IOException e) {
-        throw new GenericException("Error creating parent folder structure to write aips into", e);
+        throw new GenericException("Error creating parent folder structure to write holds into", e);
       }
     }
 
     // verify if file exists and if not creates
     if (!FSUtils.exists(disposalHoldFile)) {
-      entryDisposalHoldLineNumber = 1;
       try {
         Files.createFile(disposalHoldFile);
       } catch (IOException e) {
-        throw new GenericException("Error creating file to write schedules into", e);
+        throw new GenericException("Error creating file to write holds into", e);
       }
-    } else if (entryDisposalHoldLineNumber == -1) {
-      // recalculate entryDisposalHoldLineNumber as file exists but no value is set
-      // memory
-      entryDisposalHoldLineNumber = JsonUtils.calculateNumberOfLines(disposalHoldFile) + 1;
     }
 
     JsonUtils.appendObjectToFile(disposalHold, disposalHoldFile);
@@ -3582,11 +3572,9 @@ public class ModelService extends ModelObservable {
 
   public void addDisposalScheduleEntry(String disposalConfirmationId, DisposalSchedule disposalSchedule)
     throws RequestNotValidException, GenericException {
-    DefaultStoragePath confirmationPath = DefaultStoragePath
-      .parse(ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId));
-    Path entityPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);
-    Path disposalSchedulesFile = entityPath
-      .resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES_FILENAME);
+
+    Path disposalSchedulesFile = ModelUtils.getDisposalConfirmationElementPath(disposalConfirmationId,
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES_FILENAME);
 
     // ensuring parent exists
     Path parent = disposalSchedulesFile.getParent();
@@ -3594,23 +3582,17 @@ public class ModelService extends ModelObservable {
       try {
         Files.createDirectories(parent);
       } catch (IOException e) {
-        throw new GenericException("Error creating parent folder structure to write aips into", e);
+        throw new GenericException("Error creating parent folder structure to write schedules into", e);
       }
     }
 
     // verify if file exists and if not creates
     if (!FSUtils.exists(disposalSchedulesFile)) {
-      entryDisposalScheduleLineNumber = 1;
       try {
         Files.createFile(disposalSchedulesFile);
       } catch (IOException e) {
         throw new GenericException("Error creating file to write schedules into", e);
       }
-    } else if (entryDisposalScheduleLineNumber == -1) {
-      // recalculate entryDisposalScheduleLineNumber as file exists but no value is
-      // set
-      // memory
-      entryDisposalScheduleLineNumber = JsonUtils.calculateNumberOfLines(disposalSchedulesFile) + 1;
     }
 
     JsonUtils.appendObjectToFile(disposalSchedule, disposalSchedulesFile);
@@ -3619,10 +3601,8 @@ public class ModelService extends ModelObservable {
   public void addAIPEntry(String disposalConfirmationId, DisposalConfirmationAIPEntry entry)
     throws RequestNotValidException, GenericException {
 
-    DefaultStoragePath confirmationPath = DefaultStoragePath
-      .parse(ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId));
-    Path entityPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);
-    Path aipsFile = entityPath.resolve(RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME);
+    Path aipsFile = ModelUtils.getDisposalConfirmationElementPath(disposalConfirmationId,
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME);
 
     // ensuring parent exists
     Path parent = aipsFile.getParent();
@@ -3636,16 +3616,11 @@ public class ModelService extends ModelObservable {
 
     // verify if file exists and if not creates
     if (!FSUtils.exists(aipsFile)) {
-      entryAIPLineNumber = 1;
       try {
         Files.createFile(aipsFile);
       } catch (IOException e) {
         throw new GenericException("Error creating file to write aips into", e);
       }
-    } else if (entryAIPLineNumber == -1) {
-      // recalculate entryLogLineNumber as file exists but no value is set
-      // memory
-      entryAIPLineNumber = JsonUtils.calculateNumberOfLines(aipsFile) + 1;
     }
 
     JsonUtils.appendObjectToFile(entry, aipsFile);
