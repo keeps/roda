@@ -211,12 +211,12 @@ public class DeleteDisposalConfirmationPlugin extends AbstractPlugin<DisposalCon
     String outcomeText;
 
     if (state.equals(PluginState.SUCCESS)) {
-      outcomeText = "Archival Information Package [id: " + aip.getId()
-        + "] has been withdrawn from disposal confirmation '" + disposalConfirmationReport.getTitle() + "' ("
+      outcomeText = "AIP '" + aip.getId()
+        + "' was been withdrawn from disposal confirmation '" + disposalConfirmationReport.getTitle() + "' ("
         + disposalConfirmationReport.getId() + ")";
     } else {
-      outcomeText = "Archival Information Package [id: " + aip.getId()
-        + "] has not been withdrawn from disposal confirmation '" + disposalConfirmationReport.getTitle() + "' ("
+      outcomeText = "AIP '" + aip.getId()
+        + "' was not been withdrawn from disposal confirmation '" + disposalConfirmationReport.getTitle() + "' ("
         + disposalConfirmationReport.getId() + ")";
     }
 
