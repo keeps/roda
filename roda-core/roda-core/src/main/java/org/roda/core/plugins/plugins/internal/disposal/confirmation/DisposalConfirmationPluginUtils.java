@@ -1,6 +1,5 @@
 package org.roda.core.plugins.plugins.internal.disposal.confirmation;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,10 +12,8 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -35,6 +32,9 @@ import org.roda.core.util.CommandException;
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public class DisposalConfirmationPluginUtils {
+
+  private DisposalConfirmationPluginUtils() {
+  }
 
   public static void copyAIPToDisposalBin(AIP aip, String disposalConfirmationId, List<String> rsyncOptions)
     throws RequestNotValidException, GenericException, CommandException {
@@ -73,28 +73,6 @@ public class DisposalConfirmationPluginUtils {
     confirmationMetadata.setExtraFields(extraFields);
 
     return confirmationMetadata;
-  }
-
-  public static List<DisposalConfirmationAIPEntry> getAIPEntryFromAIPChildren(IndexService index, AIP aip,
-    Set<String> disposalSchedules, Set<String> disposalHolds) throws GenericException, RequestNotValidException {
-    List<DisposalConfirmationAIPEntry> entries = new ArrayList<>();
-
-    Filter ancestorFilter;
-    ancestorFilter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
-
-    try (IterableIndexResult<IndexedAIP> result = index.findAll(IndexedAIP.class, ancestorFilter, true,
-      Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID, RodaConstants.AIP_LEVEL, RodaConstants.AIP_TITLE,
-        RodaConstants.AIP_OVERDUE_DATE))) {
-
-      for (IndexedAIP indexedAIP : result) {
-        entries.add(createDisposalConfirmationAIPEntry(index, indexedAIP, aip, disposalSchedules, disposalHolds));
-
-      }
-    } catch (IOException e) {
-      throw new GenericException(e);
-    }
-
-    return entries;
   }
 
   public static DisposalConfirmationAIPEntry getAIPEntryFromAIP(IndexService indexService, AIP aip,
@@ -149,11 +127,11 @@ public class DisposalConfirmationPluginUtils {
 
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId));
 
-    IndexResult<IndexedRepresentation> indexedRepresentationIndexResult = indexService.find(IndexedRepresentation.class,
-      filter, null, new Sublist(0, RodaConstants.DEFAULT_PAGINATION_VALUE),
+    IterableIndexResult<IndexedRepresentation> all = indexService.findAll(IndexedRepresentation.class, filter, null,
+      true,
       Arrays.asList(RodaConstants.REPRESENTATION_SIZE_IN_BYTES, RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES));
 
-    for (IndexedRepresentation representation : indexedRepresentationIndexResult.getResults()) {
+    for (IndexedRepresentation representation : all) {
       totalSize += representation.getSizeInBytes();
       totalOfDataFiles += representation.getNumberOfDataFiles();
     }
