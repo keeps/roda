@@ -993,6 +993,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_ID = "parameter.disposal_confirmation_id";
   public static final String PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE = "parameter.disposal_confirmation_title";
   public static final String PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_EXTRA_INFO = "parameter.disposal_confirmation_extra";
+  public static final String PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_DESTROY_EXECUTE_AGAIN = "parameter.disposal_confirmation_re_execute";
 
   public static final String PLUGIN_CATEGORY_CONVERSION = "conversion";
   public static final String PLUGIN_CATEGORY_CHARACTERIZATION = "characterization";

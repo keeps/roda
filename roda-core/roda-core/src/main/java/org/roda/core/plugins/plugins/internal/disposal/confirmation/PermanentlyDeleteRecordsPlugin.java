@@ -51,7 +51,8 @@ public class PermanentlyDeleteRecordsPlugin extends AbstractPlugin<DisposalConfi
   }
 
   public static String getStaticDescription() {
-    return "";
+    return "Permanently deletes from the disposal bin the original records destroyed releasing storage space from the repository."
+      + "A PREMIS event is recorded after finishing the task.";
   }
 
   @Override
