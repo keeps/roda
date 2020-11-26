@@ -3547,10 +3547,9 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  public void addDisposalHoldEntry(String disposalConfirmationId, DisposalHold disposalHold)
-    throws RequestNotValidException, GenericException {
+  public Path createDisposalHoldFileIfNotExists(String disposalConfirmationId) throws RequestNotValidException, GenericException {
     Path disposalHoldFile = ModelUtils.getDisposalConfirmationElementPath(disposalConfirmationId,
-      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME);
+            RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME);
 
     // ensuring parent exists
     Path parent = disposalHoldFile.getParent();
@@ -3570,6 +3569,15 @@ public class ModelService extends ModelObservable {
         throw new GenericException("Error creating file to write holds into", e);
       }
     }
+
+    return disposalHoldFile;
+
+  }
+
+  public void addDisposalHoldEntry(String disposalConfirmationId, DisposalHold disposalHold)
+          throws GenericException, RequestNotValidException {
+
+    Path disposalHoldFile = createDisposalHoldFileIfNotExists(disposalConfirmationId);
 
     JsonUtils.appendObjectToFile(disposalHold, disposalHoldFile);
   }
