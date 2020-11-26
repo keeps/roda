@@ -137,7 +137,7 @@ public class CreateDisposalConfirmationDataPanel extends Composite {
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_CREATE_DISPOSAL_CONFIRMATION)) {
       Button btnCreate = new Button();
       btnCreate.setText(messages.confirmButton());
-      btnCreate.addStyleName("btn btn-block");
+      btnCreate.addStyleName("btn btn-block btn-play");
       btnCreate.addClickHandler(e -> {
         boolean valid = isValid();
         if (valid) {

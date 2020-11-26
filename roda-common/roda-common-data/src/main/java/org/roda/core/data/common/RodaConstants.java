@@ -351,6 +351,7 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_DISPOSAL_HOLD_ID = "disposal_hold_id";
   public static final String API_PATH_PARAM_DISPOSAL_CONFIRMATION_ID = "disposal_confirmation_id";
   public static final String API_PATH_PARAM_DISPOSAL_CONFIRMATION_REPORT = "report";
+  public static final String API_PATH_PARAM_DISPOSAL_CONFIRMATION_REPORT_PRINT = "print";
 
   public static final String API_PATH_PARAM_PART = "part";
   public static final String API_PATH_PARAM_NAME = "name";
