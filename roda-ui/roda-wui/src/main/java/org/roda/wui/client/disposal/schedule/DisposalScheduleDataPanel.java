@@ -409,6 +409,18 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
 
     checked = true;
 
+    if (!errorList.isEmpty()) {
+      errors.setVisible(true);
+      StringBuilder errorString = new StringBuilder();
+      for (String error : errorList) {
+        errorString.append("<span class='error'>").append(error).append("</span>");
+        errorString.append("<br/>");
+      }
+      errors.setHTML(errorString.toString());
+    } else {
+      errors.setVisible(false);
+    }
+
     return errorList.isEmpty();
   }
 
