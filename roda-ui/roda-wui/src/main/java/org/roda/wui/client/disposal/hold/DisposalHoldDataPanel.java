@@ -3,10 +3,10 @@ package org.roda.wui.client.disposal.hold;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -51,7 +51,7 @@ public class DisposalHoldDataPanel extends Composite implements HasValueChangeHa
   @UiField
   TextArea notes;
 
-  private boolean editmode;
+  private boolean editMode;
 
   private boolean changed = false;
   private boolean checked = false;
@@ -59,20 +59,20 @@ public class DisposalHoldDataPanel extends Composite implements HasValueChangeHa
   @UiField
   HTML errors;
 
-  public DisposalHoldDataPanel(DisposalHold disposalHold, boolean editmode) {
+  public DisposalHoldDataPanel(DisposalHold disposalHold, boolean editMode) {
     initWidget(uiBinder.createAndBindUi(this));
 
-    this.editmode = editmode;
+    this.editMode = editMode;
     errors.setVisible(false);
 
     ChangeHandler changeHandler = event -> DisposalHoldDataPanel.this.onChange();
 
-    title.addChangeHandler(changeHandler);
-    description.addChangeHandler(changeHandler);
-    mandate.addChangeHandler(changeHandler);
-    notes.addChangeHandler(changeHandler);
+    KeyUpHandler keyUpHandler = event -> DisposalHoldDataPanel.this.onChange();
 
-    if (editmode) {
+    title.addChangeHandler(changeHandler);
+    title.addKeyUpHandler(keyUpHandler);
+
+    if (editMode) {
       setDisposalHold(disposalHold);
     }
   }
@@ -113,6 +113,18 @@ public class DisposalHoldDataPanel extends Composite implements HasValueChangeHa
 
     checked = true;
 
+    if (!errorList.isEmpty()) {
+      errors.setVisible(true);
+      StringBuilder errorString = new StringBuilder();
+      for (String error : errorList) {
+        errorString.append("<span class='error'>").append(error).append("</span>");
+        errorString.append("<br/>");
+      }
+      errors.setHTML(errorString.toString());
+    } else {
+      errors.setVisible(false);
+    }
+
     return errorList.isEmpty();
   }
 
@@ -123,8 +135,8 @@ public class DisposalHoldDataPanel extends Composite implements HasValueChangeHa
     notes.setText("");
   }
 
-  public boolean isEditmode() {
-    return editmode;
+  public boolean isEditMode() {
+    return editMode;
   }
 
   public boolean isChanged() {
