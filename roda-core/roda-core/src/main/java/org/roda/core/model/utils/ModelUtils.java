@@ -54,6 +54,7 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -874,7 +875,7 @@ public final class ModelUtils {
 
   public static StoragePath getDisposalRuleStoragePath(String disposalRuleId) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISPOSAL_RULE,
-            disposalRuleId + RodaConstants.JOB_FILE_EXTENSION);
+      disposalRuleId + RodaConstants.JOB_FILE_EXTENSION);
   }
 
   public static StoragePath getDisposalScheduleStoragePath(String disposalScheduleId) throws RequestNotValidException {
@@ -895,5 +896,13 @@ public final class ModelUtils {
 
   private static List<String> getDisposalConfirmationPath(String confirmationId) {
     return Arrays.asList(RodaConstants.STORAGE_CONTAINER_DISPOSAL_CONFIRMATION, confirmationId);
+  }
+
+  public static Path getDisposalConfirmationElementPath(String disposalConfirmationId, String filename)
+    throws RequestNotValidException {
+    DefaultStoragePath confirmationPath = DefaultStoragePath
+      .parse(ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId));
+    Path entityPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);
+    return entityPath.resolve(filename);
   }
 }
