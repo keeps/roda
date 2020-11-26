@@ -968,6 +968,10 @@ pre code {
     content: "\f093";
 }
 
+.btn-print:after {
+    content: "\f02f";
+}
+
 .btn-refresh:after {
     content: "\f021";
 }
