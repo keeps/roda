@@ -271,6 +271,7 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
 
     // Make disposal holds as a jsonl
     try {
+      model.createDisposalHoldFileIfNotExists(confirmationId);
       for (String disposalHoldId : disposalHolds) {
         DisposalHold disposalHold = model.retrieveDisposalHold(disposalHoldId);
         model.addDisposalHoldEntry(confirmationId, disposalHold);
