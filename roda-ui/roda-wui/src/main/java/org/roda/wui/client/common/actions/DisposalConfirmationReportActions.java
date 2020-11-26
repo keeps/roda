@@ -3,7 +3,6 @@ package org.roda.wui.client.common.actions;
 import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_DELETE_DISPOSAL_CONFIRMATION;
 import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION;
 import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_PERMANENTLY_DELETE_RECORDS_DISPOSAL_CONFIRMATION;
-import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_RECOVER_RECORDS_DISPOSAL_CONFIRMATION;
 import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_RETRIEVE_DISPOSAL_CONFIRMATION_REPORT;
 import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_RESTORE_RECORDS_DISPOSAL_CONFIRMATION;
 
