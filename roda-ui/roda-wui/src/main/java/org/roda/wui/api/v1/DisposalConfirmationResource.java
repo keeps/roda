@@ -108,6 +108,7 @@ public class DisposalConfirmationResource {
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
   public Response retrieveDisposalConfirmationReport(
     @ApiParam(value = "The ID of the disposal confirmation to retrieve.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_DISPOSAL_CONFIRMATION_ID) String confirmationId,
+    @ApiParam(value = "Choose report template, if is to print or not", required = true) @QueryParam(RodaConstants.API_PATH_PARAM_DISPOSAL_CONFIRMATION_REPORT_PRINT) boolean isToPrint,
     @ApiParam(value = "Choose format in which to get the disposal confirmation", allowableValues = RodaConstants.API_GET_METADATA_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
     @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
     throws RODAException, IOException {
@@ -117,7 +118,7 @@ public class DisposalConfirmationResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    String report = Disposals.retrieveDisposalConfirmationReport(user, confirmationId);
+    String report = Disposals.retrieveDisposalConfirmationReport(user, confirmationId, isToPrint);
 
     return Response.ok(report, mediaType).build();
   }

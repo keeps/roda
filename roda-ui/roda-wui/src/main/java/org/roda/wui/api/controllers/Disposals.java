@@ -557,7 +557,7 @@ public class Disposals extends RodaWuiController {
     }
   }
 
-  public static String retrieveDisposalConfirmationReport(User user, String confirmationId)
+  public static String retrieveDisposalConfirmationReport(User user, String confirmationId, boolean isToPrint)
     throws RODAException, IOException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -567,7 +567,7 @@ public class Disposals extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      return DisposalsHelper.createDisposalConfirmationReport(confirmationId);
+      return DisposalsHelper.createDisposalConfirmationReport(confirmationId, isToPrint);
     } catch (RODAException | IOException e) {
       state = LogEntryState.FAILURE;
       throw e;

@@ -91,7 +91,7 @@ public class ShowDisposalConfirmation extends Composite {
         Collections.emptyList(), new NoAsyncCallback<DisposalConfirmation>() {
           @Override
           public void onSuccess(DisposalConfirmation confirmation) {
-            BrowserService.Util.getInstance().retrieveDisposalConfirmationReport(confirmationId,
+            BrowserService.Util.getInstance().retrieveDisposalConfirmationReport(confirmationId,false,
               new NoAsyncCallback<String>() {
                 @Override
                 public void onSuccess(String report) {

@@ -3,26 +3,16 @@ package org.roda.wui.api.controllers;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Helper;
-import com.github.jknack.handlebars.Options;
-import com.github.jknack.handlebars.Template;
-import com.google.gson.Gson;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.HandlebarsUtility;
@@ -30,10 +20,8 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.DisposalHoldNotValidException;
 import org.roda.core.data.exceptions.DisposalRuleNotValidException;
 import org.roda.core.data.exceptions.DisposalScheduleNotValidException;
-import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.ip.disposal.ConditionType;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
@@ -49,16 +37,34 @@ import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
 import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.bundle.DisposalConfirmationExtraBundle;
-import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Helper;
+import com.github.jknack.handlebars.Options;
+import com.github.jknack.handlebars.Template;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 public class DisposalsHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(DisposalsHelper.class);
+
+  private static final String DISPOSAL_CONFIRMATION_COMMAND_PROPERTY = "core.confirmation.generate.report.command";
+
+  private static final String METADATA_FILE_PLACEHOLDER = "metadataFile";
+  private static final String AIPS_FILE_PLACEHOLDER = "aipsFile";
+  private static final String SCHEDULES_FILE_PLACEHOLDER = "schedulesFile";
+  private static final String HOLDS_FILE_PLACEHOLDER = "holdsFile";
+
+  private static final String DISPOSAL_CONFIRMATION_REPORT_HBS = "disposal_confirmation_report.html.hbs";
+  private static final String DISPOSAL_CONFIRMATION_REPORT_PRINT_HBS = "disposal_confirmation_report_print.html.hbs";
+
+  private static final String DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+  private static final String HBS_DATEFORMAT_HELPER_NAME = "humanize";
 
   public DisposalsHelper() {
     // do nothing
@@ -254,10 +260,9 @@ public class DisposalsHelper {
     return holdsFile;
   }
 
-  public static String createDisposalConfirmationReport(String confirmationId)
-          throws RODAException, IOException {
-    String jqCommandTemplate = RodaCoreFactory
-      .getRodaConfigurationAsString("core.confirmation.generate.report.command");
+  public static String createDisposalConfirmationReport(String confirmationId, boolean isToPrint)
+    throws RODAException, IOException {
+    String jqCommandTemplate = RodaCoreFactory.getRodaConfigurationAsString(DISPOSAL_CONFIRMATION_COMMAND_PROPERTY);
 
     Path metadataPath = getDisposalConfirmationMetadataPath(confirmationId);
     Path aipsPath = getDisposalConfirmationAIPsPath(confirmationId);
@@ -266,10 +271,10 @@ public class DisposalsHelper {
 
     Map<String, String> values = new HashMap<>();
 
-    values.put("metadataFile", metadataPath.toString());
-    values.put("aipsFile", aipsPath.toString());
-    values.put("schedulesFile", schedulesPath.toString());
-    values.put("holdsFile", holdsPath.toString());
+    values.put(METADATA_FILE_PLACEHOLDER, metadataPath.toString());
+    values.put(AIPS_FILE_PLACEHOLDER, aipsPath.toString());
+    values.put(SCHEDULES_FILE_PLACEHOLDER, schedulesPath.toString());
+    values.put(HOLDS_FILE_PLACEHOLDER, holdsPath.toString());
 
     String jqCommandParams = HandlebarsUtility.executeHandlebars(jqCommandTemplate, values);
 
@@ -285,27 +290,30 @@ public class DisposalsHelper {
       throw new RODAException(e);
     }
 
-    ObjectMapper mapper = new ObjectMapper();
     Map<String, Object> confirmationValues = new ObjectMapper().readValue(output, HashMap.class);
+    InputStream templateStream;
 
-    InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(
-            RodaConstants.DISPOSAL_CONFIRMATION_INFORMATION_TEMPLATE_FOLDER + "/disposal_confirmation_report_css.html.hbs");
+    if (isToPrint) {
+      templateStream = RodaCoreFactory.getConfigurationFileAsStream(
+        RodaConstants.DISPOSAL_CONFIRMATION_INFORMATION_TEMPLATE_FOLDER + "/" + DISPOSAL_CONFIRMATION_REPORT_PRINT_HBS);
+    } else {
+      templateStream = RodaCoreFactory.getConfigurationFileAsStream(
+        RodaConstants.DISPOSAL_CONFIRMATION_INFORMATION_TEMPLATE_FOLDER + "/" + DISPOSAL_CONFIRMATION_REPORT_HBS);
+    }
+
     String reportTemplate = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
 
-    //String report = HandlebarsUtility.executeHandlebars(reportTemplate, confirmationValues);
     Handlebars handlebars = new Handlebars();
-    handlebars.registerHelper("humanize", new Helper<Long>() {
+    handlebars.registerHelper(HBS_DATEFORMAT_HELPER_NAME, new Helper<Long>() {
       @Override
       public Object apply(Long value, Options options) throws IOException {
         ZonedDateTime date = Instant.ofEpochMilli(value).atZone(ZoneOffset.UTC);
-        String result = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(date);
+        String result = DateTimeFormatter.ofPattern(DATETIME_FORMAT).format(date);
         return result;
       }
     });
     Template template = handlebars.compileInline(reportTemplate);
     String report = template.apply(confirmationValues);
-
-
 
     return report;
   }

@@ -1,5 +1,6 @@
 package org.roda.wui.client.common.dialogs;
 
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HTML;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
@@ -330,6 +331,47 @@ public class DisposalDialogs {
     footer.add(applyToManualExclusiveButton);
 
     layout.add(messageLabel);
+    layout.add(footer);
+
+    dialogBox.setGlassEnabled(true);
+    dialogBox.setAnimationEnabled(false);
+
+    dialogBox.setWidget(layout);
+    dialogBox.center();
+    dialogBox.show();
+  }
+
+
+  public static void printReport(HTML report, AsyncCallback<Boolean> callback) {
+    FlowPanel layout = new FlowPanel();
+    FlowPanel footer = new FlowPanel();
+    final DialogBox dialogBox = new DialogBox(false, true);
+    dialogBox.setText(messages.printButton());
+
+    layout.addStyleName("content");
+    layout.addStyleName("wui-dialog-layout");
+    footer.addStyleName("wui-dialog-layout-footer");
+
+    Button cancelButton = new Button(messages.cancelButton());
+    cancelButton.addStyleName("btn btn-link");
+    cancelButton.addClickHandler(event -> {
+      dialogBox.hide();
+      callback.onFailure(null);
+    });
+
+    Button printButton = new Button();
+    printButton.setText(messages.printButton());
+    printButton.addStyleName("btn btn-play");
+    printButton.addClickHandler(event -> {
+      Window.print();
+      dialogBox.hide();
+      callback.onSuccess(false);
+    });
+
+    footer.add(cancelButton);
+    footer.add(printButton);
+
+    layout.add(report);
     layout.add(footer);
 
     dialogBox.setGlassEnabled(true);

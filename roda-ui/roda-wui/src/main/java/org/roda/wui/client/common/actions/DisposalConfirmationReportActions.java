@@ -20,6 +20,7 @@ import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.disposal.DisposalConfirmations;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.disposal.confirmations.ShowDisposalConfirmation;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.InternalProcess;
@@ -137,9 +138,16 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
     }
   }
 
-  private void retrieveDisposalConfirmationReportForPrint(DisposalConfirmation object,
+  private void retrieveDisposalConfirmationReportForPrint(DisposalConfirmation confirmation,
     AsyncCallback<ActionImpact> callback) {
-
+    BrowserService.Util.getInstance().retrieveDisposalConfirmationReport(confirmation.getId(),true,
+      new ActionNoAsyncCallback<String>(callback) {
+        @Override
+        public void onSuccess(String report) {
+          JavascriptUtils.print(report);
+          doActionCallbackNone();
+        }
+      });
   }
 
   private void reExecuteDisposalConfirmation(DisposalConfirmation confirmation, AsyncCallback<ActionImpact> callback) {
