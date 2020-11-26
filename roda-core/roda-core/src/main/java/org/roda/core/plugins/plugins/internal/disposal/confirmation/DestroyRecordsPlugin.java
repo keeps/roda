@@ -6,10 +6,13 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.ReaderInputStream;
@@ -18,6 +21,7 @@ import org.roda.core.common.RodaUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
@@ -32,6 +36,7 @@ import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalDestructionAIPMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -50,6 +55,9 @@ import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.roda.core.data.common.RodaConstants.PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_EXTRA_INFO;
+import static org.roda.core.data.common.RodaConstants.PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -155,7 +163,7 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
         // Iterate over the AIP
         while (reader.ready()) {
           String aipEntryJson = reader.readLine();
-          preProcessAIP(aipEntryJson, disposalConfirmation, model, cachedJob, report, jobPluginInfo);
+          processAipEntry(aipEntryJson, disposalConfirmation, model, cachedJob, report, jobPluginInfo);
         }
       }
     } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException
@@ -189,21 +197,21 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
     }
   }
 
-  private void preProcessAIP(String aipEntryJson, DisposalConfirmation disposalConfirmation, ModelService model,
-    Job cachedJob, Report report, JobPluginInfo jobPluginInfo) {
+  private void processAipEntry(String aipEntryJson, DisposalConfirmation disposalConfirmation, ModelService model,
+                               Job cachedJob, Report report, JobPluginInfo jobPluginInfo) {
     try {
       DisposalConfirmationAIPEntry aipEntry = JsonUtils.getObjectFromJson(aipEntryJson,
         DisposalConfirmationAIPEntry.class);
       AIP aip = model.retrieveAIP(aipEntry.getAipId());
       processAIP(aip, disposalConfirmation, model, cachedJob, report, jobPluginInfo);
     } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-      LOGGER.error("Failed to pre-process the AIP entry '{}': {}", aipEntryJson, e.getMessage(), e);
+      LOGGER.error("Failed to process AIP entry '{}': {}", aipEntryJson, e.getMessage(), e);
       processedWithErrors = true;
       jobPluginInfo.incrementObjectsProcessedWithFailure();
       Report reportItem = PluginHelper.initPluginReportItem(this, disposalConfirmation.getId(),
         DisposalConfirmation.class);
       reportItem.setPluginState(PluginState.FAILURE)
-        .setPluginDetails("Failed to pre-process the AIP entry '" + aipEntryJson + "' from disposal confirmation '"
+        .setPluginDetails("Failed to process the AIP entry '" + aipEntryJson + "' from disposal confirmation '"
           + disposalConfirmation.getTitle() + "' (" + disposalConfirmation.getId() + "): " + e.getMessage());
       report.addReport(reportItem);
       PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);

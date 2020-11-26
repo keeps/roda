@@ -134,11 +134,12 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
       }
     } catch (RequestNotValidException | AuthorizationDeniedException | GenericException | NotFoundException
       | IOException e) {
-      LOGGER.error("Fail to restore disposal confirmation '{}' ({}) records: {}", disposalConfirmation.getTitle(),
+      processedWithErrors = true;
+      LOGGER.error("Failed to restore disposal confirmation '{}' ({}) records: {}", disposalConfirmation.getTitle(),
         disposalConfirmation.getId(), e.getMessage(), e);
       Report reportItem = PluginHelper.initPluginReportItem(this, disposalConfirmation.getId(),
         DisposalConfirmation.class);
-      reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Fail to restore the disposal confirmation '"
+      reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Failed to restore the disposal confirmation '"
         + disposalConfirmation.getTitle() + "' (" + disposalConfirmation.getId() + ") records: " + e.getMessage());
       jobPluginInfo.incrementObjectsProcessedWithFailure();
       report.addReport(reportItem);
@@ -169,7 +170,7 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
   }
 
   private void processAipEntry(String aipEntryJson, DisposalConfirmation disposalConfirmation, IndexService index,
-                               ModelService model, Job cachedJob, Report report, JobPluginInfo jobPluginInfo) {
+    ModelService model, Job cachedJob, Report report, JobPluginInfo jobPluginInfo) {
     try {
       DisposalConfirmationAIPEntry aipEntry = JsonUtils.getObjectFromJson(aipEntryJson,
         DisposalConfirmationAIPEntry.class);
@@ -206,16 +207,15 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
 
       // reindex the AIP
       AIP aip = model.retrieveAIP(aipEntry.getAipId());
-      if(aip.getDisposal() != null) {
+      if (aip.getDisposal() != null) {
         aip.getDisposal().setConfirmation(null);
       }
 
       model.updateAIP(aip, cachedJob.getUsername());
       index.reindexAIP(aip);
 
-      outcomeText = "AIP '" + aip.getId()
-        + "' has been restored from disposal bin under confirmation '" + disposalConfirmation.getTitle() + "' ("
-        + disposalConfirmation.getId() + ")";
+      outcomeText = "AIP '" + aip.getId() + "' has been restored from disposal bin under confirmation '"
+        + disposalConfirmation.getTitle() + "' (" + disposalConfirmation.getId() + ")";
 
       reportItem.setPluginDetails(outcomeText);
 
