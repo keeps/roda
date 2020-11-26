@@ -469,6 +469,6 @@ public interface BrowserService extends RemoteService {
   List<DisposalHoldAIPMetadata> listDisposalHoldsAssociation(String aipId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  String retrieveDisposalConfirmationReport(String confirmationId) throws IOException, RODAException;
+  String retrieveDisposalConfirmationReport(String confirmationId, boolean isToPrint) throws IOException, RODAException;
 
 }

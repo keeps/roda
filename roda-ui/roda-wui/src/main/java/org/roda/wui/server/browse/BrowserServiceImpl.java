@@ -1203,9 +1203,9 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public String retrieveDisposalConfirmationReport(String confirmationId) throws RODAException, IOException {
+  public String retrieveDisposalConfirmationReport(String confirmationId, boolean isToPrint) throws RODAException, IOException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Disposals.retrieveDisposalConfirmationReport(user, confirmationId);
+    return Disposals.retrieveDisposalConfirmationReport(user, confirmationId, isToPrint);
   }
 
 }
