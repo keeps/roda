@@ -3773,6 +3773,11 @@ public class ModelService extends ModelObservable {
     return ResourceParseUtils.getAIPMetadata(getStorage(), aipId).getHolds();
   }
 
+  public List<DisposalTransitiveHoldAIPMetadata> listTransitiveDisposalHolds(String aipId)
+          throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    return ResourceParseUtils.getAIPMetadata(getStorage(), aipId).getTransitiveHolds();
+  }
+
   /************************************
    * Disposal rule related
    ************************************/

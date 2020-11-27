@@ -67,6 +67,7 @@ import org.roda.core.data.v2.ip.disposal.DisposalRules;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobMixIn;
 import org.roda.core.data.v2.jobs.PluginInfo;
@@ -1207,5 +1208,13 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Disposals.retrieveDisposalConfirmationReport(user, confirmationId, isToPrint);
   }
+
+  @Override
+  public List<DisposalTransitiveHoldAIPMetadata> listTransitiveDisposalHolds(String aipId)
+          throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.listTransitiveDisposalHolds(user, aipId);
+  }
+
 
 }
