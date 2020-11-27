@@ -172,10 +172,10 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
 
       if (aip.getDisposal().getHolds() != null) {
         List<DisposalHoldAIPMetadata> holds = aip.getDisposal().getHolds();
-        doc.addField(RodaConstants.AIP_DISPOSAL_HOLDS_ID, holds.stream().filter(p -> p.getTransitive() == null)
+        doc.addField(RodaConstants.AIP_DISPOSAL_HOLDS_ID, holds.stream().filter(p -> !p.isTransitive())
           .map(DisposalHoldAIPMetadata::getId).collect(Collectors.toList()));
         doc.addField(RodaConstants.AIP_TRANSITIVE_DISPOSAL_HOLDS_ID, holds.stream()
-          .filter(p -> p.getTransitive() != null).map(DisposalHoldAIPMetadata::getId).collect(Collectors.toList()));
+          .filter(DisposalHoldAIPMetadata::isTransitive).map(DisposalHoldAIPMetadata::getId).collect(Collectors.toList()));
         doc.addField(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, !holds.isEmpty());
       }
 

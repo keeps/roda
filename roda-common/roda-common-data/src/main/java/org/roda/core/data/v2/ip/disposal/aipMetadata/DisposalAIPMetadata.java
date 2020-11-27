@@ -142,4 +142,20 @@ public class DisposalAIPMetadata implements Serializable {
     }
     return null;
   }
+
+  @JsonIgnore
+  public boolean removeDisposalHold(String disposalHold) {
+    if(holds != null) {
+      return holds.removeIf(hold -> hold.getId().equals(disposalHold) && !hold.isTransitive());
+    }
+    return false;
+  }
+
+  @JsonIgnore
+  public boolean removeTransitiveHold(String transitiveDisposalHold) {
+    if(holds != null) {
+      return holds.removeIf(hold -> hold.getId().equals(transitiveDisposalHold) && hold.isTransitive());
+    }
+    return false;
+  }
 }
