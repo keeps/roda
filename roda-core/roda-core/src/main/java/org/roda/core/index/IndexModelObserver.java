@@ -51,9 +51,6 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalAIPMetadata;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalConfirmationAIPMetadata;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalScheduleAIPMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
@@ -347,13 +344,6 @@ public class IndexModelObserver implements ModelObserver {
   public ReturnWithExceptions<Void, ModelObserver> aipDestroyed(AIP aip) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
-    Map<String, Object> fieldsToUpdate = new HashMap<>();
-
-    fieldsToUpdate.put(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(aip.getState()));
-
-    // change AIP
-    SolrUtils.update(index, IndexedAIP.class, aip.getId(), fieldsToUpdate, (ModelObserver) this).addTo(ret);
-
     if (ret.isEmpty()) {
       // change descriptive metadata, Representations, Files & Preservation events
       descriptivesMetadataUpdated(aip).add(ret);
@@ -361,15 +351,6 @@ public class IndexModelObserver implements ModelObserver {
         representationsStateUpdated(aip).addTo(ret);
         if (ret.isEmpty()) {
           preservationEventsStateUpdated(aip).addTo(ret);
-          if (ret.isEmpty()) {
-            fieldsToUpdate.clear();
-            if (aip.getDisposalConfirmationId() != null) {
-              DisposalConfirmationAIPMetadata confirmation = aip.getDisposal().getConfirmation();
-              fieldsToUpdate.put(RodaConstants.AIP_DESTROYED_ON,
-                SolrUtils.formatDate(confirmation.getDestruction().getDestructionOn()));
-              fieldsToUpdate.put(RodaConstants.AIP_DESTROYED_BY, confirmation.getDestruction().getDestructionBy());
-            }
-          }
         }
       }
     }
@@ -635,16 +616,16 @@ public class IndexModelObserver implements ModelObserver {
     try {
       AIP aip = model.retrieveAIP(descriptiveMetadata.getAipId());
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
-      DisposalSchedule disposalSchedule = null;
-      Map<String, String> retentionPeriodCalculation = null;
-
-      if (StringUtils.isNotBlank(aip.getDisposalScheduleId())) {
-        disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
-        retentionPeriodCalculation = SolrUtils.getRetentionPeriod(disposalSchedule, aip);
-      }
 
       if (descriptiveMetadata.isFromAIP()) {
-        indexAIP(aip, ancestors, disposalSchedule, retentionPeriodCalculation).addTo(ret);
+        indexAIP(aip, ancestors).addTo(ret);
+        if (ret.isEmpty()) {
+          if (StringUtils.isNotBlank(aip.getDisposalScheduleId())) {
+            DisposalSchedule disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
+            Map<String, String> retentionPeriodCalculation = SolrUtils.getRetentionPeriod(disposalSchedule, aip);
+            indexAIP(aip, ancestors, disposalSchedule, retentionPeriodCalculation).addTo(ret);
+          }
+        }
       } else {
         Representation representation = model.retrieveRepresentation(descriptiveMetadata.getAipId(),
           descriptiveMetadata.getRepresentationId());
