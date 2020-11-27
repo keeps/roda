@@ -483,6 +483,7 @@ public class ModelService extends ModelObservable {
 
     aip.setUpdatedBy(updatedBy);
     aip.setUpdatedOn(new Date());
+    aip.setState(AIPState.DESTROYED);
     updateAIPMetadata(aip);
     notifyAipDestroyed(aip).failOnError();
     return aip;

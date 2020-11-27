@@ -6,13 +6,10 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.ReaderInputStream;
@@ -21,7 +18,6 @@ import org.roda.core.common.RodaUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
@@ -36,7 +32,6 @@ import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalDestructionAIPMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -56,9 +51,6 @@ import org.roda.core.util.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.roda.core.data.common.RodaConstants.PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_EXTRA_INFO;
-import static org.roda.core.data.common.RodaConstants.PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE;
-
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
@@ -68,6 +60,7 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
 
   private boolean processedWithErrors = false;
   private final Date executionDate = new Date();
+  private boolean processSkipped = true;
 
   @Override
   public String getVersionImpl() {
@@ -198,7 +191,7 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
   }
 
   private void processAipEntry(String aipEntryJson, DisposalConfirmation disposalConfirmation, ModelService model,
-                               Job cachedJob, Report report, JobPluginInfo jobPluginInfo) {
+    Job cachedJob, Report report, JobPluginInfo jobPluginInfo) {
     try {
       DisposalConfirmationAIPEntry aipEntry = JsonUtils.getObjectFromJson(aipEntryJson,
         DisposalConfirmationAIPEntry.class);
@@ -230,48 +223,19 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
     String outcomeText;
 
     try {
-      // Copy AIP to disposal bin
-      DisposalConfirmationPluginUtils.copyAIPToDisposalBin(aip, disposalConfirmation.getId(),
-        Collections.singletonList("-r"));
-
       aip.setState(AIPState.DESTROY_PROCESSING);
-      DisposalDestructionAIPMetadata destruction = aip.getDisposal().getConfirmation().getDestruction();
-      if (destruction == null) {
-        destruction = new DisposalDestructionAIPMetadata();
-      }
+      model.updateAIPState(aip, cachedJob.getUsername());
 
-      destruction.setDestructionBy(cachedJob.getUsername());
-      destruction.setDestructionOn(executionDate);
-      aip.getDisposal().getConfirmation().setDestruction(destruction);
+      testAndExecuteCopyAIP2DisposalBin(aip, disposalConfirmation.getId());
 
-      // Apply stylesheet to descriptive metadata
-      for (DescriptiveMetadata metadata : aip.getDescriptiveMetadata()) {
-        Binary binary = model.retrieveDescriptiveMetadataBinary(aip.getId(), metadata.getId());
+      testAndExecuteSetAIPMetadataInformation(aip, cachedJob.getUsername());
 
-        StoragePath descriptiveMetadataStoragePath = ModelUtils.getDescriptiveMetadataStoragePath(metadata);
-        Path descriptiveMetadataPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(),
-          descriptiveMetadataStoragePath);
+      testAndExecuteApplyStylesheet(aip, model);
 
-        Reader reader = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CORE_DISPOSAL_METADATA_TRANSFORMERS,
-          metadata.getType(), metadata.getVersion(), Collections.emptyMap());
-
-        ReaderInputStream readerInputStream = new ReaderInputStream(reader, StandardCharsets.UTF_8);
-
-        FileUtils.copyInputStreamToFile(readerInputStream, descriptiveMetadataPath.toFile());
-      }
-
-      // remove all representations
-      for (Representation representation : aip.getRepresentations()) {
-        model.deleteRepresentation(aip.getId(), representation.getId());
-      }
-      aip.getRepresentations().clear();
+      testAndExecuteRemoveAllRepresentations(aip, model);
 
       // destroy the AIP
       model.destroyAIP(aip, cachedJob.getUsername());
-
-      // Change the AIP from destroying to destroy
-      aip.setState(AIPState.DESTROYED);
-      model.updateAIPState(aip, cachedJob.getUsername());
 
       outcomeText = "AIP '" + aip.getId() + "' has been destroyed with disposal confirmation '"
         + disposalConfirmation.getTitle() + "' (" + disposalConfirmation.getId() + ")";
@@ -307,6 +271,54 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
     report.addReport(reportItem);
 
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
+  }
+
+  private void testAndExecuteRemoveAllRepresentations(AIP aip, ModelService model)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    // remove all representations
+    for (Representation representation : aip.getRepresentations()) {
+      model.deleteRepresentation(aip.getId(), representation.getId());
+    }
+    aip.getRepresentations().clear();
+  }
+
+  private void testAndExecuteCopyAIP2DisposalBin(AIP aip, String disposalConfirmationId)
+    throws GenericException, CommandException, RequestNotValidException {
+    // Copy AIP to disposal bin
+    DisposalConfirmationPluginUtils.copyAIPToDisposalBin(aip, disposalConfirmationId, Collections.singletonList("-r"));
+    processSkipped = false;
+  }
+
+  private void testAndExecuteSetAIPMetadataInformation(AIP aip, String destructionBy) {
+    DisposalDestructionAIPMetadata destruction = aip.getDisposal().getConfirmation().getDestruction();
+    if (destruction == null) {
+      destruction = new DisposalDestructionAIPMetadata();
+    }
+
+    destruction.setDestructionBy(destructionBy);
+    destruction.setDestructionOn(executionDate);
+    aip.getDisposal().getConfirmation().setDestruction(destruction);
+
+    processSkipped = false;
+  }
+
+  private void testAndExecuteApplyStylesheet(AIP aip, ModelService model)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException, IOException {
+    // Apply stylesheet to descriptive metadata
+    for (DescriptiveMetadata metadata : aip.getDescriptiveMetadata()) {
+      Binary binary = model.retrieveDescriptiveMetadataBinary(aip.getId(), metadata.getId());
+
+      StoragePath descriptiveMetadataStoragePath = ModelUtils.getDescriptiveMetadataStoragePath(metadata);
+      Path descriptiveMetadataPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(),
+        descriptiveMetadataStoragePath);
+
+      Reader reader = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CORE_DISPOSAL_METADATA_TRANSFORMERS,
+        metadata.getType(), metadata.getVersion(), Collections.emptyMap());
+
+      ReaderInputStream readerInputStream = new ReaderInputStream(reader, StandardCharsets.UTF_8);
+
+      FileUtils.copyInputStreamToFile(readerInputStream, descriptiveMetadataPath.toFile());
+    }
   }
 
   @Override
