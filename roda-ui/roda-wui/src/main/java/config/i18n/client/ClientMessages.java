@@ -2266,6 +2266,12 @@ SafeHtml genericErrorTitle();
 
   String disposalHoldAssociatedOn();
 
+  String disposalHoldAssociatedBy();
+
+  String disposalHoldAssociatedFrom();
+
+  String disposalHoldAssociatedFromValue(@PluralCount int size);
+
   String disposalHoldLiftedOn();
 
   String conditionActualParent();
