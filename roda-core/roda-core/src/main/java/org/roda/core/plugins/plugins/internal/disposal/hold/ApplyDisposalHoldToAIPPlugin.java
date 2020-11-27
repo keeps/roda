@@ -29,6 +29,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalAIPMetadata;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -154,7 +155,7 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, List<AIP> objects) {
-        calculateResourcesCounter(index, jobPluginInfo, objects);
+        jobPluginInfo.incrementObjectsCount(DisposalHoldPluginUtils.calculateResourcesCounter(index, objects));
         processAIP(index, model, objects, report, jobPluginInfo, cachedJob);
       }
     }, index, model, storage, liteList);
@@ -185,8 +186,14 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
         PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
 
         PluginState state = PluginState.SUCCESS;
+        List<DisposalHoldAIPMetadata> holds = new ArrayList<>();
         String outcomeText;
         LOGGER.debug("Processing AIP {}", aip.getId());
+
+        // Save a disposal list to use when disassociate transitives disposal holds
+        if (aip.getHolds() != null) {
+          holds = new ArrayList<>(aip.getHolds());
+        }
 
         if (StringUtils.isNotBlank(aip.getDisposalConfirmationId())) {
           state = PluginState.FAILURE;
@@ -235,7 +242,7 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
           LOGGER.error("Error creating event: {}", e.getMessage(), e);
         }
 
-        applyDisposalTransitiveHolds(model, index, cachedJob, aip, disposalHold, jobPluginInfo, report);
+        applyDisposalTransitiveHolds(model, index, cachedJob, aip, disposalHold, jobPluginInfo, report, holds);
       }
     }
   }
@@ -273,18 +280,9 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
   }
 
   private void applyDisposalTransitiveHolds(ModelService model, IndexService index, Job cachedJob, AIP aip,
-    DisposalHold disposalHold, JobPluginInfo jobPluginInfo, Report report) {
+    DisposalHold disposalHold, JobPluginInfo jobPluginInfo, Report report, List<DisposalHoldAIPMetadata> holds) {
     try {
-      final IndexedAIP indexedAip = index.retrieve(IndexedAIP.class, aip.getId(), new ArrayList<>());
-      List<FilterParameter> ancestorsList = new ArrayList<>();
-      for (String ancestor : indexedAip.getAncestors()) {
-        ancestorsList.add(new SimpleFilterParameter(RodaConstants.INDEX_UUID, ancestor));
-      }
-      ancestorsList.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
-      Filter ancestorsFilter = new Filter(new OrFiltersParameters(ancestorsList));
-
-      IterableIndexResult<IndexedAIP> result = index.findAll(IndexedAIP.class, ancestorsFilter, false,
-        Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID));
+      IterableIndexResult<IndexedAIP> result = DisposalHoldPluginUtils.getTransitivesHoldsAIPs(index, aip.getId());
 
       DisposalTransitiveHoldAIPMetadata disposalTransitiveHold = new DisposalTransitiveHoldAIPMetadata();
       disposalTransitiveHold.setAipId(aip.getId());
@@ -297,20 +295,36 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
         LOGGER.debug("Processing children AIP {}", indexedAIP.getId());
         try {
           AIP transitiveAIP = model.retrieveAIP(indexedAIP.getId());
-          // check if AIP is already under the disposal hold
-          if (transitiveAIP.isAIPOnHold(disposalHoldId)) {
-            state = PluginState.SKIPPED;
-            LOGGER.info(
-              "Applying transitive disposal hold '{}' to AIP '{}' was skipped because it is already on the same disposal hold",
-              disposalHoldId, transitiveAIP.getId());
-            jobPluginInfo.incrementObjectsProcessed(state);
-            reportItem.setPluginState(state).setPluginDetails("Applying disposal hold to AIP '" + transitiveAIP.getId()
-              + "' was skipped because it is already on the same disposal hold");
-            outcomeText = "Applying disposal hold to AIP '" + transitiveAIP.getId()
-              + "' was skipped because it is already on the same disposal hold";
-          } else {
+          List<String> holdsIdList = new ArrayList<>();
+
+          if (override) {
+            for (DisposalHoldAIPMetadata hold : holds) {
+              if (transitiveAIP.removeTransitiveHold(hold.getId())) {
+                String outcomeLiftText = "Transitive disposal holds " + holdsIdList.toString()
+                  + " are disassociated from AIP " + transitiveAIP.getId();
+                model.createEvent(aip.getId(), null, null, null, POLICY_ASSIGNMENT,
+                  LiftDisposalHoldFromAIPPlugin.getStaticName(), null, null, state, outcomeLiftText, "",
+                  cachedJob.getUsername(), true);
+              }
+            }
             outcomeText = applyDisposalHold(transitiveAIP, cachedJob, model, disposalHold, state, reportItem,
               jobPluginInfo, disposalTransitiveHold);
+          } else {
+            // check if AIP is already under the disposal hold
+            if (transitiveAIP.isAIPOnHold(disposalHoldId)) {
+              state = PluginState.SKIPPED;
+              LOGGER.info(
+                "Applying transitive disposal hold '{}' to AIP '{}' was skipped because it is already on the same disposal hold",
+                disposalHoldId, transitiveAIP.getId());
+              jobPluginInfo.incrementObjectsProcessed(state);
+              reportItem.setPluginState(state).setPluginDetails("Applying disposal hold to AIP '"
+                + transitiveAIP.getId() + "' was skipped because it is already on the same disposal hold");
+              outcomeText = "Applying disposal hold to AIP '" + transitiveAIP.getId()
+                + "' was skipped because it is already on the same disposal hold";
+            } else {
+              outcomeText = applyDisposalHold(transitiveAIP, cachedJob, model, disposalHold, state, reportItem,
+                jobPluginInfo, disposalTransitiveHold);
+            }
           }
         } catch (NotFoundException | AuthorizationDeniedException e) {
           LOGGER.debug("Can't associate disposal hold to child. It wasn't found.", e);
@@ -333,24 +347,7 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
         }
       }
     } catch (NotFoundException | GenericException | RequestNotValidException e) {
-      e.printStackTrace();
-    }
-  }
-
-  private void calculateResourcesCounter(IndexService index, JobPluginInfo jobPluginInfo, List<AIP> aips) {
-    try {
-      for (AIP aip : aips) {
-        final IndexedAIP indexedAip = index.retrieve(IndexedAIP.class, aip.getId(), new ArrayList<>());
-        List<FilterParameter> ancestorsList = new ArrayList<>();
-        for (String ancestor : indexedAip.getAncestors()) {
-          ancestorsList.add(new SimpleFilterParameter(RodaConstants.INDEX_UUID, ancestor));
-        }
-        ancestorsList.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
-        Filter ancestorsFilter = new Filter(new OrFiltersParameters(ancestorsList));
-        jobPluginInfo.incrementObjectsCount(index.count(IndexedAIP.class, ancestorsFilter).intValue());
-      }
-    } catch (GenericException | RequestNotValidException | NotFoundException e) {
-      // do nothing
+      LOGGER.error("Error getting transitives AIPs when associate to a transitive disposal hold", e);
     }
   }
 

@@ -76,6 +76,13 @@ public class DisposalHoldAIPMetadata implements IsModelObject {
     return null;
   }
 
+  public boolean isTransitive(){
+    if(transitive != null){
+      return !transitive.isEmpty();
+    }
+    return false;
+  }
+
   @JsonIgnore
   @Override
   public int getClassVersion() {
