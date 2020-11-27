@@ -95,6 +95,9 @@ public class DisposalPolicyAssociationPanel extends Composite {
   @UiField(provided = true)
   DisposalHoldsPanel disposalHoldsPanel;
 
+  @UiField(provided = true)
+  TransitiveDisposalHoldsPanel transitiveDisposalHoldsPanel;
+
   @UiField
   SimplePanel actionsSidebar;
 
@@ -113,6 +116,8 @@ public class DisposalPolicyAssociationPanel extends Composite {
     retentionPeriodPanel = new RetentionPeriodPanel(bundle.getAip());
 
     disposalHoldsPanel = new DisposalHoldsPanel(bundle.getAip());
+
+    transitiveDisposalHoldsPanel = new TransitiveDisposalHoldsPanel(bundle.getAip());
 
     initWidget(uiBinder.createAndBindUi(this));
 

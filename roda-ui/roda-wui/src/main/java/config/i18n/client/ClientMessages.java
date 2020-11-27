@@ -2290,6 +2290,8 @@ SafeHtml genericErrorTitle();
 
   String disposalHoldsAssociationInformationTitle();
 
+  String transitiveDisposalHoldsAssociationInformationTitle();
+
   String disposalPolicyActionSummary(@Select String action);
 
   String disposalPolicyScheduleSummary(String action, String temporal);
