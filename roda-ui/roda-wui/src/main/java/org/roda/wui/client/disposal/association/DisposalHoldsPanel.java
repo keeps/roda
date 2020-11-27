@@ -18,6 +18,7 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.dialogs.DisposalDialogs;
 import org.roda.wui.client.common.dialogs.utils.DisposalHoldDialogResult;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.disposal.hold.ShowDisposalHold;
 import org.roda.wui.client.ingest.process.ShowJob;
@@ -26,12 +27,15 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.widgets.Toast;
 
+import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -63,6 +67,9 @@ public class DisposalHoldsPanel extends Composite {
   @UiField
   FlowPanel panel;
 
+  @UiField(provided = true)
+  TransitiveDisposalHoldsPanel transitiveDisposalHoldsPanel;
+
   @UiField
   Button associateDisposalHoldButton;
 
@@ -70,6 +77,8 @@ public class DisposalHoldsPanel extends Composite {
   private final DisposalHolds disposalHoldList = new DisposalHolds();
 
   public DisposalHoldsPanel(IndexedAIP indexedAip) {
+    transitiveDisposalHoldsPanel = new TransitiveDisposalHoldsPanel(indexedAip);
+
     initWidget(uiBinder.createAndBindUi(this));
     this.indexedAip = indexedAip;
 
@@ -247,12 +256,10 @@ public class DisposalHoldsPanel extends Composite {
     List<DisposalHoldAIPMetadata> disposalHoldAssociations) {
     Label headerHolds = new Label();
     HTMLPanel info = new HTMLPanel(SafeHtmlUtils.EMPTY_SAFE_HTML);
-
-    disposalHoldAssociations.sort(Collections.reverseOrder());
-
+    
     return new BasicTablePanel<DisposalHoldAIPMetadata>(headerHolds, info, disposalHoldAssociations.iterator(),
 
-      new BasicTablePanel.ColumnInfo<>(messages.disposalHoldTitle(), 15, new TextColumn<DisposalHoldAIPMetadata>() {
+      new BasicTablePanel.ColumnInfo<>(messages.disposalHoldTitle(), 0, new TextColumn<DisposalHoldAIPMetadata>() {
         @Override
         public String getValue(DisposalHoldAIPMetadata association) {
           DisposalHold hold = disposalHoldList.findDisposalHold(association.getId());
@@ -273,6 +280,27 @@ public class DisposalHoldsPanel extends Composite {
             } else {
               return "";
             }
+          }
+        }),
+
+      new BasicTablePanel.ColumnInfo<DisposalHoldAIPMetadata>(messages.disposalHoldAssociatedBy(), 15,
+        new TextColumn<DisposalHoldAIPMetadata>() {
+          @Override
+          public String getValue(DisposalHoldAIPMetadata association) {
+            if (association != null && association.getAssociatedBy() != null) {
+              return association.getAssociatedBy();
+            } else {
+              return "";
+            }
+          }
+        }),
+
+      new BasicTablePanel.ColumnInfo<>(messages.disposalHoldStateCol(), 15,
+        new Column<DisposalHoldAIPMetadata, SafeHtml>(new SafeHtmlCell()) {
+          @Override
+          public SafeHtml getValue(DisposalHoldAIPMetadata association) {
+            DisposalHold hold = disposalHoldList.findDisposalHold(association.getId());
+            return HtmlSnippetUtils.getDisposalHoldStateHtml(hold);
           }
         }));
   }

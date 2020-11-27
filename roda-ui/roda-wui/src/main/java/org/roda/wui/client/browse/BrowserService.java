@@ -47,6 +47,7 @@ import org.roda.core.data.v2.ip.disposal.DisposalRules;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -470,5 +471,8 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   String retrieveDisposalConfirmationReport(String confirmationId, boolean isToPrint) throws IOException, RODAException;
+
+  List<DisposalTransitiveHoldAIPMetadata> listTransitiveDisposalHolds(String aipId)
+          throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
 }
