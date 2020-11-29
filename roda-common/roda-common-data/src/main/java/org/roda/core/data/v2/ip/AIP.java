@@ -8,7 +8,6 @@
 package org.roda.core.data.v2.ip;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -16,6 +15,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalAIPMetadata;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -322,6 +322,14 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
   }
 
   @JsonIgnore
+  public DisposalTransitiveHoldAIPMetadata findTransitiveHold(String disposalHoldId) {
+    if (disposal != null) {
+      return disposal.findTransitiveHold(disposalHoldId);
+    }
+    return null;
+  }
+
+  @JsonIgnore
   public boolean removeDisposalHold(String disposalHold) {
     if(disposal != null){
       return disposal.removeDisposalHold(disposalHold);
@@ -357,6 +365,14 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
   public List<DisposalHoldAIPMetadata> getHolds() {
     if (disposal != null) {
       return disposal.getHolds();
+    }
+    return null;
+  }
+
+  @JsonIgnore
+  public List<DisposalTransitiveHoldAIPMetadata> getTransitiveHolds() {
+    if (disposal != null) {
+      return disposal.getTransitiveHolds();
     }
     return null;
   }

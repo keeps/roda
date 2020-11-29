@@ -1,8 +1,11 @@
 package org.roda.core.data.v2.ip.disposal.aipMetadata;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.roda.core.data.common.RodaConstants;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -15,17 +18,32 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class DisposalTransitiveHoldAIPMetadata implements Serializable {
   private static final long serialVersionUID = -1277210243520579523L;
 
-  private String aipId;
+  private String id;
+  private List<String> fromAIPs;
 
   public DisposalTransitiveHoldAIPMetadata() {
+    fromAIPs = new ArrayList<>();
   }
 
-  public String getAipId() {
-    return aipId;
+  public String getId() {
+    return id;
   }
 
-  public void setAipId(String aipId) {
-    this.aipId = aipId;
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public List<String> getFromAIPs() {
+    return fromAIPs;
+  }
+
+  public void setFromAIPs(List<String> fromAIPs) {
+    this.fromAIPs = fromAIPs;
+  }
+
+  @JsonIgnore
+  public void addFromAip(String aipId){
+    this.fromAIPs.add(aipId);
   }
 
   @Override
@@ -37,16 +55,31 @@ public class DisposalTransitiveHoldAIPMetadata implements Serializable {
 
     DisposalTransitiveHoldAIPMetadata that = (DisposalTransitiveHoldAIPMetadata) o;
 
-    return Objects.equals(aipId, that.aipId);
+    if (!Objects.equals(id, that.id))
+      return false;
+    return Objects.equals(fromAIPs, that.fromAIPs);
   }
 
   @Override
   public int hashCode() {
-    return aipId != null ? aipId.hashCode() : 0;
+    int result = id != null ? id.hashCode() : 0;
+    result = 31 * result + (fromAIPs != null ? fromAIPs.hashCode() : 0);
+    return result;
   }
 
   @Override
   public String toString() {
-    return "DisposalTransitiveHoldAIPMetadata{" + "aipId='" + aipId + '\'' + '}';
+    return "DisposalTransitiveHoldAIPMetadata{" + "id='" + id + '\'' + ", fromAIPs=" + fromAIPs + '}';
+  }
+
+  public String findAIP(String aipId) {
+    if(fromAIPs != null && !fromAIPs.isEmpty()) {
+      for (String fromAIP : fromAIPs) {
+       if(fromAIP.equals(aipId)){
+         return aipId;
+       }
+      }
+    }
+    return null;
   }
 }
