@@ -10,7 +10,6 @@ import org.roda.core.data.common.RodaConstants;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.roda.core.data.v2.ip.AIPDisposalScheduleAssociationType;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -24,10 +23,12 @@ public class DisposalAIPMetadata implements Serializable {
 
   private DisposalScheduleAIPMetadata schedule;
   private List<DisposalHoldAIPMetadata> holds;
+  private List<DisposalTransitiveHoldAIPMetadata> transitiveHolds;
   private DisposalConfirmationAIPMetadata confirmation;
 
   public DisposalAIPMetadata() {
     holds = new ArrayList<>();
+    transitiveHolds = new ArrayList<>();
   }
 
   public DisposalScheduleAIPMetadata getSchedule() {
@@ -46,12 +47,39 @@ public class DisposalAIPMetadata implements Serializable {
     this.holds = holds;
   }
 
+  public List<DisposalTransitiveHoldAIPMetadata> getTransitiveHolds() {
+    return transitiveHolds;
+  }
+
+  public void setTransitiveHolds(List<DisposalTransitiveHoldAIPMetadata> transitiveHolds) {
+    this.transitiveHolds = transitiveHolds;
+  }
+
   public DisposalConfirmationAIPMetadata getConfirmation() {
     return confirmation;
   }
 
   public void setConfirmation(DisposalConfirmationAIPMetadata confirmation) {
     this.confirmation = confirmation;
+  }
+
+  @JsonIgnore
+  public DisposalTransitiveHoldAIPMetadata findTransitiveAip(String aipId) {
+    if (transitiveHolds != null) {
+      for (DisposalTransitiveHoldAIPMetadata transitiveHoldAIPMetadata : transitiveHolds) {
+        for (String fromAIP : transitiveHoldAIPMetadata.getFromAIPs()) {
+          if (fromAIP.equals(aipId)) {
+            return transitiveHoldAIPMetadata;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  @JsonIgnore
+  public void addTransitiveHold(DisposalTransitiveHoldAIPMetadata transitiveHold) {
+    this.transitiveHolds.add(transitiveHold);
   }
 
   @Override
@@ -95,6 +123,18 @@ public class DisposalAIPMetadata implements Serializable {
   }
 
   @JsonIgnore
+  public DisposalTransitiveHoldAIPMetadata findTransitiveHold(String transitiveHoldId) {
+    if(transitiveHolds != null) {
+      for (DisposalTransitiveHoldAIPMetadata hold : transitiveHolds) {
+        if(hold.getId().equals(transitiveHoldId)) {
+          return hold;
+        }
+      }
+    }
+    return null;
+  }
+
+  @JsonIgnore
   public void addDisposalHold(DisposalHoldAIPMetadata disposalHoldAIPMetadata) {
     if (holds == null) {
       holds = new ArrayList<>();
@@ -116,7 +156,7 @@ public class DisposalAIPMetadata implements Serializable {
 
   @JsonIgnore
   public boolean onHold() {
-    return !holds.isEmpty();
+    return !holds.isEmpty() || !transitiveHolds.isEmpty();
   }
 
   @JsonIgnore
@@ -146,15 +186,15 @@ public class DisposalAIPMetadata implements Serializable {
   @JsonIgnore
   public boolean removeDisposalHold(String disposalHold) {
     if(holds != null) {
-      return holds.removeIf(hold -> hold.getId().equals(disposalHold) && !hold.isTransitive());
+      return holds.removeIf(hold -> hold.getId().equals(disposalHold));
     }
     return false;
   }
 
   @JsonIgnore
   public boolean removeTransitiveHold(String transitiveDisposalHold) {
-    if(holds != null) {
-      return holds.removeIf(hold -> hold.getId().equals(transitiveDisposalHold) && hold.isTransitive());
+    if(transitiveHolds != null) {
+      return transitiveHolds.removeIf(transitiveHolds -> transitiveHolds.getId().equals(transitiveDisposalHold));
     }
     return false;
   }

@@ -34,6 +34,7 @@ import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalConfirmationAIPMetadata;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalScheduleAIPMetadata;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveScheduleAIPMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.index.IndexingAdditionalInfo;
@@ -163,21 +164,26 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
         DisposalScheduleAIPMetadata schedule = aip.getDisposal().getSchedule();
         doc.addField(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID, schedule.getId());
         doc.addField(RodaConstants.AIP_DISPOSAL_SCHEDULE_ASSOCIATION_TYPE, schedule.getAssociationType().name());
-        if(schedule.getTransitive() != null){
+        if (schedule.getTransitive() != null) {
           doc.addField(RodaConstants.AIP_TRANSITIVE_DISPOSAL_SCHEDULES_ID,
-              schedule.getTransitive().stream().filter(p -> p.getAipId() != null)
-                  .map(DisposalTransitiveScheduleAIPMetadata::getAipId).collect(Collectors.toList()));
+            schedule.getTransitive().stream().filter(p -> p.getAipId() != null)
+              .map(DisposalTransitiveScheduleAIPMetadata::getAipId).collect(Collectors.toList()));
         }
       }
 
       if (aip.getDisposal().getHolds() != null) {
         List<DisposalHoldAIPMetadata> holds = aip.getDisposal().getHolds();
-        doc.addField(RodaConstants.AIP_DISPOSAL_HOLDS_ID, holds.stream().filter(p -> !p.isTransitive())
+        doc.addField(RodaConstants.AIP_DISPOSAL_HOLDS_ID, holds.stream()
           .map(DisposalHoldAIPMetadata::getId).collect(Collectors.toList()));
-        doc.addField(RodaConstants.AIP_TRANSITIVE_DISPOSAL_HOLDS_ID, holds.stream()
-          .filter(DisposalHoldAIPMetadata::isTransitive).map(DisposalHoldAIPMetadata::getId).collect(Collectors.toList()));
-        doc.addField(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, !holds.isEmpty());
       }
+
+      if (aip.getDisposal().getTransitiveHolds() != null) {
+        List<DisposalTransitiveHoldAIPMetadata> transitiveHolds = aip.getDisposal().getTransitiveHolds();
+        doc.addField(RodaConstants.AIP_TRANSITIVE_DISPOSAL_HOLDS_ID,
+          transitiveHolds.stream().map(DisposalTransitiveHoldAIPMetadata::getId).collect(Collectors.toList()));
+      }
+
+      doc.addField(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, aip.getDisposal().onHold());
 
       if (aip.getDisposal().getConfirmation() != null) {
         DisposalConfirmationAIPMetadata confirmation = aip.getDisposal().getConfirmation();

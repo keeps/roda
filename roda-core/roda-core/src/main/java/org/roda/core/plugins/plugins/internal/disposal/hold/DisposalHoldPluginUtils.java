@@ -28,30 +28,11 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.orchestrate.JobPluginInfo;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public class DisposalHoldPluginUtils {
-
-  public static int calculateResourcesCounter(IndexService index, List<AIP> aips) {
-    try {
-      for (AIP aip : aips) {
-        final IndexedAIP indexedAip = index.retrieve(IndexedAIP.class, aip.getId(), new ArrayList<>());
-        List<FilterParameter> ancestorsList = new ArrayList<>();
-        for (String ancestor : indexedAip.getAncestors()) {
-          ancestorsList.add(new SimpleFilterParameter(RodaConstants.INDEX_UUID, ancestor));
-        }
-        ancestorsList.add(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
-        Filter ancestorsFilter = new Filter(new OrFiltersParameters(ancestorsList));
-        return index.count(IndexedAIP.class, ancestorsFilter).intValue();
-      }
-    } catch (GenericException | RequestNotValidException | NotFoundException e) {
-      // do nothing
-    }
-    return 0;
-  }
 
   public static void addDisposalHoldAIPMetadata(AIP aip, String disposalHoldId, String associatedBy,
     DisposalTransitiveHoldAIPMetadata transitiveHold) {
@@ -63,36 +44,25 @@ public class DisposalHoldPluginUtils {
       aip.setDisposal(disposal);
     }
 
-    DisposalHoldAIPMetadata disposalHoldAIPMetadata = disposal.findHold(disposalHoldId);
-    if (disposalHoldAIPMetadata == null) {
-      disposalHoldAIPMetadata = new DisposalHoldAIPMetadata();
-      disposalHoldAIPMetadata.setId(disposalHoldId);
-      disposalHoldAIPMetadata.setAssociatedOn(new Date());
-      disposalHoldAIPMetadata.setAssociatedBy(associatedBy);
-      disposal.addDisposalHold(disposalHoldAIPMetadata);
-    }
-    if (transitiveHold != null) {
-      if (disposalHoldAIPMetadata.findTransitiveAip(transitiveHold.getAipId()) == null) {
-        disposalHoldAIPMetadata.addTransitiveAip(transitiveHold);
+    if (transitiveHold == null) {
+      DisposalHoldAIPMetadata disposalHoldAIPMetadata = disposal.findHold(disposalHoldId);
+      if (disposalHoldAIPMetadata == null) {
+        disposalHoldAIPMetadata = new DisposalHoldAIPMetadata();
+        disposalHoldAIPMetadata.setId(disposalHoldId);
+        disposalHoldAIPMetadata.setAssociatedOn(new Date());
+        disposalHoldAIPMetadata.setAssociatedBy(associatedBy);
+        disposal.addDisposalHold(disposalHoldAIPMetadata);
       }
-    }
-  }
-
-  public static void liftDisposalHoldFromAIP(ModelService model, PluginState state, AIP aip, String disposalHoldId,
-    Job cachedJob, Report reportItem) {
-    DisposalAIPMetadata disposal = aip.getDisposal();
-    if (disposal != null) {
-      List<DisposalHoldAIPMetadata> holds = disposal.getHolds();
-      for (DisposalHoldAIPMetadata hold : new ArrayList<>(holds)) {
-        if (!hold.isTransitive() && disposalHoldId.equals(hold.getId())) {
-          String outcomeLiftText = liftHold(hold, disposal, aip.getId(), reportItem);
-
-          model.createEvent(aip.getId(), null, null, null, POLICY_ASSIGNMENT,
-            LiftDisposalHoldFromAIPPlugin.getStaticName(), null, null, state, outcomeLiftText, "",
-            cachedJob.getUsername(), true);
+    } else {
+      DisposalTransitiveHoldAIPMetadata disposalTransitiveHoldAIPMetadata = disposal
+        .findTransitiveHold(transitiveHold.getId());
+      if (disposalTransitiveHoldAIPMetadata == null) {
+        disposal.addTransitiveHold(transitiveHold);
+      } else {
+        if (transitiveHold.findAIP(aip.getId()) == null) {
+          transitiveHold.addFromAip(aip.getId());
         }
       }
-
     }
   }
 
@@ -102,7 +72,7 @@ public class DisposalHoldPluginUtils {
     if (disposal != null) {
       List<DisposalHoldAIPMetadata> holds = disposal.getHolds();
       for (DisposalHoldAIPMetadata hold : new ArrayList<>(holds)) {
-        if (!hold.isTransitive() && disposalHoldId.equals(hold.getId())) {
+        if (disposalHoldId.equals(hold.getId())) {
           outcomeLiftText = liftHold(hold, disposal, aip.getId(), reportItem);
           break;
         }
@@ -115,25 +85,11 @@ public class DisposalHoldPluginUtils {
     DisposalAIPMetadata disposal = aip.getDisposal();
     String outcomeLiftText = "Cannot find transitive disposal hold " + disposalHoldId + " on AIP " + aip.getId();
     if (disposal != null) {
-      List<DisposalHoldAIPMetadata> holds = disposal.getHolds();
-      for (DisposalHoldAIPMetadata hold : new ArrayList<>(holds)) {
-        if (hold.isTransitive() && disposalHoldId.equals(hold.getId())) {
-          outcomeLiftText = liftHold(hold, disposal, aip.getId(), reportItem);
+      List<DisposalTransitiveHoldAIPMetadata> transitiveHolds = disposal.getTransitiveHolds();
+      for (DisposalTransitiveHoldAIPMetadata transitiveHold : new ArrayList<>(transitiveHolds)) {
+        if (disposalHoldId.equals(transitiveHold.getId())) {
+          outcomeLiftText = liftTransitiveHold(transitiveHold, disposal, aip.getId(), reportItem);
           break;
-        }
-      }
-    }
-    return outcomeLiftText;
-  }
-
-  public static String liftAllDisposalHoldsFromAIP(AIP aip, Report reportItem) {
-    String outcomeLiftText = "Cannot find any disposal hold on AIP " + aip.getId();
-    DisposalAIPMetadata disposal = aip.getDisposal();
-    if (disposal != null) {
-      List<DisposalHoldAIPMetadata> holds = disposal.getHolds();
-      for (DisposalHoldAIPMetadata hold : new ArrayList<>(holds)) {
-        if (!hold.isTransitive()) {
-          outcomeLiftText = liftHold(hold, disposal, aip.getId(), reportItem);
         }
       }
     }
@@ -169,6 +125,26 @@ public class DisposalHoldPluginUtils {
       reportItem.addPluginDetails("Disposal hold '" + disposalHold.getTitle() + "' (" + disposalHold.getId()
         + ") was successfully lifted from AIP\n");
     }
+    return outcomeLiftText;
+  }
+
+  private static String liftTransitiveHold(DisposalTransitiveHoldAIPMetadata transitiveHold,
+    DisposalAIPMetadata disposal, String aipId, Report reportItem) {
+    disposal.getTransitiveHolds().remove(transitiveHold);
+    DisposalHold liftedHold = RodaCoreFactory.getDisposalHold(transitiveHold.getId());
+    String outcomeLiftText;
+    if (liftedHold == null) {
+      outcomeLiftText = "Transitive Disposal hold '" + transitiveHold.getId() + "' was successfully lifted from AIP '"
+        + aipId + "'";
+      reportItem.addPluginDetails(
+        "Transitive Disposal hold '" + transitiveHold.getId() + "' was successfully lifted from AIP\n");
+    } else {
+      outcomeLiftText = "Transitive Disposal hold '" + liftedHold.getTitle() + "' (" + liftedHold.getId()
+        + ") was successfully lifted from AIP '" + aipId + "'";
+      reportItem.addPluginDetails("Transitive Disposal hold '" + liftedHold.getTitle() + "' (" + liftedHold.getId()
+        + ") was successfully lifted from AIP\n");
+    }
+
     return outcomeLiftText;
   }
 

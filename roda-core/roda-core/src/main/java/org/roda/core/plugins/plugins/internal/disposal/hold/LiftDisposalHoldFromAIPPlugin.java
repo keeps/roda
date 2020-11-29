@@ -145,7 +145,7 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, List<AIP> objects) {
-        jobPluginInfo.incrementObjectsCount(DisposalHoldPluginUtils.calculateResourcesCounter(index, objects));
+        //jobPluginInfo.incrementObjectsCount(DisposalHoldPluginUtils.calculateResourcesCounter(index, objects));
         processAIP(index, model, report, cachedJob, jobPluginInfo, objects);
       }
     }, index, model, storage, liteList);
@@ -167,25 +167,29 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
           if (aip.getHolds() != null && !aip.getHolds().isEmpty()) {
             List<DisposalHoldAIPMetadata> holds = new ArrayList<>(aip.getHolds());
             outcomeText = "Cannot found any direct disposal hold for disassociate from AIP : " + aip.getId();
-            //outcomeText = DisposalHoldPluginUtils.liftAllDisposalHoldsFromAIP(aip, reportItem);
+            boolean hasAtLeastOneDirectHold = false;
             for (DisposalHoldAIPMetadata hold : holds) {
-              if(!hold.isTransitive()) {
+                hasAtLeastOneDirectHold = true;
                 outcomeText = DisposalHoldPluginUtils.liftDisposalHoldFromAIP(aip, hold.getId(), reportItem);
                 liftDisposalTransitiveHold(model, index, cachedJob, aip, hold.getId(), jobPluginInfo, report);
-              }
             }
-            model.updateAIP(aip, cachedJob.getUsername());
+            if(hasAtLeastOneDirectHold) {
+              model.updateAIP(aip, cachedJob.getUsername());
+              jobPluginInfo.incrementObjectsProcessedWithSuccess();
+              reportItem.setPluginState(state);
+            } else {
+              state = PluginState.SKIPPED;
+              LOGGER.info(outcomeText + " aip : " + aip.getId());
+              jobPluginInfo.incrementObjectsProcessed(state);
+              reportItem.setPluginState(state).setPluginDetails(outcomeText);
+            }
 
-            jobPluginInfo.incrementObjectsProcessedWithSuccess();
-            reportItem.setPluginState(state);
           } else {
             state = PluginState.SKIPPED;
             outcomeText = "There are no direct Disposal hold on this AIP";
             LOGGER.info(outcomeText + " aip : " + aip.getId());
             jobPluginInfo.incrementObjectsProcessed(state);
             reportItem.setPluginState(state).setPluginDetails(outcomeText + " aip : " + aip.getId());
-            int nonProcessedResources = DisposalHoldPluginUtils.calculateResourcesCounter(index, Arrays.asList(aip));
-            jobPluginInfo.setSourceObjectsCount(jobPluginInfo.getSourceObjectsCount()-nonProcessedResources);
           }
 
         } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
@@ -247,6 +251,7 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
       PluginState state = PluginState.SUCCESS;
       Report reportItem = PluginHelper.initPluginReportItem(this, indexedAIP.getId(), AIP.class);
       PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
+      jobPluginInfo.incrementObjectsCount();
 
       try {
         AIP aipChildren = model.retrieveAIP(indexedAIP.getId());
