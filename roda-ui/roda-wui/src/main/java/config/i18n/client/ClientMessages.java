@@ -2171,6 +2171,8 @@ SafeHtml genericErrorTitle();
 
   String disassociateDisposalScheduleButton();
 
+  String disassociateDisposalHoldButton();
+
   String associateDisposalScheduleButton();
 
   String disposalScheduleSelectionDialogTitle();
@@ -2263,6 +2265,10 @@ SafeHtml genericErrorTitle();
   String clearDisposalHoldDialogTitle();
 
   String clearDisposalHoldDialogMessage(@PluralCount int size);
+
+  String disassociateDisposalHoldDialogTitle();
+
+  String disassociateDisposalHoldDialogMessage(@PluralCount int size);
 
   String disposalHoldAssociatedOn();
 
