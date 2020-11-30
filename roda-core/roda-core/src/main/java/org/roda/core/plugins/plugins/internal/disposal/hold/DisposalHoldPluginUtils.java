@@ -190,12 +190,13 @@ public class DisposalHoldPluginUtils {
     String outcomeLiftText;
     if (liftedHold == null) {
       outcomeLiftText = "Disposal hold '" + disposalHold.getId() + "' was successfully lifted from AIP '" + aipId + "'";
-      reportItem.addPluginDetails("Disposal hold '" + disposalHold.getId() + "' was successfully lifted from AIP\n");
+      reportItem.addPluginDetails(
+        "Disposal hold '" + disposalHold.getId() + "' was successfully lifted from AIP '" + aipId + "'");
     } else {
       outcomeLiftText = "Disposal hold '" + liftedHold.getTitle() + "' (" + liftedHold.getId()
         + ") was successfully lifted from AIP '" + aipId + "'";
       reportItem.addPluginDetails("Disposal hold '" + liftedHold.getTitle() + "' (" + liftedHold.getId()
-        + ") was successfully lifted from AIP\n");
+        + ") was successfully lifted from AIP '" + aipId + "'");
     }
 
     return outcomeLiftText;
