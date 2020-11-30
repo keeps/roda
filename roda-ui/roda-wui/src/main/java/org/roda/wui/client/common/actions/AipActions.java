@@ -768,7 +768,6 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
 
   private void disassociateDisposalSchedule(SelectedItems<IndexedAIP> aips, Long size,
     DisposalScheduleDialogResult dialogResult, AsyncCallback<ActionImpact> callback) {
-    Boolean applyToHierarchy = dialogResult.isApplyToHierarchy();
 
     Dialogs.showConfirmDialog(messages.dissociateDisposalScheduleDialogTitle(),
       messages.dissociateDisposalScheduleDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
@@ -776,8 +775,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            BrowserService.Util.getInstance().disassociateDisposalSchedule(aips, applyToHierarchy,
-              new ActionAsyncCallback<Job>(callback) {
+            BrowserService.Util.getInstance().disassociateDisposalSchedule(aips, new ActionAsyncCallback<Job>(callback) {
                 @Override
                 public void onFailure(Throwable caught) {
                   callback.onFailure(caught);
@@ -820,8 +818,6 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
   private void associateDisposalSchedule(SelectedItems<IndexedAIP> aips, Long size,
     DisposalScheduleDialogResult dialogResult, AsyncCallback<ActionImpact> callback) {
     DisposalSchedule disposalSchedule = dialogResult.getDisposalSchedule();
-    Boolean applyToHierarchy = dialogResult.isApplyToHierarchy();
-    Boolean overwriteAll = dialogResult.isOverwriteAll();
 
     Dialogs.showConfirmDialog(messages.associateDisposalScheduleDialogTitle(),
       messages.associateDisposalScheduleDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
@@ -830,7 +826,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
         public void onSuccess(Boolean result) {
           if (result) {
             BrowserService.Util.getInstance().associateDisposalSchedule(aips, disposalSchedule.getId(),
-              applyToHierarchy, overwriteAll, new ActionAsyncCallback<Job>(callback) {
+              new ActionAsyncCallback<Job>(callback) {
 
                 @Override
                 public void onFailure(Throwable caught) {

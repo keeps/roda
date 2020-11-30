@@ -34,8 +34,7 @@ import org.roda.core.model.ModelService;
  */
 public class DisposalHoldPluginUtils {
 
-  public static void addDisposalHoldAIPMetadata(AIP aip, String disposalHoldId, String associatedBy,
-    DisposalTransitiveHoldAIPMetadata transitiveHold) {
+  public static void addDisposalHoldAIPMetadata(AIP aip, String disposalHoldId, String associatedBy) {
     DisposalAIPMetadata disposal;
     if (aip.getDisposal() != null) {
       disposal = aip.getDisposal();
@@ -44,25 +43,13 @@ public class DisposalHoldPluginUtils {
       aip.setDisposal(disposal);
     }
 
-    if (transitiveHold == null) {
-      DisposalHoldAIPMetadata disposalHoldAIPMetadata = disposal.findHold(disposalHoldId);
-      if (disposalHoldAIPMetadata == null) {
-        disposalHoldAIPMetadata = new DisposalHoldAIPMetadata();
-        disposalHoldAIPMetadata.setId(disposalHoldId);
-        disposalHoldAIPMetadata.setAssociatedOn(new Date());
-        disposalHoldAIPMetadata.setAssociatedBy(associatedBy);
-        disposal.addDisposalHold(disposalHoldAIPMetadata);
-      }
-    } else {
-      DisposalTransitiveHoldAIPMetadata disposalTransitiveHoldAIPMetadata = disposal
-        .findTransitiveHold(transitiveHold.getId());
-      if (disposalTransitiveHoldAIPMetadata == null) {
-        disposal.addTransitiveHold(transitiveHold);
-      } else {
-        if (transitiveHold.findAIP(aip.getId()) == null) {
-          transitiveHold.addFromAip(aip.getId());
-        }
-      }
+    DisposalHoldAIPMetadata disposalHoldAIPMetadata = disposal.findHold(disposalHoldId);
+    if (disposalHoldAIPMetadata == null) {
+      disposalHoldAIPMetadata = new DisposalHoldAIPMetadata();
+      disposalHoldAIPMetadata.setId(disposalHoldId);
+      disposalHoldAIPMetadata.setAssociatedOn(new Date());
+      disposalHoldAIPMetadata.setAssociatedBy(associatedBy);
+      disposal.addDisposalHold(disposalHoldAIPMetadata);
     }
   }
 
@@ -130,7 +117,6 @@ public class DisposalHoldPluginUtils {
 
   private static String liftTransitiveHold(DisposalTransitiveHoldAIPMetadata transitiveHold,
     DisposalAIPMetadata disposal, String aipId, Report reportItem) {
-    disposal.getTransitiveHolds().remove(transitiveHold);
     DisposalHold liftedHold = RodaCoreFactory.getDisposalHold(transitiveHold.getId());
     String outcomeLiftText;
     if (liftedHold == null) {
@@ -151,7 +137,7 @@ public class DisposalHoldPluginUtils {
   private static String liftHold(DisposalHoldAIPMetadata disposalHold, DisposalAIPMetadata disposal, String aipId,
     Report reportItem) {
 
-    disposal.getHolds().remove(disposalHold);
+    //disposal.getHolds().remove(disposalHold);
     DisposalHold liftedHold = RodaCoreFactory.getDisposalHold(disposalHold.getId());
     String outcomeLiftText;
     if (liftedHold == null) {

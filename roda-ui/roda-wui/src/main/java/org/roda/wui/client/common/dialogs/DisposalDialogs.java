@@ -39,8 +39,6 @@ import config.i18n.client.ClientMessages;
  */
 public class DisposalDialogs {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private static Boolean applyToHierarchy = true;
-  private static Boolean overwriteAll = false;
 
   public static void showDisposalHoldSelection(String title, DisposalHolds holds,
     final AsyncCallback<DisposalHoldDialogResult> callback) {
@@ -166,19 +164,12 @@ public class DisposalDialogs {
     final AsyncCallback<DisposalScheduleDialogResult> callback) {
     final DialogBox dialogBox = new DialogBox(false, true);
     dialogBox.setText(title);
-    applyToHierarchy = true;
-    overwriteAll = false;
 
     FlowPanel layout = new FlowPanel();
     Button cancelButton = new Button(messages.cancelButton());
     Button changeScheduleButton = new Button(messages.associateDisposalScheduleButton());
     Button noScheduleButton = new Button(messages.disassociateDisposalScheduleButton());
     Button newScheduleButton = new Button(messages.createDisposalScheduleButton());
-    CheckBox applyToHierarchyCheckBox = new CheckBox(messages.applyAllButton());
-    Label applyToHierarchyDescription = new Label(messages.applyToHierarchyDisposalDialogDescription());
-    CheckBox overwriteAllCheckBox = new CheckBox(messages.overwriteAllDisposalDialogCheckBox());
-    Label overwriteAllDescription = new Label(messages.overwriteAllDisposalDialogDescription());
-    FlowPanel options = new FlowPanel();
     FlowPanel footer = new FlowPanel();
 
     changeScheduleButton.setEnabled(false);
@@ -249,7 +240,6 @@ public class DisposalDialogs {
     dataProvider.addDataDisplay(table);
 
     layout.add(displayScrollWrapper);
-    layout.add(options);
     layout.add(footer);
 
     dialogBox.setGlassEnabled(true);
@@ -263,16 +253,14 @@ public class DisposalDialogs {
     noScheduleButton.addClickHandler(clickEvent -> {
       dialogBox.hide();
       DisposalScheduleDialogResult result = new DisposalScheduleDialogResult(
-        DisposalScheduleDialogResult.ActionType.CLEAR, singleSelectionModel.getSelectedObject(), applyToHierarchy,
-        overwriteAll);
+        DisposalScheduleDialogResult.ActionType.CLEAR, singleSelectionModel.getSelectedObject());
       callback.onSuccess(result);
     });
 
     changeScheduleButton.addClickHandler(clickEvent -> {
       dialogBox.hide();
       DisposalScheduleDialogResult result = new DisposalScheduleDialogResult(
-        DisposalScheduleDialogResult.ActionType.ASSOCIATE, singleSelectionModel.getSelectedObject(), applyToHierarchy,
-        overwriteAll);
+        DisposalScheduleDialogResult.ActionType.ASSOCIATE, singleSelectionModel.getSelectedObject());
       callback.onSuccess(result);
     });
 
@@ -282,27 +270,6 @@ public class DisposalDialogs {
       HistoryUtils.newHistory(CreateDisposalSchedule.RESOLVER);
     });
 
-    applyToHierarchyCheckBox.setValue(true);
-    applyToHierarchyCheckBox.addStyleName("disposal-dialogs-checkbox form-checkbox");
-    applyToHierarchyDescription.addStyleName("form-help");
-    applyToHierarchyCheckBox.addValueChangeHandler(valueChangeEvent -> {
-      applyToHierarchy = valueChangeEvent.getValue();
-      if (applyToHierarchy) {
-        overwriteAllCheckBox.setEnabled(true);
-      } else {
-        overwriteAllCheckBox.setEnabled(false);
-        overwriteAllCheckBox.setValue(false);
-        overwriteAll = false;
-      }
-    });
-
-    overwriteAllCheckBox.setValue(false);
-    overwriteAllCheckBox.addStyleName("disposal-dialogs-checkbox form-checkbox");
-    overwriteAllDescription.addStyleName("form-help");
-    overwriteAllCheckBox.addValueChangeHandler(valueChangeEvent -> {
-      overwriteAll = valueChangeEvent.getValue();
-    });
-
     cancelButton.addStyleName("btn btn-link");
     noScheduleButton.addStyleName("btn btn-danger btn-ban");
     changeScheduleButton.addStyleName("btn btn-play");
@@ -310,10 +277,6 @@ public class DisposalDialogs {
     table.addStyleName("my-asyncdatagrid-display");
 
     layout.addStyleName("wui-dialog-layout");
-    options.add(applyToHierarchyCheckBox);
-    options.add(applyToHierarchyDescription);
-    options.add(overwriteAllCheckBox);
-    options.add(overwriteAllDescription);
     footer.addStyleName("wui-dialog-layout-footer");
     footer.add(newScheduleButton);
     footer.add(cancelButton);
