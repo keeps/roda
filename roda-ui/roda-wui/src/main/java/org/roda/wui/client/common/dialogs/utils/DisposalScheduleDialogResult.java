@@ -19,15 +19,10 @@ public class DisposalScheduleDialogResult implements Serializable {
 
   private ActionType actionType;
   private DisposalSchedule disposalSchedule;
-  private Boolean applyToHierarchy;
-  private Boolean overwriteAll;
 
-  public DisposalScheduleDialogResult(ActionType actionType, DisposalSchedule disposalSchedule,
-    Boolean applyToHierarchy, Boolean overwriteAll) {
+  public DisposalScheduleDialogResult(ActionType actionType, DisposalSchedule disposalSchedule) {
     this.actionType = actionType;
     this.disposalSchedule = disposalSchedule;
-    this.applyToHierarchy = applyToHierarchy;
-    this.overwriteAll = overwriteAll;
   }
 
   public DisposalSchedule getDisposalSchedule() {
@@ -36,22 +31,6 @@ public class DisposalScheduleDialogResult implements Serializable {
 
   public void setDisposalSchedule(DisposalSchedule disposalSchedule) {
     this.disposalSchedule = disposalSchedule;
-  }
-
-  public Boolean isApplyToHierarchy() {
-    return applyToHierarchy;
-  }
-
-  public void setApplyToHierarchy(Boolean applyToHierarchy) {
-    this.applyToHierarchy = applyToHierarchy;
-  }
-
-  public Boolean isOverwriteAll() {
-    return overwriteAll;
-  }
-
-  public void setOverwriteAll(Boolean overwriteAll) {
-    this.overwriteAll = overwriteAll;
   }
 
   public ActionType getActionType() {

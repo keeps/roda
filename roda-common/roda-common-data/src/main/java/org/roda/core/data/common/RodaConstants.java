@@ -703,7 +703,6 @@ public final class RodaConstants {
 
   public static final String AIP_DISPOSAL_SCHEDULE_ID = "disposalScheduleId";
   public static final String AIP_DISPOSAL_SCHEDULE_NAME = "disposalScheduleName";
-  public static final String AIP_TRANSITIVE_DISPOSAL_SCHEDULES_ID = "transitiveDisposalSchedulesId";
   public static final String AIP_DISPOSAL_HOLDS_ID = "disposalHoldsId";
   public static final String AIP_TRANSITIVE_DISPOSAL_HOLDS_ID = "transitiveDisposalHoldsId";
   public static final String AIP_DESTROYED_ON = "destroyedOn";

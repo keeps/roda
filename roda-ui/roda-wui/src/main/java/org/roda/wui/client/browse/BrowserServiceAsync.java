@@ -327,10 +327,9 @@ public interface BrowserServiceAsync {
   void deleteDisposalHold(String disposalHoldId, AsyncCallback<Void> async);
 
   void associateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, String disposalScheduleId,
-    Boolean applyToHierarchy, Boolean overwriteAll, AsyncCallback<Job> async);
-
-  void disassociateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, Boolean applyToHierarchy,
     AsyncCallback<Job> async);
+
+  void disassociateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, AsyncCallback<Job> async);
 
   void createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, String title,
     DisposalConfirmationExtraBundle metadata, AsyncCallback<Job> async);
@@ -354,7 +353,8 @@ public interface BrowserServiceAsync {
   void recoverRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems,
     AsyncCallback<Job> async);
 
-  void restoreRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems, AsyncCallback<Job> async);
+  void restoreRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems,
+    AsyncCallback<Job> async);
 
   void liftDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean clearAll,
     AsyncCallback<Job> async);

@@ -92,6 +92,7 @@ import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalAIPMetadata;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
@@ -3419,6 +3420,58 @@ public class ModelService extends ModelObservable {
 
     updateAIPMetadata(aip);
     // TODO notify
+  }
+  
+  public List<DisposalHold> retrieveActiveDisposalHolds(String aipId) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
+    List<DisposalHold> disposalHoldList = new ArrayList<>();
+
+    for (DisposalHoldAIPMetadata hold : aip.getHolds()) {
+      DisposalHold disposalHold = retrieveDisposalHold(hold.getId());
+      if(disposalHold != null && (disposalHold.getState() == DisposalHoldState.ACTIVE)){
+        disposalHoldList.add(disposalHold);
+      }
+    }
+
+    for (DisposalTransitiveHoldAIPMetadata transitiveHold : aip.getTransitiveHolds()) {
+      DisposalHold transitiveDisposalHold = retrieveDisposalHold(transitiveHold.getId());
+      if(transitiveDisposalHold != null && (transitiveDisposalHold.getState() == DisposalHoldState.ACTIVE)){
+        disposalHoldList.add(transitiveDisposalHold);
+      }
+    }
+
+    return disposalHoldList;
+  }
+
+  public boolean OnHold(String aipId) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
+
+    for (DisposalHoldAIPMetadata hold : aip.getHolds()) {
+      DisposalHold disposalHold = retrieveDisposalHold(hold.getId());
+      if(disposalHold != null ){
+        return disposalHold.getState() == DisposalHoldState.ACTIVE;
+      }
+    }
+
+    for (DisposalTransitiveHoldAIPMetadata transitiveHold : aip.getTransitiveHolds()) {
+      DisposalHold transitiveDisposalHold = retrieveDisposalHold(transitiveHold.getId());
+      if(transitiveDisposalHold != null ){
+        return transitiveDisposalHold.getState() == DisposalHoldState.ACTIVE;
+      }
+    }
+
+    return false;
+  }
+
+  public boolean isAIPOnDirectHold(String aipId, String holdId) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
+    DisposalHold disposalHold = retrieveDisposalHold(holdId);
+
+    if( disposalHold.getState() == DisposalHoldState.ACTIVE) {
+      return aip.findHold(holdId) != null;
+    }
+
+    return false;
   }
 
   /************************************

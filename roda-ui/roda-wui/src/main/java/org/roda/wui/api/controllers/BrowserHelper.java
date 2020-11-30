@@ -3360,23 +3360,18 @@ public class BrowserHelper {
       "Could not execute delete disposal confirmation report");
   }
 
-  public static Job disassociateDisposalSchedule(User user, SelectedItems<IndexedAIP> selected,
-    Boolean applyToHierarchy)
+  public static Job disassociateDisposalSchedule(User user, SelectedItems<IndexedAIP> selected)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RECURSIVE, applyToHierarchy.toString());
     return createAndExecuteInternalJob("Disassociate disposal schedule", selected,
       DisassociateDisposalScheduleToAIPPlugin.class, user, pluginParameters,
       "Could not execute disassociate disposal schedule action");
   }
 
-  public static Job associateDisposalSchedule(User user, SelectedItems<IndexedAIP> selected, String disposalScheduleId,
-    Boolean applyToHierarchy, Boolean overwriteAll)
+  public static Job associateDisposalSchedule(User user, SelectedItems<IndexedAIP> selected, String disposalScheduleId)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID, disposalScheduleId);
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RECURSIVE, applyToHierarchy.toString());
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_ALL, overwriteAll.toString());
 
     return createAndExecuteInternalJob("Associate disposal schedule", selected,
       AssociateDisposalScheduleToAIPPlugin.class, user, pluginParameters,
