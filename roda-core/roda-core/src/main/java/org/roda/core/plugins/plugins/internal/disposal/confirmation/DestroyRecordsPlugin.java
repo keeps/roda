@@ -60,7 +60,6 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
 
   private boolean processedWithErrors = false;
   private final Date executionDate = new Date();
-  private boolean processSkipped = true;
 
   @Override
   public String getVersionImpl() {
@@ -219,33 +218,37 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
     Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
 
-    PluginState pluginState = PluginState.SUCCESS;
+    PluginState state = PluginState.SUCCESS;
     String outcomeText;
 
     try {
-      aip.setState(AIPState.DESTROY_PROCESSING);
-      model.updateAIPState(aip, cachedJob.getUsername());
+      if (AIPState.DESTROYED.equals(aip.getState())) {
+        state = PluginState.SKIPPED;
+        outcomeText = "AIP '" + aip.getId() + " has been skipped because destruction process was successfully done";
+      } else {
+        aip.setState(AIPState.DESTROY_PROCESSING);
+        model.updateAIPState(aip, cachedJob.getUsername());
 
-      testAndExecuteCopyAIP2DisposalBin(aip, disposalConfirmation.getId());
+        testAndExecuteCopyAIP2DisposalBin(aip, disposalConfirmation.getId());
 
-      testAndExecuteSetAIPMetadataInformation(aip, cachedJob.getUsername());
+        executeSetAIPMetadataInformation(aip, cachedJob.getUsername());
 
-      testAndExecuteApplyStylesheet(aip, model);
+        executeApplyStylesheet(aip, model);
 
-      testAndExecuteRemoveAllRepresentations(aip, model);
+        executeRemoveAllRepresentations(aip, model);
 
-      // destroy the AIP
-      model.destroyAIP(aip, cachedJob.getUsername());
+        // destroy the AIP
+        model.destroyAIP(aip, cachedJob.getUsername());
 
-      outcomeText = "AIP '" + aip.getId() + "' has been destroyed with disposal confirmation '"
-        + disposalConfirmation.getTitle() + "' (" + disposalConfirmation.getId() + ")";
+        outcomeText = "AIP '" + aip.getId() + "' has been destroyed with disposal confirmation '"
+          + disposalConfirmation.getTitle() + "' (" + disposalConfirmation.getId() + ")";
+      }
 
       reportItem.setPluginDetails(outcomeText);
-
     } catch (IOException | CommandException | RequestNotValidException | GenericException | AuthorizationDeniedException
       | NotFoundException e) {
       LOGGER.error("Failed to destroy AIP '{}': {}", aip.getId(), e.getMessage(), e);
-      pluginState = PluginState.FAILURE;
+      state = PluginState.FAILURE;
       outcomeText = "AIP '" + aip.getId() + "' has not been destroyed with disposal confirmation '"
         + disposalConfirmation.getTitle() + "' (" + disposalConfirmation.getId() + ")";
       reportItem.setPluginDetails(outcomeText + ": " + e.getMessage());
@@ -253,7 +256,7 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
     }
 
     model.createEvent(aip.getId(), null, null, null, RodaConstants.PreservationEventType.DESTRUCTION, EVENT_DESCRIPTION,
-      null, null, pluginState, outcomeText, "", cachedJob.getUsername(), true);
+      null, null, state, outcomeText, "", cachedJob.getUsername(), true);
 
     // copy the preservation event to the AIP in the disposal bin
     // using the --ignore-existing flag in the rsync process, copying only the new
@@ -265,15 +268,15 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
       LOGGER.error("Failed to copy preservation event: {}", e.getMessage(), e);
     }
 
-    jobPluginInfo.incrementObjectsProcessed(pluginState);
+    jobPluginInfo.incrementObjectsProcessed(state);
 
-    reportItem.setPluginState(pluginState);
+    reportItem.setPluginState(state);
     report.addReport(reportItem);
 
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
   }
 
-  private void testAndExecuteRemoveAllRepresentations(AIP aip, ModelService model)
+  private void executeRemoveAllRepresentations(AIP aip, ModelService model)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     // remove all representations
     for (Representation representation : aip.getRepresentations()) {
@@ -284,12 +287,15 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
 
   private void testAndExecuteCopyAIP2DisposalBin(AIP aip, String disposalConfirmationId)
     throws GenericException, CommandException, RequestNotValidException {
-    // Copy AIP to disposal bin
-    DisposalConfirmationPluginUtils.copyAIPToDisposalBin(aip, disposalConfirmationId, Collections.singletonList("-r"));
-    processSkipped = false;
+    // test if the AIP was copied to disposal bin
+    if (!DisposalConfirmationPluginUtils.aipExistsInDisposalBin(aip.getId(), disposalConfirmationId)) {
+      // Copy AIP to disposal bin
+      DisposalConfirmationPluginUtils.copyAIPToDisposalBin(aip, disposalConfirmationId,
+        Collections.singletonList("-r"));
+    }
   }
 
-  private void testAndExecuteSetAIPMetadataInformation(AIP aip, String destructionBy) {
+  private void executeSetAIPMetadataInformation(AIP aip, String destructionBy) {
     DisposalDestructionAIPMetadata destruction = aip.getDisposal().getConfirmation().getDestruction();
     if (destruction == null) {
       destruction = new DisposalDestructionAIPMetadata();
@@ -298,11 +304,9 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
     destruction.setDestructionBy(destructionBy);
     destruction.setDestructionOn(executionDate);
     aip.getDisposal().getConfirmation().setDestruction(destruction);
-
-    processSkipped = false;
   }
 
-  private void testAndExecuteApplyStylesheet(AIP aip, ModelService model)
+  private void executeApplyStylesheet(AIP aip, ModelService model)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException, IOException {
     // Apply stylesheet to descriptive metadata
     for (DescriptiveMetadata metadata : aip.getDescriptiveMetadata()) {
