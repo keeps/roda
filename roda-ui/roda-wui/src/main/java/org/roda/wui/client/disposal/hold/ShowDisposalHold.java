@@ -15,6 +15,8 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.actions.DisposalHoldActions;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
@@ -128,6 +130,8 @@ public class ShowDisposalHold extends Composite {
   @UiField
   SimplePanel aipsListCard;
 
+  private SearchWrapper aipsSearchWrapper;
+
   public ShowDisposalHold() {
     this.disposalHold = new DisposalHold();
   }
@@ -135,10 +139,32 @@ public class ShowDisposalHold extends Composite {
   public ShowDisposalHold(final DisposalHold disposalHold) {
     instance = this;
     this.disposalHold = disposalHold;
+    initAipsList();
 
     initWidget(uiBinder.createAndBindUi(this));
     initElements();
     initButtons();
+  }
+
+  private void initAipsList() {
+    DisposalHoldActions disposalHoldActions = new DisposalHoldActions(disposalHold);
+
+    AsyncCallback<Actionable.ActionImpact> listActionableCallback = new NoAsyncCallback<Actionable.ActionImpact>() {
+      @Override
+      public void onSuccess(Actionable.ActionImpact impact) {
+        if (!Actionable.ActionImpact.NONE.equals(impact)) {
+          refresh();
+        }
+      }
+    };
+
+    ListBuilder<IndexedAIP> aipsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
+      new AsyncTableCellOptions<>(IndexedAIP.class, "ShowDisposalHold_aips")
+        .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLDS_ID, disposalHold.getId())))
+        .withSummary(messages.listOfAIPs()).bindOpener().withActionable(disposalHoldActions)
+        .withActionableCallback(listActionableCallback));
+
+    aipsSearchWrapper = new SearchWrapper(false).createListAndSearchPanel(aipsListBuilder);
   }
 
   public void initElements() {
@@ -167,7 +193,7 @@ public class ShowDisposalHold extends Composite {
 
     disposalHoldStateValue.setHTML(HtmlSnippetUtils.getDisposalHoldStateHtml(disposalHold));
 
-    // Records with this schedule
+    // Records with this hold
 
     if (disposalHold.getState().equals(DisposalHoldState.ACTIVE)
       && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
@@ -176,12 +202,6 @@ public class ShowDisposalHold extends Composite {
       aipTitle.setText(messages.disposalHoldListAips());
       aipListTitle.add(aipTitle);
 
-      ListBuilder<IndexedAIP> aipsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
-        new AsyncTableCellOptions<>(IndexedAIP.class, "ShowDisposalHold_aips")
-          .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLDS_ID, disposalHold.getId())))
-          .withSummary(messages.listOfAIPs()).bindOpener());
-
-      SearchWrapper aipsSearchWrapper = new SearchWrapper(false).createListAndSearchPanel(aipsListBuilder);
       aipsListCard.setWidget(aipsSearchWrapper);
       aipsListCard.setVisible(true);
     } else {
@@ -203,7 +223,7 @@ public class ShowDisposalHold extends Composite {
       buttonsPanel.add(editHoldBtn);
 
       Button liftHoldBtn = new Button();
-      liftHoldBtn.addStyleName("btn btn-block btn-danger btn-ban");
+      liftHoldBtn.addStyleName("btn btn-block btn-danger btn-lift-hold");
       liftHoldBtn.setText(messages.liftButton());
 
       liftHoldBtn.addClickHandler(clickEvent -> {

@@ -932,6 +932,14 @@ pre code {
     content: "\f14b";
 }
 
+.btn-unlock:after {
+    content: "\f09c";
+}
+
+.btn-lift-hold:after {
+    content: "\f3c1";
+}
+
 .btn-edit + .btn-edit {
     margin-right: 5px;
 }
