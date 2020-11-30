@@ -12,7 +12,6 @@ import java.util.function.Consumer;
 import com.google.gwt.cell.client.AbstractEditableCell;
 import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.ValueUpdater;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.BrowserEvents;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.InputElement;
@@ -90,7 +89,6 @@ public class AccessibleHoverableCheckboxCell extends AbstractEditableCell<Boolea
       }
 
       if (valueUpdater != null) {
-        GWT.log("valueUpdater!!");
         valueUpdater.update(isChecked);
       }
     } else if (BrowserEvents.MOUSEOUT.equals(type) && onMouseOut != null) {
