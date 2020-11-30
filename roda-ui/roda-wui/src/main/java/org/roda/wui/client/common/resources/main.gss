@@ -7209,7 +7209,8 @@ span.code {
 
 .disposal-confirmation-select input[type=radio]:checked + label {
    background-image: none;
-   background-color:#d0d0d0;
+   background-color: COLOR_PRIMARY;
+   color: white;
 }
 
 .disposal-schedules-modal-table {
