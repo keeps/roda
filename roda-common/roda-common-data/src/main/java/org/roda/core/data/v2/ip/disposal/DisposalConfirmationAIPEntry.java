@@ -5,18 +5,22 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.roda.core.data.v2.IsModelObject;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public class DisposalConfirmationAIPEntry implements IsModelObject {
-  private static final long serialVersionUID = 3298601603286113188L;
+  private static final long serialVersionUID = 7105815768385479520L;
 
   private String aipId;
   private String aipTitle;
   private String aipLevel;
+  private String parentId;
+  private String destroyedTransitiveSource;
+  private DestroyedSelectionState destroyedSelection;
   private String aipCollection;
   private Date aipCreationDate;
   private Date aipOverdueDate;
@@ -63,6 +67,30 @@ public class DisposalConfirmationAIPEntry implements IsModelObject {
 
   public void setAipLevel(String aipLevel) {
     this.aipLevel = aipLevel;
+  }
+
+  public String getParentId() {
+    return parentId;
+  }
+
+  public void setParentId(String parentId) {
+    this.parentId = parentId;
+  }
+
+  public String getDestroyedTransitiveSource() {
+    return destroyedTransitiveSource;
+  }
+
+  public void setDestroyedTransitiveSource(String destroyedTransitiveSource) {
+    this.destroyedTransitiveSource = destroyedTransitiveSource;
+  }
+
+  public DestroyedSelectionState getDestroyedSelection() {
+    return destroyedSelection;
+  }
+
+  public void setDestroyedSelection(DestroyedSelectionState destroyedSelection) {
+    this.destroyedSelection = destroyedSelection;
   }
 
   public String getAipCollection() {
@@ -128,27 +156,30 @@ public class DisposalConfirmationAIPEntry implements IsModelObject {
     if (o == null || getClass() != o.getClass())
       return false;
     DisposalConfirmationAIPEntry that = (DisposalConfirmationAIPEntry) o;
-    return getAipNumberOfFiles() == that.getAipNumberOfFiles() && getAipSize() == that.getAipSize()
-      && Objects.equals(getAipId(), that.getAipId()) && Objects.equals(getAipTitle(), that.getAipTitle())
-      && Objects.equals(getAipLevel(), that.getAipLevel())
-      && Objects.equals(getAipCollection(), that.getAipCollection())
-      && Objects.equals(getAipCreationDate(), that.getAipCreationDate())
-      && Objects.equals(getAipOverdueDate(), that.getAipOverdueDate())
-      && Objects.equals(getAipDisposalScheduleId(), that.getAipDisposalScheduleId())
-      && Objects.equals(getAipDisposalHoldIds(), that.getAipDisposalHoldIds());
+    return aipNumberOfFiles == that.aipNumberOfFiles && aipSize == that.aipSize && Objects.equals(aipId, that.aipId)
+      && Objects.equals(aipTitle, that.aipTitle) && Objects.equals(aipLevel, that.aipLevel)
+      && Objects.equals(parentId, that.parentId)
+      && Objects.equals(destroyedTransitiveSource, that.destroyedTransitiveSource)
+      && destroyedSelection == that.destroyedSelection && Objects.equals(aipCollection, that.aipCollection)
+      && Objects.equals(aipCreationDate, that.aipCreationDate) && Objects.equals(aipOverdueDate, that.aipOverdueDate)
+      && Objects.equals(aipDisposalScheduleId, that.aipDisposalScheduleId)
+      && Objects.equals(aipDisposalHoldIds, that.aipDisposalHoldIds);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(getAipId(), getAipTitle(), getAipLevel(), getAipCollection(), getAipCreationDate(),
-      getAipOverdueDate(), getAipNumberOfFiles(), getAipSize(), getAipDisposalScheduleId(), getAipDisposalHoldIds());
+    return Objects.hash(aipId, aipTitle, aipLevel, parentId, destroyedTransitiveSource, destroyedSelection,
+      aipCollection, aipCreationDate, aipOverdueDate, aipNumberOfFiles, aipSize, aipDisposalScheduleId,
+      aipDisposalHoldIds);
   }
 
   @Override
   public String toString() {
-    return "DisposalConfirmationAIPEntry{" + "aipId='" + aipId + '\'' + ", aipName='" + aipTitle + '\'' + ", aipLevel='"
-      + aipLevel + '\'' + ", aipCollection='" + aipCollection + '\'' + ", aipCreationDate=" + aipCreationDate
-      + ", aipOverdueDate=" + aipOverdueDate + ", aipNumberOfFiles=" + aipNumberOfFiles + ", aipSize=" + aipSize
-      + ", aipDisposalScheduleId='" + aipDisposalScheduleId + '\'' + ", aipDisposalHoldIds=" + aipDisposalHoldIds + '}';
+    return "DisposalConfirmationAIPEntry{" + "aipId='" + aipId + '\'' + ", aipTitle='" + aipTitle + '\''
+      + ", aipLevel='" + aipLevel + '\'' + ", parentId='" + parentId + '\'' + ", destroyedTransitiveSource='"
+      + destroyedTransitiveSource + '\'' + ", destroyedSelection=" + destroyedSelection + ", aipCollection='"
+      + aipCollection + '\'' + ", aipCreationDate=" + aipCreationDate + ", aipOverdueDate=" + aipOverdueDate
+      + ", aipNumberOfFiles=" + aipNumberOfFiles + ", aipSize=" + aipSize + ", aipDisposalScheduleId='"
+      + aipDisposalScheduleId + '\'' + ", aipDisposalHoldIds=" + aipDisposalHoldIds + '}';
   }
 }
