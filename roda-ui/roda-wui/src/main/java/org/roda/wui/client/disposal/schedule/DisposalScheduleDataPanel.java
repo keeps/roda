@@ -394,6 +394,8 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
             retentionPeriodDurationError.setText(messages.numberIsRequired());
             retentionPeriodIntervals.removeStyleName(IS_WRONG);
             retentionPeriodDurationError.setVisible(true);
+            Window.scrollTo(retentionPeriodIntervals.getAbsoluteLeft(), retentionPeriodIntervals.getAbsoluteTop());
+            errorList.add(messages.isAMandatoryField(messages.disposalScheduleRetentionPeriodInterval()));
           } else {
             retentionPeriodDuration.removeStyleName(IS_WRONG);
             retentionPeriodIntervals.removeStyleName(IS_WRONG);
