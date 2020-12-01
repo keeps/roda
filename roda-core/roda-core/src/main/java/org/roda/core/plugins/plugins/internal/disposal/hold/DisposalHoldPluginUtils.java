@@ -168,14 +168,14 @@ public class DisposalHoldPluginUtils {
     DisposalHold liftedHold = RodaCoreFactory.getDisposalHold(transitiveHold.getId());
     String outcomeLiftText;
     if (liftedHold == null) {
-      outcomeLiftText = "Transitive Disposal hold '" + transitiveHold.getId() + "' was successfully lifted from AIP '"
+      outcomeLiftText = "Transitive disposal hold '" + transitiveHold.getId() + "' was successfully lifted from AIP '"
         + aipId + "'";
       reportItem.addPluginDetails(
-        "Transitive Disposal hold '" + transitiveHold.getId() + "' was successfully lifted from AIP\n");
+        "Transitive disposal hold '" + transitiveHold.getId() + "' was successfully lifted from AIP\n");
     } else {
-      outcomeLiftText = "Transitive Disposal hold '" + liftedHold.getTitle() + "' (" + liftedHold.getId()
+      outcomeLiftText = "Transitive disposal hold '" + liftedHold.getTitle() + "' (" + liftedHold.getId()
         + ") was successfully lifted from AIP '" + aipId + "'";
-      reportItem.addPluginDetails("Transitive Disposal hold '" + liftedHold.getTitle() + "' (" + liftedHold.getId()
+      reportItem.addPluginDetails("Transitive disposal hold '" + liftedHold.getTitle() + "' (" + liftedHold.getId()
         + ") was successfully lifted from AIP\n");
     }
 

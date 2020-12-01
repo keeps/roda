@@ -1,6 +1,5 @@
 package org.roda.core.plugins.plugins.internal.disposal.confirmation;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,6 +18,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.disposal.DestroyedSelectionState;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
@@ -85,23 +85,26 @@ public class DisposalConfirmationPluginUtils {
   }
 
   public static DisposalConfirmationAIPEntry getAIPEntryFromAIP(IndexService indexService, AIP aip,
-    Set<String> disposalSchedules, Set<String> disposalHolds)
+    DestroyedSelectionState destroyedSelectionState, Set<String> disposalSchedules, Set<String> disposalHolds)
     throws GenericException, RequestNotValidException, NotFoundException {
 
     IndexedAIP indexedAIP = indexService.retrieve(IndexedAIP.class, aip.getId(),
       Arrays.asList(RodaConstants.AIP_LEVEL, RodaConstants.AIP_TITLE, RodaConstants.AIP_OVERDUE_DATE));
 
-    return createDisposalConfirmationAIPEntry(indexService, indexedAIP, aip, disposalSchedules, disposalHolds);
+    return createDisposalConfirmationAIPEntry(indexService, indexedAIP, aip, destroyedSelectionState, disposalSchedules,
+      disposalHolds);
   }
 
   private static DisposalConfirmationAIPEntry createDisposalConfirmationAIPEntry(IndexService indexService,
-    final IndexedAIP indexedAIP, final AIP aip, Set<String> disposalSchedules, Set<String> disposalHolds)
-    throws GenericException, RequestNotValidException {
+    final IndexedAIP indexedAIP, final AIP aip, DestroyedSelectionState destroyedSelectionState,
+    Set<String> disposalSchedules, Set<String> disposalHolds) throws GenericException, RequestNotValidException {
     DisposalConfirmationAIPEntry entry = new DisposalConfirmationAIPEntry();
 
     entry.setAipId(aip.getId());
     entry.setAipLevel(indexedAIP.getLevel());
     entry.setAipTitle(indexedAIP.getTitle());
+    entry.setParentId(indexedAIP.getParentID());
+    entry.setDestroyedSelection(destroyedSelectionState);
     entry.setAipCreationDate(indexedAIP.getCreatedOn());
     entry.setAipOverdueDate(indexedAIP.getOverdueDate());
 
