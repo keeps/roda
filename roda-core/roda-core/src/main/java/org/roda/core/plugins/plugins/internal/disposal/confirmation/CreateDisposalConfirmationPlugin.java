@@ -255,7 +255,7 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
         EVENT_DESCRIPTION, state, outcomeText, "", cachedJob.getUsername(), true);
 
       if (processChildren) {
-        processAIPChildren(aip, confirmationId, index, model, report, cachedJob, jobPluginInfo);
+        processAIPChildren(aip, confirmationId, index, model, cachedJob);
       }
     }
 
@@ -301,7 +301,7 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
   }
 
   private void processAIPChildren(AIP aipParent, String confirmationId, IndexService index, ModelService model,
-    Report report, Job cachedJob, JobPluginInfo jobPluginInfo) {
+    Job cachedJob) {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipParent.getId()));
 
     try {
@@ -309,7 +309,7 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
         Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID, RodaConstants.AIP_OVERDUE_DATE));
 
       for (IndexedAIP child : children) {
-        processChild(child, confirmationId, index, model, report, cachedJob, jobPluginInfo);
+        processChild(child, confirmationId, index, model, cachedJob);
       }
     } catch (GenericException | RequestNotValidException e) {
       LOGGER.error("Failed to retrieve AIP '{}' children", aipParent.getId());
@@ -317,7 +317,7 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
   }
 
   private void processChild(IndexedAIP child, String confirmationId, IndexService index, ModelService model,
-    Report report, Job cachedJob, JobPluginInfo jobPluginInfo) {
+    Job cachedJob) {
     boolean processChild = true;
 
     LOGGER.debug("Processing child AIP {}", child.getId());
@@ -361,7 +361,6 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
         aipCounter++;
       } else {
         state = PluginState.SKIPPED;
-        jobPluginInfo.incrementObjectsProcessedWithSkipped();
         outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationCreation(
           "was skipped from being assign to disposal confirmation due to incompatible disposal schedule",
           confirmationId, aip.getId());

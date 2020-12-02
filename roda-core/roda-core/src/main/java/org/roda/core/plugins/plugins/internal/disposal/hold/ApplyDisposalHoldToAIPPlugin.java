@@ -24,7 +24,6 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -305,7 +304,7 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
                 String outcomeLiftText = "Transitive disposal holds " + holdsIdList.toString()
                   + " are disassociated from AIP " + transitiveAIP.getId();
                 model.createEvent(transitiveAIP.getId(), null, null, null, POLICY_ASSIGNMENT,
-                  LiftDisposalHoldFromAIPPlugin.getStaticName(), null, null, state, outcomeLiftText, "",
+                  LiftDisposalHoldPlugin.getStaticName(), null, null, state, outcomeLiftText, "",
                   cachedJob.getUsername(), true);
               }
             }
