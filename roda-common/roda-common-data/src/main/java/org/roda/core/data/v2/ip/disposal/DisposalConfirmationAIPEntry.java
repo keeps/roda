@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public class DisposalConfirmationAIPEntry implements IsModelObject {
-  private static final long serialVersionUID = 7105815768385479520L;
+  private static final long serialVersionUID = 895170173370654544L;
 
   private String aipId;
   private String aipTitle;
@@ -28,6 +28,7 @@ public class DisposalConfirmationAIPEntry implements IsModelObject {
   private long aipSize;
   private String aipDisposalScheduleId;
   private List<String> aipDisposalHoldIds;
+  private List<String> aipDisposalHoldTransitiveIds;
 
   @JsonIgnore
   @Override
@@ -149,6 +150,14 @@ public class DisposalConfirmationAIPEntry implements IsModelObject {
     this.aipDisposalHoldIds = aipDisposalHoldIds;
   }
 
+  public List<String> getAipDisposalHoldTransitiveIds() {
+    return aipDisposalHoldTransitiveIds;
+  }
+
+  public void setAipDisposalHoldTransitiveIds(List<String> aipDisposalHoldTransitiveIds) {
+    this.aipDisposalHoldTransitiveIds = aipDisposalHoldTransitiveIds;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -163,14 +172,15 @@ public class DisposalConfirmationAIPEntry implements IsModelObject {
       && destroyedSelection == that.destroyedSelection && Objects.equals(aipCollection, that.aipCollection)
       && Objects.equals(aipCreationDate, that.aipCreationDate) && Objects.equals(aipOverdueDate, that.aipOverdueDate)
       && Objects.equals(aipDisposalScheduleId, that.aipDisposalScheduleId)
-      && Objects.equals(aipDisposalHoldIds, that.aipDisposalHoldIds);
+      && Objects.equals(aipDisposalHoldIds, that.aipDisposalHoldIds)
+      && Objects.equals(aipDisposalHoldTransitiveIds, that.aipDisposalHoldTransitiveIds);
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(aipId, aipTitle, aipLevel, parentId, destroyedTransitiveSource, destroyedSelection,
       aipCollection, aipCreationDate, aipOverdueDate, aipNumberOfFiles, aipSize, aipDisposalScheduleId,
-      aipDisposalHoldIds);
+      aipDisposalHoldIds, aipDisposalHoldTransitiveIds);
   }
 
   @Override
@@ -180,6 +190,7 @@ public class DisposalConfirmationAIPEntry implements IsModelObject {
       + destroyedTransitiveSource + '\'' + ", destroyedSelection=" + destroyedSelection + ", aipCollection='"
       + aipCollection + '\'' + ", aipCreationDate=" + aipCreationDate + ", aipOverdueDate=" + aipOverdueDate
       + ", aipNumberOfFiles=" + aipNumberOfFiles + ", aipSize=" + aipSize + ", aipDisposalScheduleId='"
-      + aipDisposalScheduleId + '\'' + ", aipDisposalHoldIds=" + aipDisposalHoldIds + '}';
+      + aipDisposalScheduleId + '\'' + ", aipDisposalHoldIds=" + aipDisposalHoldIds + ", aipDisposalHoldTransitiveIds="
+      + aipDisposalHoldTransitiveIds + '}';
   }
 }
