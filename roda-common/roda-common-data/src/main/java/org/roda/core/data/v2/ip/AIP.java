@@ -346,14 +346,6 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
   }
 
   @JsonIgnore
-  public boolean isAIPOnHold(String disposalHoldId) {
-    if (disposal != null) {
-      return disposal.isAIPOnHold(disposalHoldId);
-    }
-    return false;
-  }
-
-  @JsonIgnore
   public boolean onHold() {
     if (disposal != null) {
       return disposal.onHold();

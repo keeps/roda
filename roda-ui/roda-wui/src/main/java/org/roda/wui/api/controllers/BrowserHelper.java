@@ -156,6 +156,7 @@ import org.roda.core.plugins.plugins.internal.disposal.confirmation.PermanentlyD
 import org.roda.core.plugins.plugins.internal.disposal.confirmation.RecoverDisposalConfirmationExecutionFailedPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.confirmation.RestoreRecordsPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.hold.ApplyDisposalHoldToAIPPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.hold.DisassociateDisposalHoldFromAIPPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.hold.LiftDisposalHoldFromAIPPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.rules.ApplyDisposalRulesPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.schedule.AssociateDisposalScheduleToAIPPlugin;
@@ -3362,9 +3363,8 @@ public class BrowserHelper {
 
   public static Job disassociateDisposalSchedule(User user, SelectedItems<IndexedAIP> selected)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
-    Map<String, String> pluginParameters = new HashMap<>();
     return createAndExecuteInternalJob("Disassociate disposal schedule", selected,
-      DisassociateDisposalScheduleToAIPPlugin.class, user, pluginParameters,
+      DisassociateDisposalScheduleToAIPPlugin.class, user, Collections.emptyMap(),
       "Could not execute disassociate disposal schedule action");
   }
 
@@ -3470,7 +3470,7 @@ public class BrowserHelper {
     SelectedItemsList<DisposalConfirmation> selectedItems)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     return createAndExecuteInternalJob("Recover disposal confirmation from a failure state", selectedItems,
-        RecoverDisposalConfirmationExecutionFailedPlugin.class, user, Collections.emptyMap(),
+      RecoverDisposalConfirmationExecutionFailedPlugin.class, user, Collections.emptyMap(),
       "Could not execute recover the disposal confirmation from a previous faulty state");
   }
 
@@ -3500,15 +3500,24 @@ public class BrowserHelper {
       pluginParameters, "Could not execute apply disposal hold action");
   }
 
-  public static Job liftDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId,
+  public static Job liftDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, disposalHoldId);
+
+    return createAndExecuteInternalJob("Lift disposal hold", items, LiftDisposalHoldFromAIPPlugin.class, user,
+      pluginParameters, "Could not execute lift disposal hold action");
+  }
+
+  public static Job disassociateDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId,
     boolean clearAll)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, disposalHoldId);
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_LIFT_ALL, Boolean.toString(clearAll));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_DISASSOCIATE_ALL, Boolean.toString(clearAll));
 
-    return createAndExecuteInternalJob("Lift disposal hold", items, LiftDisposalHoldFromAIPPlugin.class, user,
-      pluginParameters, "Could not execute lift disposal hold action");
+    return createAndExecuteInternalJob("Disassociate disposal hold", items, DisassociateDisposalHoldFromAIPPlugin.class,
+      user, pluginParameters, "Could not execute disassociate disposal hold action");
   }
 
   public static Job applyDisposalRules(User user, boolean applyToManuallyInclusive)

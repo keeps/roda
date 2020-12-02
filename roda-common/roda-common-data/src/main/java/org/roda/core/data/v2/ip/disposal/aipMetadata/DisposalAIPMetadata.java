@@ -143,18 +143,6 @@ public class DisposalAIPMetadata implements Serializable {
   }
 
   @JsonIgnore
-  public boolean isAIPOnHold(String disposalHoldId) {
-    if(holds != null) {
-      for (DisposalHoldAIPMetadata hold : holds) {
-        if (hold.getId().equals(disposalHoldId)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
-  @JsonIgnore
   public boolean onHold() {
     return !holds.isEmpty() || !transitiveHolds.isEmpty();
   }

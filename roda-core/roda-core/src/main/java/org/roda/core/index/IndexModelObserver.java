@@ -133,25 +133,33 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private ReturnWithExceptions<Void, ModelObserver> indexAIP(final AIP aip, final List<String> ancestors) {
-    return indexAIP(aip, ancestors, false, null, null);
+    return indexAIP(aip, ancestors, false, null, null, false);
   }
 
   private ReturnWithExceptions<Void, ModelObserver> indexAIP(final AIP aip, final List<String> ancestors,
     DisposalSchedule disposalSchedule, Map<String, String> retentionPeriodCalculation) {
-    return indexAIP(aip, ancestors, false, disposalSchedule, retentionPeriodCalculation);
+    return indexAIP(aip, ancestors, false, disposalSchedule, retentionPeriodCalculation, false);
+  }
+
+  private ReturnWithExceptions<Void, ModelObserver> indexAIP(final AIP aip, final List<String> ancestors,
+    DisposalSchedule disposalSchedule, Map<String, String> retentionPeriodCalculation, boolean disposalHoldStatus) {
+    return indexAIP(aip, ancestors, false, disposalSchedule, retentionPeriodCalculation, disposalHoldStatus);
   }
 
   private ReturnWithExceptions<Void, ModelObserver> indexAIP(final AIP aip, final List<String> ancestors,
     boolean safemode) {
-    return indexAIP(aip, ancestors, false, null, null);
+    return indexAIP(aip, ancestors, safemode, null, null, false);
   }
 
   private ReturnWithExceptions<Void, ModelObserver> indexAIP(final AIP aip, final List<String> ancestors,
-    boolean safemode, DisposalSchedule disposalSchedule, Map<String, String> retentionPeriodCalculation) {
+    boolean safemode, DisposalSchedule disposalSchedule, Map<String, String> retentionPeriodCalculation,
+    boolean disposalHoldStatus) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
-    SolrUtils.create2(index, (ModelObserver) this, IndexedAIP.class, aip,
-      new AIPCollection.Info(ancestors, safemode, disposalSchedule, retentionPeriodCalculation)).addTo(ret);
+    SolrUtils
+      .create2(index, (ModelObserver) this, IndexedAIP.class, aip,
+        new AIPCollection.Info(ancestors, safemode, disposalSchedule, retentionPeriodCalculation, disposalHoldStatus))
+      .addTo(ret);
 
     // if there was an error indexing, try in safe mode
     if (!ret.isEmpty()) {
@@ -267,21 +275,25 @@ public class IndexModelObserver implements ModelObserver {
   private ReturnWithExceptions<Void, ModelObserver> indexRetentionPeriod(final AIP aip, final List<String> ancestors) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
-    if (aip.getDisposalScheduleId() != null) {
-      try {
+    try {
+      boolean onDisposalHold = model.onDisposalHold(aip.getId());
+      if (aip.getDisposalScheduleId() != null) {
+
         DisposalSchedule disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
 
         Map<String, String> retentionPeriod = SolrUtils.getRetentionPeriod(disposalSchedule, aip);
-        indexAIP(aip, ancestors, disposalSchedule, retentionPeriod).addTo(ret);
+        indexAIP(aip, ancestors, disposalSchedule, retentionPeriod, onDisposalHold).addTo(ret);
         if (StringUtils.isNotBlank(retentionPeriod.get(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_DETAILS))) {
           throw new RetentionPeriodCalculationException(
             retentionPeriod.get(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_DETAILS));
         }
-      } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException
-        | RetentionPeriodCalculationException e) {
-        LOGGER.error("Cannot index retention period", e);
-        ret.add(e);
+      } else {
+        indexAIP(aip, ancestors, null, null, onDisposalHold).addTo(ret);
       }
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException
+      | RetentionPeriodCalculationException e) {
+      LOGGER.error("Cannot index retention period", e);
+      ret.add(e);
     }
 
     return ret;
@@ -627,8 +639,8 @@ public class IndexModelObserver implements ModelObserver {
       Map<String, String> retentionPeriodCalculation = null;
 
       if (StringUtils.isNotBlank(aip.getDisposalScheduleId())) {
-          disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
-          retentionPeriodCalculation = SolrUtils.getRetentionPeriod(disposalSchedule, aip);
+        disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
+        retentionPeriodCalculation = SolrUtils.getRetentionPeriod(disposalSchedule, aip);
       }
 
       if (descriptiveMetadata.isFromAIP()) {

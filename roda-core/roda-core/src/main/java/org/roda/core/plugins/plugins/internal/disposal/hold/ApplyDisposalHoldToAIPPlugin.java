@@ -281,10 +281,10 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
     }
   }
 
-  private void applyDisposalTransitiveHolds(ModelService model, IndexService index, Job cachedJob, AIP aip,
+  private void applyDisposalTransitiveHolds(ModelService model, IndexService index, Job cachedJob, AIP fromAIP,
     DisposalHold disposalHold, JobPluginInfo jobPluginInfo, Report report, List<DisposalHoldAIPMetadata> holds) {
     try {
-      IterableIndexResult<IndexedAIP> result = DisposalHoldPluginUtils.getTransitivesHoldsAIPs(index, aip.getId());
+      IterableIndexResult<IndexedAIP> result = DisposalHoldPluginUtils.getTransitivesHoldsAIPs(index, fromAIP.getId());
 
       for (IndexedAIP indexedAIP : result) {
         String outcomeText;
@@ -297,28 +297,24 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
           AIP transitiveAIP = model.retrieveAIP(indexedAIP.getId());
           List<String> holdsIdList = new ArrayList<>();
 
-          DisposalTransitiveHoldAIPMetadata transitiveHoldAIPMetadata = transitiveAIP
-            .findTransitiveHold(disposalHoldId);
-          if (transitiveHoldAIPMetadata == null) {
-            transitiveHoldAIPMetadata = new DisposalTransitiveHoldAIPMetadata();
-            transitiveHoldAIPMetadata.setId(disposalHoldId);
-          }
-          transitiveHoldAIPMetadata.addFromAip(aip.getId());
+          DisposalHoldPluginUtils.addTransitiveDisposalHoldAIPMetadata(transitiveAIP, disposalHoldId, fromAIP.getId());
 
           if (override) {
             for (DisposalHoldAIPMetadata hold : holds) {
               if (transitiveAIP.removeTransitiveHold(hold.getId())) {
                 String outcomeLiftText = "Transitive disposal holds " + holdsIdList.toString()
                   + " are disassociated from AIP " + transitiveAIP.getId();
-                model.createEvent(aip.getId(), null, null, null, POLICY_ASSIGNMENT,
+                model.createEvent(transitiveAIP.getId(), null, null, null, POLICY_ASSIGNMENT,
                   LiftDisposalHoldFromAIPPlugin.getStaticName(), null, null, state, outcomeLiftText, "",
                   cachedJob.getUsername(), true);
               }
             }
           }
-          model.updateAIP(aip, cachedJob.getUsername());
+          model.updateAIP(transitiveAIP, cachedJob.getUsername());
           outcomeText = PluginHelper.createOutcomeTextForDisposalHold("Transitive applied with success",
               disposalHold.getId(), disposalHold.getTitle());
+          reportItem.setPluginState(state).addPluginDetails(outcomeText);
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
         } catch (NotFoundException | AuthorizationDeniedException e) {
           LOGGER.debug("Can't associate disposal hold to child. It wasn't found.", e);
           jobPluginInfo.incrementObjectsProcessedWithFailure();

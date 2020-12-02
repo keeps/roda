@@ -3421,21 +3421,22 @@ public class ModelService extends ModelObservable {
     updateAIPMetadata(aip);
     // TODO notify
   }
-  
-  public List<DisposalHold> retrieveActiveDisposalHolds(String aipId) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+
+  public List<DisposalHold> retrieveActiveDisposalHolds(String aipId)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
     List<DisposalHold> disposalHoldList = new ArrayList<>();
 
     for (DisposalHoldAIPMetadata hold : aip.getHolds()) {
       DisposalHold disposalHold = retrieveDisposalHold(hold.getId());
-      if(disposalHold != null && (disposalHold.getState() == DisposalHoldState.ACTIVE)){
+      if (disposalHold != null && (disposalHold.getState() == DisposalHoldState.ACTIVE)) {
         disposalHoldList.add(disposalHold);
       }
     }
 
     for (DisposalTransitiveHoldAIPMetadata transitiveHold : aip.getTransitiveHolds()) {
       DisposalHold transitiveDisposalHold = retrieveDisposalHold(transitiveHold.getId());
-      if(transitiveDisposalHold != null && (transitiveDisposalHold.getState() == DisposalHoldState.ACTIVE)){
+      if (transitiveDisposalHold != null && (transitiveDisposalHold.getState() == DisposalHoldState.ACTIVE)) {
         disposalHoldList.add(transitiveDisposalHold);
       }
     }
@@ -3443,31 +3444,48 @@ public class ModelService extends ModelObservable {
     return disposalHoldList;
   }
 
-  public boolean OnHold(String aipId) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+  public List<DisposalHold> retrieveDirectActiveDisposalHolds(String aipId)
+      throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
+    List<DisposalHold> disposalHoldList = new ArrayList<>();
+
+    for (DisposalHoldAIPMetadata hold : aip.getHolds()) {
+      DisposalHold disposalHold = retrieveDisposalHold(hold.getId());
+      if (disposalHold != null && (disposalHold.getState() == DisposalHoldState.ACTIVE)) {
+        disposalHoldList.add(disposalHold);
+      }
+    }
+
+    return disposalHoldList;
+  }
+
+  public boolean onDisposalHold(String aipId)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
 
     for (DisposalHoldAIPMetadata hold : aip.getHolds()) {
       DisposalHold disposalHold = retrieveDisposalHold(hold.getId());
-      if(disposalHold != null ){
-        return disposalHold.getState() == DisposalHoldState.ACTIVE;
+      if (disposalHold != null && disposalHold.getState() == DisposalHoldState.ACTIVE) {
+        return true;
       }
     }
 
     for (DisposalTransitiveHoldAIPMetadata transitiveHold : aip.getTransitiveHolds()) {
       DisposalHold transitiveDisposalHold = retrieveDisposalHold(transitiveHold.getId());
-      if(transitiveDisposalHold != null ){
-        return transitiveDisposalHold.getState() == DisposalHoldState.ACTIVE;
+      if (transitiveDisposalHold != null && transitiveDisposalHold.getState() == DisposalHoldState.ACTIVE) {
+        return true;
       }
     }
 
     return false;
   }
 
-  public boolean isAIPOnDirectHold(String aipId, String holdId) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+  public boolean isAIPOnDirectHold(String aipId, String holdId)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
     DisposalHold disposalHold = retrieveDisposalHold(holdId);
 
-    if( disposalHold.getState() == DisposalHoldState.ACTIVE) {
+    if (disposalHold.getState() == DisposalHoldState.ACTIVE) {
       return aip.findHold(holdId) != null;
     }
 
@@ -3600,9 +3618,10 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  public Path createDisposalHoldFileIfNotExists(String disposalConfirmationId) throws RequestNotValidException, GenericException {
+  public Path createDisposalHoldFileIfNotExists(String disposalConfirmationId)
+    throws RequestNotValidException, GenericException {
     Path disposalHoldFile = ModelUtils.getDisposalConfirmationElementPath(disposalConfirmationId,
-            RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME);
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME);
 
     // ensuring parent exists
     Path parent = disposalHoldFile.getParent();
@@ -3628,7 +3647,7 @@ public class ModelService extends ModelObservable {
   }
 
   public void addDisposalHoldEntry(String disposalConfirmationId, DisposalHold disposalHold)
-          throws GenericException, RequestNotValidException {
+    throws GenericException, RequestNotValidException {
 
     Path disposalHoldFile = createDisposalHoldFileIfNotExists(disposalConfirmationId);
 
