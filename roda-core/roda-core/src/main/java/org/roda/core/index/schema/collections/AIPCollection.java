@@ -35,7 +35,6 @@ import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalConfirmationAIPMeta
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalScheduleAIPMetadata;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveScheduleAIPMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.IndexingAdditionalInfo.Flags;
@@ -167,8 +166,8 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
 
       if (aip.getDisposal().getHolds() != null) {
         List<DisposalHoldAIPMetadata> holds = aip.getDisposal().getHolds();
-        doc.addField(RodaConstants.AIP_DISPOSAL_HOLDS_ID, holds.stream()
-          .map(DisposalHoldAIPMetadata::getId).collect(Collectors.toList()));
+        doc.addField(RodaConstants.AIP_DISPOSAL_HOLDS_ID,
+          holds.stream().map(DisposalHoldAIPMetadata::getId).collect(Collectors.toList()));
       }
 
       if (aip.getDisposal().getTransitiveHolds() != null) {
@@ -176,8 +175,6 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
         doc.addField(RodaConstants.AIP_TRANSITIVE_DISPOSAL_HOLDS_ID,
           transitiveHolds.stream().map(DisposalTransitiveHoldAIPMetadata::getId).collect(Collectors.toList()));
       }
-
-      doc.addField(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, aip.getDisposal().onHold());
 
       if (aip.getDisposal().getConfirmation() != null) {
         DisposalConfirmationAIPMetadata confirmation = aip.getDisposal().getConfirmation();
@@ -250,18 +247,20 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     private final boolean safeMode;
     private final DisposalSchedule disposalSchedule;
     private final Map<String, String> retentionPeriod;
+    private final boolean disposalHoldStatus;
 
     public Info(List<String> ancestors, boolean safeMode) {
-      this(ancestors, safeMode, null, null);
+      this(ancestors, safeMode, null, null, false);
     }
 
     public Info(List<String> ancestors, boolean safeMode, DisposalSchedule disposalSchedule,
-      Map<String, String> retentionPeriod) {
+      Map<String, String> retentionPeriod, boolean disposalHoldStatus) {
       super();
       this.ancestors = ancestors;
       this.safeMode = safeMode;
       this.disposalSchedule = disposalSchedule;
       this.retentionPeriod = retentionPeriod;
+      this.disposalHoldStatus = disposalHoldStatus;
     }
 
     @Override
@@ -279,6 +278,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
         }
         preCalculatedFields.put(RodaConstants.AIP_DISPOSAL_ACTION, disposalSchedule.getActionCode().name());
       }
+      preCalculatedFields.put(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, disposalHoldStatus);
       return preCalculatedFields;
     }
 
