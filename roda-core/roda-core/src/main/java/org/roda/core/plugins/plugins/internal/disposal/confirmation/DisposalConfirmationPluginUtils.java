@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -22,9 +23,11 @@ import org.roda.core.data.v2.ip.disposal.DestroyedSelectionState;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.rsync.RsyncUtils;
 import org.roda.core.util.CommandException;
@@ -85,25 +88,36 @@ public class DisposalConfirmationPluginUtils {
   }
 
   public static DisposalConfirmationAIPEntry getAIPEntryFromAIP(IndexService indexService, AIP aip,
-    DestroyedSelectionState destroyedSelectionState, Set<String> disposalSchedules, Set<String> disposalHolds)
+    String topAncestorId, DestroyedSelectionState destroyedSelectionState, Set<String> disposalSchedules,
+    Set<String> disposalHolds, Set<String> disposalHoldTransitives)
     throws GenericException, RequestNotValidException, NotFoundException {
 
     IndexedAIP indexedAIP = indexService.retrieve(IndexedAIP.class, aip.getId(),
       Arrays.asList(RodaConstants.AIP_LEVEL, RodaConstants.AIP_TITLE, RodaConstants.AIP_OVERDUE_DATE));
 
-    return createDisposalConfirmationAIPEntry(indexService, indexedAIP, aip, destroyedSelectionState, disposalSchedules,
-      disposalHolds);
+    return createDisposalConfirmationAIPEntry(indexService, indexedAIP, aip, topAncestorId, destroyedSelectionState,
+      disposalSchedules, disposalHolds, disposalHoldTransitives);
+  }
+
+  public static DisposalConfirmationAIPEntry getAIPEntryFromAIP(IndexService indexService, AIP aip,
+    DestroyedSelectionState destroyedSelectionState, Set<String> disposalSchedules, Set<String> disposalHolds,
+    Set<String> disposalHoldTransitives) throws GenericException, RequestNotValidException, NotFoundException {
+
+    return getAIPEntryFromAIP(indexService, aip, null, destroyedSelectionState, disposalSchedules, disposalHolds,
+      disposalHoldTransitives);
   }
 
   private static DisposalConfirmationAIPEntry createDisposalConfirmationAIPEntry(IndexService indexService,
-    final IndexedAIP indexedAIP, final AIP aip, DestroyedSelectionState destroyedSelectionState,
-    Set<String> disposalSchedules, Set<String> disposalHolds) throws GenericException, RequestNotValidException {
+    final IndexedAIP indexedAIP, final AIP aip, String topAncestorId, DestroyedSelectionState destroyedSelectionState,
+    Set<String> disposalSchedules, Set<String> disposalHolds, Set<String> disposalHoldTransitives)
+    throws GenericException, RequestNotValidException {
     DisposalConfirmationAIPEntry entry = new DisposalConfirmationAIPEntry();
 
     entry.setAipId(aip.getId());
     entry.setAipLevel(indexedAIP.getLevel());
     entry.setAipTitle(indexedAIP.getTitle());
     entry.setParentId(indexedAIP.getParentID());
+    entry.setDestroyedTransitiveSource(topAncestorId);
     entry.setDestroyedSelection(destroyedSelectionState);
     entry.setAipCreationDate(indexedAIP.getCreatedOn());
     entry.setAipOverdueDate(indexedAIP.getOverdueDate());
@@ -113,6 +127,11 @@ public class DisposalConfirmationPluginUtils {
 
     entry.setAipDisposalHoldIds(getDisposalHoldIds(aip.getHolds()));
     disposalHolds.addAll(entry.getAipDisposalHoldIds());
+
+    List<String> collect = aip.getTransitiveHolds().stream().map(DisposalTransitiveHoldAIPMetadata::getId)
+      .collect(Collectors.toList());
+    entry.setAipDisposalHoldTransitiveIds(collect);
+    disposalHoldTransitives.addAll(collect);
 
     getStorageSizeInBytesForAIP(indexService, aip.getId(), entry);
 
@@ -150,5 +169,12 @@ public class DisposalConfirmationPluginUtils {
 
     entry.setAipSize(totalSize);
     entry.setAipNumberOfFiles(totalOfDataFiles);
+  }
+
+  public static Path getDisposalConfirmationPath(String disposalConfirmationId)
+    throws RequestNotValidException {
+    DefaultStoragePath confirmationPath = DefaultStoragePath
+      .parse(ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId));
+    return FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);
   }
 }
