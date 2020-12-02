@@ -104,7 +104,7 @@ public class CreateDisposalConfirmationDataPanel extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     initActions();
-    createDisposalConfirmationFormDescription.add(new HTMLWidgetWrapper("CreateDisposalConfirmationDescription.html"));
+    createDisposalConfirmationFormDescription.add(new HTMLWidgetWrapper("CreateDisposalConfirmationExtraDescription.html"));
 
     errors.setVisible(false);
 
