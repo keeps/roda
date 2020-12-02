@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -19,7 +20,6 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
-import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -42,12 +42,10 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(LiftDisposalHoldFromAIPPlugin.class);
+public class LiftDisposalHoldPlugin extends AbstractPlugin<AIP> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(LiftDisposalHoldPlugin.class);
 
   private String disposalHoldId;
-  private boolean clearAll;
-  private boolean liftHold;
 
   private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
@@ -79,7 +77,7 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticName() {
-    return "Disassociate disposal hold from AIP";
+    return "Lift disposal hold";
   }
 
   @Override
@@ -103,7 +101,7 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Lift disposal hold from AIP";
+    return "Lift disposal hold";
   }
 
   @Override
@@ -156,7 +154,7 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
             disposalHold.setState(DisposalHoldState.LIFTED);
             model.updateDisposalHold(disposalHold, cachedJob.getUsername());
           } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
-              | IllegalOperationException e) {
+            | IllegalOperationException e) {
             LOGGER.error("Unable to update disposal hold {}: {}", disposalHoldId, e.getMessage(), e);
           }
         }
@@ -167,8 +165,7 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
         reportItem.setPluginState(state);
       } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
         outcomeText = "Error lifting disposal hold" + disposalHoldId + " from AIP " + aip.getId();
-        LOGGER.error("Error lifting disposal hold '{}' from '{}': {}", disposalHoldId, aip.getId(), e.getMessage(),
-          e);
+        LOGGER.error("Error lifting disposal hold '{}' from '{}': {}", disposalHoldId, aip.getId(), e.getMessage(), e);
         state = PluginState.FAILURE;
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         reportItem.setPluginState(state).setPluginDetails(
@@ -213,8 +210,8 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
         outcomeText = "Can't retrieve AIP " + aip.getId() + " for lifting transitive hold " + holdId + ".";
         LOGGER.debug(outcomeText, e);
         jobPluginInfo.incrementObjectsProcessedWithFailure();
-        reportItem.setPluginState(state).setPluginDetails("Error lifting transitive disposal hold " + holdId
-          + " on aip " + indexedAIP.getId() + ": " + e.getMessage());
+        reportItem.setPluginState(state).setPluginDetails(
+          "Error lifting transitive disposal hold " + holdId + " on aip " + indexedAIP.getId() + ": " + e.getMessage());
       } finally {
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
@@ -258,7 +255,7 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public Plugin<AIP> cloneMe() {
-    return new LiftDisposalHoldFromAIPPlugin();
+    return new LiftDisposalHoldPlugin();
   }
 
   @Override

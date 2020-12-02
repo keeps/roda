@@ -114,7 +114,7 @@ public class DisposalHoldActions extends AbstractActionable<IndexedAIP> {
             @Override
             public void onSuccess(Boolean result) {
               if (result) {
-                BrowserService.Util.getInstance().liftDisposalHold(aips, disposalHold.getId(), false,false,
+                BrowserService.Util.getInstance().liftDisposalHold(aips, disposalHold.getId(),
                   new ActionAsyncCallback<Job>(callback) {
                     @Override
                     public void onFailure(Throwable caught) {
@@ -163,7 +163,8 @@ public class DisposalHoldActions extends AbstractActionable<IndexedAIP> {
     ActionableBundle<IndexedAIP> disposalHoldActionableBundle = new ActionableBundle<>();
 
     ActionableGroup<IndexedAIP> managementGroup = new ActionableGroup<>(messages.sidebarActionsTitle());
-    managementGroup.addButton(messages.disassociateDisposalHoldButton(), DisposalHoldAction.DISASSOCIATE, ActionImpact.UPDATED, "btn-unlock");
+    managementGroup.addButton(messages.disassociateDisposalHoldButton(), DisposalHoldAction.DISASSOCIATE,
+      ActionImpact.UPDATED, "btn-unlock");
 
     disposalHoldActionableBundle.addGroup(managementGroup);
     return disposalHoldActionableBundle;
