@@ -1,13 +1,11 @@
 package org.roda.core.plugins.plugins.internal.disposal.hold;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -49,6 +47,7 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
 
   private String disposalHoldId;
   private boolean clearAll;
+  private boolean liftHold;
 
   private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
@@ -80,7 +79,7 @@ public class LiftDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticName() {
-    return "Lift disposal hold from AIP";
+    return "Disassociate disposal hold from AIP";
   }
 
   @Override
