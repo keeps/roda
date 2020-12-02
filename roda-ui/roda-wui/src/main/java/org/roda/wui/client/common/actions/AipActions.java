@@ -960,7 +960,7 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            BrowserService.Util.getInstance().liftDisposalHold(aips, null, true,
+            BrowserService.Util.getInstance().disassociateDisposalHold(aips, null, true,
               new ActionAsyncCallback<Job>(callback) {
                 @Override
                 public void onFailure(Throwable caught) {

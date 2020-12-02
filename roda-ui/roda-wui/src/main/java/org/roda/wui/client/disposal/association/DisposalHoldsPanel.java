@@ -153,7 +153,7 @@ public class DisposalHoldsPanel extends Composite {
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            BrowserService.Util.getInstance().liftDisposalHold(aips, null, true, new AsyncCallback<Job>() {
+            BrowserService.Util.getInstance().disassociateDisposalHold(aips, null, true, new AsyncCallback<Job>() {
               @Override
               public void onFailure(Throwable caught) {
                 HistoryUtils.newHistory(InternalProcess.RESOLVER);
