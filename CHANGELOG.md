@@ -1,5 +1,34 @@
 # Changelog
 
+## v3.5.1 (02/12/2020)
+#### Security fixes
+-  Bump xstream from 1.4.10-java7 to 1.4.14-java7 [#1710](https://github.com/keeps/roda/issues/1710) to fix CVE-2019-10173
+
+#### Dependency upgrades
+-  Bump Solr from 7.7.2 to 7.7.3 [#1706](https://github.com/keeps/roda/issues/1706)
+-  Bump several dependencies [#1707](https://github.com/keeps/roda/issues/1707)
+   - CAS from 3.5.0 to 3.6.1
+   - Jersey from 2.27 to 2.31
+   - Swagger from 1.5.24 to 1.6.2
+   - Jackson from 2.10.1 to 2.11.2
+   - Springboot from 2.1.9 to 2.3.3
+   - Commons-code from 1.12 to 1.15
+   - Commons-io from 2.6 to 2.8.0
+   - Commons-lang from 3.9 to 3.11
+   - Commons-csv from 1.6 to 1.8
+   - Commons-text from 1.6 to 1.9
+   - handlebars from 4.1.0 to 4.2.0
+   - prometheus from 0.8.0 to 0.9.0
+ 
+#### Enhancements
+-  Skip Siegfried and Premis plugin when SIP update has no representations [#1709](https://github.com/keeps/roda/issues/1709)
+
+Install for demonstration:
+```
+docker pull keeps/roda:v3.5.1
+```
+---
+
 ## v3.5.0 (16/09/2020)
 #### New features:
 
@@ -966,21 +995,3 @@ Bug fixes
 - String formater was used in some parts of the code to build SQL statements and proved to be a problem with different
   locales (when different characters are used as separator for floating point values)
 - Revised footer logos (roda-wui)
-
----
-
-## RODA v1.2.0 (01/11/2013)
-RODA version 1.2.0, codename Victoria.
-
-New features:
-- Using Droid for file format identification
-- Added support for presentations: Microsoft Powerpoint (ppt, pptx), OpenOffice Presentation / LibreOffice Impress (odp)
-- Added suport for spreadsheets: Microsoft Excel (xls, xlsx), OpenOffice Spreadsheet / LibreOffice Calc (ods)
-- Added support for email (.eml) but conversion is not yet supported
-- Added web service to download AIP
-- Added web service to download DIP
-
-Bug fixes:
-- Validation of SIP XML was not being properly done
-- Fixed visualization of preservation metadata in roda-wui when system locale was not in English
-- Fixed roda-in representation type selector in some Java versions
