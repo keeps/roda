@@ -24,7 +24,6 @@ import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +34,6 @@ import java.util.stream.Collectors;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.HandlebarsUtility;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.common.dips.DIPUtils;
@@ -132,8 +130,6 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.util.CommandException;
-import org.roda.core.util.CommandUtility;
 import org.roda.core.util.HTTPUtility;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -3446,7 +3442,7 @@ public class ModelService extends ModelObservable {
   }
 
   public List<DisposalHold> retrieveDirectActiveDisposalHolds(String aipId)
-      throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
     List<DisposalHold> disposalHoldList = new ArrayList<>();
 
@@ -3619,96 +3615,48 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  public Path createDisposalHoldFileIfNotExists(String disposalConfirmationId)
-    throws RequestNotValidException, GenericException {
-    Path disposalHoldFile = ModelUtils.getDisposalConfirmationElementPath(disposalConfirmationId,
-      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME);
-
-    // ensuring parent exists
-    Path parent = disposalHoldFile.getParent();
-    if (!FSUtils.exists(parent)) {
-      try {
-        Files.createDirectories(parent);
-      } catch (IOException e) {
-        throw new GenericException("Error creating parent folder structure to write holds into", e);
-      }
-    }
-
-    // verify if file exists and if not creates
-    if (!FSUtils.exists(disposalHoldFile)) {
-      try {
-        Files.createFile(disposalHoldFile);
-      } catch (IOException e) {
-        throw new GenericException("Error creating file to write holds into", e);
-      }
-    }
-
-    return disposalHoldFile;
-
-  }
-
   public void addDisposalHoldEntry(String disposalConfirmationId, DisposalHold disposalHold)
     throws GenericException, RequestNotValidException {
+    StoragePath confirmationStoragePath = ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId);
+    Path confirmationPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationStoragePath);
 
-    Path disposalHoldFile = createDisposalHoldFileIfNotExists(disposalConfirmationId);
+    Path file = FSUtils.createFile(confirmationPath,
+        RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME, true, true);
 
-    JsonUtils.appendObjectToFile(disposalHold, disposalHoldFile);
+    JsonUtils.appendObjectToFile(disposalHold, file);
+  }
+
+  public void addDisposalHoldTransitiveEntry(String disposalConfirmationId, DisposalHold transitiveDisposalHold)
+      throws RequestNotValidException, GenericException {
+    StoragePath confirmationStoragePath = ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId);
+    Path confirmationPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationStoragePath);
+
+    Path file = FSUtils.createFile(confirmationPath,
+        RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_TRANSITIVE_HOLDS_FILENAME, true, true);
+
+    JsonUtils.appendObjectToFile(transitiveDisposalHold, file);
   }
 
   public void addDisposalScheduleEntry(String disposalConfirmationId, DisposalSchedule disposalSchedule)
     throws RequestNotValidException, GenericException {
+    StoragePath confirmationStoragePath = ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId);
+    Path confirmationPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationStoragePath);
 
-    Path disposalSchedulesFile = ModelUtils.getDisposalConfirmationElementPath(disposalConfirmationId,
-      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES_FILENAME);
+    Path file = FSUtils.createFile(confirmationPath,
+        RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES_FILENAME, true, true);
 
-    // ensuring parent exists
-    Path parent = disposalSchedulesFile.getParent();
-    if (!FSUtils.exists(parent)) {
-      try {
-        Files.createDirectories(parent);
-      } catch (IOException e) {
-        throw new GenericException("Error creating parent folder structure to write schedules into", e);
-      }
-    }
-
-    // verify if file exists and if not creates
-    if (!FSUtils.exists(disposalSchedulesFile)) {
-      try {
-        Files.createFile(disposalSchedulesFile);
-      } catch (IOException e) {
-        throw new GenericException("Error creating file to write schedules into", e);
-      }
-    }
-
-    JsonUtils.appendObjectToFile(disposalSchedule, disposalSchedulesFile);
+    JsonUtils.appendObjectToFile(disposalSchedule, file);
   }
 
   public void addAIPEntry(String disposalConfirmationId, DisposalConfirmationAIPEntry entry)
     throws RequestNotValidException, GenericException {
+    StoragePath confirmationStoragePath = ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId);
+    Path confirmationPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationStoragePath);
 
-    Path aipsFile = ModelUtils.getDisposalConfirmationElementPath(disposalConfirmationId,
-      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME);
+    Path file = FSUtils.createFile(confirmationPath,
+        RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME, true, true);
 
-    // ensuring parent exists
-    Path parent = aipsFile.getParent();
-    if (!FSUtils.exists(parent)) {
-      try {
-        Files.createDirectories(parent);
-      } catch (IOException e) {
-        throw new GenericException("Error creating parent folder structure to write aips into", e);
-      }
-    }
-
-    // verify if file exists and if not creates
-    if (!FSUtils.exists(aipsFile)) {
-      try {
-        Files.createFile(aipsFile);
-      } catch (IOException e) {
-        throw new GenericException("Error creating file to write aips into", e);
-      }
-    }
-
-    JsonUtils.appendObjectToFile(entry, aipsFile);
+    JsonUtils.appendObjectToFile(entry, file);
   }
 
   public DisposalConfirmation updateDisposalConfirmation(DisposalConfirmation disposalConfirmation)
@@ -3774,7 +3722,7 @@ public class ModelService extends ModelObservable {
   }
 
   public List<DisposalTransitiveHoldAIPMetadata> listTransitiveDisposalHolds(String aipId)
-          throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     return ResourceParseUtils.getAIPMetadata(getStorage(), aipId).getTransitiveHolds();
   }
 

@@ -51,6 +51,7 @@ import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,10 +65,9 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
 
   private final Set<String> disposalSchedules = new HashSet<>();
   private final Set<String> disposalHolds = new HashSet<>();
+  private final Set<String> disposalHoldTransitives = new HashSet<>();
   private long storageSize = 0L;
   private int aipCounter = 0;
-
-  private int total = 0;
 
   private String title;
   private Map<String, String> extraInformation;
@@ -212,7 +212,7 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
         try {
           // Fetch the AIP information to crystallize in the confirmation report
           DisposalConfirmationAIPEntry entry = DisposalConfirmationPluginUtils.getAIPEntryFromAIP(index, aip,
-            DestroyedSelectionState.DIRECT, disposalSchedules, disposalHolds);
+            DestroyedSelectionState.DIRECT, disposalSchedules, disposalHolds, disposalHoldTransitives);
           model.addAIPEntry(confirmationId, entry);
 
           // Mark the AIP as "on confirmation" so they cannot be added to another
@@ -272,7 +272,8 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
 
     // Make disposal holds as a jsonl
     try {
-      model.createDisposalHoldFileIfNotExists(confirmationId);
+      FSUtils.createFile(DisposalConfirmationPluginUtils.getDisposalConfirmationPath(confirmationId),
+        RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME, true, true);
       for (String disposalHoldId : disposalHolds) {
         DisposalHold disposalHold = model.retrieveDisposalHold(disposalHoldId);
         model.addDisposalHoldEntry(confirmationId, disposalHold);
@@ -280,6 +281,19 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
     } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException e) {
       LOGGER.error("Failed to create disposal holds jsonl file", e);
       report.addPluginDetails("Failed to create jsonl with disposal holds");
+    }
+
+    // Make disposal holds transitive as a jsonl
+    try {
+      FSUtils.createFile(DisposalConfirmationPluginUtils.getDisposalConfirmationPath(confirmationId),
+        RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_TRANSITIVE_HOLDS_FILENAME, true, true);
+      for (String disposalHoldId : disposalHoldTransitives) {
+        DisposalHold disposalHold = model.retrieveDisposalHold(disposalHoldId);
+        model.addDisposalHoldTransitiveEntry(confirmationId, disposalHold);
+      }
+    } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException e) {
+      LOGGER.error("Failed to create transitive disposal holds jsonl file", e);
+      report.addPluginDetails("Failed to create jsonl with transitive disposal holds");
     }
 
     // create disposal confirmation report metadata
@@ -309,15 +323,15 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
         Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID, RodaConstants.AIP_OVERDUE_DATE));
 
       for (IndexedAIP child : children) {
-        processChild(child, confirmationId, index, model, cachedJob);
+        processChild(child, aipParent.getId(), confirmationId, index, model, cachedJob);
       }
     } catch (GenericException | RequestNotValidException e) {
       LOGGER.error("Failed to retrieve AIP '{}' children", aipParent.getId());
     }
   }
 
-  private void processChild(IndexedAIP child, String confirmationId, IndexService index, ModelService model,
-    Job cachedJob) {
+  private void processChild(IndexedAIP child, String topAncestorId, String confirmationId, IndexService index,
+    ModelService model, Job cachedJob) {
     boolean processChild = true;
 
     LOGGER.debug("Processing child AIP {}", child.getId());
@@ -343,7 +357,7 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
       if (processChild) {
         // Fetch the AIP information to crystallize in the confirmation report
         DisposalConfirmationAIPEntry entry = DisposalConfirmationPluginUtils.getAIPEntryFromAIP(index, aip,
-          DestroyedSelectionState.TRANSITIVE, disposalSchedules, disposalHolds);
+          topAncestorId, DestroyedSelectionState.TRANSITIVE, disposalSchedules, disposalHolds, disposalHoldTransitives);
         model.addAIPEntry(confirmationId, entry);
 
         // Mark the AIP as "on confirmation" so they cannot be added to another

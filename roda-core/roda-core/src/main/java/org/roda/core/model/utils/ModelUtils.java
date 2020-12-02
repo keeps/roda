@@ -897,12 +897,4 @@ public final class ModelUtils {
   private static List<String> getDisposalConfirmationPath(String confirmationId) {
     return Arrays.asList(RodaConstants.STORAGE_CONTAINER_DISPOSAL_CONFIRMATION, confirmationId);
   }
-
-  public static Path getDisposalConfirmationElementPath(String disposalConfirmationId, String filename)
-    throws RequestNotValidException {
-    DefaultStoragePath confirmationPath = DefaultStoragePath
-      .parse(ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId));
-    Path entityPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);
-    return entityPath.resolve(filename);
-  }
 }
