@@ -15,7 +15,6 @@
 
                 <association:DisposalConfirmationPanel ui:field="disposalConfirmationPanel"/>
                 <association:RetentionPeriodPanel ui:field="retentionPeriodPanel"/>
-                <association:TransitiveDisposalHoldsPanel ui:field="transitiveDisposalHoldsPanel"/>
                 <association:DisposalHoldsPanel ui:field="disposalHoldsPanel"/>
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="col_2 last sidebar">
