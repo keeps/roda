@@ -264,11 +264,20 @@ public class BrowseAIP extends Composite {
 
     // AIP CHILDREN
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
-      ListBuilder<IndexedAIP> aipChildrenListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
-        new AsyncTableCellOptions<>(IndexedAIP.class, "BrowseAIP_aipChildren")
-          .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId())))
-          .withJustActive(justActive).withSummary(messages.listOfAIPs()).bindOpener().withActionable(aipActions)
-          .withActionableCallback(listActionableCallback));
+      ListBuilder<IndexedAIP> aipChildrenListBuilder;
+      if (aip.getState().equals(AIPState.DESTROYED)) {
+        aipChildrenListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
+          new AsyncTableCellOptions<>(IndexedAIP.class, "BrowseAIP_aipChildren")
+            .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId())))
+            .withJustActive(justActive).withSummary(messages.listOfAIPs()).bindOpener());
+
+      } else {
+        aipChildrenListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
+          new AsyncTableCellOptions<>(IndexedAIP.class, "BrowseAIP_aipChildren")
+            .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId())))
+            .withJustActive(justActive).withSummary(messages.listOfAIPs()).bindOpener().withActionable(aipActions)
+            .withActionableCallback(listActionableCallback));
+      }
 
       SearchWrapper aipChildrenSearchWrapper = new SearchWrapper(false)
         .createListAndSearchPanel(aipChildrenListBuilder);
