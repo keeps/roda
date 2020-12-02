@@ -110,7 +110,7 @@ public class DisposalHoldPluginUtils {
       for (DisposalHoldAIPMetadata disposalHoldAIPMetadata : new ArrayList<>(disposal.getHolds())) {
         String outcomeLiftText = disassociateDisposalHoldFromAIP(disposalHoldAIPMetadata.getId(), aip, reportItem);
         model.createEvent(aip.getId(), null, null, null, POLICY_ASSIGNMENT,
-          LiftDisposalHoldFromAIPPlugin.getStaticName(), null, null, state, outcomeLiftText, "",
+          LiftDisposalHoldPlugin.getStaticName(), null, null, state, outcomeLiftText, "",
           cachedJob.getUsername(), true);
       }
     }

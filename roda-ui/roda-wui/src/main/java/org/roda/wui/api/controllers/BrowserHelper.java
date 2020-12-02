@@ -157,7 +157,7 @@ import org.roda.core.plugins.plugins.internal.disposal.confirmation.RecoverDispo
 import org.roda.core.plugins.plugins.internal.disposal.confirmation.RestoreRecordsPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.hold.ApplyDisposalHoldToAIPPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.hold.DisassociateDisposalHoldFromAIPPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.hold.LiftDisposalHoldFromAIPPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.hold.LiftDisposalHoldPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.rules.ApplyDisposalRulesPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.schedule.AssociateDisposalScheduleToAIPPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.schedule.DisassociateDisposalScheduleToAIPPlugin;
@@ -3505,7 +3505,7 @@ public class BrowserHelper {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, disposalHoldId);
 
-    return createAndExecuteInternalJob("Lift disposal hold", items, LiftDisposalHoldFromAIPPlugin.class, user,
+    return createAndExecuteInternalJob("Lift disposal hold", items, LiftDisposalHoldPlugin.class, user,
       pluginParameters, "Could not execute lift disposal hold action");
   }
 

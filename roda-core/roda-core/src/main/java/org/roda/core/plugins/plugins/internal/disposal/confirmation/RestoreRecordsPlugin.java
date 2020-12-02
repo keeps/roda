@@ -17,6 +17,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry;
@@ -207,6 +208,7 @@ public class RestoreRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
 
       // reindex the AIP
       AIP aip = model.retrieveAIP(aipEntry.getAipId());
+      aip.setState(AIPState.ACTIVE);
       if (aip.getDisposal() != null) {
         aip.getDisposal().setConfirmation(null);
       }
