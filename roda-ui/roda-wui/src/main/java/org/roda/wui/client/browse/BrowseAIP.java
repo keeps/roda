@@ -230,12 +230,19 @@ public class BrowseAIP extends Composite {
 
     // REPRESENTATIONS
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)) {
-      ListBuilder<IndexedRepresentation> representationsListBuilder = new ListBuilder<>(
-        () -> new ConfigurableAsyncTableCell<>(),
-        new AsyncTableCellOptions<>(IndexedRepresentation.class, "BrowseAIP_representations")
-          .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aip.getId())))
-          .withJustActive(justActive).withSummary(messages.listOfRepresentations()).bindOpener()
-          .withActionable(representationActions).withActionableCallback(listActionableCallback));
+      ListBuilder<IndexedRepresentation> representationsListBuilder;
+      if (aip.getState().equals(AIPState.DESTROYED) || aip.isOnHold() || aip.getDisposalConfirmationId() != null) {
+        representationsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
+          new AsyncTableCellOptions<>(IndexedRepresentation.class, "BrowseAIP_representations")
+            .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aip.getId())))
+            .withJustActive(justActive).withSummary(messages.listOfRepresentations()).bindOpener());
+      } else {
+        representationsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
+          new AsyncTableCellOptions<>(IndexedRepresentation.class, "BrowseAIP_representations")
+            .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aip.getId())))
+            .withJustActive(justActive).withSummary(messages.listOfRepresentations()).bindOpener()
+            .withActionable(representationActions).withActionableCallback(listActionableCallback));
+      }
 
       SearchWrapper representationsSearchWrapper = new SearchWrapper(false)
         .createListAndSearchPanel(representationsListBuilder);
@@ -265,7 +272,7 @@ public class BrowseAIP extends Composite {
     // AIP CHILDREN
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
       ListBuilder<IndexedAIP> aipChildrenListBuilder;
-      if (aip.getState().equals(AIPState.DESTROYED)) {
+      if (aip.getState().equals(AIPState.DESTROYED) || aip.isOnHold() || aip.getDisposalConfirmationId() != null) {
         aipChildrenListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
           new AsyncTableCellOptions<>(IndexedAIP.class, "BrowseAIP_aipChildren")
             .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId())))
@@ -331,7 +338,8 @@ public class BrowseAIP extends Composite {
     updateSectionDescriptiveMetadata(bundle);
 
     // REPRESENTATIONS
-    if (bundle.getRepresentationCount() == 0 && aip.getState().equals(AIPState.ACTIVE)) {
+    if (bundle.getRepresentationCount() == 0 && aip.getState().equals(AIPState.ACTIVE) && !aip.isOnHold()
+      && aip.getDisposalConfirmationId() == null) {
       addRepresentation.setWidget(new ActionableWidgetBuilder<>(representationActions).buildListWithObjects(
         new ActionableObject<>(IndexedRepresentation.class),
         Collections.singletonList(RepresentationActions.RepresentationAction.NEW)));
@@ -341,13 +349,14 @@ public class BrowseAIP extends Composite {
 
     // AIP CHILDREN
     if (aip.getState().equals(AIPState.ACTIVE)) {
-
       if (bundle.getChildAIPCount() > 0) {
         LastSelectedItemsSingleton.getInstance().setSelectedJustActive(justActive);
       } else {
-        addChildAip.setWidget(
-          new ActionableWidgetBuilder<>(aipActions).buildListWithObjects(new ActionableObject<>(IndexedAIP.class),
-            Collections.singletonList(AipActions.AipAction.NEW_CHILD_AIP_BELOW)));
+        if (!aip.isOnHold() && aip.getDisposalConfirmationId() == null) {
+          addChildAip.setWidget(
+            new ActionableWidgetBuilder<>(aipActions).buildListWithObjects(new ActionableObject<>(IndexedAIP.class),
+              Collections.singletonList(AipActions.AipAction.NEW_CHILD_AIP_BELOW)));
+        }
       }
 
       addChildAip.setVisible(bundle.getChildAIPCount() == 0);
@@ -398,7 +407,8 @@ public class BrowseAIP extends Composite {
     });
 
     if (PermissionClientUtils.hasPermissions(aip.getPermissions(),
-      RodaConstants.PERMISSION_METHOD_CREATE_DESCRIPTIVE_METADATA_FILE) && aip.getState().equals(AIPState.ACTIVE)) {
+      RodaConstants.PERMISSION_METHOD_CREATE_DESCRIPTIVE_METADATA_FILE) && aip.getState().equals(AIPState.ACTIVE)
+      && !aip.isOnHold() && aip.getDisposalConfirmationId() == null) {
       final int addTabIndex = descriptiveMetadata.getWidgetCount();
       FlowPanel addTab = new FlowPanel();
       addTab.add(new HTML(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-plus-circle\"></i>")));
@@ -542,7 +552,8 @@ public class BrowseAIP extends Composite {
             }
 
             // Edit link
-            if (!AIPState.DESTROYED.equals(aip.getState())) {
+            if (!AIPState.DESTROYED.equals(aip.getState()) && !aip.isOnHold()
+              && aip.getDisposalConfirmationId() == null) {
               if (PermissionClientUtils.hasPermissions(aip.getPermissions(),
                 RodaConstants.PERMISSION_METHOD_UPDATE_DESCRIPTIVE_METADATA_FILE)) {
                 String editLink = HistoryUtils.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId,

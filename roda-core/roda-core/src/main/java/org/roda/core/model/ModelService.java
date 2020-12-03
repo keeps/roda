@@ -3460,17 +3460,21 @@ public class ModelService extends ModelObservable {
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
 
-    for (DisposalHoldAIPMetadata hold : aip.getHolds()) {
-      DisposalHold disposalHold = retrieveDisposalHold(hold.getId());
-      if (disposalHold != null && disposalHold.getState() == DisposalHoldState.ACTIVE) {
-        return true;
+    if (aip.getHolds() != null) {
+      for (DisposalHoldAIPMetadata hold : aip.getHolds()) {
+        DisposalHold disposalHold = retrieveDisposalHold(hold.getId());
+        if (disposalHold != null && disposalHold.getState() == DisposalHoldState.ACTIVE) {
+          return true;
+        }
       }
     }
 
-    for (DisposalTransitiveHoldAIPMetadata transitiveHold : aip.getTransitiveHolds()) {
-      DisposalHold transitiveDisposalHold = retrieveDisposalHold(transitiveHold.getId());
-      if (transitiveDisposalHold != null && transitiveDisposalHold.getState() == DisposalHoldState.ACTIVE) {
-        return true;
+    if (aip.getTransitiveHolds() != null) {
+      for (DisposalTransitiveHoldAIPMetadata transitiveHold : aip.getTransitiveHolds()) {
+        DisposalHold transitiveDisposalHold = retrieveDisposalHold(transitiveHold.getId());
+        if (transitiveDisposalHold != null && transitiveDisposalHold.getState() == DisposalHoldState.ACTIVE) {
+          return true;
+        }
       }
     }
 
@@ -3621,18 +3625,18 @@ public class ModelService extends ModelObservable {
     Path confirmationPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationStoragePath);
 
     Path file = FSUtils.createFile(confirmationPath,
-        RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME, true, true);
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME, true, true);
 
     JsonUtils.appendObjectToFile(disposalHold, file);
   }
 
   public void addDisposalHoldTransitiveEntry(String disposalConfirmationId, DisposalHold transitiveDisposalHold)
-      throws RequestNotValidException, GenericException {
+    throws RequestNotValidException, GenericException {
     StoragePath confirmationStoragePath = ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId);
     Path confirmationPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationStoragePath);
 
     Path file = FSUtils.createFile(confirmationPath,
-        RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_TRANSITIVE_HOLDS_FILENAME, true, true);
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_TRANSITIVE_HOLDS_FILENAME, true, true);
 
     JsonUtils.appendObjectToFile(transitiveDisposalHold, file);
   }
@@ -3643,7 +3647,7 @@ public class ModelService extends ModelObservable {
     Path confirmationPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationStoragePath);
 
     Path file = FSUtils.createFile(confirmationPath,
-        RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES_FILENAME, true, true);
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES_FILENAME, true, true);
 
     JsonUtils.appendObjectToFile(disposalSchedule, file);
   }
@@ -3654,7 +3658,7 @@ public class ModelService extends ModelObservable {
     Path confirmationPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationStoragePath);
 
     Path file = FSUtils.createFile(confirmationPath,
-        RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME, true, true);
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME, true, true);
 
     JsonUtils.appendObjectToFile(entry, file);
   }
