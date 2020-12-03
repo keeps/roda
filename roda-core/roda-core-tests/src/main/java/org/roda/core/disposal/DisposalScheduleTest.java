@@ -195,53 +195,6 @@ public class DisposalScheduleTest {
     assertEquals(aip.getDisposalScheduleId(), indexedAip.getDisposalScheduleId());
   }
 
-  @Test
-  public void testDisposalScheduleRecursiveAssociation() throws RequestNotValidException, AuthorizationDeniedException,
-    ValidationException, NotFoundException, GenericException, AlreadyExistsException {
-    // generate AIP ID
-    final String parentId = IdUtils.createUUID();
-    final String childId = IdUtils.createUUID();
-    final String grandsonId = IdUtils.createUUID();
-
-    // Create AIPs
-    AIP parentAIP = model.createAIP(parentId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
-      RodaConstants.ADMIN);
-    AIP childAIP = model.createAIP(childId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
-      RodaConstants.ADMIN);
-    AIP grandsonAIP = model.createAIP(grandsonId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
-      RodaConstants.ADMIN);
-
-    model.updateAIP(parentAIP, RodaConstants.ADMIN);
-    model.updateAIP(childAIP, RodaConstants.ADMIN);
-    model.updateAIP(grandsonAIP, RodaConstants.ADMIN);
-    // Create hierarchy
-    model.moveAIP(childId, parentId, RodaConstants.ADMIN);
-    model.moveAIP(grandsonId, parentId, RodaConstants.ADMIN);
-    index.commitAIPs();
-
-    // Generate Disposal
-    DisposalSchedule disposalSchedule = createDisposalSchedule();
-
-    // Associate disposal schedule to parentAip
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ID, parentId));
-    SelectedItemsFilter<IndexedAIP> selectedItems = new SelectedItemsFilter<>(filter, IndexedAIP.class.getName(),
-      Boolean.FALSE);
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID, disposalSchedule.getId());
-    Job job = TestsHelper.executeJob(AssociateDisposalScheduleToAIPPlugin.class, pluginParameters, PluginType.INTERNAL,
-      (SelectedItems) selectedItems);
-    index.commitAIPs();
-    // assertEquals(3, job.getJobStats().getSourceObjectsCount());
-
-    AIP retrieveChildAIP = model.retrieveAIP(childId);
-    AIP retrieveGrandSonAIP = model.retrieveAIP(grandsonId);
-    assertEquals(disposalSchedule.getId(), retrieveChildAIP.getDisposalScheduleId());
-    assertEquals(disposalSchedule.getId(), retrieveGrandSonAIP.getDisposalScheduleId());
-  }
-
   private DisposalSchedule createDisposalSchedule() throws AlreadyExistsException, AuthorizationDeniedException,
     GenericException, NotFoundException, RequestNotValidException {
     String title = "Normal";
