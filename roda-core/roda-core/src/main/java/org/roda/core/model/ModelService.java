@@ -22,7 +22,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -65,6 +64,8 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIP;
@@ -76,6 +77,20 @@ import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
+import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
+import org.roda.core.data.v2.ip.disposal.DisposalHolds;
+import org.roda.core.data.v2.ip.disposal.DisposalRule;
+import org.roda.core.data.v2.ip.disposal.DisposalRules;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.disposal.DisposalScheduleState;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalAIPMetadata;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
@@ -96,6 +111,7 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.events.EventsManager;
+import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.iterables.LogEntryFileSystemIterable;
 import org.roda.core.model.iterables.LogEntryStorageIterable;
 import org.roda.core.model.utils.ModelUtils;
@@ -147,7 +163,7 @@ public class ModelService extends ModelObservable {
 
     if (RodaCoreFactory.checkIfWriteIsAllowed(nodeType)) {
       ensureAllContainersExist();
-      ensureAllDiretoriesExist();
+      ensureAllDirectoriesExist();
     }
   }
 
@@ -162,6 +178,10 @@ public class ModelService extends ModelObservable {
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_RISK_INCIDENCE);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_DIP);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_REPRESENTATION_INFORMATION);
+      createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_DISPOSAL_SCHEDULE);
+      createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_DISPOSAL_HOLD);
+      createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_DISPOSAL_CONFIRMATION);
+      createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_DISPOSAL_RULE);
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error while ensuring that all containers exist", e);
     }
@@ -177,7 +197,7 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  private void ensureAllDiretoriesExist() {
+  private void ensureAllDirectoriesExist() {
     try {
       createDirectoryIfNotExists(
         DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION, RodaConstants.STORAGE_DIRECTORY_AGENTS));
@@ -200,8 +220,9 @@ public class ModelService extends ModelObservable {
     return storage;
   }
 
-  /***************** AIP related *****************/
-  /***********************************************/
+  /********************
+   * AIP related
+   ********************/
 
   private void createAIPMetadata(AIP aip) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException {
@@ -398,7 +419,7 @@ public class ModelService extends ModelObservable {
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     if (parentId != null) {
       AIP parentAIP = this.retrieveAIP(parentId);
-      Set<String> parentGroupnames = parentAIP.getPermissions().getGroupnames();
+      Set<String> parentGroupNames = parentAIP.getPermissions().getGroupnames();
       Set<String> parentUsernames = parentAIP.getPermissions().getUsernames();
       Set<String> groupnames = permissions.getGroupnames();
       Set<String> usernames = permissions.getUsernames();
@@ -409,7 +430,7 @@ public class ModelService extends ModelObservable {
         }
       }
 
-      for (String group : parentGroupnames) {
+      for (String group : parentGroupNames) {
         if (!groupnames.contains(group)) {
           permissions.setGroupPermissions(group, parentAIP.getPermissions().getGroupPermissions(group));
         }
@@ -449,6 +470,18 @@ public class ModelService extends ModelObservable {
       throw new ValidationException(validationReport);
     }
 
+    return aip;
+  }
+
+  public AIP destroyAIP(AIP aip, String updatedBy)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    aip.setUpdatedBy(updatedBy);
+    aip.setUpdatedOn(new Date());
+    aip.setState(AIPState.DESTROYED);
+    updateAIPMetadata(aip);
+    notifyAipDestroyed(aip).failOnError();
     return aip;
   }
 
@@ -534,8 +567,9 @@ public class ModelService extends ModelObservable {
     updateAIPMetadata(aip);
   }
 
-  /***************** Descriptive Metadata related *****************/
-  /****************************************************************/
+  /********************************
+   * Descriptive Metadata related
+   ********************************/
 
   public Binary retrieveDescriptiveMetadataBinary(String aipId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
@@ -847,8 +881,9 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  /***************** Representation related *****************/
-  /**********************************************************/
+  /**************************
+   * Representation related
+   **************************/
 
   public Representation retrieveRepresentation(String aipId, String representationId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
@@ -1045,8 +1080,9 @@ public class ModelService extends ModelObservable {
 
   }
 
-  /***************** File related *****************/
-  /************************************************/
+  /*****************
+   * File related
+   *****************/
 
   public CloseableIterable<OptionalWithCause<File>> listFilesUnder(File f, boolean recursive)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
@@ -1203,8 +1239,9 @@ public class ModelService extends ModelObservable {
     return newFile;
   }
 
-  /***************** Preservation related *****************/
-  /********************************************************/
+  /***********************
+   * Preservation related
+   ***********************/
 
   public void createRepositoryEvent(PreservationEventType eventType, String eventDescription, PluginState outcomeState,
     String outcomeText, String outcomeDetail, String agentName, boolean notify) {
@@ -1238,10 +1275,10 @@ public class ModelService extends ModelObservable {
       }
 
       createEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, sources, targets,
-        outcomeState, builder.toString(), "", Arrays.asList(IdUtils.getUserAgentId(agentName)), notify);
+        outcomeState, builder.toString(), "", Collections.singletonList(IdUtils.getUserAgentId(agentName)), notify);
     } catch (ValidationException | AlreadyExistsException | GenericException | NotFoundException
       | RequestNotValidException | AuthorizationDeniedException e1) {
-      LOGGER.error("Could not create an event for: " + eventDescription, e1);
+      LOGGER.error("Could not create an event for: {}", eventDescription, e1);
     }
   }
 
@@ -1589,8 +1626,9 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  /***************** Other metadata related *****************/
-  /**********************************************************/
+  /***************************
+   * Other metadata related
+   ***************************/
 
   public Binary retrieveOtherMetadataBinary(OtherMetadata om)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
@@ -1733,8 +1771,10 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  /***************** Log entry related *****************/
-  /*****************************************************/
+  /*********************
+   * Log entry related
+   *********************/
+
   public void importLogEntries(InputStream inputStream, String filename) throws AuthorizationDeniedException,
     GenericException, AlreadyExistsException, RequestNotValidException, NotFoundException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
@@ -1838,8 +1878,9 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  /***************** Users/Groups related *****************/
-  /********************************************************/
+  /************************
+   * Users/Groups related
+   ************************/
 
   public User retrieveAuthenticatedUser(String name, String password)
     throws GenericException, AuthenticationDeniedException {
@@ -2160,8 +2201,10 @@ public class ModelService extends ModelObservable {
     return user;
   }
 
-  /***************** Jobs related *****************/
-  /************************************************/
+  /*****************
+   * Jobs related
+   *****************/
+
   public void createJob(Job job)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
@@ -2320,8 +2363,9 @@ public class ModelService extends ModelObservable {
     notifyTransferredResourceDeleted(transferredResource.getUUID()).failOnError();
   }
 
-  /***************** Risk related *****************/
-  /************************************************/
+  /*****************
+   * Risk related
+   *****************/
 
   public Risk createRisk(Risk risk, boolean commit) throws GenericException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
@@ -2475,8 +2519,9 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  /***************** Notification related *****************/
-  /**********************************************************/
+  /************************
+   * Notification related
+   ************************/
 
   public Notification createNotification(Notification notification, NotificationProcessor processor)
     throws GenericException, AuthorizationDeniedException {
@@ -2574,8 +2619,9 @@ public class ModelService extends ModelObservable {
     return notification;
   }
 
-  /***************** DIP related *****************/
-  /**********************************************************/
+  /*********************************************
+   * DIP related
+   *********************************************/
 
   public CloseableIterable<OptionalWithCause<DIPFile>> listDIPFilesUnder(DIPFile f, boolean recursive)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
@@ -2806,15 +2852,9 @@ public class ModelService extends ModelObservable {
     return file;
   }
 
-  /****************************************************************
-   * 
+  /*********************************************************
    * OTHER DIRECTORIES (submission, documentation, schemas)
-   * 
    *********************************************************/
-
-  /**
-   * 
-   */
 
   public Directory getSubmissionDirectory(String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
@@ -3005,6 +3045,11 @@ public class ModelService extends ModelObservable {
         objectClass);
     } else if (Report.class.equals(objectClass)) {
       ret = ResourceParseUtils.convertLite(getStorage(), listReportResources(), objectClass);
+      /*
+       * } else if (DisposalConfirmation.class.equals(objectClass)) { ret =
+       * ResourceParseUtils.convertLite(getStorage(),
+       * ResourceListUtils.listDisposalConfirmationResources(storage), objectClass);
+       */
     } else {
       StoragePath containerPath = ModelUtils.getContainerPath(objectClass);
       final CloseableIterable<Resource> resourcesIterable = storage.listResourcesUnderContainer(containerPath, false);
@@ -3156,8 +3201,9 @@ public class ModelService extends ModelObservable {
     return hasPermission;
   }
 
-  /***************** Representation information related *****************/
-  /*****************************************************************************/
+  /*******************************************
+   * Representation information related
+   *******************************************/
 
   public RepresentationInformation createRepresentationInformation(RepresentationInformation ri, String createdBy,
     boolean commit) throws GenericException, AuthorizationDeniedException {
@@ -3228,4 +3274,544 @@ public class ModelService extends ModelObservable {
 
     return ret;
   }
+
+  /************************************
+   * Disposal hold related
+   ************************************/
+
+  public DisposalHold retrieveDisposalHold(String disposalHoldId)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHoldId);
+    Binary binary = storage.getBinary(disposalHoldPath);
+    DisposalHold ret;
+
+    try (InputStream inputStream = binary.getContent().createInputStream()) {
+      ret = JsonUtils.getObjectFromJson(inputStream, DisposalHold.class);
+    } catch (IOException | GenericException e) {
+      throw new GenericException("Error reading disposal hold: " + disposalHoldId, e);
+    }
+
+    Long count = SolrUtils.count(RodaCoreFactory.getSolr(), IndexedAIP.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLDS_ID, ret.getId())));
+    ret.setAipCounter(count);
+
+    return ret;
+  }
+
+  public DisposalHold createDisposalHold(DisposalHold disposalHold, String createdBy) throws GenericException,
+    AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, NotFoundException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    if (disposalHold.getId() == null) {
+      disposalHold.setId(IdUtils.createUUID());
+    }
+
+    disposalHold.setCreatedOn(new Date());
+    disposalHold.setCreatedBy(createdBy);
+    disposalHold.setUpdatedOn(new Date());
+    disposalHold.setUpdatedBy(createdBy);
+
+    String disposalHoldAsJson = JsonUtils.getJsonFromObject(disposalHold);
+    StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
+    storage.createBinary(disposalHoldPath, new StringContentPayload(disposalHoldAsJson), false);
+
+    return disposalHold;
+  }
+
+  public DisposalHold updateDisposalHold(DisposalHold disposalHold, String updatedBy) throws RequestNotValidException,
+    NotFoundException, GenericException, AuthorizationDeniedException, IllegalOperationException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    // Check if disposal hold is ACTIVE to update
+    DisposalHold currentDisposalHold = retrieveDisposalHold(disposalHold.getId());
+    if (DisposalHoldState.LIFTED.equals(currentDisposalHold.getState())) {
+      throw new IllegalOperationException("Error updating disposal hold: " + currentDisposalHold.getId()
+        + ". Reason: Disposal hold is lifted therefore can not change its content");
+    }
+
+    disposalHold.setUpdatedOn(new Date());
+    disposalHold.setUpdatedBy(updatedBy);
+
+    String disposalHoldAsJson = JsonUtils.getJsonFromObject(disposalHold);
+    StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
+
+    storage.updateBinaryContent(disposalHoldPath, new StringContentPayload(disposalHoldAsJson), false, true);
+
+    return disposalHold;
+  }
+
+  public void deleteDisposalHold(String disposalHoldId) throws RequestNotValidException, NotFoundException,
+    GenericException, AuthorizationDeniedException, IllegalOperationException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    DisposalHold disposalHold = retrieveDisposalHold(disposalHoldId);
+
+    if (disposalHold.getFirstTimeUsed() == null) {
+      StoragePath disposalHoldPath = ModelUtils.getDisposalHoldStoragePath(disposalHold.getId());
+      storage.deleteResource(disposalHoldPath);
+    } else {
+      throw new IllegalOperationException("Error deleting disposal hold: " + disposalHold.getId()
+        + ". Reason: One or more AIPs where associated under this disposal hold");
+    }
+  }
+
+  public DisposalHolds listDisposalHolds()
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
+    StoragePath disposalHoldContainerPath = ModelUtils.getDisposalHoldContainerPath();
+    DisposalHolds disposalHolds = new DisposalHolds();
+
+    try {
+      CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(disposalHoldContainerPath, false);
+      for (Resource resource : iterable) {
+        DisposalHold hold = ResourceParseUtils.convertResourceToObject(resource, DisposalHold.class);
+        disposalHolds.addObject(hold);
+      }
+    } catch (NotFoundException e) {
+      return new DisposalHolds();
+    }
+
+    return disposalHolds;
+  }
+
+  public DisposalAIPMetadata createDisposalHoldAssociation(String aipId, String disposalHoldId, Date associatedOn,
+    String associatedBy)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+
+    final DisposalHold disposalHold = retrieveDisposalHold(disposalHoldId);
+    if (disposalHold.getLiftedOn() != null) {
+      throw new NotFoundException("Could not associate an AIP with a disposal hold that is lifted: " + disposalHoldId);
+    }
+
+    // update AIP metadata
+    AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
+    DisposalAIPMetadata disposal = aip.getDisposal();
+    if (disposal == null) {
+      disposal = new DisposalAIPMetadata();
+      aip.setDisposal(disposal);
+    }
+
+    DisposalHoldAIPMetadata disposalHoldAIPMetadata = new DisposalHoldAIPMetadata();
+    disposalHoldAIPMetadata.setId(disposalHoldId);
+    disposalHoldAIPMetadata.setAssociatedBy(associatedBy);
+    disposalHoldAIPMetadata.setAssociatedOn(associatedOn);
+
+    disposal.addDisposalHold(disposalHoldAIPMetadata);
+
+    updateAIPMetadata(aip);
+    notifyAipUpdated(aip.getId());
+
+    return disposal;
+  }
+
+  public void deleteDisposalHoldAssociation(String aipId, String disposalHoldId)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    // update AIP metadata
+    AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
+    for (Iterator<DisposalHoldAIPMetadata> it = aip.getHolds().iterator(); it.hasNext();) {
+      DisposalHoldAIPMetadata disposalHoldAssociation = it.next();
+      if (disposalHoldAssociation.getId().equals(disposalHoldId)) {
+        it.remove();
+        break;
+      }
+    }
+
+    updateAIPMetadata(aip);
+    // TODO notify
+  }
+
+  public List<DisposalHold> retrieveActiveDisposalHolds(String aipId)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
+    List<DisposalHold> disposalHoldList = new ArrayList<>();
+
+    for (DisposalHoldAIPMetadata hold : aip.getHolds()) {
+      DisposalHold disposalHold = retrieveDisposalHold(hold.getId());
+      if (disposalHold != null && (disposalHold.getState() == DisposalHoldState.ACTIVE)) {
+        disposalHoldList.add(disposalHold);
+      }
+    }
+
+    for (DisposalTransitiveHoldAIPMetadata transitiveHold : aip.getTransitiveHolds()) {
+      DisposalHold transitiveDisposalHold = retrieveDisposalHold(transitiveHold.getId());
+      if (transitiveDisposalHold != null && (transitiveDisposalHold.getState() == DisposalHoldState.ACTIVE)) {
+        disposalHoldList.add(transitiveDisposalHold);
+      }
+    }
+
+    return disposalHoldList;
+  }
+
+  public List<DisposalHold> retrieveDirectActiveDisposalHolds(String aipId)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
+    List<DisposalHold> disposalHoldList = new ArrayList<>();
+
+    for (DisposalHoldAIPMetadata hold : aip.getHolds()) {
+      DisposalHold disposalHold = retrieveDisposalHold(hold.getId());
+      if (disposalHold != null && (disposalHold.getState() == DisposalHoldState.ACTIVE)) {
+        disposalHoldList.add(disposalHold);
+      }
+    }
+
+    return disposalHoldList;
+  }
+
+  public boolean onDisposalHold(String aipId)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
+
+    if (aip.getHolds() != null) {
+      for (DisposalHoldAIPMetadata hold : aip.getHolds()) {
+        DisposalHold disposalHold = retrieveDisposalHold(hold.getId());
+        if (disposalHold != null && disposalHold.getState() == DisposalHoldState.ACTIVE) {
+          return true;
+        }
+      }
+    }
+
+    if (aip.getTransitiveHolds() != null) {
+      for (DisposalTransitiveHoldAIPMetadata transitiveHold : aip.getTransitiveHolds()) {
+        DisposalHold transitiveDisposalHold = retrieveDisposalHold(transitiveHold.getId());
+        if (transitiveDisposalHold != null && transitiveDisposalHold.getState() == DisposalHoldState.ACTIVE) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  public boolean isAIPOnDirectHold(String aipId, String holdId)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
+    DisposalHold disposalHold = retrieveDisposalHold(holdId);
+
+    if (disposalHold.getState() == DisposalHoldState.ACTIVE) {
+      return aip.findHold(holdId) != null;
+    }
+
+    return false;
+  }
+
+  /************************************
+   * Disposal schedule related
+   ************************************/
+
+  public DisposalSchedule createDisposalSchedule(DisposalSchedule disposalSchedule, String createdBy)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    if (disposalSchedule.getId() == null) {
+      disposalSchedule.setId(IdUtils.createUUID());
+    }
+
+    disposalSchedule.setCreatedBy(createdBy);
+    disposalSchedule.setCreatedOn(new Date());
+    disposalSchedule.setUpdatedBy(createdBy);
+    disposalSchedule.setUpdatedOn(new Date());
+
+    String disposalScheduleAsJson = JsonUtils.getJsonFromObject(disposalSchedule);
+    StoragePath disposalSchedulePath = ModelUtils.getDisposalScheduleStoragePath(disposalSchedule.getId());
+    storage.createBinary(disposalSchedulePath, new StringContentPayload(disposalScheduleAsJson), false);
+
+    return disposalSchedule;
+  }
+
+  public DisposalSchedule updateDisposalSchedule(DisposalSchedule disposalSchedule, String updatedBy)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
+    IllegalOperationException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    // Check if disposal schedule is ACTIVE to update
+    DisposalSchedule currentDisposalSchedule = retrieveDisposalSchedule(disposalSchedule.getId());
+    if (DisposalScheduleState.INACTIVE.equals(currentDisposalSchedule.getState())) {
+      throw new IllegalOperationException("Error updating disposal schedule: " + currentDisposalSchedule.getId()
+        + ". Reason: Disposal schedule is inactive therefore can not change its content");
+    }
+
+    disposalSchedule.setUpdatedOn(new Date());
+    disposalSchedule.setUpdatedBy(updatedBy);
+
+    String disposalScheduleAsJson = JsonUtils.getJsonFromObject(disposalSchedule);
+    StoragePath disposalSchedulePath = ModelUtils.getDisposalScheduleStoragePath(disposalSchedule.getId());
+    storage.updateBinaryContent(disposalSchedulePath, new StringContentPayload(disposalScheduleAsJson), false, false);
+
+    return disposalSchedule;
+  }
+
+  public DisposalSchedule retrieveDisposalSchedule(String disposalScheduleId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    if (disposalScheduleId == null) {
+      throw new GenericException("Error retrieving disposal schedule identifier must not be null");
+    }
+    StoragePath disposalSchedulePath = ModelUtils.getDisposalScheduleStoragePath(disposalScheduleId);
+    Binary binary = storage.getBinary(disposalSchedulePath);
+    DisposalSchedule ret;
+
+    try (InputStream inputStream = binary.getContent().createInputStream()) {
+      ret = JsonUtils.getObjectFromJson(inputStream, DisposalSchedule.class);
+    } catch (IOException | GenericException e) {
+      throw new GenericException("Error reading disposal schedule: " + disposalScheduleId, e);
+    }
+
+    Long count = SolrUtils.count(RodaCoreFactory.getSolr(), IndexedAIP.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID, ret.getId())));
+    ret.setApiCounter(count);
+
+    return ret;
+  }
+
+  public DisposalSchedules listDisposalSchedules()
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
+    StoragePath disposalScheduleContainerPath = ModelUtils.getDisposalScheduleContainerPath();
+    DisposalSchedules disposalSchedules = new DisposalSchedules();
+
+    try {
+      CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(disposalScheduleContainerPath, false);
+      for (Resource resource : iterable) {
+        DisposalSchedule schedule = ResourceParseUtils.convertResourceToObject(resource, DisposalSchedule.class);
+        disposalSchedules.addObject(schedule);
+      }
+
+    } catch (NotFoundException e) {
+      LOGGER.error("Could not find any disposal schedules to list: {}", e.getMessage(), e);
+      return disposalSchedules;
+    }
+
+    return disposalSchedules;
+  }
+
+  public void deleteDisposalSchedule(String disposalScheduleId) throws NotFoundException, GenericException,
+    AuthorizationDeniedException, RequestNotValidException, IllegalOperationException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    StoragePath disposalSchedulePath = ModelUtils.getDisposalScheduleStoragePath(disposalScheduleId);
+
+    // check if the disposal schedule was used to destroy an AIP
+    // if so, block the action and keep the disposal schedule
+    if (retrieveDisposalSchedule(disposalScheduleId).getFirstTimeUsed() == null) {
+      // remove it from storage
+      storage.deleteResource(disposalSchedulePath);
+    } else {
+      throw new IllegalOperationException("Error deleting disposal schedule: " + disposalScheduleId
+        + ". Reason: One or more AIPs where destroyed under this disposal schedule");
+    }
+  }
+
+  /**********************************
+   * Disposal confirmation related
+   **********************************/
+  public DisposalConfirmation retrieveDisposalConfirmation(String disposalConfirmationId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(
+      ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId),
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME);
+    Binary binary = storage.getBinary(metadataStoragePath);
+    DisposalConfirmation ret;
+
+    try (InputStream inputStream = binary.getContent().createInputStream()) {
+      ret = JsonUtils.getObjectFromJson(inputStream, DisposalConfirmation.class);
+    } catch (IOException | GenericException e) {
+      throw new GenericException("Error reading disposal confirmation: " + disposalConfirmationId, e);
+    }
+
+    return ret;
+  }
+
+  public void addDisposalHoldEntry(String disposalConfirmationId, DisposalHold disposalHold)
+    throws GenericException, RequestNotValidException {
+    StoragePath confirmationStoragePath = ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId);
+    Path confirmationPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationStoragePath);
+
+    Path file = FSUtils.createFile(confirmationPath,
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME, true, true);
+
+    JsonUtils.appendObjectToFile(disposalHold, file);
+  }
+
+  public void addDisposalHoldTransitiveEntry(String disposalConfirmationId, DisposalHold transitiveDisposalHold)
+    throws RequestNotValidException, GenericException {
+    StoragePath confirmationStoragePath = ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId);
+    Path confirmationPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationStoragePath);
+
+    Path file = FSUtils.createFile(confirmationPath,
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_TRANSITIVE_HOLDS_FILENAME, true, true);
+
+    JsonUtils.appendObjectToFile(transitiveDisposalHold, file);
+  }
+
+  public void addDisposalScheduleEntry(String disposalConfirmationId, DisposalSchedule disposalSchedule)
+    throws RequestNotValidException, GenericException {
+    StoragePath confirmationStoragePath = ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId);
+    Path confirmationPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationStoragePath);
+
+    Path file = FSUtils.createFile(confirmationPath,
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES_FILENAME, true, true);
+
+    JsonUtils.appendObjectToFile(disposalSchedule, file);
+  }
+
+  public void addAIPEntry(String disposalConfirmationId, DisposalConfirmationAIPEntry entry)
+    throws RequestNotValidException, GenericException {
+    StoragePath confirmationStoragePath = ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId);
+    Path confirmationPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationStoragePath);
+
+    Path file = FSUtils.createFile(confirmationPath,
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_AIPS_FILENAME, true, true);
+
+    JsonUtils.appendObjectToFile(entry, file);
+  }
+
+  public DisposalConfirmation updateDisposalConfirmation(DisposalConfirmation disposalConfirmation)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    String disposalConfirmationAsJson = JsonUtils.getJsonFromObject(disposalConfirmation);
+    DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(
+      ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmation.getId()),
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME);
+    storage.updateBinaryContent(metadataStoragePath, new StringContentPayload(disposalConfirmationAsJson), false,
+      false);
+
+    notifyDisposalConfirmationCreatedOrUpdated(disposalConfirmation).failOnError();
+    return disposalConfirmation;
+  }
+
+  public DisposalConfirmation createDisposalConfirmation(DisposalConfirmation disposalConfirmation, String createdBy)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    if (disposalConfirmation.getId() == null) {
+      disposalConfirmation.setId(IdUtils.createUUID());
+    }
+
+    disposalConfirmation.setCreatedBy(createdBy);
+    disposalConfirmation.setCreatedOn(new Date());
+
+    String disposalConfirmationAsJson = JsonUtils.getJsonFromObject(disposalConfirmation);
+
+    DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(
+      ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmation.getId()),
+      RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_METADATA_FILENAME);
+
+    storage.createBinary(metadataStoragePath, new StringContentPayload(disposalConfirmationAsJson), false);
+    notifyDisposalConfirmationCreatedOrUpdated(disposalConfirmation).failOnError();
+
+    return disposalConfirmation;
+  }
+
+  public void deleteDisposalConfirmation(String disposalConfirmationId) throws AuthorizationDeniedException,
+    RequestNotValidException, NotFoundException, GenericException, IllegalOperationException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    StoragePath disposalSchedulePath = ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId);
+    DisposalConfirmation metadata = retrieveDisposalConfirmation(disposalConfirmationId);
+
+    // check if the disposal confirmation is pending
+    // if so the disposal confirmation can be deleted from the system
+    if (DisposalConfirmationState.PENDING.equals(metadata.getState())) {
+      storage.deleteResource(disposalSchedulePath);
+      notifyDisposalConfirmationDeleted(disposalConfirmationId, false).failOnError();
+    } else {
+      throw new IllegalOperationException("Error deleting disposal confirmation: " + disposalConfirmationId
+        + ". Reason: This confirmation state is " + metadata.getState().toString() + " and cannot be deleted");
+    }
+  }
+
+  public List<DisposalHoldAIPMetadata> listDisposalHoldsAssociation(String aipId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    return ResourceParseUtils.getAIPMetadata(getStorage(), aipId).getHolds();
+  }
+
+  public List<DisposalTransitiveHoldAIPMetadata> listTransitiveDisposalHolds(String aipId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    return ResourceParseUtils.getAIPMetadata(getStorage(), aipId).getTransitiveHolds();
+  }
+
+  /************************************
+   * Disposal rule related
+   ************************************/
+
+  public DisposalRule createDisposalRule(DisposalRule disposalRule, String createdBy) throws RequestNotValidException,
+    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    if (disposalRule.getId() == null) {
+      disposalRule.setId(IdUtils.createUUID());
+    }
+
+    disposalRule.setCreatedBy(createdBy);
+    disposalRule.setCreatedOn(new Date());
+    disposalRule.setUpdatedBy(createdBy);
+    disposalRule.setUpdatedOn(new Date());
+
+    String disposalRuleAsJson = JsonUtils.getJsonFromObject(disposalRule);
+    StoragePath disposalRulePath = ModelUtils.getDisposalRuleStoragePath(disposalRule.getId());
+    storage.createBinary(disposalRulePath, new StringContentPayload(disposalRuleAsJson), false);
+
+    return disposalRule;
+  }
+
+  public DisposalRule updateDisposalRule(DisposalRule disposalRule, String updatedBy)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    disposalRule.setUpdatedOn(new Date());
+    disposalRule.setUpdatedBy(updatedBy);
+
+    String disposalRuleAsJson = JsonUtils.getJsonFromObject(disposalRule);
+    StoragePath disposalRulePath = ModelUtils.getDisposalRuleStoragePath(disposalRule.getId());
+    storage.updateBinaryContent(disposalRulePath, new StringContentPayload(disposalRuleAsJson), false, false);
+
+    return disposalRule;
+  }
+
+  public void deleteDisposalRule(String disposalRuleId)
+    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    StoragePath disposalRulePath = ModelUtils.getDisposalRuleStoragePath(disposalRuleId);
+    storage.deleteResource(disposalRulePath);
+  }
+
+  public DisposalRule retrieveDisposalRule(String disposalRuleId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    StoragePath disposalRulePath = ModelUtils.getDisposalRuleStoragePath(disposalRuleId);
+    Binary binary = storage.getBinary(disposalRulePath);
+    DisposalRule ret;
+
+    try (InputStream inputStream = binary.getContent().createInputStream()) {
+      ret = JsonUtils.getObjectFromJson(inputStream, DisposalRule.class);
+    } catch (IOException | GenericException e) {
+      throw new GenericException("Error reading disposal rule: " + disposalRuleId, e);
+    }
+
+    return ret;
+  }
+
+  public DisposalRules listDisposalRules()
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
+    StoragePath disposalRuleContainerPath = ModelUtils.getDisposalRuleContainerPath();
+    DisposalRules disposalRules = new DisposalRules();
+
+    try {
+      CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(disposalRuleContainerPath, false);
+      for (Resource resource : iterable) {
+        DisposalRule rule = ResourceParseUtils.convertResourceToObject(resource, DisposalRule.class);
+        disposalRules.addObject(rule);
+      }
+      Collections.sort(disposalRules.getObjects());
+    } catch (NotFoundException e) {
+      return disposalRules;
+    }
+
+    return disposalRules;
+  }
+
+  /************************************
+   * Disposal bin related
+   ************************************/
+
 }

@@ -9,6 +9,7 @@ package org.roda.core.plugins.plugins.ingest.v2;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ import org.roda.core.plugins.plugins.ingest.EARKSIPToAIPPlugin;
 import org.roda.core.plugins.plugins.ingest.VerifyUserAuthorizationPlugin;
 import org.roda.core.plugins.plugins.ingest.v2.steps.AutoAcceptIngestStep;
 import org.roda.core.plugins.plugins.ingest.v2.steps.IngestStep;
+import org.roda.core.plugins.plugins.internal.disposal.rules.ApplyDisposalRulesPlugin;
 import org.roda.core.plugins.plugins.notifications.EmailIngestNotification;
 import org.roda.core.plugins.plugins.notifications.HttpGenericNotification;
 import org.roda.core.plugins.plugins.notifications.JobNotification;
@@ -69,7 +71,10 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
     // 9) verify producer authorization
     steps.add(new IngestStep(VerifyUserAuthorizationPlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK, true, true, true, true));
-    // 10) Auto accept
+    // 10) apply a disposal schedule via disposal rules
+    steps.add(new IngestStep(ApplyDisposalRulesPlugin.class.getName(),
+      RodaConstants.PLUGIN_PARAMS_DO_APPLY_DISPOSAL_RULES, true, false, true, false));
+    // 11) Auto accept
     steps.add(new AutoAcceptIngestStep(AutoAcceptSIPPlugin.class.getName(), RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT,
       true, true, true, true));
   }
@@ -118,6 +123,7 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
     }
 
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK));
+    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_APPLY_DISPOSAL_RULES));
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT));
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_NOTIFICATION_WHEN_FAILED));
@@ -194,6 +200,11 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
         deactivatedPlugins.add(DefaultIngestPlugin.PLUGIN_CLASS_DIGITAL_SIGNATURE);
       }
 
+      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_APPLY_DISPOSAL_RULES,
+        new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_APPLY_DISPOSAL_RULES,
+          ApplyDisposalRulesPlugin.getStaticName(), PluginParameterType.BOOLEAN, "true", true, false,
+          ApplyDisposalRulesPlugin.getStaticDescription()));
+
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT,
         new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT, AutoAcceptSIPPlugin.getStaticName(),
           PluginParameterType.BOOLEAN, "true", true, false, AutoAcceptSIPPlugin.getStaticDescription()));
@@ -266,12 +277,12 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_INGEST);
+    return Collections.singletonList(RodaConstants.PLUGIN_CATEGORY_INGEST);
   }
 
   @Override
   public List<Class<TransferredResource>> getObjectClasses() {
-    return Arrays.asList(TransferredResource.class);
+    return Collections.singletonList(TransferredResource.class);
   }
 
   @Override

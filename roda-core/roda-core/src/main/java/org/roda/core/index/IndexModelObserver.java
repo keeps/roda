@@ -19,6 +19,7 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrInputDocument;
@@ -28,6 +29,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.RetentionPeriodCalculationException;
 import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsModelObject;
@@ -47,6 +49,8 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
@@ -106,11 +110,15 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
     try {
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
+
       indexAIP(aip, ancestors).addTo(ret);
       if (ret.isEmpty()) {
         indexRepresentations(aip, ancestors).addTo(ret);
         if (ret.isEmpty()) {
           indexPreservationsEvents(aip.getId(), null).addTo(ret);
+          if (ret.isEmpty()) {
+            indexRetentionPeriod(aip, ancestors).addTo(ret);
+          }
         }
       }
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
@@ -122,14 +130,32 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private ReturnWithExceptions<Void, ModelObserver> indexAIP(final AIP aip, final List<String> ancestors) {
-    return indexAIP(aip, ancestors, false);
+    return indexAIP(aip, ancestors, false, null, null, false);
+  }
+
+  private ReturnWithExceptions<Void, ModelObserver> indexAIP(final AIP aip, final List<String> ancestors,
+    DisposalSchedule disposalSchedule, Map<String, String> retentionPeriodCalculation) {
+    return indexAIP(aip, ancestors, false, disposalSchedule, retentionPeriodCalculation, false);
+  }
+
+  private ReturnWithExceptions<Void, ModelObserver> indexAIP(final AIP aip, final List<String> ancestors,
+    DisposalSchedule disposalSchedule, Map<String, String> retentionPeriodCalculation, boolean disposalHoldStatus) {
+    return indexAIP(aip, ancestors, false, disposalSchedule, retentionPeriodCalculation, disposalHoldStatus);
   }
 
   private ReturnWithExceptions<Void, ModelObserver> indexAIP(final AIP aip, final List<String> ancestors,
     boolean safemode) {
+    return indexAIP(aip, ancestors, safemode, null, null, false);
+  }
+
+  private ReturnWithExceptions<Void, ModelObserver> indexAIP(final AIP aip, final List<String> ancestors,
+    boolean safemode, DisposalSchedule disposalSchedule, Map<String, String> retentionPeriodCalculation,
+    boolean disposalHoldStatus) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
-    SolrUtils.create2(index, (ModelObserver) this, IndexedAIP.class, aip, new AIPCollection.Info(ancestors, safemode))
+    SolrUtils
+      .create2(index, (ModelObserver) this, IndexedAIP.class, aip,
+        new AIPCollection.Info(ancestors, safemode, disposalSchedule, retentionPeriodCalculation, disposalHoldStatus))
       .addTo(ret);
 
     // if there was an error indexing, try in safe mode
@@ -243,6 +269,33 @@ public class IndexModelObserver implements ModelObserver {
     return ret;
   }
 
+  private ReturnWithExceptions<Void, ModelObserver> indexRetentionPeriod(final AIP aip, final List<String> ancestors) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+
+    try {
+      boolean onDisposalHold = model.onDisposalHold(aip.getId());
+      if (aip.getDisposalScheduleId() != null) {
+
+        DisposalSchedule disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
+
+        Map<String, String> retentionPeriod = SolrUtils.getRetentionPeriod(disposalSchedule, aip);
+        indexAIP(aip, ancestors, disposalSchedule, retentionPeriod, onDisposalHold).addTo(ret);
+        if (StringUtils.isNotBlank(retentionPeriod.get(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_DETAILS))) {
+          throw new RetentionPeriodCalculationException(
+            retentionPeriod.get(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_DETAILS));
+        }
+      } else {
+        indexAIP(aip, ancestors, null, null, onDisposalHold).addTo(ret);
+      }
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException
+      | RetentionPeriodCalculationException e) {
+      LOGGER.error("Cannot index retention period", e);
+      ret.add(e);
+    }
+
+    return ret;
+  }
+
   private ReturnWithExceptions<Long, ModelObserver> indexFile(AIP aip, File file, List<String> ancestors,
     boolean recursive) {
     ReturnWithExceptions<Long, ModelObserver> ret = new ReturnWithExceptions<>(this);
@@ -288,6 +341,24 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
+  public ReturnWithExceptions<Void, ModelObserver> aipDestroyed(AIP aip) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+
+    if (ret.isEmpty()) {
+      // change descriptive metadata, Representations, Files & Preservation events
+      descriptivesMetadataUpdated(aip).add(ret);
+      if (ret.isEmpty()) {
+        representationsStateUpdated(aip).addTo(ret);
+        if (ret.isEmpty()) {
+          preservationEventsStateUpdated(aip).addTo(ret);
+        }
+      }
+    }
+
+    return ret;
+  }
+
+  @Override
   public ReturnWithExceptions<Void, ModelObserver> aipStateUpdated(AIP aip) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
@@ -303,6 +374,14 @@ public class IndexModelObserver implements ModelObserver {
       preservationEventsStateUpdated(aip).addTo(ret);
     }
 
+    return ret;
+  }
+
+  private ReturnWithExceptions<Void, ModelObserver> descriptivesMetadataUpdated(final AIP aip) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+    for (DescriptiveMetadata metadata : aip.getDescriptiveMetadata()) {
+      descriptiveMetadataUpdated(metadata).addTo(ret);
+    }
     return ret;
   }
 
@@ -540,6 +619,13 @@ public class IndexModelObserver implements ModelObserver {
 
       if (descriptiveMetadata.isFromAIP()) {
         indexAIP(aip, ancestors).addTo(ret);
+        if (ret.isEmpty()) {
+          if (StringUtils.isNotBlank(aip.getDisposalScheduleId())) {
+            DisposalSchedule disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
+            Map<String, String> retentionPeriodCalculation = SolrUtils.getRetentionPeriod(disposalSchedule, aip);
+            indexAIP(aip, ancestors, disposalSchedule, retentionPeriodCalculation).addTo(ret);
+          }
+        }
       } else {
         Representation representation = model.retrieveRepresentation(descriptiveMetadata.getAipId(),
           descriptiveMetadata.getRepresentationId());
@@ -847,7 +933,8 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public ReturnWithExceptions<Void, ModelObserver> jobReportCreatedOrUpdated(Report jobReport, Job cachedJob) {
-    return SolrUtils.create2(index, this, IndexedReport.class, jobReport, new JobReportCollection.Info(jobReport, cachedJob));
+    return SolrUtils.create2(index, this, IndexedReport.class, jobReport,
+      new JobReportCollection.Info(jobReport, cachedJob));
   }
 
   @Override
@@ -1127,6 +1214,17 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public ReturnWithExceptions<Void, ModelObserver> dipFileDeleted(String dipId, List<String> path, String fileId) {
     return deleteDocumentFromIndex(DIPFile.class, IdUtils.getDIPFileId(dipId, path, fileId));
+  }
+
+  @Override
+  public ReturnWithExceptions<Void, ModelObserver> disposalConfirmationCreateOrUpdate(
+    DisposalConfirmation confirmation) {
+    return SolrUtils.create2(index, this, DisposalConfirmation.class, confirmation);
+  }
+
+  @Override
+  public ReturnWithExceptions<Void, ModelObserver> disposalConfirmationDeleted(String confirmationId, boolean commit) {
+    return deleteDocumentFromIndex(DisposalConfirmation.class, confirmationId);
   }
 
 }

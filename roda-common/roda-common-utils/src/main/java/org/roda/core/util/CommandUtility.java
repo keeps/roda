@@ -62,7 +62,7 @@ public class CommandUtility {
     try {
       StringBuilder builder = new StringBuilder();
       for (String arg : args) {
-        builder.append(arg + " ");
+        builder.append(arg).append(" ");
       }
 
       LOGGER.debug("Executing {}", builder);

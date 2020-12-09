@@ -319,3 +319,45 @@ file_filter = roda-ui/roda-wui/src/main/resources/config/theme/IngestProcessDesc
 source_file = roda-ui/roda-wui/src/main/resources/config/theme/IngestProcessDescription.html
 source_lang = en
 type = HTML
+
+[roda2.theme_PreDisseminationsPortal]
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/PreDisseminationsPortal_<lang>.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/PreDisseminationsPortal.html
+source_lang = en
+type = HTML
+
+[roda2.theme_WelcomePortal]
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/WelcomePortal_<lang>.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/WelcomePortal.html
+source_lang = en
+type = HTML
+
+[roda2.theme_PreChildrenPortal]
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/PreChildrenPortal_<lang>.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/PreChildrenPortal.html
+source_lang = en
+type = HTML
+
+[roda2.theme_PreservationEventsDescription]
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/PreservationEventsDescription_<lang>.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/PreservationEventsDescription.html
+source_lang = en
+type = HTML
+
+[roda2.theme_Error500]
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/Error500_<lang>.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/Error500.html
+source_lang = en
+type = HTML
+
+[roda2.theme_PreMetadataPortal]
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/PreMetadataPortal_<lang>.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/PreMetadataPortal.html
+source_lang = en
+type = HTML
+
+[roda2.theme_ErrorInactiveAccount]
+file_filter = roda-ui/roda-wui/src/main/resources/config/theme/ErrorInactiveAccount_<lang>.html
+source_file = roda-ui/roda-wui/src/main/resources/config/theme/ErrorInactiveAccount.html
+source_lang = en
+type = HTML

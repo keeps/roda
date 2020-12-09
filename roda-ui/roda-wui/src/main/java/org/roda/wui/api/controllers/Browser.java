@@ -59,6 +59,14 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalHolds;
+import org.roda.core.data.v2.ip.disposal.DisposalRule;
+import org.roda.core.data.v2.ip.disposal.DisposalRules;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
@@ -1108,6 +1116,12 @@ public class Browser extends RodaWuiController {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, aip);
 
+      // check state
+      controllerAssistant.checkAIPstate(aip);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
+
       String name = fileName;
       if (name.contains(".")) {
         name = name.substring(name.lastIndexOf('.'));
@@ -1115,6 +1129,7 @@ public class Browser extends RodaWuiController {
 
       // delegate
       BrowserHelper.createOrUpdateOtherMetadataFile(aipId, representationId, null, null, type, name, is);
+
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -1176,6 +1191,12 @@ public class Browser extends RodaWuiController {
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, aip);
+
+      // check state
+      controllerAssistant.checkAIPstate(aip);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
 
       // delegate
       BrowserHelper.deleteOtherMetadataFile(aipId, representationId, null, null, suffix, type);
@@ -1241,6 +1262,12 @@ public class Browser extends RodaWuiController {
         IndexedAIP parentAip = BrowserHelper.retrieve(IndexedAIP.class, parentId,
           RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
         controllerAssistant.checkObjectPermissions(user, parentAip);
+
+        // check state
+        controllerAssistant.checkAIPstate(parentAip);
+
+        // check if AIP is in a disposal confirmation
+        controllerAssistant.checkIfAIPInConfirmation(parentAip);
       }
 
       // delegate
@@ -1304,6 +1331,13 @@ public class Browser extends RodaWuiController {
         IndexedAIP parentSDO = BrowserHelper.retrieve(IndexedAIP.class, parentId,
           RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
         controllerAssistant.checkObjectPermissions(user, parentSDO);
+
+        // check state
+        controllerAssistant.checkAIPstate(parentSDO);
+
+        // check if AIP is in a disposal confirmation
+        controllerAssistant.checkIfAIPInConfirmation(parentSDO);
+
         Permissions parentPermissions = parentSDO.getPermissions();
 
         for (String name : parentPermissions.getUsernames()) {
@@ -1344,6 +1378,12 @@ public class Browser extends RodaWuiController {
       IndexedAIP indexedAip = BrowserHelper.retrieve(IndexedAIP.class, aip.getId(),
         RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, indexedAip);
+
+      // check state
+      controllerAssistant.checkAIPstate(indexedAip);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(indexedAip);
 
       // delegate
       return BrowserHelper.updateAIP(user, aip);
@@ -1437,6 +1477,12 @@ public class Browser extends RodaWuiController {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, aip);
 
+      // check state
+      controllerAssistant.checkAIPstate(aip);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
+
       // delegate
       return BrowserHelper.createDescriptiveMetadataFile(aipId, representationId, metadataId, metadataType,
         metadataVersion, metadataPayload);
@@ -1466,6 +1512,12 @@ public class Browser extends RodaWuiController {
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, aip);
+
+      // check state
+      controllerAssistant.checkAIPstate(aip);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
 
       // delegate
       Map<String, String> properties = new HashMap<>();
@@ -1497,6 +1549,12 @@ public class Browser extends RodaWuiController {
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, aip);
+
+      // check state
+      controllerAssistant.checkAIPstate(aip);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
 
       // delegate
       BrowserHelper.deleteDescriptiveMetadataFile(aipId, representationId, metadataId);
@@ -1552,6 +1610,12 @@ public class Browser extends RodaWuiController {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, aip);
 
+      // check state
+      controllerAssistant.checkAIPstate(aip);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
+
       // delegate
       return BrowserHelper.createRepresentation(user, aipId, representationId, type, details);
     } catch (RODAException e) {
@@ -1566,7 +1630,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static Representation updateRepresentation(User user, Representation representation)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -1575,9 +1639,6 @@ public class Browser extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId(),
-        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
-      controllerAssistant.checkObjectPermissions(user, aip);
 
       // delegate
       return BrowserHelper.updateRepresentation(representation);
@@ -1636,6 +1697,12 @@ public class Browser extends RodaWuiController {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, aip);
 
+      // check state
+      controllerAssistant.checkAIPstate(aip);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
+
       // delegate
       Map<String, String> properties = new HashMap<>();
       properties.put(RodaConstants.VERSION_USER, user.getId());
@@ -1665,6 +1732,15 @@ public class Browser extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
+      IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+      controllerAssistant.checkObjectPermissions(user, aip);
+
+      // check state
+      controllerAssistant.checkAIPstate(aip);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
+
       IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
         IdUtils.getRepresentationId(aipId, representationId), RodaConstants.REPRESENTATION_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, representation);
@@ -1702,6 +1778,12 @@ public class Browser extends RodaWuiController {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, aip);
 
+      // check state
+      controllerAssistant.checkAIPstate(aip);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
+
       // delegate
       Map<String, String> properties = new HashMap<>();
       properties.put(RodaConstants.VERSION_USER, user.getId());
@@ -1732,6 +1814,15 @@ public class Browser extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
+      IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+      controllerAssistant.checkObjectPermissions(user, aip);
+
+      // check state
+      controllerAssistant.checkAIPstate(aip);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
+
       IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
         IdUtils.getRepresentationId(aipId, representationId), RodaConstants.REPRESENTATION_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, representation);
@@ -1770,17 +1861,16 @@ public class Browser extends RodaWuiController {
         forceCommit);
 
       // register action
-      controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_PARENT_PARAM,
-        parentUUID, RodaConstants.CONTROLLER_FOLDERNAME_PARAM, folderName, RodaConstants.CONTROLLER_SUCCESS_PARAM,
-        true);
+      controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_PARENT_PARAM, parentUUID,
+        RodaConstants.CONTROLLER_FOLDERNAME_PARAM, folderName, RodaConstants.CONTROLLER_SUCCESS_PARAM, true);
       return transferredResource;
     } catch (GenericException e) {
       // register action
       // FIXME nvieira 20170518: does this make sense to register with SUCCESS?
       // and the other exception, should they be treated differently?
-      controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_PARENT_PARAM,
-        parentUUID, RodaConstants.CONTROLLER_FOLDERNAME_PARAM, folderName, RodaConstants.CONTROLLER_SUCCESS_PARAM,
-        false, RodaConstants.CONTROLLER_ERROR_PARAM, e.getMessage());
+      controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_PARENT_PARAM, parentUUID,
+        RodaConstants.CONTROLLER_FOLDERNAME_PARAM, folderName, RodaConstants.CONTROLLER_SUCCESS_PARAM, false,
+        RodaConstants.CONTROLLER_ERROR_PARAM, e.getMessage());
       throw e;
     }
   }
@@ -2595,6 +2685,12 @@ public class Browser extends RodaWuiController {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, aip);
 
+      // check state
+      controllerAssistant.checkAIPstate(aip);
+
+      // check if AIP is in a disposal confirmation
+      controllerAssistant.checkIfAIPInConfirmation(aip);
+
       // delegate
       Path file = Files.createTempFile("descriptive", ".tmp");
       Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
@@ -2625,9 +2721,6 @@ public class Browser extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, file.getAipId(),
-        RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
-      controllerAssistant.checkObjectPermissions(user, aip);
 
       // delegate
       Path temp = Files.createTempFile("descriptive", ".tmp");
@@ -3097,7 +3190,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static boolean hasSubmissions(User user, String aipId)
-          throws AuthorizationDeniedException, RequestNotValidException, GenericException {
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -3394,6 +3487,166 @@ public class Browser extends RodaWuiController {
       throw e;
     } finally {
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_FILENAME_PARAM, filename);
+    }
+  }
+
+  public static DisposalSchedule retrieveDisposalSchedule(User user, String scheduleId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().retrieveDisposalSchedule(scheduleId);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, scheduleId, state, RodaConstants.DISPOSAL_SCHEDULE_ID, scheduleId);
+    }
+  }
+
+  public static DisposalSchedules listDisposalSchedules(User user)
+    throws GenericException, RequestNotValidException, IOException, AuthorizationDeniedException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().listDisposalSchedules();
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state);
+    }
+  }
+
+  public static DisposalHolds listDisposalHolds(User user)
+    throws GenericException, RequestNotValidException, IOException, AuthorizationDeniedException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().listDisposalHolds();
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state);
+    }
+  }
+
+  public static DisposalHold retrieveDisposalHold(User user, String holdId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().retrieveDisposalHold(holdId);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, holdId, state, RodaConstants.DISPOSAL_HOLD_ID, holdId);
+    }
+  }
+
+  public static List<DisposalHoldAIPMetadata> listDisposalHoldsAssociation(User user, String aipId)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().listDisposalHoldsAssociation(aipId);
+    } catch (NotFoundException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state);
+    }
+  }
+
+  public static DisposalRules listDisposalRules(User user)
+    throws GenericException, RequestNotValidException, IOException, AuthorizationDeniedException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().listDisposalRules();
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state);
+    }
+  }
+
+  public static DisposalRule retrieveDisposalRule(User user, String ruleId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().retrieveDisposalRule(ruleId);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, ruleId, state, RodaConstants.DISPOSAL_RULE_ID, ruleId);
+    }
+  }
+
+  public static List<DisposalTransitiveHoldAIPMetadata> listTransitiveDisposalHolds(User user, String aipId)
+    throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().listTransitiveDisposalHolds(aipId);
+    } catch (NotFoundException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state);
     }
   }
 }

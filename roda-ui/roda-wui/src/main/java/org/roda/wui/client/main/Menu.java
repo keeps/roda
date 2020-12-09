@@ -20,17 +20,15 @@ import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.disposal.Disposal;
+import org.roda.wui.client.disposal.DisposalConfirmations;
+import org.roda.wui.client.disposal.DisposalDestroyedRecords;
+import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.preingest.PreIngest;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
-import org.roda.wui.client.management.Management;
-import org.roda.wui.client.management.MemberManagement;
-import org.roda.wui.client.management.NotificationRegister;
-import org.roda.wui.client.management.Profile;
-import org.roda.wui.client.management.Register;
-import org.roda.wui.client.management.Statistics;
-import org.roda.wui.client.management.UserLog;
+import org.roda.wui.client.management.*;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.planning.PreservationAgents;
 import org.roda.wui.client.planning.RepresentationInformationNetwork;
@@ -99,6 +97,11 @@ public class Menu extends Composite {
   private MenuItem administrationNotifications;
   private MenuItem administrationStatistics;
   // private MenuItem administrationPreferences;
+
+  private AcessibleMenuBar disposalMenu;;
+  private MenuItem disposalPolicy;
+  private MenuItem disposalConfirmation;
+  private MenuItem disposalDestroyedRecords;
 
   private AcessibleMenuBar planningMenu;
   // private MenuItem planningMonitoring;
@@ -169,6 +172,17 @@ public class Menu extends Composite {
     // administration_preferences =
     // administrationMenu.addItem(messages.title("administrationPreferences"),
     // createCommand(Management.RESOLVER.getHistoryPath()));
+
+    disposalMenu = new AcessibleMenuBar(true);
+    disposalPolicy = disposalMenu.addItem(messages.title("disposal_policy"),
+      createCommand(DisposalPolicy.RESOLVER.getHistoryPath()));
+    disposalPolicy.addStyleName("disposal_policy_item");
+    disposalConfirmation = disposalMenu.addItem(messages.title("disposal_confirmation"),
+      createCommand(DisposalConfirmations.RESOLVER.getHistoryPath()));
+    disposalConfirmation.addStyleName("disposal_confirmation_item");
+    disposalDestroyedRecords = disposalMenu.addItem(messages.title("disposal_destroyed_records"),
+      createCommand(DisposalDestroyedRecords.RESOLVER.getHistoryPath()));
+    disposalDestroyedRecords.addStyleName("disposal_destroyed_records_item");
 
     planningMenu = new AcessibleMenuBar(true);
     // planningMonitoring =
@@ -262,6 +276,14 @@ public class Menu extends Composite {
     adminItem.addStyleName("administration_menu_item");
     updateResolverTopItemVisibility(Management.RESOLVER, adminItem, 4);
 
+    // Disposal
+    updateResolverSubItemVisibility(DisposalPolicy.RESOLVER, disposalPolicy);
+    updateResolverSubItemVisibility(DisposalConfirmations.RESOLVER, disposalConfirmation);
+    updateResolverSubItemVisibility(DisposalDestroyedRecords.RESOLVER, disposalDestroyedRecords);
+    MenuItem disposalItem = new MenuItem(messages.title("disposal"), disposalMenu);
+    disposalItem.addStyleName("disposal_menu_item");
+    updateResolverTopItemVisibility(Disposal.RESOLVER, disposalItem, 5);
+
     // Planning
     // updateResolverSubItemVisibility(Planning.RESOLVER, planningMonitoring);
     updateResolverSubItemVisibility(RiskRegister.RESOLVER, planningRisk);
@@ -270,10 +292,10 @@ public class Menu extends Composite {
     updateResolverSubItemVisibility(PreservationAgents.RESOLVER, planningAgent);
     MenuItem planningItem = new MenuItem(messages.title("planning"), planningMenu);
     planningItem.addStyleName("planning_menu_item");
-    updateResolverTopItemVisibility(Planning.RESOLVER, planningItem, 5);
+    updateResolverTopItemVisibility(Planning.RESOLVER, planningItem, 6);
 
     // Help
-    updateResolverTopItemVisibility(Help.RESOLVER, help, 6);
+    updateResolverTopItemVisibility(Help.RESOLVER, help, 7);
 
     // User
     if (user.isGuest()) {

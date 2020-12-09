@@ -9,11 +9,32 @@ package org.roda.wui.client.common.utils;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
+import java.util.Date;
+
 public class JavascriptUtils {
 
   private JavascriptUtils() {
     // do nothing
   }
+
+  public static native JavaScriptObject durationInYMD(String futureDate) /*-{
+      var todayDate = $wnd.moment().startOf('day');
+      var disposalDate = $wnd.moment(futureDate).startOf('day');
+
+      var differenceInYears = Math.abs(todayDate.diff(disposalDate, 'years'));
+
+      if (differenceInYears < 1) {
+          var differenceInMonths = Math.abs(todayDate.diff(disposalDate, 'months'));
+          if (differenceInMonths < 1) {
+              var differenceInDays = Math.abs(todayDate.diff(disposalDate, 'days'));
+                  return { "diff": differenceInDays, "unit": "days" };
+          } else {
+              return { "diff": differenceInMonths, "unit": "months" };
+          }
+      } else {
+          return { "diff": differenceInYears, "unit": "years" };
+      }
+  }-*/;
 
   public static native void runHighlighter() /*-{
     $wnd.jQuery('pre code').each(function(i, block) {
@@ -363,14 +384,14 @@ public class JavascriptUtils {
   public static native int pdfDipViewerBottomPosition() /*-{
     var mainBottom = Math.floor($wnd.jQuery('.main').offset().top
         + $wnd.jQuery('.main').outerHeight(true));
-        
+
     var footerTop;
     if ($wnd.jQuery('.footer').length) {
       footerTop = Math.floor($wnd.jQuery('.footer').offset().top);
     } else {
       footerTop = mainBottom;
     }
-    
+
     var spacing = Math.floor($wnd.jQuery(
         'div.bitstreamPreview.viewRepresentationFilePreview')
         .outerHeight(true))
@@ -384,4 +405,11 @@ public class JavascriptUtils {
       return mainBottom - spacing;
     }
   }-*/;
+
+  public static final native void print(String html) /*-{
+    top.consoleRef=$wnd.open('','_blank', "");
+    top.consoleRef.document.write(html);
+    top.consoleRef.print();
+    top.consoleRef.document.close()
+}-*/;
 }

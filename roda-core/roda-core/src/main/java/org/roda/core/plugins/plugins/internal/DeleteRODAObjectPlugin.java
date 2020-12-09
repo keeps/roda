@@ -152,90 +152,130 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     }, index, model, storage, liteList);
   }
 
-  private void processAIP(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
-    AIP aip) {
-    Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
-    reportItem.setPluginState(PluginState.SUCCESS);
+  private void updateReport(ModelService model, Report reportItem, JobPluginInfo jobPluginInfo, Report report, Job job,
+    String entityName, String entityId, String disposalType, String parentId) {
 
-    if (!dontCheckRelatives) {
-      try {
-        Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
-        index.execute(
-          IndexedAIP.class, filter, Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID,
-            RodaConstants.AIP_LEVEL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL),
-          new IndexRunnable<IndexedAIP>() {
-            @Override
-            public void run(IndexedAIP item)
-              throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-              PluginState state = PluginState.SUCCESS;
-              try {
-                model.deleteAIP(item.getId());
-              } catch (NotFoundException e) {
-                state = PluginState.FAILURE;
-                reportItem.addPluginDetails("Could not delete AIP: " + e.getMessage());
-              }
+    reportItem.setPluginState(PluginState.FAILURE);
 
-              String outcomeText;
-              if (state.equals(PluginState.SUCCESS)) {
-                outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has been manually deleted");
-              } else {
-                outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has not been manually deleted");
-              }
-
-              List<LinkingIdentifier> sources = new ArrayList<>();
-              sources
-                .add(PluginHelper.getLinkingIdentifier(item.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-
-              model.createEvent(item.getId(), null, null, null, PreservationEventType.DELETION, EVENT_DESCRIPTION,
-                sources, null, state, outcomeText, details, job.getUsername(), true);
-            }
-          }, e -> {
-            reportItem.setPluginState(PluginState.FAILURE);
-            reportItem.addPluginDetails("Could not delete sublevel AIPs: " + e.getMessage());
-          });
-      } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-        reportItem.setPluginState(PluginState.FAILURE);
-        reportItem.addPluginDetails("Could not delete sublevel AIPs: " + e.getMessage());
-      }
+    if (entityName.equals(AIP.class.getSimpleName())) {
+      reportItem.addPluginDetails("Could not delete " + entityName + " [id: " + entityId
+        + "] due to be associated to a disposal " + disposalType);
+    } else {
+      reportItem.addPluginDetails("Could not delete " + entityName + " [id: " + entityId + "] due to parent AIP [id: "
+        + parentId + "] be associated to a disposal " + disposalType);
     }
 
     report.addReport(reportItem);
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
     jobPluginInfo.incrementObjectsProcessed(reportItem.getPluginState());
-
-    IndexedAIP item = null;
     String outcomeText;
 
-    try {
-      item = index.retrieve(IndexedAIP.class, aip.getId(),
-        Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_TITLE));
-    } catch (NotFoundException | GenericException e) {
-      // do nothing
-    }
-
-    try {
-      model.deleteAIP(aip.getId());
-
-      if (item != null) {
-        outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has been manually deleted");
-      } else {
-        outcomeText = "Archival Information Package [id: " + aip.getId() + "] has been manually deleted";
-      }
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      reportItem.setPluginState(PluginState.FAILURE);
-      reportItem.addPluginDetails("Could not delete AIP: " + e.getMessage());
-      if (item != null) {
-        outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has not been manually deleted");
-      } else {
-        outcomeText = "Archival Information Package [id: " + aip.getId() + "] has not been manually deleted";
-      }
+    if (entityName.equals(AIP.class.getSimpleName())) {
+      outcomeText = entityName + " [id: " + entityId
+        + "] has not been manually deleted due to be associated to a disposal " + disposalType;
+    } else {
+      outcomeText = entityName + " [id: " + entityId + "] has not been manually deleted due to parent AIP [id: "
+        + parentId + "] be associated to a disposal " + disposalType;
     }
 
     List<LinkingIdentifier> sources = new ArrayList<>();
-    sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+    sources.add(PluginHelper.getLinkingIdentifier(entityId, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-    model.createEvent(aip.getId(), null, null, null, PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null,
+    model.createEvent(entityId, null, null, null, PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null,
       reportItem.getPluginState(), outcomeText, details, job.getUsername(), true);
+  }
+
+  private void processAIP(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
+    AIP aip) {
+    Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
+    reportItem.setPluginState(PluginState.SUCCESS);
+
+    if (StringUtils.isNotBlank(aip.getDisposalScheduleId())) {
+      updateReport(model, reportItem, jobPluginInfo, report, job, AIP.class.getSimpleName(), aip.getId(), "schedule",
+        null);
+    } else if (aip.onHold()) {
+      updateReport(model, reportItem, jobPluginInfo, report, job, AIP.class.getSimpleName(), aip.getId(), "hold", null);
+    } else {
+      if (!dontCheckRelatives) {
+        try {
+          Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
+          index.execute(
+            IndexedAIP.class, filter, Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_ID,
+              RodaConstants.AIP_LEVEL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL),
+            new IndexRunnable<IndexedAIP>() {
+              @Override
+              public void run(IndexedAIP item)
+                throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+                PluginState state = PluginState.SUCCESS;
+                try {
+                  model.deleteAIP(item.getId());
+                } catch (NotFoundException e) {
+                  state = PluginState.FAILURE;
+                  reportItem.addPluginDetails("Could not delete AIP: " + e.getMessage());
+                }
+
+                String outcomeText;
+                if (state.equals(PluginState.SUCCESS)) {
+                  outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has been manually deleted");
+                } else {
+                  outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has not been manually deleted");
+                }
+
+                List<LinkingIdentifier> sources = new ArrayList<>();
+                sources.add(
+                  PluginHelper.getLinkingIdentifier(item.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+
+                model.createEvent(item.getId(), null, null, null, PreservationEventType.DELETION, EVENT_DESCRIPTION,
+                  sources, null, state, outcomeText, details, job.getUsername(), true);
+              }
+            }, e -> {
+              reportItem.setPluginState(PluginState.FAILURE);
+              reportItem.addPluginDetails("Could not delete sublevel AIPs: " + e.getMessage());
+            });
+        } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+          reportItem.setPluginState(PluginState.FAILURE);
+          reportItem.addPluginDetails("Could not delete sublevel AIPs: " + e.getMessage());
+        }
+      }
+
+      report.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+      jobPluginInfo.incrementObjectsProcessed(reportItem.getPluginState());
+
+      IndexedAIP item = null;
+      String outcomeText;
+
+      try {
+        item = index.retrieve(IndexedAIP.class, aip.getId(),
+          Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_TITLE));
+      } catch (NotFoundException | GenericException e) {
+        // do nothing
+      }
+
+      try {
+        model.deleteAIP(aip.getId());
+
+        if (item != null) {
+          outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has been manually deleted");
+        } else {
+          outcomeText = "Archival Information Package [id: " + aip.getId() + "] has been manually deleted";
+        }
+      } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+        reportItem.setPluginState(PluginState.FAILURE);
+        reportItem.addPluginDetails("Could not delete AIP: " + e.getMessage());
+        if (item != null) {
+          outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has not been manually deleted");
+        } else {
+          outcomeText = "Archival Information Package [id: " + aip.getId() + "] has not been manually deleted";
+        }
+      }
+
+      List<LinkingIdentifier> sources = new ArrayList<>();
+      sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+
+      model.createEvent(aip.getId(), null, null, null, PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null,
+        reportItem.getPluginState(), outcomeText, details, job.getUsername(), true);
+    }
   }
 
   private void processFile(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
@@ -244,53 +284,71 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class);
 
     try {
-      model.deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), true);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      AIP retrievedAIP = model.retrieveAIP(file.getAipId());
+      if (StringUtils.isNotBlank(retrievedAIP.getDisposalScheduleId())) {
+        updateReport(model, reportItem, jobPluginInfo, report, job, File.class.getSimpleName(), file.getId(),
+          "schedule", retrievedAIP.getId());
+      } else if (retrievedAIP.onHold()) {
+        updateReport(model, reportItem, jobPluginInfo, report, job, File.class.getSimpleName(), file.getId(), "hold",
+          retrievedAIP.getId());
+      } else {
+        try {
+          model.deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), true);
+        } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+          state = PluginState.FAILURE;
+          reportItem.addPluginDetails("Could not delete File: " + e.getMessage());
+        }
+
+        try {
+          // removing related risk incidences
+          Filter incidenceFilter = new Filter(
+            new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, file.getAipId()),
+            new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, file.getRepresentationId()),
+            new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED,
+              StringUtils.join(file.getPath(), RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED_SEPARATOR)),
+            new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_ID, file.getId()));
+          deleteRelatedIncidences(model, index, incidenceFilter);
+        } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+          state = PluginState.FAILURE;
+          reportItem.addPluginDetails("Could not delete file related incidences: " + e.getMessage());
+        }
+
+        // removing PREMIS file
+        try {
+          String pmId = URNUtils.getPremisPrefix(PreservationMetadataType.FILE) + file.getId();
+          model.deletePreservationMetadata(PreservationMetadataType.FILE, file.getAipId(), file.getRepresentationId(),
+            pmId, false);
+        } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+          reportItem.addPluginDetails("Could not delete associated PREMIS file: " + e.getMessage());
+        }
+
+        report.addReport(reportItem.setPluginState(state));
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+        jobPluginInfo.incrementObjectsProcessed(state);
+
+        String outcomeText;
+        if (state.equals(PluginState.SUCCESS)) {
+          outcomeText = "The file '" + file.getId() + "' has been manually deleted.";
+        } else {
+          outcomeText = "The file '" + file.getId() + "' has not been manually deleted.";
+        }
+
+        List<LinkingIdentifier> sources = new ArrayList<>();
+        sources.add(PluginHelper.getLinkingIdentifier(file.getAipId(), file.getRepresentationId(), file.getPath(),
+          file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+
+        model.createEvent(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
+          PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null, state, outcomeText, details,
+          job.getUsername(), true);
+      }
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       state = PluginState.FAILURE;
       reportItem.addPluginDetails("Could not delete File: " + e.getMessage());
+      report.addReport(reportItem.setPluginState(state));
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+      jobPluginInfo.incrementObjectsProcessed(state);
     }
 
-    try {
-      // removing related risk incidences
-      Filter incidenceFilter = new Filter(
-        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, file.getAipId()),
-        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, file.getRepresentationId()),
-        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED,
-          StringUtils.join(file.getPath(), RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED_SEPARATOR)),
-        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_ID, file.getId()));
-      deleteRelatedIncidences(model, index, incidenceFilter);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      state = PluginState.FAILURE;
-      reportItem.addPluginDetails("Could not delete file related incidences: " + e.getMessage());
-    }
-
-    // removing PREMIS file
-    try {
-      String pmId = URNUtils.getPremisPrefix(PreservationMetadataType.FILE) + file.getId();
-      model.deletePreservationMetadata(PreservationMetadataType.FILE, file.getAipId(), file.getRepresentationId(), pmId,
-        false);
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      reportItem.addPluginDetails("Could not delete associated PREMIS file: " + e.getMessage());
-    }
-
-    report.addReport(reportItem.setPluginState(state));
-    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
-    jobPluginInfo.incrementObjectsProcessed(state);
-
-    String outcomeText;
-    if (state.equals(PluginState.SUCCESS)) {
-      outcomeText = "The file '" + file.getId() + "' has been manually deleted.";
-    } else {
-      outcomeText = "The file '" + file.getId() + "' has not been manually deleted.";
-    }
-
-    List<LinkingIdentifier> sources = new ArrayList<>();
-    sources.add(PluginHelper.getLinkingIdentifier(file.getAipId(), file.getRepresentationId(), file.getPath(),
-      file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-
-    model.createEvent(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-      PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null, state, outcomeText, details, job.getUsername(),
-      true);
   }
 
   private void processRepresentation(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo,
@@ -299,49 +357,66 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), Representation.class);
 
     try {
-      model.deleteRepresentation(representation.getAipId(), representation.getId());
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      AIP retrievedAIP = model.retrieveAIP(representation.getAipId());
+      if (StringUtils.isNotBlank(retrievedAIP.getDisposalScheduleId())) {
+        updateReport(model, reportItem, jobPluginInfo, report, job, Representation.class.getSimpleName(),
+          representation.getId(), "schedule", retrievedAIP.getId());
+      } else if (retrievedAIP.onHold()) {
+        updateReport(model, reportItem, jobPluginInfo, report, job, Representation.class.getSimpleName(),
+          representation.getId(), "hold", retrievedAIP.getId());
+      } else {
+        try {
+          model.deleteRepresentation(representation.getAipId(), representation.getId());
+        } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+          state = PluginState.FAILURE;
+          reportItem.addPluginDetails("Could not delete representation: " + e.getMessage());
+        }
+
+        try {
+          // removing related risk incidences
+          Filter incidenceFilter = new Filter(
+            new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, representation.getAipId()),
+            new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representation.getId()));
+          deleteRelatedIncidences(model, index, incidenceFilter);
+        } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+          state = PluginState.FAILURE;
+          reportItem.addPluginDetails("Could not delete representation related incidences: " + e.getMessage());
+        }
+
+        // removing PREMIS file
+        try {
+          String pmId = URNUtils.getPremisPrefix(PreservationMetadataType.REPRESENTATION) + representation.getId();
+          model.deletePreservationMetadata(PreservationMetadataType.REPRESENTATION, representation.getAipId(),
+            representation.getId(), pmId, false);
+        } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+          reportItem.addPluginDetails("Could not delete associated PREMIS file: " + e.getMessage());
+        }
+
+        report.addReport(reportItem.setPluginState(state));
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+        jobPluginInfo.incrementObjectsProcessed(state);
+
+        String outcomeText;
+        if (state.equals(PluginState.SUCCESS)) {
+          outcomeText = "The representation '" + representation.getId() + "' has been manually deleted.";
+        } else {
+          outcomeText = "The representation '" + representation.getId() + "' has not been manually deleted.";
+        }
+
+        List<LinkingIdentifier> sources = new ArrayList<>();
+        sources.add(PluginHelper.getLinkingIdentifier(representation.getAipId(), representation.getId(),
+          RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+
+        model.createEvent(representation.getAipId(), representation.getId(), null, null, PreservationEventType.DELETION,
+          EVENT_DESCRIPTION, sources, null, state, outcomeText, details, job.getUsername(), true);
+      }
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       state = PluginState.FAILURE;
       reportItem.addPluginDetails("Could not delete representation: " + e.getMessage());
+      report.addReport(reportItem.setPluginState(state));
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+      jobPluginInfo.incrementObjectsProcessed(state);
     }
-
-    try {
-      // removing related risk incidences
-      Filter incidenceFilter = new Filter(
-        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, representation.getAipId()),
-        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representation.getId()));
-      deleteRelatedIncidences(model, index, incidenceFilter);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      state = PluginState.FAILURE;
-      reportItem.addPluginDetails("Could not delete representation related incidences: " + e.getMessage());
-    }
-
-    // removing PREMIS file
-    try {
-      String pmId = URNUtils.getPremisPrefix(PreservationMetadataType.REPRESENTATION) + representation.getId();
-      model.deletePreservationMetadata(PreservationMetadataType.REPRESENTATION, representation.getAipId(),
-        representation.getId(), pmId, false);
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      reportItem.addPluginDetails("Could not delete associated PREMIS file: " + e.getMessage());
-    }
-
-    report.addReport(reportItem.setPluginState(state));
-    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
-    jobPluginInfo.incrementObjectsProcessed(state);
-
-    String outcomeText;
-    if (state.equals(PluginState.SUCCESS)) {
-      outcomeText = "The representation '" + representation.getId() + "' has been manually deleted.";
-    } else {
-      outcomeText = "The representation '" + representation.getId() + "' has not been manually deleted.";
-    }
-
-    List<LinkingIdentifier> sources = new ArrayList<>();
-    sources.add(PluginHelper.getLinkingIdentifier(representation.getAipId(), representation.getId(),
-      RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-
-    model.createEvent(representation.getAipId(), representation.getId(), null, null, PreservationEventType.DELETION,
-      EVENT_DESCRIPTION, sources, null, state, outcomeText, details, job.getUsername(), true);
   }
 
   private void processRisk(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,

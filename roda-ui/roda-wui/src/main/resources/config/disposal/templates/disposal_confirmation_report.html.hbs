@@ -1,0 +1,198 @@
+<div>
+	<h1>Disposal report nrº {{metadata.id}}</h1>
+	<p>
+		This disposal agreement created by {{metadata.createdBy}} on {{humanize metadata.createdOn}}, was
+		approved on {{metadata.extraFields.approvedOn}} and signed by {{metadata.extraFields.approvedBy}},
+		on the date defined below, allowing the destruction of {{metadata.numberOfAIPs}} records.
+	</p>
+
+	<hr>
+	{{#if aips.length}}
+
+    <div class="disposal-policy-summary">
+	    <div class="gwt-HTML h5 disposal-policy-summary-icon" style=""><i class="fas fa-info-circle"></i></div>
+	    <div class="gwt-Label h5 disposal-policy-summary-text">List of records to be destroyed</div>
+    </div>
+
+    <br>
+
+	<div>
+        <div class="my-asyncdatagrid-display-scroll-wrapper">
+            <div style="overflow: auto; position: relative; zoom: 1;">
+                <div style="position: relative; zoom: 1;">
+                    <table __gwtcellbasedwidgetimpldispatchingfocus="true" __gwtcellbasedwidgetimpldispatchingblur="true"
+                        class="cellTableWidget table-info my-asyncdatagrid-display" cellspacing="0">
+                        <colgroup>
+                            <col style="width: 15em;">
+                            <col>
+                            <col style="width: 12em;">
+                            <col style="width: 12em;">
+                            <col style="width: 12em;">
+                        </colgroup>
+                        <thead>
+                            <tr __gwt_header_row="0">
+                                <th colspan="1" class="cellTableHeader" __gwt_column="column-gwt-uid-76"
+                                    __gwt_header="header-gwt-uid-77">Level</th>
+                                <th colspan="1" class="cellTableHeader" __gwt_column="column-gwt-uid-78"
+                                    __gwt_header="header-gwt-uid-79">Name</th>
+                                <th colspan="1" class="cellTableHeader" __gwt_column="column-gwt-uid-80"
+                                    __gwt_header="header-gwt-uid-81">Collection</th>
+                                <th colspan="1" class="cellTableHeader" __gwt_column="column-gwt-uid-82"
+                                    __gwt_header="header-gwt-uid-83">Nr files</th>
+                                <th colspan="1" class="cellTableHeader" __gwt_column="column-gwt-uid-84"
+                                    __gwt_header="header-gwt-uid-85">Size</th>
+                                <th colspan="1" class="cellTableHeader" __gwt_column="column-gwt-uid-86"
+                                __gwt_header="header-gwt-uid-87">Schedule id</th>
+                                <th colspan="1" class="cellTableHeader" __gwt_column="column-gwt-uid-88"
+                                __gwt_header="header-gwt-uid-89">Holds id</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each aips}}
+                            <tr __gwt_row="0" __gwt_subrow="0">
+                                <td class="cellTableCell GWHXELB-d-c GWHXELB-d-d">
+                                    <div style="outline-style:none;" __gwt_cell="cell-gwt-uid-86">{{aipLevel}}</div>
+                                </td>
+                                <td class="cellTableCell GWHXELB-d-c">
+                                    <div style="outline-style:none;" __gwt_cell="cell-gwt-uid-87">{{aipTitle}}</div>
+                                </td>
+                                <td class="cellTableCell GWHXELB-d-c">
+                                    <div style="outline-style:none;" __gwt_cell="cell-gwt-uid-88">{{aipCollection}}</div>
+                                </td>
+                                <td class="cellTableCell GWHXELB-d-c">
+                                    <div style="outline-style:none;" __gwt_cell="cell-gwt-uid-89">{{aipNumberOfFiles}}</div>
+                                </td>
+                                <td class="cellTableCell GWHXELB-d-c">
+                                    <div style="outline-style:none;" __gwt_cell="cell-gwt-uid-90">{{aipSize}}</div>
+                                </td>
+                                <td class="cellTableCell GWHXELB-d-c">
+                                    <div style="outline-style:none;" __gwt_cell="cell-gwt-uid-91">{{aipDisposalScheduleId}}</div>
+                                </td>
+                                {{#if aipDisposalHoldIds.length}}
+                                    <td class="cellTableCell GWHXELB-d-c">
+                                        <div style="outline-style:none;" __gwt_cell="cell-gwt-uid-92">{{aipDisposalHoldIds}}</div>
+                                    </td>
+                                {{else}}
+                                    <td></td>
+                                {{/if}}
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+	{{/if}}
+
+    <br>
+	<hr>
+
+	{{#if schedules.length}}
+
+    <div class="disposal-policy-summary">
+    	<div class="gwt-HTML h5 disposal-policy-summary-icon" style=""><i class="fas fa-info-circle"></i></div>
+        <div class="gwt-Label h5 disposal-policy-summary-text">Description of disposal schedules associated to a record</div>
+    </div>
+
+
+	{{#each schedules}}
+	<br>
+
+	<div class="wui-data-panel">
+		<div class="browseItemPanelWithMargin">
+			<div class="browseItemPanel">
+			    <span class="h5">Disposal Schedule: {{title}}</span>
+			</div>
+			<div class="gwt-Label browseItemId" title="Identifier">Identifier: {{id}}
+			</div>
+			<div class="gwt-Label browseItemId">Created on {{humanize createdOn}} UTC by {{createdBy}}</div>
+			<div class="gwt-Label browseItemId">Updated on {{humanize updatedOn}} UTC by {{updatedBy}}</div>
+		</div>
+		<div>
+			<span class="label">Description: </span><span class="value">{{description}}</span>
+		</div>
+		<div>
+			<span class="label">Mandate: </span><span class="value">{{mandate}}</span>
+		</div>
+		<div>
+			<span class="label">Scope notes: </span><span class="value">{{scopeNotes}}</span>
+		</div>
+		<div>
+			<span class="label">Action: </span><span class="value">{{actionCode}}</span>
+		</div>
+		<div>
+			<span class="label">Retention trigger element identifier: </span><span class="value">{{retentionTriggerElementId}}</span>
+		</div>
+		<div>
+			<span class="label">Retention period: </span><span class="value">{{retentionPeriodDuration}} {{retentionPeriodIntervalCode}}</span>
+		</div>
+	</div>
+	<br>
+	{{/each}}
+
+	{{/if}}
+
+	<hr>
+
+	{{#if holds.length}}
+
+	<div class="disposal-policy-summary">
+        <div class="gwt-HTML h4 disposal-policy-summary-icon" style=""><i class="fas fa-info-circle"></i></div>
+        <div class="gwt-Label h4 disposal-policy-summary-text">Description of disposal holds associated to a record</div>
+    </div>
+
+	<h5></h5>
+
+	{{#each holds}}
+    <br>
+	<div class="wui-data-panel">
+		<div class="browseItemPanelWithMargin">
+		    <div class="browseItemPanel">
+        	    <span class="h5">Disposal Hold: {{title}}</span>
+        	</div>
+			<div class="gwt-Label browseItemId" title="Identifier">Identifier: {{id}}
+			</div>
+			<div class="gwt-Label browseItemId">Created on {{humanize createdOn}} UTC by {{createdBy}}</div>
+			<div class="gwt-Label browseItemId">Updated on {{humanize updatedOn}} UTC by {{updatedBy}}</div>
+		</div>
+		<div>
+			<span class="label">Description: </span><span class="value">{{description}}</span>
+		</div>
+		<div>
+			<span class="label">Mandate: </span><span class="value">{{mandate}}</span>
+		</div>
+		<div>
+		    <span class="label">Scope notes</span><span class="value">{{scopeNotes}}</span>
+		</div>
+	</div>
+    <br>
+	{{/each}}
+
+    <hr>
+
+	{{/if}}
+
+     <br>
+
+      <table style="width: 100%;">
+        <thead>
+            <tr style="text-align: left;">
+                <th>Approved by</th>
+                <th>Approved on</th>
+                <th>Signature</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{metadata.extraFields.approvedBy}}</td>
+                <td>{{metadata.extraFields.approvedOn}}</td>
+                <td>___________________________________</td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+
+
+
