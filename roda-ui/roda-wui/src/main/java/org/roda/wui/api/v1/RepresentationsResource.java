@@ -173,6 +173,7 @@ public class RepresentationsResource {
   }
 
   @POST
+  @Path("/{" + RodaConstants.API_PATH_PARAM_AIP_ID + "}/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_ID + "}")
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
@@ -183,8 +184,8 @@ public class RepresentationsResource {
   public Response createRepresentation(
     @ApiParam(value = "The AIP to add the representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The desired representation ID", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
-    @ApiParam(value = "The type of the new representation", required = true) @FormParam(RodaConstants.API_QUERY_PARAM_TYPE) String type,
-    @ApiParam(value = "Reason to create representation", required = true) @FormParam(RodaConstants.API_QUERY_PARAM_DETAILS) String details,
+    @ApiParam(value = "The type of the new representation", required = true) @QueryParam(RodaConstants.API_QUERY_PARAM_TYPE) String type,
+    @ApiParam(value = "Reason to create representation", required = true) @QueryParam(RodaConstants.API_QUERY_PARAM_DETAILS) String details,
     @ApiParam(value = "Choose format in which to get the representation", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
     @ApiParam(value = "JSONP callback name", required = false, allowMultiple = false, defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
     throws RODAException {

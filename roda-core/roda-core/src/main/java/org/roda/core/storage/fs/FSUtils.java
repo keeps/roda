@@ -783,6 +783,31 @@ public class FSUtils {
     return file;
   }
 
+  public static Path createFile(Path parent, String name, boolean createDirectoriesIfNotExists,
+    boolean createIfNotExists) throws GenericException {
+    // ensuring parent exists
+    if (createDirectoriesIfNotExists && !FSUtils.exists(parent)) {
+      try {
+        Files.createDirectories(parent);
+      } catch (IOException e) {
+        throw new GenericException("Error creating parent folder structure to write holds into", e);
+      }
+    }
+
+    Path file = parent.resolve(name);
+
+    // verify if file exists and if not creates
+    if (createIfNotExists && !FSUtils.exists(file)) {
+      try {
+        Files.createFile(file);
+      } catch (IOException e) {
+        throw new GenericException("Error creating file " + file, e);
+      }
+    }
+
+    return file;
+  }
+
   public static CloseableIterable<BinaryVersion> listBinaryVersions(final Path historyDataPath,
     final Path historyMetadataPath, final StoragePath storagePath) throws GenericException, NotFoundException {
     Path fauxPath = getEntityPath(historyDataPath, storagePath);

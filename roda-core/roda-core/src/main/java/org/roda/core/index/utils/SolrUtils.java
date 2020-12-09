@@ -18,6 +18,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -45,8 +47,8 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
 import org.apache.solr.client.solrj.SolrRequest.METHOD;
-import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -58,6 +60,7 @@ import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.handler.loader.XMLLoader;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
@@ -104,11 +107,16 @@ import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.HasPermissionFilters;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.disposal.RetentionPeriodCalculation;
+import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ri.RelationObjectType;
@@ -1601,4 +1609,76 @@ public class SolrUtils {
     }
   }
 
+  public static Map<String, String> getRetentionPeriod(DisposalSchedule disposalSchedule, AIP aip)
+    throws NotFoundException, GenericException {
+    Map<String, String> values = new HashMap<>();
+
+    if (DisposalActionCode.RETAIN_PERMANENTLY.equals(disposalSchedule.getActionCode())) {
+      return values;
+    }
+
+    Date overDueDate;
+    Integer retentionPeriodDuration = disposalSchedule.getRetentionPeriodDuration();
+    Calendar cal = Calendar.getInstance();
+
+    IndexedAIP retrieve = retrieve(RodaCoreFactory.getSolr(), IndexedAIP.class, aip.getId(),
+      Collections.singletonList(disposalSchedule.getRetentionTriggerElementId()));
+
+    Object o = retrieve.getFields().get(disposalSchedule.getRetentionTriggerElementId());
+
+    if (o == null) {
+      values.put(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_DETAILS, "Retention period start date is missing");
+      values.put(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_CALCULATION, RetentionPeriodCalculation.ERROR.name());
+      return values;
+    }
+
+    if (o instanceof Date) {
+      Date retentionPeriodStartDate = (Date) o;
+      cal.setTime(retentionPeriodStartDate);
+    } else {
+      values.put(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_DETAILS, "Retention period start must be of date type");
+      values.put(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_CALCULATION, RetentionPeriodCalculation.ERROR.name());
+      return values;
+    }
+
+    if (!disposalSchedule.getRetentionPeriodIntervalCode().equals(RetentionPeriodIntervalCode.NO_RETENTION_PERIOD)) {
+      switch (disposalSchedule.getRetentionPeriodIntervalCode()) {
+        case YEARS:
+          cal.add(Calendar.YEAR, retentionPeriodDuration);
+          break;
+        case MONTHS:
+          cal.add(Calendar.MONTH, retentionPeriodDuration);
+          break;
+        case WEEKS:
+          cal.add(Calendar.WEEK_OF_MONTH, retentionPeriodDuration);
+          break;
+        case DAYS:
+          cal.add(Calendar.DATE, retentionPeriodDuration);
+          break;
+      }
+    }
+    overDueDate = cal.getTime();
+
+    values.put(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_START_DATE, formatDate(objectToDate(o)));
+    values.put(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_CALCULATION, RetentionPeriodCalculation.SUCCESS.name());
+    values.put(RodaConstants.AIP_OVERDUE_DATE, formatDate(overDueDate));
+
+    return values;
+  }
+
+  public static DisposalSchedule getDisposalSchedule(AIP aip, ModelService model)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+    DisposalSchedule disposalSchedule;
+    try {
+      if(StringUtils.isNoneBlank(aip.getDisposalScheduleId())){
+        disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
+      } else {
+        return null;
+      }
+    } catch (NotFoundException e) {
+      return null;
+    }
+
+    return disposalSchedule;
+  }
 }

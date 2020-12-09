@@ -447,7 +447,9 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     if (jobStateInfoActor != null) {
       jobStateInfoActor.tell(partialUpdate, ActorRef.noSender());
       if (partialUpdate instanceof JobStateUpdated && Job.isFinalState(((JobStateUpdated) partialUpdate).getState())) {
+        LOGGER.debug("Removing job {} from list of running jobs; Plugin is {}", jobId, plugin.getClass().getName());
         runningJobs.remove(jobId);
+        LOGGER.debug("Removing job {} from list of stopping jobs; Plugin is {}", jobId, plugin.getClass().getName());
         stoppingJobs.remove(jobId);
         inErrorJobs.remove(jobId);
       }
@@ -460,6 +462,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public void setJobContextInformation(String jobId, Object object) {
     runningJobs.put(jobId, (ActorRef) object);
+    LOGGER.debug("Running jobs: {}", runningJobs);
   }
 
   public ActorRef getJobContextInformation(String jobId) {
@@ -467,6 +470,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   public <T extends IsRODAObject> ActorRef getJobContextInformation(Plugin<T> plugin) {
+    LOGGER.debug("Getting job context information; JobId: {}; Plugin name: {}", PluginHelper.getJobId(plugin), plugin.getClass().getName());
+    LOGGER.debug("Plugin parameters map: {}", plugin.getParameterValues());
     return getJobContextInformation(PluginHelper.getJobId(plugin));
   }
 
@@ -478,7 +483,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     if (jobStateInfoActor != null) {
       jobStateInfoActor.tell(Messages.newJobInfoUpdated(plugin, info), ActorRef.noSender());
     } else {
-      throw new JobException("Job id or job information is null");
+        throw new JobException("Job id or job information is null");
     }
   }
 
