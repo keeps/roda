@@ -21,6 +21,7 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -29,6 +30,15 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
+import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalHolds;
+import org.roda.core.data.v2.ip.disposal.DisposalRule;
+import org.roda.core.data.v2.ip.disposal.DisposalRules;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -43,6 +53,7 @@ import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
+import org.roda.wui.client.browse.bundle.DisposalConfirmationExtraBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
@@ -280,4 +291,78 @@ public interface BrowserServiceAsync {
     AsyncCallback<RepresentationInformationExtraBundle> asyncCallback);
 
   void retrieveSharedProperties(String localeName, AsyncCallback<Map<String, List<String>>> asyncCallback);
+
+  void createDisposalRule(DisposalRule rule, AsyncCallback<DisposalRule> async);
+
+  void retrieveDisposalRule(String disposalRuleId, AsyncCallback<DisposalRule> async);
+
+  void listDisposalRules(AsyncCallback<DisposalRules> async);
+
+  void updateDisposalRule(DisposalRule rule, AsyncCallback<DisposalRule> async);
+
+  void updateDisposalRules(DisposalRules rules, AsyncCallback<Void> async);
+
+  void deleteDisposalRule(String disposalRuleId, AsyncCallback<Void> async);
+
+  void applyDisposalRules(boolean applyToManuallyInclusive, AsyncCallback<Job> async);
+
+  void createDisposalSchedule(DisposalSchedule schedule, AsyncCallback<DisposalSchedule> async);
+
+  void retrieveDisposalSchedule(String disposalScheduleId, AsyncCallback<DisposalSchedule> async);
+
+  void listDisposalSchedules(AsyncCallback<DisposalSchedules> async);
+
+  void updateDisposalSchedule(DisposalSchedule schedule, AsyncCallback<DisposalSchedule> async);
+
+  void deleteDisposalSchedule(String disposalScheduleId, AsyncCallback<Void> async);
+
+  void createDisposalHold(DisposalHold hold, AsyncCallback<DisposalHold> async);
+
+  void retrieveDisposalHold(String disposalHoldId, AsyncCallback<DisposalHold> async);
+
+  void listDisposalHolds(AsyncCallback<DisposalHolds> async);
+
+  void updateDisposalHold(DisposalHold hold, AsyncCallback<DisposalHold> async);
+
+  void deleteDisposalHold(String disposalHoldId, AsyncCallback<Void> async);
+
+  void associateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, String disposalScheduleId,
+    AsyncCallback<Job> async);
+
+  void disassociateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, AsyncCallback<Job> async);
+
+  void createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, String title,
+    DisposalConfirmationExtraBundle metadata, AsyncCallback<Job> async);
+
+  void listDisposalHoldsAssociation(String aipId, AsyncCallback<List<DisposalHoldAIPMetadata>> async);
+
+  void deleteDisposalConfirmationReport(SelectedItems<DisposalConfirmation> selectedItems, String details,
+    AsyncCallback<Job> async);
+
+  void destroyRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems,
+    AsyncCallback<Job> async);
+
+  void permanentlyDeleteRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems,
+    AsyncCallback<Job> async);
+
+  void retrieveDisposalConfirmationExtraBundle(AsyncCallback<DisposalConfirmationExtraBundle> async);
+
+  void applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean override,
+    AsyncCallback<Job> async);
+
+  void recoverRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems,
+    AsyncCallback<Job> async);
+
+  void restoreRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems,
+    AsyncCallback<Job> async);
+
+  void liftDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, AsyncCallback<Job> async);
+
+  void disassociateDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean clearAll,
+    AsyncCallback<Job> async);
+
+  void retrieveDisposalConfirmationReport(String confirmationId, boolean isToPrint, AsyncCallback<String> async);
+
+  void listTransitiveDisposalHolds(String aipId, AsyncCallback<List<DisposalTransitiveHoldAIPMetadata>> async);
+
 }

@@ -221,12 +221,12 @@ public class UserLogin {
   public void checkRole(final HistoryResolver res, final AsyncCallback<Boolean> callback) {
     String historyKey = StringUtils.join(res.getHistoryPath(), HistoryUtils.HISTORY_PERMISSION_SEP);
     final String propertyName = "ui.menu." + historyKey + ".role";
-    String role = ConfigurationManager.getString(propertyName);
-    checkRole(role, callback);
+    List<String> roles = ConfigurationManager.getStringList(propertyName);
+    checkRole(roles, callback);
   }
 
-  public void checkRole(final String role, final AsyncCallback<Boolean> callback) {
-    if (StringUtils.isBlank(role)) {
+  public void checkRole(final List<String> roles, final AsyncCallback<Boolean> callback) {
+    if (roles.isEmpty()) {
       callback.onSuccess(Boolean.TRUE);
     } else {
       getAuthenticatedUser(new AsyncCallback<User>() {
@@ -237,7 +237,7 @@ public class UserLogin {
 
         @Override
         public void onSuccess(User authUser) {
-          callback.onSuccess(authUser.hasRole(role));
+          callback.onSuccess(authUser.hasRoles(roles));
         }
       });
     }

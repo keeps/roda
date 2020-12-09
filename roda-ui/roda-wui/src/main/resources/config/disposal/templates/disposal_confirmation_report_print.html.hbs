@@ -1,0 +1,189 @@
+<html>
+    <head>
+    <style type="text/css" media="print">
+        @page
+        {
+            size: auto;   /* auto is the initial value */
+            margin: 5mm;  /* this affects the margin in the printer settings */
+        }
+    </style>
+    <title>Disposal confirmation report</title>
+    </head>
+
+    <body>
+        <div>
+            <h3>Disposal report nrº {{metadata.id}}</h3>
+            <p>
+                This disposal agreement created by {{metadata.createdBy}} on {{humanize metadata.createdOn}}, was
+                approved on {{metadata.extraFields.approvedOn}} and signed by {{metadata.extraFields.approvedBy}},
+                on the date defined below, allowing the destruction of {{metadata.numberOfAIPs}} records.
+            </p>
+
+            <hr>
+
+            {{#if aips.length}}
+
+            <h5>List of records to be destroyed</h5>
+
+            <br>
+
+            <table style="width: 100%; border-collapse: collapse; border: 1px solid black">
+                <thead>
+                    <tr style="text-align: center; border-collapse: collapse; border: 1px solid black">
+                        <th style="text-align: center; border-collapse: collapse; border: 1px solid black">Level</th>
+                        <th style="text-align: center; border-collapse: collapse; border: 1px solid black">Name</th>
+                        <th style="text-align: center; border-collapse: collapse; border: 1px solid black">Collection</th>
+                        <th style="text-align: center; border-collapse: collapse; border: 1px solid black">Nr files</th>
+                        <th style="text-align: center; border-collapse: collapse; border: 1px solid black">Size</th>
+                        <th style="text-align: center; border-collapse: collapse; border: 1px solid black">Schedule id</th>
+                        <th style="text-align: center; border-collapse: collapse; border: 1px solid black">Hold id</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each aips}}
+                    <tr style="text-align: center; border-collapse: collapse; border: 1px solid black">
+                        <td style="text-align: center; border-collapse: collapse; border: 1px solid black">{{aipLevel}}</td>
+                        <td style="text-align: center; border-collapse: collapse; border: 1px solid black">{{aipTitle}}</td>
+                        <td style="text-align: center; border-collapse: collapse; border: 1px solid black">{{aipCollection}}</td>
+                        <td style="text-align: center; border-collapse: collapse; border: 1px solid black">{{aipNumberOfFiles}}</td>
+                        <td style="text-align: center; border-collapse: collapse; border: 1px solid black">{{aipSize}}</td>
+                        <td style="text-align: center; border-collapse: collapse; border: 1px solid black">{{aipDisposalScheduleId}}</td>
+                        {{#if aipDisposalHoldIds.length}}
+                        <td style="text-align: center; border-collapse: collapse; border: 1px solid black">{{aipDisposalHoldIds}}</td>
+                        {{else}}
+                        <td></td>
+                        {{/if}}
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+            {{/if}}
+
+            <br>
+            <hr>
+
+            {{#if schedules.length}}
+
+            <h5>Description of disposal schedules associated to a record</h5>
+
+            {{#each schedules}}
+
+            <br>
+
+            <table style="width: 100%; border-collapse: collapse; border: 1px solid black">
+                <tr style="text-align: left; border-collapse: collapse; border: 1px solid black">
+                    <th width="20%" style="text-align: left; border-collapse: collapse; border: 1px solid black">Disposal
+                        schedule</th>
+                    <td>{{title}}</td>
+                <tr>
+                <tr style="text-align: left; border-collapse: collapse; border: 1px solid black">
+                    <th width="20%" style="text-align: left; border-collapse: collapse; border: 1px solid black">Identifier
+                    </th>
+                    <td>{{id}}</td>
+                <tr>
+                <tr style="text-align: left; border-collapse: collapse; border: 1px solid black">
+                    <th width="20%" style="text-align: left; border-collapse: collapse; border: 1px solid black">Description
+                    </th>
+                    <td>{{description}}</td>
+                <tr>
+                <tr style="text-align: left; border-collapse: collapse; border: 1px solid black">
+                    <th width="20%" style="text-align: left; border-collapse: collapse; border: 1px solid black">Mandate
+                    </th>
+                    <td>{{mandate}}</td>
+                <tr>
+                <tr style="text-align: left; border-collapse: collapse; border: 1px solid black">
+                    <th width="20%" style="text-align: left; border-collapse: collapse; border: 1px solid black">Scope Notes
+                    </th>
+                    <td>{{scopeNotes}}</td>
+                <tr>
+                <tr style="text-align: left; border-collapse: collapse; border: 1px solid black">
+                    <th width="20%" style="text-align: left; border-collapse: collapse; border: 1px solid black">Action</th>
+                    <td>{{actionCode}}</td>
+                <tr>
+                <tr style="text-align: left; border-collapse: collapse; border: 1px solid black">
+                    <th width="20%" style="text-align: left; border-collapse: collapse; border: 1px solid black">Retention
+                        trigger element identifier</th>
+                    <td>{{retentionTriggerElementId}}</td>
+                <tr>
+                <tr style="text-align: left; border-collapse: collapse; border: 1px solid black">
+                    <th width="20%" style="text-align: left; border-collapse: collapse; border: 1px solid black">Retention
+                        period</th>
+                    <td>{{retentionPeriodDuration}} {{retentionPeriodIntervalCode}}</td>
+                <tr>
+            </table>
+
+            <br>
+
+            {{/each}}
+
+            {{/if}}
+
+            <hr>
+
+            {{#if holds.length}}
+
+            <h5>Description of disposal holds associated to a record</h5>
+
+            {{#each holds}}
+
+            <br>
+
+           <table style="width: 100%; border-collapse: collapse; border: 1px solid black">
+               <tr style="text-align: left; border-collapse: collapse; border: 1px solid black">
+                   <th width="20%" style="text-align: left; border-collapse: collapse; border: 1px solid black">Disposal
+                       hold</th>
+                   <td>{{title}}</td>
+               <tr>
+               <tr style="text-align: left; border-collapse: collapse; border: 1px solid black">
+                   <th width="20%" style="text-align: left; border-collapse: collapse; border: 1px solid black">Identifier
+                   </th>
+                   <td>{{id}}</td>
+               <tr>
+               <tr style="text-align: left; border-collapse: collapse; border: 1px solid black">
+                   <th width="20%" style="text-align: left; border-collapse: collapse; border: 1px solid black">Description
+                   </th>
+                   <td>{{description}}</td>
+               <tr>
+               <tr style="text-align: left; border-collapse: collapse; border: 1px solid black">
+                   <th width="20%" style="text-align: left; border-collapse: collapse; border: 1px solid black">Mandate
+                   </th>
+                   <td>{{mandate}}</td>
+               <tr>
+               <tr style="text-align: left; border-collapse: collapse; border: 1px solid black">
+                   <th width="20%" style="text-align: left; border-collapse: collapse; border: 1px solid black">Scope Notes
+                   </th>
+                   <td>{{scopeNotes}}</td>
+               <tr>
+           </table>
+
+            <br>
+
+            {{/each}}
+
+            <hr>
+
+            {{/if}}
+
+            <br>
+
+            <table style="width: 100%;">
+               <thead>
+                    <tr style="text-align: left;">
+                        <th>Approved by</th>
+                        <th>Approved on</th>
+                        <th>Signature</th>
+                    </tr>
+               </thead>
+               <tbody>
+                    <tr>
+                        <td>{{metadata.extraFields.approvedBy}}</td>
+                        <td>{{metadata.extraFields.approvedOn}}</td>
+                        <td>___________________________________</td>
+                    </tr>
+               </tbody>
+            </table>
+
+        </div>
+    </body>
+</html>
+

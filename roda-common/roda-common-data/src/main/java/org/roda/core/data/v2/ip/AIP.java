@@ -13,6 +13,9 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalAIPMetadata;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -20,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_AIP)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
+public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasDisposal {
 
   private static final long serialVersionUID = 430629679119752757L;
   private static final int VERSION = 1;
@@ -50,23 +53,26 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
   private Date updatedOn = null;
   private String updatedBy = null;
 
+  private DisposalAIPMetadata disposal;
+
   public AIP() {
     super();
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions) {
     this(id, parentId, type, state, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>(),
-      new AIPFormat(), new ArrayList<Relationship>(), new Date(), null, new Date(), null);
+      new AIPFormat(), new ArrayList<Relationship>(), new Date(), null, new Date(), null, new DisposalAIPMetadata());
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions, String createdBy) {
     this(id, parentId, type, state, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>(),
-      new AIPFormat(), new ArrayList<Relationship>(), new Date(), createdBy, new Date(), createdBy);
+      new AIPFormat(), new ArrayList<Relationship>(), new Date(), createdBy, new Date(), createdBy, new DisposalAIPMetadata());
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions,
     List<DescriptiveMetadata> descriptiveMetadata, List<Representation> representations, AIPFormat format,
-    List<Relationship> relationships, Date createdOn, String createdBy, Date updatedOn, String updatedBy) {
+    List<Relationship> relationships, Date createdOn, String createdBy, Date updatedOn, String updatedBy,
+    DisposalAIPMetadata disposal) {
     super();
     this.id = id;
     this.parentId = parentId;
@@ -83,6 +89,8 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
     this.createdBy = createdBy;
     this.updatedOn = updatedOn;
     this.updatedBy = updatedBy;
+
+    this.disposal = disposal;
   }
 
   @JsonIgnore
@@ -297,6 +305,94 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
     this.updatedBy = updatedBy;
   }
 
+  public DisposalAIPMetadata getDisposal() {
+    return disposal;
+  }
+
+  public void setDisposal(DisposalAIPMetadata disposal) {
+    this.disposal = disposal;
+  }
+
+  @JsonIgnore
+  public DisposalHoldAIPMetadata findHold(String disposalHoldId) {
+    if (disposal != null) {
+      return disposal.findHold(disposalHoldId);
+    }
+    return null;
+  }
+
+  @JsonIgnore
+  public DisposalTransitiveHoldAIPMetadata findTransitiveHold(String disposalHoldId) {
+    if (disposal != null) {
+      return disposal.findTransitiveHold(disposalHoldId);
+    }
+    return null;
+  }
+
+  @JsonIgnore
+  public boolean removeDisposalHold(String disposalHold) {
+    if(disposal != null){
+      return disposal.removeDisposalHold(disposalHold);
+    }
+    return false;
+  }
+
+  @JsonIgnore
+  public boolean removeTransitiveHold(String transitiveDisposalHold) {
+    if(disposal != null){
+      return disposal.removeTransitiveHold(transitiveDisposalHold);
+    }
+    return false;
+  }
+
+  @JsonIgnore
+  public boolean onHold() {
+    if (disposal != null) {
+      return disposal.onHold();
+    }
+    return false;
+  }
+
+  @JsonIgnore
+  public List<DisposalHoldAIPMetadata> getHolds() {
+    if (disposal != null) {
+      return disposal.getHolds();
+    }
+    return null;
+  }
+
+  @JsonIgnore
+  public List<DisposalTransitiveHoldAIPMetadata> getTransitiveHolds() {
+    if (disposal != null) {
+      return disposal.getTransitiveHolds();
+    }
+    return null;
+  }
+
+  @JsonIgnore
+  public String getDisposalScheduleId() {
+    if (disposal != null) {
+      return disposal.getDisposalScheduleId();
+    }
+    return null;
+  }
+
+  @JsonIgnore
+  public String getDisposalConfirmationId() {
+    if (disposal != null) {
+      return disposal.getDisposalConfirmationId();
+    }
+    return null;
+  }
+
+  @JsonIgnore
+  public AIPDisposalScheduleAssociationType getDisposalScheduleAssociationType() {
+    if (disposal != null) {
+      return disposal.getDisposalScheduleAssociationType();
+    }
+    return null;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -325,7 +421,9 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
       return false;
     if (ingestJobId != null ? !ingestJobId.equals(aip.ingestJobId) : aip.ingestJobId != null)
       return false;
-    return ghost != null ? ghost.equals(aip.ghost) : aip.ghost == null;
+    if (ghost != null ? !ghost.equals(aip.ghost) : aip.ghost != null)
+      return false;
+    return disposal != null ? disposal.equals(aip.disposal) : aip.disposal == null;
 
   }
 
@@ -341,6 +439,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
     result = 31 * result + (ingestSIPIds != null ? ingestSIPIds.hashCode() : 0);
     result = 31 * result + (ingestJobId != null ? ingestJobId.hashCode() : 0);
     result = 31 * result + (ghost != null ? ghost.hashCode() : 0);
+    result = 31 * result + (disposal != null ? disposal.hashCode() : 0);
     return result;
   }
 
@@ -348,10 +447,10 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions {
   public String toString() {
     return "AIP{" + "id='" + id + '\'' + ", parentId='" + parentId + '\'' + ", type='" + type + '\'' + ", state="
       + state + ", permissions=" + permissions + ", descriptiveMetadata=" + descriptiveMetadata + ", representations="
-      + representations + ", ingestSIPId='" + ingestSIPIds + '\'' + ", ingestJobId='" + ingestJobId + '\''
-      + ", ingestJobIds='" + ingestUpdateJobIds + '\'' + ", ghost=" + ghost + ", format=" + format + ", relationships="
-      + relationships + ", createdOn=" + createdOn + ", createdBy=" + createdBy + ", updatedOn=" + updatedOn
-      + ", updatedBy=" + updatedBy + '}';
+      + representations + ", ingestSIPUUID='" + ingestSIPUUID + '\'' + ", ingestSIPIds=" + ingestSIPIds
+      + ", ingestJobId='" + ingestJobId + '\'' + ", ingestUpdateJobIds=" + ingestUpdateJobIds + ", ghost=" + ghost
+      + ", format=" + format + ", relationships=" + relationships + ", createdOn=" + createdOn + ", createdBy='"
+      + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\'' + ", disposal='" + disposal
+      + '}';
   }
-
 }

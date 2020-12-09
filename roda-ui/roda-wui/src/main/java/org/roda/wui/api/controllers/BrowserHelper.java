@@ -14,8 +14,20 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.MissingResourceException;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -25,7 +37,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.*;
+import org.roda.core.common.ClassificationPlanUtils;
+import org.roda.core.common.ConsumesOutputStream;
+import org.roda.core.common.DefaultConsumesOutputStream;
+import org.roda.core.common.DownloadUtils;
+import org.roda.core.common.EntityResponse;
+import org.roda.core.common.HandlebarsUtility;
+import org.roda.core.common.Messages;
+import org.roda.core.common.PremisV3Utils;
+import org.roda.core.common.RodaUtils;
+import org.roda.core.common.StreamResponse;
+import org.roda.core.common.UserUtility;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
@@ -35,7 +57,15 @@ import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.common.RodaConstants.RODA_TYPE;
-import org.roda.core.data.exceptions.*;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IllegalOperationException;
+import org.roda.core.data.exceptions.IsStillUpdatingException;
+import org.roda.core.data.exceptions.JobAlreadyStartedException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LinkingObjectUtils;
@@ -49,17 +79,51 @@ import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
-import org.roda.core.data.v2.index.filter.*;
+import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
+import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.ip.*;
-import org.roda.core.data.v2.ip.metadata.*;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.DIPFile;
+import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
+import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.core.data.v2.ip.disposal.DisposalRule;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataList;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.ip.metadata.OtherMetadata;
+import org.roda.core.data.v2.ip.metadata.OtherMetadataList;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
-import org.roda.core.data.v2.jobs.*;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadataList;
+import org.roda.core.data.v2.jobs.IndexedReport;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginState;
+import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RelationObjectType;
@@ -78,15 +142,51 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.characterization.SiegfriedPlugin;
-import org.roda.core.plugins.plugins.internal.*;
-import org.roda.core.storage.*;
+import org.roda.core.plugins.plugins.internal.AddRepresentationInformationFilterPlugin;
+import org.roda.core.plugins.plugins.internal.AppraisalPlugin;
+import org.roda.core.plugins.plugins.internal.ChangeTypePlugin;
+import org.roda.core.plugins.plugins.internal.DeleteRODAObjectPlugin;
+import org.roda.core.plugins.plugins.internal.MovePlugin;
+import org.roda.core.plugins.plugins.internal.UpdateIncidencesPlugin;
+import org.roda.core.plugins.plugins.internal.UpdatePermissionsPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.confirmation.CreateDisposalConfirmationPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.confirmation.DeleteDisposalConfirmationPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.confirmation.DestroyRecordsPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.confirmation.PermanentlyDeleteRecordsPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.confirmation.RecoverDisposalConfirmationExecutionFailedPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.confirmation.RestoreRecordsPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.hold.ApplyDisposalHoldToAIPPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.hold.DisassociateDisposalHoldFromAIPPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.hold.LiftDisposalHoldPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.rules.ApplyDisposalRulesPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.schedule.AssociateDisposalScheduleToAIPPlugin;
+import org.roda.core.plugins.plugins.internal.disposal.schedule.DisassociateDisposalScheduleToAIPPlugin;
+import org.roda.core.storage.Binary;
+import org.roda.core.storage.BinaryConsumesOutputStream;
+import org.roda.core.storage.BinaryVersion;
+import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.Directory;
+import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ObjectResponse;
 import org.roda.wui.client.browse.MetadataValue;
-import org.roda.wui.client.browse.bundle.*;
+import org.roda.wui.client.browse.bundle.BinaryVersionBundle;
+import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
+import org.roda.wui.client.browse.bundle.BrowseDipBundle;
+import org.roda.wui.client.browse.bundle.BrowseFileBundle;
+import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
+import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
+import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
+import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
+import org.roda.wui.client.browse.bundle.DisposalConfirmationExtraBundle;
+import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
+import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
+import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
+import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
 import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
@@ -3214,5 +3314,219 @@ public class BrowserHelper {
     GenericException, AlreadyExistsException, RequestNotValidException, NotFoundException {
     ModelService model = RodaCoreFactory.getModelService();
     model.importLogEntries(inputStream, filename);
+  }
+
+  public static DisposalSchedule createDisposalSchedule(DisposalSchedule disposalSchedule, User user)
+    throws GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException,
+    RequestNotValidException {
+    return RodaCoreFactory.getModelService().createDisposalSchedule(disposalSchedule, user.getName());
+  }
+
+  public static DisposalSchedule updateDisposalSchedule(DisposalSchedule disposalSchedule, User user)
+    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException,
+    IllegalOperationException {
+    return RodaCoreFactory.getModelService().updateDisposalSchedule(disposalSchedule, user.getName());
+  }
+
+  public static void deleteDisposalSchedule(String disposalScheduleId) throws GenericException,
+    RequestNotValidException, NotFoundException, AuthorizationDeniedException, IllegalOperationException {
+    RodaCoreFactory.getModelService().deleteDisposalSchedule(disposalScheduleId);
+  }
+
+  public static DisposalHold createDisposalHold(DisposalHold disposalHold, User user) throws GenericException,
+    AuthorizationDeniedException, AlreadyExistsException, NotFoundException, RequestNotValidException {
+    return RodaCoreFactory.getModelService().createDisposalHold(disposalHold, user.getName());
+  }
+
+  public static DisposalHold updateDisposalHold(DisposalHold disposalHold, User user) throws GenericException,
+    AuthorizationDeniedException, NotFoundException, RequestNotValidException, IllegalOperationException {
+    return RodaCoreFactory.getModelService().updateDisposalHold(disposalHold, user.getName());
+  }
+
+  public static void deleteDisposalHold(String disposalHoldId) throws GenericException, RequestNotValidException,
+    NotFoundException, AuthorizationDeniedException, IllegalOperationException {
+    RodaCoreFactory.getModelService().deleteDisposalHold(disposalHoldId);
+  }
+
+  public static DisposalConfirmation createDisposalConfirmation(DisposalConfirmation confirmationMetadata, User user)
+    throws AlreadyExistsException, AuthorizationDeniedException, GenericException, NotFoundException,
+    RequestNotValidException {
+    return RodaCoreFactory.getModelService().createDisposalConfirmation(confirmationMetadata, user.getName());
+  }
+
+  public static Job deleteDisposalConfirmation(User user, SelectedItems<DisposalConfirmation> selectedItems,
+    String details) throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    return createAndExecuteInternalJob("Delete disposal confirmation report", selectedItems,
+      DeleteDisposalConfirmationPlugin.class, user, Collections.emptyMap(),
+      "Could not execute delete disposal confirmation report");
+  }
+
+  public static Job disassociateDisposalSchedule(User user, SelectedItems<IndexedAIP> selected)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    return createAndExecuteInternalJob("Disassociate disposal schedule", selected,
+      DisassociateDisposalScheduleToAIPPlugin.class, user, Collections.emptyMap(),
+      "Could not execute disassociate disposal schedule action");
+  }
+
+  public static Job associateDisposalSchedule(User user, SelectedItems<IndexedAIP> selected, String disposalScheduleId)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_ID, disposalScheduleId);
+
+    return createAndExecuteInternalJob("Associate disposal schedule", selected,
+      AssociateDisposalScheduleToAIPPlugin.class, user, pluginParameters,
+      "Could not execute associate disposal schedule action");
+  }
+
+  public static Job createDisposalConfirmationReport(User user, SelectedItems<IndexedAIP> selectedItems, String title,
+    DisposalConfirmationExtraBundle confirmationMetadata)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Map<String, String> extraInformation = DisposalsHelper.getDisposalConfirmationExtra(confirmationMetadata);
+    String extraInformationJson = JsonUtils.getJsonFromObject(extraInformation);
+
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE, title);
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_EXTRA_INFO, extraInformationJson);
+
+    return createAndExecuteInternalJob("Create disposal confirmation report", selectedItems,
+      CreateDisposalConfirmationPlugin.class, user, pluginParameters,
+      "Could not execute create disposal confirmation report action");
+  }
+
+  public static DisposalConfirmationExtraBundle retrieveDisposalConfirmationExtraBundle() {
+    String template = null;
+
+    try (InputStream templateStream = RodaCoreFactory
+      .getConfigurationFileAsStream(RodaConstants.DISPOSAL_CONFIRMATION_INFORMATION_TEMPLATE_FOLDER + "/"
+        + RodaConstants.DISPOSAL_CONFIRMATION_EXTRA_METADATA_FILE)) {
+      template = IOUtils.toString(templateStream, RodaConstants.DEFAULT_ENCODING);
+    } catch (IOException e) {
+      LOGGER.error("Error getting template from stream", e);
+    }
+
+    Set<MetadataValue> values = ServerTools.transform(template);
+
+    try {
+      User user = RodaCoreFactory.getModelService().retrieveUser("name");
+      String userExtra = user.getExtra();
+
+      if (userExtra != null && !values.isEmpty()) {
+        for (MetadataValue mv : values) {
+          // clear the auto-generated values
+          // mv.set("value", null);
+          String xpathRaw = mv.get("xpath");
+          if (xpathRaw != null && xpathRaw.length() > 0) {
+            String[] xpaths = xpathRaw.split("##%##");
+            String value;
+            List<String> allValues = new ArrayList<>();
+            for (String xpath : xpaths) {
+              allValues.addAll(ServerTools.applyXpath(userExtra, xpath));
+            }
+            // if any of the values is different, concatenate all values in a
+            // string, otherwise return the value
+            boolean allEqual = allValues.stream().allMatch(s -> s.trim().equals(allValues.get(0).trim()));
+            if (allEqual && !allValues.isEmpty()) {
+              value = allValues.get(0);
+            } else {
+              value = String.join(" / ", allValues);
+            }
+            mv.set("value", value.trim());
+          }
+        }
+      }
+
+    } catch (GenericException e) {
+      // do nothing
+    }
+
+    return new DisposalConfirmationExtraBundle(values);
+  }
+
+  public static Job destroyRecordsInDisposalConfirmation(User user,
+    SelectedItemsList<DisposalConfirmation> selectedItems)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    return createAndExecuteInternalJob("Destroy records from disposal confirmation report", selectedItems,
+      DestroyRecordsPlugin.class, user, Collections.emptyMap(),
+      "Could not execute destruction of records in disposal confirmation report action");
+  }
+
+  public static Job permanentlyDeleteRecordsInDisposalConfirmation(User user,
+    SelectedItemsList<DisposalConfirmation> selectedItems)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    return createAndExecuteInternalJob("Permanently delete records from disposal bin", selectedItems,
+      PermanentlyDeleteRecordsPlugin.class, user, Collections.emptyMap(),
+      "Could not execute permanent deletion of records in disposal bin action");
+  }
+
+  public static Job restoreRecordsInDisposalConfirmation(User user,
+    SelectedItemsList<DisposalConfirmation> selectedItems)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    return createAndExecuteInternalJob("Restore destroyed records from disposal bin", selectedItems,
+      RestoreRecordsPlugin.class, user, Collections.emptyMap(),
+      "Could not execute restoration of destroyed records from disposal bin action");
+  }
+
+  public static Job recoverDisposalConfirmationExecutionFailed(User user,
+    SelectedItemsList<DisposalConfirmation> selectedItems)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    return createAndExecuteInternalJob("Recover disposal confirmation from a failure state", selectedItems,
+      RecoverDisposalConfirmationExecutionFailedPlugin.class, user, Collections.emptyMap(),
+      "Could not execute recover the disposal confirmation from a previous faulty state");
+  }
+
+  public static DisposalRule createDisposalRule(DisposalRule disposalRule, User user) throws GenericException,
+    AuthorizationDeniedException, AlreadyExistsException, NotFoundException, RequestNotValidException {
+    return RodaCoreFactory.getModelService().createDisposalRule(disposalRule, user.getName());
+  }
+
+  public static DisposalRule updateDisposalRule(DisposalRule disposalRule, User user)
+    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
+    return RodaCoreFactory.getModelService().updateDisposalRule(disposalRule, user.getName());
+  }
+
+  public static void deleteDisposalRule(String disposalRuleId)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().deleteDisposalRule(disposalRuleId);
+  }
+
+  public static Job applyDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId,
+    boolean override)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, disposalHoldId);
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_OVERRIDE, Boolean.toString(override));
+
+    return createAndExecuteInternalJob("Apply disposal hold", items, ApplyDisposalHoldToAIPPlugin.class, user,
+      pluginParameters, "Could not execute apply disposal hold action");
+  }
+
+  public static Job liftDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, disposalHoldId);
+
+    return createAndExecuteInternalJob("Lift disposal hold", items, LiftDisposalHoldPlugin.class, user,
+      pluginParameters, "Could not execute lift disposal hold action");
+  }
+
+  public static Job disassociateDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId,
+    boolean clearAll)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_ID, disposalHoldId);
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_HOLD_DISASSOCIATE_ALL, Boolean.toString(clearAll));
+
+    return createAndExecuteInternalJob("Disassociate disposal hold", items, DisassociateDisposalHoldFromAIPPlugin.class,
+      user, pluginParameters, "Could not execute disassociate disposal hold action");
+  }
+
+  public static Job applyDisposalRules(User user, boolean applyToManuallyInclusive)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_MANUAL,
+      Boolean.toString(applyToManuallyInclusive));
+    return createAndExecuteInternalJob("Apply disposal rules to repository",
+      SelectedItemsAll.create(AIP.class.getName()), ApplyDisposalRulesPlugin.class, user, pluginParameters,
+      "Could not execute apply disposal rules to repository");
   }
 }

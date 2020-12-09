@@ -70,6 +70,7 @@ public class PluginParameterPanel extends Composite {
   private final FlowPanel layout;
 
   private String value;
+  private String aipTitle;
 
   public PluginParameterPanel(PluginParameter parameter) {
     super();
@@ -300,6 +301,7 @@ public class PluginParameterPanel extends Composite {
               button.setVisible(false);
 
               value = aip.getId();
+              aipTitle = aip.getTitle();
             }
           });
         }
@@ -623,8 +625,12 @@ public class PluginParameterPanel extends Composite {
     return value;
   }
 
+  public String getAipTitle() { return aipTitle; }
+
   public PluginParameter getParameter() {
     return parameter;
   }
+
+  public FlowPanel getLayout() { return layout;}
 
 }

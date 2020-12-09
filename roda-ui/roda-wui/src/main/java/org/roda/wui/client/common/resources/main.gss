@@ -906,12 +906,38 @@ pre code {
     content: "\f055";
 }
 
+
+.btn-top:after {
+    content: "\f102";
+}
+
+
+.btn-up:after {
+    content: "\f077";
+}
+
+.btn-down:after {
+    content: "\f078";
+}
+
+.btn-bottom:after {
+    content: "\f103";
+}
+
 .btn-envelope:after {
     content: "\f0e0";
 }
 
 .btn-edit:after {
     content: "\f14b";
+}
+
+.btn-unlock:after {
+    content: "\f09c";
+}
+
+.btn-lift-hold:after {
+    content: "\f3c1";
 }
 
 .btn-edit + .btn-edit {
@@ -924,6 +950,10 @@ pre code {
 
 .btn-download:after {
     content: "\f019";
+}
+
+.btn-disposal-schedule:after {
+    content: "\f133";
 }
 
 .btn-view:after {
@@ -944,6 +974,10 @@ pre code {
 
 .btn-upload:after {
     content: "\f093";
+}
+
+.btn-print:after {
+    content: "\f02f";
 }
 
 .btn-refresh:after {
@@ -7138,8 +7172,147 @@ span.code {
     padding: 0 5px 0 5px;
 }
 
+.basicTableEmpty{
+    font-size: 1.4rem;
+    margin-left: 1.5rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    color: #9a9a9a;
+}
+
+.basicTable{
+    border-left: 5px solid COLOR_PRIMARY;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.disposalScopeNotes{
+    min-height: 20rem;
+}
+
 /* Permission related */
 
 .hasNoPermissions {
     display: none;
+}
+
+.disposal-confirmation-select {
+    margin-bottom: 10px;
+}
+
+.disposal-confirmation-select input[type="radio"] {
+        display: none;
+        margin: 10px;
+}
+
+.disposal-confirmation-select input[type=radio] + label {
+    display:inline-block;
+    padding: 4px 12px;
+    background-color: #e7e7e7;
+    border-color: #ddd;
+    cursor: pointer;
+    margin-right: 10px
+}
+
+.disposal-confirmation-select input[type=radio]:checked + label {
+   background-image: none;
+   background-color: COLOR_PRIMARY;
+   color: white;
+}
+
+.disposal-schedules-modal-table {
+    margin-bottom: 10px;
+    min-height: 70vh;
+}
+
+.disposalPolicyScrollPanel {
+    width: 100%;
+    max-height: 30vh;
+}
+
+.addCursorPointer {
+    cursor: pointer;
+}
+
+.orderButtons {
+    width: 10%;
+}
+
+.alignButtonsPanel{
+    margin-top: 2rem;
+}
+
+.disposalRuleDescription{
+    min-height: 25rem;
+}
+
+.disposalRuleMetadataField {
+    border-left: 5px solid COLOR_PRIMARY;
+    margin-top: 15px;
+    padding: 5px 10px;
+}
+
+.wui-create-disposal-confirmation-data .wui-disposal-confirmation-data-note {
+    font-size: 8pt;
+    color: #999;
+    margin-top: 2px;
+}
+
+.wui-required-fields-note {
+    font-size: 8pt;
+    color: #999;
+    margin-top: 2px;
+}
+
+.wui-cursor-not-allowed {
+    cursor: not-allowed;
+}
+
+
+.disposal-dialogs-checkbox input[type="checkbox"]{
+    vertical-align: middle;
+}
+
+.disposal-dialogs-checkbox input[type="checkbox"]:disabled{
+    border-color:#ccc;
+}
+
+.disposal-dialogs-checkbox input[type="checkbox"]:disabled + label{
+    color: #ccc;
+}
+
+.disposal-dialogs-checkbox + .form-help{
+    font-size: 1.5rem;
+}
+
+.disposalRuleOperator {
+    text-align: center;
+}
+
+.childOfLabel{
+    width: 100%;
+}
+
+.sidebarDisposalLabels{
+    margin-top: 2rem;
+}
+
+.disposal-policy-summary {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.disposal-policy-summary-icon {
+    display: inline;
+    padding-right: 1rem;
+}
+
+.disposal-policy-summary-icon div {
+    display: inline-block;
+}
+
+.disposal-policy-summary-text {
+    display: inline;
+    vertical-align: bottom;
 }

@@ -66,6 +66,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
@@ -101,6 +102,7 @@ import org.roda.core.plugins.plugins.notifications.JobNotification;
 import org.roda.core.plugins.plugins.reindex.ReindexAIPPlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexActionLogPlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexDIPPlugin;
+import org.roda.core.plugins.plugins.reindex.ReindexDisposalConfirmationPlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexIncidencePlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexJobPlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexNotificationPlugin;
@@ -736,6 +738,7 @@ public final class PluginHelper {
     list.add(IndexedPreservationAgent.class);
     list.add(IndexedPreservationEvent.class);
     list.add(DIP.class);
+    list.add(DisposalConfirmation.class);
     return list;
   }
 
@@ -1296,9 +1299,11 @@ public final class PluginHelper {
       default:
         outcomeDetailNote = plugin.getPreservationEventFailureMessage();
     }
-/*    String outcomeDetailNote = (outcome == PluginState.SUCCESS || outcome == PluginState.PARTIAL_SUCCESS)
-      ? plugin.getPreservationEventSuccessMessage()
-      : plugin.getPreservationEventFailureMessage();*/
+    /*
+     * String outcomeDetailNote = (outcome == PluginState.SUCCESS || outcome ==
+     * PluginState.PARTIAL_SUCCESS) ? plugin.getPreservationEventSuccessMessage() :
+     * plugin.getPreservationEventFailureMessage();
+     */
     ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, startDate,
       plugin.getPreservationEventType().toString(), plugin.getPreservationEventDescription(), sources, outcomes,
       outcome.name(), outcomeDetailNote, outcomeDetailExtension, agentIds);
@@ -1604,6 +1609,8 @@ public final class PluginHelper {
       return ReindexPreservationRepositoryEventPlugin.class.getName();
     } else if (reindexClass.equals(DIP.class)) {
       return ReindexDIPPlugin.class.getName();
+    } else if (reindexClass.equals(DisposalConfirmation.class)) {
+      return ReindexDisposalConfirmationPlugin.class.getName();
     } else {
       throw new NotFoundException("No reindex plugin available");
     }
@@ -1726,6 +1733,41 @@ public final class PluginHelper {
         PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, job);
       }
     }
+  }
+
+  public static String createOutcomeTextForDisposalConfirmationCreation(String actionMessage,
+    String disposalConfirmationId, String aipId) {
+    return "The AIP '" + aipId + "' " + actionMessage + " '" + disposalConfirmationId + "'";
+  }
+
+  public static String createOutcomeTextForDisposalConfirmationEvent(String actionMessage,
+    String disposalConfirmationTitle, String disposalConfirmationId) {
+    return "The disposal confirmation '" + disposalConfirmationTitle + " ' (" + disposalConfirmationId + ") "
+      + actionMessage;
+  }
+
+  public static String createOutcomeTextForDisposalHold(String actionMessage, String disposalHoldId,
+    String disposalHoldTitle) {
+    return createOutcomeTextForDisposal("Disposal hold", actionMessage, disposalHoldId, disposalHoldTitle);
+  }
+
+  public static String createOutcomeTextForDisposalSchedule(String actionMessage, String disposalScheduleId,
+    String disposalScheduleTitle) {
+    return createOutcomeTextForDisposal("Disposal schedule", actionMessage, disposalScheduleId, disposalScheduleTitle);
+  }
+
+  private static String createOutcomeTextForDisposal(String type, String actionMessage, String disposalId,
+    String disposalTitle) {
+    StringBuilder outcomeText = new StringBuilder(type);
+
+    if (StringUtils.isNotBlank(disposalTitle)) {
+      outcomeText.append(" '").append(disposalTitle).append("'");
+    }
+
+    outcomeText.append(" (").append(disposalId).append(") ");
+    outcomeText.append(actionMessage);
+
+    return outcomeText.toString();
   }
 
   public static String createOutcomeTextForAIP(IndexedAIP item, String actionMessage) {
