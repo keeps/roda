@@ -16,8 +16,11 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.common.client.tools.StringUtils;
 
 public class ControllerAssistant {
   private final Date startDate;
@@ -98,4 +101,16 @@ public class ControllerAssistant {
   public void registerAction(final User user, final LogEntryState state) {
     registerAction(user, (String) null, state);
   }
+
+  public void checkAIPstate(IndexedAIP aip) throws RequestNotValidException {
+    if(aip.getState().equals(AIPState.DESTROYED)){
+      throw new RequestNotValidException("The AIP [id: " + aip.getId() + "] is destroyed, therefore the request is not valid.");
+    }
+  }
+
+    public void checkIfAIPInConfirmation(IndexedAIP indexedAip) throws RequestNotValidException {
+      if(StringUtils.isNotBlank(indexedAip.getDisposalConfirmationId())){
+        throw new RequestNotValidException("The AIP [id: " + indexedAip.getId() + "] is under a disposal confirmation [id: " + indexedAip.getDisposalConfirmationId() + "]  , therefore the request is not valid.");
+      }
+    }
 }

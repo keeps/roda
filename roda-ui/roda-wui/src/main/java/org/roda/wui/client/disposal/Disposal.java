@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.disposal.association.DisposalPolicyAssociationPanel;
+import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -66,11 +68,13 @@ public class Disposal {
     if (historyTokens.isEmpty()) {
       callback.onSuccess(page);
     } else if (historyTokens.get(0).equals(DisposalPolicy.RESOLVER.getHistoryToken())) {
-      DisposalPolicy.getInstance().resolve(HistoryUtils.tail(historyTokens), callback);
+      DisposalPolicy.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(DisposalConfirmations.RESOLVER.getHistoryToken())) {
-      DisposalConfirmations.getInstance().resolve(HistoryUtils.tail(historyTokens), callback);
+      DisposalConfirmations.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(DisposalDestroyedRecords.RESOLVER.getHistoryToken())) {
       DisposalDestroyedRecords.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (historyTokens.get(0).equals(DisposalPolicyAssociationPanel.RESOLVER.getHistoryToken())) {
+      DisposalPolicyAssociationPanel.RESOLVER.resolve(historyTokens, callback);
     }
   }
 }

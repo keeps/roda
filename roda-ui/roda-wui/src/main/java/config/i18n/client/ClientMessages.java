@@ -13,17 +13,18 @@ package config.i18n.client;
 import java.util.Date;
 import java.util.List;
 
-import com.google.gwt.i18n.client.Messages;
-import com.google.gwt.safehtml.shared.SafeHtml;
-
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.risks.IncidenceStatus;
 import org.roda.core.data.v2.risks.SeverityLevel;
 import org.roda.wui.client.common.actions.model.ActionableObject;
+
+import com.google.gwt.i18n.client.Messages;
+import com.google.gwt.safehtml.shared.SafeHtml;
 
 /**
  * @author Luis Faria
@@ -161,6 +162,14 @@ public interface ClientMessages extends Messages {
 
   String sidebarActionsTitle();
 
+  String sidebarDisposalBinTitle();
+
+  String sidebarDisposalScheduleTitle();
+
+  String sidebarDisposalConfirmationReportTitle();
+
+  String sidebarDisposalConfirmationTitle();
+
   String sidebarRepresentationInformationTitle();
 
   String sidebarRisksTitle();
@@ -179,7 +188,7 @@ public interface ClientMessages extends Messages {
 
   SafeHtml notFoundErrorMessage(String id);
 
-  SafeHtml genericErrorTitle();
+SafeHtml genericErrorTitle();
 
   SafeHtml genericErrorMessage(String message);
 
@@ -431,11 +440,23 @@ public interface ClientMessages extends Messages {
 
   String editButton();
 
+  String liftButton();
+
+  String deactivateButton();
+
+  String nextButton();
+
   String saveButton();
 
   String addButton();
 
   String confirmButton();
+
+  String applyButton();
+
+  String overrideManualAppliedSchedulesButton();
+
+  String applyDisposalRulesButton();
 
   String applyAllButton();
 
@@ -474,6 +495,8 @@ public interface ClientMessages extends Messages {
   String selectButton();
 
   String inspectButton();
+
+  String printButton();
 
   /*** Identify formats ***/
 
@@ -1846,6 +1869,10 @@ public interface ClientMessages extends Messages {
 
   /************* TO BE ORGANIZED *************************/
 
+  String mandatoryPlugin();
+
+  String optionalPlugin();
+
   String aipLevel();
 
   SafeHtml defaultColumnHeader(@Select String field);
@@ -1869,6 +1896,8 @@ public interface ClientMessages extends Messages {
   String preservationEventAgentExtension();
 
   String mandatoryField();
+
+  String numberIsRequired();
 
   String isAMandatoryField(String field);
 
@@ -1983,11 +2012,373 @@ public interface ClientMessages extends Messages {
   String removableTextBox();
 
   /** Disposal **/
+
   String disposalPolicyTitle();
+
+  String disposalRulesTitle();
+
+  String orderDisposalRulesTitle();
+
+  String disposalSchedulesTitle();
+
+  String disposalHoldsTitle();
 
   String disposalDestroyedRecordsTitle();
 
   String disposalConfirmationsTitle();
 
+  String createDisposalConfirmationTitle();
+
+  String createDisposalConfirmationExtraInformationTitle();
+
   String disposalNewConfirmationAction();
+
+  String disposalRuleTitle();
+
+  String disposalRuleIdentifier();
+
+  String disposalRuleDescription();
+
+  String disposalRuleScheduleName();
+
+  String disposalRuleType();
+
+  String disposalRuleTypeValue(@Select String action);
+
+  String disposalRuleOrder();
+
+  String disposalRuleCondition();
+
+  String disposalRuleConditionOperator();
+
+  String addMetadataField();
+
+  String disposalScheduleTitle();
+
+  String disposalScheduleIdentifier();
+
+  String disposalScheduleDescription();
+
+  String disposalScheduleMandate();
+
+  String disposalScheduleNotes();
+
+  String disposalSchedulePeriod();
+
+  String disposalScheduleActionCol();
+
+  String disposalScheduleAction(@Select String action);
+
+  String disposalScheduleRetentionTriggerElementId();
+
+  String disposalScheduleRetentionTriggerCodeValue(@Select String trigger);
+
+  String disposalScheduleRetentionPeriodInterval();
+
+  String retentionPeriod(@PluralCount int duration, @Select String interval);
+
+  String disposalScheduleRetentionPeriodIntervalValue(@Select String interval);
+
+  String disposalScheduleRetentionPeriodDuration();
+
+  String disposalScheduleNumberOfAIPs();
+
+  String disposalScheduleStateCol();
+
+  String disposalScheduleState(@Select String state);
+
+  String disposalScheduleUsedInRule();
+
+  String disposalHoldIdentifier();
+
+  String disposalHoldTitle();
+
+  String disposalHoldDescription();
+
+  String disposalHoldMandate();
+
+  String disposalHoldNotes();
+
+  String disposalHoldNumberOfAIPs();
+
+  String disposalHoldStateCol();
+
+  String disposalHoldState(@Select String state);
+
+  String newDisposalRuleTitle();
+
+  String editDisposalRuleTitle();
+
+  String newDisposalScheduleTitle();
+
+  String editDisposalScheduleTitle();
+
+  String newDisposalHoldTitle();
+
+  String editDisposalHoldTitle();
+
+  String createDisposalRuleFailure(String reason);
+
+  String createDisposalRuleAlreadyExists(String title);
+
+  String createDisposalScheduleFailure(String reason);
+
+  String createDisposalScheduleAlreadyExists(String title);
+
+  String createDisposalHoldFailure(String reason);
+
+  String createDisposalHoldAlreadyExists(String title);
+
+  String editRules();
+
+  String applyRules();
+
+  String showDisposalRuleTitle();
+
+  String showDisposalHoldTitle();
+
+  String showDisposalScheduleTitle();
+
+  String disposalConfirmationTitle();
+
+  String disposalConfirmationCreationDate();
+
+  String disposalConfirmationCreationBy();
+
+  String disposalConfirmationStatus();
+
+  String disposalConfirmationAIPs();
+
+  String disposalConfirmationSize();
+
+  String disposalConfirmationState(@Select DisposalConfirmationState state);
+
+  String applyDisposalScheduleButton();
+
+  String deleteDisposalConfirmationReport();
+
+  String permanentlyDeleteFromBinButton();
+
+  String reExecuteDisposalDestroyActionButton();
+
+  String recoverDisposalConfirmationExecutionFailedButton();
+
+  String restoreFromBinButton();
+
+  String newDisposalConfirmationButton();
+
+  String createDisposalScheduleButton();
+
+  String disassociateDisposalScheduleButton();
+
+  String disassociateDisposalHoldButton();
+
+  String associateDisposalScheduleButton();
+
+  String disposalScheduleSelectionDialogTitle();
+
+  String changeDisposalScheduleActionTitle();
+
+  String createDisposalConfirmationActionTitle();
+
+  String dissociateDisposalScheduleDialogTitle();
+
+  String dissociateDisposalScheduleDialogMessage(Long size);
+
+  String createDisposalConfirmationReportDialogTitle();
+
+  String createDisposalConfirmationReportDialogMessage(Long size);
+
+  String associateDisposalScheduleDialogTitle();
+
+  String associateDisposalScheduleDialogMessage(Long size);
+
+  String applyToHierarchyDisposalDialogDescription();
+
+  String overwriteAllDisposalDialogCheckBox();
+
+  String overwriteAllDisposalDialogDescription();
+
+  String disposalPolicyAIPWithoutAssociation();
+
+  String disposalRetentionStartDateLabel();
+
+  String disposalRetentionDueDateLabel();
+
+  String disposalRetentionPeriodLabel();
+
+  String disposalActionLabel();
+
+  String holdStatusLabel();
+
+  String addDisposalHoldButton();
+
+  String disposalHoldAssociatedOnLabel();
+
+  String disposalHoldAssociatedByLabel();
+
+  String disposalHoldLiftedOnLabel();
+
+  String disposalHoldLiftedByLabel();
+
+  String disposalOnHoldStatusLabel();
+
+  String disposalClearStatusLabel();
+
+  String disposalScheduleRetentionPeriodNotValidFormat();
+
+  String disposalScheduleListAips();
+
+  String disposalHoldListAips();
+
+  String deleteConfirmationReportDialogTitle();
+
+  String deleteConfirmationReportDialogMessage();
+
+  String deleteConfirmationReportSuccessTitle();
+
+  String deleteConfirmationReportSuccessMessage();
+
+  // disposal confirmation data panel
+  String disposalConfirmationDataPanelTitle();
+
+  String disposalConfirmationDataNote();
+
+  String disposalTitle();
+
+  String disposalHoldSelectionDialogTitle();
+
+  String applyDisposalHoldDialogTitle();
+
+  String applyDisposalHoldDialogMessage(@PluralCount int size);
+
+  String applyDisposalHoldButton();
+
+  String createDisposalHoldButton();
+
+  String associateDisposalHoldButton();
+
+  String clearDisposalHoldButton();
+
+  String overrideDisposalHoldButton();
+
+  String clearDisposalHoldDialogTitle();
+
+  String clearDisposalHoldDialogMessage(@PluralCount int size);
+
+  String disassociateDisposalHoldDialogTitle();
+
+  String disassociateDisposalHoldDialogMessage(@PluralCount int size);
+
+  String disposalHoldAssociatedOn();
+
+  String disposalHoldAssociatedBy();
+
+  String disposalHoldAssociatedFrom();
+
+  String disposalHoldAssociatedFromValue(@PluralCount int size);
+
+  String disposalHoldLiftedOn();
+
+  String conditionActualParent();
+
+  String editRulesOrder();
+
+  String confirmChangeRulesOrder();
+
+  String deleteDisposalRuleDialogTitle();
+
+  String deleteDisposalRuleDialogMessage(String title);
+
+  String disposalScheduleAssociationInformationTitle();
+
+  String disposalScheduleActionCode(@Select String disposalAction);
+
+  String disposalScheduleAssociationTitle();
+
+  String disposalConfirmationAssociationInformationTitle();
+
+  String disposalConfirmationAssociationTitle();
+
+  String disposalHoldsAssociationInformationTitle();
+
+  String transitiveDisposalHoldsAssociationInformationTitle();
+
+  String disposalPolicyActionSummary(@Select String action);
+
+  String disposalPolicyScheduleSummary(String action, String temporal);
+
+  String disposalPolicyScheduleYearSummary(@PluralCount int duration);
+
+  String disposalPolicyScheduleMonthSummary(@PluralCount int duration);
+
+  String disposalPolicyScheduleDaySummary(@PluralCount int duration);
+
+  String disposalPolicyHoldSummary();
+
+  String disposalPolicyConfirmationSummary();
+
+  String disposalPolicySummaryReady(String action);
+
+  String disposalPolicyNoScheduleSummary();
+
+  String permanentlyRetained();
+
+  String disposalPolicyRetainPermanently();
+
+  String disposalPolicyNone();
+
+  String disposalPolicyDestroyedAIPSummary(String destroyedOn);
+
+  String permanentlyDeleteConfirmDialogTitle();
+
+  String permanentlyDeleteConfirmDialogMessage();
+
+  String restoreDestroyedRecordsConfirmDialogTitle();
+
+  String restoreDestroyedRecordsConfirmDialogMessage();
+
+  String restoreDestroyedRecordsSuccessTitle();
+
+  String restoreDestroyedRecordsSuccessMessage();
+
+  String recoverDestroyedRecordsConfirmDialogTitle();
+
+  String recoverDestroyedRecordsConfirmDialogMessage();
+
+  String recoverDestroyedRecordsSuccessTitle();
+
+  String recoverDestroyedRecordsSuccessMessage();
+
+  String permanentlyDeleteRecordsSuccessTitle();
+
+  String permanentlyDeleteRecordsSuccessMessage();
+
+  String disposalScheduleAssociationTypeLabel();
+
+  String disposalScheduleAssociationType(@Select String type);
+
+  String applyDisposalRulesDialogTitle();
+
+  String applyDisposalRulesDialogMessage();
+
+  SafeHtml applyDisposalRulesDialogExplanation();
+
+  String deleteDisposalRuleSuccessTitle();
+
+  String deleteDisposalRuleSuccessMessage(String title);
+
+  String updateDisposalRulesOrderSuccessTitle();
+
+  String updateDisposalRulesOrderSuccessMessage();
+
+  String confirmEditRuleMessage();
+
+  String disposalPolicyRetentionPeriodCalculationError();
+
+  String disposalConfirmationShowRecordsToDestroy();
+
+  String disposalConfirmationShowRecordsToReview();
+
+  String disposalConfirmationShowRecordsRetentionPeriodCalculationError();
 }

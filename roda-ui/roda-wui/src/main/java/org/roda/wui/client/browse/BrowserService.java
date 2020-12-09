@@ -30,6 +30,7 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -38,10 +39,15 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
+import org.roda.core.data.v2.ip.disposal.DisposalRule;
+import org.roda.core.data.v2.ip.disposal.DisposalRules;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
+import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -57,6 +63,7 @@ import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
+import org.roda.wui.client.browse.bundle.DisposalConfirmationExtraBundle;
 import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
@@ -373,6 +380,27 @@ public interface BrowserService extends RemoteService {
 
   Map<String, List<String>> retrieveSharedProperties(String localeName);
 
+  DisposalRule createDisposalRule(DisposalRule rule) throws AuthorizationDeniedException, AlreadyExistsException,
+    NotFoundException, GenericException, RequestNotValidException, IOException;
+
+  DisposalRule retrieveDisposalRule(String disposalRuleId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  DisposalRules listDisposalRules()
+    throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException;
+
+  DisposalRule updateDisposalRule(DisposalRule rule)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  void updateDisposalRules(DisposalRules rules)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  void deleteDisposalRule(String disposalRuleId)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException;
+
+  Job applyDisposalRules(boolean applyToManuallyInclusive)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
   DisposalSchedule createDisposalSchedule(DisposalSchedule schedule) throws AuthorizationDeniedException,
     AlreadyExistsException, NotFoundException, GenericException, RequestNotValidException;
 
@@ -382,8 +410,8 @@ public interface BrowserService extends RemoteService {
   DisposalSchedules listDisposalSchedules()
     throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException;
 
-  DisposalSchedule updateDisposalSchedule(DisposalSchedule schedule)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+  DisposalSchedule updateDisposalSchedule(DisposalSchedule schedule) throws AuthorizationDeniedException,
+    NotFoundException, GenericException, RequestNotValidException, IllegalOperationException;
 
   void deleteDisposalSchedule(String disposalScheduleId) throws NotFoundException, AuthorizationDeniedException,
     IllegalOperationException, GenericException, RequestNotValidException;
@@ -397,9 +425,54 @@ public interface BrowserService extends RemoteService {
   DisposalHolds listDisposalHolds()
     throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException;
 
-  DisposalHold updateDisposalHold(DisposalHold hold)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+  DisposalHold updateDisposalHold(DisposalHold hold) throws AuthorizationDeniedException, NotFoundException,
+    GenericException, RequestNotValidException, IllegalOperationException;
 
   void deleteDisposalHold(String disposalHoldId) throws NotFoundException, AuthorizationDeniedException,
     IllegalOperationException, GenericException, RequestNotValidException;
+
+  Job associateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems, String disposalScheduleId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  Job disassociateDisposalSchedule(SelectedItems<IndexedAIP> selectedItems)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  Job applyDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean override)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  Job liftDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  Job disassociateDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean clearAll)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  Job createDisposalConfirmationReport(SelectedItems<IndexedAIP> selectedItems, String title,
+    DisposalConfirmationExtraBundle metadata)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
+
+  DisposalConfirmationExtraBundle retrieveDisposalConfirmationExtraBundle() throws RODAException;
+
+  Job deleteDisposalConfirmationReport(SelectedItems<DisposalConfirmation> selectedItems, String details)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException;
+
+  Job destroyRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
+
+  Job permanentlyDeleteRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
+
+  Job recoverRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  Job restoreRecordsInDisposalConfirmationReport(SelectedItemsList<DisposalConfirmation> selectedItems)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
+
+  List<DisposalHoldAIPMetadata> listDisposalHoldsAssociation(String aipId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  String retrieveDisposalConfirmationReport(String confirmationId, boolean isToPrint) throws IOException, RODAException;
+
+  List<DisposalTransitiveHoldAIPMetadata> listTransitiveDisposalHolds(String aipId)
+          throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
 }

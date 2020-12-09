@@ -16,11 +16,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import jnr.ffi.annotations.In;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.HasDisposal;
 import org.roda.core.data.v2.ip.HasPermissions;
 import org.roda.core.data.v2.ip.HasState;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -28,6 +30,7 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
+import org.roda.core.index.IndexService;
 import org.roda.wui.client.common.lists.utils.ColumnOptions.RenderingHint;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -248,6 +251,8 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
 
   private static final List<Class<? extends HasState>> HAS_STATE = Arrays.asList(AIP.class, IndexedAIP.class);
 
+  private static final List<Class<? extends HasDisposal>> HAS_DISPOSAL = Arrays.asList(AIP.class, IndexedAIP.class);
+
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private final Map<Column<T, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
@@ -278,6 +283,12 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
     // if index object has state, add state field
     if (HAS_STATE.contains(options.getClassToReturn())) {
       fieldsToReturn.add(RodaConstants.AIP_STATE);
+    }
+
+    // if index object has disposal hold status, add status field
+    if (HAS_DISPOSAL.contains(options.getClassToReturn())) {
+      fieldsToReturn.add(RodaConstants.AIP_DISPOSAL_HOLD_STATUS);
+      fieldsToReturn.add(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID);
     }
 
     // nested collections

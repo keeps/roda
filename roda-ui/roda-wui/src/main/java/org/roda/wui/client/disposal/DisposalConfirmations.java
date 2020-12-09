@@ -2,25 +2,35 @@ package org.roda.wui.client.disposal;
 
 import java.util.List;
 
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.DisposalConfirmationActions;
+import org.roda.wui.client.common.actions.model.ActionableObject;
+import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
+import org.roda.wui.client.common.lists.DisposalConfirmationList;
+import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
+import org.roda.wui.client.common.lists.utils.ListBuilder;
+import org.roda.wui.client.common.search.SearchWrapper;
+import org.roda.wui.client.common.utils.SidebarUtils;
+import org.roda.wui.client.disposal.confirmations.CreateDisposalConfirmation;
+import org.roda.wui.client.disposal.confirmations.ShowDisposalConfirmation;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
 /**
- * @author Tiago Fraga <tfraga@keep.pt>
+ * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public class DisposalConfirmations extends Composite {
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
@@ -57,14 +67,35 @@ public class DisposalConfirmations extends Composite {
   @UiField
   FlowPanel disposalConfirmationDescription;
 
+  @UiField(provided = true)
+  SearchWrapper searchWrapper;
+
   @UiField
-  FlowPanel content;
+  SimplePanel actionsSidebar;
+
+  @UiField
+  FlowPanel contentFlowPanel;
+
+  @UiField
+  FlowPanel sidebarFlowPanel;
 
   /**
    * Create a disposal confirmation page
    */
   public DisposalConfirmations() {
+    ListBuilder<DisposalConfirmation> disposalConfirmationListBuilder = new ListBuilder<>(
+      () -> new DisposalConfirmationList(),
+      new AsyncTableCellOptions<>(DisposalConfirmation.class, "Disposal_confirmations").bindOpener()
+        .withAutoUpdate(5000));
+
+    searchWrapper = new SearchWrapper(false).createListAndSearchPanel(disposalConfirmationListBuilder);
+
     initWidget(uiBinder.createAndBindUi(this));
+
+    final DisposalConfirmationActions confirmationActions = DisposalConfirmationActions.get();
+    SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, confirmationActions.hasAnyRoles());
+    actionsSidebar.setWidget(new ActionableWidgetBuilder<>(confirmationActions)
+      .buildListWithObjects(new ActionableObject<>(DisposalConfirmation.class)));
 
     disposalConfirmationDescription.add(new HTMLWidgetWrapper("DisposalConfirmationDescription.html"));
   }
@@ -77,37 +108,26 @@ public class DisposalConfirmations extends Composite {
   public static DisposalConfirmations getInstance() {
     if (instance == null) {
       instance = new DisposalConfirmations();
+    } else {
+      instance.refresh();
     }
     return instance;
   }
 
-  @UiHandler("buttonApply")
-  void buttonApplyHandler(ClickEvent e) {
-    // TODO: add logic
+  private void refresh() {
+    searchWrapper.refreshCurrentList();
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty()) {
       callback.onSuccess(this);
-    } /*
-       * else { String basePage = historyTokens.remove(0); if
-       * (ShowRepresentationInformation.RESOLVER.getHistoryToken().equals(basePage)) {
-       * ShowRepresentationInformation.RESOLVER.resolve(historyTokens, callback); }
-       * else if
-       * (CreateRepresentationInformation.RESOLVER.getHistoryToken().equals(basePage))
-       * { CreateRepresentationInformation.RESOLVER.resolve(historyTokens, callback);
-       * } else if
-       * (EditRepresentationInformation.RESOLVER.getHistoryToken().equals(basePage)) {
-       * EditRepresentationInformation.RESOLVER.resolve(historyTokens, callback); }
-       * else if
-       * (RepresentationInformationAssociations.RESOLVER.getHistoryToken().equals(
-       * basePage)) {
-       * RepresentationInformationAssociations.RESOLVER.resolve(historyTokens,
-       * callback); } else if (Search.RESOLVER.getHistoryToken().equals(basePage)) {
-       * searchPanel.setFilter(RepresentationInformation.class,
-       * SearchFilters.createFilterFromHistoryTokens(historyTokens));
-       * callback.onSuccess(this); } else { HistoryUtils.newHistory(RESOLVER);
-       * callback.onSuccess(null); }
-       */
+    } else {
+      String basePage = historyTokens.remove(0);
+      if (ShowDisposalConfirmation.RESOLVER.getHistoryToken().equals(basePage)) {
+        ShowDisposalConfirmation.RESOLVER.resolve(historyTokens, callback);
+      } else if (CreateDisposalConfirmation.RESOLVER.getHistoryToken().equals(basePage)) {
+        CreateDisposalConfirmation.RESOLVER.resolve(historyTokens, callback);
+      }
+    }
   }
 }

@@ -1,9 +1,7 @@
 package org.roda.core.data.v2.ip.disposal;
 
 import java.util.Date;
-import java.util.Map;
 import java.util.Objects;
-import java.util.TreeMap;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
@@ -34,6 +32,8 @@ public class DisposalHold implements IsModelObject {
   // automatically generated upon disposal hold creation action
   private Date createdOn;
   private String createdBy;
+  private Date updatedOn;
+  private String updatedBy;
 
   // the date on which the legal or administrative order was issued
   private Date originatedOn;
@@ -42,16 +42,18 @@ public class DisposalHold implements IsModelObject {
   private Date liftedOn;
   private String liftedBy;
 
-  private Date updatedOn;
-  private String updatedBy;
+  // If any AIP was associated to this disposal hold the date should be set to
+  // prevent this disposal hold from being deleted
+  private Date firstTimeUsed = null;
 
-  private Map<String, Date> activeAIPs;
-  private Map<String, Date> inactiveAIPs;
+  private Long aipCounter;
+
+  private DisposalHoldState state;
 
   public DisposalHold() {
     super();
-    this.activeAIPs = new TreeMap<>();
-    this.inactiveAIPs = new TreeMap<>();
+    this.state = DisposalHoldState.ACTIVE;
+    this.aipCounter = 0L;
   }
 
   public DisposalHold(String disposalHoldId, String title, String description, String mandate, String scopeNotes) {
@@ -60,8 +62,8 @@ public class DisposalHold implements IsModelObject {
     this.description = description;
     this.mandate = mandate;
     this.scopeNotes = scopeNotes;
-    this.activeAIPs = new TreeMap<>();
-    this.inactiveAIPs = new TreeMap<>();
+    this.state = DisposalHoldState.ACTIVE;
+    this.aipCounter = 0L;
   }
 
   @JsonIgnore
@@ -135,28 +137,12 @@ public class DisposalHold implements IsModelObject {
     this.updatedOn = updatedOn;
   }
 
-  public Map<String, Date> getActiveAIPs() {
-    return activeAIPs;
-  }
-
-  public void setActiveAIPs(Map<String, Date> activeAIPs) {
-    this.activeAIPs = activeAIPs;
-  }
-
   public String getUpdatedBy() {
     return updatedBy;
   }
 
   public void setUpdatedBy(String updatedBy) {
     this.updatedBy = updatedBy;
-  }
-
-  public Map<String, Date> getInactiveAIPs() {
-    return inactiveAIPs;
-  }
-
-  public void setInactiveAIPs(Map<String, Date> inactiveAIPs) {
-    this.inactiveAIPs = inactiveAIPs;
   }
 
   public String getCreatedBy() {
@@ -191,24 +177,30 @@ public class DisposalHold implements IsModelObject {
     this.originatedBy = originatedBy;
   }
 
-  @JsonIgnore
-  public void addAIPtoActiveAIPs(String aipId) {
-    getActiveAIPs().put(aipId, new Date());
+  public DisposalHoldState getState() {
+    return state;
   }
 
-  @JsonIgnore
-  public void removeActiveAIP(String aipId) {
-    getActiveAIPs().remove(aipId);
-    getInactiveAIPs().put(aipId, new Date());
+  public void setState(DisposalHoldState state) {
+    this.state = state;
   }
 
-  @JsonIgnore
-  public void liftAllAIPs() {
-    getActiveAIPs().forEach((key, value) -> {
-      getInactiveAIPs().put(key, new Date());
-    });
+  public Long getAipCounter() {
+    return aipCounter;
+  }
 
-    getActiveAIPs().clear();
+  public void setAipCounter(Long aipCounter) {
+    this.aipCounter = aipCounter;
+  }
+
+  public Date getFirstTimeUsed() {
+    return firstTimeUsed;
+  }
+
+  public void setFirstTimeUsed(Date firstTimeUsed) {
+    if (this.firstTimeUsed == null) {
+      this.firstTimeUsed = firstTimeUsed;
+    }
   }
 
   @Override
@@ -221,25 +213,26 @@ public class DisposalHold implements IsModelObject {
     return Objects.equals(id, that.id) && Objects.equals(title, that.title)
       && Objects.equals(description, that.description) && Objects.equals(mandate, that.mandate)
       && Objects.equals(scopeNotes, that.scopeNotes) && Objects.equals(createdOn, that.createdOn)
-      && Objects.equals(createdBy, that.createdBy) && Objects.equals(originatedOn, that.originatedOn)
+      && Objects.equals(createdBy, that.createdBy) && Objects.equals(updatedOn, that.updatedOn)
+      && Objects.equals(updatedBy, that.updatedBy) && Objects.equals(originatedOn, that.originatedOn)
       && Objects.equals(originatedBy, that.originatedBy) && Objects.equals(liftedOn, that.liftedOn)
-      && Objects.equals(liftedBy, that.liftedBy) && Objects.equals(updatedOn, that.updatedOn)
-      && Objects.equals(updatedBy, that.updatedBy) && Objects.equals(activeAIPs, that.activeAIPs)
-      && Objects.equals(inactiveAIPs, that.inactiveAIPs);
+      && Objects.equals(liftedBy, that.liftedBy) && Objects.equals(firstTimeUsed, that.firstTimeUsed)
+      && Objects.equals(aipCounter, that.aipCounter) && state == that.state;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, title, description, mandate, scopeNotes, createdOn, createdBy, originatedOn, originatedBy,
-      liftedOn, liftedBy, updatedOn, updatedBy, activeAIPs, inactiveAIPs);
+    return Objects.hash(id, title, description, mandate, scopeNotes, createdOn, createdBy, updatedOn, updatedBy,
+      originatedOn, originatedBy, liftedOn, liftedBy, firstTimeUsed, aipCounter, state);
   }
 
   @Override
   public String toString() {
     return "DisposalHold{" + "id='" + id + '\'' + ", title='" + title + '\'' + ", description='" + description + '\''
       + ", mandate='" + mandate + '\'' + ", scopeNotes='" + scopeNotes + '\'' + ", createdOn=" + createdOn
-      + ", createdBy='" + createdBy + '\'' + ", originatedOn=" + originatedOn + ", originatedBy='" + originatedBy + '\''
-      + ", liftedOn=" + liftedOn + ", liftedBy='" + liftedBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='"
-      + updatedBy + '\'' + ", activeAIPs=" + activeAIPs + ", inactiveAIPs=" + inactiveAIPs + '}';
+      + ", createdBy='" + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\''
+      + ", originatedOn=" + originatedOn + ", originatedBy='" + originatedBy + '\'' + ", liftedOn=" + liftedOn
+      + ", liftedBy='" + liftedBy + '\'' + ", firstTimeUsed=" + firstTimeUsed + ", aipCounter=" + aipCounter
+      + ", state=" + state + '}';
   }
 }

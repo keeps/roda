@@ -8,12 +8,14 @@
 package org.roda.core.data.v2.user;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.v2.IsModelObject;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -210,6 +212,17 @@ public abstract class RodaPrincipal implements Serializable, RODAMember, IsModel
 
   public boolean hasRole(String role) {
     return allRoles.contains(role);
+  }
+
+  public boolean hasRoles(List<String> roles) {
+    // INFO mguimaraes contain at least one role
+    boolean contains = false;
+
+    for (String role : roles) {
+      contains = hasRole(role) || contains;
+    }
+
+    return contains;
   }
 
   public void addDirectRole(String role) {

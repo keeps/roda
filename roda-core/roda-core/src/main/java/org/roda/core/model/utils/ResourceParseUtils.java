@@ -13,7 +13,11 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 
 import org.apache.commons.io.IOUtils;
@@ -22,13 +26,24 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.*;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
-import org.roda.core.data.v2.ip.*;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.DIPFile;
+import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -40,7 +55,12 @@ import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.model.LiteRODAObjectFactory;
-import org.roda.core.storage.*;
+import org.roda.core.storage.Binary;
+import org.roda.core.storage.DefaultBinary;
+import org.roda.core.storage.DefaultDirectory;
+import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.Resource;
+import org.roda.core.storage.StorageService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -388,7 +408,8 @@ public class ResourceParseUtils {
   private static <T extends Serializable> boolean isDirectoryAcceptable(Class<T> classToReturn) {
     return classToReturn.equals(File.class) || classToReturn.equals(AIP.class)
       || classToReturn.equals(Representation.class) || classToReturn.equals(TransferredResource.class)
-      || classToReturn.equals(DIPFile.class) || classToReturn.equals(DIP.class);
+      || classToReturn.equals(DIPFile.class) || classToReturn.equals(DIP.class)
+      || classToReturn.equals(DisposalConfirmation.class);
   }
 
   @FunctionalInterface
