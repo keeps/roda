@@ -6,7 +6,7 @@ RUN set -ex; \
     curl -s https://bintray.com/user/downloadSubjectPublicKey?username=bintray | \
     apt-key add - && echo "deb http://dl.bintray.com/siegfried/debian wheezy main" | \
     tee -a /etc/apt/sources.list && apt-get -qq update && \
-    apt-get -qq -y --no-install-recommends install clamav clamav-daemon clamdscan siegfried supervisor zip rsync \
+    apt-get -qq -y --no-install-recommends install clamav clamav-daemon clamdscan siegfried supervisor zip rsync jq \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY supervisor-conf.d/* /etc/supervisor/conf.d/
