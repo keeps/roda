@@ -113,6 +113,8 @@ public class EditDisposalSchedule extends Composite {
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
+    GWT.log("" + disposalScheduleDataPanel.isChanged());
+    GWT.log("" + disposalScheduleDataPanel.isValid());
     if (disposalScheduleDataPanel.isChanged() && disposalScheduleDataPanel.isValid()) {
       DisposalSchedule disposalScheduleUpdated = disposalScheduleDataPanel.getDisposalSchedule();
       disposalSchedule.setTitle(disposalScheduleUpdated.getTitle());

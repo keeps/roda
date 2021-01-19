@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.MissingResourceException;
 
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.KeyUpEvent;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -132,9 +134,19 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
 
   private void initHandlers() {
 
-    ChangeHandler changeHandler = event -> DisposalScheduleDataPanel.this.onChange();
+    ChangeHandler changeHandler = new ChangeHandler() {
+      @Override
+      public void onChange(ChangeEvent event) {
+        DisposalScheduleDataPanel.this.onChange();
+      }
+    };
 
-    KeyUpHandler keyUpHandler = event -> DisposalScheduleDataPanel.this.onChange();
+    KeyUpHandler keyUpHandler = new KeyUpHandler() {
+      @Override
+      public void onKeyUp(KeyUpEvent keyUpEvent) {
+        DisposalScheduleDataPanel.this.onChange();
+      }
+    };
 
     ChangeHandler retentionPeriodChangeHandler = event -> {
       if (retentionPeriodIntervals.getSelectedValue()
@@ -194,6 +206,9 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
     retentionPeriodDuration.addKeyUpHandler(keyUpHandler);
     retentionPeriodDuration.addChangeHandler(changeHandler);
     retentionPeriodIntervals.addChangeHandler(changeHandler);
+    description.addChangeHandler(changeHandler);
+    mandate.addChangeHandler(changeHandler);
+    notes.addChangeHandler(changeHandler);
   }
 
   private void setInitialState() {
@@ -464,6 +479,7 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
   }
 
   protected void onChange() {
+    GWT.log("HERE!!!");
     changed = true;
     if (checked) {
       isValid();
