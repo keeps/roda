@@ -174,10 +174,10 @@ public class Menu extends Composite {
     // createCommand(Management.RESOLVER.getHistoryPath()));
 
     disposalMenu = new AcessibleMenuBar(true);
-    disposalPolicy = disposalMenu.addItem(messages.title("disposal_policy"),
+    disposalPolicy = disposalMenu.addItem(messages.title("disposal_policies"),
       createCommand(DisposalPolicy.RESOLVER.getHistoryPath()));
     disposalPolicy.addStyleName("disposal_policy_item");
-    disposalConfirmation = disposalMenu.addItem(messages.title("disposal_confirmation"),
+    disposalConfirmation = disposalMenu.addItem(messages.title("disposal_confirmations"),
       createCommand(DisposalConfirmations.RESOLVER.getHistoryPath()));
     disposalConfirmation.addStyleName("disposal_confirmation_item");
     disposalDestroyedRecords = disposalMenu.addItem(messages.title("disposal_destroyed_records"),

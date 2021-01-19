@@ -13,8 +13,8 @@
                 <g:FlowPanel addStyleNames="page-description" ui:field="disposalPolicyDescription"/>
                 <g:FlowPanel ui:field="disposalSchedulesDescription"/>
                 <u:DisposalPolicySchedulesPanel ui:field="disposalPolicySchedulesPanel"/>
-                <u:DisposalPolicyHoldsPanel ui:field="disposalPolicyHoldsPanel"/>
                 <u:DisposalPolicyRulesPanel ui:field="disposalPolicyRulesPanel"/>
+                <u:DisposalPolicyHoldsPanel ui:field="disposalPolicyHoldsPanel"/>
             </g:FlowPanel>
             <g:FlowPanel ui:field="sidebarFlowPanel" addStyleNames="col_2 last sidebar contentPanel">
                 <g:FlowPanel addStyleNames="sticky-flow">
