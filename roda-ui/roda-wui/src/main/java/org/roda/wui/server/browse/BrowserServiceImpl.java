@@ -1141,6 +1141,13 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
+  public DisposalHold liftDisposalHold(DisposalHold disposalHold) throws AuthorizationDeniedException,
+    IllegalOperationException, GenericException, NotFoundException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Disposals.liftDisposalHold(user, disposalHold);
+  }
+
+  @Override
   public Job disassociateDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean clearAll)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
@@ -1204,17 +1211,17 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public String retrieveDisposalConfirmationReport(String confirmationId, boolean isToPrint) throws RODAException, IOException {
+  public String retrieveDisposalConfirmationReport(String confirmationId, boolean isToPrint)
+    throws RODAException, IOException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Disposals.retrieveDisposalConfirmationReport(user, confirmationId, isToPrint);
   }
 
   @Override
   public List<DisposalTransitiveHoldAIPMetadata> listTransitiveDisposalHolds(String aipId)
-          throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.listTransitiveDisposalHolds(user, aipId);
   }
-
 
 }

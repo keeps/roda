@@ -2381,4 +2381,6 @@ SafeHtml genericErrorTitle();
   String disposalConfirmationShowRecordsToReview();
 
   String disposalConfirmationShowRecordsRetentionPeriodCalculationError();
+
+  String updateDisposalHoldMessage();
 }

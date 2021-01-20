@@ -1,6 +1,7 @@
 package org.roda.wui.api.controllers;
 
 import java.io.IOException;
+import java.util.Date;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -417,9 +418,32 @@ public class Disposals extends RodaWuiController {
     }
   }
 
+  public static DisposalHold liftDisposalHold(User user, DisposalHold disposalHold) throws AuthorizationDeniedException,
+    NotFoundException, IllegalOperationException, GenericException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+    try {
+      disposalHold.setLiftedBy(user.getName());
+      disposalHold.setLiftedOn(new Date());
+      // delegate
+      return BrowserHelper.updateDisposalHold(disposalHold, user);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, disposalHold.getId(), state,
+        RodaConstants.CONTROLLER_DISPOSAL_HOLD_PARAM, disposalHold);
+    }
+  }
+
   public static Job disassociateDisposalHold(User user, SelectedItems<IndexedAIP> items, String disposalHoldId,
-                                     boolean clearAll)
-      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    boolean clearAll)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -435,8 +459,8 @@ public class Disposals extends RodaWuiController {
     } finally {
       // register action
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_SELECTED_PARAM, items,
-          RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId,
-          RodaConstants.CONTROLLER_DISPOSAL_HOLD_DISASSOCIATE_ALL, clearAll);
+        RodaConstants.CONTROLLER_DISPOSAL_HOLD_ID_PARAM, disposalHoldId,
+        RodaConstants.CONTROLLER_DISPOSAL_HOLD_DISASSOCIATE_ALL, clearAll);
     }
   }
 

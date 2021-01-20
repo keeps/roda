@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -68,6 +69,7 @@ import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
+import org.roda.wui.client.disposal.Disposal;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
@@ -442,6 +444,8 @@ public interface BrowserService extends RemoteService {
 
   Job liftDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  DisposalHold liftDisposalHold(DisposalHold disposalHold) throws AuthorizationDeniedException, IllegalOperationException, GenericException, NotFoundException, RequestNotValidException;
 
   Job disassociateDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean clearAll)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;

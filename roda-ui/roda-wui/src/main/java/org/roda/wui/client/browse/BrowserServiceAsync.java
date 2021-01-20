@@ -358,6 +358,8 @@ public interface BrowserServiceAsync {
 
   void liftDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, AsyncCallback<Job> async);
 
+  void liftDisposalHold(DisposalHold disposalHold, AsyncCallback<DisposalHold> async);
+
   void disassociateDisposalHold(SelectedItems<IndexedAIP> selectedItems, String disposalHoldId, boolean clearAll,
     AsyncCallback<Job> async);
 

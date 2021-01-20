@@ -33,7 +33,6 @@ import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -205,12 +204,14 @@ public class ShowDisposalHold extends Composite {
       aipsListCard.setWidget(aipsSearchWrapper);
       aipsListCard.setVisible(true);
     } else {
+      aipListTitle.setVisible(false);
       aipsListCard.setVisible(false);
     }
 
   }
 
   public void initButtons() {
+    buttonsPanel.clear();
 
     if (disposalHold.getState().equals(DisposalHoldState.ACTIVE)
       && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_UPDATE_DISPOSAL_HOLD)) {
@@ -229,7 +230,7 @@ public class ShowDisposalHold extends Composite {
       liftHoldBtn.addClickHandler(clickEvent -> {
         if (disposalHold.getFirstTimeUsed() == null) {
           disposalHold.setState(DisposalHoldState.LIFTED);
-          BrowserServiceImpl.Util.getInstance().updateDisposalHold(disposalHold, new NoAsyncCallback<DisposalHold>() {
+          BrowserService.Util.getInstance().updateDisposalHold(disposalHold, new NoAsyncCallback<DisposalHold>() {
             @Override
             public void onSuccess(DisposalHold disposalHold) {
               HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
@@ -240,36 +241,64 @@ public class ShowDisposalHold extends Composite {
             new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLDS_ID, disposalHold.getId()));
           SelectedItemsFilter<IndexedAIP> selectedItemsFilter = new SelectedItemsFilter<>(filter,
             IndexedAIP.class.getName(), true);
-          BrowserService.Util.getInstance().liftDisposalHold(selectedItemsFilter, disposalHold.getId(),
-            new AsyncCallback<Job>() {
+
+          BrowserService.Util.getInstance().count(IndexedAIP.class.getName(), filter, true,
+            new NoAsyncCallback<Long>() {
               @Override
-              public void onFailure(Throwable throwable) {
-                HistoryUtils.newHistory(InternalProcess.RESOLVER);
-              }
-
-              @Override
-              public void onSuccess(Job job) {
-                Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
-
-                    Timer timer = new Timer() {
+              public void onSuccess(Long size) {
+                GWT.log("" + size);
+                if (size != 0) {
+                  BrowserService.Util.getInstance().liftDisposalHold(selectedItemsFilter, disposalHold.getId(),
+                    new AsyncCallback<Job>() {
                       @Override
-                      public void run() {
-                        refresh();
+                      public void onFailure(Throwable throwable) {
+                        HistoryUtils.newHistory(InternalProcess.RESOLVER);
                       }
-                    };
 
-                    timer.schedule(RodaConstants.ACTION_TIMEOUT);
-                  }
+                      @Override
+                      public void onSuccess(Job job) {
+                        Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
 
-                  @Override
-                  public void onSuccess(final Void nothing) {
-                    HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-                  }
-                });
+                          @Override
+                          public void onFailure(Throwable caught) {
+                            Toast.showInfo(messages.runningInBackgroundTitle(),
+                              messages.runningInBackgroundDescription());
+
+                            Timer timer = new Timer() {
+                              @Override
+                              public void run() {
+                                refresh();
+                              }
+                            };
+
+                            timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                          }
+
+                          @Override
+                          public void onSuccess(final Void nothing) {
+                            HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                          }
+                        });
+                      }
+                    });
+                } else {
+                  disposalHold.setState(DisposalHoldState.LIFTED);
+                  BrowserService.Util.getInstance().liftDisposalHold(disposalHold, new NoAsyncCallback<DisposalHold>() {
+                    @Override
+                    public void onSuccess(DisposalHold result) {
+                      Toast.showInfo(messages.runningInBackgroundTitle(),
+                          messages.updateDisposalHoldMessage());
+                      Timer timer = new Timer() {
+                        @Override
+                        public void run() {
+                          refresh();
+                        }
+                      };
+
+                      timer.schedule(RodaConstants.ACTION_TIMEOUT);
+                    }
+                  });
+                }
               }
             });
         }
@@ -304,6 +333,9 @@ public class ShowDisposalHold extends Composite {
       @Override
       public void onSuccess(DisposalHold result) {
         disposalHold = result;
+        initElements();
+        initAipsList();
+        initButtons();
       }
     });
   }
