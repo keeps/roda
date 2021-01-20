@@ -3,8 +3,8 @@ package org.roda.wui.client.common.actions;
 import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_DELETE_DISPOSAL_CONFIRMATION;
 import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_DESTROY_RECORDS_DISPOSAL_CONFIRMATION;
 import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_PERMANENTLY_DELETE_RECORDS_DISPOSAL_CONFIRMATION;
-import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_RETRIEVE_DISPOSAL_CONFIRMATION_REPORT;
 import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_RESTORE_RECORDS_DISPOSAL_CONFIRMATION;
+import static org.roda.core.data.common.RodaConstants.PERMISSION_METHOD_RETRIEVE_DISPOSAL_CONFIRMATION_REPORT;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -19,8 +19,8 @@ import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
-import org.roda.wui.client.disposal.DisposalConfirmations;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.disposal.DisposalConfirmations;
 import org.roda.wui.client.disposal.confirmations.ShowDisposalConfirmation;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.InternalProcess;
@@ -140,7 +140,7 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
 
   private void retrieveDisposalConfirmationReportForPrint(DisposalConfirmation confirmation,
     AsyncCallback<ActionImpact> callback) {
-    BrowserService.Util.getInstance().retrieveDisposalConfirmationReport(confirmation.getId(),true,
+    BrowserService.Util.getInstance().retrieveDisposalConfirmationReport(confirmation.getId(), true,
       new ActionNoAsyncCallback<String>(callback) {
         @Override
         public void onSuccess(String report) {
@@ -209,7 +209,7 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
                       Toast.showInfo(messages.restoreDestroyedRecordsSuccessTitle(),
                         messages.restoreDestroyedRecordsSuccessMessage());
                       doActionCallbackUpdated();
-                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                      HistoryUtils.newHistory(DisposalConfirmations.RESOLVER);
                     }
 
                     @Override
@@ -247,7 +247,7 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
                       Toast.showInfo(messages.permanentlyDeleteRecordsSuccessTitle(),
                         messages.permanentlyDeleteRecordsSuccessMessage());
                       doActionCallbackUpdated();
-                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                      HistoryUtils.newHistory(DisposalConfirmations.RESOLVER);
                     }
 
                     @Override
@@ -284,7 +284,7 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
                       Toast.showInfo(messages.deleteConfirmationReportSuccessTitle(),
                         messages.deleteConfirmationReportSuccessMessage());
                       doActionCallbackUpdated();
-                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                      HistoryUtils.newHistory(DisposalConfirmations.RESOLVER);
                     }
 
                     @Override
