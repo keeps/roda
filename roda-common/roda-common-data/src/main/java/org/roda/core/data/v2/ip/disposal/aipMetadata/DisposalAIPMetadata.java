@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.roda.core.data.common.RodaConstants;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
 import org.roda.core.data.v2.ip.AIPDisposalScheduleAssociationType;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -112,9 +112,9 @@ public class DisposalAIPMetadata implements Serializable {
 
   @JsonIgnore
   public DisposalHoldAIPMetadata findHold(String DisposalHoldId) {
-    if(holds != null) {
+    if (holds != null) {
       for (DisposalHoldAIPMetadata hold : holds) {
-        if(hold.getId().equals(DisposalHoldId)) {
+        if (hold.getId().equals(DisposalHoldId)) {
           return hold;
         }
       }
@@ -124,9 +124,9 @@ public class DisposalAIPMetadata implements Serializable {
 
   @JsonIgnore
   public DisposalTransitiveHoldAIPMetadata findTransitiveHold(String transitiveHoldId) {
-    if(transitiveHolds != null) {
+    if (transitiveHolds != null) {
       for (DisposalTransitiveHoldAIPMetadata hold : transitiveHolds) {
-        if(hold.getId().equals(transitiveHoldId)) {
+        if (hold.getId().equals(transitiveHoldId)) {
           return hold;
         }
       }
@@ -149,7 +149,7 @@ public class DisposalAIPMetadata implements Serializable {
 
   @JsonIgnore
   public String getDisposalScheduleId() {
-    if(schedule != null) {
+    if (schedule != null) {
       return schedule.getId();
     }
     return null;
@@ -157,15 +157,15 @@ public class DisposalAIPMetadata implements Serializable {
 
   @JsonIgnore
   public String getDisposalConfirmationId() {
-    if(confirmation != null) {
+    if (confirmation != null) {
       return confirmation.getId();
     }
     return null;
   }
 
   @JsonIgnore
-  public AIPDisposalScheduleAssociationType getDisposalScheduleAssociationType(){
-    if(schedule != null){
+  public AIPDisposalScheduleAssociationType getDisposalScheduleAssociationType() {
+    if (schedule != null) {
       return schedule.getAssociationType();
     }
     return null;
@@ -173,7 +173,7 @@ public class DisposalAIPMetadata implements Serializable {
 
   @JsonIgnore
   public boolean removeDisposalHold(String disposalHold) {
-    if(holds != null) {
+    if (holds != null) {
       return holds.removeIf(hold -> hold.getId().equals(disposalHold));
     }
     return false;
@@ -181,7 +181,7 @@ public class DisposalAIPMetadata implements Serializable {
 
   @JsonIgnore
   public boolean removeTransitiveHold(String transitiveDisposalHold) {
-    if(transitiveHolds != null) {
+    if (transitiveHolds != null) {
       return transitiveHolds.removeIf(transitiveHolds -> transitiveHolds.getId().equals(transitiveDisposalHold));
     }
     return false;

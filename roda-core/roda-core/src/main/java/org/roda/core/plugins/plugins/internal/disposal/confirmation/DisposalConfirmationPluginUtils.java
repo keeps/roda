@@ -171,8 +171,7 @@ public class DisposalConfirmationPluginUtils {
     entry.setAipNumberOfFiles(totalOfDataFiles);
   }
 
-  public static Path getDisposalConfirmationPath(String disposalConfirmationId)
-    throws RequestNotValidException {
+  public static Path getDisposalConfirmationPath(String disposalConfirmationId) throws RequestNotValidException {
     DefaultStoragePath confirmationPath = DefaultStoragePath
       .parse(ModelUtils.getDisposalConfirmationStoragePath(disposalConfirmationId));
     return FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), confirmationPath);

@@ -171,8 +171,17 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
     Job cachedJob, List<AIP> aips) {
 
     String confirmationId = IdUtils.createUUID();
+    IndexedAIP indexedAIP = null;
 
     for (AIP aip : aips) {
+      try {
+        indexedAIP = index.retrieve(IndexedAIP.class, aip.getId(),
+          Collections.singletonList(RodaConstants.AIP_DISPOSAL_HOLD_STATUS));
+      } catch (NotFoundException | GenericException e) {
+        // do nothing; if it fails to retrieve the IndexedAIP it will prompt an error
+        // and caught in the if sequence
+      }
+
       boolean processChildren = true;
       PluginState state = PluginState.SUCCESS;
       String outcomeText;
@@ -195,7 +204,7 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
         processChildren = false;
-      } else if (aip.onHold()) {
+      } else if (indexedAIP != null && indexedAIP.isOnHold()) {
         LOGGER.error(
           "Failed to assign AIP '{}' to disposal confirmation {} because AIP is currently with one or more holds applied",
           confirmationId, aip.getId());
@@ -203,6 +212,18 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         reportItem.setPluginState(state)
           .setPluginDetails("AIP '" + aip.getId() + "' is currently with one or more holds applied");
+        outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationCreation(
+          "failed to be assigned to disposal confirmation", title, aip.getId());
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
+        processChildren = false;
+      } else if (indexedAIP == null) {
+        LOGGER.error("Failed to assign AIP '{}' to disposal confirmation {} because retrieving the IndexedAIP failed",
+          confirmationId, aip.getId());
+        state = PluginState.FAILURE;
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+        reportItem.setPluginState(state)
+          .setPluginDetails("AIP '" + aip.getId() + "' failed to be retrieve from the index");
         outcomeText = PluginHelper.createOutcomeTextForDisposalConfirmationCreation(
           "failed to be assigned to disposal confirmation", title, aip.getId());
         report.addReport(reportItem);
@@ -259,58 +280,61 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
       }
     }
 
-    // Make disposal schedules as a jsonl
-    try {
-      for (String disposalScheduleId : disposalSchedules) {
-        DisposalSchedule disposalSchedule = model.retrieveDisposalSchedule(disposalScheduleId);
-        model.addDisposalScheduleEntry(confirmationId, disposalSchedule);
+    if (aipCounter != 0) {
+
+      // Make disposal schedules as a jsonl
+      try {
+        for (String disposalScheduleId : disposalSchedules) {
+          DisposalSchedule disposalSchedule = model.retrieveDisposalSchedule(disposalScheduleId);
+          model.addDisposalScheduleEntry(confirmationId, disposalSchedule);
+        }
+      } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException e) {
+        LOGGER.error("Failed to create disposal schedules jsonl file", e);
+        report.addPluginDetails("Failed to create jsonl with disposal schedules");
       }
-    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException e) {
-      LOGGER.error("Failed to create disposal schedules jsonl file", e);
-      report.addPluginDetails("Failed to create jsonl with disposal schedules");
-    }
 
-    // Make disposal holds as a jsonl
-    try {
-      FSUtils.createFile(DisposalConfirmationPluginUtils.getDisposalConfirmationPath(confirmationId),
-        RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME, true, true);
-      for (String disposalHoldId : disposalHolds) {
-        DisposalHold disposalHold = model.retrieveDisposalHold(disposalHoldId);
-        model.addDisposalHoldEntry(confirmationId, disposalHold);
+      // Make disposal holds as a jsonl
+      try {
+        FSUtils.createFile(DisposalConfirmationPluginUtils.getDisposalConfirmationPath(confirmationId),
+          RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME, true, true);
+        for (String disposalHoldId : disposalHolds) {
+          DisposalHold disposalHold = model.retrieveDisposalHold(disposalHoldId);
+          model.addDisposalHoldEntry(confirmationId, disposalHold);
+        }
+      } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException e) {
+        LOGGER.error("Failed to create disposal holds jsonl file", e);
+        report.addPluginDetails("Failed to create jsonl with disposal holds");
       }
-    } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException e) {
-      LOGGER.error("Failed to create disposal holds jsonl file", e);
-      report.addPluginDetails("Failed to create jsonl with disposal holds");
-    }
 
-    // Make disposal holds transitive as a jsonl
-    try {
-      FSUtils.createFile(DisposalConfirmationPluginUtils.getDisposalConfirmationPath(confirmationId),
-        RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_TRANSITIVE_HOLDS_FILENAME, true, true);
-      for (String disposalHoldId : disposalHoldTransitives) {
-        DisposalHold disposalHold = model.retrieveDisposalHold(disposalHoldId);
-        model.addDisposalHoldTransitiveEntry(confirmationId, disposalHold);
+      // Make disposal holds transitive as a jsonl
+      try {
+        FSUtils.createFile(DisposalConfirmationPluginUtils.getDisposalConfirmationPath(confirmationId),
+          RodaConstants.STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_TRANSITIVE_HOLDS_FILENAME, true, true);
+        for (String disposalHoldId : disposalHoldTransitives) {
+          DisposalHold disposalHold = model.retrieveDisposalHold(disposalHoldId);
+          model.addDisposalHoldTransitiveEntry(confirmationId, disposalHold);
+        }
+      } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException e) {
+        LOGGER.error("Failed to create transitive disposal holds jsonl file", e);
+        report.addPluginDetails("Failed to create jsonl with transitive disposal holds");
       }
-    } catch (NotFoundException | AuthorizationDeniedException | GenericException | RequestNotValidException e) {
-      LOGGER.error("Failed to create transitive disposal holds jsonl file", e);
-      report.addPluginDetails("Failed to create jsonl with transitive disposal holds");
-    }
 
-    // create disposal confirmation report metadata
-    try {
-      model.createDisposalConfirmation(DisposalConfirmationPluginUtils.getDisposalConfirmation(confirmationId, title,
-        storageSize, disposalHolds, disposalSchedules, aipCounter, extraInformation), cachedJob.getUsername());
+      // create disposal confirmation report metadata
+      try {
+        model.createDisposalConfirmation(DisposalConfirmationPluginUtils.getDisposalConfirmation(confirmationId, title,
+          storageSize, disposalHolds, disposalSchedules, aipCounter, extraInformation), cachedJob.getUsername());
 
-      model.createRepositoryEvent(getPreservationEventType(), getPreservationEventDescription(), PluginState.SUCCESS,
-        getPreservationEventSuccessMessage(), confirmationId, cachedJob.getUsername(), true);
-    } catch (RequestNotValidException | NotFoundException | GenericException | AlreadyExistsException
-      | AuthorizationDeniedException e) {
-      LOGGER.error("Failed to create disposal confirmation metadata file", e);
-      report.setPluginState(PluginState.FAILURE)
-        .setPluginDetails("Failed to create disposal confirmation metadata file: " + e.getMessage());
+        model.createRepositoryEvent(getPreservationEventType(), getPreservationEventDescription(), PluginState.SUCCESS,
+          getPreservationEventSuccessMessage(), confirmationId, cachedJob.getUsername(), true);
+      } catch (RequestNotValidException | NotFoundException | GenericException | AlreadyExistsException
+        | AuthorizationDeniedException e) {
+        LOGGER.error("Failed to create disposal confirmation metadata file", e);
+        report.setPluginState(PluginState.FAILURE)
+          .setPluginDetails("Failed to create disposal confirmation metadata file: " + e.getMessage());
 
-      model.createRepositoryEvent(getPreservationEventType(), getPreservationEventDescription(), PluginState.FAILURE,
-        getPreservationEventFailureMessage(), confirmationId, cachedJob.getUsername(), true);
+        model.createRepositoryEvent(getPreservationEventType(), getPreservationEventDescription(), PluginState.FAILURE,
+          getPreservationEventFailureMessage(), confirmationId, cachedJob.getUsername(), true);
+      }
     }
   }
 
