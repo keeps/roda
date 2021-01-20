@@ -176,10 +176,10 @@ public class ShowDisposalSchedule extends Composite {
   public void initElements() {
     title.setText(disposalSchedule.getTitle());
 
-    if(isScheduleInRule()){
+    if (isScheduleInRule()) {
       usedInRulePanel.setIcon("fas fa-info-circle");
       usedInRulePanel.setText(messages.disposalScheduleUsedInRule());
-    }else{
+    } else {
       usedInRulePanel.setVisible(false);
     }
 
@@ -207,7 +207,7 @@ public class ShowDisposalSchedule extends Composite {
     disposalActionsValue.setHTML(messages.disposalScheduleAction(disposalSchedule.getActionCode().toString()));
     disposalActionsLabel.setVisible(StringUtils.isNotBlank(disposalSchedule.getActionCode().toString()));
 
-    retentionTriggersValue.setHTML(disposalSchedule.getRetentionTriggerElementId());
+    retentionTriggersValue.setHTML(DisposalScheduleUtils.getI18nRetentionTriggerIdentifier(disposalSchedule.getRetentionTriggerElementId()));
     retentionTriggersLabel.setVisible(StringUtils.isNotBlank(disposalSchedule.getRetentionTriggerElementId()));
 
     if (disposalSchedule.getRetentionPeriodIntervalCode() == null) {
@@ -216,7 +216,7 @@ public class ShowDisposalSchedule extends Composite {
     } else if (disposalSchedule.getRetentionPeriodIntervalCode()
       .equals(RetentionPeriodIntervalCode.NO_RETENTION_PERIOD)) {
       String retentionPeriod = messages.retentionPeriod(0,
-              disposalSchedule.getRetentionPeriodIntervalCode().toString());
+        disposalSchedule.getRetentionPeriodIntervalCode().toString());
       retentionPeriodValue.setHTML(retentionPeriod);
       retentionPeriodLabel.setVisible(true);
     } else {
@@ -292,8 +292,8 @@ public class ShowDisposalSchedule extends Composite {
 
   private boolean isScheduleInRule() {
     boolean ret = false;
-    for(DisposalRule rule: disposalRules.getObjects()){
-      if(rule.getDisposalScheduleId().equals(disposalSchedule.getId())){
+    for (DisposalRule rule : disposalRules.getObjects()) {
+      if (rule.getDisposalScheduleId().equals(disposalSchedule.getId())) {
         ret = true;
       }
     }

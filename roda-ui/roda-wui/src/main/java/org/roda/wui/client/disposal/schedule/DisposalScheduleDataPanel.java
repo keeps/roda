@@ -239,50 +239,11 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
         retentionPeriodIntervalCode.toString());
     }
 
-    List<Pair<String, String>> retentionElementsIds = getElementsFromConfig();
+    List<Pair<String, String>> retentionElementsIds = DisposalScheduleUtils.getElementsFromConfig();
     retentionTriggerElementIdList.addItem("", "");
     for (Pair<String, String> value : retentionElementsIds) {
       retentionTriggerElementIdList.addItem(value.getSecond(), value.getFirst());
     }
-  }
-
-  private List<Pair<String, String>> getElementsFromConfig() {
-    List<Pair<String, String>> elements = new ArrayList<>();
-    String classSimpleName = IndexedAIP.class.getSimpleName();
-    List<String> fields = ConfigurationManager.getStringList(RodaConstants.SEARCH_FIELD_PREFIX, classSimpleName);
-
-    for (String field : fields) {
-      String fieldPrefix = RodaConstants.SEARCH_FIELD_PREFIX + '.' + classSimpleName + '.' + field;
-      String fieldType = ConfigurationManager.getString(fieldPrefix, RodaConstants.SEARCH_FIELD_TYPE);
-      String fieldsNames = ConfigurationManager.getString(fieldPrefix, RodaConstants.SEARCH_FIELD_FIELDS);
-
-      if ((RodaConstants.SEARCH_FIELD_TYPE_DATE.equals(fieldType)
-        || RodaConstants.SEARCH_FIELD_TYPE_DATE_INTERVAL.equals(fieldType))) {
-        String fieldLabelI18N = ConfigurationManager.getString(fieldPrefix, RodaConstants.SEARCH_FIELD_I18N);
-        String translation = fieldLabelI18N;
-        try {
-          translation = ConfigurationManager.getTranslation(fieldLabelI18N);
-        } catch (MissingResourceException e) {
-          // do nothing
-        }
-
-        Pair<String, String> pair = new Pair<>(parseFieldsNames(fieldsNames), translation);
-        elements.add(pair);
-      }
-
-    }
-    return elements;
-  }
-
-  private String parseFieldsNames(String fieldsNames) {
-    if (fieldsNames.contains(",")) {
-      String[] split = fieldsNames.split(",");
-      if (split.length == 2) {
-        return split[1];
-      }
-    }
-
-    return fieldsNames;
   }
 
   public void setDisposalSchedule(DisposalSchedule disposalSchedule) {
