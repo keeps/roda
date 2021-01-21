@@ -85,7 +85,6 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.SortParameter;
@@ -3525,8 +3524,10 @@ public class BrowserHelper {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISPOSAL_SCHEDULE_OVERWRITE_MANUAL,
       Boolean.toString(applyToManuallyInclusive));
+
     return createAndExecuteInternalJob("Apply disposal rules to repository",
-      SelectedItemsAll.create(AIP.class.getName()), ApplyDisposalRulesPlugin.class, user, pluginParameters,
-      "Could not execute apply disposal rules to repository");
+      new SelectedItemsFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name())),
+        IndexedAIP.class.getName(), true),
+      ApplyDisposalRulesPlugin.class, user, pluginParameters, "Could not execute apply disposal rules to repository");
   }
 }

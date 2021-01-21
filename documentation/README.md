@@ -18,6 +18,7 @@ Among others articles, in this series of documentation you will find information
 	- [Risk assessment](Risk_Assessment.md)
 	- [Representation Information](Representation_Information.md)
 	- [Format normalization policy](Format_Normalization_Policy.md)
+	- [Disposal Policies](Disposal_Policies.md)
 - Support
 	- [Community support](Community_Support.md)
 	- [Professional support](Professional_Support.md)

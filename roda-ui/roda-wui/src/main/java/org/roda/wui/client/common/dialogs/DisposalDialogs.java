@@ -1,7 +1,5 @@
 package org.roda.wui.client.common.dialogs;
 
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.HTML;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
@@ -22,10 +20,9 @@ import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.view.client.ListDataProvider;
@@ -340,46 +337,4 @@ public class DisposalDialogs {
     dialogBox.center();
     dialogBox.show();
   }
-
-
-  public static void printReport(HTML report, AsyncCallback<Boolean> callback) {
-    FlowPanel layout = new FlowPanel();
-    FlowPanel footer = new FlowPanel();
-    final DialogBox dialogBox = new DialogBox(false, true);
-    dialogBox.setText(messages.printButton());
-
-    layout.addStyleName("content");
-    layout.addStyleName("wui-dialog-layout");
-    footer.addStyleName("wui-dialog-layout-footer");
-
-    Button cancelButton = new Button(messages.cancelButton());
-    cancelButton.addStyleName("btn btn-link");
-    cancelButton.addClickHandler(event -> {
-      dialogBox.hide();
-      callback.onFailure(null);
-    });
-
-    Button printButton = new Button();
-    printButton.setText(messages.printButton());
-    printButton.addStyleName("btn btn-play");
-    printButton.addClickHandler(event -> {
-      Window.print();
-      dialogBox.hide();
-      callback.onSuccess(false);
-    });
-
-    footer.add(cancelButton);
-    footer.add(printButton);
-
-    layout.add(report);
-    layout.add(footer);
-
-    dialogBox.setGlassEnabled(true);
-    dialogBox.setAnimationEnabled(false);
-
-    dialogBox.setWidget(layout);
-    dialogBox.center();
-    dialogBox.show();
-  }
-
 }

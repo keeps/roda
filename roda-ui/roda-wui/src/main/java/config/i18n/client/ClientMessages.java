@@ -188,7 +188,7 @@ public interface ClientMessages extends Messages {
 
   SafeHtml notFoundErrorMessage(String id);
 
-SafeHtml genericErrorTitle();
+  SafeHtml genericErrorTitle();
 
   SafeHtml genericErrorMessage(String message);
 
@@ -2270,6 +2270,10 @@ SafeHtml genericErrorTitle();
 
   String disassociateDisposalHoldDialogMessage(@PluralCount int size);
 
+  String disassociateDisposalScheduleDialogTitle();
+
+  String disassociateDisposalScheduleDialogMessage(@PluralCount int size);
+
   String disposalHoldAssociatedOn();
 
   String disposalHoldAssociatedBy();
@@ -2383,4 +2387,5 @@ SafeHtml genericErrorTitle();
   String disposalConfirmationShowRecordsRetentionPeriodCalculationError();
 
   String updateDisposalHoldMessage();
+
 }

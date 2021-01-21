@@ -5,6 +5,7 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalRules;
@@ -16,6 +17,7 @@ import org.roda.wui.client.common.DisposalPolicySummaryPanel;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.actions.DisposalScheduleActions;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
@@ -28,6 +30,7 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
@@ -207,7 +210,8 @@ public class ShowDisposalSchedule extends Composite {
     disposalActionsValue.setHTML(messages.disposalScheduleAction(disposalSchedule.getActionCode().toString()));
     disposalActionsLabel.setVisible(StringUtils.isNotBlank(disposalSchedule.getActionCode().toString()));
 
-    retentionTriggersValue.setHTML(DisposalScheduleUtils.getI18nRetentionTriggerIdentifier(disposalSchedule.getRetentionTriggerElementId()));
+    retentionTriggersValue.setHTML(
+      DisposalScheduleUtils.getI18nRetentionTriggerIdentifier(disposalSchedule.getRetentionTriggerElementId()));
     retentionTriggersLabel.setVisible(StringUtils.isNotBlank(disposalSchedule.getRetentionTriggerElementId()));
 
     if (disposalSchedule.getRetentionPeriodIntervalCode() == null) {
@@ -240,8 +244,10 @@ public class ShowDisposalSchedule extends Composite {
       ListBuilder<IndexedAIP> aipsListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
         new AsyncTableCellOptions<>(IndexedAIP.class, "ShowDisposalSchedule_aips")
           .withFilter(
-            new Filter(new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID, disposalSchedule.getId())))
-          .withSummary(messages.listOfAIPs()).bindOpener());
+            new Filter(new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_SCHEDULE_ID, disposalSchedule.getId()),
+              new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name())))
+          .withActionable(DisposalScheduleActions.get(disposalSchedule.getId())).withSummary(messages.listOfAIPs())
+          .bindOpener());
 
       SearchWrapper aipsSearchWrapper = new SearchWrapper(false).createListAndSearchPanel(aipsListBuilder);
       aipsListCard.setWidget(aipsSearchWrapper);
@@ -263,8 +269,9 @@ public class ShowDisposalSchedule extends Composite {
       }
       buttonsPanel.add(editScheduleBtn);
 
-      if (!isScheduleInRule() && disposalSchedule.getApiCounter() == 0
-        && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_UPDATE_DISPOSAL_SCHEDULE)) {
+      if (!isScheduleInRule() && disposalSchedule.getFirstTimeUsed() != null
+        && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_DELETE_DISPOSAL_SCHEDULE)) {
+        // Change the state to inactive
         Button deactivateScheduleButton = new Button();
         deactivateScheduleButton.addStyleName("btn btn-block btn-danger btn-ban");
         deactivateScheduleButton.setText(messages.deactivateButton());
@@ -279,6 +286,25 @@ public class ShowDisposalSchedule extends Composite {
             });
         });
         buttonsPanel.add(deactivateScheduleButton);
+      }
+
+      if (!isScheduleInRule() && disposalSchedule.getFirstTimeUsed() == null
+        && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_DELETE_DISPOSAL_SCHEDULE)) {
+        // Delete the disposal schedule
+        Button deleteDisposalSchedule = new Button();
+        deleteDisposalSchedule.addStyleName("btn btn-block btn-danger btn-delete");
+        deleteDisposalSchedule.setText("Delete");
+        deleteDisposalSchedule.addClickHandler(clickEvent -> {
+          BrowserServiceImpl.Util.getInstance().deleteDisposalSchedule(disposalSchedule.getId(),
+            new NoAsyncCallback<Void>() {
+              @Override
+              public void onSuccess(Void result) {
+                Toast.showInfo("Delete", "Delete");
+                HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+              }
+            });
+        });
+        buttonsPanel.add(deleteDisposalSchedule);
       }
     }
 

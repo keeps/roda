@@ -184,6 +184,8 @@ public class AssociateDisposalScheduleToAIPPlugin extends AbstractPlugin<AIP> {
             "failed to be associated to AIP '" + aip.getId()
               + "'; This AIP is part of a disposal confirmation report and the schedule cannot be changed",
             disposalScheduleId, null);
+          report.addReport(reportItem);
+          PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
         } else {
           try {
             applyDisposalSchedule(model, cachedJob, aip, disposalSchedule);

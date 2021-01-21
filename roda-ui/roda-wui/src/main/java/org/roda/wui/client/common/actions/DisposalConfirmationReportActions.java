@@ -359,17 +359,13 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
     scheduleGroup.addButton(messages.applyDisposalScheduleButton(), DisposalConfirmationReportAction.DESTROY,
       ActionImpact.UPDATED, "btn-trash-alt");
 
-    // REPORT
-    ActionableGroup<DisposalConfirmation> reportGroup = new ActionableGroup<>(
-      messages.sidebarDisposalConfirmationReportTitle());
-    reportGroup.addButton(messages.printButton(), DisposalConfirmationReportAction.PRINT, ActionImpact.NONE,
-      "btn-print");
-    reportGroup.addButton(messages.deleteDisposalConfirmationReport(), DisposalConfirmationReportAction.DELETE_REPORT,
-      ActionImpact.DESTROYED, "btn-remove");
-
     // DISPOSAL CONFIRMATION
     ActionableGroup<DisposalConfirmation> confirmationGroup = new ActionableGroup<>(
       messages.sidebarDisposalConfirmationTitle());
+    confirmationGroup.addButton(messages.printButton(), DisposalConfirmationReportAction.PRINT, ActionImpact.NONE,
+        "btn-print");
+    confirmationGroup.addButton(messages.deleteDisposalConfirmationReport(), DisposalConfirmationReportAction.DELETE_REPORT,
+        ActionImpact.DESTROYED, "btn-remove");
     confirmationGroup.addButton(messages.reExecuteDisposalDestroyActionButton(),
       DisposalConfirmationReportAction.RE_EXECUTE, ActionImpact.UPDATED, "btn-play-circle");
     confirmationGroup.addButton(messages.recoverDisposalConfirmationExecutionFailedButton(),
@@ -382,7 +378,7 @@ public class DisposalConfirmationReportActions extends AbstractActionable<Dispos
     disposalBinGroup.addButton(messages.restoreFromBinButton(), DisposalConfirmationReportAction.RESTORE_FROM_BIN,
       ActionImpact.UPDATED, "btn-history");
 
-    confirmationActionableBundle.addGroup(scheduleGroup).addGroup(reportGroup).addGroup(confirmationGroup)
+    confirmationActionableBundle.addGroup(scheduleGroup).addGroup(confirmationGroup)
       .addGroup(disposalBinGroup);
 
     return confirmationActionableBundle;

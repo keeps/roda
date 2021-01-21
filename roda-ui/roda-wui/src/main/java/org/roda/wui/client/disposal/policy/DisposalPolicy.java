@@ -111,8 +111,8 @@ public class DisposalPolicy extends Composite {
 
   private boolean initSidebarButtons(FlowPanel sidebar) {
     boolean hasCreatedScheduleBtns = initDisposalScheduleButtons(sidebar, true, true);
-    boolean hasCreatedHoldBtns = initDisposalHoldButtons(sidebar, true, true);
     boolean hasCreatedRuleBtns = initDisposalRuleButtons(sidebar, true, true);
+    boolean hasCreatedHoldBtns = initDisposalHoldButtons(sidebar, true, true);
 
     return hasCreatedRuleBtns || hasCreatedScheduleBtns || hasCreatedHoldBtns;
   }

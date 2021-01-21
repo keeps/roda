@@ -86,7 +86,7 @@ public class ApplyDisposalRulesPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "";
+    return "Associates a disposal schedule to an AIP via rules previously defined for the repository.";
   }
 
   @Override

@@ -23,12 +23,19 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.disposal.Disposal;
 import org.roda.wui.client.disposal.DisposalConfirmations;
 import org.roda.wui.client.disposal.DisposalDestroyedRecords;
+import org.roda.wui.client.disposal.confirmations.CreateDisposalConfirmation;
 import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.preingest.PreIngest;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
-import org.roda.wui.client.management.*;
+import org.roda.wui.client.management.Management;
+import org.roda.wui.client.management.MemberManagement;
+import org.roda.wui.client.management.NotificationRegister;
+import org.roda.wui.client.management.Profile;
+import org.roda.wui.client.management.Register;
+import org.roda.wui.client.management.Statistics;
+import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.planning.PreservationAgents;
 import org.roda.wui.client.planning.RepresentationInformationNetwork;
@@ -101,6 +108,7 @@ public class Menu extends Composite {
   private AcessibleMenuBar disposalMenu;;
   private MenuItem disposalPolicy;
   private MenuItem disposalConfirmation;
+  private MenuItem overdueActions;
   private MenuItem disposalDestroyedRecords;
 
   private AcessibleMenuBar planningMenu;
@@ -180,6 +188,9 @@ public class Menu extends Composite {
     disposalConfirmation = disposalMenu.addItem(messages.title("disposal_confirmations"),
       createCommand(DisposalConfirmations.RESOLVER.getHistoryPath()));
     disposalConfirmation.addStyleName("disposal_confirmation_item");
+    overdueActions = disposalMenu.addItem(messages.title("overdue_actions"),
+      createCommand(CreateDisposalConfirmation.RESOLVER.getHistoryPath()));
+    overdueActions.addStyleName("overdue_actions_item");
     disposalDestroyedRecords = disposalMenu.addItem(messages.title("disposal_destroyed_records"),
       createCommand(DisposalDestroyedRecords.RESOLVER.getHistoryPath()));
     disposalDestroyedRecords.addStyleName("disposal_destroyed_records_item");
@@ -280,6 +291,7 @@ public class Menu extends Composite {
     updateResolverSubItemVisibility(DisposalPolicy.RESOLVER, disposalPolicy);
     updateResolverSubItemVisibility(DisposalConfirmations.RESOLVER, disposalConfirmation);
     updateResolverSubItemVisibility(DisposalDestroyedRecords.RESOLVER, disposalDestroyedRecords);
+    updateResolverSubItemVisibility(DisposalConfirmations.RESOLVER, overdueActions);
     MenuItem disposalItem = new MenuItem(messages.title("disposal"), disposalMenu);
     disposalItem.addStyleName("disposal_menu_item");
     updateResolverTopItemVisibility(Disposal.RESOLVER, disposalItem, 5);
