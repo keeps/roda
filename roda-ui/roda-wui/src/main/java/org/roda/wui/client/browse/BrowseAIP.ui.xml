@@ -16,8 +16,8 @@
 
 					<!-- IDENTIFICATION -->
 					<common:TitlePanel ui:field="title">
+						<g:FlowPanel addStyleNames="browseItemPanelDisposal" ui:field="disposalPolicy" />
 						<g:FlowPanel addStyleNames="browseItemPanelRisksEventsLogs" ui:field="risksEventsLogs" />
-						<g:FlowPanel addStyleNames="browseItemPanelRisksEventsLogs" ui:field="disposalPolicy" />
 						<g:Label addStyleNames="browseItemId" ui:field="dateCreatedAndModified" />
 					</common:TitlePanel>
 

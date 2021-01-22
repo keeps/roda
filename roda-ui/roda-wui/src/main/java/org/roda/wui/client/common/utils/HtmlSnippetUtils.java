@@ -81,6 +81,39 @@ public class HtmlSnippetUtils {
     // do nothing
   }
 
+  public static SafeHtml getDisposalPolicySummaryBadge(DisposalPolicySummary summary) {
+    switch (summary.getPolicyStatus()) {
+      case DESTROY:
+      case CONFIRMATION:
+      case OVERDUE:
+      case ERROR:
+        return getDisposalPolicySummaryBadge(summary.getMessage(), "");
+      case REVIEW:
+        return getDisposalPolicySummaryBadge(summary.getMessage(), "disposal-policy-summary-review");
+      case HOLD:
+        return getDisposalPolicySummaryBadge(summary.getMessage(), "disposal-policy-summary-hold");
+      case RETAIN:
+        return getDisposalPolicySummaryBadge(summary.getMessage(), "disposal-policy-summary-retain");
+      case NONE:
+      default:
+        return getDisposalPolicySummaryBadge(summary.getMessage(), "disposal-policy-summary-none");
+    }
+  }
+
+  public static SafeHtml getDisposalPolicySummaryBadge(String label, String extraCSS) {
+    SafeHtmlBuilder b = new SafeHtmlBuilder();
+
+    b.append(SafeHtmlUtils.fromSafeConstant("<span class='badge-card "))
+      .append(SafeHtmlUtils.fromSafeConstant(extraCSS)).append(SafeHtmlUtils.fromSafeConstant("'>"));
+
+    b.append(SafeHtmlUtils.fromSafeConstant("<i class=\"fas fa-stopwatch\" style=\"color: white\"></i>"));
+
+    b.append(SafeHtmlUtils.fromSafeConstant("<span> ")).append(SafeHtmlUtils.fromSafeConstant(label))
+      .append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+
+    return b.toSafeHtml();
+  }
+
   public static SafeHtml getDisposalScheduleStateHtml(DisposalSchedule disposalSchedule) {
     SafeHtml ret = null;
     if (disposalSchedule != null && disposalSchedule.getState() != null) {

@@ -2433,6 +2433,10 @@ td.datePickerMonth, td.datePickerYear {
     display: inline;
 }
 
+.browseItemPanelDisposal {
+    margin-top: 5px;
+}
+
 .browseItemIcon {
     display: inline;
     padding-right: 1rem;
@@ -7315,4 +7319,24 @@ span.code {
 .disposal-policy-summary-text {
     display: inline;
     vertical-align: bottom;
+}
+
+.badge-card {
+    padding: 5px;
+    background-color: #c44c4c;
+    display: inline-block;
+    border-radius: 6px;
+    font-family: Ubuntu;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.disposal-policy-summary-review {
+    background-color: #f9ad5d;
+}
+
+.disposal-policy-summary-hold {
+    background-color: #888;
 }

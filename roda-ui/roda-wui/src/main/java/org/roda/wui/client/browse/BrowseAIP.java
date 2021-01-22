@@ -519,9 +519,13 @@ public class BrowseAIP extends Composite {
   }
 
   private void updateDisposalInformation() {
-    Anchor disposalPolicyLink = new Anchor(DisposalPolicyUtils.getDisposalPolicySummaryText(aip),
-      HistoryUtils.createHistoryHashLink(DisposalPolicyAssociationPanel.RESOLVER, aip.getId()));
-    disposalPolicy.add(disposalPolicyLink);
+    if (DisposalPolicyUtils.showDisposalPolicySummary(aip)) {
+      Anchor disposalPolicyLink = new Anchor(DisposalPolicyUtils.getDisposalPolicySummarySafeHTML(aip),
+        HistoryUtils.createHistoryHashLink(DisposalPolicyAssociationPanel.RESOLVER, aip.getId()));
+      disposalPolicy.add(disposalPolicyLink);
+    } else {
+      disposalPolicy.setVisible(false);
+    }
   }
 
   private void getDescriptiveMetadataHTML(final String aipId, final String descId,
