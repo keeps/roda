@@ -29,6 +29,7 @@ Among others articles, in this series of documentation you will find information
 	- [Statistics](Statistics.md)
 	- [Metadata formats](Metadata_Formats.md)
 	- [Central Authentication Service (CAS)](Central_Authentication_Service.md)
+	- [Disposal feature](Disposal.md)
 - Contributing
 	- [Developers guide](Developers_Guide.md)
 	- [Translation guide](Translation_Guide.md)
