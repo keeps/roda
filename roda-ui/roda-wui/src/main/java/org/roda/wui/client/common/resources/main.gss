@@ -7340,3 +7340,7 @@ span.code {
 .disposal-policy-summary-hold {
     background-color: #888;
 }
+
+.disposal-policy-summary-retain {
+    background-color: #479f43;
+}
