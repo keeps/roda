@@ -337,8 +337,15 @@ public final class JobsHelper {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     List<File> filesToReturn = new ArrayList<>();
     for (IndexedFile indexedFile : retrieve) {
-      filesToReturn.add(model.retrieveFile(indexedFile.getAipId(), indexedFile.getRepresentationId(),
-        indexedFile.getPath(), indexedFile.getId()));
+      if (indexedFile.isReference()) {
+        File file = new File(indexedFile.getId(), indexedFile.getAipId(), indexedFile.getRepresentationId(),
+          indexedFile.getPath(), indexedFile.isDirectory(), indexedFile.isReference(), indexedFile.getReferenceURL(),
+          indexedFile.getReferenceManifest(), indexedFile.getReferenceUUID());
+        filesToReturn.add(file);
+      } else {
+        filesToReturn.add(model.retrieveFile(indexedFile.getAipId(), indexedFile.getRepresentationId(),
+          indexedFile.getPath(), indexedFile.getId()));
+      }
     }
     return filesToReturn;
   }

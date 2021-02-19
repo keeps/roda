@@ -9,6 +9,7 @@ package org.roda.core.index;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -83,6 +84,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -241,7 +243,16 @@ public class IndexModelObserver implements ModelObserver {
       representation.getId(), true)) {
       for (OptionalWithCause<File> file : allFiles) {
         if (file.isPresent()) {
-          sizeInBytes += indexFile(aip, file.get(), ancestors, false).addTo(ret).getReturnedObject();
+          // TODO: SHALLOW
+          if (FSUtils.isExternalFile(file.get().getId())) {
+            for (OptionalWithCause<File> shallowFile : model.listExternalFilesUnder(file.get())) {
+              if(shallowFile.isPresent()){
+                sizeInBytes += indexFile(aip, shallowFile.get(), ancestors, false).addTo(ret).getReturnedObject();
+              }
+            }
+          } else {
+            sizeInBytes += indexFile(aip, file.get(), ancestors, false).addTo(ret).getReturnedObject();
+          }
 
           if (file.get().isDirectory()) {
             numberOfDataFolders++;
@@ -407,7 +418,13 @@ public class IndexModelObserver implements ModelObserver {
       if (ret.isEmpty()) {
         for (OptionalWithCause<File> file : allFiles) {
           if (file.isPresent()) {
-            fileStateUpdated(aip, file.get(), false).addTo(ret);
+            if (FSUtils.isExternalFile(file.get().getId())) {
+              for (OptionalWithCause<File> fileShallow : model.listExternalFilesUnder(file.get())) {
+                fileStateUpdated(aip, fileShallow.get(), false).addTo(ret);
+              }
+            } else {
+              fileStateUpdated(aip, file.get(), false).addTo(ret);
+            }
           } else {
             LOGGER.error("Cannot do a partial update on File", file.getCause());
             ret.add(file.getCause());

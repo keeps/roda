@@ -38,6 +38,7 @@ import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.util.IdUtils;
 import org.roda_project.commons_ip2.model.IPDescriptiveMetadata;
 import org.roda_project.commons_ip2.model.IPFileInterface;
+import org.roda_project.commons_ip2.model.IPFileShallow;
 import org.roda_project.commons_ip2.model.IPMetadata;
 import org.roda_project.commons_ip2.model.IPRepresentation;
 import org.roda_project.commons_ip2.model.RepresentationStatus;
@@ -275,11 +276,25 @@ public class EARKSIP2ToAIPPluginUtils {
 
     // process representation files
     for (IPFileInterface file : sr.getData()) {
-      List<String> directoryPath = file.getRelativeFolders();
-      String fileId = file.getFileName();
-      ContentPayload payload = new FSPathContentPayload(file.getPath());
+      List<String> directoryPath;
+      String fileId;
+      ContentPayload payload;
+      if (file instanceof IPFileShallow) {
+        fileId = RodaConstants.RODA_EXTERNAL_FILE;
+        directoryPath = null;
+        payload = null;
+      } else {
+        fileId = file.getFileName();
+        directoryPath = file.getRelativeFolders();
+        payload = new FSPathContentPayload(file.getPath());
+      }
       try {
-        File createdFile = model.createFile(aipId, representation.getId(), directoryPath, fileId, payload, notify);
+        File createdFile;
+        if (file instanceof IPFileShallow) {
+          createdFile = model.createFileShallow(aipId, representation.getId(), fileId, (IPFileShallow) file, notify);
+        } else {
+          createdFile = model.createFile(aipId, representation.getId(), directoryPath, fileId, payload, notify);
+        }
         if (reportItem != null && update) {
           reportItem.getSipInformation().addFileData(aipId, IdUtils.getRepresentationId(representation), createdFile);
         }
