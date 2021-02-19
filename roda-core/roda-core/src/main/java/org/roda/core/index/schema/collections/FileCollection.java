@@ -94,6 +94,10 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
     fields.add(new Field(RodaConstants.FILE_ORIGINALNAME, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.FILE_SIZE, Field.TYPE_LONG));
     fields.add(new Field(RodaConstants.FILE_ISDIRECTORY, Field.TYPE_BOOLEAN));
+    fields.add(new Field(RodaConstants.FILE_ISREFERENCE, Field.TYPE_BOOLEAN));
+    fields.add(new Field(RodaConstants.FILE_REFERENCE_UUID, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.FILE_REFERENCE_URL, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.FILE_REFERENCE_MANIFEST, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.FILE_EXTENSION, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.FILE_FULLTEXT, Field.TYPE_TEXT).setMultiValued(false).setStored(false));
     fields.add(new Field(RodaConstants.FILE_CREATING_APPLICATION_NAME, Field.TYPE_STRING));
@@ -166,9 +170,18 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
     doc.addField(RodaConstants.FILE_REPRESENTATION_UUID,
       IdUtils.getRepresentationId(file.getAipId(), file.getRepresentationId()));
     doc.addField(RodaConstants.FILE_ISDIRECTORY, file.isDirectory());
+    doc.addField(RodaConstants.FILE_ISREFERENCE, file.isReference());
 
-    // extra-fields
     try {
+      if (file.isReference()) {
+        doc.addField(RodaConstants.FILE_REFERENCE_UUID, file.getReferenceUUID());
+        doc.addField(RodaConstants.FILE_REFERENCE_URL, file.getReferenceUrl());
+        StoragePath filePath = ModelUtils.getFileStoragePath(file.getAipId(), file.getRepresentationId(),
+            file.getPath(), RodaConstants.RODA_EXTERNAL_FILE);
+        doc.addField(RodaConstants.FILE_REFERENCE_MANIFEST,
+            RodaCoreFactory.getStorageService().getStoragePathAsString(filePath, false));
+      }
+
       StoragePath filePath = ModelUtils.getFileStoragePath(file);
       doc.addField(RodaConstants.FILE_STORAGEPATH,
         RodaCoreFactory.getStorageService().getStoragePathAsString(filePath, false));
@@ -285,6 +298,10 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
     long size = SolrUtils.objectToLong(doc.get(RodaConstants.FILE_SIZE), 0L);
     boolean isDirectory = SolrUtils.objectToBoolean(doc.get(RodaConstants.FILE_ISDIRECTORY), Boolean.FALSE);
     String storagePath = SolrUtils.objectToString(doc.get(RodaConstants.FILE_STORAGEPATH), null);
+    boolean isReference = SolrUtils.objectToBoolean(doc.get(RodaConstants.FILE_ISREFERENCE), Boolean.FALSE);
+    String referenceUUID = SolrUtils.objectToString(doc.get(RodaConstants.FILE_REFERENCE_UUID), null);
+    String referenceURL = SolrUtils.objectToString(doc.get(RodaConstants.FILE_REFERENCE_URL), null);
+    String referenceManifest = SolrUtils.objectToString(doc.get(RodaConstants.FILE_REFERENCE_MANIFEST), null);
 
     // format
     String formatDesignationName = SolrUtils.objectToString(doc.get(RodaConstants.FILE_FILEFORMAT), null);
@@ -332,11 +349,15 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
     ret.setOriginalName(originalName);
     ret.setSize(size);
     ret.setDirectory(isDirectory);
+    ret.setReference(isReference);
     ret.setCreatingApplicationName(creatingApplicationName);
     ret.setCreatingApplicationVersion(creatingApplicationVersion);
     ret.setDateCreatedByApplication(dateCreatedByApplication);
     ret.setHash(hash);
     ret.setStoragePath(storagePath);
+    ret.setReferenceUUID(referenceUUID);
+    ret.setReferenceURL(referenceURL);
+    ret.setReferenceManifest(referenceManifest);
     ret.setAncestors(ancestors);
     ret.setOtherProperties(otherProperties);
     ret.setFields(indexedFields);

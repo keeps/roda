@@ -33,11 +33,15 @@ public class IndexedFile implements IsIndexed, HasId, SetsUUID, HasPermissionFil
   private List<String> path;
   private List<String> ancestorsPath;
   private String id;
+  private String referenceUUID;
+  private String referenceURL;
+  private String referenceManifest;
 
   private FileFormat fileFormat;
   private String originalName;
   private long size = 0;
   private boolean isDirectory = false;
+  private boolean isReference = false;
   private String creatingApplicationName;
   private String creatingApplicationVersion;
   private String dateCreatedByApplication;
@@ -54,10 +58,10 @@ public class IndexedFile implements IsIndexed, HasId, SetsUUID, HasPermissionFil
   }
 
   public IndexedFile(String uuid, String parentUUID, String aipId, String representationId, String representationUUID,
-    List<String> path, List<String> ancestorsPath, String id, FileFormat fileFormat, String originalName, long size,
-    boolean isDirectory, String creatingApplicationName, String creatingApplicationVersion,
-    String dateCreatedByApplication, List<String> hash, String storagePath, List<String> ancestors,
-    Map<String, List<String>> otherProperties) {
+                     List<String> path, List<String> ancestorsPath, String id, String referenceUUID, String referenceURL, String referenceManifest, FileFormat fileFormat, String originalName, long size,
+                     boolean isDirectory, boolean isReference, String creatingApplicationName, String creatingApplicationVersion,
+                     String dateCreatedByApplication, List<String> hash, String storagePath, List<String> ancestors,
+                     Map<String, List<String>> otherProperties) {
     this.uuid = uuid;
     this.parentUUID = parentUUID;
 
@@ -68,10 +72,15 @@ public class IndexedFile implements IsIndexed, HasId, SetsUUID, HasPermissionFil
     this.ancestorsPath = ancestorsPath;
     this.id = id;
 
+    this.referenceUUID = referenceUUID;
+    this.referenceURL = referenceURL;
+    this.referenceManifest = referenceManifest;
+
     this.fileFormat = fileFormat;
     this.originalName = originalName;
     this.size = size;
     this.isDirectory = isDirectory;
+    this.isReference = isReference;
     this.creatingApplicationName = creatingApplicationName;
     this.creatingApplicationVersion = creatingApplicationVersion;
     this.dateCreatedByApplication = dateCreatedByApplication;
@@ -139,6 +148,30 @@ public class IndexedFile implements IsIndexed, HasId, SetsUUID, HasPermissionFil
     this.id = id;
   }
 
+  public String getReferenceUUID() {
+    return referenceUUID;
+  }
+
+  public void setReferenceUUID(String referenceUUID) {
+    this.referenceUUID = referenceUUID;
+  }
+
+  public String getReferenceURL() {
+    return referenceURL;
+  }
+
+  public void setReferenceURL(String referenceURL) {
+    this.referenceURL = referenceURL;
+  }
+
+  public String getReferenceManifest() {
+    return referenceManifest;
+  }
+
+  public void setReferenceManifest(String referenceManifest) {
+    this.referenceManifest = referenceManifest;
+  }
+
   public FileFormat getFileFormat() {
     return fileFormat;
   }
@@ -169,6 +202,14 @@ public class IndexedFile implements IsIndexed, HasId, SetsUUID, HasPermissionFil
 
   public void setDirectory(boolean isDirectory) {
     this.isDirectory = isDirectory;
+  }
+
+  public boolean isReference() {
+    return isReference;
+  }
+
+  public void setReference(boolean reference) {
+    isReference = reference;
   }
 
   public String getCreatingApplicationName() {

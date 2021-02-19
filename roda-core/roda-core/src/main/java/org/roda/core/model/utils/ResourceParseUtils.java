@@ -41,6 +41,7 @@ import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.ShallowFile;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
@@ -54,13 +55,17 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultBinary;
 import org.roda.core.storage.DefaultDirectory;
 import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.JsonContentPayload;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,7 +91,22 @@ public class ResourceParseUtils {
     List<String> filePath = ModelUtils.extractFilePathFromRepresentationData(resourcePath);
 
     if (resource instanceof DefaultBinary) {
-      return new File(id, aipId, representationId, filePath, false);
+      ContentPayload content = ((DefaultBinary) resource).getContent();
+      // TODO: Shallow
+      if(content instanceof JsonContentPayload) {
+        try {
+          ShallowFile shallowFile = JsonUtils.getObjectFromJson(content.createInputStream(), ShallowFile.class);
+          String url = shallowFile.getLocation().toString();
+          String originFile = FSUtils.getStoragePathAsString(resource.getStoragePath(), true);
+          String referenceUUID = shallowFile.getUUID();
+          return new File(shallowFile.getName(), aipId, representationId, filePath, false, true, url, originFile, referenceUUID);
+        } catch (IOException e) {
+          throw new GenericException(
+              "Error while trying to convert shallow file into a representation file");
+        }
+      } else {
+        return new File(id, aipId, representationId, filePath, false);
+      }
     } else if (resource instanceof DefaultDirectory) {
       return new File(id, aipId, representationId, filePath, true);
     } else {
