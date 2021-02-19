@@ -193,6 +193,9 @@ public interface StorageService {
   CloseableIterable<Resource> listResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException;
 
+  CloseableIterable<Resource> listResourcesUnderFile(StoragePath storagePath, boolean recursive)
+      throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException;
+
   /**
    * Count all resources, container or binaries, under this directory.
    * 
@@ -261,6 +264,8 @@ public interface StorageService {
    */
   Binary getBinary(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException;
+
+  Binary getBinary(StoragePath storagePath, String url) throws GenericException, RequestNotValidException;
 
   /**
    * Tests if binary exists.

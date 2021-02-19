@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
@@ -75,6 +76,8 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.ShallowFile;
+import org.roda.core.data.v2.ip.ShallowFiles;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
@@ -130,9 +133,13 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.storage.protocol.ProtocolManager;
+import org.roda.core.storage.protocol.ProtocolManagerFactory;
+import org.roda.core.storage.protocol.ShallowFileContentPayload;
 import org.roda.core.util.HTTPUtility;
 import org.roda.core.util.IdUtils;
 import org.roda.core.util.RESTClientUtility;
+import org.roda_project.commons_ip2.model.IPFileShallow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1081,6 +1088,26 @@ public class ModelService extends ModelObservable {
 
   }
 
+  public CloseableIterable<OptionalWithCause<File>> listExternalFilesUnder(File file)
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+
+    StoragePath filePath = ModelUtils.getFileStoragePath(file.getAipId(), file.getRepresentationId(), file.getPath(),
+      file.getId());
+
+    CloseableIterable<OptionalWithCause<File>> ret;
+    try {
+      final CloseableIterable<Resource> iterable = storage.listResourcesUnderFile(filePath, true);
+      ret = ResourceParseUtils.convert(getStorage(), iterable, File.class);
+    } catch (NotFoundException e) {
+      // check if AIP exists
+      storage.getDirectory(ModelUtils.getAIPStoragePath(file.getAipId()));
+      // if no exception was sent by above method, return empty list
+      ret = new EmptyClosableIterable<>();
+    }
+
+    return ret;
+  }
+
   /*****************
    * File related
    *****************/
@@ -1115,6 +1142,25 @@ public class ModelService extends ModelObservable {
     return file;
   }
 
+  public File retrieveFileInsideManifest(String aipId, String representationId, List<String> directoryPath,
+    String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath,
+      RodaConstants.RODA_EXTERNAL_FILE);
+    Binary binary = storage.getBinary(filePath);
+    ContentPayload content = binary.getContent();
+
+    if (content instanceof ShallowFileContentPayload) {
+      String fileUUID = IdUtils.getFileId(aipId, representationId, directoryPath, fileId);
+      ShallowFile shallowFile = ((ShallowFileContentPayload) content).getShallowFiles().getObject(fileUUID);
+      if (shallowFile != null) {
+        String storagePath = FSUtils.getStoragePathAsString(filePath, false);
+        return new File(shallowFile.getName(), aipId, representationId, directoryPath, false, true,
+          shallowFile.getLocation().toString(), storagePath, fileUUID);
+      }
+    }
+    throw new NotFoundException("File shallow was not found: " + fileId);
+  }
+
   public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
     ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException {
@@ -1127,7 +1173,6 @@ public class ModelService extends ModelObservable {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId);
-
     final Binary createdBinary = storage.createBinary(filePath, contentPayload, false);
     File file = ResourceParseUtils.convertResourceToFile(createdBinary);
 
@@ -1136,6 +1181,36 @@ public class ModelService extends ModelObservable {
     }
 
     return file;
+  }
+
+  public File createFileShallow(String aipId, String representationId, String fileId, IPFileShallow fileShallow,
+    boolean notify) throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException,
+    AlreadyExistsException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    ProtocolManager protocolManager = ProtocolManagerFactory.createProtocolManager(fileShallow.getFileLocation());
+    if (protocolManager.isAvailable()) {
+      ShallowFile shallowFile = new ShallowFile();
+      shallowFile.setName(FilenameUtils.getName((fileShallow).getFileLocation().getPath()));
+      shallowFile.setUUID(IdUtils.getFileId(aipId, representationId, null, shallowFile.getName()));
+      shallowFile.setLocation((fileShallow).getFileLocation());
+      ShallowFiles shallowFiles = new ShallowFiles();
+      shallowFiles.addObject(shallowFile);
+      ContentPayload contentPayload = new ShallowFileContentPayload(shallowFiles);
+
+      StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, null, fileId);
+
+      final Binary createdBinary = storage.createBinary(filePath, contentPayload, true);
+
+      File file = ResourceParseUtils.convertResourceToFile(createdBinary);
+
+      if (notify) {
+        notifyFileCreated(file).failOnError();
+      }
+      return file;
+    } else {
+      throw new NotFoundException("Resource not found at: " + fileShallow.getFileLocation());
+    }
   }
 
   public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
@@ -1188,6 +1263,30 @@ public class ModelService extends ModelObservable {
 
     if (notify) {
       notifyFileDeleted(aipId, representationId, directoryPath, fileId).failOnError();
+    }
+  }
+
+  public void deleteFile(File file, boolean notify)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    if (file.isReference()) {
+      StoragePath storagePath = ModelUtils.getFileStoragePath(file.getAipId(), file.getRepresentationId(), file.getPath(),
+        RodaConstants.RODA_EXTERNAL_FILE);
+      Binary binary = getStorage().getBinary(storagePath);
+      ContentPayload content = binary.getContent();
+      if (content instanceof ShallowFileContentPayload) {
+        ShallowFiles shallowFiles = ((ShallowFileContentPayload) content).getShallowFiles();
+        shallowFiles.removeObject(IdUtils.getFileId(file));
+
+        ContentPayload newContentPayload = new ShallowFileContentPayload(shallowFiles);
+        getStorage().updateBinaryContent(storagePath, newContentPayload, false, false);
+        if (notify) {
+          notifyFileDeleted(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()).failOnError();
+        }
+      }
+    } else {
+      deleteFile(file.getId(), file.getRepresentationId(), file.getPath(), file.getId(), notify);
     }
   }
 

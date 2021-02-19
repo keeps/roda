@@ -7,8 +7,10 @@
  */
 package org.roda.core.storage.fs;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.CopyOption;
@@ -20,6 +22,7 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -34,14 +37,20 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.StringUtils;
+import org.roda.core.common.ProvidesInputStream;
 import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.ip.ShallowFile;
+import org.roda.core.data.v2.ip.ShallowFiles;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
@@ -52,7 +61,13 @@ import org.roda.core.storage.DefaultBinaryVersion;
 import org.roda.core.storage.DefaultContainer;
 import org.roda.core.storage.DefaultDirectory;
 import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.InputStreamContentPayload;
+import org.roda.core.storage.JsonContentPayload;
 import org.roda.core.storage.Resource;
+import org.roda.core.storage.protocol.ProtocolManager;
+import org.roda.core.storage.protocol.ProtocolManagerFactory;
+import org.roda.core.storage.protocol.ReferenceBinary;
+import org.roda.core.storage.protocol.ShallowFileContentPayload;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -446,6 +461,58 @@ public class FSUtils {
     return resourceIterable;
   }
 
+  public static CloseableIterable<Resource> listPathUnderFile(final Path basePath, final Path path)
+      throws NotFoundException, GenericException {
+    CloseableIterable<Resource> resourceIterable;
+    try {
+      LineIterator lineIterator = FileUtils.lineIterator(path.toFile());
+      resourceIterable = new CloseableIterable<Resource>() {
+
+        @Override
+        public Iterator<Resource> iterator() {
+          return new Iterator<Resource>() {
+
+            @Override
+            public boolean hasNext() {
+              return lineIterator.hasNext();
+            }
+
+            @Override
+            public Resource next() {
+              String json = lineIterator.next();
+              Resource ret;
+              try {
+                //ShallowFile shallowFile = JsonUtils.getObjectFromJson(json, ShallowFile.class);
+                JsonContentPayload content = new JsonContentPayload(json);
+                Map<String, String> contentDigest = null;
+                StoragePath storagePath = getStoragePath(basePath, path);
+                ret = new DefaultBinary(storagePath, content, 0L, true, contentDigest);
+              } catch (RequestNotValidException e) {
+                LOGGER.error("Error while list path " + basePath + " while parsing resource " + json, e);
+                ret = null;
+              }
+
+              return ret;
+            }
+
+          };
+        }
+
+        @Override
+        public void close() throws IOException {
+          lineIterator.close();
+        }
+      };
+
+    } catch (NoSuchFileException e) {
+      throw new NotFoundException("Could not list contents of entity because it doesn't exist: " + path, e);
+    } catch (IOException e) {
+      throw new GenericException("Could not list contents of entity at: " + path, e);
+    }
+
+    return resourceIterable;
+  }
+
   public static Long countPath(Path directoryPath) throws NotFoundException, GenericException {
     Long count = 0L;
 
@@ -618,9 +685,19 @@ public class FSUtils {
     if (FSUtils.isDirectory(path)) {
       resource = new DefaultDirectory(storagePath);
     } else {
-      ContentPayload content = new FSPathContentPayload(path);
+      ContentPayload content = null;
       long sizeInBytes;
       try {
+        if (FSUtils.isExternalFile(path)) {
+          List<String> allLines = Files.readAllLines(path);
+          ShallowFiles shallowFiles = new ShallowFiles();
+          for (String line : allLines) {
+            shallowFiles.addObject(JsonUtils.getObjectFromJson(line, ShallowFile.class));
+          }
+          content = new ShallowFileContentPayload(shallowFiles);
+        } else {
+          content = new FSPathContentPayload(path);
+        }
         sizeInBytes = Files.size(path);
         Map<String, String> contentDigest = null;
         resource = new DefaultBinary(storagePath, content, sizeInBytes, false, contentDigest);
@@ -628,6 +705,19 @@ public class FSUtils {
         throw new GenericException("Could not get file size", e);
       }
     }
+    return resource;
+  }
+
+  public static Resource convertReferenceToResource(StoragePath storagePath, String url) throws GenericException {
+    Resource resource;
+    ProtocolManager protocolManager = ProtocolManagerFactory.createProtocolManager(URI.create(url));
+    resource = new ReferenceBinary(storagePath, new InputStreamContentPayload(new ProvidesInputStream() {
+      @Override
+      public InputStream createInputStream() throws IOException {
+        return protocolManager.getInputStream();
+      }
+    }));
+
     return resource;
   }
 
@@ -910,6 +1000,13 @@ public class FSUtils {
    */
   public static boolean isDirectory(Path file) {
     return file != null && file.toFile().isDirectory();
+  }
+
+  public static boolean isExternalFile(String fileId) {
+    return fileId != null && fileId.equals(RodaConstants.RODA_EXTERNAL_FILE);
+  }
+  public static boolean isExternalFile(Path file) {
+    return file != null && isExternalFile(file.getFileName().toString());
   }
 
   /**
