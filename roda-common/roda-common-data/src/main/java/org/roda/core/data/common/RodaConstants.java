@@ -182,6 +182,8 @@ public final class RodaConstants {
   public static final String RODA_OBJECT_DISPOSAL_CONFIRMATION_METADATA = "disposal_confirmation_metadata";
   public static final String RODA_OBJECT_DISPOSAL_CONFIRMATIONS_METADATA = "disposal_confirmations_metadata";
   public static final String RODA_OBJECT_DISPOSAL_HOLD_ASSOCIATION = "disposal_hold_association";
+  public static final String RODA_OBJECT_SHALLOW_FILE = "shallow_file";
+  public static final String RODA_OBJECT_SHALLOWS_FILE = "shallow_files";
 
   public static final String RODA_OBJECT_MEMBERS = "members";
   public static final String RODA_OBJECT_USERS = "users";
@@ -1067,6 +1069,10 @@ public final class RodaConstants {
   public static final String FILE_ORIGINALNAME = "originalName";
   public static final String FILE_SIZE = "size";
   public static final String FILE_ISDIRECTORY = "isDirectory";
+  public static final String FILE_ISREFERENCE = "isReference";
+  public static final String FILE_REFERENCE_UUID = "referenceUUID";
+  public static final String FILE_REFERENCE_URL = "referenceUrl";
+  public static final String FILE_REFERENCE_MANIFEST = "referenceManifest";
   public static final String FILE_PRONOM = "formatPronom";
   public static final String FILE_EXTENSION = "extension";
   public static final String FILE_CREATING_APPLICATION_NAME = "creatingApplicationName";
@@ -1666,6 +1672,9 @@ public final class RodaConstants {
   public static final String ENV_CONFIG_SYMBOLIC_LINKS_FORBIDDEN = "RODA_CONFIG_SYMBOLIC_LINKS_FORBIDDEN";
 
   public static final String RODA_NODE_TYPE_KEY = "nodeType";
+
+  /* File Shallow */
+  public static final String RODA_EXTERNAL_FILE = "external_files.jsonl";
 
   /** Private empty constructor */
   private RodaConstants() {
