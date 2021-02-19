@@ -1824,9 +1824,13 @@ public class BrowserHelper {
 
     if (!iFile.isDirectory() && RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       final ConsumesOutputStream stream;
-
+      Binary representationFileBinary;
       StorageService storage = RodaCoreFactory.getStorageService();
-      Binary representationFileBinary = storage.getBinary(filePath);
+      if (iFile.isReference()){
+        representationFileBinary = storage.getBinary(filePath, iFile.getReferenceURL());
+      } else {
+        representationFileBinary = storage.getBinary(filePath);
+      }
       if (iFile.getFileFormat() != null && StringUtils.isNotBlank(iFile.getFileFormat().getMimeType())) {
         stream = new BinaryConsumesOutputStream(representationFileBinary, iFile.getFileFormat().getMimeType());
       } else {

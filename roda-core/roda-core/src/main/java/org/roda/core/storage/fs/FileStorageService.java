@@ -16,7 +16,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -28,6 +30,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.Container;
@@ -43,6 +46,7 @@ import org.roda.core.storage.Entity;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceUtils;
+import org.roda.core.storage.protocol.ShallowFileContentPayload;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -309,6 +313,13 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
+  public CloseableIterable<Resource> listResourcesUnderFile(StoragePath storagePath, boolean recursive)
+      throws NotFoundException, GenericException {
+    Path directoryPath = FSUtils.getEntityPath(basePath, storagePath);
+    return FSUtils.listPathUnderFile(basePath, directoryPath);
+  }
+
+  @Override
   public Long countResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
     throws NotFoundException, GenericException {
     Path directoryPath = FSUtils.getEntityPath(basePath, storagePath);
@@ -323,7 +334,34 @@ public class FileStorageService implements StorageService {
   public Binary createBinary(StoragePath storagePath, ContentPayload payload, boolean asReference)
     throws GenericException, AlreadyExistsException {
     if (asReference) {
-      throw new GenericException("Method not yet implemented");
+      //throw new GenericException("Method not yet implemented");
+      Path binPath = FSUtils.getEntityPath(basePath, storagePath);
+      try {
+        if (FSUtils.exists(binPath)) {
+          Resource resource = FSUtils.convertPathToResource(basePath, binPath);
+          if(resource instanceof DefaultBinary){
+            ContentPayload content = ((DefaultBinary) resource).getContent();
+            if(content instanceof ShallowFileContentPayload && payload instanceof ShallowFileContentPayload) {
+              ((ShallowFileContentPayload) payload).addShallowFiles(((ShallowFileContentPayload) content).getShallowFiles());
+            }
+          }
+        }
+        // ensuring parent exists
+        Path parent = binPath.getParent();
+        if (!FSUtils.exists(parent)) {
+          Files.createDirectories(parent);
+        }
+
+        // writing file
+        payload.writeToPath(binPath);
+        Long sizeInBytes = Files.size(binPath);
+        boolean isReference = false;
+        Map<String, String> contentDigest = null;
+
+        return new DefaultBinary(storagePath, payload, sizeInBytes, isReference, contentDigest);
+      } catch (IOException | RequestNotValidException | NotFoundException e) {
+        throw new GenericException("Could not create binary", e);
+      }
     } else {
       Path binPath = FSUtils.getEntityPath(basePath, storagePath);
       if (FSUtils.exists(binPath)) {
@@ -428,6 +466,16 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
+  public Binary getBinary(StoragePath storagePath, String url) throws GenericException, RequestNotValidException {
+    Resource resource = FSUtils.convertReferenceToResource(storagePath, url);
+    if (resource instanceof Binary){
+      return (Binary) resource;
+    } else {
+      throw new RequestNotValidException("Looking for a binary but found something else");
+    }
+  }
+
+  @Override
   public void deleteResource(StoragePath storagePath) throws NotFoundException, GenericException {
     Path resourcePath = FSUtils.getEntityPath(basePath, storagePath);
     trash(resourcePath);
@@ -472,19 +520,41 @@ public class FileStorageService implements StorageService {
   public Class<? extends Entity> getEntity(StoragePath storagePath) throws NotFoundException {
     Path entity = FSUtils.getEntityPath(basePath, storagePath);
     if (FSUtils.exists(entity)) {
-      if (FSUtils.isDirectory(entity)) {
-        if (storagePath.isFromAContainer()) {
-          return DefaultContainer.class;
-        } else {
-          return DefaultDirectory.class;
-        }
-      } else {
-        return DefaultBinary.class;
-      }
+      return getEntityClass(storagePath, entity);
     } else {
       throw new NotFoundException("Entity was not found: " + storagePath);
     }
   }
+
+  public Class<? extends Entity> getEntityExternalFile(StoragePath storagePath) throws NotFoundException {
+    Optional<String> aipId = ModelUtils.extractAipId(storagePath);
+    Optional<String> representationId = ModelUtils.extractRepresentationId(storagePath);
+    List<String> path = ModelUtils.extractFilePathFromRepresentationOtherMetadata(storagePath);
+    try {
+      StoragePath externalFile = ModelUtils.getFileStoragePath(aipId.get(), representationId.get(), path, RodaConstants.RODA_EXTERNAL_FILE);
+      Path entity = FSUtils.getEntityPath(basePath, externalFile);
+      if (FSUtils.exists(entity)) {
+        return getEntityClass(externalFile, entity);
+      } else {
+        throw new NotFoundException("Entity was not found: " + storagePath);
+      }
+    } catch (RequestNotValidException e) {
+      throw new NotFoundException("Entity was not found: " + storagePath);
+    }
+  }
+
+  public Class<? extends Entity> getEntityClass(StoragePath storagePath, Path entity) throws NotFoundException {
+    if (FSUtils.isDirectory(entity)) {
+      if (storagePath.isFromAContainer()) {
+        return DefaultContainer.class;
+      } else {
+        return DefaultDirectory.class;
+      }
+    } else {
+      return DefaultBinary.class;
+    }
+  }
+
 
   @Override
   public DirectResourceAccess getDirectAccess(final StoragePath storagePath) {
