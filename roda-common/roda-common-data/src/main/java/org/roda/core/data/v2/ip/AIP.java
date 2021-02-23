@@ -44,7 +44,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
   private List<String> ingestUpdateJobIds = new ArrayList<>();
 
   private Boolean ghost = null;
-  private Boolean hasShallowFiles = null;
+  private Boolean hasShallowFiles = false;
 
   private AIPFormat format;
   private List<Relationship> relationships;

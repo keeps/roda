@@ -356,7 +356,7 @@ public class FileStorageService implements StorageService {
         // writing file
         payload.writeToPath(binPath);
         Long sizeInBytes = Files.size(binPath);
-        boolean isReference = false;
+        boolean isReference = true;
         Map<String, String> contentDigest = null;
 
         return new DefaultBinary(storagePath, payload, sizeInBytes, isReference, contentDigest);
