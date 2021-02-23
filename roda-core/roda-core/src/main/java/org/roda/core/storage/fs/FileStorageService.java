@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -845,5 +846,18 @@ public class FileStorageService implements StorageService {
   @Override
   public String getStoragePathAsString(StoragePath storagePath, boolean skipContainer) {
     return FSUtils.getStoragePathAsString(storagePath, skipContainer);
+  }
+
+  @Override
+  public List<StoragePath> getShallowFiles(StoragePath storagePath) throws NotFoundException, GenericException {
+    ArrayList<StoragePath> storagePaths = new ArrayList<>();
+    for (Resource resource : listResourcesUnderContainer(storagePath, true)) {
+      if(resource instanceof Binary){
+        if(((Binary) resource).getContent() instanceof ShallowFileContentPayload){
+          storagePaths.add(resource.getStoragePath());
+        }
+      }
+    }
+    return storagePaths;
   }
 }

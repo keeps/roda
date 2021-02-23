@@ -101,6 +101,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     fields.add(new Field(RodaConstants.AIP_LEVEL, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.AIP_TITLE, Field.TYPE_TEXT).setMultiValued(false));
     fields.add(new Field(RodaConstants.AIP_GHOST, Field.TYPE_BOOLEAN).setDefaultValue("false"));
+    fields.add(new Field(RodaConstants.AIP_HAS_SHALLOW_FILES, Field.TYPE_BOOLEAN).setDefaultValue("false"));
 
     fields.add(new Field(RodaConstants.AIP_DESCRIPTION, Field.TYPE_TEXT).setMultiValued(true));
     fields.add(new Field(RodaConstants.AIP_DATE_INITIAL, Field.TYPE_DATE));
@@ -201,6 +202,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     doc.addField(RodaConstants.AIP_HAS_REPRESENTATIONS, !representationIds.isEmpty());
 
     doc.addField(RodaConstants.AIP_GHOST, aip.getGhost() != null ? aip.getGhost() : false);
+    doc.addField(RodaConstants.AIP_HAS_SHALLOW_FILES, aip.getHasShallowFiles() != null ? aip.getHasShallowFiles() : false);
 
     ModelService model = RodaCoreFactory.getModelService();
     if (!safemode) {
@@ -314,6 +316,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     final Boolean hasRepresentations = SolrUtils.objectToBoolean(doc.get(RodaConstants.AIP_HAS_REPRESENTATIONS),
       Boolean.FALSE);
     final Boolean ghost = SolrUtils.objectToBoolean(doc.get(RodaConstants.AIP_GHOST), Boolean.FALSE);
+    final Boolean hasShallowFiles = SolrUtils.objectToBoolean(doc.get(RodaConstants.AIP_HAS_SHALLOW_FILES), Boolean.FALSE);
 
     final String title = titles.isEmpty() ? null : titles.get(0);
     final String description = descriptions.isEmpty() ? null : descriptions.get(0);
@@ -369,6 +372,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     ret.setNumberOfSchemaFiles(numberOfSchemaFiles);
     ret.setHasRepresentations(hasRepresentations);
     ret.setGhost(ghost);
+    ret.setHasShallowFiles(hasShallowFiles);
     ret.setIngestSIPIds(ingestSIPIds).setIngestJobId(ingestJobId).setIngestUpdateJobIds(ingestUpdateJobIds)
       .setCreatedOn(createdOn).setCreatedBy(createdBy).setUpdatedOn(updatedOn).setUpdatedBy(updatedBy)
       .setAllUpdateJobIds(allIngestJobIds);

@@ -694,6 +694,7 @@ public final class RodaConstants {
   public static final String AIP_REPRESENTATION_ID = "representationId";
   public static final String AIP_HAS_REPRESENTATIONS = "hasRepresentations";
   public static final String AIP_GHOST = "ghost";
+  public static final String AIP_HAS_SHALLOW_FILES = "hasShallowFiles";
   public static final String AIP_CHILDREN = "aip_children";
 
   public static final String AIP_DESCRIPTIVE_METADATA = "descriptiveMetadata";
@@ -759,6 +760,7 @@ public final class RodaConstants {
   public static final String REPRESENTATION_NUMBER_OF_DOCUMENTATION_FILES = "numberOfDocumentationFiles";
   public static final String REPRESENTATION_NUMBER_OF_SCHEMA_FILES = "numberOfSchemaFiles";
   public static final String REPRESENTATION_ANCESTORS = "ancestors";
+  public static final String REPRESENTATION_HAS_SHALLOW_FILES = "hasShallowFiles";
 
   public static final String REPRESENTATION_CREATED_ON = "createdOn";
   public static final String REPRESENTATION_CREATED_BY = "createdBy";

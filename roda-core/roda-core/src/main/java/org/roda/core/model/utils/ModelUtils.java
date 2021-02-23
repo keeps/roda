@@ -7,21 +7,29 @@
  */
 package org.roda.core.model.utils;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
@@ -36,6 +44,7 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.ShallowFile;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
@@ -53,8 +62,19 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
+import org.roda.core.model.ModelService;
+import org.roda.core.storage.Container;
+import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.DefaultBinary;
 import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.DirectResourceAccess;
+import org.roda.core.storage.JsonContentPayload;
+import org.roda.core.storage.Resource;
+import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.storage.fs.FileStorageService;
+import org.roda.core.storage.protocol.ProtocolManager;
+import org.roda.core.storage.protocol.ProtocolManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -896,5 +916,46 @@ public final class ModelUtils {
 
   private static List<String> getDisposalConfirmationPath(String confirmationId) {
     return Arrays.asList(RodaConstants.STORAGE_CONTAINER_DISPOSAL_CONFIRMATION, confirmationId);
+  }
+
+  public static StorageService resolveTemporaryResourceShallow(StorageService storage, StoragePath storagePath) throws GenericException {
+    FileStorageService temporaryStorage;
+    String tempDirectory = "shallow_" + new Date().getTime();
+    try {
+      Path tempPath = Files.createTempDirectory(tempDirectory);
+      temporaryStorage = new FileStorageService(tempPath, false, null, false);
+
+      temporaryStorage.copy(storage, storagePath, storagePath);
+
+      List<StoragePath> externalFiles = temporaryStorage.getShallowFiles(storagePath);
+      for (StoragePath externalFile : externalFiles) {
+        final CloseableIterable<Resource> resources = temporaryStorage.listResourcesUnderFile(externalFile, true);
+        for (Resource resource : resources) {
+          if (resource instanceof DefaultBinary){
+            ContentPayload content = ((DefaultBinary) resource).getContent();
+            if(content instanceof JsonContentPayload){
+              ShallowFile shallowFile = JsonUtils.getObjectFromJson(content.createInputStream(), ShallowFile.class);
+              ProtocolManager pm = ProtocolManagerFactory.createProtocolManager(shallowFile.getLocation());
+              pm.downloadResource(temporaryStorage.getDirectAccess(externalFile).getPath().getParent());
+            }
+
+          }
+        }
+        temporaryStorage.deleteResource(externalFile);
+      }
+    } catch (IOException | AlreadyExistsException | AuthorizationDeniedException e) {
+      throw new GenericException("Cannot create temporary directory " + tempDirectory);
+    } catch (RequestNotValidException | NotFoundException e) {
+      throw new GenericException("Cannot found resources at " + storagePath.toString());
+    }
+    return temporaryStorage;
+  }
+
+  public static void removeTemporaryResourceShallow(StorageService storage, StoragePath storagePath) throws GenericException {
+    try {
+      storage.deleteResource(storagePath);
+    } catch (GenericException | AuthorizationDeniedException | NotFoundException e) {
+      throw new GenericException("Cannot delete resource at " + storagePath.toString());
+    }
   }
 }
