@@ -124,7 +124,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
     PluginState reportState = PluginState.SUCCESS;
     Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.INGEST_PROCESSING);
 
-    if (aip.getHasShallowFiles()) {
+    if (aip.getHasShallowFiles() != null && aip.getHasShallowFiles()) {
       StorageService tmpStorageService = null;
       try {
         tmpStorageService = ModelUtils.resolveTemporaryResourceShallow(storage, ModelUtils.getAIPStoragePath(aip.getId()));
