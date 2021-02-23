@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.net.URI;
 import java.net.URL;
 
@@ -18,6 +19,12 @@ public class ShallowFile implements IsModelObject {
   private String UUID;
   private String name;
   private URI location;
+  private Long size;
+  private XMLGregorianCalendar created;
+  private String mimeType;
+  private String checksum;
+  private String checksumType;
+
 
   public ShallowFile() {
   }
@@ -56,5 +63,45 @@ public class ShallowFile implements IsModelObject {
   @Override
   public String getId() {
     return null;
+  }
+
+  public Long getSize() {
+    return size;
+  }
+
+  public void setSize(Long size) {
+    this.size = size;
+  }
+
+  public XMLGregorianCalendar getCreated() {
+    return created;
+  }
+
+  public void setCreated(XMLGregorianCalendar created) {
+    this.created = created;
+  }
+
+  public String getMimeType() {
+    return mimeType;
+  }
+
+  public void setMimeType(String mimeType) {
+    this.mimeType = mimeType;
+  }
+
+  public String getChecksum() {
+    return checksum;
+  }
+
+  public void setChecksum(String checksum) {
+    this.checksum = checksum;
+  }
+
+  public String getChecksumType() {
+    return checksumType;
+  }
+
+  public void setChecksumType(String checksumType) {
+    this.checksumType = checksumType;
   }
 }
