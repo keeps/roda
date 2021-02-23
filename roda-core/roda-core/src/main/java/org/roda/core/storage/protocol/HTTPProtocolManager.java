@@ -1,30 +1,23 @@
 package org.roda.core.storage.protocol;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.roda.core.storage.DefaultBinary;
-
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URI;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Path;
-import java.util.stream.Collectors;
+
+import org.apache.commons.io.FilenameUtils;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-public class HTTPProtocolManager implements ProtocolManager{
-  URI connectionString;
+public class HTTPProtocolManager implements ProtocolManager {
+  private final URI connectionString;
 
   public HTTPProtocolManager(URI connectionString) {
     this.connectionString = connectionString;
