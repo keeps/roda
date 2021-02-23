@@ -36,6 +36,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
+import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.Base64;
@@ -119,8 +120,14 @@ public class SiegfriedPluginUtils {
     AuthorizationDeniedException, PluginException {
     StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(representation.getAipId(),
       representation.getId());
+    StorageService storageService;
+    if (representation.getHasShallowFiles()) {
+      storageService = ModelUtils.resolveTemporaryResourceShallow(model.getStorage(), representationDataPath);
+    } else {
+      storageService = model.getStorage();
+    }
 
-    try (DirectResourceAccess directAccess = model.getStorage().getDirectAccess(representationDataPath)) {
+    try (DirectResourceAccess directAccess = storageService.getDirectAccess(representationDataPath)) {
       Path representationFsPath = directAccess.getPath();
       return runSiegfriedOnRepresentationOrFile(model, representation.getAipId(),
         representation.getId(), new ArrayList<>(), null, representationFsPath);
