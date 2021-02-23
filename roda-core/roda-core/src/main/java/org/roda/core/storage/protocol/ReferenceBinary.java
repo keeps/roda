@@ -1,10 +1,10 @@
 package org.roda.core.storage.protocol;
 
+import java.util.Map;
+
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
-
-import java.util.Map;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
