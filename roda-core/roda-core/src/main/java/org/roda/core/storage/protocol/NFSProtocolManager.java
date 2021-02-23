@@ -2,6 +2,7 @@ package org.roda.core.storage.protocol;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Path;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -21,5 +22,10 @@ public class NFSProtocolManager implements ProtocolManager {
   @Override
   public Boolean isAvailable() {
     return null;
+  }
+
+  @Override
+  public void downloadResource(Path target) {
+
   }
 }

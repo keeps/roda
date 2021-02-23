@@ -692,8 +692,8 @@ public final class PremisV3Utils {
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
     ValidationException, AlreadyExistsException {
     String id = IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion());
-    ContentPayload agentPayload = PremisV3Utils.createPremisAgentBinary(id, plugin.getName(), plugin.getAgentType(),
-      "", plugin.getDescription(), plugin.getVersion());
+    ContentPayload agentPayload = PremisV3Utils.createPremisAgentBinary(id, plugin.getName(), plugin.getAgentType(), "",
+      plugin.getDescription(), plugin.getVersion());
     return model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
   }
 

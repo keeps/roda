@@ -139,6 +139,7 @@ import org.roda.core.storage.protocol.ShallowFileContentPayload;
 import org.roda.core.util.HTTPUtility;
 import org.roda.core.util.IdUtils;
 import org.roda.core.util.RESTClientUtility;
+import org.roda_project.commons_ip2.mets_v1_12.beans.FileType;
 import org.roda_project.commons_ip2.model.IPFileShallow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1194,6 +1195,13 @@ public class ModelService extends ModelObservable {
       shallowFile.setName(FilenameUtils.getName((fileShallow).getFileLocation().getPath()));
       shallowFile.setUUID(IdUtils.getFileId(aipId, representationId, null, shallowFile.getName()));
       shallowFile.setLocation((fileShallow).getFileLocation());
+      FileType fileType = fileShallow.getFileType();
+      shallowFile.setSize(fileType.getSIZE());
+      shallowFile.setCreated(fileType.getCREATED());
+      shallowFile.setMimeType(fileType.getMIMETYPE());
+      shallowFile.setChecksum(fileType.getCHECKSUM());
+      shallowFile.setChecksumType(fileType.getCHECKSUMTYPE());
+
       ShallowFiles shallowFiles = new ShallowFiles();
       shallowFiles.addObject(shallowFile);
       ContentPayload contentPayload = new ShallowFileContentPayload(shallowFiles);

@@ -34,6 +34,7 @@ public class Representation implements IsModelObject, HasId {
   private List<String> representationStates = new ArrayList<>();
 
   private String type;
+  private Boolean hasShallowFiles = null;
 
   private Date createdOn = null;
   private String createdBy = null;
@@ -47,16 +48,21 @@ public class Representation implements IsModelObject, HasId {
   }
 
   public Representation(String id, String aipId, boolean original, String type) {
-    this(id, aipId, original, type, new ArrayList<DescriptiveMetadata>());
+    this(id, aipId, original, type, new ArrayList<DescriptiveMetadata>(), false);
+  }
+
+  public Representation(String id, String aipId, boolean original, String type, Boolean hasShallowFiles) {
+    this(id, aipId, original, type, new ArrayList<DescriptiveMetadata>(), hasShallowFiles);
   }
 
   public Representation(String id, String aipId, boolean original, String type,
-    List<DescriptiveMetadata> descriptiveMetadata) {
+    List<DescriptiveMetadata> descriptiveMetadata, Boolean hasShallowFiles) {
     super();
     this.id = id;
     this.aipId = aipId;
     this.original = original;
     this.type = type;
+    this.hasShallowFiles = hasShallowFiles;
     this.descriptiveMetadata = descriptiveMetadata;
     this.createdOn = new Date();
     this.updatedOn = new Date();
@@ -109,6 +115,14 @@ public class Representation implements IsModelObject, HasId {
 
   public void setType(String type) {
     this.type = type;
+  }
+
+  public Boolean getHasShallowFiles() {
+    return hasShallowFiles;
+  }
+
+  public void setHasShallowFiles(Boolean hasShallowFiles) {
+    this.hasShallowFiles = hasShallowFiles;
   }
 
   public List<DescriptiveMetadata> getDescriptiveMetadata() {

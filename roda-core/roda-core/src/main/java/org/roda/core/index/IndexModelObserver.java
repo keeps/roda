@@ -49,6 +49,8 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.ShallowFile;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
@@ -82,6 +84,9 @@ import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.DefaultBinary;
+import org.roda.core.storage.JsonContentPayload;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -247,16 +252,18 @@ public class IndexModelObserver implements ModelObserver {
           if (FSUtils.isExternalFile(file.get().getId())) {
             for (OptionalWithCause<File> shallowFile : model.listExternalFilesUnder(file.get())) {
               if(shallowFile.isPresent()){
-                sizeInBytes += indexFile(aip, shallowFile.get(), ancestors, false).addTo(ret).getReturnedObject();
+                indexFile(aip, shallowFile.get(), ancestors, false).addTo(ret).getReturnedObject();
+                numberOfDataFiles++;
               }
             }
+            sizeInBytes += getExternalFilesTotalSize(file.get());
           } else {
             sizeInBytes += indexFile(aip, file.get(), ancestors, false).addTo(ret).getReturnedObject();
           }
 
           if (file.get().isDirectory()) {
             numberOfDataFolders++;
-          } else {
+          } else if(!FSUtils.isExternalFile(file.get().getId())){
             numberOfDataFiles++;
           }
         } else {
@@ -278,6 +285,22 @@ public class IndexModelObserver implements ModelObserver {
     }
 
     return ret;
+  }
+
+  private Long getExternalFilesTotalSize(File file) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
+    Long sizeInBytes = 0L;
+    StoragePath storagePath = ModelUtils.getFileStoragePath(file);
+    CloseableIterable<Resource> resources = model.getStorage().listResourcesUnderFile(storagePath, false);
+    for (Resource resource : resources) {
+      if(resource instanceof DefaultBinary){
+        ContentPayload content = ((DefaultBinary) resource).getContent();
+        if(content instanceof JsonContentPayload){
+          ShallowFile shallowFile = JsonUtils.getObjectFromJson(content.createInputStream(), ShallowFile.class);
+          sizeInBytes += shallowFile.getSize();
+        }
+      }
+    }
+    return sizeInBytes;
   }
 
   private ReturnWithExceptions<Void, ModelObserver> indexRetentionPeriod(final AIP aip, final List<String> ancestors) {

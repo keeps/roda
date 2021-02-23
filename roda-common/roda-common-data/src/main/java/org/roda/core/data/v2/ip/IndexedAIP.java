@@ -62,6 +62,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
   private Long numberOfSchemaFiles;
   private Boolean hasRepresentations;
   private Boolean ghost;
+  private Boolean hasShallowFiles;
 
   private List<String> ingestSIPIds;
   private String ingestJobId;
@@ -110,7 +111,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
     this(other.getId(), other.getState(), other.getType(), other.getLevel(), other.getTitle(), other.getDateInitial(),
       other.getDateFinal(), other.getDescription(), other.getParentID(), other.getAncestors(), other.getPermissions(),
       other.getNumberOfSubmissionFiles(), other.getNumberOfDocumentationFiles(), other.getNumberOfSchemaFiles(),
-      other.getHasRepresentations(), other.getGhost(), other.getDisposalScheduleId(), other.getDisposalScheduleName(),
+      other.getHasRepresentations(), other.getGhost(), other.hasShallowFiles(), other.getDisposalScheduleId(), other.getDisposalScheduleName(),
       other.getRetentionPeriodDuration(), other.getRetentionPeriodInterval(), other.getRetentionPeriodStartDate(),
       other.getRetentionPeriodDetails(), other.getRetentionPeriodState(), other.getDisposalHoldsId(),
       other.getTransitiveDisposalHoldsId(), other.getDestroyedOn(), other.getDestroyedBy(),
@@ -132,7 +133,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
   public IndexedAIP(String id, AIPState state, String type, String level, String title, Date dateInitial,
     Date dateFinal, String description, String parentID, List<String> ancestors, Permissions permissions,
     Long numberOfSubmissionFiles, Long numberOfDocumentationFiles, Long numberOfSchemaFiles, Boolean hasRepresentations,
-    Boolean ghost, String disposalScheduleId, String disposalScheduleName, Integer retentionPeriodDuration,
+    Boolean ghost, Boolean hasShallowFiles, String disposalScheduleId, String disposalScheduleName, Integer retentionPeriodDuration,
     RetentionPeriodIntervalCode retentionPeriodInterval, Date retentionPeriodStartDate, String retentionPeriodDetails,
     RetentionPeriodCalculation retentionPeriodCalculation, List<String> disposalHoldsId,
     List<String> transitiveDisposalHoldsId, Date destroyedOn, String destroyedBy, String disposalConfirmationId,
@@ -154,6 +155,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
     this.numberOfSchemaFiles = numberOfSchemaFiles;
     this.hasRepresentations = hasRepresentations;
     this.ghost = ghost;
+    this.hasShallowFiles = hasShallowFiles;
     this.disposalScheduleId = disposalScheduleId;
     this.disposalScheduleName = disposalScheduleName;
     this.retentionPeriodDuration = retentionPeriodDuration;
@@ -395,6 +397,14 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
 
   public void setGhost(Boolean ghost) {
     this.ghost = ghost;
+  }
+
+  public Boolean hasShallowFiles() {
+    return hasShallowFiles;
+  }
+
+  public void setHasShallowFiles(Boolean hasShallowFiles) {
+    this.hasShallowFiles = hasShallowFiles;
   }
 
   public String getDisposalScheduleId() {
