@@ -44,6 +44,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
   private List<String> ingestUpdateJobIds = new ArrayList<>();
 
   private Boolean ghost = null;
+  private Boolean hasShallowFiles = null;
 
   private AIPFormat format;
   private List<Relationship> relationships;
@@ -145,6 +146,14 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
 
   public void setGhost(Boolean ghost) {
     this.ghost = ghost.equals(Boolean.FALSE) ? null : ghost;
+  }
+
+  public Boolean getHasShallowFiles() {
+    return hasShallowFiles;
+  }
+
+  public void setHasShallowFiles(Boolean hasShallowFiles) {
+    this.hasShallowFiles = hasShallowFiles;
   }
 
   public void setParentId(String parentId) {

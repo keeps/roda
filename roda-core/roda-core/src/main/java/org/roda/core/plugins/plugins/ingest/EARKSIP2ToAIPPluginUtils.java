@@ -292,6 +292,16 @@ public class EARKSIP2ToAIPPluginUtils {
         File createdFile;
         if (file instanceof IPFileShallow) {
           createdFile = model.createFileShallow(aipId, representation.getId(), fileId, (IPFileShallow) file, notify);
+          AIP aip = model.retrieveAIP(aipId);
+          aip.setHasShallowFiles(true);
+          representation.setHasShallowFiles(true);
+          for (Representation aipRepresentation : aip.getRepresentations()) {
+            if(aipRepresentation.getId().equals(representation.getId())){
+             aipRepresentation.setHasShallowFiles(true);
+             break;
+            }
+          }
+          model.updateAIP(aip, username);
         } else {
           createdFile = model.createFile(aipId, representation.getId(), directoryPath, fileId, payload, notify);
         }

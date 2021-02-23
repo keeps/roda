@@ -7,6 +7,7 @@
  */
 package org.roda.core.storage;
 
+import java.util.List;
 import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
@@ -235,6 +236,11 @@ public class StorageServiceWrapper implements StorageService {
   @Override
   public String getStoragePathAsString(StoragePath storagePath, boolean skipContainer) {
     return storageService.getStoragePathAsString(storagePath, skipContainer);
+  }
+
+  @Override
+  public List<StoragePath> getShallowFiles(StoragePath storagePath) throws NotFoundException, GenericException {
+    return storageService.getShallowFiles(storagePath);
   }
 
 }

@@ -77,6 +77,7 @@ public class RepresentationCollection extends AbstractSolrCollection<IndexedRepr
     fields.add(new Field(RodaConstants.REPRESENTATION_NUMBER_OF_DOCUMENTATION_FILES, Field.TYPE_LONG));
     fields.add(new Field(RodaConstants.REPRESENTATION_NUMBER_OF_SCHEMA_FILES, Field.TYPE_LONG));
     fields.add(new Field(RodaConstants.REPRESENTATION_ANCESTORS, Field.TYPE_STRING).setMultiValued(true));
+    fields.add(new Field(RodaConstants.REPRESENTATION_HAS_SHALLOW_FILES, Field.TYPE_BOOLEAN));
 
     fields.add(new Field(RodaConstants.REPRESENTATION_CREATED_ON, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.REPRESENTATION_CREATED_BY, Field.TYPE_STRING));
@@ -124,6 +125,7 @@ public class RepresentationCollection extends AbstractSolrCollection<IndexedRepr
     doc.addField(RodaConstants.REPRESENTATION_AIP_ID, rep.getAipId());
     doc.addField(RodaConstants.REPRESENTATION_ORIGINAL, rep.isOriginal());
     doc.addField(RodaConstants.REPRESENTATION_TYPE, rep.getType());
+    doc.addField(RodaConstants.REPRESENTATION_HAS_SHALLOW_FILES, rep.getHasShallowFiles());
 
     doc.addField(RodaConstants.REPRESENTATION_CREATED_ON, SolrUtils.formatDate(rep.getCreatedOn()));
     doc.addField(RodaConstants.REPRESENTATION_CREATED_BY, rep.getCreatedBy());
@@ -234,6 +236,7 @@ public class RepresentationCollection extends AbstractSolrCollection<IndexedRepr
     ret
       .setNumberOfSchemaFiles(SolrUtils.objectToLong(doc.get(RodaConstants.REPRESENTATION_NUMBER_OF_SCHEMA_FILES), 0L));
     ret.setAncestors(SolrUtils.objectToListString(doc.get(RodaConstants.AIP_ANCESTORS)));
+    ret.setHasShallowFiles(SolrUtils.objectToBoolean(doc.get(RodaConstants.REPRESENTATION_HAS_SHALLOW_FILES), Boolean.FALSE));
 
     ret.setCreatedOn(SolrUtils.objectToDate(doc.get(RodaConstants.REPRESENTATION_CREATED_ON)));
     ret.setCreatedBy(SolrUtils.objectToString(doc.get(RodaConstants.REPRESENTATION_CREATED_BY), ""));

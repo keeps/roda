@@ -30,7 +30,5 @@ public class ProtocolManagerTest {
 
     ProtocolManager protocol = new ProtocolManagerFactory().createProtocolManager(URI.create("https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"));
 
-    System.out.println(protocol.getBinary());
-
   }
 }

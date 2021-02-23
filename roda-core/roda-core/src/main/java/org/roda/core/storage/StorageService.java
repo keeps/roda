@@ -7,6 +7,7 @@
  */
 package org.roda.core.storage;
 
+import java.util.List;
 import java.util.Map;
 
 import org.roda.core.common.iterables.CloseableIterable;
@@ -384,4 +385,6 @@ public interface StorageService {
     StoragePath anotherStoragePath, boolean skipAnotherStoragePathContainer);
 
   String getStoragePathAsString(StoragePath storagePath, boolean skipContainer);
+
+  List<StoragePath> getShallowFiles(StoragePath storagePath) throws NotFoundException, GenericException;
 }
