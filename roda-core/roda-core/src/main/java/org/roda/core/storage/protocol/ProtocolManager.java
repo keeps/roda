@@ -8,6 +8,8 @@ import java.nio.file.Path;
  */
 public interface ProtocolManager {
   InputStream getInputStream();
+
   Boolean isAvailable();
+
   void downloadResource(Path target);
 }
