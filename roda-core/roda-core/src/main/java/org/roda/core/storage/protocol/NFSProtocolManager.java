@@ -8,8 +8,8 @@ import java.nio.file.Path;
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 public class NFSProtocolManager implements ProtocolManager {
+  private final URI connectionString;
 
-  URI connectionString;
   public NFSProtocolManager(URI connectionString) {
     this.connectionString = connectionString;
   }

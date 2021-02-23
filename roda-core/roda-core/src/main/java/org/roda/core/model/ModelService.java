@@ -9,6 +9,8 @@ package org.roda.core.model;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -141,8 +143,10 @@ import org.roda.core.util.IdUtils;
 import org.roda.core.util.RESTClientUtility;
 import org.roda_project.commons_ip2.mets_v1_12.beans.FileType;
 import org.roda_project.commons_ip2.model.IPFileShallow;
+import org.roda_project.commons_ip2.utils.METSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.util.URLUtils;
 
 /**
  * Class that "relates" Model & Storage
@@ -1192,9 +1196,16 @@ public class ModelService extends ModelObservable {
     ProtocolManager protocolManager = ProtocolManagerFactory.createProtocolManager(fileShallow.getFileLocation());
     if (protocolManager.isAvailable()) {
       ShallowFile shallowFile = new ShallowFile();
-      shallowFile.setName(FilenameUtils.getName((fileShallow).getFileLocation().getPath()));
+      String decode;
+      try {
+        decode = URLDecoder.decode(fileShallow.getFileLocation().toString(), "UTF-8");
+      } catch (UnsupportedEncodingException e) {
+        // do nothing
+        decode = fileShallow.getFileLocation().toString();
+      }
+      shallowFile.setName(FilenameUtils.getName(decode));
       shallowFile.setUUID(IdUtils.getFileId(aipId, representationId, null, shallowFile.getName()));
-      shallowFile.setLocation((fileShallow).getFileLocation());
+      shallowFile.setLocation(fileShallow.getFileLocation());
       FileType fileType = fileShallow.getFileType();
       shallowFile.setSize(fileType.getSIZE());
       shallowFile.setCreated(fileType.getCREATED());
