@@ -41,7 +41,6 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.Fixity;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -56,8 +55,6 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.plugins.characterization.PremisSkeletonPluginUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
-import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.storage.protocol.ReferenceBinary;
 import org.roda.core.util.FileUtility;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -413,9 +410,8 @@ public final class PremisV3Utils {
     fdct.setFormatVersion("");
     Binary binary = null;
     if (originalFile.isReference()) {
-      StoragePath fileStoragePath = ModelUtils.getFileStoragePath(originalFile.getAipId(),
-        originalFile.getRepresentationId(), originalFile.getPath(), originalFile.getId());
-      binary = (ReferenceBinary) FSUtils.convertReferenceToResource(fileStoragePath, originalFile.getReferenceUrl());
+      binary = model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile),
+        originalFile.getReferenceUrl(), true);
     } else {
       binary = model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile));
     }

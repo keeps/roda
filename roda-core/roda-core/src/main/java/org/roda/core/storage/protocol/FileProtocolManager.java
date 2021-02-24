@@ -1,6 +1,7 @@
 package org.roda.core.storage.protocol;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -12,6 +13,8 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import org.apache.commons.io.FilenameUtils;
+import org.roda.core.common.ProvidesInputStream;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.utils.URLUtils;
 
 /**
@@ -27,28 +30,23 @@ public class FileProtocolManager implements ProtocolManager {
   }
 
   @Override
-  public InputStream getInputStream() {
-
-    try {
+  public InputStream getInputStream() throws IOException{
       return new FileInputStream(path.toFile());
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return null;
   }
 
   @Override
   public Boolean isAvailable() {
-    return true;
+    return Files.exists(path);
   }
 
   @Override
-  public void downloadResource(Path target) {
+  public Long getSize() throws IOException {
+    return Files.size(path);
+  }
+
+  @Override
+  public void downloadResource(Path target) throws IOException {
     Path output = target.resolve(FilenameUtils.getName(path.toString()));
-    try {
-      Files.copy(path, output, StandardCopyOption.REPLACE_EXISTING);
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    Files.copy(path, output, StandardCopyOption.REPLACE_EXISTING);
   }
 }
