@@ -125,17 +125,24 @@ public class SiegfriedPluginUtils {
     // stream para os nomes e meter numa lista
 
     if (representation.getHasShallowFiles()) {
-      storageService = ModelUtils.resolveTemporaryResourceShallow(model.getStorage(), representationDataPath);
+      StorageService tmpStorageService = ModelUtils.resolveTemporaryResourceShallow(model.getStorage(), representationDataPath);
+      try (DirectResourceAccess directAccess = tmpStorageService.getDirectAccess(representationDataPath)) {
+        Path representationFsPath = directAccess.getPath();
+        return runSiegfriedOnRepresentationOrFile(model, representation.getAipId(),
+            representation.getId(), new ArrayList<>(), null, representationFsPath, representation.getHasShallowFiles());
+      } catch (IOException e) {
+        throw new GenericException(e);
+      } finally {
+        ModelUtils.removeTemporaryResourceShallow(tmpStorageService, representationDataPath);
+      }
     } else {
-      storageService = model.getStorage();
-    }
-
-    try (DirectResourceAccess directAccess = storageService.getDirectAccess(representationDataPath)) {
-      Path representationFsPath = directAccess.getPath();
-      return runSiegfriedOnRepresentationOrFile(model, representation.getAipId(),
-        representation.getId(), new ArrayList<>(), null, representationFsPath, representation.getHasShallowFiles());
-    } catch (IOException e) {
-      throw new GenericException(e);
+      try (DirectResourceAccess directAccess = model.getStorage().getDirectAccess(representationDataPath)) {
+        Path representationFsPath = directAccess.getPath();
+        return runSiegfriedOnRepresentationOrFile(model, representation.getAipId(),
+            representation.getId(), new ArrayList<>(), null, representationFsPath, representation.getHasShallowFiles());
+      } catch (IOException e) {
+        throw new GenericException(e);
+      }
     }
   }
 

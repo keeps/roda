@@ -7,7 +7,6 @@
  */
 package org.roda.core.storage.fs;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -22,7 +21,6 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -41,7 +39,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.StringUtils;
-import org.roda.core.common.ProvidesInputStream;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -462,7 +459,7 @@ public class FSUtils {
   }
 
   public static CloseableIterable<Resource> listPathUnderFile(final Path basePath, final Path path)
-      throws NotFoundException, GenericException {
+    throws NotFoundException, GenericException {
     CloseableIterable<Resource> resourceIterable;
     try {
       LineIterator lineIterator = FileUtils.lineIterator(path.toFile());
@@ -482,7 +479,8 @@ public class FSUtils {
               String json = lineIterator.next();
               Resource ret;
               try {
-                //ShallowFile shallowFile = JsonUtils.getObjectFromJson(json, ShallowFile.class);
+                // ShallowFile shallowFile = JsonUtils.getObjectFromJson(json,
+                // ShallowFile.class);
                 JsonContentPayload content = new JsonContentPayload(json);
                 Map<String, String> contentDigest = null;
                 StoragePath storagePath = getStoragePath(basePath, path);
@@ -606,7 +604,7 @@ public class FSUtils {
 
   /**
    * List containers
-   * 
+   *
    * @param basePath
    *          base path
    * @throws GenericException
@@ -659,7 +657,7 @@ public class FSUtils {
 
   /**
    * Converts a path into a resource
-   * 
+   *
    * @param basePath
    *          base path
    * @param path
@@ -708,17 +706,26 @@ public class FSUtils {
     return resource;
   }
 
-  public static Resource convertReferenceToResource(StoragePath storagePath, String url) throws GenericException {
+  public static Resource convertReferenceToResource(StoragePath storagePath, String url, boolean calculateSize)
+    throws GenericException {
     Resource resource;
+    Long sizeInBytes = 0L;
     ProtocolManager protocolManager = ProtocolManagerFactory.createProtocolManager(URI.create(url));
-    resource = new ReferenceBinary(storagePath, new InputStreamContentPayload(new ProvidesInputStream() {
-      @Override
-      public InputStream createInputStream() throws IOException {
-        return protocolManager.getInputStream();
+    if(protocolManager.isAvailable()){
+      if (calculateSize) {
+        try {
+          sizeInBytes = protocolManager.getSize();
+        } catch (IOException e) {
+          throw new GenericException("Cannot retrieve size of file at " + url);
+        }
       }
-    }));
+      ContentPayload contentPayload = new InputStreamContentPayload(() -> protocolManager.getInputStream());
+      resource = new ReferenceBinary(storagePath, contentPayload, sizeInBytes);
 
-    return resource;
+      return resource;
+    } else {
+      throw new GenericException("Resource not available in " + url);
+    }
   }
 
   public static Path getBinaryHistoryMetadataPath(Path historyDataPath, Path historyMetadataPath, Path path) {
@@ -777,7 +784,7 @@ public class FSUtils {
 
   /**
    * Converts a path into a container
-   * 
+   *
    * @param basePath
    *          base path
    * @param path
@@ -985,7 +992,7 @@ public class FSUtils {
   /**
    * We are using java.io because sonar has suggested as a performance update
    * https://sonarqube.com/coding_rules#rule_key=squid%3AS3725
-   * 
+   *
    * @since 2017-03-16
    */
   public static boolean exists(Path file) {
@@ -995,7 +1002,7 @@ public class FSUtils {
   /**
    * We are using java.io because sonar has suggested as a performance update
    * https://sonarqube.com/coding_rules#rule_key=squid%3AS3725
-   * 
+   *
    * @since 2017-03-16
    */
   public static boolean isDirectory(Path file) {
@@ -1005,6 +1012,7 @@ public class FSUtils {
   public static boolean isExternalFile(String fileId) {
     return fileId != null && fileId.equals(RodaConstants.RODA_EXTERNAL_FILE);
   }
+
   public static boolean isExternalFile(Path file) {
     return file != null && isExternalFile(file.getFileName().toString());
   }

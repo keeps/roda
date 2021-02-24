@@ -1791,7 +1791,7 @@ public class BrowserHelper {
       Binary representationFileBinary;
       StorageService storage = RodaCoreFactory.getStorageService();
       if (iFile.isReference()){
-        representationFileBinary = storage.getBinary(filePath, iFile.getReferenceURL());
+        representationFileBinary = storage.getBinary(filePath, iFile.getReferenceURL(), false);
       } else {
         representationFileBinary = storage.getBinary(filePath);
       }

@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Path;
@@ -24,13 +25,8 @@ public class HTTPProtocolManager implements ProtocolManager {
   }
 
   @Override
-  public InputStream getInputStream() {
-    try {
+  public InputStream getInputStream() throws IOException{
       return connectionString.toURL().openStream();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return null;
   }
 
   @Override
@@ -49,16 +45,27 @@ public class HTTPProtocolManager implements ProtocolManager {
   }
 
   @Override
-  public void downloadResource(Path target) {
+  public Long getSize() throws IOException {
+    URLConnection conn = null;
+    try {
+      conn = connectionString.toURL().openConnection();
+      if(conn instanceof HttpURLConnection) {
+        ((HttpURLConnection)conn).setRequestMethod("HEAD");
+      }
+      conn.getInputStream();
+      return conn.getContentLengthLong();
+    } finally {
+      if(conn instanceof HttpURLConnection) {
+        ((HttpURLConnection)conn).disconnect();
+      }
+    }
+  }
+
+  @Override
+  public void downloadResource(Path target) throws IOException{
     Path output = target.resolve(FilenameUtils.getName(connectionString.getPath()));
     ReadableByteChannel readableByteChannel = Channels.newChannel(getInputStream());
-    try {
-      FileOutputStream fileOutputStream = new FileOutputStream(output.toString());
-      fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    FileOutputStream fileOutputStream = new FileOutputStream(output.toString());
+    fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
   }
 }

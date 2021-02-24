@@ -10,12 +10,14 @@ import org.roda.core.storage.ContentPayload;
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 public class ReferenceBinary implements Binary {
-  ContentPayload contentPayload;
-  StoragePath storagePath;
+  private ContentPayload contentPayload;
+  private StoragePath storagePath;
+  private Long sizeInBytes;
 
-  public ReferenceBinary(StoragePath storagePath, ContentPayload contentPayload) {
+  public ReferenceBinary(StoragePath storagePath, ContentPayload contentPayload, Long sizeInBytes) {
     this.contentPayload = contentPayload;
     this.storagePath = storagePath;
+    this.sizeInBytes = sizeInBytes;
   }
 
   @Override
@@ -25,7 +27,7 @@ public class ReferenceBinary implements Binary {
 
   @Override
   public Long getSizeInBytes() {
-    return 0L;
+    return sizeInBytes;
   }
 
   @Override
