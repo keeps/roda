@@ -315,7 +315,7 @@ public class FileStorageService implements StorageService {
 
   @Override
   public CloseableIterable<Resource> listResourcesUnderFile(StoragePath storagePath, boolean recursive)
-      throws NotFoundException, GenericException {
+    throws NotFoundException, GenericException {
     Path directoryPath = FSUtils.getEntityPath(basePath, storagePath);
     return FSUtils.listPathUnderFile(basePath, directoryPath);
   }
@@ -335,15 +335,16 @@ public class FileStorageService implements StorageService {
   public Binary createBinary(StoragePath storagePath, ContentPayload payload, boolean asReference)
     throws GenericException, AlreadyExistsException {
     if (asReference) {
-      //throw new GenericException("Method not yet implemented");
+      // throw new GenericException("Method not yet implemented");
       Path binPath = FSUtils.getEntityPath(basePath, storagePath);
       try {
         if (FSUtils.exists(binPath)) {
           Resource resource = FSUtils.convertPathToResource(basePath, binPath);
-          if(resource instanceof DefaultBinary){
+          if (resource instanceof DefaultBinary) {
             ContentPayload content = ((DefaultBinary) resource).getContent();
-            if(content instanceof ShallowFileContentPayload && payload instanceof ShallowFileContentPayload) {
-              ((ShallowFileContentPayload) payload).addShallowFiles(((ShallowFileContentPayload) content).getShallowFiles());
+            if (content instanceof ShallowFileContentPayload && payload instanceof ShallowFileContentPayload) {
+              ((ShallowFileContentPayload) payload)
+                .addShallowFiles(((ShallowFileContentPayload) content).getShallowFiles());
             }
           }
         }
@@ -467,9 +468,10 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
-  public Binary getBinary(StoragePath storagePath, String url) throws GenericException, RequestNotValidException {
-    Resource resource = FSUtils.convertReferenceToResource(storagePath, url);
-    if (resource instanceof Binary){
+  public Binary getBinary(StoragePath storagePath, String url, boolean calculateSize)
+    throws GenericException, RequestNotValidException {
+    Resource resource = FSUtils.convertReferenceToResource(storagePath, url, calculateSize);
+    if (resource instanceof Binary) {
       return (Binary) resource;
     } else {
       throw new RequestNotValidException("Looking for a binary but found something else");
@@ -532,7 +534,8 @@ public class FileStorageService implements StorageService {
     Optional<String> representationId = ModelUtils.extractRepresentationId(storagePath);
     List<String> path = ModelUtils.extractFilePathFromRepresentationOtherMetadata(storagePath);
     try {
-      StoragePath externalFile = ModelUtils.getFileStoragePath(aipId.get(), representationId.get(), path, RodaConstants.RODA_EXTERNAL_FILE);
+      StoragePath externalFile = ModelUtils.getFileStoragePath(aipId.get(), representationId.get(), path,
+        RodaConstants.RODA_EXTERNAL_FILE);
       Path entity = FSUtils.getEntityPath(basePath, externalFile);
       if (FSUtils.exists(entity)) {
         return getEntityClass(externalFile, entity);
@@ -555,7 +558,6 @@ public class FileStorageService implements StorageService {
       return DefaultBinary.class;
     }
   }
-
 
   @Override
   public DirectResourceAccess getDirectAccess(final StoragePath storagePath) {
@@ -852,8 +854,8 @@ public class FileStorageService implements StorageService {
   public List<StoragePath> getShallowFiles(StoragePath storagePath) throws NotFoundException, GenericException {
     ArrayList<StoragePath> storagePaths = new ArrayList<>();
     for (Resource resource : listResourcesUnderContainer(storagePath, true)) {
-      if(resource instanceof Binary){
-        if(((Binary) resource).getContent() instanceof ShallowFileContentPayload){
+      if (resource instanceof Binary) {
+        if (((Binary) resource).getContent() instanceof ShallowFileContentPayload) {
           storagePaths.add(resource.getStoragePath());
         }
       }

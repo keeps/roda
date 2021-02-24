@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -953,8 +954,10 @@ public final class ModelUtils {
 
   public static void removeTemporaryResourceShallow(StorageService storage, StoragePath storagePath) throws GenericException {
     try {
-      storage.deleteResource(storagePath);
-    } catch (GenericException | AuthorizationDeniedException | NotFoundException e) {
+      Path directAccess = storage.getDirectAccess(storagePath).getPath();
+      Path pathToDelete = Paths.get(RodaConstants.CORE_TEMPORARY_STORAGE_FOLDER, String.valueOf(directAccess.getName(1)));
+      FileUtils.deleteDirectory(pathToDelete.toFile());
+    } catch (IOException | AuthorizationDeniedException | RequestNotValidException | NotFoundException e) {
       throw new GenericException("Cannot delete resource at " + storagePath.toString());
     }
   }

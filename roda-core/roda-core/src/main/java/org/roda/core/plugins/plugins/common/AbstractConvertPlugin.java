@@ -654,6 +654,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
     PluginState pluginResultState = PluginState.SUCCESS;
 
     for (File file : list) {
+      StorageService tmpStorageService = null;
       try {
         LOGGER.debug("Processing file {}", file.getId());
         newRepresentationID = IdUtils.createUUID();
@@ -684,9 +685,9 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
             StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
             DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
             if (file.isReference()) {
-              StorageService tmpStorage = ModelUtils.resolveTemporaryResourceShallow(storage,
+              tmpStorageService = ModelUtils.resolveTemporaryResourceShallow(storage,
                 ModelUtils.getAIPStoragePath(file.getAipId()));
-              directAccess = tmpStorage.getDirectAccess(fileStoragePath);
+              directAccess = tmpStorageService.getDirectAccess(fileStoragePath);
             }
 
             LOGGER.debug("Running a ConvertPlugin ({} to {}) on {}", fileFormat, outputFormat, file.getId());
@@ -787,6 +788,13 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
         reportItem.setPluginDetails(e.getMessage());
         jobPluginInfo.incrementObjectsProcessedWithFailure();
       } finally {
+        if(file.isReference() && tmpStorageService != null){
+          try {
+            ModelUtils.removeTemporaryResourceShallow(tmpStorageService, ModelUtils.getAIPStoragePath(file.getAipId()));
+          } catch (GenericException | RequestNotValidException e) {
+            LOGGER.error("Error on removing temporary AIP " + file.getAipId(), e);
+          }
+        }
         reportItem.setPluginState(pluginResultState);
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);

@@ -147,6 +147,7 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
                     processFilesShallow(index, model, tmpStorageService, validationReport, sources, aipFailed, aip,
                       fileShallow.get());
                   }
+                  ModelUtils.removeTemporaryResourceShallow(tmpStorageService, ModelUtils.getAIPStoragePath(aip.getId()));
                 } else {
                   StoragePath storagePath = ModelUtils.getFileStoragePath(file);
                   Binary currentFileBinary = storage.getBinary(storagePath);
