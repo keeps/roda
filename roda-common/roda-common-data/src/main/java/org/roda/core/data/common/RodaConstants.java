@@ -267,6 +267,7 @@ public final class RodaConstants {
   public static final String CORE_DIP_FILE_FOLDER = "dipfile";
   public static final String CORE_REPRESENTATION_INFORMATION_FOLDER = "representation-information";
   public static final String CORE_DISPOSAL_BIN_FOLDER = "disposal-bin";
+  public static final String CORE_TEMPORARY_STORAGE_FOLDER = "/tmp";
 
   public static final String CORE_I18N_CLIENT_FOLDER = "client";
   public static final String CORE_I18_GWT_XML_FILE = "I18N.gwt.xml";

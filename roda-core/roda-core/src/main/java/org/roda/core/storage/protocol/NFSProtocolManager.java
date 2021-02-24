@@ -25,6 +25,11 @@ public class NFSProtocolManager implements ProtocolManager {
   }
 
   @Override
+  public Long getSize() {
+    return 0L;
+  }
+
+  @Override
   public void downloadResource(Path target) {
 
   }

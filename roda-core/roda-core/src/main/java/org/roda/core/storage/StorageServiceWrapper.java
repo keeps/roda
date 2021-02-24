@@ -110,7 +110,7 @@ public class StorageServiceWrapper implements StorageService {
 
   @Override
   public CloseableIterable<Resource> listResourcesUnderFile(StoragePath storagePath, boolean recursive)
-      throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
+    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     return storageService.listResourcesUnderFile(storagePath, recursive);
   }
 
@@ -142,8 +142,9 @@ public class StorageServiceWrapper implements StorageService {
   }
 
   @Override
-  public Binary getBinary(StoragePath storagePath, String url) throws GenericException, RequestNotValidException {
-    return storageService.getBinary(storagePath, url);
+  public Binary getBinary(StoragePath storagePath, String url, boolean calculateSize)
+    throws GenericException, RequestNotValidException {
+    return storageService.getBinary(storagePath, url, calculateSize);
   }
 
   @Override

@@ -266,7 +266,7 @@ public interface StorageService {
   Binary getBinary(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException;
 
-  Binary getBinary(StoragePath storagePath, String url) throws GenericException, RequestNotValidException;
+  Binary getBinary(StoragePath storagePath, String url, boolean calculateSize) throws GenericException, RequestNotValidException;
 
   /**
    * Tests if binary exists.

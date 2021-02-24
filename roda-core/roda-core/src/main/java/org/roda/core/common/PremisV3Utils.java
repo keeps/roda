@@ -42,7 +42,6 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.Fixity;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -57,8 +56,6 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.plugins.characterization.PremisSkeletonPluginUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
-import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.storage.protocol.ReferenceBinary;
 import org.roda.core.util.FileUtility;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -394,33 +391,17 @@ public final class PremisV3Utils {
     file.getObjectIdentifier().add(objectIdentifier2);
 
     ObjectCharacteristicsComplexType objectCharacteristics = FACTORY.createObjectCharacteristicsComplexType();
-    FormatComplexType format = FACTORY.createFormatComplexType();
-    FormatDesignationComplexType formatDesignation = FACTORY.createFormatDesignationComplexType();
-    formatDesignation.setFormatName(getStringPlusAuthority(""));
-    formatDesignation.setFormatVersion("");
-    format.getFormatDesignation().add(formatDesignation);
-    objectCharacteristics.getFormat().add(format);
-
-    Binary binary = model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile));
-    if (binary.getContentDigest() != null && !binary.getContentDigest().isEmpty()) {
-      ObjectCharacteristicsComplexType objectCharacteristicsComplexType = FACTORY
-        .createObjectCharacteristicsComplexType();
       FormatComplexType formatComplexType = FACTORY.createFormatComplexType();
       FormatDesignationComplexType formatDesignationComplexType = FACTORY.createFormatDesignationComplexType();
       formatDesignationComplexType.setFormatName(getStringPlusAuthority(""));
       formatDesignationComplexType.setFormatVersion("");
-
       formatComplexType.getFormatDesignation().add(formatDesignationComplexType);
-      objectCharacteristicsComplexType.getFormat().add(formatComplexType);
-      file.getObjectCharacteristics().add(objectCharacteristicsComplexType);
+      objectCharacteristics.getFormat().add(formatComplexType);
+      file.getObjectCharacteristics().add(objectCharacteristics);
 
-      if (originalFile.isReference()) {
-        StoragePath fileStoragePath = ModelUtils.getFileStoragePath(originalFile.getAipId(),
-          originalFile.getRepresentationId(), originalFile.getPath(), originalFile.getId());
-        binary = (ReferenceBinary) FSUtils.convertReferenceToResource(fileStoragePath, originalFile.getReferenceUrl());
-      } else {
-        binary = model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile));
-      }
+    Binary binary = model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile));
+
+    if (binary != null && binary.getContentDigest() != null && !binary.getContentDigest().isEmpty()) {
       // use binary content digest information
       for (Entry<String, String> entry : binary.getContentDigest().entrySet()) {
         FixityComplexType fixity = FACTORY.createFixityComplexType();
