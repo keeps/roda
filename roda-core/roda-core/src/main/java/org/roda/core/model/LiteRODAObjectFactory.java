@@ -16,7 +16,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.roda.core.common.iterables.CloseableIterable;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -434,7 +433,7 @@ public final class LiteRODAObjectFactory {
         }
       }
 
-      if(Boolean.parseBoolean(decodeId(split[3]))){
+      if (Boolean.parseBoolean(decodeId(split[3]))) {
         ret = (T) model.retrieveFileInsideManifest(decodeId(split[1]), decodeId(split[2]), directoryPath, fileId);
       } else {
         ret = (T) model.retrieveFile(decodeId(split[1]), decodeId(split[2]), directoryPath, fileId);

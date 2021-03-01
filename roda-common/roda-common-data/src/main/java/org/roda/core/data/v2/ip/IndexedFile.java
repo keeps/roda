@@ -11,8 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
@@ -58,10 +56,11 @@ public class IndexedFile implements IsIndexed, HasId, SetsUUID, HasPermissionFil
   }
 
   public IndexedFile(String uuid, String parentUUID, String aipId, String representationId, String representationUUID,
-                     List<String> path, List<String> ancestorsPath, String id, String referenceUUID, String referenceURL, String referenceManifest, FileFormat fileFormat, String originalName, long size,
-                     boolean isDirectory, boolean isReference, String creatingApplicationName, String creatingApplicationVersion,
-                     String dateCreatedByApplication, List<String> hash, String storagePath, List<String> ancestors,
-                     Map<String, List<String>> otherProperties) {
+    List<String> path, List<String> ancestorsPath, String id, String referenceUUID, String referenceURL,
+    String referenceManifest, FileFormat fileFormat, String originalName, long size, boolean isDirectory,
+    boolean isReference, String creatingApplicationName, String creatingApplicationVersion,
+    String dateCreatedByApplication, List<String> hash, String storagePath, List<String> ancestors,
+    Map<String, List<String>> otherProperties) {
     this.uuid = uuid;
     this.parentUUID = parentUUID;
 

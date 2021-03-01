@@ -391,13 +391,13 @@ public final class PremisV3Utils {
     file.getObjectIdentifier().add(objectIdentifier2);
 
     ObjectCharacteristicsComplexType objectCharacteristics = FACTORY.createObjectCharacteristicsComplexType();
-      FormatComplexType formatComplexType = FACTORY.createFormatComplexType();
-      FormatDesignationComplexType formatDesignationComplexType = FACTORY.createFormatDesignationComplexType();
-      formatDesignationComplexType.setFormatName(getStringPlusAuthority(""));
-      formatDesignationComplexType.setFormatVersion("");
-      formatComplexType.getFormatDesignation().add(formatDesignationComplexType);
-      objectCharacteristics.getFormat().add(formatComplexType);
-      file.getObjectCharacteristics().add(objectCharacteristics);
+    FormatComplexType formatComplexType = FACTORY.createFormatComplexType();
+    FormatDesignationComplexType formatDesignationComplexType = FACTORY.createFormatDesignationComplexType();
+    formatDesignationComplexType.setFormatName(getStringPlusAuthority(""));
+    formatDesignationComplexType.setFormatVersion("");
+    formatComplexType.getFormatDesignation().add(formatDesignationComplexType);
+    objectCharacteristics.getFormat().add(formatComplexType);
+    file.getObjectCharacteristics().add(objectCharacteristics);
 
     Binary binary = model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile));
 
