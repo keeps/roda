@@ -138,7 +138,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
               // SIP CREATE
               for (Representation representation : aip.getRepresentations()) {
                 LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-                sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation));
+                sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation, cachedJob.getId()));
                 model.notifyRepresentationUpdated(representation).failOnError();
               }
 
@@ -166,7 +166,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
             for (Representation representation : filteredList) {
               try {
                 LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-                sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation));
+                sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation, cachedJob.getId()));
                 model.notifyRepresentationUpdated(representation).failOnError();
                 state = PluginState.SUCCESS;
               } catch (RODAException e) {
@@ -211,7 +211,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
       PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
       LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), representation.getAipId());
       try {
-        sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation));
+        sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation, cachedJob.getId()));
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
         reportItem.setPluginState(PluginState.SUCCESS);
         model.notifyRepresentationUpdated(representation).failOnError();
