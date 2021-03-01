@@ -117,12 +117,10 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
 
         if (!getSipInformation().hasUpdatedData() || !updatedData.containsKey(aip.getId())) {
           try {
-            if (getSipInformation().isUpdate()) {
-              // SIP update
+            if (aip.getRepresentations().isEmpty()) {
               reportItem.setPluginState(PluginState.SKIPPED).setPluginDetails("Executed on a SIP update context.");
               jobPluginInfo.incrementObjectsProcessed(PluginState.SKIPPED);
             } else {
-              // SIP create
               for (Representation representation : aip.getRepresentations()) {
                 LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
                 PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aip.getId(), representation.getId(),

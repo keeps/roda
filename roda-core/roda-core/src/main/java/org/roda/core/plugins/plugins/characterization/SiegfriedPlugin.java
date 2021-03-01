@@ -9,7 +9,6 @@ package org.roda.core.plugins.plugins.characterization;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -120,12 +119,10 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
         if (!getSipInformation().hasUpdatedData() || !updatedData.containsKey(aip.getId())) {
           try {
-            if (getSipInformation().isUpdate()) {
-              // SIP update
+            if (aip.getRepresentations().isEmpty()) {
               reportItem.setPluginState(PluginState.SKIPPED).setPluginDetails("Executed on a SIP update context.");
               jobPluginInfo.incrementObjectsProcessed(PluginState.SKIPPED);
             } else {
-              // SIP create
               for (Representation representation : aip.getRepresentations()) {
                 LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
                 sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation));
