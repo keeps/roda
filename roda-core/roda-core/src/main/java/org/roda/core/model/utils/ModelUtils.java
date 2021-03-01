@@ -13,10 +13,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,16 +61,13 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
-import org.roda.core.model.ModelService;
-import org.roda.core.storage.Container;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultBinary;
 import org.roda.core.storage.DefaultStoragePath;
-import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.JsonContentPayload;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.storage.protocol.ProtocolManager;
 import org.roda.core.storage.protocol.ProtocolManagerFactory;
@@ -919,46 +914,56 @@ public final class ModelUtils {
     return Arrays.asList(RodaConstants.STORAGE_CONTAINER_DISPOSAL_CONFIRMATION, confirmationId);
   }
 
-  public static StorageService resolveTemporaryResourceShallow(StorageService storage, StoragePath storagePath) throws GenericException {
+  public static StorageService resolveTemporaryResourceShallow(String jobId, StorageService storage,
+    StoragePath storagePath) throws GenericException {
     FileStorageService temporaryStorage;
-    String tempDirectory = "shallow_" + new Date().getTime();
+    Path tempPath = RodaCoreFactory.getFileShallowTmpDirectoryPath().resolve(jobId)
+      .resolve(String.valueOf(storagePath.hashCode()));
     try {
-      Path tempPath = Files.createTempDirectory(tempDirectory);
-      temporaryStorage = new FileStorageService(tempPath, false, null, false);
+      if (Files.exists(tempPath)) {
+        temporaryStorage = new FileStorageService(tempPath, false, null, false);
+      } else {
+        Files.createDirectories(tempPath);
+        temporaryStorage = new FileStorageService(tempPath, false, null, false);
 
-      temporaryStorage.copy(storage, storagePath, storagePath);
+        temporaryStorage.copy(storage, storagePath, storagePath);
+        List<StoragePath> externalFiles = temporaryStorage.getShallowFiles(storagePath);
+        for (StoragePath externalFile : externalFiles) {
+          final CloseableIterable<Resource> resources = temporaryStorage.listResourcesUnderFile(externalFile, true);
+          for (Resource resource : resources) {
+            if (resource instanceof DefaultBinary) {
+              ContentPayload content = ((DefaultBinary) resource).getContent();
+              if (content instanceof JsonContentPayload) {
+                ShallowFile shallowFile = JsonUtils.getObjectFromJson(content.createInputStream(), ShallowFile.class);
+                ProtocolManager pm = ProtocolManagerFactory.createProtocolManager(shallowFile.getLocation());
+                pm.downloadResource(temporaryStorage.getDirectAccess(externalFile).getPath().getParent());
+              }
 
-      List<StoragePath> externalFiles = temporaryStorage.getShallowFiles(storagePath);
-      for (StoragePath externalFile : externalFiles) {
-        final CloseableIterable<Resource> resources = temporaryStorage.listResourcesUnderFile(externalFile, true);
-        for (Resource resource : resources) {
-          if (resource instanceof DefaultBinary){
-            ContentPayload content = ((DefaultBinary) resource).getContent();
-            if(content instanceof JsonContentPayload){
-              ShallowFile shallowFile = JsonUtils.getObjectFromJson(content.createInputStream(), ShallowFile.class);
-              ProtocolManager pm = ProtocolManagerFactory.createProtocolManager(shallowFile.getLocation());
-              pm.downloadResource(temporaryStorage.getDirectAccess(externalFile).getPath().getParent());
             }
-
           }
+          temporaryStorage.deleteResource(externalFile);
         }
-        temporaryStorage.deleteResource(externalFile);
       }
     } catch (IOException | AlreadyExistsException | AuthorizationDeniedException e) {
-      throw new GenericException("Cannot create temporary directory " + tempDirectory);
+      throw new GenericException("Cannot create temporary directory " + tempPath);
     } catch (RequestNotValidException | NotFoundException e) {
       throw new GenericException("Cannot found resources at " + storagePath.toString());
     }
     return temporaryStorage;
   }
 
-  public static void removeTemporaryResourceShallow(StorageService storage, StoragePath storagePath) throws GenericException {
-    try {
-      Path directAccess = storage.getDirectAccess(storagePath).getPath();
-      Path pathToDelete = Paths.get(RodaConstants.CORE_TEMPORARY_STORAGE_FOLDER, String.valueOf(directAccess.getName(1)));
-      FileUtils.deleteDirectory(pathToDelete.toFile());
-    } catch (IOException | AuthorizationDeniedException | RequestNotValidException | NotFoundException e) {
-      throw new GenericException("Cannot delete resource at " + storagePath.toString());
+  public static void removeTemporaryResourceShallow(String jobId, StoragePath storagePath) throws IOException {
+    Path tempPath = RodaCoreFactory.getFileShallowTmpDirectoryPath().resolve(jobId)
+      .resolve(String.valueOf(storagePath.hashCode()));
+    if (Files.exists(tempPath)) {
+      FileUtils.deleteDirectory(tempPath.toFile());
+    }
+  }
+
+  public static void removeTemporaryResourceShallow(String jobId) throws IOException {
+    Path tempPath = RodaCoreFactory.getFileShallowTmpDirectoryPath().resolve(jobId);
+    if (Files.exists(tempPath)) {
+      FileUtils.deleteDirectory(tempPath.toFile());
     }
   }
 }
