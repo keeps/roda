@@ -294,7 +294,8 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
       } else {
         try {
           model.deleteFile(file, true);
-          //model.deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), true);
+          // model.deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(),
+          // file.getId(), true);
         } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
           state = PluginState.FAILURE;
           reportItem.addPluginDetails("Could not delete File: " + e.getMessage());

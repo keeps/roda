@@ -1,14 +1,12 @@
 package org.roda.core.data.v2.ip;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.common.RODAObjectList;
-import org.roda.core.data.v2.ip.ShallowFile;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.common.RODAObjectList;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -17,7 +15,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ShallowFiles implements RODAObjectList<ShallowFile> {
   private static final long serialVersionUID = 3404494208482338468L;
-  private List<ShallowFile> shallowFiles ;
+  private List<ShallowFile> shallowFiles;
 
   public ShallowFiles() {
     super();
@@ -41,12 +39,13 @@ public class ShallowFiles implements RODAObjectList<ShallowFile> {
 
   public ShallowFile getObject(String UUID) {
     for (ShallowFile file : shallowFiles) {
-      if(file.getUUID().equals(UUID)){
+      if (file.getUUID().equals(UUID)) {
         return file;
       }
     }
     return null;
   }
+
   public void removeObject(String UUID) {
     this.shallowFiles.removeIf(shallowFile -> shallowFile.getUUID().equals(UUID));
   }

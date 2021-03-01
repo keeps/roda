@@ -55,7 +55,6 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
@@ -92,17 +91,16 @@ public class ResourceParseUtils {
 
     if (resource instanceof DefaultBinary) {
       ContentPayload content = ((DefaultBinary) resource).getContent();
-      // TODO: Shallow
-      if(content instanceof JsonContentPayload) {
+      if (content instanceof JsonContentPayload) {
         try {
           ShallowFile shallowFile = JsonUtils.getObjectFromJson(content.createInputStream(), ShallowFile.class);
           String url = shallowFile.getLocation().toString();
           String originFile = FSUtils.getStoragePathAsString(resource.getStoragePath(), true);
           String referenceUUID = shallowFile.getUUID();
-          return new File(shallowFile.getName(), aipId, representationId, filePath, false, true, url, originFile, referenceUUID);
+          return new File(shallowFile.getName(), aipId, representationId, filePath, false, true, url, originFile,
+            referenceUUID);
         } catch (IOException e) {
-          throw new GenericException(
-              "Error while trying to convert shallow file into a representation file");
+          throw new GenericException("Error while trying to convert shallow file into a representation file");
         }
       } else {
         return new File(id, aipId, representationId, filePath, false);

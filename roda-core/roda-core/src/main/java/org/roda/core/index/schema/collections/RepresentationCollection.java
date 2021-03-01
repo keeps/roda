@@ -236,7 +236,8 @@ public class RepresentationCollection extends AbstractSolrCollection<IndexedRepr
     ret
       .setNumberOfSchemaFiles(SolrUtils.objectToLong(doc.get(RodaConstants.REPRESENTATION_NUMBER_OF_SCHEMA_FILES), 0L));
     ret.setAncestors(SolrUtils.objectToListString(doc.get(RodaConstants.AIP_ANCESTORS)));
-    ret.setHasShallowFiles(SolrUtils.objectToBoolean(doc.get(RodaConstants.REPRESENTATION_HAS_SHALLOW_FILES), Boolean.FALSE));
+    ret.setHasShallowFiles(
+      SolrUtils.objectToBoolean(doc.get(RodaConstants.REPRESENTATION_HAS_SHALLOW_FILES), Boolean.FALSE));
 
     ret.setCreatedOn(SolrUtils.objectToDate(doc.get(RodaConstants.REPRESENTATION_CREATED_ON)));
     ret.setCreatedBy(SolrUtils.objectToString(doc.get(RodaConstants.REPRESENTATION_CREATED_BY), ""));

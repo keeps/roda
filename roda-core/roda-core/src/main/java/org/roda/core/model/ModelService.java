@@ -143,10 +143,8 @@ import org.roda.core.util.IdUtils;
 import org.roda.core.util.RESTClientUtility;
 import org.roda_project.commons_ip2.mets_v1_12.beans.FileType;
 import org.roda_project.commons_ip2.model.IPFileShallow;
-import org.roda_project.commons_ip2.utils.METSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.util.URLUtils;
 
 /**
  * Class that "relates" Model & Storage
@@ -1290,8 +1288,8 @@ public class ModelService extends ModelObservable {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     if (file.isReference()) {
-      StoragePath storagePath = ModelUtils.getFileStoragePath(file.getAipId(), file.getRepresentationId(), file.getPath(),
-        RodaConstants.RODA_EXTERNAL_FILE);
+      StoragePath storagePath = ModelUtils.getFileStoragePath(file.getAipId(), file.getRepresentationId(),
+        file.getPath(), RodaConstants.RODA_EXTERNAL_FILE);
       Binary binary = getStorage().getBinary(storagePath);
       ContentPayload content = binary.getContent();
       if (content instanceof ShallowFileContentPayload) {

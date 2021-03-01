@@ -63,7 +63,7 @@ import org.roda.core.storage.JsonContentPayload;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.protocol.ProtocolManager;
 import org.roda.core.storage.protocol.ProtocolManagerFactory;
-import org.roda.core.storage.protocol.ReferenceBinary;
+import org.roda.core.storage.ReferenceBinary;
 import org.roda.core.storage.protocol.ShallowFileContentPayload;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -711,7 +711,7 @@ public class FSUtils {
     Resource resource;
     Long sizeInBytes = 0L;
     ProtocolManager protocolManager = ProtocolManagerFactory.createProtocolManager(URI.create(url));
-    if(protocolManager.isAvailable()){
+    if (protocolManager.isAvailable()) {
       if (calculateSize) {
         try {
           sizeInBytes = protocolManager.getSize();
