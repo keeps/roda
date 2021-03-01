@@ -177,9 +177,9 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
         doc.addField(RodaConstants.FILE_REFERENCE_UUID, file.getReferenceUUID());
         doc.addField(RodaConstants.FILE_REFERENCE_URL, file.getReferenceUrl());
         StoragePath filePath = ModelUtils.getFileStoragePath(file.getAipId(), file.getRepresentationId(),
-            file.getPath(), RodaConstants.RODA_EXTERNAL_FILE);
+          file.getPath(), RodaConstants.RODA_EXTERNAL_FILE);
         doc.addField(RodaConstants.FILE_REFERENCE_MANIFEST,
-            RodaCoreFactory.getStorageService().getStoragePathAsString(filePath, false));
+          RodaCoreFactory.getStorageService().getStoragePathAsString(filePath, false));
       }
 
       StoragePath filePath = ModelUtils.getFileStoragePath(file);

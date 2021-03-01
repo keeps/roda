@@ -296,9 +296,9 @@ public class EARKSIP2ToAIPPluginUtils {
           aip.setHasShallowFiles(true);
           representation.setHasShallowFiles(true);
           for (Representation aipRepresentation : aip.getRepresentations()) {
-            if(aipRepresentation.getId().equals(representation.getId())){
-             aipRepresentation.setHasShallowFiles(true);
-             break;
+            if (aipRepresentation.getId().equals(representation.getId())) {
+              aipRepresentation.setHasShallowFiles(true);
+              break;
             }
           }
           model.updateAIP(aip, username);
