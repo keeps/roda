@@ -410,8 +410,8 @@ public final class PremisV3Utils {
     fdct.setFormatVersion("");
     Binary binary = null;
     if (originalFile.isReference()) {
-      binary = model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile),
-        originalFile.getReferenceUrl(), true);
+      binary = model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile), originalFile.getReferenceUrl(),
+        true);
     } else {
       binary = model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile));
     }

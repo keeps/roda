@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.commons.io.FilenameUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -21,15 +20,12 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.LockingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.utils.JsonUtils;
-import org.roda.core.data.v2.ip.ShallowFiles;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.ShallowFile;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.validation.ValidationException;
@@ -37,15 +33,10 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
-import org.roda.core.storage.JsonContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
-import org.roda.core.storage.protocol.ProtocolManager;
-import org.roda.core.storage.protocol.ProtocolManagerFactory;
-import org.roda.core.storage.protocol.ShallowFileContentPayload;
 import org.roda.core.util.IdUtils;
 import org.roda_project.commons_ip2.model.IPDescriptiveMetadata;
-import org.roda_project.commons_ip2.model.IPFile;
 import org.roda_project.commons_ip2.model.IPFileInterface;
 import org.roda_project.commons_ip2.model.IPFileShallow;
 import org.roda_project.commons_ip2.model.IPMetadata;
@@ -232,8 +223,8 @@ public class EARKSIP2ToAIPPluginUtils {
     }
   }
 
-  private static void processSchemas(ModelService model, List<IPFileInterface> schemas, String aipId, String representationId,
-                                     boolean update) throws RequestNotValidException, GenericException, AlreadyExistsException,
+  private static void processSchemas(ModelService model, List<IPFileInterface> schemas, String aipId,
+    String representationId, boolean update) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException {
     for (IPFileInterface schema : schemas) {
       List<String> directoryPath = schema.getRelativeFolders();
@@ -288,7 +279,7 @@ public class EARKSIP2ToAIPPluginUtils {
       List<String> directoryPath;
       String fileId;
       ContentPayload payload;
-      if(file instanceof IPFileShallow) {
+      if (file instanceof IPFileShallow) {
         fileId = RodaConstants.RODA_EXTERNAL_FILE;
         directoryPath = null;
         payload = null;
@@ -299,15 +290,15 @@ public class EARKSIP2ToAIPPluginUtils {
       }
       try {
         File createdFile;
-        if(file instanceof IPFileShallow) {
+        if (file instanceof IPFileShallow) {
           createdFile = model.createFileShallow(aipId, representation.getId(), fileId, (IPFileShallow) file, notify);
           AIP aip = model.retrieveAIP(aipId);
           aip.setHasShallowFiles(true);
           representation.setHasShallowFiles(true);
           for (Representation aipRepresentation : aip.getRepresentations()) {
-            if(aipRepresentation.getId().equals(representation.getId())){
-             aipRepresentation.setHasShallowFiles(true);
-             break;
+            if (aipRepresentation.getId().equals(representation.getId())) {
+              aipRepresentation.setHasShallowFiles(true);
+              break;
             }
           }
           model.updateAIP(aip, username);
@@ -315,16 +306,14 @@ public class EARKSIP2ToAIPPluginUtils {
           createdFile = model.createFile(aipId, representation.getId(), directoryPath, fileId, payload, notify);
         }
         if (reportItem != null && update) {
-          reportItem.getSipInformation().addFileData(aipId, IdUtils.getRepresentationId(representation),
-            createdFile);
+          reportItem.getSipInformation().addFileData(aipId, IdUtils.getRepresentationId(representation), createdFile);
         }
       } catch (AlreadyExistsException e) {
         if (update) {
           File updatedFile = model.updateFile(aipId, representation.getId(), directoryPath, fileId, payload, true,
             notify);
           if (reportItem != null) {
-            reportItem.getSipInformation().addFileData(aipId, IdUtils.getRepresentationId(representation),
-              updatedFile);
+            reportItem.getSipInformation().addFileData(aipId, IdUtils.getRepresentationId(representation), updatedFile);
           }
         } else
           throw e;
