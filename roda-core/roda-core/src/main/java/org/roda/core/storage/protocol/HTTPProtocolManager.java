@@ -1,6 +1,5 @@
 package org.roda.core.storage.protocol;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,8 +24,8 @@ public class HTTPProtocolManager implements ProtocolManager {
   }
 
   @Override
-  public InputStream getInputStream() throws IOException{
-      return connectionString.toURL().openStream();
+  public InputStream getInputStream() throws IOException {
+    return connectionString.toURL().openStream();
   }
 
   @Override
@@ -49,20 +48,20 @@ public class HTTPProtocolManager implements ProtocolManager {
     URLConnection conn = null;
     try {
       conn = connectionString.toURL().openConnection();
-      if(conn instanceof HttpURLConnection) {
-        ((HttpURLConnection)conn).setRequestMethod("HEAD");
+      if (conn instanceof HttpURLConnection) {
+        ((HttpURLConnection) conn).setRequestMethod("HEAD");
       }
       conn.getInputStream();
       return conn.getContentLengthLong();
     } finally {
-      if(conn instanceof HttpURLConnection) {
-        ((HttpURLConnection)conn).disconnect();
+      if (conn instanceof HttpURLConnection) {
+        ((HttpURLConnection) conn).disconnect();
       }
     }
   }
 
   @Override
-  public void downloadResource(Path target) throws IOException{
+  public void downloadResource(Path target) throws IOException {
     Path output = target.resolve(FilenameUtils.getName(connectionString.getPath()));
     ReadableByteChannel readableByteChannel = Channels.newChannel(getInputStream());
     FileOutputStream fileOutputStream = new FileOutputStream(output.toString());

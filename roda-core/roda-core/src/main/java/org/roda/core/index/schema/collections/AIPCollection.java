@@ -202,7 +202,8 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     doc.addField(RodaConstants.AIP_HAS_REPRESENTATIONS, !representationIds.isEmpty());
 
     doc.addField(RodaConstants.AIP_GHOST, aip.getGhost() != null ? aip.getGhost() : false);
-    doc.addField(RodaConstants.AIP_HAS_SHALLOW_FILES, aip.getHasShallowFiles() != null ? aip.getHasShallowFiles() : false);
+    doc.addField(RodaConstants.AIP_HAS_SHALLOW_FILES,
+      aip.getHasShallowFiles() != null ? aip.getHasShallowFiles() : false);
 
     ModelService model = RodaCoreFactory.getModelService();
     if (!safemode) {
@@ -316,7 +317,8 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     final Boolean hasRepresentations = SolrUtils.objectToBoolean(doc.get(RodaConstants.AIP_HAS_REPRESENTATIONS),
       Boolean.FALSE);
     final Boolean ghost = SolrUtils.objectToBoolean(doc.get(RodaConstants.AIP_GHOST), Boolean.FALSE);
-    final Boolean hasShallowFiles = SolrUtils.objectToBoolean(doc.get(RodaConstants.AIP_HAS_SHALLOW_FILES), Boolean.FALSE);
+    final Boolean hasShallowFiles = SolrUtils.objectToBoolean(doc.get(RodaConstants.AIP_HAS_SHALLOW_FILES),
+      Boolean.FALSE);
 
     final String title = titles.isEmpty() ? null : titles.get(0);
     final String description = descriptions.isEmpty() ? null : descriptions.get(0);
