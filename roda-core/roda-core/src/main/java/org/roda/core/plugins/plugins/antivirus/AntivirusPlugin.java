@@ -8,7 +8,6 @@
 package org.roda.core.plugins.plugins.antivirus;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,10 +39,8 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,9 +86,9 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "Scans Information Package(s) for malicious software using the Antivirus application ClamAV. Clam AntiVirus (ClamAV) is a free and open-source, " +
-            "cross-platform antivirus software toolkit able to detect many types of malicious software, including viruses.\nIf malicious software is detected a " +
-            "report will be generated and a PREMIS event will record this occurrence.";
+    return "Scans Information Package(s) for malicious software using the Antivirus application ClamAV. Clam AntiVirus (ClamAV) is a free and open-source, "
+      + "cross-platform antivirus software toolkit able to detect many types of malicious software, including viruses.\nIf malicious software is detected a "
+      + "report will be generated and a PREMIS event will record this occurrence.";
   }
 
   @Override
@@ -127,7 +124,8 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
     if (aip.getHasShallowFiles() != null && aip.getHasShallowFiles()) {
       StorageService tmpStorageService = null;
       try {
-        tmpStorageService = ModelUtils.resolveTemporaryResourceShallow(storage, ModelUtils.getAIPStoragePath(aip.getId()));
+        tmpStorageService = ModelUtils.resolveTemporaryResourceShallow(job.getId(), storage,
+          ModelUtils.getAIPStoragePath(aip.getId()));
         processAIP(index, model, tmpStorageService, report, jobPluginInfo, job, aip, reportItem, reportState);
       } catch (RequestNotValidException | GenericException e) {
         LOGGER.error("Error processing AIP " + aip.getId(), e);
@@ -135,8 +133,10 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
         reportItem.setPluginState(reportState).setPluginDetails(e.getMessage());
       } finally {
         try {
-          ModelUtils.removeTemporaryResourceShallow(tmpStorageService, ModelUtils.getAIPStoragePath(aip.getId()));
-        } catch (RequestNotValidException | GenericException e) {
+          if (!job.getPluginType().equals(PluginType.INGEST)) {
+            ModelUtils.removeTemporaryResourceShallow(job.getId(), ModelUtils.getAIPStoragePath(aip.getId()));
+          }
+        } catch (RequestNotValidException | IOException e) {
           LOGGER.error("Error on removing temporary AIP " + aip.getId(), e);
         }
       }
@@ -146,41 +146,41 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
   }
 
   private void processAIP(IndexService index, ModelService model, StorageService storage, Report report,
-                          JobPluginInfo jobPluginInfo, Job job, AIP aip, Report reportItem, PluginState reportState) {
-      PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
+    JobPluginInfo jobPluginInfo, Job job, AIP aip, Report reportItem, PluginState reportState) {
+    PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
 
-      VirusCheckResult virusCheckResult = null;
-      Exception exception = null;
-      DirectResourceAccess directAccess = null;
+    VirusCheckResult virusCheckResult = null;
+    Exception exception = null;
+    DirectResourceAccess directAccess = null;
+
+    try {
+      LOGGER.debug("Checking if AIP {} is clean of virus", aip.getId());
+      StoragePath aipPath = ModelUtils.getAIPStoragePath(aip.getId());
+
+      directAccess = storage.getDirectAccess(aipPath);
+      virusCheckResult = getAntiVirus().checkForVirus(directAccess.getPath());
+      reportState = virusCheckResult.isClean() ? PluginState.SUCCESS : PluginState.FAILURE;
+      reportItem.setPluginState(reportState).setPluginDetails(virusCheckResult.getReport());
+
+      LOGGER.debug("Done with checking if AIP {} has virus. Is clean of virus: {}", aip.getId(),
+        virusCheckResult.isClean());
+    } catch (RODAException | RuntimeException e) {
+      LOGGER.error("Error processing AIP " + aip.getId(), e);
+      reportState = PluginState.FAILURE;
+      reportItem.setPluginState(reportState).setPluginDetails(e.getMessage());
+      exception = e;
+    } finally {
+      IOUtils.closeQuietly(directAccess);
+      jobPluginInfo.incrementObjectsProcessed(reportState);
 
       try {
-        LOGGER.debug("Checking if AIP {} is clean of virus", aip.getId());
-        StoragePath aipPath = ModelUtils.getAIPStoragePath(aip.getId());
-
-        directAccess = storage.getDirectAccess(aipPath);
-        virusCheckResult = getAntiVirus().checkForVirus(directAccess.getPath());
-        reportState = virusCheckResult.isClean() ? PluginState.SUCCESS : PluginState.FAILURE;
-        reportItem.setPluginState(reportState).setPluginDetails(virusCheckResult.getReport());
-
-        LOGGER.debug("Done with checking if AIP {} has virus. Is clean of virus: {}", aip.getId(),
-            virusCheckResult.isClean());
-      } catch (RODAException | RuntimeException e) {
-        LOGGER.error("Error processing AIP " + aip.getId(), e);
-        reportState = PluginState.FAILURE;
-        reportItem.setPluginState(reportState).setPluginDetails(e.getMessage());
-        exception = e;
-      } finally {
-        IOUtils.closeQuietly(directAccess);
-        jobPluginInfo.incrementObjectsProcessed(reportState);
-
-        try {
-          createEvent(virusCheckResult, exception, reportItem.getPluginState(), aip, model, index, true);
-          report.addReport(reportItem);
-          PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
-        } catch (PluginException e) {
-          LOGGER.error("Error updating event and job", e);
-        }
+        createEvent(virusCheckResult, exception, reportItem.getPluginState(), aip, model, index, true);
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+      } catch (PluginException e) {
+        LOGGER.error("Error updating event and job", e);
       }
+    }
 
   }
 
