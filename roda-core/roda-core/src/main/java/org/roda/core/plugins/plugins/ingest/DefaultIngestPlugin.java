@@ -56,6 +56,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
@@ -326,6 +327,14 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         PluginHelper.getSearchScopeFromParameters(this, model), PluginHelper.getJobUsername(this, index));
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
       LOGGER.error("Could not fix parents", e);
+    }
+
+    try {
+      Job job = PluginHelper.getJob(this, model);
+      ModelUtils.removeTemporaryResourceShallow(job.getId());
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException
+      | IOException e) {
+      LOGGER.error("Could not remove temporary file shallow", e);
     }
 
     return null;

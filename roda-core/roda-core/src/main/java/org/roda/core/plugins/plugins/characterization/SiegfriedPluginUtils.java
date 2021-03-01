@@ -30,6 +30,8 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.PluginException;
@@ -116,7 +118,7 @@ public class SiegfriedPluginUtils {
   }
 
   public static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnRepresentation(ModelService model,
-    Representation representation) throws GenericException, RequestNotValidException, NotFoundException,
+    Representation representation, String jobId) throws GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException, PluginException {
     StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(representation.getAipId(),
       representation.getId());
@@ -125,21 +127,29 @@ public class SiegfriedPluginUtils {
     // stream para os nomes e meter numa lista
 
     if (representation.getHasShallowFiles()) {
-      StorageService tmpStorageService = ModelUtils.resolveTemporaryResourceShallow(model.getStorage(), representationDataPath);
+      StorageService tmpStorageService = ModelUtils.resolveTemporaryResourceShallow(jobId, model.getStorage(),
+        representationDataPath);
       try (DirectResourceAccess directAccess = tmpStorageService.getDirectAccess(representationDataPath)) {
         Path representationFsPath = directAccess.getPath();
-        return runSiegfriedOnRepresentationOrFile(model, representation.getAipId(),
-            representation.getId(), new ArrayList<>(), null, representationFsPath, representation.getHasShallowFiles());
+        return runSiegfriedOnRepresentationOrFile(model, representation.getAipId(), representation.getId(),
+          new ArrayList<>(), null, representationFsPath, representation.getHasShallowFiles());
       } catch (IOException e) {
         throw new GenericException(e);
       } finally {
-        ModelUtils.removeTemporaryResourceShallow(tmpStorageService, representationDataPath);
+        try {
+          Job job = PluginHelper.getJob(jobId, model);
+          if (!job.getPluginType().equals(PluginType.INGEST)) {
+            ModelUtils.removeTemporaryResourceShallow(job.getId(), representationDataPath);
+          }
+        } catch (IOException e) {
+          LOGGER.error("Error on removing temporary Representation " + representation.getId(), e);
+        }
       }
     } else {
       try (DirectResourceAccess directAccess = model.getStorage().getDirectAccess(representationDataPath)) {
         Path representationFsPath = directAccess.getPath();
-        return runSiegfriedOnRepresentationOrFile(model, representation.getAipId(),
-            representation.getId(), new ArrayList<>(), null, representationFsPath, representation.getHasShallowFiles());
+        return runSiegfriedOnRepresentationOrFile(model, representation.getAipId(), representation.getId(),
+          new ArrayList<>(), null, representationFsPath, representation.getHasShallowFiles());
       } catch (IOException e) {
         throw new GenericException(e);
       }

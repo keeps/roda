@@ -181,6 +181,7 @@ public class RodaCoreFactory {
   private static Path disposalBinDirectoryPath;
   private static Path exampleConfigPath;
   private static Path defaultPath;
+  private static Path fileShallowTmpDirectoryPath;
 
   private static StorageService storage;
   private static ModelService model;
@@ -469,6 +470,9 @@ public class RodaCoreFactory {
         // initialize disposal bin directory
         initializeDisposalBinDirectory();
 
+        // initialize file shallow temporary directory
+        initializeFileShallowTmpDirectoryPath();
+
         // instantiate solr and index service
         instantiateSolrAndIndexService(nodeType);
         LOGGER.debug("Finished instantiating solr & index");
@@ -534,6 +538,17 @@ public class RodaCoreFactory {
     } catch (IOException e) {
       throw new RuntimeException(
         "Unable to create RODA Disposal bin DIRECTORY " + disposalBinDirectoryPath + ". Aborting...", e);
+    }
+  }
+
+  private static void initializeFileShallowTmpDirectoryPath() {
+    try {
+      String fileShallowTmpFolder = getConfigurationString("file_shallow_tmp.folder", RodaConstants.CORE_FILE_SHALLOW_TMP_FOLDER);
+      fileShallowTmpDirectoryPath = Files.createTempDirectory(getWorkingDirectory(), fileShallowTmpFolder);
+      toDeleteDuringShutdown.add(fileShallowTmpDirectoryPath);
+    } catch (IOException e) {
+      throw new RuntimeException(
+          "Unable to create RODA file shallow temporary DIRECTORY " + fileShallowTmpDirectoryPath + ". Aborting...", e);
     }
   }
 
@@ -1659,6 +1674,10 @@ public class RodaCoreFactory {
 
   public static Path getDisposalBinDirectoryPath() {
     return disposalBinDirectoryPath;
+  }
+
+  public static Path getFileShallowTmpDirectoryPath() {
+    return fileShallowTmpDirectoryPath;
   }
 
   public static Path getDataPath() {

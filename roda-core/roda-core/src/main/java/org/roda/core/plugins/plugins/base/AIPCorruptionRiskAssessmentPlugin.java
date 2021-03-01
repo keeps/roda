@@ -141,13 +141,19 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
 
               if (!file.isDirectory()) {
                 if (FSUtils.isExternalFile(file.getId())) {
-                  StorageService tmpStorageService = ModelUtils.resolveTemporaryResourceShallow(storage,
+                  StorageService tmpStorageService = ModelUtils.resolveTemporaryResourceShallow(job.getId(), storage,
                     ModelUtils.getAIPStoragePath(aip.getId()));
                   for (OptionalWithCause<File> fileShallow : model.listExternalFilesUnder(file)) {
                     processFilesShallow(index, model, tmpStorageService, validationReport, sources, aipFailed, aip,
                       fileShallow.get());
                   }
-                  ModelUtils.removeTemporaryResourceShallow(tmpStorageService, ModelUtils.getAIPStoragePath(aip.getId()));
+                  try {
+                    if (!job.getPluginType().equals(PluginType.INGEST)) {
+                      ModelUtils.removeTemporaryResourceShallow(job.getId(), ModelUtils.getAIPStoragePath(aip.getId()));
+                    }
+                  } catch (IOException e) {
+                    LOGGER.error("Error on removing temporary AIP " + aip.getId(), e);
+                  }
                 } else {
                   StoragePath storagePath = ModelUtils.getFileStoragePath(file);
                   Binary currentFileBinary = storage.getBinary(storagePath);
@@ -229,21 +235,16 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
               PreservationMetadata pm = opm.get();
               if (PreservationMetadataType.FILE.equals(pm.getType())) {
                 try {
-                  model.retrieveFile(pm.getAipId(), pm.getRepresentationId(), pm.getFileDirectoryPath(),
+                  model.retrieveFileInsideManifest(pm.getAipId(), pm.getRepresentationId(), pm.getFileDirectoryPath(),
                     pm.getFileId());
-                } catch (NotFoundException e) {
-                  try {
-                    model.retrieveFileInsideManifest(pm.getAipId(), pm.getRepresentationId(), pm.getFileDirectoryPath(),
-                      pm.getFileId());
-                  } catch (NotFoundException exception) {
-                    ValidationIssue issue = new ValidationIssue(
-                      "File " + pm.getFileId() + " of representation " + pm.getRepresentationId() + " of AIP "
-                        + pm.getAipId() + " was not found but the PREMIS file exists");
-                    validationReport.addIssue(issue);
-                    aipFailed = true;
-                    createIncidence(model, index, aip.getId(), pm.getRepresentationId(), pm.getFileDirectoryPath(),
-                      pm.getFileId(), risks.get(0));
-                  }
+                } catch (NotFoundException exception) {
+                  ValidationIssue issue = new ValidationIssue(
+                    "File " + pm.getFileId() + " of representation " + pm.getRepresentationId() + " of AIP "
+                      + pm.getAipId() + " was not found but the PREMIS file exists");
+                  validationReport.addIssue(issue);
+                  aipFailed = true;
+                  createIncidence(model, index, aip.getId(), pm.getRepresentationId(), pm.getFileDirectoryPath(),
+                    pm.getFileId(), risks.get(0));
                 }
               }
             }
