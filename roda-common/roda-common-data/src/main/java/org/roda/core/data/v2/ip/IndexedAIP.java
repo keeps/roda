@@ -111,10 +111,10 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
     this(other.getId(), other.getState(), other.getType(), other.getLevel(), other.getTitle(), other.getDateInitial(),
       other.getDateFinal(), other.getDescription(), other.getParentID(), other.getAncestors(), other.getPermissions(),
       other.getNumberOfSubmissionFiles(), other.getNumberOfDocumentationFiles(), other.getNumberOfSchemaFiles(),
-      other.getHasRepresentations(), other.getGhost(), other.hasShallowFiles(), other.getDisposalScheduleId(), other.getDisposalScheduleName(),
-      other.getRetentionPeriodDuration(), other.getRetentionPeriodInterval(), other.getRetentionPeriodStartDate(),
-      other.getRetentionPeriodDetails(), other.getRetentionPeriodState(), other.getDisposalHoldsId(),
-      other.getTransitiveDisposalHoldsId(), other.getDestroyedOn(), other.getDestroyedBy(),
+      other.getHasRepresentations(), other.getGhost(), other.hasShallowFiles(), other.getDisposalScheduleId(),
+      other.getDisposalScheduleName(), other.getRetentionPeriodDuration(), other.getRetentionPeriodInterval(),
+      other.getRetentionPeriodStartDate(), other.getRetentionPeriodDetails(), other.getRetentionPeriodState(),
+      other.getDisposalHoldsId(), other.getTransitiveDisposalHoldsId(), other.getDestroyedOn(), other.getDestroyedBy(),
       other.getDisposalConfirmationId(), other.getScheduleAssociationType());
   }
 
@@ -133,9 +133,9 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
   public IndexedAIP(String id, AIPState state, String type, String level, String title, Date dateInitial,
     Date dateFinal, String description, String parentID, List<String> ancestors, Permissions permissions,
     Long numberOfSubmissionFiles, Long numberOfDocumentationFiles, Long numberOfSchemaFiles, Boolean hasRepresentations,
-    Boolean ghost, Boolean hasShallowFiles, String disposalScheduleId, String disposalScheduleName, Integer retentionPeriodDuration,
-    RetentionPeriodIntervalCode retentionPeriodInterval, Date retentionPeriodStartDate, String retentionPeriodDetails,
-    RetentionPeriodCalculation retentionPeriodCalculation, List<String> disposalHoldsId,
+    Boolean ghost, Boolean hasShallowFiles, String disposalScheduleId, String disposalScheduleName,
+    Integer retentionPeriodDuration, RetentionPeriodIntervalCode retentionPeriodInterval, Date retentionPeriodStartDate,
+    String retentionPeriodDetails, RetentionPeriodCalculation retentionPeriodCalculation, List<String> disposalHoldsId,
     List<String> transitiveDisposalHoldsId, Date destroyedOn, String destroyedBy, String disposalConfirmationId,
     AIPDisposalScheduleAssociationType scheduleAssociationType) {
     super();

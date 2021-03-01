@@ -9,7 +9,6 @@ package org.roda.core.index;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -248,10 +247,9 @@ public class IndexModelObserver implements ModelObserver {
       representation.getId(), true)) {
       for (OptionalWithCause<File> file : allFiles) {
         if (file.isPresent()) {
-          // TODO: SHALLOW
           if (FSUtils.isExternalFile(file.get().getId())) {
             for (OptionalWithCause<File> shallowFile : model.listExternalFilesUnder(file.get())) {
-              if(shallowFile.isPresent()){
+              if (shallowFile.isPresent()) {
                 indexFile(aip, shallowFile.get(), ancestors, false).addTo(ret).getReturnedObject();
                 numberOfDataFiles++;
               }
@@ -263,7 +261,7 @@ public class IndexModelObserver implements ModelObserver {
 
           if (file.get().isDirectory()) {
             numberOfDataFolders++;
-          } else if(!FSUtils.isExternalFile(file.get().getId())){
+          } else if (!FSUtils.isExternalFile(file.get().getId())) {
             numberOfDataFiles++;
           }
         } else {
@@ -287,14 +285,15 @@ public class IndexModelObserver implements ModelObserver {
     return ret;
   }
 
-  private Long getExternalFilesTotalSize(File file) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
+  private Long getExternalFilesTotalSize(File file)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
     Long sizeInBytes = 0L;
     StoragePath storagePath = ModelUtils.getFileStoragePath(file);
     CloseableIterable<Resource> resources = model.getStorage().listResourcesUnderFile(storagePath, false);
     for (Resource resource : resources) {
-      if(resource instanceof DefaultBinary){
+      if (resource instanceof DefaultBinary) {
         ContentPayload content = ((DefaultBinary) resource).getContent();
-        if(content instanceof JsonContentPayload){
+        if (content instanceof JsonContentPayload) {
           ShallowFile shallowFile = JsonUtils.getObjectFromJson(content.createInputStream(), ShallowFile.class);
           sizeInBytes += shallowFile.getSize();
         }

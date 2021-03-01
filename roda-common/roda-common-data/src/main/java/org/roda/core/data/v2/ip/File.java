@@ -9,8 +9,6 @@ package org.roda.core.data.v2.ip;
 
 import java.util.List;
 
-
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 
@@ -38,7 +36,8 @@ public class File implements IsModelObject, HasId {
     super();
   }
 
-  public File(String id, String aipId, String representationId, List<String> path, boolean isDirectory, boolean isReference, String referenceUrl, String referenceManifest, String referenceUUID) {
+  public File(String id, String aipId, String representationId, List<String> path, boolean isDirectory,
+    boolean isReference, String referenceUrl, String referenceManifest, String referenceUUID) {
     super();
     this.id = id;
     this.aipId = aipId;
@@ -102,7 +101,9 @@ public class File implements IsModelObject, HasId {
     this.isDirectory = isDirectory;
   }
 
-  public boolean isReference() { return isReference; }
+  public boolean isReference() {
+    return isReference;
+  }
 
   public void setReference(boolean reference) {
     isReference = reference;
@@ -132,74 +133,29 @@ public class File implements IsModelObject, HasId {
     this.referenceUUID = referenceUUID;
   }
 
-//  @Override
-//  public int hashCode() {
-//    final int prime = 31;
-//    int result = 1;
-//    result = prime * result + ((aipId == null) ? 0 : aipId.hashCode());
-//    result = prime * result + ((id == null) ? 0 : id.hashCode());
-//    result = prime * result + (isDirectory ? 1231 : 1237);
-//    result = prime * result + ((path == null) ? 0 : path.hashCode());
-//    result = prime * result + ((representationId == null) ? 0 : representationId.hashCode());
-//    return result;
-//  }
-//
-//  @Override
-//  public boolean equals(Object obj) {
-//    if (this == obj)
-//      return true;
-//    if (obj == null)
-//      return false;
-//    if (getClass() != obj.getClass())
-//      return false;
-//    File other = (File) obj;
-//    if (aipId == null) {
-//      if (other.aipId != null)
-//        return false;
-//    } else if (!aipId.equals(other.aipId))
-//      return false;
-//    if (id == null) {
-//      if (other.id != null)
-//        return false;
-//    } else if (!id.equals(other.id))
-//      return false;
-//    if (isDirectory != other.isDirectory)
-//      return false;
-//    if (path == null) {
-//      if (other.path != null)
-//        return false;
-//    } else if (!path.equals(other.path))
-//      return false;
-//    if (representationId == null) {
-//      if (other.representationId != null)
-//        return false;
-//    } else if (!representationId.equals(other.representationId))
-//      return false;
-//    return true;
-//  }
-
-//  @Override
-//  public String toString() {
-//    return "File [id=" + id + ", path=" + path + ", aipId=" + aipId + ", representationId=" + representationId
-//      + ", isDirectory=" + isDirectory + "]";
-//  }
-
-
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
 
     File file = (File) o;
 
-    if (isDirectory != file.isDirectory) return false;
-    if (isReference != file.isReference) return false;
-    if (id != null ? !id.equals(file.id) : file.id != null) return false;
-    if (path != null ? !path.equals(file.path) : file.path != null) return false;
-    if (aipId != null ? !aipId.equals(file.aipId) : file.aipId != null) return false;
+    if (isDirectory != file.isDirectory)
+      return false;
+    if (isReference != file.isReference)
+      return false;
+    if (id != null ? !id.equals(file.id) : file.id != null)
+      return false;
+    if (path != null ? !path.equals(file.path) : file.path != null)
+      return false;
+    if (aipId != null ? !aipId.equals(file.aipId) : file.aipId != null)
+      return false;
     if (representationId != null ? !representationId.equals(file.representationId) : file.representationId != null)
       return false;
-    if (referenceUrl != null ? !referenceUrl.equals(file.referenceUrl) : file.referenceUrl != null) return false;
+    if (referenceUrl != null ? !referenceUrl.equals(file.referenceUrl) : file.referenceUrl != null)
+      return false;
     if (referenceManifest != null ? !referenceManifest.equals(file.referenceManifest) : file.referenceManifest != null)
       return false;
     return referenceUUID != null ? referenceUUID.equals(file.referenceUUID) : file.referenceUUID == null;
@@ -221,16 +177,9 @@ public class File implements IsModelObject, HasId {
 
   @Override
   public String toString() {
-    return "File{" +
-        "id='" + id + '\'' +
-        ", path=" + path +
-        ", aipId='" + aipId + '\'' +
-        ", representationId='" + representationId + '\'' +
-        ", isDirectory=" + isDirectory +
-        ", isReference=" + isReference +
-        ", referenceUrl='" + referenceUrl + '\'' +
-        ", referenceManifest='" + referenceManifest + '\'' +
-        ", referenceUUID='" + referenceUUID + '\'' +
-        '}';
+    return "File{" + "id='" + id + '\'' + ", path=" + path + ", aipId='" + aipId + '\'' + ", representationId='"
+      + representationId + '\'' + ", isDirectory=" + isDirectory + ", isReference=" + isReference + ", referenceUrl='"
+      + referenceUrl + '\'' + ", referenceManifest='" + referenceManifest + '\'' + ", referenceUUID='" + referenceUUID
+      + '\'' + '}';
   }
 }

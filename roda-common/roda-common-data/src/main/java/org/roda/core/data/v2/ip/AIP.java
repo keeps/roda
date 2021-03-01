@@ -67,7 +67,8 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions, String createdBy) {
     this(id, parentId, type, state, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>(),
-      new AIPFormat(), new ArrayList<Relationship>(), new Date(), createdBy, new Date(), createdBy, new DisposalAIPMetadata());
+      new AIPFormat(), new ArrayList<Relationship>(), new Date(), createdBy, new Date(), createdBy,
+      new DisposalAIPMetadata());
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions,
@@ -340,7 +341,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
 
   @JsonIgnore
   public boolean removeDisposalHold(String disposalHold) {
-    if(disposal != null){
+    if (disposal != null) {
       return disposal.removeDisposalHold(disposalHold);
     }
     return false;
@@ -348,7 +349,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
 
   @JsonIgnore
   public boolean removeTransitiveHold(String transitiveDisposalHold) {
-    if(disposal != null){
+    if (disposal != null) {
       return disposal.removeTransitiveHold(transitiveDisposalHold);
     }
     return false;

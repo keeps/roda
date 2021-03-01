@@ -1,13 +1,14 @@
 package org.roda.core.data.v2.ip;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import java.net.URI;
+
+import javax.xml.datatype.XMLGregorianCalendar;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.net.URI;
-import java.net.URL;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -24,7 +25,6 @@ public class ShallowFile implements IsModelObject {
   private String mimeType;
   private String checksum;
   private String checksumType;
-
 
   public ShallowFile() {
   }
