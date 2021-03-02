@@ -80,7 +80,7 @@ public class SolrUtilsTest {
     boolean deployPluginManager = false;
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-      deployPluginManager, deployDefaultResources);
+      deployPluginManager, deployDefaultResources, false);
   }
 
   @AfterMethod

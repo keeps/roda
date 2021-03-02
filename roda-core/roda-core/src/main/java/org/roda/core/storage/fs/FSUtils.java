@@ -39,6 +39,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.StringUtils;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -49,6 +50,7 @@ import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.ip.ShallowFile;
 import org.roda.core.data.v2.ip.ShallowFiles;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.protocols.Protocol;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.Container;
@@ -60,11 +62,9 @@ import org.roda.core.storage.DefaultDirectory;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.InputStreamContentPayload;
 import org.roda.core.storage.JsonContentPayload;
-import org.roda.core.storage.Resource;
-import org.roda.core.storage.protocol.ProtocolManager;
-import org.roda.core.storage.protocol.ProtocolManagerFactory;
 import org.roda.core.storage.ReferenceBinary;
-import org.roda.core.storage.protocol.ShallowFileContentPayload;
+import org.roda.core.storage.Resource;
+import org.roda.core.storage.ShallowFileContentPayload;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -710,16 +710,18 @@ public class FSUtils {
     throws GenericException {
     Resource resource;
     Long sizeInBytes = 0L;
-    ProtocolManager protocolManager = ProtocolManagerFactory.createProtocolManager(URI.create(url));
-    if (protocolManager.isAvailable()) {
+    Protocol protocol = RodaCoreFactory.getProtocol(URI.create(url));
+    // ProtocolManager protocolManager =
+    // ProtocolManagerFactory.createProtocolManager(URI.create(url));
+    if (protocol.isAvailable()) {
       if (calculateSize) {
         try {
-          sizeInBytes = protocolManager.getSize();
+          sizeInBytes = protocol.getSize();
         } catch (IOException e) {
           throw new GenericException("Cannot retrieve size of file at " + url);
         }
       }
-      ContentPayload contentPayload = new InputStreamContentPayload(() -> protocolManager.getInputStream());
+      ContentPayload contentPayload = new InputStreamContentPayload(() -> protocol.getInputStream());
       resource = new ReferenceBinary(storagePath, contentPayload, sizeInBytes);
 
       return resource;

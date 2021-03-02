@@ -61,6 +61,7 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
+import org.roda.core.protocols.Protocol;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultBinary;
 import org.roda.core.storage.DefaultStoragePath;
@@ -68,8 +69,6 @@ import org.roda.core.storage.JsonContentPayload;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FileStorageService;
-import org.roda.core.storage.protocol.ProtocolManager;
-import org.roda.core.storage.protocol.ProtocolManagerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -934,7 +933,9 @@ public final class ModelUtils {
               ContentPayload content = ((DefaultBinary) resource).getContent();
               if (content instanceof JsonContentPayload) {
                 ShallowFile shallowFile = JsonUtils.getObjectFromJson(content.createInputStream(), ShallowFile.class);
-                ProtocolManager pm = ProtocolManagerFactory.createProtocolManager(shallowFile.getLocation());
+                Protocol pm = RodaCoreFactory.getProtocol(shallowFile.getLocation());
+                // ProtocolManager pm =
+                // ProtocolManagerFactory.createProtocolManager(shallowFile.getLocation());
                 pm.downloadResource(temporaryStorage.getDirectAccess(externalFile).getPath().getParent());
               }
 

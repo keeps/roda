@@ -53,7 +53,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 @Test(groups = {RodaConstants.TEST_GROUP_DEV})
@@ -91,7 +90,7 @@ public class FilterTest {
     boolean deployPluginManager = true;
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-      deployPluginManager, deployDefaultResources);
+      deployPluginManager, deployDefaultResources, false);
 
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();

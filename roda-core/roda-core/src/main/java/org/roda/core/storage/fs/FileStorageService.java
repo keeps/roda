@@ -47,7 +47,7 @@ import org.roda.core.storage.Entity;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceUtils;
-import org.roda.core.storage.protocol.ShallowFileContentPayload;
+import org.roda.core.storage.ShallowFileContentPayload;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
