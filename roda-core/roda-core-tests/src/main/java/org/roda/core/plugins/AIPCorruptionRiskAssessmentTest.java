@@ -7,7 +7,6 @@
  */
 package org.roda.core.plugins;
 
-import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,7 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
@@ -67,7 +65,7 @@ public class AIPCorruptionRiskAssessmentTest {
     boolean deployPluginManager = true;
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-      deployPluginManager, deployDefaultResources);
+      deployPluginManager, deployDefaultResources, false);
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
 
