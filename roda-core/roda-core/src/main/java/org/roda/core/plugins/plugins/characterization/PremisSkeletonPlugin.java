@@ -117,7 +117,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
 
         if (!getSipInformation().hasUpdatedData() || !updatedData.containsKey(aip.getId())) {
           try {
-            if (aip.getRepresentations().isEmpty()) {
+            if (aip.getRepresentations().isEmpty() && getSipInformation().isUpdate()) {
               reportItem.setPluginState(PluginState.SKIPPED).setPluginDetails("Executed on a SIP update context.");
               jobPluginInfo.incrementObjectsProcessed(PluginState.SKIPPED);
             } else {

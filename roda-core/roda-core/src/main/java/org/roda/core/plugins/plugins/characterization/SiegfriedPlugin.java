@@ -119,7 +119,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
         if (!getSipInformation().hasUpdatedData() || !updatedData.containsKey(aip.getId())) {
           try {
-            if (aip.getRepresentations().isEmpty()) {
+            if (aip.getRepresentations().isEmpty() && getSipInformation().isUpdate()) {
               reportItem.setPluginState(PluginState.SKIPPED).setPluginDetails("Executed on a SIP update context.");
               jobPluginInfo.incrementObjectsProcessed(PluginState.SKIPPED);
             } else {
