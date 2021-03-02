@@ -122,6 +122,7 @@ import org.roda.core.model.iterables.LogEntryStorageIterable;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.model.utils.ResourceListUtils;
 import org.roda.core.model.utils.ResourceParseUtils;
+import org.roda.core.protocols.Protocol;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
@@ -135,9 +136,7 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.storage.protocol.ProtocolManager;
-import org.roda.core.storage.protocol.ProtocolManagerFactory;
-import org.roda.core.storage.protocol.ShallowFileContentPayload;
+import org.roda.core.storage.ShallowFileContentPayload;
 import org.roda.core.util.HTTPUtility;
 import org.roda.core.util.IdUtils;
 import org.roda.core.util.RESTClientUtility;
@@ -1191,8 +1190,8 @@ public class ModelService extends ModelObservable {
     AlreadyExistsException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    ProtocolManager protocolManager = ProtocolManagerFactory.createProtocolManager(fileShallow.getFileLocation());
-    if (protocolManager.isAvailable()) {
+    Protocol protocol = RodaCoreFactory.getProtocol(fileShallow.getFileLocation());
+    if (protocol.isAvailable()) {
       ShallowFile shallowFile = new ShallowFile();
       String decode;
       try {
