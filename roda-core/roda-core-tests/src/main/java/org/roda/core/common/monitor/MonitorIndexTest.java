@@ -22,7 +22,6 @@ import org.hamcrest.Matchers;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -64,7 +63,7 @@ public class MonitorIndexTest {
     boolean deployPluginManager = true;
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-      deployPluginManager, deployDefaultResources);
+      deployPluginManager, deployDefaultResources, false);
 
     index = RodaCoreFactory.getIndexService();
     transferredResourcesFolder = RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder",

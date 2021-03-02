@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -133,6 +134,9 @@ import org.roda.core.plugins.PluginManager;
 import org.roda.core.plugins.PluginManagerException;
 import org.roda.core.plugins.PluginOrchestrator;
 import org.roda.core.plugins.orchestrate.AkkaEmbeddedPluginOrchestrator;
+import org.roda.core.protocols.Protocol;
+import org.roda.core.protocols.ProtocolManager;
+import org.roda.core.protocols.ProtocolManagerException;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
@@ -196,6 +200,7 @@ public class RodaCoreFactory {
   private static boolean INSTANTIATE_SCANNER = true;
   private static boolean INSTANTIATE_PLUGIN_ORCHESTRATOR = true;
   private static boolean INSTANTIATE_PLUGIN_MANAGER = true;
+  private static boolean INSTANTIATE_PROTOCOL_MANAGER = true;
   private static boolean INSTANTIATE_DEFAULT_RESOURCES = true;
   private static boolean INSTANTIATE_CONFIGURE_LOGBACK = true;
   private static boolean INSTANTIATE_EXAMPLE_RESOURCES = true;
@@ -207,6 +212,8 @@ public class RodaCoreFactory {
   // Orchestrator related objects
   private static PluginManager pluginManager;
   private static PluginOrchestrator pluginOrchestrator = null;
+
+  private static ProtocolManager protocolManager;
 
   // Events related
   private static EventsManager eventsManager;
@@ -367,13 +374,15 @@ public class RodaCoreFactory {
   }
 
   public static void instantiateTest(boolean deploySolr, boolean deployLdap, boolean deployTransferredResourcesScanner,
-    boolean deployOrchestrator, boolean deployPluginManager, boolean deployDefaultResources) {
+    boolean deployOrchestrator, boolean deployPluginManager, boolean deployDefaultResources,
+    boolean deployProtocolManager) {
     INSTANTIATE_SOLR = deploySolr;
     INSTANTIATE_LDAP = deployLdap;
     INSTANTIATE_SCANNER = deployTransferredResourcesScanner;
     INSTANTIATE_PLUGIN_ORCHESTRATOR = deployOrchestrator;
     INSTANTIATE_PLUGIN_MANAGER = deployPluginManager;
     INSTANTIATE_DEFAULT_RESOURCES = deployDefaultResources;
+    INSTANTIATE_PROTOCOL_MANAGER = deployProtocolManager;
     instantiateTest();
   }
 
@@ -381,7 +390,7 @@ public class RodaCoreFactory {
     boolean deployOrchestrator, boolean deployPluginManager, boolean deployDefaultResources, SolrType solrType) {
     INSTANTIATE_SOLR_TYPE = solrType;
     instantiateTest(deploySolr, deployLdap, deployTransferredResourcesScanner, deployOrchestrator, deployPluginManager,
-      deployDefaultResources);
+      deployDefaultResources, false);
   }
 
   private static void instantiateTest() {
@@ -500,6 +509,9 @@ public class RodaCoreFactory {
         instantiatePluginManager();
         LOGGER.debug("Finished instantiating plugin manager");
 
+        instantiateProtocolManager();
+        LOGGER.debug("Finished instantiating protocol manager");
+
         // now that plugin manager is up, lets do some tasks that can only be
         // done after it
         if (nodeType == NodeType.MASTER && pluginOrchestrator != null) {
@@ -543,12 +555,13 @@ public class RodaCoreFactory {
 
   private static void initializeFileShallowTmpDirectoryPath() {
     try {
-      String fileShallowTmpFolder = getConfigurationString("file_shallow_tmp.folder", RodaConstants.CORE_FILE_SHALLOW_TMP_FOLDER);
+      String fileShallowTmpFolder = getConfigurationString("file_shallow_tmp.folder",
+        RodaConstants.CORE_FILE_SHALLOW_TMP_FOLDER);
       fileShallowTmpDirectoryPath = Files.createTempDirectory(getWorkingDirectory(), fileShallowTmpFolder);
       toDeleteDuringShutdown.add(fileShallowTmpDirectoryPath);
     } catch (IOException e) {
       throw new RuntimeException(
-          "Unable to create RODA file shallow temporary DIRECTORY " + fileShallowTmpDirectoryPath + ". Aborting...", e);
+        "Unable to create RODA file shallow temporary DIRECTORY " + fileShallowTmpDirectoryPath + ". Aborting...", e);
     }
   }
 
@@ -962,6 +975,17 @@ public class RodaCoreFactory {
         pluginManager = PluginManager.instantiatePluginManager(getConfigPath(), getPluginsPath());
       } catch (PluginManagerException e) {
         LOGGER.error("Error instantiating PluginManager", e);
+        instantiatedWithoutErrors = false;
+      }
+    }
+  }
+
+  private static void instantiateProtocolManager() {
+    if (INSTANTIATE_PROTOCOL_MANAGER) {
+      try {
+        protocolManager = ProtocolManager.instantiateProtocolManager(getConfigPath(), getProtocolsPath());
+      } catch (ProtocolManagerException e) {
+        LOGGER.error("Error instantiating ProtocolManager", e);
         instantiatedWithoutErrors = false;
       }
     }
@@ -1412,6 +1436,9 @@ public class RodaCoreFactory {
       if (INSTANTIATE_PLUGIN_MANAGER) {
         pluginManager.shutdown();
       }
+      if (INSTANTIATE_PROTOCOL_MANAGER) {
+        protocolManager.shutdown();
+      }
       if (INSTANTIATE_PLUGIN_ORCHESTRATOR) {
         pluginOrchestrator.shutdown();
       }
@@ -1694,6 +1721,14 @@ public class RodaCoreFactory {
 
   public static Path getPluginsPath() {
     return configPath.resolve(RodaConstants.CORE_PLUGINS_FOLDER);
+  }
+
+  public static Path getProtocolsPath() {
+    return configPath.resolve(RodaConstants.CORE_PROTOCOLS_FOLDER);
+  }
+
+  public static ProtocolManager getProtocolManager() {
+    return protocolManager;
   }
 
   /*
@@ -2089,6 +2124,18 @@ public class RodaCoreFactory {
       LOGGER.debug("Could not get disposal hold", e);
       return null;
     }
+  }
+
+  public static Protocol getProtocol(URI uri) throws GenericException {
+    if (protocolManager != null) {
+      try {
+        return protocolManager.getProtocol(uri);
+      } catch (ProtocolManagerException e) {
+        throw new GenericException(e.getMessage(), e);
+      }
+    }
+    throw new GenericException(
+      "The Application was unable to configure the protocols correctly, please check the logs ");
   }
 
   public static Messages getI18NMessages(Locale locale) {
