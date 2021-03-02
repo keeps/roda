@@ -66,7 +66,7 @@ public class JobsTest {
     boolean deployPluginManager = true;
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-      deployPluginManager, deployDefaultResources);
+      deployPluginManager, deployDefaultResources, false);
 
     LOGGER.info("Running Jobs tests under storage {}", basePath);
   }

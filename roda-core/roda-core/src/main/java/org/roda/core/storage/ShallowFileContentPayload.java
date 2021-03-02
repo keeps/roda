@@ -1,4 +1,4 @@
-package org.roda.core.storage.protocol;
+package org.roda.core.storage;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

@@ -248,6 +248,10 @@ public final class RodaConstants {
   public static final String CORE_PLUGINS_DEPENDENCIES_FOLDER = "dependencies";
   public static final String CORE_PLUGINS_SHARED_FOLDER = "shared";
   public static final String CORE_PLUGINS_DISABLED_FOLDER = "disabled";
+  public static final String CORE_PROTOCOLS_FOLDER = "protocols";
+  public static final String CORE_PROTOCOLS_DEPENDENCIES_FOLDER = "dependencies";
+  public static final String CORE_PROTOCOLS_SHARED_FOLDER = "shared";
+  public static final String CORE_PROTOCOLS_DISABLED_FOLDER = "disabled";
   public static final String CORE_DISSEMINATION_FOLDER = "dissemination";
   public static final String CORE_HTML_FOLDER = "html";
   public static final String CORE_INGEST_FOLDER = "ingest";

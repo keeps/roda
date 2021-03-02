@@ -1,4 +1,4 @@
-package org.roda.core.storage.protocol;
+package org.roda.core.protocols.protocols;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -12,26 +12,68 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.file.Path;
 
 import org.apache.commons.io.FilenameUtils;
+import org.roda.core.protocols.AbstractProtocol;
+import org.roda.core.protocols.Protocol;
+import org.roda.core.protocols.ProtocolException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-public class HTTPProtocolManager implements ProtocolManager {
-  private final URI connectionString;
+public class HttpProtocol extends AbstractProtocol {
+  private static final Logger LOGGER = LoggerFactory.getLogger(FileProtocol.class);
+  private static final String SCHEMA = "http";
+  private static final String NAME = "Http protocol";
+  private static final String VERSION = "0";
 
-  public HTTPProtocolManager(URI connectionString) {
-    this.connectionString = connectionString;
+  public HttpProtocol(){
+    super();
+  }
+
+  public HttpProtocol(URI uri) {
+    setConnectionString(uri);
+  }
+
+  @Override
+  public void init() throws ProtocolException {
+
+  }
+
+  @Override
+  public String getName() {
+    return NAME;
+  }
+
+  @Override
+  public String getVersion() {
+    return VERSION;
+  }
+
+  @Override
+  public String getDescription() {
+    return null;
+  }
+
+  @Override
+  public Protocol cloneMe(URI uri) {
+    return new HttpProtocol(uri);
+  }
+
+  @Override
+  public String getSchema() {
+    return SCHEMA;
   }
 
   @Override
   public InputStream getInputStream() throws IOException {
-    return connectionString.toURL().openStream();
+    return getConnectionString().toURL().openStream();
   }
 
   @Override
   public Boolean isAvailable() {
     try {
-      URL url = connectionString.toURL();
+      URL url = getConnectionString().toURL();
       HttpURLConnection huc = (HttpURLConnection) url.openConnection();
       huc.setRequestMethod("HEAD");
 
@@ -47,7 +89,7 @@ public class HTTPProtocolManager implements ProtocolManager {
   public Long getSize() throws IOException {
     URLConnection conn = null;
     try {
-      conn = connectionString.toURL().openConnection();
+      conn = getConnectionString().toURL().openConnection();
       if (conn instanceof HttpURLConnection) {
         ((HttpURLConnection) conn).setRequestMethod("HEAD");
       }
@@ -62,9 +104,19 @@ public class HTTPProtocolManager implements ProtocolManager {
 
   @Override
   public void downloadResource(Path target) throws IOException {
-    Path output = target.resolve(FilenameUtils.getName(connectionString.getPath()));
+    Path output = target.resolve(FilenameUtils.getName(getConnectionString().getPath()));
     ReadableByteChannel readableByteChannel = Channels.newChannel(getInputStream());
     FileOutputStream fileOutputStream = new FileOutputStream(output.toString());
     fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
+  }
+
+  @Override
+  public void shutdown() {
+
+  }
+
+  @Override
+  public String getId() {
+    return null;
   }
 }

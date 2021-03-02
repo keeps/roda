@@ -44,7 +44,7 @@ public class RodaCoreFactoryTest {
   @BeforeClass
   public static void setUp() throws IOException, ConfigurationException {
     basePath = TestsHelper.createBaseTempDir(RodaCoreFactoryTest.class, true);
-    RodaCoreFactory.instantiateTest(false, false, false, false, false, false);
+    RodaCoreFactory.instantiateTest(false, false, false, false, false, false, false);
     RodaCoreFactory.addConfiguration("roda-wui.properties");
   }
 

@@ -66,7 +66,7 @@ public class DisposalRuleTest {
     boolean deployPluginManager = true;
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-      deployPluginManager, deployDefaultResources);
+      deployPluginManager, deployDefaultResources, false);
     model = RodaCoreFactory.getModelService();
     storagePath = RodaCoreFactory.getStoragePath();
     index = RodaCoreFactory.getIndexService();
