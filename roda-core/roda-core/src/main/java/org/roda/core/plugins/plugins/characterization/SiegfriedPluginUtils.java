@@ -128,7 +128,7 @@ public class SiegfriedPluginUtils {
 
     if (representation.getHasShallowFiles()) {
       StorageService tmpStorageService = ModelUtils.resolveTemporaryResourceShallow(jobId, model.getStorage(),
-        representationDataPath);
+          ModelUtils.getAIPStoragePath(representation.getAipId()));
       try (DirectResourceAccess directAccess = tmpStorageService.getDirectAccess(representationDataPath)) {
         Path representationFsPath = directAccess.getPath();
         return runSiegfriedOnRepresentationOrFile(model, representation.getAipId(), representation.getId(),
