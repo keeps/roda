@@ -198,13 +198,6 @@ public class ProtocolManager {
     // load, for the first time, all the protocols (internal & external)
     loadProtocols();
 
-    // schedule
-    // TODO: this same behavior happens in plugins, is it really necessary?
-    LOGGER.debug("Starting protocol scanner timer...");
-    int timeInSeconds = RodaCoreFactory.getRodaConfiguration().getInt("core.protocols.external.scheduler.interval", 30);
-    this.loadProtocolsTimer = new Timer("Protocol scanner timer", true);
-    this.loadProtocolsTimer.schedule(new SearchProtocolsTask(), timeInSeconds * 1000, timeInSeconds * 1000);
-
     LOGGER.info("{} init OK", getClass().getSimpleName());
   }
 
@@ -572,32 +565,6 @@ public class ProtocolManager {
       }
     }
     return ret;
-  }
-
-  protected class SearchProtocolsTask extends TimerTask {
-
-    @Override
-    public void run() {
-
-      LOGGER.debug("Searching for protocols...");
-
-      loadProtocols();
-
-      if (LOGGER.isDebugEnabled()) {
-        LOGGER.debug("Search complete - {} jar files", jarProtocolCache.size());
-
-        for (Entry<Path, JarProtocols> jarEntry : jarProtocolCache.entrySet()) {
-          Path jarFile = jarEntry.getKey();
-          List<Protocol> protocols = jarEntry.getValue().protocols;
-          if (!protocols.isEmpty()) {
-            for (Protocol protocol : protocols) {
-              LOGGER.debug("- {}", jarFile.getFileName());
-              LOGGER.debug("--- {} - {} - {}", protocol.getName(), protocol.getVersion(), protocol.getDescription());
-            }
-          }
-        }
-      }
-    }
   }
 
   protected class JarProtocols {
