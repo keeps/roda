@@ -119,10 +119,23 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
 
         if (!getSipInformation().hasUpdatedData() || !updatedData.containsKey(aip.getId())) {
           try {
-            if (aip.getRepresentations().isEmpty() && getSipInformation().isUpdate()) {
-              reportItem.setPluginState(PluginState.SKIPPED).setPluginDetails("Executed on a SIP update context.");
-              jobPluginInfo.incrementObjectsProcessed(PluginState.SKIPPED);
+            if (getSipInformation().isUpdate()) {
+              // SIP UPDATE
+              if (AIPState.INGEST_PROCESSING.equals(aip.getState())) {
+                for (Representation representation : aip.getRepresentations()) {
+                  LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
+                  sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation));
+                  model.notifyRepresentationUpdated(representation).failOnError();
+                }
+
+                jobPluginInfo.incrementObjectsProcessedWithSuccess();
+                reportItem.setPluginState(PluginState.SUCCESS);
+              } else {
+                reportItem.setPluginState(PluginState.SKIPPED).setPluginDetails("Executed on a SIP update context.");
+                jobPluginInfo.incrementObjectsProcessed(PluginState.SKIPPED);
+              }
             } else {
+              // SIP CREATE
               for (Representation representation : aip.getRepresentations()) {
                 LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
                 sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation));

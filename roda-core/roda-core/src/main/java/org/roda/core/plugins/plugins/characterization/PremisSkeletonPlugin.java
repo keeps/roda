@@ -117,10 +117,25 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
 
         if (!getSipInformation().hasUpdatedData() || !updatedData.containsKey(aip.getId())) {
           try {
-            if (aip.getRepresentations().isEmpty() && getSipInformation().isUpdate()) {
-              reportItem.setPluginState(PluginState.SKIPPED).setPluginDetails("Executed on a SIP update context.");
-              jobPluginInfo.incrementObjectsProcessed(PluginState.SKIPPED);
+            if (getSipInformation().isUpdate()) {
+              // SIP UPDATE
+              if (AIPState.INGEST_PROCESSING.equals(aip.getState())) {
+                for (Representation representation : aip.getRepresentations()) {
+                  LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
+                  PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aip.getId(), representation.getId(),
+                      algorithms);
+                  // notify is not failing because it is not crucial
+                  model.notifyRepresentationUpdated(representation);
+                }
+
+                jobPluginInfo.incrementObjectsProcessedWithSuccess();
+                reportItem.setPluginState(PluginState.SUCCESS);
+              } else {
+                reportItem.setPluginState(PluginState.SKIPPED).setPluginDetails("Executed on a SIP update context.");
+                jobPluginInfo.incrementObjectsProcessed(PluginState.SKIPPED);
+              }
             } else {
+              // SIP CREATE
               for (Representation representation : aip.getRepresentations()) {
                 LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
                 PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aip.getId(), representation.getId(),
