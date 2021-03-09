@@ -45,6 +45,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.plugins.v2.FailureOnMandatoryStepAfterPartialSuccessIngestPlugin;
 import org.roda.core.plugins.plugins.v2.FailureOnMandatoryStepIngestPlugin;
@@ -114,15 +115,20 @@ public class FailureIngestPluginTest {
       }
     }, e -> Assert.fail("Error cleaning up", e));
 
+    index.execute(TransferredResource.class, Filter.ALL, new ArrayList<>(),
+      item -> model.deleteTransferredResource(item), e -> Assert.fail("Error removing resources", e));
+
     TestsHelper.releaseAllLocks();
   }
 
   @Test
-  public void testWithEARKSIPMandatoryPluginFailureViaUnexpectedExceptionAndNoMoveWhenAutoAccept()throws IOException, RODAException {
+  public void testWithEARKSIPMandatoryPluginFailureViaUnexpectedExceptionAndNoMoveWhenAutoAccept()
+    throws IOException, RODAException {
     RodaCoreFactory.getRodaConfiguration()
-        .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT, false);
+      .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT, false);
 
-    AIP aip = EARKSIPPluginsTest.ingestCorpora(FailureOnMandatoryStepIngestPlugin.class, model, index, corporaPath, false);
+    AIP aip = EARKSIPPluginsTest.ingestCorpora(FailureOnMandatoryStepIngestPlugin.class, model, index, corporaPath,
+      false);
     assessAIP(aip);
 
     Job job = model.retrieveJob(aip.getIngestJobId());
@@ -132,15 +138,19 @@ public class FailureIngestPluginTest {
     Assert.assertEquals(jobReports.size(), 1);
     Assert.assertEquals(jobReports.get(0).getReports().size(), 4);
 
-    assessJobStats(job, 0,1,0);
+    assessJobStats(job, 0, 1, 0);
+
+    assessTransferResourceFolderContent(false, false, false);
   }
 
   @Test
-  public void testWithEARKSIPMandatoryPluginFailureViaUnexpectedExceptionAfterPartialAndNoMoveWhenAutoAccept()throws IOException, RODAException {
+  public void testWithEARKSIPMandatoryPluginFailureViaUnexpectedExceptionAfterPartialAndNoMoveWhenAutoAccept()
+    throws IOException, RODAException {
     RodaCoreFactory.getRodaConfiguration()
-        .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT, false);
+      .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT, false);
 
-    AIP aip = EARKSIPPluginsTest.ingestCorpora(FailureOnMandatoryStepAfterPartialSuccessIngestPlugin.class, model, index, corporaPath, false);
+    AIP aip = EARKSIPPluginsTest.ingestCorpora(FailureOnMandatoryStepAfterPartialSuccessIngestPlugin.class, model,
+      index, corporaPath, false);
     assessAIP(aip);
 
     Job job = model.retrieveJob(aip.getIngestJobId());
@@ -150,15 +160,19 @@ public class FailureIngestPluginTest {
     Assert.assertEquals(jobReports.size(), 1);
     Assert.assertEquals(jobReports.get(0).getReports().size(), 5);
 
-    assessJobStats(job, 0,1,0);
+    assessJobStats(job, 0, 1, 0);
+
+    assessTransferResourceFolderContent(false, false, false);
   }
 
   @Test
-  public void testWithEARKSIPMandatoryPluginFailureViaUnexpectedExceptionAfterPartialAndMoveWhenAutoAccept()throws IOException, RODAException {
+  public void testWithEARKSIPMandatoryPluginFailureViaUnexpectedExceptionAfterPartialAndMoveWhenAutoAccept()
+    throws IOException, RODAException {
     RodaCoreFactory.getRodaConfiguration()
-        .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT, true);
+      .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT, true);
 
-    AIP aip = EARKSIPPluginsTest.ingestCorpora(FailureOnMandatoryStepAfterPartialSuccessIngestPlugin.class, model, index, corporaPath, false);
+    AIP aip = EARKSIPPluginsTest.ingestCorpora(FailureOnMandatoryStepAfterPartialSuccessIngestPlugin.class, model,
+      index, corporaPath, false);
     assessAIP(aip);
 
     Job job = model.retrieveJob(aip.getIngestJobId());
@@ -168,15 +182,19 @@ public class FailureIngestPluginTest {
     Assert.assertEquals(jobReports.size(), 1);
     Assert.assertEquals(jobReports.get(0).getReports().size(), 5);
 
-    assessJobStats(job, 0,1,0);
+    assessJobStats(job, 0, 1, 0);
+
+    assessTransferResourceFolderContent(true, false, false);
   }
 
   @Test
-  public void testWithEARKSIPMandatoryPluginFailureViaUnexpectedExceptionAndMoveWhenAutoAccept()throws IOException, RODAException {
+  public void testWithEARKSIPMandatoryPluginFailureViaUnexpectedExceptionAndMoveWhenAutoAccept()
+    throws IOException, RODAException {
     RodaCoreFactory.getRodaConfiguration()
-        .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT, true);
+      .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT, true);
 
-    AIP aip = EARKSIPPluginsTest.ingestCorpora(FailureOnMandatoryStepIngestPlugin.class, model, index, corporaPath, false);
+    AIP aip = EARKSIPPluginsTest.ingestCorpora(FailureOnMandatoryStepIngestPlugin.class, model, index, corporaPath,
+      false);
     assessAIP(aip);
 
     Job job = model.retrieveJob(aip.getIngestJobId());
@@ -186,7 +204,9 @@ public class FailureIngestPluginTest {
     Assert.assertEquals(jobReports.size(), 1);
     Assert.assertEquals(jobReports.get(0).getReports().size(), 4);
 
-    assessJobStats(job, 0,1,0);
+    assessJobStats(job, 0, 1, 0);
+
+    assessTransferResourceFolderContent(true, false, false);
   }
 
   @Test
@@ -204,7 +224,7 @@ public class FailureIngestPluginTest {
     Job job = TestsHelper.executeJob(FailureOnMandatoryStepIngestPlugin.class, new HashMap<>(), PluginType.SIP_TO_AIP,
       SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
 
-    assessJobStats(job, 0, 1 ,0);
+    assessJobStats(job, 0, 1, 0);
 
     // assess reports
     List<Report> jobReports = TestsHelper.getJobReports(index, job, false);
@@ -215,12 +235,12 @@ public class FailureIngestPluginTest {
     Assert.assertEquals(report.getOutcomeObjectId(), Report.NO_OUTCOME_OBJECT_ID);
     String baseFolder = RodaCoreFactory.getRodaConfiguration().getString("core.ingest.processed.base_folder",
       "PROCESSED");
-    String unsuccessFolder = RodaCoreFactory.getRodaConfiguration()
+    String unsuccessfulFolder = RodaCoreFactory.getRodaConfiguration()
       .getString("core.ingest.processed.unsuccessfully_ingested", "UNSUCCESSFULLY_INGESTED");
     TransferredResource transferredResourceAfterMove = index.retrieve(TransferredResource.class,
       report.getSourceObjectId(), Collections.emptyList());
     Assert.assertTrue(transferredResourceAfterMove.getFullPath().contains(baseFolder));
-    Assert.assertTrue(transferredResourceAfterMove.getFullPath().contains(unsuccessFolder));
+    Assert.assertTrue(transferredResourceAfterMove.getFullPath().contains(unsuccessfulFolder));
   }
 
   private void assessAIP(AIP aip)
@@ -263,10 +283,53 @@ public class FailureIngestPluginTest {
 
   private void assessJobStats(Job job, int expectedSuccess, int expectedFailure, int expectedPartialSuccess) {
     Assert.assertEquals(job.getJobStats().getSourceObjectsProcessedWithSuccess(), expectedSuccess);
-    Assert.assertEquals(job.getJobStats().getSourceObjectsProcessedWithFailure(),expectedFailure);
-    Assert.assertEquals(job.getJobStats().getSourceObjectsProcessedWithPartialSuccess(),expectedPartialSuccess);
+    Assert.assertEquals(job.getJobStats().getSourceObjectsProcessedWithFailure(), expectedFailure);
+    Assert.assertEquals(job.getJobStats().getSourceObjectsProcessedWithPartialSuccess(), expectedPartialSuccess);
     Assert.assertEquals(job.getJobStats().getSourceObjectsBeingProcessed(), 0);
     Assert.assertEquals(job.getJobStats().getSourceObjectsWaitingToBeProcessed(), 0);
     Assert.assertEquals(job.getJobStats().getSourceObjectsCount(), 1);
+  }
+
+  private void assessTransferResourceFolderContent(boolean moved, boolean successfully, boolean remove)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+    String baseFolder = RodaCoreFactory.getRodaConfiguration().getString("core.ingest.processed.base_folder",
+      "PROCESSED");
+    String successfulFolder = RodaCoreFactory.getRodaConfiguration()
+      .getString("core.ingest.processed.successfully_ingested", "SUCCESSFULLY_INGESTED");
+    String unsuccessfulFolder = RodaCoreFactory.getRodaConfiguration()
+      .getString("core.ingest.processed.unsuccessfully_ingested", "UNSUCCESSFULLY_INGESTED");
+
+    Path successfulPath = RodaCoreFactory.getDataPath()
+      .resolve(RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder")).resolve(baseFolder)
+      .resolve(successfulFolder);
+
+    Path unsuccessfulPath = RodaCoreFactory.getDataPath()
+      .resolve(RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder")).resolve(baseFolder)
+      .resolve(unsuccessfulFolder);
+
+    index.commit(TransferredResource.class);
+
+    IterableIndexResult<TransferredResource> transferredResources = index.findAll(TransferredResource.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, Boolean.TRUE.toString())),
+      new ArrayList<>());
+
+    if (moved) {
+      // Test if it was moved successfully
+      transferredResources.forEach(transferredResource -> {
+        if (successfully) {
+          Assert.assertTrue(transferredResource.getFullPath().contains(successfulPath.toString()));
+        } else {
+          Assert.assertTrue(transferredResource.getFullPath().contains(unsuccessfulPath.toString()));
+        }
+      });
+    } else if (remove) {
+      // If it is not to be moved test if was remove successfully
+      Assert.assertEquals(transferredResources.getTotalCount(), 0L);
+    } else {
+      Assert.assertEquals(transferredResources.getTotalCount(), 1L);
+      transferredResources.forEach(transferredResource -> {
+        Assert.assertFalse(transferredResource.getFullPath().contains(baseFolder));
+      });
+    }
   }
 }

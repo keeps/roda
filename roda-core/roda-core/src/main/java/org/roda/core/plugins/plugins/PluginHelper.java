@@ -1344,19 +1344,52 @@ public final class PluginHelper {
     return li;
   }
 
+  public static <T extends IsRODAObject> void removeSIPs(ModelService model,
+                                                       List<TransferredResource> transferredResources, IngestJobPluginInfo jobPluginInfo, Job cachedJob) {
+    for (TransferredResource transferredResource : transferredResources) {
+      String transferredResourceId = transferredResource.getUUID();
+
+      List<String> aipIds = jobPluginInfo.getAipIds(transferredResourceId);
+      if (aipIds != null && !aipIds.isEmpty()) {
+        try {
+          AIPState aipState = model.retrieveAIP(aipIds.get(0)).getState();
+          if (AIPState.ACTIVE.equals(aipState)) {
+            LOGGER.debug("Removing SIP {}", transferredResource.getFullPath());
+            try {
+              model.deleteTransferredResource(transferredResource);
+            } catch (GenericException | AuthorizationDeniedException e) {
+              model.createRepositoryEvent(RodaConstants.PreservationEventType.DELETION,
+                  "The process of deleting an object of the repository", PluginState.FAILURE,
+                  "The transferred resource " + transferredResource.getName() + " has not been deleted.", "", cachedJob.getUsername(),
+                  true);
+              LOGGER.debug("Failed to remove SIP {}", transferredResource.getFullPath(), e);
+            }
+            model.createRepositoryEvent(RodaConstants.PreservationEventType.DELETION,
+                "The process of deleting an object of the repository", PluginState.SUCCESS,
+                "The transferred resource " + transferredResource.getName() + " has been deleted.", "", cachedJob.getUsername(),
+                true);
+            LOGGER.debug("Done with removing SIP {}", transferredResource.getFullPath());
+          }
+        } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+          LOGGER.error("Error retrieving AIP", e);
+        }
+      }
+    }
+  }
+
   public static <T extends IsRODAObject> void moveSIPs(Plugin<T> plugin, ModelService model, IndexService index,
     List<TransferredResource> transferredResources, IngestJobPluginInfo jobPluginInfo) {
     List<String> success = new ArrayList<>();
-    List<String> unsuccess = new ArrayList<>();
+    List<String> unsuccessful = new ArrayList<>();
 
     String baseFolder = RodaCoreFactory.getRodaConfiguration().getString("core.ingest.processed.base_folder",
       "PROCESSED");
     String successFolder = RodaCoreFactory.getRodaConfiguration()
       .getString("core.ingest.processed.successfully_ingested", "SUCCESSFULLY_INGESTED");
-    String unsuccessFolder = RodaCoreFactory.getRodaConfiguration()
+    String unsuccessfulFolder = RodaCoreFactory.getRodaConfiguration()
       .getString("core.ingest.processed.unsuccessfully_ingested", "UNSUCCESSFULLY_INGESTED");
     String successPath = Paths.get(baseFolder, successFolder).toString();
-    String unsuccessPath = Paths.get(baseFolder, unsuccessFolder).toString();
+    String unsuccessfulPath = Paths.get(baseFolder, unsuccessfulFolder).toString();
 
     // determine which SIPs will be moved based on 1) if at least one AIP was
     // created from each SIP; 2) if it was created, in which state it is
@@ -1369,20 +1402,20 @@ public final class PluginHelper {
           if (AIPState.ACTIVE == aipState) {
             success.add(transferredResourceId);
           } else if (AIPState.UNDER_APPRAISAL != aipState) {
-            unsuccess.add(transferredResourceId);
+            unsuccessful.add(transferredResourceId);
           }
         } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
           LOGGER.error("Error retrieving AIP", e);
         }
       } else {
         // no AIP was generated
-        unsuccess.add(transferredResourceId);
+        unsuccessful.add(transferredResourceId);
       }
     }
 
     // move SIPs and update reports
     Map<String, String> successOldToNewTransferredResourceIds = new HashMap<>();
-    Map<String, String> unsuccessOldToNewTransferredResourceIds = new HashMap<>();
+    Map<String, String> unsuccessfulOldToNewTransferredResourceIds = new HashMap<>();
     try {
       if (!success.isEmpty()) {
         successOldToNewTransferredResourceIds = RodaCoreFactory.getTransferredResourcesScanner()
@@ -1396,10 +1429,10 @@ public final class PluginHelper {
     }
 
     try {
-      if (!unsuccess.isEmpty()) {
-        unsuccessOldToNewTransferredResourceIds = RodaCoreFactory.getTransferredResourcesScanner()
-          .moveTransferredResource(unsuccessPath, unsuccess, true);
-        updateReportsAndIngestInfoAfterMovingSIPs(model, jobPluginInfo, unsuccessOldToNewTransferredResourceIds);
+      if (!unsuccessful.isEmpty()) {
+        unsuccessfulOldToNewTransferredResourceIds = RodaCoreFactory.getTransferredResourcesScanner()
+          .moveTransferredResource(unsuccessfulPath, unsuccessful, true);
+        updateReportsAndIngestInfoAfterMovingSIPs(model, jobPluginInfo, unsuccessfulOldToNewTransferredResourceIds);
       }
     } catch (GenericException | NotFoundException | AuthorizationDeniedException e) {
       LOGGER.error("Error moving unsuccessfully ingested SIPs", e);
@@ -1408,7 +1441,7 @@ public final class PluginHelper {
     }
 
     // update Job (with all new ids)
-    successOldToNewTransferredResourceIds.putAll(unsuccessOldToNewTransferredResourceIds);
+    successOldToNewTransferredResourceIds.putAll(unsuccessfulOldToNewTransferredResourceIds);
     updateJobAfterMovingSIPsAsync(plugin, index, successOldToNewTransferredResourceIds);
   }
 

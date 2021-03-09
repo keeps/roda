@@ -180,6 +180,9 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
       getAfterExecute().ifPresent(e -> e.execute(jobPluginInfo, aips));
 
+      // remove SIP if property set and SIP was not moved to another location
+      removeSIPAfterIngestEnded(model, resources, jobPluginInfo, cachedJob);
+
       // X) final job info update
       jobPluginInfo.updateSourceObjectsProcessed();
       jobPluginInfo.finalizeInfo();
@@ -336,6 +339,18 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     setPreservationFailureMessage(END_FAILURE);
     setPreservationEventDescription(END_DESCRIPTION);
     createIngestEvent(model, index, jobPluginInfo, new Date(), cachedJob);
+  }
+
+  private void removeSIPAfterIngestEnded(ModelService model, List<TransferredResource> resources,
+    IngestJobPluginInfo jobPluginInfo, Job cachedJob) {
+
+    boolean moveSIPs = RodaCoreFactory.getRodaConfiguration()
+      .getBoolean(RodaConstants.CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT, false);
+
+    if (!moveSIPs && RodaCoreFactory.getRodaConfiguration()
+      .getBoolean(RodaConstants.CORE_TRANSFERRED_RESOURCES_DELETE_WHEN_SUCCESSFULLY_INGESTED, false)) {
+      PluginHelper.removeSIPs(model, resources, jobPluginInfo, cachedJob);
+    }
   }
 
   @Override

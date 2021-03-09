@@ -45,8 +45,9 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.plugins.ingest.MinimalIngestPlugin;
+import org.roda.core.plugins.plugins.ingest.v2.MinimalIngestPlugin;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,7 +114,58 @@ public class MinimalIngestPluginTest {
       }
     }, e -> Assert.fail("Error cleaning up", e));
 
+    index.execute(TransferredResource.class, Filter.ALL, new ArrayList<>(),
+      item -> model.deleteTransferredResource(item), e -> Assert.fail("Error removing resources", e));
+
     TestsHelper.releaseAllLocks();
+  }
+
+  @Test
+  public void testWithEARKSIPAndNoRemoveSIPWhenAutoAccept() throws IsStillUpdatingException, GenericException,
+    AuthorizationDeniedException, IOException, AlreadyExistsException, RequestNotValidException, NotFoundException {
+    RodaCoreFactory.getRodaConfiguration()
+      .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_DELETE_WHEN_SUCCESSFULLY_INGESTED, false);
+
+    AIP aip = EARKSIPPluginsTest.ingestCorpora(MinimalIngestPlugin.class, model, index, corporaPath);
+    assessAIP(aip);
+
+    Job job = model.retrieveJob(aip.getIngestJobId());
+    assessJobStats(job, true);
+
+    assessTransferResourceFolderContent(false, true, false);
+  }
+
+  @Test
+  public void testWithEARKSIPMoveWhenAutoAcceptAndRemoveSIP() throws GenericException, RequestNotValidException,
+    AuthorizationDeniedException, NotFoundException, IsStillUpdatingException, IOException, AlreadyExistsException {
+    RodaCoreFactory.getRodaConfiguration()
+      .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_DELETE_WHEN_SUCCESSFULLY_INGESTED, true);
+
+    RodaCoreFactory.getRodaConfiguration()
+      .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT, true);
+
+    AIP aip = EARKSIPPluginsTest.ingestCorpora(MinimalIngestPlugin.class, model, index, corporaPath);
+    assessAIP(aip);
+
+    Job job = model.retrieveJob(aip.getIngestJobId());
+    assessJobStats(job, true);
+
+    assessTransferResourceFolderContent(true, true, false);
+  }
+
+  @Test
+  public void testWithEARKSIPAndRemoveSIPWhenAutoAccept() throws IsStillUpdatingException, GenericException,
+    AuthorizationDeniedException, IOException, AlreadyExistsException, RequestNotValidException, NotFoundException {
+    RodaCoreFactory.getRodaConfiguration()
+      .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_DELETE_WHEN_SUCCESSFULLY_INGESTED, true);
+
+    AIP aip = EARKSIPPluginsTest.ingestCorpora(MinimalIngestPlugin.class, model, index, corporaPath);
+    assessAIP(aip);
+
+    Job job = model.retrieveJob(aip.getIngestJobId());
+    assessJobStats(job, true);
+
+    assessTransferResourceFolderContent(false, true, true);
   }
 
   @Test
@@ -121,11 +173,16 @@ public class MinimalIngestPluginTest {
     RodaCoreFactory.getRodaConfiguration()
       .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT, false);
 
+    RodaCoreFactory.getRodaConfiguration()
+      .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_DELETE_WHEN_SUCCESSFULLY_INGESTED, false);
+
     AIP aip = EARKSIPPluginsTest.ingestCorpora(MinimalIngestPlugin.class, model, index, corporaPath);
     assessAIP(aip);
 
     Job job = model.retrieveJob(aip.getIngestJobId());
     assessJobStats(job, true);
+
+    assessTransferResourceFolderContent(false, true, false);
   }
 
   @Test
@@ -138,6 +195,8 @@ public class MinimalIngestPluginTest {
 
     Job job = model.retrieveJob(aip.getIngestJobId());
     assessJobStats(job, true);
+
+    assessTransferResourceFolderContent(true, true, false);
   }
 
   @Test
@@ -218,5 +277,48 @@ public class MinimalIngestPluginTest {
     Assert.assertEquals(job.getJobStats().getSourceObjectsBeingProcessed(), 0);
     Assert.assertEquals(job.getJobStats().getSourceObjectsWaitingToBeProcessed(), 0);
     Assert.assertEquals(job.getJobStats().getSourceObjectsCount(), 1);
+  }
+
+  private void assessTransferResourceFolderContent(boolean moved, boolean successfully, boolean remove)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+    String baseFolder = RodaCoreFactory.getRodaConfiguration().getString("core.ingest.processed.base_folder",
+      "PROCESSED");
+    String successfulFolder = RodaCoreFactory.getRodaConfiguration()
+      .getString("core.ingest.processed.successfully_ingested", "SUCCESSFULLY_INGESTED");
+    String unsuccessfulFolder = RodaCoreFactory.getRodaConfiguration()
+      .getString("core.ingest.processed.unsuccessfully_ingested", "UNSUCCESSFULLY_INGESTED");
+
+    Path successfulPath = RodaCoreFactory.getDataPath()
+      .resolve(RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder")).resolve(baseFolder)
+      .resolve(successfulFolder);
+
+    Path unsuccessfulPath = RodaCoreFactory.getDataPath()
+      .resolve(RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder")).resolve(baseFolder)
+      .resolve(unsuccessfulFolder);
+
+    index.commit(TransferredResource.class);
+
+    IterableIndexResult<TransferredResource> transferredResources = index.findAll(TransferredResource.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, Boolean.TRUE.toString())),
+      new ArrayList<>());
+
+    if (moved) {
+      // Test if it was moved successfully
+      transferredResources.forEach(transferredResource -> {
+        if (successfully) {
+          Assert.assertTrue(transferredResource.getFullPath().contains(successfulPath.toString()));
+        } else {
+          Assert.assertTrue(transferredResource.getFullPath().contains(unsuccessfulPath.toString()));
+        }
+      });
+    } else if (remove) {
+      // If it is not to be moved test if was remove successfully
+      Assert.assertEquals(transferredResources.getTotalCount(), 0L);
+    } else {
+      Assert.assertEquals(transferredResources.getTotalCount(), 1L);
+      transferredResources.forEach(transferredResource -> {
+        Assert.assertFalse(transferredResource.getFullPath().contains(baseFolder));
+      });
+    }
   }
 }

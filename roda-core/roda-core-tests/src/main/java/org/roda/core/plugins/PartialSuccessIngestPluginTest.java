@@ -45,6 +45,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.plugins.v2.PartialSuccessIngestPlugin;
 import org.roda.core.storage.fs.FSUtils;
@@ -113,13 +114,19 @@ public class PartialSuccessIngestPluginTest {
       }
     }, e -> Assert.fail("Error cleaning up", e));
 
+    index.execute(TransferredResource.class, Filter.ALL, new ArrayList<>(),
+      item -> model.deleteTransferredResource(item), e -> Assert.fail("Error removing resources", e));
+
     TestsHelper.releaseAllLocks();
   }
 
   @Test
-  public void testWithEARKSIPAndNoMoveWhenAutoAccept() throws IOException, RODAException {
+  public void testWithEARKSIPAndNoMoveWhenAutoAcceptAndRemove() throws IOException, RODAException {
     RodaCoreFactory.getRodaConfiguration()
-      .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT, false);
+        .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT, false);
+
+    RodaCoreFactory.getRodaConfiguration()
+        .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_DELETE_WHEN_SUCCESSFULLY_INGESTED, true);
 
     AIP aip = EARKSIPPluginsTest.ingestCorpora(PartialSuccessIngestPlugin.class, model, index, corporaPath, false);
     assessAIP(aip);
@@ -132,6 +139,31 @@ public class PartialSuccessIngestPluginTest {
     Assert.assertEquals(jobReports.get(0).getReports().size(), 6);
 
     assessJobStats(job, 0, 0, 1);
+
+    assessTransferResourceFolderContent(false, true, true);
+  }
+
+  @Test
+  public void testWithEARKSIPAndNoMoveWhenAutoAccept() throws IOException, RODAException {
+    RodaCoreFactory.getRodaConfiguration()
+      .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT, false);
+
+    RodaCoreFactory.getRodaConfiguration()
+        .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_DELETE_WHEN_SUCCESSFULLY_INGESTED, false);
+
+    AIP aip = EARKSIPPluginsTest.ingestCorpora(PartialSuccessIngestPlugin.class, model, index, corporaPath, false);
+    assessAIP(aip);
+
+    Job job = model.retrieveJob(aip.getIngestJobId());
+
+    // assess reports
+    List<Report> jobReports = TestsHelper.getJobReports(index, job, false);
+    Assert.assertEquals(jobReports.size(), 1);
+    Assert.assertEquals(jobReports.get(0).getReports().size(), 6);
+
+    assessJobStats(job, 0, 0, 1);
+
+    assessTransferResourceFolderContent(false, true, false);
   }
 
   @Test
@@ -149,7 +181,9 @@ public class PartialSuccessIngestPluginTest {
     Assert.assertEquals(jobReports.size(), 1);
     Assert.assertEquals(jobReports.get(0).getReports().size(), 6);
 
-    assessJobStats(job, 0, 0,1);
+    assessJobStats(job, 0, 0, 1);
+
+    assessTransferResourceFolderContent(true, true, false);
   }
 
   @Test
@@ -167,7 +201,7 @@ public class PartialSuccessIngestPluginTest {
     Job job = TestsHelper.executeJob(PartialSuccessIngestPlugin.class, new HashMap<>(), PluginType.SIP_TO_AIP,
       SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
 
-    assessJobStats(job, 0, 1 ,0);
+    assessJobStats(job, 0, 1, 0);
 
     // assess reports
     List<Report> jobReports = TestsHelper.getJobReports(index, job, false);
@@ -226,10 +260,53 @@ public class PartialSuccessIngestPluginTest {
 
   private void assessJobStats(Job job, int expectedSuccess, int expectedFailure, int expectedPartialSuccess) {
     Assert.assertEquals(job.getJobStats().getSourceObjectsProcessedWithSuccess(), expectedSuccess);
-    Assert.assertEquals(job.getJobStats().getSourceObjectsProcessedWithFailure(),expectedFailure);
-    Assert.assertEquals(job.getJobStats().getSourceObjectsProcessedWithPartialSuccess(),expectedPartialSuccess);
+    Assert.assertEquals(job.getJobStats().getSourceObjectsProcessedWithFailure(), expectedFailure);
+    Assert.assertEquals(job.getJobStats().getSourceObjectsProcessedWithPartialSuccess(), expectedPartialSuccess);
     Assert.assertEquals(job.getJobStats().getSourceObjectsBeingProcessed(), 0);
     Assert.assertEquals(job.getJobStats().getSourceObjectsWaitingToBeProcessed(), 0);
     Assert.assertEquals(job.getJobStats().getSourceObjectsCount(), 1);
+  }
+
+  private void assessTransferResourceFolderContent(boolean moved, boolean successfully, boolean remove)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+    String baseFolder = RodaCoreFactory.getRodaConfiguration().getString("core.ingest.processed.base_folder",
+      "PROCESSED");
+    String successfulFolder = RodaCoreFactory.getRodaConfiguration()
+      .getString("core.ingest.processed.successfully_ingested", "SUCCESSFULLY_INGESTED");
+    String unsuccessfulFolder = RodaCoreFactory.getRodaConfiguration()
+      .getString("core.ingest.processed.unsuccessfully_ingested", "UNSUCCESSFULLY_INGESTED");
+
+    Path successfulPath = RodaCoreFactory.getDataPath()
+      .resolve(RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder")).resolve(baseFolder)
+      .resolve(successfulFolder);
+
+    Path unsuccessfulPath = RodaCoreFactory.getDataPath()
+      .resolve(RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder")).resolve(baseFolder)
+      .resolve(unsuccessfulFolder);
+
+    index.commit(TransferredResource.class);
+
+    IterableIndexResult<TransferredResource> transferredResources = index.findAll(TransferredResource.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, Boolean.TRUE.toString())),
+      new ArrayList<>());
+
+    if (moved) {
+      // Test if it was moved successfully
+      transferredResources.forEach(transferredResource -> {
+        if (successfully) {
+          Assert.assertTrue(transferredResource.getFullPath().contains(successfulPath.toString()));
+        } else {
+          Assert.assertTrue(transferredResource.getFullPath().contains(unsuccessfulPath.toString()));
+        }
+      });
+    } else if (remove) {
+      // If it is not to be moved test if was remove successfully
+      Assert.assertEquals(transferredResources.getTotalCount(), 0L);
+    } else {
+      Assert.assertEquals(transferredResources.getTotalCount(), 1L);
+      transferredResources.forEach(transferredResource -> {
+        Assert.assertFalse(transferredResource.getFullPath().contains(baseFolder));
+      });
+    }
   }
 }
