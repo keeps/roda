@@ -1,5 +1,21 @@
 # Changelog
 
+## v3.5.2 (10/03/2021)
+
+#### New features:
+
+-  Add option to remove SIP from transfer resource folder after a successfully ingest workflow [#1917](https://github.com/keeps/roda/issues/1917)
+
+#### Bug Fixes:
+
+-  Siegfried and fixity skipped during ingest workflow [#1916](https://github.com/keeps/roda/issues/1916)
+
+Install for demonstration:
+```
+docker pull keeps/roda:v3.5.2
+```
+---
+
 ## v3.5.1 (02/12/2020)
 #### Security fixes
 -  Bump xstream from 1.4.10-java7 to 1.4.14-java7 [#1710](https://github.com/keeps/roda/issues/1710) to fix CVE-2019-10173
@@ -977,21 +993,3 @@ Improvements:
 
 Bug fixes:
 - Installation scripts (e.g. specified Tomcat was no longer available for download)
-
----
-
-## RODA v1.1.0 (01/11/2013)
-RODA version 1.1.0, codename Superior
-
-New features:
-- RODA was released to GitHub
-- RODA was completly mavenized (installer creation included, using the maven profile "create-installer")
-- RODA now running on Apache Tomcat
-- Added new instalation process
-- Added support for Ubuntu Linux 12.04 LTS (supported until April 2017)
-
-Bug fixes
-- Scheduler was storing dates incorrectly
-- String formater was used in some parts of the code to build SQL statements and proved to be a problem with different
-  locales (when different characters are used as separator for floating point values)
-- Revised footer logos (roda-wui)
