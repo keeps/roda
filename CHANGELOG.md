@@ -1,5 +1,18 @@
 # Changelog
 
+## v4.0.0 (11/03/2021)
+
+#### New features:
+
+-  Adding Croatian language [#1711](https://github.com/keeps/roda/issues/1711)
+-  Retention and disposal features [#1708](https://github.com/keeps/roda/issues/1708)
+
+Install for demonstration:
+```
+docker pull keeps/roda:v4.0.0
+```
+---
+
 ## v3.5.2 (10/03/2021)
 
 #### New features:
@@ -977,19 +990,3 @@ docker pull keeps/roda:2.0.0
 ```
 
 Check instructions for production-level install.
-
----
-
-## RODA v1.3.0 (26/05/2015)
-RODA version 1.3.0, codename Huron
-
-New features:
-- Using CAS (Central Authentication Service) as the authentication mechanism
-- Added [extended version FITS](https://github.com/keeps/fits/releases/tag/v0.8) to the ingest with support for technical metadata extraction of several new metadata types
-- Added support for customized description level, defined in a properties file
-
-Improvements:
-- EAD-C used by RODA is now compliant with the original EAD Component
-
-Bug fixes:
-- Installation scripts (e.g. specified Tomcat was no longer available for download)
