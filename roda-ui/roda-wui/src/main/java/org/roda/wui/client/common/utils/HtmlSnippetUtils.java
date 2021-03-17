@@ -87,30 +87,34 @@ public class HtmlSnippetUtils {
               .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
         } else if (job.getJobStats().getSourceObjectsProcessedWithSuccess() > 0) {
           ret = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
+              .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
+        } else if (job.getJobStats().getSourceObjectsProcessedWithSuccess() == 0
+            && job.getJobStats().getSourceObjectsProcessedWithSkipped() > 0) {
+          ret = SafeHtmlUtils
+              .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
         } else {
           ret = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.showJobStatusCompleted() + CLOSE_SPAN);
+              .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.showJobStatusCompleted() + CLOSE_SPAN);
         }
       } else if (JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
         ret = SafeHtmlUtils
-          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusFailedDuringCreation() + CLOSE_SPAN);
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusFailedDuringCreation() + CLOSE_SPAN);
       } else if (JOB_STATE.FAILED_TO_COMPLETE.equals(state)) {
         ret = SafeHtmlUtils
-          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusFailedToComplete() + CLOSE_SPAN);
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusFailedToComplete() + CLOSE_SPAN);
       } else if (JOB_STATE.STOPPING.equals(state)) {
         ret = SafeHtmlUtils
-          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusStopping() + CLOSE_SPAN);
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusStopping() + CLOSE_SPAN);
       } else if (JOB_STATE.STOPPED.equals(state)) {
         ret = SafeHtmlUtils
-          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusStopped() + CLOSE_SPAN);
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusStopped() + CLOSE_SPAN);
       } else if (JOB_STATE.CREATED.equals(state)) {
         ret = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + messages.showJobStatusCreated() + CLOSE_SPAN);
       } else if (JOB_STATE.STARTED.equals(state)) {
         ret = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + messages.showJobStatusStarted() + CLOSE_SPAN);
       } else if (JOB_STATE.TO_BE_CLEANED.equals(state)) {
         ret = SafeHtmlUtils
-          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusToBeCleaned() + CLOSE_SPAN);
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusToBeCleaned() + CLOSE_SPAN);
       } else {
         ret = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + state + CLOSE_SPAN);
       }
@@ -167,11 +171,11 @@ public class HtmlSnippetUtils {
     switch (pluginState) {
       case SUCCESS:
         pluginStateHTML = SafeHtmlUtils
-          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
         break;
       case RUNNING:
         pluginStateHTML = SafeHtmlUtils
-          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
         break;
       case PARTIAL_SUCCESS:
       case SKIPPED:
@@ -181,7 +185,7 @@ public class HtmlSnippetUtils {
       case FAILURE:
       default:
         pluginStateHTML = SafeHtmlUtils
-          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
         break;
     }
     return pluginStateHTML;

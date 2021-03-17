@@ -107,11 +107,31 @@ public class JobStats implements Serializable {
   }
 
   public void incrementObjectsProcessed(PluginState state) {
-    if (PluginState.SUCCESS.equals(state) || PluginState.SKIPPED.equals(state)) {
+    if (PluginState.SUCCESS.equals(state)) {
       incrementObjectsProcessedWithSuccess();
+    } else if (PluginState.SKIPPED.equals(state)) {
+      incrementObjectsProcessedWithSkipped();
     } else {
       incrementObjectsProcessedWithFailure();
     }
+  }
+
+  /**
+   * Increments by one the number of objects processed with skip & decrements by
+   * the same amount the number of objects being processed
+   */
+  public void incrementObjectsProcessedWithSkipped() {
+    this.sourceObjectsProcessedWithSkipped += 1;
+    this.sourceObjectsBeingProcessed -= 1;
+  }
+
+  /**
+   * Increments by one the number of objects processed with skip & decrements by
+   * the same amount the number of objects being processed
+   */
+  public void incrementObjectsProcessedWithSkipped(int count) {
+    this.sourceObjectsProcessedWithSkipped += count;
+    this.sourceObjectsBeingProcessed -= count;
   }
 
   /**
@@ -231,5 +251,4 @@ public class JobStats implements Serializable {
         + ", sourceObjectsProcessedWithSkipped=" + sourceObjectsProcessedWithSkipped
       + ", outcomeObjectsWithManualIntervention=" + outcomeObjectsWithManualIntervention + "]";
   }
-
 }

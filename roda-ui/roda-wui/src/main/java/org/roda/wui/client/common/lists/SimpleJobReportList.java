@@ -76,7 +76,8 @@ public class SimpleJobReportList extends AsyncTableCell<IndexedReport> {
     this.pluginsInfo = Collections.emptyMap();
   }
 
-  public SimpleJobReportList(Map<String, PluginInfo> pluginsInfo, boolean insideJob, boolean jobRunning, boolean jobComplex) {
+  public SimpleJobReportList(Map<String, PluginInfo> pluginsInfo, boolean insideJob, boolean jobRunning,
+    boolean jobComplex) {
     super();
     this.pluginsInfo = pluginsInfo;
     this.insideJob = insideJob;
@@ -188,6 +189,10 @@ public class SimpleJobReportList extends AsyncTableCell<IndexedReport> {
             case PARTIAL_SUCCESS:
               ret = SafeHtmlUtils.fromSafeConstant(
                 "<span class='label-warning'>" + messages.pluginStateMessage(PluginState.PARTIAL_SUCCESS) + "</span>");
+              break;
+            case SKIPPED:
+              ret = SafeHtmlUtils.fromSafeConstant(
+                "<span class='label-warning'>" + messages.pluginStateMessage(PluginState.SKIPPED) + "</span>");
               break;
             case FAILURE:
             default:
