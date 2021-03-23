@@ -36,6 +36,9 @@ public class ErrorHandler extends HttpServlet {
       StringBuilder msg = new StringBuilder();
       msg.append("[").append(statusCode).append("]").append(" ").append(uri).append(": ").append(message);
       LOGGER.info(msg.toString(), throwable);
+    } else if (statusCode.equals(200)) {
+      // added because broken pipe exception when using IE11
+      LOGGER.info("[" + statusCode + "] " + uri + ": " + message, throwable);
     } else {
 
       // Log the exception
