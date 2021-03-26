@@ -19,10 +19,12 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -53,6 +55,7 @@ import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.CommandException;
 import org.slf4j.Logger;
@@ -252,8 +255,7 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
       }
 
       reportItem.setPluginDetails(outcomeText);
-    } catch (IOException | CommandException | RequestNotValidException | GenericException | AuthorizationDeniedException
-      | NotFoundException e) {
+    } catch (IOException | CommandException | RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException | AlreadyExistsException e) {
       LOGGER.error("Failed to destroy AIP '{}': {}", aip.getId(), e.getMessage(), e);
       state = PluginState.FAILURE;
       outcomeText = "AIP '" + aip.getId() + "' has not been destroyed with disposal confirmation '"
@@ -314,21 +316,18 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
   }
 
   private void executeApplyStylesheet(AIP aip, ModelService model)
-    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException, IOException {
+      throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException, IOException, AlreadyExistsException {
     // Apply stylesheet to descriptive metadata
     for (DescriptiveMetadata metadata : aip.getDescriptiveMetadata()) {
       Binary binary = model.retrieveDescriptiveMetadataBinary(aip.getId(), metadata.getId());
-
-      StoragePath descriptiveMetadataStoragePath = ModelUtils.getDescriptiveMetadataStoragePath(metadata);
-      Path descriptiveMetadataPath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(),
-        descriptiveMetadataStoragePath);
-
       Reader reader = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CORE_DISPOSAL_METADATA_TRANSFORMERS,
         metadata.getType(), metadata.getVersion(), Collections.emptyMap());
-
       ReaderInputStream readerInputStream = new ReaderInputStream(reader, StandardCharsets.UTF_8);
+      String content = IOUtils.toString(readerInputStream, StandardCharsets.UTF_8);
 
-      FileUtils.copyInputStreamToFile(readerInputStream, descriptiveMetadataPath.toFile());
+      model.deleteDescriptiveMetadata(aip.getId(), metadata.getId());
+
+      model.createDescriptiveMetadata(aip.getId(), metadata.getId(), new StringContentPayload(content), metadata.getType(), metadata.getVersion());
     }
   }
 
