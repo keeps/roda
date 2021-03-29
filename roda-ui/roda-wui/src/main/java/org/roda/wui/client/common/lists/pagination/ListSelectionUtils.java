@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.google.gwt.core.client.JavaScriptException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
@@ -83,7 +84,11 @@ public class ListSelectionUtils {
 
   private static <T extends IsIndexed> void saveOnStorage(String className, ListSelectionState<T> state) {
     if (storage != null) {
-      storage.setItem(STORAGE_PREFIX + className, ListSelectionStateMappers.getJson(className, state));
+      try {
+        storage.setItem(STORAGE_PREFIX + className, ListSelectionStateMappers.getJson(className, state));
+      } catch (JavaScriptException e) {
+        Toast.showError(messages.errorLoadingJobReport(e.getMessage()));
+      }
     }
   }
 
