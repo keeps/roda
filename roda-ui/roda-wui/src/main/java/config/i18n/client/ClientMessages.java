@@ -197,6 +197,8 @@ public interface ClientMessages extends Messages {
 
   String errorLoadingPreservationEventDetails(String message);
 
+  String errorLoadingJobReport(String message);
+
   String titleDatesEmpty();
 
   String titleDatesNoFinal(String dateInitial);
