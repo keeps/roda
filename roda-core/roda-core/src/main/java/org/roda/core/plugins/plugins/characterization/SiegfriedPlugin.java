@@ -124,7 +124,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
               if (AIPState.INGEST_PROCESSING.equals(aip.getState())) {
                 for (Representation representation : aip.getRepresentations()) {
                   LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-                  sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation));
+                  sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation, cachedJob.getId()));
                   model.notifyRepresentationUpdated(representation).failOnError();
                 }
 
