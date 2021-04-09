@@ -1710,12 +1710,12 @@ public final class PluginHelper {
       PluginHelper.acquireObjectLock(objectsToLock.stream().map(obj -> obj.getInfo()).collect(Collectors.toList()),
         requestUuid);
 
-      String failureMessage = "";
       for (LiteRODAObject object : objectsToLock) {
         OptionalWithCause<T> retrievedObject = (OptionalWithCause<T>) model.retrieveObjectFromLite(object);
         if (retrievedObject.isPresent()) {
           finalObjects.add(retrievedObject.get());
         } else {
+          String failureMessage;
           RODAException exception = retrievedObject.getCause();
           if (exception != null) {
             failureMessage = "RODA object conversion from lite throwed an error: [" + exception.getClass().getName()
@@ -1723,12 +1723,11 @@ public final class PluginHelper {
           } else {
             failureMessage = "RODA object conversion from lite throwed an error.";
           }
+
+          reportFailureTransformingLiteInObject(model, plugin, report, pluginInfo, job, LiteOptionalWithCause.of(object),
+              failureMessage, Optional.of(object));
         }
-
-        reportFailureTransformingLiteInObject(model, plugin, report, pluginInfo, job, LiteOptionalWithCause.of(object),
-          failureMessage, Optional.of(object));
       }
-
     }
 
     return finalObjects;
