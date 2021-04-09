@@ -70,18 +70,20 @@ public class UserLogin extends RodaWuiController {
    *           if the roda user info could not be retrieved
    */
   public static void casLogin(String username, HttpServletRequest request) throws RODAException {
-    User user;
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     try {
-      // delegate
-      user = UserLoginHelper.casLogin(username, request);
+      User requestUser = UserUtility.getUser(request, false);
 
-      // register action
-      controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_USERNAME_PARAM,
-        username);
+      if (requestUser == null || !username.equals(requestUser.getName())) {
+        // delegate
+        User user = UserLoginHelper.casLogin(username, request);
+        // register action
+        controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_USERNAME_PARAM,
+          username);
+      }
     } catch (AuthenticationDeniedException e) {
-      user = UserUtility.getGuest(request.getRemoteAddr());
+      User user = UserUtility.getGuest(request.getRemoteAddr());
       // register action
       controllerAssistant.registerAction(user, LogEntryState.FAILURE, RodaConstants.CONTROLLER_USERNAME_PARAM,
         username);
