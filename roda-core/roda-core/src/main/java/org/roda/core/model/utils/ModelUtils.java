@@ -966,4 +966,19 @@ public final class ModelUtils {
       FileUtils.deleteDirectory(tempPath.toFile());
     }
   }
+
+  public static void removeTemporaryAIPShallow(String jobId, List<AIP> aips) {
+    Path tempPath;
+    for (AIP aip : aips) {
+      try {
+        tempPath = RodaCoreFactory.getFileShallowTmpDirectoryPath().resolve(jobId)
+          .resolve(String.valueOf(getAIPStoragePath(aip.getId()).hashCode()));
+        if (Files.exists(tempPath)) {
+          FileUtils.deleteDirectory(tempPath.toFile());
+        }
+      } catch (IOException | RequestNotValidException e) {
+        LOGGER.error("Could not delete temporary AIP shallow" + aip.getId());
+      }
+    }
+  }
 }

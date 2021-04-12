@@ -286,6 +286,8 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         PluginHelper.moveSIPs(this, model, index, resources, jobPluginInfo);
       }
 
+      ModelUtils.removeTemporaryAIPShallow(cachedJob.getId(), aips);
+
       createIngestEndedEvent(model, index, jobPluginInfo, cachedJob);
 
       getAfterExecute().ifPresent(e -> e.execute(jobPluginInfo, aips));
