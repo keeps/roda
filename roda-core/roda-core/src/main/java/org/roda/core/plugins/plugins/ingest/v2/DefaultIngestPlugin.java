@@ -185,6 +185,8 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       // remove SIP if property set and SIP was not moved to another location
       removeSIPAfterIngestEnded(model, resources, jobPluginInfo, cachedJob);
 
+      ModelUtils.removeTemporaryAIPShallow(cachedJob.getId(), aips);
+
       // X) final job info update
       jobPluginInfo.updateSourceObjectsProcessed();
       jobPluginInfo.finalizeInfo();
@@ -213,7 +215,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       Job job = PluginHelper.getJob(this, model);
       ModelUtils.removeTemporaryResourceShallow(job.getId());
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException
-        | IOException e) {
+      | IOException e) {
       LOGGER.error("Could not remove temporary file shallow", e);
     }
 
