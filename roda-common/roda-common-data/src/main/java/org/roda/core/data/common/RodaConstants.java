@@ -626,7 +626,6 @@ public final class RodaConstants {
   public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME = "holds.jsonl";
   public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_TRANSITIVE_HOLDS_FILENAME = "transitive-holds.jsonl";
 
-
   public static final String STORAGE_HISTORY_CONTAINER_DATA = "data";
   public static final String STORAGE_HISTORY_CONTAINER_METADATA = "metadata";
 
@@ -1704,6 +1703,14 @@ public final class RodaConstants {
   public static final int HTTP_RESPONSE_CODE_SERVER_ERROR = 500;
   /* File Shallow */
   public static final String RODA_EXTERNAL_FILE = "external_files.jsonl";
+
+  /* HTTP Response codes */
+  public static final int HTTP_RESPONSE_CODE_SUCCESS = 200;
+  public static final int HTTP_RESPONSE_CODE_BAD_REQUEST = 400;
+  public static final int HTTP_RESPONSE_CODE_UNAUTHORIZED = 401;
+  public static final int HTTP_RESPONSE_CODE_NOT_FOUND = 404;
+  public static final int HTTP_RESPONSE_CODE_REQUEST_CONFLICT = 409;
+  public static final int HTTP_RESPONSE_CODE_SERVER_ERROR = 500;
 
   /** Private empty constructor */
   private RodaConstants() {
