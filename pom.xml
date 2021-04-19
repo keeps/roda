@@ -505,7 +505,7 @@
 			<dependency>
 				<groupId>com.thoughtworks.xstream</groupId>
 				<artifactId>xstream</artifactId>
-				<version>1.4.14-jdk7</version>
+				<version>1.4.16</version>
 			</dependency>
 			<dependency>
 				<groupId>com.toedter</groupId>
@@ -847,7 +847,7 @@
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
-				<version>26.0-jre</version>
+				<version>29.0-jre</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apache.solr</groupId>
