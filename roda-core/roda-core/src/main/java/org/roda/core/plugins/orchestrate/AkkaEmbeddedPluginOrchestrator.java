@@ -462,7 +462,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public void setJobContextInformation(String jobId, Object object) {
     runningJobs.put(jobId, (ActorRef) object);
-    LOGGER.debug("Running jobs: {}", runningJobs);
+    LOGGER.debug("Running jobs: {}", runningJobs.keySet());
   }
 
   public ActorRef getJobContextInformation(String jobId) {
