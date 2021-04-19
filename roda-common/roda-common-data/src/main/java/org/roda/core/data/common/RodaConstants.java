@@ -46,6 +46,12 @@ public final class RodaConstants {
   public static final String CORE_EVENTS_NOTIFIER_CLASS = "core.events.notifier_class";
   public static final String CORE_EVENTS_HANDLER_CLASS = "core.events.handler_class";
 
+  public static final String CORE_ACTION_LOGS_MASTER_USER = "core.action_logs.master.user";
+  public static final String CORE_ACTION_LOGS_MASTER_PASS = "core.action_logs.master.pass";
+  public static final String CORE_ACTION_LOGS_MASTER_URL = "core.action_logs.master.url";
+  public static final String CORE_ACTION_LOGS_MASTER_RESOURCE = "core.action_logs.master.resource";
+  public static final String CORE_ACTION_LOGS_SLAVE_WRITE_IN_SOLR = "core.action_logs.slave.write.solr";
+
   public static final String TRASH_CONTAINER = "trash";
 
   public static final String TRANSFERRED_RESOURCES_PROCESSED_FOLDER = "PROCESSED";
@@ -308,6 +314,7 @@ public final class RodaConstants {
   public static final String API_QUERY_KEY_FACET_LIMIT = "facetLimit";
   public static final String API_QUERY_KEY_EXPORT_FACETS = "exportFacets";
   public static final String API_QUERY_KEY_FILENAME = "filename";
+  public static final String API_QUERY_KEY_FILE = "file";
   // "http path param" related strings
   public static final String API_PATH_PARAM_AIP_ID = "aip_id";
   public static final String API_PATH_PARAM_REPRESENTATION_ID = "representation_id";
