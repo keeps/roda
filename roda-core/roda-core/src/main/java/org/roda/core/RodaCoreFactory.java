@@ -374,6 +374,11 @@ public class RodaCoreFactory {
   }
 
   public static void instantiateTest(boolean deploySolr, boolean deployLdap, boolean deployTransferredResourcesScanner,
+                                    boolean deployOrchestrator, boolean deployPluginManager, boolean deployDefaultResources) {
+    instantiateTest(deploySolr, deployLdap, deployTransferredResourcesScanner, deployOrchestrator, deployPluginManager, deployDefaultResources, false);
+  }
+
+  public static void instantiateTest(boolean deploySolr, boolean deployLdap, boolean deployTransferredResourcesScanner,
     boolean deployOrchestrator, boolean deployPluginManager, boolean deployDefaultResources,
     boolean deployProtocolManager) {
     INSTANTIATE_SOLR = deploySolr;
