@@ -139,6 +139,7 @@ import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.ShallowFileContentPayload;
 import org.roda.core.util.HTTPUtility;
 import org.roda.core.util.IdUtils;
+import org.roda.core.util.RESTClientUtility;
 import org.roda_project.commons_ip2.mets_v1_12.beans.FileType;
 import org.roda_project.commons_ip2.model.IPFileShallow;
 import org.slf4j.Logger;
@@ -1940,7 +1941,10 @@ public class ModelService extends ModelObservable {
         entryLogLineNumber = 1;
         if (writeIsAllowed) {
           findOldLogsAndMoveThemToStorage(logDirectory, logFile);
+        } else {
+          findOldLogsAndSendThemToMaster(logDirectory, logFile);
         }
+
         try {
           Files.createFile(logFile);
         } catch (FileAlreadyExistsException e) {
@@ -1962,7 +1966,8 @@ public class ModelService extends ModelObservable {
       entryLogLineNumber++;
 
       // emit event
-      if (notify && writeIsAllowed) {
+      boolean slaveWriteInSolr = RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_SLAVE_WRITE_IN_SOLR, false);
+      if (notify && (writeIsAllowed || slaveWriteInSolr)) {
         notifyLogEntryCreated(logEntry).failOnError();
       }
     }
@@ -1971,6 +1976,32 @@ public class ModelService extends ModelObservable {
   public void addLogEntry(LogEntry logEntry, Path logDirectory)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     addLogEntry(logEntry, logDirectory, true);
+  }
+
+  public synchronized void findOldLogsAndSendThemToMaster(Path logDirectory, Path currentLogFile) {
+
+    String username = RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_MASTER_USER, "");
+    String password = RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_MASTER_PASS, "");
+    String url = RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_MASTER_URL, "");
+    String resource = RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_MASTER_RESOURCE, "");
+
+    try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(logDirectory)) {
+      for (Path path : directoryStream) {
+        if (!path.equals(currentLogFile)) {
+          int httpExitCode = RESTClientUtility.sendPostRequestWithFile(url, resource, username, password, path);
+          if (httpExitCode == RodaConstants.HTTP_RESPONSE_CODE_SUCCESS) {
+            LOGGER.info("The action log file ({}) was moved to Master successfully!", path);
+          } else {
+            LOGGER.error(
+              "The action log file (" + path + ") was not moved to Master due to http response error: " + httpExitCode);
+          }
+        }
+      }
+    } catch (IOException e) {
+      LOGGER.error("Error listing directory for log files", e);
+    } catch (RODAException e) {
+      LOGGER.error("Error sending slave logs to master", e);
+    }
   }
 
   public synchronized void findOldLogsAndMoveThemToStorage(Path logDirectory, Path currentLogFile)

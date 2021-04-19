@@ -46,6 +46,12 @@ public final class RodaConstants {
   public static final String CORE_EVENTS_NOTIFIER_CLASS = "core.events.notifier_class";
   public static final String CORE_EVENTS_HANDLER_CLASS = "core.events.handler_class";
 
+  public static final String CORE_ACTION_LOGS_MASTER_USER = "core.action_logs.master.user";
+  public static final String CORE_ACTION_LOGS_MASTER_PASS = "core.action_logs.master.pass";
+  public static final String CORE_ACTION_LOGS_MASTER_URL = "core.action_logs.master.url";
+  public static final String CORE_ACTION_LOGS_MASTER_RESOURCE = "core.action_logs.master.resource";
+  public static final String CORE_ACTION_LOGS_SLAVE_WRITE_IN_SOLR = "core.action_logs.slave.write.solr";
+
   public static final String TRASH_CONTAINER = "trash";
 
   public static final String TRANSFERRED_RESOURCES_PROCESSED_FOLDER = "PROCESSED";
@@ -334,6 +340,7 @@ public final class RodaConstants {
   public static final String API_QUERY_KEY_FACET_LIMIT = "facetLimit";
   public static final String API_QUERY_KEY_EXPORT_FACETS = "exportFacets";
   public static final String API_QUERY_KEY_FILENAME = "filename";
+  public static final String API_QUERY_KEY_FILE = "file";
   // "http path param" related strings
   public static final String API_PATH_PARAM_AIP_ID = "aip_id";
   public static final String API_PATH_PARAM_REPRESENTATION_ID = "representation_id";
@@ -613,7 +620,6 @@ public final class RodaConstants {
   public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES_FILENAME = "schedules.jsonl";
   public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME = "holds.jsonl";
   public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_TRANSITIVE_HOLDS_FILENAME = "transitive-holds.jsonl";
-
 
   public static final String STORAGE_HISTORY_CONTAINER_DATA = "data";
   public static final String STORAGE_HISTORY_CONTAINER_METADATA = "metadata";
@@ -1682,6 +1688,14 @@ public final class RodaConstants {
 
   /* File Shallow */
   public static final String RODA_EXTERNAL_FILE = "external_files.jsonl";
+
+  /* HTTP Response codes */
+  public static final int HTTP_RESPONSE_CODE_SUCCESS = 200;
+  public static final int HTTP_RESPONSE_CODE_BAD_REQUEST = 400;
+  public static final int HTTP_RESPONSE_CODE_UNAUTHORIZED = 401;
+  public static final int HTTP_RESPONSE_CODE_NOT_FOUND = 404;
+  public static final int HTTP_RESPONSE_CODE_REQUEST_CONFLICT = 409;
+  public static final int HTTP_RESPONSE_CODE_SERVER_ERROR = 500;
 
   /** Private empty constructor */
   private RodaConstants() {

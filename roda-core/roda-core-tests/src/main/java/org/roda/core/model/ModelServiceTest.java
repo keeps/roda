@@ -72,6 +72,7 @@ import org.roda.core.storage.StorageTestUtils;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.util.IdUtils;
+import org.roda.core.util.RESTClientUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -86,6 +87,8 @@ import gov.loc.premis.v3.EventComplexType;
 import gov.loc.premis.v3.ObjectCharacteristicsComplexType;
 import gov.loc.premis.v3.ObjectIdentifierComplexType;
 import jersey.repackaged.com.google.common.collect.Lists;
+
+import javax.json.Json;
 
 /**
  * Unit tests for ModelService
@@ -943,6 +946,15 @@ public class ModelServiceTest {
     assertEquals(CorporaConstants.INGEST_CREATE_AIP, agent.getAgentNameArray(0).getStringValue());
 
   }
+
+  /*
+   * @Test public void testImportLog() throws RODAException, IOException { Path
+   * dummyLogFile = corporaPath.resolve("logs").resolve("dummy.log"); int response
+   * = RESTClientUtility.sendPostRequestWithFile("http://localhost:8080",
+   * "/api/v1/log_entries", "admin", "roda", dummyLogFile);
+   * 
+   * assertEquals(response, RodaConstants.HTTP_RESPONSE_CODE_SUCCESS); }
+   */
 
   @Test
   public void createLogEntry() throws RODAException {
