@@ -1523,6 +1523,14 @@ public final class RodaConstants {
 
   public static final String RODA_NODE_TYPE_KEY = "nodeType";
 
+  /* HTTP Response codes */
+  public static final int HTTP_RESPONSE_CODE_SUCCESS = 200;
+  public static final int HTTP_RESPONSE_CODE_BAD_REQUEST = 400;
+  public static final int HTTP_RESPONSE_CODE_UNAUTHORIZED = 401;
+  public static final int HTTP_RESPONSE_CODE_NOT_FOUND = 404;
+  public static final int HTTP_RESPONSE_CODE_REQUEST_CONFLICT = 409;
+  public static final int HTTP_RESPONSE_CODE_SERVER_ERROR = 500;
+
   /** Private empty constructor */
   private RodaConstants() {
     // do nothing
