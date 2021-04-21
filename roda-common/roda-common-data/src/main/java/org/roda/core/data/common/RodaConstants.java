@@ -1636,14 +1636,14 @@ public final class RodaConstants {
   }
 
   public static final List<String> REPRESENTATION_FIELDS_TO_RETURN = Arrays.asList(RodaConstants.INDEX_UUID,
-    RodaConstants.REPRESENTATION_ID, RodaConstants.REPRESENTATION_AIP_ID);
+      RodaConstants.REPRESENTATION_ID, RodaConstants.REPRESENTATION_AIP_ID);
 
   public static final List<String> FILE_FIELDS_TO_RETURN = Arrays.asList(RodaConstants.INDEX_UUID,
-    RodaConstants.INDEX_ID, RodaConstants.FILE_PATH, RodaConstants.FILE_REPRESENTATION_ID, RodaConstants.FILE_AIP_ID,
-    RodaConstants.FILE_ISDIRECTORY);
+      RodaConstants.INDEX_ID, RodaConstants.FILE_PATH, RodaConstants.FILE_REPRESENTATION_ID, RodaConstants.FILE_AIP_ID,
+      RodaConstants.FILE_ISDIRECTORY);
 
   public static final List<String> FILE_FORMAT_FIELDS_TO_RETURN = Arrays.asList(RodaConstants.INDEX_UUID,
-    RodaConstants.INDEX_ID, RodaConstants.FILE_FORMAT_MIMETYPE, RodaConstants.FILE_PRONOM);
+      RodaConstants.INDEX_ID, RodaConstants.FILE_FORMAT_MIMETYPE, RodaConstants.FILE_PRONOM);
 
   public static final List<String> DIP_PERMISSIONS_FIELDS_TO_RETURN = new ArrayList<>();
   static {
@@ -1657,8 +1657,8 @@ public final class RodaConstants {
   }
 
   public static final List<String> DIPFILE_FIELDS_TO_RETURN = Arrays.asList(RodaConstants.INDEX_UUID,
-    RodaConstants.DIPFILE_ID, RodaConstants.DIPFILE_PATH, RodaConstants.DIPFILE_DIP_ID,
-    RodaConstants.DIPFILE_IS_DIRECTORY);
+      RodaConstants.DIPFILE_ID, RodaConstants.DIPFILE_PATH, RodaConstants.DIPFILE_DIP_ID,
+      RodaConstants.DIPFILE_IS_DIRECTORY);
 
   public static final String PERMISSION_METHOD_FIND_AIP = "org.roda.wui.api.controllers.Browser.find(IndexedAIP)";
   public static final String PERMISSION_METHOD_FIND_REPRESENTATION = "org.roda.wui.api.controllers.Browser.find(IndexedRepresentation)";
@@ -1779,7 +1779,7 @@ public final class RodaConstants {
   public static final String SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FOLDER = "local-instance";
   public static final String SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE = "config.yaml";
   public static final String SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE_PATH = SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FOLDER
-    + "/" + SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE;
+      + "/" + SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE;
   public static final String SYNCHRONIZATION_BUNDLE_PATH = "data/synchronization/bundle";
 
   public static final String PROTOCOL_SEPARATOR = "://";
