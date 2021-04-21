@@ -1991,6 +1991,7 @@ public class ModelService extends ModelObservable {
           int httpExitCode = RESTClientUtility.sendPostRequestWithFile(url, resource, username, password, path);
           if (httpExitCode == RodaConstants.HTTP_RESPONSE_CODE_SUCCESS) {
             LOGGER.info("The action log file ({}) was moved to Master successfully!", path);
+            Files.delete(path);
           } else {
             LOGGER.error(
               "The action log file (" + path + ") was not moved to Master due to http response error: " + httpExitCode);
