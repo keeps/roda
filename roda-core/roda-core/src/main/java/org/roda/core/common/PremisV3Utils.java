@@ -815,6 +815,13 @@ public final class PremisV3Utils {
 
   public static void updateFormatPreservationMetadata(ModelService model, String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId, String format, String version, String pronom, String mime,
+    boolean notify) {
+    PremisV3Utils.updateFormatPreservationMetadata(model, aipId, representationId, fileDirectoryPath, fileId, format,
+      version, pronom, mime, notify, false);
+  }
+
+  public static void updateFormatPreservationMetadata(ModelService model, String aipId, String representationId,
+    List<String> fileDirectoryPath, String fileId, String format, String version, String pronom, String mime,
     boolean notify, boolean shallow) {
     Binary premisBin;
 
