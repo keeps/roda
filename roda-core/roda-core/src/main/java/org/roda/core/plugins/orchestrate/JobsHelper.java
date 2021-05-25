@@ -340,7 +340,7 @@ public final class JobsHelper {
       if (indexedFile.isReference()) {
         File file = new File(indexedFile.getId(), indexedFile.getAipId(), indexedFile.getRepresentationId(),
           indexedFile.getPath(), indexedFile.isDirectory(), indexedFile.isReference(), indexedFile.getReferenceURL(),
-          indexedFile.getReferenceManifest(), indexedFile.getReferenceUUID());
+          indexedFile.getReferenceManifest(), indexedFile.getReferenceUUID(), null);
         filesToReturn.add(file);
       } else {
         filesToReturn.add(model.retrieveFile(indexedFile.getAipId(), indexedFile.getRepresentationId(),

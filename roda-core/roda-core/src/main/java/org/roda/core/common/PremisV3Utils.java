@@ -38,6 +38,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationAgentType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AlreadyHasInstanceIdentifier;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -46,6 +47,8 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.metadata.Fixity;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
@@ -59,6 +62,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.plugins.characterization.PremisSkeletonPluginUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.utils.LocalInstanceUtils;
 import org.roda.core.util.FileUtility;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -331,6 +335,60 @@ public final class PremisV3Utils {
     return MetadataUtils.saveToContentPayload(FACTORY.createEvent(ect), EventComplexType.class, true);
   }
 
+  public static ContentPayload retrievePremisEventBinary(String eventID, Date date, String type, String details,
+    List<LinkingIdentifier> sources, List<LinkingIdentifier> outcomes, String outcome, String detailNote,
+    String detailExtension, List<LinkingIdentifier> agentIds) throws GenericException, ValidationException {
+    EventDocument event = EventDocument.Factory.newInstance();
+    EventComplexType ect = event.addNewEvent();
+    EventIdentifierComplexType eict = ect.addNewEventIdentifier();
+    eict.setEventIdentifierValue(eventID);
+    eict.setEventIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
+    ect.setEventDateTime(DateParser.getIsoDate(date));
+    ect.setEventType(getStringPlusAuthority(type));
+    EventDetailInformationComplexType edict = ect.addNewEventDetailInformation();
+    edict.setEventDetail(details);
+    if (sources != null) {
+      for (LinkingIdentifier identifier : sources) {
+        LinkingObjectIdentifierComplexType loict = ect.addNewLinkingObjectIdentifier();
+        loict.setLinkingObjectIdentifierValue(identifier.getValue());
+        loict.setLinkingObjectIdentifierType(getStringPlusAuthority(identifier.getType()));
+        if (identifier.getRoles() != null) {
+          loict.setLinkingObjectRoleArray(getStringPlusAuthorityArray(identifier.getRoles()));
+        }
+      }
+    }
+
+    if (outcomes != null) {
+      for (LinkingIdentifier identifier : outcomes) {
+        LinkingObjectIdentifierComplexType loict = ect.addNewLinkingObjectIdentifier();
+        loict.setLinkingObjectIdentifierValue(identifier.getValue());
+        loict.setLinkingObjectIdentifierType(getStringPlusAuthority(identifier.getType()));
+        if (identifier.getRoles() != null) {
+          loict.setLinkingObjectRoleArray(getStringPlusAuthorityArray(identifier.getRoles()));
+        }
+      }
+    }
+
+    if (agentIds != null) {
+      for (LinkingIdentifier agentId : agentIds) {
+        LinkingAgentIdentifierComplexType agentIdentifier = ect.addNewLinkingAgentIdentifier();
+        agentIdentifier.setLinkingAgentIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
+        agentIdentifier.setLinkingAgentIdentifierValue(agentId.getValue());
+      }
+    }
+
+    EventOutcomeInformationComplexType outcomeInformation = ect.addNewEventOutcomeInformation();
+    outcomeInformation.setEventOutcome(getStringPlusAuthority(outcome));
+    StringBuilder outcomeDetailNote = new StringBuilder(detailNote);
+    if (StringUtils.isNotBlank(detailExtension)) {
+      outcomeDetailNote.append("\n").append(detailExtension);
+    }
+    EventOutcomeDetailComplexType eodct = outcomeInformation.addNewEventOutcomeDetail();
+    eodct.setEventOutcomeDetailNote(outcomeDetailNote.toString());
+
+    return MetadataUtils.saveToContentPayload(event, true);
+  }
+
   public static ContentPayload createPremisAgentBinary(String id, String name, PreservationAgentType type,
     String extension, String note, String version) {
     AgentComplexType agent = FACTORY.createAgentComplexType();
@@ -363,7 +421,8 @@ public final class PremisV3Utils {
 
     ObjectIdentifierComplexType objectIdentifier = FACTORY.createObjectIdentifierComplexType();
     objectIdentifier.setObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
-    objectIdentifier.setObjectIdentifierValue(IdUtils.getRepresentationPreservationId(aipId, representationId));
+    objectIdentifier.setObjectIdentifierValue(IdUtils.getRepresentationPreservationId(aipId, representationId,
+      LocalInstanceUtils.getLocalInstanceIdentifier()));
     representation.getObjectIdentifier().add(objectIdentifier);
     PreservationLevelComplexType preservationLevelComplexType = FACTORY.createPreservationLevelComplexType();
     preservationLevelComplexType.setPreservationLevelType(getStringPlusAuthority(""));
@@ -383,15 +442,15 @@ public final class PremisV3Utils {
 
     // URN-local identifier
     ObjectIdentifierComplexType objectIdentifier = FACTORY.createObjectIdentifierComplexType();
-    objectIdentifier.setObjectIdentifierValue(
-      URNUtils.createRodaPreservationURN(PreservationMetadataType.FILE, originalFile.getId()));
+    objectIdentifier.setObjectIdentifierValue(URNUtils.createRodaPreservationURN(PreservationMetadataType.FILE,
+      originalFile.getId(), LocalInstanceUtils.getLocalInstanceIdentifier()));
     objectIdentifier.setObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN_LOCAL));
     file.getObjectIdentifier().add(objectIdentifier);
 
     // URN identifier (UUID)
     ObjectIdentifierComplexType objectIdentifier2 = FACTORY.createObjectIdentifierComplexType();
-    objectIdentifier2.setObjectIdentifierValue(
-      URNUtils.createRodaPreservationURN(PreservationMetadataType.FILE, IdUtils.getFileId(originalFile)));
+    objectIdentifier2.setObjectIdentifierValue(URNUtils.createRodaPreservationURN(PreservationMetadataType.FILE,
+      IdUtils.getFileId(originalFile), LocalInstanceUtils.getLocalInstanceIdentifier()));
     objectIdentifier2.setObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
     file.getObjectIdentifier().add(objectIdentifier2);
 
@@ -405,7 +464,6 @@ public final class PremisV3Utils {
     file.getObjectCharacteristics().add(objectCharacteristics);
 
     Binary binary = model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile));
-
     if (binary != null && binary.getContentDigest() != null && !binary.getContentDigest().isEmpty()) {
       // use binary content digest information
       for (Entry<String, String> entry : binary.getContentDigest().entrySet()) {
@@ -730,7 +788,8 @@ public final class PremisV3Utils {
   public static PreservationMetadata createPremisAgentBinary(Plugin<?> plugin, ModelService model, boolean notify)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
     ValidationException, AlreadyExistsException {
-    String id = IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion());
+    String id = IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion(),
+      LocalInstanceUtils.getLocalInstanceIdentifier());
     ContentPayload agentPayload = PremisV3Utils.createPremisAgentBinary(id, plugin.getName(), plugin.getAgentType(), "",
       plugin.getDescription(), plugin.getVersion());
     return model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
@@ -823,13 +882,75 @@ public final class PremisV3Utils {
     return dst;
   }
 
+  public static void updatePremisEventInstanceId(PreservationMetadata pm, ModelService model, IndexService index,
+    String instanceId) throws AuthorizationDeniedException, RequestNotValidException, NotFoundException,
+    GenericException, ValidationException, AlreadyExistsException, AlreadyHasInstanceIdentifier {
+
+    if (URNUtils.hasIntanceId(pm.getId(), instanceId)) {
+      throw new AlreadyHasInstanceIdentifier(
+        "The preservation event (" + pm.getId() + ") already has instance identifier");
+    }
+
+    IndexedPreservationEvent event = index.retrieve(IndexedPreservationEvent.class, pm.getId(), new ArrayList<>());
+
+    String updatedId = IdUtils.updatePreservationMetadataInstanceId(pm.getId(), instanceId);
+
+    ContentPayload payload = PremisV3Utils.retrievePremisEventBinary(updatedId, event.getEventDateTime(),
+      event.getEventType(), event.getEventDetail(), event.getSourcesObjectIds(), event.getOutcomeObjectIds(),
+      event.getEventOutcome(), event.getEventDetail(), null, event.getLinkingAgentIds());
+
+    model.createPreservationMetadata(pm.getType(), updatedId, pm.getAipId(), pm.getRepresentationId(),
+      pm.getFileDirectoryPath(), pm.getFileId(), payload, true);
+
+    model.deletePreservationMetadata(pm.getType(), pm.getAipId(), pm.getRepresentationId(), pm.getId(), true);
+
+  }
+
+  public static void updatePremisUserAgentId(PreservationMetadata pm, ModelService model, IndexService index,
+    String instanceId) throws GenericException, AuthorizationDeniedException, RequestNotValidException,
+    AlreadyExistsException, ValidationException, NotFoundException {
+
+    String updatedId = IdUtils.updatePreservationMetadataInstanceId(pm.getId(), instanceId);
+
+    IndexedPreservationAgent agent;
+    try {
+      agent = index.retrieve(IndexedPreservationAgent.class, pm.getId(), new ArrayList<>());
+
+      ContentPayload agentPayload = PremisV3Utils.createPremisAgentBinary(updatedId, agent.getName(),
+        PreservationAgentType.valueOf(agent.getType().toUpperCase()), agent.getExtension(), agent.getNote(),
+        agent.getVersion());
+
+      model.createPreservationMetadata(PreservationMetadataType.AGENT, updatedId, agentPayload, true);
+
+      model.deletePreservationMetadata(PreservationMetadataType.AGENT, pm.getAipId(), pm.getRepresentationId(),
+        pm.getId(), true);
+
+    } catch (NotFoundException e) {
+      RODAMember member = index.retrieve(RODAMember.class,
+        IdUtils.getUserId(URNUtils.getAgentUsernameFromURN(pm.getId())),
+        Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.MEMBERS_FULLNAME, RodaConstants.MEMBERS_EMAIL));
+      if (member instanceof User) {
+        User user = (User) member;
+        String note = user.getEmail();
+        ContentPayload agentPayload = PremisV3Utils.createPremisAgentBinary(updatedId, member.getFullName(),
+          PreservationAgentType.PERSON, null, note, null);
+
+        model.createPreservationMetadata(PreservationMetadataType.AGENT, updatedId, agentPayload, true);
+
+        model.deletePreservationMetadata(PreservationMetadataType.AGENT, pm.getAipId(), pm.getRepresentationId(),
+          pm.getId(), true);
+      }
+    }
+
+  }
+
   public static PreservationMetadata createOrUpdatePremisUserAgentBinary(String username, ModelService model,
     IndexService index, boolean notify) throws GenericException, ValidationException, NotFoundException,
     RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
     PreservationMetadata pm = null;
 
     if (StringUtils.isNotBlank(username)) {
-      String id = IdUtils.getUserAgentId(username);
+      String id = IdUtils.getUserAgentId(username, LocalInstanceUtils.getLocalInstanceIdentifier());
       String fullName = "";
       String extension = "";
       String note = "";
@@ -896,7 +1017,7 @@ public final class PremisV3Utils {
       PremisV3Utils.updateFileFormat(premisFile, format, version, pronom, mime);
 
       PreservationMetadataType type = PreservationMetadataType.FILE;
-      String id = IdUtils.getPreservationFileId(fileDirectoryPath, fileId);
+      String id = IdUtils.getPreservationFileId(fileId, LocalInstanceUtils.getLocalInstanceIdentifier());
 
       ContentPayload premisFilePayload = fileToBinary(premisFile);
       model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, premisFilePayload,
@@ -927,7 +1048,7 @@ public final class PremisV3Utils {
         dateCreatedByApplication);
 
       PreservationMetadataType type = PreservationMetadataType.FILE;
-      String id = IdUtils.getPreservationFileId(fileDirectoryPath, fileId);
+      String id = IdUtils.getPreservationFileId(fileId, LocalInstanceUtils.getLocalInstanceIdentifier());
 
       ContentPayload premisFilePayload = fileToBinary(premisFile);
       model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, premisFilePayload,

@@ -13,6 +13,8 @@ import java.util.Set;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.accessKey.AccessKey;
+import org.roda.core.data.v2.distributedInstance.LocalInstanceIdentifierState;
+import org.roda.core.data.v2.distributedInstance.LocalInstance;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.distributedInstance.DistributedInstance;
@@ -770,4 +772,25 @@ public class HtmlSnippetUtils {
     }
     return ret;
   }
+
+  public static SafeHtml getInstanceIdStateHtml(LocalInstance localInstance) {
+    SafeHtml ret = null;
+    if (localInstance != null) {
+      SafeHtmlBuilder b = new SafeHtmlBuilder();
+      if (localInstance.getInstanceIdentifierState().equals(LocalInstanceIdentifierState.ACTIVE)) {
+        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
+        b.append(
+          SafeHtmlUtils.fromString(messages.localInstanceIdentifierState(localInstance.getInstanceIdentifierState())));
+      } else {
+        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT));
+        b.append(
+          SafeHtmlUtils.fromString(messages.localInstanceIdentifierState(localInstance.getInstanceIdentifierState())));
+      }
+
+      b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+      ret = b.toSafeHtml();
+    }
+    return ret;
+  }
+
 }

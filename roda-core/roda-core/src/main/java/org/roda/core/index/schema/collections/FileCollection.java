@@ -82,6 +82,7 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
     fields.add(new Field(RodaConstants.FILE_AIP_ID, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.FILE_REPRESENTATION_ID, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.FILE_REPRESENTATION_UUID, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.FILE_INSTANCE_ID, Field.TYPE_STRING));
 
     fields.add(new Field(RodaConstants.FILE_STORAGE_PATH, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.FILE_FORMAT_MIMETYPE, Field.TYPE_STRING));
@@ -171,6 +172,7 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
       IdUtils.getRepresentationId(file.getAipId(), file.getRepresentationId()));
     doc.addField(RodaConstants.FILE_ISDIRECTORY, file.isDirectory());
     doc.addField(RodaConstants.FILE_ISREFERENCE, file.isReference());
+    doc.addField(RodaConstants.FILE_INSTANCE_ID, file.getInstanceId());
 
     try {
       if (file.isReference()) {
@@ -293,6 +295,8 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
     String parentUUID = SolrUtils.objectToString(doc.get(RodaConstants.FILE_PARENT_UUID), null);
     List<String> ancestorsPath = SolrUtils.objectToListString(doc.get(RodaConstants.FILE_ANCESTORS_PATH));
 
+    String instanceId = SolrUtils.objectToString(doc.get(RodaConstants.FILE_INSTANCE_ID), null);
+
     String originalName = SolrUtils.objectToString(doc.get(RodaConstants.FILE_ORIGINALNAME), null);
     List<String> hash = SolrUtils.objectToListString(doc.get(RodaConstants.FILE_HASH));
     long size = SolrUtils.objectToLong(doc.get(RodaConstants.FILE_SIZE), 0L);
@@ -361,6 +365,7 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
     ret.setAncestors(ancestors);
     ret.setOtherProperties(otherProperties);
     ret.setFields(indexedFields);
+    ret.setInstanceId(instanceId);
 
     return ret;
   }

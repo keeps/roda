@@ -24,6 +24,8 @@ public class LocalInstance implements IsModelObject {
   private Boolean isRegistered;
   private Date lastSynchronizationDate;
 
+  private LocalInstanceIdentifierState instanceIdentifierState = LocalInstanceIdentifierState.INACTIVE;
+
   private Date createdOn;
   private String createdBy;
   private Date updatedOn;
@@ -114,22 +116,25 @@ public class LocalInstance implements IsModelObject {
     this.updatedBy = updatedBy;
   }
 
+  public LocalInstanceIdentifierState getInstanceIdentifierState() {
+    return instanceIdentifierState;
+  }
+
+  public void setInstanceIdentifierState(LocalInstanceIdentifierState instanceIdentifierState) {
+    this.instanceIdentifierState = instanceIdentifierState;
+  }
+
   @JsonIgnore
   @Override
   public int getClassVersion() {
-    return 0;
+    return VERSION;
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    LocalInstance that = (LocalInstance) o;
-
-    if (id != null ? !id.equals(that.id) : that.id != null) return false;
-    if (accessKey != null ? !accessKey.equals(that.accessKey) : that.accessKey != null) return false;
-    if (centralInstanceURL != null ? !centralInstanceURL.equals(that.centralInstanceURL) : that.centralInstanceURL != null)
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
       return false;
     if (bundlePath != null ? !bundlePath.equals(that.bundlePath) : that.bundlePath != null) return false;
     if (isRegistered != null ? !isRegistered.equals(that.isRegistered) : that.isRegistered != null) return false;

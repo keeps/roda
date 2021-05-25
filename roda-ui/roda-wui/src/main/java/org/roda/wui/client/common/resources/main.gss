@@ -6187,6 +6187,10 @@ td.datePickerMonth, td.datePickerYear {
 	content: "\f021";
 }
 
+.plugin-list-item-icon-synchronization:before {
+	content: "\f126";
+}
+
 .plugin-list-item-icon-conversion:before {
 	content: "\f085";
 }

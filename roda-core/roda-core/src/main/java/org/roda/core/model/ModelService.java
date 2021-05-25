@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import gov.loc.premis.v3.EventComplexType;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -61,6 +63,8 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.storage.utils.LocalInstanceUtils;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.utils.XMLUtils;
@@ -169,8 +173,9 @@ public class ModelService extends ModelObservable {
   private final StorageService storage;
   private final EventsManager eventsManager;
   private final NodeType nodeType;
-  private Object logFileLock = new Object();
   private String instanceId = "";
+  private Object logFileLock = new Object();
+
   private long entryLogLineNumber = -1;
 
   public ModelService(StorageService storage, EventsManager eventsManager, NodeType nodeType, String instanceId) {
@@ -324,6 +329,9 @@ public class ModelService extends ModelObservable {
       aip.setUpdatedBy(createdBy);
       aip.setUpdatedOn(new Date());
 
+      // Instance Id Management
+      aip.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
+
       if (notify) {
         notifyAipCreated(aip).failOnError();
       }
@@ -349,6 +357,9 @@ public class ModelService extends ModelObservable {
     aip.setGhost(isGhost);
     aip.setIngestSIPIds(ingestSIPIds);
     aip.setIngestJobId(ingestJobId);
+
+    // Instance Id Management
+    aip.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
 
     createAIPMetadata(aip);
 
@@ -384,6 +395,8 @@ public class ModelService extends ModelObservable {
     Permissions inheritedPermissions = this.addParentPermissions(permissions, parentId);
 
     AIP aip = new AIP(id, parentId, type, state, inheritedPermissions, createdBy);
+    // Instance Id Management
+    aip.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
     createAIPMetadata(aip);
 
     if (notify) {
@@ -404,6 +417,8 @@ public class ModelService extends ModelObservable {
 
     AIP aip = new AIP(id, parentId, type, state, inheritedPermissions, createdBy).setIngestSIPIds(ingestSIPIds)
       .setIngestJobId(ingestJobId).setIngestSIPUUID(ingestSIPUUID);
+    // Instance Id Management
+    aip.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
 
     createAIPMetadata(aip);
 
@@ -524,6 +539,18 @@ public class ModelService extends ModelObservable {
     updateAIPMetadata(aip);
 
     notifyAipStateUpdated(aip).failOnError();
+    return aip;
+  }
+
+  public AIP updateAIPInstanceId(AIP aip)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    aip.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
+    aip.setUpdatedOn(new Date());
+    updateAIPMetadata(aip);
+
+    notifyAipInstanceIdUpdated(aip).failOnError();
     return aip;
   }
 
@@ -932,6 +959,7 @@ public class ModelService extends ModelObservable {
     Representation representation = new Representation(representationId, aipId, original, type);
     representation.setCreatedBy(createdBy);
     representation.setUpdatedBy(createdBy);
+    representation.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
 
     StoragePath directoryPath = ModelUtils.getRepresentationStoragePath(aipId, representationId);
     storage.createDirectory(directoryPath);
@@ -971,6 +999,7 @@ public class ModelService extends ModelObservable {
     representation = new Representation(representationId, aipId, original, type);
     representation.setCreatedBy(createdBy);
     representation.setUpdatedBy(createdBy);
+    representation.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
 
     // update AIP metadata
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
@@ -1166,7 +1195,7 @@ public class ModelService extends ModelObservable {
       if (shallowFile != null) {
         String storagePath = FSUtils.getStoragePathAsString(filePath, false);
         return new File(shallowFile.getName(), aipId, representationId, directoryPath, false, true,
-          shallowFile.getLocation().toString(), storagePath, fileUUID);
+          shallowFile.getLocation().toString(), storagePath, fileUUID, null);
       }
     }
     throw new NotFoundException("File shallow was not found: " + fileId);
@@ -1186,6 +1215,7 @@ public class ModelService extends ModelObservable {
     StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId);
     final Binary createdBinary = storage.createBinary(filePath, contentPayload, false);
     File file = ResourceParseUtils.convertResourceToFile(createdBinary);
+    file.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
 
     if (notify) {
       notifyFileCreated(file).failOnError();
@@ -1228,6 +1258,7 @@ public class ModelService extends ModelObservable {
       final Binary createdBinary = storage.createBinary(filePath, contentPayload, true);
 
       File file = ResourceParseUtils.convertResourceToFile(createdBinary);
+      file.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
 
       if (notify) {
         notifyFileCreated(file).failOnError();
@@ -1246,6 +1277,7 @@ public class ModelService extends ModelObservable {
     StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId);
     final Directory createdDirectory = storage.createDirectory(DefaultStoragePath.parse(filePath, dirName));
     File file = ResourceParseUtils.convertResourceToFile(createdDirectory);
+    file.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
 
     if (notify) {
       notifyFileCreated(file).failOnError();
@@ -1400,7 +1432,9 @@ public class ModelService extends ModelObservable {
       }
 
       createEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, sources, targets,
-        outcomeState, builder.toString(), "", Collections.singletonList(IdUtils.getUserAgentId(agentName)), notify);
+        outcomeState, builder.toString(), "",
+        Collections.singletonList(IdUtils.getUserAgentId(agentName, LocalInstanceUtils.getLocalInstanceIdentifier())),
+        notify);
     } catch (ValidationException | AlreadyExistsException | GenericException | NotFoundException
       | RequestNotValidException | AuthorizationDeniedException e1) {
       LOGGER.error("Could not create an event for: {}", eventDescription, e1);
@@ -1414,7 +1448,8 @@ public class ModelService extends ModelObservable {
     RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    String id = IdUtils.createPreservationMetadataId(PreservationMetadataType.EVENT);
+    String id = IdUtils.createPreservationMetadataId(PreservationMetadataType.EVENT,
+      LocalInstanceUtils.getLocalInstanceIdentifier());
     ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, new Date(), eventType.toString(),
       eventDescription, sources, targets, outcomeState.toString(), outcomeDetail, outcomeExtension, agentIds);
 
@@ -1433,10 +1468,18 @@ public class ModelService extends ModelObservable {
     }
   }
 
+  public PreservationMetadata retrievePreservationMetadata(String id, PreservationMetadataType type) {
+    PreservationMetadata pm = new PreservationMetadata();
+    pm.setId(id);
+    pm.setType(type);
+    return pm;
+  }
+
   public PreservationMetadata retrievePreservationMetadata(String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId, PreservationMetadataType type) {
     PreservationMetadata pm = new PreservationMetadata();
-    pm.setId(IdUtils.getPreservationId(type, aipId, representationId, fileDirectoryPath, fileId));
+    pm.setId(IdUtils.getPreservationId(type, aipId, representationId, fileDirectoryPath, null,
+      LocalInstanceUtils.getLocalInstanceIdentifier()));
     pm.setAipId(aipId);
     pm.setRepresentationId(representationId);
     pm.setFileDirectoryPath(fileDirectoryPath);
@@ -1447,8 +1490,8 @@ public class ModelService extends ModelObservable {
 
   public Binary retrievePreservationRepresentation(String aipId, String representationId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    String urn = IdUtils.getPreservationId(PreservationMetadataType.REPRESENTATION, aipId, representationId, null,
-      null);
+    String urn = IdUtils.getPreservationId(PreservationMetadataType.REPRESENTATION, aipId, representationId, null, null,
+      LocalInstanceUtils.getLocalInstanceIdentifier());
     StoragePath path = ModelUtils.getPreservationMetadataStoragePath(urn, PreservationMetadataType.REPRESENTATION,
       aipId, representationId);
     return storage.getBinary(path);
@@ -1456,8 +1499,8 @@ public class ModelService extends ModelObservable {
 
   public boolean preservationRepresentationExists(String aipId, String representationId)
     throws RequestNotValidException {
-    String urn = IdUtils.getPreservationId(PreservationMetadataType.REPRESENTATION, aipId, representationId, null,
-      null);
+    String urn = IdUtils.getPreservationId(PreservationMetadataType.REPRESENTATION, aipId, representationId, null, null,
+      LocalInstanceUtils.getLocalInstanceIdentifier());
     StoragePath path = ModelUtils.getPreservationMetadataStoragePath(urn, PreservationMetadataType.REPRESENTATION,
       aipId, representationId);
     return storage.exists(path);
@@ -1470,7 +1513,7 @@ public class ModelService extends ModelObservable {
 
   public Binary retrievePreservationFile(String aipId, String representationId, List<String> fileDirectoryPath,
     String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    String identifier = IdUtils.getPreservationFileId(fileDirectoryPath, fileId);
+    String identifier = IdUtils.getPreservationFileId(fileId, LocalInstanceUtils.getLocalInstanceIdentifier());
     StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(identifier, PreservationMetadataType.FILE,
       aipId, representationId, fileDirectoryPath, fileId);
     return storage.getBinary(filePath);
@@ -1478,10 +1521,19 @@ public class ModelService extends ModelObservable {
 
   public boolean preservationFileExists(String aipId, String representationId, List<String> fileDirectoryPath,
     String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    String identifier = IdUtils.getPreservationFileId(fileDirectoryPath, fileId);
+
+    String identifier = IdUtils.getPreservationFileId(fileId, LocalInstanceUtils.getLocalInstanceIdentifier());
     StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(identifier, PreservationMetadataType.FILE,
       aipId, representationId, fileDirectoryPath, fileId);
     return storage.exists(filePath);
+  }
+
+  public Binary retrieveRepositoryPreservationEvent(String fileId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    String fileName = fileId + RodaConstants.PREMIS_SUFFIX;
+    StoragePath storagePath = ModelUtils.getPreservationRepositoryEventStoragePath();
+
+    return storage.getBinary(DefaultStoragePath.parse(storagePath, fileName));
   }
 
   public Binary retrievePreservationEvent(String aipId, String representationId, List<String> filePath, String fileId,
@@ -1509,8 +1561,10 @@ public class ModelService extends ModelObservable {
     if (!PreservationMetadataType.FILE.equals(type)) {
       identifier = IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId);
     }
-    String urn = URNUtils.createRodaPreservationURN(type, fileDirectoryPath, identifier);
-    return createPreservationMetadata(type, urn, aipId, representationId, fileDirectoryPath, fileId, payload, notify);
+
+    String urn = URNUtils.createRodaPreservationURN(type, identifier, LocalInstanceUtils.getLocalInstanceIdentifier());
+    return createPreservationMetadata(type, urn, aipId, representationId, fileDirectoryPath, fileId, payload,
+      notify);
   }
 
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String aipId,
@@ -1518,7 +1572,8 @@ public class ModelService extends ModelObservable {
     NotFoundException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    String id = IdUtils.getPreservationId(type, aipId, null, fileDirectoryPath, fileId);
+    String id = IdUtils.getPreservationId(type, aipId, null, fileDirectoryPath, fileId,
+      LocalInstanceUtils.getLocalInstanceIdentifier());
     return createPreservationMetadata(type, id, aipId, null, fileDirectoryPath, fileId, payload, notify);
   }
 
@@ -1527,7 +1582,8 @@ public class ModelService extends ModelObservable {
     RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    String id = IdUtils.getPreservationId(type, aipId, representationId, null, null);
+    String id = IdUtils.getPreservationId(type, aipId, representationId, null, null,
+      LocalInstanceUtils.getLocalInstanceIdentifier());
     return createPreservationMetadata(type, id, aipId, representationId, null, null, payload, notify);
   }
 
@@ -1551,6 +1607,7 @@ public class ModelService extends ModelObservable {
     pm.setFileDirectoryPath(fileDirectoryPath);
     pm.setFileId(fileId);
     pm.setType(type);
+    pm.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
 
     StoragePath binaryPath = ModelUtils.getPreservationMetadataStoragePath(pm);
     storage.createBinary(binaryPath, payload, false);
@@ -1581,6 +1638,7 @@ public class ModelService extends ModelObservable {
     pm.setRepresentationId(representationId);
     pm.setFileDirectoryPath(fileDirectoryPath);
     pm.setFileId(fileId);
+    pm.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
 
     StoragePath binaryPath = ModelUtils.getPreservationMetadataStoragePath(pm);
     storage.updateBinaryContent(binaryPath, payload, false, true);
@@ -2382,6 +2440,8 @@ public class ModelService extends ModelObservable {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
+    job.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
+
     // create or update job in storage
     String jobAsJson = JsonUtils.getJsonFromObject(job);
     StoragePath jobPath = ModelUtils.getJobStoragePath(job.getId());
@@ -2443,6 +2503,8 @@ public class ModelService extends ModelObservable {
   public void createOrUpdateJobReport(Report jobReport, Job cachedJob)
     throws GenericException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    jobReport.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
 
     // create job report in storage
     try {
@@ -2519,6 +2581,39 @@ public class ModelService extends ModelObservable {
     notifyTransferredResourceDeleted(transferredResource.getUUID()).failOnError();
   }
 
+  public Job updateJobInstanceId(Job job)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    job.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
+    createOrUpdateJob(job);
+
+    try (CloseableIterable<Resource> listResourcesUnderDirectory = storage
+      .listResourcesUnderDirectory(ModelUtils.getJobReportsStoragePath(job.getId()), true)) {
+
+      if (listResourcesUnderDirectory != null) {
+        for (Resource resource : listResourcesUnderDirectory) {
+          if (!resource.isDirectory()) {
+            try (
+              InputStream inputStream = storage.getBinary(resource.getStoragePath()).getContent().createInputStream()) {
+              Report jobReport = JsonUtils.getObjectFromJson(inputStream, Report.class);
+              jobReport.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
+              createOrUpdateJobReport(jobReport, job);
+            } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
+              | IOException e) {
+              LOGGER.error("Error getting report json from binary", e);
+            }
+          }
+        }
+      }
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
+      | IOException e) {
+      LOGGER.error("Error updating instance identifier on job reports", e);
+    }
+
+    return job;
+  }
+
   /*****************
    * Risk related
    *****************/
@@ -2533,6 +2628,7 @@ public class ModelService extends ModelObservable {
 
       risk.setCreatedOn(new Date());
       risk.setUpdatedOn(new Date());
+      risk.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
 
       String riskAsJson = JsonUtils.getJsonFromObject(risk);
       StoragePath riskPath = ModelUtils.getRiskStoragePath(risk.getId());
@@ -2544,6 +2640,18 @@ public class ModelService extends ModelObservable {
 
     notifyRiskCreatedOrUpdated(risk, 0, commit).failOnError();
     return risk;
+  }
+
+  public Risk updateRiskInstanceId(Risk risk, boolean commit) throws GenericException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    Map<String, String> properties = new HashMap<>();
+    properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
+
+    risk.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
+    Risk updatedRisk = updateRisk(risk, properties, commit, 0);
+
+    return updatedRisk;
   }
 
   public Risk updateRisk(Risk risk, Map<String, String> properties, boolean commit, int incidences)
@@ -2620,6 +2728,7 @@ public class ModelService extends ModelObservable {
     try {
       riskIncidence.setId(IdUtils.createUUID());
       riskIncidence.setDetectedOn(new Date());
+      riskIncidence.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
 
       String riskIncidenceAsJson = JsonUtils.getJsonFromObject(riskIncidence);
       StoragePath riskIncidencePath = ModelUtils.getRiskIncidenceStoragePath(riskIncidence.getId());
@@ -2631,6 +2740,16 @@ public class ModelService extends ModelObservable {
 
     notifyRiskIncidenceCreatedOrUpdated(riskIncidence, commit).failOnError();
     return riskIncidence;
+  }
+
+  public RiskIncidence updateRiskIncidenceInstanceId(RiskIncidence riskIncidence, boolean commit)
+    throws GenericException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    riskIncidence.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
+    RiskIncidence updatedRiskIncidence = updateRiskIncidence(riskIncidence, commit);
+
+    return updatedRiskIncidence;
   }
 
   public RiskIncidence updateRiskIncidence(RiskIncidence riskIncidence, boolean commit)
@@ -2685,6 +2804,7 @@ public class ModelService extends ModelObservable {
 
     notification.setId(IdUtils.createUUID());
     notification.setAcknowledgeToken(IdUtils.createUUID());
+    notification.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
 
     if (processor != null) {
       notification = processor.processNotification(this, notification);
@@ -2701,6 +2821,15 @@ public class ModelService extends ModelObservable {
     }
 
     return notification;
+  }
+
+  public Notification updateNotificationInstanceId(Notification notification)
+    throws GenericException, NotFoundException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    notification.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
+    Notification updatedNotification = updateNotification(notification);
+    return updatedNotification;
   }
 
   public Notification updateNotification(Notification notification)
@@ -3373,6 +3502,7 @@ public class ModelService extends ModelObservable {
       ri.setCreatedOn(creationDate);
       ri.setUpdatedBy(createdBy);
       ri.setUpdatedOn(creationDate);
+      ri.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
 
       String riAsXML = XMLUtils.getXMLFromObject(ri);
       StoragePath representationInformationPath = ModelUtils.getRepresentationInformationStoragePath(ri.getId());
@@ -3402,6 +3532,16 @@ public class ModelService extends ModelObservable {
     }
 
     notifyRepresentationInformationCreatedOrUpdated(ri, commit).failOnError();
+    return ri;
+  }
+
+  public RepresentationInformation updateRepresentationInformationInstanceId(RepresentationInformation ri,
+    String updatedBy, boolean notify)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    ri.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
+    updateRepresentationInformation(ri, updatedBy, notify);
     return ri;
   }
 

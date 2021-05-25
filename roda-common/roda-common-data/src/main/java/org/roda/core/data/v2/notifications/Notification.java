@@ -13,8 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -39,8 +37,10 @@ public class Notification implements IsModelObject, IsIndexed, HasId {
   private boolean isAcknowledged = false;
   private Map<String, String> acknowledgedUsers = null;
   private NotificationState state;
-  
+
   private Map<String, Object> fields;
+
+  private String instanceId = null;
 
   public Notification() {
     super();
@@ -60,6 +60,7 @@ public class Notification implements IsModelObject, IsIndexed, HasId {
     this.isAcknowledged = notification.isAcknowledged();
     this.acknowledgedUsers = notification.getAcknowledgedUsers();
     this.state = NotificationState.CREATED;
+    this.instanceId = notification.getInstanceId();
   }
 
   @JsonIgnore
@@ -153,6 +154,14 @@ public class Notification implements IsModelObject, IsIndexed, HasId {
     this.state = state;
   }
 
+  public String getInstanceId() {
+    return instanceId;
+  }
+
+  public void setInstanceId(String instanceId) {
+    this.instanceId = instanceId;
+  }
+
   @JsonIgnore
   @Override
   public String getUUID() {
@@ -163,19 +172,20 @@ public class Notification implements IsModelObject, IsIndexed, HasId {
   public String toString() {
     return "Notification [id=" + id + ", subject=" + subject + ", body=" + body + ", sentOn=" + sentOn + ", fromUser="
       + fromUser + ", recipientUsers=" + recipientUsers + ", acknowledgeToken=" + acknowledgeToken + ", isAcknowledged="
-      + isAcknowledged + ", acknowledgedUsers=" + acknowledgedUsers + ", state=" + state + "]";
+      + isAcknowledged + ", acknowledgedUsers=" + acknowledgedUsers + ", state=" + state + ", instanceId=" + instanceId
+      + "]";
   }
 
   @Override
   public List<String> toCsvHeaders() {
     return Arrays.asList("id", "subject", "body", "sentOn", "fromUser", "recipientUsers", "acknowledgeToken",
-      "isAcknowledged", "acknowledgedUsers", "state");
+      "isAcknowledged", "acknowledgedUsers", "state", "instanceId");
   }
 
   @Override
   public List<Object> toCsvValues() {
     return Arrays.asList(id, subject, body, sentOn, fromUser, recipientUsers, acknowledgeToken, isAcknowledged,
-      acknowledgedUsers, state);
+      acknowledgedUsers, state, instanceId);
   }
 
   @Override
@@ -191,7 +201,8 @@ public class Notification implements IsModelObject, IsIndexed, HasId {
   }
 
   /**
-   * @param fields the fields to set
+   * @param fields
+   *          the fields to set
    */
   public void setFields(Map<String, Object> fields) {
     this.fields = fields;

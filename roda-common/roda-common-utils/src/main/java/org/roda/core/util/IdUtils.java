@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.roda.core.data.utils.URNUtils;
+import org.roda.core.data.v2.distributedInstance.LocalInstanceIdentifierState;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.FileLink;
@@ -142,34 +143,35 @@ public final class IdUtils {
     return prefix + ID_SEPARATOR + suffix;
   }
 
-  public static String getPluginAgentId(String pluginClassName, String version) {
-    return URNUtils.createRodaPreservationURN(PreservationMetadataType.AGENT, pluginClassName + "@" + version);
+  public static String getPluginAgentId(String pluginClassName, String version, String instanceId) {
+    return URNUtils.createRodaPreservationURN(PreservationMetadataType.AGENT, pluginClassName + "@" + version,
+      instanceId);
   }
 
-  public static String getUserAgentId(String username) {
-    return URNUtils.createRodaPreservationURN(PreservationMetadataType.AGENT, username);
+  public static String retrieveAgentUsername(String urnId) {
+    return URNUtils.getAgentUsernameFromURN(urnId);
   }
 
-  public static String createPreservationMetadataId(PreservationMetadataType type) {
-    return URNUtils.createRodaPreservationURN(type, IdUtils.createUUID());
+  public static String getUserAgentId(String username, String instanceId) {
+    return URNUtils.createRodaPreservationURN(PreservationMetadataType.AGENT, username, instanceId);
   }
 
-  public static String getRepresentationPreservationId(String aipId, String representationId) {
-    return getPreservationId(PreservationMetadataType.REPRESENTATION, aipId, representationId, null, null);
+  public static String createPreservationMetadataId(PreservationMetadataType type, String instanceId) {
+    return URNUtils.createRodaPreservationURN(type, IdUtils.createUUID(), instanceId);
+  }
+
+  public static String getRepresentationPreservationId(String aipId, String representationId, String instanceId) {
+    return getPreservationId(PreservationMetadataType.REPRESENTATION, aipId, representationId, null, null, instanceId);
   }
 
   public static String getPreservationId(PreservationMetadataType type, String aipId, String representationId,
-    List<String> fileDirectoryPath, String fileId) {
+    List<String> fileDirectoryPath, String fileId, String instanceId) {
     return URNUtils.createRodaPreservationURN(type,
-      IdUtils.createUUID(getFileId(aipId, representationId, fileDirectoryPath, fileId, ID_SEPARATOR)));
+      IdUtils.createUUID(getFileId(aipId, representationId, fileDirectoryPath, fileId, ID_SEPARATOR)), instanceId);
   }
 
-  public static String getPreservationFileId(File file) {
-    return URNUtils.createRodaPreservationURN(file);
-  }
-
-  public static String getPreservationFileId(final List<String> path, String fileid) {
-    return URNUtils.createRodaPreservationURN(PreservationMetadataType.FILE, path, fileid);
+  public static String getPreservationFileId(String fileId, String instanceId) {
+    return URNUtils.createRodaPreservationURN(PreservationMetadataType.FILE, fileId, instanceId);
   }
 
   public static PreservationMetadataType getPreservationTypeFromId(String id) {
@@ -192,4 +194,9 @@ public final class IdUtils {
     return RodaPrincipal.getGroupUUID(groupname);
   }
 
+  public static String updatePreservationMetadataInstanceId(String id, String instanceId) {
+    PreservationMetadataType type = URNUtils.getPreservationMetadataTypeFromId(id);
+    String idHashCode = URNUtils.getIdHashCodeFromEventId(id);
+    return URNUtils.createRodaPreservationURN(type, idHashCode, instanceId);
+  }
 }

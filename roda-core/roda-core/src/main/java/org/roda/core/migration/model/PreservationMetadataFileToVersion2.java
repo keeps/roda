@@ -32,6 +32,7 @@ import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.utils.LocalInstanceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,8 +58,8 @@ public class PreservationMetadataFileToVersion2 implements MigrationAction<Prese
 
             try (CloseableIterable<Resource> pms = storage.listResourcesUnderDirectory(pmPath, true)) {
               for (Resource pm : pms) {
-                if (!pm.isDirectory() && pm instanceof Binary && pm.getStoragePath().getName()
-                  .startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.FILE))) {
+                if (!pm.isDirectory() && pm instanceof Binary && pm.getStoragePath().getName().startsWith(URNUtils
+                  .getPremisPrefix(PreservationMetadataType.FILE, LocalInstanceUtils.getLocalInstanceIdentifier()))) {
                   Binary binary = (Binary) pm;
                   migrate(storage, binary);
                 }
