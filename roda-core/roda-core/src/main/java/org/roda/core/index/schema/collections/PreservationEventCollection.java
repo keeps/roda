@@ -99,6 +99,7 @@ public class PreservationEventCollection
       .setMultiValued(true));
     fields.add(new Field(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER, Field.TYPE_STRING)
       .setMultiValued(true));
+    fields.add(new Field(RodaConstants.PRESERVATION_EVENT_INSTANCE_ID, Field.TYPE_STRING));
 
     return fields;
   }
@@ -114,6 +115,8 @@ public class PreservationEventCollection
 
     SolrInputDocument doc = super.toSolrDocument(pm, info);
     String objectClass = PreservationMetadataEventClass.REPOSITORY.toString();
+    doc.addField(RodaConstants.PRESERVATION_EVENT_INSTANCE_ID, pm.getInstanceId());
+
 
     if (StringUtils.isNotBlank(pm.getAipId())) {
       doc.addField(RodaConstants.PRESERVATION_EVENT_AIP_ID, pm.getAipId());
@@ -133,7 +136,8 @@ public class PreservationEventCollection
     }
 
     if (objectClass.equals(PreservationMetadataEventClass.REPOSITORY.toString())) {
-      //doc.addField(RodaConstants.INDEX_STATE, SolrUtils.formatEnum(AIPState.ACTIVE));
+      // doc.addField(RodaConstants.INDEX_STATE,
+      // SolrUtils.formatEnum(AIPState.ACTIVE));
 
       Permissions permissions = new Permissions();
       List<String> users = RodaCoreFactory.getRodaConfigurationAsList("core.permission.repository_events.user");

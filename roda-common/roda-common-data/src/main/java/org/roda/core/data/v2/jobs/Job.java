@@ -55,6 +55,9 @@ public class Job implements IsModelObject, IsIndexed, HasId {
   // job state details
   private String stateDetails = "";
 
+  // job instance id
+  private String instanceId = null;
+
   // job statistics (total source objects, etc.)
   JobStats jobStats = new JobStats();
 
@@ -97,6 +100,7 @@ public class Job implements IsModelObject, IsIndexed, HasId {
     if (sourceObjects instanceof SelectedItemsList) {
       jobStats.setSourceObjectsCount(((SelectedItemsList<?>) sourceObjects).getIds().size());
     }
+    this.instanceId = job.getInstanceId();
   }
 
   @JsonIgnore
@@ -258,25 +262,33 @@ public class Job implements IsModelObject, IsIndexed, HasId {
     return nonFinalStates;
   }
 
+  public String getInstanceId() {
+    return instanceId;
+  }
+
+  public void setInstanceId(String instanceId) {
+    this.instanceId = instanceId;
+  }
+
   @Override
   public String toString() {
     return "Job [id=" + id + ", name=" + name + ", username=" + username + ", startDate=" + startDate + ", endDate="
       + endDate + ", state=" + state + ", stateDetails=" + stateDetails + ", priority=" + priority + ", type="
       + parallelism + ", jobStats=" + jobStats + ", plugin=" + plugin + ", pluginType=" + pluginType
       + ", pluginParameters=" + pluginParameters + ", sourceObjects=" + sourceObjects + ", outcomeObjectsClass="
-      + outcomeObjectsClass + "]";
+      + outcomeObjectsClass + ", instanceId=" + instanceId + "]";
   }
 
   @Override
   public List<String> toCsvHeaders() {
     return Arrays.asList("id", "name", "username", "startDate", "endDate", "state", "stateDetails", "priority", "type",
-      "jobStats", "plugin", "pluginType", "pluginParameters", "sourceObjects", "outcomeObjectsClass");
+      "jobStats", "plugin", "pluginType", "pluginParameters", "sourceObjects", "outcomeObjectsClass", "instanceId");
   }
 
   @Override
   public List<Object> toCsvValues() {
     return Arrays.asList(id, name, username, startDate, endDate, state, stateDetails, priority, parallelism, jobStats,
-      plugin, pluginType, pluginParameters, sourceObjects, outcomeObjectsClass);
+      plugin, pluginType, pluginParameters, sourceObjects, outcomeObjectsClass, instanceId);
   }
 
   @JsonIgnore

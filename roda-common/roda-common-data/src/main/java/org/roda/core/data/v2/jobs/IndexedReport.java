@@ -12,8 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 
@@ -35,7 +33,7 @@ public class IndexedReport extends Report implements IsIndexed {
   private List<String> successfulPlugins = new ArrayList<>();
   private List<String> unsuccessfulPlugins = new ArrayList<>();
   private int unsuccessfulPluginsCounter = 0;
-  
+
   private Map<String, Object> fields;
 
   public IndexedReport() {
@@ -114,7 +112,7 @@ public class IndexedReport extends Report implements IsIndexed {
       "sourceObjectClass", "sourceObjectOriginalIds", "outcomeObjectId", "outcomeObjectLabel", "outcomeObjectClass",
       "outcomeObjectState", "title", "dateCreated", "dateUpdated", "completionPercentage", "stepsCompleted",
       "totalSteps", "plugin", "pluginName", "pluginVersion", "pluginState", "pluginDetails", "htmlPluginDetails",
-      "successfulPlugins", "unsuccessfulPlugins", "reports");
+      "successfulPlugins", "unsuccessfulPlugins", "reports", "instanceId");
   }
 
   @Override
@@ -126,7 +124,7 @@ public class IndexedReport extends Report implements IsIndexed {
       super.getDateUpdated(), super.getCompletionPercentage(), super.getStepsCompleted(), super.getTotalSteps(),
       super.getPlugin(), super.getPluginName(), super.getPluginVersion(), super.getPluginState(),
       super.getPluginDetails(), super.isHtmlPluginDetails(), getSuccessfulPlugins(), getUnsuccessfulPlugins(),
-      super.getReports());
+      super.getReports(), super.getInstanceId());
   }
 
   @JsonIgnore
@@ -148,7 +146,8 @@ public class IndexedReport extends Report implements IsIndexed {
   }
 
   /**
-   * @param fields the fields to set
+   * @param fields
+   *          the fields to set
    */
   public void setFields(Map<String, Object> fields) {
     this.fields = fields;

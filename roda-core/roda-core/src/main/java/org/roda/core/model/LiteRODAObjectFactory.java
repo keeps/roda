@@ -37,6 +37,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.IndexedReport;
@@ -159,6 +160,8 @@ public final class LiteRODAObjectFactory {
       ret = getDescriptiveMetadata(object);
     } else if (object instanceof PreservationMetadata) {
       ret = getPreservationMetadata(object);
+    } else if (object instanceof IndexedPreservationEvent) {
+      ret = getIndexedPreservationEvent(object);
     } else if (object instanceof DIPFile) {
       ret = getDIPFile(object);
     } else if (object instanceof File) {
@@ -219,6 +222,8 @@ public final class LiteRODAObjectFactory {
     } else if (objectClass == TransferredResource.class || objectClass == PreservationMetadata.class
       || objectClass == DisposalConfirmation.class) {
       ret = create(objectClass, ids.size(), ids);
+    } else if (objectClass == IndexedPreservationEvent.class) {
+      ret = create(PreservationMetadata.class, ids.size(), ids);
     }
 
     if (logIfReturningEmpty && !ret.isPresent()) {
@@ -260,6 +265,22 @@ public final class LiteRODAObjectFactory {
       list.add(o.getFileId());
       list.add(o.getId());
       ret = get(DIPFile.class, list, false);
+    }
+
+    return ret;
+  }
+
+  private static <T extends IsRODAObject> Optional<LiteRODAObject> getIndexedPreservationEvent(T object) {
+    Optional<LiteRODAObject> ret;
+
+    IndexedPreservationEvent o = (IndexedPreservationEvent) object;
+    if (o.getAipID() == null) {
+      ret = get(IndexedPreservationEvent.class, Arrays.asList(o.getId()), false);
+    } else if (o.getRepresentationUUID() == null) {
+      ret = get(IndexedPreservationEvent.class, Arrays.asList(o.getAipID(), o.getId()), false);
+    } else {
+      ret = get(IndexedPreservationEvent.class, Arrays.asList(o.getAipID(), o.getRepresentationUUID(), o.getId()),
+        false);
     }
 
     return ret;
@@ -376,13 +397,13 @@ public final class LiteRODAObjectFactory {
     int size = split.length;
     PreservationMetadataType type = IdUtils.getPreservationTypeFromId(decodeId(split[size - 1]));
 
-    if (split.length == 2) {
-      ret = (T) model.retrievePreservationMetadata(null, null, null, null, type);
-    } else if (split.length == 3) {
+    if (size == 2) {
+      ret = (T) model.retrievePreservationMetadata(split[1], type);
+    } else if (size == 3) {
       ret = (T) model.retrievePreservationMetadata(decodeId(split[1]), null, null, null, type);
-    } else if (split.length == 4) {
+    } else if (size == 4) {
       ret = (T) model.retrievePreservationMetadata(decodeId(split[1]), decodeId(split[2]), null, null, type);
-    } else if (split.length > 4) {
+    } else if (size > 4) {
       List<String> directoryPath = new ArrayList<>();
       String fileId = null;
       for (int i = 2; i < split.length - 1; i++) {

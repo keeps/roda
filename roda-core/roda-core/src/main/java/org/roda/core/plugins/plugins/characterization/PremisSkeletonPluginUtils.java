@@ -26,6 +26,7 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.utils.LocalInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +71,7 @@ public class PremisSkeletonPluginUtils {
         representationPayload, false);
     } catch (AlreadyExistsException e1) {
       String pmId = IdUtils.getPreservationId(PreservationMetadataType.REPRESENTATION, aipId, representationId, null,
-        null);
+        null, LocalInstanceUtils.getLocalInstanceIdentifier());
       model.updatePreservationMetadata(pmId, PreservationMetadataType.REPRESENTATION, aipId, representationId, null,
         null, representationPayload, false);
     }
@@ -109,7 +110,7 @@ public class PremisSkeletonPluginUtils {
           pmId = pm.getId();
           model.notifyFileCreated(file).failOnError();
         } catch (AlreadyExistsException e1) {
-          pmId = IdUtils.getPreservationFileId(file.getId());
+          pmId = IdUtils.getPreservationFileId(file.getId(), LocalInstanceUtils.getLocalInstanceIdentifier());
           model.updatePreservationMetadata(pmId, PreservationMetadataType.FILE, file.getAipId(),
             file.getRepresentationId(), file.getPath(), file.getId(), filePreservation, notifyInSteps);
           model.notifyFileUpdated(file).failOnError();

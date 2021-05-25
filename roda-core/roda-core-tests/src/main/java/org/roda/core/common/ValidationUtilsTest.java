@@ -127,6 +127,7 @@ public class ValidationUtilsTest {
   public void testValidateAIP() throws ValidationException, RequestNotValidException, GenericException,
     AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
     final String aipId = IdUtils.createUUID();
+    System.out.println(basePath);
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);

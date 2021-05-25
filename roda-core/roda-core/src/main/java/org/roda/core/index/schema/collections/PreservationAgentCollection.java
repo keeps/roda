@@ -72,6 +72,7 @@ public class PreservationAgentCollection
     fields.add(new Field(RodaConstants.PRESERVATION_AGENT_EXTENSION, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.PRESERVATION_AGENT_NOTE, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.PRESERVATION_AGENT_VERSION, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.PRESERVATION_AGENT_INSTANCE_ID, Field.TYPE_STRING));
 
     return fields;
   }
@@ -111,6 +112,8 @@ public class PreservationAgentCollection
       doc.addField(RodaConstants.PRESERVATION_AGENT_NOTE, Collections.singletonList(agent.getAgentNote()));
       doc.addField(RodaConstants.PRESERVATION_AGENT_VERSION, agent.getAgentVersion());
 
+      doc.addField(RodaConstants.PRESERVATION_AGENT_INSTANCE_ID, pm.getInstanceId());
+
     } catch (ValidationException e) {
       throw new GenericException(e);
     }
@@ -131,6 +134,7 @@ public class PreservationAgentCollection
     final String version = SolrUtils.objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_VERSION), null);
     final String note = SolrUtils.objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_NOTE), null);
     final List<String> roles = SolrUtils.objectToListString(doc.get(RodaConstants.PRESERVATION_AGENT_ROLES));
+    final String instanceId = SolrUtils.objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_INSTANCE_ID), null);
 
     ipa.setId(id);
     ipa.setName(name);
@@ -139,6 +143,7 @@ public class PreservationAgentCollection
     ipa.setVersion(version);
     ipa.setNote(note);
     ipa.setRoles(roles);
+    ipa.setInstanceId(instanceId);
 
     return ipa;
 

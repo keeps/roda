@@ -3880,6 +3880,61 @@ public class Browser extends RodaWuiController {
     return responseList;
   }
 
+  public static void modifyInstanceIdOnRepository(User user, LocalInstance localInstance)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    List<String> responseList = new ArrayList();
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // BrowserHelper.applyInstanceIdToAIP(localInstance, user);
+      // BrowserHelper.applyInstanceIdToRisk(localInstance, user);
+      // BrowserHelper.applyInstanceIdToRiskIncidence(localInstance, user);
+      // BrowserHelper.applyInstanceIdToRI(localInstance, user);
+      // BrowserHelper.applyInstanceIdToNotification(localInstance, user);
+
+      // BrowserHelper.applyInstanceIdToJob(localInstance, user);
+
+      // BrowserHelper.applyInstanceIdToAIPPreservationEvent(localInstance, user);
+      BrowserHelper.applyInstanceIdToPreservationAgents(localInstance, user);
+
+      // BrowserHelper.applyInstanceIdToRepositoryPreservationEvent(localInstance, user);
+
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
+    }
+
+
+
+  }
+
+  public static void updateInstanceIdManagement(User user, LocalInstance localInstance)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    List<String> responseList = new ArrayList();
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      BrowserHelper.updateLocalInstanceConfiguration(localInstance, user.getId());
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
+    }
+  }
+
   public static LocalInstance registerLocalInstance(User user, LocalInstance localInstance)
       throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -3965,4 +4020,10 @@ public class Browser extends RodaWuiController {
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
     }
   }
+
 }
+
+
+
+
+

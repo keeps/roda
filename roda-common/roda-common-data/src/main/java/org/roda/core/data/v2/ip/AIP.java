@@ -32,6 +32,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
   private String parentId;
   private String type;
   private AIPState state = AIPState.getDefault();
+  private String instanceId;
   private Permissions permissions;
 
   private List<DescriptiveMetadata> descriptiveMetadata;
@@ -61,17 +62,18 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions) {
-    this(id, parentId, type, state, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>(),
-      new AIPFormat(), new ArrayList<Relationship>(), new Date(), null, new Date(), null, new DisposalAIPMetadata());
+    this(id, parentId, type, null, state, permissions, new ArrayList<DescriptiveMetadata>(),
+      new ArrayList<Representation>(), new AIPFormat(), new ArrayList<Relationship>(), new Date(), null, new Date(),
+      null, new DisposalAIPMetadata());
   }
 
   public AIP(String id, String parentId, String type, AIPState state, Permissions permissions, String createdBy) {
-    this(id, parentId, type, state, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>(),
-      new AIPFormat(), new ArrayList<Relationship>(), new Date(), createdBy, new Date(), createdBy,
-      new DisposalAIPMetadata());
+    this(id, parentId, type, null, state, permissions, new ArrayList<DescriptiveMetadata>(),
+      new ArrayList<Representation>(), new AIPFormat(), new ArrayList<Relationship>(), new Date(), createdBy,
+      new Date(), createdBy, new DisposalAIPMetadata());
   }
 
-  public AIP(String id, String parentId, String type, AIPState state, Permissions permissions,
+  public AIP(String id, String parentId, String type, String instanceId, AIPState state, Permissions permissions,
     List<DescriptiveMetadata> descriptiveMetadata, List<Representation> representations, AIPFormat format,
     List<Relationship> relationships, Date createdOn, String createdBy, Date updatedOn, String updatedBy,
     DisposalAIPMetadata disposal) {
@@ -79,6 +81,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
     this.id = id;
     this.parentId = parentId;
     this.type = type;
+    this.instanceId = instanceId;
     this.state = state;
     this.permissions = permissions;
     this.relationships = relationships;
@@ -403,6 +406,14 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
     return null;
   }
 
+  public String getInstanceId() {
+    return instanceId;
+  }
+
+  public void setInstanceId(String instanceId) {
+    this.instanceId = instanceId;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -417,6 +428,8 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
     if (parentId != null ? !parentId.equals(aip.parentId) : aip.parentId != null)
       return false;
     if (type != null ? !type.equals(aip.type) : aip.type != null)
+      return false;
+    if (instanceId != null ? !instanceId.equals(aip.instanceId) : aip.instanceId != null)
       return false;
     if (state != aip.state)
       return false;
@@ -442,6 +455,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
     int result = id != null ? id.hashCode() : 0;
     result = 31 * result + (parentId != null ? parentId.hashCode() : 0);
     result = 31 * result + (type != null ? type.hashCode() : 0);
+    result = 31 * result + (instanceId != null ? instanceId.hashCode() : 0);
     result = 31 * result + (state != null ? state.hashCode() : 0);
     result = 31 * result + (permissions != null ? permissions.hashCode() : 0);
     result = 31 * result + (descriptiveMetadata != null ? descriptiveMetadata.hashCode() : 0);
@@ -455,12 +469,12 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
 
   @Override
   public String toString() {
-    return "AIP{" + "id='" + id + '\'' + ", parentId='" + parentId + '\'' + ", type='" + type + '\'' + ", state="
-      + state + ", permissions=" + permissions + ", descriptiveMetadata=" + descriptiveMetadata + ", representations="
-      + representations + ", ingestSIPUUID='" + ingestSIPUUID + '\'' + ", ingestSIPIds=" + ingestSIPIds
-      + ", ingestJobId='" + ingestJobId + '\'' + ", ingestUpdateJobIds=" + ingestUpdateJobIds + ", ghost=" + ghost
-      + ", format=" + format + ", relationships=" + relationships + ", createdOn=" + createdOn + ", createdBy='"
-      + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\'' + ", disposal='" + disposal
-      + '}';
+    return "AIP{" + "id='" + id + '\'' + ", parentId='" + parentId + '\'' + ", type='" + type + '\'' + ", instanceId='"
+      + instanceId + '\'' + ", state=" + state + ", permissions=" + permissions + ", descriptiveMetadata="
+      + descriptiveMetadata + ", representations=" + representations + ", ingestSIPUUID='" + ingestSIPUUID + '\''
+      + ", ingestSIPIds=" + ingestSIPIds + ", ingestJobId='" + ingestJobId + '\'' + ", ingestUpdateJobIds="
+      + ingestUpdateJobIds + ", ghost=" + ghost + ", format=" + format + ", relationships=" + relationships
+      + ", createdOn=" + createdOn + ", createdBy='" + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='"
+      + updatedBy + '\'' + ", disposal='" + disposal + '}';
   }
 }

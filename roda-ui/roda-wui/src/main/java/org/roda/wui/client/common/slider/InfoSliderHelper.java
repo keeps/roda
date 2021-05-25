@@ -149,6 +149,10 @@ public class InfoSliderHelper {
       values.put(messages.representationType(), createRepresentationTypeHTML(bundle));
     }
 
+    if (StringUtils.isNotBlank(representation.getInstanceId())) {
+      values.put(messages.itemInstanceId(), createRepresentationInstanceIdHTML(bundle));
+    }
+
     populate(infoSliderPanel, values);
   }
 
@@ -177,6 +181,10 @@ public class InfoSliderHelper {
 
     if (StringUtils.isNotBlank(aip.getType())) {
       values.put(messages.aipType(), createAipTypeHTML(bundle));
+    }
+
+    if (StringUtils.isNotBlank(aip.getInstanceId())) {
+      values.put(messages.itemInstanceId(), createAipInstanceIdHTML(bundle));
     }
 
     if (!aip.getIngestSIPIds().isEmpty()) {
@@ -429,6 +437,10 @@ public class InfoSliderHelper {
       }
     }
 
+    if (StringUtils.isNotBlank(file.getInstanceId())) {
+      values.put(messages.itemInstanceId(), createFileInstanceIdHTML(bundle));
+    }
+
     List<String> history = new ArrayList<>();
     history.add(file.getAipId());
     history.add(file.getRepresentationId());
@@ -604,4 +616,42 @@ public class InfoSliderHelper {
 
     return panel;
   }
+
+  private static FlowPanel createAipInstanceIdHTML(BrowseAIPBundle bundle) {
+    IndexedAIP aip = bundle.getAip();
+    FlowPanel panel = new FlowPanel();
+    final String riFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
+      RodaConstants.INDEX_AIP, RodaConstants.AIP_INSTANCE_ID, aip.getInstanceId());
+
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
+      SafeHtmlUtils.fromString(aip.getInstanceId()), riFilter, panel,
+      bundle.getRepresentationInformationFields().contains(RodaConstants.AIP_INSTANCE_ID), "browseFileInformationIcon");
+    return panel;
+  }
+
+  private static FlowPanel createRepresentationInstanceIdHTML(BrowseRepresentationBundle bundle) {
+    IndexedRepresentation representation = bundle.getRepresentation();
+    FlowPanel panel = new FlowPanel();
+
+    final String riFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
+      RodaConstants.INDEX_REPRESENTATION, RodaConstants.REPRESENTATION_INSTANCE_ID, representation.getInstanceId());
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
+      SafeHtmlUtils.fromString(representation.getInstanceId()), riFilter, panel,
+      bundle.getRepresentationInformationFields().contains(RodaConstants.REPRESENTATION_INSTANCE_ID));
+
+    return panel;
+  }
+
+  private static FlowPanel createFileInstanceIdHTML(BrowseFileBundle bundle) {
+    IndexedFile file = bundle.getFile();
+    FlowPanel panel = new FlowPanel();
+    final String riFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
+      RodaConstants.INDEX_FILE, RodaConstants.FILE_INSTANCE_ID, file.getInstanceId());
+    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
+      SafeHtmlUtils.fromString(file.getInstanceId()), riFilter, panel,
+      bundle.getRepresentationInformationFields().contains(RodaConstants.FILE_INSTANCE_ID),
+      "browseFileInformationIcon");
+    return panel;
+  }
+
 }

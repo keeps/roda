@@ -32,12 +32,14 @@ public class File implements IsModelObject, HasId {
   private String referenceManifest;
   private String referenceUUID;
 
+  private String instanceId;
+
   public File() {
     super();
   }
 
   public File(String id, String aipId, String representationId, List<String> path, boolean isDirectory,
-    boolean isReference, String referenceUrl, String referenceManifest, String referenceUUID) {
+    boolean isReference, String referenceUrl, String referenceManifest, String referenceUUID, String instanceId) {
     super();
     this.id = id;
     this.aipId = aipId;
@@ -48,10 +50,11 @@ public class File implements IsModelObject, HasId {
     this.referenceUrl = referenceUrl;
     this.referenceManifest = referenceManifest;
     this.referenceUUID = referenceUUID;
+    this.instanceId = instanceId;
   }
 
   public File(String id, String aipId, String representationId, List<String> path, boolean isDirectory) {
-    this(id, aipId, representationId, path, isDirectory, false, null, null, null);
+    this(id, aipId, representationId, path, isDirectory, false, null, null, null, null);
   }
 
   @JsonIgnore
@@ -133,6 +136,14 @@ public class File implements IsModelObject, HasId {
     this.referenceUUID = referenceUUID;
   }
 
+  public String getInstanceId() {
+    return instanceId;
+  }
+
+  public void setInstanceId(String instanceId) {
+    this.instanceId = instanceId;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -158,6 +169,8 @@ public class File implements IsModelObject, HasId {
       return false;
     if (referenceManifest != null ? !referenceManifest.equals(file.referenceManifest) : file.referenceManifest != null)
       return false;
+    if (instanceId != null ? !instanceId.equals(file.instanceId) : file.instanceId != null)
+      return false;
     return referenceUUID != null ? referenceUUID.equals(file.referenceUUID) : file.referenceUUID == null;
   }
 
@@ -172,6 +185,7 @@ public class File implements IsModelObject, HasId {
     result = 31 * result + (referenceUrl != null ? referenceUrl.hashCode() : 0);
     result = 31 * result + (referenceManifest != null ? referenceManifest.hashCode() : 0);
     result = 31 * result + (referenceUUID != null ? referenceUUID.hashCode() : 0);
+    result = 31 * result + (instanceId != null ? instanceId.hashCode() : 0);
     return result;
   }
 
@@ -180,6 +194,6 @@ public class File implements IsModelObject, HasId {
     return "File{" + "id='" + id + '\'' + ", path=" + path + ", aipId='" + aipId + '\'' + ", representationId='"
       + representationId + '\'' + ", isDirectory=" + isDirectory + ", isReference=" + isReference + ", referenceUrl='"
       + referenceUrl + '\'' + ", referenceManifest='" + referenceManifest + '\'' + ", referenceUUID='" + referenceUUID
-      + '\'' + '}';
+      + ", instanceId='" + instanceId + '\'' + '}';
   }
 }
