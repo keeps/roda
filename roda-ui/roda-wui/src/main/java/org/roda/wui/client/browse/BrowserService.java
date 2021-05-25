@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import org.apache.tomcat.jni.Local;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
@@ -540,7 +542,7 @@ public interface BrowserService extends RemoteService {
   void updateLocalInstanceConfiguration(LocalInstance localInstance)
     throws AuthorizationDeniedException, GenericException;
 
-  List<String> testLocalInstanceConfiguration(LocalInstance localInstance)
+   List<String> testLocalInstanceConfiguration(LocalInstance localInstance)
     throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException;
 
   LocalInstance registerLocalInstance(LocalInstance localInstance)
@@ -551,4 +553,7 @@ public interface BrowserService extends RemoteService {
 
   Job synchronizeBundle(LocalInstance localInstance)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
+    
+  void modifyInstanceIdOnRepository(LocalInstance localInstance)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 }

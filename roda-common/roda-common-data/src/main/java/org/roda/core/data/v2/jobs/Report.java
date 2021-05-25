@@ -56,6 +56,8 @@ public class Report implements IsModelObject, HasId {
   private String pluginDetails = "";
   private boolean htmlPluginDetails = false;
 
+  private String instanceId = null;
+
   @JsonIgnore
   private SIPInformation sipInformation = new SIPInformation();
 
@@ -97,6 +99,7 @@ public class Report implements IsModelObject, HasId {
     this.pluginDetails = report.getPluginDetails();
     this.htmlPluginDetails = report.isHtmlPluginDetails();
     this.reports = new ArrayList<>();
+    this.instanceId = report.getInstanceId();
   }
 
   @JsonIgnore
@@ -343,6 +346,14 @@ public class Report implements IsModelObject, HasId {
     return this;
   }
 
+  public String getInstanceId() {
+    return instanceId;
+  }
+
+  public void setInstanceId(String instanceId) {
+    this.instanceId = instanceId;
+  }
+
   @JsonIgnore
   public SIPInformation getSipInformation() {
     return sipInformation;
@@ -385,7 +396,8 @@ public class Report implements IsModelObject, HasId {
       setPluginVersion(report.getPluginVersion());
     }
 
-    setPluginState(ReportUtils.calculatePluginState(getPluginState(), report.getPluginState(), report.getPluginIsMandatory()));
+    setPluginState(
+      ReportUtils.calculatePluginState(getPluginState(), report.getPluginState(), report.getPluginIsMandatory()));
 
     if (!"".equals(report.getPluginDetails()) && !getPluginDetails().equals(report.getPluginDetails())) {
       setPluginDetails(
@@ -397,34 +409,21 @@ public class Report implements IsModelObject, HasId {
     return this;
   }
 
-  /*@JsonIgnore
-  private PluginState calculatePluginState(PluginState currentPluginState, PluginState newPluginState,
-    Boolean pluginIsMandatory) {
-    if (pluginIsMandatory) {
-      if (currentPluginState.equals(PluginState.PARTIAL_SUCCESS)) {
-        switch (newPluginState) {
-          case SKIPPED:
-          case RUNNING:
-          case SUCCESS:
-            return PluginState.PARTIAL_SUCCESS;
-          case FAILURE:
-            return PluginState.FAILURE;
-        }
-      } else if (newPluginState.equals(PluginState.SKIPPED)){
-        return currentPluginState;
-      } else {
-        return newPluginState;
-      }
-    } else {
-      if (!currentPluginState.equals(PluginState.FAILURE)) {
-        if (newPluginState.equals(PluginState.FAILURE)) {
-          return PluginState.PARTIAL_SUCCESS;
-        }
-      }
-    }
-
-    return newPluginState;
-  }*/
+  /*
+   * @JsonIgnore private PluginState calculatePluginState(PluginState
+   * currentPluginState, PluginState newPluginState, Boolean pluginIsMandatory) {
+   * if (pluginIsMandatory) { if
+   * (currentPluginState.equals(PluginState.PARTIAL_SUCCESS)) { switch
+   * (newPluginState) { case SKIPPED: case RUNNING: case SUCCESS: return
+   * PluginState.PARTIAL_SUCCESS; case FAILURE: return PluginState.FAILURE; } }
+   * else if (newPluginState.equals(PluginState.SKIPPED)){ return
+   * currentPluginState; } else { return newPluginState; } } else { if
+   * (!currentPluginState.equals(PluginState.FAILURE)) { if
+   * (newPluginState.equals(PluginState.FAILURE)) { return
+   * PluginState.PARTIAL_SUCCESS; } } }
+   * 
+   * return newPluginState; }
+   */
 
   public List<Report> getReports() {
     return reports;
@@ -446,8 +445,9 @@ public class Report implements IsModelObject, HasId {
   @JsonIgnore
   public Report getLastRunPlugin() {
     int size = reports.size();
-    if (size == 0) return null;
-    return reports.get(size-1);
+    if (size == 0)
+      return null;
+    return reports.get(size - 1);
   }
 
   @Override
@@ -459,7 +459,7 @@ public class Report implements IsModelObject, HasId {
       + completionPercentage + ", stepsCompleted=" + stepsCompleted + ", totalSteps=" + totalSteps + ", plugin="
       + plugin + ", pluginName=" + pluginName + ", pluginVersion=" + pluginVersion + ", pluginState=" + pluginState
       + ", pluginIsMandatory=" + pluginIsMandatory + ", pluginDetails=" + pluginDetails + ", htmlPluginDetails="
-      + htmlPluginDetails + ", reports=" + reports + "]";
+      + htmlPluginDetails + ", reports=" + reports + ", instanceId=" + instanceId + "]";
   }
 
 }

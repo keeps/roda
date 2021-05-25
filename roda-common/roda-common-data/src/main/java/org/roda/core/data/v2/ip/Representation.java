@@ -32,6 +32,7 @@ public class Representation implements IsModelObject, HasId {
   private List<String> representationStates = new ArrayList<>();
 
   private String type;
+  private String instanceId;
   private Boolean hasShallowFiles = null;
 
   private Date createdOn = null;
@@ -46,20 +47,21 @@ public class Representation implements IsModelObject, HasId {
   }
 
   public Representation(String id, String aipId, boolean original, String type) {
-    this(id, aipId, original, type, new ArrayList<DescriptiveMetadata>(), false);
+    this(id, aipId, original, type, null, new ArrayList<DescriptiveMetadata>(), false);
   }
 
   public Representation(String id, String aipId, boolean original, String type, Boolean hasShallowFiles) {
-    this(id, aipId, original, type, new ArrayList<DescriptiveMetadata>(), hasShallowFiles);
+    this(id, aipId, original, type, null, new ArrayList<DescriptiveMetadata>(), hasShallowFiles);
   }
 
-  public Representation(String id, String aipId, boolean original, String type,
+  public Representation(String id, String aipId, boolean original, String type, String instanceId,
     List<DescriptiveMetadata> descriptiveMetadata, Boolean hasShallowFiles) {
     super();
     this.id = id;
     this.aipId = aipId;
     this.original = original;
     this.type = type;
+    this.instanceId = instanceId;
     this.hasShallowFiles = hasShallowFiles;
     this.descriptiveMetadata = descriptiveMetadata;
     this.createdOn = new Date();
@@ -113,6 +115,14 @@ public class Representation implements IsModelObject, HasId {
 
   public void setType(String type) {
     this.type = type;
+  }
+
+  public String getInstanceId() {
+    return instanceId;
+  }
+
+  public void setInstanceId(String instanceId) {
+    this.instanceId = instanceId;
   }
 
   public Boolean getHasShallowFiles() {
@@ -184,6 +194,7 @@ public class Representation implements IsModelObject, HasId {
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     result = prime * result + (original ? 1231 : 1237);
     result = prime * result + ((type == null) ? 0 : type.hashCode());
+    result = prime * result + ((instanceId == null) ? 0 : instanceId.hashCode());
     return result;
   }
 
@@ -218,15 +229,20 @@ public class Representation implements IsModelObject, HasId {
         return false;
     } else if (!type.equals(other.type))
       return false;
+    if (instanceId == null) {
+      if (other.instanceId != null)
+        return false;
+    } else if (!instanceId.equals(other.instanceId))
+      return false;
     return true;
   }
 
   @Override
   public String toString() {
     return "Representation [aipId=" + aipId + ", id=" + id + ", original=" + original + ", type=" + type
-      + ", descriptiveMetadata=" + descriptiveMetadata + ", createdOn=" + createdOn + ", createdBy=" + createdBy
-      + ", updatedOn=" + updatedOn + ", updatedBy=" + updatedBy + ", representationStates=" + representationStates
-      + ']';
+      + ", instanceId=" + instanceId + ", descriptiveMetadata=" + descriptiveMetadata + ", createdOn=" + createdOn
+      + ", createdBy=" + createdBy + ", updatedOn=" + updatedOn + ", updatedBy=" + updatedBy + ", representationStates="
+      + representationStates + ']';
   }
 
 }

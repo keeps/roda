@@ -23,6 +23,7 @@ import java.util.function.Function;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.data.common.RodaConstants;
@@ -65,6 +66,7 @@ import org.roda.core.storage.JsonContentPayload;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.storage.utils.LocalInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,7 +100,7 @@ public class ResourceParseUtils {
           String originFile = FSUtils.getStoragePathAsString(resource.getStoragePath(), true);
           String referenceUUID = shallowFile.getUUID();
           return new File(shallowFile.getName(), aipId, representationId, filePath, false, true, url, originFile,
-            referenceUUID);
+            referenceUUID, null);
         } catch (IOException e) {
           throw new GenericException("Error while trying to convert shallow file into a representation file");
         }
@@ -157,12 +159,16 @@ public class ResourceParseUtils {
     String fileId = null;
 
     PreservationMetadataType type;
-    if (filename.startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.AGENT))) {
+    if (filename.startsWith(
+      URNUtils.getPremisPrefix(PreservationMetadataType.AGENT, LocalInstanceUtils.getLocalInstanceIdentifier()))
+      || filename.startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.AGENT, null))) {
       id = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
       type = PreservationMetadataType.AGENT;
       aipId = null;
       representationId = null;
-    } else if (filename.startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.EVENT))) {
+    } else if (filename.startsWith(
+      URNUtils.getPremisPrefix(PreservationMetadataType.EVENT, LocalInstanceUtils.getLocalInstanceIdentifier()))
+      || filename.startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.EVENT, null))) {
       id = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
       type = PreservationMetadataType.EVENT;
       try {
@@ -174,22 +180,32 @@ public class ResourceParseUtils {
       } catch (UnsupportedEncodingException e) {
         LOGGER.error("Error encoding urn separator when converting file event preservation metadata");
       }
-    } else if (filename.startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.FILE))) {
+    } else if (filename.startsWith(
+      URNUtils.getPremisPrefix(PreservationMetadataType.FILE, LocalInstanceUtils.getLocalInstanceIdentifier()))
+      || filename.startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.FILE, null))) {
       type = PreservationMetadataType.FILE;
       fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
       id = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
-      fileId = id.substring(URNUtils.getPremisPrefix(PreservationMetadataType.FILE).length());
+      // fileId = id.substring(URNUtils
+      // .getPremisPrefix(PreservationMetadataType.FILE,
+      // LocalInstanceUtils.getLocalInstanceIdentifier()).length());
+      fileId = id;
     } else if (filename.endsWith(RodaConstants.OTHER_TECH_METADATA_FILE_SUFFIX)) {
       type = PreservationMetadataType.OTHER;
       fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
       fileId = filename.substring(0, filename.length() - RodaConstants.OTHER_TECH_METADATA_FILE_SUFFIX.length());
       id = fileId;
-    } else if (filename.startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.OTHER))) {
+    } else if (filename.startsWith(
+      URNUtils.getPremisPrefix(PreservationMetadataType.OTHER, LocalInstanceUtils.getLocalInstanceIdentifier()))
+      || filename.startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.OTHER, null))) {
       type = PreservationMetadataType.OTHER;
       fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
       fileId = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
       id = fileId;
-    } else if (filename.startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.REPRESENTATION))) {
+    } else if (filename
+      .startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.REPRESENTATION,
+        LocalInstanceUtils.getLocalInstanceIdentifier()))
+      || filename.startsWith(URNUtils.getPremisPrefix(PreservationMetadataType.REPRESENTATION, null))) {
       id = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
       type = PreservationMetadataType.REPRESENTATION;
     } else {

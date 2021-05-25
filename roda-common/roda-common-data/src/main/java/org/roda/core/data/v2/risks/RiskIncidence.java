@@ -13,8 +13,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -45,8 +43,10 @@ public class RiskIncidence implements IsModelObject, IsIndexed, HasId {
   private Date mitigatedOn = null;
   private String mitigatedBy = null;
   private String mitigatedDescription = null;
-  
+
   private Map<String, Object> fields;
+
+  private String instanceId = null;
 
   public RiskIncidence() {
     super();
@@ -197,26 +197,34 @@ public class RiskIncidence implements IsModelObject, IsIndexed, HasId {
     this.mitigatedDescription = mitigatedDescription;
   }
 
+  public String getInstanceId() {
+    return instanceId;
+  }
+
+  public void setInstanceId(String instanceId) {
+    this.instanceId = instanceId;
+  }
+
   @Override
   public String toString() {
     return "RiskIncidence [id=" + id + ", aipId=" + aipId + ", representationId=" + representationId + ", filePath="
       + filePath + ", fileId=" + fileId + ", objectClass=" + objectClass + ", riskId=" + riskId + ", description="
       + description + ", byPlugin=" + byPlugin + ", status=" + status + ", severity=" + severity + ", detectedOn="
       + detectedOn + ", detectedBy=" + detectedBy + ", mitigatedOn=" + mitigatedOn + ", mitigatedBy=" + mitigatedBy
-      + ", mitigatedDescription=" + mitigatedDescription + "]";
+      + ", mitigatedDescription=" + mitigatedDescription + ", instanceId=" + instanceId + "]";
   }
 
   @Override
   public List<String> toCsvHeaders() {
     return Arrays.asList("id", "aipId", "representationId", "filePath", "fileId", "objectClass", "riskId",
       "description", "byPlugin", "status", "severity", "detectedOn", "detectedBy", "mitigatedOn", "mitigatedBy",
-      "mitigatedDescription");
+      "mitigatedDescription", "instanceId");
   }
 
   @Override
   public List<Object> toCsvValues() {
     return Arrays.asList(id, aipId, representationId, filePath, fileId, objectClass, riskId, description, byPlugin,
-      status, severity, detectedOn, detectedBy, mitigatedOn, mitigatedBy, mitigatedDescription);
+      status, severity, detectedOn, detectedBy, mitigatedOn, mitigatedBy, mitigatedDescription, instanceId);
   }
 
   @JsonIgnore
@@ -238,7 +246,8 @@ public class RiskIncidence implements IsModelObject, IsIndexed, HasId {
   }
 
   /**
-   * @param fields the fields to set
+   * @param fields
+   *          the fields to set
    */
   public void setFields(Map<String, Object> fields) {
     this.fields = fields;

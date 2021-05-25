@@ -118,6 +118,7 @@ import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
+import org.roda.core.storage.utils.LocalInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -749,6 +750,18 @@ public final class PluginHelper {
     return list;
   }
 
+  public static List<Class<? extends IsRODAObject>> getInstanceIdObjectClasses() {
+    List<Class<? extends IsRODAObject>> list = new ArrayList<>();
+    list.add(AIP.class);
+    list.add(RepresentationInformation.class);
+    list.add(Notification.class);
+    list.add(Risk.class);
+    list.add(RiskIncidence.class);
+    // list.add(IndexedPreservationAgent.class);
+    // list.add(IndexedPreservationEvent.class);
+    return list;
+  }
+
   public static <T extends IsRODAObject> boolean getBooleanFromParameters(Plugin<T> plugin,
     PluginParameter pluginParameter) {
     return verifyIfStepShouldBePerformed(plugin, pluginParameter);
@@ -919,7 +932,7 @@ public final class PluginHelper {
   /**************************************************/
   /**
    * 
-   * @param requestUuid
+   * @param plugin
    *          uniq identifier of this request
    */
   public static <T extends IsRODAObject> void acquireObjectLock(String lite, Plugin<T> plugin) throws LockingException {
@@ -968,7 +981,7 @@ public final class PluginHelper {
 
   /**
    * 
-   * @param requestUuid
+   * @param plugin
    *          uniq identifier of this request
    */
   public static <T extends IsRODAObject> void releaseObjectLock(String lite, Plugin<T> plugin) throws LockingException {
@@ -1028,7 +1041,8 @@ public final class PluginHelper {
   }
 
   public static <T extends IsRODAObject> String getPluginAgentId(Plugin<T> plugin) {
-    return IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion());
+    return IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion(),
+      LocalInstanceUtils.getLocalInstanceIdentifier());
   }
 
   public static void createSubmission(ModelService model, boolean createSubmission, Path submissionPath, String aipId)
@@ -1249,7 +1263,8 @@ public final class PluginHelper {
     String outcomeDetailExtension, boolean notify, Date startDate, Job cachedJob) throws RequestNotValidException,
     NotFoundException, GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
     List<String> agentIds = new ArrayList<>();
-    String agentId = IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion());
+    String agentId = IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion(),
+      LocalInstanceUtils.getLocalInstanceIdentifier());
     StoragePath agentPath = ModelUtils.getPreservationMetadataStoragePath(agentId, PreservationMetadataType.AGENT);
 
     try {
@@ -1274,7 +1289,7 @@ public final class PluginHelper {
     }
 
     if (job != null) {
-      String userId = IdUtils.getUserAgentId(job.getUsername());
+      String userId = IdUtils.getUserAgentId(job.getUsername(), LocalInstanceUtils.getLocalInstanceIdentifier());
       StoragePath userAgentPath = ModelUtils.getPreservationMetadataStoragePath(userId, PreservationMetadataType.AGENT);
 
       try {
@@ -1294,7 +1309,8 @@ public final class PluginHelper {
       }
     }
 
-    String id = IdUtils.createPreservationMetadataId(PreservationMetadataType.EVENT);
+    String id = IdUtils.createPreservationMetadataId(PreservationMetadataType.EVENT,
+      LocalInstanceUtils.getLocalInstanceIdentifier());
     String outcomeDetailNote;
     switch (outcome) {
       case SKIPPED:
@@ -1329,7 +1345,8 @@ public final class PluginHelper {
 
   public static LinkingIdentifier getLinkingIdentifier(TransferredResource transferredResource, String role) {
     LinkingIdentifier li = new LinkingIdentifier();
-    li.setValue(LinkingObjectUtils.getLinkingIdentifierId(transferredResource));
+    li.setValue(
+      LinkingObjectUtils.getLinkingIdentifierId(transferredResource, LocalInstanceUtils.getLocalInstanceIdentifier()));
     li.setType(RodaConstants.URN_TYPE);
     li.setRoles(Arrays.asList(role));
     return li;
@@ -1350,14 +1367,14 @@ public final class PluginHelper {
 
   private static LinkingIdentifier getLinkingIdentifier(RODA_TYPE type, String uuid, String role) {
     LinkingIdentifier li = new LinkingIdentifier();
-    li.setValue(LinkingObjectUtils.getLinkingIdentifierId(type, uuid));
+    li.setValue(LinkingObjectUtils.getLinkingIdentifierId(type, uuid, LocalInstanceUtils.getLocalInstanceIdentifier()));
     li.setType(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN);
     li.setRoles(Arrays.asList(role));
     return li;
   }
 
   public static <T extends IsRODAObject> void removeSIPs(ModelService model,
-                                                       List<TransferredResource> transferredResources, IngestJobPluginInfo jobPluginInfo, Job cachedJob) {
+    List<TransferredResource> transferredResources, IngestJobPluginInfo jobPluginInfo, Job cachedJob) {
     for (TransferredResource transferredResource : transferredResources) {
       String transferredResourceId = transferredResource.getUUID();
 
@@ -1371,15 +1388,15 @@ public final class PluginHelper {
               model.deleteTransferredResource(transferredResource);
             } catch (GenericException | AuthorizationDeniedException e) {
               model.createRepositoryEvent(RodaConstants.PreservationEventType.DELETION,
-                  "The process of deleting an object of the repository", PluginState.FAILURE,
-                  "The transferred resource " + transferredResource.getName() + " has not been deleted.", "", cachedJob.getUsername(),
-                  true);
+                "The process of deleting an object of the repository", PluginState.FAILURE,
+                "The transferred resource " + transferredResource.getName() + " has not been deleted.", "",
+                cachedJob.getUsername(), true);
               LOGGER.debug("Failed to remove SIP {}", transferredResource.getFullPath(), e);
             }
             model.createRepositoryEvent(RodaConstants.PreservationEventType.DELETION,
-                "The process of deleting an object of the repository", PluginState.SUCCESS,
-                "The transferred resource " + transferredResource.getName() + " has been deleted.", "", cachedJob.getUsername(),
-                true);
+              "The process of deleting an object of the repository", PluginState.SUCCESS,
+              "The transferred resource " + transferredResource.getName() + " has been deleted.", "",
+              cachedJob.getUsername(), true);
             LOGGER.debug("Done with removing SIP {}", transferredResource.getFullPath());
           }
         } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
@@ -1746,8 +1763,8 @@ public final class PluginHelper {
             failureMessage = "RODA object conversion from lite throwed an error.";
           }
 
-          reportFailureTransformingLiteInObject(model, plugin, report, pluginInfo, job, LiteOptionalWithCause.of(object),
-              failureMessage, Optional.of(object));
+          reportFailureTransformingLiteInObject(model, plugin, report, pluginInfo, job,
+            LiteOptionalWithCause.of(object), failureMessage, Optional.of(object));
         }
       }
     }

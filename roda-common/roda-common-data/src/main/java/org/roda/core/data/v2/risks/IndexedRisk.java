@@ -11,8 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 
@@ -24,7 +22,7 @@ public class IndexedRisk extends Risk implements IsIndexed {
   private static final long serialVersionUID = 2864416437668370485L;
   private int incidencesCount = 0;
   private int unmitigatedIncidencesCount = 0;
-  
+
   private Map<String, Object> fields;
 
   public IndexedRisk() {
@@ -70,7 +68,7 @@ public class IndexedRisk extends Risk implements IsIndexed {
       "posMitigationProbability", "posMitigationImpact", "posMitigationSeverity", "posMitigationNotes",
       "mitigationStrategy", "mitigationOwnerType", "mitigationOwner", "mitigationRelatedEventIdentifierType",
       "mitigationRelatedEventIdentifierValue", "createdOn", "createdBy", "updatedOn", "updatedBy", "incidencesCount",
-      "unmitigatedIncidencesCount");
+      "unmitigatedIncidencesCount", "instanceId");
   }
 
   @Override
@@ -80,7 +78,8 @@ public class IndexedRisk extends Risk implements IsIndexed {
       getPreMitigationNotes(), getPostMitigationProbability(), getPostMitigationImpact(), getPostMitigationSeverity(),
       getPreMitigationNotes(), getMitigationStrategy(), getMitigationOwnerType(), getMitigationOwner(),
       getMitigationRelatedEventIdentifierType(), getMitigationRelatedEventIdentifierValue(), getCreatedOn(),
-      getCreatedBy(), getUpdatedOn(), getUpdatedBy(), getIncidencesCount(), getUnmitigatedIncidencesCount()});
+      getCreatedBy(), getUpdatedOn(), getUpdatedBy(), getIncidencesCount(), getUnmitigatedIncidencesCount(),
+      getInstanceId()});
   }
 
   @Override
@@ -96,7 +95,8 @@ public class IndexedRisk extends Risk implements IsIndexed {
   }
 
   /**
-   * @param fields the fields to set
+   * @param fields
+   *          the fields to set
    */
   public void setFields(Map<String, Object> fields) {
     this.fields = fields;

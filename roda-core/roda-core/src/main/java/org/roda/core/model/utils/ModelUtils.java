@@ -542,6 +542,13 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(path);
   }
 
+  public static StoragePath getPreservationEventStoragePath(String fileId) throws RequestNotValidException {
+    String fileName = fileId + RodaConstants.PREMIS_SUFFIX;
+    List<String> path = Arrays.asList(RodaConstants.STORAGE_CONTAINER_PRESERVATION,
+      RodaConstants.STORAGE_DIRECTORY_EVENTS, fileName);
+    return DefaultStoragePath.parse(path);
+  }
+
   public static StoragePath getPreservationAIPStoragePath(String aipId) throws RequestNotValidException {
     List<String> path = Arrays.asList(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
@@ -643,14 +650,15 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISPOSAL_HOLD);
   }
 
-  public static StoragePath getDistributedInstanceStoragePath(String distributedInstanceId) throws RequestNotValidException {
+  public static StoragePath getDistributedInstanceStoragePath(String distributedInstanceId)
+    throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISTRIBUTED_INSTANCES,
-        distributedInstanceId + RodaConstants.DISTRIBUTED_INSTANCE_FILE_EXTENSION);
+      distributedInstanceId + RodaConstants.DISTRIBUTED_INSTANCE_FILE_EXTENSION);
   }
 
   public static StoragePath getAccessKeysStoragePath(String accessKeyId) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACCESS_KEYS,
-        accessKeyId + RodaConstants.DISTRIBUTED_INSTANCE_FILE_EXTENSION);
+      accessKeyId + RodaConstants.DISTRIBUTED_INSTANCE_FILE_EXTENSION);
   }
 
   public static String getJobId(StoragePath jobPath) {
