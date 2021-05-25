@@ -35,6 +35,8 @@ public interface ModelObserver {
 
   public ReturnWithExceptions<Void, ModelObserver> aipStateUpdated(AIP aip);
 
+  public ReturnWithExceptions<Void, ModelObserver> aipInstanceIdUpdated(AIP aip);
+
   public ReturnWithExceptions<Void, ModelObserver> aipMoved(AIP aip, String oldParentId, String newParentId);
 
   public ReturnWithExceptions<Void, ModelObserver> aipDeleted(String aipId, boolean deleteIncidences);

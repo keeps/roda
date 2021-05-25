@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import org.apache.tomcat.jni.Local;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
@@ -524,8 +526,8 @@ public interface BrowserService extends RemoteService {
   void deleteUserAccessKeys(String userId)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
 
-  AccessKey regenerateAccessKey(AccessKey accessKey) throws AuthorizationDeniedException,
-    RequestNotValidException, NotFoundException, GenericException, AuthenticationDeniedException;
+  AccessKey regenerateAccessKey(AccessKey accessKey) throws AuthorizationDeniedException, RequestNotValidException,
+    NotFoundException, GenericException, AuthenticationDeniedException;
 
   AccessKey revokeAccessKey(AccessKey accessKey)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
@@ -541,4 +543,7 @@ public interface BrowserService extends RemoteService {
 
   List<String> testLocalInstanceConfiguration(LocalInstance localInstance)
     throws AuthorizationDeniedException, GenericException;
+
+  void modifyInstanceIdOnRepository(LocalInstance localInstance)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 }

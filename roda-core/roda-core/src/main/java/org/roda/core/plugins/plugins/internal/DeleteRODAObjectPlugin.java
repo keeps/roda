@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -58,6 +59,7 @@ import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.utils.LocalInstanceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -317,7 +319,8 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
 
         // removing PREMIS file
         try {
-          String pmId = URNUtils.getPremisPrefix(PreservationMetadataType.FILE) + file.getId();
+          String pmId = URNUtils.getPremisPrefix(PreservationMetadataType.FILE,
+            LocalInstanceUtils.getLocalInstanceIdentifier()) + file.getId();
           model.deletePreservationMetadata(PreservationMetadataType.FILE, file.getAipId(), file.getRepresentationId(),
             pmId, false);
         } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
@@ -387,7 +390,8 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
 
         // removing PREMIS file
         try {
-          String pmId = URNUtils.getPremisPrefix(PreservationMetadataType.REPRESENTATION) + representation.getId();
+          String pmId = URNUtils.getPremisPrefix(PreservationMetadataType.REPRESENTATION,
+            LocalInstanceUtils.getLocalInstanceIdentifier()) + representation.getId();
           model.deletePreservationMetadata(PreservationMetadataType.REPRESENTATION, representation.getAipId(),
             representation.getId(), pmId, false);
         } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {

@@ -21,12 +21,14 @@ public final class LinkingObjectUtils {
 
   }
 
-  public static String getLinkingIdentifierId(RODA_TYPE type, String uuid) {
-    return URNUtils.createRodaURN(type, uuid);
+  public static String getLinkingIdentifierId(RODA_TYPE type, String uuid, String instanceId) {
+    return URNUtils.createRodaURN(type, uuid, instanceId);
   }
 
-  public static String getLinkingIdentifierId(TransferredResource transferredResource) {
-    return getLinkingIdentifierId(RODA_TYPE.TRANSFERRED_RESOURCE, transferredResource.getRelativePath());
+  public static String getLinkingIdentifierId(TransferredResource transferredResource,
+    String instanceId) {
+    return getLinkingIdentifierId(RODA_TYPE.TRANSFERRED_RESOURCE, transferredResource.getRelativePath(),
+      instanceId);
   }
 
   /**

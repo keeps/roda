@@ -1367,4 +1367,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.testLocalInstanceConfiguration(user, localInstance);
   }
+
+  @Override
+  public void modifyInstanceIdOnRepository(LocalInstance localInstance) throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.modifyInstanceIdOnRepository(user, localInstance);
+  }
+
 }

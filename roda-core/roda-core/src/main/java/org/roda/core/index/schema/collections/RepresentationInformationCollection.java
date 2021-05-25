@@ -87,6 +87,8 @@ public class RepresentationInformationCollection
 
     fields.add(SolrCollection.getSortFieldOf(RodaConstants.REPRESENTATION_INFORMATION_NAME));
 
+    fields.add(new Field(RodaConstants.REPRESENTATION_INFORMATION_INSTANCE_ID, Field.TYPE_STRING));
+
     return fields;
   }
 
@@ -122,6 +124,7 @@ public class RepresentationInformationCollection
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_CREATED_BY, ri.getCreatedBy());
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_UPDATED_ON, SolrUtils.formatDate(ri.getUpdatedOn()));
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_UPDATED_BY, ri.getUpdatedBy());
+    doc.addField(RodaConstants.REPRESENTATION_INFORMATION_INSTANCE_ID, ri.getInstanceId());
 
     return doc;
   }
@@ -148,6 +151,7 @@ public class RepresentationInformationCollection
     ri.setCreatedBy(SolrUtils.objectToString(doc.get(RodaConstants.REPRESENTATION_INFORMATION_CREATED_BY), ""));
     ri.setUpdatedOn(SolrUtils.objectToDate(doc.get(RodaConstants.REPRESENTATION_INFORMATION_UPDATED_ON)));
     ri.setUpdatedBy(SolrUtils.objectToString(doc.get(RodaConstants.REPRESENTATION_INFORMATION_UPDATED_BY), ""));
+    ri.setInstanceId(SolrUtils.objectToString(doc.get(RodaConstants.REPRESENTATION_INFORMATION_INSTANCE_ID), null));
 
     return ri;
 

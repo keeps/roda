@@ -79,6 +79,7 @@ public class RiskIncidenceCollection extends AbstractSolrCollection<RiskIncidenc
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_MITIGATED_BY, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION, Field.TYPE_TEXT).setMultiValued(false));
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED, Field.TYPE_STRING).setStored(false));
+    fields.add(new Field(RodaConstants.RISK_INCIDENCE_INSTANCE_ID, Field.TYPE_STRING));
 
     return fields;
   }
@@ -110,6 +111,7 @@ public class RiskIncidenceCollection extends AbstractSolrCollection<RiskIncidenc
     doc.addField(RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION, incidence.getMitigatedDescription());
     doc.addField(RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED,
       StringUtils.join(incidence.getFilePath(), RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED_SEPARATOR));
+    doc.addField(RodaConstants.RISK_INCIDENCE_INSTANCE_ID, incidence.getInstanceId());
 
     return doc;
   }
@@ -127,8 +129,8 @@ public class RiskIncidenceCollection extends AbstractSolrCollection<RiskIncidenc
     incidence.setRiskId(SolrUtils.objectToString(doc.get(RodaConstants.RISK_INCIDENCE_RISK_ID), null));
     incidence.setDescription(SolrUtils.objectToString(doc.get(RodaConstants.RISK_INCIDENCE_DESCRIPTION), null));
     if (doc.containsKey(RodaConstants.RISK_INCIDENCE_STATUS)) {
-      incidence.setStatus(IncidenceStatus.valueOf(SolrUtils
-        .objectToString(doc.get(RodaConstants.RISK_INCIDENCE_STATUS), IncidenceStatus.UNMITIGATED.toString())));
+      incidence.setStatus(IncidenceStatus.valueOf(SolrUtils.objectToString(doc.get(RodaConstants.RISK_INCIDENCE_STATUS),
+        IncidenceStatus.UNMITIGATED.toString())));
     }
     if (doc.containsKey(RodaConstants.RISK_INCIDENCE_SEVERITY)) {
       incidence.setSeverity(SeverityLevel.valueOf(
@@ -140,6 +142,7 @@ public class RiskIncidenceCollection extends AbstractSolrCollection<RiskIncidenc
     incidence.setMitigatedBy(SolrUtils.objectToString(doc.get(RodaConstants.RISK_INCIDENCE_MITIGATED_BY), null));
     incidence.setMitigatedDescription(
       SolrUtils.objectToString(doc.get(RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION), null));
+    incidence.setInstanceId(SolrUtils.objectToString(doc.get(RodaConstants.RISK_INCIDENCE_INSTANCE_ID), null));
 
     return incidence;
   }

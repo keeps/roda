@@ -9,8 +9,6 @@ package org.roda.core.data.v2.ip.metadata;
 
 import java.util.List;
 
-
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.ip.HasId;
@@ -34,12 +32,14 @@ public class PreservationMetadata implements IsModelObject, HasId {
   private String fileId;
   private PreservationMetadataType type;
 
+  private String instanceId;
+
   public PreservationMetadata() {
     super();
   }
 
   public PreservationMetadata(String id, PreservationMetadataType type, String aipId, String representationId,
-    List<String> fileDirectoryPath, String fileId) {
+    List<String> fileDirectoryPath, String fileId, String instanceId) {
     super();
     this.id = id;
     this.type = type;
@@ -48,18 +48,19 @@ public class PreservationMetadata implements IsModelObject, HasId {
     this.representationId = representationId;
     this.fileDirectoryPath = fileDirectoryPath;
     this.fileId = fileId;
+    this.instanceId = instanceId;
   }
 
   public PreservationMetadata(String id, PreservationMetadataType type) {
-    this(id, type, null, null, null, null);
+    this(id, type, null, null, null, null, null);
   }
 
   public PreservationMetadata(String id, PreservationMetadataType type, String aipId) {
-    this(id, type, aipId, null, null, null);
+    this(id, type, aipId, null, null, null, null);
   }
 
   public PreservationMetadata(String id, PreservationMetadataType type, String aipId, String representationId) {
-    this(id, type, aipId, representationId, null, null);
+    this(id, type, aipId, representationId, null, null, null);
   }
 
   @JsonIgnore
@@ -123,6 +124,14 @@ public class PreservationMetadata implements IsModelObject, HasId {
     this.fileId = fileId;
   }
 
+  public String getInstanceId() {
+    return instanceId;
+  }
+
+  public void setInstanceId(String instanceId) {
+    this.instanceId = instanceId;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -133,6 +142,7 @@ public class PreservationMetadata implements IsModelObject, HasId {
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     result = prime * result + ((representationId == null) ? 0 : representationId.hashCode());
     result = prime * result + ((type == null) ? 0 : type.hashCode());
+    result = prime * result + ((instanceId == null) ? 0 : instanceId.hashCode());
     return result;
   }
 
@@ -172,13 +182,19 @@ public class PreservationMetadata implements IsModelObject, HasId {
       return false;
     if (type != other.type)
       return false;
+    if (instanceId == null) {
+      if (other.instanceId != null)
+        return false;
+    } else if (!instanceId.equals(other.instanceId))
+      return false;
     return true;
   }
 
   @Override
   public String toString() {
     return "PreservationMetadata [id=" + id + ", aipId=" + aipId + ", representationId=" + representationId
-      + ", fileDirectoryPath=" + fileDirectoryPath + ", fileId=" + fileId + ", type=" + type + "]";
+      + ", fileDirectoryPath=" + fileDirectoryPath + ", fileId=" + fileId + ", type=" + type + ", instanceId="
+      + instanceId + "]";
   }
 
 }

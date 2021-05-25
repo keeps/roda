@@ -53,6 +53,8 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
   private Date updatedOn = null;
   private String updatedBy = null;
 
+  private String instanceId = null;
+
   public Risk() {
     super();
     this.identifiedOn = new Date();
@@ -85,6 +87,7 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
     this.mitigationOwner = risk.getMitigationOwner();
     this.mitigationRelatedEventIdentifierType = risk.getMitigationRelatedEventIdentifierType();
     this.mitigationRelatedEventIdentifierValue = risk.getMitigationRelatedEventIdentifierValue();
+    this.instanceId = risk.getInstanceId();
   }
 
   @JsonIgnore
@@ -211,8 +214,8 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
   }
 
   public void setPostMitigationSeverityLevel(String postMitigationSeverity) {
-    this.postMitigationSeverityLevel = postMitigationSeverity != null
-      ? SeverityLevel.valueOf(postMitigationSeverity) : null;
+    this.postMitigationSeverityLevel = postMitigationSeverity != null ? SeverityLevel.valueOf(postMitigationSeverity)
+      : null;
   }
 
   public String getPostMitigationNotes() {
@@ -304,6 +307,14 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
     this.updatedBy = updatedBy;
   }
 
+  public String getInstanceId() {
+    return instanceId;
+  }
+
+  public void setInstanceId(String instanceId) {
+    this.instanceId = instanceId;
+  }
+
   @Override
   public String toString() {
     return "Risk [id=" + getId() + ", name=" + getName() + ", description=" + description + ", identifiedOn="
@@ -316,7 +327,7 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
       + ", mitigationOwner=" + mitigationOwner + ", mitigationRelatedEventIdentifierType="
       + mitigationRelatedEventIdentifierType + ", mitigationRelatedEventIdentifierValue="
       + mitigationRelatedEventIdentifierValue + ", createdOn=" + createdOn + ", createdBy=" + createdBy + ", updatedOn="
-      + updatedOn + ", updatedBy=" + updatedBy + "]";
+      + updatedOn + ", updatedBy=" + updatedBy + ", instanceId=" + instanceId + "]";
   }
 
   @JsonIgnore
@@ -355,6 +366,7 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
     result = prime * result + ((preMitigationSeverityLevel == null) ? 0 : preMitigationSeverityLevel.hashCode());
     result = prime * result + ((updatedBy == null) ? 0 : updatedBy.hashCode());
     result = prime * result + ((updatedOn == null) ? 0 : updatedOn.hashCode());
+    result = prime * result + ((instanceId == null) ? 0 : instanceId.hashCode());
     return result;
   }
 
@@ -462,6 +474,11 @@ public class Risk extends NamedIndexedModel implements IsModelObject {
       if (other.updatedOn != null)
         return false;
     } else if (!updatedOn.equals(other.updatedOn))
+      return false;
+    if (instanceId == null) {
+      if (other.instanceId != null)
+        return false;
+    } else if (!instanceId.equals(other.instanceId))
       return false;
     return true;
   }

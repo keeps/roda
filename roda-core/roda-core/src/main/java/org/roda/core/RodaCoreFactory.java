@@ -264,8 +264,8 @@ public class RodaCoreFactory {
       }
     });
 
-  private static List<String> CONFIGURATIONS = new ArrayList<>(
-    Arrays.asList("roda-core.properties", "roda-roles.properties", "roda-permissions.properties"));
+  private static List<String> CONFIGURATIONS = new ArrayList<>(Arrays.asList("roda-core.properties",
+    "roda-roles.properties", "roda-permissions.properties", "roda-instance.properties"));
 
   /**
    * Shared configuration and message properties (cache). Includes properties from
@@ -1442,8 +1442,7 @@ public class RodaCoreFactory {
     distributedModeType = DistributedModeType.valueOf(
       getProperty(RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY, RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name()));
     if (DistributedModeType.CENTRAL.equals(distributedModeType)) {
-      apiSecretKey = getProperty(RodaConstants.API_SECRET_KEY_PROPERTY,
-        RodaConstants.DEFAULT_API_SECRET_KEY);
+      apiSecretKey = getProperty(RodaConstants.API_SECRET_KEY_PROPERTY, RodaConstants.DEFAULT_API_SECRET_KEY);
       tokenValidity = RodaCoreFactory.getRodaConfiguration().getLong(RodaConstants.TOKEN_VALIDITY,
         RodaConstants.DEFAULT_TOKEN_VALIDITY);
     }
@@ -2111,7 +2110,7 @@ public class RodaCoreFactory {
         Collections.singletonList(getNodeType().toString()));
 
       rodaSharedConfigurationPropertiesCache.put(RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY,
-          Collections.singletonList(getDistributedModeType().toString()));
+        Collections.singletonList(getDistributedModeType().toString()));
 
       Iterator<String> keys = configuration.getKeys();
       while (keys.hasNext()) {

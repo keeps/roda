@@ -89,6 +89,7 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
     fields.add(new Field(RodaConstants.JOB_HAS_FAILURES, Field.TYPE_BOOLEAN).setStored(false));
     fields.add(new Field(RodaConstants.JOB_HAS_PARTIAL_SUCCESS, Field.TYPE_BOOLEAN).setStored(false));
     fields.add(new Field(RodaConstants.JOB_HAS_SKIPPED, Field.TYPE_BOOLEAN).setStored(false));
+    fields.add(new Field(RodaConstants.JOB_INSTANCE_ID, Field.TYPE_STRING));
 
     return fields;
   }
@@ -140,6 +141,7 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
           + jobStats.getSourceObjectsWaitingToBeProcessed()));
     doc.addField(RodaConstants.JOB_HAS_PARTIAL_SUCCESS, jobStats.getSourceObjectsProcessedWithPartialSuccess() > 0);
     doc.addField(RodaConstants.JOB_HAS_SKIPPED, jobStats.getSourceObjectsProcessedWithSkipped() > 0);
+    doc.addField(RodaConstants.JOB_INSTANCE_ID, job.getInstanceId());
 
     return doc;
   }
@@ -153,6 +155,7 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
     job.setUsername(SolrUtils.objectToString(doc.get(RodaConstants.JOB_USERNAME), null));
     job.setStartDate(SolrUtils.objectToDateWithMillis(doc.get(RodaConstants.JOB_START_DATE)));
     job.setEndDate(SolrUtils.objectToDateWithMillis(doc.get(RodaConstants.JOB_END_DATE)));
+    job.setInstanceId(SolrUtils.objectToString(doc.get(RodaConstants.JOB_INSTANCE_ID),null));
     if (doc.containsKey(RodaConstants.JOB_STATE)) {
       job.setState(JOB_STATE.valueOf(SolrUtils.objectToString(doc.get(RodaConstants.JOB_STATE), null)));
     }

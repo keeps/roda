@@ -6,6 +6,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -19,6 +20,8 @@ public class LocalInstance implements IsModelObject {
   private String id;
   private String accessKey;
   private String centralInstanceURL;
+
+  private LocalInstanceIdentifierState instanceIdentifierState = LocalInstanceIdentifierState.INACTIVE;
 
   private Date createdOn;
   private String createdBy;
@@ -82,38 +85,44 @@ public class LocalInstance implements IsModelObject {
     this.updatedBy = updatedBy;
   }
 
+  public LocalInstanceIdentifierState getInstanceIdentifierState() {
+    return instanceIdentifierState;
+  }
+
+  public void setInstanceIdentifierState(LocalInstanceIdentifierState instanceIdentifierState) {
+    this.instanceIdentifierState = instanceIdentifierState;
+  }
+
   @JsonIgnore
   @Override
   public int getClassVersion() {
-    return 0;
+    return VERSION;
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
-
-    LocalInstance that = (LocalInstance) o;
-
-    if (id != null ? !id.equals(that.id) : that.id != null) return false;
-    if (accessKey != null ? !accessKey.equals(that.accessKey) : that.accessKey != null) return false;
-    if (centralInstanceURL != null ? !centralInstanceURL.equals(that.centralInstanceURL) : that.centralInstanceURL != null)
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
       return false;
-    if (createdOn != null ? !createdOn.equals(that.createdOn) : that.createdOn != null) return false;
-    if (createdBy != null ? !createdBy.equals(that.createdBy) : that.createdBy != null) return false;
-    if (updatedOn != null ? !updatedOn.equals(that.updatedOn) : that.updatedOn != null) return false;
-    return updatedBy != null ? updatedBy.equals(that.updatedBy) : that.updatedBy == null;
+    LocalInstance that = (LocalInstance) o;
+    return Objects.equals(id, that.id) && Objects.equals(accessKey, that.accessKey)
+      && Objects.equals(centralInstanceURL, that.centralInstanceURL)
+      && instanceIdentifierState == that.instanceIdentifierState && Objects.equals(createdOn, that.createdOn)
+      && Objects.equals(createdBy, that.createdBy) && Objects.equals(updatedOn, that.updatedOn)
+      && Objects.equals(updatedBy, that.updatedBy);
   }
 
   @Override
   public int hashCode() {
-    int result = id != null ? id.hashCode() : 0;
-    result = 31 * result + (accessKey != null ? accessKey.hashCode() : 0);
-    result = 31 * result + (centralInstanceURL != null ? centralInstanceURL.hashCode() : 0);
-    result = 31 * result + (createdOn != null ? createdOn.hashCode() : 0);
-    result = 31 * result + (createdBy != null ? createdBy.hashCode() : 0);
-    result = 31 * result + (updatedOn != null ? updatedOn.hashCode() : 0);
-    result = 31 * result + (updatedBy != null ? updatedBy.hashCode() : 0);
-    return result;
+    return Objects.hash(id, accessKey, centralInstanceURL, instanceIdentifierState, createdOn, createdBy, updatedOn,
+      updatedBy);
+  }
+
+  @Override
+  public String toString() {
+    return "LocalInstance{" + "id='" + id + '\'' + ", accessKey='" + accessKey + '\'' + ", centralInstanceURL='"
+      + centralInstanceURL + '\'' + ", instanceIdentifierState=" + instanceIdentifierState + ", createdOn=" + createdOn
+      + ", createdBy='" + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\'' + '}';
   }
 }

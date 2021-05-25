@@ -41,8 +41,10 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
   private String createdBy = null;
   private Date updatedOn = null;
   private String updatedBy = null;
-  
+
   private Map<String, Object> fields;
+
+  private String instanceId = null;
 
   public RepresentationInformation() {
     super();
@@ -61,6 +63,7 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
     this.createdBy = representationInformation.getCreatedBy();
     this.updatedOn = representationInformation.getUpdatedOn();
     this.updatedBy = representationInformation.getUpdatedBy();
+    this.instanceId = representationInformation.getInstanceId();
   }
 
   @JsonIgnore
@@ -164,21 +167,31 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
     this.updatedBy = updatedBy;
   }
 
+  public String getInstanceId() {
+    return instanceId;
+  }
+
+  public void setInstanceId(String instanceId) {
+    this.instanceId = instanceId;
+  }
+
   @Override
   public String toString() {
     return "RepresentationInformation [id=" + getId() + ", name=" + getName() + ", description=" + description
       + ", family=" + family + ", tags=" + tags + ", extras=" + extras + ", support=" + support + ", relations="
-      + relations + ", filters=" + filters + "]";
+      + relations + ", filters=" + filters + ", instanceId=" + instanceId + "]";
   }
 
   @Override
   public List<String> toCsvHeaders() {
-    return Arrays.asList("id", "name", "description", "family", "tags", "extras", "support", "relations", "filters");
+    return Arrays.asList("id", "name", "description", "family", "tags", "extras", "support", "relations", "filters",
+      "instanceId");
   }
 
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(getId(), getName(), description, family, tags, extras, support, relations, filters);
+    return Arrays.asList(getId(), getName(), description, family, tags, extras, support, relations, filters,
+      instanceId);
   }
 
   @JsonIgnore
@@ -200,7 +213,8 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
   }
 
   /**
-   * @param fields the fields to set
+   * @param fields
+   *          the fields to set
    */
   public void setFields(Map<String, Object> fields) {
     this.fields = fields;
@@ -221,6 +235,7 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
     result = prime * result + ((tags == null) ? 0 : tags.hashCode());
     result = prime * result + ((updatedBy == null) ? 0 : updatedBy.hashCode());
     result = prime * result + ((updatedOn == null) ? 0 : updatedOn.hashCode());
+    result = prime * result + ((instanceId == null) ? 0 : instanceId.hashCode());
     return result;
   }
 
@@ -284,6 +299,11 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
       if (other.updatedOn != null)
         return false;
     } else if (!updatedOn.equals(other.updatedOn))
+      return false;
+    if (instanceId == null) {
+      if (other.instanceId != null)
+        return false;
+    } else if (!instanceId.equals(other.instanceId))
       return false;
     return true;
   }

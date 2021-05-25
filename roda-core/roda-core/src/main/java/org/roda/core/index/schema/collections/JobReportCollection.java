@@ -105,6 +105,7 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     fields.add(new Field(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS, Field.TYPE_STRING).setMultiValued(true)
       .setStored(false));
     fields.add(new Field(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS_COUNTER, Field.TYPE_INT).setStored(false));
+    fields.add(new Field(RodaConstants.JOB_REPORT_INSTANCE_ID, Field.TYPE_STRING));
 
     return fields;
   }
@@ -142,6 +143,7 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     doc.addField(RodaConstants.JOB_REPORT_REPORTS, JsonUtils.getJsonFromObject(jobReport.getReports()));
     doc.addField(RodaConstants.JOB_REPORT_SOURCE_OBJECT_CLASS, jobReport.getSourceObjectClass());
     doc.addField(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_CLASS, jobReport.getOutcomeObjectClass());
+    doc.addField(RodaConstants.JOB_REPORT_INSTANCE_ID, jobReport.getInstanceId());
 
     return doc;
   }
@@ -226,7 +228,8 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     jobReport.setPluginVersion(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_VERSION), null));
     jobReport.setPluginState(
       PluginState.valueOf(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_STATE), null)));
-    jobReport.setPluginIsMandatory(SolrUtils.objectToBoolean(doc.get(RodaConstants.JOB_REPORT_PLUGIN_IS_MANDATORY), null));
+    jobReport
+      .setPluginIsMandatory(SolrUtils.objectToBoolean(doc.get(RodaConstants.JOB_REPORT_PLUGIN_IS_MANDATORY), null));
     jobReport.setPluginDetails(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_DETAILS), null));
     jobReport
       .setHtmlPluginDetails(SolrUtils.objectToBoolean(doc.get(RodaConstants.JOB_REPORT_HTML_PLUGIN_DETAILS), false));
@@ -248,6 +251,7 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     jobReport.setSuccessfulPlugins(SolrUtils.objectToListString(doc.get(RodaConstants.JOB_REPORT_SUCCESSFUL_PLUGINS)));
     jobReport
       .setUnsuccessfulPlugins(SolrUtils.objectToListString(doc.get(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS)));
+    jobReport.setInstanceId(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_INSTANCE_ID), null));
 
     return jobReport;
   }

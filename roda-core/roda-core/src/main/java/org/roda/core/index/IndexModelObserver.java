@@ -56,11 +56,13 @@ import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
@@ -83,6 +85,7 @@ import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultBinary;
 import org.roda.core.storage.JsonContentPayload;
@@ -410,6 +413,21 @@ public class IndexModelObserver implements ModelObserver {
     return ret;
   }
 
+  @Override
+  public ReturnWithExceptions<Void, ModelObserver> aipInstanceIdUpdated(AIP aip) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+
+    // change AIP
+    SolrUtils.update(index, IndexedAIP.class, aip.getId(),
+      Collections.singletonMap(RodaConstants.AIP_INSTANCE_ID, aip.getInstanceId()), (ModelObserver) this).addTo(ret);
+
+    if (ret.isEmpty()) {
+      representationsInstanceIdUpdated(aip).addTo(ret);
+    }
+
+    return ret;
+  }
+
   private ReturnWithExceptions<Void, ModelObserver> descriptivesMetadataUpdated(final AIP aip) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
     for (DescriptiveMetadata metadata : aip.getDescriptiveMetadata()) {
@@ -463,6 +481,53 @@ public class IndexModelObserver implements ModelObserver {
     return ret;
   }
 
+  private ReturnWithExceptions<Void, ModelObserver> representationsInstanceIdUpdated(final AIP aip) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+
+    for (Representation representation : aip.getRepresentations()) {
+      representationInstanceIdUpdated(aip, representation).addTo(ret);
+    }
+    return ret;
+  }
+
+  private ReturnWithExceptions<Void, ModelObserver> representationInstanceIdUpdated(final AIP aip,
+    final Representation representation) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+
+    try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
+      representation.getId(), true)) {
+      SolrUtils
+        .update(index, IndexedRepresentation.class, IdUtils.getRepresentationId(representation),
+          Collections.singletonMap(RodaConstants.REPRESENTATION_INSTANCE_ID, aip.getInstanceId()), (ModelObserver) this)
+        .addTo(ret);
+
+      if (ret.isEmpty()) {
+        for (OptionalWithCause<File> file : allFiles) {
+          if (file.isPresent()) {
+            if (FSUtils.isExternalFile(file.get().getId())) {
+              for (OptionalWithCause<File> fileShallow : model.listExternalFilesUnder(file.get())) {
+                fileInstanceIdUpdated(aip, fileShallow.get(), false).addTo(ret);
+              }
+            } else {
+              fileInstanceIdUpdated(aip, file.get(), false).addTo(ret);
+            }
+          } else {
+            LOGGER.error("Cannot do a partial update on File", file.getCause());
+            ret.add(file.getCause());
+          }
+        }
+      } else {
+        LOGGER.error("Cannot index representation: {}", representation);
+      }
+    } catch (AuthorizationDeniedException | IOException | NotFoundException | GenericException
+      | RequestNotValidException e) {
+      LOGGER.error("Cannot do a partial update", e);
+      ret.add(e);
+    }
+
+    return ret;
+  }
+
   private ReturnWithExceptions<Void, ModelObserver> fileStateUpdated(AIP aip, File file, boolean recursive) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
@@ -493,6 +558,70 @@ public class IndexModelObserver implements ModelObserver {
     }
 
     return ret;
+  }
+
+  private ReturnWithExceptions<Void, ModelObserver> fileInstanceIdUpdated(AIP aip, File file, boolean recursive) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+
+    SolrUtils.update(index, IndexedFile.class, IdUtils.getFileId(file),
+      Collections.singletonMap(RodaConstants.FILE_INSTANCE_ID, aip.getInstanceId()), (ModelObserver) this).addTo(ret);
+
+    if (ret.isEmpty()) {
+      if (recursive && file.isDirectory()) {
+        try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(file, true)) {
+          for (OptionalWithCause<File> subfile : allFiles) {
+            if (subfile.isPresent()) {
+              fileInstanceIdUpdated(aip, subfile.get(), false).addTo(ret);
+            } else {
+              LOGGER.error("Cannot update instance id on the file sub-resources", subfile.getCause());
+              ret.add(subfile.getCause());
+            }
+          }
+        } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
+          | IOException e) {
+          LOGGER.error("Cannot update instance id on the file sub-resources: {}", file, e);
+          ret.add(e);
+        }
+      }
+    } else {
+      LOGGER.error("Cannot update instance id on the file: {}", file);
+    }
+
+    return ret;
+  }
+
+  private ReturnWithExceptions<Void, ModelObserver> preservationEventsInstanceIdUpdated(final AIP aip) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+
+    try (CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadata = model
+      .listPreservationMetadata(aip.getId(), true)) {
+      for (OptionalWithCause<PreservationMetadata> opm : preservationMetadata) {
+        if (opm.isPresent()) {
+          PreservationMetadata pm = opm.get();
+          if (pm.getType().equals(PreservationMetadataType.EVENT)) {
+            preservationEventInstanceIdUpdated(pm, aip.getInstanceId()).addTo(ret);
+          }
+        } else {
+          LOGGER.error("Cannot index premis event", opm.getCause());
+          ret.add(opm.getCause());
+        }
+      }
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
+      | IOException e) {
+      LOGGER.error("Cannot index preservation events", e);
+      ret.add(e);
+    }
+
+    return ret;
+  }
+
+  private ReturnWithExceptions<Void, ModelObserver> preservationEventInstanceIdUpdated(PreservationMetadata pm,
+    String instanceId) {
+    Map<String, Object> fieldsToUpdate = new HashMap<>();
+    fieldsToUpdate.put(RodaConstants.AIP_INSTANCE_ID, instanceId);
+    fieldsToUpdate.put(RodaConstants.PRESERVATION_EVENT_AIP_ID, pm.getAipId());
+    fieldsToUpdate.put(RodaConstants.INDEX_ID, pm.getId());
+    return SolrUtils.update(index, IndexedPreservationEvent.class, pm.getId(), fieldsToUpdate, (ModelObserver) this);
   }
 
   private ReturnWithExceptions<Void, ModelObserver> preservationEventsStateUpdated(final AIP aip) {

@@ -2,11 +2,16 @@ package org.roda.wui.client.management.distributed;
 
 import java.util.List;
 
-import com.google.gwt.jsonp.client.JsonpRequestBuilder;
 import org.roda.core.data.v2.distributedInstance.LocalInstance;
+import org.roda.core.data.v2.distributedInstance.LocalInstanceIdentifierState;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -79,6 +84,9 @@ public class ShowLocalInstanceConfiguration extends Composite {
   @UiField
   HTML centralInstanceURLValue;
 
+  @UiField
+  HTML instanceIdStateValue;
+
   public ShowLocalInstanceConfiguration(LocalInstance localInstance) {
     initWidget(uiBinder.createAndBindUi(this));
     this.localInstance = localInstance;
@@ -89,6 +97,7 @@ public class ShowLocalInstanceConfiguration extends Composite {
   private void initElements(LocalInstance localInstance) {
     IDValue.setText(localInstance.getId());
     centralInstanceURLValue.setText(localInstance.getCentralInstanceURL());
+    instanceIdStateValue.setHTML(HtmlSnippetUtils.getInstanceIdStateHtml(localInstance));
   }
 
   @UiHandler("buttonEdit")
@@ -98,25 +107,102 @@ public class ShowLocalInstanceConfiguration extends Composite {
 
   @UiHandler("buttonTest")
   void buttonTestHandler(ClickEvent e) {
-    BrowserService.Util.getInstance().testLocalInstanceConfiguration(localInstance, new NoAsyncCallback<List<String>>() {
-      @Override
-      public void onSuccess(List<String> result) {
-        if (result.isEmpty()) {
-          Toast.showInfo("Test instance", "Success");
-        } else {
-          Toast.showError("Test instance", "Error: " + result.toString());
+    BrowserService.Util.getInstance().testLocalInstanceConfiguration(localInstance,
+      new NoAsyncCallback<List<String>>() {
+        @Override
+        public void onSuccess(List<String> result) {
+          if (result.isEmpty()) {
+            Toast.showInfo("Test instance", "Success");
+          } else {
+            Toast.showError("Test instance", "Error: " + result.toString());
+          }
         }
-      }
-    });
+      });
+  }
+
+  @UiHandler("buttonApplyId")
+  void buttonApplyIdHandler(ClickEvent e) {
+    Dialogs.showConfirmDialog(messages.applyInstanceIdToRepository(), messages.applyInstanceIdToRepositoryMessage(),
+      messages.dialogNo(), messages.dialogYes(), new NoAsyncCallback<Boolean>() {
+        @Override
+        public void onSuccess(Boolean result) {
+          if (result) {
+            localInstance.setInstanceIdentifierState(LocalInstanceIdentifierState.ACTIVE);
+            BrowserService.Util.getInstance().updateLocalInstanceConfiguration(localInstance,
+              new NoAsyncCallback<Void>() {
+                @Override
+                public void onSuccess(Void unused) {
+                  BrowserService.Util.getInstance().modifyInstanceIdOnRepository(localInstance,
+                    new AsyncCallback<Job>() {
+                      @Override
+                      public void onFailure(Throwable caught) {
+                        AsyncCallbackUtils.defaultFailureTreatment(caught);
+                        HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                      }
+
+                      @Override
+                      public void onSuccess(Job job) {
+                        Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+                          @Override
+                          public void onFailure(Throwable caught) {
+                            Toast.showInfo(messages.runningInBackgroundTitle(),
+                              messages.runningInBackgroundDescription());
+                          }
+
+                          @Override
+                          public void onSuccess(final Void nothing) {
+                            HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                          }
+                        });
+                      }
+                    });
+                }
+              });
+          }
+        }
+      });
   }
 
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
-    BrowserServiceImpl.Util.getInstance().deleteLocalInstanceConfiguration(new NoAsyncCallback<Void>() {
-      @Override
-      public void onSuccess(Void result) {
-        HistoryUtils.newHistory(LocalInstanceManagement.RESOLVER);
-      }
-    });
+
+    Dialogs.showConfirmDialog(messages.removeInstanceIdFromRepository(),
+      messages.removeInstanceIdFromRepositoryMessage(), messages.dialogNo(), messages.dialogYes(),
+      new NoAsyncCallback<Boolean>() {
+        @Override
+        public void onSuccess(Boolean result) {
+          if (result) {
+            BrowserService.Util.getInstance().deleteLocalInstanceConfiguration(new NoAsyncCallback<Void>() {
+              @Override
+              public void onSuccess(Void unused) {
+                localInstance.setInstanceIdentifierState(LocalInstanceIdentifierState.INACTIVE);
+                localInstance.setId(null);
+                BrowserService.Util.getInstance().modifyInstanceIdOnRepository(localInstance, new AsyncCallback<Job>() {
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    AsyncCallbackUtils.defaultFailureTreatment(caught);
+                    HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                  }
+
+                  @Override
+                  public void onSuccess(Job job) {
+                    Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+                      @Override
+                      public void onFailure(Throwable caught) {
+                        Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+                      }
+
+                      @Override
+                      public void onSuccess(final Void nothing) {
+                        HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                      }
+                    });
+                  }
+                });
+              }
+            });
+          }
+        }
+      });
   }
 }

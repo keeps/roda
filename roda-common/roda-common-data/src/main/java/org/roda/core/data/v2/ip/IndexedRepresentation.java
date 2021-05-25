@@ -11,8 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 
@@ -43,11 +41,12 @@ public class IndexedRepresentation extends Representation
   }
 
   public IndexedRepresentation(String uuid, String id, String aipId, boolean original, String type, String title,
-    long sizeInBytes, long totalNumberOfFiles, long totalNumberOfFolders, long numberOfDocumentationFiles,
-    long numberOfSchemaFiles, List<String> ancestors) {
+    String instanceId, long sizeInBytes, long totalNumberOfFiles, long totalNumberOfFolders,
+    long numberOfDocumentationFiles, long numberOfSchemaFiles, List<String> ancestors) {
     super(id, aipId, original, type);
     this.uuid = uuid;
     this.setTitle(title);
+    this.setInstanceId(instanceId);
     this.sizeInBytes = sizeInBytes;
     this.numberOfDataFiles = totalNumberOfFiles;
     this.setNumberOfDataFolders(totalNumberOfFolders);
@@ -172,26 +171,26 @@ public class IndexedRepresentation extends Representation
 
   @Override
   public String toString() {
-    return "IndexedRepresentation [uuid=" + uuid + ", title=" + title + ", sizeInBytes=" + sizeInBytes
-      + ", numberOfDataFiles=" + numberOfDataFiles + ", numberOfDataFolders=" + numberOfDataFolders
-      + " numberOfDocumentationFiles=" + numberOfDocumentationFiles + ", numberOfSchemaFiles=" + numberOfSchemaFiles
-      + ", ancestors=" + ancestors + ", createdOn=" + super.getCreatedOn() + ", createdBy=" + super.getCreatedBy()
-      + ", updatedOn=" + super.getUpdatedOn() + ", updatedBy=" + super.getUpdatedBy() + ", representationStates="
-      + super.getRepresentationStates() + ']';
+    return "IndexedRepresentation [uuid=" + uuid + ", title=" + title + ", instanceId=" + super.getInstanceId()
+      + ", sizeInBytes=" + sizeInBytes + ", numberOfDataFiles=" + numberOfDataFiles + ", numberOfDataFolders="
+      + numberOfDataFolders + " numberOfDocumentationFiles=" + numberOfDocumentationFiles + ", numberOfSchemaFiles="
+      + numberOfSchemaFiles + ", ancestors=" + ancestors + ", createdOn=" + super.getCreatedOn() + ", createdBy="
+      + super.getCreatedBy() + ", updatedOn=" + super.getUpdatedOn() + ", updatedBy=" + super.getUpdatedBy()
+      + ", representationStates=" + super.getRepresentationStates() + ']';
   }
 
   @Override
   public List<String> toCsvHeaders() {
-    return Arrays.asList("uuid", "title", "sizeInBytes", "numberOfDataFiles", "numberOfDataFolders",
+    return Arrays.asList("uuid", "title", "instanceId", "sizeInBytes", "numberOfDataFiles", "numberOfDataFolders",
       "numberOfDocumentationFiles", "numberOfSchemaFiles", "ancestors", "createdOn", "createdBy", "updatedOn",
       "updatedBy", "representationStates");
   }
 
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(uuid, title, sizeInBytes, numberOfDataFiles, numberOfDataFolders, numberOfDocumentationFiles,
-      numberOfSchemaFiles, ancestors, super.getCreatedOn(), super.getCreatedBy(), super.getUpdatedOn(),
-      super.getUpdatedBy(), super.getRepresentationStates());
+    return Arrays.asList(uuid, title, super.getInstanceId(), sizeInBytes, numberOfDataFiles, numberOfDataFolders,
+      numberOfDocumentationFiles, numberOfSchemaFiles, ancestors, super.getCreatedOn(), super.getCreatedBy(),
+      super.getUpdatedOn(), super.getUpdatedBy(), super.getRepresentationStates());
   }
 
   @Override
