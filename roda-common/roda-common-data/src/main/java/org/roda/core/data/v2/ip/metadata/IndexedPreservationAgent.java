@@ -27,6 +27,8 @@ public class IndexedPreservationAgent implements IsIndexed, HasId {
 
   private Map<String, Object> fields;
 
+  private String instanceId;
+
   public IndexedPreservationAgent() {
     super();
   }
@@ -88,20 +90,28 @@ public class IndexedPreservationAgent implements IsIndexed, HasId {
     this.version = version;
   }
 
+  public String getInstanceId() {
+    return instanceId;
+  }
+
+  public void setInstanceId(String instanceId) {
+    this.instanceId = instanceId;
+  }
+
   @Override
   public String toString() {
     return "IndexedPreservationAgent [id=" + id + ", name=" + name + ", type=" + type + ", note=" + note
-      + ", extension=" + extension + ", roles=" + roles + "]";
+      + ", extension=" + extension + ", roles=" + roles + ", instanceId=" + instanceId + "]";
   }
 
   @Override
   public List<String> toCsvHeaders() {
-    return Arrays.asList("id", "name", "type", "note", "extension", "roles");
+    return Arrays.asList("id", "name", "type", "note", "extension", "roles", "instanceId");
   }
 
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(id, name, type, note, extension, roles);
+    return Arrays.asList(id, name, type, note, extension, roles, instanceId);
   }
 
   @Override

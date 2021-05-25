@@ -774,6 +774,7 @@ public final class RodaConstants {
   public static final String AIP_DISPOSAL_RETENTION_PERIOD_INTERVAL = "retentionPeriodInterval";
   public static final String AIP_DISPOSAL_RETENTION_PERIOD_DETAILS = "retentionPeriodDetails";
   public static final String AIP_DISPOSAL_RETENTION_PERIOD_CALCULATION = "retentionPeriodCalculation";
+  public static final String AIP_INSTANCE_ID = "instanceId";
 
   // AIP types
   public static final String AIP_TYPE_MIXED = "MIXED";
@@ -791,6 +792,7 @@ public final class RodaConstants {
   public static final String REPRESENTATION_AIP_ID = "aipId";
   public static final String REPRESENTATION_ORIGINAL = "original";
   public static final String REPRESENTATION_TYPE = "type";
+  public static final String REPRESENTATION_INSTANCE_ID = "instanceId";
   public static final String REPRESENTATION_TITLE = "title";
   public static final String REPRESENTATION_SIZE_IN_BYTES = "sizeInBytes";
   public static final String REPRESENTATION_NUMBER_OF_DATA_FILES = "numberOfDataFiles";
@@ -945,6 +947,7 @@ public final class RodaConstants {
   public static final String JOB_HAS_FAILURES = "hasFailures";
   public static final String JOB_HAS_PARTIAL_SUCCESS = "hasPartialSuccess";
   public static final String JOB_HAS_SKIPPED = "hasSkipped";
+  public static final String JOB_INSTANCE_ID = "instanceId";
   public static final String JOB_FILE_EXTENSION = ".json";
 
   public static final String DISPOSAL_CONFIRMATION_CREATED_ON = "createdOn";
@@ -976,6 +979,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_BOOLEAN_VALUE = "parameter.boolean_value";
   public static final String PLUGIN_PARAMS_CLEAR_INDEXES = "parameter.clear_indexes";
   public static final String PLUGIN_PARAMS_OPTIMIZE_INDEXES = "parameter.optimize_indexes";
+  public static final String PLUGIN_PARAMS_INSTANCE_IDENTIFIER = "parameter.instance_identifier";
   public static final String PLUGIN_PARAMS_OBJECT_CLASS = "parameter.object_class";
   public static final String PLUGIN_PARAMS_CLASS_CANONICAL_NAME = "parameter.class_canonical_name";
   public static final String PLUGIN_PARAMS_SIP_TO_AIP_CLASS = "parameter.sip_to_aip_class";
@@ -1098,6 +1102,7 @@ public final class RodaConstants {
   public static final String JOB_REPORT_OUTCOME_OBJECT_CLASS = "outcomeObjectClass";
   public static final String JOB_REPORT_OUTCOME_OBJECT_STATE = "outcomeObjectState";
   public static final String JOB_REPORT_TITLE = "title";
+  public static final String JOB_REPORT_INSTANCE_ID = "instanceId";
   public static final String JOB_REPORT_DATE_CREATED = "dateCreated";
   public static final String JOB_REPORT_DATE_UPDATED = "dateUpdated";
   public static final String JOB_REPORT_COMPLETION_PERCENTAGE = "completionPercentage";
@@ -1124,6 +1129,7 @@ public final class RodaConstants {
   public static final String FILE_ANCESTORS_PATH = "ancestorsPath";
   public static final String FILE_PARENT_UUID = "parentUUID";
   public static final String FILE_AIP_ID = "aipId";
+  public static final String FILE_INSTANCE_ID = "instanceId";
   public static final String FILE_FORMAT_MIMETYPE = "formatMimetype";
   public static final String FILE_FORMAT_VERSION = "formatVersion";
   public static final String FILE_REPRESENTATION_UUID = "representationUUID";
@@ -1157,6 +1163,7 @@ public final class RodaConstants {
   public static final String RISK_IDENTIFIED_BY = "identifiedBy";
   public static final String RISK_CATEGORIES = "categories";
   public static final String RISK_NOTES = "notes";
+  public static final String RISK_INSTANCE_ID = "instanceId";
 
   public static final String RISK_PRE_MITIGATION_PROBABILITY = "preMitigationProbability";
   public static final String RISK_PRE_MITIGATION_IMPACT = "preMitigationImpact";
@@ -1196,6 +1203,7 @@ public final class RodaConstants {
   public static final String RISK_INCIDENCE_RISK_ID = "riskId";
   public static final String RISK_INCIDENCE_DESCRIPTION = "description";
   public static final String RISK_INCIDENCE_BYPLUGIN = "byPlugin";
+  public static final String RISK_INCIDENCE_INSTANCE_ID = "instanceId";
 
   public static final String RISK_INCIDENCE_STATUS = "status";
   public static final String RISK_INCIDENCE_SEVERITY = "severity";
@@ -1231,6 +1239,7 @@ public final class RodaConstants {
   public static final String REPRESENTATION_INFORMATION_CREATED_BY = "createdBy";
   public static final String REPRESENTATION_INFORMATION_UPDATED_ON = "updatedOn";
   public static final String REPRESENTATION_INFORMATION_UPDATED_BY = "updatedBy";
+  public static final String REPRESENTATION_INFORMATION_INSTANCE_ID = "instanceId";
 
   public static final String REPRESENTATION_INFORMATION_FILE_EXTENSION = ".xml";
 
@@ -1247,6 +1256,7 @@ public final class RodaConstants {
   public static final String NOTIFICATION_IS_ACKNOWLEDGED = "isAcknowledged";
   public static final String NOTIFICATION_ACKNOWLEDGED_USERS = "acknowledgedUsers";
   public static final String NOTIFICATION_STATE = "state";
+  public static final String NOTIFICATION_INSTANCE_ID = "instanceId";
 
   public static final String NOTIFICATION_FILE_EXTENSION = ".json";
   public static final String NOTIFICATION_VARIOUS_RECIPIENT_USERS = "various-recipient-users";
@@ -1328,6 +1338,7 @@ public final class RodaConstants {
   public static final String PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER = "linkingAgentIdentifier";
   public static final String PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER = "linkingOutcomeObjectIdentifier";
   public static final String PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER = "linkingSourceObjectIdentifier";
+  public static final String PRESERVATION_EVENT_INSTANCE_ID = "instanceId";
 
   /* Disposal Rule */
   public static final String DISPOSAL_RULE_ID = "id";
@@ -1349,6 +1360,7 @@ public final class RodaConstants {
   public static final String PRESERVATION_AGENT_VERSION = "version";
   public static final String PRESERVATION_AGENT_NOTE = "note";
   public static final String PRESERVATION_AGENT_ROLES = "roles";
+  public static final String PRESERVATION_AGENT_INSTANCE_ID = "instanceId";
 
   public static final String PRESERVATION_TYPE_AGENT = "agent";
   public static final String PRESERVATION_TYPE_FILE = "file";
@@ -1758,6 +1770,12 @@ public final class RodaConstants {
   public static final int HTTP_RESPONSE_CODE_NOT_FOUND = 404;
   public static final int HTTP_RESPONSE_CODE_REQUEST_CONFLICT = 409;
   public static final int HTTP_RESPONSE_CODE_SERVER_ERROR = 500;
+
+  /* Synchronization */
+  public static final String SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FOLDER = "local-instance";
+  public static final String SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE = "configuration.yaml";
+  public static final String SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE_PATH = SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FOLDER
+    + "/" + SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE;
 
   /** Private empty constructor */
   private RodaConstants() {

@@ -84,6 +84,10 @@ public abstract class ModelObservable {
     return notifyObserversSafely(observer -> observer.aipStateUpdated(aip));
   }
 
+  public ReturnWithExceptionsWrapper notifyAipInstanceIdUpdated(AIP aip) {
+    return notifyObserversSafely(observer -> observer.aipInstanceIdUpdated(aip));
+  }
+
   public ReturnWithExceptionsWrapper notifyAipDeleted(String aipId) {
     return notifyObserversSafely(observer -> observer.aipDeleted(aipId, true));
   }

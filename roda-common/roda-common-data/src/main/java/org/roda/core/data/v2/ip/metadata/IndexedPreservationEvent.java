@@ -37,8 +37,10 @@ public class IndexedPreservationEvent implements IsIndexed, HasId, HasPermission
   private List<LinkingIdentifier> linkingAgentIds;
   private List<LinkingIdentifier> outcomeObjectIds;
   private List<LinkingIdentifier> sourcesObjectIds;
-  
+
   private Map<String, Object> fields;
+
+  private String instanceId;
 
   @Override
   public String getId() {
@@ -137,25 +139,33 @@ public class IndexedPreservationEvent implements IsIndexed, HasId, HasPermission
     this.sourcesObjectIds = sourcesObjectIds;
   }
 
+  public String getInstanceId() {
+    return instanceId;
+  }
+
+  public void setInstanceId(String instanceId) {
+    this.instanceId = instanceId;
+  }
+
   @Override
   public String toString() {
     return "IndexedPreservationEvent [id=" + id + ", aipID=" + aipID + ", representationUUID=" + representationUUID
       + ", fileUUID=" + fileUUID + ", objectClass=" + objectClass + ", eventDateTime=" + eventDateTime
       + ", eventDetail=" + eventDetail + ", eventType=" + eventType + ", eventOutcome=" + eventOutcome
       + ", linkingAgentIds=" + linkingAgentIds + ", outcomeObjectIds=" + outcomeObjectIds + ", sourcesObjectIds="
-      + sourcesObjectIds + "]";
+      + sourcesObjectIds + ", instanceId=" + instanceId + "]";
   }
 
   @Override
   public List<String> toCsvHeaders() {
     return Arrays.asList("id", "aipID", "representationUUID", "fileUUID", "objectClass", "eventDateTime", "eventDetail",
-      "eventType", "eventOutcome", "linkingAgentIds", "outcomeObjectIds", "sourcesObjectIds");
+      "eventType", "eventOutcome", "linkingAgentIds", "outcomeObjectIds", "sourcesObjectIds", "instanceId");
   }
 
   @Override
   public List<Object> toCsvValues() {
     return Arrays.asList(id, aipID, representationUUID, fileUUID, objectClass, eventDateTime, eventDetail, eventType,
-      eventOutcome, linkingAgentIds, outcomeObjectIds, sourcesObjectIds);
+      eventOutcome, linkingAgentIds, outcomeObjectIds, sourcesObjectIds, instanceId);
   }
 
   @Override
@@ -177,7 +187,8 @@ public class IndexedPreservationEvent implements IsIndexed, HasId, HasPermission
   }
 
   /**
-   * @param fields the fields to set
+   * @param fields
+   *          the fields to set
    */
   public void setFields(Map<String, Object> fields) {
     this.fields = fields;
