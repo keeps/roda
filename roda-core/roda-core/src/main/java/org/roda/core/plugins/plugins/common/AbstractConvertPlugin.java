@@ -771,7 +771,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }
 
-      boolean notifyEvent = false;
+      boolean notifyEvent = true;
       createEvent(model, index, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), outputFormat,
         reportState, Arrays.asList(file), newFiles, notifyEvent);
 
