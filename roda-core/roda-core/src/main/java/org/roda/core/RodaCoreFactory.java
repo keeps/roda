@@ -89,6 +89,7 @@ import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.monitor.TransferUpdateStatus;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.DistributedModeType;
 import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.common.RodaConstants.OrchestratorType;
 import org.roda.core.data.common.RodaConstants.PreservationAgentType;
@@ -171,6 +172,7 @@ public class RodaCoreFactory {
   private static boolean instantiated = false;
   private static boolean instantiatedWithoutErrors = true;
   private static NodeType nodeType;
+  private static DistributedModeType distributedModeType;
   private static String instanceId = "";
   private static boolean migrationMode = false;
   private static List<Path> toDeleteDuringShutdown = new ArrayList<>();
@@ -519,6 +521,9 @@ public class RodaCoreFactory {
 
         instantiateProtocolManager();
         LOGGER.debug("Finished instantiating protocol manager");
+
+        instantiateDistributedMode();
+        LOGGER.debug("Finished instantiating distrib");
 
         // now that plugin manager is up, lets do some tasks that can only be
         // done after it
@@ -1428,6 +1433,11 @@ public class RodaCoreFactory {
         LOGGER.warn("Could not create user admin in index for test mode", e);
       }
     }
+  }
+
+  private static void instantiateDistributedMode() {
+    distributedModeType = DistributedModeType.valueOf(RodaCoreFactory.getRodaConfiguration()
+        .getString(RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY, RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name()));
   }
 
   private static void instantiateOrchestrator() {
