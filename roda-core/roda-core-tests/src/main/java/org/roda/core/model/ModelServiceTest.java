@@ -52,6 +52,8 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
+import org.roda.core.data.v2.institution.Institution;
+import org.roda.core.data.v2.institution.Institutions;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
@@ -146,7 +148,7 @@ public class ModelServiceTest {
   @AfterClass
   public void cleanup() throws NotFoundException, GenericException, IOException {
     RodaCoreFactory.shutdown();
-    FSUtils.deletePath(basePath);
+    //FSUtils.deletePath(basePath);
   }
 
   @Test
@@ -1162,4 +1164,42 @@ public class ModelServiceTest {
     return i;
   }
 
+  @Test
+  public void createInstitutionTest() throws RODAException, IOException {
+    Institution institution = new Institution();
+    institution.setName("institution");
+
+    Institution institution1 = model.createInstitution(institution, RodaConstants.ADMIN);
+
+    Institution ret = model.retrieveInstitution(institution1.getId());
+    assertEquals(ret, institution);
+  }
+
+  @Test
+  public void deleteInstitutionTest() throws RODAException, IOException {
+    Institution institution = new Institution();
+    institution.setName("institution");
+
+    Institution institution1 = model.createInstitution(institution, RodaConstants.ADMIN);
+
+    Institution ret = model.retrieveInstitution(institution1.getId());
+    assertEquals(ret, institution);
+
+    model.deleteInstitution(institution1.getId());
+    //model.retrieveInstitution(institution1.getId());
+  }
+
+  @Test
+  public void updateInstitutionTest() throws RODAException, IOException {
+    Institution institution = new Institution();
+    institution.setName("institution");
+
+    Institution institution1 = model.createInstitution(institution, RodaConstants.ADMIN);
+
+    institution.setName("updated");
+    model.updatedInstitution(institution, RodaConstants.ADMIN);
+
+    Institution ret = model.retrieveInstitution(institution1.getId());
+    assertEquals(ret.getName(), "updated");
+  }
 }

@@ -14,6 +14,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
+import org.roda.core.data.v2.institution.Institution;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
@@ -716,5 +717,29 @@ public class HtmlSnippetUtils {
 
     return SafeHtmlUtils.fromSafeConstant(
       "<span class='" + labelClass + "'>" + messages.disposalScheduleActionCode(disposalAction.name()) + CLOSE_SPAN);
+  }
+
+  public static SafeHtml getInstitutionStateHtml(Institution institution) {
+    SafeHtml ret = null;
+    if (institution != null && institution.getStatus() != null) {
+      SafeHtmlBuilder b = new SafeHtmlBuilder();
+      switch (institution.getStatus()) {
+        case CREATED:
+          b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING));
+          break;
+        case ACTIVE:
+          b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
+          break;
+        case INACTIVE:
+        default:
+          b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT));
+          break;
+      }
+
+      b.append(SafeHtmlUtils.fromString(messages.disposalScheduleState(institution.getStatus().toString())));
+      b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+      ret = b.toSafeHtml();
+    }
+    return ret;
   }
 }

@@ -112,6 +112,8 @@ public class Management {
         CreateSelectedJob.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(Statistics.RESOLVER.getHistoryToken())) {
         Statistics.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+      } else if (historyTokens.get(0).equals(InstitutionManagement.RESOLVER.getHistoryToken())) {
+        InstitutionManagement.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(Help.RESOLVER.getHistoryToken())) {
         callback.onSuccess(getHelp());
       } else {

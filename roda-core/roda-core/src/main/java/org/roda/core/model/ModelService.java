@@ -69,6 +69,8 @@ import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.institution.Institution;
+import org.roda.core.data.v2.institution.Institutions;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIP;
@@ -3960,5 +3962,85 @@ public class ModelService extends ModelObservable {
   /************************************
    * Disposal bin related
    ************************************/
+
+  /************************************
+   * Distributed system related
+   ************************************/
+  public Institution createInstitution(Institution institution, String createdBy) throws GenericException,
+      AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, NotFoundException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    if (institution.getId() == null) {
+      institution.setId(IdUtils.createUUID());
+      institution.setAccessKey(IdUtils.createUUID());
+    }
+
+    institution.setCreatedOn(new Date());
+    institution.setCreatedBy(createdBy);
+    institution.setUpdatedOn(new Date());
+    institution.setUpdatedBy(createdBy);
+
+    String institutionAsJson = JsonUtils.getJsonFromObject(institution);
+    StoragePath institutionPath = ModelUtils.getInstitutionStoragePath(institution.getId());
+    storage.createBinary(institutionPath, new StringContentPayload(institutionAsJson), false);
+
+    return institution;
+  }
+
+  public Institutions listInstitutions()
+      throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
+    StoragePath institutionsScheduleContainerPath = ModelUtils.getInstitutionsContainerPath();
+    Institutions institutions = new Institutions();
+
+    try {
+      CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(institutionsScheduleContainerPath, false);
+      for (Resource resource : iterable) {
+        Institution institution = ResourceParseUtils.convertResourceToObject(resource, Institution.class);
+        institutions.addObject(institution);
+      }
+
+    } catch (NotFoundException e) {
+      LOGGER.error("Could not find any institution to list: {}", e.getMessage(), e);
+      return institutions;
+    }
+
+    return institutions;
+  }
+
+  public Institution retrieveInstitution(String institutionId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    StoragePath institutionPath = ModelUtils.getInstitutionStoragePath(institutionId);
+    Binary binary = storage.getBinary(institutionPath);
+    Institution ret;
+
+    try (InputStream inputStream = binary.getContent().createInputStream()) {
+      ret = JsonUtils.getObjectFromJson(inputStream, Institution.class);
+    } catch (IOException | GenericException e) {
+      throw new GenericException("Error reading institution: " + institutionId, e);
+    }
+
+    return ret;
+  }
+
+  public void deleteInstitution(String institutionId)
+      throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    StoragePath institutionPath = ModelUtils.getInstitutionStoragePath(institutionId);
+    storage.deleteResource(institutionPath);
+  }
+
+  public Institution updatedInstitution(Institution institution, String updatedBy)
+      throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    institution.setUpdatedOn(new Date());
+    institution.setUpdatedBy(updatedBy);
+
+    String institutionAsJson = JsonUtils.getJsonFromObject(institution);
+    StoragePath institutionPath = ModelUtils.getInstitutionStoragePath(institution.getId());
+    storage.updateBinaryContent(institutionPath, new StringContentPayload(institutionAsJson), false, false);
+
+    return institution;
+  }
 
 }
