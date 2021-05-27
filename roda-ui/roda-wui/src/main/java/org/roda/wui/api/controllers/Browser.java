@@ -48,6 +48,8 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.institution.Institution;
+import org.roda.core.data.v2.institution.Institutions;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
@@ -95,6 +97,7 @@ import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
+import org.roda.wui.client.common.lists.InstitutionList;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
 import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
@@ -3643,6 +3646,86 @@ public class Browser extends RodaWuiController {
     try {
       return RodaCoreFactory.getModelService().listTransitiveDisposalHolds(aipId);
     } catch (NotFoundException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state);
+    }
+  }
+
+  public static Institutions listInstitutions(User user)
+      throws GenericException, RequestNotValidException, IOException, AuthorizationDeniedException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().listInstitutions();
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state);
+    }
+  }
+
+  public static Institution retrieveInstitution(User user, String institutionId)
+      throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().retrieveInstitution(institutionId);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state);
+    }
+  }
+
+  public static Institution updateInstitution(User user, Institution institution)
+      throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().updatedInstitution(institution, user.getId());
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state);
+    }
+  }
+
+  public static void deleteInstitution(User user, String institutionId)
+      throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      RodaCoreFactory.getModelService().deleteInstitution(institutionId);
+    } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
     } finally {

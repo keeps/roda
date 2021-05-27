@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui">
+
+    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
+
+    <ui:style>
+        .section {
+        margin-top: 20px;
+        }
+
+        .group {
+        display: flex;
+        }
+    </ui:style>
+
+    <g:FlowPanel styleName="wui-disposal-schedule-data wui-user-data" addStyleNames="wrapper skip_padding">
+        <g:FlowPanel addStyleNames="row full_width no_padding">
+            <g:FlowPanel styleName="wui-data-panel">
+                <g:FlowPanel addStyleNames="wui-error-panel">
+                    <g:HTML ui:field="errors"/>
+                </g:FlowPanel>
+                <g:Label addStyleNames="form-label">
+                    <ui:text from='{messages.institutionNameLabel}'/>
+                    *
+                </g:Label>
+                <g:TextBox title="{messages.institutionNameLabel}" ui:field="name" addStyleNames="form-textbox"/>
+                <g:Label ui:field="nameError" addStyleNames="form-label-error"/>
+
+                <g:Label addStyleNames="form-label">
+                    <ui:text from='{messages.institutionIDLabel}'/>
+                    *
+                </g:Label>
+                <g:TextBox title="{messages.institutionIDLabel}" ui:field="identifier" addStyleNames="form-textbox"/>
+                <g:Label ui:field="identifierError" addStyleNames="form-label-error"/>
+
+                <g:Label addStyleNames="form-label">
+                    <ui:text from='{messages.institutionDescriptionLabel}'/>
+                </g:Label>
+                <g:TextArea title="{messages.institutionDescriptionLabel}" ui:field="description"
+                           addStyleNames="disposalScopeNotes form-textbox"/>
+
+                <g:Label styleName="wui-required-fields-note">
+                    <ui:text from="{messages.disposalConfirmationDataNote}"/>
+                </g:Label>
+            </g:FlowPanel>
+        </g:FlowPanel>
+    </g:FlowPanel>
+</ui:UiBinder>

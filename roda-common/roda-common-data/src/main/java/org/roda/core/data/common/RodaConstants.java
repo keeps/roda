@@ -192,6 +192,8 @@ public final class RodaConstants {
   public static final String RODA_OBJECT_DISPOSAL_HOLD_ASSOCIATION = "disposal_hold_association";
   public static final String RODA_OBJECT_SHALLOW_FILE = "shallow_file";
   public static final String RODA_OBJECT_SHALLOWS_FILE = "shallow_files";
+  public static final String RODA_OBJECT_INSTITUTIONS = "institutions";
+  public static final String RODA_OBJECT_INSTITUTION = "institution";
 
   public static final String RODA_OBJECT_MEMBERS = "members";
   public static final String RODA_OBJECT_USERS = "users";
@@ -470,6 +472,8 @@ public final class RodaConstants {
   public static final String CONTROLLER_DISPOSAL_CONFIRMATION_METADATA_PARAM = RODA_OBJECT_DISPOSAL_CONFIRMATION_METADATA;
   public static final String CONTROLLER_DISPOSAL_CONFIRMATION_ID_PARAM = "disposalConfirmationId";
 
+  public static final String CONTROLLER_INSTITUTION_PARAM = RODA_OBJECT_INSTITUTION;
+
   public static final String CONTROLLER_ID_OBJECT_PARAM = "transferred_resource_uuid, transferred_resource_path, sip, transferred_resource_original_name";
   public static final String CONTROLLER_SIP_PARAM = "sip";
   public static final String CONTROLLER_ID_OBJECT_RESOURCE_PATH = "transferred_resource_path";
@@ -559,6 +563,13 @@ public final class RodaConstants {
 
   public static final NodeType DEFAULT_NODE_TYPE = NodeType.MASTER;
 
+  public enum DistributedModeType {
+    CENTRAL, LOCAL, BASE
+  }
+
+  public static final DistributedModeType DEFAULT_DISTRIBUTED_MODE_TYPE = DistributedModeType.BASE;
+  public static final String DISTRIBUTED_MODE_TYPE_PROPERTY = "core.distributed.mode.type";
+
   public enum OrchestratorType {
     AKKA, AKKA_DISTRIBUTED
   }
@@ -615,6 +626,7 @@ public final class RodaConstants {
   public static final String STORAGE_CONTAINER_DISPOSAL_HOLD = "disposal-hold";
   public static final String STORAGE_CONTAINER_DISPOSAL_SCHEDULE = "disposal-schedule";
   public static final String STORAGE_CONTAINER_DISPOSAL_RULE = "disposal-rule";
+  public static final String STORAGE_CONTAINER_INSTITUTIONS = "institutions";
 
   /*
    * Disposal Confirmation
@@ -833,6 +845,7 @@ public final class RodaConstants {
   public static final String REPOSITORY_PERMISSIONS_REPRESENTATION_INFORMATION_READ = "ri.read";
 
   public static final String REPOSITORY_PERMISSIONS_DISPOSAL_SCHEDULE_READ = "disposal_schedule.read";
+  public static final String REPOSITORY_PERMISSIONS_INSTITUTION_READ = "institution.read";
 
   public static final String LOG_ACTION_COMPONENT = "actionComponent";
   public static final String LOG_ACTION_METHOD = "actionMethod";
@@ -921,6 +934,9 @@ public final class RodaConstants {
 
   /* Disposal related parameters */
   public static final String DISPOSAL_HOLD_FILE_EXTENSION = ".json";
+
+  /* Distributed related parameters */
+  public static final String DISTRIBUTED_INSTITUTION_FILE_EXTENSION = ".json";
 
   /* Plugins related parameters */
   public static final String PLUGIN_PARAMS_LOCK_REQUEST_UUID = "parameter.lock_request_uuid";
