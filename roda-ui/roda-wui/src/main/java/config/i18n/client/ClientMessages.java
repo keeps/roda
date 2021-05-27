@@ -13,6 +13,7 @@ package config.i18n.client;
 import java.util.Date;
 import java.util.List;
 
+import org.roda.core.data.v2.institution.InstitutionStatus;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
@@ -2417,5 +2418,35 @@ public interface ClientMessages extends Messages {
   String disposalConfirmationShowRecordsRetentionPeriodCalculationError();
 
   String updateDisposalHoldMessage();
+
+  String manageInstitutionTitle();
+
+  String createInstitutionTitle();
+
+  String showInstitutionTitle();
+
+  String editInstitutionTitle();
+
+  String institutionsLabel();
+
+  String institutionNameLabel();
+
+  String institutionIDLabel();
+
+  String institutionUUIDLabel();
+
+  String institutionStatusLabel();
+
+  String institutionDescriptionLabel();
+
+  String institutionAccessKeyLabel();
+
+  String institutionLastSyncDateLabel();
+
+  String institutionStatusValue(@Select InstitutionStatus status);
+
+  String institutionStatusButtonActivateLabel();
+
+  String institutionStatusButtonDeactivateLabel();
 
 }

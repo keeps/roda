@@ -53,6 +53,8 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.institution.Institution;
+import org.roda.core.data.v2.institution.Institutions;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -90,6 +92,7 @@ import org.roda.core.storage.StringContentPayload;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.controllers.Disposals;
+import org.roda.wui.api.controllers.DistributedInstitutions;
 import org.roda.wui.api.controllers.Jobs;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.Viewers;
@@ -1246,4 +1249,38 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return Browser.listTransitiveDisposalHolds(user, aipId);
   }
 
+  @Override
+  public Institution createInstitution(Institution institution) throws AuthorizationDeniedException,
+    AlreadyExistsException, NotFoundException, GenericException, RequestNotValidException, IOException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return DistributedInstitutions.createInstitution(user, institution);
+  }
+
+  @Override
+  public Institutions listInstitutions()
+    throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.listInstitutions(user);
+  }
+
+  @Override
+  public Institution retrieveInstitution(String institutionId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.retrieveInstitution(user, institutionId);
+  }
+
+  @Override
+  public Institution updateInstitution(Institution institution)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.updateInstitution(user, institution);
+  }
+
+  @Override
+  public void deleteInstitution(String institutionId)
+    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.deleteInstitution(user, institutionId);
+  }
 }

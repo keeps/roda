@@ -24,6 +24,8 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.institution.Institution;
+import org.roda.core.data.v2.institution.Institutions;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -375,4 +377,13 @@ public interface BrowserServiceAsync {
 
   void listTransitiveDisposalHolds(String aipId, AsyncCallback<List<DisposalTransitiveHoldAIPMetadata>> async);
 
+  void createInstitution(Institution institution, AsyncCallback<Institution> async);
+
+  void listInstitutions(AsyncCallback<Institutions> async);
+
+  void retrieveInstitution(String institutionId, AsyncCallback<Institution> async);
+
+  void deleteInstitution(String institutionId, AsyncCallback<Void> async);
+
+  void updateInstitution(Institution institution, AsyncCallback<Institution> async);
 }
