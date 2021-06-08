@@ -24,7 +24,11 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.AccessToken.AccessToken;
+import org.roda.core.data.v2.AccessToken.AccessTokens;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.distributedInstance.DistributedInstance;
+import org.roda.core.data.v2.distributedInstance.DistributedInstances;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -33,8 +37,6 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.institution.Institution;
-import org.roda.core.data.v2.institution.Institutions;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -492,18 +494,50 @@ public interface BrowserService extends RemoteService {
   List<DisposalTransitiveHoldAIPMetadata> listTransitiveDisposalHolds(String aipId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  Institution createInstitution(Institution institution) throws AuthorizationDeniedException, AlreadyExistsException,
-    NotFoundException, GenericException, RequestNotValidException, IOException;
+  DistributedInstance createDistributedInstance(DistributedInstance distributedInstance)
+    throws AuthorizationDeniedException, AlreadyExistsException, NotFoundException, GenericException,
+    RequestNotValidException, IOException, IllegalOperationException;
 
-  Institutions listInstitutions()
+  DistributedInstances listDistributedInstances()
     throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException;
 
-  Institution retrieveInstitution(String institutionId)
+  DistributedInstance retrieveDistributedInstance(String distributedInstancesId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
-  void deleteInstitution(String institutionId)
+  void deleteDistributedInstance(String distributedInstancesId)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException;
 
-  Institution updateInstitution(Institution institution)
+  DistributedInstance updateDistributedInstance(DistributedInstance distributedInstance)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+
+  AccessToken createAccessToken(AccessToken accessToken) throws AuthorizationDeniedException, AlreadyExistsException,
+    NotFoundException, GenericException, RequestNotValidException, IOException;
+
+  AccessTokens listAccessToken()
+    throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException;
+
+  AccessToken retrieveAccessToken(String accessTokenId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
+
+  void deleteAccessToken(String accessTokenId)
+    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException;
+
+  AccessToken updateAccessToken(AccessToken accessToken)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+
+  AccessTokens listAccessTokenByUser(String userId)
+    throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException;
+
+  void deactivateUserAccessTokens(String userId)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
+
+  void deleteUserAccessTokens(String userId)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
+
+  AccessToken regenerateAccessToken(AccessToken accessToken)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+
+  AccessToken revokeAccessToken(AccessToken accessToken)
+      throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+
 }

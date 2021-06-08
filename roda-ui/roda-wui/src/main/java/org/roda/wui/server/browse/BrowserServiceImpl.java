@@ -39,7 +39,11 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.AccessToken.AccessToken;
+import org.roda.core.data.v2.AccessToken.AccessTokens;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.distributedInstance.DistributedInstance;
+import org.roda.core.data.v2.distributedInstance.DistributedInstances;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
@@ -53,8 +57,6 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.institution.Institution;
-import org.roda.core.data.v2.institution.Institutions;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -90,9 +92,9 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.core.util.IdUtils;
+import org.roda.wui.api.controllers.ApplicationAuth;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.controllers.Disposals;
-import org.roda.wui.api.controllers.DistributedInstitutions;
 import org.roda.wui.api.controllers.Jobs;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.Viewers;
@@ -1250,37 +1252,106 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public Institution createInstitution(Institution institution) throws AuthorizationDeniedException,
-    AlreadyExistsException, NotFoundException, GenericException, RequestNotValidException, IOException {
+  public DistributedInstance createDistributedInstance(DistributedInstance distributedInstance)
+    throws AuthorizationDeniedException, AlreadyExistsException, NotFoundException, GenericException,
+    RequestNotValidException, IllegalOperationException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return DistributedInstitutions.createInstitution(user, institution);
+    return Browser.createDistributedInstance(user, distributedInstance);
   }
 
   @Override
-  public Institutions listInstitutions()
+  public DistributedInstances listDistributedInstances()
     throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.listInstitutions(user);
+    return Browser.listDistributedInstances(user);
   }
 
   @Override
-  public Institution retrieveInstitution(String institutionId)
+  public DistributedInstance retrieveDistributedInstance(String distributedInstanceId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.retrieveInstitution(user, institutionId);
+    return Browser.retrieveDistributedInstance(user, distributedInstanceId);
   }
 
   @Override
-  public Institution updateInstitution(Institution institution)
+  public DistributedInstance updateDistributedInstance(DistributedInstance distributedInstance)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.updateInstitution(user, institution);
+    return Browser.updateDistributedInstance(user, distributedInstance);
   }
 
   @Override
-  public void deleteInstitution(String institutionId)
+  public void deleteDistributedInstance(String distributedInstanceId)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.deleteInstitution(user, institutionId);
+    Browser.deleteDistributedInstance(user, distributedInstanceId);
+  }
+
+  @Override
+  public AccessToken createAccessToken(AccessToken accessToken) throws AuthorizationDeniedException,
+    AlreadyExistsException, NotFoundException, GenericException, RequestNotValidException, IOException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return ApplicationAuth.createAccessToken(user, accessToken);
+  }
+
+  @Override
+  public AccessTokens listAccessToken()
+    throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return ApplicationAuth.listAccessToken(user);
+  }
+
+  @Override
+  public AccessToken retrieveAccessToken(String accessTokenId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return ApplicationAuth.retrieveAccessToken(user, accessTokenId);
+  }
+
+  @Override
+  public AccessToken updateAccessToken(AccessToken accessToken)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return ApplicationAuth.updateAccessToken(user, accessToken);
+  }
+
+  @Override
+  public void deleteAccessToken(String accessTokenId)
+    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    ApplicationAuth.deleteAccessToken(user, accessTokenId);
+  }
+
+  @Override
+  public AccessTokens listAccessTokenByUser(String userId)
+    throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return ApplicationAuth.listAccessTokenByUser(user, userId);
+  }
+
+  @Override
+  public void deactivateUserAccessTokens(String userId)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    ApplicationAuth.deactivateUserAccessTokens(user, userId);
+  }
+
+  @Override
+  public void deleteUserAccessTokens(String userId)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    ApplicationAuth.deleteUserAccessTokens(user, userId);
+  }
+
+  @Override
+  public AccessToken regenerateAccessToken(AccessToken accessToken) throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return ApplicationAuth.regenerateAccessToken(user, accessToken);
+  }
+
+  @Override
+  public AccessToken revokeAccessToken(AccessToken accessToken) throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return ApplicationAuth.revokeAccessToken(user, accessToken);
   }
 }

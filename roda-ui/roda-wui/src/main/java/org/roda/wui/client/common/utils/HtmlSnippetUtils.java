@@ -12,9 +12,10 @@ import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
+import org.roda.core.data.v2.AccessToken.AccessToken;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
-import org.roda.core.data.v2.institution.Institution;
+import org.roda.core.data.v2.distributedInstance.DistributedInstance;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
@@ -716,11 +717,11 @@ public class HtmlSnippetUtils {
       "<span class='" + labelClass + "'>" + messages.disposalScheduleActionCode(disposalAction.name()) + CLOSE_SPAN);
   }
 
-  public static SafeHtml getInstitutionStateHtml(Institution institution) {
+  public static SafeHtml getDistributedInstanceStateHtml(DistributedInstance distributedInstance) {
     SafeHtml ret = null;
-    if (institution != null && institution.getStatus() != null) {
+    if (distributedInstance != null && distributedInstance.getStatus() != null) {
       SafeHtmlBuilder b = new SafeHtmlBuilder();
-      switch (institution.getStatus()) {
+      switch (distributedInstance.getStatus()) {
         case CREATED:
           b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING));
           break;
@@ -733,7 +734,34 @@ public class HtmlSnippetUtils {
           break;
       }
 
-      b.append(SafeHtmlUtils.fromString(messages.disposalScheduleState(institution.getStatus().toString())));
+      b.append(SafeHtmlUtils.fromString(messages.distributedInstanceStatusValue(distributedInstance.getStatus())));
+      b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+      ret = b.toSafeHtml();
+    }
+    return ret;
+  }
+
+  public static SafeHtml getAccessTokenStateHtml(AccessToken accessToken) {
+    SafeHtml ret = null;
+    if (accessToken != null && accessToken.getStatus() != null) {
+      SafeHtmlBuilder b = new SafeHtmlBuilder();
+      switch (accessToken.getStatus()) {
+        case CREATED:
+          b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING));
+          break;
+        case ACTIVE:
+          b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
+          break;
+        case REVOKED:
+          b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER));
+          break;
+        case INACTIVE:
+        default:
+          b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT));
+          break;
+      }
+
+      b.append(SafeHtmlUtils.fromString(messages.accessTokenStatusValue(accessToken.getStatus())));
       b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
       ret = b.toSafeHtml();
     }

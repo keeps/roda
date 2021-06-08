@@ -6,12 +6,12 @@
 
     <ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
-    <g:FlowPanel styleName="wui-institutions" addStyleNames="wrapper skip_padding">
+    <g:FlowPanel styleName="wui-distributedInstances" addStyleNames="wrapper skip_padding">
         <g:FlowPanel addStyleNames="row full_width skip_padding">
             <g:FlowPanel ui:field="contentFlowPanel" addStyleNames="col_12 content">
-                <common:TitlePanel text="{messages.manageInstitutionTitle}" iconClass="Group" />
-                <g:FlowPanel addStyleNames="page-description" ui:field="institutionManagementDescription" />
-                <g:ScrollPanel ui:field="institutionManagementTablePanel"/>
+                <common:TitlePanel text="{messages.manageAccessTokenTitle}" iconClass="AccessToken" />
+                <g:FlowPanel addStyleNames="page-description" ui:field="description" />
+                <g:ScrollPanel ui:field="accessTokenManagementTablePanel"/>
             </g:FlowPanel>
             <g:FlowPanel ui:field="sidebarFlowPanel" addStyleNames="col_2 last sidebar contentPanel">
                 <g:FlowPanel addStyleNames="sticky-flow">

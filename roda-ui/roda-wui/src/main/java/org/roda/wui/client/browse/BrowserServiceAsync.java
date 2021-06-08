@@ -15,7 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.roda.core.data.v2.AccessToken.AccessToken;
+import org.roda.core.data.v2.AccessToken.AccessTokens;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.distributedInstance.DistributedInstances;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -24,8 +27,7 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.institution.Institution;
-import org.roda.core.data.v2.institution.Institutions;
+import org.roda.core.data.v2.distributedInstance.DistributedInstance;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -377,13 +379,33 @@ public interface BrowserServiceAsync {
 
   void listTransitiveDisposalHolds(String aipId, AsyncCallback<List<DisposalTransitiveHoldAIPMetadata>> async);
 
-  void createInstitution(Institution institution, AsyncCallback<Institution> async);
+  void createDistributedInstance(DistributedInstance distributedInstance, AsyncCallback<DistributedInstance> async);
 
-  void listInstitutions(AsyncCallback<Institutions> async);
+  void listDistributedInstances(AsyncCallback<DistributedInstances> async);
 
-  void retrieveInstitution(String institutionId, AsyncCallback<Institution> async);
+  void retrieveDistributedInstance(String distributedInstanceId, AsyncCallback<DistributedInstance> async);
 
-  void deleteInstitution(String institutionId, AsyncCallback<Void> async);
+  void updateDistributedInstance(DistributedInstance distributedInstance, AsyncCallback<DistributedInstance> async);
 
-  void updateInstitution(Institution institution, AsyncCallback<Institution> async);
+  void deleteDistributedInstance(String distributedInstanceId, AsyncCallback<Void> async);
+
+  void createAccessToken(AccessToken accessToken, AsyncCallback<AccessToken> async);
+
+  void listAccessToken(AsyncCallback<AccessTokens> async);
+
+  void retrieveAccessToken(String accessTokenId, AsyncCallback<AccessToken> async);
+
+  void deleteAccessToken(String accessTokenId, AsyncCallback<Void> async);
+
+  void updateAccessToken(AccessToken accessToken, AsyncCallback<AccessToken> async);
+
+  void listAccessTokenByUser(String userId, AsyncCallback<AccessTokens> async);
+
+  void deactivateUserAccessTokens(String userId, AsyncCallback<Void> async);
+
+  void deleteUserAccessTokens(String userId, AsyncCallback<Void> async);
+
+  void regenerateAccessToken(AccessToken accessToken, AsyncCallback<AccessToken> async);
+
+  void revokeAccessToken(AccessToken accessToken, AsyncCallback<AccessToken> async);
 }

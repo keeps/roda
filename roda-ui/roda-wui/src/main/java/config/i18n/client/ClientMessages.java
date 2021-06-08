@@ -13,7 +13,8 @@ package config.i18n.client;
 import java.util.Date;
 import java.util.List;
 
-import org.roda.core.data.v2.institution.InstitutionStatus;
+import org.roda.core.data.v2.AccessToken.AccessTokenStatus;
+import org.roda.core.data.v2.distributedInstance.DistributedInstanceStatus;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
@@ -2419,34 +2420,93 @@ public interface ClientMessages extends Messages {
 
   String updateDisposalHoldMessage();
 
-  String manageInstitutionTitle();
+  /** Institution **/
 
-  String createInstitutionTitle();
+  String manageDistributedInstanceTitle();
 
-  String showInstitutionTitle();
+  String createDistributedInstanceTitle();
 
-  String editInstitutionTitle();
+  String showDistributedInstanceTitle();
 
-  String institutionsLabel();
+  String editDistributedInstanceTitle();
 
-  String institutionNameLabel();
+  String distributedInstancesLabel();
 
-  String institutionIDLabel();
+  String distributedInstanceNameLabel();
 
-  String institutionUUIDLabel();
+  String distributedInstanceUUIDLabel();
 
-  String institutionStatusLabel();
+  String distributedInstanceDescriptionLabel();
 
-  String institutionDescriptionLabel();
+  String distributedInstanceIDLabel();
 
-  String institutionAccessKeyLabel();
+  String distributedInstanceLastSyncDateLabel();
 
-  String institutionLastSyncDateLabel();
+  String distributedInstanceAccessKeyLabel();
 
-  String institutionStatusValue(@Select InstitutionStatus status);
+  String distributedInstanceStatusLabel();
 
-  String institutionStatusButtonActivateLabel();
+  String distributedInstanceStatusValue(@Select DistributedInstanceStatus status);
 
-  String institutionStatusButtonDeactivateLabel();
+  String distributedInstanceStatusButtonActivateLabel();
 
+  String distributedInstanceStatusButtonDeactivateLabel();
+
+  /** Access Token **/
+
+  String addAccessTokenButton();
+
+  String manageAccessTokenTitle();
+
+  String createAccessTokenTitle();
+
+  String showAccessTokenTitle();
+
+  String editAccessTokenTitle();
+
+  String accessTokenLabel();
+
+  String accessTokensLabel();
+
+  String accessTokenNameLabel();
+
+  String accessTokenIDLabel();
+
+  String accessTokenKeyLabel();
+
+  String accessTokenLastUsageDateLabel();
+
+  String accessTokenExpirationDateLabel();
+
+  String accessTokenStatusLabel();
+
+  String accessTokenStatusValue(@Select AccessTokenStatus status);
+
+  String accessTokenWarningLabel();
+
+  String accessTokenCreateButton();
+
+  String accessTokenEditButton();
+
+  String accessTokenUpdateButton();
+
+  String accessTokenDeleteButton();
+
+  String accessTokenRegenerateButton();
+
+  String accessTokenRevokeButton();
+
+  String accessTokenNeverUsedLabel();
+
+  String accessTokenNotFoundLabel();
+
+  String accessTokenSuccessfullyRegenerated();
+
+  String accessTokenSuccessfullyRevoked();
+
+  String accessTokenDeleteConfirmationMessage();
+
+  String accessTokenRevokeConfirmationMessage();
+
+  String accessTokenRegenerateConfirmationMessage();
 }

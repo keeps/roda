@@ -1,8 +1,8 @@
-package org.roda.wui.client.management;
+package org.roda.wui.client.management.distributed;
 
 import java.util.List;
 
-import org.roda.core.data.v2.institution.Institution;
+import org.roda.core.data.v2.distributedInstance.DistributedInstance;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -26,39 +26,39 @@ import config.i18n.client.ClientMessages;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-public class CreateInstitution extends Composite {
+public class CreateDistributedInstance extends Composite {
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-      CreateInstitution createInstitution = new CreateInstitution();
-      callback.onSuccess(createInstitution);
+      CreateDistributedInstance createDistributedInstance = new CreateDistributedInstance();
+      callback.onSuccess(createDistributedInstance);
     }
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {InstitutionManagement.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {DistributedInstancesManagement.RESOLVER}, false, callback);
     }
 
     @Override
     public List<String> getHistoryPath() {
-      return ListUtils.concat(InstitutionManagement.RESOLVER.getHistoryPath(), getHistoryToken());
+      return ListUtils.concat(DistributedInstancesManagement.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     @Override
     public String getHistoryToken() {
-      return "create_institution";
+      return "create_distributed_instance";
     }
   };
 
-  interface MyUiBinder extends UiBinder<Widget, CreateInstitution> {
+  interface MyUiBinder extends UiBinder<Widget, CreateDistributedInstance> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private Institution institution;
+  private DistributedInstance distributedInstance;
 
   @UiField
   Button buttonSave;
@@ -67,12 +67,12 @@ public class CreateInstitution extends Composite {
   Button buttonCancel;
 
   @UiField(provided = true)
-  InstitutionDataPanel institutionDataPanel;
+  DistributedInstanceDataPanel distributedInstanceDataPanel;
 
-  public CreateInstitution() {
-    this.institution = new Institution();
-    this.institutionDataPanel = new InstitutionDataPanel(institution, false);
-    this.institutionDataPanel.setInstitution(institution);
+  public CreateDistributedInstance() {
+    this.distributedInstance = new DistributedInstance();
+    this.distributedInstanceDataPanel = new DistributedInstanceDataPanel(distributedInstance, false);
+    this.distributedInstanceDataPanel.setDistributedInstance(distributedInstance);
 
     initWidget(uiBinder.createAndBindUi(this));
   }
@@ -85,12 +85,12 @@ public class CreateInstitution extends Composite {
 
   @UiHandler("buttonSave")
   void buttonApplyHandler(ClickEvent e) {
-    if (institutionDataPanel.isValid()) {
-      institution = institutionDataPanel.getInstitution();
-      BrowserServiceImpl.Util.getInstance().createInstitution(institution, new NoAsyncCallback<Institution>() {
+    if (distributedInstanceDataPanel.isValid()) {
+      distributedInstance = distributedInstanceDataPanel.getDistributedInstance();
+      BrowserServiceImpl.Util.getInstance().createDistributedInstance(distributedInstance, new NoAsyncCallback<DistributedInstance>() {
         @Override
-        public void onSuccess(Institution institution) {
-          HistoryUtils.newHistory(InstitutionManagement.RESOLVER);
+        public void onSuccess(DistributedInstance distributedInstance) {
+          HistoryUtils.newHistory(DistributedInstancesManagement.RESOLVER);
         }
       });
     }
@@ -102,6 +102,6 @@ public class CreateInstitution extends Composite {
   }
 
   private void cancel() {
-    HistoryUtils.newHistory(InstitutionManagement.RESOLVER);
+    HistoryUtils.newHistory(DistributedInstancesManagement.RESOLVER);
   }
 }
