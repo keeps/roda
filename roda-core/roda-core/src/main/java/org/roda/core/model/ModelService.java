@@ -33,13 +33,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import io.jsonwebtoken.JwtBuilder;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.JwtUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.common.dips.DIPUtils;
@@ -4080,12 +4078,11 @@ public class ModelService extends ModelObservable {
 
     if (accessToken.getExpirationDate() == null) {
       Date today = new Date();
-      Date expirationDate = new Date(today.getTime() + (1000 * 60 * 60 * 24));
+      Date expirationDate = new Date(today.getTime() + RodaCoreFactory.getTokenValidity());
       accessToken.setExpirationDate(expirationDate);
     }
 
-    String token = Jwts.builder().signWith(SignatureAlgorithm.HS256, RodaCoreFactory.getApiSecretKey())
-        .setIssuedAt(new Date()).setExpiration(accessToken.getExpirationDate()).compact();
+    String token = JwtUtils.generateToken(accessToken.getUserName(), accessToken.getExpirationDate());
 
     accessToken.setAccessKey(token);
 

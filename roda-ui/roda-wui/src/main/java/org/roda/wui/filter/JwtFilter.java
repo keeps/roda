@@ -11,6 +11,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.JwtUtils;
+import org.roda.core.common.UserUtility;
+import org.roda.core.data.v2.user.User;
 import org.springframework.web.filter.GenericFilterBean;
 
 import io.jsonwebtoken.Claims;
@@ -28,13 +31,13 @@ public class JwtFilter extends GenericFilterBean {
 
     String authHeader = httpRequest.getHeader("Authorization");
     if (authHeader != null) {
-      String[] authHeaderArr = authHeader.split("Barear ");
+      String[] authHeaderArr = authHeader.split("Bearer ");
       if (authHeaderArr.length > 1 && authHeaderArr[1] != null) {
         String token = authHeaderArr[1];
         try {
-          Claims claims = Jwts.parser().setSigningKey(RodaCoreFactory.getApiSecretKey()).parseClaimsJws(token)
-            .getBody();
-          httpRequest.setAttribute("accessTokenId", claims.get("accessTokenId").toString());
+          String subject = JwtUtils.getSubjectFromToken(token);
+          User user = UserUtility.getLdapUtility().getUser(subject);
+          UserUtility.setUser(httpRequest, user);
         } catch (Exception e) {
           httpResponse.sendError(HttpStatus.SC_FORBIDDEN, "invalid/expired token");
           return;

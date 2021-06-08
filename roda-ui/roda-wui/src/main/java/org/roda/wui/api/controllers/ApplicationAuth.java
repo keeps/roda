@@ -2,10 +2,11 @@ package org.roda.wui.api.controllers;
 
 import java.util.Date;
 
-import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.JwtUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -16,12 +17,11 @@ import org.roda.core.data.v2.AccessToken.AccessTokenStatus;
 import org.roda.core.data.v2.AccessToken.AccessTokens;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
-import org.roda.core.util.IdUtils;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -176,16 +176,16 @@ public class ApplicationAuth extends RodaWuiController {
   }
 
   public static AccessToken regenerateAccessToken(User user, AccessToken accessToken)
-    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException,
+    AuthenticationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     controllerAssistant.checkRoles(user);
 
     LogEntryState state = LogEntryState.SUCCESS;
 
-    accessToken.setAccessKey(IdUtils.createUUID());
-
     try {
+      accessToken.setAccessKey(JwtUtils.regenerateToken(accessToken.getAccessKey()));
       return RodaCoreFactory.getModelService().updateAccessToken(accessToken, user.getName());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
@@ -220,32 +220,29 @@ public class ApplicationAuth extends RodaWuiController {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     LogEntryState state = LogEntryState.SUCCESS;
 
+    Claims claims = Jwts.parser().setSigningKey(RodaCoreFactory.getApiSecretKey())
+      .parseClaimsJws(accessToken.getAccessKey()).getBody();
+
+    User user = RodaCoreFactory.getModelService().retrieveUser(claims.getSubject());
+
     try {
       AccessTokens accessTokens = RodaCoreFactory.getModelService().listAccessToken();
       AccessToken retAccessToken = accessTokens.getAccessTokenByKey(accessToken.getAccessKey());
       if (retAccessToken != null) {
-        String token = generateJWTToken(retAccessToken);
+        Date expirationDate = new Date(new Date().getTime() + RodaCoreFactory.getTokenValidity());
+        String token = JwtUtils.generateToken(user.getId(), expirationDate, retAccessToken.getClaims());
         retAccessToken.setLastUsageDate(new Date());
         RodaCoreFactory.getModelService().updateAccessTokenLastUsageDate(retAccessToken);
         return token;
+      } else {
+        state = LogEntryState.FAILURE;
+        throw new AuthorizationDeniedException("Access token not found");
       }
-      state = LogEntryState.FAILURE;
-      throw new AuthorizationDeniedException("Access token not found");
     } catch (RequestNotValidException | AuthorizationDeniedException | GenericException | NotFoundException e) {
       state = LogEntryState.FAILURE;
       throw e;
+    } finally {
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_ACCESS_TOKEN_PARAM);
     }
-  }
-
-  public static String generateJWTToken(AccessToken accessToken) {
-    long timestamp = System.currentTimeMillis();
-    String token = Jwts.builder().signWith(SignatureAlgorithm.HS256, RodaCoreFactory.getApiSecretKey())
-      .setIssuedAt(new Date(timestamp)).setExpiration(new Date(timestamp + RodaCoreFactory.getTokenValidity()))
-      .claim("accessTokenId", accessToken.getId()).claim("accessTokenName", accessToken.getName())
-      .claim("accessTokenLastUsage",
-        accessToken.getLastUsageDate() != null ? accessToken.getLastUsageDate().toString() : "Never")
-      .compact();
-
-    return token;
   }
 }
