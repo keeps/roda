@@ -7,6 +7,9 @@
  */
 package org.roda.wui.api.v1;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -35,9 +38,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * REST API CAS authentication tickets resource.
@@ -91,9 +91,9 @@ public class AuthResource {
   @Path("/token")
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
   public Response authenticate(AccessToken accessToken,
-                               @ApiParam(value = "Choose format in which to get the disposal schedule", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-                               @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
-      throws RODAException {
+    @ApiParam(value = "Choose format in which to get the disposal schedule", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
     Map<String, String> response = new HashMap<>();
     String token = ApplicationAuth.authenticate(accessToken);

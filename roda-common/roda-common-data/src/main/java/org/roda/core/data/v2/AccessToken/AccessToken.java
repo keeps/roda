@@ -1,6 +1,7 @@
 package org.roda.core.data.v2.AccessToken;
 
 import java.util.Date;
+import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
@@ -24,6 +25,7 @@ public class AccessToken implements IsModelObject {
   private Date expirationDate;
   private String userName;
   private AccessTokenStatus status;
+  private Map<String, Object> claims;
 
   private Date createdOn;
   private String createdBy;
@@ -129,6 +131,14 @@ public class AccessToken implements IsModelObject {
     this.updatedBy = updatedBy;
   }
 
+  public Map<String, Object> getClaims() {
+    return claims;
+  }
+
+  public void setClaims(Map<String, Object> claims) {
+    this.claims = claims;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -143,6 +153,8 @@ public class AccessToken implements IsModelObject {
     if (expirationDate != null ? !expirationDate.equals(that.expirationDate) : that.expirationDate != null)
       return false;
     if (userName != null ? !userName.equals(that.userName) : that.userName != null) return false;
+    if (status != that.status) return false;
+    if (claims != null ? !claims.equals(that.claims) : that.claims != null) return false;
     if (createdOn != null ? !createdOn.equals(that.createdOn) : that.createdOn != null) return false;
     if (createdBy != null ? !createdBy.equals(that.createdBy) : that.createdBy != null) return false;
     if (updatedOn != null ? !updatedOn.equals(that.updatedOn) : that.updatedOn != null) return false;
@@ -157,6 +169,8 @@ public class AccessToken implements IsModelObject {
     result = 31 * result + (lastUsageDate != null ? lastUsageDate.hashCode() : 0);
     result = 31 * result + (expirationDate != null ? expirationDate.hashCode() : 0);
     result = 31 * result + (userName != null ? userName.hashCode() : 0);
+    result = 31 * result + (status != null ? status.hashCode() : 0);
+    result = 31 * result + (claims != null ? claims.hashCode() : 0);
     result = 31 * result + (createdOn != null ? createdOn.hashCode() : 0);
     result = 31 * result + (createdBy != null ? createdBy.hashCode() : 0);
     result = 31 * result + (updatedOn != null ? updatedOn.hashCode() : 0);
