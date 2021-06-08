@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
@@ -534,10 +535,10 @@ public interface BrowserService extends RemoteService {
   void deleteUserAccessTokens(String userId)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
 
-  AccessToken regenerateAccessToken(AccessToken accessToken)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+  AccessToken regenerateAccessToken(AccessToken accessToken) throws AuthorizationDeniedException,
+    RequestNotValidException, NotFoundException, GenericException, AuthenticationDeniedException;
 
   AccessToken revokeAccessToken(AccessToken accessToken)
-      throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
 }

@@ -27,6 +27,7 @@ import org.roda.core.common.SelectedItemsUtils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
@@ -1344,13 +1345,15 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public AccessToken regenerateAccessToken(AccessToken accessToken) throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+  public AccessToken regenerateAccessToken(AccessToken accessToken) throws AuthorizationDeniedException,
+    RequestNotValidException, NotFoundException, GenericException, AuthenticationDeniedException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return ApplicationAuth.regenerateAccessToken(user, accessToken);
   }
 
   @Override
-  public AccessToken revokeAccessToken(AccessToken accessToken) throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+  public AccessToken revokeAccessToken(AccessToken accessToken)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return ApplicationAuth.revokeAccessToken(user, accessToken);
   }
