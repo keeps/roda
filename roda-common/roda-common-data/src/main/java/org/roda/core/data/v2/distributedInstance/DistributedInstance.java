@@ -1,4 +1,4 @@
-package org.roda.core.data.v2.institution;
+package org.roda.core.data.v2.distributedInstance;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -10,9 +10,9 @@ import java.util.Date;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_INSTITUTION)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISTRIBUTED_INSTANCE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Institution implements IsModelObject {
+public class DistributedInstance implements IsModelObject {
   private static final int VERSION = 1;
   private static final long serialVersionUID = 7125122191135652087L;
 
@@ -20,18 +20,18 @@ public class Institution implements IsModelObject {
   private String name;
   private String nameIdentifier;
   private String description;
-  private String accessKey;
+  private String accessTokenId;
+  private String username;
   private Date lastSyncDate;
-  private InstitutionStatus status;
+  private DistributedInstanceStatus status;
 
-  // automatically generated upon disposal hold creation action
   private Date createdOn;
   private String createdBy;
   private Date updatedOn;
   private String updatedBy;
 
-  public Institution(){
-    status = InstitutionStatus.CREATED;
+  public DistributedInstance(){
+    status = DistributedInstanceStatus.CREATED;
     lastSyncDate = null;
   }
 
@@ -100,20 +100,28 @@ public class Institution implements IsModelObject {
     this.description = description;
   }
 
-  public InstitutionStatus getStatus() {
+  public DistributedInstanceStatus getStatus() {
     return this.status;
   }
 
-  public void setStatus(InstitutionStatus status) {
+  public void setStatus(DistributedInstanceStatus status) {
     this.status = status;
   }
 
-  public String getAccessKey() {
-    return accessKey;
+  public String getAccessTokenId() {
+    return accessTokenId;
   }
 
-  public void setAccessKey(String accessKey) {
-    this.accessKey = accessKey;
+  public void setAccessTokenId(String accessTokenId) {
+    this.accessTokenId = accessTokenId;
+  }
+
+  public String getUsername() {
+    return username;
+  }
+
+  public void setUsername(String username) {
+    this.username = username;
   }
 
   public Date getLastSyncDate() {
@@ -132,18 +140,18 @@ public class Institution implements IsModelObject {
 
   @Override
   public boolean equals(Object o) {
-
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    Institution that = (Institution) o;
+    DistributedInstance that = (DistributedInstance) o;
 
     if (id != null ? !id.equals(that.id) : that.id != null) return false;
     if (name != null ? !name.equals(that.name) : that.name != null) return false;
     if (nameIdentifier != null ? !nameIdentifier.equals(that.nameIdentifier) : that.nameIdentifier != null)
       return false;
     if (description != null ? !description.equals(that.description) : that.description != null) return false;
-    if (accessKey != null ? !accessKey.equals(that.accessKey) : that.accessKey != null) return false;
+    if (accessTokenId != null ? !accessTokenId.equals(that.accessTokenId) : that.accessTokenId != null) return false;
+    if (username != null ? !username.equals(that.username) : that.username != null) return false;
     if (lastSyncDate != null ? !lastSyncDate.equals(that.lastSyncDate) : that.lastSyncDate != null) return false;
     if (status != that.status) return false;
     if (createdOn != null ? !createdOn.equals(that.createdOn) : that.createdOn != null) return false;
@@ -158,7 +166,8 @@ public class Institution implements IsModelObject {
     result = 31 * result + (name != null ? name.hashCode() : 0);
     result = 31 * result + (nameIdentifier != null ? nameIdentifier.hashCode() : 0);
     result = 31 * result + (description != null ? description.hashCode() : 0);
-    result = 31 * result + (accessKey != null ? accessKey.hashCode() : 0);
+    result = 31 * result + (accessTokenId != null ? accessTokenId.hashCode() : 0);
+    result = 31 * result + (username != null ? username.hashCode() : 0);
     result = 31 * result + (lastSyncDate != null ? lastSyncDate.hashCode() : 0);
     result = 31 * result + (status != null ? status.hashCode() : 0);
     result = 31 * result + (createdOn != null ? createdOn.hashCode() : 0);

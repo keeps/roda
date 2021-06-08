@@ -946,6 +946,10 @@ pre code {
     content: "\f14b";
 }
 
+.btn-key:after {
+    content: "\f084";
+}
+
 .btn-unlock:after {
     content: "\f09c";
 }

@@ -170,6 +170,8 @@ public class RodaCoreFactory {
   private static boolean instantiatedWithoutErrors = true;
   private static NodeType nodeType;
   private static DistributedModeType distributedModeType;
+  private static String apiSecretKey;
+  private static long tokenValidity;
   private static String instanceId = "";
   private static boolean migrationMode = false;
   private static List<Path> toDeleteDuringShutdown = new ArrayList<>();
@@ -376,8 +378,9 @@ public class RodaCoreFactory {
   }
 
   public static void instantiateTest(boolean deploySolr, boolean deployLdap, boolean deployTransferredResourcesScanner,
-                                    boolean deployOrchestrator, boolean deployPluginManager, boolean deployDefaultResources) {
-    instantiateTest(deploySolr, deployLdap, deployTransferredResourcesScanner, deployOrchestrator, deployPluginManager, deployDefaultResources, false);
+    boolean deployOrchestrator, boolean deployPluginManager, boolean deployDefaultResources) {
+    instantiateTest(deploySolr, deployLdap, deployTransferredResourcesScanner, deployOrchestrator, deployPluginManager,
+      deployDefaultResources, false);
   }
 
   public static void instantiateTest(boolean deploySolr, boolean deployLdap, boolean deployTransferredResourcesScanner,
@@ -1395,7 +1398,13 @@ public class RodaCoreFactory {
 
   private static void instantiateDistributedMode() {
     distributedModeType = DistributedModeType.valueOf(RodaCoreFactory.getRodaConfiguration()
-        .getString(RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY, RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name()));
+      .getString(RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY, RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name()));
+    if(DistributedModeType.CENTRAL.equals(distributedModeType)){
+      apiSecretKey = RodaCoreFactory.getRodaConfiguration().getString(RodaConstants.API_SECRET_KEY_PROPERTY,
+          RodaConstants.DEFAULT_API_SECRET_KEY);
+      tokenValidity = RodaCoreFactory.getRodaConfiguration().getLong(RodaConstants.TOKEN_VALIDITY,
+          RodaConstants.DEFAULT_TOKEN_VALIDITY);
+    }
   }
 
   private static void instantiateOrchestrator() {
@@ -1744,6 +1753,14 @@ public class RodaCoreFactory {
 
   public static ProtocolManager getProtocolManager() {
     return protocolManager;
+  }
+
+  public static String getApiSecretKey() {
+    return apiSecretKey;
+  }
+
+  public static long getTokenValidity() {
+    return tokenValidity;
   }
 
   /*

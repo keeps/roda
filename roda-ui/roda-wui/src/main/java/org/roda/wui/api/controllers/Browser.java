@@ -34,12 +34,14 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.ObjectPermissionResult;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.distributedInstance.DistributedInstances;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -48,8 +50,7 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.institution.Institution;
-import org.roda.core.data.v2.institution.Institutions;
+import org.roda.core.data.v2.distributedInstance.DistributedInstance;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
@@ -97,7 +98,6 @@ import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
-import org.roda.wui.client.common.lists.InstitutionList;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
 import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
@@ -3654,7 +3654,26 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static Institutions listInstitutions(User user)
+  public static DistributedInstance createDistributedInstance(User user, DistributedInstance distributedInstance) throws GenericException,
+      AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException, IllegalOperationException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return BrowserHelper.createDistributedInstance(distributedInstance, user);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_DISTRIBUTED_INSTANCE_PARAM, distributedInstance);
+    }
+  }
+
+  public static DistributedInstances listDistributedInstances(User user)
       throws GenericException, RequestNotValidException, IOException, AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -3664,7 +3683,7 @@ public class Browser extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      return RodaCoreFactory.getModelService().listInstitutions();
+      return RodaCoreFactory.getModelService().listDistributedInstances();
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -3674,7 +3693,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static Institution retrieveInstitution(User user, String institutionId)
+  public static DistributedInstance retrieveDistributedInstance(User user, String distributedInstacneId)
       throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -3684,7 +3703,7 @@ public class Browser extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      return RodaCoreFactory.getModelService().retrieveInstitution(institutionId);
+      return RodaCoreFactory.getModelService().retrieveDistributedInstance(distributedInstacneId);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -3694,7 +3713,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static Institution updateInstitution(User user, Institution institution)
+  public static DistributedInstance updateDistributedInstance(User user, DistributedInstance distributedInstance)
       throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -3704,7 +3723,7 @@ public class Browser extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      return RodaCoreFactory.getModelService().updatedInstitution(institution, user.getId());
+      return RodaCoreFactory.getModelService().updateDistributedInstance(distributedInstance, user.getId());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -3714,7 +3733,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void deleteInstitution(User user, String institutionId)
+  public static void deleteDistributedInstance(User user, String distributedInstacneId)
       throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -3724,7 +3743,7 @@ public class Browser extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      RodaCoreFactory.getModelService().deleteInstitution(institutionId);
+      RodaCoreFactory.getModelService().deleteDistributedInstance(distributedInstacneId);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
