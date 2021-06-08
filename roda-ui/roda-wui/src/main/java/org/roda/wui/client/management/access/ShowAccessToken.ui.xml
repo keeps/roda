@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:common="urn:import:org.roda.wui.client.common">
+
+    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
+
+    <g:FlowPanel styleName="wui-disposal-confirmation" addStyleNames="wrapper skip_padding">
+        <g:FlowPanel addStyleNames="row full_width skip_padding">
+            <g:FlowPanel addStyleNames="col_10 content" ui:field="content">
+                <g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
+                    <g:FlowPanel addStyleNames="row full_width no_padding">
+                        <g:FlowPanel addStyleNames="wui-data-panel">
+                            <g:FlowPanel styleName="browseItemPanelWithMargin">
+                                <g:Label addStyleNames="browseItemHeader">
+                                    <ui:text from='{messages.showAccessTokenTitle}'/>
+                                </g:Label>
+                                <common:TitlePanel iconClass="AccessToken" ui:field="title"/>
+                                <common:DisposalPolicySummaryPanel ui:field="usedInRulePanel"/>
+                                <g:Label addStyleNames="browseItemId" ui:field="accessKeyID"
+                                         title="{messages.accessTokenIDLabel}"/>
+                                <g:Label addStyleNames="browseItemId" ui:field="dateCreated"/>
+                                <g:Label addStyleNames="browseItemId" ui:field="dateUpdated"/>
+                            </g:FlowPanel>
+
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label"
+                                         ui:field="nameLabel">
+                                    <ui:text from='{messages.accessTokenNameLabel}'/>
+                                </g:Label>
+                                <g:HTML styleName="value"
+                                        ui:field="nameValue"/>
+                            </g:FlowPanel>
+
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label"
+                                         ui:field="expirationDateLabel">
+                                    <ui:text from='{messages.accessTokenExpirationDateLabel}'/>
+                                </g:Label>
+                                <g:HTML styleName="value"
+                                        ui:field="expirationDateValue"/>
+                            </g:FlowPanel>
+
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label"
+                                         ui:field="lastUsageLabel">
+                                    <ui:text from='{messages.accessTokenLastUsageDateLabel}'/>
+                                </g:Label>
+                                <g:HTML styleName="value"
+                                        ui:field="lastUsageValue"/>
+                            </g:FlowPanel>
+
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label"
+                                         ui:field="statusLabel">
+                                    <ui:text from='{messages.distributedInstanceStatusLabel}' />
+                                </g:Label>
+                                <g:HTML styleName="value"
+                                        ui:field="statusValue" />
+                            </g:FlowPanel>
+                        </g:FlowPanel>
+                    </g:FlowPanel>
+                </g:FlowPanel>
+            </g:FlowPanel>
+            <g:FlowPanel addStyleNames="col_2 last sidebar">
+                <g:FlowPanel addStyleNames="sticky-flow">
+                    <g:FlowPanel addStyleNames="sticky-padding">
+                        <g:Label addStyleNames="h4">
+                            <ui:text from="{messages.actions}"/>
+                        </g:Label>
+                        <g:Button addStyleNames="btn btn-block btn-edit" ui:field="buttonEdit">
+                            <ui:text from='{messages.accessTokenEditButton}'/>
+                        </g:Button>
+                        <g:Button addStyleNames="btn btn-block btn-success btn-refresh" ui:field="buttonRegenerate">
+                            <ui:text from='{messages.accessTokenRegenerateButton}'/>
+                        </g:Button>
+                        <g:Button addStyleNames="btn btn-block btn-danger btn-times-circle" ui:field="buttonRevoke">
+                            <ui:text from='{messages.accessTokenRevokeButton}'/>
+                        </g:Button>
+                        <g:Button addStyleNames="btn btn-block btn-danger btn-times-circle" ui:field="buttonDelete">
+                            <ui:text from='{messages.accessTokenDeleteButton}'/>
+                        </g:Button>
+                        <g:Button addStyleNames="btn btn-block btn-default btn-times-circle" ui:field="buttonCancel">
+                            <ui:text from='{messages.editUserCancel}'/>
+                        </g:Button>
+                    </g:FlowPanel>
+                </g:FlowPanel>
+            </g:FlowPanel>
+        </g:FlowPanel>
+    </g:FlowPanel>
+</ui:UiBinder>

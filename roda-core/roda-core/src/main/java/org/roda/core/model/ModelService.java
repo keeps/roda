@@ -33,6 +33,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -65,12 +68,15 @@ import org.roda.core.data.utils.XMLUtils;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteRODAObject;
+import org.roda.core.data.v2.AccessToken.AccessToken;
+import org.roda.core.data.v2.AccessToken.AccessTokenStatus;
+import org.roda.core.data.v2.AccessToken.AccessTokens;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.distributedInstance.DistributedInstance;
+import org.roda.core.data.v2.distributedInstance.DistributedInstances;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.institution.Institution;
-import org.roda.core.data.v2.institution.Institutions;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIP;
@@ -134,11 +140,11 @@ import org.roda.core.storage.Directory;
 import org.roda.core.storage.EmptyClosableIterable;
 import org.roda.core.storage.Entity;
 import org.roda.core.storage.Resource;
+import org.roda.core.storage.ShallowFileContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.storage.ShallowFileContentPayload;
 import org.roda.core.util.HTTPUtility;
 import org.roda.core.util.IdUtils;
 import org.roda.core.util.RESTClientUtility;
@@ -3964,83 +3970,239 @@ public class ModelService extends ModelObservable {
    ************************************/
 
   /************************************
-   * Distributed system related
+   * Distributed instances system related
    ************************************/
-  public Institution createInstitution(Institution institution, String createdBy) throws GenericException,
-      AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, NotFoundException {
+  public DistributedInstance createDistributedInstance(DistributedInstance distributedInstance, String createdBy)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException,
+    NotFoundException, IllegalOperationException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    if (institution.getId() == null) {
-      institution.setId(IdUtils.createUUID());
-      institution.setAccessKey(IdUtils.createUUID());
+    if (distributedInstance.getId() == null) {
+      distributedInstance.setId(IdUtils.createUUID());
     }
 
-    institution.setCreatedOn(new Date());
-    institution.setCreatedBy(createdBy);
-    institution.setUpdatedOn(new Date());
-    institution.setUpdatedBy(createdBy);
+    // Create a new User
+    String username = "DISTRIBUTED_" + distributedInstance.getName();
+    User user = createUser(new User(username), true);
 
-    String institutionAsJson = JsonUtils.getJsonFromObject(institution);
-    StoragePath institutionPath = ModelUtils.getInstitutionStoragePath(institution.getId());
-    storage.createBinary(institutionPath, new StringContentPayload(institutionAsJson), false);
+    // Create a new Access token
+    AccessToken accessToken = new AccessToken();
+    accessToken.setName("DISTRIBUTED_" + distributedInstance.getName() + "_TOKEN");
+    accessToken.setUserName(user.getName());
+    createAccessToken(accessToken, createdBy);
 
-    return institution;
+    // Associate to access token
+    distributedInstance.setAccessTokenId(accessToken.getId());
+    distributedInstance.setUsername(username);
+
+    distributedInstance.setCreatedOn(new Date());
+    distributedInstance.setCreatedBy(createdBy);
+    distributedInstance.setUpdatedOn(new Date());
+    distributedInstance.setUpdatedBy(createdBy);
+
+    String distributedInstanceAsJson = JsonUtils.getJsonFromObject(distributedInstance);
+    StoragePath distributedInstancePath = ModelUtils.getDistributedInstanceStoragePath(distributedInstance.getId());
+    storage.createBinary(distributedInstancePath, new StringContentPayload(distributedInstanceAsJson), false);
+
+    return distributedInstance;
   }
 
-  public Institutions listInstitutions()
-      throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
-    StoragePath institutionsScheduleContainerPath = ModelUtils.getInstitutionsContainerPath();
-    Institutions institutions = new Institutions();
+  public DistributedInstances listDistributedInstances()
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
+    StoragePath distributedInstancesContainerPath = ModelUtils.getDistributedInstancesContainerPath();
+    DistributedInstances distributedInstances = new DistributedInstances();
 
     try {
-      CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(institutionsScheduleContainerPath, false);
+      CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(distributedInstancesContainerPath,
+        false);
       for (Resource resource : iterable) {
-        Institution institution = ResourceParseUtils.convertResourceToObject(resource, Institution.class);
-        institutions.addObject(institution);
+        DistributedInstance distributedInstance = ResourceParseUtils.convertResourceToObject(resource,
+          DistributedInstance.class);
+        distributedInstances.addObject(distributedInstance);
       }
 
     } catch (NotFoundException e) {
-      LOGGER.error("Could not find any institution to list: {}", e.getMessage(), e);
-      return institutions;
+      LOGGER.error("Could not find any distributed instance to list: {}", e.getMessage(), e);
+      return distributedInstances;
     }
 
-    return institutions;
+    return distributedInstances;
   }
 
-  public Institution retrieveInstitution(String institutionId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    StoragePath institutionPath = ModelUtils.getInstitutionStoragePath(institutionId);
-    Binary binary = storage.getBinary(institutionPath);
-    Institution ret;
+  public DistributedInstance retrieveDistributedInstance(String distributedInstanceId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    StoragePath distributedInstancePath = ModelUtils.getDistributedInstanceStoragePath(distributedInstanceId);
+    Binary binary = storage.getBinary(distributedInstancePath);
+    DistributedInstance ret;
 
     try (InputStream inputStream = binary.getContent().createInputStream()) {
-      ret = JsonUtils.getObjectFromJson(inputStream, Institution.class);
+      ret = JsonUtils.getObjectFromJson(inputStream, DistributedInstance.class);
     } catch (IOException | GenericException e) {
-      throw new GenericException("Error reading institution: " + institutionId, e);
+      throw new GenericException("Error reading distributed instance: " + distributedInstanceId, e);
     }
 
     return ret;
   }
 
-  public void deleteInstitution(String institutionId)
-      throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
+  public void deleteDistributedInstance(String distributedInstanceId)
+    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    StoragePath institutionPath = ModelUtils.getInstitutionStoragePath(institutionId);
-    storage.deleteResource(institutionPath);
+    StoragePath distributedInstancePath = ModelUtils.getDistributedInstanceStoragePath(distributedInstanceId);
+    storage.deleteResource(distributedInstancePath);
   }
 
-  public Institution updatedInstitution(Institution institution, String updatedBy)
-      throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+  public DistributedInstance updateDistributedInstance(DistributedInstance distributedInstance, String updatedBy)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    institution.setUpdatedOn(new Date());
-    institution.setUpdatedBy(updatedBy);
+    distributedInstance.setUpdatedOn(new Date());
+    distributedInstance.setUpdatedBy(updatedBy);
 
-    String institutionAsJson = JsonUtils.getJsonFromObject(institution);
-    StoragePath institutionPath = ModelUtils.getInstitutionStoragePath(institution.getId());
-    storage.updateBinaryContent(institutionPath, new StringContentPayload(institutionAsJson), false, false);
+    String distributedInstanceAsJson = JsonUtils.getJsonFromObject(distributedInstance);
+    StoragePath distributedInstancePath = ModelUtils.getDistributedInstanceStoragePath(distributedInstance.getId());
+    storage.updateBinaryContent(distributedInstancePath, new StringContentPayload(distributedInstanceAsJson), false,
+      false);
 
-    return institution;
+    return distributedInstance;
   }
 
+  /************************************
+   * Access Token related
+   ************************************/
+  public AccessToken createAccessToken(AccessToken accessToken, String createdBy) throws GenericException,
+    AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, NotFoundException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    if (accessToken.getId() == null) {
+      accessToken.setId(IdUtils.createUUID());
+    }
+
+    if (accessToken.getExpirationDate() == null) {
+      Date today = new Date();
+      Date expirationDate = new Date(today.getTime() + (1000 * 60 * 60 * 24));
+      accessToken.setExpirationDate(expirationDate);
+    }
+
+    String token = Jwts.builder().signWith(SignatureAlgorithm.HS256, RodaCoreFactory.getApiSecretKey())
+        .setIssuedAt(new Date()).setExpiration(accessToken.getExpirationDate()).compact();
+
+    accessToken.setAccessKey(token);
+
+    accessToken.setCreatedOn(new Date());
+    accessToken.setCreatedBy(createdBy);
+    accessToken.setUpdatedOn(new Date());
+    accessToken.setUpdatedBy(createdBy);
+
+    String accessTokenAsJson = JsonUtils.getJsonFromObject(accessToken);
+    StoragePath accessTokenPath = ModelUtils.getAccessTokenStoragePath(accessToken.getId());
+    storage.createBinary(accessTokenPath, new StringContentPayload(accessTokenAsJson), false);
+
+    return accessToken;
+  }
+
+  public AccessTokens listAccessToken()
+    throws RequestNotValidException, AuthorizationDeniedException, GenericException {
+    StoragePath accessTokenContainerPath = ModelUtils.getAccessTokenContainerPath();
+    AccessTokens accessTokens = new AccessTokens();
+
+    try {
+      CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(accessTokenContainerPath, false);
+      for (Resource resource : iterable) {
+        AccessToken accessToken = ResourceParseUtils.convertResourceToObject(resource, AccessToken.class);
+        accessTokens.addObject(accessToken);
+      }
+
+    } catch (NotFoundException | IOException e) {
+      LOGGER.error("Could not find any access token to list: {}", e.getMessage(), e);
+      return accessTokens;
+    }
+
+    return accessTokens;
+  }
+
+  public AccessToken retrieveAccessToken(String accessTokenId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    StoragePath accessTokenPath = ModelUtils.getAccessTokenStoragePath(accessTokenId);
+    Binary binary = storage.getBinary(accessTokenPath);
+    AccessToken ret;
+
+    try (InputStream inputStream = binary.getContent().createInputStream()) {
+      ret = JsonUtils.getObjectFromJson(inputStream, AccessToken.class);
+    } catch (IOException | GenericException e) {
+      throw new GenericException("Error reading accessToken: " + accessTokenId, e);
+    }
+
+    return ret;
+  }
+
+  public AccessToken updateAccessToken(AccessToken accessToken, String updatedBy)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    accessToken.setUpdatedOn(new Date());
+    accessToken.setUpdatedBy(updatedBy);
+
+    String accessTokenAsJson = JsonUtils.getJsonFromObject(accessToken);
+    StoragePath accessTokenPath = ModelUtils.getAccessTokenStoragePath(accessToken.getId());
+    storage.updateBinaryContent(accessTokenPath, new StringContentPayload(accessTokenAsJson), false, false);
+
+    return accessToken;
+  }
+
+  public void deleteAccessToken(String accessTokenId)
+    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    StoragePath accessTokenPath = ModelUtils.getAccessTokenStoragePath(accessTokenId);
+    storage.deleteResource(accessTokenPath);
+  }
+
+  public void updateAccessTokenLastUsageDate(AccessToken accessToken)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    String accessTokenAsJson = JsonUtils.getJsonFromObject(accessToken);
+    StoragePath accessTokenPath = ModelUtils.getAccessTokenStoragePath(accessToken.getId());
+    storage.updateBinaryContent(accessTokenPath, new StringContentPayload(accessTokenAsJson), false, false);
+  }
+
+  public AccessTokens listAccessTokenByUser(String userId)
+    throws RequestNotValidException, AuthorizationDeniedException, GenericException {
+    StoragePath accessTokenContainerPath = ModelUtils.getAccessTokenContainerPath();
+    AccessTokens accessTokens = new AccessTokens();
+
+    try {
+      CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(accessTokenContainerPath, false);
+      for (Resource resource : iterable) {
+        AccessToken accessToken = ResourceParseUtils.convertResourceToObject(resource, AccessToken.class);
+        if (accessToken.getUserName().equals(userId)) {
+          accessTokens.addObject(accessToken);
+        }
+      }
+
+    } catch (NotFoundException | IOException e) {
+      LOGGER.error("Could not find any access token to list: {}", e.getMessage(), e);
+      return accessTokens;
+    }
+
+    return accessTokens;
+  }
+
+  public void deactivateUserAccessTokens(String userId, String updatedBy)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    AccessTokens accessTokens = listAccessTokenByUser(userId);
+
+    for (AccessToken accessToken : accessTokens.getObjects()) {
+      accessToken.setStatus(AccessTokenStatus.INACTIVE);
+      updateAccessToken(accessToken, updatedBy);
+    }
+  }
+
+  public void deleteUserAccessTokens(String userId, String updatedBy)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    AccessTokens accessTokens = listAccessTokenByUser(userId);
+
+    for (AccessToken accessToken : accessTokens.getObjects()) {
+      deleteAccessToken(accessToken.getId());
+    }
+  }
 }

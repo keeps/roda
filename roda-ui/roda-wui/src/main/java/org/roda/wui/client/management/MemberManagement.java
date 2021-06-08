@@ -17,6 +17,9 @@ import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.search.SearchWrapper;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.management.access.CreateAccessToken;
+import org.roda.wui.client.management.access.EditAccessToken;
+import org.roda.wui.client.management.access.ShowAccessToken;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -127,6 +130,12 @@ public class MemberManagement extends Composite {
         EditUser.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(EditGroup.RESOLVER.getHistoryToken())) {
         EditGroup.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+      } else if (historyTokens.get(0).equals(ShowAccessToken.RESOLVER.getHistoryToken())) {
+        ShowAccessToken.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+      } else if (historyTokens.get(0).equals(EditAccessToken.RESOLVER.getHistoryToken())) {
+        EditAccessToken.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+      } else if (historyTokens.get(0).equals(CreateAccessToken.RESOLVER.getHistoryToken())) {
+        CreateAccessToken.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else {
         HistoryUtils.newHistory(RESOLVER);
         callback.onSuccess(null);

@@ -52,8 +52,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
-import org.roda.core.data.v2.institution.Institution;
-import org.roda.core.data.v2.institution.Institutions;
+import org.roda.core.data.v2.distributedInstance.DistributedInstance;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
@@ -71,10 +70,8 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageTestUtils;
-import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.util.IdUtils;
-import org.roda.core.util.RESTClientUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -89,8 +86,6 @@ import gov.loc.premis.v3.EventComplexType;
 import gov.loc.premis.v3.ObjectCharacteristicsComplexType;
 import gov.loc.premis.v3.ObjectIdentifierComplexType;
 import jersey.repackaged.com.google.common.collect.Lists;
-
-import javax.json.Json;
 
 /**
  * Unit tests for ModelService
@@ -1165,41 +1160,40 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void createInstitutionTest() throws RODAException, IOException {
-    Institution institution = new Institution();
-    institution.setName("institution");
+  public void createDistributedInstanceTest() throws RODAException, IOException {
+    DistributedInstance distributedInstance = new DistributedInstance();
+    distributedInstance.setName("TEST_1");
 
-    Institution institution1 = model.createInstitution(institution, RodaConstants.ADMIN);
+    DistributedInstance createdDistributedInstance = model.createDistributedInstance(distributedInstance, RodaConstants.ADMIN);
 
-    Institution ret = model.retrieveInstitution(institution1.getId());
-    assertEquals(ret, institution);
+    DistributedInstance ret = model.retrieveDistributedInstance(createdDistributedInstance.getId());
+    assertEquals(ret, distributedInstance);
   }
 
   @Test
-  public void deleteInstitutionTest() throws RODAException, IOException {
-    Institution institution = new Institution();
-    institution.setName("institution");
+  public void deleteDistributedInstanceTest() throws RODAException, IOException {
+    DistributedInstance distributedInstance = new DistributedInstance();
+    distributedInstance.setName("TEST_1");
 
-    Institution institution1 = model.createInstitution(institution, RodaConstants.ADMIN);
+    DistributedInstance distributedInstance1 = model.createDistributedInstance(distributedInstance, RodaConstants.ADMIN);
 
-    Institution ret = model.retrieveInstitution(institution1.getId());
-    assertEquals(ret, institution);
+    DistributedInstance ret = model.retrieveDistributedInstance(distributedInstance1.getId());
+    assertEquals(ret, distributedInstance);
 
-    model.deleteInstitution(institution1.getId());
-    //model.retrieveInstitution(institution1.getId());
+    model.deleteDistributedInstance(distributedInstance1.getId());
   }
 
   @Test
-  public void updateInstitutionTest() throws RODAException, IOException {
-    Institution institution = new Institution();
-    institution.setName("institution");
+  public void updateDistributedInstanceTest() throws RODAException, IOException {
+    DistributedInstance distributedInstance = new DistributedInstance();
+    distributedInstance.setName("TEST_1");
 
-    Institution institution1 = model.createInstitution(institution, RodaConstants.ADMIN);
+    DistributedInstance distributedInstance1 = model.createDistributedInstance(distributedInstance, RodaConstants.ADMIN);
 
-    institution.setName("updated");
-    model.updatedInstitution(institution, RodaConstants.ADMIN);
+    distributedInstance.setName("updated");
+    model.updateDistributedInstance(distributedInstance, RodaConstants.ADMIN);
 
-    Institution ret = model.retrieveInstitution(institution1.getId());
+    DistributedInstance ret = model.retrieveDistributedInstance(distributedInstance1.getId());
     assertEquals(ret.getName(), "updated");
   }
 }

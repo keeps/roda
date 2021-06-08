@@ -34,7 +34,7 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.institution.Institution;
+import org.roda.core.data.v2.distributedInstance.DistributedInstance;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
@@ -643,9 +643,14 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISPOSAL_HOLD);
   }
 
-  public static StoragePath getInstitutionStoragePath(String institutionId) throws RequestNotValidException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_INSTITUTIONS,
-        institutionId + RodaConstants.DISTRIBUTED_INSTITUTION_FILE_EXTENSION);
+  public static StoragePath getDistributedInstanceStoragePath(String distributedInstanceId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISTRIBUTED_INSTANCES,
+        distributedInstanceId + RodaConstants.DISTRIBUTED_INSTANCE_FILE_EXTENSION);
+  }
+
+  public static StoragePath getAccessTokenStoragePath(String accessTokenId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACCESS_TOKEN,
+        accessTokenId + RodaConstants.DISTRIBUTED_INSTANCE_FILE_EXTENSION);
   }
 
   public static String getJobId(StoragePath jobPath) {
@@ -739,8 +744,12 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISPOSAL_CONFIRMATION);
   }
 
-  public static StoragePath getInstitutionsContainerPath() throws RequestNotValidException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_INSTITUTIONS);
+  public static StoragePath getDistributedInstancesContainerPath() throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISTRIBUTED_INSTANCES);
+  }
+
+  public static StoragePath getAccessTokenContainerPath() throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACCESS_TOKEN);
   }
 
   public static StoragePath getDIPStoragePath(String dipId) throws RequestNotValidException {
@@ -815,8 +824,8 @@ public final class ModelUtils {
       return getDisposalHoldContainerPath();
     } else if (clazz.equals(DisposalConfirmation.class)) {
       return getDisposalConfirmationContainerPath();
-    } else if (clazz.equals(Institution.class)) {
-      return getInstitutionsContainerPath();
+    } else if (clazz.equals(DistributedInstance.class)) {
+      return getDistributedInstancesContainerPath();
     } else {
       throw new RequestNotValidException("Unknown class for getting container path: " + clazz.getName());
     }

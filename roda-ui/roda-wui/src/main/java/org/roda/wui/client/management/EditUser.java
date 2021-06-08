@@ -14,10 +14,17 @@ import java.util.List;
 
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.AccessToken.AccessTokens;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.api.controllers.Browser;
+import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.management.access.AccessTokenTablePanel;
+import org.roda.wui.client.management.access.CreateAccessToken;
+import org.roda.wui.client.management.access.ShowAccessToken;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -31,6 +38,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -101,10 +109,16 @@ public class EditUser extends Composite {
   Button buttonRemove;
 
   @UiField
+  Button buttonAddAccessToken;
+
+  @UiField
   Button buttonCancel;
 
   @UiField(provided = true)
   UserDataPanel userDataPanel;
+
+  @UiField
+  FlowPanel accessTokenTablePanel;
 
   /**
    * Create a new panel to edit a user
@@ -120,6 +134,7 @@ public class EditUser extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
+    accessTokenTablePanel.add(new AccessTokenTablePanel(user.getId()));
     userDataPanel.setUsernameReadOnly(true);
 
     buttonDeActivate.setEnabled(true);
@@ -169,6 +184,7 @@ public class EditUser extends Composite {
 
         @Override
         public void onSuccess(Void result) {
+          BrowserService.Util.getInstance().deactivateUserAccessTokens(user.getId(), new NoAsyncCallback<Void>());
           HistoryUtils.newHistory(MemberManagement.RESOLVER);
         }
 
@@ -178,6 +194,11 @@ public class EditUser extends Composite {
           errorMessage(caught, null);
         }
       });
+  }
+
+  @UiHandler("buttonAddAccessToken")
+  void buttonAddAccessTokenHandler(ClickEvent e) {
+    HistoryUtils.newHistory(CreateAccessToken.RESOLVER, user.getName());
   }
 
   @UiHandler("buttonRemove")
@@ -191,6 +212,7 @@ public class EditUser extends Composite {
 
               @Override
               public void onSuccess(Void result) {
+                BrowserService.Util.getInstance().deleteUserAccessTokens(user.getId(), new NoAsyncCallback<Void>());
                 HistoryUtils.newHistory(MemberManagement.RESOLVER);
               }
 

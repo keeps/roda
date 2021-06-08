@@ -1,10 +1,10 @@
-package org.roda.wui.client.management;
+package org.roda.wui.client.management.distributed;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.client.ui.TextArea;
-import org.roda.core.data.v2.institution.Institution;
+import org.roda.core.data.v2.distributedInstance.DistributedInstance;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -30,13 +30,13 @@ import config.i18n.client.ClientMessages;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-public class InstitutionDataPanel extends Composite implements HasValueChangeHandlers<Institution> {
+public class DistributedInstanceDataPanel extends Composite implements HasValueChangeHandlers<DistributedInstance> {
   public static final String IS_WRONG = "isWrong";
 
-  interface MyUiBinder extends UiBinder<Widget, InstitutionDataPanel> {
+  interface MyUiBinder extends UiBinder<Widget, DistributedInstanceDataPanel> {
   }
 
-  private static InstitutionDataPanel.MyUiBinder uiBinder = GWT.create(InstitutionDataPanel.MyUiBinder.class);
+  private static DistributedInstanceDataPanel.MyUiBinder uiBinder = GWT.create(DistributedInstanceDataPanel.MyUiBinder.class);
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -63,7 +63,7 @@ public class InstitutionDataPanel extends Composite implements HasValueChangeHan
   private boolean changed = false;
   private boolean checked = false;
 
-  public InstitutionDataPanel(Institution institution, boolean editMode) {
+  public DistributedInstanceDataPanel(DistributedInstance distributedInstance, boolean editMode) {
     initWidget(uiBinder.createAndBindUi(this));
 
     this.editMode = editMode;
@@ -72,7 +72,7 @@ public class InstitutionDataPanel extends Composite implements HasValueChangeHan
     initHandlers();
 
     if (editMode) {
-      setInstitution(institution);
+      setDistributedInstance(distributedInstance);
     }
   }
 
@@ -80,14 +80,14 @@ public class InstitutionDataPanel extends Composite implements HasValueChangeHan
     ChangeHandler changeHandler = new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent changeEvent) {
-        InstitutionDataPanel.this.onChange();
+        DistributedInstanceDataPanel.this.onChange();
       }
     };
 
     KeyUpHandler keyUpHandler = new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent keyUpEvent) {
-        InstitutionDataPanel.this.onChange();
+        DistributedInstanceDataPanel.this.onChange();
       }
     };
 
@@ -105,19 +105,19 @@ public class InstitutionDataPanel extends Composite implements HasValueChangeHan
     errors.setVisible(false);
   }
 
-  public void setInstitution(Institution institution) {
-    this.name.setText(institution.getName());
-    this.identifier.setText(institution.getNameIdentifier());
-    this.description.setText(institution.getDescription());
+  public void setDistributedInstance(DistributedInstance distributedInstance) {
+    this.name.setText(distributedInstance.getName());
+    this.identifier.setText(distributedInstance.getNameIdentifier());
+    this.description.setText(distributedInstance.getDescription());
   }
 
-  public Institution getInstitution() {
-    Institution institution = new Institution();
-    institution.setName(name.getText());
-    institution.setNameIdentifier(identifier.getText());
-    institution.setDescription(description.getText());
+  public DistributedInstance getDistributedInstance() {
+    DistributedInstance distributedInstance = new DistributedInstance();
+    distributedInstance.setName(name.getText());
+    distributedInstance.setNameIdentifier(identifier.getText());
+    distributedInstance.setDescription(description.getText());
 
-    return institution;
+    return distributedInstance;
   }
 
   public boolean isValid() {
@@ -128,7 +128,7 @@ public class InstitutionDataPanel extends Composite implements HasValueChangeHan
       nameError.setText(messages.mandatoryField());
       nameError.setVisible(true);
       Window.scrollTo(name.getAbsoluteLeft(), name.getAbsoluteTop());
-      errorList.add(messages.isAMandatoryField(messages.institutionNameLabel()));
+      errorList.add(messages.isAMandatoryField(messages.distributedInstanceNameLabel()));
     } else {
       name.removeStyleName(IS_WRONG);
       nameError.setVisible(false);
@@ -140,13 +140,13 @@ public class InstitutionDataPanel extends Composite implements HasValueChangeHan
       identifierError.setText(messages.mandatoryField());
       identifierError.setVisible(true);
       Window.scrollTo(identifier.getAbsoluteLeft(), identifier.getAbsoluteTop());
-      errorList.add(messages.isAMandatoryField(messages.institutionIDLabel()));
+      errorList.add(messages.isAMandatoryField(messages.distributedInstanceIDLabel()));
     } else if (identifier.getText().length() != 3) {
       identifier.addStyleName(IS_WRONG);
       identifierError.setText(messages.mandatoryField());
       identifierError.setVisible(true);
       Window.scrollTo(identifier.getAbsoluteLeft(), identifier.getAbsoluteTop());
-      errorList.add(messages.isAMandatoryField(messages.institutionIDLabel()));
+      errorList.add(messages.isAMandatoryField(messages.distributedInstanceIDLabel()));
     } else {
       identifier.removeStyleName(IS_WRONG);
       identifierError.setVisible(false);
@@ -176,7 +176,7 @@ public class InstitutionDataPanel extends Composite implements HasValueChangeHan
   }
 
   @Override
-  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Institution> handler) {
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<DistributedInstance> handler) {
     return addHandler(handler, ValueChangeEvent.getType());
   }
 
@@ -188,7 +188,7 @@ public class InstitutionDataPanel extends Composite implements HasValueChangeHan
     ValueChangeEvent.fire(this, getValue());
   }
 
-  public Institution getValue() {
-    return getInstitution();
+  public DistributedInstance getValue() {
+    return getDistributedInstance();
   }
 }
