@@ -22,23 +22,23 @@
                     <g:HTML ui:field="errors"/>
                 </g:FlowPanel>
                 <g:Label addStyleNames="form-label">
-                    <ui:text from='{messages.institutionNameLabel}'/>
+                    <ui:text from='{messages.distributedInstanceNameLabel}'/>
                     *
                 </g:Label>
-                <g:TextBox title="{messages.institutionNameLabel}" ui:field="name" addStyleNames="form-textbox"/>
+                <g:TextBox title="{messages.distributedInstanceNameLabel}" ui:field="name" addStyleNames="form-textbox"/>
                 <g:Label ui:field="nameError" addStyleNames="form-label-error"/>
 
                 <g:Label addStyleNames="form-label">
-                    <ui:text from='{messages.institutionIDLabel}'/>
+                    <ui:text from='{messages.distributedInstanceIDLabel}'/>
                     *
                 </g:Label>
-                <g:TextBox title="{messages.institutionIDLabel}" ui:field="identifier" addStyleNames="form-textbox"/>
+                <g:TextBox title="{messages.distributedInstanceIDLabel}" ui:field="identifier" addStyleNames="form-textbox"/>
                 <g:Label ui:field="identifierError" addStyleNames="form-label-error"/>
 
                 <g:Label addStyleNames="form-label">
-                    <ui:text from='{messages.institutionDescriptionLabel}'/>
+                    <ui:text from='{messages.distributedInstanceDescriptionLabel}'/>
                 </g:Label>
-                <g:TextArea title="{messages.institutionDescriptionLabel}" ui:field="description"
+                <g:TextArea title="{messages.distributedInstanceDescriptionLabel}" ui:field="description"
                            addStyleNames="disposalScopeNotes form-textbox"/>
 
                 <g:Label styleName="wui-required-fields-note">

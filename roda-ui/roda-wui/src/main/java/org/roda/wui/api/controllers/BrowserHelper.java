@@ -90,7 +90,7 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.institution.Institution;
+import org.roda.core.data.v2.distributedInstance.DistributedInstance;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIP;
@@ -3572,8 +3572,9 @@ public class BrowserHelper {
       ApplyDisposalRulesPlugin.class, user, pluginParameters, "Could not execute apply disposal rules to repository");
   }
 
-  public static Institution createInstitution(Institution institution, User user) throws GenericException,
-      AuthorizationDeniedException, AlreadyExistsException, NotFoundException, RequestNotValidException {
-    return RodaCoreFactory.getModelService().createInstitution(institution, user.getName());
+  public static DistributedInstance createDistributedInstance(DistributedInstance distributedInstance, User user)
+    throws GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException,
+    RequestNotValidException, IllegalOperationException {
+    return RodaCoreFactory.getModelService().createDistributedInstance(distributedInstance, user.getName());
   }
 }

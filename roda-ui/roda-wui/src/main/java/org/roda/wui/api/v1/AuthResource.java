@@ -21,7 +21,9 @@ import org.glassfish.jersey.server.JSONP;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.AccessToken.AccessToken;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.api.controllers.ApplicationAuth;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ExtraMediaType;
@@ -33,6 +35,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * REST API CAS authentication tickets resource.
@@ -79,6 +84,22 @@ public class AuthResource {
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
     return Response.ok(UserUtility.getApiUser(request), mediaType).build();
+  }
+
+  @POST
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Path("/token")
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
+  public Response authenticate(AccessToken accessToken,
+                               @ApiParam(value = "Choose format in which to get the disposal schedule", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+                               @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+      throws RODAException {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+    Map<String, String> response = new HashMap<>();
+    String token = ApplicationAuth.authenticate(accessToken);
+    response.put("token", token);
+
+    return Response.ok(response, mediaType).build();
   }
 
 }

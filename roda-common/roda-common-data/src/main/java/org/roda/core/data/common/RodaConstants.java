@@ -192,8 +192,10 @@ public final class RodaConstants {
   public static final String RODA_OBJECT_DISPOSAL_HOLD_ASSOCIATION = "disposal_hold_association";
   public static final String RODA_OBJECT_SHALLOW_FILE = "shallow_file";
   public static final String RODA_OBJECT_SHALLOWS_FILE = "shallow_files";
-  public static final String RODA_OBJECT_INSTITUTIONS = "institutions";
-  public static final String RODA_OBJECT_INSTITUTION = "institution";
+  public static final String RODA_OBJECT_DISTRIBUTED_INSTANCES = "distributed_instances";
+  public static final String RODA_OBJECT_DISTRIBUTED_INSTANCE = "distributed_instance";
+  public static final String RODA_OBJECT_ACCESS_TOKEN = "access_token";
+  public static final String RODA_OBJECT_ACCESS_TOKENS = "access_tokens";
 
   public static final String RODA_OBJECT_MEMBERS = "members";
   public static final String RODA_OBJECT_USERS = "users";
@@ -472,7 +474,8 @@ public final class RodaConstants {
   public static final String CONTROLLER_DISPOSAL_CONFIRMATION_METADATA_PARAM = RODA_OBJECT_DISPOSAL_CONFIRMATION_METADATA;
   public static final String CONTROLLER_DISPOSAL_CONFIRMATION_ID_PARAM = "disposalConfirmationId";
 
-  public static final String CONTROLLER_INSTITUTION_PARAM = RODA_OBJECT_INSTITUTION;
+  public static final String CONTROLLER_DISTRIBUTED_INSTANCE_PARAM = RODA_OBJECT_DISTRIBUTED_INSTANCE;
+  public static final String CONTROLLER_ACCESS_TOKEN_PARAM = RODA_OBJECT_ACCESS_TOKEN;
 
   public static final String CONTROLLER_ID_OBJECT_PARAM = "transferred_resource_uuid, transferred_resource_path, sip, transferred_resource_original_name";
   public static final String CONTROLLER_SIP_PARAM = "sip";
@@ -567,8 +570,14 @@ public final class RodaConstants {
     CENTRAL, LOCAL, BASE
   }
 
-  public static final DistributedModeType DEFAULT_DISTRIBUTED_MODE_TYPE = DistributedModeType.BASE;
+  public static final DistributedModeType DEFAULT_DISTRIBUTED_MODE_TYPE = DistributedModeType.CENTRAL;
   public static final String DISTRIBUTED_MODE_TYPE_PROPERTY = "core.distributed.mode.type";
+
+  public static final String DEFAULT_API_SECRET_KEY = "changeit";
+  public static final String API_SECRET_KEY_PROPERTY = "core.distributed.api.secret";
+
+  public static final long DEFAULT_TOKEN_VALIDITY = 2 * 60 * 60 * 1000;
+  public static final String TOKEN_VALIDITY = "core.distributed.api.token.validity";
 
   public enum OrchestratorType {
     AKKA, AKKA_DISTRIBUTED
@@ -626,7 +635,8 @@ public final class RodaConstants {
   public static final String STORAGE_CONTAINER_DISPOSAL_HOLD = "disposal-hold";
   public static final String STORAGE_CONTAINER_DISPOSAL_SCHEDULE = "disposal-schedule";
   public static final String STORAGE_CONTAINER_DISPOSAL_RULE = "disposal-rule";
-  public static final String STORAGE_CONTAINER_INSTITUTIONS = "institutions";
+  public static final String STORAGE_CONTAINER_DISTRIBUTED_INSTANCES = "distributed-instances";
+  public static final String STORAGE_CONTAINER_ACCESS_TOKEN = "accessTokens";
 
   /*
    * Disposal Confirmation
@@ -845,7 +855,7 @@ public final class RodaConstants {
   public static final String REPOSITORY_PERMISSIONS_REPRESENTATION_INFORMATION_READ = "ri.read";
 
   public static final String REPOSITORY_PERMISSIONS_DISPOSAL_SCHEDULE_READ = "disposal_schedule.read";
-  public static final String REPOSITORY_PERMISSIONS_INSTITUTION_READ = "institution.read";
+  public static final String REPOSITORY_PERMISSIONS_DISTRIBUTED_INSTANCES_READ = "distributed_instances.read";
 
   public static final String LOG_ACTION_COMPONENT = "actionComponent";
   public static final String LOG_ACTION_METHOD = "actionMethod";
@@ -936,7 +946,7 @@ public final class RodaConstants {
   public static final String DISPOSAL_HOLD_FILE_EXTENSION = ".json";
 
   /* Distributed related parameters */
-  public static final String DISTRIBUTED_INSTITUTION_FILE_EXTENSION = ".json";
+  public static final String DISTRIBUTED_INSTANCE_FILE_EXTENSION = ".json";
 
   /* Plugins related parameters */
   public static final String PLUGIN_PARAMS_LOCK_REQUEST_UUID = "parameter.lock_request_uuid";
@@ -1676,6 +1686,8 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_CREATE_GROUP = "org.roda.wui.api.controllers.UserManagement.createGroup";
   public static final String PERMISSION_METHOD_UPDATE_USER = "org.roda.wui.api.controllers.UserManagement.updateUser";
   public static final String PERMISSION_METHOD_DELETE_USER = "org.roda.wui.api.controllers.UserManagement.deleteUser";
+
+  public static final String PERMISSION_METHOD_CREATE_ACCESS_TOKEN = "org.roda.wui.api.controllers.ApplicationAuth.createAccessToken";
 
   public static final String PERMISSION_METHOD_CREATE_DISPOSAL_RULE = "org.roda.wui.api.controllers.Disposals.createDisposalRule";
   public static final String PERMISSION_METHOD_UPDATE_DISPOSAL_RULE = "org.roda.wui.api.controllers.Disposals.updateDisposalRule";

@@ -29,7 +29,7 @@ import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.preingest.PreIngest;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
-import org.roda.wui.client.management.InstitutionManagement;
+import org.roda.wui.client.management.distributed.DistributedInstancesManagement;
 import org.roda.wui.client.management.Management;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.management.NotificationRegister;
@@ -104,7 +104,7 @@ public class Menu extends Composite {
   private MenuItem administrationLog;
   private MenuItem administrationNotifications;
   private MenuItem administrationStatistics;
-  private MenuItem administrationInstitutions;
+  private MenuItem administrationDistributedInstances;
   // private MenuItem administrationPreferences;
 
   private AcessibleMenuBar disposalMenu;;
@@ -179,8 +179,9 @@ public class Menu extends Composite {
     administrationStatistics = administrationMenu.addItem(messages.title("administration_statistics"),
       createCommand(Statistics.RESOLVER.getHistoryPath()));
     administrationStatistics.addStyleName("administration_statistics_item");
-    administrationInstitutions = administrationMenu.addItem(messages.title("administration_institutions"),
-        createCommand(InstitutionManagement.RESOLVER.getHistoryPath()));
+    administrationDistributedInstances = administrationMenu.addItem(messages.title("administration_distributed_instances"),
+        createCommand(DistributedInstancesManagement.RESOLVER.getHistoryPath()));
+    administrationDistributedInstances.addStyleName("administration_statistics_item");
     // administration_preferences =
     // administrationMenu.addItem(messages.title("administrationPreferences"),
     // createCommand(Management.RESOLVER.getHistoryPath()));

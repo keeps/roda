@@ -14,19 +14,19 @@
                         <g:FlowPanel addStyleNames="wui-data-panel">
                             <g:FlowPanel styleName="browseItemPanelWithMargin">
                                 <g:Label addStyleNames="browseItemHeader">
-                                    <ui:text from='{messages.showInstitutionTitle}' />
+                                    <ui:text from='{messages.showDistributedInstanceTitle}' />
                                 </g:Label>
-                                <common:TitlePanel iconClass="DisposalSchedule" ui:field="title" />
+                                <common:TitlePanel iconClass="DistributedInstance" ui:field="title" />
                                 <common:DisposalPolicySummaryPanel ui:field="usedInRulePanel" />
-                                <g:Label addStyleNames="browseItemId" ui:field="institutionUUID"
-                                         title="{messages.institutionUUIDLabel}" />
+                                <g:Label addStyleNames="browseItemId" ui:field="distributedInstanceUUID"
+                                         title="{messages.distributedInstanceUUIDLabel}" />
                                 <g:Label addStyleNames="browseItemId" ui:field="dateCreated"/>
                                 <g:Label addStyleNames="browseItemId" ui:field="dateUpdated"/>
                             </g:FlowPanel>
                             <g:FlowPanel styleName="field">
                                 <g:Label styleName="label"
                                          ui:field="descriptionLabel">
-                                    <ui:text from='{messages.institutionDescriptionLabel}' />
+                                    <ui:text from='{messages.distributedInstanceDescriptionLabel}' />
                                 </g:Label>
                                 <g:HTML styleName="value"
                                         ui:field="descriptionValue" />
@@ -34,7 +34,7 @@
                             <g:FlowPanel styleName="field">
                                 <g:Label styleName="label"
                                          ui:field="IDLabel">
-                                    <ui:text from='{messages.institutionIDLabel}' />
+                                    <ui:text from='{messages.distributedInstanceIDLabel}' />
                                 </g:Label>
                                 <g:HTML styleName="value"
                                         ui:field="IDValue" />
@@ -42,27 +42,28 @@
                             <g:FlowPanel styleName="field">
                                 <g:Label styleName="label"
                                          ui:field="lastSyncDateLabel">
-                                    <ui:text from='{messages.institutionLastSyncDateLabel}' />
+                                    <ui:text from='{messages.distributedInstanceLastSyncDateLabel}' />
                                 </g:Label>
                                 <g:HTML styleName="value"
                                         ui:field="lastSyncDateValue" />
                             </g:FlowPanel>
                             <g:FlowPanel styleName="field">
                                 <g:Label styleName="label"
-                                         ui:field="accessKeyLabel">
-                                    <ui:text from='{messages.institutionAccessKeyLabel}' />
-                                </g:Label>
-                                <g:HTML styleName="value"
-                                        ui:field="accessKeyValue" />
-                            </g:FlowPanel>
-                            <g:FlowPanel styleName="field">
-                                <g:Label styleName="label"
                                          ui:field="statusLabel">
-                                    <ui:text from='{messages.institutionStatusLabel}' />
+                                    <ui:text from='{messages.distributedInstanceStatusLabel}' />
                                 </g:Label>
                                 <g:HTML styleName="value"
                                         ui:field="statusValue" />
                             </g:FlowPanel>
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label"
+                                         ui:field="userNameLabel">
+                                    <ui:text from='{messages.loginUsername}' />
+                                </g:Label>
+                                <g:FlowPanel styleName="value"
+                                        ui:field="userNameValue" />
+                            </g:FlowPanel>
+                            <g:FlowPanel ui:field="accessTokenTablePanel" />
                         </g:FlowPanel>
                     </g:FlowPanel>
                 </g:FlowPanel>
