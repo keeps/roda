@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.roda.core.data.v2.accessToken.AccessToken;
+import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -32,13 +32,13 @@ import config.i18n.client.ClientMessages;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-public class AccessTokenDataPanel extends Composite implements HasValueChangeHandlers<AccessToken> {
+public class AccessKeyDataPanel extends Composite implements HasValueChangeHandlers<AccessKey> {
   public static final String IS_WRONG = "isWrong";
 
-  interface MyUiBinder extends UiBinder<Widget, AccessTokenDataPanel> {
+  interface MyUiBinder extends UiBinder<Widget, AccessKeyDataPanel> {
   }
 
-  private static AccessTokenDataPanel.MyUiBinder uiBinder = GWT.create(AccessTokenDataPanel.MyUiBinder.class);
+  private static AccessKeyDataPanel.MyUiBinder uiBinder = GWT.create(AccessKeyDataPanel.MyUiBinder.class);
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -62,16 +62,16 @@ public class AccessTokenDataPanel extends Composite implements HasValueChangeHan
   private boolean changed = false;
   private boolean checked = false;
 
-  public AccessTokenDataPanel(AccessToken accessToken, boolean editMode) {
+  public AccessKeyDataPanel(AccessKey accessKey, boolean editMode) {
     initWidget(uiBinder.createAndBindUi(this));
 
     this.editMode = editMode;
 
-    setInitialState(accessToken);
+    setInitialState(accessKey);
     initHandlers();
 
     if (editMode) {
-      setAccessToken(accessToken);
+      setAccessKey(accessKey);
     }
   }
 
@@ -79,19 +79,19 @@ public class AccessTokenDataPanel extends Composite implements HasValueChangeHan
     ChangeHandler changeHandler = new ChangeHandler() {
       @Override
       public void onChange(ChangeEvent changeEvent) {
-        AccessTokenDataPanel.this.onChange();
+        AccessKeyDataPanel.this.onChange();
       }
     };
 
     KeyUpHandler keyUpHandler = new KeyUpHandler() {
       @Override
       public void onKeyUp(KeyUpEvent keyUpEvent) {
-        AccessTokenDataPanel.this.onChange();
+        AccessKeyDataPanel.this.onChange();
       }
     };
   }
 
-  private void setInitialState(AccessToken accessToken) {
+  private void setInitialState(AccessKey accessKey) {
     errors.setVisible(false);
 
     DateBox.DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
@@ -108,16 +108,16 @@ public class AccessTokenDataPanel extends Composite implements HasValueChangeHan
     });
   }
 
-  public void setAccessToken(AccessToken accessToken) {
-    this.name.setText(accessToken.getName());
-    this.expirationDate.setValue(accessToken.getExpirationDate());
+  public void setAccessKey(AccessKey accessKey) {
+    this.name.setText(accessKey.getName());
+    this.expirationDate.setValue(accessKey.getExpirationDate());
   }
 
-  public AccessToken getAccessToken() {
-    AccessToken accessToken = new AccessToken();
-    accessToken.setName(name.getText());
-    accessToken.setExpirationDate(expirationDate.getValue());
-    return accessToken;
+  public AccessKey getAccessKey() {
+    AccessKey accessKey = new AccessKey();
+    accessKey.setName(name.getText());
+    accessKey.setExpirationDate(expirationDate.getValue());
+    return accessKey;
   }
 
   public boolean isValid() {
@@ -137,7 +137,7 @@ public class AccessTokenDataPanel extends Composite implements HasValueChangeHan
       expirationDate.addStyleName("isWrong");
       expirationDateError.setVisible(true);
       expirationDateError.setText(messages.mandatoryField());
-      errorList.add(messages.isAMandatoryField(messages.accessTokenExpirationDateLabel()));
+      errorList.add(messages.isAMandatoryField(messages.accessKeyExpirationDateLabel()));
     } else {
       expirationDate.removeStyleName("isWrong");
       expirationDateError.setVisible(false);
@@ -147,7 +147,7 @@ public class AccessTokenDataPanel extends Composite implements HasValueChangeHan
   }
 
   @Override
-  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<AccessToken> handler) {
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<AccessKey> handler) {
     return addHandler(handler, ValueChangeEvent.getType());
   }
 
@@ -179,7 +179,7 @@ public class AccessTokenDataPanel extends Composite implements HasValueChangeHan
     ValueChangeEvent.fire(this, getValue());
   }
 
-  public AccessToken getValue() {
-    return getAccessToken();
+  public AccessKey getValue() {
+    return getAccessKey();
   }
 }

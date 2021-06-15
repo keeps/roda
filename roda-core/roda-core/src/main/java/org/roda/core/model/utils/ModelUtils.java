@@ -648,9 +648,9 @@ public final class ModelUtils {
         distributedInstanceId + RodaConstants.DISTRIBUTED_INSTANCE_FILE_EXTENSION);
   }
 
-  public static StoragePath getAccessTokenStoragePath(String accessTokenId) throws RequestNotValidException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACCESS_TOKEN,
-        accessTokenId + RodaConstants.DISTRIBUTED_INSTANCE_FILE_EXTENSION);
+  public static StoragePath getAccessKeysStoragePath(String accessKeyId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACCESS_KEYS,
+        accessKeyId + RodaConstants.DISTRIBUTED_INSTANCE_FILE_EXTENSION);
   }
 
   public static String getJobId(StoragePath jobPath) {
@@ -748,8 +748,8 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISTRIBUTED_INSTANCES);
   }
 
-  public static StoragePath getAccessTokenContainerPath() throws RequestNotValidException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACCESS_TOKEN);
+  public static StoragePath getAccessKeysContainerPath() throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACCESS_KEYS);
   }
 
   public static StoragePath getDIPStoragePath(String dipId) throws RequestNotValidException {

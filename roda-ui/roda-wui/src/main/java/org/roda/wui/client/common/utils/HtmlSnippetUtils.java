@@ -12,7 +12,7 @@ import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
-import org.roda.core.data.v2.accessToken.AccessToken;
+import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.distributedInstance.DistributedInstance;
@@ -744,11 +744,11 @@ public class HtmlSnippetUtils {
     return ret;
   }
 
-  public static SafeHtml getAccessTokenStateHtml(AccessToken accessToken) {
+  public static SafeHtml getAccessKeyStateHtml(AccessKey accessKey) {
     SafeHtml ret = null;
-    if (accessToken != null && accessToken.getStatus() != null) {
+    if (accessKey != null && accessKey.getStatus() != null) {
       SafeHtmlBuilder b = new SafeHtmlBuilder();
-      switch (accessToken.getStatus()) {
+      switch (accessKey.getStatus()) {
         case CREATED:
           b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING));
           break;
@@ -764,7 +764,7 @@ public class HtmlSnippetUtils {
           break;
       }
 
-      b.append(SafeHtmlUtils.fromString(messages.accessTokenStatusValue(accessToken.getStatus())));
+      b.append(SafeHtmlUtils.fromString(messages.accessKeyStatusValue(accessKey.getStatus())));
       b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
       ret = b.toSafeHtml();
     }
