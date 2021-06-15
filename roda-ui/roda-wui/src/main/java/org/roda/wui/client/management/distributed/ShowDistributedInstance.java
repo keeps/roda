@@ -8,11 +8,9 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.UserLoginService;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
-import org.roda.wui.client.management.EditUser;
 import org.roda.wui.client.management.UserManagementService;
-import org.roda.wui.client.management.access.AccessTokenTablePanel;
+import org.roda.wui.client.management.access.AccessKeyTablePanel;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -26,7 +24,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -104,7 +101,7 @@ public class ShowDistributedInstance extends Composite {
   FlowPanel userNameValue;
 
   @UiField
-  FlowPanel accessTokenTablePanel;
+  FlowPanel accessKeyTablePanel;
 
   public ShowDistributedInstance(DistributedInstance distributedInstance) {
     initWidget(uiBinder.createAndBindUi(this));
@@ -149,7 +146,7 @@ public class ShowDistributedInstance extends Composite {
         }
       });
 
-      accessTokenTablePanel.add(new AccessTokenTablePanel(distributedInstance.getUsername()));
+      accessKeyTablePanel.add(new AccessKeyTablePanel(distributedInstance.getUsername()));
     }
   }
 

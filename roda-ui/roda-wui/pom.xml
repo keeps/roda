@@ -156,7 +156,7 @@
                                 <folder>${project.build.directory}/${project.build.finalName}</folder>
                             </folders>
                             <jvmArguments>
-                                -Dserver.port=9090
+                                -Dserver.port=8081
                                 -Droda.distributed.mode.type=CENTRAL
                                 -Droda.home=${env.HOME}/.roda_central
                                 -Dgwt.codeServerPort=9876 -Xdebug

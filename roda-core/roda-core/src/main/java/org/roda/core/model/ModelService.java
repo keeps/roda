@@ -66,9 +66,9 @@ import org.roda.core.data.utils.XMLUtils;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteRODAObject;
-import org.roda.core.data.v2.accessToken.AccessToken;
-import org.roda.core.data.v2.accessToken.AccessTokenStatus;
-import org.roda.core.data.v2.accessToken.AccessTokens;
+import org.roda.core.data.v2.accessKey.AccessKey;
+import org.roda.core.data.v2.accessKey.AccessKeyStatus;
+import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.distributedInstance.DistributedInstance;
@@ -3984,13 +3984,13 @@ public class ModelService extends ModelObservable {
     User user = createUser(new User(username), true);
 
     // Create a new Access token
-    AccessToken accessToken = new AccessToken();
-    accessToken.setName("DISTRIBUTED_" + distributedInstance.getName() + "_TOKEN");
-    accessToken.setUserName(user.getName());
-    createAccessToken(accessToken, createdBy);
+    AccessKey accessKey = new AccessKey();
+    accessKey.setName("DISTRIBUTED_" + distributedInstance.getName() + "_TOKEN");
+    accessKey.setUserName(user.getName());
+    createAccessKey(accessKey, createdBy);
 
     // Associate to access token
-    distributedInstance.setAccessTokenId(accessToken.getId());
+    distributedInstance.setAccessKeyId(accessKey.getId());
     distributedInstance.setUsername(username);
 
     distributedInstance.setCreatedOn(new Date());
@@ -4068,138 +4068,138 @@ public class ModelService extends ModelObservable {
   /************************************
    * Access Token related
    ************************************/
-  public AccessToken createAccessToken(AccessToken accessToken, String createdBy) throws GenericException,
+  public AccessKey createAccessKey(AccessKey accessKey, String createdBy) throws GenericException,
     AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, NotFoundException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    if (accessToken.getId() == null) {
-      accessToken.setId(IdUtils.createUUID());
+    if (accessKey.getId() == null) {
+      accessKey.setId(IdUtils.createUUID());
     }
 
-    if (accessToken.getExpirationDate() == null) {
+    if (accessKey.getExpirationDate() == null) {
       Date today = new Date();
       Date expirationDate = new Date(today.getTime() + RodaCoreFactory.getTokenValidity());
-      accessToken.setExpirationDate(expirationDate);
+      accessKey.setExpirationDate(expirationDate);
     }
 
-    String token = JwtUtils.generateToken(accessToken.getUserName(), accessToken.getExpirationDate());
+    String token = JwtUtils.generateToken(accessKey.getUserName(), accessKey.getExpirationDate());
 
-    accessToken.setAccessKey(token);
+    accessKey.setKey(token);
 
-    accessToken.setCreatedOn(new Date());
-    accessToken.setCreatedBy(createdBy);
-    accessToken.setUpdatedOn(new Date());
-    accessToken.setUpdatedBy(createdBy);
+    accessKey.setCreatedOn(new Date());
+    accessKey.setCreatedBy(createdBy);
+    accessKey.setUpdatedOn(new Date());
+    accessKey.setUpdatedBy(createdBy);
 
-    String accessTokenAsJson = JsonUtils.getJsonFromObject(accessToken);
-    StoragePath accessTokenPath = ModelUtils.getAccessTokenStoragePath(accessToken.getId());
-    storage.createBinary(accessTokenPath, new StringContentPayload(accessTokenAsJson), false);
+    String accessKeyAsJson = JsonUtils.getJsonFromObject(accessKey);
+    StoragePath accessKeyPath = ModelUtils.getAccessKeysStoragePath(accessKey.getId());
+    storage.createBinary(accessKeyPath, new StringContentPayload(accessKeyAsJson), false);
 
-    return accessToken;
+    return accessKey;
   }
 
-  public AccessTokens listAccessToken()
+  public AccessKeys listAccessKeys()
     throws RequestNotValidException, AuthorizationDeniedException, GenericException {
-    StoragePath accessTokenContainerPath = ModelUtils.getAccessTokenContainerPath();
-    AccessTokens accessTokens = new AccessTokens();
+    StoragePath accessKeysContainerPath = ModelUtils.getAccessKeysContainerPath();
+    AccessKeys accessKeys = new AccessKeys();
 
     try {
-      CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(accessTokenContainerPath, false);
+      CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(accessKeysContainerPath, false);
       for (Resource resource : iterable) {
-        AccessToken accessToken = ResourceParseUtils.convertResourceToObject(resource, AccessToken.class);
-        accessTokens.addObject(accessToken);
+        AccessKey accessKey = ResourceParseUtils.convertResourceToObject(resource, AccessKey.class);
+        accessKeys.addObject(accessKey);
       }
 
     } catch (NotFoundException | IOException e) {
       LOGGER.error("Could not find any access token to list: {}", e.getMessage(), e);
-      return accessTokens;
+      return accessKeys;
     }
 
-    return accessTokens;
+    return accessKeys;
   }
 
-  public AccessToken retrieveAccessToken(String accessTokenId)
+  public AccessKey retrieveAccessKey(String accessKeyId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    StoragePath accessTokenPath = ModelUtils.getAccessTokenStoragePath(accessTokenId);
-    Binary binary = storage.getBinary(accessTokenPath);
-    AccessToken ret;
+    StoragePath accessKeysStoragePath = ModelUtils.getAccessKeysStoragePath(accessKeyId);
+    Binary binary = storage.getBinary(accessKeysStoragePath);
+    AccessKey ret;
 
     try (InputStream inputStream = binary.getContent().createInputStream()) {
-      ret = JsonUtils.getObjectFromJson(inputStream, AccessToken.class);
+      ret = JsonUtils.getObjectFromJson(inputStream, AccessKey.class);
     } catch (IOException | GenericException e) {
-      throw new GenericException("Error reading accessToken: " + accessTokenId, e);
+      throw new GenericException("Error reading access key: " + accessKeyId, e);
     }
 
     return ret;
   }
 
-  public AccessToken updateAccessToken(AccessToken accessToken, String updatedBy)
+  public AccessKey updateAccessKey(AccessKey accessKey, String updatedBy)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    accessToken.setUpdatedOn(new Date());
-    accessToken.setUpdatedBy(updatedBy);
+    accessKey.setUpdatedOn(new Date());
+    accessKey.setUpdatedBy(updatedBy);
 
-    String accessTokenAsJson = JsonUtils.getJsonFromObject(accessToken);
-    StoragePath accessTokenPath = ModelUtils.getAccessTokenStoragePath(accessToken.getId());
-    storage.updateBinaryContent(accessTokenPath, new StringContentPayload(accessTokenAsJson), false, false);
+    String accessKeyAsJson = JsonUtils.getJsonFromObject(accessKey);
+    StoragePath accessKeysStoragePath = ModelUtils.getAccessKeysStoragePath(accessKey.getId());
+    storage.updateBinaryContent(accessKeysStoragePath, new StringContentPayload(accessKeyAsJson), false, false);
 
-    return accessToken;
+    return accessKey;
   }
 
-  public void deleteAccessToken(String accessTokenId)
+  public void deleteAccessKey(String accessKeyId)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    StoragePath accessTokenPath = ModelUtils.getAccessTokenStoragePath(accessTokenId);
-    storage.deleteResource(accessTokenPath);
+    StoragePath accessKeysStoragePath = ModelUtils.getAccessKeysStoragePath(accessKeyId);
+    storage.deleteResource(accessKeysStoragePath);
   }
 
-  public void updateAccessTokenLastUsageDate(AccessToken accessToken)
+  public void updateAccessKeyLastUsageDate(AccessKey accessKey)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    String accessTokenAsJson = JsonUtils.getJsonFromObject(accessToken);
-    StoragePath accessTokenPath = ModelUtils.getAccessTokenStoragePath(accessToken.getId());
-    storage.updateBinaryContent(accessTokenPath, new StringContentPayload(accessTokenAsJson), false, false);
+    String accessKeyAsJson = JsonUtils.getJsonFromObject(accessKey);
+    StoragePath accessKeysStoragePath = ModelUtils.getAccessKeysStoragePath(accessKey.getId());
+    storage.updateBinaryContent(accessKeysStoragePath, new StringContentPayload(accessKeyAsJson), false, false);
   }
 
-  public AccessTokens listAccessTokenByUser(String userId)
+  public AccessKeys listAccessKeysByUser(String userId)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException {
-    StoragePath accessTokenContainerPath = ModelUtils.getAccessTokenContainerPath();
-    AccessTokens accessTokens = new AccessTokens();
+    StoragePath accessKeysContainerPath = ModelUtils.getAccessKeysContainerPath();
+    AccessKeys accessKeys = new AccessKeys();
 
     try {
-      CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(accessTokenContainerPath, false);
+      CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(accessKeysContainerPath, false);
       for (Resource resource : iterable) {
-        AccessToken accessToken = ResourceParseUtils.convertResourceToObject(resource, AccessToken.class);
-        if (accessToken.getUserName().equals(userId)) {
-          accessTokens.addObject(accessToken);
+        AccessKey accessKey = ResourceParseUtils.convertResourceToObject(resource, AccessKey.class);
+        if (accessKey.getUserName().equals(userId)) {
+          accessKeys.addObject(accessKey);
         }
       }
 
     } catch (NotFoundException | IOException e) {
       LOGGER.error("Could not find any access token to list: {}", e.getMessage(), e);
-      return accessTokens;
+      return accessKeys;
     }
 
-    return accessTokens;
+    return accessKeys;
   }
 
-  public void deactivateUserAccessTokens(String userId, String updatedBy)
+  public void deactivateUserAccessKeys(String userId, String updatedBy)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
-    AccessTokens accessTokens = listAccessTokenByUser(userId);
+    AccessKeys accessKeys = listAccessKeysByUser(userId);
 
-    for (AccessToken accessToken : accessTokens.getObjects()) {
-      accessToken.setStatus(AccessTokenStatus.INACTIVE);
-      updateAccessToken(accessToken, updatedBy);
+    for (AccessKey accessKey : accessKeys.getObjects()) {
+      accessKey.setStatus(AccessKeyStatus.INACTIVE);
+      updateAccessKey(accessKey, updatedBy);
     }
   }
 
-  public void deleteUserAccessTokens(String userId, String updatedBy)
+  public void deleteUserAccessKeys(String userId, String updatedBy)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
-    AccessTokens accessTokens = listAccessTokenByUser(userId);
+    AccessKeys accessKeys = listAccessKeysByUser(userId);
 
-    for (AccessToken accessToken : accessTokens.getObjects()) {
-      deleteAccessToken(accessToken.getId());
+    for (AccessKey accessKey : accessKeys.getObjects()) {
+      deleteAccessKey(accessKey.getId());
     }
   }
 }

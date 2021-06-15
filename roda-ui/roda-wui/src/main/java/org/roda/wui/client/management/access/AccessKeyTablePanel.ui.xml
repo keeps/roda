@@ -8,7 +8,7 @@
 
     <g:FlowPanel addStyleNames="wrapper skip_padding col_12">
         <g:Label addStyleNames="h4">
-            <ui:text from='{messages.accessTokenLabel}' />
+            <ui:text from='{messages.accessKeyLabel}' />
         </g:Label>
         <g:FlowPanel addStyleNames="row full_width skip_padding">
             <g:FlowPanel ui:field="contentFlowPanel" addStyleNames="skip_padding" />

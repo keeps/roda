@@ -63,7 +63,7 @@
                                 <g:FlowPanel styleName="value"
                                         ui:field="userNameValue" />
                             </g:FlowPanel>
-                            <g:FlowPanel ui:field="accessTokenTablePanel" />
+                            <g:FlowPanel ui:field="accessKeyTablePanel" />
                         </g:FlowPanel>
                     </g:FlowPanel>
                 </g:FlowPanel>

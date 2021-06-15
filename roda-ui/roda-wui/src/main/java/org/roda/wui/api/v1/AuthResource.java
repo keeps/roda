@@ -24,7 +24,7 @@ import org.glassfish.jersey.server.JSONP;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.accessToken.AccessToken;
+import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.ApplicationAuth;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
@@ -90,13 +90,13 @@ public class AuthResource {
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Path("/token")
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
-  public Response authenticate(AccessToken accessToken,
-    @ApiParam(value = "Choose format in which to get the disposal schedule", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-    @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+  public Response authenticate(AccessKey accessKey,
+                               @ApiParam(value = "Choose format in which to get the disposal schedule", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+                               @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
     Map<String, String> response = new HashMap<>();
-    String token = ApplicationAuth.authenticate(accessToken);
+    String token = ApplicationAuth.authenticate(accessKey);
     response.put("token", token);
 
     return Response.ok(response, mediaType).build();

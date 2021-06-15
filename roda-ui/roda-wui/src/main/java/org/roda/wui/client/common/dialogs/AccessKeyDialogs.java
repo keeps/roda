@@ -1,6 +1,6 @@
 package org.roda.wui.client.common.dialogs;
 
-import org.roda.core.data.v2.accessToken.AccessToken;
+import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -18,18 +18,18 @@ import config.i18n.client.ClientMessages;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-public class AccessTokenDialogs {
+public class AccessKeyDialogs {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  public static void showAccessTokenDialog(String title, AccessToken accessToken,
-    final AsyncCallback<Boolean> callback) {
+  public static void showAccessKeyDialog(String title, AccessKey accessKey,
+                                         final AsyncCallback<Boolean> callback) {
     final DialogBox dialogBox = new DialogBox(false, true);
     final Button closeButton = new Button(messages.closeButton());
     final FlowPanel layout = new FlowPanel();
     final FlowPanel header = new FlowPanel();
     final FlowPanel footer = new FlowPanel();
-    final Label warningMessage = new Label(messages.accessTokenWarningLabel());
-    final Label tokenMessage = new Label(accessToken.getAccessKey());
+    final Label warningMessage = new Label(messages.accessKeyWarningLabel());
+    final Label tokenMessage = new Label(accessKey.getKey());
     tokenMessage.getElement().setId("token_message");
 
     dialogBox.setText(title);

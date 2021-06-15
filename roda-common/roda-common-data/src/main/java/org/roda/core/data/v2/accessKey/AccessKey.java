@@ -1,4 +1,4 @@
-package org.roda.core.data.v2.accessToken;
+package org.roda.core.data.v2.accessKey;
 
 import java.util.Date;
 import java.util.Map;
@@ -12,19 +12,19 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_ACCESS_TOKEN)
+@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_ACCESS_KEY)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AccessToken implements IsModelObject {
+public class AccessKey implements IsModelObject {
   private static final int VERSION = 1;
   private static final long serialVersionUID = 2279579053027903305L;
 
   private String id;
   private String name;
-  private String accessKey;
+  private String key;
   private Date lastUsageDate;
   private Date expirationDate;
   private String userName;
-  private AccessTokenStatus status;
+  private AccessKeyStatus status;
   private Map<String, Object> claims;
 
   private Date createdOn;
@@ -32,8 +32,8 @@ public class AccessToken implements IsModelObject {
   private Date updatedOn;
   private String updatedBy;
 
-  public AccessToken() {
-    status = AccessTokenStatus.CREATED;
+  public AccessKey() {
+    status = AccessKeyStatus.CREATED;
   }
 
   @JsonIgnore
@@ -59,12 +59,12 @@ public class AccessToken implements IsModelObject {
     this.name = name;
   }
 
-  public String getAccessKey() {
-    return accessKey;
+  public String getKey() {
+    return key;
   }
 
-  public void setAccessKey(String accessKey) {
-    this.accessKey = accessKey;
+  public void setKey(String key) {
+    this.key = key;
   }
 
   public Date getLastUsageDate() {
@@ -91,11 +91,11 @@ public class AccessToken implements IsModelObject {
     this.userName = userName;
   }
 
-  public AccessTokenStatus getStatus() {
+  public AccessKeyStatus getStatus() {
     return status;
   }
 
-  public void setStatus(AccessTokenStatus status) {
+  public void setStatus(AccessKeyStatus status) {
     this.status = status;
   }
 
@@ -144,11 +144,11 @@ public class AccessToken implements IsModelObject {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
 
-    AccessToken that = (AccessToken) o;
+    AccessKey that = (AccessKey) o;
 
     if (id != null ? !id.equals(that.id) : that.id != null) return false;
     if (name != null ? !name.equals(that.name) : that.name != null) return false;
-    if (accessKey != null ? !accessKey.equals(that.accessKey) : that.accessKey != null) return false;
+    if (key != null ? !key.equals(that.key) : that.key != null) return false;
     if (lastUsageDate != null ? !lastUsageDate.equals(that.lastUsageDate) : that.lastUsageDate != null) return false;
     if (expirationDate != null ? !expirationDate.equals(that.expirationDate) : that.expirationDate != null)
       return false;
@@ -165,7 +165,7 @@ public class AccessToken implements IsModelObject {
   public int hashCode() {
     int result = id != null ? id.hashCode() : 0;
     result = 31 * result + (name != null ? name.hashCode() : 0);
-    result = 31 * result + (accessKey != null ? accessKey.hashCode() : 0);
+    result = 31 * result + (key != null ? key.hashCode() : 0);
     result = 31 * result + (lastUsageDate != null ? lastUsageDate.hashCode() : 0);
     result = 31 * result + (expirationDate != null ? expirationDate.hashCode() : 0);
     result = 31 * result + (userName != null ? userName.hashCode() : 0);

@@ -5,8 +5,8 @@ import java.util.List;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
-import org.roda.core.data.v2.accessToken.AccessToken;
-import org.roda.core.data.v2.accessToken.AccessTokens;
+import org.roda.core.data.v2.accessKey.AccessKey;
+import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
@@ -36,7 +36,7 @@ import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-public class AccessTokenManagement extends Composite {
+public class AccessKeyManagement extends Composite {
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
@@ -46,12 +46,12 @@ public class AccessTokenManagement extends Composite {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {AccessTokenManagement.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {AccessKeyManagement.RESOLVER}, false, callback);
     }
 
     @Override
     public String getHistoryToken() {
-      return "access_tokens";
+      return "access_keys";
     }
 
     @Override
@@ -60,18 +60,18 @@ public class AccessTokenManagement extends Composite {
     }
   };
 
-  interface MyUiBinder extends UiBinder<Widget, AccessTokenManagement> {
+  interface MyUiBinder extends UiBinder<Widget, AccessKeyManagement> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private static AccessTokenManagement instance = null;
+  private static AccessKeyManagement instance = null;
 
-  public static AccessTokenManagement getInstance() {
+  public static AccessKeyManagement getInstance() {
     if (instance == null) {
-      instance = new AccessTokenManagement();
+      instance = new AccessKeyManagement();
     } else {
       instance.refresh();
     }
@@ -82,7 +82,7 @@ public class AccessTokenManagement extends Composite {
   FlowPanel description;
 
   @UiField
-  ScrollPanel accessTokenManagementTablePanel;
+  ScrollPanel accessKeyManagementTablePanel;
 
   @UiField
   FlowPanel contentFlowPanel;
@@ -93,13 +93,13 @@ public class AccessTokenManagement extends Composite {
   @UiField
   FlowPanel sidebarButtonsPanel;
 
-  public AccessTokenManagement() {
+  public AccessKeyManagement() {
     initWidget(uiBinder.createAndBindUi(this));
     description.add(new HTMLWidgetWrapper(("DisposalPolicyDescription.html")));
-    BrowserService.Util.getInstance().listAccessToken(new NoAsyncCallback<AccessTokens>() {
+    BrowserService.Util.getInstance().listAccessKey(new NoAsyncCallback<AccessKeys>() {
       @Override
-      public void onSuccess(AccessTokens accessTokens) {
-        createAccessTokenListPanel(accessTokens);
+      public void onSuccess(AccessKeys accessKeys) {
+        createAccessKeyListPanel(accessKeys);
       }
     });
     initSidebar();
@@ -107,72 +107,72 @@ public class AccessTokenManagement extends Composite {
 
   private void initSidebar() {
     SidebarUtils.showSidebar(contentFlowPanel, sidebarFlowPanel);
-    Button createNewAccessTokenBtn = new Button();
-    createNewAccessTokenBtn.addStyleName("btn btn-block btn-plus");
-    createNewAccessTokenBtn.setText(messages.newButton());
-    createNewAccessTokenBtn.addClickHandler(new ClickHandler() {
+    Button createNewAccessKeyBtn = new Button();
+    createNewAccessKeyBtn.addStyleName("btn btn-block btn-plus");
+    createNewAccessKeyBtn.setText(messages.newButton());
+    createNewAccessKeyBtn.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent clickEvent) {
-        HistoryUtils.newHistory(CreateAccessToken.RESOLVER);
+        HistoryUtils.newHistory(CreateAccessKey.RESOLVER);
       }
     });
 
-    sidebarButtonsPanel.add(createNewAccessTokenBtn);
+    sidebarButtonsPanel.add(createNewAccessKeyBtn);
   }
 
-  private void createAccessTokenListPanel(AccessTokens accessTokens) {
-    accessTokenManagementTablePanel.clear();
-    accessTokenManagementTablePanel.addStyleName("basicTable-border");
-    accessTokenManagementTablePanel.addStyleName("basicTable");
+  private void createAccessKeyListPanel(AccessKeys accessKeys) {
+    accessKeyManagementTablePanel.clear();
+    accessKeyManagementTablePanel.addStyleName("basicTable-border");
+    accessKeyManagementTablePanel.addStyleName("basicTable");
 
-    if (accessTokens.getObjects().isEmpty()) {
-      String someOfAObject = messages.someOfAObject(accessTokens.getClass().getName());
+    if (accessKeys.getObjects().isEmpty()) {
+      String someOfAObject = messages.someOfAObject(accessKeys.getClass().getName());
       Label label = new HTML(SafeHtmlUtils.fromSafeConstant(messages.noItemsToDisplayPreFilters(someOfAObject)));
       label.addStyleName("basicTableEmpty");
-      accessTokenManagementTablePanel.add(label);
+      accessKeyManagementTablePanel.add(label);
     } else {
-      FlowPanel accessTokenPanel = new FlowPanel();
-      BasicTablePanel<AccessToken> table = getBasicTableForAccessToken(accessTokens);
+      FlowPanel accessKeyPanel = new FlowPanel();
+      BasicTablePanel<AccessKey> table = getBasicTableForAccessKey(accessKeys);
       table.getSelectionModel().addSelectionChangeHandler(event -> {
-        AccessToken selectedObject = table.getSelectionModel().getSelectedObject();
+        AccessKey selectedObject = table.getSelectionModel().getSelectedObject();
         if (selectedObject != null) {
           table.getSelectionModel().clear();
-          List<String> path = HistoryUtils.getHistory(ShowAccessToken.RESOLVER.getHistoryPath(),
+          List<String> path = HistoryUtils.getHistory(ShowAccessKey.RESOLVER.getHistoryPath(),
             selectedObject.getId());
           HistoryUtils.newHistory(path);
         }
       });
 
-      accessTokenPanel.add(table);
-      accessTokenManagementTablePanel.add(accessTokenPanel);
+      accessKeyPanel.add(table);
+      accessKeyManagementTablePanel.add(accessKeyPanel);
     }
   }
 
-  private BasicTablePanel<AccessToken> getBasicTableForAccessToken(AccessTokens accessTokens) {
-    if (accessTokens.getObjects().isEmpty()) {
+  private BasicTablePanel<AccessKey> getBasicTableForAccessKey(AccessKeys accessKeys) {
+    if (accessKeys.getObjects().isEmpty()) {
       return new BasicTablePanel<>(messages.noItemsToDisplay(messages.distributedInstancesLabel()));
     } else {
-      return new BasicTablePanel<AccessToken>(accessTokens.getObjects().iterator(),
-        new BasicTablePanel.ColumnInfo<AccessToken>(messages.accessTokenNameLabel(), 15, new TextColumn<AccessToken>() {
+      return new BasicTablePanel<AccessKey>(accessKeys.getObjects().iterator(),
+        new BasicTablePanel.ColumnInfo<AccessKey>(messages.accessKeyNameLabel(), 15, new TextColumn<AccessKey>() {
           @Override
-          public String getValue(AccessToken accessToken) {
-            return accessToken.getName();
+          public String getValue(AccessKey accessKey) {
+            return accessKey.getName();
           }
-        }), new BasicTablePanel.ColumnInfo<AccessToken>(messages.accessTokenLastUsageDateLabel(), 15,
-          new TextColumn<AccessToken>() {
+        }), new BasicTablePanel.ColumnInfo<AccessKey>(messages.accessKeyLastUsageDateLabel(), 15,
+          new TextColumn<AccessKey>() {
             @Override
-            public String getValue(AccessToken accessToken) {
-              return accessToken.getLastUsageDate() != null ? accessToken.getLastUsageDate().toString() : "Never";
+            public String getValue(AccessKey accessKey) {
+              return accessKey.getLastUsageDate() != null ? accessKey.getLastUsageDate().toString() : "Never";
             }
           }));
     }
   }
 
   private void refresh() {
-    BrowserService.Util.getInstance().listAccessToken(new NoAsyncCallback<AccessTokens>() {
+    BrowserService.Util.getInstance().listAccessKey(new NoAsyncCallback<AccessKeys>() {
       @Override
-      public void onSuccess(AccessTokens result) {
-        createAccessTokenListPanel(result);
+      public void onSuccess(AccessKeys result) {
+        createAccessKeyListPanel(result);
       }
     });
   }
@@ -180,12 +180,12 @@ public class AccessTokenManagement extends Composite {
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.isEmpty()) {
       callback.onSuccess(this);
-    } else if (historyTokens.get(0).equals(CreateAccessToken.RESOLVER.getHistoryToken())) {
-      CreateAccessToken.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-    } else if (historyTokens.get(0).equals(ShowAccessToken.RESOLVER.getHistoryToken())) {
-      ShowAccessToken.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
-    } else if (historyTokens.get(0).equals(EditAccessToken.RESOLVER.getHistoryToken())) {
-      EditAccessToken.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (historyTokens.get(0).equals(CreateAccessKey.RESOLVER.getHistoryToken())) {
+      CreateAccessKey.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (historyTokens.get(0).equals(ShowAccessKey.RESOLVER.getHistoryToken())) {
+      ShowAccessKey.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+    } else if (historyTokens.get(0).equals(EditAccessKey.RESOLVER.getHistoryToken())) {
+      EditAccessKey.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
     } else {
       HistoryUtils.newHistory(RESOLVER);
       callback.onSuccess(null);
