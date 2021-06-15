@@ -2,18 +2,9 @@ package org.roda.wui.client.management.access;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FlowPanel;
-import org.roda.core.data.v2.AccessToken.AccessToken;
-import org.roda.core.data.v2.user.User;
-import org.roda.wui.api.controllers.UserManagement;
-import org.roda.wui.client.common.NoAsyncCallback;
-import org.roda.wui.client.management.PermissionsPanel;
-import org.roda.wui.client.management.UserManagementService;
+import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -37,7 +28,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.DateBox;
 
 import config.i18n.client.ClientMessages;
-import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>

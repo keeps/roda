@@ -12,15 +12,16 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.AccessToken.AccessToken;
-import org.roda.core.data.v2.AccessToken.AccessTokenStatus;
-import org.roda.core.data.v2.AccessToken.AccessTokens;
+import org.roda.core.data.v2.accessToken.AccessToken;
+import org.roda.core.data.v2.accessToken.AccessTokenStatus;
+import org.roda.core.data.v2.accessToken.AccessTokens;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 
 /**
@@ -220,8 +221,13 @@ public class ApplicationAuth extends RodaWuiController {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     LogEntryState state = LogEntryState.SUCCESS;
 
-    Claims claims = Jwts.parser().setSigningKey(RodaCoreFactory.getApiSecretKey())
-      .parseClaimsJws(accessToken.getAccessKey()).getBody();
+    Claims claims;
+    try {
+      claims = Jwts.parser().setSigningKey(RodaCoreFactory.getApiSecretKey()).parseClaimsJws(accessToken.getAccessKey())
+        .getBody();
+    } catch (JwtException e) {
+      throw new AuthorizationDeniedException("Expired token");
+    }
 
     User user = RodaCoreFactory.getModelService().retrieveUser(claims.getSubject());
 

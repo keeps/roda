@@ -13,7 +13,7 @@ package config.i18n.client;
 import java.util.Date;
 import java.util.List;
 
-import org.roda.core.data.v2.AccessToken.AccessTokenStatus;
+import org.roda.core.data.v2.accessToken.AccessTokenStatus;
 import org.roda.core.data.v2.distributedInstance.DistributedInstanceStatus;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
@@ -2423,6 +2423,22 @@ public interface ClientMessages extends Messages {
   String distributedInstanceStatusButtonActivateLabel();
 
   String distributedInstanceStatusButtonDeactivateLabel();
+
+  /** Local instance configuration **/
+
+  String createLocalInstanceConfigurationTitle();
+
+  String showLocalInstanceConfigurationTitle();
+
+  String editLocalInstanceConfigurationTitle();
+
+  String testLocalInstanceConfigurationButton();
+
+  String localInstanceConfigurationIDLabel();
+
+  String localInstanceConfigurationSecretLabel();
+
+  String localInstanceConfigurationCentralInstanceURLLabel();
 
   /** Access Token **/
 

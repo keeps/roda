@@ -1,6 +1,6 @@
 package org.roda.wui.client.common.dialogs;
 
-import org.roda.core.data.v2.AccessToken.AccessToken;
+import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.widgets.Toast;
 

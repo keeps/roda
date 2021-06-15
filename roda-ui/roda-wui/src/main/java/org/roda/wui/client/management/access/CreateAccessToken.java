@@ -2,7 +2,7 @@ package org.roda.wui.client.management.access;
 
 import java.util.List;
 
-import org.roda.core.data.v2.AccessToken.AccessToken;
+import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;

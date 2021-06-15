@@ -1,4 +1,4 @@
-package org.roda.core.data.v2.AccessToken;
+package org.roda.core.data.v2.accessToken;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>

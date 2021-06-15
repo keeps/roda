@@ -16,6 +16,7 @@ import java.util.List;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.management.access.AccessTokenManagement;
 import org.roda.wui.client.management.distributed.DistributedInstancesManagement;
+import org.roda.wui.client.management.distributed.LocalInstanceManagement;
 import org.roda.wui.client.process.ActionProcess;
 import org.roda.wui.client.process.CreateSelectedJob;
 import org.roda.wui.client.process.InternalProcess;
@@ -116,6 +117,8 @@ public class Management {
         Statistics.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(DistributedInstancesManagement.RESOLVER.getHistoryToken())) {
         DistributedInstancesManagement.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+      } else if (historyTokens.get(0).equals(LocalInstanceManagement.RESOLVER.getHistoryToken())) {
+        LocalInstanceManagement.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(AccessTokenManagement.RESOLVER.getHistoryToken())) {
         AccessTokenManagement.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(Help.RESOLVER.getHistoryToken())) {

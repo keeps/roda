@@ -145,9 +145,6 @@ public class ShowDistributedInstance extends Composite {
 
         @Override
         public void onSuccess(User user) {
-//          Anchor anchor = new Anchor(user.getName(),
-//              HistoryUtils.createHistoryHashLink(EditUser.RESOLVER, user.getId()));
-//          userNameValue.add(anchor);
           userNameValue.add(new Label(user.getId()));
         }
       });
