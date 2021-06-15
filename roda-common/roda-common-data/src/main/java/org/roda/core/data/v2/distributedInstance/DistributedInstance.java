@@ -20,7 +20,7 @@ public class DistributedInstance implements IsModelObject {
   private String name;
   private String nameIdentifier;
   private String description;
-  private String accessTokenId;
+  private String accessKeyId;
   private String username;
   private Date lastSyncDate;
   private DistributedInstanceStatus status;
@@ -108,12 +108,12 @@ public class DistributedInstance implements IsModelObject {
     this.status = status;
   }
 
-  public String getAccessTokenId() {
-    return accessTokenId;
+  public String getAccessKeyId() {
+    return accessKeyId;
   }
 
-  public void setAccessTokenId(String accessTokenId) {
-    this.accessTokenId = accessTokenId;
+  public void setAccessKeyId(String accessKeyId) {
+    this.accessKeyId = accessKeyId;
   }
 
   public String getUsername() {
@@ -150,7 +150,7 @@ public class DistributedInstance implements IsModelObject {
     if (nameIdentifier != null ? !nameIdentifier.equals(that.nameIdentifier) : that.nameIdentifier != null)
       return false;
     if (description != null ? !description.equals(that.description) : that.description != null) return false;
-    if (accessTokenId != null ? !accessTokenId.equals(that.accessTokenId) : that.accessTokenId != null) return false;
+    if (accessKeyId != null ? !accessKeyId.equals(that.accessKeyId) : that.accessKeyId != null) return false;
     if (username != null ? !username.equals(that.username) : that.username != null) return false;
     if (lastSyncDate != null ? !lastSyncDate.equals(that.lastSyncDate) : that.lastSyncDate != null) return false;
     if (status != that.status) return false;
@@ -166,7 +166,7 @@ public class DistributedInstance implements IsModelObject {
     result = 31 * result + (name != null ? name.hashCode() : 0);
     result = 31 * result + (nameIdentifier != null ? nameIdentifier.hashCode() : 0);
     result = 31 * result + (description != null ? description.hashCode() : 0);
-    result = 31 * result + (accessTokenId != null ? accessTokenId.hashCode() : 0);
+    result = 31 * result + (accessKeyId != null ? accessKeyId.hashCode() : 0);
     result = 31 * result + (username != null ? username.hashCode() : 0);
     result = 31 * result + (lastSyncDate != null ? lastSyncDate.hashCode() : 0);
     result = 31 * result + (status != null ? status.hashCode() : 0);

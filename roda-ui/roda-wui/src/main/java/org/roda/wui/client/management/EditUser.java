@@ -20,8 +20,8 @@ import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.management.access.AccessTokenTablePanel;
-import org.roda.wui.client.management.access.CreateAccessToken;
+import org.roda.wui.client.management.access.AccessKeyTablePanel;
+import org.roda.wui.client.management.access.CreateAccessKey;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -106,7 +106,7 @@ public class EditUser extends Composite {
   Button buttonRemove;
 
   @UiField
-  Button buttonAddAccessToken;
+  Button buttonAddAccessKey;
 
   @UiField
   Button buttonCancel;
@@ -115,7 +115,7 @@ public class EditUser extends Composite {
   UserDataPanel userDataPanel;
 
   @UiField
-  FlowPanel accessTokenTablePanel;
+  FlowPanel accessKeyTablePanel;
 
   /**
    * Create a new panel to edit a user
@@ -131,7 +131,7 @@ public class EditUser extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    accessTokenTablePanel.add(new AccessTokenTablePanel(user.getId()));
+    accessKeyTablePanel.add(new AccessKeyTablePanel(user.getId()));
     userDataPanel.setUsernameReadOnly(true);
 
     buttonDeActivate.setEnabled(true);
@@ -181,7 +181,7 @@ public class EditUser extends Composite {
 
         @Override
         public void onSuccess(Void result) {
-          BrowserService.Util.getInstance().deactivateUserAccessTokens(user.getId(), new NoAsyncCallback<Void>());
+          BrowserService.Util.getInstance().deactivateUserAccessKeys(user.getId(), new NoAsyncCallback<Void>());
           HistoryUtils.newHistory(MemberManagement.RESOLVER);
         }
 
@@ -193,9 +193,9 @@ public class EditUser extends Composite {
       });
   }
 
-  @UiHandler("buttonAddAccessToken")
-  void buttonAddAccessTokenHandler(ClickEvent e) {
-    HistoryUtils.newHistory(CreateAccessToken.RESOLVER, user.getName());
+  @UiHandler("buttonAddAccessKey")
+  void buttonAddAccessKeyHandler(ClickEvent e) {
+    HistoryUtils.newHistory(CreateAccessKey.RESOLVER, user.getName());
   }
 
   @UiHandler("buttonRemove")
@@ -209,7 +209,7 @@ public class EditUser extends Composite {
 
               @Override
               public void onSuccess(Void result) {
-                BrowserService.Util.getInstance().deleteUserAccessTokens(user.getId(), new NoAsyncCallback<Void>());
+                BrowserService.Util.getInstance().deleteUserAccessKeys(user.getId(), new NoAsyncCallback<Void>());
                 HistoryUtils.newHistory(MemberManagement.RESOLVER);
               }
 

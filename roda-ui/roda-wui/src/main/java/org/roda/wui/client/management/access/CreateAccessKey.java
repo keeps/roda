@@ -2,12 +2,12 @@ package org.roda.wui.client.management.access;
 
 import java.util.List;
 
-import org.roda.core.data.v2.accessToken.AccessToken;
+import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.dialogs.AccessTokenDialogs;
+import org.roda.wui.client.common.dialogs.AccessKeyDialogs;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.EditUser;
 import org.roda.wui.client.management.MemberManagement;
@@ -32,7 +32,7 @@ import config.i18n.client.ClientMessages;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-public class CreateAccessToken extends Composite {
+public class CreateAccessKey extends Composite {
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
@@ -41,13 +41,13 @@ public class CreateAccessToken extends Composite {
         UserManagementService.Util.getInstance().retrieveUser(historyTokens.get(0), new NoAsyncCallback<User>() {
           @Override
           public void onSuccess(User user) {
-            CreateAccessToken createAccessToken = new CreateAccessToken(user);
-            callback.onSuccess(createAccessToken);
+            CreateAccessKey createAccessKey = new CreateAccessKey(user);
+            callback.onSuccess(createAccessKey);
           }
         });
       } else {
-        CreateAccessToken createAccessToken = new CreateAccessToken(null);
-        callback.onSuccess(createAccessToken);
+        CreateAccessKey createAccessKey = new CreateAccessKey(null);
+        callback.onSuccess(createAccessKey);
       }
     }
 
@@ -58,7 +58,7 @@ public class CreateAccessToken extends Composite {
 
     @Override
     public String getHistoryToken() {
-      return "create_access_tokens";
+      return "create_access_key";
     }
 
     @Override
@@ -67,14 +67,14 @@ public class CreateAccessToken extends Composite {
     }
   };
 
-  interface MyUiBinder extends UiBinder<Widget, CreateAccessToken> {
+  interface MyUiBinder extends UiBinder<Widget, CreateAccessKey> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  private AccessToken accessToken;
+  private AccessKey accessKey;
   private User user;
 
   @UiField
@@ -87,14 +87,14 @@ public class CreateAccessToken extends Composite {
   Button buttonCancel;
 
   @UiField(provided = true)
-  AccessTokenDataPanel accessTokenDataPanel;
+  AccessKeyDataPanel accessKeyDataPanel;
 
-  public CreateAccessToken(User user) {
+  public CreateAccessKey(User user) {
     this.user = user;
-    this.accessToken = new AccessToken();
-    this.accessToken.setUserName(user.getName());
-    this.accessTokenDataPanel = new AccessTokenDataPanel(accessToken, false);
-    this.accessTokenDataPanel.setAccessToken(accessToken);
+    this.accessKey = new AccessKey();
+    this.accessKey.setUserName(user.getName());
+    this.accessKeyDataPanel = new AccessKeyDataPanel(accessKey, false);
+    this.accessKeyDataPanel.setAccessKey(accessKey);
 
     initWidget(uiBinder.createAndBindUi(this));
     titlePanel.setText(user.getName());
@@ -108,17 +108,17 @@ public class CreateAccessToken extends Composite {
 
   @UiHandler("buttonSave")
   void buttonApplyHandler(ClickEvent e) {
-    if (accessTokenDataPanel.isValid()) {
-      AccessToken accessTokenUpdated = accessTokenDataPanel.getAccessToken();
-      accessToken.setName(accessTokenUpdated.getName());
-      accessToken.setExpirationDate(accessTokenUpdated.getExpirationDate());
-      BrowserServiceImpl.Util.getInstance().createAccessToken(this.accessToken, new NoAsyncCallback<AccessToken>() {
+    if (accessKeyDataPanel.isValid()) {
+      AccessKey accessKeyUpdated = accessKeyDataPanel.getAccessKey();
+      accessKey.setName(accessKeyUpdated.getName());
+      accessKey.setExpirationDate(accessKeyUpdated.getExpirationDate());
+      BrowserServiceImpl.Util.getInstance().createAccessKey(this.accessKey, new NoAsyncCallback<AccessKey>() {
         @Override
-        public void onSuccess(AccessToken accessToken) {
-          AccessTokenDialogs.showAccessTokenDialog(messages.accessTokenLabel(), accessToken, new NoAsyncCallback<Boolean>(){
+        public void onSuccess(AccessKey accessKey) {
+          AccessKeyDialogs.showAccessKeyDialog(messages.accessKeyLabel(), accessKey, new NoAsyncCallback<Boolean>(){
             @Override
             public void onSuccess(Boolean result) {
-              HistoryUtils.newHistory(EditUser.RESOLVER, accessToken.getUserName());
+              HistoryUtils.newHistory(EditUser.RESOLVER, accessKey.getUserName());
             }
           });
         }
@@ -132,6 +132,6 @@ public class CreateAccessToken extends Composite {
   }
 
   private void cancel() {
-    HistoryUtils.newHistory(EditUser.RESOLVER, accessToken.getUserName());
+    HistoryUtils.newHistory(EditUser.RESOLVER, accessKey.getUserName());
   }
 }

@@ -13,7 +13,7 @@ package config.i18n.client;
 import java.util.Date;
 import java.util.List;
 
-import org.roda.core.data.v2.accessToken.AccessTokenStatus;
+import org.roda.core.data.v2.accessKey.AccessKeyStatus;
 import org.roda.core.data.v2.distributedInstance.DistributedInstanceStatus;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
@@ -2468,61 +2468,61 @@ public interface ClientMessages extends Messages {
 
   String localInstanceConfigurationCentralInstanceURLLabel();
 
-  /** Access Token **/
+  /** Access Key **/
 
-  String addAccessTokenButton();
+  String addAccessKeyButton();
 
-  String manageAccessTokenTitle();
+  String manageAccessKeyTitle();
 
-  String createAccessTokenTitle();
+  String createAccessKeyTitle();
 
-  String showAccessTokenTitle();
+  String showAccessKeyTitle();
 
-  String editAccessTokenTitle();
+  String editAccessKeyTitle();
 
-  String accessTokenLabel();
+  String accessKeyLabel();
 
-  String accessTokensLabel();
+  String accessKeysLabel();
 
-  String accessTokenNameLabel();
+  String accessKeyNameLabel();
 
-  String accessTokenIDLabel();
+  String accessKeyIDLabel();
 
-  String accessTokenKeyLabel();
+  String accessKeyKeyLabel();
 
-  String accessTokenLastUsageDateLabel();
+  String accessKeyLastUsageDateLabel();
 
-  String accessTokenExpirationDateLabel();
+  String accessKeyExpirationDateLabel();
 
-  String accessTokenStatusLabel();
+  String accessKeyStatusLabel();
 
-  String accessTokenStatusValue(@Select AccessTokenStatus status);
+  String accessKeyStatusValue(@Select AccessKeyStatus status);
 
-  String accessTokenWarningLabel();
+  String accessKeyWarningLabel();
 
-  String accessTokenCreateButton();
+  String accessKeyCreateButton();
 
-  String accessTokenEditButton();
+  String accessKeyEditButton();
 
-  String accessTokenUpdateButton();
+  String accessKeyUpdateButton();
 
-  String accessTokenDeleteButton();
+  String accessKeyDeleteButton();
 
-  String accessTokenRegenerateButton();
+  String accessKeyRegenerateButton();
 
-  String accessTokenRevokeButton();
+  String accessKeyRevokeButton();
 
-  String accessTokenNeverUsedLabel();
+  String accessKeyNeverUsedLabel();
 
-  String accessTokenNotFoundLabel();
+  String accessKeyNotFoundLabel();
 
-  String accessTokenSuccessfullyRegenerated();
+  String accessKeySuccessfullyRegenerated();
 
-  String accessTokenSuccessfullyRevoked();
+  String accessKeySuccessfullyRevoked();
 
-  String accessTokenDeleteConfirmationMessage();
+  String accessKeyDeleteConfirmationMessage();
 
-  String accessTokenRevokeConfirmationMessage();
+  String accessKeyRevokeConfirmationMessage();
 
-  String accessTokenRegenerateConfirmationMessage();
+  String accessKeyRegenerateConfirmationMessage();
 }

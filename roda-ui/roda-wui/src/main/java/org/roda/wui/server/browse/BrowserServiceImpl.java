@@ -40,8 +40,8 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.Void;
-import org.roda.core.data.v2.accessToken.AccessToken;
-import org.roda.core.data.v2.accessToken.AccessTokens;
+import org.roda.core.data.v2.accessKey.AccessKey;
+import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.distributedInstance.DistributedInstance;
 import org.roda.core.data.v2.distributedInstance.DistributedInstances;
@@ -1290,73 +1290,73 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public AccessToken createAccessToken(AccessToken accessToken) throws AuthorizationDeniedException,
+  public AccessKey createAccessKey(AccessKey accessKey) throws AuthorizationDeniedException,
     AlreadyExistsException, NotFoundException, GenericException, RequestNotValidException, IOException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return ApplicationAuth.createAccessToken(user, accessToken);
+    return ApplicationAuth.createAccessKey(user, accessKey);
   }
 
   @Override
-  public AccessTokens listAccessToken()
+  public AccessKeys listAccessKey()
     throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return ApplicationAuth.listAccessToken(user);
+    return ApplicationAuth.listAccessKey(user);
   }
 
   @Override
-  public AccessToken retrieveAccessToken(String accessTokenId)
+  public AccessKey retrieveAccessKey(String accessKeyId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return ApplicationAuth.retrieveAccessToken(user, accessTokenId);
+    return ApplicationAuth.retrieveAccessKey(user, accessKeyId);
   }
 
   @Override
-  public AccessToken updateAccessToken(AccessToken accessToken)
+  public AccessKey updateAccessKey(AccessKey accessKey)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return ApplicationAuth.updateAccessToken(user, accessToken);
+    return ApplicationAuth.updateAccessKey(user, accessKey);
   }
 
   @Override
-  public void deleteAccessToken(String accessTokenId)
+  public void deleteAccessKey(String accessKeyId)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    ApplicationAuth.deleteAccessToken(user, accessTokenId);
+    ApplicationAuth.deleteAccessKey(user, accessKeyId);
   }
 
   @Override
-  public AccessTokens listAccessTokenByUser(String userId)
+  public AccessKeys listAccessKeyByUser(String userId)
     throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return ApplicationAuth.listAccessTokenByUser(user, userId);
+    return ApplicationAuth.listAccessKeyByUser(user, userId);
   }
 
   @Override
-  public void deactivateUserAccessTokens(String userId)
+  public void deactivateUserAccessKeys(String userId)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    ApplicationAuth.deactivateUserAccessTokens(user, userId);
+    ApplicationAuth.deactivateUserAccessKeys(user, userId);
   }
 
   @Override
-  public void deleteUserAccessTokens(String userId)
+  public void deleteUserAccessKeys(String userId)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    ApplicationAuth.deleteUserAccessTokens(user, userId);
+    ApplicationAuth.deleteUserAccessKeys(user, userId);
   }
 
   @Override
-  public AccessToken regenerateAccessToken(AccessToken accessToken) throws AuthorizationDeniedException,
+  public AccessKey regenerateAccessKey(AccessKey accessKey) throws AuthorizationDeniedException,
     RequestNotValidException, NotFoundException, GenericException, AuthenticationDeniedException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return ApplicationAuth.regenerateAccessToken(user, accessToken);
+    return ApplicationAuth.regenerateAccessKey(user, accessKey);
   }
 
   @Override
-  public AccessToken revokeAccessToken(AccessToken accessToken)
+  public AccessKey revokeAccessKey(AccessKey accessKey)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return ApplicationAuth.revokeAccessToken(user, accessToken);
+    return ApplicationAuth.revokeAccessKey(user, accessKey);
   }
 
   @Override

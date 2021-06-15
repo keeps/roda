@@ -9,9 +9,9 @@
     <g:FlowPanel styleName="wui-distributedInstances" addStyleNames="wrapper skip_padding">
         <g:FlowPanel addStyleNames="row full_width skip_padding">
             <g:FlowPanel ui:field="contentFlowPanel" addStyleNames="col_12 content">
-                <common:TitlePanel text="{messages.manageAccessTokenTitle}" iconClass="AccessToken" />
+                <common:TitlePanel text="{messages.manageAccessKeyTitle}" iconClass="AccessKey" />
                 <g:FlowPanel addStyleNames="page-description" ui:field="description" />
-                <g:ScrollPanel ui:field="accessTokenManagementTablePanel"/>
+                <g:ScrollPanel ui:field="accessKeyManagementTablePanel"/>
             </g:FlowPanel>
             <g:FlowPanel ui:field="sidebarFlowPanel" addStyleNames="col_2 last sidebar contentPanel">
                 <g:FlowPanel addStyleNames="sticky-flow">
