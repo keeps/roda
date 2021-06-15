@@ -1397,13 +1397,13 @@ public class RodaCoreFactory {
   }
 
   private static void instantiateDistributedMode() {
-    distributedModeType = DistributedModeType.valueOf(RodaCoreFactory.getRodaConfiguration()
-      .getString(RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY, RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name()));
-    if(DistributedModeType.CENTRAL.equals(distributedModeType)){
-      apiSecretKey = RodaCoreFactory.getRodaConfiguration().getString(RodaConstants.API_SECRET_KEY_PROPERTY,
-          RodaConstants.DEFAULT_API_SECRET_KEY);
+    distributedModeType = DistributedModeType.valueOf(
+      getProperty(RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY, RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name()));
+    if (DistributedModeType.CENTRAL.equals(distributedModeType)) {
+      apiSecretKey = getProperty(RodaConstants.API_SECRET_KEY_PROPERTY,
+        RodaConstants.DEFAULT_API_SECRET_KEY);
       tokenValidity = RodaCoreFactory.getRodaConfiguration().getLong(RodaConstants.TOKEN_VALIDITY,
-          RodaConstants.DEFAULT_TOKEN_VALIDITY);
+        RodaConstants.DEFAULT_TOKEN_VALIDITY);
     }
   }
 
@@ -1701,6 +1701,10 @@ public class RodaCoreFactory {
 
   public static NodeType getNodeType() {
     return nodeType;
+  }
+
+  public static DistributedModeType getDistributedModeType() {
+    return distributedModeType;
   }
 
   public static Path getRodaHomePath() {
@@ -2067,6 +2071,9 @@ public class RodaCoreFactory {
 
       rodaSharedConfigurationPropertiesCache.put(RodaConstants.RODA_NODE_TYPE_KEY,
         Collections.singletonList(getNodeType().toString()));
+
+      rodaSharedConfigurationPropertiesCache.put(RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY,
+          Collections.singletonList(getDistributedModeType().toString()));
 
       Iterator<String> keys = configuration.getKeys();
       while (keys.hasNext()) {

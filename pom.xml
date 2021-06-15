@@ -458,6 +458,11 @@
 				<version>${jackson.version}</version>
 			</dependency>
 			<dependency>
+				<groupId>com.fasterxml.jackson.dataformat</groupId>
+				<artifactId>jackson-dataformat-yaml</artifactId>
+				<version>${jackson.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>com.google.gwt</groupId>
 				<artifactId>gwt-dev</artifactId>
 				<version>${gwt.version}</version>

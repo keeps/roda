@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui">
+
+    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
+
+    <ui:style>
+        .section {
+        margin-top: 20px;
+        }
+
+        .group {
+        display: flex;
+        }
+    </ui:style>
+
+    <g:FlowPanel styleName="wui-disposal-schedule-data wui-user-data" addStyleNames="wrapper skip_padding">
+        <g:FlowPanel addStyleNames="row full_width no_padding">
+            <g:FlowPanel styleName="wui-data-panel">
+                <g:FlowPanel addStyleNames="wui-error-panel">
+                    <g:HTML ui:field="errors"/>
+                </g:FlowPanel>
+                <g:Label addStyleNames="form-label">
+                    <ui:text from='{messages.localInstanceConfigurationIDLabel}'/>
+                    *
+                </g:Label>
+                <g:TextBox title="{messages.localInstanceConfigurationIDLabel}" ui:field="IDValue" addStyleNames="form-textbox"/>
+                <g:Label ui:field="IDError" addStyleNames="form-label-error"/>
+
+                <g:Label addStyleNames="form-label">
+                    <ui:text from='{messages.localInstanceConfigurationSecretLabel}'/>
+                    *
+                </g:Label>
+                <g:TextBox title="{messages.localInstanceConfigurationSecretLabel}" ui:field="secretValue" addStyleNames="form-textbox"/>
+                <g:Label ui:field="secretError" addStyleNames="form-label-error"/>
+
+                <g:Label addStyleNames="form-label">
+                    <ui:text from='{messages.localInstanceConfigurationCentralInstanceURLLabel}'/>
+                    *
+                </g:Label>
+                <g:TextBox title="{messages.localInstanceConfigurationCentralInstanceURLLabel}" ui:field="centralInstanceURLValue" addStyleNames="form-textbox"/>
+                <g:Label ui:field="centralInstanceURError" addStyleNames="form-label-error"/>
+            </g:FlowPanel>
+        </g:FlowPanel>
+    </g:FlowPanel>
+</ui:UiBinder>

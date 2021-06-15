@@ -14,9 +14,7 @@ import java.util.List;
 
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.AccessToken.AccessTokens;
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
@@ -24,7 +22,6 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.access.AccessTokenTablePanel;
 import org.roda.wui.client.management.access.CreateAccessToken;
-import org.roda.wui.client.management.access.ShowAccessToken;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;

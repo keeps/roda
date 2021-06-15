@@ -41,7 +41,9 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.ObjectPermissionResult;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.distributedInstance.DistributedInstance;
 import org.roda.core.data.v2.distributedInstance.DistributedInstances;
+import org.roda.core.data.v2.distributedInstance.LocalInstance;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -50,7 +52,6 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.distributedInstance.DistributedInstance;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
@@ -88,6 +89,7 @@ import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
+import org.roda.core.util.RESTClientUtility;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseDipBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
@@ -3654,8 +3656,9 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static DistributedInstance createDistributedInstance(User user, DistributedInstance distributedInstance) throws GenericException,
-      AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException, IllegalOperationException {
+  public static DistributedInstance createDistributedInstance(User user, DistributedInstance distributedInstance)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
+    AlreadyExistsException, IllegalOperationException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -3669,12 +3672,13 @@ public class Browser extends RodaWuiController {
       state = LogEntryState.FAILURE;
       throw e;
     } finally {
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_DISTRIBUTED_INSTANCE_PARAM, distributedInstance);
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_DISTRIBUTED_INSTANCE_PARAM,
+        distributedInstance);
     }
   }
 
   public static DistributedInstances listDistributedInstances(User user)
-      throws GenericException, RequestNotValidException, IOException, AuthorizationDeniedException {
+    throws GenericException, RequestNotValidException, IOException, AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -3694,7 +3698,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static DistributedInstance retrieveDistributedInstance(User user, String distributedInstacneId)
-      throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -3714,7 +3718,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static DistributedInstance updateDistributedInstance(User user, DistributedInstance distributedInstance)
-      throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -3734,7 +3738,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static void deleteDistributedInstance(User user, String distributedInstacneId)
-      throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -3751,5 +3755,101 @@ public class Browser extends RodaWuiController {
       // register action
       controllerAssistant.registerAction(user, state);
     }
+  }
+
+  public static void createLocalInstance(User user, LocalInstance localInstance)
+    throws AuthorizationDeniedException, GenericException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+    try {
+      BrowserHelper.createLocalInstanceConfiguration(localInstance);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM, localInstance);
+    }
+  }
+
+  public static LocalInstance retrieveLocalInstance(User user) throws AuthorizationDeniedException, GenericException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+    try {
+      return BrowserHelper.getLocalInstanceConfiguration();
+    } catch (GenericException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
+    }
+  }
+
+  public static void deleteLocalInstanceConfiguration(User user) throws AuthorizationDeniedException, GenericException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+    try {
+      BrowserHelper.deleteLocalInstanceConfiguration();
+    } catch (GenericException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
+    }
+  }
+
+  public static void updateLocalInstanceConfiguration(User user, LocalInstance localInstance)
+    throws AuthorizationDeniedException, GenericException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+    try {
+      BrowserHelper.updateLocalInstanceConfiguration(localInstance, user.getId());
+    } catch (GenericException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
+    }
+  }
+
+  public static List<String> testLocalInstanceConfiguration(User user, LocalInstance localInstance)
+    throws AuthorizationDeniedException, GenericException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    List<String> responseList = new ArrayList();
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      RESTClientUtility.sendPostRequest(localInstance, null, localInstance.getCentralInstanceURL(), "/api/v1/auth/token");
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
+    }
+
+    return responseList;
   }
 }
