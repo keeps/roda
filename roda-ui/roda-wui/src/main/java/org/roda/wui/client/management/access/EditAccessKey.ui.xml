@@ -12,11 +12,11 @@
             <g:FlowPanel addStyleNames="col_10 content" ui:field="content">
                 <g:FlowPanel styleName="browseItemPanelWithMargin">
                     <g:Label addStyleNames="browseItemHeader">
-                        <ui:text from='{messages.editAccessTokenTitle}'/>
+                        <ui:text from='{messages.editAccessKeyTitle}'/>
                     </g:Label>
                     <common:TitlePanel iconClass="User" ui:field="titlePanel"/>
                 </g:FlowPanel>
-                <u:AccessTokenDataPanel ui:field="accessTokenDataPanel" />
+                <u:AccessKeyDataPanel ui:field="accessKeyDataPanel" />
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="col_2 last sidebar">
                 <g:FlowPanel addStyleNames="sticky-flow">
@@ -25,7 +25,7 @@
                             <ui:text from="{messages.actions}"/>
                         </g:Label>
                         <g:Button addStyleNames="btn btn-block btn-info btn-play" ui:field="buttonUpdate">
-                            <ui:text from='{messages.accessTokenUpdateButton}'/>
+                            <ui:text from='{messages.accessKeyUpdateButton}'/>
                         </g:Button>
                         <g:Button addStyleNames="btn btn-block btn-default btn-times-circle" ui:field="buttonCancel">
                             <ui:text from='{messages.cancelButton}'/>

@@ -22,7 +22,6 @@ import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.management.CreateGroup;
 import org.roda.wui.client.management.CreateUser;
 import org.roda.wui.client.management.UserManagementService;
-import org.roda.wui.client.management.access.CreateAccessToken;
 import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;

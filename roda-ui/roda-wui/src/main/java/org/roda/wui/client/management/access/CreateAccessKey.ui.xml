@@ -11,10 +11,10 @@
         <g:FlowPanel addStyleNames="row full_width skip_padding">
             <g:FlowPanel addStyleNames="col_10 content" ui:field="content">
                 <g:Label addStyleNames="browseItemHeader">
-                    <ui:text from='{messages.createAccessTokenTitle}'/>
+                    <ui:text from='{messages.createAccessKeyTitle}'/>
                 </g:Label>
                 <common:TitlePanel iconClass="User" ui:field="titlePanel"/>
-                <u:AccessTokenDataPanel ui:field="accessTokenDataPanel" />
+                <u:AccessKeyDataPanel ui:field="accessKeyDataPanel" />
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="col_2 last sidebar">
                 <g:FlowPanel addStyleNames="sticky-flow">

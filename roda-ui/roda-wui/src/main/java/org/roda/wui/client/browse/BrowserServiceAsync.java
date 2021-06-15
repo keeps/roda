@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.roda.core.data.v2.accessToken.AccessToken;
-import org.roda.core.data.v2.accessToken.AccessTokens;
+import org.roda.core.data.v2.accessKey.AccessKey;
+import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.distributedInstance.DistributedInstance;
 import org.roda.core.data.v2.distributedInstance.DistributedInstances;
@@ -390,25 +390,25 @@ public interface BrowserServiceAsync {
 
   void deleteDistributedInstance(String distributedInstanceId, AsyncCallback<Void> async);
 
-  void createAccessToken(AccessToken accessToken, AsyncCallback<AccessToken> async);
+  void createAccessKey(AccessKey accessKey, AsyncCallback<AccessKey> async);
 
-  void listAccessToken(AsyncCallback<AccessTokens> async);
+  void listAccessKey(AsyncCallback<AccessKeys> async);
 
-  void retrieveAccessToken(String accessTokenId, AsyncCallback<AccessToken> async);
+  void retrieveAccessKey(String accessKeyId, AsyncCallback<AccessKey> async);
 
-  void deleteAccessToken(String accessTokenId, AsyncCallback<Void> async);
+  void deleteAccessKey(String accessKeyId, AsyncCallback<Void> async);
 
-  void updateAccessToken(AccessToken accessToken, AsyncCallback<AccessToken> async);
+  void updateAccessKey(AccessKey accessKey, AsyncCallback<AccessKey> async);
 
-  void listAccessTokenByUser(String userId, AsyncCallback<AccessTokens> async);
+  void listAccessKeyByUser(String userId, AsyncCallback<AccessKeys> async);
 
-  void deactivateUserAccessTokens(String userId, AsyncCallback<Void> async);
+  void deactivateUserAccessKeys(String userId, AsyncCallback<Void> async);
 
-  void deleteUserAccessTokens(String userId, AsyncCallback<Void> async);
+  void deleteUserAccessKeys(String userId, AsyncCallback<Void> async);
 
-  void regenerateAccessToken(AccessToken accessToken, AsyncCallback<AccessToken> async);
+  void regenerateAccessKey(AccessKey accessKey, AsyncCallback<AccessKey> async);
 
-  void revokeAccessToken(AccessToken accessToken, AsyncCallback<AccessToken> async);
+  void revokeAccessKey(AccessKey accessKey, AsyncCallback<AccessKey> async);
 
   void createLocalInstance(LocalInstance localInstance, AsyncCallback async);
 

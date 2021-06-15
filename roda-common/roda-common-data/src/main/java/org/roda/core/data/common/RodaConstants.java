@@ -195,8 +195,8 @@ public final class RodaConstants {
   public static final String RODA_OBJECT_DISTRIBUTED_INSTANCES = "distributed_instances";
   public static final String RODA_OBJECT_DISTRIBUTED_INSTANCE = "distributed_instance";
   public static final String RODA_OBJECT_LOCAL_INSTANCE = "local_instance";
-  public static final String RODA_OBJECT_ACCESS_TOKEN = "access_token";
-  public static final String RODA_OBJECT_ACCESS_TOKENS = "access_tokens";
+  public static final String RODA_OBJECT_ACCESS_KEY = "access_key";
+  public static final String RODA_OBJECT_ACCESS_KEYS = "access_keys";
 
   public static final String RODA_OBJECT_MEMBERS = "members";
   public static final String RODA_OBJECT_USERS = "users";
@@ -477,7 +477,7 @@ public final class RodaConstants {
 
   public static final String CONTROLLER_DISTRIBUTED_INSTANCE_PARAM = RODA_OBJECT_DISTRIBUTED_INSTANCE;
   public static final String CONTROLLER_LOCAL_INSTANCE_PARAM = RODA_OBJECT_LOCAL_INSTANCE;
-  public static final String CONTROLLER_ACCESS_TOKEN_PARAM = RODA_OBJECT_ACCESS_TOKEN;
+  public static final String CONTROLLER_ACCESS_KEY_PARAM = RODA_OBJECT_ACCESS_KEY;
 
   public static final String CONTROLLER_ID_OBJECT_PARAM = "transferred_resource_uuid, transferred_resource_path, sip, transferred_resource_original_name";
   public static final String CONTROLLER_SIP_PARAM = "sip";
@@ -638,7 +638,7 @@ public final class RodaConstants {
   public static final String STORAGE_CONTAINER_DISPOSAL_SCHEDULE = "disposal-schedule";
   public static final String STORAGE_CONTAINER_DISPOSAL_RULE = "disposal-rule";
   public static final String STORAGE_CONTAINER_DISTRIBUTED_INSTANCES = "distributed-instances";
-  public static final String STORAGE_CONTAINER_ACCESS_TOKEN = "accessTokens";
+  public static final String STORAGE_CONTAINER_ACCESS_KEYS = "access-keys";
 
   /*
    * Disposal Confirmation
@@ -1689,7 +1689,7 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_UPDATE_USER = "org.roda.wui.api.controllers.UserManagement.updateUser";
   public static final String PERMISSION_METHOD_DELETE_USER = "org.roda.wui.api.controllers.UserManagement.deleteUser";
 
-  public static final String PERMISSION_METHOD_CREATE_ACCESS_TOKEN = "org.roda.wui.api.controllers.ApplicationAuth.createAccessToken";
+  public static final String PERMISSION_METHOD_CREATE_ACCESS_KEY = "org.roda.wui.api.controllers.ApplicationAuth.createAccessKey";
 
   public static final String PERMISSION_METHOD_CREATE_DISPOSAL_RULE = "org.roda.wui.api.controllers.Disposals.createDisposalRule";
   public static final String PERMISSION_METHOD_UPDATE_DISPOSAL_RULE = "org.roda.wui.api.controllers.Disposals.updateDisposalRule";

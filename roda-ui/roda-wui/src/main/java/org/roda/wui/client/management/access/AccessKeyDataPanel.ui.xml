@@ -26,17 +26,17 @@
                 </g:FlowPanel>
 
                 <g:Label addStyleNames="form-label">
-                    <ui:text from='{messages.accessTokenNameLabel}'/>
+                    <ui:text from='{messages.accessKeyNameLabel}'/>
                     *
                 </g:Label>
-                <g:TextBox title="{messages.accessTokenNameLabel}" ui:field="name" addStyleNames="form-textbox"/>
+                <g:TextBox title="{messages.accessKeyNameLabel}" ui:field="name" addStyleNames="form-textbox"/>
                 <g:Label ui:field="nameError" addStyleNames="form-label-error"/>
 
                 <g:Label addStyleNames="form-label">
-                    <ui:text from='{messages.accessTokenExpirationDateLabel}' />
+                    <ui:text from='{messages.accessKeyExpirationDateLabel}' />
                     *
                 </g:Label>
-                <d:DateBox title="{messages.accessTokenExpirationDateLabel}" ui:field="expirationDate" addStyleNames="form-textbox form-textbox-small" />
+                <d:DateBox title="{messages.accessKeyExpirationDateLabel}" ui:field="expirationDate" addStyleNames="form-textbox form-textbox-small" />
                 <g:Label ui:field="expirationDateError" addStyleNames="form-label-error"/>
 
                 <g:Label ui:field="userError" addStyleNames="form-label-error"/>
