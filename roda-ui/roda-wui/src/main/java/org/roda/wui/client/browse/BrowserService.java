@@ -25,11 +25,12 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.AccessToken.AccessToken;
-import org.roda.core.data.v2.AccessToken.AccessTokens;
+import org.roda.core.data.v2.accessToken.AccessToken;
+import org.roda.core.data.v2.accessToken.AccessTokens;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.distributedInstance.DistributedInstance;
 import org.roda.core.data.v2.distributedInstance.DistributedInstances;
+import org.roda.core.data.v2.distributedInstance.LocalInstance;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -541,4 +542,15 @@ public interface BrowserService extends RemoteService {
   AccessToken revokeAccessToken(AccessToken accessToken)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
+  void createLocalInstance(LocalInstance localInstance) throws AuthorizationDeniedException, GenericException;
+
+  LocalInstance retrieveLocalInstance() throws AuthorizationDeniedException, GenericException;
+
+  void deleteLocalInstanceConfiguration() throws AuthorizationDeniedException, GenericException;
+
+  void updateLocalInstanceConfiguration(LocalInstance localInstance)
+    throws AuthorizationDeniedException, GenericException;
+
+  List<String> testLocalInstanceConfiguration(LocalInstance localInstance)
+    throws AuthorizationDeniedException, GenericException;
 }

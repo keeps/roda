@@ -12,7 +12,7 @@ import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
-import org.roda.core.data.v2.AccessToken.AccessToken;
+import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.distributedInstance.DistributedInstance;

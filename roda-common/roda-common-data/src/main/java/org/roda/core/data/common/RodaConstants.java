@@ -194,6 +194,7 @@ public final class RodaConstants {
   public static final String RODA_OBJECT_SHALLOWS_FILE = "shallow_files";
   public static final String RODA_OBJECT_DISTRIBUTED_INSTANCES = "distributed_instances";
   public static final String RODA_OBJECT_DISTRIBUTED_INSTANCE = "distributed_instance";
+  public static final String RODA_OBJECT_LOCAL_INSTANCE = "local_instance";
   public static final String RODA_OBJECT_ACCESS_TOKEN = "access_token";
   public static final String RODA_OBJECT_ACCESS_TOKENS = "access_tokens";
 
@@ -475,6 +476,7 @@ public final class RodaConstants {
   public static final String CONTROLLER_DISPOSAL_CONFIRMATION_ID_PARAM = "disposalConfirmationId";
 
   public static final String CONTROLLER_DISTRIBUTED_INSTANCE_PARAM = RODA_OBJECT_DISTRIBUTED_INSTANCE;
+  public static final String CONTROLLER_LOCAL_INSTANCE_PARAM = RODA_OBJECT_LOCAL_INSTANCE;
   public static final String CONTROLLER_ACCESS_TOKEN_PARAM = RODA_OBJECT_ACCESS_TOKEN;
 
   public static final String CONTROLLER_ID_OBJECT_PARAM = "transferred_resource_uuid, transferred_resource_path, sip, transferred_resource_original_name";
@@ -570,14 +572,14 @@ public final class RodaConstants {
     CENTRAL, LOCAL, BASE
   }
 
-  public static final DistributedModeType DEFAULT_DISTRIBUTED_MODE_TYPE = DistributedModeType.CENTRAL;
-  public static final String DISTRIBUTED_MODE_TYPE_PROPERTY = "core.distributed.mode.type";
+  public static final DistributedModeType DEFAULT_DISTRIBUTED_MODE_TYPE = DistributedModeType.LOCAL;
+  public static final String DISTRIBUTED_MODE_TYPE_PROPERTY = "roda.distributed.mode.type";
 
   public static final String DEFAULT_API_SECRET_KEY = "changeit";
-  public static final String API_SECRET_KEY_PROPERTY = "core.distributed.api.secret";
+  public static final String API_SECRET_KEY_PROPERTY = "roda.distributed.api.secret";
 
   public static final long DEFAULT_TOKEN_VALIDITY = 2 * 60 * 60 * 1000;
-  public static final String TOKEN_VALIDITY = "core.distributed.api.token.validity";
+  public static final String TOKEN_VALIDITY = "roda.distributed.api.token.validity";
 
   public enum OrchestratorType {
     AKKA, AKKA_DISTRIBUTED

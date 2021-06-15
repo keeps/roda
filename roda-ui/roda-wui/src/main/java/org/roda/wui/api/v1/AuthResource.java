@@ -24,7 +24,7 @@ import org.glassfish.jersey.server.JSONP;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.AccessToken.AccessToken;
+import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.ApplicationAuth;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;

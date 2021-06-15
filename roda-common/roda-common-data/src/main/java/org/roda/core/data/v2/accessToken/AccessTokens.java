@@ -1,4 +1,4 @@
-package org.roda.core.data.v2.AccessToken;
+package org.roda.core.data.v2.accessToken;
 
 import java.util.ArrayList;
 import java.util.List;

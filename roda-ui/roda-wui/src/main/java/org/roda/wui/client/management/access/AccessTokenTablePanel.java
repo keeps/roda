@@ -2,8 +2,8 @@ package org.roda.wui.client.management.access;
 
 import java.util.List;
 
-import org.roda.core.data.v2.AccessToken.AccessToken;
-import org.roda.core.data.v2.AccessToken.AccessTokens;
+import org.roda.core.data.v2.accessToken.AccessToken;
+import org.roda.core.data.v2.accessToken.AccessTokens;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.lists.utils.BasicTablePanel;

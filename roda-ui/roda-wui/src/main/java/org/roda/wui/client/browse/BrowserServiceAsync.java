@@ -15,10 +15,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.roda.core.data.v2.AccessToken.AccessToken;
-import org.roda.core.data.v2.AccessToken.AccessTokens;
+import org.roda.core.data.v2.accessToken.AccessToken;
+import org.roda.core.data.v2.accessToken.AccessTokens;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.distributedInstance.DistributedInstance;
 import org.roda.core.data.v2.distributedInstance.DistributedInstances;
+import org.roda.core.data.v2.distributedInstance.LocalInstance;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -27,7 +29,6 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.distributedInstance.DistributedInstance;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -408,4 +409,14 @@ public interface BrowserServiceAsync {
   void regenerateAccessToken(AccessToken accessToken, AsyncCallback<AccessToken> async);
 
   void revokeAccessToken(AccessToken accessToken, AsyncCallback<AccessToken> async);
+
+  void createLocalInstance(LocalInstance localInstance, AsyncCallback async);
+
+  void retrieveLocalInstance(AsyncCallback async);
+
+  void deleteLocalInstanceConfiguration(AsyncCallback async);
+
+  void updateLocalInstanceConfiguration(LocalInstance localInstance, AsyncCallback async);
+
+  void testLocalInstanceConfiguration(LocalInstance localInstance, AsyncCallback<List<String>> async);
 }
