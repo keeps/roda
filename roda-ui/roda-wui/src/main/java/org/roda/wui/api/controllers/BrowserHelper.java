@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,12 +68,15 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.utils.YamlUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LinkingObjectUtils;
 import org.roda.core.data.v2.common.ObjectPermission;
 import org.roda.core.data.v2.common.ObjectPermissionResult;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.distributedInstance.DistributedInstance;
+import org.roda.core.data.v2.distributedInstance.LocalInstance;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
@@ -90,7 +94,6 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.distributedInstance.DistributedInstance;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIP;
@@ -3576,5 +3579,45 @@ public class BrowserHelper {
     throws GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException,
     RequestNotValidException, IllegalOperationException {
     return RodaCoreFactory.getModelService().createDistributedInstance(distributedInstance, user.getName());
+  }
+
+  public static LocalInstance getLocalInstanceConfiguration() throws GenericException {
+    LocalInstance localInstance = null;
+    InputStream configurationFileAsStream = RodaCoreFactory
+      .getConfigurationFileAsStream("local-instance/configuration.yaml");
+    if (configurationFileAsStream != null) {
+      localInstance = YamlUtils.getObjectFromYaml(configurationFileAsStream, LocalInstance.class);
+    }
+
+    return localInstance;
+  }
+
+  public static void createLocalInstanceConfiguration(LocalInstance localInstance) throws GenericException {
+    Path localInstanceConfigPath = RodaCoreFactory.getConfigPath().resolve("local-instance");
+    if(!Files.isDirectory(localInstanceConfigPath)){
+      try {
+        Files.createDirectory(localInstanceConfigPath);
+      } catch (IOException e) {
+        throw new GenericException("Unable to create directory " + localInstanceConfigPath.toString(), e);
+      }
+    }
+    YamlUtils.writeObjectToFile(localInstance, localInstanceConfigPath.resolve("configuration.yaml"));
+  }
+
+  public static void deleteLocalInstanceConfiguration() throws GenericException {
+    Path configPath = RodaCoreFactory.getConfigPath().resolve("local-instance/configuration.yaml");
+
+    if (Files.exists(configPath)) {
+      try {
+        FSUtils.deletePath(configPath);
+      } catch (NotFoundException exception) {
+        throw new GenericException("Failed to delete local instance configuration file", exception);
+      }
+    }
+  }
+
+  public static void updateLocalInstanceConfiguration(LocalInstance localInstance, String id) throws GenericException {
+    deleteLocalInstanceConfiguration();
+    createLocalInstanceConfiguration(localInstance);
   }
 }

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.PreservationEvents;
@@ -29,7 +30,6 @@ import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.preingest.PreIngest;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
-import org.roda.wui.client.management.distributed.DistributedInstancesManagement;
 import org.roda.wui.client.management.Management;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.management.NotificationRegister;
@@ -37,6 +37,8 @@ import org.roda.wui.client.management.Profile;
 import org.roda.wui.client.management.Register;
 import org.roda.wui.client.management.Statistics;
 import org.roda.wui.client.management.UserLog;
+import org.roda.wui.client.management.distributed.DistributedInstancesManagement;
+import org.roda.wui.client.management.distributed.LocalInstanceManagement;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.planning.PreservationAgents;
 import org.roda.wui.client.planning.RepresentationInformationNetwork;
@@ -49,6 +51,7 @@ import org.roda.wui.client.welcome.Help;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.wcag.AcessibleMenuBar;
 
@@ -179,9 +182,20 @@ public class Menu extends Composite {
     administrationStatistics = administrationMenu.addItem(messages.title("administration_statistics"),
       createCommand(Statistics.RESOLVER.getHistoryPath()));
     administrationStatistics.addStyleName("administration_statistics_item");
-    administrationDistributedInstances = administrationMenu.addItem(messages.title("administration_distributed_instances"),
+    String distributedMode = ConfigurationManager.getStringWithDefault(
+      RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
+    GWT.log("distributedMode: " + distributedMode);
+    if (distributedMode.equals(RodaConstants.DistributedModeType.CENTRAL.name())) {
+      administrationDistributedInstances = administrationMenu.addItem(
+        messages.title("administration_distributed_instances"),
         createCommand(DistributedInstancesManagement.RESOLVER.getHistoryPath()));
-    administrationDistributedInstances.addStyleName("administration_statistics_item");
+      administrationDistributedInstances.addStyleName("administration_statistics_item");
+    } else if (distributedMode.equals(RodaConstants.DistributedModeType.LOCAL.name())) {
+      administrationDistributedInstances = administrationMenu.addItem(
+        messages.title("administration_local_instance_configuration"),
+        createCommand(LocalInstanceManagement.RESOLVER.getHistoryPath()));
+      administrationDistributedInstances.addStyleName("administration_statistics_item");
+    }
     // administration_preferences =
     // administrationMenu.addItem(messages.title("administrationPreferences"),
     // createCommand(Management.RESOLVER.getHistoryPath()));

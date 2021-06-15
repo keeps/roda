@@ -40,11 +40,12 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.Void;
-import org.roda.core.data.v2.AccessToken.AccessToken;
-import org.roda.core.data.v2.AccessToken.AccessTokens;
+import org.roda.core.data.v2.accessToken.AccessToken;
+import org.roda.core.data.v2.accessToken.AccessTokens;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.distributedInstance.DistributedInstance;
 import org.roda.core.data.v2.distributedInstance.DistributedInstances;
+import org.roda.core.data.v2.distributedInstance.LocalInstance;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
@@ -1356,5 +1357,36 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return ApplicationAuth.revokeAccessToken(user, accessToken);
+  }
+
+  @Override
+  public void createLocalInstance(LocalInstance localInstance) throws AuthorizationDeniedException, GenericException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.createLocalInstance(user, localInstance);
+  }
+
+  @Override
+  public LocalInstance retrieveLocalInstance() throws AuthorizationDeniedException, GenericException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.retrieveLocalInstance(user);
+  }
+
+  @Override
+  public void deleteLocalInstanceConfiguration() throws AuthorizationDeniedException, GenericException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.deleteLocalInstanceConfiguration(user);
+  }
+
+  @Override
+  public void updateLocalInstanceConfiguration(LocalInstance localInstance)
+    throws AuthorizationDeniedException, GenericException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.updateLocalInstanceConfiguration(user, localInstance);
+  }
+
+  @Override
+  public List<String> testLocalInstanceConfiguration(LocalInstance localInstance) throws AuthorizationDeniedException, GenericException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.testLocalInstanceConfiguration(user, localInstance);
   }
 }
