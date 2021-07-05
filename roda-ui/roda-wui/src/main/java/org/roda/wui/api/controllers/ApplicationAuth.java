@@ -15,6 +15,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeyStatus;
 import org.roda.core.data.v2.accessKey.AccessKeys;
+import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.ControllerAssistant;
@@ -176,9 +177,8 @@ public class ApplicationAuth extends RodaWuiController {
     }
   }
 
-  public static AccessKey regenerateAccessKey(User user, AccessKey accessKey)
-    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException,
-    AuthenticationDeniedException {
+  public static AccessKey regenerateAccessKey(User user, AccessKey accessKey) throws AuthorizationDeniedException,
+    RequestNotValidException, GenericException, NotFoundException, AuthenticationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     controllerAssistant.checkRoles(user);
@@ -216,7 +216,7 @@ public class ApplicationAuth extends RodaWuiController {
     }
   }
 
-  public static String authenticate(AccessKey accessKey)
+  public static AccessToken authenticate(AccessKey accessKey)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     LogEntryState state = LogEntryState.SUCCESS;
@@ -235,11 +235,12 @@ public class ApplicationAuth extends RodaWuiController {
       AccessKeys accessKeys = RodaCoreFactory.getModelService().listAccessKeys();
       AccessKey retAccessKey = accessKeys.getAccessKeyByKey(accessKey.getKey());
       if (retAccessKey != null) {
+        AccessToken accessToken = new AccessToken();
         Date expirationDate = new Date(new Date().getTime() + RodaCoreFactory.getTokenValidity());
-        String token = JwtUtils.generateToken(user.getId(), expirationDate, retAccessKey.getClaims());
+        accessToken.setToken(JwtUtils.generateToken(user.getId(), expirationDate, retAccessKey.getClaims()));
         retAccessKey.setLastUsageDate(new Date());
         RodaCoreFactory.getModelService().updateAccessKeyLastUsageDate(retAccessKey);
-        return token;
+        return accessToken;
       } else {
         state = LogEntryState.FAILURE;
         throw new AuthorizationDeniedException("Access token not found");

@@ -33,7 +33,12 @@ public class AccessKey implements IsModelObject {
   private String updatedBy;
 
   public AccessKey() {
-    status = AccessKeyStatus.CREATED;
+    this.status = AccessKeyStatus.CREATED;
+  }
+
+  public AccessKey(String accessKey) {
+    this.key = accessKey;
+    this.status = AccessKeyStatus.CREATED;
   }
 
   @JsonIgnore

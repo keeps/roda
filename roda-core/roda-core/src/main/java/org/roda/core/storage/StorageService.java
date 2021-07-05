@@ -7,6 +7,7 @@
  */
 package org.roda.core.storage;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -347,6 +348,9 @@ public interface StorageService {
   void copy(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException;
+
+  void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource)
+    throws AlreadyExistsException, GenericException, AuthorizationDeniedException;
 
   /**
    * Move resources from another (or the same) storage service.

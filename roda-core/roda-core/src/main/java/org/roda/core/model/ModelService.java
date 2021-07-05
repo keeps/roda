@@ -63,6 +63,7 @@ import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.utils.XMLUtils;
+import org.roda.core.data.utils.YamlUtils;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteRODAObject;
@@ -73,6 +74,7 @@ import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.distributedInstance.DistributedInstance;
 import org.roda.core.data.v2.distributedInstance.DistributedInstances;
+import org.roda.core.data.v2.distributedInstance.LocalInstance;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
@@ -4066,6 +4068,19 @@ public class ModelService extends ModelObservable {
   }
 
   /************************************
+   * Local instances related
+   ************************************/
+
+  public LocalInstance retrieveLocalInstanceConfiguration() throws GenericException {
+    LocalInstance localInstance = null;
+    InputStream configurationFileAsStream = RodaCoreFactory.getConfigurationFileAsStream("local-instance/configuration.yaml");
+    if(configurationFileAsStream != null) {
+      localInstance = YamlUtils.getObjectFromYaml(configurationFileAsStream, LocalInstance.class);
+    }
+    return localInstance;
+  }
+
+  /************************************
    * Access Token related
    ************************************/
   public AccessKey createAccessKey(AccessKey accessKey, String createdBy) throws GenericException,
@@ -4157,6 +4172,9 @@ public class ModelService extends ModelObservable {
 
   public void updateAccessKeyLastUsageDate(AccessKey accessKey)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    if(accessKey.getStatus().equals(AccessKeyStatus.CREATED)){
+      accessKey.setStatus(AccessKeyStatus.ACTIVE);
+    }
     String accessKeyAsJson = JsonUtils.getJsonFromObject(accessKey);
     StoragePath accessKeysStoragePath = ModelUtils.getAccessKeysStoragePath(accessKey.getId());
     storage.updateBinaryContent(accessKeysStoragePath, new StringContentPayload(accessKeyAsJson), false, false);

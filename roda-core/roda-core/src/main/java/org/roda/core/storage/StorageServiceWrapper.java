@@ -7,6 +7,7 @@
  */
 package org.roda.core.storage;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -179,6 +180,13 @@ public class StorageServiceWrapper implements StorageService {
     AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
     storageService.copy(fromService, fromStoragePath, toStoragePath);
+  }
+
+  @Override
+  public void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource)
+    throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+    storageService.copy(fromService, fromStoragePath, toPath, resource);
   }
 
   @Override
