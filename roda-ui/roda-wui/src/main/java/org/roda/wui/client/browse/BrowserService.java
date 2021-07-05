@@ -8,6 +8,7 @@
 package org.roda.wui.client.browse;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -536,8 +537,8 @@ public interface BrowserService extends RemoteService {
   void deleteUserAccessKeys(String userId)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
 
-  AccessKey regenerateAccessKey(AccessKey accessKey) throws AuthorizationDeniedException,
-    RequestNotValidException, NotFoundException, GenericException, AuthenticationDeniedException;
+  AccessKey regenerateAccessKey(AccessKey accessKey) throws AuthorizationDeniedException, RequestNotValidException,
+    NotFoundException, GenericException, AuthenticationDeniedException;
 
   AccessKey revokeAccessKey(AccessKey accessKey)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
@@ -553,4 +554,13 @@ public interface BrowserService extends RemoteService {
 
   List<String> testLocalInstanceConfiguration(LocalInstance localInstance)
     throws AuthorizationDeniedException, GenericException;
+
+  LocalInstance registerLocalInstance(LocalInstance localInstance)
+    throws AuthorizationDeniedException, GenericException;
+
+  Job createSyncBundle(LocalInstance localInstance)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
+
+  Job synchronizeBundle(LocalInstance localInstance)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 }

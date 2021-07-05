@@ -7,9 +7,6 @@
  */
 package org.roda.wui.api.v1;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -25,6 +22,7 @@ import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.accessKey.AccessKey;
+import org.roda.core.data.v2.distributedInstance.LocalInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.ApplicationAuth;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
@@ -95,11 +93,7 @@ public class AuthResource {
                                @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
-    Map<String, String> response = new HashMap<>();
-    String token = ApplicationAuth.authenticate(accessKey);
-    response.put("token", token);
-
-    return Response.ok(response, mediaType).build();
+    return Response.ok(ApplicationAuth.authenticate(accessKey), mediaType).build();
   }
 
 }

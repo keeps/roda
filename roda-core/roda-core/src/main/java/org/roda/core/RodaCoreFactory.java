@@ -193,6 +193,7 @@ public class RodaCoreFactory {
   private static Path exampleConfigPath;
   private static Path defaultPath;
   private static Path fileShallowTmpDirectoryPath;
+  private static Path synchronizationDirectoryPath;
 
   private static StorageService storage;
   private static ModelService model;
@@ -495,6 +496,9 @@ public class RodaCoreFactory {
         // initialize file shallow temporary directory
         initializeFileShallowTmpDirectoryPath();
 
+        // initialize synchronization directory
+        initializeSynchronizationStateDir();
+
         // instantiate solr and index service
         instantiateSolrAndIndexService(nodeType);
         LOGGER.debug("Finished instantiating solr & index");
@@ -578,6 +582,18 @@ public class RodaCoreFactory {
     } catch (IOException e) {
       throw new RuntimeException(
         "Unable to create RODA file shallow temporary DIRECTORY " + fileShallowTmpDirectoryPath + ". Aborting...", e);
+    }
+  }
+
+  private static void initializeSynchronizationStateDir() {
+    try {
+      String synchronizationFolder = getConfigurationString("synchronization.folder",
+        RodaConstants.CORE_SYNCHRONIZATION_FOLDER);
+      synchronizationDirectoryPath = getDataPath().resolve(synchronizationFolder);
+      Files.createDirectories(synchronizationDirectoryPath);
+    } catch (IOException e) {
+      throw new RuntimeException(
+        "Unable to create Synchronization DIRECTORY " + synchronizationDirectoryPath + ", Aborting...", e);
     }
   }
 
@@ -1442,8 +1458,7 @@ public class RodaCoreFactory {
     distributedModeType = DistributedModeType.valueOf(
       getProperty(RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY, RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name()));
     if (DistributedModeType.CENTRAL.equals(distributedModeType)) {
-      apiSecretKey = getProperty(RodaConstants.API_SECRET_KEY_PROPERTY,
-        RodaConstants.DEFAULT_API_SECRET_KEY);
+      apiSecretKey = getProperty(RodaConstants.API_SECRET_KEY_PROPERTY, RodaConstants.DEFAULT_API_SECRET_KEY);
       tokenValidity = RodaCoreFactory.getRodaConfiguration().getLong(RodaConstants.TOKEN_VALIDITY,
         RodaConstants.DEFAULT_TOKEN_VALIDITY);
     }
@@ -1775,6 +1790,10 @@ public class RodaCoreFactory {
 
   public static Path getFileShallowTmpDirectoryPath() {
     return fileShallowTmpDirectoryPath;
+  }
+
+  public static Path getSynchronizationDirectoryPath() {
+    return synchronizationDirectoryPath;
   }
 
   public static Path getDataPath() {
@@ -2115,7 +2134,7 @@ public class RodaCoreFactory {
         Collections.singletonList(getNodeType().toString()));
 
       rodaSharedConfigurationPropertiesCache.put(RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY,
-          Collections.singletonList(getDistributedModeType().toString()));
+        Collections.singletonList(getDistributedModeType().toString()));
 
       Iterator<String> keys = configuration.getKeys();
       while (keys.hasNext()) {

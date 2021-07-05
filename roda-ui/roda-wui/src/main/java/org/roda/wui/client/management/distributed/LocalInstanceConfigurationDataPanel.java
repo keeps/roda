@@ -1,8 +1,19 @@
 package org.roda.wui.client.management.distributed;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.roda.core.data.v2.distributedInstance.LocalInstance;
+import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.wui.common.client.tools.ValidationUtils;
+import org.roda.wui.common.client.widgets.Toast;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
@@ -11,19 +22,15 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import config.i18n.client.ClientMessages;
-import org.roda.core.data.v2.distributedInstance.LocalInstance;
-import org.roda.wui.common.client.tools.StringUtils;
-import org.roda.wui.common.client.tools.ValidationUtils;
 
-import java.util.ArrayList;
-import java.util.List;
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -57,6 +64,12 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
   Label centralInstanceURError;
 
   @UiField
+  TextBox bundlePathValue;
+
+  @UiField
+  Label bundlePathError;
+
+  @UiField
   HTML errors;
 
   private final boolean editMode;
@@ -80,6 +93,7 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
     this.IDValue.setText(localInstance.getId());
     this.secretValue.setText(localInstance.getAccessKey());
     this.centralInstanceURLValue.setText(localInstance.getCentralInstanceURL());
+    this.bundlePathValue.setText(localInstance.getBundlePath());
   }
 
   private void initHandlers() {
@@ -106,6 +120,9 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
     centralInstanceURLValue.addChangeHandler(changeHandler);
     centralInstanceURLValue.addKeyUpHandler(keyUpHandler);
 
+    bundlePathValue.addChangeHandler(changeHandler);
+    bundlePathValue.addKeyUpHandler(keyUpHandler);
+
   }
 
   private void setInitialState() {
@@ -117,16 +134,14 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
     localInstance.setId(IDValue.getText());
     localInstance.setAccessKey(secretValue.getText());
     localInstance.setCentralInstanceURL(centralInstanceURLValue.getText());
-    GWT.log("localInstance.getId: " + localInstance.getId());
-    GWT.log("localInstance.getId: " + localInstance.getId());
-    GWT.log("localInstance.getSecret: " + localInstance.getAccessKey());
+    localInstance.setBundlePath(bundlePathValue.getText());
     return localInstance;
   }
 
   public boolean isValid() {
     List<String> errorList = new ArrayList<>();
     // ID
-    if(StringUtils.isBlank(IDValue.getText())) {
+    if (StringUtils.isBlank(IDValue.getText())) {
       IDValue.addStyleName(IS_WRONG);
       IDError.setText(messages.mandatoryField());
       IDError.setVisible(true);
@@ -138,7 +153,7 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
     }
 
     // SECRET
-    if(StringUtils.isBlank(secretValue.getText())) {
+    if (StringUtils.isBlank(secretValue.getText())) {
       secretValue.addStyleName(IS_WRONG);
       secretError.setText(messages.mandatoryField());
       secretError.setVisible(true);
@@ -149,14 +164,26 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
       secretError.setVisible(false);
     }
 
+    // SECRET
+    if (StringUtils.isBlank(bundlePathValue.getText())) {
+      bundlePathValue.addStyleName(IS_WRONG);
+      bundlePathError.setText(messages.mandatoryField());
+      bundlePathError.setVisible(true);
+      Window.scrollTo(bundlePathValue.getAbsoluteLeft(), bundlePathValue.getAbsoluteTop());
+      errorList.add(messages.isAMandatoryField(messages.localInstanceConfigurationBundlePathLabel()));
+    } else {
+      bundlePathValue.removeStyleName(IS_WRONG);
+      bundlePathError.setVisible(false);
+    }
+
     // CENTRAL URL
-    if(StringUtils.isBlank(centralInstanceURLValue.getText())) {
+    if (StringUtils.isBlank(centralInstanceURLValue.getText())) {
       centralInstanceURLValue.addStyleName(IS_WRONG);
       centralInstanceURError.setText(messages.mandatoryField());
       centralInstanceURError.setVisible(true);
       Window.scrollTo(centralInstanceURLValue.getAbsoluteLeft(), centralInstanceURLValue.getAbsoluteTop());
       errorList.add(messages.isAMandatoryField(messages.localInstanceConfigurationCentralInstanceURLLabel()));
-    } else if(!ValidationUtils.isValidURL(centralInstanceURLValue.getText(), false)){
+    } else if (!ValidationUtils.isValidURL(centralInstanceURLValue.getText(), false)) {
       centralInstanceURLValue.addStyleName(IS_WRONG);
       centralInstanceURError.setText("Invalid URL");
       centralInstanceURError.setVisible(true);
@@ -205,5 +232,22 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
 
   public LocalInstance getValue() {
     return getLocalInstance();
+  }
+
+  @UiHandler("buttonTest")
+  void buttonTestHandler(ClickEvent e) {
+    if (isValid()) {
+      BrowserService.Util.getInstance().testLocalInstanceConfiguration(getLocalInstance(),
+        new NoAsyncCallback<List<String>>() {
+          @Override
+          public void onSuccess(List<String> result) {
+            if (result.isEmpty()) {
+              Toast.showInfo("Test instance", "Success");
+            } else {
+              Toast.showError("Test instance", "Error: " + result.toString());
+            }
+          }
+        });
+    }
   }
 }

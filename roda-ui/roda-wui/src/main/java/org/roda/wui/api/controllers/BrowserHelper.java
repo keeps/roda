@@ -13,7 +13,6 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,10 +32,14 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
+import org.glassfish.jersey.media.multipart.BodyPartEntity;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ClassificationPlanUtils;
 import org.roda.core.common.ConsumesOutputStream;
@@ -71,6 +74,8 @@ import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.utils.YamlUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LinkingObjectUtils;
+import org.roda.core.data.v2.accessKey.AccessKey;
+import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.common.ObjectPermission;
 import org.roda.core.data.v2.common.ObjectPermissionResult;
 import org.roda.core.data.v2.common.OptionalWithCause;
@@ -91,6 +96,7 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
@@ -166,6 +172,9 @@ import org.roda.core.plugins.plugins.internal.disposal.hold.LiftDisposalHoldPlug
 import org.roda.core.plugins.plugins.internal.disposal.rules.ApplyDisposalRulesPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.schedule.AssociateDisposalScheduleToAIPPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.schedule.DisassociateDisposalScheduleToAIPPlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateSyncBundlePlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.proccess.SyncImportPlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.proccess.SyncProcessPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.BinaryVersion;
@@ -176,6 +185,7 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
+import org.roda.core.util.RESTClientUtility;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ObjectResponse;
 import org.roda.wui.client.browse.MetadataValue;
@@ -3594,7 +3604,7 @@ public class BrowserHelper {
 
   public static void createLocalInstanceConfiguration(LocalInstance localInstance) throws GenericException {
     Path localInstanceConfigPath = RodaCoreFactory.getConfigPath().resolve("local-instance");
-    if(!Files.isDirectory(localInstanceConfigPath)){
+    if (!Files.isDirectory(localInstanceConfigPath)) {
       try {
         Files.createDirectory(localInstanceConfigPath);
       } catch (IOException e) {
@@ -3619,5 +3629,59 @@ public class BrowserHelper {
   public static void updateLocalInstanceConfiguration(LocalInstance localInstance, String id) throws GenericException {
     deleteLocalInstanceConfiguration();
     createLocalInstanceConfiguration(localInstance);
+  }
+
+  public static AccessToken retrieveAccessToken(LocalInstance localInstance) throws GenericException {
+    AccessKey accessKey = new AccessKey(localInstance.getAccessKey());
+    return retrieveAccessToken(accessKey, localInstance.getCentralInstanceURL(), "/api/v1/auth/token");
+  }
+
+  public static AccessToken retrieveAccessToken(AccessKey accessKey, String url, String resouce)
+    throws GenericException {
+    return RESTClientUtility.sendPostRequest(accessKey, AccessToken.class, url, resouce);
+  }
+
+  public static Job createSyncBundle(User user, LocalInstance localInstance)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    String path = localInstance.getBundlePath();
+    if (path == null) {
+      path = RodaCoreFactory.getSynchronizationDirectoryPath().resolve("bundle").toString();
+    }
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, path);
+    return createAndExecuteInternalJob("Create sync bundle", SelectedItemsNone.create(), CreateSyncBundlePlugin.class,
+      user, pluginParameters, "Could not execute bundle job");
+  }
+
+  public static Job synchronizeBundle(User user, LocalInstance localInstance)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    String path = localInstance.getBundlePath();
+    if (path == null) {
+      path = RodaCoreFactory.getSynchronizationDirectoryPath().resolve("bundle").toString();
+    }
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, path);
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CENTRAL_INSTANCE_URL, localInstance.getCentralInstanceURL());
+    return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(), SyncProcessPlugin.class, user,
+      pluginParameters, "Could not execute bundle job");
+  }
+
+  public static Job importSyncBundle(User user, FormDataMultiPart multiPart)
+    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    FormDataBodyPart file = multiPart.getField(RodaConstants.API_PARAM_FILE);
+    BodyPartEntity bodyPartEntity = (BodyPartEntity) file.getEntity();
+    String fileName = file.getContentDisposition().getFileName();
+    String path = RodaCoreFactory.getSynchronizationDirectoryPath().resolve("transferred").resolve(fileName).toString();
+    java.io.File targetFile = new java.io.File(path);
+    try {
+      FileUtils.copyInputStreamToFile(bodyPartEntity.getInputStream(), targetFile);
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, path);
+    return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(), SyncImportPlugin.class, user,
+      pluginParameters, "Could not execute bundle job");
   }
 }

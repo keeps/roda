@@ -197,6 +197,7 @@ public final class RodaConstants {
   public static final String RODA_OBJECT_LOCAL_INSTANCE = "local_instance";
   public static final String RODA_OBJECT_ACCESS_KEY = "access_key";
   public static final String RODA_OBJECT_ACCESS_KEYS = "access_keys";
+  public static final String RODA_OBJECT_ACCESS_TOKEN = "access_token";
 
   public static final String RODA_OBJECT_MEMBERS = "members";
   public static final String RODA_OBJECT_USERS = "users";
@@ -277,6 +278,7 @@ public final class RodaConstants {
   public static final String CORE_REPRESENTATION_INFORMATION_FOLDER = "representation-information";
   public static final String CORE_DISPOSAL_BIN_FOLDER = "disposal-bin";
   public static final String CORE_FILE_SHALLOW_TMP_FOLDER = "file-shallow";
+  public static final String CORE_SYNCHRONIZATION_FOLDER = "synchronization";
 
   public static final String CORE_I18N_CLIENT_FOLDER = "client";
   public static final String CORE_I18_GWT_XML_FILE = "I18N.gwt.xml";
@@ -1046,6 +1048,9 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_TITLE = "parameter.disposal_confirmation_title";
   public static final String PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_EXTRA_INFO = "parameter.disposal_confirmation_extra";
   public static final String PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_DESTROY_EXECUTE_AGAIN = "parameter.disposal_confirmation_re_execute";
+
+  public static final String PLUGIN_PARAMS_BUNDLE_PATH = "parameter.destination_path";
+  public static final String PLUGIN_PARAMS_CENTRAL_INSTANCE_URL = "parameter.central_instance_url";
 
   public static final String PLUGIN_CATEGORY_CONVERSION = "conversion";
   public static final String PLUGIN_CATEGORY_CHARACTERIZATION = "characterization";

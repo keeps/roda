@@ -10,6 +10,7 @@
  */
 package org.roda.wui.client.browse;
 
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -419,4 +420,10 @@ public interface BrowserServiceAsync {
   void updateLocalInstanceConfiguration(LocalInstance localInstance, AsyncCallback async);
 
   void testLocalInstanceConfiguration(LocalInstance localInstance, AsyncCallback<List<String>> async);
+
+  void registerLocalInstance(LocalInstance localInstance, AsyncCallback<LocalInstance> async);
+
+  void createSyncBundle(LocalInstance localInstance, AsyncCallback<Job> async);
+
+  void synchronizeBundle(LocalInstance localInstance, AsyncCallback<Job> async);
 }

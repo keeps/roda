@@ -8,6 +8,7 @@
 package org.roda.wui.server.browse;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -1290,8 +1291,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public AccessKey createAccessKey(AccessKey accessKey) throws AuthorizationDeniedException,
-    AlreadyExistsException, NotFoundException, GenericException, RequestNotValidException, IOException {
+  public AccessKey createAccessKey(AccessKey accessKey) throws AuthorizationDeniedException, AlreadyExistsException,
+    NotFoundException, GenericException, RequestNotValidException, IOException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return ApplicationAuth.createAccessKey(user, accessKey);
   }
@@ -1385,8 +1386,30 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public List<String> testLocalInstanceConfiguration(LocalInstance localInstance) throws AuthorizationDeniedException, GenericException {
+  public List<String> testLocalInstanceConfiguration(LocalInstance localInstance)
+    throws AuthorizationDeniedException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.testLocalInstanceConfiguration(user, localInstance);
+  }
+
+  @Override
+  public LocalInstance registerLocalInstance(LocalInstance localInstance)
+    throws AuthorizationDeniedException, GenericException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.registerLocalInstance(user, localInstance);
+  }
+
+  @Override
+  public Job createSyncBundle(LocalInstance localInstance)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.createSyncBundle(user, localInstance);
+  }
+
+  @Override
+  public Job synchronizeBundle(LocalInstance localInstance)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.synchronizeBundle(user, localInstance);
   }
 }

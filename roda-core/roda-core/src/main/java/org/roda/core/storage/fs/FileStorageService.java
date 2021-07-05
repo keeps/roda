@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -45,9 +46,9 @@ import org.roda.core.storage.Directory;
 import org.roda.core.storage.EmptyClosableIterable;
 import org.roda.core.storage.Entity;
 import org.roda.core.storage.Resource;
+import org.roda.core.storage.ShallowFileContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceUtils;
-import org.roda.core.storage.ShallowFileContentPayload;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -502,6 +503,20 @@ public class FileStorageService implements StorageService {
     } else {
       Class<? extends Entity> rootEntity = fromService.getEntity(fromStoragePath);
       StorageServiceUtils.copyBetweenStorageServices(fromService, fromStoragePath, this, toStoragePath, rootEntity);
+    }
+  }
+
+  @Override
+  public void copy(StorageService fromService, StoragePath fromStoragePath, Path toPath, String resource)
+    throws AlreadyExistsException, GenericException {
+    Path sourcePath = null;
+    if (StringUtils.isNotBlank(resource)) {
+      sourcePath = FSUtils.getEntityPath(basePath, fromStoragePath).resolve(resource);
+    } else {
+      sourcePath = FSUtils.getEntityPath(basePath, fromStoragePath);
+    }
+    if (FSUtils.exists(sourcePath)) {
+      FSUtils.copy(sourcePath, toPath, false);
     }
   }
 
