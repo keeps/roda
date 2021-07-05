@@ -25,22 +25,37 @@
                     <ui:text from='{messages.localInstanceConfigurationIDLabel}'/>
                     *
                 </g:Label>
-                <g:TextBox title="{messages.localInstanceConfigurationIDLabel}" ui:field="IDValue" addStyleNames="form-textbox"/>
+                <g:TextBox title="{messages.localInstanceConfigurationIDLabel}" ui:field="IDValue"
+                           addStyleNames="form-textbox"/>
                 <g:Label ui:field="IDError" addStyleNames="form-label-error"/>
 
                 <g:Label addStyleNames="form-label">
                     <ui:text from='{messages.localInstanceConfigurationSecretLabel}'/>
                     *
                 </g:Label>
-                <g:TextBox title="{messages.localInstanceConfigurationSecretLabel}" ui:field="secretValue" addStyleNames="form-textbox"/>
+                <g:TextBox title="{messages.localInstanceConfigurationSecretLabel}" ui:field="secretValue"
+                           addStyleNames="form-textbox"/>
                 <g:Label ui:field="secretError" addStyleNames="form-label-error"/>
+
+                <g:Label addStyleNames="form-label">
+                    <ui:text from='{messages.localInstanceConfigurationBundlePathLabel}'/>
+                    *
+                </g:Label>
+                <g:TextBox title="{messages.localInstanceConfigurationBundlePathLabel}" ui:field="bundlePathValue"
+                           addStyleNames="form-textbox"/>
+                <g:Label ui:field="bundlePathError" addStyleNames="form-label-error"/>
 
                 <g:Label addStyleNames="form-label">
                     <ui:text from='{messages.localInstanceConfigurationCentralInstanceURLLabel}'/>
                     *
                 </g:Label>
-                <g:TextBox title="{messages.localInstanceConfigurationCentralInstanceURLLabel}" ui:field="centralInstanceURLValue" addStyleNames="form-textbox"/>
+                <g:TextBox title="{messages.localInstanceConfigurationCentralInstanceURLLabel}"
+                           ui:field="centralInstanceURLValue" addStyleNames="form-textbox"/>
                 <g:Label ui:field="centralInstanceURError" addStyleNames="form-label-error"/>
+
+                <g:Button addStyleNames="btn btn-play" ui:field="buttonTest">
+                    <ui:text from='{messages.testLocalInstanceConfigurationButton}'/>
+                </g:Button>
             </g:FlowPanel>
         </g:FlowPanel>
     </g:FlowPanel>

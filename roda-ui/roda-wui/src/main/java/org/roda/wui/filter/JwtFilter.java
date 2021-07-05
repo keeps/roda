@@ -10,14 +10,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.httpclient.HttpStatus;
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.JwtUtils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.v2.user.User;
 import org.springframework.web.filter.GenericFilterBean;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>

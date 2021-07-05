@@ -2,11 +2,12 @@ package org.roda.wui.client.management.distributed;
 
 import java.util.List;
 
-import com.google.gwt.jsonp.client.JsonpRequestBuilder;
 import org.roda.core.data.v2.distributedInstance.LocalInstance;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -77,7 +78,13 @@ public class ShowLocalInstanceConfiguration extends Composite {
   HTML IDValue;
 
   @UiField
+  HTML bundlePathValue;
+
+  @UiField
   HTML centralInstanceURLValue;
+
+  @UiField
+  HTML isRegisteredValue;
 
   public ShowLocalInstanceConfiguration(LocalInstance localInstance) {
     initWidget(uiBinder.createAndBindUi(this));
@@ -89,6 +96,8 @@ public class ShowLocalInstanceConfiguration extends Composite {
   private void initElements(LocalInstance localInstance) {
     IDValue.setText(localInstance.getId());
     centralInstanceURLValue.setText(localInstance.getCentralInstanceURL());
+    isRegisteredValue.setText(localInstance.getIsRegistered().toString());
+    bundlePathValue.setText(localInstance.getBundlePath());
   }
 
   @UiHandler("buttonEdit")
@@ -96,16 +105,36 @@ public class ShowLocalInstanceConfiguration extends Composite {
     HistoryUtils.newHistory(EditLocalInstanceConfiguration.RESOLVER);
   }
 
-  @UiHandler("buttonTest")
-  void buttonTestHandler(ClickEvent e) {
-    BrowserService.Util.getInstance().testLocalInstanceConfiguration(localInstance, new NoAsyncCallback<List<String>>() {
+  @UiHandler("buttonRegister")
+  void buttonRegisterHandler(ClickEvent e) {
+    BrowserService.Util.getInstance().registerLocalInstance(localInstance, new NoAsyncCallback<LocalInstance>(){
       @Override
-      public void onSuccess(List<String> result) {
-        if (result.isEmpty()) {
-          Toast.showInfo("Test instance", "Success");
-        } else {
-          Toast.showError("Test instance", "Error: " + result.toString());
-        }
+      public void onSuccess(LocalInstance result) {
+        localInstance = result;
+        initElements(localInstance);
+        Toast.showInfo("Register", "Success");
+      }
+    });
+  }
+
+  @UiHandler("buttonCreateBundle")
+  void buttonCreateBundleHandler(ClickEvent e) {
+    BrowserService.Util.getInstance().createSyncBundle(localInstance, new NoAsyncCallback<Job>(){
+      @Override
+      public void onSuccess(Job job) {
+        Toast.showInfo("Create Job", "Success");
+        HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+      }
+    });
+  }
+
+  @UiHandler("buttonSynchronize")
+  void buttonSynchronizeHandler(ClickEvent e) {
+    BrowserService.Util.getInstance().synchronizeBundle(localInstance, new NoAsyncCallback<Job>(){
+      @Override
+      public void onSuccess(Job job) {
+        Toast.showInfo("Create Job", "Success");
+        HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
       }
     });
   }

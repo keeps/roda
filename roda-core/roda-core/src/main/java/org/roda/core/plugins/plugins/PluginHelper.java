@@ -98,6 +98,7 @@ import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.MultipleJobPluginInfo;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
+import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateAipPackagePlugin;
 import org.roda.core.plugins.plugins.notifications.GenericJobNotification;
 import org.roda.core.plugins.plugins.notifications.JobNotification;
 import org.roda.core.plugins.plugins.reindex.ReindexAIPPlugin;
@@ -763,6 +764,12 @@ public final class PluginHelper {
     list.add(IndexedPreservationEvent.class);
     list.add(DIP.class);
     list.add(DisposalConfirmation.class);
+    return list;
+  }
+
+  public static List<Class<? extends IsRODAObject>> getSynchronizedObjectClasses() {
+    List<Class<? extends IsRODAObject>> list = new ArrayList<>();
+    list.add(AIP.class);
     return list;
   }
 
@@ -1670,6 +1677,14 @@ public final class PluginHelper {
       return ReindexDisposalConfirmationPlugin.class.getName();
     } else {
       throw new NotFoundException("No reindex plugin available");
+    }
+  }
+
+  public static String getBundlePluginName(Class<?> reindexClass) throws NotFoundException {
+    if (reindexClass.equals(AIP.class)) {
+      return CreateAipPackagePlugin.class.getName();
+    } else {
+      throw new NotFoundException("No Bundle plugin available");
     }
   }
 

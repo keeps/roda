@@ -32,6 +32,24 @@
                                 <g:HTML styleName="value"
                                         ui:field="centralInstanceURLValue" />
                             </g:FlowPanel>
+
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label"
+                                         ui:field="bundlePathLabel">
+                                    <ui:text from='{messages.localInstanceConfigurationBundlePathLabel}' />
+                                </g:Label>
+                                <g:HTML styleName="value"
+                                        ui:field="bundlePathValue" />
+                            </g:FlowPanel>
+
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label"
+                                         ui:field="isRegisteredLabel">
+                                    <ui:text from='{messages.localInstanceIsRegisteredLabel}' />
+                                </g:Label>
+                                <g:HTML styleName="value"
+                                        ui:field="isRegisteredValue" />
+                            </g:FlowPanel>
                         </g:FlowPanel>
                     </g:FlowPanel>
                 </g:FlowPanel>
@@ -45,8 +63,14 @@
                         <g:Button addStyleNames="btn btn-block btn-edit" ui:field="buttonEdit">
                             <ui:text from='{messages.editButton}'/>
                         </g:Button>
-                        <g:Button addStyleNames="btn btn-block btn-success btn-play" ui:field="buttonTest">
-                            <ui:text from='{messages.testLocalInstanceConfigurationButton}'/>
+                        <g:Button addStyleNames="btn btn-block btn-file-signature" ui:field="buttonRegister">
+                            <ui:text from='{messages.registerLocalInstanceConfigurationButton}'/>
+                        </g:Button>
+                        <g:Button addStyleNames="btn btn-block btn-file-signature" ui:field="buttonCreateBundle">
+                            <ui:text from='{messages.createBundleButton}'/>
+                        </g:Button>
+                        <g:Button addStyleNames="btn btn-block btn-file-signature" ui:field="buttonSynchronize">
+                            <ui:text from='{messages.synchronizeLocalInstanceConfigurationButton}'/>
                         </g:Button>
                         <g:Button addStyleNames="btn btn-block btn-danger btn-times-circle" ui:field="buttonRemove">
                             <ui:text from='{messages.removeButton}'/>
