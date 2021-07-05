@@ -2462,11 +2462,23 @@ public interface ClientMessages extends Messages {
 
   String testLocalInstanceConfigurationButton();
 
+  String registerLocalInstanceConfigurationButton();
+
+  String runPluginLocalInstanceConfigurationButton();
+
+  String synchronizeLocalInstanceConfigurationButton();
+
+  String createBundleButton();
+
   String localInstanceConfigurationIDLabel();
 
   String localInstanceConfigurationSecretLabel();
 
+  String localInstanceConfigurationBundlePathLabel();
+
   String localInstanceConfigurationCentralInstanceURLLabel();
+
+  String localInstanceIsRegisteredLabel();
 
   /** Access Key **/
 

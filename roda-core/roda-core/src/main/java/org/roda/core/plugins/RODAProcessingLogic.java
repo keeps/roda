@@ -18,5 +18,5 @@ import org.roda.core.storage.StorageService;
 @FunctionalInterface
 public interface RODAProcessingLogic<T extends IsRODAObject> {
   public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-    JobPluginInfo jobPluginInfo, Plugin<T> plugin);
+    JobPluginInfo jobPluginInfo, Plugin<T> plugin) throws PluginException;
 }

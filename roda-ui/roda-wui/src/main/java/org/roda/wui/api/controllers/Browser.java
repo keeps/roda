@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.EntityResponse;
@@ -39,9 +40,12 @@ import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.accessKey.AccessKey;
+import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.common.ObjectPermissionResult;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.distributedInstance.DistributedInstance;
+import org.roda.core.data.v2.distributedInstance.DistributedInstanceStatus;
 import org.roda.core.data.v2.distributedInstance.DistributedInstances;
 import org.roda.core.data.v2.distributedInstance.LocalInstance;
 import org.roda.core.data.v2.index.IndexResult;
@@ -3696,7 +3700,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static DistributedInstance retrieveDistributedInstance(User user, String distributedInstacneId)
+  public static DistributedInstance retrieveDistributedInstance(User user, String distributedInstanceId)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -3706,7 +3710,7 @@ public class Browser extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      return RodaCoreFactory.getModelService().retrieveDistributedInstance(distributedInstacneId);
+      return RodaCoreFactory.getModelService().retrieveDistributedInstance(distributedInstanceId);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -3736,7 +3740,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static void deleteDistributedInstance(User user, String distributedInstacneId)
+  public static void deleteDistributedInstance(User user, String distributedInstanceId)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -3746,13 +3750,35 @@ public class Browser extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      RodaCoreFactory.getModelService().deleteDistributedInstance(distributedInstacneId);
+      RodaCoreFactory.getModelService().deleteDistributedInstance(distributedInstanceId);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
       controllerAssistant.registerAction(user, state);
+    }
+  }
+
+  public static void registerDistributedInstance(User user, LocalInstance localInstance)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      DistributedInstance distributedInstance = RodaCoreFactory.getModelService()
+        .retrieveDistributedInstance(localInstance.getId());
+      distributedInstance.setStatus(DistributedInstanceStatus.ACTIVE);
+      RodaCoreFactory.getModelService().updateDistributedInstance(distributedInstance, user.getId());
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
     }
   }
 
@@ -3783,7 +3809,7 @@ public class Browser extends RodaWuiController {
 
     LogEntryState state = LogEntryState.SUCCESS;
     try {
-      return BrowserHelper.getLocalInstanceConfiguration();
+      return RodaCoreFactory.getModelService().retrieveLocalInstanceConfiguration();
     } catch (GenericException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -3841,7 +3867,9 @@ public class Browser extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      RESTClientUtility.sendPostRequest(localInstance, null, localInstance.getCentralInstanceURL(), "/api/v1/auth/token");
+
+      RESTClientUtility.sendPostRequest(new AccessKey(localInstance.getAccessKey()), AccessToken.class,
+        localInstance.getCentralInstanceURL(), "/api/v1/auth/token");
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -3850,5 +3878,89 @@ public class Browser extends RodaWuiController {
     }
 
     return responseList;
+  }
+
+  public static LocalInstance registerLocalInstance(User user, LocalInstance localInstance)
+    throws AuthorizationDeniedException, GenericException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      AccessToken accessToken = BrowserHelper.retrieveAccessToken(localInstance);
+      RESTClientUtility.sendPostRequest(localInstance, null, localInstance.getCentralInstanceURL(),
+        "/api/v1/distributed_instances/register", accessToken);
+      localInstance.setIsRegistered(true);
+      BrowserHelper.updateLocalInstanceConfiguration(localInstance, user.getId());
+      return localInstance;
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
+    }
+  }
+
+  public static Job createSyncBundle(User user, LocalInstance localInstance)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return BrowserHelper.createSyncBundle(user, localInstance);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
+    }
+  }
+
+  public static Job synchronizeBundle(User user, LocalInstance localInstance)
+      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return BrowserHelper.synchronizeBundle(user, localInstance);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
+    }
+  }
+
+  public static Job importSyncBundle(User user, FormDataMultiPart multiPart)
+      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return BrowserHelper.importSyncBundle(user, multiPart);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
+    }
   }
 }
