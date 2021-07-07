@@ -26,6 +26,7 @@ import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -3982,13 +3983,23 @@ public class ModelService extends ModelObservable {
     }
 
     // Create a new User
-    String username = "DISTRIBUTED_" + distributedInstance.getName();
-    User user = createUser(new User(username), true);
+    String username = RodaConstants.DISTRIBUTED_INSTANCE_USER_PREFIX + distributedInstance.getName();
+
+    Set<String> roles = new HashSet<>();
+    roles.add(RodaConstants.REPOSITORY_PERMISSIONS_DISTRIBUTED_INSTANCES_MANAGE);
+    roles.add(RodaConstants.REPOSITORY_PERMISSIONS_LOCAL_INSTANCES_MANAGE);
+
+    User user = new User(username);
+    user.setAllRoles(roles);
+    user.setDirectRoles(roles);
+
+    User accessTokenUser = createUser(user, true);
 
     // Create a new Access token
     AccessKey accessKey = new AccessKey();
-    accessKey.setName("DISTRIBUTED_" + distributedInstance.getName() + "_TOKEN");
-    accessKey.setUserName(user.getName());
+    accessKey.setName(RodaConstants.DISTRIBUTED_INSTANCE_ACCESS_KEY_PREFIX + distributedInstance.getName()
+      + RodaConstants.DISTRIBUTED_INSTANCE_ACCESS_KEY_SUFFIX);
+    accessKey.setUserName(accessTokenUser.getName());
     createAccessKey(accessKey, createdBy);
 
     // Associate to access token
@@ -4073,8 +4084,9 @@ public class ModelService extends ModelObservable {
 
   public LocalInstance retrieveLocalInstanceConfiguration() throws GenericException {
     LocalInstance localInstance = null;
-    InputStream configurationFileAsStream = RodaCoreFactory.getConfigurationFileAsStream("local-instance/configuration.yaml");
-    if(configurationFileAsStream != null) {
+    InputStream configurationFileAsStream = RodaCoreFactory
+      .getConfigurationFileAsStream("local-instance/configuration.yaml");
+    if (configurationFileAsStream != null) {
       localInstance = YamlUtils.getObjectFromYaml(configurationFileAsStream, LocalInstance.class);
     }
     return localInstance;
@@ -4093,7 +4105,7 @@ public class ModelService extends ModelObservable {
 
     if (accessKey.getExpirationDate() == null) {
       Date today = new Date();
-      Date expirationDate = new Date(today.getTime() + RodaCoreFactory.getTokenValidity());
+      Date expirationDate = new Date(today.getTime() + RodaCoreFactory.getAccessKeyValidity());
       accessKey.setExpirationDate(expirationDate);
     }
 
@@ -4113,8 +4125,7 @@ public class ModelService extends ModelObservable {
     return accessKey;
   }
 
-  public AccessKeys listAccessKeys()
-    throws RequestNotValidException, AuthorizationDeniedException, GenericException {
+  public AccessKeys listAccessKeys() throws RequestNotValidException, AuthorizationDeniedException, GenericException {
     StoragePath accessKeysContainerPath = ModelUtils.getAccessKeysContainerPath();
     AccessKeys accessKeys = new AccessKeys();
 
@@ -4172,7 +4183,7 @@ public class ModelService extends ModelObservable {
 
   public void updateAccessKeyLastUsageDate(AccessKey accessKey)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    if(accessKey.getStatus().equals(AccessKeyStatus.CREATED)){
+    if (accessKey.getStatus().equals(AccessKeyStatus.CREATED)) {
       accessKey.setStatus(AccessKeyStatus.ACTIVE);
     }
     String accessKeyAsJson = JsonUtils.getJsonFromObject(accessKey);

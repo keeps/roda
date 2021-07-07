@@ -18,6 +18,7 @@ import java.nio.file.Path;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -25,6 +26,7 @@ import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
@@ -105,6 +107,7 @@ public final class RESTClientUtility {
   public static int sendPostRequestWithCompressedFile(String url, String resource, Path path, AccessToken accessToken)
     throws RODAException, FileNotFoundException {
     CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+
     HttpPost httpPost = new HttpPost(url + resource);
     httpPost.addHeader("Authorization", "Bearer " + accessToken.getToken());
 
@@ -124,30 +127,6 @@ public final class RESTClientUtility {
 
     } catch (IOException e) {
       throw new RODAException("Error sending POST request", e);
-    }
-  }
-
-  public static <T extends Serializable> T sendPostRequest(Object element, Class<T> elementClass, String url,
-    String resource) throws GenericException {
-    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-    HttpPost httpPost = new HttpPost(url + resource);
-    httpPost.addHeader("content-type", "application/json");
-    httpPost.addHeader("Accept", "application/json");
-
-    try {
-      httpPost.setEntity(new StringEntity(JsonUtils.getJsonFromObject(element)));
-      HttpResponse response;
-      response = httpClient.execute(httpPost);
-      HttpEntity responseEntity = response.getEntity();
-
-      int responseStatusCode = response.getStatusLine().getStatusCode();
-      if (responseStatusCode == 200) {
-        return JsonUtils.getObjectFromJson(responseEntity.getContent(), elementClass);
-      } else {
-        throw new GenericException("POST request response status code: " + responseStatusCode);
-      }
-    } catch (IOException e) {
-      throw new GenericException("Error sending POST request", e);
     }
   }
 

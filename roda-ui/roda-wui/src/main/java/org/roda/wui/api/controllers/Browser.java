@@ -30,9 +30,11 @@ import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.Messages;
 import org.roda.core.common.StreamResponse;
+import org.roda.core.common.TokenManager;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
@@ -40,7 +42,6 @@ import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.common.ObjectPermissionResult;
 import org.roda.core.data.v2.common.Pair;
@@ -3857,7 +3858,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static List<String> testLocalInstanceConfiguration(User user, LocalInstance localInstance)
-    throws AuthorizationDeniedException, GenericException {
+    throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     List<String> responseList = new ArrayList();
 
@@ -3867,9 +3868,7 @@ public class Browser extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-
-      RESTClientUtility.sendPostRequest(new AccessKey(localInstance.getAccessKey()), AccessToken.class,
-        localInstance.getCentralInstanceURL(), "/api/v1/auth/token");
+      TokenManager.getInstance().getAccessToken(localInstance);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -3881,7 +3880,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static LocalInstance registerLocalInstance(User user, LocalInstance localInstance)
-    throws AuthorizationDeniedException, GenericException {
+      throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -3890,9 +3889,11 @@ public class Browser extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      AccessToken accessToken = BrowserHelper.retrieveAccessToken(localInstance);
-      RESTClientUtility.sendPostRequest(localInstance, null, localInstance.getCentralInstanceURL(),
-        "/api/v1/distributed_instances/register", accessToken);
+      AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
+      String resource = RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE
+        + RodaConstants.API_PATH_PARAM_DISTRIBUTED_INSTANCE_REGISTER;
+      RESTClientUtility.sendPostRequest(localInstance, null, localInstance.getCentralInstanceURL(), resource,
+        accessToken);
       localInstance.setIsRegistered(true);
       BrowserHelper.updateLocalInstanceConfiguration(localInstance, user.getId());
       return localInstance;
@@ -3925,7 +3926,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static Job synchronizeBundle(User user, LocalInstance localInstance)
-      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
 
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -3945,7 +3946,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static Job importSyncBundle(User user, FormDataMultiPart multiPart)
-      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
 
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
