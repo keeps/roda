@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.TokenManager;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -210,14 +211,14 @@ public class SyncProcessPlugin extends AbstractPlugin<Void> {
       Path zipPath = Paths.get(bundleStateFile.getZipPath());
 
       LocalInstance localInstance = model.retrieveLocalInstanceConfiguration();
-      AccessKey accessKey = new AccessKey(localInstance.getAccessKey());
-      AccessToken accessToken = RESTClientUtility.sendPostRequest(accessKey, AccessToken.class,
-        localInstance.getCentralInstanceURL(), "/api/v1/auth/token");
+      AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
 
+      String resource = RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE
+        + RodaConstants.API_PATH_PARAM_DISTRIBUTED_INSTANCE_SYNC;
       int responseCode = RESTClientUtility.sendPostRequestWithCompressedFile(localInstance.getCentralInstanceURL(),
-          "/api/v1/distributed_instances/sync", zipPath, accessToken);
+        resource, zipPath, accessToken);
 
-      if(responseCode != 200) {
+      if (responseCode != 200) {
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         report.setPluginState(PluginState.FAILURE).setPluginDetails("Server response is " + responseCode);
         bundleStateFile.setSyncState(BundleState.Status.FAILED);

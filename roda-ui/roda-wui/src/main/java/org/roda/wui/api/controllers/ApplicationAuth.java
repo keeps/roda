@@ -236,8 +236,9 @@ public class ApplicationAuth extends RodaWuiController {
       AccessKey retAccessKey = accessKeys.getAccessKeyByKey(accessKey.getKey());
       if (retAccessKey != null) {
         AccessToken accessToken = new AccessToken();
-        Date expirationDate = new Date(new Date().getTime() + RodaCoreFactory.getTokenValidity());
+        Date expirationDate = new Date(new Date().getTime() + RodaCoreFactory.getAccessTokenValidity());
         accessToken.setToken(JwtUtils.generateToken(user.getId(), expirationDate, retAccessKey.getClaims()));
+        accessToken.setExpiresIn(RodaCoreFactory.getAccessTokenValidity());
         retAccessKey.setLastUsageDate(new Date());
         RodaCoreFactory.getModelService().updateAccessKeyLastUsageDate(retAccessKey);
         return accessToken;

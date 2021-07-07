@@ -553,10 +553,10 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException;
 
   List<String> testLocalInstanceConfiguration(LocalInstance localInstance)
-    throws AuthorizationDeniedException, GenericException;
+    throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException;
 
   LocalInstance registerLocalInstance(LocalInstance localInstance)
-    throws AuthorizationDeniedException, GenericException;
+      throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException;
 
   Job createSyncBundle(LocalInstance localInstance)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;

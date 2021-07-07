@@ -74,8 +74,6 @@ import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.utils.YamlUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LinkingObjectUtils;
-import org.roda.core.data.v2.accessKey.AccessKey;
-import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.common.ObjectPermission;
 import org.roda.core.data.v2.common.ObjectPermissionResult;
 import org.roda.core.data.v2.common.OptionalWithCause;
@@ -185,7 +183,6 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
-import org.roda.core.util.RESTClientUtility;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ObjectResponse;
 import org.roda.wui.client.browse.MetadataValue;
@@ -3629,16 +3626,6 @@ public class BrowserHelper {
   public static void updateLocalInstanceConfiguration(LocalInstance localInstance, String id) throws GenericException {
     deleteLocalInstanceConfiguration();
     createLocalInstanceConfiguration(localInstance);
-  }
-
-  public static AccessToken retrieveAccessToken(LocalInstance localInstance) throws GenericException {
-    AccessKey accessKey = new AccessKey(localInstance.getAccessKey());
-    return retrieveAccessToken(accessKey, localInstance.getCentralInstanceURL(), "/api/v1/auth/token");
-  }
-
-  public static AccessToken retrieveAccessToken(AccessKey accessKey, String url, String resouce)
-    throws GenericException {
-    return RESTClientUtility.sendPostRequest(accessKey, AccessToken.class, url, resouce);
   }
 
   public static Job createSyncBundle(User user, LocalInstance localInstance)

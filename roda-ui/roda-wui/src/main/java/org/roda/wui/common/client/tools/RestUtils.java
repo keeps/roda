@@ -10,6 +10,7 @@ package org.roda.wui.common.client.tools;
 import java.util.ArrayList;
 import java.util.List;
 
+import jnr.ffi.Struct;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IsIndexed;
