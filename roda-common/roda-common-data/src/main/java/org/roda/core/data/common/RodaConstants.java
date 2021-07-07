@@ -309,6 +309,8 @@ public final class RodaConstants {
   public static final String API_REST_V1_EVENTS = "api/v1/events/";
   public static final String API_REST_V1_AGENTS = "api/v1/agents/";
   public static final String API_REST_V1_REPRESENTATION_INFORMATION = "api/v1/representation_information/";
+  public static final String API_REST_V1_AUTH = "api/v1/auth/";
+  public static final String API_REST_V1_DISTRIBUTED_INSTANCE = "api/v1/distributed_instances/";
   // sub-resources strings
   public static final String API_DATA = "data";
   public static final Object API_FILE = "file";
@@ -375,6 +377,9 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_DISPOSAL_CONFIRMATION_ID = "disposal_confirmation_id";
   public static final String API_PATH_PARAM_DISPOSAL_CONFIRMATION_REPORT = "report";
   public static final String API_PATH_PARAM_DISPOSAL_CONFIRMATION_REPORT_PRINT = "print";
+  public static final String API_PATH_PARAM_AUTH_TOKEN = "token";
+  public static final String API_PATH_PARAM_DISTRIBUTED_INSTANCE_REGISTER = "register";
+  public static final String API_PATH_PARAM_DISTRIBUTED_INSTANCE_SYNC = "sync";
 
   public static final String API_PATH_PARAM_PART = "part";
   public static final String API_PATH_PARAM_NAME = "name";
@@ -580,8 +585,10 @@ public final class RodaConstants {
   public static final String DEFAULT_API_SECRET_KEY = "changeit";
   public static final String API_SECRET_KEY_PROPERTY = "roda.distributed.api.secret";
 
-  public static final long DEFAULT_TOKEN_VALIDITY = 2 * 60 * 60 * 1000;
-  public static final String TOKEN_VALIDITY = "roda.distributed.api.token.validity";
+  public static final long DEFAULT_ACCESS_KEY_VALIDITY = 31536000000L; // 1 year in ms
+  public static final String ACCESS_KEY_VALIDITY = "roda.distributed.api.access.key.validity";
+  public static final long DEFAULT_ACCESS_TOKEN_VALIDITY = 7200000L; // 2 hours in ms
+  public static final String ACCESS_TOKEN_VALIDITY = "roda.distributed.api.access.token.validity";
 
   public enum OrchestratorType {
     AKKA, AKKA_DISTRIBUTED
@@ -859,7 +866,12 @@ public final class RodaConstants {
   public static final String REPOSITORY_PERMISSIONS_REPRESENTATION_INFORMATION_READ = "ri.read";
 
   public static final String REPOSITORY_PERMISSIONS_DISPOSAL_SCHEDULE_READ = "disposal_schedule.read";
+
+  public static final String REPOSITORY_PERMISSIONS_DISTRIBUTED_INSTANCES_MANAGE = "distributed_instances.manage";
   public static final String REPOSITORY_PERMISSIONS_DISTRIBUTED_INSTANCES_READ = "distributed_instances.read";
+
+  public static final String REPOSITORY_PERMISSIONS_LOCAL_INSTANCES_MANAGE = "local_instance_configuration.manage";
+  public static final String REPOSITORY_PERMISSIONS_LOCAL_INSTANCES_READ = "local_instance_configuration.read";
 
   public static final String LOG_ACTION_COMPONENT = "actionComponent";
   public static final String LOG_ACTION_METHOD = "actionMethod";
@@ -1729,15 +1741,13 @@ public final class RodaConstants {
 
   public static final String RODA_NODE_TYPE_KEY = "nodeType";
 
-  /* HTTP Response codes */
-  public static final int HTTP_RESPONSE_CODE_SUCCESS = 200;
-  public static final int HTTP_RESPONSE_CODE_BAD_REQUEST = 400;
-  public static final int HTTP_RESPONSE_CODE_UNAUTHORIZED = 401;
-  public static final int HTTP_RESPONSE_CODE_NOT_FOUND = 404;
-  public static final int HTTP_RESPONSE_CODE_REQUEST_CONFLICT = 409;
-  public static final int HTTP_RESPONSE_CODE_SERVER_ERROR = 500;
-  /* File Shallow */
+  /* Shallow File */
   public static final String RODA_EXTERNAL_FILE = "external_files.jsonl";
+
+  /* Distributed instances */
+  public static final String DISTRIBUTED_INSTANCE_USER_PREFIX = "DISTRIBUTED_";
+  public static final String DISTRIBUTED_INSTANCE_ACCESS_KEY_PREFIX = DISTRIBUTED_INSTANCE_USER_PREFIX;
+  public static final String DISTRIBUTED_INSTANCE_ACCESS_KEY_SUFFIX = "_KEY";
 
   /* HTTP Response codes */
   public static final int HTTP_RESPONSE_CODE_SUCCESS = 200;

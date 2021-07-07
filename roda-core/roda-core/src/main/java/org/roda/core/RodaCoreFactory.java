@@ -174,7 +174,8 @@ public class RodaCoreFactory {
   private static NodeType nodeType;
   private static DistributedModeType distributedModeType;
   private static String apiSecretKey;
-  private static long tokenValidity;
+  private static long accessKeyValidity;
+  private static long accessTokenValidity;
   private static String instanceId = "";
   private static boolean migrationMode = false;
   private static List<Path> toDeleteDuringShutdown = new ArrayList<>();
@@ -1459,8 +1460,10 @@ public class RodaCoreFactory {
       getProperty(RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY, RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name()));
     if (DistributedModeType.CENTRAL.equals(distributedModeType)) {
       apiSecretKey = getProperty(RodaConstants.API_SECRET_KEY_PROPERTY, RodaConstants.DEFAULT_API_SECRET_KEY);
-      tokenValidity = RodaCoreFactory.getRodaConfiguration().getLong(RodaConstants.TOKEN_VALIDITY,
-        RodaConstants.DEFAULT_TOKEN_VALIDITY);
+      accessKeyValidity = RodaCoreFactory.getRodaConfiguration().getLong(RodaConstants.ACCESS_KEY_VALIDITY,
+          RodaConstants.DEFAULT_ACCESS_KEY_VALIDITY);
+      accessTokenValidity = RodaCoreFactory.getRodaConfiguration().getLong(RodaConstants.ACCESS_TOKEN_VALIDITY,
+        RodaConstants.DEFAULT_ACCESS_TOKEN_VALIDITY);
     }
   }
 
@@ -1820,8 +1823,12 @@ public class RodaCoreFactory {
     return apiSecretKey;
   }
 
-  public static long getTokenValidity() {
-    return tokenValidity;
+  public static long getAccessTokenValidity() {
+    return accessTokenValidity;
+  }
+
+  public static long getAccessKeyValidity() {
+    return accessKeyValidity;
   }
 
   /*
