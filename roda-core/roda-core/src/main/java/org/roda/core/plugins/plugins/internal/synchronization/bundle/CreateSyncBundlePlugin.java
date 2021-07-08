@@ -1,5 +1,6 @@
 package org.roda.core.plugins.plugins.internal.synchronization.bundle;
 
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -15,6 +16,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.distributedInstance.LocalInstance;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -29,6 +31,7 @@ import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +43,7 @@ public class CreateSyncBundlePlugin extends AbstractPlugin<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(CreateSyncBundlePlugin.class);
 
   private String destinationPath = null;
+  private LocalInstance localInstance;
   private BundleState bundleState;
 
   private Date finalDate = null;
@@ -167,14 +171,18 @@ public class CreateSyncBundlePlugin extends AbstractPlugin<Void> {
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
     try {
+      if (FSUtils.isDirectory(Paths.get(destinationPath))) {
+        FSUtils.deletePath(Paths.get(destinationPath));
+      }
       bundleState = SyncBundleHelper.getBundleStateFile();
-      if (bundleState.getToDate() != null) {
+      if (bundleState.getSyncStatus().equals(BundleState.Status.SENT)) {
         bundleState.setFromDate(bundleState.getToDate());
+        bundleState.setSyncState(BundleState.Status.NONE);
       }
       bundleState.setDestinationPath(destinationPath);
       bundleState.setToDate(new Date());
       SyncBundleHelper.updateBundleStateFile(bundleState);
-    } catch (GenericException e) {
+    } catch (GenericException | NotFoundException e) {
       throw new PluginException("Error while creating entity bundle state", e);
     }
     return new Report();

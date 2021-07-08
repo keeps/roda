@@ -3588,46 +3588,6 @@ public class BrowserHelper {
     return RodaCoreFactory.getModelService().createDistributedInstance(distributedInstance, user.getName());
   }
 
-  public static LocalInstance getLocalInstanceConfiguration() throws GenericException {
-    LocalInstance localInstance = null;
-    InputStream configurationFileAsStream = RodaCoreFactory
-      .getConfigurationFileAsStream("local-instance/configuration.yaml");
-    if (configurationFileAsStream != null) {
-      localInstance = YamlUtils.getObjectFromYaml(configurationFileAsStream, LocalInstance.class);
-    }
-
-    return localInstance;
-  }
-
-  public static void createLocalInstanceConfiguration(LocalInstance localInstance) throws GenericException {
-    Path localInstanceConfigPath = RodaCoreFactory.getConfigPath().resolve("local-instance");
-    if (!Files.isDirectory(localInstanceConfigPath)) {
-      try {
-        Files.createDirectory(localInstanceConfigPath);
-      } catch (IOException e) {
-        throw new GenericException("Unable to create directory " + localInstanceConfigPath.toString(), e);
-      }
-    }
-    YamlUtils.writeObjectToFile(localInstance, localInstanceConfigPath.resolve("configuration.yaml"));
-  }
-
-  public static void deleteLocalInstanceConfiguration() throws GenericException {
-    Path configPath = RodaCoreFactory.getConfigPath().resolve("local-instance/configuration.yaml");
-
-    if (Files.exists(configPath)) {
-      try {
-        FSUtils.deletePath(configPath);
-      } catch (NotFoundException exception) {
-        throw new GenericException("Failed to delete local instance configuration file", exception);
-      }
-    }
-  }
-
-  public static void updateLocalInstanceConfiguration(LocalInstance localInstance, String id) throws GenericException {
-    deleteLocalInstanceConfiguration();
-    createLocalInstanceConfiguration(localInstance);
-  }
-
   public static Job createSyncBundle(User user, LocalInstance localInstance)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     Map<String, String> pluginParameters = new HashMap<>();

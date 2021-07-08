@@ -279,6 +279,7 @@ public final class RodaConstants {
   public static final String CORE_DISPOSAL_BIN_FOLDER = "disposal-bin";
   public static final String CORE_FILE_SHALLOW_TMP_FOLDER = "file-shallow";
   public static final String CORE_SYNCHRONIZATION_FOLDER = "synchronization";
+  public static final String CORE_LOCAL_INSTANCE_FOLDER = "local-instance";
 
   public static final String CORE_I18N_CLIENT_FOLDER = "client";
   public static final String CORE_I18_GWT_XML_FILE = "I18N.gwt.xml";
