@@ -103,7 +103,9 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.exceptions.RoleAlreadyExistsException;
+import org.roda.core.data.utils.YamlUtils;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.distributedInstance.LocalInstance;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
@@ -172,13 +174,16 @@ public class RodaCoreFactory {
   private static boolean instantiated = false;
   private static boolean instantiatedWithoutErrors = true;
   private static NodeType nodeType;
-  private static DistributedModeType distributedModeType;
-  private static String apiSecretKey;
-  private static long accessKeyValidity;
-  private static long accessTokenValidity;
   private static String instanceId = "";
   private static boolean migrationMode = false;
   private static List<Path> toDeleteDuringShutdown = new ArrayList<>();
+
+  // Distributed instance related objects
+  private static DistributedModeType distributedModeType;
+  private static LocalInstance localInstance;
+  private static String apiSecretKey;
+  private static long accessKeyValidity;
+  private static long accessTokenValidity;
 
   // Core related objects
   private static Path rodaHomePath;
@@ -195,6 +200,7 @@ public class RodaCoreFactory {
   private static Path defaultPath;
   private static Path fileShallowTmpDirectoryPath;
   private static Path synchronizationDirectoryPath;
+  private static Path localInstanceConfigPath;
 
   private static StorageService storage;
   private static ModelService model;
@@ -583,6 +589,18 @@ public class RodaCoreFactory {
     } catch (IOException e) {
       throw new RuntimeException(
         "Unable to create RODA file shallow temporary DIRECTORY " + fileShallowTmpDirectoryPath + ". Aborting...", e);
+    }
+  }
+
+  private static void initializeLocalInstanceConfigDirectory() {
+    try {
+      String localInstanceFolder = getConfigurationString("local_instance.folder",
+        RodaConstants.CORE_LOCAL_INSTANCE_FOLDER);
+      localInstanceConfigPath = getConfigPath().resolve(localInstanceFolder);
+      Files.createDirectories(localInstanceConfigPath);
+    } catch (IOException e) {
+      throw new RuntimeException(
+        "Unable to create RODA local instance config DIRECTORY " + localInstanceConfigPath + ". Aborting...", e);
     }
   }
 
@@ -1461,9 +1479,11 @@ public class RodaCoreFactory {
     if (DistributedModeType.CENTRAL.equals(distributedModeType)) {
       apiSecretKey = getProperty(RodaConstants.API_SECRET_KEY_PROPERTY, RodaConstants.DEFAULT_API_SECRET_KEY);
       accessKeyValidity = RodaCoreFactory.getRodaConfiguration().getLong(RodaConstants.ACCESS_KEY_VALIDITY,
-          RodaConstants.DEFAULT_ACCESS_KEY_VALIDITY);
+        RodaConstants.DEFAULT_ACCESS_KEY_VALIDITY);
       accessTokenValidity = RodaCoreFactory.getRodaConfiguration().getLong(RodaConstants.ACCESS_TOKEN_VALIDITY,
         RodaConstants.DEFAULT_ACCESS_TOKEN_VALIDITY);
+    } else if (DistributedModeType.LOCAL.equals(distributedModeType)) {
+      initializeLocalInstanceConfigDirectory();
     }
   }
 
@@ -1793,6 +1813,10 @@ public class RodaCoreFactory {
 
   public static Path getSynchronizationDirectoryPath() {
     return synchronizationDirectoryPath;
+  }
+
+  public static Path getLocalInstanceConfigPath() {
+    return localInstanceConfigPath;
   }
 
   public static Path getDataPath() {
@@ -2139,6 +2163,9 @@ public class RodaCoreFactory {
       rodaSharedConfigurationPropertiesCache.put(RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY,
         Collections.singletonList(getDistributedModeType().toString()));
 
+      rodaSharedConfigurationPropertiesCache.put(RodaConstants.CORE_SYNCHRONIZATION_FOLDER,
+        Collections.singletonList(getSynchronizationDirectoryPath().toString()));
+
       Iterator<String> keys = configuration.getKeys();
       while (keys.hasNext()) {
         String key = keys.next();
@@ -2239,6 +2266,31 @@ public class RodaCoreFactory {
     }
     throw new GenericException(
       "The Application was unable to configure the protocols correctly, please check the logs ");
+  }
+
+  public static LocalInstance getLocalInstance() throws GenericException {
+    String configuration = localInstanceConfigPath.resolve("config.yaml").toString();
+    InputStream configurationFileAsStream = RodaCoreFactory.getConfigurationFileAsStream(configuration);
+    if (configurationFileAsStream != null) {
+      localInstance = YamlUtils.getObjectFromYaml(configurationFileAsStream, LocalInstance.class);
+    }
+
+    return localInstance;
+  }
+
+  public static void createOrUpdateLocalInstance(LocalInstance newLocalInstance) throws GenericException {
+    Path configuration = localInstanceConfigPath.resolve("config.yaml");
+    if (Files.exists(configuration)) {
+      try {
+        Files.delete(configuration);
+      } catch (IOException e) {
+        throw new GenericException("Cannot remove current local instance configuration");
+      }
+    }
+    if(newLocalInstance != null){
+      YamlUtils.writeObjectToFile(newLocalInstance, configuration);
+    }
+    localInstance = newLocalInstance;
   }
 
   public static Messages getI18NMessages(Locale locale) {

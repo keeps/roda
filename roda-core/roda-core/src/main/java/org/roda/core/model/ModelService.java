@@ -4079,20 +4079,6 @@ public class ModelService extends ModelObservable {
   }
 
   /************************************
-   * Local instances related
-   ************************************/
-
-  public LocalInstance retrieveLocalInstanceConfiguration() throws GenericException {
-    LocalInstance localInstance = null;
-    InputStream configurationFileAsStream = RodaCoreFactory
-      .getConfigurationFileAsStream("local-instance/configuration.yaml");
-    if (configurationFileAsStream != null) {
-      localInstance = YamlUtils.getObjectFromYaml(configurationFileAsStream, LocalInstance.class);
-    }
-    return localInstance;
-  }
-
-  /************************************
    * Access Token related
    ************************************/
   public AccessKey createAccessKey(AccessKey accessKey, String createdBy) throws GenericException,

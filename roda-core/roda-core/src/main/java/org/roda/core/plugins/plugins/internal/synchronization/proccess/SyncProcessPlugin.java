@@ -210,10 +210,10 @@ public class SyncProcessPlugin extends AbstractPlugin<Void> {
       BundleState bundleStateFile = SyncBundleHelper.getBundleStateFile();
       Path zipPath = Paths.get(bundleStateFile.getZipPath());
 
-      LocalInstance localInstance = model.retrieveLocalInstanceConfiguration();
+      LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
 
-      String resource = RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE
+      String resource =  RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE
         + RodaConstants.API_PATH_PARAM_DISTRIBUTED_INSTANCE_SYNC;
       int responseCode = RESTClientUtility.sendPostRequestWithCompressedFile(localInstance.getCentralInstanceURL(),
         resource, zipPath, accessToken);

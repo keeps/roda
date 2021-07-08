@@ -3792,7 +3792,7 @@ public class Browser extends RodaWuiController {
 
     LogEntryState state = LogEntryState.SUCCESS;
     try {
-      BrowserHelper.createLocalInstanceConfiguration(localInstance);
+      RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -3810,7 +3810,7 @@ public class Browser extends RodaWuiController {
 
     LogEntryState state = LogEntryState.SUCCESS;
     try {
-      return RodaCoreFactory.getModelService().retrieveLocalInstanceConfiguration();
+      return RodaCoreFactory.getLocalInstance();
     } catch (GenericException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -3828,7 +3828,7 @@ public class Browser extends RodaWuiController {
 
     LogEntryState state = LogEntryState.SUCCESS;
     try {
-      BrowserHelper.deleteLocalInstanceConfiguration();
+      RodaCoreFactory.createOrUpdateLocalInstance(null);
     } catch (GenericException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -3847,7 +3847,7 @@ public class Browser extends RodaWuiController {
 
     LogEntryState state = LogEntryState.SUCCESS;
     try {
-      BrowserHelper.updateLocalInstanceConfiguration(localInstance, user.getId());
+      RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
     } catch (GenericException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -3890,12 +3890,12 @@ public class Browser extends RodaWuiController {
 
     try {
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
-      String resource = RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE
+      String resource =  RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE
         + RodaConstants.API_PATH_PARAM_DISTRIBUTED_INSTANCE_REGISTER;
       RESTClientUtility.sendPostRequest(localInstance, null, localInstance.getCentralInstanceURL(), resource,
         accessToken);
       localInstance.setIsRegistered(true);
-      BrowserHelper.updateLocalInstanceConfiguration(localInstance, user.getId());
+      RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
       return localInstance;
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
