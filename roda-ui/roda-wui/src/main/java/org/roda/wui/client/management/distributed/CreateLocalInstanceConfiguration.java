@@ -2,13 +2,14 @@ package org.roda.wui.client.management.distributed;
 
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.distributedInstance.DistributedInstance;
 import org.roda.core.data.v2.distributedInstance.LocalInstance;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.management.Management;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.server.browse.BrowserServiceImpl;
@@ -67,6 +68,8 @@ public class CreateLocalInstanceConfiguration extends Composite {
 
   public CreateLocalInstanceConfiguration() {
     this.localInstance = new LocalInstance();
+    this.localInstance
+      .setBundlePath(ConfigurationManager.getString(RodaConstants.CORE_SYNCHRONIZATION_FOLDER) + "/bundle");
     this.localInstanceConfigurationDataPanel = new LocalInstanceConfigurationDataPanel(localInstance, false);
     this.localInstanceConfigurationDataPanel.setLocalInstanceConfiguration(localInstance);
 
