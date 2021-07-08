@@ -3,6 +3,7 @@ package org.roda.wui.client.management.distributed;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.v2.distributedInstance.LocalInstance;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
@@ -81,7 +82,7 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
     initWidget(uiBinder.createAndBindUi(this));
     this.editMode = editMode;
 
-    setInitialState();
+    setInitialState(localInstance);
     initHandlers();
 
     if (editMode) {
@@ -125,8 +126,9 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
 
   }
 
-  private void setInitialState() {
+  private void setInitialState(LocalInstance localInstance) {
     errors.setVisible(false);
+    bundlePathValue.setText(localInstance.getBundlePath());
   }
 
   public LocalInstance getLocalInstance() {
@@ -164,7 +166,7 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
       secretError.setVisible(false);
     }
 
-    // SECRET
+    // BundlePath
     if (StringUtils.isBlank(bundlePathValue.getText())) {
       bundlePathValue.addStyleName(IS_WRONG);
       bundlePathError.setText(messages.mandatoryField());
