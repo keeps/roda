@@ -10,6 +10,7 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.server.browse.BrowserServiceImpl;
@@ -86,6 +87,9 @@ public class ShowLocalInstanceConfiguration extends Composite {
   @UiField
   HTML isRegisteredValue;
 
+  @UiField
+  HTML lastSyncValue;
+
   public ShowLocalInstanceConfiguration(LocalInstance localInstance) {
     initWidget(uiBinder.createAndBindUi(this));
     this.localInstance = localInstance;
@@ -98,6 +102,11 @@ public class ShowLocalInstanceConfiguration extends Composite {
     centralInstanceURLValue.setText(localInstance.getCentralInstanceURL());
     isRegisteredValue.setText(localInstance.getIsRegistered().toString());
     bundlePathValue.setText(localInstance.getBundlePath());
+    if (localInstance.getLastSynchronizationDate() != null) {
+      lastSyncValue.setText(Humanize.formatDateTime(localInstance.getLastSynchronizationDate()));
+    } else {
+      lastSyncValue.setText("Never");
+    }
   }
 
   @UiHandler("buttonEdit")
@@ -107,7 +116,7 @@ public class ShowLocalInstanceConfiguration extends Composite {
 
   @UiHandler("buttonRegister")
   void buttonRegisterHandler(ClickEvent e) {
-    BrowserService.Util.getInstance().registerLocalInstance(localInstance, new NoAsyncCallback<LocalInstance>(){
+    BrowserService.Util.getInstance().registerLocalInstance(localInstance, new NoAsyncCallback<LocalInstance>() {
       @Override
       public void onSuccess(LocalInstance result) {
         localInstance = result;
@@ -119,7 +128,7 @@ public class ShowLocalInstanceConfiguration extends Composite {
 
   @UiHandler("buttonCreateBundle")
   void buttonCreateBundleHandler(ClickEvent e) {
-    BrowserService.Util.getInstance().createSyncBundle(localInstance, new NoAsyncCallback<Job>(){
+    BrowserService.Util.getInstance().createSyncBundle(localInstance, new NoAsyncCallback<Job>() {
       @Override
       public void onSuccess(Job job) {
         Toast.showInfo("Create Job", "Success");
@@ -130,7 +139,7 @@ public class ShowLocalInstanceConfiguration extends Composite {
 
   @UiHandler("buttonSynchronize")
   void buttonSynchronizeHandler(ClickEvent e) {
-    BrowserService.Util.getInstance().synchronizeBundle(localInstance, new NoAsyncCallback<Job>(){
+    BrowserService.Util.getInstance().synchronizeBundle(localInstance, new NoAsyncCallback<Job>() {
       @Override
       public void onSuccess(Job job) {
         Toast.showInfo("Create Job", "Success");
