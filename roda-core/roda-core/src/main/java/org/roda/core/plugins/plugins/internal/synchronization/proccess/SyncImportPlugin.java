@@ -1,9 +1,24 @@
 package org.roda.core.plugins.plugins.internal.synchronization.proccess;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -17,17 +32,13 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.storage.Container;
+import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FileStorageService;
+import org.roda.core.util.ZipUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -41,8 +52,8 @@ public class SyncImportPlugin extends AbstractPlugin<Void> {
 
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH,
-        new PluginParameter(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, "Destination path",
-            PluginParameter.PluginParameterType.STRING, "", true, false, "Destination path where bundles will be created"));
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, "Destination path",
+        PluginParameter.PluginParameterType.STRING, "", true, false, "Destination path where bundles will be created"));
   }
 
   @Override
@@ -118,7 +129,7 @@ public class SyncImportPlugin extends AbstractPlugin<Void> {
 
   @Override
   public void init() throws PluginException {
-    // do nothing
+
   }
 
   @Override
@@ -132,26 +143,58 @@ public class SyncImportPlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
     return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-                          JobPluginInfo jobPluginInfo, Plugin<Void> plugin) throws PluginException {
-        importSyncBundle(index, model, report, jobPluginInfo, cachedJob);
+        JobPluginInfo jobPluginInfo, Plugin<Void> plugin) throws PluginException {
+        importSyncBundle(index, model, storage, report, jobPluginInfo, cachedJob);
       }
     }, index, model, storage);
   }
 
-  private void importSyncBundle(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo, Job cachedJob) {
-    if(Files.exists(Paths.get(bundlePath))) {
-      report.setPluginState(PluginState.SUCCESS);
+  private void importSyncBundle(IndexService index, ModelService model, StorageService storage, Report report,
+    JobPluginInfo jobPluginInfo, Job cachedJob) {
+    if (Files.exists(Paths.get(bundlePath))) {
+      Path tempDirectory;
+      FileStorageService temporaryStorage;
+      try {
+        tempDirectory = Files.createTempDirectory(Paths.get(bundlePath).getFileName().toString());
+        ZipUtility.extractFilesFromZIP(new File(bundlePath), tempDirectory.toFile(), true);
+        temporaryStorage = new FileStorageService(tempDirectory.resolve("storage"), false, null, false);
+
+        CloseableIterable<Container> containers = temporaryStorage.listContainers();
+        Iterator<Container> containerIterator = containers.iterator();
+        while (containerIterator.hasNext()) {
+          Container container = containerIterator.next();
+          StoragePath containerStoragePath = container.getStoragePath();
+
+          CloseableIterable<Resource> resources = temporaryStorage.listResourcesUnderContainer(containerStoragePath,
+            true);
+          Iterator<Resource> resourceIterator = resources.iterator();
+          while (resourceIterator.hasNext()) {
+            Resource resource = resourceIterator.next();
+            StoragePath storagePath = resource.getStoragePath();
+
+            if (storagePath.getContainerName().equals(RodaConstants.STORAGE_CONTAINER_AIP)) {
+              storage.move(temporaryStorage, storagePath, storagePath);
+            }
+          }
+        }
+
+        report.setPluginState(PluginState.SUCCESS);
+      } catch (IOException | RODAException e) {
+        e.printStackTrace();
+      }
     } else {
       report.setPluginState(PluginState.FAILURE);
     }
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<LiteOptionalWithCause> list) throws PluginException {
+  public Report execute(IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> list) throws PluginException {
     return null;
   }
 
@@ -159,6 +202,5 @@ public class SyncImportPlugin extends AbstractPlugin<Void> {
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     return new Report();
   }
-
 
 }

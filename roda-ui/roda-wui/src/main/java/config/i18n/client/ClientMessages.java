@@ -2452,6 +2452,8 @@ public interface ClientMessages extends Messages {
 
   String localInstanceIsRegisteredLabel();
 
+  String localInstanceLastSyncDateLabel();
+
   /** Access Key **/
 
   String addAccessKeyButton();

@@ -1,6 +1,5 @@
 package org.roda.core.plugins.plugins.internal.synchronization.bundle;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -8,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -31,7 +31,6 @@ import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,18 +41,10 @@ import org.slf4j.LoggerFactory;
 public class CreateSyncBundlePlugin extends AbstractPlugin<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(CreateSyncBundlePlugin.class);
 
-  private String destinationPath = null;
   private LocalInstance localInstance;
   private BundleState bundleState;
 
   private Date finalDate = null;
-
-  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
-  static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, "Destination path",
-        PluginParameter.PluginParameterType.STRING, "", true, false, "Destination path where bundles will be created"));
-  }
 
   @Override
   public void init() throws PluginException {
@@ -78,21 +69,6 @@ public class CreateSyncBundlePlugin extends AbstractPlugin<Void> {
   @Override
   public String getVersionImpl() {
     return "1.0";
-  }
-
-  @Override
-  public List<PluginParameter> getParameters() {
-    ArrayList<PluginParameter> parameters = new ArrayList<>();
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH));
-    return parameters;
-  }
-
-  @Override
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    super.setParameterValues(parameters);
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH)) {
-      destinationPath = parameters.get(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH);
-    }
   }
 
   @Override
@@ -154,9 +130,6 @@ public class CreateSyncBundlePlugin extends AbstractPlugin<Void> {
     job.setId(jobId);
     job.setName(jobName);
 
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, destinationPath);
-    job.setPluginParameters(pluginParameters);
     job.setPluginType(PluginType.INTERNAL);
     job.setUsername(username);
 
@@ -171,18 +144,9 @@ public class CreateSyncBundlePlugin extends AbstractPlugin<Void> {
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
     try {
-      if (FSUtils.isDirectory(Paths.get(destinationPath))) {
-        FSUtils.deletePath(Paths.get(destinationPath));
-      }
-      bundleState = SyncBundleHelper.getBundleStateFile();
-      if (bundleState.getSyncStatus().equals(BundleState.Status.SENT)) {
-        bundleState.setFromDate(bundleState.getToDate());
-        bundleState.setSyncState(BundleState.Status.NONE);
-      }
-      bundleState.setDestinationPath(destinationPath);
-      bundleState.setToDate(new Date());
-      SyncBundleHelper.updateBundleStateFile(bundleState);
-    } catch (GenericException | NotFoundException e) {
+      localInstance = RodaCoreFactory.getLocalInstance();
+      bundleState = SyncBundleHelper.createBundleStateFile(localInstance);
+    } catch (GenericException e) {
       throw new PluginException("Error while creating entity bundle state", e);
     }
     return new Report();

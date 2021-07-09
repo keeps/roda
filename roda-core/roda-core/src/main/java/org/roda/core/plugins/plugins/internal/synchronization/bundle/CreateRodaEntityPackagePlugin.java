@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -17,6 +18,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.distributedInstance.LocalInstance;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -39,31 +41,6 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class CreateRodaEntityPackagePlugin<T extends IsRODAObject> extends AbstractPlugin<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(CreateRodaEntityPackagePlugin.class);
-
-  private String destinationPath = null;
-
-  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
-  static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, "Destination path",
-        PluginParameter.PluginParameterType.STRING, "", true, false, "Destination path where bundles will be created"));
-  }
-
-  @Override
-  public List<PluginParameter> getParameters() {
-    ArrayList<PluginParameter> parameters = new ArrayList<>();
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH));
-    return parameters;
-  }
-
-  @Override
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    super.setParameterValues(parameters);
-
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH)) {
-      destinationPath = parameters.get(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH);
-    }
-  }
 
   @Override
   public void init() throws PluginException {
@@ -100,13 +77,17 @@ public abstract class CreateRodaEntityPackagePlugin<T extends IsRODAObject> exte
 
   protected abstract String getEntity();
 
-  protected Path getDestinationPath() {
-    return Paths.get(destinationPath);
+  protected Path getDestinationPath() throws GenericException {
+    return Paths.get(getLocalInstance().getBundlePath());
+  }
+
+  protected LocalInstance getLocalInstance() throws GenericException {
+    return RodaCoreFactory.getLocalInstance();
   }
 
   protected void updatePackageState(PackageState.Status status) throws PluginException {
     try {
-      SyncBundleHelper.updatePackageStateStatus(getEntity(), status);
+      SyncBundleHelper.updatePackageStateStatus(getLocalInstance(), getEntity(), status);
     } catch (GenericException e) {
       throw new PluginException("Error while creating entity bundle state", e);
     }
@@ -172,7 +153,7 @@ public abstract class CreateRodaEntityPackagePlugin<T extends IsRODAObject> exte
       JobStats jobStats = job.getJobStats();
       if (jobStats.getSourceObjectsProcessedWithFailure() == 0) {
         updatePackageState(PackageState.Status.SUCCESS);
-        SyncBundleHelper.executeShaSumCommand(getEntity());
+        SyncBundleHelper.executeShaSumCommand(getLocalInstance(), getEntity());
       } else {
         updatePackageState(PackageState.Status.FAILED);
       }

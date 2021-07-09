@@ -50,6 +50,15 @@
                                 <g:HTML styleName="value"
                                         ui:field="isRegisteredValue" />
                             </g:FlowPanel>
+
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label"
+                                         ui:field="lastSyncLabel">
+                                    <ui:text from='{messages.localInstanceLastSyncDateLabel}' />
+                                </g:Label>
+                                <g:HTML styleName="value"
+                                        ui:field="lastSyncValue" />
+                            </g:FlowPanel>
                         </g:FlowPanel>
                     </g:FlowPanel>
                 </g:FlowPanel>
