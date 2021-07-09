@@ -1,5 +1,7 @@
 package org.roda.core.plugins.plugins.internal.synchronization.bundle;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -11,6 +13,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.distributedInstance.LocalInstance;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
@@ -25,7 +28,7 @@ import org.roda.core.util.CommandUtility;
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 public class SyncBundleHelper {
-  private final static Path bundleStatePath = RodaCoreFactory.getSynchronizationDirectoryPath().resolve("state.json");
+  private final static String STATE_FILE = "state.json";
 
   public static SelectedItemsFilter getSelectItems(Class<?> bundleClass, Date initialDate, Date finalDate)
     throws NotFoundException {
@@ -41,40 +44,56 @@ public class SyncBundleHelper {
     }
   }
 
-  public static BundleState getBundleStateFile() throws GenericException {
-    BundleState bundleState;
-    if (FSUtils.exists(bundleStatePath)) {
-      bundleState = JsonUtils.readObjectFromFile(bundleStatePath, BundleState.class);
-    } else {
-      bundleState = new BundleState();
-      JsonUtils.writeObjectToFile(bundleState, bundleStatePath);
+  public static BundleState getBundleStateFile(LocalInstance localInstance) throws GenericException {
+    Path bundleStateFilePath = Paths.get(localInstance.getBundlePath()).resolve(STATE_FILE);
+    return JsonUtils.readObjectFromFile(bundleStateFilePath, BundleState.class);
+  }
+
+  public static void updateBundleStateFile(LocalInstance localInstance, BundleState bundleState) throws GenericException {
+    Path bundleStateFilePath = Paths.get(localInstance.getBundlePath()).resolve(STATE_FILE);
+    JsonUtils.writeObjectToFile(bundleState, bundleStateFilePath);
+  }
+
+  public static PackageState getPackageState(LocalInstance localInstance, String entity) throws GenericException {
+    return getBundleStateFile(localInstance).getPackageState(entity);
+  }
+
+  public static void updatePackageState(LocalInstance localInstance, String entity, PackageState packageState) throws GenericException {
+    BundleState bundleState = getBundleStateFile(localInstance);
+    bundleState.setPackageState(entity, packageState);
+    updateBundleStateFile(localInstance, bundleState);
+  }
+
+  public static void updatePackageStateStatus(LocalInstance localInstance, String entity, PackageState.Status status) throws GenericException {
+    PackageState packageState = getPackageState(localInstance, entity);
+    packageState.setStatus(status);
+    updatePackageState(localInstance, entity, packageState);
+  }
+
+  public static BundleState createBundleStateFile(LocalInstance localInstance) throws GenericException {
+    BundleState bundleState = new BundleState();
+    Path bundlePath = Paths.get(localInstance.getBundlePath());
+    try {
+      if (Files.exists(bundlePath)) {
+        FSUtils.deletePath(bundlePath);
+      }
+
+      Files.createDirectories(bundlePath);
+      bundleState.setDestinationPath(localInstance.getBundlePath());
+      bundleState.setFromDate(localInstance.getLastSynchronizationDate());
+      bundleState.setToDate(new Date());
+      Path bundleStateFilePath = Paths.get(localInstance.getBundlePath()).resolve(STATE_FILE);
+      JsonUtils.writeObjectToFile(bundleState, bundleStateFilePath);
+
+    } catch (IOException | NotFoundException e) {
+      throw new GenericException("Unable to create bundle directory", e);
     }
     return bundleState;
   }
 
-  public static void updateBundleStateFile(BundleState bundleState) throws GenericException {
-    JsonUtils.writeObjectToFile(bundleState, bundleStatePath);
-  }
-
-  public static PackageState getPackageState(String entity) throws GenericException {
-    return getBundleStateFile().getPackageState(entity);
-  }
-
-  public static void updatePackageState(String entity, PackageState packageState) throws GenericException {
-    BundleState bundleState = getBundleStateFile();
-    bundleState.setPackageState(entity, packageState);
-    updateBundleStateFile(bundleState);
-  }
-
-  public static void updatePackageStateStatus(String entity, PackageState.Status status) throws GenericException {
-    PackageState packageState = getPackageState(entity);
-    packageState.setStatus(status);
-    updatePackageState(entity, packageState);
-  }
-
-  public static void executeShaSumCommand(String entity) throws PluginException {
+  public static void executeShaSumCommand(LocalInstance localInstance, String entity) throws PluginException {
     try {
-      BundleState bundleStateFile = getBundleStateFile();
+      BundleState bundleStateFile = getBundleStateFile(localInstance);
       String targetPath = Paths.get(bundleStateFile.getDestinationPath(), entity + ".shasum").toString();
       List<String> checksumCommand = new ArrayList<>();
       checksumCommand.add("/bin/sh");
