@@ -69,7 +69,7 @@ public class CreateLocalInstanceConfiguration extends Composite {
   public CreateLocalInstanceConfiguration() {
     this.localInstance = new LocalInstance();
     this.localInstance
-      .setBundlePath(ConfigurationManager.getString(RodaConstants.CORE_SYNCHRONIZATION_FOLDER) + "/bundle");
+      .setBundlePath(ConfigurationManager.getString(RodaConstants.CORE_SYNCHRONIZATION_FOLDER) + RodaConstants.LOCAL_INSTANCE_BUNDLE_FOLDER);
     this.localInstanceConfigurationDataPanel = new LocalInstanceConfigurationDataPanel(localInstance, false);
     this.localInstanceConfigurationDataPanel.setLocalInstanceConfiguration(localInstance);
 

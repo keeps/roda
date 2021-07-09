@@ -68,9 +68,9 @@ public class CreateAipPackagePlugin extends CreateRodaEntityPackagePlugin<AIP> {
 
         jobPluginInfo.setSourceObjectsCount(counter);
 
-        PackageState packageState = SyncBundleHelper.getPackageState(getEntity());
+        PackageState packageState = SyncBundleHelper.getPackageState(getLocalInstance(), getEntity());
         packageState.setCount(counter);
-        SyncBundleHelper.updatePackageState(getEntity(), packageState);
+        SyncBundleHelper.updatePackageState(getLocalInstance(), getEntity(), packageState);
 
         IterableIndexResult<IndexedAIP> aips = index.findAll(IndexedAIP.class, filter,
           Arrays.asList(RodaConstants.INDEX_UUID));
@@ -102,7 +102,8 @@ public class CreateAipPackagePlugin extends CreateRodaEntityPackagePlugin<AIP> {
 
     StorageService storage = model.getStorage();
     StoragePath aipStoragePath = ModelUtils.getAIPStoragePath(aip.getId());
-    Path destinationPath = getDestinationPath().resolve(RodaConstants.STORAGE_CONTAINER_AIP).resolve(aip.getId());
+    Path destinationPath = getDestinationPath().resolve("storage").resolve(RodaConstants.STORAGE_CONTAINER_AIP)
+      .resolve(aip.getId());
 
     Path documentationPath = destinationPath.resolve(RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
     Path metadataPath = destinationPath.resolve(RodaConstants.STORAGE_DIRECTORY_METADATA);

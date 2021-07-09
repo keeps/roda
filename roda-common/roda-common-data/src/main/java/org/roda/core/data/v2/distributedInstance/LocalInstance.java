@@ -22,6 +22,7 @@ public class LocalInstance implements IsModelObject {
   private String centralInstanceURL;
   private String bundlePath;
   private Boolean isRegistered;
+  private Date lastSynchronizationDate;
 
   private Date createdOn;
   private String createdBy;
@@ -73,6 +74,14 @@ public class LocalInstance implements IsModelObject {
     isRegistered = registered;
   }
 
+  public Date getLastSynchronizationDate() {
+    return lastSynchronizationDate;
+  }
+
+  public void setLastSynchronizationDate(Date lastSynchronizationDate) {
+    this.lastSynchronizationDate = lastSynchronizationDate;
+  }
+
   public Date getCreatedOn() {
     return createdOn;
   }
@@ -113,28 +122,22 @@ public class LocalInstance implements IsModelObject {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o)
-      return true;
-    if (o == null || getClass() != o.getClass())
-      return false;
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
 
     LocalInstance that = (LocalInstance) o;
 
-    if (id != null ? !id.equals(that.id) : that.id != null)
+    if (id != null ? !id.equals(that.id) : that.id != null) return false;
+    if (accessKey != null ? !accessKey.equals(that.accessKey) : that.accessKey != null) return false;
+    if (centralInstanceURL != null ? !centralInstanceURL.equals(that.centralInstanceURL) : that.centralInstanceURL != null)
       return false;
-    if (accessKey != null ? !accessKey.equals(that.accessKey) : that.accessKey != null)
+    if (bundlePath != null ? !bundlePath.equals(that.bundlePath) : that.bundlePath != null) return false;
+    if (isRegistered != null ? !isRegistered.equals(that.isRegistered) : that.isRegistered != null) return false;
+    if (lastSynchronizationDate != null ? !lastSynchronizationDate.equals(that.lastSynchronizationDate) : that.lastSynchronizationDate != null)
       return false;
-    if (centralInstanceURL != null ? !centralInstanceURL.equals(that.centralInstanceURL)
-      : that.centralInstanceURL != null)
-      return false;
-    if (isRegistered != null ? !isRegistered.equals(that.isRegistered) : that.isRegistered != null)
-      return false;
-    if (createdOn != null ? !createdOn.equals(that.createdOn) : that.createdOn != null)
-      return false;
-    if (createdBy != null ? !createdBy.equals(that.createdBy) : that.createdBy != null)
-      return false;
-    if (updatedOn != null ? !updatedOn.equals(that.updatedOn) : that.updatedOn != null)
-      return false;
+    if (createdOn != null ? !createdOn.equals(that.createdOn) : that.createdOn != null) return false;
+    if (createdBy != null ? !createdBy.equals(that.createdBy) : that.createdBy != null) return false;
+    if (updatedOn != null ? !updatedOn.equals(that.updatedOn) : that.updatedOn != null) return false;
     return updatedBy != null ? updatedBy.equals(that.updatedBy) : that.updatedBy == null;
   }
 
@@ -143,7 +146,9 @@ public class LocalInstance implements IsModelObject {
     int result = id != null ? id.hashCode() : 0;
     result = 31 * result + (accessKey != null ? accessKey.hashCode() : 0);
     result = 31 * result + (centralInstanceURL != null ? centralInstanceURL.hashCode() : 0);
+    result = 31 * result + (bundlePath != null ? bundlePath.hashCode() : 0);
     result = 31 * result + (isRegistered != null ? isRegistered.hashCode() : 0);
+    result = 31 * result + (lastSynchronizationDate != null ? lastSynchronizationDate.hashCode() : 0);
     result = 31 * result + (createdOn != null ? createdOn.hashCode() : 0);
     result = 31 * result + (createdBy != null ? createdBy.hashCode() : 0);
     result = 31 * result + (updatedOn != null ? updatedOn.hashCode() : 0);
