@@ -69,6 +69,7 @@ public class CreateAipPackagePlugin extends CreateRodaEntityPackagePlugin<AIP> {
         jobPluginInfo.setSourceObjectsCount(counter);
 
         PackageState packageState = SyncBundleHelper.getPackageState(getLocalInstance(), getEntity());
+        packageState.setClassName(AIP.class);
         packageState.setCount(counter);
         SyncBundleHelper.updatePackageState(getLocalInstance(), getEntity(), packageState);
 
@@ -80,6 +81,8 @@ public class CreateAipPackagePlugin extends CreateRodaEntityPackagePlugin<AIP> {
           try {
             retrieveAIP = model.retrieveAIP(aip.getId());
             createAIPBundle(model, retrieveAIP);
+            packageState.addIdList(retrieveAIP.getId());
+            SyncBundleHelper.updatePackageState(getLocalInstance(), getEntity(), packageState);
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
           } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
             LOGGER.error("Error on create bundle for aip {}", aip.getId());
@@ -102,8 +105,8 @@ public class CreateAipPackagePlugin extends CreateRodaEntityPackagePlugin<AIP> {
 
     StorageService storage = model.getStorage();
     StoragePath aipStoragePath = ModelUtils.getAIPStoragePath(aip.getId());
-    Path destinationPath = getDestinationPath().resolve("storage").resolve(RodaConstants.STORAGE_CONTAINER_AIP)
-      .resolve(aip.getId());
+    Path destinationPath = getDestinationPath().resolve(RodaConstants.CORE_STORAGE_FOLDER)
+      .resolve(RodaConstants.STORAGE_CONTAINER_AIP).resolve(aip.getId());
 
     Path documentationPath = destinationPath.resolve(RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
     Path metadataPath = destinationPath.resolve(RodaConstants.STORAGE_DIRECTORY_METADATA);
