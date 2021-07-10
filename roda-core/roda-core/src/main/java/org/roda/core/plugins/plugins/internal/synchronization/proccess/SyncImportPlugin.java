@@ -14,10 +14,17 @@ import java.util.Map;
 
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.JobAlreadyStartedException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -32,10 +39,13 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.plugins.internal.synchronization.bundle.BundleState;
+import org.roda.core.plugins.plugins.internal.synchronization.bundle.PackageState;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FileStorageService;
+import org.roda.core.util.IdUtils;
 import org.roda.core.util.ZipUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -149,20 +159,21 @@ public class SyncImportPlugin extends AbstractPlugin<Void> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<Void> plugin) throws PluginException {
-        importSyncBundle(index, model, storage, report, jobPluginInfo, cachedJob);
+        importSyncBundle(storage, report, jobPluginInfo);
       }
     }, index, model, storage);
   }
 
-  private void importSyncBundle(IndexService index, ModelService model, StorageService storage, Report report,
-    JobPluginInfo jobPluginInfo, Job cachedJob) {
+  private void importSyncBundle(StorageService storage, Report report, JobPluginInfo jobPluginInfo) {
     if (Files.exists(Paths.get(bundlePath))) {
-      Path tempDirectory;
+      Path tempDirectory = null;
       FileStorageService temporaryStorage;
       try {
         tempDirectory = Files.createTempDirectory(Paths.get(bundlePath).getFileName().toString());
         ZipUtility.extractFilesFromZIP(new File(bundlePath), tempDirectory.toFile(), true);
-        temporaryStorage = new FileStorageService(tempDirectory.resolve("storage"), false, null, false);
+        BundleState bundleState = JsonUtils.readObjectFromFile(tempDirectory.resolve("state.json"), BundleState.class);
+        temporaryStorage = new FileStorageService(tempDirectory.resolve(RodaConstants.CORE_STORAGE_FOLDER), false, null,
+          false);
 
         CloseableIterable<Container> containers = temporaryStorage.listContainers();
         Iterator<Container> containerIterator = containers.iterator();
@@ -177,18 +188,51 @@ public class SyncImportPlugin extends AbstractPlugin<Void> {
             Resource resource = resourceIterator.next();
             StoragePath storagePath = resource.getStoragePath();
 
-            if (storagePath.getContainerName().equals(RodaConstants.STORAGE_CONTAINER_AIP)) {
-              storage.move(temporaryStorage, storagePath, storagePath);
+            // if the resource already exists, remove it before moving the updated resource
+            if (storage.exists(storagePath)) {
+              storage.deleteResource(storagePath);
             }
+            storage.move(temporaryStorage, storagePath, storagePath);
           }
         }
 
+        reindexBundle(bundleState);
         report.setPluginState(PluginState.SUCCESS);
-      } catch (IOException | RODAException e) {
-        e.printStackTrace();
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+      } catch (IOException e) {
+        LOGGER.error("Error extracting bundle to {}", tempDirectory.toString(), e);
+        report.setPluginState(PluginState.FAILURE)
+          .setPluginDetails("Error extracting bundle to " + tempDirectory.toString());
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+      } catch (RODAException e) {
+        LOGGER.error("Error creating temporary StorageService on {}", tempDirectory.toString(), e);
+        report.setPluginState(PluginState.FAILURE)
+          .setPluginDetails("Error creating temporary StorageService on " + tempDirectory.toString());
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
       }
     } else {
-      report.setPluginState(PluginState.FAILURE);
+      report.setPluginState(PluginState.FAILURE).setPluginDetails("Cannot find bundle on path " + bundlePath);
+      jobPluginInfo.incrementObjectsProcessedWithFailure();
+    }
+  }
+
+  private void reindexBundle(BundleState bundleState) throws NotFoundException, AuthorizationDeniedException,
+    JobAlreadyStartedException, GenericException, RequestNotValidException {
+    Map<String, PackageState> packageStateMap = bundleState.getPackageStateMap();
+    for (Map.Entry<String, PackageState> entry : packageStateMap.entrySet()) {
+      String entity = entry.getKey();
+      PackageState packageState = entry.getValue();
+
+      Job job = new Job();
+      job.setId(IdUtils.createUUID());
+      job.setName("Reindex RODA entity (" + entity + ")");
+      job.setPluginType(PluginType.INTERNAL);
+      job.setUsername(RodaConstants.ADMIN);
+
+      job.setPlugin(PluginHelper.getReindexPluginName(packageState.getClassName()));
+      job.setSourceObjects(SelectedItemsList.create(packageState.getClassName(), packageState.getIdList()));
+
+      PluginHelper.createAndExecuteJob(job);
     }
   }
 
