@@ -45,10 +45,10 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.common.ObjectPermissionResult;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.distributedInstance.DistributedInstance;
-import org.roda.core.data.v2.distributedInstance.DistributedInstanceStatus;
-import org.roda.core.data.v2.distributedInstance.DistributedInstances;
-import org.roda.core.data.v2.distributedInstance.LocalInstance;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
+import org.roda.core.data.v2.synchronization.central.DistributedInstanceStatus;
+import org.roda.core.data.v2.synchronization.central.DistributedInstances;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -3891,18 +3891,18 @@ public class Browser extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      // BrowserHelper.applyInstanceIdToAIP(localInstance, user);
-      // BrowserHelper.applyInstanceIdToRisk(localInstance, user);
-      // BrowserHelper.applyInstanceIdToRiskIncidence(localInstance, user);
-      // BrowserHelper.applyInstanceIdToRI(localInstance, user);
-      // BrowserHelper.applyInstanceIdToNotification(localInstance, user);
+      BrowserHelper.applyInstanceIdToAIP(localInstance, user);
+      BrowserHelper.applyInstanceIdToRisk(localInstance, user);
+      BrowserHelper.applyInstanceIdToRiskIncidence(localInstance, user);
+      BrowserHelper.applyInstanceIdToRI(localInstance, user);
+      BrowserHelper.applyInstanceIdToNotification(localInstance, user);
 
-      // BrowserHelper.applyInstanceIdToJob(localInstance, user);
+      BrowserHelper.applyInstanceIdToJob(localInstance, user);
 
-      // BrowserHelper.applyInstanceIdToAIPPreservationEvent(localInstance, user);
+      BrowserHelper.applyInstanceIdToAIPPreservationEvent(localInstance, user);
       BrowserHelper.applyInstanceIdToPreservationAgents(localInstance, user);
 
-      // BrowserHelper.applyInstanceIdToRepositoryPreservationEvent(localInstance, user);
+      BrowserHelper.applyInstanceIdToRepositoryPreservationEvent(localInstance, user);
 
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;

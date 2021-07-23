@@ -1,7 +1,5 @@
-package org.roda.core.plugins.plugins.internal.synchronization;
+package org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier;
 
-import org.apache.commons.lang3.StringUtils;
-import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.*;
@@ -9,8 +7,6 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.*;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.*;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RepresentationInformation;

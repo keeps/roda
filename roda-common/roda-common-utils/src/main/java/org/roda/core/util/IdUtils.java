@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.roda.core.data.utils.URNUtils;
-import org.roda.core.data.v2.distributedInstance.LocalInstanceIdentifierState;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.FileLink;

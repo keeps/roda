@@ -84,7 +84,7 @@
                         <g:Button addStyleNames="btn btn-block btn-file-signature" ui:field="buttonRegister">
                             <ui:text from='{messages.registerLocalInstanceConfigurationButton}'/>
                         </g:Button>
-                        <g:Button addStyleNames="btn btn-block btn-file-signature" ui:field="buttonCreateBundle">
+                        <g:Button addStyleNames="btn btn-btlock btn-file-signature" ui:field="buttonCreateBundle">
                             <ui:text from='{messages.createBundleButton}'/>
                         </g:Button>
                         <g:Button addStyleNames="btn btn-block btn-file-signature" ui:field="buttonSynchronize">

@@ -1,4 +1,4 @@
-package org.roda.core.plugins.plugins.internal.synchronization;
+package org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier;
 
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;

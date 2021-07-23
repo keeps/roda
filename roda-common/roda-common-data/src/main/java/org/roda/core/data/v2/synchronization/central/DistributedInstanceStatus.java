@@ -1,4 +1,4 @@
-package org.roda.core.data.v2.distributedInstance;
+package org.roda.core.data.v2.synchronization.central;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>

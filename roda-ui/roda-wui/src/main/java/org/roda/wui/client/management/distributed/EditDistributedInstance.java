@@ -3,8 +3,8 @@ package org.roda.wui.client.management.distributed;
 import java.util.List;
 
 import com.google.gwt.event.dom.client.ClickHandler;
-import org.roda.core.data.v2.distributedInstance.DistributedInstance;
-import org.roda.core.data.v2.distributedInstance.DistributedInstanceStatus;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
+import org.roda.core.data.v2.synchronization.central.DistributedInstanceStatus;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;

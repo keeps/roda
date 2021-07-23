@@ -10,7 +10,6 @@
  */
 package org.roda.wui.client.browse;
 
-import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -19,9 +18,9 @@ import java.util.Set;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.distributedInstance.DistributedInstance;
-import org.roda.core.data.v2.distributedInstance.DistributedInstances;
-import org.roda.core.data.v2.distributedInstance.LocalInstance;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
+import org.roda.core.data.v2.synchronization.central.DistributedInstances;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -66,7 +65,6 @@ import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
-import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
