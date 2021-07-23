@@ -14,8 +14,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.roda.core.data.v2.accessKey.AccessKeyStatus;
-import org.roda.core.data.v2.distributedInstance.DistributedInstanceStatus;
-import org.roda.core.data.v2.distributedInstance.LocalInstanceIdentifierState;
+import org.roda.core.data.v2.synchronization.central.DistributedInstanceStatus;
+import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;

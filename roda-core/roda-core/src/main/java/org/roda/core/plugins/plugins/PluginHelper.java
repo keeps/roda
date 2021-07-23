@@ -98,6 +98,7 @@ import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateAipPackagePlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateRiskIncidencePackagePlugin;
 import org.roda.core.plugins.plugins.notifications.GenericJobNotification;
 import org.roda.core.plugins.plugins.notifications.JobNotification;
 import org.roda.core.plugins.plugins.reindex.ReindexAIPPlugin;
@@ -747,6 +748,7 @@ public final class PluginHelper {
   public static List<Class<? extends IsRODAObject>> getSynchronizedObjectClasses() {
     List<Class<? extends IsRODAObject>> list = new ArrayList<>();
     list.add(AIP.class);
+    list.add(RiskIncidence.class);
     return list;
   }
 
@@ -1673,9 +1675,11 @@ public final class PluginHelper {
     }
   }
 
-  public static String getBundlePluginName(Class<?> reindexClass) throws NotFoundException {
-    if (reindexClass.equals(AIP.class)) {
+  public static String getBundlePluginName(Class<?> bundleClass) throws NotFoundException {
+    if (bundleClass.equals(AIP.class)) {
       return CreateAipPackagePlugin.class.getName();
+    } else if (bundleClass.equals(RiskIncidence.class)) {
+      return CreateRiskIncidencePackagePlugin.class.getName();
     } else {
       throw new NotFoundException("No Bundle plugin available");
     }

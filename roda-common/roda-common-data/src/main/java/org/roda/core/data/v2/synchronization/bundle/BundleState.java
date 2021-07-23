@@ -1,4 +1,4 @@
-package org.roda.core.plugins.plugins.internal.synchronization.bundle;
+package org.roda.core.data.v2.synchronization.bundle;
 
 import java.util.Date;
 import java.util.HashMap;
