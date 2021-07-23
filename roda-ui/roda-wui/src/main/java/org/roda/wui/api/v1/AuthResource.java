@@ -22,7 +22,6 @@ import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.accessKey.AccessKey;
-import org.roda.core.data.v2.distributedInstance.LocalInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.ApplicationAuth;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;

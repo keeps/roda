@@ -1,4 +1,4 @@
-package org.roda.core.plugins.plugins.internal.synchronization;
+package org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier;
 
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.plugins.Plugin;

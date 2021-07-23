@@ -1775,7 +1775,7 @@ public final class RodaConstants {
 
   /* Synchronization */
   public static final String SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FOLDER = "local-instance";
-  public static final String SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE = "configuration.yaml";
+  public static final String SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE = "config.yaml";
   public static final String SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE_PATH = SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FOLDER
     + "/" + SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE;
 

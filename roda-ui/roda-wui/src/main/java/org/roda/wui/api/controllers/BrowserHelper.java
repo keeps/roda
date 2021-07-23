@@ -78,8 +78,8 @@ import org.roda.core.data.v2.common.ObjectPermission;
 import org.roda.core.data.v2.common.ObjectPermissionResult;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.distributedInstance.DistributedInstance;
-import org.roda.core.data.v2.distributedInstance.LocalInstance;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
@@ -173,15 +173,15 @@ import org.roda.core.plugins.plugins.internal.disposal.schedule.DisassociateDisp
 import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateSyncBundlePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.proccess.SyncImportPlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.proccess.SyncProcessPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.InstanceIdentifierAIPEventPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.InstanceIdentifierAIPPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.InstanceIdentifierJobPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.InstanceIdentifierNotificationPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.InstanceIdentifierPreservationAgentPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.InstanceIdentifierRepositoryEventPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.InstanceIdentifierRepresentationInformationPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.InstanceIdentifierRiskIncidencePlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.InstanceIdentifierRiskPlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierAIPEventPlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierAIPPlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierJobPlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierNotificationPlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierPreservationAgentPlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierRepositoryEventPlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierRepresentationInformationPlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierRiskIncidencePlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierRiskPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.BinaryVersion;
@@ -3605,9 +3605,8 @@ public class BrowserHelper {
     if (configurationFileAsStream != null) {
       localInstance = YamlUtils.getObjectFromYaml(configurationFileAsStream, LocalInstance.class);
     }
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, path);
-    return createAndExecuteInternalJob("Create sync bundle", SelectedItemsNone.create(), CreateSyncBundlePlugin.class,
-      user, pluginParameters, "Could not execute bundle job");
+
+    return localInstance;
   }
 
   public static void createLocalInstanceConfiguration(LocalInstance localInstance) throws GenericException {
@@ -3635,10 +3634,6 @@ public class BrowserHelper {
         throw new GenericException("Failed to delete local instance configuration file", exception);
       }
     }
-
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, path);
-    return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(), SyncImportPlugin.class, user,
-      pluginParameters, "Could not execute bundle job");
   }
 
   public static void applyInstanceIdToAIP(LocalInstance localInstance, User user)
@@ -3740,7 +3735,7 @@ public class BrowserHelper {
       "Could not apply instance identifier to Preservation Agents");
   }
 
-   public static Job createSyncBundle(User user, LocalInstance localInstance)
+  public static Job createSyncBundle(User user, LocalInstance localInstance)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     Map<String, String> pluginParameters = new HashMap<>();
     String path = localInstance.getBundlePath();
@@ -3782,5 +3777,10 @@ public class BrowserHelper {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, path);
     return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(), SyncImportPlugin.class, user,
       pluginParameters, "Could not execute bundle job");
+  }
+
+  public static void updateLocalInstanceConfiguration(LocalInstance localInstance, String id) throws GenericException {
+    deleteLocalInstanceConfiguration();
+    createLocalInstanceConfiguration(localInstance);
   }
 }

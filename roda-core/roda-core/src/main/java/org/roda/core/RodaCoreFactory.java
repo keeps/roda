@@ -105,7 +105,7 @@ import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.exceptions.RoleAlreadyExistsException;
 import org.roda.core.data.utils.YamlUtils;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.distributedInstance.LocalInstance;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
@@ -2273,7 +2273,8 @@ public class RodaCoreFactory {
   }
 
   public static LocalInstance getLocalInstance() throws GenericException {
-    String configuration = localInstanceConfigPath.resolve("config.yaml").toString();
+    String configuration = localInstanceConfigPath.resolve(RodaConstants.SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE)
+      .toString();
     InputStream configurationFileAsStream = RodaCoreFactory.getConfigurationFileAsStream(configuration);
     if (configurationFileAsStream != null) {
       localInstance = YamlUtils.getObjectFromYaml(configurationFileAsStream, LocalInstance.class);
@@ -2283,7 +2284,7 @@ public class RodaCoreFactory {
   }
 
   public static void createOrUpdateLocalInstance(LocalInstance newLocalInstance) throws GenericException {
-    Path configuration = localInstanceConfigPath.resolve("config.yaml");
+    Path configuration = localInstanceConfigPath.resolve(RodaConstants.SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE);
     if (Files.exists(configuration)) {
       try {
         Files.delete(configuration);
@@ -2291,7 +2292,7 @@ public class RodaCoreFactory {
         throw new GenericException("Cannot remove current local instance configuration");
       }
     }
-    if(newLocalInstance != null){
+    if (newLocalInstance != null) {
       YamlUtils.writeObjectToFile(newLocalInstance, configuration);
     }
     localInstance = newLocalInstance;
