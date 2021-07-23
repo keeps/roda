@@ -2,7 +2,7 @@ package org.roda.wui.client.management.distributed;
 
 import java.util.List;
 
-import org.roda.core.data.v2.distributedInstance.DistributedInstance;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;

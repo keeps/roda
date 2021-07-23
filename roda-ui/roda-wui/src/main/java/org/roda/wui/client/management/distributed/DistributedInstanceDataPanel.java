@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.user.client.ui.TextArea;
-import org.roda.core.data.v2.distributedInstance.DistributedInstance;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;

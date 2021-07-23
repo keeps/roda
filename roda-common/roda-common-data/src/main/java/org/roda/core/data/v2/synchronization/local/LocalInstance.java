@@ -1,6 +1,7 @@
-package org.roda.core.data.v2.distributedInstance;
+package org.roda.core.data.v2.synchronization.local;
 
 import java.util.Date;
+import java.util.Objects;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
@@ -136,14 +137,14 @@ public class LocalInstance implements IsModelObject {
       return true;
     if (o == null || getClass() != o.getClass())
       return false;
-    if (bundlePath != null ? !bundlePath.equals(that.bundlePath) : that.bundlePath != null) return false;
-    if (isRegistered != null ? !isRegistered.equals(that.isRegistered) : that.isRegistered != null) return false;
-    if (lastSynchronizationDate != null ? !lastSynchronizationDate.equals(that.lastSynchronizationDate) : that.lastSynchronizationDate != null)
-      return false;
-    if (createdOn != null ? !createdOn.equals(that.createdOn) : that.createdOn != null) return false;
-    if (createdBy != null ? !createdBy.equals(that.createdBy) : that.createdBy != null) return false;
-    if (updatedOn != null ? !updatedOn.equals(that.updatedOn) : that.updatedOn != null) return false;
-    return updatedBy != null ? updatedBy.equals(that.updatedBy) : that.updatedBy == null;
+    LocalInstance that = (LocalInstance) o;
+    return Objects.equals(id, that.id) && Objects.equals(accessKey, that.accessKey)
+      && Objects.equals(centralInstanceURL, that.centralInstanceURL) && Objects.equals(bundlePath, that.bundlePath)
+      && Objects.equals(isRegistered, that.isRegistered)
+      && Objects.equals(lastSynchronizationDate, that.lastSynchronizationDate)
+      && instanceIdentifierState == that.instanceIdentifierState && Objects.equals(createdOn, that.createdOn)
+      && Objects.equals(createdBy, that.createdBy) && Objects.equals(updatedOn, that.updatedOn)
+      && Objects.equals(updatedBy, that.updatedBy);
   }
 
   @Override

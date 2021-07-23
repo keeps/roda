@@ -1,9 +1,5 @@
 package org.roda.core.plugins.plugins.internal.synchronization.bundle;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -15,13 +11,11 @@ import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.bundle.PackageState;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
@@ -34,15 +28,20 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Path;
+import java.util.Collections;
+
 /**
- * @author Gabriel Barros <gbarros@keep.pt>
+ * @author Tiago Fraga <tfraga@keep.pt>
  */
-public class CreateAipPackagePlugin extends CreateRodaEntityPackagePlugin<AIP> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(CreateAipPackagePlugin.class);
+
+public class CreateRiskIncidencePackagePlugin extends CreateRodaEntityPackagePlugin<RiskIncidence> {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(CreateRiskIncidencePackagePlugin.class);
 
   @Override
   public String getName() {
-    return "Create AIP Bundle";
+    return "Create Risk Incidence Bundle";
   }
 
   @Override
@@ -52,7 +51,7 @@ public class CreateAipPackagePlugin extends CreateRodaEntityPackagePlugin<AIP> {
 
   @Override
   protected String getEntity() {
-    return "aip";
+    return "risk incidence";
   }
 
   @Override
@@ -65,30 +64,29 @@ public class CreateAipPackagePlugin extends CreateRodaEntityPackagePlugin<AIP> {
     if (sourceObjects instanceof SelectedItemsFilter) {
       Filter filter = ((SelectedItemsFilter) sourceObjects).getFilter();
       try {
-        int counter = index.count(IndexedAIP.class, filter).intValue();
+        int counter = index.count(RiskIncidence.class, filter).intValue();
 
         jobPluginInfo.setSourceObjectsCount(counter);
 
         PackageState packageState = SyncBundleHelper.getPackageState(getLocalInstance(), getEntity());
-        packageState.setClassName(AIP.class);
+        packageState.setClassName(RiskIncidence.class);
         packageState.setCount(counter);
         SyncBundleHelper.updatePackageState(getLocalInstance(), getEntity(), packageState);
 
-        IterableIndexResult<IndexedAIP> aips = index.findAll(IndexedAIP.class, filter,
-          Arrays.asList(RodaConstants.INDEX_UUID));
-        for (IndexedAIP aip : aips) {
-          Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), IndexedAIP.class);
-          AIP retrieveAIP = null;
+        IterableIndexResult<RiskIncidence> incidences = index.findAll(RiskIncidence.class, filter,
+          Collections.emptyList());
+        for (RiskIncidence incidence : incidences) {
+          Report reportItem = PluginHelper.initPluginReportItem(this, incidence.getId(), RiskIncidence.class);
           try {
-            retrieveAIP = model.retrieveAIP(aip.getId());
-            createAIPBundle(model, retrieveAIP);
-            packageState.addIdList(retrieveAIP.getId());
+            createRiskIncidenceBundle(model, incidence);
+            packageState.addIdList(incidence.getId());
             SyncBundleHelper.updatePackageState(getLocalInstance(), getEntity(), packageState);
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
           } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-            LOGGER.error("Error on create bundle for aip {}", aip.getId());
+            LOGGER.error("Error on create bundle for Risk Incidence {}", incidence.getId());
             jobPluginInfo.incrementObjectsProcessedWithFailure();
-            reportItem.addPluginDetails("Failed to create bundle for " + aip.getClass() + " " + aip.getId() + "\n");
+            reportItem
+              .addPluginDetails("Failed to create bundle for " + incidence.getClass() + " " + incidence.getId() + "\n");
             reportItem.addPluginDetails(e.getMessage());
             pluginReport.addReport(reportItem.setPluginState(PluginState.FAILURE));
             PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
@@ -101,36 +99,24 @@ public class CreateAipPackagePlugin extends CreateRodaEntityPackagePlugin<AIP> {
     }
   }
 
-  public void createAIPBundle(ModelService model, AIP aip) throws RequestNotValidException, NotFoundException,
-    AuthorizationDeniedException, GenericException, AlreadyExistsException {
+  public void createRiskIncidenceBundle(ModelService model, RiskIncidence incidence) throws RequestNotValidException,
+    NotFoundException, AuthorizationDeniedException, GenericException, AlreadyExistsException {
 
     StorageService storage = model.getStorage();
-    StoragePath aipStoragePath = ModelUtils.getAIPStoragePath(aip.getId());
+    StoragePath riskIncidenceStoragePath = ModelUtils.getRiskIncidenceStoragePath(incidence.getId());
     Path destinationPath = getDestinationPath().resolve(RodaConstants.CORE_STORAGE_FOLDER)
-      .resolve(RodaConstants.STORAGE_CONTAINER_AIP).resolve(aip.getId());
+      .resolve(RodaConstants.STORAGE_CONTAINER_RISK_INCIDENCE);
 
-    Path documentationPath = destinationPath.resolve(RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
-    Path metadataPath = destinationPath.resolve(RodaConstants.STORAGE_DIRECTORY_METADATA);
-    Path schemasPath = destinationPath.resolve(RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
-    Path submissionsPath = destinationPath.resolve(RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
-    Path aipMetadataPath = destinationPath.resolve(RodaConstants.STORAGE_AIP_METADATA_FILENAME);
+    String incidenceFile = incidence.getId() + RodaConstants.RISK_INCIDENCE_FILE_EXTENSION;
+    Path incidencePath = destinationPath.resolve(incidenceFile);
 
-    storage.copy(storage, aipStoragePath, documentationPath, RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
-    storage.copy(storage, aipStoragePath, metadataPath, RodaConstants.STORAGE_DIRECTORY_METADATA);
-    storage.copy(storage, aipStoragePath, schemasPath, RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
-    storage.copy(storage, aipStoragePath, submissionsPath, RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
-    storage.copy(storage, aipStoragePath, aipMetadataPath, RodaConstants.STORAGE_AIP_METADATA_FILENAME);
+    storage.copy(storage, riskIncidenceStoragePath, incidencePath, incidenceFile);
 
-    for (Representation representation : aip.getRepresentations()) {
-      Path repMetadataPath = Paths.get(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS, representation.getId(),
-        RodaConstants.STORAGE_DIRECTORY_METADATA);
-      Path representationsPath = destinationPath.resolve(repMetadataPath);
-      storage.copy(storage, aipStoragePath, representationsPath, repMetadataPath.toString());
-    }
   }
 
   @Override
   public Plugin<Void> cloneMe() {
-    return new CreateAipPackagePlugin();
+    return new CreateRiskIncidencePackagePlugin();
   }
+
 }

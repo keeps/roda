@@ -8,14 +8,11 @@
 package org.roda.wui.client.browse;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import org.apache.tomcat.jni.Local;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
@@ -31,9 +28,9 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.distributedInstance.DistributedInstance;
-import org.roda.core.data.v2.distributedInstance.DistributedInstances;
-import org.roda.core.data.v2.distributedInstance.LocalInstance;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
+import org.roda.core.data.v2.synchronization.central.DistributedInstances;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;

@@ -8,12 +8,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.utils.JsonUtils;
-import org.roda.core.data.v2.distributedInstance.LocalInstance;
+import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.synchronization.bundle.BundleState;
+import org.roda.core.data.v2.synchronization.bundle.PackageState;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
@@ -39,6 +41,12 @@ public class SyncBundleHelper {
           initialDate, finalDate));
       }
       return new SelectedItemsFilter(filter, IndexedAIP.class.getName(), false);
+    } else if (bundleClass.equals(RiskIncidence.class)) {
+      if (initialDate != null) {
+        filter.add(new DateIntervalFilterParameter(RodaConstants.RISK_INCIDENCE_DETECTED_ON,
+          RodaConstants.RISK_INCIDENCE_DETECTED_ON, initialDate, finalDate));
+      }
+      return new SelectedItemsFilter(filter, RiskIncidence.class.getName(), false);
     } else {
       throw new NotFoundException("No Bundle plugin available");
     }
@@ -49,7 +57,8 @@ public class SyncBundleHelper {
     return JsonUtils.readObjectFromFile(bundleStateFilePath, BundleState.class);
   }
 
-  public static void updateBundleStateFile(LocalInstance localInstance, BundleState bundleState) throws GenericException {
+  public static void updateBundleStateFile(LocalInstance localInstance, BundleState bundleState)
+    throws GenericException {
     Path bundleStateFilePath = Paths.get(localInstance.getBundlePath()).resolve(STATE_FILE);
     JsonUtils.writeObjectToFile(bundleState, bundleStateFilePath);
   }
@@ -58,13 +67,15 @@ public class SyncBundleHelper {
     return getBundleStateFile(localInstance).getPackageState(entity);
   }
 
-  public static void updatePackageState(LocalInstance localInstance, String entity, PackageState packageState) throws GenericException {
+  public static void updatePackageState(LocalInstance localInstance, String entity, PackageState packageState)
+    throws GenericException {
     BundleState bundleState = getBundleStateFile(localInstance);
     bundleState.setPackageState(entity, packageState);
     updateBundleStateFile(localInstance, bundleState);
   }
 
-  public static void updatePackageStateStatus(LocalInstance localInstance, String entity, PackageState.Status status) throws GenericException {
+  public static void updatePackageStateStatus(LocalInstance localInstance, String entity, PackageState.Status status)
+    throws GenericException {
     PackageState packageState = getPackageState(localInstance, entity);
     packageState.setStatus(status);
     updatePackageState(localInstance, entity, packageState);

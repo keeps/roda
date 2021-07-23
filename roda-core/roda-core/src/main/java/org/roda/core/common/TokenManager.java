@@ -15,7 +15,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.accessToken.AccessToken;
-import org.roda.core.data.v2.distributedInstance.LocalInstance;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>

@@ -4,13 +4,12 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.utils.YamlUtils;
-import org.roda.core.data.v2.distributedInstance.LocalInstance;
-import org.roda.core.data.v2.distributedInstance.LocalInstanceIdentifierState;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
+import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
-import java.util.Date;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
