@@ -17,9 +17,9 @@ COPY clamd.conf /etc/clamav/clamd.conf
 
 # setup clamav, siegfried & remove old ROOT folder from tomcat
 RUN set -ex; \
-  mkdir -p /var/run/clamav && chown clamav /var/run/clamav && freshclam ; \
-	sf -update ; \
-	rm -rf /usr/local/tomcat/webapps/ROOT
+    mkdir -p /var/run/clamav && chown clamav /var/run/clamav && freshclam ; \
+    sf -update ; \
+    rm -rf /usr/local/tomcat/webapps/ROOT
 
 # Install web application
 COPY /ROOT /usr/local/tomcat/webapps/ROOT
