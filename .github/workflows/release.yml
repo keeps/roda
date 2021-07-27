@@ -1,0 +1,64 @@
+name: 'Release'
+
+on:
+  push:
+    tags:
+      - "**"
+    branches-ignore:
+      - "**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Set up JDK 8
+        uses: actions/setup-java@v2
+        with:
+          java-version: 8
+          distribution: 'adopt'
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+      - name: Install dependencies
+        run: |
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 20F802FE798E6857
+          sudo add-apt-repository "deb https://www.itforarchivists.com/ buster main"
+          sudo apt-get -qq update
+          sudo apt-get -qq install siegfried -y
+          sudo cp .github/workflows/bin/clamscan /usr/bin/clamscan
+          sudo cp .github/workflows/bin/clamscan /usr/bin/clamdscan
+          sudo chmod a+rx /usr/bin/clamscan /usr/bin/clamdscan
+      - name: Run tests & install
+        run:
+          mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" -Proda-wui-docker -Denforcer.skip=true clean org.jacoco:jacoco-maven-plugin:prepare-agent install
+      - name: Deploy to GitHub packages
+        run: mvn $MAVEN_CLI_OPTS clean deploy -Dmaven.test.skip=true -Pcore
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Login to DockerHub
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Get release version
+        id: tag
+        run: echo ::set-output name=result::${GITHUB_REF/refs\/tags\/v/}
+      - name: Deploy to DockerHub
+        run: |
+          docker tag keeps/roda:latest keeps/roda:${{ steps.tag.outputs.result }}
+          docker push keeps/roda:${{ steps.tag.outputs.result }}
+      - name: Trigger KEEPS GitLab CI/CD
+        uses: appleboy/gitlab-ci-action@master
+        with:
+          host: ${{ secrets.GITLAB_RODA_DEV_TRIGGER }}
+          token: ${{ secrets.GITLAB_RODA_DEV_TRIGGER_TOKEN }}
+          project_id: ${{ secrets.GITLAB_RODA_PROJECT_ID }}
+          ref: 'master'
