@@ -1,0 +1,41 @@
+name: 'CI'
+
+on:
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "**"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Set up JDK 8
+        uses: actions/setup-java@v2
+        with:
+          java-version: 8
+          distribution: 'adopt'
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-maven-
+      - name: Install dependencies
+        run: |
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 20F802FE798E6857
+          sudo add-apt-repository "deb https://www.itforarchivists.com/ buster main"
+          sudo apt-get -qq update
+          sudo apt-get -qq install siegfried -y
+          sudo cp .github/workflows/bin/clamscan /usr/bin/clamscan
+          sudo cp .github/workflows/bin/clamscan /usr/bin/clamdscan
+          sudo chmod a+rx /usr/bin/clamscan /usr/bin/clamdscan
+      - name: Build RODA
+        run:
+          mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" -Denforcer.skip=true clean org.jacoco:jacoco-maven-plugin:prepare-agent install
