@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<name>RODA - Repositório de Objetos Digitais Autênticos</name>
-	<url>http://roda.keep.pt/</url>
+	<url>https://roda.keep.pt/</url>
 	<groupId>org.roda-project</groupId>
 	<artifactId>roda</artifactId>
 	<version>4.0.0</version>
@@ -17,14 +17,14 @@
 	</scm>
 	<organization>
 		<name>KEEP SOLUTIONS</name>
-		<url>http://www.keep.pt</url>
+		<url>https://www.keep.pt</url>
 	</organization>
 	<distributionManagement>
 		<repository>
-			<id>keeps_artifactory</id>
-			<name>KEEP SOLUTIONS artifactory</name>
-			<url>https://artifactory.keep.pt/artifactory/keep</url>
-		</repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/keeps/roda</url>
+        </repository>
 	</distributionManagement>
 	<repositories>
 		<repository>
@@ -44,7 +44,7 @@
 			<name>Luis Faria</name>
 			<email>lfaria@keep.pt</email>
 			<organization>KEEP SOLUTIONS</organization>
-			<organizationUrl>http://www.keep.pt</organizationUrl>
+			<organizationUrl>https://www.keep.pt</organizationUrl>
 			<timezone>0</timezone>
 		</developer>
 		<developer>
@@ -52,7 +52,31 @@
 			<name>Helder Silva</name>
 			<email>hsilva@keep.pt</email>
 			<organization>KEEP SOLUTIONS</organization>
-			<organizationUrl>http://www.keep.pt</organizationUrl>
+			<organizationUrl>https://www.keep.pt</organizationUrl>
+			<timezone>0</timezone>
+		</developer>
+		<developer>
+			<id>mguimaraes</id>
+			<name>Miguel Guimarães</name>
+			<email>mguimaraes@keep.pt</email>
+			<organization>KEEP SOLUTIONS</organization>
+			<organizationUrl>https://www.keep.pt</organizationUrl>
+			<timezone>0</timezone>
+		</developer>
+		<developer>
+			<id>gbarros</id>
+			<name>Gabriel Barros</name>
+			<email>gbarros@keep.pt</email>
+			<organization>KEEP SOLUTIONS</organization>
+			<organizationUrl>https://www.keep.pt</organizationUrl>
+			<timezone>0</timezone>
+		</developer>
+		<developer>
+			<id>tfraga</id>
+			<name>Tiago Fraga</name>
+			<email>tfraga@keep.pt</email>
+			<organization>KEEP SOLUTIONS</organization>
+			<organizationUrl>https://www.keep.pt</organizationUrl>
 			<timezone>0</timezone>
 		</developer>
 	</developers>
