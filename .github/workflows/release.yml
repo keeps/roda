@@ -50,11 +50,11 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Get release version
         id: tag
-        run: echo ::set-output name=result::${GITHUB_REF/refs\/tags\/v/}
+        run: echo ::set-output name=result::${GITHUB_REF/refs\/tags\//}
       - name: Deploy to DockerHub
         run: |
-          docker tag keeps/roda:latest keeps/roda:v${{ steps.tag.outputs.result }}
-          docker push keeps/roda:v${{ steps.tag.outputs.result }}
+          docker tag keeps/roda:latest keeps/roda:${{ steps.tag.outputs.result }}
+          docker push keeps/roda:${{ steps.tag.outputs.result }}
       - name: Trigger KEEPS GitLab CI/CD
         run: |
           curl --progress-bar -o /dev/null -L --request POST \
