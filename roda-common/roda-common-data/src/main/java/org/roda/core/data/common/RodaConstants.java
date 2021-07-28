@@ -52,6 +52,8 @@ public final class RodaConstants {
   public static final String CORE_ACTION_LOGS_MASTER_RESOURCE = "core.action_logs.master.resource";
   public static final String CORE_ACTION_LOGS_SLAVE_WRITE_IN_SOLR = "core.action_logs.slave.write.solr";
 
+  public static final String CORE_SYNCHRONIZATION_BUNDLE_PATH = "core.synchronization.bundle.path";
+
   public static final String TRASH_CONTAINER = "trash";
 
   public static final String TRANSFERRED_RESOURCES_PROCESSED_FOLDER = "PROCESSED";
@@ -1761,7 +1763,6 @@ public final class RodaConstants {
   public static final String DISTRIBUTED_INSTANCE_USER_PREFIX = "DISTRIBUTED_";
   public static final String DISTRIBUTED_INSTANCE_ACCESS_KEY_PREFIX = DISTRIBUTED_INSTANCE_USER_PREFIX;
   public static final String DISTRIBUTED_INSTANCE_ACCESS_KEY_SUFFIX = "_KEY";
-  public static final String LOCAL_INSTANCE_BUNDLE_FOLDER = "/bundle";
 
   /* HTTP Response codes */
   public static final int HTTP_RESPONSE_CODE_SUCCESS = 200;
@@ -1776,6 +1777,7 @@ public final class RodaConstants {
   public static final String SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE = "config.yaml";
   public static final String SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE_PATH = SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FOLDER
     + "/" + SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE;
+  public static final String SYNCHRONIZATION_BUNDLE_PATH = "data/synchronization/bundle";
 
   /** Private empty constructor */
   private RodaConstants() {
