@@ -1559,8 +1559,7 @@ public class ModelService extends ModelObservable {
     }
 
     String urn = URNUtils.createRodaPreservationURN(type, identifier, LocalInstanceUtils.getLocalInstanceIdentifier());
-    return createPreservationMetadata(type, urn, aipId, representationId, fileDirectoryPath, fileId, payload,
-      notify);
+    return createPreservationMetadata(type, urn, aipId, representationId, fileDirectoryPath, fileId, payload, notify);
   }
 
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String aipId,
@@ -4169,7 +4168,7 @@ public class ModelService extends ModelObservable {
       }
 
     } catch (NotFoundException e) {
-      LOGGER.error("Could not find any distributed instance to list: {}", e.getMessage(), e);
+      LOGGER.debug("Could not find any distributed instance to list: {}", e.getMessage());
       return distributedInstances;
     }
 
