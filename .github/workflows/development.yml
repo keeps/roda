@@ -51,9 +51,9 @@ jobs:
           docker tag keeps/roda:latest keeps/roda:development
           docker push keeps/roda:development
       - name: Trigger KEEPS GitLab CI/CD
-        uses: appleboy/gitlab-ci-action@master
-        with:
-          host: ${{ secrets.GITLAB_RODA_DEV_TRIGGER }}
-          token: ${{ secrets.GITLAB_RODA_DEV_TRIGGER_TOKEN }}
-          project_id: ${{ secrets.GITLAB_RODA_PROJECT_ID }}
-          ref: 'development'
+        run: |
+          curl --progress-bar -o /dev/null -L --request POST \
+               --form ref=development \
+               --form token=${{ secrets.GITLAB_RODA_DEV_TRIGGER_TOKEN }} \
+               --form "variables[DOCKER_TAG]=development" \
+               ${{ secrets.GITLAB_RODA_DEV_TRIGGER }}

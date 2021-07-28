@@ -46,9 +46,9 @@ jobs:
         run: |
           docker push keeps/roda:latest
       - name: Trigger KEEPS GitLab CI/CD
-        uses: appleboy/gitlab-ci-action@master
-        with:
-          host: ${{ secrets.GITLAB_RODA_DEV_TRIGGER }}
-          token: ${{ secrets.GITLAB_RODA_DEV_TRIGGER_TOKEN }}
-          project_id: ${{ secrets.GITLAB_RODA_PROJECT_ID }}
-          ref: 'master'
+        run: |
+          curl --progress-bar -o /dev/null -L --request POST \
+               --form ref=master \
+               --form token=${{ secrets.GITLAB_RODA_DEV_TRIGGER_TOKEN }} \
+               --form "variables[DOCKER_TAG]=latest" \
+               ${{ secrets.GITLAB_RODA_DEV_TRIGGER }}
