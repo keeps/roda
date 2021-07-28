@@ -182,7 +182,7 @@ public class SyncImportPlugin extends AbstractPlugin<Void> {
           StoragePath containerStoragePath = container.getStoragePath();
 
           CloseableIterable<Resource> resources = temporaryStorage.listResourcesUnderContainer(containerStoragePath,
-            true);
+            false);
           Iterator<Resource> resourceIterator = resources.iterator();
           while (resourceIterator.hasNext()) {
             Resource resource = resourceIterator.next();
@@ -195,10 +195,8 @@ public class SyncImportPlugin extends AbstractPlugin<Void> {
             storage.move(temporaryStorage, storagePath, storagePath);
           }
         }
-
-        reindexBundle(bundleState);
+        reindexBundle(bundleState, jobPluginInfo);
         report.setPluginState(PluginState.SUCCESS);
-        jobPluginInfo.incrementObjectsProcessedWithSuccess();
       } catch (IOException e) {
         LOGGER.error("Error extracting bundle to {}", tempDirectory.toString(), e);
         report.setPluginState(PluginState.FAILURE)
@@ -216,23 +214,27 @@ public class SyncImportPlugin extends AbstractPlugin<Void> {
     }
   }
 
-  private void reindexBundle(BundleState bundleState) throws NotFoundException, AuthorizationDeniedException,
-    JobAlreadyStartedException, GenericException, RequestNotValidException {
+  private void reindexBundle(BundleState bundleState, JobPluginInfo jobPluginInfo) throws NotFoundException,
+    AuthorizationDeniedException, JobAlreadyStartedException, GenericException, RequestNotValidException {
     Map<String, PackageState> packageStateMap = bundleState.getPackageStateMap();
+    jobPluginInfo.setSourceObjectsCount(packageStateMap.size());
     for (Map.Entry<String, PackageState> entry : packageStateMap.entrySet()) {
       String entity = entry.getKey();
       PackageState packageState = entry.getValue();
 
-      Job job = new Job();
-      job.setId(IdUtils.createUUID());
-      job.setName("Reindex RODA entity (" + entity + ")");
-      job.setPluginType(PluginType.INTERNAL);
-      job.setUsername(RodaConstants.ADMIN);
+      if (packageState.getCount() > 0) {
+        Job job = new Job();
+        job.setId(IdUtils.createUUID());
+        job.setName("Reindex RODA entity (" + entity + ")");
+        job.setPluginType(PluginType.INTERNAL);
+        job.setUsername(RodaConstants.ADMIN);
 
-      job.setPlugin(PluginHelper.getReindexPluginName(packageState.getClassName()));
-      job.setSourceObjects(SelectedItemsList.create(packageState.getClassName(), packageState.getIdList()));
+        job.setPlugin(PluginHelper.getReindexPluginName(packageState.getClassName()));
+        job.setSourceObjects(SelectedItemsList.create(packageState.getClassName(), packageState.getIdList()));
 
-      PluginHelper.createAndExecuteJob(job);
+        PluginHelper.createAndExecuteJob(job);
+      }
+      jobPluginInfo.incrementObjectsProcessedWithSuccess();
     }
   }
 
