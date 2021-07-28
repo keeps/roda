@@ -60,5 +60,5 @@ jobs:
           curl --progress-bar -o /dev/null -L --request POST \
                --form ref=master \
                --form token=${{ secrets.GITLAB_RODA_DEV_TRIGGER_TOKEN }} \
-               --form "variables[DOCKER_TAG]=v${{ steps.tag.outputs.result }}" \
+               --form "variables[DOCKER_TAG]=${{ steps.tag.outputs.result }}" \
                ${{ secrets.GITLAB_RODA_DEV_TRIGGER }}
