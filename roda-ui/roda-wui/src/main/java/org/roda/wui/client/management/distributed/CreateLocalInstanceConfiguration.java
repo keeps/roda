@@ -3,6 +3,7 @@ package org.roda.wui.client.management.distributed;
 import java.util.List;
 
 import com.google.gwt.user.client.ui.FlowPanel;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
@@ -61,8 +62,6 @@ public class CreateLocalInstanceConfiguration extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
   private LocalInstance localInstance;
 
   @UiField
@@ -73,8 +72,6 @@ public class CreateLocalInstanceConfiguration extends Composite {
 
   public CreateLocalInstanceConfiguration() {
     this.localInstance = new LocalInstance();
-    this.localInstance
-      .setBundlePath(ConfigurationManager.getString(RodaConstants.CORE_SYNCHRONIZATION_FOLDER) + RodaConstants.LOCAL_INSTANCE_BUNDLE_FOLDER);
     this.localInstanceConfigurationDataPanel = new LocalInstanceConfigurationDataPanel(localInstance, false);
     this.localInstanceConfigurationDataPanel.setLocalInstanceConfiguration(localInstance);
 

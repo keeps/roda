@@ -2289,6 +2289,9 @@ public class RodaCoreFactory {
       }
     }
     if (newLocalInstance != null) {
+      newLocalInstance.setBundlePath(rodaHomePath
+        .resolve(getProperty(RodaConstants.CORE_SYNCHRONIZATION_BUNDLE_PATH, RodaConstants.SYNCHRONIZATION_BUNDLE_PATH))
+        .toString());
       YamlUtils.writeObjectToFile(newLocalInstance, configuration);
     }
     localInstance = newLocalInstance;

@@ -66,15 +66,8 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
   Label centralInstanceURError;
 
   @UiField
-  TextBox bundlePathValue;
-
-  @UiField
-  Label bundlePathError;
-
-  @UiField
   HTML errors;
 
-  private boolean changed = false;
   private boolean checked = false;
 
   public LocalInstanceConfigurationDataPanel(LocalInstance localInstance, boolean editMode) {
@@ -92,7 +85,6 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
     this.IDValue.setText(localInstance.getId());
     this.secretValue.setText(localInstance.getAccessKey());
     this.centralInstanceURLValue.setText(localInstance.getCentralInstanceURL());
-    this.bundlePathValue.setText(localInstance.getBundlePath());
   }
 
   private void initHandlers() {
@@ -118,15 +110,10 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
 
     centralInstanceURLValue.addChangeHandler(changeHandler);
     centralInstanceURLValue.addKeyUpHandler(keyUpHandler);
-
-    bundlePathValue.addChangeHandler(changeHandler);
-    bundlePathValue.addKeyUpHandler(keyUpHandler);
-
   }
 
   private void setInitialState(LocalInstance localInstance) {
     errors.setVisible(false);
-    bundlePathValue.setText(localInstance.getBundlePath());
   }
 
   public LocalInstance getLocalInstance() {
@@ -134,7 +121,6 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
     localInstance.setId(IDValue.getText());
     localInstance.setAccessKey(secretValue.getText());
     localInstance.setCentralInstanceURL(centralInstanceURLValue.getText());
-    localInstance.setBundlePath(bundlePathValue.getText());
     return localInstance;
   }
 
@@ -162,18 +148,6 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
     } else {
       secretValue.removeStyleName(IS_WRONG);
       secretError.setVisible(false);
-    }
-
-    // BundlePath
-    if (StringUtils.isBlank(bundlePathValue.getText())) {
-      bundlePathValue.addStyleName(IS_WRONG);
-      bundlePathError.setText(messages.mandatoryField());
-      bundlePathError.setVisible(true);
-      Window.scrollTo(bundlePathValue.getAbsoluteLeft(), bundlePathValue.getAbsoluteTop());
-      errorList.add(messages.isAMandatoryField(messages.localInstanceConfigurationBundlePathLabel()));
-    } else {
-      bundlePathValue.removeStyleName(IS_WRONG);
-      bundlePathError.setVisible(false);
     }
 
     // CENTRAL URL
@@ -223,7 +197,6 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
   }
 
   protected void onChange() {
-    changed = true;
     if (checked) {
       isValid();
     }

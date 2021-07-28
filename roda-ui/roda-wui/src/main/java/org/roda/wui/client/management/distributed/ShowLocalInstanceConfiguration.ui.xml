@@ -35,15 +35,6 @@
 
                             <g:FlowPanel styleName="field">
                                 <g:Label styleName="label"
-                                         ui:field="bundlePathLabel">
-                                    <ui:text from='{messages.localInstanceConfigurationBundlePathLabel}' />
-                                </g:Label>
-                                <g:HTML styleName="value"
-                                        ui:field="bundlePathValue" />
-                            </g:FlowPanel>
-
-                            <g:FlowPanel styleName="field">
-                                <g:Label styleName="label"
                                          ui:field="isRegisteredLabel">
                                     <ui:text from='{messages.localInstanceIsRegisteredLabel}' />
                                 </g:Label>

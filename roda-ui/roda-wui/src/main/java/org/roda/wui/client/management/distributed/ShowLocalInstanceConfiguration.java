@@ -83,9 +83,6 @@ public class ShowLocalInstanceConfiguration extends Composite {
   HTML IDValue;
 
   @UiField
-  HTML bundlePathValue;
-
-  @UiField
   HTML centralInstanceURLValue;
 
   @UiField
@@ -108,7 +105,6 @@ public class ShowLocalInstanceConfiguration extends Composite {
     IDValue.setText(localInstance.getId());
     centralInstanceURLValue.setText(localInstance.getCentralInstanceURL());
     isRegisteredValue.setText(localInstance.getIsRegistered().toString());
-    bundlePathValue.setText(localInstance.getBundlePath());
     if (localInstance.getLastSynchronizationDate() != null) {
       lastSyncValue.setText(Humanize.formatDateTime(localInstance.getLastSynchronizationDate()));
     } else {

@@ -38,14 +38,6 @@
                 <g:Label ui:field="secretError" addStyleNames="form-label-error"/>
 
                 <g:Label addStyleNames="form-label">
-                    <ui:text from='{messages.localInstanceConfigurationBundlePathLabel}'/>
-                    *
-                </g:Label>
-                <g:TextBox title="{messages.localInstanceConfigurationBundlePathLabel}" ui:field="bundlePathValue"
-                           addStyleNames="form-textbox"/>
-                <g:Label ui:field="bundlePathError" addStyleNames="form-label-error"/>
-
-                <g:Label addStyleNames="form-label">
                     <ui:text from='{messages.localInstanceConfigurationCentralInstanceURLLabel}'/>
                     *
                 </g:Label>
