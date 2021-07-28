@@ -81,17 +81,17 @@
                         <g:Button addStyleNames="btn btn-block btn-edit" ui:field="buttonEdit">
                             <ui:text from='{messages.editButton}'/>
                         </g:Button>
-                        <g:Button addStyleNames="btn btn-block btn-file-signature" ui:field="buttonRegister">
+                        <g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonRegister">
                             <ui:text from='{messages.registerLocalInstanceConfigurationButton}'/>
                         </g:Button>
-                        <g:Button addStyleNames="btn btn-btlock btn-file-signature" ui:field="buttonCreateBundle">
+                        <g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonApplyId">
+                            <ui:text from='{messages.applyInstanceId}'/>
+                        </g:Button>
+                        <g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonCreateBundle">
                             <ui:text from='{messages.createBundleButton}'/>
                         </g:Button>
-                        <g:Button addStyleNames="btn btn-block btn-file-signature" ui:field="buttonSynchronize">
+                        <g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonSynchronize">
                             <ui:text from='{messages.synchronizeLocalInstanceConfigurationButton}'/>
-                        </g:Button>
-                        <g:Button addStyleNames="btn btn-block btn-success btn-play" ui:field="buttonApplyId">
-                            <ui:text from='{messages.applyInstanceId}'/>
                         </g:Button>
                         <g:Button addStyleNames="btn btn-block btn-danger btn-times-circle" ui:field="buttonRemove">
                             <ui:text from='{messages.removeButton}'/>
