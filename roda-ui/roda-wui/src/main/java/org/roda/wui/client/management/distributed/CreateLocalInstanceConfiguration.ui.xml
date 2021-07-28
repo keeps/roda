@@ -11,6 +11,7 @@
         <g:FlowPanel addStyleNames="row full_width skip_padding">
             <g:FlowPanel addStyleNames="col_10 content" ui:field="content">
                 <common:TitlePanel text="{messages.createLocalInstanceConfigurationTitle}" iconClass="DistributedInstance"/>
+                <g:FlowPanel addStyleNames="page-description" ui:field="description" />
                 <u:LocalInstanceConfigurationDataPanel ui:field="localInstanceConfigurationDataPanel" />
             </g:FlowPanel>
             <g:FlowPanel addStyleNames="col_2 last sidebar">

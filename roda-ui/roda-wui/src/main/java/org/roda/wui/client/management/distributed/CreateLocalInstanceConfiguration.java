@@ -2,6 +2,7 @@ package org.roda.wui.client.management.distributed;
 
 import java.util.List;
 
+import com.google.gwt.user.client.ui.FlowPanel;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
@@ -12,6 +13,7 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
@@ -63,6 +65,9 @@ public class CreateLocalInstanceConfiguration extends Composite {
 
   private LocalInstance localInstance;
 
+  @UiField
+  FlowPanel description;
+
   @UiField(provided = true)
   LocalInstanceConfigurationDataPanel localInstanceConfigurationDataPanel;
 
@@ -74,6 +79,8 @@ public class CreateLocalInstanceConfiguration extends Composite {
     this.localInstanceConfigurationDataPanel.setLocalInstanceConfiguration(localInstance);
 
     initWidget(uiBinder.createAndBindUi(this));
+
+    this.description.add(new HTMLWidgetWrapper(("LocalInstanceDescription.html")));
   }
 
   @Override
