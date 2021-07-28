@@ -1,5 +1,21 @@
 # Changelog
 
+## v3.5.5 (28/07/2021)
+
+#### Enhancements:
+
+-  Update Dockerfile siegfried repository [#1938](https://github.com/keeps/roda/issues/1938)
+
+#### Bug Fixes:
+
+-  ImageMagick plugin does not create a preservation event  [#1936](https://github.com/keeps/roda/issues/1936)
+
+Install for demonstration:
+```
+docker pull keeps/roda:v3.5.5
+```
+---
+
 ## v3.5.4 (22/04/2021)
 
 #### Enhancements:
@@ -330,13 +346,12 @@ docker pull keeps/roda:v3.0.0
 ```
 
 ### Main highlights
-* Improvements in product usability
 * Native support for representation information management
+* Improvements in product usability
 * Ability to search all repository pages (e.g., intellectual entities, ingestion processes, preservation processes, preservation events, users/groups, etc.)
 * New visual metaphors for the state of processes including the ability to pause them
 * Delayed execution of actions in the background
 * New PDF viewer
-* Native support for Representation Information management
 * Support for operation in Read Only mode and for operation in multi-server environments for high performance and high availability, i.e. cluster
 * New indexing engine, faster in contexts in the hundreds of millions of records
 * Bug fixes and improvements in terms of security and system stability
@@ -965,26 +980,3 @@ docker pull keeps/roda:v2.2.0
 -  EARKSIPPluginsTest.testIngestAncestors() is throwing an unexpected error [#853](https://github.com/keeps/roda/issues/853)
 -  Error downloading PREMIS on demo server [#833](https://github.com/keeps/roda/issues/833)
 -  PDF to PDFA conversion plugin reporting is not well [#619](https://github.com/keeps/roda/issues/619)
-
----
-
-## 2.1.0 (20/09/2017)
-New features:
-* Representation created and updated date
-* Representation type editor has controlled vocabulary with open other
-* Add a new option to the ingest workflow that specifies that a notification/email should only be sent if the ingest procedure is not 100% successful
-* Performance enhancements to SIP update ingestion
-* Disable showing all results when entering search #1029 
-
-Bug fixes:
-* Showing search descendants and in this package buttons when item has no siblings #1043
-* Sub-levels are not shown when browsing through catalogue with a facet selected #1042
-* Moving a transferred resource with a long path makes an error #1035
-
-Enhancements:
-* Add translation on CSV when downloading it via statistics page #1048
-
-Install for demonstration:
-```
-docker pull keeps/roda:2.1.0
-```
