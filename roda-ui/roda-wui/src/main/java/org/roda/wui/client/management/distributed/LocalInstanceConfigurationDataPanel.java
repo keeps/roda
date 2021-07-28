@@ -3,11 +3,13 @@ package org.roda.wui.client.management.distributed;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.gwt.user.client.ui.FlowPanel;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.tools.ValidationUtils;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -72,14 +74,11 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
   @UiField
   HTML errors;
 
-  private final boolean editMode;
-
   private boolean changed = false;
   private boolean checked = false;
 
   public LocalInstanceConfigurationDataPanel(LocalInstance localInstance, boolean editMode) {
     initWidget(uiBinder.createAndBindUi(this));
-    this.editMode = editMode;
 
     setInitialState(localInstance);
     initHandlers();
