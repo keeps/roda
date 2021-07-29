@@ -863,7 +863,7 @@ public final class PremisV3Utils {
     String instanceId) throws AuthorizationDeniedException, RequestNotValidException, NotFoundException,
           GenericException, ValidationException, AlreadyExistsException, AlreadyHasInstanceIdentifier {
 
-    if (URNUtils.hasIntanceId(pm.getId(), instanceId)) {
+    if (URNUtils.verifyInstanceIdentifier(pm.getId(), instanceId)) {
       throw new AlreadyHasInstanceIdentifier(
         "The preservation event (" + pm.getId() + ") already has instance identifier");
     }

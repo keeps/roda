@@ -10,6 +10,7 @@ package org.roda.core.data.utils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.RODA_TYPE;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
 
 public final class URNUtils {
 
@@ -95,12 +96,33 @@ public final class URNUtils {
     return fields[fields.length - 1];
   }
 
-  public static boolean hasIntanceId(String id, String instanceId) {
-    String[] fields = id.split(RodaConstants.URN_SEPARATOR);
-    if (fields[URN_INSTANCE_IDENTIFIER_POSITION].equals(instanceId)) {
+  public static boolean verifyInstanceIdentifier(String id, String instanceId) {
+    if (extractInstanceIdentifierFromId(id).equals(instanceId)) {
       return true;
     } else {
       return false;
+    }
+  }
+
+  public static String extractInstanceIdentifierFromId(String id) {
+    String[] fields = id.split(RodaConstants.URN_SEPARATOR);
+    return fields[URN_INSTANCE_IDENTIFIER_POSITION];
+  }
+
+  public static boolean hasInstanceId(String id) {
+    String[] fields = id.split(RodaConstants.URN_SEPARATOR);
+    if (fields.length == URN_LENGTH_WITH_INSTANCE_IDENTIFIER) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  public static boolean verifyPremisPrefix(PreservationMetadataType type, String filename) {
+    if (hasInstanceId(filename)) {
+      return filename.startsWith(getPremisPrefix(type, extractInstanceIdentifierFromId(filename)));
+    } else {
+      return filename.startsWith(getPremisPrefix(type, null));
     }
   }
 
