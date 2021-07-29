@@ -16,7 +16,6 @@ import java.nio.file.Path;
  */
 
 public class LocalInstanceUtils {
-  private static final Logger LOGGER = LoggerFactory.getLogger(LocalInstanceUtils.class);
 
   private LocalInstanceUtils() {
     // do nothing
@@ -37,23 +36,23 @@ public class LocalInstanceUtils {
     }
   }
 
-  public static String retrieveLocalInstanceIdentifierToPlugin() {
-    try {
-      Path configFile = RodaCoreFactory.getConfigPath()
-        .resolve(RodaConstants.SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE_PATH);
-      LocalInstance localInstance = YamlUtils.readObjectFromFile(configFile, LocalInstance.class);
-      return localInstance.getId();
-    } catch (GenericException e) {
-      return null;
-    }
-  }
-
   public static LocalInstanceIdentifierState getLocalInstanceState() {
     try {
       Path configFile = RodaCoreFactory.getConfigPath()
         .resolve(RodaConstants.SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE_PATH);
       LocalInstance localInstance = YamlUtils.readObjectFromFile(configFile, LocalInstance.class);
       return localInstance.getInstanceIdentifierState();
+    } catch (GenericException e) {
+      return null;
+    }
+  }
+
+  public static String retrieveLocalInstanceIdentifierToPlugin() {
+    try {
+      Path configFile = RodaCoreFactory.getConfigPath()
+        .resolve(RodaConstants.SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE_PATH);
+      LocalInstance localInstance = YamlUtils.readObjectFromFile(configFile, LocalInstance.class);
+      return localInstance.getId();
     } catch (GenericException e) {
       return null;
     }
