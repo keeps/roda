@@ -46,6 +46,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.JobStats;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
@@ -350,6 +351,25 @@ public final class JobsHelper {
     return filesToReturn;
   }
 
+  public static List<RiskIncidence> getRiskIncidences(ModelService model, List<String> uuids) throws NotFoundException {
+    List<RiskIncidence> incidencesToReturn = new ArrayList<>();
+    if (!uuids.isEmpty()) {
+      for (String uuid : uuids) {
+        try {
+          incidencesToReturn.add(model.retrieveRiskIncidence(uuid));
+        } catch (RODAException | RuntimeException e) {
+          LOGGER.error("Error while retrieving Risk Incidence from model", e);
+        }
+      }
+    }
+
+    if (incidencesToReturn.isEmpty()) {
+      throw new NotFoundException("Could not retrieve the Risk Incidences");
+    }
+
+    return incidencesToReturn;
+  }
+
   public static <T extends IsRODAObject> List<T> getObjectsFromUUID(ModelService model, IndexService index,
     Class<T> objectClass, List<String> uuids) throws NotFoundException, GenericException, RequestNotValidException {
     if (AIP.class.equals(objectClass)) {
@@ -358,6 +378,8 @@ public final class JobsHelper {
       return (List<T>) getRepresentations(model, index, uuids);
     } else if (File.class.equals(objectClass)) {
       return (List<T>) getFiles(model, index, uuids);
+    } else if (RiskIncidence.class.equals(objectClass)) {
+      return (List<T>) getRiskIncidences(model, uuids);
     } else {
       return getObjectsFromIndex(index, objectClass, uuids);
     }
