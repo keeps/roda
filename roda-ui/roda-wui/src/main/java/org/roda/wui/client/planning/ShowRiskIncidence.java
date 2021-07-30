@@ -96,6 +96,12 @@ public class ShowRiskIncidence extends Composite {
   Label incidenceId;
 
   @UiField
+  Label instanceIdLabel;
+
+  @UiField
+  Label instanceIdValue;
+
+  @UiField
   Label objectLabel;
 
   @UiField
@@ -148,6 +154,13 @@ public class ShowRiskIncidence extends Composite {
   public ShowRiskIncidence(RiskIncidence incidence) {
     initWidget(uiBinder.createAndBindUi(this));
     this.incidence = incidence;
+
+    if (this.incidence.getInstanceId() != null) {
+      instanceIdValue.setText(incidence.getInstanceId());
+    } else {
+      instanceIdLabel.setVisible(false);
+      instanceIdValue.setVisible(false);
+    }
 
     RiskIncidenceActions riskIncidenceActions = RiskIncidenceActions.get();
     SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, riskIncidenceActions.hasAnyRoles());
