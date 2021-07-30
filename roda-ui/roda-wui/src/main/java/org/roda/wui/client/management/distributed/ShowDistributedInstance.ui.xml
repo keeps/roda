@@ -6,7 +6,7 @@
 
     <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
 
-    <g:FlowPanel styleName="wui-disposal-confirmation" addStyleNames="wrapper skip_padding">
+    <g:FlowPanel styleName="wui-representation-information-network" addStyleNames="wrapper skip_padding">
         <g:FlowPanel addStyleNames="row full_width skip_padding">
             <g:FlowPanel addStyleNames="col_10 content" ui:field="content">
                 <g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
@@ -63,7 +63,7 @@
                                 <g:FlowPanel styleName="value"
                                         ui:field="userNameValue" />
                             </g:FlowPanel>
-                            <g:FlowPanel ui:field="accessKeyTablePanel" />
+                            <g:ScrollPanel ui:field="accessKeyTablePanel" />
                         </g:FlowPanel>
                     </g:FlowPanel>
                 </g:FlowPanel>

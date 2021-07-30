@@ -2,6 +2,7 @@ package org.roda.wui.client.management.distributed;
 
 import java.util.List;
 
+import com.google.gwt.user.client.ui.ScrollPanel;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowserService;
@@ -101,7 +102,7 @@ public class ShowDistributedInstance extends Composite {
   FlowPanel userNameValue;
 
   @UiField
-  FlowPanel accessKeyTablePanel;
+  ScrollPanel accessKeyTablePanel;
 
   public ShowDistributedInstance(DistributedInstance distributedInstance) {
     initWidget(uiBinder.createAndBindUi(this));

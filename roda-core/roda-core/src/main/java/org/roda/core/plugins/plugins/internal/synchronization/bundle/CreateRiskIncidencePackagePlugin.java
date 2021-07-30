@@ -103,11 +103,12 @@ public class CreateRiskIncidencePackagePlugin extends CreateRodaEntityPackagePlu
     NotFoundException, AuthorizationDeniedException, GenericException, AlreadyExistsException {
 
     StorageService storage = model.getStorage();
-    StoragePath riskIncidenceStoragePath = ModelUtils.getRiskIncidenceStoragePath(incidence.getId());
+    StoragePath riskIncidenceStoragePath = ModelUtils.getRiskIncidenceContainerPath();
+    String incidenceFile = incidence.getId() + RodaConstants.RISK_INCIDENCE_FILE_EXTENSION;
+
     Path destinationPath = getDestinationPath().resolve(RodaConstants.CORE_STORAGE_FOLDER)
       .resolve(RodaConstants.STORAGE_CONTAINER_RISK_INCIDENCE);
 
-    String incidenceFile = incidence.getId() + RodaConstants.RISK_INCIDENCE_FILE_EXTENSION;
     Path incidencePath = destinationPath.resolve(incidenceFile);
 
     storage.copy(storage, riskIncidenceStoragePath, incidencePath, incidenceFile);
