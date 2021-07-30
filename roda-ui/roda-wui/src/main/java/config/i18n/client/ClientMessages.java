@@ -1283,6 +1283,8 @@ public interface ClientMessages extends Messages {
 
   String riskIncidenceIdentifier();
 
+  String riskIncidenceInstanceIdentifier();
+
   String riskIncidenceDescription();
 
   String riskIncidenceRisk();

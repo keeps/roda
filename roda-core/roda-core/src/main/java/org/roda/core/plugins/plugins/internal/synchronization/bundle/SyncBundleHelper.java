@@ -105,6 +105,7 @@ public class SyncBundleHelper {
   public static void executeShaSumCommand(LocalInstance localInstance, String entity) throws PluginException {
     try {
       BundleState bundleStateFile = getBundleStateFile(localInstance);
+      entity = entity.replace(' ', '_');
       String targetPath = Paths.get(bundleStateFile.getDestinationPath(), entity + ".shasum").toString();
       List<String> checksumCommand = new ArrayList<>();
       checksumCommand.add("/bin/sh");

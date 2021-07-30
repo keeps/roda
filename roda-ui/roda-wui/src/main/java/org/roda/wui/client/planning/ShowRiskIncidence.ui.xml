@@ -1,94 +1,100 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:common="urn:import:org.roda.wui.client.common">
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:common="urn:import:org.roda.wui.client.common">
 
-	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
 
-	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
-		<g:FlowPanel addStyleNames="row full_width skip_padding">
-			<g:FlowPanel addStyleNames="col_10 content" ui:field="contentFlowPanel">
-				<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
-					<g:FlowPanel addStyleNames="row full_width no_padding">
-						<g:FlowPanel addStyleNames="wui-data-panel">
-							<common:TitlePanel text="{messages.showRiskIncidenceTitle}" iconClass="RiskIncidence" />
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label">
-									<ui:text from='{messages.riskIncidenceIdentifier}' />
-								</g:Label>
-								<g:Label styleName="value" ui:field="incidenceId" />
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="objectLabel"></g:Label>
-								<g:Anchor ui:field="objectLink" />
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label">
-									<ui:text from='{messages.riskIncidenceRisk}' />
-								</g:Label>
-								<g:Anchor ui:field="riskLink" />
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label">
-									<ui:text from='{messages.riskIncidenceDetectedOn}' />
-								</g:Label>
-								<g:Label styleName="value" ui:field="detectedOn" />
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label">
-									<ui:text from='{messages.riskIncidenceDetectedBy}' />
-								</g:Label>
-								<g:Label styleName="value" ui:field="detectedBy" />
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="descriptionKey">
-									<ui:text from='{messages.riskIncidenceDescription}' />
-								</g:Label>
-								<g:Label styleName="value" ui:field="descriptionValue" />
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label">
-									<ui:text from='{messages.riskIncidenceStatus}' />
-								</g:Label>
-								<g:Label styleName="value" ui:field="status" />
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label">
-									<ui:text from='{messages.riskIncidenceSeverity}' />
-								</g:Label>
-								<g:HTML styleName="value" ui:field="severity"></g:HTML>
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="mitigatedOnKey">
-									<ui:text from='{messages.riskIncidenceMitigatedOn}' />
-								</g:Label>
-								<g:Label styleName="value" ui:field="mitigatedOnValue" />
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="mitigatedByKey">
-									<ui:text from='{messages.riskIncidenceMitigatedBy}' />
-								</g:Label>
-								<g:Label styleName="value" ui:field="mitigatedByValue" />
-							</g:FlowPanel>
-							<g:FlowPanel styleName="field">
-								<g:Label styleName="label" ui:field="mitigatedDescriptionKey">
-									<ui:text from='{messages.riskIncidenceMitigatedDescription}' />
-								</g:Label>
-								<g:Label styleName="value" ui:field="mitigatedDescriptionValue" />
-							</g:FlowPanel>
-						</g:FlowPanel>
-					</g:FlowPanel>
-				</g:FlowPanel>
-			</g:FlowPanel>
+    <g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
+        <g:FlowPanel addStyleNames="row full_width skip_padding">
+            <g:FlowPanel addStyleNames="col_10 content" ui:field="contentFlowPanel">
+                <g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
+                    <g:FlowPanel addStyleNames="row full_width no_padding">
+                        <g:FlowPanel addStyleNames="wui-data-panel">
+                            <common:TitlePanel text="{messages.showRiskIncidenceTitle}" iconClass="RiskIncidence"/>
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label">
+                                    <ui:text from='{messages.riskIncidenceIdentifier}'/>
+                                </g:Label>
+                                <g:Label styleName="value" ui:field="incidenceId"/>
+                            </g:FlowPanel>
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label" ui:field="instanceIdLabel">
+                                    <ui:text from='{messages.riskIncidenceInstanceIdentifier}'/>
+                                </g:Label>
+                                <g:Label styleName="value" ui:field="instanceIdValue"/>
+                            </g:FlowPanel>
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label" ui:field="objectLabel"></g:Label>
+                                <g:Anchor ui:field="objectLink"/>
+                            </g:FlowPanel>
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label">
+                                    <ui:text from='{messages.riskIncidenceRisk}'/>
+                                </g:Label>
+                                <g:Anchor ui:field="riskLink"/>
+                            </g:FlowPanel>
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label">
+                                    <ui:text from='{messages.riskIncidenceDetectedOn}'/>
+                                </g:Label>
+                                <g:Label styleName="value" ui:field="detectedOn"/>
+                            </g:FlowPanel>
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label">
+                                    <ui:text from='{messages.riskIncidenceDetectedBy}'/>
+                                </g:Label>
+                                <g:Label styleName="value" ui:field="detectedBy"/>
+                            </g:FlowPanel>
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label" ui:field="descriptionKey">
+                                    <ui:text from='{messages.riskIncidenceDescription}'/>
+                                </g:Label>
+                                <g:Label styleName="value" ui:field="descriptionValue"/>
+                            </g:FlowPanel>
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label">
+                                    <ui:text from='{messages.riskIncidenceStatus}'/>
+                                </g:Label>
+                                <g:Label styleName="value" ui:field="status"/>
+                            </g:FlowPanel>
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label">
+                                    <ui:text from='{messages.riskIncidenceSeverity}'/>
+                                </g:Label>
+                                <g:HTML styleName="value" ui:field="severity"></g:HTML>
+                            </g:FlowPanel>
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label" ui:field="mitigatedOnKey">
+                                    <ui:text from='{messages.riskIncidenceMitigatedOn}'/>
+                                </g:Label>
+                                <g:Label styleName="value" ui:field="mitigatedOnValue"/>
+                            </g:FlowPanel>
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label" ui:field="mitigatedByKey">
+                                    <ui:text from='{messages.riskIncidenceMitigatedBy}'/>
+                                </g:Label>
+                                <g:Label styleName="value" ui:field="mitigatedByValue"/>
+                            </g:FlowPanel>
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label" ui:field="mitigatedDescriptionKey">
+                                    <ui:text from='{messages.riskIncidenceMitigatedDescription}'/>
+                                </g:Label>
+                                <g:Label styleName="value" ui:field="mitigatedDescriptionValue"/>
+                            </g:FlowPanel>
+                        </g:FlowPanel>
+                    </g:FlowPanel>
+                </g:FlowPanel>
+            </g:FlowPanel>
 
-			<g:FlowPanel addStyleNames="col_2 last sidebar" ui:field="sidebarFlowPanel">
-				<g:FlowPanel addStyleNames="sticky-flow">
-					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:SimplePanel addStyleNames="sidebar-group" ui:field="actionsSidebar" />
-					</g:FlowPanel>
-				</g:FlowPanel>
-			</g:FlowPanel>
-		</g:FlowPanel>
-	</g:FlowPanel>
+            <g:FlowPanel addStyleNames="col_2 last sidebar" ui:field="sidebarFlowPanel">
+                <g:FlowPanel addStyleNames="sticky-flow">
+                    <g:FlowPanel addStyleNames="sticky-padding">
+                        <g:SimplePanel addStyleNames="sidebar-group" ui:field="actionsSidebar"/>
+                    </g:FlowPanel>
+                </g:FlowPanel>
+            </g:FlowPanel>
+        </g:FlowPanel>
+    </g:FlowPanel>
 </ui:UiBinder>
