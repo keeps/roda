@@ -180,6 +180,12 @@ public class ShowJob extends Composite {
   private Map<String, PluginInfo> pluginsInfo;
 
   @UiField
+  Label instanceIdLabel;
+
+  @UiField
+  Label instanceIdValue;
+
+  @UiField
   Label name;
 
   @UiField
@@ -280,6 +286,13 @@ public class ShowJob extends Composite {
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(jobReportListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
+
+    if (job.getInstanceId() != null) {
+      instanceIdValue.setText(job.getInstanceId());
+    } else {
+      instanceIdLabel.setVisible(false);
+      instanceIdValue.setVisible(false);
+    }
 
     name.setText(job.getName());
     creator.setText(job.getUsername());
