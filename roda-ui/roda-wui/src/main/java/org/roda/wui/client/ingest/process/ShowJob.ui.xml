@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
-	xmlns:common="urn:import:org.roda.wui.client.common">
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
+             xmlns:common="urn:import:org.roda.wui.client.common">
 
-	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
 
 	<g:FlowPanel styleName="wui-ingest-new" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
@@ -14,6 +14,12 @@
 					<g:FlowPanel addStyleNames="row full_width no_padding">
 						<g:FlowPanel addStyleNames="wui-data-panel">
 							<common:TitlePanel text="{messages.processTitle}" iconClass="Job" />
+                            <g:FlowPanel styleName="field">
+                                <g:Label addStyleNames="label" ui:field="instanceIdLabel">
+                                    <ui:text from='{messages.jobInstanceId}'/>
+                                </g:Label>
+                                <g:Label styleName="value" ui:field="instanceIdValue"/>
+                            </g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label">
 									<ui:text from='{messages.jobName}' />
@@ -71,44 +77,44 @@
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 
-							</g:FlowPanel>
+                            </g:FlowPanel>
 
-							<g:FlowPanel styleName="field" ui:field="selectedListPanel">
-								<g:Label addStyleNames="label">
-									<ui:text from='{messages.showJobSourceObjects}' />
-								</g:Label>
-								<g:FlowPanel ui:field="selectedList" />
-							</g:FlowPanel>
+                            <g:FlowPanel styleName="field" ui:field="selectedListPanel">
+                                <g:Label addStyleNames="label">
+                                    <ui:text from='{messages.showJobSourceObjects}'/>
+                                </g:Label>
+                                <g:FlowPanel ui:field="selectedList"/>
+                            </g:FlowPanel>
 
-							<g:FlowPanel styleName="field">
-								<g:Label addStyleNames="label">
-									<ui:text from='{messages.jobPlugin}' />
-								</g:Label>
-								<g:Label styleName="value" ui:field="plugin" />
-								<g:FlowPanel styleName="panel" ui:field="pluginPanel">
-									<g:FlowPanel styleName="panel-body" ui:field="pluginOptions" />
-								</g:FlowPanel>
-							</g:FlowPanel>
+                            <g:FlowPanel styleName="field">
+                                <g:Label addStyleNames="label">
+                                    <ui:text from='{messages.jobPlugin}'/>
+                                </g:Label>
+                                <g:Label styleName="value" ui:field="plugin"/>
+                                <g:FlowPanel styleName="panel" ui:field="pluginPanel">
+                                    <g:FlowPanel styleName="panel-body" ui:field="pluginOptions"/>
+                                </g:FlowPanel>
+                            </g:FlowPanel>
 
-							<g:FlowPanel styleName="field" ui:field="reportListPanel">
-								<g:Label addStyleNames="h4" ui:field="reportsLabel">
-									<ui:text from='{messages.jobProcessed}' />
-								</g:Label>
-								<commonsearch:SearchWrapper ui:field="searchWrapper" />
-							</g:FlowPanel>
+                            <g:FlowPanel styleName="field" ui:field="reportListPanel">
+                                <g:Label addStyleNames="h4" ui:field="reportsLabel">
+                                    <ui:text from='{messages.jobProcessed}'/>
+                                </g:Label>
+                                <commonsearch:SearchWrapper ui:field="searchWrapper"/>
+                            </g:FlowPanel>
 
-						</g:FlowPanel>
-					</g:FlowPanel>
-				</g:FlowPanel>
-			</g:FlowPanel>
+                        </g:FlowPanel>
+                    </g:FlowPanel>
+                </g:FlowPanel>
+            </g:FlowPanel>
 
-			<g:FlowPanel addStyleNames="col_2 last sidebar" ui:field="sidebar">
-				<g:FlowPanel addStyleNames="sticky-flow">
-					<g:FlowPanel addStyleNames="sticky-padding">
-						<g:SimplePanel ui:field="actionsSidebar" />
-					</g:FlowPanel>
-				</g:FlowPanel>
-			</g:FlowPanel>
-		</g:FlowPanel>
-	</g:FlowPanel>
+            <g:FlowPanel addStyleNames="col_2 last sidebar" ui:field="sidebar">
+                <g:FlowPanel addStyleNames="sticky-flow">
+                    <g:FlowPanel addStyleNames="sticky-padding">
+                        <g:SimplePanel ui:field="actionsSidebar"/>
+                    </g:FlowPanel>
+                </g:FlowPanel>
+            </g:FlowPanel>
+        </g:FlowPanel>
+    </g:FlowPanel>
 </ui:UiBinder>

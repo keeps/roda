@@ -108,6 +108,11 @@ public class ShowJobReport extends Composite {
   private final IndexedReport jobReport;
 
   @UiField
+  Label instanceIdLabel;
+  @UiField
+  Label instanceIdValue;
+
+  @UiField
   Anchor job;
   @UiField
   Label outcomeObjectLabel;
@@ -145,6 +150,13 @@ public class ShowJobReport extends Composite {
     this.jobReport = jobReport;
 
     initWidget(uiBinder.createAndBindUi(this));
+
+    if (jobReport.getInstanceId() != null) {
+      instanceIdValue.setText(jobReport.getInstanceId());
+    } else {
+      instanceIdLabel.setVisible(false);
+      instanceIdValue.setVisible(false);
+    }
 
     job.setText(jobReport.getJobName());
     job.setHref(HistoryUtils.createHistoryHashLink(ShowJob.RESOLVER, jobReport.getJobId()));

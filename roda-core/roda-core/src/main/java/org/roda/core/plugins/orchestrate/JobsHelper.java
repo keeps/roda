@@ -370,6 +370,25 @@ public final class JobsHelper {
     return incidencesToReturn;
   }
 
+  public static List<Job> getJobs(ModelService model, List<String> uuids) throws NotFoundException {
+    List<Job> jobsToReturn = new ArrayList<>();
+    if (!uuids.isEmpty()) {
+      for (String uuid : uuids) {
+        try {
+          jobsToReturn.add(model.retrieveJob(uuid));
+        } catch (RODAException | RuntimeException e) {
+          LOGGER.error("Error while retrieving Job from model", e);
+        }
+      }
+    }
+
+    if (jobsToReturn.isEmpty()) {
+      throw new NotFoundException("Could not retrieve the Jobs");
+    }
+
+    return jobsToReturn;
+  }
+
   public static <T extends IsRODAObject> List<T> getObjectsFromUUID(ModelService model, IndexService index,
     Class<T> objectClass, List<String> uuids) throws NotFoundException, GenericException, RequestNotValidException {
     if (AIP.class.equals(objectClass)) {
@@ -380,6 +399,8 @@ public final class JobsHelper {
       return (List<T>) getFiles(model, index, uuids);
     } else if (RiskIncidence.class.equals(objectClass)) {
       return (List<T>) getRiskIncidences(model, uuids);
+    } else if (Job.class.equals(objectClass)) {
+      return (List<T>) getJobs(model, uuids);
     } else {
       return getObjectsFromIndex(index, objectClass, uuids);
     }
