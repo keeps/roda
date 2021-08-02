@@ -2,6 +2,7 @@ package org.roda.core.plugins.plugins.internal.synchronization.proccess;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,6 +34,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
@@ -45,6 +47,7 @@ import org.roda.core.storage.Container;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FileStorageService;
+import org.roda.core.storage.utils.LocalInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.roda.core.util.ZipUtility;
 import org.slf4j.Logger;
@@ -193,6 +196,25 @@ public class SyncImportPlugin extends AbstractPlugin<Void> {
               storage.deleteResource(storagePath);
             }
             storage.move(temporaryStorage, storagePath, storagePath);
+
+            // Job and job reports
+            if (resource.getStoragePath().getContainerName().equals(RodaConstants.STORAGE_CONTAINER_JOB)) {
+              if (!resource.isDirectory()) {
+                try (InputStream inputStream = storage.getBinary(resource.getStoragePath()).getContent()
+                  .createInputStream()) {
+                  Job jobToImport = JsonUtils.getObjectFromJson(inputStream, Job.class);
+                  StoragePath jobReportsContainerPath = ModelUtils.getJobReportsStoragePath(jobToImport.getId());
+                  if (storage.exists(jobReportsContainerPath)) {
+                    storage.deleteResource(jobReportsContainerPath);
+                  }
+                  storage.createDirectory(jobReportsContainerPath);
+                } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
+                  | IOException e) {
+                  LOGGER.error("Error getting Job json from binary", e);
+                }
+              }
+            }
+
           }
         }
         reindexBundle(bundleState, jobPluginInfo);

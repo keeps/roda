@@ -1109,6 +1109,8 @@ public interface ClientMessages extends Messages {
 
   /*** Show job and report ****/
 
+  String jobInstanceId();
+
   String jobName();
 
   String jobCreator();
