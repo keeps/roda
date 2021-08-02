@@ -12,6 +12,11 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.index.filter.FilterParameter;
+import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.bundle.BundleState;
 import org.roda.core.data.v2.synchronization.bundle.PackageState;
@@ -47,6 +52,15 @@ public class SyncBundleHelper {
           RodaConstants.RISK_INCIDENCE_DETECTED_ON, initialDate, finalDate));
       }
       return new SelectedItemsFilter(filter, RiskIncidence.class.getName(), false);
+    } else if (bundleClass.equals(Job.class)) {
+      List<FilterParameter> parameters = new ArrayList<>();
+      parameters.add(new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INTERNAL.toString()));
+      if (initialDate != null) {
+        parameters.add(new DateIntervalFilterParameter(RodaConstants.JOB_START_DATE, RodaConstants.JOB_END_DATE,
+          initialDate, finalDate));
+      }
+      filter.add(parameters);
+      return new SelectedItemsFilter(filter, Job.class.getName(), false);
     } else {
       throw new NotFoundException("No Bundle plugin available");
     }
