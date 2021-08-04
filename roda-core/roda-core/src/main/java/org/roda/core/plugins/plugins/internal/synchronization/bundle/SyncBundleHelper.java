@@ -15,6 +15,8 @@ import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -61,6 +63,18 @@ public class SyncBundleHelper {
       }
       filter.add(parameters);
       return new SelectedItemsFilter(filter, Job.class.getName(), false);
+    } else if (bundleClass.equals(IndexedPreservationEvent.class)) {
+      List<FilterParameter> parameters = new ArrayList<>();
+      parameters.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS,
+        IndexedPreservationEvent.PreservationMetadataEventClass.REPOSITORY.toString()));
+      if (initialDate != null) {
+        parameters.add(new DateIntervalFilterParameter(RodaConstants.PRESERVATION_EVENT_DATETIME,
+          RodaConstants.PRESERVATION_EVENT_DATETIME, initialDate, finalDate));
+      }
+      filter.add(parameters);
+      return new SelectedItemsFilter(filter, IndexedPreservationEvent.class.getName(), false);
+    } else if (bundleClass.equals(IndexedPreservationAgent.class)) {
+      return new SelectedItemsFilter(filter, IndexedPreservationAgent.class.getName(), false);
     } else {
       throw new NotFoundException("No Bundle plugin available");
     }

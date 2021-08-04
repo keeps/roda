@@ -1,5 +1,9 @@
 package org.roda.core.plugins.plugins.internal.synchronization.bundle;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -14,6 +18,8 @@ import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
@@ -29,20 +35,15 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-
 /**
- * @author Tiago Fraga <tfraga@keep.pt>
+ * @author Gabriel Barros <gbarros@keep.pt>
  */
-
-public class CreateJobPackagePlugin extends CreateRodaEntityPackagePlugin<Job> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(CreateJobPackagePlugin.class);
+public class CreateRepositoryEventPackagePlugin extends CreateRodaEntityPackagePlugin<IndexedPreservationEvent> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(CreateRepositoryEventPackagePlugin.class);
 
   @Override
   public String getName() {
-    return "Create Job Bundle";
+    return "Create Repository Preservation Event Bundle";
   }
 
   @Override
@@ -52,7 +53,7 @@ public class CreateJobPackagePlugin extends CreateRodaEntityPackagePlugin<Job> {
 
   @Override
   protected String getEntity() {
-    return "job";
+    return "preservation_event";
   }
 
   @Override
@@ -65,30 +66,32 @@ public class CreateJobPackagePlugin extends CreateRodaEntityPackagePlugin<Job> {
     if (sourceObjects instanceof SelectedItemsFilter) {
       Filter filter = ((SelectedItemsFilter) sourceObjects).getFilter();
       try {
-        int counter = index.count(Job.class, filter).intValue();
+        int counter = index.count(IndexedPreservationEvent.class, filter).intValue();
 
         jobPluginInfo.setSourceObjectsCount(counter);
 
         PackageState packageState = SyncBundleHelper.getPackageState(getLocalInstance(), getEntity());
-        packageState.setClassName(Job.class);
+        packageState.setClassName(IndexedPreservationEvent.class);
         packageState.setCount(counter);
         SyncBundleHelper.updatePackageState(getLocalInstance(), getEntity(), packageState);
 
-        IterableIndexResult<Job> jobs = index.findAll(Job.class, filter, Arrays.asList(RodaConstants.INDEX_UUID));
-        for (Job jobToBundle : jobs) {
-          Report reportItem = PluginHelper.initPluginReportItem(this, jobToBundle.getId(), Job.class);
-          Job retrieveJob = null;
+        IterableIndexResult<IndexedPreservationEvent> events = index.findAll(IndexedPreservationEvent.class, filter,
+          Arrays.asList(RodaConstants.INDEX_UUID));
+        for (IndexedPreservationEvent event : events) {
+          Report reportItem = PluginHelper.initPluginReportItem(this, event.getId(), IndexedPreservationEvent.class);
+          PreservationMetadata retrieveEvent = null;
           try {
-            retrieveJob = model.retrieveJob(jobToBundle.getId());
-            createJobBundle(model, retrieveJob);
-            packageState.addIdList(retrieveJob.getId());
+            retrieveEvent = model.retrievePreservationMetadata(event.getId(),
+              PreservationMetadata.PreservationMetadataType.EVENT);
+            createEventBundle(model, retrieveEvent);
+            packageState.addIdList(retrieveEvent.getId());
             SyncBundleHelper.updatePackageState(getLocalInstance(), getEntity(), packageState);
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
           } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-            LOGGER.error("Error on create bundle for job {}", jobToBundle.getId());
+            LOGGER.error("Error on create bundle for repository event {}", retrieveEvent.getId());
             jobPluginInfo.incrementObjectsProcessedWithFailure();
             reportItem.addPluginDetails(
-              "Failed to create bundle for " + jobToBundle.getClass() + " " + jobToBundle.getId() + "\n");
+              "Failed to create bundle for " + retrieveEvent.getClass() + " " + retrieveEvent.getId() + "\n");
             reportItem.addPluginDetails(e.getMessage());
             pluginReport.addReport(reportItem.setPluginState(PluginState.FAILURE));
             PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
@@ -101,33 +104,23 @@ public class CreateJobPackagePlugin extends CreateRodaEntityPackagePlugin<Job> {
     }
   }
 
-  public void createJobBundle(ModelService model, Job jobToBundle) throws RequestNotValidException, NotFoundException,
-    AuthorizationDeniedException, GenericException, AlreadyExistsException {
+  public void createEventBundle(ModelService model, PreservationMetadata event) throws RequestNotValidException,
+    NotFoundException, AuthorizationDeniedException, GenericException, AlreadyExistsException {
 
     StorageService storage = model.getStorage();
-    StoragePath jobContainerPath = ModelUtils.getJobContainerPath();
-    String jobFile = jobToBundle.getId() + RodaConstants.JOB_FILE_EXTENSION;
+    StoragePath eventStoragePath = ModelUtils.getPreservationRepositoryEventStoragePath();
+    String eventFile = event.getId() + RodaConstants.PREMIS_SUFFIX;
 
     Path destinationPath = getDestinationPath().resolve(RodaConstants.CORE_STORAGE_FOLDER)
-      .resolve(RodaConstants.STORAGE_CONTAINER_JOB);
+      .resolve(RodaConstants.STORAGE_CONTAINER_PRESERVATION).resolve(RodaConstants.STORAGE_DIRECTORY_EVENTS);
 
-    Path jobPath = destinationPath.resolve(jobFile);
+    Path eventPath = destinationPath.resolve(eventFile);
 
-    storage.copy(storage, jobContainerPath, jobPath, jobFile);
-
-    // Job Report
-    StoragePath jobReportsPath = ModelUtils.getJobReportContainerPath();
-    if (storage.exists(jobReportsPath)) {
-      Path jobReportDestinationPath = getDestinationPath().resolve(RodaConstants.CORE_STORAGE_FOLDER)
-        .resolve(RodaConstants.STORAGE_CONTAINER_JOB_REPORT).resolve(jobToBundle.getId());
-
-      storage.copy(storage, jobReportsPath, jobReportDestinationPath, jobToBundle.getId());
-    }
-
+    storage.copy(storage, eventStoragePath, eventPath, eventFile);
   }
 
   @Override
   public Plugin<Void> cloneMe() {
-    return new CreateJobPackagePlugin();
+    return new CreateRepositoryEventPackagePlugin();
   }
 }

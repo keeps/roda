@@ -99,6 +99,8 @@ import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateAipPackagePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateJobPackagePlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreatePreservationAgentPackagePlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateRepositoryEventPackagePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateRiskIncidencePackagePlugin;
 import org.roda.core.plugins.plugins.notifications.GenericJobNotification;
 import org.roda.core.plugins.plugins.notifications.JobNotification;
@@ -751,9 +753,13 @@ public final class PluginHelper {
     list.add(AIP.class);
     list.add(RiskIncidence.class);
     list.add(Job.class);
+    list.add(IndexedPreservationEvent.class);
+    list.add(IndexedPreservationAgent.class);
     return list;
   }
 
+
+  // TODO tfraga: remove
   public static List<Class<? extends IsRODAObject>> getInstanceIdObjectClasses() {
     List<Class<? extends IsRODAObject>> list = new ArrayList<>();
     list.add(AIP.class);
@@ -1684,6 +1690,10 @@ public final class PluginHelper {
       return CreateRiskIncidencePackagePlugin.class.getName();
     } else if (bundleClass.equals(Job.class)) {
       return CreateJobPackagePlugin.class.getName();
+    } else if (bundleClass.equals(IndexedPreservationEvent.class)) {
+      return CreateRepositoryEventPackagePlugin.class.getName();
+    } else if (bundleClass.equals(IndexedPreservationAgent.class)) {
+      return CreatePreservationAgentPackagePlugin.class.getName();
     } else {
       throw new NotFoundException("No Bundle plugin available");
     }
