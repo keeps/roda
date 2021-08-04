@@ -62,6 +62,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.storage.utils.LocalInstanceUtils;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.utils.URNUtils;
@@ -3420,8 +3421,8 @@ public class ModelService extends ModelObservable {
     try {
       if (LogEntry.class.equals(objectClass) || RODAMember.class.equals(objectClass)
         || TransferredResource.class.equals(objectClass) || IndexedPreservationAgent.class.equals(objectClass)
-        || IndexedAIP.class.equals(objectClass) || RepresentationInformation.class.equals(objectClass)
-        || RiskIncidence.class.equals(objectClass)) {
+        || IndexedPreservationEvent.class.equals(objectClass) || IndexedAIP.class.equals(objectClass)
+        || RepresentationInformation.class.equals(objectClass) || RiskIncidence.class.equals(objectClass)) {
         return true;
       } else {
         StoragePath storagePath = ModelUtils.getContainerPath(objectClass);

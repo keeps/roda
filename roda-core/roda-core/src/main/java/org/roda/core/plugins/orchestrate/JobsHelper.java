@@ -42,6 +42,9 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobPriority;
@@ -389,6 +392,48 @@ public final class JobsHelper {
     return jobsToReturn;
   }
 
+  public static List<PreservationMetadata> getRepositoryEvents(ModelService model, List<String> uuids)
+    throws NotFoundException {
+    List<PreservationMetadata> eventsToReturn = new ArrayList<>();
+    if (!uuids.isEmpty()) {
+      for (String uuid : uuids) {
+        try {
+          eventsToReturn
+            .add(model.retrievePreservationMetadata(uuid, PreservationMetadata.PreservationMetadataType.EVENT));
+        } catch (RuntimeException e) {
+          LOGGER.error("Error while retrieving repository event from model", e);
+        }
+      }
+    }
+
+    if (eventsToReturn.isEmpty()) {
+      throw new NotFoundException("Could not retrieve the repository events");
+    }
+
+    return eventsToReturn;
+  }
+
+  public static List<PreservationMetadata> getPreservationAgents(ModelService model, List<String> uuids)
+    throws NotFoundException {
+    List<PreservationMetadata> agentsToReturn = new ArrayList<>();
+    if (!uuids.isEmpty()) {
+      for (String uuid : uuids) {
+        try {
+          agentsToReturn
+            .add(model.retrievePreservationMetadata(uuid, PreservationMetadata.PreservationMetadataType.AGENT));
+        } catch (RuntimeException e) {
+          LOGGER.error("Error while retrieving preservation agent from model", e);
+        }
+      }
+    }
+
+    if (agentsToReturn.isEmpty()) {
+      throw new NotFoundException("Could not retrieve the preservation agents");
+    }
+
+    return agentsToReturn;
+  }
+
   public static <T extends IsRODAObject> List<T> getObjectsFromUUID(ModelService model, IndexService index,
     Class<T> objectClass, List<String> uuids) throws NotFoundException, GenericException, RequestNotValidException {
     if (AIP.class.equals(objectClass)) {
@@ -401,6 +446,10 @@ public final class JobsHelper {
       return (List<T>) getRiskIncidences(model, uuids);
     } else if (Job.class.equals(objectClass)) {
       return (List<T>) getJobs(model, uuids);
+    } else if (IndexedPreservationEvent.class.equals(objectClass)) {
+      return (List<T>) getRepositoryEvents(model, uuids);
+    } else if (IndexedPreservationAgent.class.equals(objectClass)) {
+      return (List<T>) getPreservationAgents(model, uuids);
     } else {
       return getObjectsFromIndex(index, objectClass, uuids);
     }
