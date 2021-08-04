@@ -51,7 +51,7 @@ public class CreateRiskIncidencePackagePlugin extends CreateRodaEntityPackagePlu
 
   @Override
   protected String getEntity() {
-    return "risk incidence";
+    return "risk_incidence";
   }
 
   @Override
