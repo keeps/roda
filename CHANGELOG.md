@@ -1,7 +1,15 @@
 # Changelog
 
-## v3.5.6 (01/01/1970)
-*No changelog for this release.*
+## v3.5.6 (12/08/2021)
+
+#### Bug Fixes:
+
+-  Missing Cron in Tomcat base image. [#1940](https://github.com/keeps/roda/issues/1940)
+
+Install for demonstration:
+```
+docker pull keeps/roda:v3.5.6
+```
 
 ---
 
