@@ -31,7 +31,7 @@ Before releasing:
 Example release 2.2.0 and prepare for next version 2.3.0.
 
 1. Run `./scripts/release.sh 2.2.0`
-2. Wait for [travis tag build](https://travis-ci.org/keeps/roda/) to be finished and successful
+2. Wait for [GitHub action build](https://github.com/keeps/roda/actions/workflows/release.yml) to be finished and successful
 3. Local compile to generate roda-wui.war artifact `mvn clean package -Dmaven.test.skip`
 4. Generate release with tags: `gren release --draft -t v2.2.0..v2.1.0` or with milestone `gren release -d --tags=v3.4.0 --data-source=milestones --milestone-match="3.4.0"`
 5. Review release and accept release:
@@ -49,44 +49,6 @@ Install for demonstration:
 docker pull keeps/roda:v2.2.11
 ```
 ````
-
-## How to's in travis
-
-Travis client install process: https://github.com/travis-ci/travis.rb#installation
-
-### Create secure variable
-
-* Generate secure variable called `MY_SECRET_ENV` with the value `super_secret`:
-```
-travis encrypt MY_SECRET_ENV=super_secret
-```
-* Then add it to .travis.yml
-
-### Generate secure file
-
-* Login into travis (supports two-factor authentication)
-```
-travis login --org
-```
-* Generate secure file from file called settings.xml
-```
-travis encrypt-file settings.xml
-```
-* Follow the instructions given as result of the previous command execution, which will add stuff into .travis.yml
-
-### Update artifactory token
-
-Generate a new token:
-```bash
-# ARTIFACTORY_USER
-echo "roda-travis-$(date -I)"
-# ARTIFACTORY_PASS
- curl -u lfaria -XPOST "https://artifactory.keep.pt/artifactory/api/security/token" -d expires_in=31536000 -d "username=roda-travis-$(date -I)" -d "scope=member-of-groups:deployers"
-```
-
-Update the variables at [RODA Travis settings](https://travis-ci.org/github/keeps/roda/settings).
-
-
 
 ## Redeploy on docker
 
