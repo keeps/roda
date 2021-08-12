@@ -1,5 +1,29 @@
 # Changelog
 
+## v4.0.2 (12/08/2021)
+#### Bug Fixes:
+
+-  Missing Cron in Tomcat base image. [#1940](https://github.com/keeps/roda/issues/1940)
+
+Install for demonstration:
+```
+docker pull keeps/roda:v4.0.2
+```
+---
+
+## v3.5.6 (12/08/2021)
+
+#### Bug Fixes:
+
+-  Missing Cron in Tomcat base image. [#1940](https://github.com/keeps/roda/issues/1940)
+
+Install for demonstration:
+```
+docker pull keeps/roda:v3.5.6
+```
+
+---
+
 ## v4.0.1 (29/07/2021)
 #### Enhancements:
 -  Improve pruning of descriptive metadata when destroying a record #1920
@@ -859,34 +883,3 @@ docker pull keeps/roda:v2.2.3
 -  Change RI extra bundle permission to read instead of manage [#1221](https://github.com/keeps/roda/issues/1221)
 
 
-
----
-
-## v2.2.2 (30/04/2018)
-Install for demonstration:
-```
-docker pull keeps/roda:v2.2.2
-```
-
-#### Bug Fixes:
-
--  Descriptive metadata form with separators gives NPE on clicking raw XML button [#1215](https://github.com/keeps/roda/issues/1215)
--  Ingest > Process > List Created Packages stopped working [#1213](https://github.com/keeps/roda/issues/1213)
--  File notification fails to index because recipientUsers is a required field [#1210](https://github.com/keeps/roda/issues/1210)
-
----
-
-## v2.2.1 (24/04/2018)
-Install for demonstration:
-```
-docker pull keeps/roda:v2.2.1
-```
-
-#### Enhancements:
-
--  RI search by tags show no feedback [#1202](https://github.com/keeps/roda/issues/1202)
--  An external link in RI should be opened in another window [#1201](https://github.com/keeps/roda/issues/1201)
-
-#### Bug Fixes:
-
-- CAS API Authentication Filter does not generate user [#1209](https://github.com/keeps/roda/issues/1209)
