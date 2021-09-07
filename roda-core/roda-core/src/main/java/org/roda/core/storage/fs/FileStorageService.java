@@ -550,7 +550,7 @@ public class FileStorageService implements StorageService {
     List<String> path = ModelUtils.extractFilePathFromRepresentationOtherMetadata(storagePath);
     try {
       StoragePath externalFile = ModelUtils.getFileStoragePath(aipId.get(), representationId.get(), path,
-        RodaConstants.RODA_EXTERNAL_FILE);
+        RodaConstants.RODA_MANIFEST_EXTERNAL_FILES);
       Path entity = FSUtils.getEntityPath(basePath, externalFile);
       if (FSUtils.exists(entity)) {
         return getEntityClass(externalFile, entity);

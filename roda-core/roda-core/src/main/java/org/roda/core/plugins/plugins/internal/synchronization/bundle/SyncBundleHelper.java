@@ -15,6 +15,8 @@ import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
@@ -48,6 +50,12 @@ public class SyncBundleHelper {
           initialDate, finalDate));
       }
       return new SelectedItemsFilter(filter, IndexedAIP.class.getName(), false);
+    } else if (bundleClass.equals(DIP.class)) {
+      if (initialDate != null) {
+        filter.add(new DateIntervalFilterParameter(RodaConstants.DIP_LAST_MODIFIED, RodaConstants.DIP_LAST_MODIFIED,
+          initialDate, finalDate));
+      }
+      return new SelectedItemsFilter(filter, IndexedDIP.class.getName(), false);
     } else if (bundleClass.equals(RiskIncidence.class)) {
       if (initialDate != null) {
         filter.add(new DateIntervalFilterParameter(RodaConstants.RISK_INCIDENCE_DETECTED_ON,

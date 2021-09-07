@@ -12,8 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-
+import java.util.Objects;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
@@ -44,6 +43,8 @@ public class DIP implements IsModelObject, HasId, HasPermissions {
   private List<FileLink> fileIds;
 
   private Permissions permissions = new Permissions();
+
+  private String instanceId;
 
   public DIP() {
     super();
@@ -195,6 +196,14 @@ public class DIP implements IsModelObject, HasId, HasPermissions {
     this.fileIds.add(link);
   }
 
+  public String getInstanceId() {
+    return instanceId;
+  }
+
+  public void setInstanceId(String instanceId) {
+    this.instanceId = instanceId;
+  }
+
   public Permissions getPermissions() {
     return permissions;
   }
@@ -237,27 +246,15 @@ public class DIP implements IsModelObject, HasId, HasPermissions {
 
   @Override
   public int hashCode() {
-    int result = id != null ? id.hashCode() : 0;
-    result = 31 * result + (title != null ? title.hashCode() : 0);
-    result = 31 * result + (description != null ? description.hashCode() : 0);
-    result = 31 * result + (type != null ? type.hashCode() : 0);
-    result = 31 * result + (dateCreated != null ? dateCreated.hashCode() : 0);
-    result = 31 * result + (lastModified != null ? lastModified.hashCode() : 0);
-    result = 31 * result + (isPermanent != null ? isPermanent.hashCode() : 0);
-    result = 31 * result + (properties != null ? properties.hashCode() : 0);
-    result = 31 * result + (aipIds != null ? aipIds.hashCode() : 0);
-    result = 31 * result + (representationIds != null ? representationIds.hashCode() : 0);
-    result = 31 * result + (fileIds != null ? fileIds.hashCode() : 0);
-    result = 31 * result + (permissions != null ? permissions.hashCode() : 0);
-    return result;
+    return Objects.hash(id, title, description, type, dateCreated, lastModified, isPermanent, properties, aipIds,
+      representationIds, fileIds, permissions, instanceId);
   }
 
   @Override
   public String toString() {
-    return "DIP [id=" + id + ", title=" + title + ", description=" + description + ", type=" + type + ", dateCreated="
-      + dateCreated + ", lastModified=" + lastModified + ", isPermanent=" + isPermanent + ", properties=" + properties
-      + ", aipIds=" + aipIds + ", representationIds=" + representationIds + ", fileIds=" + fileIds + ", permissions="
-      + permissions + "]";
+    return "DIP{" + "id='" + id + '\'' + ", title='" + title + '\'' + ", description='" + description + '\''
+      + ", type='" + type + '\'' + ", dateCreated=" + dateCreated + ", lastModified=" + lastModified + ", isPermanent="
+      + isPermanent + ", properties=" + properties + ", aipIds=" + aipIds + ", representationIds=" + representationIds
+      + ", fileIds=" + fileIds + ", permissions=" + permissions + ", instanceId='" + instanceId + '\'' + '}';
   }
-
 }

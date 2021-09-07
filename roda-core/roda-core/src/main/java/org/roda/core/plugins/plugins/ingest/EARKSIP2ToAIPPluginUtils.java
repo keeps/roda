@@ -280,7 +280,7 @@ public class EARKSIP2ToAIPPluginUtils {
       String fileId;
       ContentPayload payload;
       if (file instanceof IPFileShallow) {
-        fileId = RodaConstants.RODA_EXTERNAL_FILE;
+        fileId = RodaConstants.RODA_MANIFEST_EXTERNAL_FILES;
         directoryPath = null;
         payload = null;
       } else {
@@ -301,7 +301,6 @@ public class EARKSIP2ToAIPPluginUtils {
               break;
             }
           }
-          model.updateAIP(aip, username);
         } else {
           createdFile = model.createFile(aipId, representation.getId(), directoryPath, fileId, payload, notify);
         }

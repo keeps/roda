@@ -88,6 +88,7 @@ public class DIPCollection extends AbstractSolrCollection<IndexedDIP, DIP> {
     fields.add(new Field(RodaConstants.DIP_ALL_AIP_UUIDS, Field.TYPE_STRING).setStored(false).setMultiValued(true));
     fields.add(
       new Field(RodaConstants.DIP_ALL_REPRESENTATION_UUIDS, Field.TYPE_STRING).setStored(false).setMultiValued(true));
+    fields.add(new Field(RodaConstants.DIP_INSTANCE_ID, Field.TYPE_STRING));
 
     return fields;
   }
@@ -103,6 +104,7 @@ public class DIPCollection extends AbstractSolrCollection<IndexedDIP, DIP> {
     SolrInputDocument doc = super.toSolrDocument(dip, info);
 
     doc.addField(RodaConstants.DIP_TITLE, dip.getTitle());
+    doc.addField(RodaConstants.DIP_INSTANCE_ID, dip.getInstanceId());
     doc.addField(RodaConstants.DIP_DESCRIPTION, dip.getDescription());
     doc.addField(RodaConstants.DIP_TYPE, dip.getType());
     doc.addField(RodaConstants.DIP_DATE_CREATED, SolrUtils.formatDate(dip.getDateCreated()));
@@ -173,6 +175,7 @@ public class DIPCollection extends AbstractSolrCollection<IndexedDIP, DIP> {
     dip.setDateCreated(SolrUtils.objectToDate(doc.get(RodaConstants.DIP_DATE_CREATED)));
     dip.setLastModified(SolrUtils.objectToDate(doc.get(RodaConstants.DIP_LAST_MODIFIED)));
     dip.setIsPermanent(SolrUtils.objectToBoolean(doc.get(RodaConstants.DIP_IS_PERMANENT), Boolean.FALSE));
+    dip.setInstanceId(SolrUtils.objectToString(doc.get(RodaConstants.DIP_INSTANCE_ID), null));
 
     boolean emptyFields = fieldsToReturn.isEmpty();
 

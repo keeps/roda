@@ -162,8 +162,17 @@ public abstract class InstanceIdentifierRodaEntityPlugin<T extends IsRODAObject>
         try {
           model.updateAIPInstanceId(AIP.class.cast(object));
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
-          // TODO: The instance id plugin should create a preservation event ?
-          // createEventOnAIP(aip, model, index, cachedJob);
+        } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+          reportItem.addPluginDetails(e.getMessage() + "\n");
+
+          pluginReport.addReport(reportItem.setPluginState(PluginState.FAILURE));
+          PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
+        }
+      } else if (DIP.class.equals(objectClass)) {
+        try {
+          model.updateDIPInstanceId(DIP.class.cast(object));
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
         } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
           jobPluginInfo.incrementObjectsProcessedWithFailure();
           reportItem.addPluginDetails(e.getMessage() + "\n");
@@ -242,53 +251,6 @@ public abstract class InstanceIdentifierRodaEntityPlugin<T extends IsRODAObject>
     }
   }
 
-  private void createEventOnAIP(AIP aip, ModelService model, IndexService index, Job cachedJob) {
-    try {
-      PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.SUCCESS, "", true, cachedJob);
-      createEventOnRepresentation(aip, model, index, cachedJob);
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
-      | ValidationException | AlreadyExistsException e) {
-      LOGGER.error("Could not create preservation event: " + e.getMessage());
-    }
-  }
-
-  private void createEventOnRepresentation(AIP aip, ModelService model, IndexService index, Job cachedJob)
-    throws AuthorizationDeniedException, RequestNotValidException, ValidationException, AlreadyExistsException,
-    NotFoundException, GenericException {
-    for (Representation representation : aip.getRepresentations()) {
-      PluginHelper.createPluginEvent(this, aip.getId(), representation.getId(), model, index, null, null,
-        PluginState.SUCCESS, "", true, cachedJob);
-
-      try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
-        representation.getId(), true)) {
-        for (OptionalWithCause<File> file : allFiles) {
-          if (file.isPresent()) {
-            if (FSUtils.isExternalFile(file.get().getId())) {
-              for (OptionalWithCause<File> fileShallow : model.listExternalFilesUnder(file.get())) {
-                createEventOnFile(aip, representation, fileShallow.get(), model, index, cachedJob);
-              }
-            } else {
-              createEventOnFile(aip, representation, file.get(), model, index, cachedJob);
-            }
-          } else {
-            LOGGER.error("Cannot do a partial update on File", file.getCause());
-          }
-        }
-
-      } catch (AuthorizationDeniedException | IOException | NotFoundException | GenericException
-        | RequestNotValidException e) {
-        LOGGER.error("Cannot do a partial update", e);
-      }
-    }
-
-  }
-
-  private void createEventOnFile(AIP aip, Representation representation, File file, ModelService model,
-    IndexService index, Job cachedJob) throws AuthorizationDeniedException, RequestNotValidException,
-    ValidationException, AlreadyExistsException, NotFoundException, GenericException {
-    PluginHelper.createPluginEvent(this, aip.getId(), representation.getId(), file.getPath(), file.getId(), model,
-      index, null, null, PluginState.SUCCESS, "", true, cachedJob);
-  }
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {

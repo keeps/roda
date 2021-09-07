@@ -686,7 +686,7 @@ public class FSUtils {
       ContentPayload content = null;
       long sizeInBytes;
       try {
-        if (FSUtils.isExternalFile(path)) {
+        if (FSUtils.isManifestOfExternalFiles(path)) {
           List<String> allLines = Files.readAllLines(path);
           ShallowFiles shallowFiles = new ShallowFiles();
           for (String line : allLines) {
@@ -1011,12 +1011,12 @@ public class FSUtils {
     return file != null && file.toFile().isDirectory();
   }
 
-  public static boolean isExternalFile(String fileId) {
-    return fileId != null && fileId.equals(RodaConstants.RODA_EXTERNAL_FILE);
+  public static boolean isManifestOfExternalFiles(String fileId) {
+    return fileId != null && fileId.equals(RodaConstants.RODA_MANIFEST_EXTERNAL_FILES);
   }
 
-  public static boolean isExternalFile(Path file) {
-    return file != null && isExternalFile(file.getFileName().toString());
+  public static boolean isManifestOfExternalFiles(Path file) {
+    return file != null && isManifestOfExternalFiles(file.getFileName().toString());
   }
 
   /**

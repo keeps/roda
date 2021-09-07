@@ -101,6 +101,8 @@ public interface ModelObserver {
 
   public ReturnWithExceptions<Void, ModelObserver> dipPermissionsUpdated(DIP dip);
 
+  public ReturnWithExceptions<Void, ModelObserver> dipInstanceIdUpdated(DIP dip);
+
   public ReturnWithExceptions<Void, ModelObserver> transferredResourceDeleted(String transferredResourceID);
 
   public ReturnWithExceptions<Void, ModelObserver> riskCreatedOrUpdated(Risk risk, int incidences, boolean commit);

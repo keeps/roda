@@ -1182,7 +1182,7 @@ public class ModelService extends ModelObservable {
   public File retrieveFileInsideManifest(String aipId, String representationId, List<String> directoryPath,
     String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath,
-      RodaConstants.RODA_EXTERNAL_FILE);
+      RodaConstants.RODA_MANIFEST_EXTERNAL_FILES);
     Binary binary = storage.getBinary(filePath);
     ContentPayload content = binary.getContent();
 
@@ -1326,7 +1326,7 @@ public class ModelService extends ModelObservable {
 
     if (file.isReference()) {
       StoragePath storagePath = ModelUtils.getFileStoragePath(file.getAipId(), file.getRepresentationId(),
-        file.getPath(), RodaConstants.RODA_EXTERNAL_FILE);
+        file.getPath(), RodaConstants.RODA_MANIFEST_EXTERNAL_FILES);
       Binary binary = getStorage().getBinary(storagePath);
       ContentPayload content = binary.getContent();
       if (content instanceof ShallowFileContentPayload) {
@@ -2942,6 +2942,16 @@ public class ModelService extends ModelObservable {
     DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(storagePath,
       RodaConstants.STORAGE_DIP_METADATA_FILENAME);
     storage.createBinary(metadataStoragePath, new StringContentPayload(json), false);
+  }
+
+  public void updateDIPInstanceId(DIP dip)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+
+    dip.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
+    dip.setLastModified(new Date());
+    updateDIPMetadata(dip);
+    notifyDipInstanceIdUpdated(dip).failOnError();
   }
 
   private void updateDIPMetadata(DIP dip)
