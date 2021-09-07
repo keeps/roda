@@ -1287,6 +1287,7 @@ public final class RodaConstants {
   public static final String DIP_FILE_UUIDS = "fileUUIDs";
   public static final String DIP_ALL_AIP_UUIDS = "allAipUUIDs";
   public static final String DIP_ALL_REPRESENTATION_UUIDS = "allRepresentationUUIDs";
+  public static final String DIP_INSTANCE_ID = "instanceId";
 
   public static final String DIP_FILE_EXTENSION = ".json";
 
@@ -1757,7 +1758,7 @@ public final class RodaConstants {
   public static final String RODA_NODE_TYPE_KEY = "nodeType";
 
   /* Shallow File */
-  public static final String RODA_EXTERNAL_FILE = "external_files.jsonl";
+  public static final String RODA_MANIFEST_EXTERNAL_FILES = "external_files.jsonl";
 
   /* Distributed instances */
   public static final String DISTRIBUTED_INSTANCE_USER_PREFIX = "DISTRIBUTED_";
@@ -1778,6 +1779,8 @@ public final class RodaConstants {
   public static final String SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE_PATH = SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FOLDER
     + "/" + SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE;
   public static final String SYNCHRONIZATION_BUNDLE_PATH = "data/synchronization/bundle";
+
+  public static final String PROTOCOL_SEPARATOR = "://";
 
   /** Private empty constructor */
   private RodaConstants() {

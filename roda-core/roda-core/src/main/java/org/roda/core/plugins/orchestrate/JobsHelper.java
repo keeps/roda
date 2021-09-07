@@ -37,6 +37,7 @@ import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -434,6 +435,25 @@ public final class JobsHelper {
     return agentsToReturn;
   }
 
+  public static List<DIP> getDIPs(ModelService model, List<String> uuids) throws NotFoundException {
+    List<DIP> dipsToReturn = new ArrayList<>();
+    if (!uuids.isEmpty()) {
+      for (String uuid : uuids) {
+        try {
+          dipsToReturn.add(model.retrieveDIP(uuid));
+        } catch (RODAException | RuntimeException e) {
+          LOGGER.error("Error while retrieving DIP from model", e);
+        }
+      }
+    }
+
+    if (dipsToReturn.isEmpty()) {
+      throw new NotFoundException("Could not retrieve the DIPs");
+    }
+
+    return dipsToReturn;
+  }
+
   public static <T extends IsRODAObject> List<T> getObjectsFromUUID(ModelService model, IndexService index,
     Class<T> objectClass, List<String> uuids) throws NotFoundException, GenericException, RequestNotValidException {
     if (AIP.class.equals(objectClass)) {
@@ -450,6 +470,8 @@ public final class JobsHelper {
       return (List<T>) getRepositoryEvents(model, uuids);
     } else if (IndexedPreservationAgent.class.equals(objectClass)) {
       return (List<T>) getPreservationAgents(model, uuids);
+    } else if (DIP.class.equals(objectClass)) {
+      return (List<T>) getDIPs(model, uuids);
     } else {
       return getObjectsFromIndex(index, objectClass, uuids);
     }

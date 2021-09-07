@@ -452,4 +452,18 @@ public class IndexedFile implements IsIndexed, HasId, SetsUUID, HasPermissionFil
       RodaConstants.FILE_PATH, RodaConstants.INDEX_ID);
   }
 
+  public String getSHA256Checksum() {
+    if (hash.size() != 0) {
+      return hash.get(1).split(" ")[0];
+    } else
+      return null;
+  }
+
+  public String getSHA256Type() {
+    if (hash.size() != 0) {
+      return hash.get(1).split("\\(")[1].split(",")[0];
+    } else
+      return null;
+  }
+
 }
