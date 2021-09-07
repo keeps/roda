@@ -171,6 +171,7 @@ import org.roda.core.plugins.plugins.internal.disposal.rules.ApplyDisposalRulesP
 import org.roda.core.plugins.plugins.internal.disposal.schedule.AssociateDisposalScheduleToAIPPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.schedule.DisassociateDisposalScheduleToAIPPlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateSyncBundlePlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierDIPPlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.proccess.SyncImportPlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.proccess.SyncProcessPlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierAIPEventPlugin;
@@ -3645,6 +3646,16 @@ public class BrowserHelper {
       new SelectedItemsFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name())),
         IndexedAIP.class.getName(), true),
       InstanceIdentifierAIPPlugin.class, user, pluginParameters, "Could not apply instance identifier to AIP");
+  }
+
+  public static void applyInstanceIdToDIP(LocalInstance localInstance, User user)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
+
+    createAndExecuteInternalJob("Apply instance identifier to DIP",
+      new SelectedItemsFilter(new Filter(), IndexedDIP.class.getName(), true), InstanceIdentifierDIPPlugin.class, user,
+      pluginParameters, "Could not apply instance identifier to DIP");
   }
 
   public static void applyInstanceIdToRisk(LocalInstance localInstance, User user)

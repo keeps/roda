@@ -56,13 +56,11 @@ import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
@@ -85,7 +83,6 @@ import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
-import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultBinary;
 import org.roda.core.storage.JsonContentPayload;
@@ -250,7 +247,7 @@ public class IndexModelObserver implements ModelObserver {
       representation.getId(), true)) {
       for (OptionalWithCause<File> file : allFiles) {
         if (file.isPresent()) {
-          if (FSUtils.isExternalFile(file.get().getId())) {
+          if (FSUtils.isManifestOfExternalFiles(file.get().getId())) {
             for (OptionalWithCause<File> shallowFile : model.listExternalFilesUnder(file.get())) {
               if (shallowFile.isPresent()) {
                 indexFile(aip, shallowFile.get(), ancestors, false).addTo(ret).getReturnedObject();
@@ -264,7 +261,7 @@ public class IndexModelObserver implements ModelObserver {
 
           if (file.get().isDirectory()) {
             numberOfDataFolders++;
-          } else if (!FSUtils.isExternalFile(file.get().getId())) {
+          } else if (!FSUtils.isManifestOfExternalFiles(file.get().getId())) {
             numberOfDataFiles++;
           }
         } else {
@@ -458,7 +455,7 @@ public class IndexModelObserver implements ModelObserver {
       if (ret.isEmpty()) {
         for (OptionalWithCause<File> file : allFiles) {
           if (file.isPresent()) {
-            if (FSUtils.isExternalFile(file.get().getId())) {
+            if (FSUtils.isManifestOfExternalFiles(file.get().getId())) {
               for (OptionalWithCause<File> fileShallow : model.listExternalFilesUnder(file.get())) {
                 fileStateUpdated(aip, fileShallow.get(), false).addTo(ret);
               }
@@ -505,7 +502,7 @@ public class IndexModelObserver implements ModelObserver {
       if (ret.isEmpty()) {
         for (OptionalWithCause<File> file : allFiles) {
           if (file.isPresent()) {
-            if (FSUtils.isExternalFile(file.get().getId())) {
+            if (FSUtils.isManifestOfExternalFiles(file.get().getId())) {
               for (OptionalWithCause<File> fileShallow : model.listExternalFilesUnder(file.get())) {
                 fileInstanceIdUpdated(aip, fileShallow.get(), false).addTo(ret);
               }
@@ -1163,6 +1160,17 @@ public class IndexModelObserver implements ModelObserver {
         ret.add(e);
       }
     }
+
+    return ret;
+  }
+
+  @Override
+  public ReturnWithExceptions<Void, ModelObserver> dipInstanceIdUpdated(DIP dip) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+
+    // change DIP
+    SolrUtils.update(index, IndexedDIP.class, dip.getId(),
+      Collections.singletonMap(RodaConstants.DIP_INSTANCE_ID, dip.getInstanceId()), (ModelObserver) this).addTo(ret);
 
     return ret;
   }

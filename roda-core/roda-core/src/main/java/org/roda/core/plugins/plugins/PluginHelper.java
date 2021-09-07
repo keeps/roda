@@ -99,6 +99,7 @@ import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.MultipleJobPluginInfo;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateAipPackagePlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateDipPackagePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateJobPackagePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreatePreservationAgentPackagePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateRepositoryEventPackagePlugin;
@@ -775,24 +776,11 @@ public final class PluginHelper {
   public static List<Class<? extends IsRODAObject>> getSynchronizedObjectClasses() {
     List<Class<? extends IsRODAObject>> list = new ArrayList<>();
     list.add(AIP.class);
+    list.add(DIP.class);
     list.add(RiskIncidence.class);
     list.add(Job.class);
     list.add(IndexedPreservationEvent.class);
     list.add(IndexedPreservationAgent.class);
-    return list;
-  }
-
-
-  // TODO tfraga: remove
-  public static List<Class<? extends IsRODAObject>> getInstanceIdObjectClasses() {
-    List<Class<? extends IsRODAObject>> list = new ArrayList<>();
-    list.add(AIP.class);
-    list.add(RepresentationInformation.class);
-    list.add(Notification.class);
-    list.add(Risk.class);
-    list.add(RiskIncidence.class);
-    // list.add(IndexedPreservationAgent.class);
-    // list.add(IndexedPreservationEvent.class);
     return list;
   }
 
@@ -1710,6 +1698,8 @@ public final class PluginHelper {
   public static String getBundlePluginName(Class<?> bundleClass) throws NotFoundException {
     if (bundleClass.equals(AIP.class)) {
       return CreateAipPackagePlugin.class.getName();
+    } else if (bundleClass.equals(DIP.class)) {
+      return CreateDipPackagePlugin.class.getName();
     } else if (bundleClass.equals(RiskIncidence.class)) {
       return CreateRiskIncidencePackagePlugin.class.getName();
     } else if (bundleClass.equals(Job.class)) {
