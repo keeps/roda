@@ -140,7 +140,7 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
               File file = oFile.get();
 
               if (!file.isDirectory()) {
-                if (FSUtils.isExternalFile(file.getId())) {
+                if (FSUtils.isManifestOfExternalFiles(file.getId())) {
                   StorageService tmpStorageService = ModelUtils.resolveTemporaryResourceShallow(job.getId(), storage,
                     ModelUtils.getAIPStoragePath(aip.getId()));
                   for (OptionalWithCause<File> fileShallow : model.listExternalFilesUnder(file)) {

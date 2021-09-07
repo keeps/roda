@@ -3891,26 +3891,21 @@ public class Browser extends RodaWuiController {
 
     try {
       BrowserHelper.applyInstanceIdToAIP(localInstance, user);
+      BrowserHelper.applyInstanceIdToDIP(localInstance, user);
       BrowserHelper.applyInstanceIdToRisk(localInstance, user);
       BrowserHelper.applyInstanceIdToRiskIncidence(localInstance, user);
       BrowserHelper.applyInstanceIdToRI(localInstance, user);
       BrowserHelper.applyInstanceIdToNotification(localInstance, user);
-
       BrowserHelper.applyInstanceIdToJob(localInstance, user);
-
       BrowserHelper.applyInstanceIdToAIPPreservationEvent(localInstance, user);
       BrowserHelper.applyInstanceIdToPreservationAgents(localInstance, user);
-
       BrowserHelper.applyInstanceIdToRepositoryPreservationEvent(localInstance, user);
-
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
     } finally {
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
     }
-
-
 
   }
 
@@ -3935,7 +3930,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static LocalInstance registerLocalInstance(User user, LocalInstance localInstance)
-      throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException {
+    throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -3945,7 +3940,7 @@ public class Browser extends RodaWuiController {
 
     try {
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
-      String resource =  RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE
+      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE
         + RodaConstants.API_PATH_PARAM_DISTRIBUTED_INSTANCE_REGISTER;
       RESTClientUtility.sendPostRequest(localInstance, null, localInstance.getCentralInstanceURL(), resource,
         accessToken);
@@ -4021,8 +4016,3 @@ public class Browser extends RodaWuiController {
   }
 
 }
-
-
-
-
-

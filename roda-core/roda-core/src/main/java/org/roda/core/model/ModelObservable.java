@@ -202,6 +202,10 @@ public abstract class ModelObservable {
     return notifyObserversSafely(observer -> observer.dipPermissionsUpdated(dip));
   }
 
+  public ReturnWithExceptionsWrapper notifyDipInstanceIdUpdated(DIP dip) {
+    return notifyObserversSafely(observer -> observer.dipInstanceIdUpdated(dip));
+  }
+
   public ReturnWithExceptionsWrapper notifyTransferredResourceDeleted(String transferredResourceID) {
     return notifyObserversSafely(observer -> observer.transferredResourceDeleted(transferredResourceID));
   }
