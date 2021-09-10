@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -29,7 +30,6 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.ShallowFile;
-import org.roda.core.data.v2.ip.ShallowFiles;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -47,8 +47,6 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.roda.core.data.utils.JsonUtils.getJsonFromObject;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -147,23 +145,13 @@ public class CreateAipPackagePlugin extends CreateRodaEntityPackagePlugin<AIP> {
       Path repMetadataDestinationPath = destinationPath.resolve(repMetadataPath);
       storage.copy(storage, aipStoragePath, repMetadataDestinationPath, repMetadataPath.toString());
 
-      ShallowFiles shallowFiles = new ShallowFiles();
-      addFilesToBundle(shallowFiles, aip, representation, index);
-
-      if (shallowFiles.getObjects().size() != 0) {
-        Files.createDirectory(repDataDestinationPath);
-        Path temp = Files.createFile(repDataDestinationPath.resolve(RodaConstants.RODA_MANIFEST_EXTERNAL_FILES));
-
-        for (ShallowFile shallowFile : shallowFiles.getObjects()) {
-          JsonUtils.appendObjectToFile(shallowFile, temp);
-        }
-
-      }
+      addFilesToBundle(aip, representation, index, repDataDestinationPath);
 
     }
   }
 
-  private void addFilesToBundle(ShallowFiles shallowFiles, AIP aip, Representation representation, IndexService index) {
+  private void addFilesToBundle(AIP aip, Representation representation, IndexService index,
+    Path repDataDestinationPath) {
     FilterParameter aipFilterParameter = new SimpleFilterParameter(RodaConstants.FILE_AIP_ID, aip.getId());
     FilterParameter repFilterParameter = new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_ID,
       representation.getId());
@@ -174,12 +162,66 @@ public class CreateAipPackagePlugin extends CreateRodaEntityPackagePlugin<AIP> {
 
     try (IterableIndexResult<IndexedFile> result = index.findAll(IndexedFile.class, filter, Collections.emptyList())) {
       for (IndexedFile indexedFile : result) {
-        ShallowFile shallowFile = convertFileOnShallow(aip, representation, indexedFile);
-        shallowFiles.addObject(shallowFile);
+        createDirectory(repDataDestinationPath);
+        if (indexedFile.isDirectory()) {
+          createDirectoryOnBundle(indexedFile, repDataDestinationPath);
+        } else {
+          ShallowFile shallowFile = convertFileOnShallow(aip, representation, indexedFile);
+          createFileOnBundle(repDataDestinationPath, indexedFile, shallowFile);
+        }
       }
     } catch (GenericException | RequestNotValidException | IOException | AuthorizationDeniedException
       | AlreadyExistsException | NotFoundException | URISyntaxException e) {
       LOGGER.error("Error getting Files to convert to shallow", e);
+    }
+  }
+
+  private void createFileOnBundle(Path repDataDestinationPath, IndexedFile indexedFile, ShallowFile shallowFile)
+    throws IOException, GenericException {
+    List<String> subFolders = indexedFile.getPath();
+    Path subFolder;
+    if (subFolders != null && subFolders.size() != 0) {
+      subFolder = repDataDestinationPath.resolve(subFolders.get(0));
+      createDirectory(subFolder);
+      for (int i = 1; i < subFolders.size(); i++) {
+        subFolder = subFolder.resolve(subFolders.get(i));
+        createDirectory(subFolder);
+      }
+    } else {
+      subFolder = repDataDestinationPath;
+    }
+
+    Path manifestExternalFiles = subFolder.resolve(RodaConstants.RODA_MANIFEST_EXTERNAL_FILES);
+    Path temp = Files.createFile(manifestExternalFiles);
+    JsonUtils.appendObjectToFile(shallowFile, temp);
+
+  }
+
+  private void createDirectoryOnBundle(IndexedFile indexedFile, Path repDataDestinationPath) throws IOException {
+    List<String> subFolders = indexedFile.getPath();
+    Path subFolder;
+    if (subFolders != null && subFolders.size() != 0) {
+      subFolder = repDataDestinationPath.resolve(subFolders.get(0));
+      createDirectory(subFolder);
+      for (int i = 1; i < subFolders.size(); i++) {
+        subFolder = subFolder.resolve(subFolders.get(i));
+        createDirectory(subFolder);
+      }
+      subFolder = subFolder.resolve(indexedFile.getId());
+    } else {
+      subFolder = repDataDestinationPath.resolve(indexedFile.getId());
+    }
+    createDirectory(subFolder);
+
+  }
+
+  private void createDirectory(Path subFolder) {
+    if (!Files.exists(subFolder)) {
+      try {
+        Files.createDirectory(subFolder);
+      } catch (IOException e) {
+        LOGGER.error("Error creating directory on bundle: {}", subFolder.toString());
+      }
     }
   }
 
