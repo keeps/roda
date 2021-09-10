@@ -1,7 +1,6 @@
 package org.roda.core.plugins.plugins.internal.synchronization.bundle;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 
 import org.roda.core.data.common.RodaConstants;
@@ -15,11 +14,8 @@ import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
-import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
