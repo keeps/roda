@@ -2993,6 +2993,7 @@ public class ModelService extends ModelObservable {
 
       dip.setDateCreated(new Date());
       dip.setLastModified(new Date());
+      dip.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
       createDIPMetadata(dip, directory.getStoragePath());
 
       if (notify) {
