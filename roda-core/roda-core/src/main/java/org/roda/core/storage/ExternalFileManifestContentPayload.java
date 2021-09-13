@@ -16,11 +16,11 @@ import org.roda.core.storage.ContentPayload;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-public class ShallowFileContentPayload implements ContentPayload {
+public class ExternalFileManifestContentPayload implements ContentPayload {
   private Path contentPath;
   private ShallowFiles shallowFiles;
 
-  public ShallowFileContentPayload(ShallowFiles shallowFiles) {
+  public ExternalFileManifestContentPayload(ShallowFiles shallowFiles) {
     this.shallowFiles = shallowFiles;
   }
 

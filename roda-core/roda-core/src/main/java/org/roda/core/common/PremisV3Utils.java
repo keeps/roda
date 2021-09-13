@@ -467,13 +467,7 @@ public final class PremisV3Utils {
     FormatDesignationComplexType fdct = fct.addNewFormatDesignation();
     fdct.setFormatName(getStringPlusAuthority(""));
     fdct.setFormatVersion("");
-    Binary binary = null;
-    if (originalFile.isReference()) {
-      binary = model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile), originalFile.getReferenceUrl(),
-        true);
-    } else {
-      binary = model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile));
-    }
+    Binary binary  = model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile));
 
     if (binary != null && binary.getContentDigest() != null && !binary.getContentDigest().isEmpty()) {
       // use binary content digest information
@@ -984,12 +978,13 @@ public final class PremisV3Utils {
         if (fileId == null) {
           PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representationId, algorithms);
         } else {
-          File file;
-          if (shallow) {
-            file = model.retrieveFileInsideManifest(aipId, representationId, fileDirectoryPath, fileId);
-          } else {
-            file = model.retrieveFile(aipId, representationId, fileDirectoryPath, fileId);
-          }
+//          File file;
+//          if (shallow) {
+//            file = model.retrieveFileInsideManifest(aipId, representationId, fileDirectoryPath, fileId);
+//          } else {
+//            file = model.retrieveFile(aipId, representationId, fileDirectoryPath, fileId);
+//          }
+          File file = model.retrieveFile(aipId, representationId, fileDirectoryPath, fileId);
           PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, algorithms);
         }
 
