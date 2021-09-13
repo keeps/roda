@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -295,9 +294,8 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
           retrievedAIP.getId());
       } else {
         try {
-          model.deleteFile(file, true);
-          // model.deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(),
-          // file.getId(), true);
+          // model.deleteFile(file, true);
+          model.deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), true);
         } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
           state = PluginState.FAILURE;
           reportItem.addPluginDetails("Could not delete File: " + e.getMessage());

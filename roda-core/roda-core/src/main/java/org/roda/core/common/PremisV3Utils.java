@@ -338,55 +338,64 @@ public final class PremisV3Utils {
   public static ContentPayload retrievePremisEventBinary(String eventID, Date date, String type, String details,
     List<LinkingIdentifier> sources, List<LinkingIdentifier> outcomes, String outcome, String detailNote,
     String detailExtension, List<LinkingIdentifier> agentIds) throws GenericException, ValidationException {
-    EventDocument event = EventDocument.Factory.newInstance();
-    EventComplexType ect = event.addNewEvent();
-    EventIdentifierComplexType eict = ect.addNewEventIdentifier();
-    eict.setEventIdentifierValue(eventID);
-    eict.setEventIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
-    ect.setEventDateTime(DateParser.getIsoDate(date));
-    ect.setEventType(getStringPlusAuthority(type));
-    EventDetailInformationComplexType edict = ect.addNewEventDetailInformation();
-    edict.setEventDetail(details);
+
+    EventComplexType eventComplexType = FACTORY.createEventComplexType();
+    EventIdentifierComplexType eventIdentifier = FACTORY.createEventIdentifierComplexType();
+    eventIdentifier.setEventIdentifierValue(eventID);
+    eventIdentifier.setEventIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
+    eventComplexType.setEventDateTime(DateTime.parse(date.toInstant().toString()).toString());
+    eventComplexType.setEventType(getStringPlusAuthority(type));
+
+    EventDetailInformationComplexType eventDetailInformation = FACTORY.createEventDetailInformationComplexType();
+    eventDetailInformation.setEventDetail(details);
     if (sources != null) {
       for (LinkingIdentifier identifier : sources) {
-        LinkingObjectIdentifierComplexType loict = ect.addNewLinkingObjectIdentifier();
-        loict.setLinkingObjectIdentifierValue(identifier.getValue());
-        loict.setLinkingObjectIdentifierType(getStringPlusAuthority(identifier.getType()));
+        LinkingObjectIdentifierComplexType linkingObjectIdentifier = FACTORY.createLinkingObjectIdentifierComplexType();
+        linkingObjectIdentifier.setLinkingObjectIdentifierValue(identifier.getValue());
+        linkingObjectIdentifier.setLinkingObjectIdentifierType(getStringPlusAuthority(identifier.getType()));
         if (identifier.getRoles() != null) {
-          loict.setLinkingObjectRoleArray(getStringPlusAuthorityArray(identifier.getRoles()));
+          linkingObjectIdentifier.getLinkingObjectRole().addAll(getStringPlusAuthorityArray(identifier.getRoles()));
         }
+        eventComplexType.getLinkingObjectIdentifier().add(linkingObjectIdentifier);
       }
+
     }
 
     if (outcomes != null) {
       for (LinkingIdentifier identifier : outcomes) {
-        LinkingObjectIdentifierComplexType loict = ect.addNewLinkingObjectIdentifier();
-        loict.setLinkingObjectIdentifierValue(identifier.getValue());
-        loict.setLinkingObjectIdentifierType(getStringPlusAuthority(identifier.getType()));
+        LinkingObjectIdentifierComplexType linkingObjectIdentifier = FACTORY.createLinkingObjectIdentifierComplexType();
+        linkingObjectIdentifier.setLinkingObjectIdentifierValue(identifier.getValue());
+        linkingObjectIdentifier.setLinkingObjectIdentifierType(getStringPlusAuthority(identifier.getType()));
         if (identifier.getRoles() != null) {
-          loict.setLinkingObjectRoleArray(getStringPlusAuthorityArray(identifier.getRoles()));
+          linkingObjectIdentifier.getLinkingObjectRole().addAll(getStringPlusAuthorityArray(identifier.getRoles()));
         }
+        eventComplexType.getLinkingObjectIdentifier().add(linkingObjectIdentifier);
       }
     }
 
     if (agentIds != null) {
       for (LinkingIdentifier agentId : agentIds) {
-        LinkingAgentIdentifierComplexType agentIdentifier = ect.addNewLinkingAgentIdentifier();
-        agentIdentifier.setLinkingAgentIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
-        agentIdentifier.setLinkingAgentIdentifierValue(agentId.getValue());
+        LinkingAgentIdentifierComplexType linkingAgentIdentifier = FACTORY.createLinkingAgentIdentifierComplexType();
+        linkingAgentIdentifier.setLinkingAgentIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
+        linkingAgentIdentifier.setLinkingAgentIdentifierValue(agentId.getValue());
+        eventComplexType.getLinkingAgentIdentifier().add(linkingAgentIdentifier);
       }
     }
 
-    EventOutcomeInformationComplexType outcomeInformation = ect.addNewEventOutcomeInformation();
-    outcomeInformation.setEventOutcome(getStringPlusAuthority(outcome));
+    eventComplexType.getEventDetailInformation().add(eventDetailInformation);
+
+    EventOutcomeInformationComplexType eventOutcomeInformation = FACTORY.createEventOutcomeInformationComplexType();
+    eventOutcomeInformation.getEventOutcome().add(getStringPlusAuthority(outcome));
     StringBuilder outcomeDetailNote = new StringBuilder(detailNote);
     if (StringUtils.isNotBlank(detailExtension)) {
       outcomeDetailNote.append("\n").append(detailExtension);
     }
-    EventOutcomeDetailComplexType eodct = outcomeInformation.addNewEventOutcomeDetail();
-    eodct.setEventOutcomeDetailNote(outcomeDetailNote.toString());
+    EventOutcomeDetailComplexType eventOutcomeDetail = FACTORY.createEventOutcomeDetailComplexType();
+    eventOutcomeDetail.getEventOutcomeDetailNote().add(outcomeDetailNote.toString());
+    eventOutcomeInformation.getEventOutcomeDetail().add(eventOutcomeDetail);
+    eventComplexType.getEventOutcomeInformation().add(eventOutcomeInformation);
 
-    return MetadataUtils.saveToContentPayload(event, true);
+    return MetadataUtils.saveToContentPayload(FACTORY.createEvent(eventComplexType), eventComplexType.getClass(), true);
   }
 
   public static ContentPayload createPremisAgentBinary(String id, String name, PreservationAgentType type,
@@ -1007,12 +1016,15 @@ public final class PremisV3Utils {
         if (fileId == null) {
           PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representationId, algorithms);
         } else {
-          File file;
-          if (shallow) {
-            file = model.retrieveFileInsideManifest(aipId, representationId, fileDirectoryPath, fileId);
-          } else {
-            file = model.retrieveFile(aipId, representationId, fileDirectoryPath, fileId);
-          }
+          // File file;
+          // if (shallow) {
+          // file = model.retrieveFileInsideManifest(aipId, representationId,
+          // fileDirectoryPath, fileId);
+          // } else {
+          // file = model.retrieveFile(aipId, representationId, fileDirectoryPath,
+          // fileId);
+          // }
+          File file = model.retrieveFile(aipId, representationId, fileDirectoryPath, fileId);
           PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, algorithms);
         }
 

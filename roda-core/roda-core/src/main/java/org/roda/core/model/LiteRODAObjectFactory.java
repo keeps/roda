@@ -300,7 +300,6 @@ public final class LiteRODAObjectFactory {
     List<String> list = new ArrayList<>();
     list.add(o.getAipId());
     list.add(o.getRepresentationId());
-    list.add(String.valueOf(o.isReference()));
     list.addAll(o.getPath());
     list.add(o.getId());
     return get(File.class, list, false);
@@ -443,10 +442,10 @@ public final class LiteRODAObjectFactory {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     T ret = null;
 
-    if (split.length >= 5) {
+    if (split.length >= 4) {
       List<String> directoryPath = new ArrayList<>();
       String fileId = null;
-      for (int i = 4; i < split.length; i++) {
+      for (int i = 3; i < split.length; i++) {
         if (i + 1 == split.length) {
           fileId = decodeId(split[i]);
         } else {
@@ -454,11 +453,7 @@ public final class LiteRODAObjectFactory {
         }
       }
 
-      if (Boolean.parseBoolean(decodeId(split[3]))) {
-        ret = (T) model.retrieveFileInsideManifest(decodeId(split[1]), decodeId(split[2]), directoryPath, fileId);
-      } else {
-        ret = (T) model.retrieveFile(decodeId(split[1]), decodeId(split[2]), directoryPath, fileId);
-      }
+      ret = (T) model.retrieveFile(decodeId(split[1]), decodeId(split[2]), directoryPath, fileId);
     }
 
     return ret;
