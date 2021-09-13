@@ -60,11 +60,10 @@ import org.roda.core.storage.DefaultBinaryVersion;
 import org.roda.core.storage.DefaultContainer;
 import org.roda.core.storage.DefaultDirectory;
 import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.ExternalFileManifestContentPayload;
 import org.roda.core.storage.InputStreamContentPayload;
 import org.roda.core.storage.JsonContentPayload;
-import org.roda.core.storage.ReferenceBinary;
 import org.roda.core.storage.Resource;
-import org.roda.core.storage.ShallowFileContentPayload;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -479,12 +478,9 @@ public class FSUtils {
               String json = lineIterator.next();
               Resource ret;
               try {
-                // ShallowFile shallowFile = JsonUtils.getObjectFromJson(json,
-                // ShallowFile.class);
                 JsonContentPayload content = new JsonContentPayload(json);
-                Map<String, String> contentDigest = null;
                 StoragePath storagePath = getStoragePath(basePath, path);
-                ret = new DefaultBinary(storagePath, content, 0L, true, contentDigest);
+                ret = new DefaultBinary(storagePath, content, 0L, true, new HashMap<>());
               } catch (RequestNotValidException e) {
                 LOGGER.error("Error while list path " + basePath + " while parsing resource " + json, e);
                 ret = null;
@@ -692,7 +688,7 @@ public class FSUtils {
           for (String line : allLines) {
             shallowFiles.addObject(JsonUtils.getObjectFromJson(line, ShallowFile.class));
           }
-          content = new ShallowFileContentPayload(shallowFiles);
+          content = new ExternalFileManifestContentPayload(shallowFiles);
         } else {
           content = new FSPathContentPayload(path);
         }
@@ -711,8 +707,6 @@ public class FSUtils {
     Resource resource;
     Long sizeInBytes = 0L;
     Protocol protocol = RodaCoreFactory.getProtocol(URI.create(url));
-    // ProtocolManager protocolManager =
-    // ProtocolManagerFactory.createProtocolManager(URI.create(url));
     if (protocol.isAvailable()) {
       if (calculateSize) {
         try {
@@ -722,7 +716,7 @@ public class FSUtils {
         }
       }
       ContentPayload contentPayload = new InputStreamContentPayload(() -> protocol.getInputStream());
-      resource = new ReferenceBinary(storagePath, contentPayload, sizeInBytes);
+      resource = new DefaultBinary(storagePath, contentPayload, sizeInBytes, true, new HashMap<>());
 
       return resource;
     } else {
@@ -1001,22 +995,8 @@ public class FSUtils {
     return file != null && file.toFile().exists();
   }
 
-  /**
-   * We are using java.io because sonar has suggested as a performance update
-   * https://sonarqube.com/coding_rules#rule_key=squid%3AS3725
-   *
-   * @since 2017-03-16
-   */
   public static boolean isDirectory(Path file) {
     return file != null && file.toFile().isDirectory();
-  }
-
-  public static boolean isManifestOfExternalFiles(String fileId) {
-    return fileId != null && fileId.equals(RodaConstants.RODA_MANIFEST_EXTERNAL_FILES);
-  }
-
-  public static boolean isManifestOfExternalFiles(Path file) {
-    return file != null && isManifestOfExternalFiles(file.getFileName().toString());
   }
 
   /**
@@ -1034,4 +1014,65 @@ public class FSUtils {
       return !dirStream.iterator().hasNext();
     }
   }
+
+  /**
+   * Related to Shallow files
+   */
+
+  public static boolean isManifestOfExternalFiles(String fileId) {
+    return fileId != null && fileId.equals(RodaConstants.RODA_MANIFEST_EXTERNAL_FILES);
+  }
+
+  public static boolean isManifestOfExternalFiles(Path file) {
+    return file != null && isManifestOfExternalFiles(file.getFileName().toString());
+  }
+
+  public static ShallowFiles retrieveManifestFileContent(Path path) throws IOException, GenericException {
+    List<String> allLines = Files.readAllLines(path);
+    ShallowFiles shallowFiles = new ShallowFiles();
+    for (String line : allLines) {
+      shallowFiles.addObject(JsonUtils.getObjectFromJson(line, ShallowFile.class));
+    }
+    return shallowFiles;
+  }
+
+  public static ShallowFile isResourcePresentOnManifestFile(Path path) throws GenericException {
+    Path manifestFile = path.getParent().resolve(RodaConstants.RODA_MANIFEST_EXTERNAL_FILES);
+    if (!exists(manifestFile)) {
+      return null;
+    }
+    try {
+      String targetFile = path.getFileName().toString();
+      ShallowFiles shallowFiles = retrieveManifestFileContent(manifestFile);
+      for (ShallowFile shallowFile : shallowFiles.getObjects()) {
+        if (shallowFile.getName().equals(targetFile)) {
+          return shallowFile;
+        }
+      }
+    } catch (IOException e) {
+      throw new GenericException("Cannot read manifest file", e);
+    }
+    return null;
+  }
+
+  public static void removeResourceFromManifestFile(Path path) throws GenericException {
+    Path manifestFile = path.getParent().resolve(RodaConstants.RODA_MANIFEST_EXTERNAL_FILES);
+    if (!exists(manifestFile)) {
+      throw new GenericException("Manifest file not found");
+    }
+    try {
+      String targetFile = path.getFileName().toString();
+      ShallowFiles shallowFiles = retrieveManifestFileContent(manifestFile);
+      shallowFiles.getObjects().removeIf(sf -> sf.getName().equals(targetFile));
+      ExternalFileManifestContentPayload payload = new ExternalFileManifestContentPayload(shallowFiles);
+      try {
+        payload.writeToPath(manifestFile);
+      } catch (IOException e) {
+        throw new GenericException("Cannot modify content " + path, e);
+      }
+    } catch (IOException e) {
+      throw new GenericException("Cannot read manifest file", e);
+    }
+  }
+
 }

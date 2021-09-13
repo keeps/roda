@@ -331,6 +331,69 @@ public final class PremisV3Utils {
     return MetadataUtils.saveToContentPayload(FACTORY.createEvent(ect), EventComplexType.class);
   }
 
+  public static ContentPayload retrievePremisEventBinary(String eventID, Date date, String type, String details,
+    List<LinkingIdentifier> sources, List<LinkingIdentifier> outcomes, String outcome, String detailNote,
+    String detailExtension, List<LinkingIdentifier> agentIds) throws GenericException, ValidationException {
+
+    EventComplexType eventComplexType = FACTORY.createEventComplexType();
+    EventIdentifierComplexType eventIdentifier = FACTORY.createEventIdentifierComplexType();
+    eventIdentifier.setEventIdentifierValue(eventID);
+    eventIdentifier.setEventIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
+    eventComplexType.setEventDateTime(DateTime.parse(date.toInstant().toString()).toString());
+    eventComplexType.setEventType(getStringPlusAuthority(type));
+
+    EventDetailInformationComplexType eventDetailInformation = FACTORY.createEventDetailInformationComplexType();
+    eventDetailInformation.setEventDetail(details);
+    if (sources != null) {
+      for (LinkingIdentifier identifier : sources) {
+        LinkingObjectIdentifierComplexType linkingObjectIdentifier = FACTORY.createLinkingObjectIdentifierComplexType();
+        linkingObjectIdentifier.setLinkingObjectIdentifierValue(identifier.getValue());
+        linkingObjectIdentifier.setLinkingObjectIdentifierType(getStringPlusAuthority(identifier.getType()));
+        if (identifier.getRoles() != null) {
+          linkingObjectIdentifier.getLinkingObjectRole().addAll(getStringPlusAuthorityArray(identifier.getRoles()));
+        }
+        eventComplexType.getLinkingObjectIdentifier().add(linkingObjectIdentifier);
+      }
+
+    }
+
+    if (outcomes != null) {
+      for (LinkingIdentifier identifier : outcomes) {
+        LinkingObjectIdentifierComplexType linkingObjectIdentifier = FACTORY.createLinkingObjectIdentifierComplexType();
+        linkingObjectIdentifier.setLinkingObjectIdentifierValue(identifier.getValue());
+        linkingObjectIdentifier.setLinkingObjectIdentifierType(getStringPlusAuthority(identifier.getType()));
+        if (identifier.getRoles() != null) {
+          linkingObjectIdentifier.getLinkingObjectRole().addAll(getStringPlusAuthorityArray(identifier.getRoles()));
+        }
+        eventComplexType.getLinkingObjectIdentifier().add(linkingObjectIdentifier);
+      }
+    }
+
+    if (agentIds != null) {
+      for (LinkingIdentifier agentId : agentIds) {
+        LinkingAgentIdentifierComplexType linkingAgentIdentifier = FACTORY.createLinkingAgentIdentifierComplexType();
+        linkingAgentIdentifier.setLinkingAgentIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
+        linkingAgentIdentifier.setLinkingAgentIdentifierValue(agentId.getValue());
+        eventComplexType.getLinkingAgentIdentifier().add(linkingAgentIdentifier);
+      }
+    }
+
+    eventComplexType.getEventDetailInformation().add(eventDetailInformation);
+
+    EventOutcomeInformationComplexType eventOutcomeInformation = FACTORY.createEventOutcomeInformationComplexType();
+    eventOutcomeInformation.getEventOutcome().add(getStringPlusAuthority(outcome));
+    StringBuilder outcomeDetailNote = new StringBuilder(detailNote);
+    if (StringUtils.isNotBlank(detailExtension)) {
+      outcomeDetailNote.append("\n").append(detailExtension);
+    }
+    EventOutcomeDetailComplexType eventOutcomeDetail = FACTORY.createEventOutcomeDetailComplexType();
+    eventOutcomeDetail.getEventOutcomeDetailNote().add(outcomeDetailNote.toString());
+    eventOutcomeInformation.getEventOutcomeDetail().add(eventOutcomeDetail);
+    eventComplexType.getEventOutcomeInformation().add(eventOutcomeInformation);
+
+    return MetadataUtils.saveToContentPayload(FACTORY.createEvent(eventComplexType), eventComplexType.getClass(), true);
+  }
+
   public static ContentPayload createPremisAgentBinary(String id, String name, PreservationAgentType type,
     String extension, String note, String version) {
     AgentComplexType agent = FACTORY.createAgentComplexType();
@@ -835,12 +898,15 @@ public final class PremisV3Utils {
         if (fileId == null) {
           PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representationId, algorithms);
         } else {
-          File file;
-          if (shallow) {
-            file = model.retrieveFileInsideManifest(aipId, representationId, fileDirectoryPath, fileId);
-          } else {
-            file = model.retrieveFile(aipId, representationId, fileDirectoryPath, fileId);
-          }
+          // File file;
+          // if (shallow) {
+          // file = model.retrieveFileInsideManifest(aipId, representationId,
+          // fileDirectoryPath, fileId);
+          // } else {
+          // file = model.retrieveFile(aipId, representationId, fileDirectoryPath,
+          // fileId);
+          // }
+          File file = model.retrieveFile(aipId, representationId, fileDirectoryPath, fileId);
           PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, algorithms);
         }
 

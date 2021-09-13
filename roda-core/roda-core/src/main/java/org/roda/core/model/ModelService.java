@@ -9,8 +9,6 @@ package org.roda.core.model;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -26,8 +24,8 @@ import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +33,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
@@ -62,8 +59,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.storage.utils.LocalInstanceUtils;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.utils.XMLUtils;
@@ -75,8 +70,6 @@ import org.roda.core.data.v2.accessKey.AccessKeyStatus;
 import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.synchronization.central.DistributedInstance;
-import org.roda.core.data.v2.synchronization.central.DistributedInstances;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
@@ -108,6 +101,7 @@ import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -120,6 +114,8 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
+import org.roda.core.data.v2.synchronization.central.DistributedInstances;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
@@ -132,7 +128,6 @@ import org.roda.core.model.iterables.LogEntryStorageIterable;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.model.utils.ResourceListUtils;
 import org.roda.core.model.utils.ResourceParseUtils;
-import org.roda.core.protocols.Protocol;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
@@ -141,17 +136,16 @@ import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Directory;
 import org.roda.core.storage.EmptyClosableIterable;
 import org.roda.core.storage.Entity;
+import org.roda.core.storage.ExternalFileManifestContentPayload;
 import org.roda.core.storage.Resource;
-import org.roda.core.storage.ShallowFileContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.storage.utils.LocalInstanceUtils;
 import org.roda.core.util.HTTPUtility;
 import org.roda.core.util.IdUtils;
 import org.roda.core.util.RESTClientUtility;
-import org.roda_project.commons_ip2.mets_v1_12.beans.FileType;
-import org.roda_project.commons_ip2.model.IPFileShallow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1033,6 +1027,35 @@ public class ModelService extends ModelObservable {
     updateAIPMetadata(aip);
   }
 
+  public void changeRepresentationShallowFileFlag(String aipId, String representationId, boolean hasShallowFiles,
+    String updatedBy, boolean notify)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+
+    AIP aip = retrieveAIP(aipId);
+    Iterator<Representation> it = aip.getRepresentations().iterator();
+
+    while (it.hasNext()) {
+      Representation representation = it.next();
+      if (representation.getId().equals(representationId)) {
+        representation.setHasShallowFiles(hasShallowFiles);
+        representation.setUpdatedOn(new Date());
+        representation.setUpdatedBy(updatedBy);
+        if (notify) {
+          notifyRepresentationUpdated(representation).failOnError();
+        }
+        break;
+      }
+    }
+
+    aip.setHasShallowFiles(hasShallowFiles);
+    aip.setUpdatedOn(new Date());
+    aip.setUpdatedBy(updatedBy);
+    if (notify) {
+      notifyAipUpdated(aip).failOnError();
+    }
+    updateAIPMetadata(aip);
+  }
+
   public void changeRepresentationStates(String aipId, String representationId, List<String> newStates,
       String updatedBy)
       throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
@@ -1179,26 +1202,6 @@ public class ModelService extends ModelObservable {
     return file;
   }
 
-  public File retrieveFileInsideManifest(String aipId, String representationId, List<String> directoryPath,
-      String fileId)
-      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath,
-        RodaConstants.RODA_MANIFEST_EXTERNAL_FILES);
-    Binary binary = storage.getBinary(filePath);
-    ContentPayload content = binary.getContent();
-
-    if (content instanceof ShallowFileContentPayload) {
-      String fileUUID = IdUtils.getFileId(aipId, representationId, directoryPath, fileId);
-      ShallowFile shallowFile = ((ShallowFileContentPayload) content).getShallowFiles().getObject(fileUUID);
-      if (shallowFile != null) {
-        String storagePath = FSUtils.getStoragePathAsString(filePath, false);
-        return new File(shallowFile.getName(), aipId, representationId, directoryPath, false, true,
-            shallowFile.getLocation().toString(), storagePath, fileUUID, null);
-      }
-    }
-    throw new NotFoundException("File shallow was not found: " + fileId);
-  }
-
   public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
       ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
       AuthorizationDeniedException, NotFoundException {
@@ -1206,12 +1209,16 @@ public class ModelService extends ModelObservable {
   }
 
   public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
-      ContentPayload contentPayload, boolean notify) throws RequestNotValidException, GenericException,
-      AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+    ContentPayload contentPayload, boolean notify) throws RequestNotValidException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+    boolean asReference = false;
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId);
-    final Binary createdBinary = storage.createBinary(filePath, contentPayload, false);
+    if (contentPayload instanceof ExternalFileManifestContentPayload) {
+      asReference = true;
+    }
+    final Binary createdBinary = storage.createBinary(filePath, contentPayload, asReference);
     File file = ResourceParseUtils.convertResourceToFile(createdBinary);
     file.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
 
@@ -1220,51 +1227,6 @@ public class ModelService extends ModelObservable {
     }
 
     return file;
-  }
-
-  public File createFileShallow(String aipId, String representationId, String fileId, IPFileShallow fileShallow,
-      boolean notify) throws AuthorizationDeniedException, RequestNotValidException, GenericException,
-      NotFoundException, AlreadyExistsException {
-    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
-
-    Protocol protocol = RodaCoreFactory.getProtocol(fileShallow.getFileLocation());
-    if (protocol.isAvailable()) {
-      ShallowFile shallowFile = new ShallowFile();
-      String decode;
-      try {
-        decode = URLDecoder.decode(fileShallow.getFileLocation().toString(), "UTF-8");
-      } catch (UnsupportedEncodingException e) {
-        // do nothing
-        decode = fileShallow.getFileLocation().toString();
-      }
-      shallowFile.setName(FilenameUtils.getName(decode));
-      shallowFile.setUUID(IdUtils.getFileId(aipId, representationId, null, shallowFile.getName()));
-      shallowFile.setLocation(fileShallow.getFileLocation());
-      FileType fileType = fileShallow.getFileType();
-      shallowFile.setSize(fileType.getSIZE());
-      shallowFile.setCreated(fileType.getCREATED());
-      shallowFile.setMimeType(fileType.getMIMETYPE());
-      shallowFile.setChecksum(fileType.getCHECKSUM());
-      shallowFile.setChecksumType(fileType.getCHECKSUMTYPE());
-
-      ShallowFiles shallowFiles = new ShallowFiles();
-      shallowFiles.addObject(shallowFile);
-      ContentPayload contentPayload = new ShallowFileContentPayload(shallowFiles);
-
-      StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, null, fileId);
-
-      final Binary createdBinary = storage.createBinary(filePath, contentPayload, true);
-
-      File file = ResourceParseUtils.convertResourceToFile(createdBinary);
-      file.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
-
-      if (notify) {
-        notifyFileCreated(file).failOnError();
-      }
-      return file;
-    } else {
-      throw new NotFoundException("Resource not found at: " + fileShallow.getFileLocation());
-    }
   }
 
   public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
@@ -1290,8 +1252,11 @@ public class ModelService extends ModelObservable {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     boolean asReference = false;
-    StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId);
+    if (contentPayload instanceof ExternalFileManifestContentPayload) {
+      asReference = true;
+    }
 
+    StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId);
     storage.updateBinaryContent(filePath, contentPayload, asReference, createIfNotExists);
     Binary binaryUpdated = storage.getBinary(filePath);
     File file = ResourceParseUtils.convertResourceToFile(binaryUpdated);
@@ -1331,11 +1296,11 @@ public class ModelService extends ModelObservable {
           file.getPath(), RodaConstants.RODA_MANIFEST_EXTERNAL_FILES);
       Binary binary = getStorage().getBinary(storagePath);
       ContentPayload content = binary.getContent();
-      if (content instanceof ShallowFileContentPayload) {
-        ShallowFiles shallowFiles = ((ShallowFileContentPayload) content).getShallowFiles();
+      if (content instanceof ExternalFileManifestContentPayload) {
+        ShallowFiles shallowFiles = ((ExternalFileManifestContentPayload) content).getShallowFiles();
         shallowFiles.removeObject(IdUtils.getFileId(file));
 
-        ContentPayload newContentPayload = new ShallowFileContentPayload(shallowFiles);
+        ContentPayload newContentPayload = new ExternalFileManifestContentPayload(shallowFiles);
         getStorage().updateBinaryContent(storagePath, newContentPayload, false, false);
         if (notify) {
           notifyFileDeleted(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()).failOnError();

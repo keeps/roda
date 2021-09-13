@@ -235,9 +235,9 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
               PreservationMetadata pm = opm.get();
               if (PreservationMetadataType.FILE.equals(pm.getType())) {
                 try {
-                  model.retrieveFileInsideManifest(pm.getAipId(), pm.getRepresentationId(), pm.getFileDirectoryPath(),
+                  model.retrieveFile(pm.getAipId(), pm.getRepresentationId(), pm.getFileDirectoryPath(),
                     pm.getFileId());
-                } catch (NotFoundException exception) {
+                } catch (NotFoundException e) {
                   ValidationIssue issue = new ValidationIssue(
                     "File " + pm.getFileId() + " of representation " + pm.getRepresentationId() + " of AIP "
                       + pm.getAipId() + " was not found but the PREMIS file exists");

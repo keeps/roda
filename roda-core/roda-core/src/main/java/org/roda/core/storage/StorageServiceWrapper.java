@@ -143,12 +143,6 @@ public class StorageServiceWrapper implements StorageService {
   }
 
   @Override
-  public Binary getBinary(StoragePath storagePath, String url, boolean calculateSize)
-    throws GenericException, RequestNotValidException {
-    return storageService.getBinary(storagePath, url, calculateSize);
-  }
-
-  @Override
   public boolean hasBinary(StoragePath storagePath) {
     return storageService.hasBinary(storagePath);
   }
