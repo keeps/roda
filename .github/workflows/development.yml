@@ -1,4 +1,4 @@
-name: 'Development'
+name: "Development"
 
 on:
   push:
@@ -18,7 +18,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: 8
-          distribution: 'adopt'
+          distribution: "adopt"
       - name: Cache
         uses: actions/cache@v2
         with:
@@ -35,14 +35,15 @@ jobs:
           sudo cp .github/workflows/bin/clamscan /usr/bin/clamdscan
           sudo chmod a+rx /usr/bin/clamscan /usr/bin/clamdscan
       - name: Run tests & install
-        run:
-          mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" -Proda-wui-docker -Denforcer.skip=true clean org.jacoco:jacoco-maven-plugin:prepare-agent install
+        run: mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" -Proda-wui-docker -Denforcer.skip=true clean org.jacoco:jacoco-maven-plugin:prepare-agent install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Deploy to GitHub packages
         run: mvn $MAVEN_CLI_OPTS clean deploy -Dmaven.test.skip=true -Pcore
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Login to DockerHub
-        uses: docker/login-action@v1 
+        uses: docker/login-action@v1
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
