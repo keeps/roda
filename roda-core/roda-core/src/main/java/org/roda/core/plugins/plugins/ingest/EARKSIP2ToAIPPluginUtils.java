@@ -8,11 +8,15 @@
 package org.roda.core.plugins.plugins.ingest;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.io.FilenameUtils;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -26,16 +30,21 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.ShallowFile;
+import org.roda.core.data.v2.ip.ShallowFiles;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.protocols.Protocol;
 import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.ExternalFileManifestContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.util.IdUtils;
+import org.roda_project.commons_ip2.mets_v1_12.beans.FileType;
 import org.roda_project.commons_ip2.model.IPDescriptiveMetadata;
 import org.roda_project.commons_ip2.model.IPFileInterface;
 import org.roda_project.commons_ip2.model.IPFileShallow;
@@ -275,6 +284,7 @@ public class EARKSIP2ToAIPPluginUtils {
       notify);
 
     // process representation files
+    boolean hasShallowFile = false;
     for (IPFileInterface file : sr.getData()) {
       List<String> directoryPath;
       String fileId;
@@ -282,28 +292,15 @@ public class EARKSIP2ToAIPPluginUtils {
       if (file instanceof IPFileShallow) {
         fileId = RodaConstants.RODA_MANIFEST_EXTERNAL_FILES;
         directoryPath = null;
-        payload = null;
+        payload = processIPFileShallow(aipId, representation.getId(), (IPFileShallow) file);
+        hasShallowFile = true;
       } else {
         fileId = file.getFileName();
         directoryPath = file.getRelativeFolders();
         payload = new FSPathContentPayload(file.getPath());
       }
       try {
-        File createdFile;
-        if (file instanceof IPFileShallow) {
-          createdFile = model.createFileShallow(aipId, representation.getId(), fileId, (IPFileShallow) file, notify);
-          AIP aip = model.retrieveAIP(aipId);
-          aip.setHasShallowFiles(true);
-          representation.setHasShallowFiles(true);
-          for (Representation aipRepresentation : aip.getRepresentations()) {
-            if (aipRepresentation.getId().equals(representation.getId())) {
-              aipRepresentation.setHasShallowFiles(true);
-              break;
-            }
-          }
-        } else {
-          createdFile = model.createFile(aipId, representation.getId(), directoryPath, fileId, payload, notify);
-        }
+        File createdFile = model.createFile(aipId, representation.getId(), directoryPath, fileId, payload, notify);
         if (reportItem != null && update) {
           reportItem.getSipInformation().addFileData(aipId, IdUtils.getRepresentationId(representation), createdFile);
         }
@@ -319,11 +316,44 @@ public class EARKSIP2ToAIPPluginUtils {
       }
     }
 
+    if (hasShallowFile) {
+      model.changeRepresentationShallowFileFlag(aipId, representation.getId(), true, username, false);
+    }
+
     // process representation documentation
     processDocumentation(model, sr.getDocumentation(), aipId, representation.getId(), false);
 
     // process representation schemas
     processSchemas(model, sr.getSchemas(), aipId, representation.getId(), false);
+  }
+
+  private static ContentPayload processIPFileShallow(String aipId, String representationId, IPFileShallow file)
+    throws GenericException {
+    ContentPayload contentPayload = null;
+    Protocol protocol = RodaCoreFactory.getProtocol(file.getFileLocation());
+    if (protocol.isAvailable()) {
+      try {
+        String decode = URLDecoder.decode(file.getFileLocation().toString(), "UTF-8");
+        FileType fileType = file.getFileType();
+        ShallowFile shallowFile = new ShallowFile();
+        shallowFile.setName(FilenameUtils.getName(decode));
+        shallowFile.setUUID(IdUtils.getFileId(aipId, representationId, null, shallowFile.getName()));
+        shallowFile.setLocation(file.getFileLocation());
+        shallowFile.setSize(fileType.getSIZE());
+        shallowFile.setCreated(fileType.getCREATED());
+        shallowFile.setMimeType(fileType.getMIMETYPE());
+        shallowFile.setChecksum(fileType.getCHECKSUM());
+        shallowFile.setChecksumType(fileType.getCHECKSUMTYPE());
+
+        ShallowFiles shallowFiles = new ShallowFiles();
+        shallowFiles.addObject(shallowFile);
+        contentPayload = new ExternalFileManifestContentPayload(shallowFiles);
+
+      } catch (UnsupportedEncodingException e) {
+        throw new GenericException("Unable to identify the resource name", e);
+      }
+    }
+    return contentPayload;
   }
 
   private static String getType(SIP sip) {

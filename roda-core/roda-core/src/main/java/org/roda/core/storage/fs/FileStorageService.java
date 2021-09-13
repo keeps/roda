@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,8 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.ip.ShallowFile;
+import org.roda.core.data.v2.ip.ShallowFiles;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
@@ -45,8 +48,8 @@ import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.Directory;
 import org.roda.core.storage.EmptyClosableIterable;
 import org.roda.core.storage.Entity;
+import org.roda.core.storage.ExternalFileManifestContentPayload;
 import org.roda.core.storage.Resource;
-import org.roda.core.storage.ShallowFileContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceUtils;
 import org.roda.core.util.IdUtils;
@@ -336,17 +339,23 @@ public class FileStorageService implements StorageService {
   public Binary createBinary(StoragePath storagePath, ContentPayload payload, boolean asReference)
     throws GenericException, AlreadyExistsException {
     if (asReference) {
-      // throw new GenericException("Method not yet implemented");
       Path binPath = FSUtils.getEntityPath(basePath, storagePath);
       try {
         if (FSUtils.exists(binPath)) {
-          Resource resource = FSUtils.convertPathToResource(basePath, binPath);
-          if (resource instanceof DefaultBinary) {
-            ContentPayload content = ((DefaultBinary) resource).getContent();
-            if (content instanceof ShallowFileContentPayload && payload instanceof ShallowFileContentPayload) {
-              ((ShallowFileContentPayload) payload)
-                .addShallowFiles(((ShallowFileContentPayload) content).getShallowFiles());
+          if (payload instanceof ExternalFileManifestContentPayload) {
+            ShallowFile shallowFile = ((ExternalFileManifestContentPayload) payload).getShallowFiles().getObjects()
+              .get(0);
+            ShallowFiles manifestContent = FSUtils.retrieveManifestFileContent(binPath);
+
+            for (ShallowFile manifestFileShallow : manifestContent.getObjects()) {
+              if (manifestFileShallow.getName().equals(shallowFile.getName())) {
+                throw new AlreadyExistsException("Binary already exists: " + binPath);
+              }
             }
+            manifestContent.addObject(shallowFile);
+            payload = new ExternalFileManifestContentPayload(manifestContent);
+          } else {
+            throw new GenericException("Looking for a manifest external file but found something else: " + storagePath);
           }
         }
         // ensuring parent exists
@@ -358,11 +367,8 @@ public class FileStorageService implements StorageService {
         // writing file
         payload.writeToPath(binPath);
         Long sizeInBytes = Files.size(binPath);
-        boolean isReference = true;
-        Map<String, String> contentDigest = null;
-
-        return new DefaultBinary(storagePath, payload, sizeInBytes, isReference, contentDigest);
-      } catch (IOException | RequestNotValidException | NotFoundException e) {
+        return new DefaultBinary(storagePath, payload, sizeInBytes, true, new HashMap<>());
+      } catch (IOException e) {
         throw new GenericException("Could not create binary", e);
       }
     } else {
@@ -429,9 +435,34 @@ public class FileStorageService implements StorageService {
   public Binary updateBinaryContent(StoragePath storagePath, ContentPayload payload, boolean asReference,
     boolean createIfNotExists) throws GenericException, NotFoundException, RequestNotValidException {
     if (asReference) {
-      throw new GenericException("Method not yet implemented");
-    } else {
+      Path binaryPath = FSUtils.getEntityPath(basePath, storagePath);
+      boolean fileExists = FSUtils.exists(binaryPath);
+      if (!fileExists && !createIfNotExists) {
+        throw new NotFoundException("Binary does not exist: " + binaryPath);
+      } else {
+        try {
+          ShallowFile shallowFile = ((ExternalFileManifestContentPayload) payload).getShallowFiles().getObjects()
+            .get(0);
+          ShallowFiles manifestFileContent = FSUtils.retrieveManifestFileContent(binaryPath);
+          manifestFileContent.getObjects()
+            .replaceAll(sf -> sf.getName().equals(shallowFile.getName()) ? shallowFile : sf);
+          ExternalFileManifestContentPayload newPayload = new ExternalFileManifestContentPayload(manifestFileContent);
+          newPayload.writeToPath(binaryPath);
 
+          Path sfPath = binaryPath.getParent().resolve(shallowFile.getName());
+          StoragePath sfStoragePath = FSUtils.getStoragePath(basePath, sfPath);
+          Resource resource = FSUtils.convertReferenceToResource(sfStoragePath, shallowFile.getLocation().toString(),
+            false);
+          if (resource instanceof Binary) {
+            return (DefaultBinary) resource;
+          } else {
+            throw new GenericException("Looking for a binary but found something else");
+          }
+        } catch (IOException e) {
+          throw new GenericException("Could not update binary content", e);
+        }
+      }
+    } else {
       Path binaryPath = FSUtils.getEntityPath(basePath, storagePath);
       boolean fileExists = FSUtils.exists(binaryPath);
 
@@ -460,32 +491,42 @@ public class FileStorageService implements StorageService {
   public Binary getBinary(StoragePath storagePath)
     throws RequestNotValidException, NotFoundException, GenericException {
     Path binaryPath = FSUtils.getEntityPath(basePath, storagePath);
-    Resource resource = FSUtils.convertPathToResource(basePath, binaryPath);
-    if (resource instanceof Binary) {
-      return (Binary) resource;
+    if (FSUtils.exists(binaryPath)) {
+      Resource resource = FSUtils.convertPathToResource(basePath, binaryPath);
+      if (resource instanceof Binary) {
+        return (Binary) resource;
+      } else {
+        throw new RequestNotValidException("Looking for a binary but found something else");
+      }
     } else {
-      throw new RequestNotValidException("Looking for a binary but found something else");
+      ShallowFile shallowFile = FSUtils.isResourcePresentOnManifestFile(binaryPath);
+      if (shallowFile != null) {
+        Resource resource = FSUtils.convertReferenceToResource(storagePath, shallowFile.getLocation().toString(),
+          false);
+        if (resource instanceof Binary) {
+          return (Binary) resource;
+        } else {
+          throw new RequestNotValidException("Looking for a binary but found something else");
+        }
+      }
     }
-  }
-
-  @Override
-  public Binary getBinary(StoragePath storagePath, String url, boolean calculateSize)
-    throws GenericException, RequestNotValidException {
-    Resource resource = FSUtils.convertReferenceToResource(storagePath, url, calculateSize);
-    if (resource instanceof Binary) {
-      return (Binary) resource;
-    } else {
-      throw new RequestNotValidException("Looking for a binary but found something else");
-    }
+    throw new NotFoundException("Cannot find file or directory at " + binaryPath);
   }
 
   @Override
   public void deleteResource(StoragePath storagePath) throws NotFoundException, GenericException {
     Path resourcePath = FSUtils.getEntityPath(basePath, storagePath);
-    trash(resourcePath);
+    if (FSUtils.exists(resourcePath)) {
+      trash(resourcePath);
 
-    // cleanup history
-    deleteAllBinaryVersionsUnder(storagePath);
+      // cleanup history
+      deleteAllBinaryVersionsUnder(storagePath);
+    } else {
+      ShallowFile shallowFile = FSUtils.isResourcePresentOnManifestFile(resourcePath);
+      if (shallowFile != null) {
+        FSUtils.removeResourceFromManifestFile(resourcePath);
+      }
+    }
   }
 
   public Path resolve(StoragePath storagePath) {
@@ -540,7 +581,7 @@ public class FileStorageService implements StorageService {
     if (FSUtils.exists(entity)) {
       return getEntityClass(storagePath, entity);
     } else {
-      throw new NotFoundException("Entity was not found: " + storagePath);
+      return getEntityExternalFile(storagePath);
     }
   }
 
@@ -870,7 +911,7 @@ public class FileStorageService implements StorageService {
     ArrayList<StoragePath> storagePaths = new ArrayList<>();
     for (Resource resource : listResourcesUnderContainer(storagePath, true)) {
       if (resource instanceof Binary) {
-        if (((Binary) resource).getContent() instanceof ShallowFileContentPayload) {
+        if (((Binary) resource).getContent() instanceof ExternalFileManifestContentPayload) {
           storagePaths.add(resource.getStoragePath());
         }
       }

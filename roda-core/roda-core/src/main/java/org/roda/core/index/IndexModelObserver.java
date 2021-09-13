@@ -255,6 +255,9 @@ public class IndexModelObserver implements ModelObserver {
               }
             }
             sizeInBytes += getExternalFilesTotalSize(file.get());
+            representation.setHasShallowFiles(true);
+            aip.setHasShallowFiles(true);
+            indexAIP(aip, ancestors).addTo(ret);
           } else {
             sizeInBytes += indexFile(aip, file.get(), ancestors, false).addTo(ret).getReturnedObject();
           }

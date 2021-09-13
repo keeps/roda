@@ -237,18 +237,13 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
               try {
                 model.retrieveFile(pm.getAipId(), pm.getRepresentationId(), pm.getFileDirectoryPath(), pm.getFileId());
               } catch (NotFoundException e) {
-                try {
-                  model.retrieveFileInsideManifest(pm.getAipId(), pm.getRepresentationId(), pm.getFileDirectoryPath(),
-                    pm.getFileId());
-                } catch (NotFoundException exception) {
-                  ValidationIssue issue = new ValidationIssue(
+                ValidationIssue issue = new ValidationIssue(
                     "File " + pm.getFileId() + " of representation " + pm.getRepresentationId() + " of AIP "
-                      + pm.getAipId() + " was not found but the PREMIS file exists");
-                  validationReport.addIssue(issue);
-                  aipFailed = true;
-                  createIncidence(model, index, aip.getId(), pm.getRepresentationId(), pm.getFileDirectoryPath(),
+                        + pm.getAipId() + " was not found but the PREMIS file exists");
+                validationReport.addIssue(issue);
+                aipFailed = true;
+                createIncidence(model, index, aip.getId(), pm.getRepresentationId(), pm.getFileDirectoryPath(),
                     pm.getFileId(), risks.get(0));
-                }
               }
             }
           }
