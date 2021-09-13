@@ -152,6 +152,8 @@ public class RodaCoreFactoryTest {
       .put("testing.prefix.array", Arrays.asList("first", "second"))
       .put("testing.property.thisOne", Collections.singletonList("value"))
       .put(RodaConstants.RODA_NODE_TYPE_KEY, Collections.singletonList(RodaCoreFactory.getNodeType().toString()))
+      .put(RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY, Collections.singletonList(RodaCoreFactory.getDistributedModeType().toString()))
+      .put(RodaConstants.CORE_SYNCHRONIZATION_FOLDER, Collections.singletonList(RodaCoreFactory.getSynchronizationDirectoryPath().toString()))
       .build();
 
     // add shared properties expected to be present in ServerMessages_locale

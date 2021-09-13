@@ -1159,41 +1159,42 @@ public class ModelServiceTest {
     return i;
   }
 
-  @Test
-  public void createDistributedInstanceTest() throws RODAException, IOException {
-    DistributedInstance distributedInstance = new DistributedInstance();
-    distributedInstance.setName("TEST_1");
-
-    DistributedInstance createdDistributedInstance = model.createDistributedInstance(distributedInstance, RodaConstants.ADMIN);
-
-    DistributedInstance ret = model.retrieveDistributedInstance(createdDistributedInstance.getId());
-    assertEquals(ret, distributedInstance);
-  }
-
-  @Test
-  public void deleteDistributedInstanceTest() throws RODAException, IOException {
-    DistributedInstance distributedInstance = new DistributedInstance();
-    distributedInstance.setName("TEST_1");
-
-    DistributedInstance distributedInstance1 = model.createDistributedInstance(distributedInstance, RodaConstants.ADMIN);
-
-    DistributedInstance ret = model.retrieveDistributedInstance(distributedInstance1.getId());
-    assertEquals(ret, distributedInstance);
-
-    model.deleteDistributedInstance(distributedInstance1.getId());
-  }
-
-  @Test
-  public void updateDistributedInstanceTest() throws RODAException, IOException {
-    DistributedInstance distributedInstance = new DistributedInstance();
-    distributedInstance.setName("TEST_1");
-
-    DistributedInstance distributedInstance1 = model.createDistributedInstance(distributedInstance, RodaConstants.ADMIN);
-
-    distributedInstance.setName("updated");
-    model.updateDistributedInstance(distributedInstance, RodaConstants.ADMIN);
-
-    DistributedInstance ret = model.retrieveDistributedInstance(distributedInstance1.getId());
-    assertEquals(ret.getName(), "updated");
-  }
+  // TODO: Create a test with separate setup. The following tests must be in distributed mode
+//  @Test
+//  public void createDistributedInstanceTest() throws RODAException, IOException {
+//    DistributedInstance distributedInstance = new DistributedInstance();
+//    distributedInstance.setName("TEST_1");
+//
+//    DistributedInstance createdDistributedInstance = model.createDistributedInstance(distributedInstance, RodaConstants.ADMIN);
+//
+//    DistributedInstance ret = model.retrieveDistributedInstance(createdDistributedInstance.getId());
+//    assertEquals(ret, distributedInstance);
+//  }
+//
+//  @Test
+//  public void deleteDistributedInstanceTest() throws RODAException, IOException {
+//    DistributedInstance distributedInstance = new DistributedInstance();
+//    distributedInstance.setName("TEST_1");
+//
+//    DistributedInstance distributedInstance1 = model.createDistributedInstance(distributedInstance, RodaConstants.ADMIN);
+//
+//    DistributedInstance ret = model.retrieveDistributedInstance(distributedInstance1.getId());
+//    assertEquals(ret, distributedInstance);
+//
+//    model.deleteDistributedInstance(distributedInstance1.getId());
+//  }
+//
+//  @Test
+//  public void updateDistributedInstanceTest() throws RODAException, IOException {
+//    DistributedInstance distributedInstance = new DistributedInstance();
+//    distributedInstance.setName("TEST_1");
+//
+//    DistributedInstance distributedInstance1 = model.createDistributedInstance(distributedInstance, RodaConstants.ADMIN);
+//
+//    distributedInstance.setName("updated");
+//    model.updateDistributedInstance(distributedInstance, RodaConstants.ADMIN);
+//
+//    DistributedInstance ret = model.retrieveDistributedInstance(distributedInstance1.getId());
+//    assertEquals(ret.getName(), "updated");
+//  }
 }
