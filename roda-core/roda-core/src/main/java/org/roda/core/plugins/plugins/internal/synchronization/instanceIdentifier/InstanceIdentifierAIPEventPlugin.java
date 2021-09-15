@@ -7,6 +7,7 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AlreadyHasInstanceIdentifier;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.InstanceIdNotUpdated;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -177,7 +178,14 @@ public class InstanceIdentifierAIPEventPlugin extends AbstractPlugin<AIP> {
         if (opm.isPresent()) {
           PreservationMetadata pm = opm.get();
           if (pm.getType().equals(PreservationMetadata.PreservationMetadataType.EVENT)) {
-            PremisV3Utils.updatePremisEventInstanceId(pm, model, index, instanceId);
+            try {
+              PremisV3Utils.updatePremisEventInstanceId(pm, model, index, instanceId);
+            } catch (InstanceIdNotUpdated e) {
+              eventCounter++;
+              jobPluginInfo.incrementObjectsProcessedWithFailure();
+              pluginReport.setPluginState(PluginState.FAILURE)
+                .addPluginDetails("Could not add update instance id on AIP preservation event: " + e.getCause());
+            }
             eventCounter++;
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
           }
