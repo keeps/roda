@@ -103,7 +103,7 @@ public class CreateIngestJob extends CreateSelectedJob<TransferredResource> {
     if (missingMandatoryParameters.isEmpty()) {
 
       BrowserService.Util.getInstance().createProcess(jobName, getJobPriority(), getJobParallelism(), getSelected(),
-        getSelectedPlugin().getId(), getWorkflowOptions().getValue(), null, new AsyncCallback<Job>() {
+        getSelectedPlugin().getId(), getWorkflowOptions().getValue(), null, new AsyncCallback<List<Job>>() {
 
           @Override
           public void onFailure(Throwable caught) {
@@ -112,7 +112,7 @@ public class CreateIngestJob extends CreateSelectedJob<TransferredResource> {
           }
 
           @Override
-          public void onSuccess(Job result) {
+          public void onSuccess(List<Job> result) {
             Toast.showInfo(messages.dialogDone(), messages.processCreated());
             HistoryUtils.newHistory(IngestProcess.RESOLVER);
           }
