@@ -202,9 +202,8 @@
                                 <folder>${project.build.directory}/${project.build.finalName}</folder>
                             </folders>
                             <jvmArguments>
-                                -Dserver.port=8082
                                 -Dgwt.codeServerPort=9876 -Xdebug
-                                -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5006
+                                -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
                             </jvmArguments>
                         </configuration>
                     </plugin>
