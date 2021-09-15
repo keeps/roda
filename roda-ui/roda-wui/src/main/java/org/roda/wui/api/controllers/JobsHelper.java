@@ -8,6 +8,8 @@
 package org.roda.wui.api.controllers;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -23,12 +25,21 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -37,8 +48,10 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.storage.utils.LocalInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v1.utils.ApiUtils;
+import org.roda.wui.server.browse.BrowserServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,7 +125,9 @@ public class JobsHelper {
 
     // ask plugin orchestrator to execute the job (which will be executed
     // asynchronously)
-    RodaCoreFactory.getPluginOrchestrator().executeJob(updatedJob, async);
+    if (LocalInstanceUtils.getLocalInstanceIdentifier() == updatedJob.getInstanceId()) {
+      RodaCoreFactory.getPluginOrchestrator().executeJob(updatedJob, async);
+    }
 
     // force commit
     RodaCoreFactory.getIndexService().commit(Job.class);
@@ -216,6 +231,59 @@ public class JobsHelper {
     }
 
     return reports;
+  }
+
+  public static <T extends IsIndexed> HashMap<String, SelectedItems<T>> splitInstancesItems(
+    SelectedItems<T> selectedItems) throws NotFoundException, GenericException, RequestNotValidException {
+    IndexService index = RodaCoreFactory.getIndexService();
+    HashMap<String, SelectedItems<T>> instancesItems = new HashMap<>();
+
+    if (selectedItems instanceof SelectedItemsList) {
+      SelectedItemsList<T> items = (SelectedItemsList<T>) selectedItems;
+
+      List<String> idsList = items.getIds();
+      String itemsClass = items.getSelectedClass();
+
+      for (String id : idsList) {
+        if (itemsClass.equals(IndexedFile.class.getName())) {
+          IndexedFile indexedFile = index.retrieve(IndexedFile.class, id, Collections.emptyList());
+          addItemToInstancesItems(instancesItems, itemsClass, id, indexedFile.getInstanceId());
+        } else if (itemsClass.equals(IndexedRepresentation.class.getName())) {
+          IndexedRepresentation indexedRepresentation = index.retrieve(IndexedRepresentation.class, id,
+            Collections.emptyList());
+          addItemToInstancesItems(instancesItems, itemsClass, id, indexedRepresentation.getInstanceId());
+        } else if (itemsClass.equals(IndexedAIP.class.getName())) {
+          IndexedAIP indexedAIP = index.retrieve(IndexedAIP.class, id, Collections.emptyList());
+          addItemToInstancesItems(instancesItems, itemsClass, id, indexedAIP.getInstanceId());
+        } else {
+          addItemToInstancesItems(instancesItems, itemsClass, id, LocalInstanceUtils.getLocalInstanceIdentifier());
+        }
+      }
+    } else {
+      // TODO tfraga: change this logic
+      instancesItems.put(null, selectedItems);
+    }
+
+    return instancesItems;
+  }
+
+  private static <T extends IsIndexed> void addItemToInstancesItems(HashMap<String, SelectedItems<T>> instancesItems,
+    String itemsClass, String id, String instanceId) {
+    SelectedItemsList<T> items = (SelectedItemsList<T>) instancesItems.get(instanceId);
+
+    if (items == null) {
+      items = new SelectedItemsList<>();
+      items.setSelectedClass(itemsClass);
+      List<String> list = items.getIds();
+      list.add(id);
+      items.setIds(list);
+      instancesItems.put(instanceId, items);
+    } else {
+      List<String> list = items.getIds();
+      list.add(id);
+      items.setIds(list);
+      instancesItems.replace(instanceId, items);
+    }
   }
 
 }

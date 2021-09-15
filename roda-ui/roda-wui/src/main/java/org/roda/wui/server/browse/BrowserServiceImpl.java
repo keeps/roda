@@ -738,27 +738,13 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public <T extends IsIndexed> Job createProcess(String jobName, SelectedItems<T> selected, String id,
+  public <T extends IsIndexed> List<Job> createProcess(String jobName, SelectedItems<T> selected, String id,
     Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
     NotFoundException, GenericException, JobAlreadyStartedException {
     SelectedItems<T> selectedItems = selected;
     User user = UserUtility.getUser(getThreadLocalRequest());
 
-    if (selectedItems instanceof SelectedItemsList) {
-      SelectedItemsList<T> items = (SelectedItemsList<T>) selectedItems;
-
-      if (items.getIds().isEmpty()) {
-        selectedItems = getAllItemsByClass(selectedClass);
-      }
-    }
-
-    Job job = new Job();
-    job.setName(jobName);
-    job.setSourceObjects(selectedItems);
-    job.setPlugin(id);
-    job.setPluginParameters(value);
-
-    return Jobs.createJob(user, job, true);
+    return Jobs.createJobs(user, selectedItems, jobName, id, value, true);
   }
 
   @Override
@@ -1371,7 +1357,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public LocalInstance registerLocalInstance(LocalInstance localInstance)
-      throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException {
+    throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.registerLocalInstance(user, localInstance);
   }
@@ -1389,8 +1375,9 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.synchronizeBundle(user, localInstance);
   }
-  
-  public void modifyInstanceIdOnRepository(LocalInstance localInstance) throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+
+  public void modifyInstanceIdOnRepository(LocalInstance localInstance)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.modifyInstanceIdOnRepository(user, localInstance);
   }

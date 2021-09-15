@@ -267,8 +267,8 @@ public interface BrowserService extends RemoteService {
   Job deleteRisk(SelectedItems<IndexedRisk> selected) throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, NotFoundException, InvalidParameterException, JobAlreadyStartedException;
 
-  <T extends IsIndexed> Job createProcess(String jobName, SelectedItems<T> selected, String id,
-    Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
+  <T extends IsIndexed> List<Job> createProcess(String jobName, SelectedItems<T> selected, String id,
+                                                Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
     NotFoundException, GenericException, JobAlreadyStartedException;
 
   <T extends IsIndexed> String createProcessJson(String jobName, SelectedItems<T> selected, String id,
