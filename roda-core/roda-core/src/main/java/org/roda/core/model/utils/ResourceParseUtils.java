@@ -318,12 +318,12 @@ public class ResourceParseUtils {
       List<String> ids = new ArrayList<>();
       ids.add(ModelUtils.extractAipId(storagePath).orElse(null));
       ids.add(ModelUtils.extractRepresentationId(storagePath).orElse(null));
-      if (resource instanceof DefaultBinary) {
-        boolean reference = ((DefaultBinary) resource).isReference();
-        ids.add(Boolean.toString(reference));
-      } else {
-        ids.add(Boolean.FALSE.toString());
-      }
+//      if (resource instanceof DefaultBinary) {
+//        boolean reference = ((DefaultBinary) resource).isReference();
+//        ids.add(Boolean.toString(reference));
+//      } else {
+//        ids.add(Boolean.FALSE.toString());
+//      }
       ids.addAll(ModelUtils.extractFilePathFromRepresentationData(storagePath));
       ids.add(fileName);
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ids));
