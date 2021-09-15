@@ -95,7 +95,7 @@ public class CreateActionJob extends CreateSelectedJob<IsIndexed> {
     String jobName = getName().getText();
 
     BrowserService.Util.getInstance().createProcess(jobName, getJobPriority(), getJobParallelism(), getSelected(),
-      getSelectedPlugin().getId(), getWorkflowOptions().getValue(), getSelectedClass(), new AsyncCallback<Job>() {
+      getSelectedPlugin().getId(), getWorkflowOptions().getValue(), getSelectedClass(), new AsyncCallback<List<Job>>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -104,10 +104,11 @@ public class CreateActionJob extends CreateSelectedJob<IsIndexed> {
         }
 
         @Override
-        public void onSuccess(Job result) {
+        public void onSuccess(List<Job> jobs) {
           Toast.showInfo(messages.dialogDone(), messages.processCreated());
           HistoryUtils.newHistory(ActionProcess.RESOLVER);
         }
+
       });
   }
 

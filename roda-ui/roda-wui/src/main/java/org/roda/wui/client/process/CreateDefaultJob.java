@@ -540,7 +540,7 @@ public class CreateDefaultJob extends Composite {
 
     BrowserService.Util.getInstance().createProcess(jobName, priority, parallelism, selected,
       getSelectedPlugin().getId(), getWorkflowOptions().getValue(), selected.getSelectedClass(),
-      new AsyncCallback<Job>() {
+      new AsyncCallback<List<Job>>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -549,7 +549,7 @@ public class CreateDefaultJob extends Composite {
         }
 
         @Override
-        public void onSuccess(Job result) {
+        public void onSuccess(List<Job> result) {
           Toast.showInfo(messages.dialogDone(), messages.processCreated());
           HistoryUtils.newHistory(ActionProcess.RESOLVER);
         }

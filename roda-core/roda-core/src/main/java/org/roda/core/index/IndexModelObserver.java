@@ -243,6 +243,8 @@ public class IndexModelObserver implements ModelObserver {
     Long numberOfDataFiles = 0L;
     Long numberOfDataFolders = 0L;
 
+    representation.setInstanceId(aip.getInstanceId());
+
     try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
       representation.getId(), true)) {
       for (OptionalWithCause<File> file : allFiles) {
@@ -337,6 +339,8 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Long, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
     Long sizeInBytes = 0L;
+
+    file.setInstanceId(aip.getInstanceId());
 
     FileCollection.Info info = new FileCollection.Info(aip, ancestors);
     SolrUtils.create2(index, (ModelObserver) this, IndexedFile.class, file, info).addTo(ret);

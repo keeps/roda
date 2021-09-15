@@ -740,7 +740,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public <T extends IsIndexed> Job createProcess(String jobName, JobPriority priority, JobParallelism parallelism,
+  public <T extends IsIndexed> List<Job> createProcess(String jobName, JobPriority priority, JobParallelism parallelism,
     SelectedItems<T> selected, String id, Map<String, String> value, String selectedClass)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
     JobAlreadyStartedException {
@@ -763,7 +763,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     job.setPriority(priority);
     job.setParallelism(parallelism);
 
-    return Jobs.createJob(user, job, true);
+    return Jobs.createJobs(user, selectedItems, jobName, id, value, true);
   }
 
   @Override
@@ -1393,7 +1393,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public LocalInstance registerLocalInstance(LocalInstance localInstance)
-      throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException {
+    throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.registerLocalInstance(user, localInstance);
   }
@@ -1411,8 +1411,9 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.synchronizeBundle(user, localInstance);
   }
-  
-  public void modifyInstanceIdOnRepository(LocalInstance localInstance) throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+
+  public void modifyInstanceIdOnRepository(LocalInstance localInstance)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Browser.modifyInstanceIdOnRepository(user, localInstance);
   }
