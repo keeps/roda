@@ -6,6 +6,7 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AlreadyHasInstanceIdentifier;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.InstanceIdNotUpdated;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -168,8 +169,8 @@ public class InstanceIdentifierRepositoryEventPlugin extends AbstractPlugin<Pres
     try {
       PremisV3Utils.updatePremisEventInstanceId(pm, model, index, instanceId);
       jobPluginInfo.incrementObjectsProcessedWithSuccess();
-    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
-      | ValidationException | AlreadyExistsException e) {
+    } catch (AuthorizationDeniedException | RequestNotValidException | GenericException | ValidationException
+      | AlreadyExistsException | InstanceIdNotUpdated e) {
       jobPluginInfo.incrementObjectsProcessedWithFailure();
       pluginReport.setPluginState(PluginState.FAILURE)
         .addPluginDetails("Could not update instance id on repository preservation event: " + e.getCause());
