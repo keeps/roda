@@ -41,6 +41,7 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AlreadyHasInstanceIdentifier;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.InstanceIdNotUpdated;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -892,27 +893,30 @@ public final class PremisV3Utils {
   }
 
   public static void updatePremisEventInstanceId(PreservationMetadata pm, ModelService model, IndexService index,
-    String instanceId) throws AuthorizationDeniedException, RequestNotValidException, NotFoundException,
-    GenericException, ValidationException, AlreadyExistsException, AlreadyHasInstanceIdentifier {
+    String instanceId) throws AuthorizationDeniedException, RequestNotValidException, GenericException,
+    ValidationException, AlreadyExistsException, AlreadyHasInstanceIdentifier, InstanceIdNotUpdated {
 
     if (URNUtils.verifyInstanceIdentifier(pm.getId(), instanceId)) {
       throw new AlreadyHasInstanceIdentifier(
         "The preservation event (" + pm.getId() + ") already has instance identifier");
     }
 
-    IndexedPreservationEvent event = index.retrieve(IndexedPreservationEvent.class, pm.getId(), new ArrayList<>());
+    IndexedPreservationEvent event = null;
+    try {
+      event = index.retrieve(IndexedPreservationEvent.class, pm.getId(), new ArrayList<>());
+      String updatedId = IdUtils.updatePreservationMetadataInstanceId(pm.getId(), instanceId);
 
-    String updatedId = IdUtils.updatePreservationMetadataInstanceId(pm.getId(), instanceId);
+      ContentPayload payload = PremisV3Utils.retrievePremisEventBinary(updatedId, event.getEventDateTime(),
+        event.getEventType(), event.getEventDetail(), event.getSourcesObjectIds(), event.getOutcomeObjectIds(),
+        event.getEventOutcome(), event.getEventDetail(), null, event.getLinkingAgentIds());
 
-    ContentPayload payload = PremisV3Utils.retrievePremisEventBinary(updatedId, event.getEventDateTime(),
-      event.getEventType(), event.getEventDetail(), event.getSourcesObjectIds(), event.getOutcomeObjectIds(),
-      event.getEventOutcome(), event.getEventDetail(), null, event.getLinkingAgentIds());
+      model.createPreservationMetadata(pm.getType(), updatedId, pm.getAipId(), pm.getRepresentationId(),
+        pm.getFileDirectoryPath(), pm.getFileId(), payload, true);
 
-    model.createPreservationMetadata(pm.getType(), updatedId, pm.getAipId(), pm.getRepresentationId(),
-      pm.getFileDirectoryPath(), pm.getFileId(), payload, true);
-
-    model.deletePreservationMetadata(pm.getType(), pm.getAipId(), pm.getRepresentationId(), pm.getId(), true);
-
+      model.deletePreservationMetadata(pm.getType(), pm.getAipId(), pm.getRepresentationId(), pm.getId(), true);
+    } catch (NotFoundException e) {
+      throw new InstanceIdNotUpdated(e);
+    }
   }
 
   public static void updatePremisUserAgentId(PreservationMetadata pm, ModelService model, IndexService index,
