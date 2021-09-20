@@ -178,10 +178,16 @@ public class ResourceParseUtils {
       }
     } else if (URNUtils.verifyPremisPrefix(PreservationMetadataType.FILE, filename)) {
       type = PreservationMetadataType.FILE;
-      fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
       id = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
-      fileId = id.substring(URNUtils
-        .getPremisPrefix(PreservationMetadataType.FILE, LocalInstanceUtils.getLocalInstanceIdentifier()).length());
+      try {
+        String separator = URLEncoder.encode(RodaConstants.URN_SEPARATOR, RodaConstants.DEFAULT_ENCODING);
+        if (StringUtils.countMatches(id, separator) > 0) {
+          fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
+          fileId = id.substring(id.lastIndexOf(separator) + 1);
+        }
+      } catch (UnsupportedEncodingException e) {
+        LOGGER.error("Error encoding urn separator when converting file event preservation metadata");
+      }
     } else if (filename.endsWith(RodaConstants.OTHER_TECH_METADATA_FILE_SUFFIX)) {
       type = PreservationMetadataType.OTHER;
       fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
@@ -318,12 +324,12 @@ public class ResourceParseUtils {
       List<String> ids = new ArrayList<>();
       ids.add(ModelUtils.extractAipId(storagePath).orElse(null));
       ids.add(ModelUtils.extractRepresentationId(storagePath).orElse(null));
-//      if (resource instanceof DefaultBinary) {
-//        boolean reference = ((DefaultBinary) resource).isReference();
-//        ids.add(Boolean.toString(reference));
-//      } else {
-//        ids.add(Boolean.FALSE.toString());
-//      }
+      // if (resource instanceof DefaultBinary) {
+      // boolean reference = ((DefaultBinary) resource).isReference();
+      // ids.add(Boolean.toString(reference));
+      // } else {
+      // ids.add(Boolean.FALSE.toString());
+      // }
       ids.addAll(ModelUtils.extractFilePathFromRepresentationData(storagePath));
       ids.add(fileName);
       ret = OptionalWithCause.of(LiteRODAObjectFactory.get(classToReturn, ids));
