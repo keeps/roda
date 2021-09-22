@@ -79,7 +79,7 @@ public class Statistics {
     if (!initialized) {
       initialized = true;
       JavascriptUtils.expose("locale", LocaleInfo.getCurrentLocale().getLocaleName());
-      layout = new HTMLWidgetWrapper("Statistics.html", new AsyncCallback<Void>() {
+      layout = new HTMLWidgetWrapper("Statistics.html", null, new AsyncCallback<Void>() {
 
         @Override
         public void onFailure(Throwable caught) {

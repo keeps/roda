@@ -2431,6 +2431,8 @@ public interface ClientMessages extends Messages {
 
   String distributedInstanceStatusButtonDeactivateLabel();
 
+  String distributedInstanceStatistics();
+
   /** Local instance configuration **/
 
   String createLocalInstanceConfigurationTitle();
@@ -2460,7 +2462,7 @@ public interface ClientMessages extends Messages {
   String localInstanceIsRegisteredLabel();
 
   String localInstanceLastSyncDateLabel();
-  
+
   String localInstanceIdentifierStateLabel();
 
   String applyInstanceId();

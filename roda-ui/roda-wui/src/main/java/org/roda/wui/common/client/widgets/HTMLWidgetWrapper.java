@@ -10,6 +10,7 @@
  */
 package org.roda.wui.common.client.widgets;
 
+import com.google.gwt.core.client.GWT;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.wui.client.main.Theme;
@@ -36,7 +37,7 @@ public class HTMLWidgetWrapper extends HTML {
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   public HTMLWidgetWrapper(String resourceId) {
-    this(resourceId, new AsyncCallback<Void>() {
+    this(resourceId,null, new AsyncCallback<Void>() {
 
       @Override
       public void onFailure(Throwable caught) {
@@ -50,7 +51,22 @@ public class HTMLWidgetWrapper extends HTML {
     });
   }
 
-  public HTMLWidgetWrapper(String resourceId, final AsyncCallback<Void> callback) {
+  public HTMLWidgetWrapper(String resourceId, String instanceId) {
+    this(resourceId, instanceId, new AsyncCallback<Void>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        // do nothing
+      }
+
+      @Override
+      public void onSuccess(Void result) {
+        // do nothing
+      }
+    });
+  }
+
+  public HTMLWidgetWrapper(String resourceId, String instanceId, final AsyncCallback<Void> callback) {
     String id = resourceId;
     boolean isMarkdown = false;
     if (id.endsWith(".html")) {
@@ -121,6 +137,10 @@ public class HTMLWidgetWrapper extends HTML {
               html = imgRegExp.replace(html, imgReplacement);
             } else {
               html = response.getText();
+            }
+            if (instanceId != null) {
+              html = html.replaceAll("\\b" + RodaConstants.DISTRIBUTED_INSTANCE_STATISTIC_PLACEHOLDER + "\\b",
+                instanceId);
             }
             HTMLWidgetWrapper.this.setHTML(html);
             callback.onSuccess(null);

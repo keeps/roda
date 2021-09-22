@@ -92,17 +92,18 @@ public class RepresentationInformationDialogs {
     final FlowPanel layout = new FlowPanel();
     layout.addStyleName("wui-dialog-layout");
 
-    HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIAssociationsDescription.html", new AsyncCallback<Void>() {
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
+    HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIAssociationsDescription.html", null,
+      new AsyncCallback<Void>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
 
-      @Override
-      public void onSuccess(Void result) {
-        dialogBox.center();
-      }
-    });
+        @Override
+        public void onSuccess(Void result) {
+          dialogBox.center();
+        }
+      });
 
     description.addStyleName("page-description");
     layout.add(description);
@@ -482,7 +483,8 @@ public class RepresentationInformationDialogs {
               webLabel.removeStyleName("dialog-left-item-selected");
               rightSide.clear();
 
-              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionHelp.html", centerDialogBox);
+              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionHelp.html", null,
+                centerDialogBox);
               description.addStyleName("page-description");
               rightSide.add(description);
 
@@ -508,7 +510,7 @@ public class RepresentationInformationDialogs {
 
               rightSide.clear();
 
-              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithRI.html",
+              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithRI.html", null,
                 centerDialogBox);
               description.addStyleName("page-description");
               rightSide.add(description);
@@ -604,7 +606,7 @@ public class RepresentationInformationDialogs {
 
               rightSide.clear();
 
-              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithText.html",
+              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithText.html", null,
                 centerDialogBox);
               description.addStyleName("page-description");
               rightSide.add(description);
@@ -661,7 +663,7 @@ public class RepresentationInformationDialogs {
 
               rightSide.clear();
 
-              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithWeb.html",
+              HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithWeb.html", null,
                 centerDialogBox);
               description.addStyleName("page-description");
               rightSide.add(description);
@@ -730,7 +732,8 @@ public class RepresentationInformationDialogs {
 
     rightSide.clear();
 
-    HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsWithIntellectualEntity.html", centerDialogBox);
+    HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsWithIntellectualEntity.html", null,
+      centerDialogBox);
     description.addStyleName("page-description");
     rightSide.add(description);
 
