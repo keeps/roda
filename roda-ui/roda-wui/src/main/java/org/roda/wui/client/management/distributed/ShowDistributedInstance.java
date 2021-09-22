@@ -2,6 +2,9 @@ package org.roda.wui.client.management.distributed;
 
 import java.util.List;
 
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlHostedModeUtils;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.user.User;
@@ -17,6 +20,7 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
@@ -104,6 +108,9 @@ public class ShowDistributedInstance extends Composite {
   @UiField
   ScrollPanel accessKeyTablePanel;
 
+  @UiField
+  FlowPanel statisticsPanel;
+
   public ShowDistributedInstance(DistributedInstance distributedInstance) {
     initWidget(uiBinder.createAndBindUi(this));
     this.distributedInstance = distributedInstance;
@@ -134,21 +141,27 @@ public class ShowDistributedInstance extends Composite {
 
     statusValue.setHTML(HtmlSnippetUtils.getDistributedInstanceStateHtml(distributedInstance));
 
-    if(StringUtils.isNotBlank(distributedInstance.getUsername())){
-      UserManagementService.Util.getInstance().retrieveUser(distributedInstance.getUsername(), new AsyncCallback<User>() {
-        @Override
-        public void onFailure(Throwable throwable) {
-          userNameValue.add(new Label("NONE"));
-        }
+    if (StringUtils.isNotBlank(distributedInstance.getUsername())) {
+      UserManagementService.Util.getInstance().retrieveUser(distributedInstance.getUsername(),
+        new AsyncCallback<User>() {
+          @Override
+          public void onFailure(Throwable throwable) {
+            userNameValue.add(new Label("NONE"));
+          }
 
-        @Override
-        public void onSuccess(User user) {
-          userNameValue.add(new Label(user.getId()));
-        }
-      });
+          @Override
+          public void onSuccess(User user) {
+            userNameValue.add(new Label(user.getId()));
+          }
+        });
 
       accessKeyTablePanel.add(new AccessKeyTablePanel(distributedInstance.getUsername()));
     }
+
+    if (distributedInstance != null && distributedInstance.getId() != null) {
+      statisticsPanel.add(new HTMLWidgetWrapper("DistributedInstanceStatistics.html", distributedInstance.getId()));
+    }
+
   }
 
   private void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

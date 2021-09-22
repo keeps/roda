@@ -1766,6 +1766,7 @@ public final class RodaConstants {
   public static final String DISTRIBUTED_INSTANCE_USER_PREFIX = "DISTRIBUTED_";
   public static final String DISTRIBUTED_INSTANCE_ACCESS_KEY_PREFIX = DISTRIBUTED_INSTANCE_USER_PREFIX;
   public static final String DISTRIBUTED_INSTANCE_ACCESS_KEY_SUFFIX = "_KEY";
+  public static final String DISTRIBUTED_INSTANCE_STATISTIC_PLACEHOLDER = "INSTANCEID";
 
   /* HTTP Response codes */
   public static final int HTTP_RESPONSE_CODE_SUCCESS = 200;
