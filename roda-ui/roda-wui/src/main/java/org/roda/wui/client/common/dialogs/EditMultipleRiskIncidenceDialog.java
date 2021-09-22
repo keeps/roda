@@ -83,7 +83,7 @@ public class EditMultipleRiskIncidenceDialog<T extends IsIndexed> extends Dialog
       severity.addItem(messages.severityLevel(iseverity), iseverity.toString());
     }
 
-    titlePanel.add(new HTMLWidgetWrapper("EditRiskIncidenceDescription.html", new AsyncCallback<Void>() {
+    titlePanel.add(new HTMLWidgetWrapper("EditRiskIncidenceDescription.html", null, new AsyncCallback<Void>() {
 
       @Override
       public void onFailure(Throwable caught) {
