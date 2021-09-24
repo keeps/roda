@@ -203,7 +203,7 @@ public final class IdUtils {
 
   public static String updatePreservationMetadataInstanceId(String id, String instanceId) {
     PreservationMetadataType type = URNUtils.getPreservationMetadataTypeFromId(id);
-    String idHashCode = URNUtils.getIdHashCodeFromEventId(id);
+    String idHashCode = URNUtils.getIdHashCodeFromEventId(id, instanceId);
     return URNUtils.createRodaPreservationURN(type, idHashCode, instanceId);
   }
 }
