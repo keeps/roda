@@ -16,6 +16,9 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
 
+import java.util.Arrays;
+import java.util.List;
+
 public final class URNUtils {
 
   /** Private empty constructor */
@@ -79,20 +82,37 @@ public final class URNUtils {
     } else if (fields.length == URN_LENGTH_WITHOUT_INSTANCE_IDENTIFIER) {
       return PreservationMetadataType.valueOf(fields[3].toUpperCase());
     } else {
-      return null;
+      List<PreservationMetadataType> values = Arrays.asList(PreservationMetadataType.values());
+      for (PreservationMetadataType type : values) {
+        if (type.toString().equals(fields[3].toUpperCase())) {
+          return PreservationMetadataType.valueOf(fields[3].toUpperCase());
+        } else if (type.toString().equals(fields[4].toUpperCase())) {
+          return PreservationMetadataType.valueOf(fields[4].toUpperCase());
+        }
+      }
     }
+    return null;
   }
 
-  public static String getIdHashCodeFromEventId(String id) {
+  public static String getIdHashCodeFromEventId(String id, String instanceId) {
     String[] fields = id.split(RodaConstants.URN_SEPARATOR);
     if (fields.length == URN_LENGTH_WITH_INSTANCE_IDENTIFIER) {
       return fields[5];
     } else if (fields.length == URN_LENGTH_WITHOUT_INSTANCE_IDENTIFIER) {
       return fields[4];
+    } else if (fields[2].equals(instanceId)) {
+      String result = "";
+      for (int i = 5; i < fields.length; i++) {
+        result = result + fields[i];
+      }
+      return result;
     } else {
-      return null;
+      String result = "";
+      for (int i = 4; i < fields.length; i++) {
+        result = result + fields[i];
+      }
+      return result;
     }
-
   }
 
   public static String getAgentUsernameFromURN(String urnId) {
