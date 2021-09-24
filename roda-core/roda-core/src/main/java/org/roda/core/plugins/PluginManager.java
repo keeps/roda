@@ -41,6 +41,7 @@ import org.reflections.Reflections;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.File;
@@ -746,17 +747,19 @@ public class PluginManager {
     }
   }
 
-  public static String getPluginsInformationAsMarkdown(List<String> plugins) {
+  public static String getPluginsInformationAsMarkdown(List<Pair<String,String>> plugins) {
     StringBuilder sb = new StringBuilder();
     int numberOfPlugins = plugins.size();
     if (numberOfPlugins > 1) {
       sb.append(String.format("# Plugins%n%n"));
     }
-    for (String plugin : plugins) {
+    for (Pair<String,String> pluginNameAndState : plugins) {
+      String plugin = pluginNameAndState.getFirst();
+      String state = pluginNameAndState.getSecond();
       try {
         Class<?> pluginClass = Class.forName(plugin);
         Plugin<? extends IsRODAObject> pluginInstance = (Plugin<? extends IsRODAObject>) pluginClass.newInstance();
-        sb.append(getPluginInformationAsMarkdown(pluginInstance, numberOfPlugins > 1));
+        sb.append(getPluginInformationAsMarkdown(pluginInstance, state, numberOfPlugins > 1));
       } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
         sb.append(String.format("#%s %s %n%n", numberOfPlugins > 1 ? "#" : "", plugin));
         sb.append(String.format("##%s Description %n%n%s%n%n", numberOfPlugins > 1 ? "#" : "",
@@ -767,12 +770,12 @@ public class PluginManager {
   }
 
   public static String getPluginInformationAsMarkdown(Plugin<? extends IsRODAObject> plugin) {
-    return getPluginInformationAsMarkdown(plugin, false);
+    return getPluginInformationAsMarkdown(plugin, "", false);
   }
 
-  private static String getPluginInformationAsMarkdown(Plugin<? extends IsRODAObject> plugin, boolean severalPlugins) {
+  private static String getPluginInformationAsMarkdown(Plugin<? extends IsRODAObject> plugin, String pluginState, boolean severalPlugins) {
     StringBuilder sb = new StringBuilder();
-    sb.append(String.format("#%s %s %n%n", severalPlugins ? "#" : "", plugin.getName()));
+    sb.append(String.format("#%s %s %s %n%n", severalPlugins ? "#" : "", plugin.getName(), pluginState));
     // 2018-01-24 hsilva: having the version usually depends on having the tool
     // installed, so lets not show that information
     sb.append(String.format("##%s Description %n%n%s%n%n", severalPlugins ? "#" : "", plugin.getDescription()));
