@@ -2344,15 +2344,29 @@ public class RodaCoreFactory {
   }
 
   private static void mainConfigsTasks(final List<String> args) {
-    if ("generatePluginsMarkdown".equals(args.get(0)) && args.size() == 3 && StringUtils.isNotBlank(args.get(1))
-      && StringUtils.isNotBlank(args.get(2)) && Files.exists(Paths.get(args.get(2)))) {
-      List<String> plugins = Arrays.asList(args.get(1).split(" "));
-      String pluginsMarkdown = PluginManager.getPluginsInformationAsMarkdown(plugins);
-      try {
-        Files.write(Paths.get(args.get(2), "README.md"), pluginsMarkdown.getBytes());
-      } catch (IOException e) {
-        System.err
-          .println("Error while writing plugin/plugins information in markdown format! Reason: " + e.getMessage());
+    if ("generatePluginsMarkdown".equals(args.get(0)) && args.size() == 4 && StringUtils.isNotBlank(args.get(1))
+      && StringUtils.isNotBlank(args.get(2)) && StringUtils.isNotBlank(args.get(3))
+      && Files.exists(Paths.get(args.get(3)))) {
+
+      List<Pair<String, String>> pluginsNameAndState = new ArrayList<>();
+
+      String[] pluginsName = args.get(1).split(" ");
+      String[] pluginsState = args.get(2).split(";");
+
+      if (pluginsName.length == pluginsState.length) {
+        for (int i = 0, pluginsNameLength = pluginsName.length; i < pluginsNameLength; i++) {
+          pluginsNameAndState.add(Pair.of(pluginsName[i], pluginsState[i]));
+        }
+
+        String pluginsMarkdown = PluginManager.getPluginsInformationAsMarkdown(pluginsNameAndState);
+        try {
+          Files.write(Paths.get(args.get(3), "README.md"), pluginsMarkdown.getBytes());
+        } catch (IOException e) {
+          System.err
+              .println("Error while writing plugin/plugins information in markdown format! Reason: " + e.getMessage());
+        }
+      } else {
+        printConfigsUsage();
       }
     } else {
       printConfigsUsage();
