@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.roda.core.common.JwtUtils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
@@ -66,7 +67,14 @@ public class InternalApiAuthFilter implements Filter {
     if (!isRequestUrlExcluded(request) && !UserUtility.isUserInSession(request)) {
       // No user yet
       try {
-        UserUtility.setUser(request, getBasicAuthUser(request));
+        // try bearer auth
+        User bearerAuthUser = getBearerAuthUser(request);
+        if (bearerAuthUser != null) {
+          UserUtility.setUser(request, bearerAuthUser);
+        } else {
+          // try basic auth
+          UserUtility.setUser(request, getBasicAuthUser(request));
+        }
         chain.doFilter(servletRequest, servletResponse);
       } catch (final AuthenticationDeniedException | GenericException e) {
         if (LOGGER.isDebugEnabled()) {
@@ -79,6 +87,28 @@ public class InternalApiAuthFilter implements Filter {
       chain.doFilter(servletRequest, servletResponse);
     }
 
+  }
+
+  /**
+   * Return a {@link User} from the HTTP Bearer auth header information.
+   *
+   * @param request
+   *          the HTTP request.
+   * @return the {@link User}.
+   * @throws AuthenticationDeniedException
+   *           if the token are invalid.
+   * @throws GenericException
+   *           if some other error occurs.
+   */
+  private User getBearerAuthUser(final HttpServletRequest request)
+    throws AuthenticationDeniedException, GenericException {
+    User user = null;
+    String token = new BearerAuthRequestWrapper(request).getBearerToken();
+    if (token != null) {
+      String username = JwtUtils.getSubjectFromToken(token);
+      user = UserUtility.getLdapUtility().getUser(username);
+    }
+    return user;
   }
 
   /**

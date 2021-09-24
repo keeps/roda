@@ -10,7 +10,6 @@ package org.roda.wui;
 import javax.servlet.http.HttpServlet;
 
 import org.jasig.cas.client.session.SingleSignOutHttpSessionListener;
-import org.roda.wui.filter.JwtFilter;
 import org.roda.wui.filter.OnOffFilter;
 import org.roda.wui.servlets.RodaWuiServlet;
 import org.springframework.boot.SpringApplication;
@@ -173,16 +172,6 @@ public class RODA {
     registrationBean.addInitParameter("casServerLogoutUrl", "https://localhost:8443/cas/logout");
 
     registrationBean.addUrlPatterns("/login", "/logout");
-
-    return registrationBean;
-  }
-
-  @Bean
-  public FilterRegistrationBean<JwtFilter> jwtFilter() {
-    FilterRegistrationBean<JwtFilter> registrationBean = new FilterRegistrationBean<>();
-    JwtFilter jwtFilter = new JwtFilter();
-    registrationBean.setFilter(jwtFilter);
-    registrationBean.addUrlPatterns("/api/v1/distributed_instances/*");
 
     return registrationBean;
   }
