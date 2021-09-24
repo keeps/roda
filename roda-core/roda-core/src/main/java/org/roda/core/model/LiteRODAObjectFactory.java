@@ -37,6 +37,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
@@ -186,6 +187,8 @@ public final class LiteRODAObjectFactory {
     } else if (object instanceof DisposalConfirmation) {
       DisposalConfirmation o = (DisposalConfirmation) object;
       ret = get(DisposalConfirmation.class, Arrays.asList(o.getId()), false);
+    } else if (object instanceof IndexedPreservationAgent) {
+      ret = getIndexedPreservationAgent(object);
     }
 
     if (!ret.isPresent()) {
@@ -223,6 +226,9 @@ public final class LiteRODAObjectFactory {
       || objectClass == DisposalConfirmation.class) {
       ret = create(objectClass, ids.size(), ids);
     } else if (objectClass == IndexedPreservationEvent.class) {
+      ret = create(PreservationMetadata.class, ids.size(), ids);
+    }
+    else if (objectClass == IndexedPreservationAgent.class) {
       ret = create(PreservationMetadata.class, ids.size(), ids);
     }
 
@@ -285,6 +291,12 @@ public final class LiteRODAObjectFactory {
 
     return ret;
   }
+
+  private static <T extends IsRODAObject> Optional<LiteRODAObject> getIndexedPreservationAgent(T object) {
+    IndexedPreservationAgent o = (IndexedPreservationAgent) object;
+    return get(IndexedPreservationAgent.class, Arrays.asList(o.getId()), false);
+  }
+
 
   private static <T extends IsRODAObject> Optional<LiteRODAObject> getDIPFile(T object) {
     DIPFile o = (DIPFile) object;
