@@ -76,7 +76,6 @@ public class ReindexAllRodaEntitiesPlugin extends AbstractPlugin<Void> {
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> list) throws PluginException {
     final List<Class<? extends IsRODAObject>> classes = PluginHelper.getReindexObjectClasses();
-    classes.remove(Job.class);
     return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,

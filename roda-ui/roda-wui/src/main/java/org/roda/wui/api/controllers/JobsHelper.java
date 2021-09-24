@@ -125,7 +125,7 @@ public class JobsHelper {
 
     // ask plugin orchestrator to execute the job (which will be executed
     // asynchronously)
-    if (LocalInstanceUtils.getLocalInstanceIdentifier() == updatedJob.getInstanceId()) {
+    if (jobCanRun(updatedJob.getInstanceId())) {
       RodaCoreFactory.getPluginOrchestrator().executeJob(updatedJob, async);
     }
 
@@ -133,6 +133,18 @@ public class JobsHelper {
     RodaCoreFactory.getIndexService().commit(Job.class);
 
     return updatedJob;
+  }
+
+  private static boolean jobCanRun(String jobInstanceId) {
+    String rodaInstanceId = LocalInstanceUtils.getLocalInstanceIdentifier();
+
+    if(rodaInstanceId == null && jobInstanceId == null){
+      return true;
+    }else if(rodaInstanceId != null && rodaInstanceId.equals(jobInstanceId)){
+      return true;
+    }else{
+      return false;
+    }
   }
 
   public static org.roda.core.data.v2.jobs.Jobs getJobsFromIndexResult(User user, String start, String limit,
