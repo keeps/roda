@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.roda.core.common.JwtUtils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -86,6 +87,19 @@ public class CasApiAuthFilter implements Filter {
       return;
     }
 
+    // try bearer token auth
+    final String token = new BearerAuthRequestWrapper(request).getBearerToken();
+    if(token != null){
+      try {
+        doFilterWithToken(request, response, filterChain, token);
+      } catch (NotFoundException | AuthenticationDeniedException e) {
+        LOGGER.error("Error authenticating token '" + token + "': " + e.getMessage());
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error authenticating user");
+      } catch (final GenericException e) {
+        throw new ServletException(e.getMessage(), e);
+      }
+    }
+
     // try basic auth
     final Pair<String, String> credentials = new BasicAuthRequestWrapper(request).getCredentials();
     if (credentials != null) {
@@ -122,6 +136,20 @@ public class CasApiAuthFilter implements Filter {
     // check if user is internal
     if (UserUtility.getLdapUtility().isInternal(username)) {
       final User user = UserUtility.getLdapUtility().getAuthenticatedUser(username, password);
+      UserUtility.setUser(request, user);
+    }
+
+    filterChain.doFilter(request, response);
+  }
+
+  private void doFilterWithToken(final HttpServletRequest request, final HttpServletResponse response,
+    final FilterChain filterChain, final String token)
+    throws GenericException, IOException, ServletException, AuthenticationDeniedException, NotFoundException {
+
+    String username = JwtUtils.getSubjectFromToken(token);
+    // check if user is internal
+    if (UserUtility.getLdapUtility().isInternal(username)) {
+      User user = UserUtility.getLdapUtility().getUser(username);
       UserUtility.setUser(request, user);
     }
 
