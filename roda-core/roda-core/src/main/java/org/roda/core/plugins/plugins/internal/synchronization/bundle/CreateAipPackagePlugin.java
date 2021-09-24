@@ -192,8 +192,10 @@ public class CreateAipPackagePlugin extends CreateRodaEntityPackagePlugin<AIP> {
     }
 
     Path manifestExternalFiles = subFolder.resolve(RodaConstants.RODA_MANIFEST_EXTERNAL_FILES);
-    Path temp = Files.createFile(manifestExternalFiles);
-    JsonUtils.appendObjectToFile(shallowFile, temp);
+    if (!Files.exists(subFolder)) {
+      manifestExternalFiles = Files.createFile(manifestExternalFiles);
+    }
+    JsonUtils.appendObjectToFile(shallowFile, manifestExternalFiles);
 
   }
 
