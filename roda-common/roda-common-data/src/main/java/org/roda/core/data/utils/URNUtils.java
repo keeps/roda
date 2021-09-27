@@ -7,16 +7,12 @@
  */
 package org.roda.core.data.utils;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.RODA_TYPE;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
-import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
-
-import java.util.Arrays;
-import java.util.List;
 
 public final class URNUtils {
 
@@ -93,30 +89,23 @@ public final class URNUtils {
     return null;
   }
 
-  public static String getIdHashCodeFromEventId(String id, String instanceId) {
+  public static String getIdHashCodeFromEventId(String id) {
     String[] fields = id.split(RodaConstants.URN_SEPARATOR);
     if (fields.length == URN_LENGTH_WITH_INSTANCE_IDENTIFIER) {
       return fields[5];
     } else if (fields.length == URN_LENGTH_WITHOUT_INSTANCE_IDENTIFIER) {
       return fields[4];
-    } else if (fields[2].equals(instanceId)) {
-      String result = "";
-      for (int i = 5; i < fields.length; i++) {
-        result = result + fields[i];
-      }
-      return result;
-    } else {
-      String result = "";
-      for (int i = 4; i < fields.length; i++) {
-        result = result + fields[i];
-      }
-      return result;
-    }
+    } else
+      return retrieveIdWithHours(fields);
   }
 
   public static String getAgentUsernameFromURN(String urnId) {
     String[] fields = urnId.split(RodaConstants.URN_SEPARATOR);
-    return fields[fields.length - 1];
+    if (fields.length == URN_LENGTH_WITH_INSTANCE_IDENTIFIER
+      || fields.length == URN_LENGTH_WITHOUT_INSTANCE_IDENTIFIER) {
+      return fields[fields.length - 1];
+    } else
+      return retrieveIdWithHours(fields);
   }
 
   public static boolean verifyInstanceIdentifier(String id, String instanceId) {
@@ -134,11 +123,7 @@ public final class URNUtils {
 
   public static boolean hasInstanceId(String id) {
     String[] fields = id.split(RodaConstants.URN_SEPARATOR);
-    if (fields.length == URN_LENGTH_WITH_INSTANCE_IDENTIFIER) {
-      return true;
-    } else {
-      return false;
-    }
+    return !fields[URN_INSTANCE_IDENTIFIER_POSITION].equals(RodaConstants.PREMIS_METADATA_TYPE);
   }
 
   public static boolean verifyPremisPrefix(PreservationMetadataType type, String filename) {
@@ -147,5 +132,20 @@ public final class URNUtils {
     } else {
       return filename.startsWith(getPremisPrefix(type, null));
     }
+  }
+
+  public static String retrieveIdWithHours(String[] fields) {
+    String result = "";
+    if (!fields[URN_INSTANCE_IDENTIFIER_POSITION].equals(RodaConstants.PREMIS_METADATA_TYPE)) {
+      for (int i = 5; i < fields.length - 1; i++) {
+        result = result + RodaConstants.URN_SEPARATOR + fields[i];
+      }
+    } else {
+      for (int i = 4; i < fields.length - 1; i++) {
+        result = result + fields[i];
+      }
+    }
+    result = result + RodaConstants.URN_SEPARATOR + fields[fields.length - 1];
+    return result;
   }
 }
