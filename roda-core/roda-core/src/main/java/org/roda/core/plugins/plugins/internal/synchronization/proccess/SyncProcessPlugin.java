@@ -22,12 +22,13 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.accessToken.AccessToken;
-import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.synchronization.bundle.BundleState;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -36,8 +37,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.data.v2.synchronization.bundle.BundleState;
-import org.roda.core.plugins.plugins.internal.synchronization.bundle.SyncBundleHelper;
+import org.roda.core.plugins.plugins.internal.synchronization.SynchronizationHelper;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.RESTClientUtility;
@@ -176,48 +176,29 @@ public class SyncProcessPlugin extends AbstractPlugin<Void> {
     }, index, model, storage);
   }
 
-  private void sendSyncBundle(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job cachedJob) throws PluginException {
+  private void sendSyncBundle(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job cachedJob)
+    throws PluginException {
     try {
       localInstance = RodaCoreFactory.getLocalInstance();
-      BundleState bundleStateFile = SyncBundleHelper.getBundleStateFile(localInstance);
+      BundleState bundleState = SynchronizationHelper.buildBundleStateFile();
       jobPluginInfo.setSourceObjectsCount(1);
 
-      int responseCode = send(localInstance, bundleStateFile);
-
+      int responseCode = send(localInstance, bundleState);
       if (responseCode == 200) {
-        localInstance.setLastSynchronizationDate(bundleStateFile.getToDate());
+        localInstance.setLastSynchronizationDate(bundleState.getToDate());
         RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
-        bundleStateFile.setSyncState(BundleState.Status.SENT);
+        bundleState.setSyncState(BundleState.Status.SENT);
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
         report.setPluginState(PluginState.SUCCESS);
       } else {
         report.setPluginState(PluginState.FAILURE).setPluginDetails("Server response is " + responseCode);
-        bundleStateFile.setSyncState(BundleState.Status.FAILED);
+        bundleState.setSyncState(BundleState.Status.FAILED);
       }
-      SyncBundleHelper.updateBundleStateFile(localInstance, bundleStateFile);
+      SynchronizationHelper.updateBundleStateFile(bundleState);
     } catch (GenericException e) {
       jobPluginInfo.incrementObjectsProcessedWithFailure();
       report.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
       throw new PluginException("Unable to retrieve local instance configuration", e);
-    }
-  }
-
-  private Path compressBundle(BundleState bundleStateFile) throws PluginException {
-    try {
-      String fileName = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'.zip'").format(bundleStateFile.getToDate());
-      Path filePath = RodaCoreFactory.getSynchronizationDirectoryPath().resolve(fileName);
-      if (FSUtils.exists(filePath)) {
-        FSUtils.deletePath(filePath);
-      }
-      Path file = Files.createFile(filePath);
-      File zipFile = ZipUtility.createZIPFile(file.toFile(), new File(localInstance.getBundlePath()));
-      bundleStateFile.setZipFile(zipFile.getPath());
-      bundleStateFile.setSyncState(BundleState.Status.PREPARED);
-      SyncBundleHelper.updateBundleStateFile(localInstance, bundleStateFile);
-      return filePath;
-    } catch (GenericException | IOException | NotFoundException e) {
-      LOGGER.error("Unable to read bundle state file", e);
-      throw new PluginException("Unable to read bundle state file", e);
     }
   }
 
@@ -233,6 +214,25 @@ public class SyncProcessPlugin extends AbstractPlugin<Void> {
     } catch (RODAException | FileNotFoundException e) {
       LOGGER.error("Unable to send bundle to central instance", e);
       throw new PluginException("Unable to send bundle to central instance", e);
+    }
+  }
+
+  private Path compressBundle(BundleState bundleStateFile) throws PluginException {
+    try {
+      String fileName = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'.zip'").format(bundleStateFile.getToDate());
+      Path filePath = RodaCoreFactory.getSynchronizationDirectoryPath().resolve(fileName);
+      if (FSUtils.exists(filePath)) {
+        FSUtils.deletePath(filePath);
+      }
+      Path file = Files.createFile(filePath);
+      File zipFile = ZipUtility.createZIPFile(file.toFile(), new File(localInstance.getBundlePath()));
+      bundleStateFile.setZipFile(zipFile.getPath());
+      bundleStateFile.setSyncState(BundleState.Status.PREPARED);
+      SynchronizationHelper.updateBundleStateFile(bundleStateFile);
+      return filePath;
+    } catch (GenericException | IOException | NotFoundException e) {
+      LOGGER.error("Unable to read bundle state file", e);
+      throw new PluginException("Unable to read bundle state file", e);
     }
   }
 
