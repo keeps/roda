@@ -1,5 +1,10 @@
 package org.roda.core.plugins.plugins.internal.synchronization.bundle;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -16,7 +21,6 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.data.v2.synchronization.bundle.PackageState;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
@@ -27,9 +31,6 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.nio.file.Path;
-import java.util.Collections;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
@@ -55,6 +56,11 @@ public class CreateRiskIncidencePackagePlugin extends CreateRodaEntityPackagePlu
   }
 
   @Override
+  protected String getEntityStoragePath() {
+    return "risk-incidence";
+  }
+
+  @Override
   protected void createBundle(IndexService index, ModelService model, Report pluginReport, JobPluginInfo jobPluginInfo,
     Job job) {
     pluginReport.setPluginState(PluginState.SUCCESS);
@@ -67,11 +73,7 @@ public class CreateRiskIncidencePackagePlugin extends CreateRodaEntityPackagePlu
         int counter = index.count(RiskIncidence.class, filter).intValue();
 
         jobPluginInfo.setSourceObjectsCount(counter);
-
-        PackageState packageState = SyncBundleHelper.getPackageState(getLocalInstance(), getEntity());
-        packageState.setClassName(RiskIncidence.class);
-        packageState.setCount(counter);
-        SyncBundleHelper.updatePackageState(getLocalInstance(), getEntity(), packageState);
+        ArrayList<String> idList = new ArrayList<>();
 
         IterableIndexResult<RiskIncidence> incidences = index.findAll(RiskIncidence.class, filter,
           Collections.emptyList());
@@ -79,8 +81,7 @@ public class CreateRiskIncidencePackagePlugin extends CreateRodaEntityPackagePlu
           Report reportItem = PluginHelper.initPluginReportItem(this, incidence.getId(), RiskIncidence.class);
           try {
             createRiskIncidenceBundle(model, incidence);
-            packageState.addIdList(incidence.getId());
-            SyncBundleHelper.updatePackageState(getLocalInstance(), getEntity(), packageState);
+            idList.add(incidence.getId());
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
           } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
             LOGGER.error("Error on create bundle for Risk Incidence {}", incidence.getId());
@@ -92,8 +93,12 @@ public class CreateRiskIncidencePackagePlugin extends CreateRodaEntityPackagePlu
             PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
           }
         }
+        updateEntityPackageState(RiskIncidence.class, idList);
       } catch (RODAException e) {
         LOGGER.error("Error on retrieve indexes of a RODA entity", e);
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+      } catch (IOException e) {
+        LOGGER.error("Error on update entity package state file", e);
         jobPluginInfo.incrementObjectsProcessedWithFailure();
       }
     }
