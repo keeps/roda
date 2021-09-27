@@ -1,7 +1,8 @@
 package org.roda.core.plugins.plugins.internal.synchronization.bundle;
 
+import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.roda.core.data.common.RodaConstants;
@@ -15,15 +16,12 @@ import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.synchronization.bundle.PackageState;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
@@ -57,6 +55,11 @@ public class CreateRepositoryEventPackagePlugin extends CreateRodaEntityPackageP
   }
 
   @Override
+  protected String getEntityStoragePath() {
+    return "preservation/event";
+  }
+
+  @Override
   protected void createBundle(IndexService index, ModelService model, Report pluginReport, JobPluginInfo jobPluginInfo,
     Job job) {
     pluginReport.setPluginState(PluginState.SUCCESS);
@@ -67,13 +70,8 @@ public class CreateRepositoryEventPackagePlugin extends CreateRodaEntityPackageP
       Filter filter = ((SelectedItemsFilter) sourceObjects).getFilter();
       try {
         int counter = index.count(IndexedPreservationEvent.class, filter).intValue();
-
         jobPluginInfo.setSourceObjectsCount(counter);
-
-        PackageState packageState = SyncBundleHelper.getPackageState(getLocalInstance(), getEntity());
-        packageState.setClassName(IndexedPreservationEvent.class);
-        packageState.setCount(counter);
-        SyncBundleHelper.updatePackageState(getLocalInstance(), getEntity(), packageState);
+        ArrayList<String> idList = new ArrayList<>();
 
         IterableIndexResult<IndexedPreservationEvent> events = index.findAll(IndexedPreservationEvent.class, filter,
           Arrays.asList(RodaConstants.INDEX_UUID));
@@ -84,8 +82,7 @@ public class CreateRepositoryEventPackagePlugin extends CreateRodaEntityPackageP
             retrieveEvent = model.retrievePreservationMetadata(event.getId(),
               PreservationMetadata.PreservationMetadataType.EVENT);
             createEventBundle(model, retrieveEvent);
-            packageState.addIdList(retrieveEvent.getId());
-            SyncBundleHelper.updatePackageState(getLocalInstance(), getEntity(), packageState);
+            idList.add(retrieveEvent.getId());
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
           } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
             LOGGER.error("Error on create bundle for repository event {}", retrieveEvent.getId());
@@ -97,8 +94,12 @@ public class CreateRepositoryEventPackagePlugin extends CreateRodaEntityPackageP
             PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
           }
         }
+        updateEntityPackageState(IndexedPreservationEvent.class, idList);
       } catch (RODAException e) {
         LOGGER.error("Error on retrieve indexes of a RODA entity", e);
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+      } catch (IOException e) {
+        LOGGER.error("Error on update entity package state file", e);
         jobPluginInfo.incrementObjectsProcessedWithFailure();
       }
     }

@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -34,7 +35,6 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.synchronization.bundle.PackageState;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
@@ -70,6 +70,11 @@ public class CreateAipPackagePlugin extends CreateRodaEntityPackagePlugin<AIP> {
   }
 
   @Override
+  protected String getEntityStoragePath() {
+    return "aip";
+  }
+
+  @Override
   protected void createBundle(IndexService index, ModelService model, Report pluginReport, JobPluginInfo jobPluginInfo,
     Job job) {
     pluginReport.setPluginState(PluginState.SUCCESS);
@@ -80,13 +85,8 @@ public class CreateAipPackagePlugin extends CreateRodaEntityPackagePlugin<AIP> {
       Filter filter = ((SelectedItemsFilter) sourceObjects).getFilter();
       try {
         int counter = index.count(IndexedAIP.class, filter).intValue();
-
         jobPluginInfo.setSourceObjectsCount(counter);
-
-        PackageState packageState = SyncBundleHelper.getPackageState(getLocalInstance(), getEntity());
-        packageState.setClassName(AIP.class);
-        packageState.setCount(counter);
-        SyncBundleHelper.updatePackageState(getLocalInstance(), getEntity(), packageState);
+        ArrayList<String> idList = new ArrayList<>();
 
         IterableIndexResult<IndexedAIP> aips = index.findAll(IndexedAIP.class, filter,
           Arrays.asList(RodaConstants.INDEX_UUID));
@@ -96,10 +96,10 @@ public class CreateAipPackagePlugin extends CreateRodaEntityPackagePlugin<AIP> {
           try {
             retrieveAIP = model.retrieveAIP(aip.getId());
             createAIPBundle(model, index, retrieveAIP);
-            packageState.addIdList(retrieveAIP.getId());
-            SyncBundleHelper.updatePackageState(getLocalInstance(), getEntity(), packageState);
+            idList.add(retrieveAIP.getId());
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
-          } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+          } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
+            | IOException e) {
             LOGGER.error("Error on create bundle for aip {}", aip.getId());
             jobPluginInfo.incrementObjectsProcessedWithFailure();
             reportItem.addPluginDetails("Failed to create bundle for " + aip.getClass() + " " + aip.getId() + "\n");
@@ -108,8 +108,12 @@ public class CreateAipPackagePlugin extends CreateRodaEntityPackagePlugin<AIP> {
             PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
           }
         }
-      } catch (RODAException | IOException e) {
+        updateEntityPackageState(AIP.class, idList);
+      } catch (RODAException e) {
         LOGGER.error("Error on retrieve indexes of a RODA entity", e);
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+      } catch (IOException e) {
+        LOGGER.error("Error on update entity package state file", e);
         jobPluginInfo.incrementObjectsProcessedWithFailure();
       }
     }

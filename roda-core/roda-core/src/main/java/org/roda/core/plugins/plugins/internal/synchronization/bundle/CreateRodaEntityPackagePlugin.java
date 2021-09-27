@@ -1,7 +1,9 @@
 package org.roda.core.plugins.plugins.internal.synchronization.bundle;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -14,12 +16,12 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
-import org.roda.core.data.v2.synchronization.bundle.PackageState;
-import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.synchronization.bundle.PackageState;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -28,6 +30,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.plugins.internal.synchronization.SynchronizationHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,20 +76,14 @@ public abstract class CreateRodaEntityPackagePlugin<T extends IsRODAObject> exte
 
   protected abstract String getEntity();
 
+  protected abstract String getEntityStoragePath();
+
   protected Path getDestinationPath() throws GenericException {
     return Paths.get(getLocalInstance().getBundlePath());
   }
 
   protected LocalInstance getLocalInstance() throws GenericException {
     return RodaCoreFactory.getLocalInstance();
-  }
-
-  protected void updatePackageState(PackageState.Status status) throws PluginException {
-    try {
-      SyncBundleHelper.updatePackageStateStatus(getLocalInstance(), getEntity(), status);
-    } catch (GenericException e) {
-      throw new PluginException("Error while creating entity bundle state", e);
-    }
   }
 
   protected abstract void createBundle(IndexService index, ModelService model, Report report,
@@ -138,8 +135,22 @@ public abstract class CreateRodaEntityPackagePlugin<T extends IsRODAObject> exte
   @Override
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-    updatePackageState(PackageState.Status.CREATED);
+    try {
+      SynchronizationHelper.createEntityPackageState(getEntity());
+    } catch (GenericException | IOException e) {
+      throw new PluginException("Cannot create entity package state file", e);
+    }
     return new Report();
+  }
+
+  protected void updateEntityPackageState(Class<T> entityClass, ArrayList<String> idList)
+    throws NotFoundException, GenericException, IOException {
+    PackageState entityPackageState = SynchronizationHelper.getEntityPackageState(getEntity());
+    entityPackageState.setClassName(entityClass);
+    entityPackageState.setStatus(PackageState.Status.CREATED);
+    entityPackageState.setIdList(idList);
+    entityPackageState.setCount(idList.size());
+    SynchronizationHelper.updateEntityPackageState(getEntity(), entityPackageState);
   }
 
   @Override
@@ -147,13 +158,17 @@ public abstract class CreateRodaEntityPackagePlugin<T extends IsRODAObject> exte
     try {
       Job job = PluginHelper.getJob(this, model);
       JobStats jobStats = job.getJobStats();
+      PackageState entityPackageState = SynchronizationHelper.getEntityPackageState(getEntity());
       if (jobStats.getSourceObjectsProcessedWithFailure() == 0) {
-        updatePackageState(PackageState.Status.SUCCESS);
-        SyncBundleHelper.executeShaSumCommand(getLocalInstance(), getEntity());
+        String entityTopHash = SynchronizationHelper.calculateEntityTopHash(getEntity());
+        entityPackageState.setChecksum(entityTopHash);
+        entityPackageState.setStatus(PackageState.Status.SUCCESS);
       } else {
-        updatePackageState(PackageState.Status.FAILED);
+        entityPackageState.setStatus(PackageState.Status.FAILED);
       }
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      SynchronizationHelper.updateEntityPackageState(getEntity(), entityPackageState);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
+      | IOException e) {
       throw new PluginException("Error on retrieve job status", e);
     }
     return new Report();

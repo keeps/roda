@@ -32,6 +32,8 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.synchronization.bundle.BundleState;
+import org.roda.core.data.v2.synchronization.bundle.PackageState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -41,13 +43,10 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.data.v2.synchronization.bundle.BundleState;
-import org.roda.core.data.v2.synchronization.bundle.PackageState;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FileStorageService;
-import org.roda.core.storage.utils.LocalInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.roda.core.util.ZipUtility;
 import org.slf4j.Logger;
@@ -175,6 +174,7 @@ public class SyncImportPlugin extends AbstractPlugin<Void> {
         tempDirectory = Files.createTempDirectory(Paths.get(bundlePath).getFileName().toString());
         ZipUtility.extractFilesFromZIP(new File(bundlePath), tempDirectory.toFile(), true);
         BundleState bundleState = JsonUtils.readObjectFromFile(tempDirectory.resolve("state.json"), BundleState.class);
+        validateChecksum(tempDirectory, bundleState);
         temporaryStorage = new FileStorageService(tempDirectory.resolve(RodaConstants.CORE_STORAGE_FOLDER), false, null,
           false);
 
@@ -236,18 +236,19 @@ public class SyncImportPlugin extends AbstractPlugin<Void> {
     }
   }
 
+  private void validateChecksum(Path tempDirectory, BundleState bundleState){
+    // TODO validate checksum
+  }
+
   private void reindexBundle(BundleState bundleState, JobPluginInfo jobPluginInfo) throws NotFoundException,
     AuthorizationDeniedException, JobAlreadyStartedException, GenericException, RequestNotValidException {
-    Map<String, PackageState> packageStateMap = bundleState.getPackageStateMap();
-    jobPluginInfo.setSourceObjectsCount(packageStateMap.size());
-    for (Map.Entry<String, PackageState> entry : packageStateMap.entrySet()) {
-      String entity = entry.getKey();
-      PackageState packageState = entry.getValue();
-
+    List<PackageState> packageStateList = bundleState.getPackageStateList();
+    jobPluginInfo.setSourceObjectsCount(packageStateList.size());
+    for (PackageState packageState : packageStateList) {
       if (packageState.getCount() > 0) {
         Job job = new Job();
         job.setId(IdUtils.createUUID());
-        job.setName("Reindex RODA entity (" + entity + ")");
+        job.setName("Reindex RODA entity (" + packageState.getClassName() + ")");
         job.setPluginType(PluginType.INTERNAL);
         job.setUsername(RodaConstants.ADMIN);
 

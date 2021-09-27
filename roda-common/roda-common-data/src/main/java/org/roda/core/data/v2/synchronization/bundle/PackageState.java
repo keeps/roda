@@ -16,6 +16,7 @@ public class PackageState implements Serializable {
   private Status status = Status.CREATED;
   private int count = 0;
   private List<String> idList = new ArrayList<>();
+  private String checksum;
 
   public enum Status {
     CREATED, FAILED, SUCCESS
@@ -58,5 +59,13 @@ public class PackageState implements Serializable {
 
   public void addIdList(String idList){
     this.idList.add(idList);
+  }
+
+  public String getChecksum() {
+    return checksum;
+  }
+
+  public void setChecksum(String checksum) {
+    this.checksum = checksum;
   }
 }

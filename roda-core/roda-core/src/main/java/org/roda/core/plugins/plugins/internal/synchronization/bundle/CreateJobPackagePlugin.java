@@ -1,5 +1,10 @@
 package org.roda.core.plugins.plugins.internal.synchronization.bundle;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -11,13 +16,10 @@ import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.synchronization.bundle.PackageState;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
@@ -28,10 +30,6 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
@@ -56,6 +54,11 @@ public class CreateJobPackagePlugin extends CreateRodaEntityPackagePlugin<Job> {
   }
 
   @Override
+  protected String getEntityStoragePath() {
+    return "job";
+  }
+
+  @Override
   protected void createBundle(IndexService index, ModelService model, Report pluginReport, JobPluginInfo jobPluginInfo,
     Job job) {
     pluginReport.setPluginState(PluginState.SUCCESS);
@@ -66,13 +69,8 @@ public class CreateJobPackagePlugin extends CreateRodaEntityPackagePlugin<Job> {
       Filter filter = ((SelectedItemsFilter) sourceObjects).getFilter();
       try {
         int counter = index.count(Job.class, filter).intValue();
-
         jobPluginInfo.setSourceObjectsCount(counter);
-
-        PackageState packageState = SyncBundleHelper.getPackageState(getLocalInstance(), getEntity());
-        packageState.setClassName(Job.class);
-        packageState.setCount(counter);
-        SyncBundleHelper.updatePackageState(getLocalInstance(), getEntity(), packageState);
+        ArrayList<String> idList = new ArrayList<>();
 
         IterableIndexResult<Job> jobs = index.findAll(Job.class, filter, Arrays.asList(RodaConstants.INDEX_UUID));
         for (Job jobToBundle : jobs) {
@@ -81,8 +79,7 @@ public class CreateJobPackagePlugin extends CreateRodaEntityPackagePlugin<Job> {
           try {
             retrieveJob = model.retrieveJob(jobToBundle.getId());
             createJobBundle(model, retrieveJob);
-            packageState.addIdList(retrieveJob.getId());
-            SyncBundleHelper.updatePackageState(getLocalInstance(), getEntity(), packageState);
+            idList.add(retrieveJob.getId());
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
           } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
             LOGGER.error("Error on create bundle for job {}", jobToBundle.getId());
@@ -94,8 +91,12 @@ public class CreateJobPackagePlugin extends CreateRodaEntityPackagePlugin<Job> {
             PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
           }
         }
+        updateEntityPackageState(Job.class, idList);
       } catch (RODAException e) {
         LOGGER.error("Error on retrieve indexes of a RODA entity", e);
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+      } catch (IOException e) {
+        LOGGER.error("Error on update entity package state file", e);
         jobPluginInfo.incrementObjectsProcessedWithFailure();
       }
     }
