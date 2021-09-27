@@ -1,7 +1,9 @@
 package org.roda.core.data.v2.synchronization.bundle;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -15,17 +17,12 @@ public class BundleState {
   private Date toDate;
   private String destinationPath;
   private String zipPath;
-  private Map<String, PackageState> packageStateMap;
+  private List<PackageState> packageStateList;
   private Status syncStatus;
 
   public BundleState() {
-    packageStateMap = new HashMap<>();
+    packageStateList = new ArrayList<>();
     syncStatus = Status.NONE;
-  }
-
-  @JsonProperty(value = "packages")
-  public Map<String, PackageState> getPackageStateMap() {
-    return packageStateMap;
   }
 
   public Date getFromDate() {
@@ -61,17 +58,13 @@ public class BundleState {
   }
 
   @JsonIgnore
-  public PackageState getPackageState(String key) {
-    PackageState packageState = packageStateMap.get(key);
-    if (packageState == null) {
-      packageState = new PackageState();
-    }
-    return packageState;
+  public void setPackageStateList(List<PackageState> packageStateList) {
+    this.packageStateList = packageStateList;
   }
 
-  @JsonIgnore
-  public void setPackageState(String key, PackageState packageState) {
-    this.packageStateMap.put(key, packageState);
+  @JsonProperty(value = "packagesList")
+  public List<PackageState> getPackageStateList() {
+    return packageStateList;
   }
 
   public void setSyncState(Status status) {

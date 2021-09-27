@@ -1,6 +1,8 @@
 package org.roda.core.plugins.plugins.internal.synchronization.bundle;
 
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.roda.core.data.common.RodaConstants;
@@ -20,7 +22,6 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.synchronization.bundle.PackageState;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
@@ -54,6 +55,11 @@ public class CreateDipPackagePlugin extends CreateRodaEntityPackagePlugin<DIP> {
   }
 
   @Override
+  protected String getEntityStoragePath() {
+    return "dip";
+  }
+
+  @Override
   protected void createBundle(IndexService index, ModelService model, Report pluginReport, JobPluginInfo jobPluginInfo,
     Job job) {
     pluginReport.setPluginState(PluginState.SUCCESS);
@@ -64,13 +70,8 @@ public class CreateDipPackagePlugin extends CreateRodaEntityPackagePlugin<DIP> {
       Filter filter = ((SelectedItemsFilter) sourceObjects).getFilter();
       try {
         int counter = index.count(IndexedDIP.class, filter).intValue();
-
         jobPluginInfo.setSourceObjectsCount(counter);
-
-        PackageState packageState = SyncBundleHelper.getPackageState(getLocalInstance(), getEntity());
-        packageState.setClassName(DIP.class);
-        packageState.setCount(counter);
-        SyncBundleHelper.updatePackageState(getLocalInstance(), getEntity(), packageState);
+        ArrayList<String> idList = new ArrayList<>();
 
         IterableIndexResult<IndexedDIP> dips = index.findAll(IndexedDIP.class, filter,
           Arrays.asList(RodaConstants.INDEX_UUID));
@@ -80,8 +81,7 @@ public class CreateDipPackagePlugin extends CreateRodaEntityPackagePlugin<DIP> {
           try {
             retrieveDIP = model.retrieveDIP(dip.getId());
             createDIPBundle(model, retrieveDIP);
-            packageState.addIdList(retrieveDIP.getId());
-            SyncBundleHelper.updatePackageState(getLocalInstance(), getEntity(), packageState);
+            idList.add(retrieveDIP.getId());
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
           } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
             LOGGER.error("Error on create bundle for aip {}", dip.getId());
@@ -92,8 +92,12 @@ public class CreateDipPackagePlugin extends CreateRodaEntityPackagePlugin<DIP> {
             PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
           }
         }
+        updateEntityPackageState(DIP.class, idList);
       } catch (RODAException e) {
         LOGGER.error("Error on retrieve indexes of a RODA entity", e);
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+      } catch (IOException e) {
+        LOGGER.error("Error on update entity package state file", e);
         jobPluginInfo.incrementObjectsProcessedWithFailure();
       }
     }
