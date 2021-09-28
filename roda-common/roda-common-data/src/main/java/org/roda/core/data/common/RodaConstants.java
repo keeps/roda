@@ -383,6 +383,7 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_AUTH_TOKEN = "token";
   public static final String API_PATH_PARAM_DISTRIBUTED_INSTANCE_REGISTER = "register";
   public static final String API_PATH_PARAM_DISTRIBUTED_INSTANCE_SYNC = "sync";
+  public static final String API_PATH_PARAM_INSTANCE_IDENTIFIER = "instance_identifier";
 
   public static final String API_PATH_PARAM_PART = "part";
   public static final String API_PATH_PARAM_NAME = "name";

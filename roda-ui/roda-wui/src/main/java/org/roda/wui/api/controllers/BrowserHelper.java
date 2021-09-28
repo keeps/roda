@@ -172,8 +172,8 @@ import org.roda.core.plugins.plugins.internal.disposal.schedule.AssociateDisposa
 import org.roda.core.plugins.plugins.internal.disposal.schedule.DisassociateDisposalScheduleToAIPPlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateSyncBundlePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierDIPPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.proccess.SyncImportPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.proccess.SyncProcessPlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.proccess.ImportSyncBundlePlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.proccess.SendSyncBundlePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierAIPEventPlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierAIPPlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierJobPlugin;
@@ -3762,11 +3762,11 @@ public class BrowserHelper {
     }
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, path);
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CENTRAL_INSTANCE_URL, localInstance.getCentralInstanceURL());
-    return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(), SyncProcessPlugin.class, user,
+    return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(), SendSyncBundlePlugin.class, user,
       pluginParameters, "Could not execute bundle job");
   }
 
-  public static Job importSyncBundle(User user, FormDataMultiPart multiPart)
+  public static Job importSyncBundle(User user, String instanceIdentifier, FormDataMultiPart multiPart)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     Map<String, String> pluginParameters = new HashMap<>();
     FormDataBodyPart file = multiPart.getField(RodaConstants.API_PARAM_FILE);
@@ -3781,7 +3781,8 @@ public class BrowserHelper {
     }
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, path);
-    return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(), SyncImportPlugin.class, user,
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, instanceIdentifier);
+    return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(), ImportSyncBundlePlugin.class, user,
       pluginParameters, "Could not execute bundle job");
   }
 
