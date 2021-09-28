@@ -48,8 +48,8 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-public class SyncProcessPlugin extends AbstractPlugin<Void> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(SyncProcessPlugin.class);
+public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(SendSyncBundlePlugin.class);
 
   private String bundlePath = null;
   private String centralInstanceURL = null;
@@ -145,7 +145,7 @@ public class SyncProcessPlugin extends AbstractPlugin<Void> {
 
   @Override
   public Plugin<Void> cloneMe() {
-    return new SyncProcessPlugin();
+    return new SendSyncBundlePlugin();
   }
 
   @Override
@@ -208,7 +208,7 @@ public class SyncProcessPlugin extends AbstractPlugin<Void> {
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
 
       String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE
-        + RodaConstants.API_PATH_PARAM_DISTRIBUTED_INSTANCE_SYNC;
+        + RodaConstants.API_PATH_PARAM_DISTRIBUTED_INSTANCE_SYNC + RodaConstants.API_SEP + localInstance.getId();
       return RESTClientUtility.sendPostRequestWithCompressedFile(localInstance.getCentralInstanceURL(), resource,
         zipPath, accessToken);
     } catch (RODAException | FileNotFoundException e) {

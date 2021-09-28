@@ -2433,6 +2433,8 @@ public interface ClientMessages extends Messages {
 
   String distributedInstanceStatistics();
 
+  String distributedInstancesFileNotAccessibleMessage();
+
   /** Local instance configuration **/
 
   String createLocalInstanceConfigurationTitle();

@@ -64,13 +64,13 @@
                                              ui:field="userNameValue"/>
                             </g:FlowPanel>
                             <g:ScrollPanel ui:field="accessKeyTablePanel"/>
-                            <g:FlowPanel>
-                                <g:Label addStyleNames="h4">
-                                    <ui:text from='{messages.distributedInstanceStatistics}'/>
-                                </g:Label>
-                                <g:FlowPanel ui:field="statisticsPanel"></g:FlowPanel>
-                            </g:FlowPanel>
                         </g:FlowPanel>
+                    </g:FlowPanel>
+                    <g:FlowPanel>
+                        <g:Label addStyleNames="h4">
+                            <ui:text from='{messages.distributedInstanceStatistics}'/>
+                        </g:Label>
+                        <g:FlowPanel ui:field="statisticsPanel"></g:FlowPanel>
                     </g:FlowPanel>
                 </g:FlowPanel>
             </g:FlowPanel>

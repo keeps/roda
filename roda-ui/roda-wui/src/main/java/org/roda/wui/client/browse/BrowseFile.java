@@ -22,13 +22,16 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.common.NavigationToolbar;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.slider.SliderPanel;
 import org.roda.wui.client.common.slider.Sliders;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
@@ -38,6 +41,7 @@ import org.roda.wui.common.client.widgets.wcag.WCAGUtilities;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Element;
+import com.google.gwt.safehtml.shared.UriUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Command;
@@ -147,37 +151,48 @@ public class BrowseFile extends Composite {
   public BrowseFile(Viewers viewers, final BrowseFileBundle bundle) {
     final boolean justActive = AIPState.ACTIVE.equals(bundle.getAip().getState());
 
-    // initialize preview
-    filePreview = new IndexedFilePreview(viewers, bundle.getFile(), justActive, bundle.getAip().getPermissions(),
-      new Command() {
+    if (!canPreview(bundle.getFile())) {
+      Dialogs.showInformationDialog(messages.distributedInstancesLabel(),
+        messages.distributedInstancesFileNotAccessibleMessage(), messages.closeButton(), false,
+        new NoAsyncCallback<Void>() {
+          @Override
+          public void onSuccess(Void unused) {
+            HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, bundle.getAip().getId(),
+              bundle.getRepresentation().getId());
+          }
+        });
+    } else {
+      // initialize preview
+      filePreview = new IndexedFilePreview(viewers, bundle.getFile(), justActive, bundle.getAip().getPermissions(),
+        new Command() {
 
-        @Override
-        public void execute() {
-          Scheduler.get().scheduleDeferred(new Command() {
-            @Override
-            public void execute() {
-              Filter filter = new Filter(
-                new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, bundle.getFile().getUUID()));
-              BrowserService.Util.getInstance().count(IndexedDIP.class.getName(), filter, justActive,
-                new AsyncCallback<Long>() {
+          @Override
+          public void execute() {
+            Scheduler.get().scheduleDeferred(new Command() {
+              @Override
+              public void execute() {
+                Filter filter = new Filter(
+                  new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, bundle.getFile().getUUID()));
+                BrowserService.Util.getInstance().count(IndexedDIP.class.getName(), filter, justActive,
+                  new AsyncCallback<Long>() {
 
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                  }
-
-                  @Override
-                  public void onSuccess(Long dipCount) {
-                    if (dipCount > 0) {
-                      disseminationsSlider.open();
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      AsyncCallbackUtils.defaultFailureTreatment(caught);
                     }
-                  }
-                });
-            }
-          });
-        }
-      });
 
+                    @Override
+                    public void onSuccess(Long dipCount) {
+                      if (dipCount > 0) {
+                        disseminationsSlider.open();
+                      }
+                    }
+                  });
+              }
+            });
+          }
+        });
+    }
     // initialize widget
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -208,5 +223,16 @@ public class BrowseFile extends Composite {
     }
 
     WCAGUtilities.getInstance().makeAccessible(center.getElement());
+  }
+
+  public boolean canPreview(IndexedFile file) {
+    String distributedMode = ConfigurationManager.getStringWithDefault(
+      RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
+    if (distributedMode.equals(RodaConstants.DistributedModeType.CENTRAL.name()) && file.isReference()) {
+      if (UriUtils.extractScheme(file.getReferenceURL()).equals("roda")) {
+        return false;
+      }
+    }
+    return true;
   }
 }
