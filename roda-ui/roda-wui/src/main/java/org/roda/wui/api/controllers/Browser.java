@@ -3996,7 +3996,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static Job importSyncBundle(User user, FormDataMultiPart multiPart)
+  public static Job importSyncBundle(User user, String instanceIdentifier, FormDataMultiPart multiPart)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
 
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -4007,7 +4007,7 @@ public class Browser extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      return BrowserHelper.importSyncBundle(user, multiPart);
+      return BrowserHelper.importSyncBundle(user, instanceIdentifier, multiPart);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
