@@ -7,6 +7,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -92,18 +93,22 @@ public class DistributedInstancesResource {
   }
 
   @POST
-  @Path("/sync")
+  @Path("/sync/{" + RodaConstants.API_PATH_PARAM_INSTANCE_IDENTIFIER + "}")
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Consumes("multipart/*")
-  public Response synchronize(FormDataMultiPart file,
-                              @ApiParam(value = "Choose format in which to get the response", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
-    throws RODAException {
+  public Response synchronize(
+      @ApiParam(value = "The instance identifier", required = true) @PathParam(RodaConstants.API_PATH_PARAM_INSTANCE_IDENTIFIER) String instanceIdentifier,
+      FormDataMultiPart file,
+      @ApiParam(value = "Choose format in which to get the response", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
+      throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Browser.importSyncBundle(user, file);
+    Browser.importSyncBundle(user, instanceIdentifier, file);
 
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Bundle entries imported"), mediaType).build();
   }

@@ -34,6 +34,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.synchronization.bundle.BundleState;
 import org.roda.core.data.v2.synchronization.bundle.PackageState;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -55,10 +56,11 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-public class SyncImportPlugin extends AbstractPlugin<Void> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(SyncImportPlugin.class);
+public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(ImportSyncBundlePlugin.class);
 
   private String bundlePath = null;
+  private String instanceIdentifier = null;
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
@@ -66,12 +68,18 @@ public class SyncImportPlugin extends AbstractPlugin<Void> {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, "Destination path",
         PluginParameter.PluginParameterType.STRING, "", true, false, "Destination path where bundles will be created"));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, "Instance identifier",
+        PluginParameter.PluginParameterType.STRING, "", true, false,
+        "Identifier of the instance that will be synchronized "));
   }
 
   @Override
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> parameters = new ArrayList<>();
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER));
     return parameters;
   }
 
@@ -81,6 +89,10 @@ public class SyncImportPlugin extends AbstractPlugin<Void> {
 
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH)) {
       bundlePath = parameters.get(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH);
+    }
+
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER)) {
+      instanceIdentifier = parameters.get(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER);
     }
   }
 
@@ -131,7 +143,7 @@ public class SyncImportPlugin extends AbstractPlugin<Void> {
 
   @Override
   public Plugin<Void> cloneMe() {
-    return new SyncImportPlugin();
+    return new ImportSyncBundlePlugin();
   }
 
   @Override
@@ -161,12 +173,13 @@ public class SyncImportPlugin extends AbstractPlugin<Void> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<Void> plugin) throws PluginException {
-        importSyncBundle(storage, report, jobPluginInfo);
+        importSyncBundle(model, storage, report, cachedJob, jobPluginInfo);
       }
     }, index, model, storage);
   }
 
-  private void importSyncBundle(StorageService storage, Report report, JobPluginInfo jobPluginInfo) {
+  private void importSyncBundle(ModelService model, StorageService storage, Report report, Job cachedJob,
+    JobPluginInfo jobPluginInfo) {
     if (Files.exists(Paths.get(bundlePath))) {
       Path tempDirectory = null;
       FileStorageService temporaryStorage;
@@ -218,6 +231,9 @@ public class SyncImportPlugin extends AbstractPlugin<Void> {
           }
         }
         reindexBundle(bundleState, jobPluginInfo);
+        DistributedInstance distributedInstance = model.retrieveDistributedInstance(instanceIdentifier);
+        distributedInstance.setLastSyncDate(bundleState.getToDate());
+        model.updateDistributedInstance(distributedInstance, cachedJob.getUsername());
         report.setPluginState(PluginState.SUCCESS);
       } catch (IOException e) {
         LOGGER.error("Error extracting bundle to {}", tempDirectory.toString(), e);
@@ -236,7 +252,7 @@ public class SyncImportPlugin extends AbstractPlugin<Void> {
     }
   }
 
-  private void validateChecksum(Path tempDirectory, BundleState bundleState){
+  private void validateChecksum(Path tempDirectory, BundleState bundleState) {
     // TODO validate checksum
   }
 
