@@ -7403,3 +7403,9 @@ span.code {
 .job-orchestration-option label {
     margin-left: 5px;
 }
+
+#token_message {
+    max-width: 460px;
+    text-align: center;
+    word-break: break-all;
+}
