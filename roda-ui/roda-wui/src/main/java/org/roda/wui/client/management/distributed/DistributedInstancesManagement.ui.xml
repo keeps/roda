@@ -9,7 +9,7 @@
     <g:FlowPanel styleName="wui-representation-information-network" addStyleNames="wrapper skip_padding">
         <g:FlowPanel addStyleNames="row full_width skip_padding">
             <g:FlowPanel ui:field="contentFlowPanel" addStyleNames="col_10 content">
-                <common:TitlePanel text="{messages.manageDistributedInstanceTitle}" iconClass="DistributedInstances" />
+                <common:TitlePanel text="{messages.manageDistributedInstanceTitle}" iconClass="DistributedInstance"/>
                 <g:FlowPanel addStyleNames="page-description" ui:field="distributedInstancesManagementDescription" />
                 <g:ScrollPanel ui:field="distributedInstancesManagementTablePanel"/>
             </g:FlowPanel>

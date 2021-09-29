@@ -7362,3 +7362,9 @@ span.code {
 .disposal-policy-summary-retain {
     background-color: #479f43;
 }
+
+#token_message {
+    max-width: 460px;
+    text-align: center;
+    word-break: break-all;
+}
