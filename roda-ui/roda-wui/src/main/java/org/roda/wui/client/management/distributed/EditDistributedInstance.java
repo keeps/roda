@@ -147,7 +147,7 @@ public class EditDistributedInstance extends Composite {
       DistributedInstance distributedInstanceUpdated = distributedInstanceDataPanel.getDistributedInstance();
       distributedInstance.setName(distributedInstanceUpdated.getName());
       distributedInstance.setDescription(distributedInstanceUpdated.getDescription());
-      distributedInstance.setNameIdentifier(distributedInstanceUpdated.getNameIdentifier());
+      //distributedInstance.setNameIdentifier(distributedInstanceUpdated.getNameIdentifier());
       BrowserServiceImpl.Util.getInstance().updateDistributedInstance(this.distributedInstance, new NoAsyncCallback<DistributedInstance>() {
         @Override
         public void onSuccess(DistributedInstance distributedInstance) {

@@ -28,12 +28,12 @@
                 <g:TextBox title="{messages.distributedInstanceNameLabel}" ui:field="name" addStyleNames="form-textbox"/>
                 <g:Label ui:field="nameError" addStyleNames="form-label-error"/>
 
-                <g:Label addStyleNames="form-label">
-                    <ui:text from='{messages.distributedInstanceIDLabel}'/>
-                    *
-                </g:Label>
-                <g:TextBox title="{messages.distributedInstanceIDLabel}" ui:field="identifier" addStyleNames="form-textbox"/>
-                <g:Label ui:field="identifierError" addStyleNames="form-label-error"/>
+<!--                <g:Label addStyleNames="form-label">-->
+<!--                    <ui:text from='{messages.distributedInstanceIDLabel}'/>-->
+<!--                    *-->
+<!--                </g:Label>-->
+<!--                <g:TextBox title="{messages.distributedInstanceIDLabel}" ui:field="identifier" addStyleNames="form-textbox"/>-->
+<!--                <g:Label ui:field="identifierError" addStyleNames="form-label-error"/>-->
 
                 <g:Label addStyleNames="form-label">
                     <ui:text from='{messages.distributedInstanceDescriptionLabel}'/>
