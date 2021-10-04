@@ -1,5 +1,17 @@
 # Changelog
 
+## v4.0.3 (04/10/2021)
+
+#### Bug Fixes:
+
+-  Missing dependencies from RODA 4 Dockerfile [#1949](https://github.com/keeps/roda/issues/1949)
+
+Install for demonstration:
+```
+docker pull keeps/roda:v4.0.3
+```
+---
+
 ## v4.0.2 (12/08/2021)
 #### Bug Fixes:
 
@@ -863,23 +875,3 @@ docker pull keeps/roda:v2.2.4
 
 -  Error executing tasks defined via index filter when the task alters the result of the search [#1232](https://github.com/keeps/roda/issues/1232)
 -  Advanced search by date interval without latest that gives NPE [#1229](https://github.com/keeps/roda/issues/1229)
-
----
-
-## v2.2.3 (10/05/2018)
-Install for demonstration:
-```
-docker pull keeps/roda:v2.2.3
-```
-
-#### Enhancements:
-
--  Missing CSS classes in several sidebar components necessary for customization [#1228](https://github.com/keeps/roda/issues/1228)
-
-#### Bug Fixes:
-
-- RI relation count (on bottom) is counting non-active [#1219](https://github.com/keeps/roda/issues/1219)
-- RI relation count translation is not considering Representation and Files [#1220](https://github.com/keeps/roda/issues/1220)
--  Change RI extra bundle permission to read instead of manage [#1221](https://github.com/keeps/roda/issues/1221)
-
-
