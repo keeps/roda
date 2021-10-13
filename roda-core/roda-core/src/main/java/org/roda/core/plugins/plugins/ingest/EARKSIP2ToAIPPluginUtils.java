@@ -38,6 +38,7 @@ import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.util.IdUtils;
 import org.roda_project.commons_ip2.model.IPDescriptiveMetadata;
 import org.roda_project.commons_ip2.model.IPFile;
+import org.roda_project.commons_ip2.model.IPFileInterface;
 import org.roda_project.commons_ip2.model.IPMetadata;
 import org.roda_project.commons_ip2.model.IPRepresentation;
 import org.roda_project.commons_ip2.model.RepresentationStatus;
@@ -180,7 +181,7 @@ public class EARKSIP2ToAIPPluginUtils {
     RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
 
     for (IPMetadata pm : otherMetadata) {
-      IPFile file = pm.getMetadata();
+      IPFileInterface file = pm.getMetadata();
       ContentPayload fileContentPayload = new FSPathContentPayload(file.getPath());
 
       model.createOrUpdateOtherMetadata(aipId, representationId.orElse(null), file.getRelativeFolders(),
@@ -192,7 +193,7 @@ public class EARKSIP2ToAIPPluginUtils {
     String aipId, Optional<String> representationId, boolean notify) throws GenericException, NotFoundException,
     RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
     for (IPMetadata pm : preservationMetadata) {
-      IPFile file = pm.getMetadata();
+      IPFileInterface file = pm.getMetadata();
       ContentPayload fileContentPayload = new FSPathContentPayload(file.getPath());
 
       if (representationId.isPresent()) {
@@ -205,10 +206,10 @@ public class EARKSIP2ToAIPPluginUtils {
     }
   }
 
-  private static void processDocumentation(ModelService model, List<IPFile> documentation, String aipId,
-    String representationId, boolean update) throws RequestNotValidException, GenericException, AlreadyExistsException,
+  private static void processDocumentation(ModelService model, List<IPFileInterface> documentation, String aipId,
+                                           String representationId, boolean update) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException {
-    for (IPFile doc : documentation) {
+    for (IPFileInterface doc : documentation) {
       List<String> directoryPath = doc.getRelativeFolders();
       String fileId = doc.getFileName();
       ContentPayload payload = new FSPathContentPayload(doc.getPath());
@@ -222,10 +223,10 @@ public class EARKSIP2ToAIPPluginUtils {
     }
   }
 
-  private static void processSchemas(ModelService model, List<IPFile> schemas, String aipId, String representationId,
+  private static void processSchemas(ModelService model, List<IPFileInterface> schemas, String aipId, String representationId,
     boolean update) throws RequestNotValidException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException {
-    for (IPFile schema : schemas) {
+    for (IPFileInterface schema : schemas) {
       List<String> directoryPath = schema.getRelativeFolders();
       String fileId = schema.getFileName();
       ContentPayload payload = new FSPathContentPayload(schema.getPath());
@@ -274,7 +275,7 @@ public class EARKSIP2ToAIPPluginUtils {
       notify);
 
     // process representation files
-    for (IPFile file : sr.getData()) {
+    for (IPFileInterface file : sr.getData()) {
       List<String> directoryPath = file.getRelativeFolders();
       String fileId = file.getFileName();
       ContentPayload payload = new FSPathContentPayload(file.getPath());
