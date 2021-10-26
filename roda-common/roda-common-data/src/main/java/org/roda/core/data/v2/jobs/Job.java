@@ -9,14 +9,11 @@ package org.roda.core.data.v2.jobs;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
@@ -25,6 +22,10 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.HasId;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * @author Hélder Silva <hsilva@keep.pt>
@@ -67,13 +68,19 @@ public class Job implements IsModelObject, IsIndexed, HasId {
   // objects to act upon (All, None, List, Filter, etc.)
   private SelectedItems<? extends IsRODAObject> sourceObjects = null;
   private String outcomeObjectsClass = "";
-  
+
   private Map<String, Object> fields;
+
+  private JobPriority priority;
+
+  private JobActionType type;
 
   public Job() {
     super();
     startDate = new Date();
     state = JOB_STATE.CREATED;
+    priority = JobPriority.MEDIUM;
+    type = JobActionType.FOREGROUND;
   }
 
   public Job(Job job) {
@@ -82,6 +89,8 @@ public class Job implements IsModelObject, IsIndexed, HasId {
     this.name = job.getName();
     this.username = job.getUsername();
     this.pluginType = job.getPluginType();
+    this.priority = job.getPriority();
+    this.type = job.getType();
     this.plugin = job.getPlugin();
     this.pluginParameters = new HashMap<>(job.getPluginParameters());
     this.sourceObjects = job.getSourceObjects();
@@ -148,6 +157,22 @@ public class Job implements IsModelObject, IsIndexed, HasId {
 
   public void setState(JOB_STATE state) {
     this.state = state;
+  }
+
+  public JobPriority getPriority() {
+    return priority;
+  }
+
+  public void setPriority(JobPriority priority) {
+    this.priority = priority;
+  }
+
+  public JobActionType getType() {
+    return type;
+  }
+
+  public void setType(JobActionType type) {
+    this.type = type;
   }
 
   public String getStateDetails() {
@@ -236,21 +261,21 @@ public class Job implements IsModelObject, IsIndexed, HasId {
   @Override
   public String toString() {
     return "Job [id=" + id + ", name=" + name + ", username=" + username + ", startDate=" + startDate + ", endDate="
-      + endDate + ", state=" + state + ", stateDetails=" + stateDetails + ", jobStats=" + jobStats + ", plugin="
-      + plugin + ", pluginType=" + pluginType + ", pluginParameters=" + pluginParameters + ", sourceObjects="
-      + sourceObjects + ", outcomeObjectsClass=" + outcomeObjectsClass + "]";
+      + endDate + ", state=" + state + ", stateDetails=" + stateDetails + ", priority=" + priority + ", type=" + type
+      + ", jobStats=" + jobStats + ", plugin=" + plugin + ", pluginType=" + pluginType + ", pluginParameters="
+      + pluginParameters + ", sourceObjects=" + sourceObjects + ", outcomeObjectsClass=" + outcomeObjectsClass + "]";
   }
 
   @Override
   public List<String> toCsvHeaders() {
-    return Arrays.asList("id", "name", "username", "startDate", "endDate", "state", "stateDetails", "jobStats",
-      "plugin", "pluginType", "pluginParameters", "sourceObjects", "outcomeObjectsClass");
+    return Arrays.asList("id", "name", "username", "startDate", "endDate", "state", "stateDetails", "priority", "type",
+      "jobStats", "plugin", "pluginType", "pluginParameters", "sourceObjects", "outcomeObjectsClass");
   }
 
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(id, name, username, startDate, endDate, state, stateDetails, jobStats, plugin, pluginType,
-      pluginParameters, sourceObjects, outcomeObjectsClass);
+    return Arrays.asList(id, name, username, startDate, endDate, state, stateDetails, priority, type, jobStats, plugin,
+      pluginType, pluginParameters, sourceObjects, outcomeObjectsClass);
   }
 
   @JsonIgnore
@@ -261,7 +286,7 @@ public class Job implements IsModelObject, IsIndexed, HasId {
 
   @Override
   public List<String> liteFields() {
-    return Arrays.asList(RodaConstants.INDEX_UUID);
+    return Collections.singletonList(RodaConstants.INDEX_UUID);
   }
 
   /**
@@ -272,7 +297,8 @@ public class Job implements IsModelObject, IsIndexed, HasId {
   }
 
   /**
-   * @param fields the fields to set
+   * @param fields
+   *          the fields to set
    */
   public void setFields(Map<String, Object> fields) {
     this.fields = fields;

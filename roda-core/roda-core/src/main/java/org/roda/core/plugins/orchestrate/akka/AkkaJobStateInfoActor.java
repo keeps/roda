@@ -22,6 +22,8 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
+import org.roda.core.data.v2.jobs.JobActionType;
+import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.index.IndexService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
@@ -49,6 +51,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
   private ActorRef jobCreator;
   private ActorRef jobsManager;
   private ActorRef workersRouter;
+  private ActorRef backgroundWorkersRouter;
   boolean stopping = false;
   boolean errorDuringBeforeAll = false;
   private String jobId;
@@ -69,8 +72,13 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
     LOGGER.debug("Starting AkkaJobStateInfoActor router with {} actors", numberOfJobsWorkers);
     Props workersProps = new RoundRobinPool(numberOfJobsWorkers).props(Props.create(AkkaWorkerActor.class));
     workersRouter = getContext().actorOf(workersProps, "WorkersRouter");
+
+    LOGGER.debug("Starting background workers router with {} actors", 2);
+    Props props = new RoundRobinPool(2).props(Props.create(AkkaBackgroundWorkerActor.class));
+    backgroundWorkersRouter = getContext().actorOf(props, "BackgroundWorkersRouter");
     // 20160914 hsilva: watch child events, so when they stop we can react
     getContext().watch(workersRouter);
+    getContext().watch(backgroundWorkersRouter);
 
     JobsHelper.createJobWorkingDirectory(jobId);
 
@@ -183,7 +191,8 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
   private void handleJobStop(Object msg) {
     Messages.JobStop message = (Messages.JobStop) msg;
     markMessageProcessingAsStarted(message);
-    getSelf().tell(Messages.newJobStateUpdated(plugin, JOB_STATE.STOPPING), getSelf());
+    getSelf().tell(Messages.newJobStateUpdated(plugin, JOB_STATE.STOPPING).withJobPriority(JobPriority.HIGH),
+      getSelf());
     stopping = true;
     getContext().getChildren().forEach(e -> getContext().stop(e));
     markMessageProcessingAsEnded(message);
@@ -209,7 +218,13 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
       jobInfo.setStarted(message.getPlugin());
       // 20160819 hsilva: the following it's just for debugging purposes
       message.setHasBeenForwarded();
-      workersRouter.tell(message, getSelf());
+
+      if (message.getJobActionType() != null && JobActionType.BACKGROUND.equals(message.getJobActionType())) {
+        backgroundWorkersRouter.tell(message, getSelf());
+      } else {
+        workersRouter.tell(message, getSelf());
+      }
+
       markMessageProcessingAsEnded(message);
     }
   }
@@ -231,7 +246,11 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
         }
       }
 
-      workersRouter.tell(Messages.newPluginAfterAllExecuteIsReady(plugin), getSelf());
+      if (message.getJobActionType() != null && JobActionType.BACKGROUND.equals(message.getJobActionType())) {
+        backgroundWorkersRouter.tell(Messages.newPluginAfterAllExecuteIsReady(plugin), getSelf());
+      } else {
+        workersRouter.tell(Messages.newPluginAfterAllExecuteIsReady(plugin), getSelf());
+      }
     }
     markMessageProcessingAsEnded(message);
   }
@@ -249,9 +268,9 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
       // java.lang.NoSuchMethodError)
       errorDuringBeforeAll = true;
       getPluginOrchestrator().setJobInError(PluginHelper.getJobId(plugin));
-      getSelf().tell(
-        Messages.newJobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage())),
-        getSelf());
+      getSelf()
+        .tell(Messages.newJobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage()))
+          .withJobType(message.getJobActionType()).withJobPriority(message.getJobPriority()), getSelf());
 
     }
     markMessageProcessingAsEnded(message);
@@ -263,14 +282,23 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
     jobInfo.setDone(message.getPlugin(), message.isWithError());
 
     if (message.isWithError()) {
-      getSelf().tell(Messages.newJobStateDetailsUpdated(plugin, Optional.of(message.getErrorMessage())), getSelf());
+      getSelf().tell(Messages.newJobStateDetailsUpdated(plugin, Optional.of(message.getErrorMessage()))
+        .withJobPriority(message.getJobPriority()).withJobType(message.getJobActionType()), getSelf());
     }
 
     if (jobInfo.isDone() && jobInfo.isInitEnded()) {
       if (jobInfo.atLeastOneErrorOccurred()) {
-        getSelf().tell(Messages.newJobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE), getSelf());
+        getSelf().tell(Messages.newJobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE)
+          .withJobPriority(message.getJobPriority()).withJobType(message.getJobActionType()), getSelf());
       } else {
-        workersRouter.tell(Messages.newPluginAfterAllExecuteIsReady(plugin), getSelf());
+        if (message.getJobActionType() != null && JobActionType.BACKGROUND.equals(message.getJobActionType())) {
+          backgroundWorkersRouter.tell(Messages.newPluginAfterAllExecuteIsReady(plugin)
+            .withJobPriority(message.getJobPriority()).withJobType(message.getJobActionType()), getSelf());
+        } else {
+          workersRouter.tell(Messages.newPluginAfterAllExecuteIsReady(plugin).withJobPriority(message.getJobPriority())
+            .withJobType(message.getJobActionType()), getSelf());
+        }
+
       }
     }
     markMessageProcessingAsEnded(message);
@@ -279,9 +307,12 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
   private void handleAfterAllExecuteIsDone(Object msg) {
     Messages.PluginAfterAllExecuteIsDone message = (Messages.PluginAfterAllExecuteIsDone) msg;
     markMessageProcessingAsStarted(message);
-    getSelf().tell(Messages.newJobCleanup(), getSelf());
     getSelf().tell(
-      Messages.newJobStateUpdated(plugin, message.isWithError() ? JOB_STATE.FAILED_TO_COMPLETE : JOB_STATE.COMPLETED),
+      Messages.newJobCleanup().withJobType(message.getJobActionType()).withJobPriority(message.getJobPriority()),
+      getSelf());
+    getSelf().tell(
+      Messages.newJobStateUpdated(plugin, message.isWithError() ? JOB_STATE.FAILED_TO_COMPLETE : JOB_STATE.COMPLETED)
+        .withJobType(message.getJobActionType()).withJobPriority(message.getJobPriority()),
       getSelf());
     markMessageProcessingAsEnded(message);
   }

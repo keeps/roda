@@ -1,10 +1,3 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE file at the root of the source
- * tree and available online at
- *
- * https://github.com/keeps/roda
- */
 package org.roda.core.plugins.orchestrate.akka;
 
 import java.util.List;
@@ -28,14 +21,17 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AkkaWorkerActor extends AkkaBaseActor {
-  private static final Logger LOGGER = LoggerFactory.getLogger(AkkaWorkerActor.class);
+/**
+ * @author Miguel Guimarães <mguimaraes@keep.pt>
+ */
+public class AkkaBackgroundWorkerActor extends AkkaBaseActor {
+  private static final Logger LOGGER = LoggerFactory.getLogger(AkkaBackgroundWorkerActor.class);
 
   private final IndexService index;
   private final ModelService model;
   private final StorageService storage;
 
-  public AkkaWorkerActor() {
+  public AkkaBackgroundWorkerActor() {
     super();
     this.storage = getStorage();
     this.model = getModel();
@@ -43,7 +39,7 @@ public class AkkaWorkerActor extends AkkaBaseActor {
   }
 
   @Override
-  public void onReceive(Object msg) throws Exception {
+  public void onReceive(Object msg) throws Throwable {
     super.setup(msg);
     if (msg instanceof Messages.PluginExecuteIsReady) {
       handlePluginExecuteIsReady(msg);
@@ -62,15 +58,15 @@ public class AkkaWorkerActor extends AkkaBaseActor {
     Plugin<IsRODAObject> messagePlugin = message.getPlugin();
     try {
       messagePlugin.execute(index, model, storage, objectsToBeProcessed);
-      getSender().tell(Messages.newPluginExecuteIsDone(messagePlugin, false).withJobType(message.getJobActionType())
-        .withJobPriority(message.getJobPriority()), getSelf());
+      getSender().tell(Messages.newPluginExecuteIsDone(messagePlugin, false).withJobPriority(message.getJobPriority())
+        .withJobType(message.getJobActionType()), getSelf());
     } catch (Throwable e) {
       // 20170120 hsilva: it is required to catch Throwable as there are some
       // linking errors that only will happen during the execution (e.g.
       // java.lang.NoSuchMethodError)
       LOGGER.error("Error executing plugin.execute()", e);
       getSender().tell(Messages.newPluginExecuteIsDone(messagePlugin, true, getErrorMessage(e))
-        .withJobType(message.getJobActionType()).withJobPriority(message.getJobPriority()), getSelf());
+        .withJobPriority(message.getJobPriority()).withJobType(message.getJobActionType()), getSelf());
     }
     message.logProcessingEnded();
   }
@@ -111,8 +107,6 @@ public class AkkaWorkerActor extends AkkaBaseActor {
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       LOGGER.warn("Unable to get Job from model. Reason: {}", e.getMessage());
     }
-
     message.logProcessingEnded();
   }
-
 }

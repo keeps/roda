@@ -44,6 +44,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
+import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
@@ -220,15 +221,15 @@ public final class JobsHelper {
   /**
    * Updates the job state
    */
-  public static <T extends IsRODAObject> void updateJobStateAsync(Plugin<T> plugin, JOB_STATE state,
-    Optional<String> stateDetails) {
+  public static <T extends IsRODAObject> void updateJobStateAsync(Plugin<T> plugin, JobPriority priority,
+    JOB_STATE state, Optional<String> stateDetails) {
     RodaCoreFactory.getPluginOrchestrator().updateJobAsync(plugin,
-      Messages.newJobStateUpdated(plugin, state, stateDetails));
+      (Messages.JobPartialUpdate) Messages.newJobStateUpdated(plugin, state, stateDetails).withJobPriority(priority));
   }
 
-  public static <T extends IsRODAObject> void updateJobStateAsync(Plugin<T> plugin, JOB_STATE state,
-    Throwable throwable) {
-    updateJobStateAsync(plugin, state,
+  public static <T extends IsRODAObject> void updateJobStateAsync(Plugin<T> plugin, JobPriority priority,
+    JOB_STATE state, Throwable throwable) {
+    updateJobStateAsync(plugin, priority, state,
       Optional.ofNullable(throwable.getClass().getName() + ": " + throwable.getMessage()));
   }
 

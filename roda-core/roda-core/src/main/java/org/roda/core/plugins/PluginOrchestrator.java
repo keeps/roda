@@ -33,15 +33,15 @@ public interface PluginOrchestrator {
 
   public void shutdown();
 
-  public <T extends IsRODAObject, T1 extends IsIndexed> void runPluginFromIndex(Object context, Class<T1> classToActOn,
+  public <T extends IsRODAObject, T1 extends IsIndexed> void runPluginFromIndex(Object context, Job job, Class<T1> classToActOn,
     Filter filter, Boolean justActive ,Plugin<T> plugin);
 
-  public <T extends IsRODAObject> void runPluginOnObjects(Object context, Plugin<T> plugin, Class<T> objectClass,
+  public <T extends IsRODAObject> void runPluginOnObjects(Object context, Job job, Plugin<T> plugin, Class<T> objectClass,
     List<String> uuids);
 
-  public <T extends IsRODAObject> void runPluginOnAllObjects(Object context, Plugin<T> plugin, Class<T> objectClass);
+  public <T extends IsRODAObject> void runPluginOnAllObjects(Object context, Plugin<T> plugin, Job job, Class<T> objectClass);
 
-  public <T extends IsRODAObject> void runPlugin(Object context, Plugin<T> plugin);
+  public <T extends IsRODAObject> void runPlugin(Object context, Plugin<T> plugin, Job job);
 
   /*
    * Job related methods

@@ -9,13 +9,14 @@ package org.roda.core.plugins.orchestrate.akka;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.roda.core.RodaCoreFactory;
@@ -47,7 +48,7 @@ public class AkkaJobsManager extends AkkaBaseActor {
 
   // state
   private int maxNumberOfJobsInParallel;
-  private Queue<JobWaiting> jobsWaiting;
+  private PriorityBlockingQueue<JobWaiting> jobsWaiting;
   private Map<String, ActorRef> jobsWaitingCreators;
   private ActorRef jobsRouter;
   // <Lite, LockInfo>
@@ -77,7 +78,7 @@ public class AkkaJobsManager extends AkkaBaseActor {
   public AkkaJobsManager(int maxNumberOfJobsInParallel) {
     super();
     this.maxNumberOfJobsInParallel = maxNumberOfJobsInParallel;
-    this.jobsWaiting = new LinkedList<>();
+    this.jobsWaiting = new PriorityBlockingQueue<>(maxNumberOfJobsInParallel, new SortByPriority());
     this.jobsWaitingCreators = new HashMap<>();
     this.objectsLocked = new HashMap<>();
     this.requestUuidLites = new HashMap<>();
@@ -470,6 +471,12 @@ public class AkkaJobsManager extends AkkaBaseActor {
     /** Time in milliseconds */
     public long timeInQueueInMillis() {
       return new Date().getTime() - queuedIn;
+    }
+  }
+
+  private class SortByPriority implements Comparator<JobWaiting> {
+    public int compare(JobWaiting a, JobWaiting b) {
+      return a.job.getPriority().compareTo(b.job.getPriority());
     }
   }
 
