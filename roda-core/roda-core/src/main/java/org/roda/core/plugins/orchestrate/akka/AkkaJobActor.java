@@ -21,6 +21,8 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
+import org.roda.core.data.v2.jobs.JobActionType;
+import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.JobsHelper;
@@ -68,17 +70,19 @@ public class AkkaJobActor extends AkkaBaseActor {
       JobsHelper.setPluginParameters(plugin, job);
 
       String jobId = job.getId();
+      JobPriority jobPriority = job.getPriority();
+      JobActionType jobActionType = job.getType();
       ActorRef jobStateInfoActor = getContext().actorOf(Props.create(AkkaJobStateInfoActor.class, plugin, getSender(),
         jobsManager, jobId, JobsHelper.getNumberOfJobsWorkers()), jobId);
       super.getPluginOrchestrator().setJobContextInformation(jobId, jobStateInfoActor);
 
-      jobStateInfoActor.tell(Messages.newJobStateUpdated(plugin, JOB_STATE.STARTED), getSelf());
+      jobStateInfoActor.tell(Messages.newJobStateUpdated(plugin, JOB_STATE.STARTED).withJobType(jobActionType).withJobPriority(jobPriority), getSelf());
 
       try {
         if (job.getSourceObjects() instanceof SelectedItemsAll<?>) {
           runOnAll(job, plugin);
         } else if (job.getSourceObjects() instanceof SelectedItemsNone<?>) {
-          super.getPluginOrchestrator().runPlugin(getSelf(), plugin);
+          super.getPluginOrchestrator().runPlugin(getSelf(), plugin, job);
         } else if (job.getSourceObjects() instanceof SelectedItemsList<?>) {
           runFromList(job, plugin);
         } else if (job.getSourceObjects() instanceof SelectedItemsFilter<?>) {
@@ -86,7 +90,7 @@ public class AkkaJobActor extends AkkaBaseActor {
         }
       } catch (Exception e) {
         LOGGER.error("Error while invoking orchestration method", e);
-        jobStateInfoActor.tell(Messages.newJobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE, e), getSelf());
+        jobStateInfoActor.tell(Messages.newJobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE, e).withJobType(jobActionType).withJobPriority(jobPriority), getSelf());
         getSender().tell("Failed to complete", getSelf());
       }
 
@@ -101,7 +105,7 @@ public class AkkaJobActor extends AkkaBaseActor {
     Class<IsRODAObject> sourceObjectsClass = JobsHelper
       .getSelectedClassFromString(job.getSourceObjects().getSelectedClass());
 
-    getPluginOrchestrator().runPluginOnAllObjects(getSelf(), plugin, (Class<T>) sourceObjectsClass);
+    getPluginOrchestrator().runPluginOnAllObjects(getSelf(), plugin, job, (Class<T>) sourceObjectsClass);
   }
 
   private <T extends IsRODAObject> void runFromList(Job job, Plugin<T> plugin) throws GenericException {
@@ -109,7 +113,7 @@ public class AkkaJobActor extends AkkaBaseActor {
     Class<IsRODAObject> sourceObjectsClass = JobsHelper
       .getSelectedClassFromString(job.getSourceObjects().getSelectedClass());
 
-    getPluginOrchestrator().runPluginOnObjects(getSelf(), plugin,
+    getPluginOrchestrator().runPluginOnObjects(getSelf(), job, plugin,
       (Class<T>) ModelUtils.giveRespectiveModelClass(sourceObjectsClass),
       ((SelectedItemsList<IsRODAObject>) job.getSourceObjects()).getIds());
   }
@@ -127,7 +131,7 @@ public class AkkaJobActor extends AkkaBaseActor {
     JobsHelper.updateJobObjectsCount(plugin, super.getModel(), objectsCount);
 
     // execute
-    getPluginOrchestrator().runPluginFromIndex(getSelf(), sourceObjectsClass, selectedItems.getFilter(), plugin);
+    getPluginOrchestrator().runPluginFromIndex(getSelf(), job, sourceObjectsClass, selectedItems.getFilter(), plugin);
   }
 
   @Override

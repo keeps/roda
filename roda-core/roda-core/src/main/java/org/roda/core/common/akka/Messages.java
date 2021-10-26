@@ -16,7 +16,10 @@ import java.util.Optional;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.SerializableOptional;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
+import org.roda.core.data.v2.jobs.JobActionType;
+import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.plugins.Plugin;
@@ -40,6 +43,8 @@ public class Messages {
     private static final long serialVersionUID = 1898368418865765060L;
     private String uuid;
     private long creationTime;
+    private JobPriority jobPriority;
+    private JobActionType jobActionType;
 
     private AbstractMessage() {
       if (LOGGER.isTraceEnabled()) {
@@ -64,6 +69,24 @@ public class Messages {
 
     public long getTimeSinceCreation() {
       return System.currentTimeMillis() - creationTime;
+    }
+
+    public AbstractMessage withJobPriority(JobPriority priority) {
+      this.jobPriority = priority;
+      return this;
+    }
+
+    public AbstractMessage withJobType(JobActionType jobType) {
+      this.jobActionType = jobType;
+      return this;
+    }
+
+    public JobPriority getJobPriority() {
+      return jobPriority;
+    }
+
+    public JobActionType getJobActionType() {
+      return jobActionType;
     }
   }
 

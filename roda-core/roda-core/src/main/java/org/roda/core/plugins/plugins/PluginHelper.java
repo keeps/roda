@@ -1296,9 +1296,11 @@ public final class PluginHelper {
       default:
         outcomeDetailNote = plugin.getPreservationEventFailureMessage();
     }
-/*    String outcomeDetailNote = (outcome == PluginState.SUCCESS || outcome == PluginState.PARTIAL_SUCCESS)
-      ? plugin.getPreservationEventSuccessMessage()
-      : plugin.getPreservationEventFailureMessage();*/
+    /*
+     * String outcomeDetailNote = (outcome == PluginState.SUCCESS || outcome ==
+     * PluginState.PARTIAL_SUCCESS) ? plugin.getPreservationEventSuccessMessage() :
+     * plugin.getPreservationEventFailureMessage();
+     */
     ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, startDate,
       plugin.getPreservationEventType().toString(), plugin.getPreservationEventDescription(), sources, outcomes,
       outcome.name(), outcomeDetailNote, outcomeDetailExtension, agentIds);
@@ -1345,7 +1347,7 @@ public final class PluginHelper {
   }
 
   public static <T extends IsRODAObject> void removeSIPs(ModelService model,
-                                                       List<TransferredResource> transferredResources, IngestJobPluginInfo jobPluginInfo, Job cachedJob) {
+    List<TransferredResource> transferredResources, IngestJobPluginInfo jobPluginInfo, Job cachedJob) {
     for (TransferredResource transferredResource : transferredResources) {
       String transferredResourceId = transferredResource.getUUID();
 
@@ -1359,15 +1361,15 @@ public final class PluginHelper {
               model.deleteTransferredResource(transferredResource);
             } catch (GenericException | AuthorizationDeniedException e) {
               model.createRepositoryEvent(RodaConstants.PreservationEventType.DELETION,
-                  "The process of deleting an object of the repository", PluginState.FAILURE,
-                  "The transferred resource " + transferredResource.getName() + " has not been deleted.", "", cachedJob.getUsername(),
-                  true);
+                "The process of deleting an object of the repository", PluginState.FAILURE,
+                "The transferred resource " + transferredResource.getName() + " has not been deleted.", "",
+                cachedJob.getUsername(), true);
               LOGGER.debug("Failed to remove SIP {}", transferredResource.getFullPath(), e);
             }
             model.createRepositoryEvent(RodaConstants.PreservationEventType.DELETION,
-                "The process of deleting an object of the repository", PluginState.SUCCESS,
-                "The transferred resource " + transferredResource.getName() + " has been deleted.", "", cachedJob.getUsername(),
-                true);
+              "The process of deleting an object of the repository", PluginState.SUCCESS,
+              "The transferred resource " + transferredResource.getName() + " has been deleted.", "",
+              cachedJob.getUsername(), true);
             LOGGER.debug("Done with removing SIP {}", transferredResource.getFullPath());
           }
         } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
@@ -1485,8 +1487,8 @@ public final class PluginHelper {
       Job job = getJob(plugin, index);
       SelectedItems<?> sourceObjects = job.getSourceObjects();
       if (sourceObjects instanceof SelectedItemsList) {
-        RodaCoreFactory.getPluginOrchestrator().updateJobAsync(plugin,
-          Messages.newJobSourceObjectsUpdated(oldToNewTransferredResourceIds));
+        RodaCoreFactory.getPluginOrchestrator().updateJobAsync(plugin, (Messages.JobPartialUpdate) Messages
+          .newJobSourceObjectsUpdated(oldToNewTransferredResourceIds).withJobPriority(job.getPriority()));
       }
     } catch (NotFoundException | GenericException | RequestNotValidException e) {
       LOGGER.error("Error retrieving Job", e);
@@ -1724,8 +1726,8 @@ public final class PluginHelper {
             failureMessage = "RODA object conversion from lite throwed an error.";
           }
 
-          reportFailureTransformingLiteInObject(model, plugin, report, pluginInfo, job, LiteOptionalWithCause.of(object),
-              failureMessage, Optional.of(object));
+          reportFailureTransformingLiteInObject(model, plugin, report, pluginInfo, job,
+            LiteOptionalWithCause.of(object), failureMessage, Optional.of(object));
         }
       }
     }
