@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
- *
+ * <p>
  * https://github.com/keeps/roda
  */
 package org.roda.core.plugins.plugins.characterization;
@@ -48,13 +48,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponentsPlugin<T> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPlugin.class);
   public static final String FILE_SUFFIX = ".json";
+  private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPlugin.class);
 
   /*
    * private SIPUpdateInformation sipUpdateInformation = new
    * SIPUpdateInformation();
    */
+
+  public static String getStaticName() {
+    return "File format identification (Siegfried)";
+  }
+
+  public static String getStaticDescription() {
+    return "Identifies the file format and version of data files included in Information Packages using the Siegfried tool (a signature-based file format "
+      + "identification tool that supports PRONOM identifiers and Mimetypes).\nThe task updates PREMIS objects metadata in the Information Package to store "
+      + "the results of format identification. A PREMIS event is also recorded after the task is run.";
+  }
 
   @Override
   public void init() throws PluginException {
@@ -66,19 +76,9 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
     // do nothing
   }
 
-  public static String getStaticName() {
-    return "File format identification (Siegfried)";
-  }
-
   @Override
   public String getName() {
     return getStaticName();
-  }
-
-  public static String getStaticDescription() {
-    return "Identifies the file format and version of data files included in Information Packages using the Siegfried tool (a signature-based file format "
-      + "identification tool that supports PRONOM identifiers and Mimetypes).\nThe task updates PREMIS objects metadata in the Information Package to store "
-      + "the results of format identification. A PREMIS event is also recorded after the task is run.";
   }
 
   @Override
@@ -121,7 +121,8 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
           try {
             if (getSipInformation().isUpdate()) {
               // SIP UPDATE
-              if (AIPState.INGEST_PROCESSING.equals(aip.getState())) {
+              if (AIPState.INGEST_PROCESSING.equals(aip.getState()) && aip.getRepresentations() != null
+                && !aip.getRepresentations().isEmpty()) {
                 for (Representation representation : aip.getRepresentations()) {
                   LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
                   sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation));
@@ -136,14 +137,19 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
               }
             } else {
               // SIP CREATE
-              for (Representation representation : aip.getRepresentations()) {
-                LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-                sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation));
-                model.notifyRepresentationUpdated(representation).failOnError();
-              }
+              if (aip.getRepresentations() != null && !aip.getRepresentations().isEmpty()) {
+                for (Representation representation : aip.getRepresentations()) {
+                  LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
+                  sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation));
+                  model.notifyRepresentationUpdated(representation).failOnError();
+                }
 
-              jobPluginInfo.incrementObjectsProcessedWithSuccess();
-              reportItem.setPluginState(PluginState.SUCCESS);
+                jobPluginInfo.incrementObjectsProcessedWithSuccess();
+                reportItem.setPluginState(PluginState.SUCCESS);
+              } else {
+                jobPluginInfo.incrementObjectsProcessedWithSkipped();
+                reportItem.setPluginState(PluginState.SKIPPED);
+              }
             }
           } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
             | AuthorizationDeniedException e) {
@@ -157,7 +163,8 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
           Map<String, List<String>> aipData = updatedData.get(aip.getId());
           PluginState state = PluginState.SKIPPED;
 
-          if (aipData.containsKey(RodaConstants.RODA_OBJECT_REPRESENTATION)) {
+          if (aipData.containsKey(RodaConstants.RODA_OBJECT_REPRESENTATION) && aip.getRepresentations() != null
+            && !aip.getRepresentations().isEmpty()) {
             List<Representation> filteredList = aip.getRepresentations().stream()
               .filter(
                 r -> aipData.get(RodaConstants.RODA_OBJECT_REPRESENTATION).contains(IdUtils.getRepresentationId(r)))
