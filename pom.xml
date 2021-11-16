@@ -23,7 +23,7 @@
 		<repository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/keeps/*</url>
+            <url>https://maven.pkg.github.com/keeps/roda</url>
         </repository>
 	</distributionManagement>
 	<repositories>
