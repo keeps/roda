@@ -33,10 +33,10 @@
 			<url>https://artifactory.keep.pt/artifactory/keep</url>
 		</repository>
 		<repository>
-            <id>github</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/keeps/*</url>
-        </repository>
+			<id>github</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/keeps/*</url>
+		</repository>
 		<repository>
 			<id>jcenter</id>
 			<name>bintray</name>

@@ -414,8 +414,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
         final Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
         PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
         reportState = PluginState.SKIPPED;
-        reportItem.setPluginState(PluginState.SKIPPED);
-        reportItem.setPluginDetails("This aip doens't have representations");
+        reportItem.setPluginState(reportState);
+        reportItem.setPluginDetails("Skipped because no representation was found for this AIP");
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       }

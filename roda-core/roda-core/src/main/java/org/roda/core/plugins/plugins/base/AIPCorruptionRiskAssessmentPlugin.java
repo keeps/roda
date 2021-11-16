@@ -244,10 +244,10 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
       Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
       if (aipSkipped) {
         reportItem.setPluginState(PluginState.SKIPPED).setHtmlPluginDetails(true)
-          .setPluginDetails(validationReport.toHtml(false, false, false, "Skipped aip without representations"));
+          .setPluginDetails(validationReport.toHtml(false, false, false, "Skipped AIP without representations"));
         jobPluginInfo.incrementObjectsProcessedWithSkipped();
         PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, PluginState.SKIPPED,
-          validationReport.toHtml(false, false, false, "Skipped aip without representations"), true);
+          validationReport.toHtml(false, false, false, "Skipped AIP without representations"), true);
       } else if (aipFailed) {
         reportItem.setPluginState(PluginState.FAILURE).setHtmlPluginDetails(true)
           .setPluginDetails(validationReport.toHtml(false, false, false, "Corrupted files and checksums"));
