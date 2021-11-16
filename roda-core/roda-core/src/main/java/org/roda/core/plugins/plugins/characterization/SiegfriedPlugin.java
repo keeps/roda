@@ -209,7 +209,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
           | AuthorizationDeniedException | AlreadyExistsException e) {
           LOGGER.error("Error creating event: {}", e.getMessage(), e);
         }
-
+        
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
       }
