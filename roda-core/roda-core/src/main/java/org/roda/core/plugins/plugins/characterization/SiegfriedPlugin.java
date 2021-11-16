@@ -155,7 +155,8 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
                 reportItem.setPluginState(PluginState.SUCCESS);
               } else {
                 jobPluginInfo.incrementObjectsProcessedWithSkipped();
-                reportItem.setPluginState(PluginState.SKIPPED);
+                reportItem.setPluginState(PluginState.SKIPPED)
+                    .setPluginDetails("Skipped because no representation was found for this AIP");
               }
             }
           } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
@@ -208,7 +209,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
           | AuthorizationDeniedException | AlreadyExistsException e) {
           LOGGER.error("Error creating event: {}", e.getMessage(), e);
         }
-        
+
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
       }
