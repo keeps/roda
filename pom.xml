@@ -114,7 +114,7 @@
 		<poi.version>3.17</poi.version>
 		<commons_ip2.version>2.0.0</commons_ip2.version>
 		<metrics.version>3.2.6</metrics.version>
-		<roda_community_url>http://roda-community.org</roda_community_url>
+		<roda_community_url>https://roda-community.org</roda_community_url>
 		<testng.groups>all</testng.groups>
 		<springboot.version>2.3.3.RELEASE</springboot.version>
 	</properties>
