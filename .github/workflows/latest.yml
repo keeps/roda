@@ -24,7 +24,6 @@ jobs:
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-maven-
       - name: Install dependencies
         run: |
           sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 20F802FE798E6857
