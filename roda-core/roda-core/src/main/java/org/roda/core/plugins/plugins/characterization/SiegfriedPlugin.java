@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
- *
+ * <p>
  * https://github.com/keeps/roda
  */
 package org.roda.core.plugins.plugins.characterization;
@@ -48,13 +48,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponentsPlugin<T> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPlugin.class);
   public static final String FILE_SUFFIX = ".json";
+  private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPlugin.class);
 
   /*
    * private SIPUpdateInformation sipUpdateInformation = new
    * SIPUpdateInformation();
    */
+
+  public static String getStaticName() {
+    return "File format identification (Siegfried)";
+  }
+
+  public static String getStaticDescription() {
+    return "Identifies the file format and version of data files included in Information Packages using the Siegfried tool (a signature-based file format "
+      + "identification tool that supports PRONOM identifiers and Mimetypes).\nThe task updates PREMIS objects metadata in the Information Package to store "
+      + "the results of format identification. A PREMIS event is also recorded after the task is run.";
+  }
 
   @Override
   public void init() throws PluginException {
@@ -66,19 +76,9 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
     // do nothing
   }
 
-  public static String getStaticName() {
-    return "File format identification (Siegfried)";
-  }
-
   @Override
   public String getName() {
     return getStaticName();
-  }
-
-  public static String getStaticDescription() {
-    return "Identifies the file format and version of data files included in Information Packages using the Siegfried tool (a signature-based file format "
-      + "identification tool that supports PRONOM identifiers and Mimetypes).\nThe task updates PREMIS objects metadata in the Information Package to store "
-      + "the results of format identification. A PREMIS event is also recorded after the task is run.";
   }
 
   @Override
@@ -122,6 +122,29 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
             if (getSipInformation().isUpdate()) {
               // SIP UPDATE
               if (AIPState.INGEST_PROCESSING.equals(aip.getState())) {
+                if( aip.getRepresentations() != null && !aip.getRepresentations().isEmpty()) {
+                  for (Representation representation : aip.getRepresentations()) {
+                    LOGGER.debug("Processing representation {} of AIP {}", representation.getId(),
+                        aip.getId());
+                    sources.addAll(
+                        SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation));
+                    model.notifyRepresentationUpdated(representation).failOnError();
+                  }
+
+                  jobPluginInfo.incrementObjectsProcessedWithSuccess();
+                  reportItem.setPluginState(PluginState.SUCCESS);
+                }
+                else {
+                  reportItem.setPluginState(PluginState.SKIPPED).setPluginDetails("Skipped because no representation was found for this AIP.");
+                  jobPluginInfo.incrementObjectsProcessed(PluginState.SKIPPED);
+                }
+              } else {
+                reportItem.setPluginState(PluginState.SKIPPED).setPluginDetails("Executed on a SIP update context.");
+                jobPluginInfo.incrementObjectsProcessed(PluginState.SKIPPED);
+              }
+            } else {
+              // SIP CREATE
+              if (aip.getRepresentations() != null && !aip.getRepresentations().isEmpty()) {
                 for (Representation representation : aip.getRepresentations()) {
                   LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
                   sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation));
@@ -131,19 +154,10 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
                 jobPluginInfo.incrementObjectsProcessedWithSuccess();
                 reportItem.setPluginState(PluginState.SUCCESS);
               } else {
-                reportItem.setPluginState(PluginState.SKIPPED).setPluginDetails("Executed on a SIP update context.");
-                jobPluginInfo.incrementObjectsProcessed(PluginState.SKIPPED);
+                jobPluginInfo.incrementObjectsProcessedWithSkipped();
+                reportItem.setPluginState(PluginState.SKIPPED)
+                    .setPluginDetails("Skipped because no representation was found for this AIP");
               }
-            } else {
-              // SIP CREATE
-              for (Representation representation : aip.getRepresentations()) {
-                LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-                sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation));
-                model.notifyRepresentationUpdated(representation).failOnError();
-              }
-
-              jobPluginInfo.incrementObjectsProcessedWithSuccess();
-              reportItem.setPluginState(PluginState.SUCCESS);
             }
           } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
             | AuthorizationDeniedException e) {
@@ -158,26 +172,34 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
           PluginState state = PluginState.SKIPPED;
 
           if (aipData.containsKey(RodaConstants.RODA_OBJECT_REPRESENTATION)) {
-            List<Representation> filteredList = aip.getRepresentations().stream()
-              .filter(
-                r -> aipData.get(RodaConstants.RODA_OBJECT_REPRESENTATION).contains(IdUtils.getRepresentationId(r)))
-              .collect(Collectors.toList());
+            if (aip.getRepresentations() != null && !aip.getRepresentations().isEmpty()) {
 
-            for (Representation representation : filteredList) {
-              try {
-                LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-                sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation));
-                model.notifyRepresentationUpdated(representation).failOnError();
-                state = PluginState.SUCCESS;
-              } catch (RODAException e) {
-                state = PluginState.FAILURE;
-                LOGGER.error("Error running Siegfried " + aip.getId(), e);
+              List<Representation> filteredList = aip.getRepresentations().stream()
+                  .filter(
+                      r -> aipData.get(RodaConstants.RODA_OBJECT_REPRESENTATION)
+                          .contains(IdUtils.getRepresentationId(r)))
+                  .collect(Collectors.toList());
+
+              for (Representation representation : filteredList) {
+                try {
+                  LOGGER.debug("Processing representation {} of AIP {}", representation.getId(),
+                      aip.getId());
+                  sources.addAll(
+                      SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation));
+                  model.notifyRepresentationUpdated(representation).failOnError();
+                  state = PluginState.SUCCESS;
+                } catch (RODAException e) {
+                  state = PluginState.FAILURE;
+                  LOGGER.error("Error running Siegfried " + aip.getId(), e);
+                }
               }
+            } else {
+              reportItem.setPluginState(state).setPluginDetails("Skipped because no representation was found for this AIP");
+              jobPluginInfo.incrementObjectsProcessed(state);
             }
+            reportItem.setPluginState(state).setPluginDetails("Executed on a SIP update context.");
+            jobPluginInfo.incrementObjectsProcessed(state);
           }
-
-          reportItem.setPluginState(state).setPluginDetails("Executed on a SIP update context.");
-          jobPluginInfo.incrementObjectsProcessed(state);
         }
 
         try {

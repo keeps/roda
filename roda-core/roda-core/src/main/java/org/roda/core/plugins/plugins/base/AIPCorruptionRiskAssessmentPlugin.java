@@ -127,118 +127,128 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
   private void processAIP(IndexService index, ModelService model, StorageService storage, Report report,
     JobPluginInfo jobPluginInfo, Job job, AIP aip) {
     boolean aipFailed = false;
+    boolean aipSkipped = false;
     List<LinkingIdentifier> sources = new ArrayList<>();
     ValidationReport validationReport = new ValidationReport();
+    if (aip.getRepresentations() != null && !aip.getRepresentations().isEmpty()) {
+      for (Representation r : aip.getRepresentations()) {
+        LOGGER.debug("Checking fixity for files in representation {} of AIP {}", r.getId(), aip.getId());
 
-    for (Representation r : aip.getRepresentations()) {
-      LOGGER.debug("Checking fixity for files in representation {} of AIP {}", r.getId(), aip.getId());
+        try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(), r.getId(), true)) {
+          for (OptionalWithCause<File> oFile : allFiles) {
+            if (oFile.isPresent()) {
+              File file = oFile.get();
 
-      try (CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(), r.getId(), true)) {
-        for (OptionalWithCause<File> oFile : allFiles) {
-          if (oFile.isPresent()) {
-            File file = oFile.get();
+              if (!file.isDirectory()) {
+                StoragePath storagePath = ModelUtils.getFileStoragePath(file);
+                Binary currentFileBinary = storage.getBinary(storagePath);
+                List<Fixity> fixities = null;
 
-            if (!file.isDirectory()) {
-              StoragePath storagePath = ModelUtils.getFileStoragePath(file);
-              Binary currentFileBinary = storage.getBinary(storagePath);
-              List<Fixity> fixities = null;
-
-              try {
-                Binary premisFile = model.retrievePreservationFile(file);
-                fixities = PremisV3Utils.extractFixities(premisFile);
-              } catch (NotFoundException e) {
-                ValidationIssue issue = new ValidationIssue(
-                  "File " + file.getId() + " of representation " + file.getRepresentationId() + " of AIP "
-                    + file.getAipId() + " was found but the PREMIS file does not exist");
-                validationReport.addIssue(issue);
-              }
-
-              sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), file.getRepresentationId(), file.getPath(),
-                file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-
-              if (fixities != null) {
-                boolean passedFixity = true;
-
-                // get all necessary hash algorithms
-                Set<String> algorithms = new HashSet<>();
-                for (Fixity f : fixities) {
-                  algorithms.add(f.getMessageDigestAlgorithm());
-                }
-
-                // calculate hashes
                 try {
-                  Map<String, String> checksums = FileUtility
-                    .checksums(currentFileBinary.getContent().createInputStream(), algorithms);
-
-                  for (Fixity f : fixities) {
-                    String checksum = checksums.get(f.getMessageDigestAlgorithm());
-
-                    if (!f.getMessageDigest().trim().equalsIgnoreCase(checksum.trim())) {
-                      passedFixity = false;
-
-                      String fileEntry = file.getRepresentationId()
-                        + (file.getPath().isEmpty() ? "" : '/' + String.join("/", file.getPath())) + '/' + file.getId();
-                      ValidationIssue issue = new ValidationIssue(
-                        fileEntry + " (Checksums: [" + f.getMessageDigest().trim() + ", " + checksum.trim() + "])");
-                      validationReport.addIssue(issue);
-
-                      break;
-                    }
-                  }
-                } catch (NoSuchAlgorithmException | IOException e) {
-                  passedFixity = false;
-                  ValidationIssue issue = new ValidationIssue("Could not check fixity: " + e.getMessage());
+                  Binary premisFile = model.retrievePreservationFile(file);
+                  fixities = PremisV3Utils.extractFixities(premisFile);
+                } catch (NotFoundException e) {
+                  ValidationIssue issue = new ValidationIssue(
+                    "File " + file.getId() + " of representation " + file.getRepresentationId() + " of AIP "
+                      + file.getAipId() + " was found but the PREMIS file does not exist");
                   validationReport.addIssue(issue);
-                  LOGGER.debug("Could not check fixity", e);
                 }
 
-                if (passedFixity) {
-                  updateIncidence(model, index, file.getAipId(), file.getRepresentationId(), file.getPath(),
-                    file.getId(), risks.get(0));
+                sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), file.getRepresentationId(), file.getPath(),
+                  file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+
+                if (fixities != null) {
+                  boolean passedFixity = true;
+
+                  // get all necessary hash algorithms
+                  Set<String> algorithms = new HashSet<>();
+                  for (Fixity f : fixities) {
+                    algorithms.add(f.getMessageDigestAlgorithm());
+                  }
+
+                  // calculate hashes
+                  try {
+                    Map<String, String> checksums = FileUtility
+                      .checksums(currentFileBinary.getContent().createInputStream(), algorithms);
+
+                    for (Fixity f : fixities) {
+                      String checksum = checksums.get(f.getMessageDigestAlgorithm());
+
+                      if (!f.getMessageDigest().trim().equalsIgnoreCase(checksum.trim())) {
+                        passedFixity = false;
+
+                        String fileEntry = file.getRepresentationId()
+                          + (file.getPath().isEmpty() ? "" : '/' + String.join("/", file.getPath())) + '/'
+                          + file.getId();
+                        ValidationIssue issue = new ValidationIssue(
+                          fileEntry + " (Checksums: [" + f.getMessageDigest().trim() + ", " + checksum.trim() + "])");
+                        validationReport.addIssue(issue);
+
+                        break;
+                      }
+                    }
+                  } catch (NoSuchAlgorithmException | IOException e) {
+                    passedFixity = false;
+                    ValidationIssue issue = new ValidationIssue("Could not check fixity: " + e.getMessage());
+                    validationReport.addIssue(issue);
+                    LOGGER.debug("Could not check fixity", e);
+                  }
+
+                  if (passedFixity) {
+                    updateIncidence(model, index, file.getAipId(), file.getRepresentationId(), file.getPath(),
+                      file.getId(), risks.get(0));
+                  } else {
+                    aipFailed = true;
+                    createIncidence(model, index, file.getAipId(), file.getRepresentationId(), file.getPath(),
+                      file.getId(), risks.get(0));
+                  }
                 } else {
                   aipFailed = true;
                   createIncidence(model, index, file.getAipId(), file.getRepresentationId(), file.getPath(),
                     file.getId(), risks.get(0));
                 }
-              } else {
-                aipFailed = true;
-                createIncidence(model, index, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-                  risks.get(0));
               }
             }
           }
-        }
 
-        CloseableIterable<OptionalWithCause<PreservationMetadata>> pmList = model.listPreservationMetadata(aip.getId(),
-          r.getId());
+          CloseableIterable<OptionalWithCause<PreservationMetadata>> pmList = model
+            .listPreservationMetadata(aip.getId(), r.getId());
 
-        for (OptionalWithCause<PreservationMetadata> opm : pmList) {
-          if (opm.isPresent()) {
-            PreservationMetadata pm = opm.get();
-            if (PreservationMetadataType.FILE.equals(pm.getType())) {
-              try {
-                model.retrieveFile(pm.getAipId(), pm.getRepresentationId(), pm.getFileDirectoryPath(), pm.getFileId());
-              } catch (NotFoundException e) {
-                ValidationIssue issue = new ValidationIssue(
-                  "File " + pm.getFileId() + " of representation " + pm.getRepresentationId() + " of AIP "
-                    + pm.getAipId() + " was not found but the PREMIS file exists");
-                validationReport.addIssue(issue);
-                aipFailed = true;
-                createIncidence(model, index, aip.getId(), pm.getRepresentationId(), pm.getFileDirectoryPath(),
-                  pm.getFileId(), risks.get(0));
+          for (OptionalWithCause<PreservationMetadata> opm : pmList) {
+            if (opm.isPresent()) {
+              PreservationMetadata pm = opm.get();
+              if (PreservationMetadataType.FILE.equals(pm.getType())) {
+                try {
+                  model.retrieveFile(pm.getAipId(), pm.getRepresentationId(), pm.getFileDirectoryPath(),
+                    pm.getFileId());
+                } catch (NotFoundException e) {
+                  ValidationIssue issue = new ValidationIssue(
+                    "File " + pm.getFileId() + " of representation " + pm.getRepresentationId() + " of AIP "
+                      + pm.getAipId() + " was not found but the PREMIS file exists");
+                  validationReport.addIssue(issue);
+                  aipFailed = true;
+                  createIncidence(model, index, aip.getId(), pm.getRepresentationId(), pm.getFileDirectoryPath(),
+                    pm.getFileId(), risks.get(0));
+                }
               }
             }
           }
+        } catch (IOException | RODAException | XmlException e) {
+          LOGGER.error("Error processing representation {}", r.getId(), e);
         }
-      } catch (IOException | RODAException | XmlException e) {
-        LOGGER.error("Error processing representation {}", r.getId(), e);
       }
+    } else {
+      aipSkipped = true;
     }
-
     try {
       Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
-
-      if (aipFailed) {
+      if (aipSkipped) {
+        reportItem.setPluginState(PluginState.SKIPPED).setHtmlPluginDetails(true)
+          .setPluginDetails(validationReport.toHtml(false, false, false, "Skipped AIP without representations"));
+        jobPluginInfo.incrementObjectsProcessedWithSkipped();
+        PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, PluginState.SKIPPED,
+          validationReport.toHtml(false, false, false, "Skipped AIP without representations"), true);
+      } else if (aipFailed) {
         reportItem.setPluginState(PluginState.FAILURE).setHtmlPluginDetails(true)
           .setPluginDetails(validationReport.toHtml(false, false, false, "Corrupted files and checksums"));
         jobPluginInfo.incrementObjectsProcessedWithFailure();
@@ -259,8 +269,8 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
   }
 
   private void createIncidence(ModelService model, IndexService index, String aipId, String representationId,
-    List<String> filePath, String fileId, String riskId)
-          throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
+    List<String> filePath, String fileId, String riskId) throws RequestNotValidException, GenericException,
+    AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
     List<RiskIncidence> results = getUnmitigatedIncidences(index, aipId, representationId, filePath, fileId, riskId);
 
     if (results.isEmpty()) {
