@@ -41,7 +41,7 @@ jobs:
 
     - name: Build Java
       if: matrix.language == 'java'
-      run: mvn clean package
+      run: mvn clean package -Dmaven.test.skip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
