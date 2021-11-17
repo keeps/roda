@@ -1,5 +1,10 @@
 # Dev notes
 
+[![CI](https://github.com/keeps/roda/actions/workflows/CI.yml/badge.svg)](https://github.com/keeps/roda/actions/workflows/CI.yml)
+[![CodeQL](https://github.com/keeps/roda/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/keeps/roda/actions/workflows/codeql-analysis.yml)
+[![Development](https://github.com/keeps/roda/actions/workflows/development.yml/badge.svg)](https://github.com/keeps/roda/actions/workflows/development.yml)
+[![Staging](https://github.com/keeps/roda/actions/workflows/staging.yml/badge.svg)](https://github.com/keeps/roda/actions/workflows/staging.yml)
+
 ## Debug WUI
 
 ```bash
