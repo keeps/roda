@@ -75,7 +75,7 @@ import org.roda.wui.api.controllers.MimeTypeHelper;
 
 /**
  * API Utils
- * 
+ *
  * @author Hélder Silva <hsilva@keep.pt>
  */
 public class ApiUtils {
@@ -107,7 +107,7 @@ public class ApiUtils {
 
   /**
    * Get media type
-   * 
+   *
    * @param acceptFormat
    *          String with required format
    * @param acceptHeaders
@@ -430,6 +430,12 @@ public class ApiUtils {
     return new StreamResponse(download);
   }
 
+  public static StreamResponse download(Resource resource, String fileName, boolean addTopDirectory)
+      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    ConsumesOutputStream download = DownloadUtils.download(RodaCoreFactory.getStorageService(), resource, fileName, addTopDirectory);
+    return new StreamResponse(download);
+  }
+
   public static <T extends IsIndexed> Response okResponse(T indexed, String acceptFormat, String mediaType)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     EntityResponse response;
@@ -440,7 +446,7 @@ public class ApiUtils {
         StoragePath storagePath = ModelUtils.getAIPStoragePath(indexedAIP.getId());
         StorageService storage = RodaCoreFactory.getStorageService();
         Directory directory = storage.getDirectory(storagePath);
-        response = download(directory, indexedAIP.getTitle());
+        response = download(directory, indexedAIP.getTitle(),true);
       } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
         || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)
         || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSONP.equals(acceptFormat)) {
