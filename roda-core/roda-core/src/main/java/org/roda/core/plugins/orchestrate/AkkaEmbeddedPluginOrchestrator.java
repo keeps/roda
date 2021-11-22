@@ -447,9 +447,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     if (jobStateInfoActor != null) {
       jobStateInfoActor.tell(partialUpdate, ActorRef.noSender());
       if (partialUpdate instanceof JobStateUpdated && Job.isFinalState(((JobStateUpdated) partialUpdate).getState())) {
-        LOGGER.debug("Removing job {} from list of running jobs; Plugin is {}", jobId, plugin.getClass().getName());
         runningJobs.remove(jobId);
-        LOGGER.debug("Removing job {} from list of stopping jobs; Plugin is {}", jobId, plugin.getClass().getName());
         stoppingJobs.remove(jobId);
         inErrorJobs.remove(jobId);
       }
@@ -462,7 +460,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public void setJobContextInformation(String jobId, Object object) {
     runningJobs.put(jobId, (ActorRef) object);
-    LOGGER.debug("Running jobs: {}", runningJobs.keySet());
   }
 
   public ActorRef getJobContextInformation(String jobId) {
