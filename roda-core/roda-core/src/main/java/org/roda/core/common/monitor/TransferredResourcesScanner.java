@@ -266,13 +266,19 @@ public class TransferredResourcesScanner {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     if (folderRelativePath.isPresent()) {
-      Path path = basePath.resolve(folderRelativePath.get());
-      Path parent = path.getParent();
-      Path parentToBase = basePath.relativize(parent);
-      FSUtils.deletePath(path);
+      Path resolvedBasePath = basePath.resolve(Paths.get(folderRelativePath.get()));
+      boolean isWithin = RodaCoreFactory.checkPathIsWithin(resolvedBasePath,basePath);
 
-      payload.writeToPath(parent.resolve(name));
-      updateTransferredResources(Optional.ofNullable(parentToBase.toString()), waitToFinish);
+      if (isWithin) {
+        Path parent = resolvedBasePath.getParent();
+        Path parentToBase = basePath.relativize(parent);
+        FSUtils.deletePath(resolvedBasePath);
+        payload.writeToPath(parent.resolve(name));
+        updateTransferredResources(Optional.ofNullable(parentToBase.toString()), waitToFinish);
+      } else {
+        LOGGER.warn("Request trying to access folders outside the transfer resources folder ({})", folderRelativePath.get());
+        throw new AuthorizationDeniedException("Request trying to access folders outside the transfer resources folder (" + folderRelativePath.get() + ")");
+      }
     }
   }
 
