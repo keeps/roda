@@ -1,5 +1,12 @@
 package org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
@@ -33,13 +40,6 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.storage.utils.LocalInstanceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
@@ -176,19 +176,16 @@ public class InstanceIdentifierAIPEventPlugin extends AbstractPlugin<AIP> {
 
       for (OptionalWithCause<PreservationMetadata> opm : iterable) {
         if (opm.isPresent()) {
-          PreservationMetadata pm = opm.get();
-          if (pm.getType().equals(PreservationMetadata.PreservationMetadataType.EVENT)) {
-            try {
-              PremisV3Utils.updatePremisEventInstanceId(pm, model, index, instanceId);
-            } catch (InstanceIdNotUpdated e) {
-              eventCounter++;
-              jobPluginInfo.incrementObjectsProcessedWithFailure();
-              pluginReport.setPluginState(PluginState.FAILURE)
-                .addPluginDetails("Could not add update instance id on AIP preservation event: " + e.getCause());
-            }
+          try {
+            PremisV3Utils.updatePremisEventInstanceId(opm.get(), model, index, instanceId);
+          } catch (InstanceIdNotUpdated e) {
             eventCounter++;
-            jobPluginInfo.incrementObjectsProcessedWithSuccess();
+            jobPluginInfo.incrementObjectsProcessedWithFailure();
+            pluginReport.setPluginState(PluginState.FAILURE)
+              .addPluginDetails("Could not add update instance id on AIP preservation event: " + e.getCause());
           }
+          eventCounter++;
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
         } else {
           eventCounter++;
           jobPluginInfo.incrementObjectsProcessedWithFailure();
