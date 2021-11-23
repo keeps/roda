@@ -1195,7 +1195,7 @@ public class RodaCoreFactory {
       }
 
       LOGGER.info("Instantiating SOLR Embedded");
-      return new EmbeddedSolrServer(solrHome, "test");
+      return new EmbeddedSolrServer(solrHome, "schema");
     }
   }
 
@@ -2376,7 +2376,7 @@ public class RodaCoreFactory {
   private static void printConfigsUsage() {
     System.err.println("Configs command parameters:");
     System.err.println(
-      "\tgeneratePluginsMarkdown PLUGIN_OR_PLUGINS OUTPUT_FOLDER - generates plugin representation in markdown format.");
+      "\tgeneratePluginsMarkdown PLUGIN_OR_PLUGINS DEVELOPMENT_STATUS_PER_PLUGIN OUTPUT_FOLDER - generates plugin representation in markdown format. Development status if many please separate with ;");
   }
 
   public static void main(final String[] argsArray)
