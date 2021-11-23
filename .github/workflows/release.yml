@@ -54,9 +54,9 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: roda-ui/roda-wui/target/roda-wui-${{ steps.release_version.outputs.result }}.war
-          asset_name: roda-wui-${{ steps.release_version.outputs.VERSION }}.war
+          asset_name: roda-wui-${{ steps.release_version.outputs.result }}.war
           tag: ${{ github.ref }}
-          release_name: v${{ steps.release_version.outputs.VERSION }}
+          release_name: v${{ steps.release_version.outputs.result }}
       - name: Login to DockerHub
         uses: docker/login-action@v1 
         with:
