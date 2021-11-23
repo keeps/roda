@@ -134,14 +134,14 @@ docker exec -i -t CONTAINER_ID /bin/bash
 StreamingOutput streamingOutput = new StreamingOutput() {
     @Override
     public void write(OutputStream os) throws IOException, WebApplicationException {
-    InputStream retrieveFile = null;
-    try {
-        retrieveFile =  RodaCoreFactory.getFolderMonitor().retrieveFile(transferredResource.getFullPath());
-        IOUtils.copy(retrieveFile, os);
+        InputStream retrieveFile = null;
+        try {
+            retrieveFile =  RodaCoreFactory.getFolderMonitor().retrieveFile(transferredResource.getFullPath());
+            IOUtils.copy(retrieveFile, os);
         } catch (NotFoundException | RequestNotValidException | GenericException e) {
-        // do nothing
+            // do nothing
         } finally {
-        IOUtils.closeQuietly(retrieveFile);
+            IOUtils.closeQuietly(retrieveFile);
         }
     }
 };
