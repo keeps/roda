@@ -778,15 +778,15 @@ public class IndexServiceTest {
     List<String> results = new ArrayList<>();
 
     IndexResult<IndexedAIP> find;
-    int offset = 0;
+    long offset = 0;
     int blockSize = 100;
     do {
       find = RodaCoreFactory.getIndexService().find(IndexedAIP.class, Filter.ALL, Sorter.NONE,
-        new Sublist(offset, blockSize), Collections.emptyList());
+        new Sublist((int) offset, blockSize), Collections.emptyList());
       offset += find.getLimit();
 
       // Add all ids to result list
-      results.addAll(find.getResults().stream().map(aip -> aip.getId()).collect(Collectors.toList()));
+      results.addAll(find.getResults().stream().map(IndexedAIP::getId).collect(Collectors.toList()));
 
     } while (find.getTotalCount() > find.getOffset() + find.getLimit());
 
@@ -797,8 +797,7 @@ public class IndexServiceTest {
     }
 
     // check if none is repeated
-    Set<String> set = new HashSet<>();
-    set.addAll(results);
+    Set<String> set = new HashSet<>(results);
     Assert.assertEquals(results.size(), set.size());
   }
 }
