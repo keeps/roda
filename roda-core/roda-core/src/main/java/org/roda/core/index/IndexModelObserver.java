@@ -250,19 +250,11 @@ public class IndexModelObserver implements ModelObserver {
       for (OptionalWithCause<File> file : allFiles) {
         if (file.isPresent()) {
           if (FSUtils.isManifestOfExternalFiles(file.get().getId())) {
-            for (OptionalWithCause<File> shallowFile : model.listExternalFilesUnder(file.get())) {
-              if (shallowFile.isPresent()) {
-                indexFile(aip, shallowFile.get(), ancestors, false).addTo(ret).getReturnedObject();
-                numberOfDataFiles++;
-              }
-            }
-            sizeInBytes += getExternalFilesTotalSize(file.get());
             representation.setHasShallowFiles(true);
             aip.setHasShallowFiles(true);
             indexAIP(aip, ancestors).addTo(ret);
-          } else {
-            sizeInBytes += indexFile(aip, file.get(), ancestors, false).addTo(ret).getReturnedObject();
           }
+          sizeInBytes += indexFile(aip, file.get(), ancestors, false).addTo(ret).getReturnedObject();
 
           if (file.get().isDirectory()) {
             numberOfDataFolders++;
@@ -344,9 +336,23 @@ public class IndexModelObserver implements ModelObserver {
     file.setInstanceId(aip.getInstanceId());
 
     FileCollection.Info info = new FileCollection.Info(aip, ancestors);
-    SolrUtils.create2(index, (ModelObserver) this, IndexedFile.class, file, info).addTo(ret);
 
-    sizeInBytes = (Long) info.getAccumulators().get(RodaConstants.FILE_SIZE);
+    if (FSUtils.isManifestOfExternalFiles(file.getId())) {
+      try (CloseableIterable<OptionalWithCause<File>> allExternalFiles = model.listExternalFilesUnder(file)){
+        for (OptionalWithCause<File> shallowFile : allExternalFiles) {
+          if (shallowFile.isPresent()) {
+            SolrUtils.create2(index, (ModelObserver) this, IndexedFile.class, shallowFile.get(), info).addTo(ret);
+          }
+        }
+        sizeInBytes = getExternalFilesTotalSize(file);
+      } catch (IOException | RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException e) {
+        e.printStackTrace();
+      }
+
+    } else {
+      SolrUtils.create2(index, (ModelObserver) this, IndexedFile.class, file, info).addTo(ret);
+      sizeInBytes = (Long) info.getAccumulators().get(RodaConstants.FILE_SIZE);
+    }
 
     if (ret.isEmpty()) {
       if (recursive && file.isDirectory()) {

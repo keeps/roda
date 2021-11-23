@@ -44,6 +44,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.Fixity;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
@@ -783,21 +784,38 @@ public final class PremisV3Utils {
         "The preservation event (" + pm.getId() + ") already has instance identifier");
     }
 
-    IndexedPreservationEvent event = null;
-    try {
-      event = index.retrieve(IndexedPreservationEvent.class, pm.getId(), new ArrayList<>());
-      String updatedId = IdUtils.updatePreservationMetadataInstanceId(pm.getId(), instanceId);
+    String updatedId = IdUtils.updatePreservationMetadataInstanceId(pm.getId(), instanceId);
 
-      ContentPayload payload = PremisV3Utils.retrievePremisEventBinary(updatedId, event.getEventDateTime(),
-        event.getEventType(), event.getEventDetail(), event.getSourcesObjectIds(), event.getOutcomeObjectIds(),
-        event.getEventOutcome(), event.getEventDetail(), null, event.getLinkingAgentIds());
+    if (pm.getType().equals(PreservationMetadata.PreservationMetadataType.EVENT)) {
+      IndexedPreservationEvent event = null;
+      try {
+        event = index.retrieve(IndexedPreservationEvent.class, pm.getId(), new ArrayList<>());
 
-      model.createPreservationMetadata(pm.getType(), updatedId, pm.getAipId(), pm.getRepresentationId(),
-        pm.getFileDirectoryPath(), pm.getFileId(), payload, true);
+        ContentPayload payload = PremisV3Utils.retrievePremisEventBinary(updatedId, event.getEventDateTime(),
+          event.getEventType(), event.getEventDetail(), event.getSourcesObjectIds(), event.getOutcomeObjectIds(),
+          event.getEventOutcome(), event.getEventDetail(), null, event.getLinkingAgentIds());
 
-      model.deletePreservationMetadata(pm.getType(), pm.getAipId(), pm.getRepresentationId(), pm.getId(), true);
-    } catch (NotFoundException e) {
-      throw new InstanceIdNotUpdated(e);
+        model.createPreservationMetadata(pm.getType(), updatedId, pm.getAipId(), pm.getRepresentationId(),
+          pm.getFileDirectoryPath(), pm.getFileId(), payload, true);
+
+        model.deletePreservationMetadata(pm.getType(), pm.getAipId(), pm.getRepresentationId(), pm.getId(), true);
+      } catch (NotFoundException e) {
+        throw new InstanceIdNotUpdated(e);
+      }
+    } else if (pm.getType().equals(PreservationMetadataType.REPRESENTATION)
+      || pm.getType().equals(PreservationMetadataType.FILE)) {
+      try {
+        StoragePath path = ModelUtils.getPreservationMetadataStoragePath(pm.getId(), pm.getType(), pm.getAipId(),
+          pm.getRepresentationId());
+        ContentPayload payload = model.getStorage().getBinary(path).getContent();
+
+        model.createPreservationMetadata(pm.getType(), updatedId, pm.getAipId(), pm.getRepresentationId(),
+          pm.getFileDirectoryPath(), pm.getFileId(), payload, false);
+
+        model.deletePreservationMetadata(pm.getType(), pm.getAipId(), pm.getRepresentationId(), pm.getId(), false);
+      } catch (NotFoundException e) {
+        throw new InstanceIdNotUpdated(e);
+      }
     }
   }
 
