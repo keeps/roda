@@ -78,8 +78,6 @@ import org.roda.core.data.v2.common.ObjectPermission;
 import org.roda.core.data.v2.common.ObjectPermissionResult;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.synchronization.central.DistributedInstance;
-import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
@@ -141,6 +139,8 @@ import org.roda.core.data.v2.risks.IncidenceStatus;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
@@ -171,11 +171,9 @@ import org.roda.core.plugins.plugins.internal.disposal.rules.ApplyDisposalRulesP
 import org.roda.core.plugins.plugins.internal.disposal.schedule.AssociateDisposalScheduleToAIPPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.schedule.DisassociateDisposalScheduleToAIPPlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateSyncBundlePlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierDIPPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.proccess.ImportSyncBundlePlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.proccess.SendSyncBundlePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierAIPEventPlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierAIPPlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierDIPPlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierJobPlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierNotificationPlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierPreservationAgentPlugin;
@@ -183,6 +181,8 @@ import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierRepresentationInformationPlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierRiskIncidencePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierRiskPlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.proccess.ImportSyncBundlePlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.proccess.SendSyncBundlePlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.BinaryVersion;
@@ -3762,8 +3762,8 @@ public class BrowserHelper {
     }
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, path);
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CENTRAL_INSTANCE_URL, localInstance.getCentralInstanceURL());
-    return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(), SendSyncBundlePlugin.class, user,
-      pluginParameters, "Could not execute bundle job");
+    return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(), SendSyncBundlePlugin.class,
+      user, pluginParameters, "Could not execute bundle job");
   }
 
   public static Job importSyncBundle(User user, String instanceIdentifier, FormDataMultiPart multiPart)
@@ -3782,8 +3782,38 @@ public class BrowserHelper {
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, path);
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, instanceIdentifier);
-    return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(), ImportSyncBundlePlugin.class, user,
-      pluginParameters, "Could not execute bundle job");
+    return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(), ImportSyncBundlePlugin.class,
+      user, pluginParameters, "Could not execute bundle job");
+  }
+
+  public static StreamResponse retrieveRemoteActions(String instanceIdentifier)
+    throws GenericException, NotFoundException {
+    String fileName = instanceIdentifier + ".zip";
+
+    IndexService index = RodaCoreFactory.getIndexService();
+    StorageService storage = RodaCoreFactory.getStorageService();
+
+    List<ZipEntryInfo> zipEntries = new ArrayList<>();
+    try {
+      Filter filter = new Filter();
+      filter.add(new SimpleFilterParameter(RodaConstants.JOB_INSTANCE_ID, instanceIdentifier));
+      filter.add(new SimpleFilterParameter(RodaConstants.JOB_STATE, "CREATED"));
+      Long count = index.count(Job.class, filter);
+      for (int i = 0; i < count; i += RodaConstants.DEFAULT_PAGINATION_VALUE) {
+        List<Job> jobs = index.find(Job.class, filter, null,
+          new Sublist(i, RodaConstants.DEFAULT_PAGINATION_VALUE), new ArrayList<>()).getResults();
+
+        for (Job job : jobs) {
+          StoragePath jobStoragePath = ModelUtils.getJobStoragePath(job.getId());
+          Binary binary = storage.getBinary(jobStoragePath);
+          ZipEntryInfo info = new ZipEntryInfo(jobStoragePath.getName(), binary.getContent());
+          zipEntries.add(info);
+        }
+      }
+      return DownloadUtils.createZipStreamResponse(zipEntries, fileName);
+    } catch (RequestNotValidException | AuthorizationDeniedException e) {
+      throw new GenericException("Unable to create remote actions file: " + e.getMessage());
+    }
   }
 
   public static void updateLocalInstanceConfiguration(LocalInstance localInstance, String id) throws GenericException {
