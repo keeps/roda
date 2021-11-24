@@ -123,8 +123,6 @@ public class SiegfriedPluginUtils {
     StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(representation.getAipId(),
       representation.getId());
     StorageService storageService;
-    // ir buscar o manifesto de ficheiros externos
-    // stream para os nomes e meter numa lista
 
     if (representation.getHasShallowFiles()) {
       StorageService tmpStorageService = ModelUtils.resolveTemporaryResourceShallow(jobId, model.getStorage(),
@@ -132,7 +130,7 @@ public class SiegfriedPluginUtils {
       try (DirectResourceAccess directAccess = tmpStorageService.getDirectAccess(representationDataPath)) {
         Path representationFsPath = directAccess.getPath();
         return runSiegfriedOnRepresentationOrFile(model, representation.getAipId(), representation.getId(),
-          new ArrayList<>(), null, representationFsPath, representation.getHasShallowFiles());
+          new ArrayList<>(), null, representationFsPath);
       } catch (IOException e) {
         throw new GenericException(e);
       } finally {
@@ -149,7 +147,7 @@ public class SiegfriedPluginUtils {
       try (DirectResourceAccess directAccess = model.getStorage().getDirectAccess(representationDataPath)) {
         Path representationFsPath = directAccess.getPath();
         return runSiegfriedOnRepresentationOrFile(model, representation.getAipId(), representation.getId(),
-          new ArrayList<>(), null, representationFsPath, representation.getHasShallowFiles());
+          new ArrayList<>(), null, representationFsPath);
       } catch (IOException e) {
         throw new GenericException(e);
       }
@@ -164,7 +162,7 @@ public class SiegfriedPluginUtils {
     try (DirectResourceAccess directAccess = model.getStorage().getDirectAccess(fileStoragePath)) {
       Path filePath = directAccess.getPath();
       List<LinkingIdentifier> sources = runSiegfriedOnRepresentationOrFile(model, file.getAipId(),
-        file.getRepresentationId(), file.getPath(), file.getId(), filePath, file.isReference());
+        file.getRepresentationId(), file.getPath(), file.getId(), filePath);
       model.notifyFileUpdated(file).failOnError();
       return sources;
     } catch (IOException e) {
@@ -173,7 +171,7 @@ public class SiegfriedPluginUtils {
   }
 
   private static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnRepresentationOrFile(ModelService model,
-    String aipId, String representationId, List<String> fileDirectoryPath, String fileId, Path path, boolean shallow)
+    String aipId, String representationId, List<String> fileDirectoryPath, String fileId, Path path)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
     PluginException {
     List<LinkingIdentifier> sources = new ArrayList<>();
@@ -223,7 +221,7 @@ public class SiegfriedPluginUtils {
           }
 
           PremisV3Utils.updateFormatPreservationMetadata(model, aipId, representationId, jsonFilePath, jsonFileId,
-            format, version, pronom, mime, true, shallow);
+            format, version, pronom, mime, true);
         }
       }
     }

@@ -503,7 +503,8 @@ public class FileStorageService implements StorageService {
       if (shallowFile != null) {
         Resource resource = FSUtils.convertReferenceToResource(storagePath, shallowFile.getLocation().toString(),
           false);
-        if (resource instanceof Binary) {
+        if (resource instanceof DefaultBinary) {
+          ((DefaultBinary) resource).setSizeInBytes(shallowFile.getSize());
           return (Binary) resource;
         } else {
           throw new RequestNotValidException("Looking for a binary but found something else");
