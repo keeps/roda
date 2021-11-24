@@ -341,6 +341,7 @@ public class IndexModelObserver implements ModelObserver {
       try (CloseableIterable<OptionalWithCause<File>> allExternalFiles = model.listExternalFilesUnder(file)){
         for (OptionalWithCause<File> shallowFile : allExternalFiles) {
           if (shallowFile.isPresent()) {
+            shallowFile.get().setInstanceId(aip.getInstanceId());
             SolrUtils.create2(index, (ModelObserver) this, IndexedFile.class, shallowFile.get(), info).addTo(ret);
           }
         }

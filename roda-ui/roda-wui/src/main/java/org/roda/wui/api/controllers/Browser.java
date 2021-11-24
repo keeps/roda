@@ -4016,4 +4016,25 @@ public class Browser extends RodaWuiController {
     }
   }
 
+    public static StreamResponse retrieveRemoteActions(User user, String instanceIdentifier)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // delegate
+      return BrowserHelper.retrieveRemoteActions(instanceIdentifier);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM, instanceIdentifier);
+    }
+  }
+
 }

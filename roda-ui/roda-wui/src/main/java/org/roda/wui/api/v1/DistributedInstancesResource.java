@@ -16,6 +16,9 @@ import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.server.JSONP;
+import org.roda.core.common.ConsumesOutputStream;
+import org.roda.core.common.EntityResponse;
+import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
@@ -26,12 +29,14 @@ import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
+import org.roda.wui.api.v1.utils.ExtraMediaType;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.roda.wui.api.v1.utils.ObjectResponse;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -98,10 +103,10 @@ public class DistributedInstancesResource {
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Consumes("multipart/*")
   public Response synchronize(
-      @ApiParam(value = "The instance identifier", required = true) @PathParam(RodaConstants.API_PATH_PARAM_INSTANCE_IDENTIFIER) String instanceIdentifier,
-      FormDataMultiPart file,
-      @ApiParam(value = "Choose format in which to get the response", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
-      throws RODAException {
+    @ApiParam(value = "The instance identifier", required = true) @PathParam(RodaConstants.API_PATH_PARAM_INSTANCE_IDENTIFIER) String instanceIdentifier,
+    FormDataMultiPart file,
+    @ApiParam(value = "Choose format in which to get the response", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
+    throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
@@ -111,5 +116,26 @@ public class DistributedInstancesResource {
     Browser.importSyncBundle(user, instanceIdentifier, file);
 
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Bundle entries imported"), mediaType).build();
+  }
+
+  @GET
+  @Path("/remoteActions/{" + RodaConstants.API_PATH_PARAM_INSTANCE_IDENTIFIER + "}")
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
+  @ApiResponses(value = {
+    @ApiResponse(code = 200, message = "OK", response = org.roda.core.data.v2.ip.TransferredResource.class),
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
+
+  public Response remoteActions(
+    @ApiParam(value = "The instance identifier", required = true) @PathParam(RodaConstants.API_PATH_PARAM_INSTANCE_IDENTIFIER) String instanceIdentifier)
+    throws RODAException {
+
+    // get user
+    User user = UserUtility.getApiUser(request);
+
+    //EntityResponse response = Browser.retrieveTransferredResource(user, instanceIdentifier, acceptFormat);
+    StreamResponse streamResponse = Browser.retrieveRemoteActions(user, instanceIdentifier);
+
+    return ApiUtils.okResponse(streamResponse);
   }
 }
