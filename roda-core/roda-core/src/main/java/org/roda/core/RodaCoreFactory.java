@@ -610,6 +610,8 @@ public class RodaCoreFactory {
         RodaConstants.CORE_SYNCHRONIZATION_FOLDER);
       synchronizationDirectoryPath = getDataPath().resolve(synchronizationFolder);
       Files.createDirectories(synchronizationDirectoryPath);
+      Files.createDirectories(synchronizationDirectoryPath.resolve(RodaConstants.CORE_SYNCHRONIZATION_INCOMING_FOLDER));
+      Files.createDirectories(synchronizationDirectoryPath.resolve(RodaConstants.CORE_SYNCHRONIZATION_OUTCOME_FOLDER));
     } catch (IOException e) {
       throw new RuntimeException(
         "Unable to create Synchronization DIRECTORY " + synchronizationDirectoryPath + ", Aborting...", e);
@@ -2290,7 +2292,7 @@ public class RodaCoreFactory {
     }
     if (newLocalInstance != null) {
       newLocalInstance.setBundlePath(rodaHomePath
-        .resolve(getProperty(RodaConstants.CORE_SYNCHRONIZATION_BUNDLE_PATH, RodaConstants.SYNCHRONIZATION_BUNDLE_PATH))
+        .resolve(getProperty(RodaConstants.CORE_SYNCHRONIZATION_BUNDLE_PATH, RodaConstants.SYNCHRONIZATION_OUTCOME_BUNDLE_PATH))
         .toString());
       YamlUtils.writeObjectToFile(newLocalInstance, configuration);
     }

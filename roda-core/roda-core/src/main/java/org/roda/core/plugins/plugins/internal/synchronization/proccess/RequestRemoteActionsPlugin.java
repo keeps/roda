@@ -1,14 +1,19 @@
-package org.roda.core.plugins.plugins.internal.synchronization.bundle;
+package org.roda.core.plugins.plugins.internal.synchronization.proccess;
 
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.SyncUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -24,8 +29,10 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-public class CreateRemoteActionsBundlePlugin extends AbstractPlugin<Void> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(CreateRemoteActionsBundlePlugin.class);
+public class RequestRemoteActionsPlugin extends AbstractPlugin<Void> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(SendSyncBundlePlugin.class);
+
+  private LocalInstance localInstance;
 
   @Override
   public String getVersionImpl() {
@@ -34,32 +41,32 @@ public class CreateRemoteActionsBundlePlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getName() {
-    return "";
+    return "Remote actions";
   }
 
   @Override
   public String getDescription() {
-    return "";
+    return "Request remote actions to central instance";
   }
 
   @Override
   public RodaConstants.PreservationEventType getPreservationEventType() {
-    return null;
+    return RodaConstants.PreservationEventType.NONE;
   }
 
   @Override
   public String getPreservationEventDescription() {
-    return null;
+    return "";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return null;
+    return "";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return null;
+    return "";
   }
 
   @Override
@@ -74,12 +81,12 @@ public class CreateRemoteActionsBundlePlugin extends AbstractPlugin<Void> {
 
   @Override
   public Plugin<Void> cloneMe() {
-    return new CreateRemoteActionsBundlePlugin();
+    return new RequestRemoteActionsPlugin();
   }
 
   @Override
   public boolean areParameterValuesValid() {
-    return true;
+    return false;
   }
 
   @Override
@@ -105,13 +112,36 @@ public class CreateRemoteActionsBundlePlugin extends AbstractPlugin<Void> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<Void> plugin) throws PluginException {
-          createRemoteActionBundle(index, model, storage, report, cachedJob, jobPluginInfo);
+        try {
+          localInstance = RodaCoreFactory.getLocalInstance();
+        } catch (GenericException e) {
+          throw new PluginException("Unable to retrieve local instance configuration", e);
+        }
+        requestRemoteActions(model, report, jobPluginInfo, cachedJob);
       }
     }, index, model, storage);
   }
 
-  public void createRemoteActionBundle(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob, JobPluginInfo jobPluginInfo) {
+  private void requestRemoteActions(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job cachedJob) {
+    Report reportItem = PluginHelper.initPluginReportItem(this, localInstance.getId(), LocalInstance.class);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
+    PluginState pluginState = PluginState.SKIPPED;
+    String outcomeDetailsText = "";
 
+    try {
+      SyncUtils.requestRemoteActions(localInstance);
+      pluginState = PluginState.SUCCESS;
+      jobPluginInfo.incrementObjectsProcessed(pluginState);
+      outcomeDetailsText="Created remote actions";
+    } catch (GenericException e) {
+      jobPluginInfo.incrementObjectsProcessedWithFailure();
+      pluginState = PluginState.FAILURE;
+      outcomeDetailsText=e.getMessage();
+    }
+
+    reportItem.setPluginState(pluginState).setPluginDetails(outcomeDetailsText);
+    report.addReport(reportItem);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
   }
 
   @Override
