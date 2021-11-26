@@ -47,11 +47,6 @@
 			<name>bintray</name>
 			<url>https://jcenter.bintray.com</url>
 		</repository>
-		<repository>
-			<id>github</id>
-			<name>GitHub Packages</name>
-			<url>https://maven.pkg.github.com/keeps/*</url>
-		</repository>
 	</repositories>
 	<developers>
 		<developer>
