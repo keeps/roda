@@ -6,24 +6,19 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.TokenManager;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -51,42 +46,7 @@ import org.slf4j.LoggerFactory;
 public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SendSyncBundlePlugin.class);
 
-  private String bundlePath = null;
-  private String centralInstanceURL = null;
   private LocalInstance localInstance;
-
-  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
-
-  static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, "Destination path",
-        PluginParameter.PluginParameterType.STRING, "", true, false, "Destination path where bundles will be created"));
-
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CENTRAL_INSTANCE_URL,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_CENTRAL_INSTANCE_URL, "Central instance URL",
-        PluginParameter.PluginParameterType.STRING, "", true, false, "Destination path where bundles will be created"));
-  }
-
-  @Override
-  public List<PluginParameter> getParameters() {
-    ArrayList<PluginParameter> parameters = new ArrayList<>();
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH));
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_CENTRAL_INSTANCE_URL));
-    return parameters;
-  }
-
-  @Override
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    super.setParameterValues(parameters);
-
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH)) {
-      bundlePath = parameters.get(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH);
-    }
-
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_CENTRAL_INSTANCE_URL)) {
-      centralInstanceURL = parameters.get(RodaConstants.PLUGIN_PARAMS_CENTRAL_INSTANCE_URL);
-    }
-  }
 
   @Override
   public String getVersionImpl() {
@@ -105,7 +65,7 @@ public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getName() {
-    return "Synchronize instances";
+    return "Send synchronization bundle";
   }
 
   @Override
@@ -161,7 +121,7 @@ public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
   @Override
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-    return new Report();
+    return null;
   }
 
   @Override
@@ -171,6 +131,11 @@ public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<Void> plugin) throws PluginException {
+        try {
+          localInstance = RodaCoreFactory.getLocalInstance();
+        } catch (GenericException e) {
+          throw new PluginException("Unable to retrieve local instance configuration", e);
+        }
         sendSyncBundle(model, report, jobPluginInfo, cachedJob);
       }
     }, index, model, storage);
@@ -178,31 +143,41 @@ public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
 
   private void sendSyncBundle(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job cachedJob)
     throws PluginException {
-    try {
-      localInstance = RodaCoreFactory.getLocalInstance();
-      BundleState bundleState = SynchronizationHelper.buildBundleStateFile();
-      jobPluginInfo.setSourceObjectsCount(1);
+    Report reportItem = PluginHelper.initPluginReportItem(this, localInstance.getId(), LocalInstance.class);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
+    PluginState pluginState = PluginState.SKIPPED;
+    String pluginDetails = "";
 
-      int responseCode = send(localInstance, bundleState);
-      if (responseCode == 200) {
-        localInstance.setLastSynchronizationDate(bundleState.getToDate());
-        RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
-        bundleState.setSyncState(BundleState.Status.SENT);
-        jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        report.setPluginState(PluginState.SUCCESS);
-      } else {
-        report.setPluginState(PluginState.FAILURE).setPluginDetails("Server response is " + responseCode);
-        bundleState.setSyncState(BundleState.Status.FAILED);
+    try {
+      BundleState bundleState = SynchronizationHelper.buildBundleStateFile();
+      if (!bundleState.getPackageStateList().isEmpty()) {
+        LOGGER.debug("Sending sync bundle to: ", localInstance.getCentralInstanceURL());
+        int responseCode = send(localInstance, bundleState);
+        if (responseCode == 200) {
+          localInstance.setLastSynchronizationDate(bundleState.getToDate());
+          RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
+          bundleState.setSyncState(BundleState.Status.SENT);
+          pluginState = PluginState.SUCCESS;
+          jobPluginInfo.incrementObjectsProcessed(pluginState);
+        } else {
+          pluginDetails = "Server response is " + responseCode;
+          pluginState = PluginState.FAILURE;
+          bundleState.setSyncState(BundleState.Status.FAILED);
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+        }
+        SynchronizationHelper.updateBundleStateFile(bundleState);
       }
-      SynchronizationHelper.updateBundleStateFile(bundleState);
     } catch (GenericException e) {
       jobPluginInfo.incrementObjectsProcessedWithFailure();
-      report.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
-      throw new PluginException("Unable to retrieve local instance configuration", e);
+      pluginDetails = e.getMessage();
+      pluginState = PluginState.FAILURE;
     }
+    reportItem.setPluginState(pluginState).setPluginDetails(pluginDetails);
+    report.addReport(reportItem);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
   }
 
-  private int send(LocalInstance localInstance, BundleState bundleStateFile) throws PluginException {
+  private int send(LocalInstance localInstance, BundleState bundleStateFile) throws GenericException {
     try {
       Path zipPath = compressBundle(bundleStateFile);
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
@@ -213,14 +188,15 @@ public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
         zipPath, accessToken);
     } catch (RODAException | FileNotFoundException e) {
       LOGGER.error("Unable to send bundle to central instance", e);
-      throw new PluginException("Unable to send bundle to central instance", e);
+      throw new GenericException("Unable to send bundle to central instance", e);
     }
   }
 
   private Path compressBundle(BundleState bundleStateFile) throws PluginException {
     try {
       String fileName = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'.zip'").format(bundleStateFile.getToDate());
-      Path filePath = RodaCoreFactory.getSynchronizationDirectoryPath().resolve(fileName);
+      Path filePath = RodaCoreFactory.getSynchronizationDirectoryPath()
+        .resolve(RodaConstants.CORE_SYNCHRONIZATION_OUTCOME_FOLDER).resolve(fileName);
       if (FSUtils.exists(filePath)) {
         FSUtils.deletePath(filePath);
       }

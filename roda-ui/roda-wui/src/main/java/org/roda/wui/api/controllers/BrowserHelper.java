@@ -183,6 +183,7 @@ import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierRiskPlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.proccess.ImportSyncBundlePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.proccess.SendSyncBundlePlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.proccess.SynchronizeInstancePlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.BinaryVersion;
@@ -3755,15 +3756,8 @@ public class BrowserHelper {
 
   public static Job synchronizeBundle(User user, LocalInstance localInstance)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    String path = localInstance.getBundlePath();
-    if (path == null) {
-      path = RodaCoreFactory.getSynchronizationDirectoryPath().resolve("bundle").toString();
-    }
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, path);
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CENTRAL_INSTANCE_URL, localInstance.getCentralInstanceURL());
-    return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(), SendSyncBundlePlugin.class,
-      user, pluginParameters, "Could not execute bundle job");
+    return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(), SynchronizeInstancePlugin.class,
+      user, new HashMap<>(), "Could not execute bundle job");
   }
 
   public static Job importSyncBundle(User user, String instanceIdentifier, FormDataMultiPart multiPart)
@@ -3784,36 +3778,6 @@ public class BrowserHelper {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, instanceIdentifier);
     return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(), ImportSyncBundlePlugin.class,
       user, pluginParameters, "Could not execute bundle job");
-  }
-
-  public static StreamResponse retrieveRemoteActions(String instanceIdentifier)
-    throws GenericException, NotFoundException {
-    String fileName = instanceIdentifier + ".zip";
-
-    IndexService index = RodaCoreFactory.getIndexService();
-    StorageService storage = RodaCoreFactory.getStorageService();
-
-    List<ZipEntryInfo> zipEntries = new ArrayList<>();
-    try {
-      Filter filter = new Filter();
-      filter.add(new SimpleFilterParameter(RodaConstants.JOB_INSTANCE_ID, instanceIdentifier));
-      filter.add(new SimpleFilterParameter(RodaConstants.JOB_STATE, "CREATED"));
-      Long count = index.count(Job.class, filter);
-      for (int i = 0; i < count; i += RodaConstants.DEFAULT_PAGINATION_VALUE) {
-        List<Job> jobs = index.find(Job.class, filter, null,
-          new Sublist(i, RodaConstants.DEFAULT_PAGINATION_VALUE), new ArrayList<>()).getResults();
-
-        for (Job job : jobs) {
-          StoragePath jobStoragePath = ModelUtils.getJobStoragePath(job.getId());
-          Binary binary = storage.getBinary(jobStoragePath);
-          ZipEntryInfo info = new ZipEntryInfo(jobStoragePath.getName(), binary.getContent());
-          zipEntries.add(info);
-        }
-      }
-      return DownloadUtils.createZipStreamResponse(zipEntries, fileName);
-    } catch (RequestNotValidException | AuthorizationDeniedException e) {
-      throw new GenericException("Unable to create remote actions file: " + e.getMessage());
-    }
   }
 
   public static void updateLocalInstanceConfiguration(LocalInstance localInstance, String id) throws GenericException {
