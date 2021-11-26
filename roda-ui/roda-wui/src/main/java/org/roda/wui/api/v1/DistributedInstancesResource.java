@@ -3,20 +3,13 @@ package org.roda.wui.api.v1;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.server.JSONP;
-import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
@@ -30,13 +23,9 @@ import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ExtraMediaType;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.roda.wui.api.v1.utils.ObjectResponse;
+
+import io.swagger.annotations.*;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -119,7 +108,7 @@ public class DistributedInstancesResource {
   }
 
   @GET
-  @Path("/remoteActions/{" + RodaConstants.API_PATH_PARAM_INSTANCE_IDENTIFIER + "}")
+  @Path("/remote_actions/{" + RodaConstants.API_PATH_PARAM_INSTANCE_IDENTIFIER + "}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
   @ApiResponses(value = {
@@ -133,9 +122,12 @@ public class DistributedInstancesResource {
     // get user
     User user = UserUtility.getApiUser(request);
 
-    //EntityResponse response = Browser.retrieveTransferredResource(user, instanceIdentifier, acceptFormat);
-    StreamResponse streamResponse = Browser.retrieveRemoteActions(user, instanceIdentifier);
+    EntityResponse response = Browser.retrieveRemoteActions(user, instanceIdentifier);
 
-    return ApiUtils.okResponse(streamResponse);
+    if (response instanceof StreamResponse) {
+      return ApiUtils.okResponse((StreamResponse) response);
+    } else {
+      return Response.noContent().build();
+    }
   }
 }

@@ -30,6 +30,7 @@ import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.Messages;
 import org.roda.core.common.StreamResponse;
+import org.roda.core.common.SyncUtils;
 import org.roda.core.common.TokenManager;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
@@ -45,10 +46,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.common.ObjectPermissionResult;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.synchronization.central.DistributedInstance;
-import org.roda.core.data.v2.synchronization.central.DistributedInstanceStatus;
-import org.roda.core.data.v2.synchronization.central.DistributedInstances;
-import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -87,6 +84,10 @@ import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
+import org.roda.core.data.v2.synchronization.central.DistributedInstanceStatus;
+import org.roda.core.data.v2.synchronization.central.DistributedInstances;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.utils.IterableIndexResult;
@@ -95,6 +96,7 @@ import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.roda.core.util.RESTClientUtility;
+import org.roda.wui.api.v1.utils.ObjectResponse;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseDipBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
@@ -3865,8 +3867,8 @@ public class Browser extends RodaWuiController {
 
     // check user permissions
     controllerAssistant.checkRoles(user);
-
     LogEntryState state = LogEntryState.SUCCESS;
+
 
     try {
       TokenManager.getInstance().getAccessToken(localInstance);
@@ -4016,7 +4018,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-    public static StreamResponse retrieveRemoteActions(User user, String instanceIdentifier)
+  public static EntityResponse retrieveRemoteActions(User user, String instanceIdentifier)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -4027,13 +4029,18 @@ public class Browser extends RodaWuiController {
 
     try {
       // delegate
-      return BrowserHelper.retrieveRemoteActions(instanceIdentifier);
+      try {
+        return SyncUtils.createRemoteActionsBundle(instanceIdentifier);
+      } catch (NotFoundException e) {
+        return new ObjectResponse<>(null, null);
+      }
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM, instanceIdentifier);
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM,
+        instanceIdentifier);
     }
   }
 
