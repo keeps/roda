@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -25,6 +26,7 @@ import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.synchronization.bundle.RemoteActions;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.utils.ModelUtils;
@@ -37,9 +39,6 @@ import org.roda.core.util.ZipUtility;
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 public class SyncUtils {
-  public static void createSyncBundle() {
-  }
-
   // Central instance methods
 
   public static StreamResponse createRemoteActionsBundle(String instanceIdentifier)
@@ -86,6 +85,29 @@ public class SyncUtils {
   }
 
   // Local instance methods
+  public static DistributedInstance requestInstanceStatus(LocalInstance localInstance) throws GenericException {
+    try {
+      AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
+      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE + "status"
+        + RodaConstants.API_SEP + localInstance.getId();
+
+      CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+      HttpGet httpGet = new HttpGet(localInstance.getCentralInstanceURL() + resource);
+      httpGet.addHeader("Authorization", "Bearer " + accessToken.getToken());
+      httpGet.addHeader("content-type", "application/json");
+      httpGet.addHeader("Accept", "application/json");
+
+      HttpResponse response = httpClient.execute(httpGet);
+
+      if (response.getStatusLine().getStatusCode() != RodaConstants.HTTP_RESPONSE_CODE_SUCCESS) {
+        throw new GenericException(
+          "Unable to retrieve instance status error code: " + response.getStatusLine().getStatusCode());
+      }
+      return JsonUtils.getObjectFromJson(response.getEntity().getContent(), DistributedInstance.class);
+    } catch (AuthenticationDeniedException | GenericException | IOException e) {
+      throw new GenericException("Unable to retrieve instance status: " + e.getMessage());
+    }
+  }
 
   public static void requestRemoteActions(LocalInstance localInstance) throws GenericException {
     try {
@@ -111,9 +133,10 @@ public class SyncUtils {
       }
     } catch (AuthenticationDeniedException | IOException e) {
       throw new GenericException("unable to communicate with the central instance");
-    } catch (AuthorizationDeniedException | RequestNotValidException | JobAlreadyStartedException
-      | NotFoundException e) {
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException e) {
       throw new GenericException("Unable to perform remote actions");
+    } catch (JobAlreadyStartedException e) {
+      // Do nothing
     }
   }
 
@@ -147,5 +170,4 @@ public class SyncUtils {
       PluginHelper.createAndExecuteJob(job);
     }
   }
-
 }

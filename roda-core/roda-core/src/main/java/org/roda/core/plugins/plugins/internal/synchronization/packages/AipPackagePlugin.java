@@ -1,4 +1,4 @@
-package org.roda.core.plugins.plugins.internal.synchronization.bundle;
+package org.roda.core.plugins.plugins.internal.synchronization.packages;
 
 import java.io.IOException;
 import java.net.URI;
@@ -6,42 +6,21 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.Void;
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.FilterParameter;
-import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.index.select.SelectedItemsFilter;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.ShallowFile;
-import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.PluginState;
-import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.index.filter.*;
+import org.roda.core.data.v2.ip.*;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.protocols.protocols.RODAProtocol;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.IdUtils;
@@ -51,17 +30,22 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-public class CreateAipPackagePlugin extends CreateRodaEntityPackagePlugin<AIP> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(CreateAipPackagePlugin.class);
-
-  @Override
-  public String getName() {
-    return "Create AIP Bundle";
-  }
+public class AipPackagePlugin extends RodaEntityPackagesPlugin<AIP> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(AipPackagePlugin.class);
 
   @Override
   public String getVersionImpl() {
-    return "1.0.0";
+    return "1.0";
+  }
+
+  @Override
+  public String getName() {
+    return "AipPackagePlugin";
+  }
+
+  @Override
+  public Plugin<Void> cloneMe() {
+    return new AipPackagePlugin();
   }
 
   @Override
@@ -70,57 +54,55 @@ public class CreateAipPackagePlugin extends CreateRodaEntityPackagePlugin<AIP> {
   }
 
   @Override
-  protected String getEntityStoragePath() {
-    return "aip";
+  protected Class<AIP> getEntityClass() {
+    return AIP.class;
   }
 
   @Override
-  protected void createBundle(IndexService index, ModelService model, Report pluginReport, JobPluginInfo jobPluginInfo,
-    Job job) {
-    pluginReport.setPluginState(PluginState.SUCCESS);
+  protected List<String> retrieveList(IndexService index) throws RequestNotValidException, GenericException {
+    Set<String> aipHashSet = new HashSet<>();
 
-    SelectedItems<?> sourceObjects = job.getSourceObjects();
+    Filter filter = new Filter();
+    if (fromDate != null) {
+      filter.add(
+        new DateIntervalFilterParameter(RodaConstants.AIP_UPDATED_ON, RodaConstants.AIP_UPDATED_ON, fromDate, toDate));
+    }
 
-    if (sourceObjects instanceof SelectedItemsFilter) {
-      Filter filter = ((SelectedItemsFilter) sourceObjects).getFilter();
-      try {
-        int counter = index.count(IndexedAIP.class, filter).intValue();
-        jobPluginInfo.setSourceObjectsCount(counter);
-        ArrayList<String> idList = new ArrayList<>();
+    IterableIndexResult<IndexedAIP> aips = index.findAll(IndexedAIP.class, filter,
+      Collections.singletonList(RodaConstants.INDEX_UUID));
+    for (IndexedAIP aip : aips) {
+      aipHashSet.add(aip.getUUID());
+    }
+    retrievePreservationsEvents(index, aipHashSet);
 
-        IterableIndexResult<IndexedAIP> aips = index.findAll(IndexedAIP.class, filter,
-          Arrays.asList(RodaConstants.INDEX_UUID));
-        for (IndexedAIP aip : aips) {
-          Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), IndexedAIP.class);
-          AIP retrieveAIP = null;
-          try {
-            retrieveAIP = model.retrieveAIP(aip.getId());
-            createAIPBundle(model, index, retrieveAIP);
-            idList.add(retrieveAIP.getId());
-            jobPluginInfo.incrementObjectsProcessedWithSuccess();
-          } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
-            | IOException e) {
-            LOGGER.error("Error on create bundle for aip {}", aip.getId());
-            jobPluginInfo.incrementObjectsProcessedWithFailure();
-            reportItem.addPluginDetails("Failed to create bundle for " + aip.getClass() + " " + aip.getId() + "\n");
-            reportItem.addPluginDetails(e.getMessage());
-            pluginReport.addReport(reportItem.setPluginState(PluginState.FAILURE));
-            PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
-          }
-        }
-        updateEntityPackageState(AIP.class, idList);
-      } catch (RODAException e) {
-        LOGGER.error("Error on retrieve indexes of a RODA entity", e);
-        jobPluginInfo.incrementObjectsProcessedWithFailure();
-      } catch (IOException e) {
-        LOGGER.error("Error on update entity package state file", e);
-        jobPluginInfo.incrementObjectsProcessedWithFailure();
-      }
+    return new ArrayList<>(aipHashSet);
+  }
+
+  private void retrievePreservationsEvents(IndexService index, Set<String> aipHashSet)
+    throws RequestNotValidException, GenericException {
+    Filter filter = new Filter();
+    filter.add(new NotSimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS,
+      IndexedPreservationEvent.PreservationMetadataEventClass.REPOSITORY.toString()));
+    if (fromDate != null) {
+      filter.add(new DateIntervalFilterParameter(RodaConstants.PRESERVATION_EVENT_DATETIME,
+        RodaConstants.PRESERVATION_EVENT_DATETIME, fromDate, toDate));
+    }
+
+    IterableIndexResult<IndexedPreservationEvent> preservationEvents = index.findAll(IndexedPreservationEvent.class,
+      filter, Collections.singletonList(RodaConstants.PRESERVATION_EVENT_AIP_ID));
+    for (IndexedPreservationEvent preservationEvent : preservationEvents) {
+      aipHashSet.add(preservationEvent.getAipID());
     }
   }
 
-  public void retrievePreservationEvents(){
+  @Override
+  protected void createPackage(IndexService index, ModelService model, List<String> list) throws GenericException,
+    AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException, IOException {
 
+    for (String aipId : list) {
+      AIP aip = model.retrieveAIP(aipId);
+      createAIPBundle(model, index, aip);
+    }
   }
 
   public void createAIPBundle(ModelService model, IndexService index, AIP aip) throws RequestNotValidException,
@@ -128,7 +110,7 @@ public class CreateAipPackagePlugin extends CreateRodaEntityPackagePlugin<AIP> {
 
     StorageService storage = model.getStorage();
     StoragePath aipStoragePath = ModelUtils.getAIPStoragePath(aip.getId());
-    Path destinationPath = getDestinationPath().resolve(RodaConstants.CORE_STORAGE_FOLDER)
+    Path destinationPath = bundlePath.resolve(RodaConstants.CORE_STORAGE_FOLDER)
       .resolve(RodaConstants.STORAGE_CONTAINER_AIP).resolve(aip.getId());
 
     Path documentationPath = destinationPath.resolve(RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
@@ -200,8 +182,8 @@ public class CreateAipPackagePlugin extends CreateRodaEntityPackagePlugin<AIP> {
     }
 
     Path manifestExternalFiles = subFolder.resolve(RodaConstants.RODA_MANIFEST_EXTERNAL_FILES);
-    if (!Files.exists(manifestExternalFiles)) {
-      manifestExternalFiles = Files.createFile(manifestExternalFiles);
+    if (!java.nio.file.Files.exists(manifestExternalFiles)) {
+      manifestExternalFiles = java.nio.file.Files.createFile(manifestExternalFiles);
     }
     JsonUtils.appendObjectToFile(shallowFile, manifestExternalFiles);
 
@@ -226,7 +208,7 @@ public class CreateAipPackagePlugin extends CreateRodaEntityPackagePlugin<AIP> {
   }
 
   private void createDirectory(Path subFolder) {
-    if (!Files.exists(subFolder)) {
+    if (!java.nio.file.Files.exists(subFolder)) {
       try {
         Files.createDirectory(subFolder);
       } catch (IOException e) {
@@ -254,10 +236,5 @@ public class CreateAipPackagePlugin extends CreateRodaEntityPackagePlugin<AIP> {
     shallowFile.setChecksumType(indexedFile.getSHA256Type());
 
     return shallowFile;
-  }
-
-  @Override
-  public Plugin<Void> cloneMe() {
-    return new CreateAipPackagePlugin();
   }
 }
