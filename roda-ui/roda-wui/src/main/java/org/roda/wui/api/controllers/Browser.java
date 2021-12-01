@@ -12,37 +12,15 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.ConsumesOutputStream;
-import org.roda.core.common.EntityResponse;
-import org.roda.core.common.Messages;
-import org.roda.core.common.StreamResponse;
-import org.roda.core.common.SyncUtils;
-import org.roda.core.common.TokenManager;
-import org.roda.core.common.UserUtility;
+import org.roda.core.common.*;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthenticationDeniedException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.IllegalOperationException;
-import org.roda.core.data.exceptions.IsStillUpdatingException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.common.ObjectPermissionResult;
 import org.roda.core.data.v2.common.Pair;
@@ -54,23 +32,9 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.DIPFile;
-import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.*;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
-import org.roda.core.data.v2.ip.disposal.DisposalHolds;
-import org.roda.core.data.v2.ip.disposal.DisposalRule;
-import org.roda.core.data.v2.ip.disposal.DisposalRules;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
+import org.roda.core.data.v2.ip.disposal.*;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -97,16 +61,7 @@ import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.roda.core.util.RESTClientUtility;
 import org.roda.wui.api.v1.utils.ObjectResponse;
-import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
-import org.roda.wui.client.browse.bundle.BrowseDipBundle;
-import org.roda.wui.client.browse.bundle.BrowseFileBundle;
-import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
-import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
-import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
-import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
-import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
-import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
-import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
+import org.roda.wui.client.browse.bundle.*;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
 import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
@@ -3868,7 +3823,6 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
     LogEntryState state = LogEntryState.SUCCESS;
 
-
     try {
       TokenManager.getInstance().getAccessToken(localInstance);
     } catch (RODAException e) {
@@ -4033,6 +3987,24 @@ public class Browser extends RodaWuiController {
       } catch (NotFoundException e) {
         return new ObjectResponse<>(null, null);
       }
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM,
+        instanceIdentifier);
+    }
+  }
+
+  public static DistributedInstance retrieveLocalInstanceStatus(User user, String instanceIdentifier)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    // check permissions
+    controllerAssistant.checkRoles(user);
+    LogEntryState state = LogEntryState.SUCCESS;
+    try {
+      return RodaCoreFactory.getModelService().retrieveDistributedInstance(instanceIdentifier);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;

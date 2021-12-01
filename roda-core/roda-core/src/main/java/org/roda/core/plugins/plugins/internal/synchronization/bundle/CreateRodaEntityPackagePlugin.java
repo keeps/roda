@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
@@ -30,7 +31,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.plugins.plugins.internal.synchronization.SynchronizationHelper;
+import org.roda.core.plugins.plugins.internal.synchronization.SyncBundleHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -136,7 +137,7 @@ public abstract class CreateRodaEntityPackagePlugin<T extends IsRODAObject> exte
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
     try {
-      SynchronizationHelper.createEntityPackageState(getEntity());
+      SyncBundleHelper.createEntityPackageState(getEntity());
     } catch (GenericException | IOException e) {
       throw new PluginException("Cannot create entity package state file", e);
     }
@@ -145,12 +146,12 @@ public abstract class CreateRodaEntityPackagePlugin<T extends IsRODAObject> exte
 
   protected void updateEntityPackageState(Class<T> entityClass, ArrayList<String> idList)
     throws NotFoundException, GenericException, IOException {
-    PackageState entityPackageState = SynchronizationHelper.getEntityPackageState(getEntity());
+    PackageState entityPackageState = SyncBundleHelper.getEntityPackageState(getEntity());
     entityPackageState.setClassName(entityClass);
     entityPackageState.setStatus(PackageState.Status.CREATED);
     entityPackageState.setIdList(idList);
     entityPackageState.setCount(idList.size());
-    SynchronizationHelper.updateEntityPackageState(getEntity(), entityPackageState);
+    SyncBundleHelper.updateEntityPackageState(getEntity(), entityPackageState);
   }
 
   @Override
@@ -158,15 +159,15 @@ public abstract class CreateRodaEntityPackagePlugin<T extends IsRODAObject> exte
     try {
       Job job = PluginHelper.getJob(this, model);
       JobStats jobStats = job.getJobStats();
-      PackageState entityPackageState = SynchronizationHelper.getEntityPackageState(getEntity());
+      PackageState entityPackageState = SyncBundleHelper.getEntityPackageState(getEntity());
       if (jobStats.getSourceObjectsProcessedWithFailure() == 0) {
-        String entityTopHash = SynchronizationHelper.calculateEntityTopHash(getEntity());
+        String entityTopHash = SyncBundleHelper.calculateEntityTopHash(getEntity());
         entityPackageState.setChecksum(entityTopHash);
         entityPackageState.setStatus(PackageState.Status.SUCCESS);
       } else {
         entityPackageState.setStatus(PackageState.Status.FAILED);
       }
-      SynchronizationHelper.updateEntityPackageState(getEntity(), entityPackageState);
+      SyncBundleHelper.updateEntityPackageState(getEntity(), entityPackageState);
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
       | IOException e) {
       throw new PluginException("Error on retrieve job status", e);

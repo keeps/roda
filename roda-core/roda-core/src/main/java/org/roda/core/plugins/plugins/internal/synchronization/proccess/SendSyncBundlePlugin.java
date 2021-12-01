@@ -32,7 +32,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.plugins.plugins.internal.synchronization.SynchronizationHelper;
+import org.roda.core.plugins.plugins.internal.synchronization.SyncBundleHelper;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.RESTClientUtility;
@@ -143,13 +143,13 @@ public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
 
   private void sendSyncBundle(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job cachedJob)
     throws PluginException {
-    Report reportItem = PluginHelper.initPluginReportItem(this, localInstance.getId(), LocalInstance.class);
+    Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
     PluginState pluginState = PluginState.SKIPPED;
     String pluginDetails = "";
 
     try {
-      BundleState bundleState = SynchronizationHelper.buildBundleStateFile();
+      BundleState bundleState = SyncBundleHelper.buildBundleStateFile();
       if (!bundleState.getPackageStateList().isEmpty()) {
         LOGGER.debug("Sending sync bundle to: ", localInstance.getCentralInstanceURL());
         int responseCode = send(localInstance, bundleState);
@@ -165,7 +165,7 @@ public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
           bundleState.setSyncState(BundleState.Status.FAILED);
           jobPluginInfo.incrementObjectsProcessedWithFailure();
         }
-        SynchronizationHelper.updateBundleStateFile(bundleState);
+        SyncBundleHelper.updateBundleStateFile(bundleState);
       }
     } catch (GenericException e) {
       jobPluginInfo.incrementObjectsProcessedWithFailure();
@@ -204,7 +204,7 @@ public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
       File zipFile = ZipUtility.createZIPFile(file.toFile(), new File(localInstance.getBundlePath()));
       bundleStateFile.setZipFile(zipFile.getPath());
       bundleStateFile.setSyncState(BundleState.Status.PREPARED);
-      SynchronizationHelper.updateBundleStateFile(bundleStateFile);
+      SyncBundleHelper.updateBundleStateFile(bundleStateFile);
       return filePath;
     } catch (GenericException | IOException | NotFoundException e) {
       LOGGER.error("Unable to read bundle state file", e);

@@ -123,7 +123,7 @@ public class RequestRemoteActionsPlugin extends AbstractPlugin<Void> {
   }
 
   private void requestRemoteActions(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job cachedJob) {
-    Report reportItem = PluginHelper.initPluginReportItem(this, localInstance.getId(), LocalInstance.class);
+    Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
     PluginState pluginState = PluginState.SKIPPED;
     String outcomeDetailsText = "";

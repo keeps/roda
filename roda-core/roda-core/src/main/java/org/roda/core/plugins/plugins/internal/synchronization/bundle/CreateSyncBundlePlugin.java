@@ -1,12 +1,10 @@
 package org.roda.core.plugins.plugins.internal.synchronization.bundle;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IsRODAObject;
@@ -17,6 +15,7 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
@@ -38,7 +37,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.plugins.plugins.internal.synchronization.SynchronizationHelper;
+import org.roda.core.plugins.plugins.internal.synchronization.SyncBundleHelper;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -194,7 +193,7 @@ public class CreateSyncBundlePlugin extends AbstractPlugin<Void> {
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
     try {
-      bundleState = SynchronizationHelper.createBundleStateFile();
+      bundleState = SyncBundleHelper.createBundleStateFile();
     } catch (RODAException | IOException e) {
       throw new PluginException("Error while creating entity bundle state", e);
     }
