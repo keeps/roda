@@ -78,9 +78,9 @@
                         <g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonApplyId">
                             <ui:text from='{messages.applyInstanceId}'/>
                         </g:Button>
-                        <g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonCreateBundle">
-                            <ui:text from='{messages.createBundleButton}'/>
-                        </g:Button>
+<!--                        <g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonCreateBundle">-->
+<!--                            <ui:text from='{messages.createBundleButton}'/>-->
+<!--                        </g:Button>-->
                         <g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonSynchronize">
                             <ui:text from='{messages.synchronizeLocalInstanceConfigurationButton}'/>
                         </g:Button>

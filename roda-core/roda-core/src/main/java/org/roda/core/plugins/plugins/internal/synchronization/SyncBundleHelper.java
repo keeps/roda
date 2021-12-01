@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.SyncUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -17,6 +18,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.synchronization.bundle.BundleState;
 import org.roda.core.data.v2.synchronization.bundle.PackageState;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.CommandException;
@@ -26,7 +28,7 @@ import org.roda.core.util.FileUtility;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-public class SynchronizationHelper {
+public class SyncBundleHelper {
   private final static String STORAGE_DIR = RodaConstants.CORE_STORAGE_FOLDER;
   private final static String STATE_FILE = "state.json";
   private final static String PACKAGES_DIR = "packages";
@@ -37,6 +39,7 @@ public class SynchronizationHelper {
   public static BundleState createBundleStateFile() throws RODAException, IOException {
     BundleState bundleState = new BundleState();
     LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
+    DistributedInstance distributedInstance = SyncUtils.requestInstanceStatus(localInstance);
     Path bundlePath = Paths.get(localInstance.getBundlePath());
 
     if (Files.exists(bundlePath)) {
@@ -45,7 +48,7 @@ public class SynchronizationHelper {
 
     Files.createDirectories(bundlePath);
     bundleState.setDestinationPath(localInstance.getBundlePath());
-    bundleState.setFromDate(localInstance.getLastSynchronizationDate());
+    bundleState.setFromDate(distributedInstance.getLastSyncDate());
     bundleState.setToDate(new Date());
     Path bundleStateFilePath = Paths.get(localInstance.getBundlePath()).resolve(STATE_FILE);
     JsonUtils.writeObjectToFile(bundleState, bundleStateFilePath);

@@ -1,19 +1,26 @@
 package org.roda.core.plugins.plugins.internal.synchronization.proccess;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.*;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.synchronization.bundle.BundleState;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -23,7 +30,8 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateSyncBundlePlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.SyncBundleHelper;
+import org.roda.core.plugins.plugins.internal.synchronization.packages.*;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +41,8 @@ import org.slf4j.LoggerFactory;
  */
 public class SynchronizeInstancePlugin extends AbstractPlugin<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SynchronizeInstancePlugin.class);
-
   private LocalInstance localInstance;
+  private BundleState bundleState;
 
   @Override
   public String getVersionImpl() {
@@ -106,8 +114,11 @@ public class SynchronizeInstancePlugin extends AbstractPlugin<Void> {
     throws PluginException {
     try {
       localInstance = RodaCoreFactory.getLocalInstance();
+      bundleState = SyncBundleHelper.createBundleStateFile();
     } catch (GenericException e) {
       throw new PluginException("Unable to retrieve local instance configuration", e);
+    } catch (RODAException | IOException e) {
+      throw new PluginException("Error while creating entity bundle state", e);
     }
     return new Report();
   }
@@ -126,41 +137,37 @@ public class SynchronizeInstancePlugin extends AbstractPlugin<Void> {
 
   private void synchronizeInstance(IndexService index, ModelService model, StorageService storage, Report report,
     JobPluginInfo jobPluginInfo, Job cachedJob) {
-    Report reportItem = PluginHelper.initPluginReportItem(this, localInstance.getId(), LocalInstance.class);
-    PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
     Report sendReport = null;
     Report remoteActionsReport = null;
 
-    // TODO Create Bundle here
+    report.setTotalSteps(8);
 
-    reportItem.setPluginState(PluginState.SUCCESS);
-    report.addReport(reportItem);
-    PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
-
+    final List<Class<? extends IsRODAObject>> classes = getSynchronizedObjectClasses();
+    for (Class<? extends IsRODAObject> bundleClass : classes) {
+      Report packageReport = null;
+      try {
+        String bundlePluginName = getPackagePluginName(bundleClass);
+        packageReport = executePlugin(index, model, storage, cachedJob, bundlePluginName, bundleClass);
+      } catch (NotFoundException | InvalidParameterException | PluginException e) {
+        LOGGER.debug("Failed to execute fixity check plugin on {}", e.getMessage(), e);
+      }
+      if (packageReport != null) {
+        report.addReport(packageReport);
+      }
+    }
 
     try {
-      sendReport = executePlugin(index, model, storage, cachedJob, SendSyncBundlePlugin.class.getCanonicalName());
+      sendReport = executePlugin(index, model, storage, cachedJob, SendSyncBundlePlugin.class.getCanonicalName(),
+        Void.class);
     } catch (InvalidParameterException | PluginException e) {
       LOGGER.debug("Failed to execute fixity check plugin on {}", e.getMessage(), e);
     }
 
     try {
       remoteActionsReport = executePlugin(index, model, storage, cachedJob,
-        RequestRemoteActionsPlugin.class.getCanonicalName());
+        RequestRemoteActionsPlugin.class.getCanonicalName(), Void.class);
     } catch (InvalidParameterException | PluginException e) {
       LOGGER.debug("Failed to execute fixity check plugin on {}", e.getMessage(), e);
-    }
-
-    try {
-      Report jobReport = model.retrieveJobReport(reportItem.getJobId(), reportItem.getSourceObjectId(),
-        reportItem.getOutcomeObjectId());
-      int totalSteps = jobReport.getTotalSteps();
-      jobReport.setTotalSteps(totalSteps + 4);
-      model.createOrUpdateJobReport(jobReport, cachedJob);
-    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-      LOGGER.error("Failed to update job report");
-      String outcomeDetailsText = "Failed to update job Report '" + localInstance.getId() + "due to: " + e.getMessage();
-      reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(outcomeDetailsText);
     }
 
     if (sendReport != null) {
@@ -183,13 +190,42 @@ public class SynchronizeInstancePlugin extends AbstractPlugin<Void> {
   }
 
   private Report executePlugin(IndexService index, ModelService model, StorageService storage, Job job,
-    final String pluginId) throws InvalidParameterException, PluginException {
-    Plugin<Void> plugin = RodaCoreFactory.getPluginManager().getPlugin(pluginId, Void.class);
+    final String pluginId, Class<? extends IsRODAObject> clazz) throws InvalidParameterException, PluginException {
+    Plugin<? extends IsRODAObject> plugin = RodaCoreFactory.getPluginManager().getPlugin(pluginId, clazz);
     Map<String, String> mergedParams = new HashMap<>(getParameterValues());
     mergedParams.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, job.getId());
     plugin.setParameterValues(mergedParams);
     plugin.setMandatory(false);
     return plugin.execute(index, model, storage, null);
+  }
+
+  private List<Class<? extends IsRODAObject>> getSynchronizedObjectClasses() {
+    List<Class<? extends IsRODAObject>> list = new ArrayList<>();
+    list.add(AIP.class);
+    list.add(Job.class);
+    list.add(DIP.class);
+    list.add(RiskIncidence.class);
+    list.add(IndexedPreservationEvent.class);
+    list.add(IndexedPreservationAgent.class);
+    return list;
+  }
+
+  private String getPackagePluginName(Class<?> bundleClass) throws NotFoundException {
+    if (bundleClass.equals(AIP.class)) {
+      return AipPackagePlugin.class.getCanonicalName();
+    } else if (bundleClass.equals(Job.class)) {
+      return JobPackagePlugin.class.getCanonicalName();
+    } else if (bundleClass.equals(DIP.class)) {
+      return DipPackagePlugin.class.getCanonicalName();
+    } else if (bundleClass.equals(RiskIncidence.class)) {
+      return RiskIncidencePackagePlugin.class.getCanonicalName();
+    } else if (bundleClass.equals(IndexedPreservationEvent.class)) {
+      return RepositoryEventPackagePlugin.class.getCanonicalName();
+    } else if (bundleClass.equals(IndexedPreservationAgent.class)) {
+      return PreservationAgentPackagePlugin.class.getCanonicalName();
+    } else {
+      throw new NotFoundException("No Bundle plugin available");
+    }
   }
 
 }
