@@ -688,7 +688,9 @@ public class ModelService extends ModelObservable {
 
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
     aip.addDescriptiveMetadata(descriptiveMetadata);
+    aip.setUpdatedOn(new Date());
     updateAIPMetadata(aip);
+    notifyAipUpdated(aip).failOnError();
 
     if (notify) {
       notifyDescriptiveMetadataCreated(descriptiveMetadata).failOnError();
@@ -729,7 +731,9 @@ public class ModelService extends ModelObservable {
     ret = updateDescriptiveMetadata(aip, representationId, descriptiveMetadataId, descriptiveMetadataType,
       descriptiveMetadataVersion);
 
+    aip.setUpdatedOn(new Date());
     updateAIPMetadata(aip);
+    notifyAipUpdated(aip).failOnError();
     notifyDescriptiveMetadataUpdated(ret).failOnError();
 
     return ret;
@@ -772,7 +776,9 @@ public class ModelService extends ModelObservable {
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
     deleteDescriptiveMetadata(aip, representationId, descriptiveMetadataId);
 
+    aip.setUpdatedOn(new Date());
     updateAIPMetadata(aip);
+    notifyAipUpdated(aip).failOnError();
     notifyDescriptiveMetadataDeleted(aipId, representationId, descriptiveMetadataId).failOnError();
   }
 
