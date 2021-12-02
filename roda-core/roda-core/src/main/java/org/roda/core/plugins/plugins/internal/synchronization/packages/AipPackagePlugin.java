@@ -73,12 +73,12 @@ public class AipPackagePlugin extends RodaEntityPackagesPlugin<AIP> {
     for (IndexedAIP aip : aips) {
       aipHashSet.add(aip.getUUID());
     }
-    retrievePreservationsEvents(index, aipHashSet);
+    retrievePreservationEvents(index, aipHashSet);
 
     return new ArrayList<>(aipHashSet);
   }
 
-  private void retrievePreservationsEvents(IndexService index, Set<String> aipHashSet)
+  private void retrievePreservationEvents(IndexService index, Set<String> aipHashSet)
     throws RequestNotValidException, GenericException {
     Filter filter = new Filter();
     filter.add(new NotSimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS,

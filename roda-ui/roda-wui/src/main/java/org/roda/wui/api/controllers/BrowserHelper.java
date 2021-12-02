@@ -182,7 +182,6 @@ import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierRiskIncidencePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierRiskPlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.proccess.ImportSyncBundlePlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.proccess.SendSyncBundlePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.proccess.SynchronizeInstancePlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
@@ -3756,8 +3755,8 @@ public class BrowserHelper {
 
   public static Job synchronizeBundle(User user, LocalInstance localInstance)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
-    return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(), SynchronizeInstancePlugin.class,
-      user, new HashMap<>(), "Could not execute bundle job");
+    return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(),
+      SynchronizeInstancePlugin.class, user, new HashMap<>(), "Could not execute bundle job");
   }
 
   public static Job importSyncBundle(User user, String instanceIdentifier, FormDataMultiPart multiPart)
