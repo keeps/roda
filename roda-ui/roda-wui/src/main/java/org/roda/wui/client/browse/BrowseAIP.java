@@ -410,10 +410,19 @@ public class BrowseAIP extends Composite {
       newDescriptiveMetadata.setVisible(false);
 
       int index = ConfigurationManager.getInt(0, "ui.browser.metadata.index.aip");
-      if (descMetadata.size() > index) {
-        descriptiveMetadata.selectTab(index);
+      if (index > 0) {
+        if (descMetadata.size() > index) {
+          descriptiveMetadata.selectTab(index);
+        } else {
+          descriptiveMetadata.selectTab(0);
+        }
       } else {
-        descriptiveMetadata.selectTab(0);
+        int count = descMetadata.size() - Math.abs(index);
+        if (descMetadata.size() > count) {
+          descriptiveMetadata.selectTab(count);
+        } else {
+          descriptiveMetadata.selectTab(0);
+        }
       }
     } else {
       descriptiveMetadata.getParent().setVisible(false);
