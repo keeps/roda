@@ -149,7 +149,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   @Override
   public <T extends IsRODAObject, T1 extends IsIndexed> void runPluginFromIndex(Object context, Class<T1> classToActOn,
-    Filter filter, Plugin<T> plugin) {
+    Filter filter, boolean justActive ,Plugin<T> plugin) {
     try {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       boolean noObjectsOrchestrated = true;
@@ -162,7 +162,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       jobStateInfoActor.tell(Messages.newPluginBeforeAllExecuteIsReady(plugin), jobActor);
 
       List<String> liteFields = SolrUtils.getClassLiteFields(classToActOn);
-      try (IterableIndexResult<T1> findAll = index.findAll(classToActOn, filter, liteFields)) {
+      try (IterableIndexResult<T1> findAll = index.findAll(classToActOn, filter,justActive, liteFields)) {
         Iterator<T1> findAllIterator = findAll.iterator();
         List<T1> indexObjects = new ArrayList<>();
 
