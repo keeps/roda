@@ -361,10 +361,19 @@ public class BrowseRepresentation extends Composite {
       itemMetadata.getParent().setVisible(true);
 
       int index = ConfigurationManager.getInt(0, "ui.browser.metadata.index.representation");
-      if (bundle.getRepresentationDescriptiveMetadata().size() > index) {
-        itemMetadata.selectTab(index);
+      if (index > 0) {
+        if (bundle.getRepresentationDescriptiveMetadata().size() > index) {
+          itemMetadata.selectTab(index);
+        } else {
+          itemMetadata.selectTab(0);
+        }
       } else {
-        itemMetadata.selectTab(0);
+        int count = bundle.getRepresentationDescriptiveMetadata().size() - Math.abs(index);
+        if (bundle.getRepresentationDescriptiveMetadata().size() > count) {
+          itemMetadata.selectTab(count);
+        } else {
+          itemMetadata.selectTab(0);
+        }
       }
     } else {
       newDescriptiveMetadata.setVisible(true);
