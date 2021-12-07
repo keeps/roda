@@ -1209,6 +1209,7 @@ public final class RodaConstants {
   public static final String RISK_INCIDENCE_DESCRIPTION = "description";
   public static final String RISK_INCIDENCE_BYPLUGIN = "byPlugin";
   public static final String RISK_INCIDENCE_INSTANCE_ID = "instanceId";
+  public static final String RISK_INCIDENCE_UPDATED_ON = "updatedOn";
 
   public static final String RISK_INCIDENCE_STATUS = "status";
   public static final String RISK_INCIDENCE_SEVERITY = "severity";
