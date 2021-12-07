@@ -293,8 +293,16 @@ public class BrowseAIPPortal extends Composite {
     preChildren.setVisible(false);
 
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
+      String listId;
+
+      if(StringUtils.isNotBlank(bundle.getAip().getLevel())) {
+        listId = "BrowseAIPPortal_aipChildren_" + bundle.getAip().getLevel();
+      } else {
+        listId = "BrowseAIPPortal_aipChildren";
+      }
+      
       ListBuilder<IndexedAIP> aipChildrenListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
-        new AsyncTableCellOptions<>(IndexedAIP.class, "BrowseAIPPortal_aipChildren")
+        new AsyncTableCellOptions<>(IndexedAIP.class, listId)
           .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId())))
           .withJustActive(justActive).withSummary(messages.listOfAIPs()).bindOpener()
           .withActionableCallback(listActionableCallback));
