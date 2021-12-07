@@ -7,11 +7,7 @@
  */
 package org.roda.core.data.v2.risks;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
@@ -47,9 +43,11 @@ public class RiskIncidence implements IsModelObject, IsIndexed, HasId {
   private Map<String, Object> fields;
 
   private String instanceId = null;
+  private Date updatedOn = null;
 
   public RiskIncidence() {
     super();
+    this.updatedOn = new Date();
   }
 
   public RiskIncidence(RiskIncidence incidence) {
@@ -205,26 +203,35 @@ public class RiskIncidence implements IsModelObject, IsIndexed, HasId {
     this.instanceId = instanceId;
   }
 
+  public Date getUpdatedOn() {
+    return updatedOn;
+  }
+
+  public void setUpdatedOn(Date updatedOn) {
+    this.updatedOn = updatedOn;
+  }
+
   @Override
   public String toString() {
     return "RiskIncidence [id=" + id + ", aipId=" + aipId + ", representationId=" + representationId + ", filePath="
       + filePath + ", fileId=" + fileId + ", objectClass=" + objectClass + ", riskId=" + riskId + ", description="
       + description + ", byPlugin=" + byPlugin + ", status=" + status + ", severity=" + severity + ", detectedOn="
       + detectedOn + ", detectedBy=" + detectedBy + ", mitigatedOn=" + mitigatedOn + ", mitigatedBy=" + mitigatedBy
-      + ", mitigatedDescription=" + mitigatedDescription + ", instanceId=" + instanceId + "]";
+      + ", mitigatedDescription=" + mitigatedDescription + ", instanceId=" + instanceId + ", updatedOn=" + updatedOn
+      + "]";
   }
 
   @Override
   public List<String> toCsvHeaders() {
     return Arrays.asList("id", "aipId", "representationId", "filePath", "fileId", "objectClass", "riskId",
       "description", "byPlugin", "status", "severity", "detectedOn", "detectedBy", "mitigatedOn", "mitigatedBy",
-      "mitigatedDescription", "instanceId");
+      "mitigatedDescription", "instanceId", "updatedOn");
   }
 
   @Override
   public List<Object> toCsvValues() {
     return Arrays.asList(id, aipId, representationId, filePath, fileId, objectClass, riskId, description, byPlugin,
-      status, severity, detectedOn, detectedBy, mitigatedOn, mitigatedBy, mitigatedDescription, instanceId);
+      status, severity, detectedOn, detectedBy, mitigatedOn, mitigatedBy, mitigatedDescription, instanceId, updatedOn);
   }
 
   @JsonIgnore

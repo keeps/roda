@@ -2700,6 +2700,7 @@ public class ModelService extends ModelObservable {
     try {
       riskIncidence.setId(IdUtils.createUUID());
       riskIncidence.setDetectedOn(new Date());
+      riskIncidence.setUpdatedOn(new Date());
       riskIncidence.setInstanceId(LocalInstanceUtils.getLocalInstanceIdentifier());
 
       String riskIncidenceAsJson = JsonUtils.getJsonFromObject(riskIncidence);
@@ -2730,6 +2731,7 @@ public class ModelService extends ModelObservable {
 
     try {
       riskIncidence.setRiskId(riskIncidence.getRiskId());
+      riskIncidence.setUpdatedOn(new Date());
       String riskIncidenceAsJson = JsonUtils.getJsonFromObject(riskIncidence);
       StoragePath riskIncidencePath = ModelUtils.getRiskIncidenceStoragePath(riskIncidence.getId());
       storage.updateBinaryContent(riskIncidencePath, new StringContentPayload(riskIncidenceAsJson), false, true);

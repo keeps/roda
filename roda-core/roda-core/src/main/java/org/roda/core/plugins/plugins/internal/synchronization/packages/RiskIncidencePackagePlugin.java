@@ -54,8 +54,8 @@ public class RiskIncidencePackagePlugin extends RodaEntityPackagesPlugin<RiskInc
     ArrayList<String> riskList = new ArrayList<>();
     Filter filter = new Filter();
     if (fromDate != null) {
-      filter.add(new DateIntervalFilterParameter(RodaConstants.RISK_INCIDENCE_DETECTED_ON,
-        RodaConstants.RISK_INCIDENCE_DETECTED_ON, fromDate, toDate));
+      filter.add(new DateIntervalFilterParameter(RodaConstants.RISK_INCIDENCE_UPDATED_ON,
+        RodaConstants.RISK_INCIDENCE_UPDATED_ON, fromDate, toDate));
     }
     IterableIndexResult<RiskIncidence> incidences = index.findAll(RiskIncidence.class, filter, Collections.emptyList());
     for (RiskIncidence incidence : incidences) {
