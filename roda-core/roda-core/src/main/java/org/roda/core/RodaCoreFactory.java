@@ -105,7 +105,6 @@ import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.exceptions.RoleAlreadyExistsException;
 import org.roda.core.data.utils.YamlUtils;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
@@ -121,6 +120,7 @@ import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
@@ -201,6 +201,7 @@ public class RodaCoreFactory {
   private static Path fileShallowTmpDirectoryPath;
   private static Path synchronizationDirectoryPath;
   private static Path localInstanceConfigPath;
+  private static Path jobAttachmentsDirectoryPath;
 
   private static StorageService storage;
   private static ModelService model;
@@ -506,6 +507,9 @@ public class RodaCoreFactory {
         // initialize synchronization directory
         initializeSynchronizationStateDir();
 
+        // initialize synchronization directory
+        initializeJobAttachmentsDir();
+
         // instantiate solr and index service
         instantiateSolrAndIndexService(nodeType);
         LOGGER.debug("Finished instantiating solr & index");
@@ -615,6 +619,18 @@ public class RodaCoreFactory {
     } catch (IOException e) {
       throw new RuntimeException(
         "Unable to create Synchronization DIRECTORY " + synchronizationDirectoryPath + ", Aborting...", e);
+    }
+  }
+
+  private static void initializeJobAttachmentsDir() {
+    try {
+      String jobAttachmentsFolder = getConfigurationString("jobAttachments.folder",
+        RodaConstants.CORE_JOB_ATTACHMENTS_FOLDER);
+      jobAttachmentsDirectoryPath = getDataPath().resolve(jobAttachmentsFolder);
+      Files.createDirectories(jobAttachmentsDirectoryPath);
+    } catch (IOException e) {
+      throw new RuntimeException(
+        "Unable to create job-attachments DIRECTORY " + jobAttachmentsDirectoryPath + ", Aborting...", e);
     }
   }
 
@@ -1825,6 +1841,11 @@ public class RodaCoreFactory {
     return localInstanceConfigPath;
   }
 
+  public static Path getJobAttachmentsDirectoryPath() {
+    return jobAttachmentsDirectoryPath;
+  }
+
+
   public static Path getDataPath() {
     return dataPath;
   }
@@ -2295,8 +2316,8 @@ public class RodaCoreFactory {
       }
     }
     if (newLocalInstance != null) {
-      newLocalInstance.setBundlePath(rodaHomePath
-        .resolve(getProperty(RodaConstants.CORE_SYNCHRONIZATION_BUNDLE_PATH, RodaConstants.SYNCHRONIZATION_OUTCOME_BUNDLE_PATH))
+      newLocalInstance.setBundlePath(rodaHomePath.resolve(
+        getProperty(RodaConstants.CORE_SYNCHRONIZATION_BUNDLE_PATH, RodaConstants.SYNCHRONIZATION_OUTCOME_BUNDLE_PATH))
         .toString());
       YamlUtils.writeObjectToFile(newLocalInstance, configuration);
     }
@@ -2556,7 +2577,7 @@ public class RodaCoreFactory {
           Files.write(Paths.get(args.get(3), "README.md"), pluginsMarkdown.getBytes());
         } catch (IOException e) {
           System.err
-              .println("Error while writing plugin/plugins information in markdown format! Reason: " + e.getMessage());
+            .println("Error while writing plugin/plugins information in markdown format! Reason: " + e.getMessage());
         }
       } else {
         printConfigsUsage();

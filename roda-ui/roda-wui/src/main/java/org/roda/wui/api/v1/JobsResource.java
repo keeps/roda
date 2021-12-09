@@ -22,7 +22,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.glassfish.jersey.server.JSONP;
+import org.roda.core.common.EntityResponse;
+import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
@@ -182,5 +186,28 @@ public class JobsResource {
     // delegate action to controller
     Reports reports = JobsHelper.getJobReportsFromIndexResult(user, jobId, justFailed, start, limit, new ArrayList<>());
     return Response.ok(reports, mediaType).build();
+  }
+
+  @GET
+  @Path("/{" + RodaConstants.API_PATH_PARAM_JOB_ID + "}/attachment/{" + RodaConstants.API_PATH_PARAM_JOB_ATTACHMENT_ID
+    + "}")
+  @Produces({ExtraMediaType.APPLICATION_ZIP})
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
+  @ApiOperation(value = "Get attachment", notes = "Get attachment", response = Job.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Job.class),
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
+
+  public Response retrieveJobAttachment(
+    @ApiParam(value = "The ID of the existing job", required = true) @PathParam(RodaConstants.API_PATH_PARAM_JOB_ID) String jobId,
+    @ApiParam(value = "The ID of the existing attachment", required = true) @PathParam(RodaConstants.API_PATH_PARAM_JOB_ATTACHMENT_ID) String attachmentId,
+    @ApiParam(value = "Choose format in which to get the representation", allowableValues = RodaConstants.API_GET_LIST_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) throws RODAException {
+
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+
+    // get user
+    User user = UserUtility.getApiUser(request);
+
+    EntityResponse response = org.roda.wui.api.controllers.Jobs.retrieveJobAttachment(user, jobId, attachmentId);
+    return ApiUtils.okResponse((StreamResponse) response);
   }
 }

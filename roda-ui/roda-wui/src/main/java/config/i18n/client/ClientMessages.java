@@ -635,6 +635,8 @@ public interface ClientMessages extends Messages {
 
   String showJobSourceObjects();
 
+  String showAttachments();
+
   String jobStopConfirmDialogTitle();
 
   String jobStopConfirmDialogMessage();
@@ -2488,6 +2490,10 @@ public interface ClientMessages extends Messages {
   String localInstanceConfigurationBundlePathLabel();
 
   String localInstanceConfigurationCentralInstanceURLLabel();
+
+  String localInstanceConfigurationCentralInstanceURLPlaceholder();
+
+  String localInstanceConfigurationInvalidURL();
 
   String localInstanceIsRegisteredLabel();
 
