@@ -7,6 +7,12 @@
  */
 package org.roda.wui.api.controllers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.roda.core.common.EntityResponse;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -16,17 +22,11 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class Jobs extends RodaWuiController {
 
@@ -169,6 +169,23 @@ public class Jobs extends RodaWuiController {
     try {
       // delegate
       JobsHelper.deleteJob(jobId);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
+    }
+  }
+
+  public static EntityResponse retrieveJobAttachment(User user, String jobId, String attachmentId)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    // check permissions
+    controllerAssistant.checkRoles(user);
+    LogEntryState state = LogEntryState.SUCCESS;
+    try {
+      return JobsHelper.retrieveJobAttachment(jobId, attachmentId);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;

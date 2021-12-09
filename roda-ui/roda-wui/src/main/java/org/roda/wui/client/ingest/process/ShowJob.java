@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gwt.safehtml.shared.SafeUri;
+import com.google.gwt.user.client.Window;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -222,6 +224,12 @@ public class ShowJob extends Composite {
   FlowPanel selectedList;
 
   @UiField
+  FlowPanel attachmentsPanel;
+
+  @UiField
+  FlowPanel attachmentsList;
+
+  @UiField
   Label plugin;
 
   @UiField
@@ -311,6 +319,8 @@ public class ShowJob extends Composite {
     } else {
       showActionSourceObjects(selected);
     }
+
+    showAttachments(job.getAttachmentsList());
 
     PluginInfo pluginInfo = pluginsInfo.get(job.getPlugin());
     if (pluginInfo != null) {
@@ -531,6 +541,36 @@ public class ShowJob extends Composite {
         selectedList.add(objectLabel);
       } else {
         selectedListPanel.setVisible(false);
+      }
+    }
+  }
+
+  private void showAttachments(List<String> attachments){
+    if(attachments.isEmpty()) {
+      attachmentsPanel.setVisible(false);
+      attachmentsList.setVisible(false);
+    } else {
+      attachmentsPanel.setVisible(true);
+      attachmentsList.setVisible(true);
+      attachmentsList.clear();
+
+      for (String attachment : attachments) {
+        FlowPanel attachmentItem = new FlowPanel();
+        InlineHTML attachmentId = new InlineHTML(attachment);
+
+        Button button = new Button(messages.downloadButton());
+        button.addStyleName("btn btn-separator-left btn-link");
+        button.addClickHandler(new ClickHandler() {
+          @Override
+          public void onClick(ClickEvent clickEvent) {
+            SafeUri downloadUri = RestUtils.createJobAttachmentDownloadUri(job.getId(), attachment);
+            Window.Location.assign(downloadUri.asString());
+          }
+        });
+
+        attachmentItem.add(attachmentId);
+        attachmentItem.add(button);
+        this.attachmentsList.add(attachmentItem);
       }
     }
   }

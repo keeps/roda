@@ -86,6 +86,13 @@
                                 <g:FlowPanel ui:field="selectedList"/>
                             </g:FlowPanel>
 
+                            <g:FlowPanel styleName="field" ui:field="attachmentsPanel ">
+                                <g:Label addStyleNames="label">
+                                    <ui:text from='{messages.showAttachments}'/>
+                                </g:Label>
+                                <g:FlowPanel ui:field="attachmentsList"/>
+                            </g:FlowPanel>
+
                             <g:FlowPanel styleName="field">
                                 <g:Label addStyleNames="label">
                                     <ui:text from='{messages.jobPlugin}'/>

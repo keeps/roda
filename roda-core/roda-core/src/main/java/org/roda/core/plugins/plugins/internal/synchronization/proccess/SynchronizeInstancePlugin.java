@@ -165,7 +165,7 @@ public class SynchronizeInstancePlugin extends AbstractPlugin<Void> {
 
     try {
       remoteActionsReport = executePlugin(index, model, storage, cachedJob,
-        RequestRemoteActionsPlugin.class.getCanonicalName(), Void.class);
+        RequestSyncBundlePlugin.class.getCanonicalName(), Void.class);
     } catch (InvalidParameterException | PluginException e) {
       LOGGER.debug("Failed to execute fixity check plugin on {}", e.getMessage(), e);
     }

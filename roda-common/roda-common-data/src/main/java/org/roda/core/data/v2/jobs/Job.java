@@ -72,6 +72,8 @@ public class Job implements IsModelObject, IsIndexed, HasId {
   private SelectedItems<? extends IsRODAObject> sourceObjects = null;
   private String outcomeObjectsClass = "";
 
+  private List<String> attachmentsList = new ArrayList<>();
+
   private Map<String, Object> fields;
 
   private JobPriority priority;
@@ -101,6 +103,7 @@ public class Job implements IsModelObject, IsIndexed, HasId {
       jobStats.setSourceObjectsCount(((SelectedItemsList<?>) sourceObjects).getIds().size());
     }
     this.instanceId = job.getInstanceId();
+    this.attachmentsList = job.getAttachmentsList();
   }
 
   @JsonIgnore
@@ -270,25 +273,38 @@ public class Job implements IsModelObject, IsIndexed, HasId {
     this.instanceId = instanceId;
   }
 
+  public List<String> getAttachmentsList() {
+    return attachmentsList;
+  }
+
+  public void addAttachment(String attachment) {
+    this.attachmentsList.add(attachment);
+  }
+
+  public void setAttachmentsList(List<String> attachmentsList) {
+    this.attachmentsList = attachmentsList;
+  }
+
   @Override
   public String toString() {
     return "Job [id=" + id + ", name=" + name + ", username=" + username + ", startDate=" + startDate + ", endDate="
       + endDate + ", state=" + state + ", stateDetails=" + stateDetails + ", priority=" + priority + ", type="
       + parallelism + ", jobStats=" + jobStats + ", plugin=" + plugin + ", pluginType=" + pluginType
       + ", pluginParameters=" + pluginParameters + ", sourceObjects=" + sourceObjects + ", outcomeObjectsClass="
-      + outcomeObjectsClass + ", instanceId=" + instanceId + "]";
+      + outcomeObjectsClass + ", instanceId=" + instanceId + ", attachmentsList=" + attachmentsList + "]";
   }
 
   @Override
   public List<String> toCsvHeaders() {
     return Arrays.asList("id", "name", "username", "startDate", "endDate", "state", "stateDetails", "priority", "type",
-      "jobStats", "plugin", "pluginType", "pluginParameters", "sourceObjects", "outcomeObjectsClass", "instanceId");
+      "jobStats", "plugin", "pluginType", "pluginParameters", "sourceObjects", "outcomeObjectsClass", "instanceId",
+      "attachmentsList");
   }
 
   @Override
   public List<Object> toCsvValues() {
     return Arrays.asList(id, name, username, startDate, endDate, state, stateDetails, priority, parallelism, jobStats,
-      plugin, pluginType, pluginParameters, sourceObjects, outcomeObjectsClass, instanceId);
+      plugin, pluginType, pluginParameters, sourceObjects, outcomeObjectsClass, instanceId, attachmentsList);
   }
 
   @JsonIgnore

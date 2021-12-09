@@ -3,13 +3,11 @@ package org.roda.wui.client.management.distributed;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.gwt.user.client.ui.FlowPanel;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.tools.ValidationUtils;
-import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -114,6 +112,8 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
 
   private void setInitialState(LocalInstance localInstance) {
     errors.setVisible(false);
+    centralInstanceURLValue.getElement().setPropertyString("placeholder",
+      messages.localInstanceConfigurationCentralInstanceURLPlaceholder());
   }
 
   public LocalInstance getLocalInstance() {
@@ -159,7 +159,7 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
       errorList.add(messages.isAMandatoryField(messages.localInstanceConfigurationCentralInstanceURLLabel()));
     } else if (!ValidationUtils.isValidURL(centralInstanceURLValue.getText(), false)) {
       centralInstanceURLValue.addStyleName(IS_WRONG);
-      centralInstanceURError.setText("Invalid URL");
+      centralInstanceURError.setText(messages.localInstanceConfigurationInvalidURL());
       centralInstanceURError.setVisible(true);
       Window.scrollTo(centralInstanceURLValue.getAbsoluteLeft(), centralInstanceURLValue.getAbsoluteTop());
       errorList.add(messages.isAMandatoryField(messages.localInstanceConfigurationCentralInstanceURLLabel()));

@@ -28,7 +28,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.Job;
@@ -43,6 +47,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -83,8 +88,8 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
     CSV_FIELD_CHECKSUM_SHA1, CSV_FIELD_CHECKSUM_SHA256);
 
   public static final String CSV_DEFAULT_FIELDS = StringUtils.join(Arrays.asList(CSV_FIELD_SIP_ID, CSV_FIELD_AIP_ID,
-    CSV_FIELD_REPRESENTATION_ID, CSV_FIELD_FILE_PATH, CSV_FIELD_FILE_ID, CSV_FIELD_PARENT_ID, CSV_FIELD_ISDIRECTORY, CSV_FILE_TYPE,
-    CSV_FIELD_CHECKSUM_SHA256, CSV_FIELD_CHECKSUM_MD5, CSV_FIELD_CHECKSUM_SHA1), ",");
+    CSV_FIELD_REPRESENTATION_ID, CSV_FIELD_FILE_PATH, CSV_FIELD_FILE_ID, CSV_FIELD_PARENT_ID, CSV_FIELD_ISDIRECTORY,
+    CSV_FILE_TYPE, CSV_FIELD_CHECKSUM_SHA256, CSV_FIELD_CHECKSUM_MD5, CSV_FIELD_CHECKSUM_SHA1), ",");
   public static final String CSV_DEFAULT_OUTPUT = "/tmp/output.csv";
   public static final String CSV_DEFAULT_HEADERS = "true";
   public static final String CSV_DEFAULT_OTHER_METADATA = "ApacheTika,Siegfried";
@@ -304,6 +309,11 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
       try {
         InventoryReportPluginUtils.mergeFiles(partials, output);
         FSUtils.deletePathQuietly(csvTempFolder);
+        try {
+          JobsHelper.createJobAttachment(PluginHelper.getJobId(this), output);
+        } catch (AuthorizationDeniedException | GenericException | NotFoundException | RequestNotValidException e) {
+          LOGGER.error("Error while creating attached files", e);
+        }
       } catch (IOException e) {
         LOGGER.error("Error while merging partial CSVs", e);
       }

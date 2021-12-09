@@ -7,14 +7,22 @@
  */
 package org.roda.wui.api.controllers;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.ConsumesOutputStream;
+import org.roda.core.common.EntityResponse;
+import org.roda.core.common.StreamResponse;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -34,12 +42,9 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -51,7 +56,6 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.storage.utils.LocalInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v1.utils.ApiUtils;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,11 +142,11 @@ public class JobsHelper {
   private static boolean jobCanRun(String jobInstanceId) {
     String rodaInstanceId = LocalInstanceUtils.getLocalInstanceIdentifier();
 
-    if(rodaInstanceId == null && jobInstanceId == null){
+    if (rodaInstanceId == null && jobInstanceId == null) {
       return true;
-    }else if(rodaInstanceId != null && rodaInstanceId.equals(jobInstanceId)){
+    } else if (rodaInstanceId != null && rodaInstanceId.equals(jobInstanceId)) {
       return true;
-    }else{
+    } else {
       return false;
     }
   }
@@ -243,6 +247,55 @@ public class JobsHelper {
     }
 
     return reports;
+  }
+
+  public static EntityResponse retrieveJobAttachment(String jobId, String attachmentId)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
+
+    Path filePath = RodaCoreFactory.getJobAttachmentsDirectoryPath().resolve(jobId).resolve(attachmentId);
+    if (!Files.exists(filePath)) {
+      throw new NotFoundException();
+    }
+    ConsumesOutputStream stream = new ConsumesOutputStream() {
+      @Override
+      public void consumeOutputStream(OutputStream out) throws IOException {
+        Files.copy(filePath, out);
+      }
+
+      @Override
+      public long getSize() {
+        long size;
+        try {
+          size = Files.size(filePath);
+        } catch (IOException e) {
+          size = -1;
+        }
+
+        return size;
+      }
+
+      @Override
+      public Date getLastModified() {
+        Date ret;
+        try {
+          ret = new Date(Files.getLastModifiedTime(filePath).toMillis());
+        } catch (IOException e) {
+          ret = null;
+        }
+        return ret;
+      }
+
+      @Override
+      public String getFileName() {
+        return filePath.getFileName().toString();
+      }
+
+      @Override
+      public String getMediaType() {
+        return RodaConstants.MEDIA_TYPE_APPLICATION_OCTET_STREAM;
+      }
+    };
+    return new StreamResponse(stream);
   }
 
   public static <T extends IsIndexed> HashMap<String, SelectedItems<T>> splitInstancesItems(

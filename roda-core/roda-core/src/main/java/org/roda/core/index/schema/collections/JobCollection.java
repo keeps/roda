@@ -94,6 +94,8 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
     fields.add(new Field(RodaConstants.JOB_HAS_PARTIAL_SUCCESS, Field.TYPE_BOOLEAN).setStored(false));
     fields.add(new Field(RodaConstants.JOB_HAS_SKIPPED, Field.TYPE_BOOLEAN).setStored(false));
     fields.add(new Field(RodaConstants.JOB_INSTANCE_ID, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.JOB_ATTACHMENTS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
+
 
     return fields;
   }
@@ -147,6 +149,7 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
     doc.addField(RodaConstants.JOB_HAS_PARTIAL_SUCCESS, jobStats.getSourceObjectsProcessedWithPartialSuccess() > 0);
     doc.addField(RodaConstants.JOB_HAS_SKIPPED, jobStats.getSourceObjectsProcessedWithSkipped() > 0);
     doc.addField(RodaConstants.JOB_INSTANCE_ID, job.getInstanceId());
+    doc.addField(RodaConstants.JOB_ATTACHMENTS, JsonUtils.getJsonFromObject(job.getAttachmentsList()));
 
     return doc;
   }
@@ -204,6 +207,15 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
       LOGGER.error("Error parsing report in job objects", e);
     }
     job.setOutcomeObjectsClass(SolrUtils.objectToString(doc.get(RodaConstants.JOB_OUTCOME_OBJECTS_CLASS), null));
+
+    try {
+      if (fieldsToReturn.isEmpty() || fieldsToReturn.contains(RodaConstants.JOB_ATTACHMENTS)) {
+        job.setAttachmentsList(JsonUtils.getObjectFromJson(
+                SolrUtils.objectToString(doc.get(RodaConstants.JOB_ATTACHMENTS), ""), List.class));
+      }
+    } catch (GenericException e) {
+      LOGGER.error("Error parsing report in job objects", e);
+    }
 
     return job;
   }
