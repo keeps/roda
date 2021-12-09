@@ -109,7 +109,8 @@ public class SyncUtils {
     }
   }
 
-  public static void requestRemoteActions(LocalInstance localInstance) throws GenericException {
+  public static Path requestRemoteActions(LocalInstance localInstance) throws GenericException {
+    Path remoteActionsPath = null;
     try {
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
       String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE + "remote_actions"
@@ -124,20 +125,12 @@ public class SyncUtils {
       HttpResponse response = httpClient.execute(httpGet);
 
       if (response.getStatusLine().getStatusCode() == RodaConstants.HTTP_RESPONSE_CODE_SUCCESS) {
-        Path path = downloadRemoteActions(response, localInstance.getId());
-        if (path != null) {
-          Path extractFile = Files.createTempDirectory(path.getFileName().toString());
-          ZipUtility.extractFilesFromZIP(path.toFile(), extractFile.toFile(), true);
-          createJobs(extractFile, localInstance.getId());
-        }
+        return downloadRemoteActions(response, localInstance.getId());
       }
     } catch (AuthenticationDeniedException | IOException e) {
       throw new GenericException("unable to communicate with the central instance");
-    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException e) {
-      throw new GenericException("Unable to perform remote actions");
-    } catch (JobAlreadyStartedException e) {
-      // Do nothing
     }
+    return remoteActionsPath;
   }
 
   public static Path downloadRemoteActions(HttpResponse response, String instanceId) {
@@ -158,16 +151,5 @@ public class SyncUtils {
       }
     }
     return null;
-  }
-
-  public static void createJobs(Path path, String instanceId) throws GenericException, AuthorizationDeniedException,
-    RequestNotValidException, JobAlreadyStartedException, NotFoundException {
-    Path remoteActionsFile = path.resolve(instanceId + ".json");
-    RemoteActions remoteActions = JsonUtils.readObjectFromFile(remoteActionsFile, RemoteActions.class);
-    for (String jobId : remoteActions.getJobList()) {
-      Path jobFile = path.resolve(jobId + ".json");
-      Job job = JsonUtils.readObjectFromFile(jobFile, Job.class);
-      PluginHelper.createAndExecuteJob(job);
-    }
   }
 }

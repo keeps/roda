@@ -284,6 +284,7 @@ public final class RodaConstants {
   public static final String CORE_SYNCHRONIZATION_OUTCOME_FOLDER = "outcome";
   public static final String CORE_SYNCHRONIZATION_INCOMING_FOLDER = "incoming";
   public static final String CORE_LOCAL_INSTANCE_FOLDER = "local-instance";
+  public static final String CORE_JOB_ATTACHMENTS_FOLDER = "job-attachments";
 
   public static final String CORE_I18N_CLIENT_FOLDER = "client";
   public static final String CORE_I18_GWT_XML_FILE = "I18N.gwt.xml";
@@ -316,6 +317,7 @@ public final class RodaConstants {
   public static final String API_REST_V1_REPRESENTATION_INFORMATION = "api/v1/representation_information/";
   public static final String API_REST_V1_AUTH = "api/v1/auth/";
   public static final String API_REST_V1_DISTRIBUTED_INSTANCE = "api/v1/distributed_instances/";
+  public static final String API_REST_V1_JOBS = "api/v1/jobs/";
   // sub-resources strings
   public static final String API_DATA = "data";
   public static final Object API_FILE = "file";
@@ -424,6 +426,7 @@ public final class RodaConstants {
   // job related params
   public static final String API_PATH_PARAM_JOB_ID = "jobId";
   public static final String API_PATH_PARAM_JOB_JUST_FAILED = "jobJustFailed";
+  public static final String API_PATH_PARAM_JOB_ATTACHMENT_ID = "attachmentId";
 
   public static final String API_DEFAULT_CSV_FILENAME = "export.csv";
   public static final String API_DEFAULT_JSON_FILENAME = "export.json";
@@ -953,6 +956,7 @@ public final class RodaConstants {
   public static final String JOB_HAS_PARTIAL_SUCCESS = "hasPartialSuccess";
   public static final String JOB_HAS_SKIPPED = "hasSkipped";
   public static final String JOB_INSTANCE_ID = "instanceId";
+  public static final String JOB_ATTACHMENTS = "attachments";
   public static final String JOB_FILE_EXTENSION = ".json";
 
   public static final String DISPOSAL_CONFIRMATION_CREATED_ON = "createdOn";

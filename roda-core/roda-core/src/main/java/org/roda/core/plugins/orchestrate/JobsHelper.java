@@ -24,6 +24,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.akka.Messages;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.NodeType;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -577,4 +578,20 @@ public final class JobsHelper {
     }
   }
 
+  public static void createJobAttachment(String jobId, Path input) throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    ModelService model = RodaCoreFactory.getModelService();
+    Path path = RodaCoreFactory.getJobAttachmentsDirectoryPath().resolve(jobId);
+    try {
+      Files.createDirectory(path);
+      Path output = path.resolve(input.getFileName());
+      FSUtils.copy(input, output, true);
+      Job job = model.retrieveJob(jobId);
+      job.addAttachment(output.getFileName().toString());
+      model.createOrUpdateJob(job);
+    } catch (IOException e) {
+      LOGGER.error("Error while creating job attachments directory (path='{}')", path);
+    } catch (AlreadyExistsException e) {
+      // do nothing
+    }
+  }
 }

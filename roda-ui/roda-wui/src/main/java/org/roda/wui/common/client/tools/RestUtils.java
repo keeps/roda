@@ -458,6 +458,13 @@ public class RestUtils {
     return UriUtils.fromSafeConstant(b.toString());
   }
 
+  public static SafeUri createJobAttachmentDownloadUri(String jobId, String attachmentId) {
+    StringBuilder b = new StringBuilder();
+    // api/v1/jobs/{jobId}/attachment/{attachmentId}
+    b.append(RodaConstants.API_REST_V1_JOBS).append(jobId).append("/attachment/").append(attachmentId);
+    return UriUtils.fromSafeConstant(b.toString());
+  }
+
   public static interface FindRequestMapper extends ObjectMapper<FindRequest> {
   }
 
