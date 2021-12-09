@@ -34,7 +34,6 @@ import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
-import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
@@ -44,6 +43,7 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -219,8 +219,6 @@ public class BrowseAIPPortal extends Composite {
     preDisseminations.addStyleName("preSectionTitle preDisseminationsTitle");
     preChildren.addStyleName("preSectionTitle preChildrenTitle");
 
-
-
     AsyncCallback<Actionable.ActionImpact> listActionableCallback = new NoAsyncCallback<Actionable.ActionImpact>() {
       @Override
       public void onSuccess(Actionable.ActionImpact impact) {
@@ -293,8 +291,19 @@ public class BrowseAIPPortal extends Composite {
     preChildren.setVisible(false);
 
     if (PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
-      ListBuilder<IndexedAIP> aipChildrenListBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
-        new AsyncTableCellOptions<>(IndexedAIP.class, "BrowseAIPPortal_aipChildren")
+      String listId;
+
+      boolean browseAIPPortalCustomizationEnabled = ConfigurationManager.getBoolean(false,
+        RodaConstants.UI_LISTS_PROPERTY, "BrowseAIPPortal_aipChildren", RodaConstants.UI_LISTS_ENABLE_CUSTOMIZATION);
+
+      if (StringUtils.isNotBlank(bundle.getAip().getLevel()) && browseAIPPortalCustomizationEnabled) {
+        listId = "BrowseAIPPortal_aipChildren_" + bundle.getAip().getLevel();
+      } else {
+        listId = "BrowseAIPPortal_aipChildren";
+      }
+
+      ListBuilder<IndexedAIP> aipChildrenListBuilder = new ListBuilder<>(ConfigurableAsyncTableCell::new,
+        new AsyncTableCellOptions<>(IndexedAIP.class, listId)
           .withFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId())))
           .withJustActive(justActive).withSummary(messages.listOfAIPs()).bindOpener()
           .withActionableCallback(listActionableCallback));

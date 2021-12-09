@@ -122,6 +122,8 @@ public final class RodaConstants {
   public static final String UI_LISTS_FACETS_PARAMETERS_ARGS_VALUES_PROPERTY = "values";
   public static final String UI_LISTS_FACETS_PARAMETERS_ARGS_MINCOUNT_PROPERTY = "minCount";
 
+  public static final String UI_LISTS_ENABLE_CUSTOMIZATION = "customization.enabled";
+
   public static final String UI_LISTS_SEARCH_ENABLED_PROPERTY = "search.enabled";
   public static final String UI_LISTS_SEARCH_PREFILTERS_VISIBLE_PROPERTY = "search.prefilters.visible";
   public static final String UI_LISTS_SEARCH_ADVANCED_ENABLED_PROPERTY = "search.advanced.enabled";
