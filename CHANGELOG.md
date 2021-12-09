@@ -1,5 +1,37 @@
 # Changelog
 
+## v4.1.1 (09/12/2021)
+
+#### Enhancements:
+
+-  Add an option to always display the last descriptive metadata [#1965](https://github.com/keeps/roda/issues/1965)
+
+#### Bug Fixes:
+
+-  Ingest assessment not working with filter [#1964](https://github.com/keeps/roda/issues/1964)
+
+Install for demonstration:
+```
+docker pull keeps/roda:v2.2.11
+```
+---
+
+## v4.1.0 (23/11/2021)
+
+#### New features:
+
+-  Compliance with E-ARK SIP and AIP version 2.0.4  [#1960](https://github.com/keeps/roda/issues/1960)
+
+#### Enhancements:
+
+-  Embedded RODA plugins that act on files to report SKIPPED when AIPs have no files [#1961](https://github.com/keeps/roda/issues/1961)
+
+Install for demonstration:
+```
+docker pull keeps/roda:v2.2.11
+```
+---
+
 ## v4.0.3 (04/10/2021)
 
 #### Bug Fixes:
@@ -842,36 +874,3 @@ docker pull keeps/roda:v2.2.6
 
 SECURITY FIX (update immediately!):
 * Fixing path transversal vulnerability in theme REST API resource
----
-
-## v2.2.5 (23/05/2018)
-Install for demonstration:
-```
-docker pull keeps/roda:v2.2.5
-```
-
-#### Enhancements:
-
--  On SIP update add new SIP ids to the AIP [#1183](https://github.com/keeps/roda/issues/1183)
--  Parsing transferred resource date warning [#1211](https://github.com/keeps/roda/issues/1211)
-
-#### Bug Fixes:
-
--  Avoid duplicates when running plugin via filter in large scale [#1235](https://github.com/keeps/roda/issues/1235)
-
----
-
-## v2.2.4 (18/05/2018)
-Install for demonstration:
-```
-docker pull keeps/roda:v2.2.4
-```
-
-#### New features:
-
--  Index representation metadata [#621](https://github.com/keeps/roda/issues/621)
-
-#### Bug Fixes:
-
--  Error executing tasks defined via index filter when the task alters the result of the search [#1232](https://github.com/keeps/roda/issues/1232)
--  Advanced search by date interval without latest that gives NPE [#1229](https://github.com/keeps/roda/issues/1229)
