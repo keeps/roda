@@ -41,6 +41,7 @@ public abstract class RodaEntityPackagesPlugin<T extends IsRODAObject> extends A
   protected Date fromDate;
   protected Date toDate;
   protected Path bundlePath;
+  protected BundleState bundleState;
 
   @Override
   public abstract String getVersionImpl();
@@ -129,7 +130,7 @@ public abstract class RodaEntityPackagesPlugin<T extends IsRODAObject> extends A
 
     try {
       LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
-      BundleState bundleState = SyncBundleHelper.getBundleStateFile(localInstance);
+      bundleState = SyncBundleHelper.getBundleStateFile(localInstance);
       SyncBundleHelper.createEntityPackageState(getEntity());
       fromDate = bundleState.getFromDate();
       toDate = bundleState.getToDate();

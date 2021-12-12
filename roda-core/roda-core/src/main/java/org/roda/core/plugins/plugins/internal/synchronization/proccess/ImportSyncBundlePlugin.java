@@ -3,6 +3,7 @@ package org.roda.core.plugins.plugins.internal.synchronization.proccess;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,8 +14,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -23,6 +26,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.utils.URLUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
@@ -182,55 +186,14 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
     JobPluginInfo jobPluginInfo) {
     if (Files.exists(Paths.get(bundlePath))) {
       Path tempDirectory = null;
-      FileStorageService temporaryStorage;
       try {
         tempDirectory = Files.createTempDirectory(Paths.get(bundlePath).getFileName().toString());
         ZipUtility.extractFilesFromZIP(new File(bundlePath), tempDirectory.toFile(), true);
         BundleState bundleState = JsonUtils.readObjectFromFile(tempDirectory.resolve("state.json"), BundleState.class);
         validateChecksum(tempDirectory, bundleState);
-        temporaryStorage = new FileStorageService(tempDirectory.resolve(RodaConstants.CORE_STORAGE_FOLDER), false, null,
-          false);
+        importStorage(storage, tempDirectory, bundleState, jobPluginInfo);
+        importJobAttachments(tempDirectory);
 
-        CloseableIterable<Container> containers = temporaryStorage.listContainers();
-        Iterator<Container> containerIterator = containers.iterator();
-        while (containerIterator.hasNext()) {
-          Container container = containerIterator.next();
-          StoragePath containerStoragePath = container.getStoragePath();
-
-          CloseableIterable<Resource> resources = temporaryStorage.listResourcesUnderContainer(containerStoragePath,
-            false);
-          Iterator<Resource> resourceIterator = resources.iterator();
-          while (resourceIterator.hasNext()) {
-            Resource resource = resourceIterator.next();
-            StoragePath storagePath = resource.getStoragePath();
-
-            // if the resource already exists, remove it before moving the updated resource
-            if (storage.exists(storagePath)) {
-              storage.deleteResource(storagePath);
-            }
-            storage.move(temporaryStorage, storagePath, storagePath);
-
-            // Job and job reports
-            if (resource.getStoragePath().getContainerName().equals(RodaConstants.STORAGE_CONTAINER_JOB)) {
-              if (!resource.isDirectory()) {
-                try (InputStream inputStream = storage.getBinary(resource.getStoragePath()).getContent()
-                  .createInputStream()) {
-                  Job jobToImport = JsonUtils.getObjectFromJson(inputStream, Job.class);
-                  StoragePath jobReportsContainerPath = ModelUtils.getJobReportsStoragePath(jobToImport.getId());
-                  if (storage.exists(jobReportsContainerPath)) {
-                    storage.deleteResource(jobReportsContainerPath);
-                  }
-                  storage.createDirectory(jobReportsContainerPath);
-                } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
-                  | IOException e) {
-                  LOGGER.error("Error getting Job json from binary", e);
-                }
-              }
-            }
-
-          }
-        }
-        reindexBundle(bundleState, jobPluginInfo);
         DistributedInstance distributedInstance = model.retrieveDistributedInstance(instanceIdentifier);
         distributedInstance.setLastSyncDate(bundleState.getToDate());
         model.updateDistributedInstance(distributedInstance, cachedJob.getUsername());
@@ -249,6 +212,74 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
     } else {
       report.setPluginState(PluginState.FAILURE).setPluginDetails("Cannot find bundle on path " + bundlePath);
       jobPluginInfo.incrementObjectsProcessedWithFailure();
+    }
+  }
+
+  private void importStorage(StorageService storage, Path tempDirectory, BundleState bundleState,
+    JobPluginInfo jobPluginInfo) throws GenericException, NotFoundException, AuthorizationDeniedException,
+    RequestNotValidException, AlreadyExistsException, JobAlreadyStartedException {
+    FileStorageService temporaryStorage = new FileStorageService(
+      tempDirectory.resolve(RodaConstants.CORE_STORAGE_FOLDER), false, null, false);
+    CloseableIterable<Container> containers = temporaryStorage.listContainers();
+    Iterator<Container> containerIterator = containers.iterator();
+    while (containerIterator.hasNext()) {
+      Container container = containerIterator.next();
+      StoragePath containerStoragePath = container.getStoragePath();
+
+      CloseableIterable<Resource> resources = temporaryStorage.listResourcesUnderContainer(containerStoragePath, false);
+      Iterator<Resource> resourceIterator = resources.iterator();
+      while (resourceIterator.hasNext()) {
+        Resource resource = resourceIterator.next();
+        StoragePath storagePath = resource.getStoragePath();
+
+        // if the resource already exists, remove it before moving the updated resource
+        if (storage.exists(storagePath)) {
+          storage.deleteResource(storagePath);
+        }
+        storage.move(temporaryStorage, storagePath, storagePath);
+
+        // Job and job reports
+        if (resource.getStoragePath().getContainerName().equals(RodaConstants.STORAGE_CONTAINER_JOB)) {
+          if (!resource.isDirectory()) {
+            try (
+              InputStream inputStream = storage.getBinary(resource.getStoragePath()).getContent().createInputStream()) {
+              Job jobToImport = JsonUtils.getObjectFromJson(inputStream, Job.class);
+              StoragePath jobReportsContainerPath = ModelUtils.getJobReportsStoragePath(jobToImport.getId());
+              if (storage.exists(jobReportsContainerPath)) {
+                storage.deleteResource(jobReportsContainerPath);
+              }
+              storage.createDirectory(jobReportsContainerPath);
+            } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
+              | IOException e) {
+              LOGGER.error("Error getting Job json from binary", e);
+            }
+          }
+        }
+
+      }
+    }
+    reindexBundle(bundleState, jobPluginInfo);
+  }
+
+  private void importJobAttachments(Path tempDirectory) {
+    Path jobAttachments = tempDirectory.resolve(RodaConstants.CORE_JOB_ATTACHMENTS_FOLDER);
+    if (Files.exists(jobAttachments)) {
+      try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(jobAttachments)) {
+        for (Path path : dirStream) {
+          Path jobAttachmentPath = RodaCoreFactory.getJobAttachmentsDirectoryPath().resolve(path.getFileName());
+          Files.createDirectory(jobAttachmentPath);
+          Files.list(path).forEach(file -> {
+            try {
+              String fileName = URLUtils.decode(file.getFileName().toString());
+              Files.copy(file, jobAttachmentPath.resolve(fileName));
+            } catch (IOException e) {
+              LOGGER.error("Error creating file: " + file, e);
+            }
+          });
+        }
+      } catch (IOException e) {
+        LOGGER.error("Error listing directory: " + jobAttachments, e);
+      }
     }
   }
 

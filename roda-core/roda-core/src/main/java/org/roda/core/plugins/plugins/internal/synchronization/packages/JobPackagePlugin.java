@@ -1,13 +1,19 @@
 package org.roda.core.plugins.plugins.internal.synchronization.packages;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.*;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -15,12 +21,14 @@ import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.synchronization.bundle.AttachmentState;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,5 +113,28 @@ public class JobPackagePlugin extends RodaEntityPackagesPlugin<Job> {
       storage.copy(storage, jobReportsPath, jobReportDestinationPath, jobToBundle.getId());
     }
 
+    // Job Attachments
+    addAttachmentToBundle(jobToBundle);
+
+  }
+
+  private void addAttachmentToBundle(Job job) throws AlreadyExistsException, GenericException {
+    Path jobAttachmentDirectoryPath = RodaCoreFactory.getJobAttachmentsDirectoryPath().resolve(job.getId());
+    try {
+      if (FSUtils.exists(jobAttachmentDirectoryPath)) {
+        Path jobAttachmentDestinationPath = bundlePath.resolve(RodaConstants.CORE_JOB_ATTACHMENTS_FOLDER)
+                .resolve(job.getId());
+        FSUtils.copy(jobAttachmentDirectoryPath, jobAttachmentDestinationPath, true);
+
+        AttachmentState attachment = new AttachmentState();
+        attachment.setJobId(job.getId());
+        Files.list(jobAttachmentDirectoryPath).forEach( file -> {
+          attachment.getAttachmentIdList().add(file.getFileName().toString());
+        });
+        bundleState.getAttachmentStateList().add(attachment);
+      }
+    } catch (IOException e) {
+      throw new GenericException("Cannot list files under " + jobAttachmentDirectoryPath, e);
+    }
   }
 }
