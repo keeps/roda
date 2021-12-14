@@ -1,7 +1,6 @@
 package org.roda.core.plugins.plugins.internal.synchronization.proccess;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -21,7 +20,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.synchronization.bundle.RemoteActions;
+import org.roda.core.data.v2.synchronization.bundle.PackageState;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -32,7 +31,6 @@ import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
-import org.roda.core.util.ZipUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,10 +139,9 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
     try {
       Path path = SyncUtils.requestRemoteActions(localInstance);
       if (path != null) {
-        Path extractFile = Files.createTempDirectory(path.getFileName().toString());
-        ZipUtility.extractFilesFromZIP(path.toFile(), extractFile.toFile(), true);
+        SyncUtils.extractBundle(localInstance.getId(), path);
         try {
-          int jobs = createJobs(extractFile, localInstance.getId());
+          int jobs = createJobs(localInstance.getId());
           outcomeDetailsText = "Received " + jobs + " jobs";
         } catch (JobAlreadyStartedException e) {
           // Do nothing
@@ -165,16 +162,17 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
   }
 
-  public static int createJobs(Path path, String instanceId) throws GenericException, AuthorizationDeniedException,
-          RequestNotValidException, JobAlreadyStartedException, NotFoundException {
-    Path remoteActionsFile = path.resolve(instanceId + ".json");
-    RemoteActions remoteActions = JsonUtils.readObjectFromFile(remoteActionsFile, RemoteActions.class);
-    for (String jobId : remoteActions.getJobList()) {
-      Path jobFile = path.resolve(jobId + ".json");
-      Job job = JsonUtils.readObjectFromFile(jobFile, Job.class);
+  public static int createJobs(String instanceId) throws GenericException, AuthorizationDeniedException,
+    RequestNotValidException, JobAlreadyStartedException, NotFoundException {
+
+    PackageState packageState = SyncUtils.getIncomingEntityPackageState(instanceId, "job");
+    for (String jobId : packageState.getIdList()) {
+      Path jobPath = SyncUtils.getEntityStoragePath(instanceId, RodaConstants.CORE_JOB_FOLDER).resolve(jobId + ".json");
+      Job job = JsonUtils.readObjectFromFile(jobPath, Job.class);
       PluginHelper.createAndExecuteJob(job);
     }
-    return remoteActions.getJobList().size();
+
+    return packageState.getCount();
   }
 
   @Override

@@ -51,6 +51,7 @@ import org.roda.core.common.Messages;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.StreamResponse;
+import org.roda.core.common.SyncUtils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
@@ -3741,18 +3742,6 @@ public class BrowserHelper {
       "Could not apply instance identifier to Preservation Agents");
   }
 
-  public static Job createSyncBundle(User user, LocalInstance localInstance)
-    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    String path = localInstance.getBundlePath();
-    if (path == null) {
-      path = RodaCoreFactory.getSynchronizationDirectoryPath().resolve("bundle").toString();
-    }
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, path);
-    return createAndExecuteInternalJob("Create sync bundle", SelectedItemsNone.create(), CreateSyncBundlePlugin.class,
-      user, pluginParameters, "Could not execute bundle job");
-  }
-
   public static Job synchronizeBundle(User user, LocalInstance localInstance)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(),
@@ -3765,18 +3754,15 @@ public class BrowserHelper {
     FormDataBodyPart file = multiPart.getField(RodaConstants.API_PARAM_FILE);
     BodyPartEntity bodyPartEntity = (BodyPartEntity) file.getEntity();
     String fileName = file.getContentDisposition().getFileName();
-    String path = RodaCoreFactory.getSynchronizationDirectoryPath().resolve("transferred").resolve(fileName).toString();
-    java.io.File targetFile = new java.io.File(path);
     try {
-      FileUtils.copyInputStreamToFile(bodyPartEntity.getInputStream(), targetFile);
+      Path path = SyncUtils.receiveBundle(fileName, bodyPartEntity.getInputStream());
+      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, path.toString());
+      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, instanceIdentifier);
+      return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(), ImportSyncBundlePlugin.class,
+              user, pluginParameters, "Could not execute bundle job");
     } catch (IOException e) {
-      e.printStackTrace();
+      throw new GenericException("Failed during sync package import", e);
     }
-
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, path);
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, instanceIdentifier);
-    return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(), ImportSyncBundlePlugin.class,
-      user, pluginParameters, "Could not execute bundle job");
   }
 
   public static void updateLocalInstanceConfiguration(LocalInstance localInstance, String id) throws GenericException {

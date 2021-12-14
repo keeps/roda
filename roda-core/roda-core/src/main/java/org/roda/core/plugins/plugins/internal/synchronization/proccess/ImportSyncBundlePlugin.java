@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.SyncUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -185,28 +186,27 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
   private void importSyncBundle(ModelService model, StorageService storage, Report report, Job cachedJob,
     JobPluginInfo jobPluginInfo) {
     if (Files.exists(Paths.get(bundlePath))) {
-      Path tempDirectory = null;
+      Path bundleWorkingDir = null;
       try {
-        tempDirectory = Files.createTempDirectory(Paths.get(bundlePath).getFileName().toString());
-        ZipUtility.extractFilesFromZIP(new File(bundlePath), tempDirectory.toFile(), true);
-        BundleState bundleState = JsonUtils.readObjectFromFile(tempDirectory.resolve("state.json"), BundleState.class);
-        validateChecksum(tempDirectory, bundleState);
-        importStorage(storage, tempDirectory, bundleState, jobPluginInfo);
-        importJobAttachments(tempDirectory);
+        bundleWorkingDir = SyncUtils.extractBundle(instanceIdentifier, Paths.get(bundlePath));
+        BundleState bundleState = SyncUtils.getIncomingBundleState(instanceIdentifier);
+        validateChecksum(bundleWorkingDir, bundleState);
+        importStorage(storage, bundleWorkingDir, bundleState, jobPluginInfo);
+        SyncUtils.copyAttachments(instanceIdentifier);
 
         DistributedInstance distributedInstance = model.retrieveDistributedInstance(instanceIdentifier);
         distributedInstance.setLastSyncDate(bundleState.getToDate());
         model.updateDistributedInstance(distributedInstance, cachedJob.getUsername());
         report.setPluginState(PluginState.SUCCESS);
       } catch (IOException e) {
-        LOGGER.error("Error extracting bundle to {}", tempDirectory.toString(), e);
+        LOGGER.error("Error extracting bundle to {}", bundleWorkingDir.toString(), e);
         report.setPluginState(PluginState.FAILURE)
-          .setPluginDetails("Error extracting bundle to " + tempDirectory.toString());
+          .setPluginDetails("Error extracting bundle to " + bundleWorkingDir.toString());
         jobPluginInfo.incrementObjectsProcessedWithFailure();
       } catch (RODAException e) {
-        LOGGER.error("Error creating temporary StorageService on {}", tempDirectory.toString(), e);
+        LOGGER.error("Error creating temporary StorageService on {}", bundleWorkingDir.toString(), e);
         report.setPluginState(PluginState.FAILURE)
-          .setPluginDetails("Error creating temporary StorageService on " + tempDirectory.toString());
+          .setPluginDetails("Error creating temporary StorageService on " + bundleWorkingDir.toString());
         jobPluginInfo.incrementObjectsProcessedWithFailure();
       }
     } else {

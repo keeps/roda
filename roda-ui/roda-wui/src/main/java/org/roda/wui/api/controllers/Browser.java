@@ -3911,26 +3911,6 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static Job createSyncBundle(User user, LocalInstance localInstance)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      return BrowserHelper.createSyncBundle(user, localInstance);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
-    }
-  }
-
   public static Job synchronizeBundle(User user, LocalInstance localInstance)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
 
@@ -3972,7 +3952,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static EntityResponse retrieveRemoteActions(User user, String instanceIdentifier)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+          throws GenericException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check permissions
@@ -3983,7 +3963,7 @@ public class Browser extends RodaWuiController {
     try {
       // delegate
       try {
-        return SyncUtils.createRemoteActionsBundle(instanceIdentifier);
+        return SyncUtils.createCentralSyncBundle(instanceIdentifier);
       } catch (NotFoundException e) {
         return new ObjectResponse<>(null, null);
       }

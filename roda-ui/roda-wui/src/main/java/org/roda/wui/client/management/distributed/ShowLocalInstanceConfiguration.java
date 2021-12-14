@@ -130,17 +130,6 @@ public class ShowLocalInstanceConfiguration extends Composite {
     });
   }
 
-//  @UiHandler("buttonCreateBundle")
-//  void buttonCreateBundleHandler(ClickEvent e) {
-//    BrowserService.Util.getInstance().createSyncBundle(localInstance, new NoAsyncCallback<Job>() {
-//      @Override
-//      public void onSuccess(Job job) {
-//        Toast.showInfo("Create Job", "Success");
-//        HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-//      }
-//    });
-//  }
-
   @UiHandler("buttonSynchronize")
   void buttonSynchronizeHandler(ClickEvent e) {
     BrowserService.Util.getInstance().synchronizeBundle(localInstance, new NoAsyncCallback<Job>() {
