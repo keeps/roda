@@ -1399,13 +1399,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public Job createSyncBundle(LocalInstance localInstance)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.createSyncBundle(user, localInstance);
-  }
-
-  @Override
   public Job synchronizeBundle(LocalInstance localInstance)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());

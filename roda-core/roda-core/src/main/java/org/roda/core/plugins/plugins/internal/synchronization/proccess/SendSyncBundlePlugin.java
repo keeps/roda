@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.SyncUtils;
 import org.roda.core.common.TokenManager;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
@@ -149,7 +150,7 @@ public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
     String pluginDetails = "";
 
     try {
-      BundleState bundleState = SyncBundleHelper.buildBundleStateFile();
+      BundleState bundleState = SyncUtils.buildBundleStateFile(localInstance.getId());
       if (!bundleState.getPackageStateList().isEmpty()) {
         LOGGER.debug("Sending sync bundle to: ", localInstance.getCentralInstanceURL());
         int responseCode = send(localInstance, bundleState);
@@ -165,7 +166,7 @@ public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
           bundleState.setSyncState(BundleState.Status.FAILED);
           jobPluginInfo.incrementObjectsProcessedWithFailure();
         }
-        SyncBundleHelper.updateBundleStateFile(bundleState);
+        SyncUtils.updateBundleState(bundleState, localInstance.getId());
       }
     } catch (GenericException e) {
       jobPluginInfo.incrementObjectsProcessedWithFailure();
@@ -179,7 +180,7 @@ public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
 
   private int send(LocalInstance localInstance, BundleState bundleStateFile) throws GenericException {
     try {
-      Path zipPath = compressBundle(bundleStateFile);
+      Path zipPath = SyncUtils.compressBundle(localInstance.getId());
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
 
       String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE

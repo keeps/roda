@@ -422,8 +422,6 @@ public interface BrowserServiceAsync {
 
   void registerLocalInstance(LocalInstance localInstance, AsyncCallback<LocalInstance> async);
 
-  void createSyncBundle(LocalInstance localInstance, AsyncCallback<Job> async);
-
   void synchronizeBundle(LocalInstance localInstance, AsyncCallback<Job> async);
   
   void modifyInstanceIdOnRepository(LocalInstance localInstance, AsyncCallback<Job> async);
