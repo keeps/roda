@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.*;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.SyncUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -21,6 +22,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.bundle.BundleState;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -114,10 +116,11 @@ public class SynchronizeInstancePlugin extends AbstractPlugin<Void> {
     throws PluginException {
     try {
       localInstance = RodaCoreFactory.getLocalInstance();
-      bundleState = SyncBundleHelper.createBundleStateFile();
-    } catch (GenericException e) {
-      throw new PluginException("Unable to retrieve local instance configuration", e);
-    } catch (RODAException | IOException e) {
+      bundleState = SyncUtils.createBundleState(localInstance.getId());
+      DistributedInstance distributedInstance = SyncUtils.requestInstanceStatus(localInstance);
+      bundleState.setFromDate(distributedInstance.getLastSyncDate());
+      SyncUtils.updateBundleState(bundleState, localInstance.getId());
+    } catch (GenericException | IOException e) {
       throw new PluginException("Error while creating entity bundle state", e);
     }
     return new Report();
@@ -181,6 +184,7 @@ public class SynchronizeInstancePlugin extends AbstractPlugin<Void> {
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+    //SyncUtils.deleteSyncBundleWorkingDirectory(localInstance.getId());
     return null;
   }
 

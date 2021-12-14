@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.SyncUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.*;
 import org.roda.core.data.v2.IsRODAObject;
@@ -42,6 +43,7 @@ public abstract class RodaEntityPackagesPlugin<T extends IsRODAObject> extends A
   protected Date toDate;
   protected Path bundlePath;
   protected BundleState bundleState;
+  private LocalInstance localInstance;
 
   @Override
   public abstract String getVersionImpl();
@@ -129,9 +131,9 @@ public abstract class RodaEntityPackagesPlugin<T extends IsRODAObject> extends A
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
 
     try {
-      LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
-      bundleState = SyncBundleHelper.getBundleStateFile(localInstance);
-      SyncBundleHelper.createEntityPackageState(getEntity());
+      localInstance = RodaCoreFactory.getLocalInstance();
+      bundleState = SyncUtils.getOutcomeBundleState(localInstance.getId());
+      SyncUtils.createEntityPackageState(localInstance.getId(), getEntity());
       fromDate = bundleState.getFromDate();
       toDate = bundleState.getToDate();
       bundlePath = Paths.get(bundleState.getDestinationPath());
@@ -168,12 +170,12 @@ public abstract class RodaEntityPackagesPlugin<T extends IsRODAObject> extends A
 
   protected void updateEntityPackageState(Class<T> entityClass, List<String> idList)
     throws NotFoundException, GenericException, IOException {
-    PackageState entityPackageState = SyncBundleHelper.getEntityPackageState(getEntity());
+    PackageState entityPackageState = SyncUtils.getOutcomeEntityPackageState(localInstance.getId(), getEntity());
     entityPackageState.setClassName(entityClass);
     entityPackageState.setStatus(PackageState.Status.CREATED);
     entityPackageState.setIdList(idList);
     entityPackageState.setCount(idList.size());
-    SyncBundleHelper.updateEntityPackageState(getEntity(), entityPackageState);
+    SyncUtils.updateEntityPackageState(localInstance.getId(), getEntity(), entityPackageState);
   }
 
   @Override
