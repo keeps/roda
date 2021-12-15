@@ -384,10 +384,23 @@ public final class PremisV3Utils {
     gov.loc.premis.v3.File file = gov.loc.premis.v3.File.Factory.newInstance();
     file.addNewPreservationLevel()
       .setPreservationLevelValue(getStringPlusAuthority(RodaConstants.PRESERVATION_LEVEL_FULL));
+
+
+
+    // URN-local identifier
     ObjectIdentifierComplexType oict = file.addNewObjectIdentifier();
     oict.setObjectIdentifierValue(
       URNUtils.createRodaPreservationURN(PreservationMetadataType.FILE, originalFile.getId()));
-    oict.setObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
+    oict.setObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN_LOCAL));
+
+    // URN identifier (UUID)
+    String fileUUID = IdUtils.getFileId(originalFile);
+    ObjectIdentifierComplexType oict2 = file.addNewObjectIdentifier();
+    oict2.setObjectIdentifierValue(
+            URNUtils.createRodaPreservationURN(PreservationMetadataType.FILE, fileUUID));
+    oict2.setObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
+
+
     ObjectCharacteristicsComplexType occt = file.addNewObjectCharacteristics();
     // TODO
     // occt.setCompositionLevel(CompositionLevelComplexType.Factory.parse("0"));
