@@ -425,10 +425,19 @@ public final class PremisV3Utils {
     // occt.addNewObjectCharacteristicsExtension().set("");
     file.addNewOriginalName().setStringValue(originalFile.getId());
     StorageComplexType sct = file.addNewStorage();
-    ContentLocationComplexType clct = sct.addNewContentLocation();
-    clct.setContentLocationType(getStringPlusAuthority(""));
-    clct.setContentLocationValue("");
 
+    String contentLocation;
+    try {
+      contentLocation = String
+        .valueOf(model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile)).getContent().getURI());
+    } catch (IOException e) {
+      LOGGER.debug(String.format("Can't create URI, %s: %s", e.getCause(), e.getMessage()));
+      contentLocation = ModelUtils.getFileStoragePath(originalFile).asString("/", null, null, false);
+    }
+    ContentLocationComplexType clct = sct.addNewContentLocation();
+    clct.setContentLocationType(getStringPlusAuthority(RodaConstants.URI_TYPE));
+    clct.setContentLocationValue(contentLocation);
+    
     document.setObject(file);
 
     return MetadataUtils.saveToContentPayload(document, true);
@@ -692,8 +701,8 @@ public final class PremisV3Utils {
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
     ValidationException, AlreadyExistsException {
     String id = IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion());
-    ContentPayload agentPayload = PremisV3Utils.createPremisAgentBinary(id, plugin.getName(), plugin.getAgentType(),
-      "", plugin.getDescription(), plugin.getVersion());
+    ContentPayload agentPayload = PremisV3Utils.createPremisAgentBinary(id, plugin.getName(), plugin.getAgentType(), "",
+      plugin.getDescription(), plugin.getVersion());
     return model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
   }
 
