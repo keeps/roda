@@ -1240,6 +1240,7 @@ public final class RodaConstants {
    * PREMIS
    */
   public static final String PREMIS_IDENTIFIER_TYPE_URN = "URN";
+  public static final String PREMIS_IDENTIFIER_TYPE_URN_LOCAL = "URN-local";
   public static final String PREMIS_SUFFIX = ".xml";
 
   /*
