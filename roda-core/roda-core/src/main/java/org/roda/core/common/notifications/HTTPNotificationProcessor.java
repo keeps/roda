@@ -26,11 +26,15 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.model.ModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.MetricRegistry;
 
 public class HTTPNotificationProcessor implements NotificationProcessor {
   private static final Logger LOGGER = LoggerFactory.getLogger(HTTPNotificationProcessor.class);
@@ -38,10 +42,22 @@ public class HTTPNotificationProcessor implements NotificationProcessor {
 
   private String endpoint;
   private Map<String, Object> scope;
+  private final Counter notificationSentWithSuccess;
+  private final Counter notificationSentWithFailure;
+  private final Histogram notificationSentWithSuccessHisto;
+  private final Histogram notificationSentWithFailureHisto;
 
   public HTTPNotificationProcessor(String endpoint, Map<String, Object> scope) {
     this.endpoint = endpoint;
     this.scope = scope;
+    this.notificationSentWithSuccess = RodaCoreFactory.getMetrics()
+      .counter(MetricRegistry.name(HTTPNotificationProcessor.class.getSimpleName(), "notificationSentWithSuccess"));
+    this.notificationSentWithFailure = RodaCoreFactory.getMetrics()
+      .counter(MetricRegistry.name(HTTPNotificationProcessor.class.getSimpleName(), "notificationSentWithFailure"));
+    this.notificationSentWithFailureHisto = RodaCoreFactory.getMetrics().histogram(
+      MetricRegistry.name(HTTPNotificationProcessor.class.getSimpleName(), "notificationSentWithFailureHistogram"));
+    this.notificationSentWithSuccessHisto = RodaCoreFactory.getMetrics().histogram(
+      MetricRegistry.name(HTTPNotificationProcessor.class.getSimpleName(), "notificationSentWithSuccessHistogram"));
   }
 
   @Override
@@ -58,15 +74,20 @@ public class HTTPNotificationProcessor implements NotificationProcessor {
 
         if (success) {
           LOGGER.debug("Notification sent");
+          notificationSentWithSuccess.inc();
           notification.setState(NotificationState.COMPLETED);
         } else {
           LOGGER.debug("Notification not sent");
+          notificationSentWithFailure.inc();
           notification.setState(NotificationState.FAILED);
         }
       } else {
         LOGGER.warn("No endpoint, cannot send notification.");
       }
     }
+
+    notificationSentWithFailureHisto.update(notificationSentWithFailure.getCount());
+    notificationSentWithSuccessHisto.update(notificationSentWithSuccess.getCount());
 
     return notification;
   }
