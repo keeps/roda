@@ -21,7 +21,7 @@ import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
-import org.roda.core.data.v2.jobs.JobActionType;
+import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
@@ -71,12 +71,12 @@ public class AkkaJobActor extends AkkaBaseActor {
 
       String jobId = job.getId();
       JobPriority jobPriority = job.getPriority();
-      JobActionType jobActionType = job.getType();
+      JobParallelism jobParallelism = job.getParallelism();
       ActorRef jobStateInfoActor = getContext().actorOf(Props.create(AkkaJobStateInfoActor.class, plugin, getSender(),
         jobsManager, jobId, JobsHelper.getNumberOfJobsWorkers()), jobId);
       super.getPluginOrchestrator().setJobContextInformation(jobId, jobStateInfoActor);
 
-      jobStateInfoActor.tell(Messages.newJobStateUpdated(plugin, JOB_STATE.STARTED).withJobType(jobActionType).withJobPriority(jobPriority), getSelf());
+      jobStateInfoActor.tell(Messages.newJobStateUpdated(plugin, JOB_STATE.STARTED).withParallelism(jobParallelism).withJobPriority(jobPriority), getSelf());
 
       try {
         if (job.getSourceObjects() instanceof SelectedItemsAll<?>) {
@@ -90,7 +90,7 @@ public class AkkaJobActor extends AkkaBaseActor {
         }
       } catch (Exception e) {
         LOGGER.error("Error while invoking orchestration method", e);
-        jobStateInfoActor.tell(Messages.newJobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE, e).withJobType(jobActionType).withJobPriority(jobPriority), getSelf());
+        jobStateInfoActor.tell(Messages.newJobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE, e).withParallelism(jobParallelism).withJobPriority(jobPriority), getSelf());
         getSender().tell("Failed to complete", getSelf());
       }
 

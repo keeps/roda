@@ -20,10 +20,12 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
+import org.roda.core.data.v2.jobs.JobParallelism;
+import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.PluginState;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.notifications.NotificationState;
-import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.IncidenceStatus;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.risks.SeverityLevel;
@@ -74,6 +76,56 @@ public class HtmlSnippetUtils {
     // do nothing
   }
 
+  public static SafeHtml getJobParallelismTypeHtml(JobParallelism parallelism, boolean appendDefinition) {
+    SafeHtmlBuilder b = new SafeHtmlBuilder();
+    b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO));
+    b.append(SafeHtmlUtils.fromString(messages.jobParallelismTypeBadge(parallelism)));
+    if (appendDefinition) {
+      b.append(SafeHtmlUtils.fromString(" "));
+      b.append(SafeHtmlUtils.fromString(messages.jobParallelismText()));
+    }
+    b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+
+    return b.toSafeHtml();
+  }
+
+  public static SafeHtml getJobParallelismTypeHtml(JobParallelism parallelism) {
+    return getJobParallelismTypeHtml(parallelism, false);
+  }
+
+  public static SafeHtml getJobPriorityHtml(JobPriority priority, boolean appendDefinition) {
+    SafeHtmlBuilder b = new SafeHtmlBuilder();
+
+    switch (priority) {
+      case URGENT:
+        b.append(SafeHtmlUtils.fromSafeConstant("<span class='label-priority-urgent'>"));
+        break;
+      case HIGH:
+        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER));
+        break;
+      case LOW:
+        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
+        break;
+      case MEDIUM:
+      default:
+        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING));
+        break;
+    }
+
+    b.append(SafeHtmlUtils.fromString(messages.jobPriorityBadge(priority)));
+    if (appendDefinition) {
+      b.append(SafeHtmlUtils.fromString(" "));
+      b.append(SafeHtmlUtils.fromString(messages.jobPriorityText()));
+    }
+    b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+
+    return b.toSafeHtml();
+  }
+
+  public static SafeHtml getJobPriorityHtml(JobPriority priority) {
+    return getJobPriorityHtml(priority, false);
+  }
+
   public static SafeHtml getJobStateHtml(Job job) {
     SafeHtml ret = null;
     if (job != null) {
@@ -81,40 +133,40 @@ public class HtmlSnippetUtils {
       if (JOB_STATE.COMPLETED.equals(state)) {
         if (job.getJobStats().getSourceObjectsCount() == job.getJobStats().getSourceObjectsProcessedWithSuccess()) {
           ret = SafeHtmlUtils
-              .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + messages.showJobStatusCompleted() + CLOSE_SPAN);
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + messages.showJobStatusCompleted() + CLOSE_SPAN);
         } else if (job.getJobStats().getSourceObjectsProcessedWithPartialSuccess() > 0) {
           ret = SafeHtmlUtils
-              .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
         } else if (job.getJobStats().getSourceObjectsProcessedWithSuccess() > 0) {
           ret = SafeHtmlUtils
-              .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
         } else if (job.getJobStats().getSourceObjectsProcessedWithSuccess() == 0
-            && job.getJobStats().getSourceObjectsProcessedWithSkipped() > 0) {
+          && job.getJobStats().getSourceObjectsProcessedWithSkipped() > 0) {
           ret = SafeHtmlUtils
-              .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
         } else {
           ret = SafeHtmlUtils
-              .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.showJobStatusCompleted() + CLOSE_SPAN);
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.showJobStatusCompleted() + CLOSE_SPAN);
         }
       } else if (JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
         ret = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusFailedDuringCreation() + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusFailedDuringCreation() + CLOSE_SPAN);
       } else if (JOB_STATE.FAILED_TO_COMPLETE.equals(state)) {
         ret = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusFailedToComplete() + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusFailedToComplete() + CLOSE_SPAN);
       } else if (JOB_STATE.STOPPING.equals(state)) {
         ret = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusStopping() + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusStopping() + CLOSE_SPAN);
       } else if (JOB_STATE.STOPPED.equals(state)) {
         ret = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusStopped() + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusStopped() + CLOSE_SPAN);
       } else if (JOB_STATE.CREATED.equals(state)) {
         ret = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + messages.showJobStatusCreated() + CLOSE_SPAN);
       } else if (JOB_STATE.STARTED.equals(state)) {
         ret = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + messages.showJobStatusStarted() + CLOSE_SPAN);
       } else if (JOB_STATE.TO_BE_CLEANED.equals(state)) {
         ret = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusToBeCleaned() + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusToBeCleaned() + CLOSE_SPAN);
       } else {
         ret = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + state + CLOSE_SPAN);
       }
@@ -171,21 +223,21 @@ public class HtmlSnippetUtils {
     switch (pluginState) {
       case SUCCESS:
         pluginStateHTML = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
         break;
       case RUNNING:
         pluginStateHTML = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
         break;
       case PARTIAL_SUCCESS:
       case SKIPPED:
         pluginStateHTML = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
         break;
       case FAILURE:
       default:
         pluginStateHTML = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
         break;
     }
     return pluginStateHTML;
@@ -203,7 +255,6 @@ public class HtmlSnippetUtils {
     } else {
       pluginMandatoryHTML = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + "Optional" + CLOSE_SPAN);
     }
-
 
     return pluginMandatoryHTML;
   }

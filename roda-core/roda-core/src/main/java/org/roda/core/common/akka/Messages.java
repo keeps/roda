@@ -16,9 +16,8 @@ import java.util.Optional;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.SerializableOptional;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
-import org.roda.core.data.v2.jobs.JobActionType;
+import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
@@ -44,7 +43,7 @@ public class Messages {
     private String uuid;
     private long creationTime;
     private JobPriority jobPriority;
-    private JobActionType jobActionType;
+    private JobParallelism jobParallelism;
 
     private AbstractMessage() {
       if (LOGGER.isTraceEnabled()) {
@@ -76,8 +75,8 @@ public class Messages {
       return this;
     }
 
-    public AbstractMessage withJobType(JobActionType jobType) {
-      this.jobActionType = jobType;
+    public AbstractMessage withParallelism(JobParallelism parallelism) {
+      this.jobParallelism = parallelism;
       return this;
     }
 
@@ -85,8 +84,8 @@ public class Messages {
       return jobPriority;
     }
 
-    public JobActionType getJobActionType() {
-      return jobActionType;
+    public JobParallelism getParallelism() {
+      return jobParallelism;
     }
   }
 

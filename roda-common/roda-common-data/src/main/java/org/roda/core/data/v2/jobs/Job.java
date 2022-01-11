@@ -73,14 +73,14 @@ public class Job implements IsModelObject, IsIndexed, HasId {
 
   private JobPriority priority;
 
-  private JobActionType type;
+  private JobParallelism parallelism;
 
   public Job() {
     super();
     startDate = new Date();
     state = JOB_STATE.CREATED;
     priority = JobPriority.MEDIUM;
-    type = JobActionType.FOREGROUND;
+    parallelism = JobParallelism.NORMAL;
   }
 
   public Job(Job job) {
@@ -90,7 +90,7 @@ public class Job implements IsModelObject, IsIndexed, HasId {
     this.username = job.getUsername();
     this.pluginType = job.getPluginType();
     this.priority = job.getPriority();
-    this.type = job.getType();
+    this.parallelism = job.getParallelism();
     this.plugin = job.getPlugin();
     this.pluginParameters = new HashMap<>(job.getPluginParameters());
     this.sourceObjects = job.getSourceObjects();
@@ -167,12 +167,12 @@ public class Job implements IsModelObject, IsIndexed, HasId {
     this.priority = priority;
   }
 
-  public JobActionType getType() {
-    return type;
+  public JobParallelism getParallelism() {
+    return parallelism;
   }
 
-  public void setType(JobActionType type) {
-    this.type = type;
+  public void setParallelism(JobParallelism parallelism) {
+    this.parallelism = parallelism;
   }
 
   public String getStateDetails() {
@@ -261,9 +261,10 @@ public class Job implements IsModelObject, IsIndexed, HasId {
   @Override
   public String toString() {
     return "Job [id=" + id + ", name=" + name + ", username=" + username + ", startDate=" + startDate + ", endDate="
-      + endDate + ", state=" + state + ", stateDetails=" + stateDetails + ", priority=" + priority + ", type=" + type
-      + ", jobStats=" + jobStats + ", plugin=" + plugin + ", pluginType=" + pluginType + ", pluginParameters="
-      + pluginParameters + ", sourceObjects=" + sourceObjects + ", outcomeObjectsClass=" + outcomeObjectsClass + "]";
+      + endDate + ", state=" + state + ", stateDetails=" + stateDetails + ", priority=" + priority + ", type="
+      + parallelism + ", jobStats=" + jobStats + ", plugin=" + plugin + ", pluginType=" + pluginType
+      + ", pluginParameters=" + pluginParameters + ", sourceObjects=" + sourceObjects + ", outcomeObjectsClass="
+      + outcomeObjectsClass + "]";
   }
 
   @Override
@@ -274,8 +275,8 @@ public class Job implements IsModelObject, IsIndexed, HasId {
 
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(id, name, username, startDate, endDate, state, stateDetails, priority, type, jobStats, plugin,
-      pluginType, pluginParameters, sourceObjects, outcomeObjectsClass);
+    return Arrays.asList(id, name, username, startDate, endDate, state, stateDetails, priority, parallelism, jobStats,
+      plugin, pluginType, pluginParameters, sourceObjects, outcomeObjectsClass);
   }
 
   @JsonIgnore

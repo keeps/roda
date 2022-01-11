@@ -11,7 +11,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.JobActionType;
+import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -59,14 +59,14 @@ public class AkkaBackgroundWorkerActor extends AkkaBaseActor {
     try {
       messagePlugin.execute(index, model, storage, objectsToBeProcessed);
       getSender().tell(Messages.newPluginExecuteIsDone(messagePlugin, false).withJobPriority(message.getJobPriority())
-        .withJobType(message.getJobActionType()), getSelf());
+        .withParallelism(message.getParallelism()), getSelf());
     } catch (Throwable e) {
       // 20170120 hsilva: it is required to catch Throwable as there are some
       // linking errors that only will happen during the execution (e.g.
       // java.lang.NoSuchMethodError)
       LOGGER.error("Error executing plugin.execute()", e);
       getSender().tell(Messages.newPluginExecuteIsDone(messagePlugin, true, getErrorMessage(e))
-        .withJobPriority(message.getJobPriority()).withJobType(message.getJobActionType()), getSelf());
+        .withJobPriority(message.getJobPriority()).withParallelism(message.getParallelism()), getSelf());
     }
     message.logProcessingEnded();
   }
@@ -88,12 +88,12 @@ public class AkkaBackgroundWorkerActor extends AkkaBaseActor {
     Plugin<?> plugin = message.getPlugin();
     try {
       Job job = PluginHelper.getJob(plugin, model);
-      JobActionType actionType = job.getType();
+      JobParallelism parallelism = job.getParallelism();
       JobPriority priority = job.getPriority();
       try {
         plugin.afterAllExecute(index, model, storage);
         getSender().tell(
-          Messages.newPluginAfterAllExecuteIsDone(plugin, false).withJobPriority(priority).withJobType(actionType),
+          Messages.newPluginAfterAllExecuteIsDone(plugin, false).withJobPriority(priority).withParallelism(parallelism),
           getSelf());
       } catch (Throwable e) {
         // 20170120 hsilva: it is required to catch Throwable as there are some
@@ -101,7 +101,7 @@ public class AkkaBackgroundWorkerActor extends AkkaBaseActor {
         // java.lang.NoSuchMethodError)
         LOGGER.error("Error executing plugin.afterAllExecute()", e);
         getSender().tell(
-          Messages.newPluginAfterAllExecuteIsDone(plugin, true).withJobPriority(priority).withJobType(actionType),
+          Messages.newPluginAfterAllExecuteIsDone(plugin, true).withJobPriority(priority).withParallelism(parallelism),
           getSelf());
       }
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {

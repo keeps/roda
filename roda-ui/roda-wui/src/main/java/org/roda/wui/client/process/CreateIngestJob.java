@@ -102,8 +102,8 @@ public class CreateIngestJob extends CreateSelectedJob<TransferredResource> {
     List<PluginParameter> missingMandatoryParameters = getWorkflowOptions().getMissingMandatoryParameters();
     if (missingMandatoryParameters.isEmpty()) {
 
-      BrowserService.Util.getInstance().createProcess(jobName, getSelected(), getSelectedPlugin().getId(),
-        getWorkflowOptions().getValue(), null, new AsyncCallback<Job>() {
+      BrowserService.Util.getInstance().createProcess(jobName, getJobPriority(), getJobParallelism(), getSelected(),
+        getSelectedPlugin().getId(), getWorkflowOptions().getValue(), null, new AsyncCallback<Job>() {
 
           @Override
           public void onFailure(Throwable caught) {
@@ -149,8 +149,8 @@ public class CreateIngestJob extends CreateSelectedJob<TransferredResource> {
     List<PluginParameter> missingMandatoryParameters = getWorkflowOptions().getMissingMandatoryParameters();
     if (missingMandatoryParameters.isEmpty()) {
 
-      BrowserService.Util.getInstance().createProcessJson(jobName, getSelected(), getSelectedPlugin().getId(),
-        getWorkflowOptions().getValue(), null, new AsyncCallback<String>() {
+      BrowserService.Util.getInstance().createProcessJson(jobName, getJobPriority(), getJobParallelism(), getSelected(),
+        getSelectedPlugin().getId(), getWorkflowOptions().getValue(), null, new AsyncCallback<String>() {
 
           @Override
           public void onFailure(Throwable caught) {

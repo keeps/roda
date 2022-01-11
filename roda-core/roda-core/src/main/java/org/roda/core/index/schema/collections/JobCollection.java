@@ -22,6 +22,8 @@ import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
+import org.roda.core.data.v2.jobs.JobParallelism;
+import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexingAdditionalInfo;
@@ -71,6 +73,8 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
     fields.add(new Field(RodaConstants.JOB_START_DATE, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.JOB_END_DATE, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.JOB_STATE, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.JOB_PARALLELISM, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.JOB_PRIORITY, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_STATE_DETAILS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
     fields.add(new Field(RodaConstants.JOB_COMPLETION_PERCENTAGE, Field.TYPE_INT));
     fields.add(new Field(RodaConstants.JOB_PLUGIN, Field.TYPE_STRING));
@@ -110,6 +114,8 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
     doc.addField(RodaConstants.JOB_START_DATE, SolrUtils.formatDateWithMillis(job.getStartDate()));
     doc.addField(RodaConstants.JOB_END_DATE, SolrUtils.formatDateWithMillis(job.getEndDate()));
     doc.addField(RodaConstants.JOB_STATE, job.getState().toString());
+    doc.addField(RodaConstants.JOB_PARALLELISM, job.getParallelism().toString());
+    doc.addField(RodaConstants.JOB_PRIORITY, job.getPriority().toString());
     doc.addField(RodaConstants.JOB_STATE_DETAILS, job.getStateDetails());
     JobStats jobStats = job.getJobStats();
     doc.addField(RodaConstants.JOB_COMPLETION_PERCENTAGE, jobStats.getCompletionPercentage());
@@ -135,9 +141,8 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
     doc.addField(RodaConstants.JOB_HAS_FAILURES,
       jobStats.getSourceObjectsProcessedWithFailure() > 0
         || (jobStats.getSourceObjectsCount() > jobStats.getSourceObjectsProcessedWithSuccess()
-          + jobStats.getSourceObjectsProcessedWithPartialSuccess()
-          + jobStats.getSourceObjectsProcessedWithSkipped() + jobStats.getSourceObjectsBeingProcessed()
-          + jobStats.getSourceObjectsWaitingToBeProcessed()));
+          + jobStats.getSourceObjectsProcessedWithPartialSuccess() + jobStats.getSourceObjectsProcessedWithSkipped()
+          + jobStats.getSourceObjectsBeingProcessed() + jobStats.getSourceObjectsWaitingToBeProcessed()));
     doc.addField(RodaConstants.JOB_HAS_PARTIAL_SUCCESS, jobStats.getSourceObjectsProcessedWithPartialSuccess() > 0);
     doc.addField(RodaConstants.JOB_HAS_SKIPPED, jobStats.getSourceObjectsProcessedWithSkipped() > 0);
 
@@ -156,6 +161,10 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
     if (doc.containsKey(RodaConstants.JOB_STATE)) {
       job.setState(JOB_STATE.valueOf(SolrUtils.objectToString(doc.get(RodaConstants.JOB_STATE), null)));
     }
+    job.setParallelism(JobParallelism
+      .valueOf(SolrUtils.objectToString(doc.get(RodaConstants.JOB_PARALLELISM), JobParallelism.NORMAL.toString())));
+    job.setPriority(JobPriority
+      .valueOf(SolrUtils.objectToString(doc.get(RodaConstants.JOB_PRIORITY), JobPriority.MEDIUM.toString())));
     job.setStateDetails(SolrUtils.objectToString(doc.get(RodaConstants.JOB_STATE_DETAILS), null));
     JobStats jobStats = job.getJobStats();
     jobStats.setCompletionPercentage(SolrUtils.objectToInteger(doc.get(RodaConstants.JOB_COMPLETION_PERCENTAGE), 0));
@@ -169,7 +178,7 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
     jobStats.setSourceObjectsProcessedWithPartialSuccess(
       SolrUtils.objectToInteger(doc.get(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_PARTIAL_SUCCESS), 0));
     jobStats.setSourceObjectsProcessedWithSkipped(
-        SolrUtils.objectToInteger(doc.get(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SKIPPED), 0));
+      SolrUtils.objectToInteger(doc.get(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SKIPPED), 0));
     jobStats.setSourceObjectsProcessedWithFailure(
       SolrUtils.objectToInteger(doc.get(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE), 0));
     jobStats.setOutcomeObjectsWithManualIntervention(

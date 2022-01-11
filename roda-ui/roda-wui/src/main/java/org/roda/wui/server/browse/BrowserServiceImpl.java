@@ -60,6 +60,8 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobMixIn;
+import org.roda.core.data.v2.jobs.JobParallelism;
+import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -601,9 +603,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public <T extends IsIndexed> Job createProcess(String jobName, SelectedItems<T> selected, String id,
-    Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
-    NotFoundException, GenericException, JobAlreadyStartedException {
+  public <T extends IsIndexed> Job createProcess(String jobName, JobPriority priority, JobParallelism parallelism,
+    SelectedItems<T> selected, String id, Map<String, String> value, String selectedClass)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
+    JobAlreadyStartedException {
     SelectedItems<T> selectedItems = selected;
     User user = UserUtility.getUser(getThreadLocalRequest());
 
@@ -620,14 +623,24 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     job.setSourceObjects(selectedItems);
     job.setPlugin(id);
     job.setPluginParameters(value);
+    job.setPriority(priority);
+    job.setParallelism(parallelism);
 
     return Jobs.createJob(user, job, true);
   }
 
   @Override
-  public <T extends IsIndexed> String createProcessJson(String jobName, SelectedItems<T> selected, String id,
+  public <T extends IsIndexed> Job createProcess(String jobName, SelectedItems<T> selected, String id,
     Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
     NotFoundException, GenericException, JobAlreadyStartedException {
+    return createProcess(jobName, JobPriority.MEDIUM, JobParallelism.NORMAL, selected, id, value, selectedClass);
+  }
+
+  @Override
+  public <T extends IsIndexed> String createProcessJson(String jobName, JobPriority priority,
+    JobParallelism parallelism, SelectedItems<T> selected, String id, Map<String, String> value, String selectedClass)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
+    JobAlreadyStartedException {
     SelectedItems<T> selectedItems = selected;
     User user = UserUtility.getUser(getThreadLocalRequest());
 
@@ -646,6 +659,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     job.setPlugin(id);
     job.setPluginParameters(value);
     job.setUsername(user.getName());
+    job.setPriority(priority);
+    job.setParallelism(parallelism);
 
     String command = RodaCoreFactory.getRodaConfiguration().getString("ui.createJob.curl");
     if (command != null) {
@@ -655,6 +670,13 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     } else {
       return "";
     }
+  }
+
+  @Override
+  public <T extends IsIndexed> String createProcessJson(String jobName, SelectedItems<T> selected, String id,
+    Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
+    NotFoundException, GenericException, JobAlreadyStartedException {
+    return createProcessJson(jobName, JobPriority.MEDIUM, JobParallelism.NORMAL, selected, id, value, selectedClass);
   }
 
   private <T extends IsIndexed> SelectedItems<T> getAllItemsByClass(String selectedClass) {

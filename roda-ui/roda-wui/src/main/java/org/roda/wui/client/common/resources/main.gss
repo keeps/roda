@@ -262,6 +262,20 @@ table .label-success, table .label-danger, table .label-warning, table .label-in
     border-radius: .25em;
 }
 
+.label-priority-urgent {
+    background-color: #9b0000;
+    display: inline;
+    padding: .2em .6em .3em;
+    /*     font-size: 75%; */
+    /*     font-weight: 700; */
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: .25em;
+}
+
 .small {
     font-size: 75%;
 }
@@ -7142,4 +7156,16 @@ span.code {
 
 .hasNoPermissions {
     display: none;
+}
+
+.job-orchestration-options > .job-orchestration-option {
+    margin-top: 5px;
+}
+
+.job-orchestration-options + .job-orchestration-options {
+    margin-top: 5px;
+}
+
+.job-orchestration-options > .job-orchestration-option ~ .job-orchestration-option{
+    margin-top: 5px;
 }

@@ -38,6 +38,8 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobParallelism;
+import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.notifications.Notification;
@@ -95,7 +97,7 @@ public interface BrowserService extends RemoteService {
     public static BrowserServiceAsync getInstance() {
       BrowserServiceAsync instance = (BrowserServiceAsync) GWT.create(BrowserService.class);
       ServiceDefTarget target = (ServiceDefTarget) instance;
-      target.setServiceEntryPoint(GWT.getHostPageBaseURL()  + RodaConstants.GWT_RPC_BASE_URL + SERVICE_URI);
+      target.setServiceEntryPoint(GWT.getHostPageBaseURL() + RodaConstants.GWT_RPC_BASE_URL + SERVICE_URI);
       return instance;
     }
   }
@@ -249,9 +251,19 @@ public interface BrowserService extends RemoteService {
   Job deleteRisk(SelectedItems<IndexedRisk> selected) throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, NotFoundException, InvalidParameterException, JobAlreadyStartedException;
 
+  <T extends IsIndexed> Job createProcess(String jobName, JobPriority priority, JobParallelism parallelism,
+                                          SelectedItems<T> selected, String id, Map<String, String> value, String selectedClass)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
+    JobAlreadyStartedException;
+
   <T extends IsIndexed> Job createProcess(String jobName, SelectedItems<T> selected, String id,
     Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
     NotFoundException, GenericException, JobAlreadyStartedException;
+
+  <T extends IsIndexed> String createProcessJson(String jobName, JobPriority priority, JobParallelism parallelism,
+    SelectedItems<T> selected, String id, Map<String, String> value, String selectedClass)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
+    JobAlreadyStartedException;
 
   <T extends IsIndexed> String createProcessJson(String jobName, SelectedItems<T> selected, String id,
     Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
@@ -324,8 +336,7 @@ public interface BrowserService extends RemoteService {
   boolean hasDocumentation(String aipId)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException;
 
-  boolean hasSubmissions(String aipId)
-          throws AuthorizationDeniedException, RequestNotValidException, GenericException;
+  boolean hasSubmissions(String aipId) throws AuthorizationDeniedException, RequestNotValidException, GenericException;
 
   boolean showDIPEmbedded();
 
