@@ -22,7 +22,7 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
-import org.roda.core.data.v2.jobs.JobActionType;
+import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.index.IndexService;
 import org.roda.core.plugins.Plugin;
@@ -219,7 +219,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
       // 20160819 hsilva: the following it's just for debugging purposes
       message.setHasBeenForwarded();
 
-      if (message.getJobActionType() != null && JobActionType.BACKGROUND.equals(message.getJobActionType())) {
+      if (message.getParallelism() != null && JobParallelism.LIMITED.equals(message.getParallelism())) {
         backgroundWorkersRouter.tell(message, getSelf());
       } else {
         workersRouter.tell(message, getSelf());
@@ -246,7 +246,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
         }
       }
 
-      if (message.getJobActionType() != null && JobActionType.BACKGROUND.equals(message.getJobActionType())) {
+      if (message.getParallelism() != null && JobParallelism.LIMITED.equals(message.getParallelism())) {
         backgroundWorkersRouter.tell(Messages.newPluginAfterAllExecuteIsReady(plugin), getSelf());
       } else {
         workersRouter.tell(Messages.newPluginAfterAllExecuteIsReady(plugin), getSelf());
@@ -270,7 +270,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
       getPluginOrchestrator().setJobInError(PluginHelper.getJobId(plugin));
       getSelf()
         .tell(Messages.newJobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE, Optional.ofNullable(e.getMessage()))
-          .withJobType(message.getJobActionType()).withJobPriority(message.getJobPriority()), getSelf());
+          .withParallelism(message.getParallelism()).withJobPriority(message.getJobPriority()), getSelf());
 
     }
     markMessageProcessingAsEnded(message);
@@ -283,20 +283,20 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
 
     if (message.isWithError()) {
       getSelf().tell(Messages.newJobStateDetailsUpdated(plugin, Optional.of(message.getErrorMessage()))
-        .withJobPriority(message.getJobPriority()).withJobType(message.getJobActionType()), getSelf());
+        .withJobPriority(message.getJobPriority()).withParallelism(message.getParallelism()), getSelf());
     }
 
     if (jobInfo.isDone() && jobInfo.isInitEnded()) {
       if (jobInfo.atLeastOneErrorOccurred()) {
         getSelf().tell(Messages.newJobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE)
-          .withJobPriority(message.getJobPriority()).withJobType(message.getJobActionType()), getSelf());
+          .withJobPriority(message.getJobPriority()).withParallelism(message.getParallelism()), getSelf());
       } else {
-        if (message.getJobActionType() != null && JobActionType.BACKGROUND.equals(message.getJobActionType())) {
+        if (message.getParallelism() != null && JobParallelism.LIMITED.equals(message.getParallelism())) {
           backgroundWorkersRouter.tell(Messages.newPluginAfterAllExecuteIsReady(plugin)
-            .withJobPriority(message.getJobPriority()).withJobType(message.getJobActionType()), getSelf());
+            .withJobPriority(message.getJobPriority()).withParallelism(message.getParallelism()), getSelf());
         } else {
           workersRouter.tell(Messages.newPluginAfterAllExecuteIsReady(plugin).withJobPriority(message.getJobPriority())
-            .withJobType(message.getJobActionType()), getSelf());
+            .withParallelism(message.getParallelism()), getSelf());
         }
 
       }
@@ -308,11 +308,11 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
     Messages.PluginAfterAllExecuteIsDone message = (Messages.PluginAfterAllExecuteIsDone) msg;
     markMessageProcessingAsStarted(message);
     getSelf().tell(
-      Messages.newJobCleanup().withJobType(message.getJobActionType()).withJobPriority(message.getJobPriority()),
+      Messages.newJobCleanup().withParallelism(message.getParallelism()).withJobPriority(message.getJobPriority()),
       getSelf());
     getSelf().tell(
       Messages.newJobStateUpdated(plugin, message.isWithError() ? JOB_STATE.FAILED_TO_COMPLETE : JOB_STATE.COMPLETED)
-        .withJobType(message.getJobActionType()).withJobPriority(message.getJobPriority()),
+        .withParallelism(message.getParallelism()).withJobPriority(message.getJobPriority()),
       getSelf());
     markMessageProcessingAsEnded(message);
   }

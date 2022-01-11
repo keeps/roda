@@ -186,6 +186,12 @@ public class ShowJob extends Composite {
   Label creator;
 
   @UiField
+  HTML jobPriority;
+
+  @UiField
+  HTML jobParallelism;
+
+  @UiField
   Label dateStarted;
 
   @UiField
@@ -266,7 +272,8 @@ public class ShowJob extends Composite {
       jobReportListBuilder = new ListBuilder<>(() -> new IngestJobReportList(true, isJobRunning(), isJobComplex()),
         jobReportListBuilderOptions);
     } else {
-      jobReportListBuilder = new ListBuilder<>(() -> new SimpleJobReportList(this.pluginsInfo, true, isJobRunning(), isJobComplex()),
+      jobReportListBuilder = new ListBuilder<>(
+        () -> new SimpleJobReportList(this.pluginsInfo, true, isJobRunning(), isJobComplex()),
         jobReportListBuilderOptions);
     }
 
@@ -276,6 +283,10 @@ public class ShowJob extends Composite {
 
     name.setText(job.getName());
     creator.setText(job.getUsername());
+
+    jobPriority.setHTML(HtmlSnippetUtils.getJobPriorityHtml(job.getPriority(), true));
+    jobParallelism.setHTML(HtmlSnippetUtils.getJobParallelismTypeHtml(job.getParallelism(), true));
+
     dateStarted.setText(Humanize.formatDateTime(job.getStartDate()));
     update();
 
@@ -550,7 +561,8 @@ public class ShowJob extends Composite {
     }
     if (job.getJobStats().getSourceObjectsProcessedWithPartialSuccess() > 0) {
       b.append(SafeHtmlUtils.fromSafeConstant("&nbsp;<span class='label-warning'>"));
-      b.append(messages.showJobProgressPartialSuccessfulCount(job.getJobStats().getSourceObjectsProcessedWithPartialSuccess()));
+      b.append(messages
+        .showJobProgressPartialSuccessfulCount(job.getJobStats().getSourceObjectsProcessedWithPartialSuccess()));
       b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
     }
     if (job.getJobStats().getSourceObjectsProcessedWithFailure() > 0) {

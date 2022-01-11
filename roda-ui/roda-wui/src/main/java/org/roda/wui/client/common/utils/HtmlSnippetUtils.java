@@ -26,6 +26,8 @@ import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
+import org.roda.core.data.v2.jobs.JobParallelism;
+import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryState;
@@ -181,6 +183,56 @@ public class HtmlSnippetUtils {
     }
     b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
     return b.toSafeHtml();
+  }
+
+  public static SafeHtml getJobParallelismTypeHtml(JobParallelism parallelism) {
+    return getJobParallelismTypeHtml(parallelism, false);
+  }
+
+  public static SafeHtml getJobParallelismTypeHtml(JobParallelism parallelism, boolean appendDefinition) {
+    SafeHtmlBuilder b = new SafeHtmlBuilder();
+    b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO));
+    b.append(SafeHtmlUtils.fromString(messages.jobParallelismTypeBadge(parallelism)));
+    if (appendDefinition) {
+      b.append(SafeHtmlUtils.fromString(" "));
+      b.append(SafeHtmlUtils.fromString(messages.jobParallelismText()));
+    }
+    b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+
+    return b.toSafeHtml();
+  }
+
+  public static SafeHtml getJobPriorityHtml(JobPriority priority, boolean appendDefinition) {
+    SafeHtmlBuilder b = new SafeHtmlBuilder();
+
+    switch (priority) {
+      case URGENT:
+        b.append(SafeHtmlUtils.fromSafeConstant("<span class='label-priority-urgent'>"));
+        break;
+      case HIGH:
+        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER));
+        break;
+      case LOW:
+        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
+        break;
+      case MEDIUM:
+      default:
+        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING));
+        break;
+    }
+
+    b.append(SafeHtmlUtils.fromString(messages.jobPriorityBadge(priority)));
+    if (appendDefinition) {
+      b.append(SafeHtmlUtils.fromString(" "));
+      b.append(SafeHtmlUtils.fromString(messages.jobPriorityText()));
+    }
+    b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+
+    return b.toSafeHtml();
+  }
+
+  public static SafeHtml getJobPriorityHtml(JobPriority priority) {
+    return getJobPriorityHtml(priority, false);
   }
 
   public static SafeHtml getJobStateHtml(Job job) {

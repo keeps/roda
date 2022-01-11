@@ -16,6 +16,8 @@ import java.util.List;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
+import org.roda.core.data.v2.jobs.JobParallelism;
+import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.notifications.NotificationState;
@@ -375,6 +377,16 @@ public interface ClientMessages extends Messages {
   String createJobCategorySelect();
 
   SafeHtml createJobCategoryWorkflow(List<String> categoryLabels);
+
+  String createJobOrchestration();
+
+  String createJobPriority();
+
+  String createJobParallelism();
+
+  String createJobPrioritySmallDescription();
+
+  String createJobParallelismSmallDescription();
 
   String createJobCurlCommand();
 
@@ -1107,6 +1119,16 @@ public interface ClientMessages extends Messages {
   String jobName();
 
   String jobCreator();
+
+  String jobParallelismText();
+
+  String jobPriorityText();
+
+  String jobParallelismTypeBadge(@Select JobParallelism type);
+
+  String jobPriorityBadge(@Select JobPriority priority);
+
+  String joOrchestration();
 
   String jobStartDate();
 

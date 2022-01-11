@@ -94,8 +94,8 @@ public class CreateActionJob extends CreateSelectedJob<IsIndexed> {
     getButtonCreate().setEnabled(false);
     String jobName = getName().getText();
 
-    BrowserService.Util.getInstance().createProcess(jobName, getSelected(), getSelectedPlugin().getId(),
-      getWorkflowOptions().getValue(), getSelectedClass(), new AsyncCallback<Job>() {
+    BrowserService.Util.getInstance().createProcess(jobName, getJobPriority(), getJobParallelism(), getSelected(),
+      getSelectedPlugin().getId(), getWorkflowOptions().getValue(), getSelectedClass(), new AsyncCallback<Job>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -115,8 +115,8 @@ public class CreateActionJob extends CreateSelectedJob<IsIndexed> {
   public void buttonObtainCommandHandler(ClickEvent e) {
     String jobName = getName().getText();
 
-    BrowserService.Util.getInstance().createProcessJson(jobName, getSelected(), getSelectedPlugin().getId(),
-      getWorkflowOptions().getValue(), getSelectedClass(), new AsyncCallback<String>() {
+    BrowserService.Util.getInstance().createProcessJson(jobName, getJobPriority(), getJobParallelism(), getSelected(),
+      getSelectedPlugin().getId(), getWorkflowOptions().getValue(), getSelectedClass(), new AsyncCallback<String>() {
 
         @Override
         public void onFailure(Throwable caught) {

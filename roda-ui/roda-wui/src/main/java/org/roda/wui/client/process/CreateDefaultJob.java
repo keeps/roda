@@ -31,6 +31,8 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobParallelism;
+import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -44,12 +46,14 @@ import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
 import org.roda.wui.client.common.lists.utils.ListFactory;
 import org.roda.wui.client.common.search.SearchWrapper;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.ingest.process.PluginOptionsPanel;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -71,6 +75,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -122,6 +127,8 @@ public class CreateDefaultJob extends Composite {
   private List<PluginInfo> plugins = null;
   private PluginInfo selectedPlugin = null;
   private boolean isListEmpty = true;
+  private JobPriority priority = JobPriority.MEDIUM;
+  private JobParallelism parallelism = JobParallelism.NORMAL;
 
   private static List<PluginType> pluginTypes = PluginUtils.getPluginTypesWithoutIngest();
 
@@ -170,7 +177,39 @@ public class CreateDefaultJob extends Composite {
   @UiField
   Button buttonCancel;
 
+  @UiField
+  FlowPanel jobPriorityDescription;
+
+  @UiField
+  FlowPanel jobPriorityRadioButtons;
+
+  @UiField
+  FlowPanel jobParallelismRadioButtons;
+
+  @UiField(provided = true)
+  RadioButton highPriorityRadioButton;
+
+  @UiField(provided = true)
+  RadioButton mediumPriorityRadioButton;
+
+  @UiField(provided = true)
+  RadioButton lowPriorityRadioButton;
+
+  @UiField(provided = true)
+  RadioButton normalParallelismRadioButton;
+
+  @UiField(provided = true)
+  RadioButton limitedParallelismRadioButton;
+
   public CreateDefaultJob() {
+    highPriorityRadioButton = new RadioButton("priority", HtmlSnippetUtils.getJobPriorityHtml(JobPriority.HIGH));
+    mediumPriorityRadioButton = new RadioButton("priority", HtmlSnippetUtils.getJobPriorityHtml(JobPriority.MEDIUM));
+    lowPriorityRadioButton = new RadioButton("priority", HtmlSnippetUtils.getJobPriorityHtml(JobPriority.LOW));
+    normalParallelismRadioButton = new RadioButton("parallelism",
+      HtmlSnippetUtils.getJobParallelismTypeHtml(JobParallelism.NORMAL));
+    limitedParallelismRadioButton = new RadioButton("parallelism",
+      HtmlSnippetUtils.getJobParallelismTypeHtml(JobParallelism.LIMITED));
+
     initWidget(uiBinder.createAndBindUi(this));
 
     BrowserService.Util.getInstance().retrievePluginsInfo(pluginTypes, new AsyncCallback<List<PluginInfo>>() {
@@ -194,11 +233,29 @@ public class CreateDefaultJob extends Composite {
   }
 
   public void init(List<PluginInfo> plugins) {
+    configureOrchestration();
     this.plugins = plugins;
     name.setText(messages.processNewDefaultName(new Date()));
     workflowOptions.setPlugins(plugins);
     configurePlugins();
     workflowCategoryList.addStyleName("form-listbox-job");
+  }
+
+  private void configureOrchestration() {
+    jobPriorityDescription.add(new HTMLWidgetWrapper("JobOrchestrationDescription.html"));
+
+    mediumPriorityRadioButton.setValue(true);
+    normalParallelismRadioButton.setValue(true);
+
+    highPriorityRadioButton.addClickHandler(e -> priority = JobPriority.HIGH);
+
+    mediumPriorityRadioButton.addClickHandler(e -> priority = JobPriority.MEDIUM);
+
+    lowPriorityRadioButton.addClickHandler(e -> priority = JobPriority.LOW);
+
+    normalParallelismRadioButton.addClickHandler(e -> parallelism = JobParallelism.NORMAL);
+
+    limitedParallelismRadioButton.addClickHandler(e -> parallelism = JobParallelism.LIMITED);
   }
 
   public void configurePlugins() {
@@ -490,8 +547,9 @@ public class CreateDefaultJob extends Composite {
       selected = SelectedItemsAll.create(targetList.getSelectedValue());
     }
 
-    BrowserService.Util.getInstance().createProcess(jobName, selected, getSelectedPlugin().getId(),
-      getWorkflowOptions().getValue(), selected.getSelectedClass(), new AsyncCallback<Job>() {
+    BrowserService.Util.getInstance().createProcess(jobName, priority, parallelism, selected,
+      getSelectedPlugin().getId(), getWorkflowOptions().getValue(), selected.getSelectedClass(),
+      new AsyncCallback<Job>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -519,8 +577,9 @@ public class CreateDefaultJob extends Composite {
       selected = SelectedItemsAll.create(targetList.getSelectedValue());
     }
 
-    BrowserService.Util.getInstance().createProcessJson(jobName, selected, getSelectedPlugin().getId(),
-      getWorkflowOptions().getValue(), selected.getSelectedClass(), new AsyncCallback<String>() {
+    BrowserService.Util.getInstance().createProcessJson(jobName, priority, parallelism, selected,
+      getSelectedPlugin().getId(), getWorkflowOptions().getValue(), selected.getSelectedClass(),
+      new AsyncCallback<String>() {
 
         @Override
         public void onFailure(Throwable caught) {

@@ -40,6 +40,8 @@ import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata;
 import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalTransitiveHoldAIPMetadata;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobParallelism;
+import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.notifications.Notification;
@@ -190,8 +192,14 @@ public interface BrowserServiceAsync {
 
   void deleteRiskIncidences(SelectedItems<RiskIncidence> selected, String details, AsyncCallback<Job> asyncCallback);
 
+  void createProcess(String jobName, JobPriority priority, JobParallelism parallelism, SelectedItems<?> selected, String id,
+                     Map<String, String> value, String selectedClass, AsyncCallback<Job> asyncCallback);
+
   void createProcess(String jobName, SelectedItems<?> selected, String id, Map<String, String> value,
     String selectedClass, AsyncCallback<Job> asyncCallback);
+
+  void createProcessJson(String jobName, JobPriority priority, JobParallelism parallelism, SelectedItems<?> selected,
+    String id, Map<String, String> value, String selectedClass, AsyncCallback<String> asyncCallback);
 
   void createProcessJson(String jobName, SelectedItems<?> selected, String id, Map<String, String> value,
     String selectedClass, AsyncCallback<String> asyncCallback);

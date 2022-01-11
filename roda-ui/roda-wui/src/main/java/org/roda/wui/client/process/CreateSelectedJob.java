@@ -20,11 +20,14 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.JobParallelism;
+import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.ingest.process.PluginOptionsPanel;
@@ -48,10 +51,12 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 /**
  * @author Luis Faria
@@ -107,6 +112,8 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
   private List<PluginInfo> plugins = null;
   private PluginInfo selectedPlugin = null;
   private String listSelectedClass = TransferredResource.class.getName();
+  private JobPriority priority = JobPriority.MEDIUM;
+  private JobParallelism parallelism = JobParallelism.NORMAL;
 
   @UiField
   TextBox name;
@@ -150,9 +157,39 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
   @UiField
   Button buttonCancel;
 
+  @UiField
+  FlowPanel jobPriorityDescription;
+
+  @UiField
+  FlowPanel jobPriorityRadioButtons;
+
+  @UiField
+  FlowPanel jobParallelismRadioButtons;
+
+  @UiField(provided = true)
+  RadioButton highPriorityRadioButton;
+
+  @UiField(provided = true)
+  RadioButton mediumPriorityRadioButton;
+
+  @UiField(provided = true)
+  RadioButton lowPriorityRadioButton;
+
+  @UiField(provided = true)
+  RadioButton normalParallelismRadioButton;
+
+  @UiField(provided = true)
+  RadioButton limitedParallelismRadioButton;
+
   public CreateSelectedJob(final List<PluginType> pluginType) {
     this.selected = LastSelectedItemsSingleton.getInstance().getSelectedItems();
-
+    highPriorityRadioButton = new RadioButton("priority", HtmlSnippetUtils.getJobPriorityHtml(JobPriority.HIGH));
+    mediumPriorityRadioButton = new RadioButton("priority", HtmlSnippetUtils.getJobPriorityHtml(JobPriority.MEDIUM));
+    lowPriorityRadioButton = new RadioButton("priority", HtmlSnippetUtils.getJobPriorityHtml(JobPriority.LOW));
+    normalParallelismRadioButton = new RadioButton("parallelism",
+      HtmlSnippetUtils.getJobParallelismTypeHtml(JobParallelism.NORMAL));
+    limitedParallelismRadioButton = new RadioButton("parallelism",
+      HtmlSnippetUtils.getJobParallelismTypeHtml(JobParallelism.LIMITED));
     initWidget(uiBinder.createAndBindUi(this));
 
     boolean isEmpty = updateObjectList();
@@ -182,11 +219,29 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
   }
 
   public void init(List<PluginInfo> plugins) {
+    configureOrchestration();
     this.plugins = plugins;
     name.setText(messages.processNewDefaultName(new Date()));
     workflowOptions.setPlugins(plugins);
     configurePlugins(selected.getSelectedClass());
     workflowCategoryList.addStyleName("form-listbox-job");
+  }
+
+  private void configureOrchestration() {
+    jobPriorityDescription.add(new HTMLWidgetWrapper("JobOrchestrationDescription.html"));
+
+    mediumPriorityRadioButton.setValue(true);
+    normalParallelismRadioButton.setValue(true);
+
+    highPriorityRadioButton.addClickHandler(e -> priority = JobPriority.HIGH);
+
+    mediumPriorityRadioButton.addClickHandler(e -> priority = JobPriority.MEDIUM);
+
+    lowPriorityRadioButton.addClickHandler(e -> priority = JobPriority.LOW);
+
+    normalParallelismRadioButton.addClickHandler(e -> parallelism = JobParallelism.NORMAL);
+
+    limitedParallelismRadioButton.addClickHandler(e -> parallelism = JobParallelism.LIMITED);
   }
 
   public abstract boolean updateObjectList();
@@ -490,6 +545,14 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
       return ((SelectedItemsList<?>) selected).getIds().isEmpty();
     }
     return false;
+  }
+
+  public JobPriority getJobPriority() {
+    return this.priority;
+  }
+
+  public JobParallelism getJobParallelism() {
+    return this.parallelism;
   }
 
 }

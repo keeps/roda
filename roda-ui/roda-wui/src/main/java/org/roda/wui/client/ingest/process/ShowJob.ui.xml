@@ -28,6 +28,13 @@
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label">
+									<ui:text from='{messages.joOrchestration}' />
+								</g:Label>
+								<g:HTML ui:field="jobPriority" addStyleNames="inline" />
+								<g:HTML ui:field="jobParallelism" addStyleNames="inline" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label addStyleNames="label">
 									<ui:text from='{messages.jobStartDate}' />
 								</g:Label>
 								<g:Label styleName="value" ui:field="dateStarted" />
