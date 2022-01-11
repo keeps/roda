@@ -13,7 +13,7 @@ public abstract class JobPluginInfo extends JobStats implements JobPluginInfoInt
   private static final long serialVersionUID = 2106710222456788707L;
 
   private int stepsCompleted = 0;
-  private int totalSteps = 0;
+  private int totalSteps = 1;
 
   public int getStepsCompleted() {
     return stepsCompleted;
