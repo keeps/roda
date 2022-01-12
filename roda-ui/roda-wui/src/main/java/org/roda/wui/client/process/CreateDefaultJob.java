@@ -178,9 +178,6 @@ public class CreateDefaultJob extends Composite {
   Button buttonCancel;
 
   @UiField
-  FlowPanel jobPriorityDescription;
-
-  @UiField
   FlowPanel jobPriorityRadioButtons;
 
   @UiField
@@ -202,13 +199,13 @@ public class CreateDefaultJob extends Composite {
   RadioButton limitedParallelismRadioButton;
 
   public CreateDefaultJob() {
-    highPriorityRadioButton = new RadioButton("priority", HtmlSnippetUtils.getJobPriorityHtml(JobPriority.HIGH));
-    mediumPriorityRadioButton = new RadioButton("priority", HtmlSnippetUtils.getJobPriorityHtml(JobPriority.MEDIUM));
-    lowPriorityRadioButton = new RadioButton("priority", HtmlSnippetUtils.getJobPriorityHtml(JobPriority.LOW));
+    highPriorityRadioButton = new RadioButton("priority", HtmlSnippetUtils.getJobPriorityHtml(JobPriority.HIGH, true));
+    mediumPriorityRadioButton = new RadioButton("priority", HtmlSnippetUtils.getJobPriorityHtml(JobPriority.MEDIUM, true));
+    lowPriorityRadioButton = new RadioButton("priority", HtmlSnippetUtils.getJobPriorityHtml(JobPriority.LOW, true));
     normalParallelismRadioButton = new RadioButton("parallelism",
-      HtmlSnippetUtils.getJobParallelismTypeHtml(JobParallelism.NORMAL));
+      HtmlSnippetUtils.getJobParallelismTypeHtml(JobParallelism.NORMAL, true));
     limitedParallelismRadioButton = new RadioButton("parallelism",
-      HtmlSnippetUtils.getJobParallelismTypeHtml(JobParallelism.LIMITED));
+      HtmlSnippetUtils.getJobParallelismTypeHtml(JobParallelism.LIMITED, true));
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -242,19 +239,13 @@ public class CreateDefaultJob extends Composite {
   }
 
   private void configureOrchestration() {
-    jobPriorityDescription.add(new HTMLWidgetWrapper("JobOrchestrationDescription.html"));
-
     mediumPriorityRadioButton.setValue(true);
     normalParallelismRadioButton.setValue(true);
 
     highPriorityRadioButton.addClickHandler(e -> priority = JobPriority.HIGH);
-
     mediumPriorityRadioButton.addClickHandler(e -> priority = JobPriority.MEDIUM);
-
     lowPriorityRadioButton.addClickHandler(e -> priority = JobPriority.LOW);
-
     normalParallelismRadioButton.addClickHandler(e -> parallelism = JobParallelism.NORMAL);
-
     limitedParallelismRadioButton.addClickHandler(e -> parallelism = JobParallelism.LIMITED);
   }
 
