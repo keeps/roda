@@ -380,15 +380,21 @@ public interface ClientMessages extends Messages {
 
   String createJobOrchestration();
 
-  String createJobPriority();
-
-  String createJobParallelism();
-
-  String createJobPrioritySmallDescription();
-
-  String createJobParallelismSmallDescription();
-
   String createJobCurlCommand();
+
+  String createJobHighPriorityDescription();
+
+  String createJobMediumPriorityDescription();
+
+  String createJobLowPriorityDescription();
+
+  String createJobNormalParallelismDescription();
+
+  String createJobLimitedParallelismDescription();
+
+  String createJobOrchestrationPrioritySeparator();
+
+  String createJobOrchestrationParallelismSeparator();
 
   String copiedToClipboardTitle();
 

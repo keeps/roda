@@ -46,33 +46,49 @@
 
 				<g:FlowPanel addStyleNames="item-selector full_width">
 					<g:Label addStyleNames="form-label h4">
-						<ui:text from='{messages.createJobOrchestration}' />
+						<ui:text from='{messages.createJobOrchestration}'/>
 					</g:Label>
-					<g:FlowPanel addStyleNames="page-description" ui:field="jobPriorityDescription" />
 					<g:FlowPanel addStyleNames="job-orchestration-options" ui:field="jobPriorityRadioButtons">
-						<g:Label title="{messages.createJobPrioritySmallDescription}" addStyleNames="form-label" ui:field="jobPriorityTitle">
-							<ui:text from='{messages.createJobPriority}' />
+						<g:Label addStyleNames="h6">
+							<ui:text from="{messages.createJobOrchestrationPrioritySeparator}" />
 						</g:Label>
-						<g:SimplePanel addStyleNames="job-orchestration-option">
-							<g:RadioButton ui:field="highPriorityRadioButton" name="priority" />
-						</g:SimplePanel>
-						<g:SimplePanel addStyleNames="job-orchestration-option">
-							<g:RadioButton ui:field="mediumPriorityRadioButton" name="priority" />
-						</g:SimplePanel>
-						<g:SimplePanel addStyleNames="job-orchestration-option">
-							<g:RadioButton ui:field="lowPriorityRadioButton" name="priority" />
-						</g:SimplePanel>
+						<g:FlowPanel addStyleNames="job-orchestration-option">
+							<g:SimplePanel>
+								<g:RadioButton ui:field="highPriorityRadioButton" name="priority"/>
+							</g:SimplePanel>
+							<g:Label addStyleNames="job-orchestration-option-description">
+								<ui:text from='{messages.createJobHighPriorityDescription}'/>
+							</g:Label>
+						</g:FlowPanel>
+						<g:FlowPanel addStyleNames="job-orchestration-option">
+							<g:RadioButton ui:field="mediumPriorityRadioButton" name="priority"/>
+							<g:Label addStyleNames="job-orchestration-option-description">
+								<ui:text from='{messages.createJobMediumPriorityDescription}'/>
+							</g:Label>
+						</g:FlowPanel>
+						<g:FlowPanel addStyleNames="job-orchestration-option">
+							<g:RadioButton ui:field="lowPriorityRadioButton" name="priority"/>
+							<g:Label addStyleNames="job-orchestration-option-description">
+								<ui:text from='{messages.createJobLowPriorityDescription}'/>
+							</g:Label>
+						</g:FlowPanel>
 					</g:FlowPanel>
 					<g:FlowPanel addStyleNames="job-orchestration-options" ui:field="jobParallelismRadioButtons">
-						<g:Label title="{messages.createJobParallelismSmallDescription}" addStyleNames="form-label" ui:field="jobParallelismTitle">
-							<ui:text from='{messages.createJobParallelism}' />
+						<g:Label addStyleNames="h6">
+							<ui:text from="{messages.createJobOrchestrationPrioritySeparator}" />
 						</g:Label>
-						<g:SimplePanel addStyleNames="job-orchestration-option">
-							<g:RadioButton ui:field="normalParallelismRadioButton" name="parallelism" />
-						</g:SimplePanel>
-						<g:SimplePanel addStyleNames="job-orchestration-option">
-							<g:RadioButton ui:field="limitedParallelismRadioButton" name="parallelism" />
-						</g:SimplePanel>
+						<g:FlowPanel addStyleNames="job-orchestration-option">
+							<g:RadioButton ui:field="normalParallelismRadioButton" name="parallelism"/>
+							<g:Label addStyleNames="job-orchestration-option-description">
+								<ui:text from='{messages.createJobNormalParallelismDescription}'/>
+							</g:Label>
+						</g:FlowPanel>
+						<g:FlowPanel addStyleNames="job-orchestration-option">
+							<g:RadioButton ui:field="limitedParallelismRadioButton" name="parallelism"/>
+							<g:Label addStyleNames="job-orchestration-option-description">
+								<ui:text from='{messages.createJobLimitedParallelismDescription}'/>
+							</g:Label>
+						</g:FlowPanel>
 					</g:FlowPanel>
 				</g:FlowPanel>
 

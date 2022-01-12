@@ -158,9 +158,6 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
   Button buttonCancel;
 
   @UiField
-  FlowPanel jobPriorityDescription;
-
-  @UiField
   FlowPanel jobPriorityRadioButtons;
 
   @UiField
@@ -228,19 +225,13 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
   }
 
   private void configureOrchestration() {
-    jobPriorityDescription.add(new HTMLWidgetWrapper("JobOrchestrationDescription.html"));
-
     mediumPriorityRadioButton.setValue(true);
     normalParallelismRadioButton.setValue(true);
 
     highPriorityRadioButton.addClickHandler(e -> priority = JobPriority.HIGH);
-
     mediumPriorityRadioButton.addClickHandler(e -> priority = JobPriority.MEDIUM);
-
     lowPriorityRadioButton.addClickHandler(e -> priority = JobPriority.LOW);
-
     normalParallelismRadioButton.addClickHandler(e -> parallelism = JobParallelism.NORMAL);
-
     limitedParallelismRadioButton.addClickHandler(e -> parallelism = JobParallelism.LIMITED);
   }
 

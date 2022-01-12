@@ -7362,9 +7362,24 @@ span.code {
 }
 
 .job-orchestration-options + .job-orchestration-options {
-    margin-top: 5px;
+    margin-top: 15px;
 }
 
 .job-orchestration-options > .job-orchestration-option ~ .job-orchestration-option{
     margin-top: 5px;
+}
+
+.job-orchestration-option-description {
+    font-size: 75%;
+    font-weight: lighter;
+    color: #6c757d !important;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    padding-left: 30px;
+    margin-top: 2px;
+}
+
+.job-orchestration-option label {
+    margin-left: 5px;
 }
