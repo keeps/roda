@@ -73,7 +73,7 @@ public class AkkaJobActor extends AkkaBaseActor {
       JobPriority jobPriority = job.getPriority();
       JobParallelism jobParallelism = job.getParallelism();
       ActorRef jobStateInfoActor = getContext().actorOf(Props.create(AkkaJobStateInfoActor.class, plugin, getSender(),
-        jobsManager, jobId, JobsHelper.getNumberOfJobsWorkers()), jobId);
+        jobsManager, jobId, JobsHelper.getNumberOfJobsWorkers(), JobsHelper.getNumberOfLimitedJobsWorkers()), jobId);
       super.getPluginOrchestrator().setJobContextInformation(jobId, jobStateInfoActor);
 
       jobStateInfoActor.tell(Messages.newJobStateUpdated(plugin, JOB_STATE.STARTED).withParallelism(jobParallelism).withJobPriority(jobPriority), getSelf());

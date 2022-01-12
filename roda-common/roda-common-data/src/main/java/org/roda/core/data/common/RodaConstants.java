@@ -517,6 +517,9 @@ public final class RodaConstants {
 
   public static final OrchestratorType DEFAULT_ORCHESTRATOR_TYPE = OrchestratorType.AKKA;
   public static final String ORCHESTRATOR_TYPE_PROPERTY = "core.orchestrator.type";
+  public static final String CORE_ORCHESTRATOR_PREFIX = "core.orchestrator";
+  public static final String CORE_ORCHESTRATOR_PROP_INTERNAL_JOBS_PRIORITY = "internal_jobs_priority";
+  public static final String CORE_ORCHESTRATOR_PROP_INTERNAL_JOBS_PARALLELISM = "internal_jobs_parallelism";
 
   public static final int CORE_LDAP_DEFAULT_PORT = 10389;
   public static final String CORE_LDAP_BACKEND_JDBM = "JDBM";

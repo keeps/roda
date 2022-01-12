@@ -14,8 +14,20 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.MissingResourceException;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MultivaluedMap;
@@ -25,7 +37,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.*;
+import org.roda.core.common.ClassificationPlanUtils;
+import org.roda.core.common.ConsumesOutputStream;
+import org.roda.core.common.DefaultConsumesOutputStream;
+import org.roda.core.common.DownloadUtils;
+import org.roda.core.common.EntityResponse;
+import org.roda.core.common.HandlebarsUtility;
+import org.roda.core.common.Messages;
+import org.roda.core.common.PremisV3Utils;
+import org.roda.core.common.RodaUtils;
+import org.roda.core.common.StreamResponse;
+import org.roda.core.common.UserUtility;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
@@ -35,7 +57,14 @@ import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.common.RodaConstants.RODA_TYPE;
-import org.roda.core.data.exceptions.*;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IsStillUpdatingException;
+import org.roda.core.data.exceptions.JobAlreadyStartedException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LinkingObjectUtils;
@@ -49,17 +78,48 @@ import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
-import org.roda.core.data.v2.index.filter.*;
+import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
+import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.ip.*;
-import org.roda.core.data.v2.ip.metadata.*;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.DIPFile;
+import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataList;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.ip.metadata.OtherMetadata;
+import org.roda.core.data.v2.ip.metadata.OtherMetadataList;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
-import org.roda.core.data.v2.jobs.*;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadataList;
+import org.roda.core.data.v2.jobs.IndexedReport;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobParallelism;
+import org.roda.core.data.v2.jobs.JobPriority;
+import org.roda.core.data.v2.jobs.PluginState;
+import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RelationObjectType;
@@ -78,15 +138,38 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.characterization.SiegfriedPlugin;
-import org.roda.core.plugins.plugins.internal.*;
-import org.roda.core.storage.*;
+import org.roda.core.plugins.plugins.internal.AddRepresentationInformationFilterPlugin;
+import org.roda.core.plugins.plugins.internal.AppraisalPlugin;
+import org.roda.core.plugins.plugins.internal.ChangeTypePlugin;
+import org.roda.core.plugins.plugins.internal.DeleteRODAObjectPlugin;
+import org.roda.core.plugins.plugins.internal.MovePlugin;
+import org.roda.core.plugins.plugins.internal.UpdateIncidencesPlugin;
+import org.roda.core.plugins.plugins.internal.UpdatePermissionsPlugin;
+import org.roda.core.storage.Binary;
+import org.roda.core.storage.BinaryConsumesOutputStream;
+import org.roda.core.storage.BinaryVersion;
+import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.Directory;
+import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ObjectResponse;
 import org.roda.wui.client.browse.MetadataValue;
-import org.roda.wui.client.browse.bundle.*;
+import org.roda.wui.client.browse.bundle.BinaryVersionBundle;
+import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
+import org.roda.wui.client.browse.bundle.BrowseDipBundle;
+import org.roda.wui.client.browse.bundle.BrowseFileBundle;
+import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
+import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
+import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
+import org.roda.wui.client.browse.bundle.DescriptiveMetadataViewBundle;
+import org.roda.wui.client.browse.bundle.PreservationEventViewBundle;
+import org.roda.wui.client.browse.bundle.RepresentationInformationExtraBundle;
+import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
+import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
 import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
@@ -1526,6 +1609,8 @@ public class BrowserHelper {
     job.setPluginType(pluginType);
     job.setUsername(user.getName());
     job.setPluginParameters(pluginParameters);
+    job.setPriority(getJobPriorityFromConfiguration());
+    job.setParallelism(getJobParallelismFromConfiguration());
 
     try {
       RodaCoreFactory.getModelService().createJob(job);
@@ -1535,6 +1620,38 @@ public class BrowserHelper {
     }
 
     return job;
+  }
+
+  private static JobPriority getJobPriorityFromConfiguration() {
+    // Fetch priority
+    String priority = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.CORE_ORCHESTRATOR_PREFIX,
+      RodaConstants.CORE_ORCHESTRATOR_PROP_INTERNAL_JOBS_PRIORITY);
+
+    if (priority == null) {
+      return JobPriority.MEDIUM;
+    }
+
+    try {
+      return JobPriority.valueOf(priority);
+    } catch (IllegalArgumentException e) {
+      return JobPriority.MEDIUM;
+    }
+  }
+
+  private static JobParallelism getJobParallelismFromConfiguration() {
+    // Fetch priority
+    String parallelism = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.CORE_ORCHESTRATOR_PREFIX,
+        RodaConstants.CORE_ORCHESTRATOR_PROP_INTERNAL_JOBS_PARALLELISM);
+
+    if (parallelism == null) {
+      return JobParallelism.NORMAL;
+    }
+
+    try {
+      return JobParallelism.valueOf(parallelism);
+    } catch (IllegalArgumentException e) {
+      return JobParallelism.NORMAL;
+    }
   }
 
   public static AIP createAIP(User user, String parentAipId, String type, Permissions permissions)

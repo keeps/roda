@@ -64,6 +64,8 @@ public final class JobsHelper {
   private static final String SYNC_TIMEOUT_PROPERTY = "core.orchestrator.sync_timeout";
   private static final int DEFAULT_SYNC_TIMEOUT = 600;
   private static final String MAX_JOBS_IN_PARALLEL_PROPERTY = "core.orchestrator.max_jobs_in_parallel";
+  private static final String NUMBER_OF_LIMITED_JOB_WORKERS_PROPERTY = "core.orchestrator.nr_of_limited_jobs_workers";
+  private static final int DEFAULT_NUMBER_OF_LIMITED_JOBS_WORKERS = 2;
 
   private static final String LINE_SEPARATOR = System.lineSeparator();
 
@@ -85,6 +87,11 @@ public final class JobsHelper {
   public static int getNumberOfJobsWorkers() {
     int defaultNumberOfJobsWorkers = Runtime.getRuntime().availableProcessors() + 1;
     return RodaCoreFactory.getRodaConfiguration().getInt(NUMBER_OF_JOB_WORKERS_PROPERTY, defaultNumberOfJobsWorkers);
+  }
+
+  public static int getNumberOfLimitedJobsWorkers() {
+    return RodaCoreFactory.getRodaConfiguration().getInt(NUMBER_OF_LIMITED_JOB_WORKERS_PROPERTY,
+      DEFAULT_NUMBER_OF_LIMITED_JOBS_WORKERS);
   }
 
   /**
