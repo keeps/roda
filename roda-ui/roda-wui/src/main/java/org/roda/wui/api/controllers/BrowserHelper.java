@@ -119,6 +119,8 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetada
 import org.roda.core.data.v2.ip.metadata.PreservationMetadataList;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobParallelism;
+import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -1625,6 +1627,8 @@ public class BrowserHelper {
     job.setPluginType(pluginType);
     job.setUsername(user.getName());
     job.setPluginParameters(pluginParameters);
+    job.setPriority(getJobPriorityFromConfiguration());
+    job.setParallelism(getJobParallelismFromConfiguration());
 
     try {
       RodaCoreFactory.getModelService().createJob(job);
@@ -1634,6 +1638,38 @@ public class BrowserHelper {
     }
 
     return job;
+  }
+
+  private static JobPriority getJobPriorityFromConfiguration() {
+    // Fetch priority
+    String priority = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.CORE_ORCHESTRATOR_PREFIX,
+      RodaConstants.CORE_ORCHESTRATOR_PROP_INTERNAL_JOBS_PRIORITY);
+
+    if (priority == null) {
+      return JobPriority.MEDIUM;
+    }
+
+    try {
+      return JobPriority.valueOf(priority);
+    } catch (IllegalArgumentException e) {
+      return JobPriority.MEDIUM;
+    }
+  }
+
+  private static JobParallelism getJobParallelismFromConfiguration() {
+    // Fetch priority
+    String parallelism = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.CORE_ORCHESTRATOR_PREFIX,
+        RodaConstants.CORE_ORCHESTRATOR_PROP_INTERNAL_JOBS_PARALLELISM);
+
+    if (parallelism == null) {
+      return JobParallelism.NORMAL;
+    }
+
+    try {
+      return JobParallelism.valueOf(parallelism);
+    } catch (IllegalArgumentException e) {
+      return JobParallelism.NORMAL;
+    }
   }
 
   public static AIP createAIP(User user, String parentAipId, String type, Permissions permissions)

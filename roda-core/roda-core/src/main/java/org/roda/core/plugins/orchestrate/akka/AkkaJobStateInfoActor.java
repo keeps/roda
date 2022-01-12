@@ -61,7 +61,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
   private Histogram stateMessagesMetricsHistogram;
 
   public AkkaJobStateInfoActor(Plugin<?> plugin, ActorRef jobCreator, ActorRef jobsManager, String jobId,
-    int numberOfJobsWorkers) {
+    int numberOfJobsWorkers, int numberOfLimitedJobsWorkers) {
     super();
     jobInfo = new JobInfo();
     this.plugin = plugin;
@@ -73,8 +73,8 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
     Props workersProps = new RoundRobinPool(numberOfJobsWorkers).props(Props.create(AkkaWorkerActor.class));
     workersRouter = getContext().actorOf(workersProps, "WorkersRouter");
 
-    LOGGER.debug("Starting background workers router with {} actors", 2);
-    Props props = new RoundRobinPool(2).props(Props.create(AkkaBackgroundWorkerActor.class));
+    LOGGER.debug("Starting background workers router with {} actors", numberOfLimitedJobsWorkers);
+    Props props = new RoundRobinPool(numberOfLimitedJobsWorkers).props(Props.create(AkkaBackgroundWorkerActor.class));
     backgroundWorkersRouter = getContext().actorOf(props, "BackgroundWorkersRouter");
     // 20160914 hsilva: watch child events, so when they stop we can react
     getContext().watch(workersRouter);
