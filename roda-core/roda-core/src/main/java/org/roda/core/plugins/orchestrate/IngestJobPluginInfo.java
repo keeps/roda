@@ -33,9 +33,6 @@ public class IngestJobPluginInfo extends JobPluginInfo {
   private static final long serialVersionUID = -7993848868644990995L;
   private static final Logger LOGGER = LoggerFactory.getLogger(IngestJobPluginInfo.class);
 
-  private int stepsCompleted = 0;
-  private int totalSteps = 0;
-
   // transferredResourceId > map<aipId, report>
   private Map<String, Map<String, Report>> allReports = new HashMap<>();
   // transferredResourceId > map<aipId, report>
@@ -47,29 +44,6 @@ public class IngestJobPluginInfo extends JobPluginInfo {
 
   public IngestJobPluginInfo() {
     super();
-  }
-
-  public int getStepsCompleted() {
-    return stepsCompleted;
-  }
-
-  public IngestJobPluginInfo setStepsCompleted(int stepsCompleted) {
-    this.stepsCompleted = stepsCompleted;
-    return this;
-  }
-
-  public int getTotalSteps() {
-    return totalSteps;
-  }
-
-  public IngestJobPluginInfo setTotalSteps(int totalSteps) {
-    this.totalSteps = totalSteps;
-    return this;
-  }
-
-  public IngestJobPluginInfo incrementStepsCompletedByOne() {
-    this.stepsCompleted += 1;
-    return this;
   }
 
   public void update(IngestJobPluginInfo ingestJobPluginInfo) {
