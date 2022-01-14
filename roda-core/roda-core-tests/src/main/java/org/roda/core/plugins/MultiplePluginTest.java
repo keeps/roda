@@ -11,14 +11,19 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.plugins.DummyPlugin;
 import org.roda.core.plugins.plugins.MultiplePlugin;
+import org.roda.core.plugins.plugins.characterization.PremisSkeletonPlugin;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -84,6 +89,7 @@ public class MultiplePluginTest {
     Job job = TestsHelper.executeJob(MultiplePlugin.class, PluginType.AIP_TO_AIP,
       SelectedItemsList.create(AIP.class, Arrays.asList(aipId)));
 
+    TestsHelper.executeJob(PremisSkeletonPlugin.class, PluginType.AIP_TO_AIP, new SelectedItemsFilter<IndexedAIP>(Filter.ALL,IndexedAIP.class.getName(),null));
     List<Report> jobReports = TestsHelper.getJobReports(index, job, false);
 
     // 3 errors: 1 checksum checking error, 1 file without premis, 1 premis
