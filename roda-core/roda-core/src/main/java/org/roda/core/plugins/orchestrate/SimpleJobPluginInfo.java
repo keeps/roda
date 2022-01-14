@@ -7,16 +7,24 @@
  */
 package org.roda.core.plugins.orchestrate;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.jobs.PluginState;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.plugins.Plugin;
 
 public class SimpleJobPluginInfo extends JobPluginInfo {
   private static final long serialVersionUID = 2210879753936753174L;
+  private ArrayList<Report> reports = new ArrayList<>();
 
   public SimpleJobPluginInfo() {
     super();
+  }
+
+  public ArrayList<Report> getReports() {
+    return reports;
   }
 
   public void update(SimpleJobPluginInfo jobPluginInfo) {
@@ -77,4 +85,42 @@ public class SimpleJobPluginInfo extends JobPluginInfo {
     return infoUpdated;
   }
 
+  public void updateSourceObjectsProcessed() {
+    int countSuccess = 0;
+    int countPartialSuccess = 0;
+    int countFailure = 0;
+    for (Report rootReport : reports) {
+      PluginState pluginState = PluginState.SUCCESS;
+      for (Report innerReport : rootReport.getReports()) {
+        switch (innerReport.getPluginState()) {
+          case FAILURE:
+            pluginState = innerReport.getPluginState();
+            break;
+          case PARTIAL_SUCCESS:
+            if (!PluginState.FAILURE.equals(pluginState))
+              pluginState = PluginState.PARTIAL_SUCCESS;
+            break;
+          default:
+            break;
+        }
+      }
+      switch (pluginState) {
+        case SUCCESS:
+          countSuccess++;
+          break;
+        case PARTIAL_SUCCESS:
+          countPartialSuccess++;
+          break;
+        case FAILURE:
+          countFailure++;
+          break;
+        default:
+          break;
+      }
+    }
+    setSourceObjectsProcessedWithFailure(countFailure);
+    setSourceObjectsProcessedWithPartialSuccess(countPartialSuccess);
+    setSourceObjectsProcessedWithSuccess(countSuccess);
+    setSourceObjectsProcessedWithSkipped(0);
+  }
 }
