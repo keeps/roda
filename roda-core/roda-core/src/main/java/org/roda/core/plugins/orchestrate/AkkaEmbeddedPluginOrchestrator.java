@@ -149,7 +149,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   @Override
   public <T extends IsRODAObject, T1 extends IsIndexed> void runPluginFromIndex(Object context, Class<T1> classToActOn,
-    Filter filter, boolean justActive ,Plugin<T> plugin) {
+    Filter filter, Boolean justActive ,Plugin<T> plugin) {
     try {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       boolean noObjectsOrchestrated = true;
