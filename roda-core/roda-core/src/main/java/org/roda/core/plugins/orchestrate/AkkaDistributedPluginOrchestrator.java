@@ -140,7 +140,7 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
 
   @Override
   public <T extends IsRODAObject, T1 extends IsIndexed> void runPluginFromIndex(Object context, Class<T1> classToActOn,
-    Filter filter, boolean justActive, Plugin<T> plugin) {
+    Filter filter, Boolean justActive, Plugin<T> plugin) {
     // do nothing
   }
 

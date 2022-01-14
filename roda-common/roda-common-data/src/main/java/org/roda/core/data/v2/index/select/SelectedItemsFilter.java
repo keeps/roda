@@ -47,7 +47,7 @@ public class SelectedItemsFilter<T extends IsIndexed> implements SelectedItems<T
   }
 
   public Boolean justActive() {
-    return justActive;
+    return justActive != null && justActive;
   }
 
   public void setJustActive(Boolean justActive) {
