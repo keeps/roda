@@ -27,6 +27,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,7 @@ import org.slf4j.LoggerFactory;
  * {@author João Gomes <jgomes@keep.pt>}.
  */
 public class MultiplePlugin extends AbstractPlugin<AIP> {
+
   private static final Logger LOGGER = LoggerFactory.getLogger(MultiplePlugin.class);
   private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
   private int totalSteps;
@@ -107,6 +109,7 @@ public class MultiplePlugin extends AbstractPlugin<AIP> {
     getParameterValues().put(RodaConstants.PLUGIN_PARAMS_TOTAL_STEPS, "2");
     totalSteps = Integer
       .parseInt(PluginHelper.getStringFromParameters(this, RodaConstants.PLUGIN_PARAMS_TOTAL_STEPS, "2"));
+    getParameterValues().put(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS,getClass().getName());
   }
 
   @Override
@@ -143,22 +146,23 @@ public class MultiplePlugin extends AbstractPlugin<AIP> {
         PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
         PluginState state = PluginState.SUCCESS;
         String outcomeDetailsText = "";
-        jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        jobPluginInfo.incrementStepsCompletedByOne();
+        SimpleJobPluginInfo simpleJobPluginInfo = (SimpleJobPluginInfo) jobPluginInfo;
+        simpleJobPluginInfo.incrementObjectsProcessedWithSuccess();
+        simpleJobPluginInfo.incrementStepsCompletedByOne();
         report.addReport(reportItem);
-        PluginHelper.updateJobInformationAsync(this, jobPluginInfo.setTotalSteps(totalSteps));
+        PluginHelper.updateJobInformationAsync(this, simpleJobPluginInfo.setTotalSteps(totalSteps));
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
 
         fixityCheckReport = executePlugin(index, model, storage, aip, cachedJob,
           "org.roda.core.plugins.plugins.characterization.PremisSkeletonPlugin");
 
-        PluginHelper.updateJobInformationAsync(this,jobPluginInfo.incrementStepsCompletedByOne());
+        PluginHelper.updateJobInformationAsync(this,simpleJobPluginInfo.incrementStepsCompletedByOne());
         if (fixityCheckReport != null) {
           report.addReport(fixityCheckReport);
-          jobPluginInfo.incrementObjectsProcessed(fixityCheckReport.getPluginState());
         }
-
-        PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
+        simpleJobPluginInfo.getReports().add(report);
+        simpleJobPluginInfo.updateSourceObjectsProcessed();
+        PluginHelper.updateJobInformationAsync(this, simpleJobPluginInfo);
         LinkingIdentifier linkingIdentifier = PluginHelper.getLinkingIdentifier(aip.getId(),
           RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME);
         model.createRepositoryEvent(getPreservationEventType(), "EVENT_DESCRIPTION",
