@@ -88,8 +88,7 @@ public class MultiplePluginTest {
 
     Job job = TestsHelper.executeJob(MultiplePlugin.class, PluginType.AIP_TO_AIP,
       SelectedItemsList.create(AIP.class, Arrays.asList(aipId)));
-
-    TestsHelper.executeJob(PremisSkeletonPlugin.class, PluginType.AIP_TO_AIP, new SelectedItemsFilter<IndexedAIP>(Filter.ALL,IndexedAIP.class.getName(),null));
+    
     List<Report> jobReports = TestsHelper.getJobReports(index, job, false);
 
     // 3 errors: 1 checksum checking error, 1 file without premis, 1 premis
