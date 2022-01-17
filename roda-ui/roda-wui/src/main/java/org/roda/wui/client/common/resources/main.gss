@@ -7357,6 +7357,8 @@ span.code {
 
 .disposal-policy-summary-retain {
     background-color: #479f43;
+}
+
 .job-orchestration-options > .job-orchestration-option {
     margin-top: 5px;
 }
