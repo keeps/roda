@@ -1,5 +1,48 @@
 # Changelog
 
+## v4.2.0 (17/01/2022)
+### New features:
+
+- Job orchestration #1981
+- Add prometheus metrics for HTTP notification system #1982
+
+### Bug fixes:
+
+- LinkingObjectIdentifierValue links to unknown URN (in preservation metadata PREMIS) #1946
+- Object PREMIS does not register contentLocation in storage element #1947
+- Fixity information computation to report SKIPPED #1970
+- Allow run mutiple plugins #1977
+
+Install for demonstration:
+```
+docker pull keeps/roda:v4.2.0
+```
+
+---
+
+## v3.6.0 (17/01/2022)
+New features:
+
+- Job orchestration #1981
+- Add prometheus metrics for HTTP notification system #1982
+
+Install for demonstration:
+```
+docker pull keeps/roda:v3.6
+```
+---
+
+## v3.5.7 (17/01/2022)
+#### Enhancements:
+- Expand Portal to allow customization via AIP level #1969
+
+
+Install for demonstration:
+```
+docker pull keeps/roda:v3.5.7
+```
+---
+
 ## v4.1.1 (09/12/2021)
 
 #### Enhancements:
@@ -12,7 +55,7 @@
 
 Install for demonstration:
 ```
-docker pull keeps/roda:v2.2.11
+docker pull keeps/roda:v4.1.1
 ```
 ---
 
@@ -28,7 +71,7 @@ docker pull keeps/roda:v2.2.11
 
 Install for demonstration:
 ```
-docker pull keeps/roda:v2.2.11
+docker pull keeps/roda:v4.1.0
 ```
 ---
 
@@ -842,35 +885,3 @@ docker pull keeps/roda:v2.2.9
 #### Bug Fixes:
 
 -  Unauthenticated users should have the same permissions as the user 'guest'  [#1249](https://github.com/keeps/roda/issues/1249)
-
----
-
-## v2.2.8 (30/05/2018)
-Install for demonstration:
-```
-docker pull keeps/roda:v2.2.8
-```
-
-#### Enhancements:
-
--  Implement retries and metrics when using iterable index results [#1242](https://github.com/keeps/roda/issues/1242)
----
-
-## v2.2.7 (30/05/2018)
-Install for demonstration:
-```
-docker pull keeps/roda:v2.2.7
-```
-
-Enhancement:
-* Improvement on 2.2.6 release security fix by allowing symbolic links on theme path
----
-
-## v2.2.6 (29/05/2018)
-Install for demonstration:
-```
-docker pull keeps/roda:v2.2.6
-```
-
-SECURITY FIX (update immediately!):
-* Fixing path transversal vulnerability in theme REST API resource
