@@ -10,7 +10,7 @@
 
 ```bash
 # If never GWT compiled before, compile once and copy gwt.rpc files
-mvn -pl roda-ui/roda-wui -am gwt:compile -Pdebug-main
+mvn -pl roda-ui/roda-wui -am gwt:compile -Pdebug-main -Dscope.gwt-dev=compile
 cd roda-ui/roda-wui
 ./copy_gwt_rpc.sh
 cd -
@@ -19,7 +19,7 @@ cd -
 mvn -pl roda-ui/roda-wui -am spring-boot:run -Pdebug-main
 
 # Open codeserver
-mvn -pl roda-ui/roda-wui -am gwt:codeserver -Pdebug-main
+mvn -pl roda-ui/roda-wui -am gwt:codeserver -Pdebug-main -Dscope.gwt-dev=compile
 
 # Open codeserver http://127.0.0.1:9876/ and add bookmarks
 # Open RODA http://localhost:8080 and click the "Dev Mode On" bookmark
