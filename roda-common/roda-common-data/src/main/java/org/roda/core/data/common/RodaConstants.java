@@ -1690,6 +1690,8 @@ public final class RodaConstants {
   public static final int HTTP_RESPONSE_CODE_REQUEST_CONFLICT = 409;
   public static final int HTTP_RESPONSE_CODE_SERVER_ERROR = 500;
 
+  public static final String AIP_DEFAULT_PACKAGE_TYPE = "UNKNOWN";
+
   /** Private empty constructor */
   private RodaConstants() {
     // do nothing
