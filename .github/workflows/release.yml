@@ -39,10 +39,24 @@ jobs:
       - name: Run tests & install
         run:
           mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" -Proda-wui-docker -Denforcer.skip=true clean org.jacoco:jacoco-maven-plugin:prepare-agent install
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
       - name: Deploy to GitHub packages
         run: mvn $MAVEN_CLI_OPTS clean deploy -Dmaven.test.skip=true -Pcore
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Get release version
+        id: release_version
+        run: echo ::set-output name=result::${GITHUB_REF/refs\/tags\/v/} 
+      - name: Upload artifact to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: roda-ui/roda-wui/target/roda-wui-${{ steps.release_version.outputs.result }}.war
+          asset_name: roda-wui-${{ steps.release_version.outputs.result }}.war
+          tag: ${{ github.ref }}
+          release_name: v${{ steps.release_version.outputs.result }}
       - name: Login to DockerHub
         uses: docker/login-action@v1 
         with:
@@ -50,7 +64,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Get release version
         id: tag
-        run: echo ::set-output name=result::${GITHUB_REF/refs\/tags\//}
+        run: echo ::set-output name=result::${GITHUB_REF/refs\/tags\//} 
       - name: Deploy to DockerHub
         run: |
           docker tag keeps/roda:latest keeps/roda:${{ steps.tag.outputs.result }}
@@ -60,5 +74,5 @@ jobs:
           curl --progress-bar -o /dev/null -L --request POST \
                --form ref=master \
                --form token=${{ secrets.GITLAB_RODA_DEV_TRIGGER_TOKEN }} \
-               --form "variables[DOCKER_TAG]=v${{ steps.tag.outputs.result }}" \
+               --form "variables[DOCKER_TAG]=${{ steps.tag.outputs.result }}" \
                ${{ secrets.GITLAB_RODA_DEV_TRIGGER }}
