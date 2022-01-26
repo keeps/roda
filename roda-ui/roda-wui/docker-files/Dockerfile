@@ -1,4 +1,4 @@
-FROM tomcat:8
+FROM tomcat:8-jre8
 LABEL maintainer="admin@keep.pt" vendor="KEEP SOLUTIONS"
 
 # Install dependencies
@@ -8,7 +8,7 @@ RUN set -ex; \
     apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 20F802FE798E6857; \
     add-apt-repository "deb https://www.itforarchivists.com/ buster main" && \
     apt-get -qq update && \
-    apt-get -qq -y --no-install-recommends install clamav clamav-daemon clamdscan siegfried cron supervisor zip && \
+    apt-get -qq -y --no-install-recommends install clamav clamav-daemon clamdscan siegfried cron supervisor zip jq && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY supervisor-conf.d/* /etc/supervisor/conf.d/
