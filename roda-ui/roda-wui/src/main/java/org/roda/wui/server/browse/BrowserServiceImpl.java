@@ -767,7 +767,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public <T extends IsIndexed> Job createProcess(String jobName, SelectedItems<T> selected, String id,
+  public <T extends IsIndexed> List<Job> createProcess(String jobName, SelectedItems<T> selected, String id,
     Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
     NotFoundException, GenericException, JobAlreadyStartedException {
     return createProcess(jobName, JobPriority.MEDIUM, JobParallelism.NORMAL, selected, id, value, selectedClass);
