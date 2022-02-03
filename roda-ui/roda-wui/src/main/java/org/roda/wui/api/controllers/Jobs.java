@@ -14,15 +14,12 @@ import java.util.Map;
 
 import org.roda.core.common.EntityResponse;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.JobAlreadyStartedException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobParallelism;
+import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.ControllerAssistant;
@@ -66,8 +63,9 @@ public class Jobs extends RodaWuiController {
   }
 
   public static <T extends IsIndexed> List<Job> createJobs(User user, SelectedItems<T> selectedItems, String jobName,
-    String pluginName, Map<String, String> value, boolean async) throws AuthorizationDeniedException,
-    RequestNotValidException, JobAlreadyStartedException, NotFoundException, GenericException {
+    String pluginName, Map<String, String> value, JobPriority priority, JobParallelism parallelism, boolean async)
+    throws AuthorizationDeniedException, RequestNotValidException, JobAlreadyStartedException, NotFoundException,
+    GenericException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     List<Job> jobs = new ArrayList<>();
@@ -85,6 +83,8 @@ public class Jobs extends RodaWuiController {
       job.setPlugin(pluginName);
       job.setPluginParameters(value);
       job.setInstanceId(instance);
+      job.setPriority(priority);
+      job.setParallelism(parallelism);
 
       // When it is RODA CENTRAL
       if (instance == null) {
