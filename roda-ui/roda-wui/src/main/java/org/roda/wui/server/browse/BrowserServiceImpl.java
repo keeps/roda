@@ -755,15 +755,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
       }
     }
 
-    Job job = new Job();
-    job.setName(jobName);
-    job.setSourceObjects(selectedItems);
-    job.setPlugin(id);
-    job.setPluginParameters(value);
-    job.setPriority(priority);
-    job.setParallelism(parallelism);
-
-    return Jobs.createJobs(user, selectedItems, jobName, id, value, true);
+    return Jobs.createJobs(user, selectedItems, jobName, id, value, priority, parallelism, true);
   }
 
   @Override
