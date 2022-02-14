@@ -87,8 +87,24 @@ public class UserLoginHelper {
         mapCasAttribute(newUser, attributes, "email", (u, a) -> u.setEmail(a));
       }
 
-      user = RodaCoreFactory.getModelService().createUser(newUser, true);
+      // Try to find a user with email
+      User retrievedUserByEmail = null;
+      if (StringUtils.isNotBlank(newUser.getEmail())) {
+        try {
+          retrievedUserByEmail = RodaCoreFactory.getModelService().retrieveUserByEmail(newUser.getEmail());
+        } catch (GenericException e) {
+          if (!(e.getCause() instanceof LdapException)) {
+            throw e;
+          }
+        }
+      }
 
+      if (retrievedUserByEmail != null) {
+        user = retrievedUserByEmail;
+      } else {
+        // If no user was found with username or e-mail, a new one is created.
+        user = RodaCoreFactory.getModelService().createUser(newUser, true);
+      }
     }
 
     if (!user.isActive()) {
