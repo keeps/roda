@@ -1358,7 +1358,7 @@ public final class PluginHelper {
       if (aipIds != null && !aipIds.isEmpty()) {
         try {
           AIPState aipState = model.retrieveAIP(aipIds.get(0)).getState();
-          if (AIPState.ACTIVE.equals(aipState)) {
+          if (AIPState.ACTIVE.equals(aipState) || AIPState.UNDER_APPRAISAL.equals(aipState)) {
             LOGGER.debug("Removing SIP {}", transferredResource.getFullPath());
             try {
               model.deleteTransferredResource(transferredResource);
