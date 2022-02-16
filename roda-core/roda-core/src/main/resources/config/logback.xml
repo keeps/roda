@@ -65,6 +65,14 @@
 		<appender-ref ref="METRICS" />
 	</logger>
 
+	<logger name="org.roda.core.common.akka" additivity="false" level="trace">
+
+		<level value="TRACE" />
+		<appender-ref ref="CORE_FILEOUT" />
+		<!-- <appender-ref ref="AKKA_FILE" /> -->
+		<appender-ref ref="METRICS" />
+	</logger>
+
 	<logger name="org.roda.core.plugins.PluginManager" additivity="false">
 		<level value="INFO" />
 		<appender-ref ref="CORE_FILEOUT" />

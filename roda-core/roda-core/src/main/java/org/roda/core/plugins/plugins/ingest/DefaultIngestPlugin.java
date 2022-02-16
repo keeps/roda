@@ -80,6 +80,7 @@ import com.google.common.base.CaseFormat;
  * 
  * @author Hélder Silva <hsilva@keep.pt>
  */
+@Deprecated
 public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultIngestPlugin.class);
 

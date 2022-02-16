@@ -24,6 +24,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
 import org.roda.core.plugins.plugins.characterization.PremisSkeletonPlugin;
 
+@Deprecated
 public class MinimalIngestPlugin extends DefaultIngestPlugin {
 
   public static final int TOTAL_STEPS = 5;

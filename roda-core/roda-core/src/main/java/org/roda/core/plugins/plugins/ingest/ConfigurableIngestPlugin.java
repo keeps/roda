@@ -27,6 +27,7 @@ import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
 import org.roda.core.plugins.plugins.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.characterization.SiegfriedPlugin;
 
+@Deprecated
 public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
 
   private Map<String, PluginParameter> pluginParameters = new HashMap<>();
