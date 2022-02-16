@@ -28,14 +28,14 @@
 	</distributionManagement>
 	<repositories>
 		<repository>
+			<id>github</id>
+			<name>GitHub Packages</name>
+			<url>https://maven.pkg.github.com/keeps/roda</url>
+		</repository>
+		<repository>
 			<id>keeps_artifactory</id>
 			<name>KEEP SOLUTIONS artifactory</name>
 			<url>https://artifactory.keep.pt/artifactory/keep</url>
-		</repository>
-		<repository>
-			<id>jcenter</id>
-			<name>bintray</name>
-			<url>https://jcenter.bintray.com</url>
 		</repository>
 	</repositories>
 	<developers>
