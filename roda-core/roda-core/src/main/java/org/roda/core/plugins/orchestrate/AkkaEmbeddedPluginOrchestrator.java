@@ -161,9 +161,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       Plugin<T> innerPlugin;
       Class<T> modelClassToActOn = (Class<T>) ModelUtils.giveRespectiveModelClass(classToActOn);
 
-      jobStateInfoActor.tell(
-        Messages.newPluginBeforeAllExecuteIsReady(plugin).withParallelism(job.getParallelism()).withJobPriority(job.getPriority()),
-        jobActor);
+      jobStateInfoActor.tell(Messages.newPluginBeforeAllExecuteIsReady(plugin).withParallelism(job.getParallelism())
+        .withJobPriority(job.getPriority()), jobActor);
 
       List<String> liteFields = SolrUtils.getClassLiteFields(classToActOn);
       try (IterableIndexResult<T1> findAll = index.findAll(classToActOn, filter, liteFields)) {
@@ -221,7 +220,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       JobPriority priority = job.getPriority();
 
       jobStateInfoActor.tell(
-        Messages.newPluginBeforeAllExecuteIsReady(plugin).withParallelism(parallelism).withJobPriority(priority), jobActor);
+        Messages.newPluginBeforeAllExecuteIsReady(plugin).withParallelism(parallelism).withJobPriority(priority),
+        jobActor);
 
       List<T> block = new ArrayList<>();
       while (iter.hasNext()) {
@@ -272,7 +272,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       JobParallelism parallelism = job.getParallelism();
       JobPriority priority = job.getPriority();
       jobStateInfoActor.tell(
-        Messages.newPluginBeforeAllExecuteIsReady(plugin).withParallelism(parallelism).withJobPriority(priority), jobActor);
+        Messages.newPluginBeforeAllExecuteIsReady(plugin).withParallelism(parallelism).withJobPriority(priority),
+        jobActor);
 
       List<LiteOptionalWithCause> block = new ArrayList<>();
       while (iter.hasNext()) {
@@ -323,12 +324,12 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       initJobPluginInfo(plugin, job, 0, jobActor);
       jobStateInfoActor.tell(
-        Messages.newPluginBeforeAllExecuteIsReady(plugin).withParallelism(parallelism).withJobPriority(priority), jobActor);
+        Messages.newPluginBeforeAllExecuteIsReady(plugin).withParallelism(parallelism).withJobPriority(priority),
+        jobActor);
       jobStateInfoActor.tell(Messages.newPluginExecuteIsReady(plugin, Collections.emptyList()).withJobPriority(priority)
         .withParallelism(parallelism), jobActor);
-      jobStateInfoActor.tell(
-        Messages.newJobInitEnded(getJobPluginInfo(plugin), false).withJobPriority(priority).withParallelism(parallelism),
-        jobActor);
+      jobStateInfoActor.tell(Messages.newJobInitEnded(getJobPluginInfo(plugin), false).withJobPriority(priority)
+        .withParallelism(parallelism), jobActor);
 
     } catch (JobIsStoppingException | JobInErrorException e) {
       // do nothing
@@ -437,7 +438,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     ActorRef jobStateInfoActor = getJobContextInformation(jobId);
     if (jobStateInfoActor != null) {
       stoppingJobs.add(jobId);
-      jobStateInfoActor.tell(Messages.newJobStop().withJobPriority(job.getPriority()).withParallelism(job.getParallelism()),
+      jobStateInfoActor.tell(
+        Messages.newJobStop().withJobPriority(job.getPriority()).withParallelism(job.getParallelism()),
         ActorRef.noSender());
     }
   }
@@ -480,9 +482,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     if (jobStateInfoActor != null) {
       jobStateInfoActor.tell(partialUpdate, ActorRef.noSender());
       if (partialUpdate instanceof JobStateUpdated && Job.isFinalState(((JobStateUpdated) partialUpdate).getState())) {
-        LOGGER.debug("Removing job {} from list of running jobs; Plugin is {}", jobId, plugin.getClass().getName());
         runningJobs.remove(jobId);
-        LOGGER.debug("Removing job {} from list of stopping jobs; Plugin is {}", jobId, plugin.getClass().getName());
         stoppingJobs.remove(jobId);
         inErrorJobs.remove(jobId);
       }
@@ -495,7 +495,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public void setJobContextInformation(String jobId, Object object) {
     runningJobs.put(jobId, (ActorRef) object);
-    LOGGER.debug("Running jobs: {}", runningJobs.keySet());
   }
 
   public ActorRef getJobContextInformation(String jobId) {
