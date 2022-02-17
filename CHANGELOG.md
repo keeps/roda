@@ -1,10 +1,75 @@
 # Changelog
 
+## v3.6.2 (17/02/2022)
+### Bug fixes:
+
+- CAS Login issue when user with the same email already exists #1988
+
+Install for demonstration:
+```
+docker pull keeps/roda:v3.6.2
+```
+---
+
+## v4.2.1 (15/02/2022)
+### Bug fixes:
+
+- CAS Login issue when user with the same email already exists #1988
+
+### Enhancements:
+
+- Add under appraisel status to transferred resources deletion #1989
+- Replace embed marked.js by webjar #1983
+
+Install for demonstration:
+```
+docker pull keeps/roda:v4.2.1
+```
+
+---
+
+## v3.6.1 (26/01/2022)
+### Bug fixes:
+
+- Update Dockerfile base image
+
+Install for demonstration:
+```
+docker pull keeps/roda:v3.6.1
+```
+
+---
+
+## v4.2.0 (17/01/2022)
+### New features:
+
+- Job orchestration #1981
+- Add prometheus metrics for HTTP notification system #1982
+
+### Bug fixes:
+
+- LinkingObjectIdentifierValue links to unknown URN (in preservation metadata PREMIS) #1946
+- Object PREMIS does not register contentLocation in storage element #1947
+- Fixity information computation to report SKIPPED #1970
+- Allow run mutiple plugins #1977
+
+Install for demonstration:
+```
+docker pull keeps/roda:v4.2.0
+```
+
+---
+
 ## v3.6.0 (17/01/2022)
 New features:
 
 - Job orchestration #1981
 - Add prometheus metrics for HTTP notification system #1982
+
+Install for demonstration:
+```
+docker pull keeps/roda:v3.6
+```
 ---
 
 ## v3.5.7 (17/01/2022)
@@ -812,63 +877,3 @@ docker pull keeps/roda:v2.2.12
 
 #### Enhancements:
 - Add support for jsonp requests in IndexResource#list [#1375](https://github.com/keeps/roda/issues/1375)
----
-
-## v2.2.11 (27/09/2018)
-Install for demonstration:
-```
-docker pull keeps/roda:v2.2.11
-```
-
-
-#### Bug Fixes:
-- CAS API auth allows incoherent state in basic auth fallback [#1349](https://github.com/keeps/roda/issues/1349)
----
-
-## v2.2.10 (03/07/2018)
-Install for demonstration:
-```
-docker pull keeps/roda:v2.2.10
-```
-
-Run locally for demonstration:
-```
-docker run -p 8080:8080 keeps/roda:v2.2.10
-```
-Open browser on "http://localhost:8080"
-
-- username: admin
-- password: roda
-
-#### Enhancements:
-
--  Support CAS single sign out [#1250](https://github.com/keeps/roda/issues/1250)
-
-#### Bug Fixes:
-
--  Unauthenticated API requests are not working [#1265](https://github.com/keeps/roda/issues/1265)
--  Wrong icon when viewing a file [#1253](https://github.com/keeps/roda/issues/1253)
-
----
-
-## v2.2.9 (13/06/2018)
-Install for demonstration:
-```
-docker pull keeps/roda:v2.2.9
-```
-
-#### Bug Fixes:
-
--  Unauthenticated users should have the same permissions as the user 'guest'  [#1249](https://github.com/keeps/roda/issues/1249)
-
----
-
-## v2.2.8 (30/05/2018)
-Install for demonstration:
-```
-docker pull keeps/roda:v2.2.8
-```
-
-#### Enhancements:
-
--  Implement retries and metrics when using iterable index results [#1242](https://github.com/keeps/roda/issues/1242)
