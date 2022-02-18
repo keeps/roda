@@ -239,7 +239,7 @@ public class HtmlSnippetUtils {
   }
 
   public static SafeHtml getJobPriorityHtml(JobPriority priority) {
-    return getJobPriorityHtml(priority, false);
+    return getJobPriorityHtml(priority, true);
   }
 
   public static SafeHtml getJobStateHtml(Job job) {
