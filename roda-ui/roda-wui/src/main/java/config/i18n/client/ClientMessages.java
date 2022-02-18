@@ -1105,15 +1105,15 @@ public interface ClientMessages extends Messages {
 
   String jobCreator();
 
-  String jobParallelismText();
-
-  String jobPriorityText();
-
-  String jobParallelismTypeBadge(@Select JobParallelism type);
-
-  String jobPriorityBadge(@Select JobPriority priority);
-
   String joOrchestration();
+
+  String jobParallelismShortBadge(@Select JobParallelism parallelism);
+
+  String jobParallelismLongBadge(@Select JobParallelism parallelism);
+
+  String jobPriorityShortBadge(@Select JobPriority priority);
+
+  String jobPriorityLongBadge(@Select JobPriority priority);
 
   String jobStartDate();
 

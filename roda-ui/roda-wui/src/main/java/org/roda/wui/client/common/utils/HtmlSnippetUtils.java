@@ -76,24 +76,26 @@ public class HtmlSnippetUtils {
     // do nothing
   }
 
-  public static SafeHtml getJobParallelismTypeHtml(JobParallelism parallelism, boolean appendDefinition) {
+  public static SafeHtml getJobParallelismTypeHtml(JobParallelism parallelism, boolean shortForm) {
     SafeHtmlBuilder b = new SafeHtmlBuilder();
     b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO));
-    b.append(SafeHtmlUtils.fromString(messages.jobParallelismTypeBadge(parallelism)));
-    if (appendDefinition) {
+    b.append(SafeHtmlUtils.fromString(messages.jobParallelismShortBadge(parallelism)));
+
+    if (!shortForm) {
       b.append(SafeHtmlUtils.fromString(" "));
-      b.append(SafeHtmlUtils.fromString(messages.jobParallelismText()));
+      b.append(SafeHtmlUtils.fromString(messages.jobParallelismLongBadge(parallelism)));
     }
+
     b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
 
     return b.toSafeHtml();
   }
 
   public static SafeHtml getJobParallelismTypeHtml(JobParallelism parallelism) {
-    return getJobParallelismTypeHtml(parallelism, false);
+    return getJobParallelismTypeHtml(parallelism, true);
   }
 
-  public static SafeHtml getJobPriorityHtml(JobPriority priority, boolean appendDefinition) {
+  public static SafeHtml getJobPriorityHtml(JobPriority priority, boolean shortForm) {
     SafeHtmlBuilder b = new SafeHtmlBuilder();
 
     switch (priority) {
@@ -112,10 +114,11 @@ public class HtmlSnippetUtils {
         break;
     }
 
-    b.append(SafeHtmlUtils.fromString(messages.jobPriorityBadge(priority)));
-    if (appendDefinition) {
+    b.append(SafeHtmlUtils.fromString(messages.jobPriorityShortBadge(priority)));
+
+    if (!shortForm) {
       b.append(SafeHtmlUtils.fromString(" "));
-      b.append(SafeHtmlUtils.fromString(messages.jobPriorityText()));
+      b.append(SafeHtmlUtils.fromString(messages.jobPriorityLongBadge(priority)));
     }
     b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
 
@@ -123,7 +126,7 @@ public class HtmlSnippetUtils {
   }
 
   public static SafeHtml getJobPriorityHtml(JobPriority priority) {
-    return getJobPriorityHtml(priority, false);
+    return getJobPriorityHtml(priority, true);
   }
 
   public static SafeHtml getJobStateHtml(Job job) {
