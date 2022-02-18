@@ -412,7 +412,7 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
 
           if (filterParameter instanceof SimpleFilterParameter) {
             SimpleFilterParameter parameter = (SimpleFilterParameter) filterParameter;
-            if (RodaConstants.AIP_LEVEL.equals(parameter.getName())
+            if (RodaConstants.SEARCH_FIELD_TYPE_CONTROLLED.equals(searchAdvancedFieldPanel.getSearchField().getType())
               && RodaConstants.NONE_SELECTED_LEVEL.equals(parameter.getValue())) {
               filterParameter = null;
             }
