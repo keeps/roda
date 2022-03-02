@@ -44,6 +44,8 @@ public class DescriptionLevelUtils {
         level.setIconClass(ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_REPRESENTATION_FOLDER));
       } else if (levelString.equalsIgnoreCase(RodaConstants.VIEW_REPRESENTATION_FILE)) {
         level.setIconClass(ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_REPRESENTATION_FILE));
+      } else if (levelString.equalsIgnoreCase(RodaConstants.VIEW_REPRESENTATION_FILE_REFERENCE)) {
+        level.setIconClass(ConfigurationManager.getString(RodaConstants.LEVELS_ICONS_REPRESENTATION_FILE_REFERENCE));
       }
     }
 
