@@ -426,14 +426,21 @@ public class InfoSliderHelper {
         }
         values.put(messages.viewRepresentationInfoHash(), new InlineHTML(b.toSafeHtml()));
       }
-
-      if (file.getStoragePath() != null) {
-        SafeHtmlBuilder b = new SafeHtmlBuilder();
+      SafeHtmlBuilder b = new SafeHtmlBuilder();
+      if (file.isReference()) {
         b.append(SafeHtmlUtils.fromSafeConstant("<small>"));
-        b.append(SafeHtmlUtils.fromString(file.getStoragePath()));
+        b.append(SafeHtmlUtils.fromString(file.getReferenceURL()));
         b.append(SafeHtmlUtils.fromSafeConstant("</small>"));
 
         values.put(messages.viewRepresentationInfoStoragePath(), new InlineHTML(b.toSafeHtml()));
+      } else {
+        if (file.getStoragePath() != null) {
+          b.append(SafeHtmlUtils.fromSafeConstant("<small>"));
+          b.append(SafeHtmlUtils.fromString(file.getStoragePath()));
+          b.append(SafeHtmlUtils.fromSafeConstant("</small>"));
+
+          values.put(messages.viewRepresentationInfoStoragePath(), new InlineHTML(b.toSafeHtml()));
+        }
       }
     }
 

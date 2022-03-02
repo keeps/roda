@@ -1321,6 +1321,7 @@ public final class RodaConstants {
   public static final String VIEW_REPRESENTATION_REPRESENTATION = "representation_representation";
   public static final String VIEW_REPRESENTATION_FOLDER = "representation_folder";
   public static final String VIEW_REPRESENTATION_FILE = "representation_file";
+  public static final String VIEW_REPRESENTATION_FILE_REFERENCE = "representation_file_reference";
 
   /*
    * PREMIS
@@ -1587,6 +1588,7 @@ public final class RodaConstants {
   public static final String LEVELS_ICONS_REPRESENTATION = "levels.internal.icon.representation.type.default";
   public static final String LEVELS_ICONS_REPRESENTATION_FOLDER = "levels.internal.icon.representation.folder";
   public static final String LEVELS_ICONS_REPRESENTATION_FILE = "levels.internal.icon.representation.file";
+  public static final String LEVELS_ICONS_REPRESENTATION_FILE_REFERENCE = "levels.internal.icon.representation.file.reference";
   public static final String LEVELS_ICONS_REPRESENTATION_TYPES_PREFIX = "levels.internal.icon.representation.type";
   public static final String LEVEL_I18N_PREFIX = "level";
   public static final String REPRESENTATION_TYPE_DEFAULT = "default";
