@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import jnr.ffi.annotations.In;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.sort.Sorter;
@@ -30,7 +29,6 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
-import org.roda.core.index.IndexService;
 import org.roda.wui.client.common.lists.utils.ColumnOptions.RenderingHint;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -150,7 +148,12 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
           if (file.isDirectory()) {
             return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-folder-open'></i>");
           } else {
-            return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>");
+            if (file.isReference()) {
+              return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-export'></i>");
+            } else {
+              return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>");
+            }
+
           }
         }
         return null;
@@ -297,6 +300,7 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
     } else if (IndexedFile.class.equals(options.getClassToReturn())) {
       fieldsToReturn.add(RodaConstants.FILE_AIP_ID);
       fieldsToReturn.add(RodaConstants.FILE_REPRESENTATION_ID);
+      fieldsToReturn.add(RodaConstants.FILE_ISREFERENCE);
     }
 
     return fieldsToReturn;

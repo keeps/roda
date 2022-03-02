@@ -55,9 +55,18 @@ public class BreadcrumbUtils {
 
   private static BreadcrumbItem getBreadcrumbItem(IndexedFile file) {
     String fileLabel = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
-    SafeHtml breadcrumbLabel = getBreadcrumbLabel(fileLabel,
-      file.isDirectory() ? RodaConstants.VIEW_REPRESENTATION_FOLDER : RodaConstants.VIEW_REPRESENTATION_FILE);
+    SafeHtml breadcrumbLabel = getBreadcrumbLabel(fileLabel, getFileLevel(file));
     return new BreadcrumbItem(breadcrumbLabel, fileLabel, HistoryUtils.getHistoryBrowse(file));
+  }
+
+  private static String getFileLevel(IndexedFile file) {
+    if (file.isDirectory()) {
+      return RodaConstants.VIEW_REPRESENTATION_FOLDER;
+    } else if (file.isReference()) {
+      return RodaConstants.VIEW_REPRESENTATION_FILE_REFERENCE;
+    } else {
+      return RodaConstants.VIEW_REPRESENTATION_FILE;
+    }
   }
 
   public static List<BreadcrumbItem> getAipBreadcrumbs(List<IndexedAIP> aipAncestors, IndexedAIP aip) {
