@@ -706,7 +706,8 @@ public class FSUtils {
     throws GenericException {
     Resource resource;
     Long sizeInBytes = 0L;
-    Protocol protocol = RodaCoreFactory.getProtocol(URI.create(url));
+    URI uri = URI.create(url);
+    Protocol protocol = RodaCoreFactory.getProtocol(uri);
     if (protocol.isAvailable()) {
       if (calculateSize) {
         try {
@@ -715,7 +716,8 @@ public class FSUtils {
           throw new GenericException("Cannot retrieve size of file at " + url);
         }
       }
-      ContentPayload contentPayload = new InputStreamContentPayload(() -> protocol.getInputStream());
+
+      final ContentPayload contentPayload = new InputStreamContentPayload(protocol::getInputStream, uri);
       resource = new DefaultBinary(storagePath, contentPayload, sizeInBytes, true, new HashMap<>());
 
       return resource;
