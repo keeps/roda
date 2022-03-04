@@ -19,10 +19,16 @@ import org.roda.core.common.ProvidesInputStream;
 public class InputStreamContentPayload implements ContentPayload {
 
   private final ProvidesInputStream inputStreamProvider;
+  private URI uri = null;
 
   public InputStreamContentPayload(ProvidesInputStream inputStreamProvider) {
     super();
     this.inputStreamProvider = inputStreamProvider;
+  }
+
+  public InputStreamContentPayload(ProvidesInputStream inputStreamProvider, URI uri) {
+    this(inputStreamProvider);
+    this.uri = uri;
   }
 
   @Override
@@ -39,7 +45,10 @@ public class InputStreamContentPayload implements ContentPayload {
 
   @Override
   public URI getURI() throws UnsupportedOperationException {
-    throw new UnsupportedOperationException();
+    if (uri == null) {
+      throw new UnsupportedOperationException();
+    }
+    return uri;
   }
 
 }
