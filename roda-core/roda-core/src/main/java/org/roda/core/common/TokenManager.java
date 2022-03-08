@@ -86,4 +86,8 @@ public class TokenManager {
   private boolean tokenExpired() {
     return new Date().after(expirationTime);
   }
+
+  public void removeToken() {
+    this.currentToken = null;
+  }
 }
