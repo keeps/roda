@@ -52,8 +52,11 @@ import org.roda_project.commons_ip2.model.IPMetadata;
 import org.roda_project.commons_ip2.model.IPRepresentation;
 import org.roda_project.commons_ip2.model.RepresentationStatus;
 import org.roda_project.commons_ip2.model.SIP;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EARKSIP2ToAIPPluginUtils {
+  private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIP2ToAIPPluginUtils.class);
 
   private EARKSIP2ToAIPPluginUtils() {
     // do nothing
@@ -330,10 +333,10 @@ public class EARKSIP2ToAIPPluginUtils {
   private static ContentPayload processIPFileShallow(String aipId, String representationId, IPFileShallow file)
     throws GenericException {
     ContentPayload contentPayload = null;
-    Protocol protocol = RodaCoreFactory.getProtocol(file.getFileLocation());
+    final Protocol protocol = RodaCoreFactory.getProtocol(file.getFileLocation());
     if (protocol.isAvailable()) {
       try {
-        String decode = URLDecoder.decode(file.getFileLocation().toString(), "UTF-8");
+        final String decode = URLDecoder.decode(file.getFileLocation().toString(), "UTF-8");
         FileType fileType = file.getFileType();
         ShallowFile shallowFile = new ShallowFile();
         shallowFile.setName(FilenameUtils.getName(decode));
@@ -349,9 +352,12 @@ public class EARKSIP2ToAIPPluginUtils {
         shallowFiles.addObject(shallowFile);
         contentPayload = new ExternalFileManifestContentPayload(shallowFiles);
 
-      } catch (UnsupportedEncodingException e) {
+      } catch (final UnsupportedEncodingException e) {
         throw new GenericException("Unable to identify the resource name", e);
       }
+    } else {
+      LOGGER.error("The protocol {} ({}) isn't available to {}", protocol.getName(), protocol.getVersion(),
+        file.getFileLocation());
     }
     return contentPayload;
   }
