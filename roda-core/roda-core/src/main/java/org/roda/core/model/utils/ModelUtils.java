@@ -34,7 +34,6 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
@@ -61,6 +60,7 @@ import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.protocols.Protocol;
 import org.roda.core.storage.ContentPayload;
@@ -300,6 +300,16 @@ public final class ModelUtils {
       path.addAll(directoryPath);
     }
     path.add(fileId);
+    return DefaultStoragePath.parse(path);
+  }
+
+  public static StoragePath getDirectoryStoragePath(String aipId, String representationId, List<String> directoryPath)
+    throws RequestNotValidException {
+    List<String> path = getRepresentationDataPath(aipId, representationId);
+    if (directoryPath != null) {
+      path.addAll(directoryPath);
+    }
+
     return DefaultStoragePath.parse(path);
   }
 

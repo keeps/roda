@@ -32,10 +32,12 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.ShallowFile;
 import org.roda.core.data.v2.ip.ShallowFiles;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.protocols.Protocol;
@@ -289,33 +291,50 @@ public class EARKSIP2ToAIPPluginUtils {
     // process representation files
     boolean hasShallowFile = false;
     for (IPFileInterface file : sr.getData()) {
-      List<String> directoryPath;
-      String fileId;
-      ContentPayload payload;
+      List<String> directoryPath = null;
+      String fileId = null;
+      ContentPayload payload = null;
       if (file instanceof IPFileShallow) {
-        fileId = RodaConstants.RODA_MANIFEST_EXTERNAL_FILES;
-        directoryPath = null;
-        payload = processIPFileShallow(aipId, representation.getId(), (IPFileShallow) file);
-        hasShallowFile = true;
+        if (((IPFileShallow) file).getFileLocation() != null) {
+          // this is an actual shallow file
+          fileId = RodaConstants.RODA_MANIFEST_EXTERNAL_FILES;
+          directoryPath = file.getRelativeFolders();
+          payload = processIPFileShallow(aipId, representation.getId(), (IPFileShallow) file);
+          hasShallowFile = true;
+        } else {
+          // this is an empty folder
+          final StoragePath emptyDirectoryStoragePath = ModelUtils.getDirectoryStoragePath(aipId,
+            representation.getId(), file.getRelativeFolders());
+          model.getStorage().createDirectory(emptyDirectoryStoragePath);
+          // TODO jgomes 2022-03-09: Create model service method to create empty directory
+        }
+
       } else {
         fileId = file.getFileName();
         directoryPath = file.getRelativeFolders();
         payload = new FSPathContentPayload(file.getPath());
       }
-      try {
-        File createdFile = model.createFile(aipId, representation.getId(), directoryPath, fileId, payload, notify);
-        if (reportItem != null && update) {
-          reportItem.getSipInformation().addFileData(aipId, IdUtils.getRepresentationId(representation), createdFile);
-        }
-      } catch (AlreadyExistsException e) {
-        if (update) {
-          File updatedFile = model.updateFile(aipId, representation.getId(), directoryPath, fileId, payload, true,
+
+      if (payload != null) {
+
+        try {
+          final File createdFile = model.createFile(aipId, representation.getId(), directoryPath, fileId, payload,
             notify);
-          if (reportItem != null) {
-            reportItem.getSipInformation().addFileData(aipId, IdUtils.getRepresentationId(representation), updatedFile);
+          if (reportItem != null && update) {
+            reportItem.getSipInformation().addFileData(aipId, IdUtils.getRepresentationId(representation), createdFile);
           }
-        } else
-          throw e;
+        } catch (final AlreadyExistsException e) {
+          if (update) {
+            final File updatedFile = model.updateFile(aipId, representation.getId(), directoryPath, fileId, payload,
+              true, notify);
+            if (reportItem != null) {
+              reportItem.getSipInformation().addFileData(aipId, IdUtils.getRepresentationId(representation),
+                updatedFile);
+            }
+          } else {
+            throw e;
+          }
+        }
       }
     }
 
