@@ -113,7 +113,7 @@
 		<apacheds.version>2.0.0-M24</apacheds.version>
 		<httpcomponents.version>4.5.13</httpcomponents.version>
 		<poi.version>3.17</poi.version>
-		<commons_ip2.version>2.0.0</commons_ip2.version>
+		<commons_ip2.version>2.1.0-SNAPSHOT</commons_ip2.version>
 		<metrics.version>3.2.6</metrics.version>
 		<roda_community_url>https://roda-community.org</roda_community_url>
 		<testng.groups>all</testng.groups>
