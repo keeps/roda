@@ -1,5 +1,22 @@
 # Changelog
 
+## v3.6.3 (11/03/2022)
+
+#### Enhancements:
+
+-  Remove trace logs from logback configuration [#1994](https://github.com/keeps/roda/issues/1994)
+
+#### Bug Fixes:
+
+-  Generalized noneselect option when building search filter [#1995](https://github.com/keeps/roda/issues/1995)
+
+Install for demonstration:
+```
+docker pull keeps/roda:v3.6.3
+```
+
+---
+
 ## v3.6.2 (17/02/2022)
 ### Bug fixes:
 
@@ -72,17 +89,6 @@ docker pull keeps/roda:v3.6
 ```
 ---
 
-## v3.5.7 (17/01/2022)
-#### Enhancements:
-- Expand Portal to allow customization via AIP level #1969
-
-
-Install for demonstration:
-```
-docker pull keeps/roda:v3.5.7
-```
----
-
 ## v4.1.1 (09/12/2021)
 
 #### Enhancements:
@@ -96,6 +102,17 @@ docker pull keeps/roda:v3.5.7
 Install for demonstration:
 ```
 docker pull keeps/roda:v4.1.1
+```
+---
+
+## v3.5.7 (17/01/2022)
+#### Enhancements:
+- Expand Portal to allow customization via AIP level #1969
+
+
+Install for demonstration:
+```
+docker pull keeps/roda:v3.5.7
 ```
 ---
 
@@ -866,14 +883,3 @@ docker pull keeps/roda:v2.2.13
 #### Enhancements:
 
 - Add support for CORS [#1382](https://github.com/keeps/roda/issues/1382)
----
-
-## v2.2.12 (11/10/2018)
-Install for demonstration:
-```
-docker pull keeps/roda:v2.2.12
-```
-
-
-#### Enhancements:
-- Add support for jsonp requests in IndexResource#list [#1375](https://github.com/keeps/roda/issues/1375)
