@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.StreamSupport;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
@@ -260,6 +261,9 @@ public class IndexModelObserver implements ModelObserver {
             numberOfDataFolders++;
           } else if (!FSUtils.isManifestOfExternalFiles(file.get().getId())) {
             numberOfDataFiles++;
+          } else {
+            numberOfDataFiles += StreamSupport.stream(model.listExternalFilesUnder(file.get()).spliterator(), false)
+              .count();
           }
         } else {
           LOGGER.error("Cannot index representation file", file.getCause());
@@ -337,7 +341,7 @@ public class IndexModelObserver implements ModelObserver {
     FileCollection.Info info = new FileCollection.Info(aip, ancestors);
 
     if (FSUtils.isManifestOfExternalFiles(file.getId())) {
-      try (CloseableIterable<OptionalWithCause<File>> allExternalFiles = model.listExternalFilesUnder(file)){
+      try (CloseableIterable<OptionalWithCause<File>> allExternalFiles = model.listExternalFilesUnder(file)) {
         for (OptionalWithCause<File> shallowFile : allExternalFiles) {
           if (shallowFile.isPresent()) {
             shallowFile.get().setInstanceId(aip.getInstanceId());
@@ -345,7 +349,8 @@ public class IndexModelObserver implements ModelObserver {
           }
         }
         sizeInBytes = getExternalFilesTotalSize(file);
-      } catch (IOException | RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException e) {
+      } catch (IOException | RequestNotValidException | GenericException | AuthorizationDeniedException
+        | NotFoundException e) {
         e.printStackTrace();
       }
 
