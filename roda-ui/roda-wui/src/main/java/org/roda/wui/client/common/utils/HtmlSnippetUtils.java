@@ -192,11 +192,11 @@ public class HtmlSnippetUtils {
   public static SafeHtml getJobParallelismTypeHtml(JobParallelism parallelism, boolean appendDefinition) {
     SafeHtmlBuilder b = new SafeHtmlBuilder();
     b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO));
-    b.append(SafeHtmlUtils.fromString(messages.jobParallelismShortBadge(parallelism)));
 
-    if (!appendDefinition) {
-      b.append(SafeHtmlUtils.fromString(" "));
+    if (appendDefinition) {
       b.append(SafeHtmlUtils.fromString(messages.jobParallelismLongBadge(parallelism)));
+    } else {
+      b.append(SafeHtmlUtils.fromString(messages.jobParallelismShortBadge(parallelism)));
     }
 
     b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
@@ -223,19 +223,19 @@ public class HtmlSnippetUtils {
         break;
     }
 
-    b.append(SafeHtmlUtils.fromString(messages.jobPriorityShortBadge(priority)));
-
-    if (!appendDefinition) {
-      b.append(SafeHtmlUtils.fromString(" "));
+    if (appendDefinition) {
       b.append(SafeHtmlUtils.fromString(messages.jobPriorityLongBadge(priority)));
+    } else {
+      b.append(SafeHtmlUtils.fromString(messages.jobPriorityShortBadge(priority)));
     }
+
     b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
 
     return b.toSafeHtml();
   }
 
   public static SafeHtml getJobPriorityHtml(JobPriority priority) {
-    return getJobPriorityHtml(priority, true);
+    return getJobPriorityHtml(priority, false);
   }
 
   public static SafeHtml getJobStateHtml(Job job) {
