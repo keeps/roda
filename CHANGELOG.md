@@ -1,5 +1,17 @@
 # Changelog
 
+## v3.6.4 (11/03/2022)
+#### Bug Fixes:
+
+-  Fix job orchestration displayed badges
+
+Install for demonstration:
+```
+docker pull keeps/roda:v3.6.4
+```
+
+---
+
 ## v3.6.3 (11/03/2022)
 
 #### Enhancements:
@@ -870,16 +882,3 @@ docker pull keeps/roda:v3.0.0
 -  A specific plugin execution thrown an exception yet job have completed with success [#837](https://github.com/keeps/roda/issues/837)
 -  Error downloading PREMIS on demo server [#833](https://github.com/keeps/roda/issues/833)
 -  PDF to PDFA conversion plugin reporting is not well [#619](https://github.com/keeps/roda/issues/619)
-
----
-
-## v2.2.13 (25/10/2018)
-Install for demonstration:
-```
-docker pull keeps/roda:v2.2.13
-```
-
-
-#### Enhancements:
-
-- Add support for CORS [#1382](https://github.com/keeps/roda/issues/1382)
