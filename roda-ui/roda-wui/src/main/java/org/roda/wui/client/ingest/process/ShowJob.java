@@ -339,8 +339,8 @@ public class ShowJob extends Composite {
     name.setText(job.getName());
     creator.setText(job.getUsername());
 
-    jobPriority.setHTML(HtmlSnippetUtils.getJobPriorityHtml(job.getPriority(), false));
-    jobParallelism.setHTML(HtmlSnippetUtils.getJobParallelismTypeHtml(job.getParallelism(), false));
+    jobPriority.setHTML(HtmlSnippetUtils.getJobPriorityHtml(job.getPriority(), true));
+    jobParallelism.setHTML(HtmlSnippetUtils.getJobParallelismTypeHtml(job.getParallelism(), true));
 
     dateStarted.setText(Humanize.formatDateTime(job.getStartDate()));
     update();
