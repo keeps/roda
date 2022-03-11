@@ -57,17 +57,9 @@
 
 	<appender name="METRICS" class="io.prometheus.client.logback.InstrumentedAppender" />
 
-	<logger name="org.roda.core.plugins.orchestrate.akka" additivity="false" level="trace">
-
+	<logger name="org.roda.core.plugins.orchestrate.akka" additivity="false">
+		<level value="DEBUG" />
 		<!-- <level value="TRACE" /> -->
-		<appender-ref ref="CORE_FILEOUT" />
-		<!-- <appender-ref ref="AKKA_FILE" /> -->
-		<appender-ref ref="METRICS" />
-	</logger>
-
-	<logger name="org.roda.core.common.akka" additivity="false" level="trace">
-
-		<level value="TRACE" />
 		<appender-ref ref="CORE_FILEOUT" />
 		<!-- <appender-ref ref="AKKA_FILE" /> -->
 		<appender-ref ref="METRICS" />
