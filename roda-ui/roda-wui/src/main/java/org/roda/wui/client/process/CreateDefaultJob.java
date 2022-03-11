@@ -199,13 +199,13 @@ public class CreateDefaultJob extends Composite {
   RadioButton limitedParallelismRadioButton;
 
   public CreateDefaultJob() {
-    highPriorityRadioButton = new RadioButton("priority", HtmlSnippetUtils.getJobPriorityHtml(JobPriority.HIGH, true));
-    mediumPriorityRadioButton = new RadioButton("priority", HtmlSnippetUtils.getJobPriorityHtml(JobPriority.MEDIUM, true));
-    lowPriorityRadioButton = new RadioButton("priority", HtmlSnippetUtils.getJobPriorityHtml(JobPriority.LOW, true));
+    highPriorityRadioButton = new RadioButton("priority", HtmlSnippetUtils.getJobPriorityHtml(JobPriority.HIGH, false));
+    mediumPriorityRadioButton = new RadioButton("priority", HtmlSnippetUtils.getJobPriorityHtml(JobPriority.MEDIUM, false));
+    lowPriorityRadioButton = new RadioButton("priority", HtmlSnippetUtils.getJobPriorityHtml(JobPriority.LOW, false));
     normalParallelismRadioButton = new RadioButton("parallelism",
-      HtmlSnippetUtils.getJobParallelismTypeHtml(JobParallelism.NORMAL, true));
+      HtmlSnippetUtils.getJobParallelismTypeHtml(JobParallelism.NORMAL, false));
     limitedParallelismRadioButton = new RadioButton("parallelism",
-      HtmlSnippetUtils.getJobParallelismTypeHtml(JobParallelism.LIMITED, true));
+      HtmlSnippetUtils.getJobParallelismTypeHtml(JobParallelism.LIMITED, false));
 
     initWidget(uiBinder.createAndBindUi(this));
 
