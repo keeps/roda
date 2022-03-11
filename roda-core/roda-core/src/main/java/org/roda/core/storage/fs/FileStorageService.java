@@ -589,7 +589,7 @@ public class FileStorageService implements StorageService {
   public Class<? extends Entity> getEntityExternalFile(StoragePath storagePath) throws NotFoundException {
     Optional<String> aipId = ModelUtils.extractAipId(storagePath);
     Optional<String> representationId = ModelUtils.extractRepresentationId(storagePath);
-    List<String> path = ModelUtils.extractFilePathFromRepresentationOtherMetadata(storagePath);
+    List<String> path = ModelUtils.extractFilePathFromRepresentationData(storagePath);
     try {
       StoragePath externalFile = ModelUtils.getFileStoragePath(aipId.get(), representationId.get(), path,
         RodaConstants.RODA_MANIFEST_EXTERNAL_FILES);
