@@ -72,7 +72,7 @@ To start developing new components for RODA check the [Developer guide](https://
 
 Testing RODA on different browsers is done in an easy way thanks to BrowserStack!
 
-[![BrowserStack website](https://user-images.githubusercontent.com/98429/40908885-f1559ca4-67df-11e8-8a98-8b0b57d3febb.png)](http://browserstack.com/)
+[![BrowserStack website](https://user-images.githubusercontent.com/98429/40908885-f1559ca4-67df-11e8-8a98-8b0b57d3febb.png)](http://browserstack.com/) [![Join the chat at https://gitter.im/keeps-roda/community](https://badges.gitter.im/keeps-roda/community.svg)](https://gitter.im/keeps-roda/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Translators
 
