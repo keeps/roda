@@ -2,16 +2,16 @@ package org.roda.wui.client.management.distributed;
 
 import java.util.List;
 
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -125,7 +125,7 @@ public class ShowLocalInstanceConfiguration extends Composite {
       public void onSuccess(LocalInstance result) {
         localInstance = result;
         initElements(localInstance);
-        Toast.showInfo("Register", "Success");
+        Dialogs.showInformationDialog("Register", "Success", messages.closeButton(), false);
       }
     });
   }

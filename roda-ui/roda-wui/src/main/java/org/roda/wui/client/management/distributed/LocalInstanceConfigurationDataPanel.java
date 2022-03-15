@@ -6,6 +6,7 @@ import java.util.List;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.tools.ValidationUtils;
 import org.roda.wui.common.client.widgets.Toast;
@@ -215,7 +216,7 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
           @Override
           public void onSuccess(List<String> result) {
             if (result.isEmpty()) {
-              Toast.showInfo("Test instance", "Success");
+              Dialogs.showInformationDialog("Test Instance", "Success " + centralInstanceURLValue.getText() , messages.closeButton(), false);
             } else {
               Toast.showError("Test instance", "Error: " + result.toString());
             }
