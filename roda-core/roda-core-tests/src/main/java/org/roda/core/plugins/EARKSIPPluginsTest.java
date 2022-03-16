@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import java.util.stream.Stream;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
+import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.data.common.RodaConstants;
@@ -53,8 +55,12 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.plugins.base.FixAncestorsPlugin;
+import org.roda.core.plugins.plugins.characterization.PremisSkeletonPlugin;
+import org.roda.core.plugins.plugins.ingest.EARKSIP2ToAIPPlugin;
 import org.roda.core.plugins.plugins.ingest.EARKSIPToAIPPlugin;
+import org.roda.core.plugins.plugins.ingest.v2.MinimalIngestPlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexAIPPlugin;
+import org.roda.core.storage.Binary;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -67,6 +73,7 @@ import org.testng.annotations.Test;
 
 import com.google.common.collect.Iterables;
 
+import gov.loc.premis.v3.Representation;
 import jersey.repackaged.com.google.common.collect.Lists;
 
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
