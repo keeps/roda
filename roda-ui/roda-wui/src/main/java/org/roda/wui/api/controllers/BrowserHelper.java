@@ -1418,7 +1418,7 @@ public class BrowserHelper {
           fileId, payload, notify);
       } else {
         PreservationMetadataType type = PreservationMetadataType.FILE;
-        String id = IdUtils.getPreservationFileId(fileId);
+        String id = IdUtils.getPreservationFileId(fileDirectoryPath, fileId);
         model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, payload, notify);
       }
     } catch (IOException e) {
@@ -1659,7 +1659,7 @@ public class BrowserHelper {
   private static JobParallelism getJobParallelismFromConfiguration() {
     // Fetch priority
     String parallelism = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.CORE_ORCHESTRATOR_PREFIX,
-        RodaConstants.CORE_ORCHESTRATOR_PROP_INTERNAL_JOBS_PARALLELISM);
+      RodaConstants.CORE_ORCHESTRATOR_PROP_INTERNAL_JOBS_PARALLELISM);
 
     if (parallelism == null) {
       return JobParallelism.NORMAL;
