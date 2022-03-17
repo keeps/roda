@@ -1799,6 +1799,7 @@ public final class RodaConstants {
   public static final String SYNCHRONIZATION_REMOTE_ACTIONS_FOLDER = "remote_actions";
   public static final String SYNCHRONIZATION_INCOMING_REMOTE_ACTIONS_PATH = CORE_SYNCHRONIZATION_INCOMING_FOLDER + "/"
     + SYNCHRONIZATION_REMOTE_ACTIONS_FOLDER;
+  public static final String SYNCHRONIZATION_LOCAL_INSTANCE_AIP_LIST_FILE_NAME = "aip_list";
 
   /** Private empty constructor */
   private RodaConstants() {

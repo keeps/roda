@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -15,20 +16,29 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.synchronization.bundle.BundleState;
 import org.roda.core.data.v2.synchronization.bundle.PackageState;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
+import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
 import org.roda.core.util.FileUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 public class SyncBundleHelper {
+  private static final Logger LOGGER = LoggerFactory.getLogger(SyncBundleHelper.class);
   private final static String STORAGE_DIR = RodaConstants.CORE_STORAGE_FOLDER;
   private final static String STATE_FILE = "state.json";
   private final static String PACKAGES_DIR = "packages";
@@ -61,8 +71,7 @@ public class SyncBundleHelper {
     return JsonUtils.readObjectFromFile(bundleStateFilePath, BundleState.class);
   }
 
-  public static void updateBundleStateFile(BundleState bundleState)
-    throws GenericException {
+  public static void updateBundleStateFile(BundleState bundleState) throws GenericException {
     LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
     Path bundleStateFilePath = Paths.get(localInstance.getBundlePath()).resolve(STATE_FILE);
     JsonUtils.writeObjectToFile(bundleState, bundleStateFilePath);
@@ -73,7 +82,7 @@ public class SyncBundleHelper {
     BundleState bundleState = getBundleStateFile(localInstance);
     Path packagesPath = Paths.get(localInstance.getBundlePath()).resolve(PACKAGES_DIR);
     List<PackageState> packageStateList = new ArrayList<>();
-    for(File file : FileUtility.listFilesRecursively(packagesPath.toFile())){
+    for (File file : FileUtility.listFilesRecursively(packagesPath.toFile())) {
       PackageState entityPackageState = JsonUtils.readObjectFromFile(Paths.get(file.getPath()), PackageState.class);
       if (entityPackageState.getClassName() != null) {
         packageStateList.add(entityPackageState);
@@ -144,5 +153,22 @@ public class SyncBundleHelper {
     } catch (CommandException e) {
       throw new GenericException("Unable to execute command", e);
     }
+  }
+
+  public static void createAipLocalInstanceList(final String destinationPath, final String aipListFileName)
+    throws GenericException {
+    final Path aipListPath = Paths.get(destinationPath).resolve(aipListFileName + ".json");
+    final List<String> aipIdList = new ArrayList<>();
+    final IndexService index = RodaCoreFactory.getIndexService();
+    try (IterableIndexResult<IndexedAIP> result = index.findAll(IndexedAIP.class,
+      new Filter(), true, Collections.singletonList(RodaConstants.INDEX_UUID))) {
+      for (IndexedAIP aip : result) {
+        aipIdList.add(aip.getId());
+      }
+    } catch (IOException | GenericException | RequestNotValidException e) {
+      LOGGER.error("Error getting AIP iterator when creating aip list", e);
+    }
+    JsonUtils.writeObjectToFile(aipIdList, aipListPath);
+
   }
 }

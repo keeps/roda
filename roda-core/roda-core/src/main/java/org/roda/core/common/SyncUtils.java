@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +32,7 @@ import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.synchronization.bundle.AttachmentState;
@@ -432,5 +434,27 @@ public class SyncUtils {
       }
     }
     return null;
+  }
+
+  public static void deleteAipsInstance(String instanceIdentifier, Path bundleWorkingDir, String aipListName)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+    final Path aipListFile = bundleWorkingDir.resolve(aipListName + ".json");
+    final List<String> aipList = JsonUtils.readObjectFromFile(aipListFile, List.class);
+    final IndexService index = RodaCoreFactory.getIndexService();
+    final List<String> aipToRemove = new ArrayList<>();
+    final Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_INSTANCE_ID, instanceIdentifier));
+    try (IterableIndexResult<IndexedAIP> result = index.findAll(IndexedAIP.class, filter, true,
+      Collections.singletonList(RodaConstants.INDEX_UUID))) {
+      for (IndexedAIP aip : result) {
+        if (!aipList.contains(aip.getId())) {
+          aipToRemove.add(aip.getId());
+        }
+      }
+    } catch (IOException | GenericException | RequestNotValidException e) {
+      LOGGER.error("Error getting AIP iterator when creating aip list", e);
+    }
+    if (!aipToRemove.isEmpty()) {
+      index.delete(IndexedAIP.class, aipToRemove);
+    }
   }
 }

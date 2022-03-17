@@ -1,6 +1,5 @@
 package org.roda.core.plugins.plugins.internal.synchronization.proccess;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.DirectoryStream;
@@ -54,7 +53,6 @@ import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.util.IdUtils;
-import org.roda.core.util.ZipUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -193,6 +191,7 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
         validateChecksum(bundleWorkingDir, bundleState);
         importStorage(storage, bundleWorkingDir, bundleState, jobPluginInfo);
         SyncUtils.copyAttachments(instanceIdentifier);
+        SyncUtils.deleteAipsInstance(instanceIdentifier, bundleWorkingDir, bundleState.getAipListFileName());
 
         DistributedInstance distributedInstance = model.retrieveDistributedInstance(instanceIdentifier);
         distributedInstance.setLastSyncDate(bundleState.getToDate());

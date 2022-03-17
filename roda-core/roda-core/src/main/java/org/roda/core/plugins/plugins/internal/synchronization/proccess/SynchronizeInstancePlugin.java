@@ -1,6 +1,8 @@
 package org.roda.core.plugins.plugins.internal.synchronization.proccess;
 
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -13,6 +15,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
@@ -35,6 +38,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.plugins.internal.synchronization.SyncBundleHelper;
 import org.roda.core.plugins.plugins.internal.synchronization.packages.AipPackagePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.packages.DipPackagePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.packages.JobPackagePlugin;
@@ -125,6 +129,10 @@ public class SynchronizeInstancePlugin extends AbstractPlugin<Void> {
       localInstance = RodaCoreFactory.getLocalInstance();
       bundleState = SyncUtils.createBundleState(localInstance.getId());
       DistributedInstance distributedInstance = SyncUtils.requestInstanceStatus(localInstance);
+      final Path aipListJsonPath = Paths.get(bundleState.getDestinationPath())
+        .resolve(bundleState.getAipListFileName() + ".json");
+      final List<String> aipList = new ArrayList<>();
+      JsonUtils.writeObjectToFile(aipList, aipListJsonPath);
       bundleState.setFromDate(distributedInstance.getLastSyncDate());
       SyncUtils.updateBundleState(bundleState, localInstance.getId());
     } catch (GenericException | IOException e) {
@@ -167,6 +175,12 @@ public class SynchronizeInstancePlugin extends AbstractPlugin<Void> {
     }
 
     try {
+      SyncBundleHelper.createAipLocalInstanceList(bundleState.getDestinationPath(), bundleState.getAipListFileName());
+    } catch (GenericException e) {
+      LOGGER.debug("Failed to create AIP List", e.getMessage(), e);
+    }
+
+    try {
       sendReport = executePlugin(index, model, storage, cachedJob, SendSyncBundlePlugin.class.getCanonicalName(),
         Void.class);
     } catch (InvalidParameterException | PluginException e) {
@@ -191,7 +205,7 @@ public class SynchronizeInstancePlugin extends AbstractPlugin<Void> {
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    //SyncUtils.deleteSyncBundleWorkingDirectory(localInstance.getId());
+    // SyncUtils.deleteSyncBundleWorkingDirectory(localInstance.getId());
     return null;
   }
 
