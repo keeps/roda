@@ -106,7 +106,10 @@ public class ClassificationPlanUtils {
     AIP modelAIP = model.retrieveAIP(indexedAIP.getId());
 
     if (modelAIP.getType() != null) {
-      node = node.put("type", modelAIP.getType());
+      ObjectNode contentTypeNode = mapper.createObjectNode();
+      contentTypeNode = contentTypeNode.put("packageType", RodaConstants.AIP_DEFAULT_PACKAGE_TYPE);
+      contentTypeNode = contentTypeNode.put("value", modelAIP.getType());
+      node.set("contentType", contentTypeNode);
     }
     if (modelAIP != null) {
       List<DescriptiveMetadata> descriptiveMetadata = modelAIP.getDescriptiveMetadata();

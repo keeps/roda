@@ -9,7 +9,10 @@ package org.roda.core.plugins;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
@@ -66,7 +69,9 @@ import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.plugins.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.plugins.ingest.AutoAcceptSIPPlugin;
+import org.roda.core.plugins.plugins.ingest.EARKSIP2ToAIPPlugin;
 import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
+import org.roda.core.plugins.plugins.ingest.v2.MinimalIngestPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
@@ -646,5 +651,40 @@ public class InternalPluginsTest {
 
     aip = model.retrieveAIP(aip.getId());
     MatcherAssert.assertThat(aip.getState(), Is.is(AIPState.ACTIVE));
+  }
+
+  @Test
+  public void testPremisURN() throws IOException, RODAException, URISyntaxException {
+    final URL corporaURL = EARKSIPPluginsTest.class.getResource("/corpora");
+    Assert.assertNotNull(corporaURL);
+    final Path corporaPath = Paths.get(corporaURL.toURI());
+
+    final TransferredResource transferredResource = EARKSIPPluginsTest.createIngestCorpora(corporaPath, index,
+            "earkSip_twoFiles_with_same_name.zip");
+
+    final Map<String, String > parameters = new HashMap<>();
+    parameters.put("parameter.sip_to_aip_class", EARKSIP2ToAIPPlugin.class.getName());
+
+    final Job job = TestsHelper.executeJob(MinimalIngestPlugin.class, parameters, PluginType.SIP_TO_AIP,
+            SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
+
+    TestsHelper.getJobReports(index, job, true);
+
+    index.commitAIPs();
+    final IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
+            new Filter(new SimpleFilterParameter(RodaConstants.INGEST_JOB_ID, job.getId())), null, new Sublist(0, 10),
+            new ArrayList<>());
+    final IndexedAIP indexedAIP = find.getResults().get(0);
+
+    final AIP aip = model.retrieveAIP(indexedAIP.getId());
+
+    final Binary binary = model.retrievePreservationRepresentation(aip.getId(), aip.getRepresentations().get(0).getId());
+    final Representation representation = PremisV3Utils.binaryToRepresentation(binary.getContent(), false);
+    Assert.assertEquals(
+            representation.getRelationshipArray(0).getRelatedObjectIdentifierArray(0).getRelatedObjectIdentifierValue(),
+            "urn:roda:premis:file:f2-image (1).png");
+    Assert.assertEquals(
+            representation.getRelationshipArray(1).getRelatedObjectIdentifierArray(0).getRelatedObjectIdentifierValue(),
+            "urn:roda:premis:file:f1-image (1).png");
   }
 }

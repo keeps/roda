@@ -110,7 +110,7 @@ public class PremisSkeletonPluginUtils {
           pmId = pm.getId();
           model.notifyFileCreated(file).failOnError();
         } catch (AlreadyExistsException e1) {
-          pmId = IdUtils.getPreservationFileId(file.getId());
+          pmId = IdUtils.getPreservationFileId(file);
           model.updatePreservationMetadata(pmId, PreservationMetadataType.FILE, file.getAipId(),
             file.getRepresentationId(), file.getPath(), file.getId(), filePreservation, notifyInSteps);
           model.notifyFileUpdated(file).failOnError();

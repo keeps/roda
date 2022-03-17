@@ -151,9 +151,16 @@ public class EARKSIPPluginsTest {
     return createIngestCorpora(corporaPath, index, CorporaConstants.EARK_SIP_UPDATE, renameSipFileTo);
   }
 
+  public static TransferredResource createIngestCorpora(Path corporaPath, IndexService index, String sipName)
+    throws AuthorizationDeniedException, AlreadyExistsException, NotFoundException, IOException,
+    IsStillUpdatingException, GenericException {
+    return createIngestCorpora(corporaPath, index, sipName, null);
+  }
+
   protected static <T extends Plugin<TransferredResource>> AIP ingestCorpora(Class<T> pluginClass, ModelService model,
-    IndexService index, Path corporaPath, boolean failIfReportNotSucceeded) throws RequestNotValidException, NotFoundException,
-    GenericException, AlreadyExistsException, AuthorizationDeniedException, IOException, IsStillUpdatingException {
+    IndexService index, Path corporaPath, boolean failIfReportNotSucceeded)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException, IOException, IsStillUpdatingException {
     String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
     AIP root = model.createAIP(parentId, aipType, new Permissions(), RodaConstants.ADMIN);
@@ -323,5 +330,4 @@ public class EARKSIPPluginsTest {
   public void testIngestAncestors() throws IOException, RODAException {
     ingestCorporaAncestors();
   }
-
 }
