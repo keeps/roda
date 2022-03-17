@@ -13,7 +13,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +23,6 @@ import java.util.stream.Stream;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
-import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.data.common.RodaConstants;
@@ -55,12 +53,8 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.plugins.base.FixAncestorsPlugin;
-import org.roda.core.plugins.plugins.characterization.PremisSkeletonPlugin;
-import org.roda.core.plugins.plugins.ingest.EARKSIP2ToAIPPlugin;
 import org.roda.core.plugins.plugins.ingest.EARKSIPToAIPPlugin;
-import org.roda.core.plugins.plugins.ingest.v2.MinimalIngestPlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexAIPPlugin;
-import org.roda.core.storage.Binary;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -73,7 +67,6 @@ import org.testng.annotations.Test;
 
 import com.google.common.collect.Iterables;
 
-import gov.loc.premis.v3.Representation;
 import jersey.repackaged.com.google.common.collect.Lists;
 
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
@@ -156,6 +149,12 @@ public class EARKSIPPluginsTest {
     String renameSipFileTo) throws IOException, NotFoundException, GenericException, RequestNotValidException,
     IsStillUpdatingException, AlreadyExistsException, AuthorizationDeniedException {
     return createIngestCorpora(corporaPath, index, CorporaConstants.EARK_SIP_UPDATE, renameSipFileTo);
+  }
+
+  public static TransferredResource createIngestCorpora(Path corporaPath, IndexService index, String sipName)
+    throws AuthorizationDeniedException, AlreadyExistsException, NotFoundException, IOException,
+    IsStillUpdatingException, GenericException {
+    return createIngestCorpora(corporaPath, index, sipName, null);
   }
 
   protected static <T extends Plugin<TransferredResource>> AIP ingestCorpora(Class<T> pluginClass, ModelService model,
@@ -330,36 +329,5 @@ public class EARKSIPPluginsTest {
   @Test
   public void testIngestAncestors() throws IOException, RODAException {
     ingestCorporaAncestors();
-  }
-
-  @Test
-  public void testPremisURN() throws IOException, RODAException {
-    TransferredResource transferredResource = createIngestCorpora(corporaPath, index,
-            "earkSip_twoFiles_with_same_name.zip", null);
-
-    Map<String, String > parameters = new HashMap<>();
-    parameters.put("parameter.sip_to_aip_class", EARKSIP2ToAIPPlugin.class.getName());
-
-    Job job = TestsHelper.executeJob(MinimalIngestPlugin.class, parameters, PluginType.SIP_TO_AIP,
-            SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
-
-    TestsHelper.getJobReports(index, job, true);
-
-    index.commitAIPs();
-    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
-            new Filter(new SimpleFilterParameter(RodaConstants.INGEST_JOB_ID, job.getId())), null, new Sublist(0, 10),
-            new ArrayList<>());
-    IndexedAIP indexedAIP = find.getResults().get(0);
-
-    AIP aip = model.retrieveAIP(indexedAIP.getId());
-
-    Binary binary = model.retrievePreservationRepresentation(aip.getId(), aip.getRepresentations().get(0).getId());
-    Representation representation = PremisV3Utils.binaryToRepresentation(binary.getContent(), false);
-    Assert.assertEquals(
-            representation.getRelationshipArray(0).getRelatedObjectIdentifierArray(0).getRelatedObjectIdentifierValue(),
-            "urn:roda:premis:file:f2-image (1).png");
-    Assert.assertEquals(
-            representation.getRelationshipArray(1).getRelatedObjectIdentifierArray(0).getRelatedObjectIdentifierValue(),
-            "urn:roda:premis:file:f1-image (1).png");
   }
 }
