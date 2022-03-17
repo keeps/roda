@@ -1,4 +1,5 @@
 [![CI](https://github.com/keeps/roda/actions/workflows/CI.yml/badge.svg)](https://github.com/keeps/roda/actions/workflows/CI.yml)
+[![Join the chat at https://gitter.im/keeps-roda/community](https://badges.gitter.im/keeps-roda/community.svg)](https://gitter.im/keeps-roda/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 RODA - Repository of Authentic Digital Objects
 ==============================================
