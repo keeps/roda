@@ -7,6 +7,7 @@
  */
 package org.roda.core.events.akka;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.roda.core.data.v2.IsRODAObject;
@@ -80,7 +81,10 @@ public class CRDTWrapper extends AbstractReplicatedData<CRDTWrapper>
 
   @Override
   public String toString() {
-    return "CRDTWrapper [rodaObject=" + rodaObject + ", rodaObjectOtherInfo=" + rodaObjectOtherInfo + ", isUpdate="
+    Map<String, Object> clone = new HashMap<>(rodaObjectOtherInfo);
+    clone.put("password", "********");
+
+    return "CRDTWrapper [rodaObject=" + rodaObject + ", rodaObjectOtherInfo=" + clone + ", isUpdate="
       + isUpdate + ", instanceId=" + instanceId + ", timeinmillis=" + timeinmillis + "]";
   }
 }

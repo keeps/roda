@@ -1447,6 +1447,10 @@ public class RodaCoreFactory {
         FSUtils.deletePathQuietly(workingDirectoryPath);
       }
 
+      if (getProperty(RodaConstants.CORE_EVENTS_ENABLED, false)) {
+        eventsManager.shutdown();
+      }
+
       // stop jmx metrics reporter
       if (getSystemProperty("com.sun.management.jmxremote", null) != null) {
         jmxMetricsReporter.stop();

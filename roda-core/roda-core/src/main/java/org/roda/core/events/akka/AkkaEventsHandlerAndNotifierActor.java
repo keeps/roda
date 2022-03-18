@@ -221,8 +221,8 @@ public class AkkaEventsHandlerAndNotifierActor extends AbstractActor {
       replicator.tell(update1, self());
     }
 
-    Update<ORMap<String, CRDTWrapper>> update = new Update<ORMap<String, CRDTWrapper>>(dataKey(key), ORMap.create(),
-      writeConsistency, curr -> curr.put(cluster, key, value));
+    Update<ORMap<String, CRDTWrapper>> update = new Update<>(dataKey(key), ORMap.create(), writeConsistency,
+      curr -> curr.put(cluster.selfUniqueAddress(), key, value));
     replicator.tell(update, self());
   }
 
@@ -235,7 +235,7 @@ public class AkkaEventsHandlerAndNotifierActor extends AbstractActor {
     }
 
     Update<ORMap<String, CRDTWrapper>> update = new Update<>(objectKey, ORMap.create(), writeConsistency,
-      curr -> curr.remove(cluster, key));
+      curr -> curr.remove(cluster.selfUniqueAddress(), key));
     replicator.tell(update, self());
   }
 
