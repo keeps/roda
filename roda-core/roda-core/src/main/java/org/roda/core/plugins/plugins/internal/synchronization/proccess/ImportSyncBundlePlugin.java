@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -29,17 +30,23 @@ import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.utils.URLUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.synchronization.bundle.BundleState;
+import org.roda.core.data.v2.synchronization.bundle.EntitiesBundle;
 import org.roda.core.data.v2.synchronization.bundle.PackageState;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
@@ -48,6 +55,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.plugins.internal.DeleteRODAObjectPlugin;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
@@ -191,7 +199,7 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
         validateChecksum(bundleWorkingDir, bundleState);
         importStorage(storage, bundleWorkingDir, bundleState, jobPluginInfo);
         SyncUtils.copyAttachments(instanceIdentifier);
-        SyncUtils.deleteAipsInstance(instanceIdentifier, bundleWorkingDir, bundleState.getAipListFileName());
+        deleteEntities(instanceIdentifier, bundleWorkingDir, bundleState.getEntitiesBundle());
 
         DistributedInstance distributedInstance = model.retrieveDistributedInstance(instanceIdentifier);
         distributedInstance.setLastSyncDate(bundleState.getToDate());
@@ -318,4 +326,51 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
     return new Report();
   }
 
+  public void deleteEntities(final String instanceIdentifier, final Path bundleWorkingDir,
+    final EntitiesBundle entitiesBundle) throws AuthorizationDeniedException, RequestNotValidException,
+    GenericException, NotFoundException, JobAlreadyStartedException {
+    final Map<Path, Class<? extends IsIndexed>> entitiesPathMap = SyncUtils.createEntitiesPaths(bundleWorkingDir,
+      entitiesBundle);
+    for (Map.Entry entry : entitiesPathMap.entrySet()) {
+      deleteBundleEntities((Path) entry.getKey(), (Class<? extends IsIndexed>) entry.getValue(), instanceIdentifier);
+    }
+  }
+
+  private void deleteBundleEntities(final Path readPath, final Class<? extends IsIndexed> indexedClass,
+    final String instanceIdentifier) throws GenericException, AuthorizationDeniedException, RequestNotValidException,
+    NotFoundException, JobAlreadyStartedException {
+    final List<String> listToRemove = new ArrayList<>();
+    final List<String> list = JsonUtils.readObjectFromFile(readPath, List.class);
+    final IndexService index = RodaCoreFactory.getIndexService();
+    final Filter filter = new Filter();
+    filter.add(new SimpleFilterParameter(RodaConstants.AIP_INSTANCE_ID, instanceIdentifier));
+    if (indexedClass == IndexedPreservationEvent.class) {
+      filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS,
+        IndexedPreservationEvent.PreservationMetadataEventClass.REPOSITORY.toString()));
+    }
+
+    try (IterableIndexResult<? extends IsIndexed> result = index.findAll(indexedClass, filter, true,
+      Collections.singletonList(RodaConstants.INDEX_UUID))) {
+      result.forEach(indexed -> {
+        if (!list.contains(indexed.getId())) {
+          listToRemove.add(indexed.getId());
+        }
+      });
+    } catch (IOException | GenericException | RequestNotValidException e) {
+      LOGGER.error("Error getting AIP iterator when creating aip list", e);
+    }
+
+    if (!listToRemove.isEmpty()) {
+      final Job job = new Job();
+      job.setId(IdUtils.createUUID());
+      job.setName("Delete (" + indexedClass.getName() + ")");
+      job.setPluginType(PluginType.INTERNAL);
+      job.setUsername(RodaConstants.ADMIN);
+
+      job.setPlugin(DeleteRODAObjectPlugin.class.getName());
+      job.setSourceObjects(SelectedItemsList.create(indexedClass.getName(), listToRemove));
+
+      PluginHelper.createAndExecuteJob(job);
+    }
+  }
 }

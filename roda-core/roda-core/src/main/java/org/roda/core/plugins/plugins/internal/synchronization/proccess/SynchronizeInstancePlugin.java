@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.bundle.BundleState;
+import org.roda.core.data.v2.synchronization.bundle.EntitiesBundle;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
@@ -129,10 +131,8 @@ public class SynchronizeInstancePlugin extends AbstractPlugin<Void> {
       localInstance = RodaCoreFactory.getLocalInstance();
       bundleState = SyncUtils.createBundleState(localInstance.getId());
       DistributedInstance distributedInstance = SyncUtils.requestInstanceStatus(localInstance);
-      final Path aipListJsonPath = Paths.get(bundleState.getDestinationPath())
-        .resolve(bundleState.getAipListFileName() + ".json");
-      final List<String> aipList = new ArrayList<>();
-      JsonUtils.writeObjectToFile(aipList, aipListJsonPath);
+      setPackagesBlundeFileNames();
+      createBundleFiles();
       bundleState.setFromDate(distributedInstance.getLastSyncDate());
       SyncUtils.updateBundleState(bundleState, localInstance.getId());
     } catch (GenericException | IOException e) {
@@ -175,7 +175,7 @@ public class SynchronizeInstancePlugin extends AbstractPlugin<Void> {
     }
 
     try {
-      SyncBundleHelper.createAipLocalInstanceList(bundleState.getDestinationPath(), bundleState.getAipListFileName());
+      SyncBundleHelper.createLocalInstanceLists(bundleState);
     } catch (GenericException e) {
       LOGGER.debug("Failed to create AIP List", e.getMessage(), e);
     }
@@ -251,6 +251,53 @@ public class SynchronizeInstancePlugin extends AbstractPlugin<Void> {
     } else {
       throw new NotFoundException("No Bundle plugin available");
     }
+  }
+
+  private void setPackagesBlundeFileNames() {
+    final EntitiesBundle entitiesBundle = new EntitiesBundle();
+    entitiesBundle.setAipFileName(RodaConstants.SYNCHRONIZATION_LOCAL_INSTANCE_AIP_LIST_FILE_NAME);
+    entitiesBundle.setDipFileName(RodaConstants.SYNCHRONIZATION_LOCAL_INSTANCE_DIP_LIST_FILE_NAME);
+    entitiesBundle.setJobFileName(RodaConstants.SYNCHRONIZATION_LOCAL_INSTANCE_JOB_LIST_FILE_NAME);
+    entitiesBundle
+      .setPreservationAgentFileName(RodaConstants.SYNCHRONIZATION_LOCAL_INSTANCE_PRESERVATION_AGENT_LIST_FILE_NAME);
+    entitiesBundle
+      .setRepositoryEventFileName(RodaConstants.SYNCHRONIZATION_LOCAL_INSTANCE_REPOSITORY_EVENT_LIST_FILE_NAME);
+    entitiesBundle.setRiskFileName(RodaConstants.SYNCHRONIZATION_LOCAL_INSTANCE_RISK_LIST_FILE_NAME);
+    bundleState.setEntitiesBundle(entitiesBundle);
+  }
+
+  private void createBundleFiles() throws GenericException {
+
+    // init AIP List path
+    final Path aipListJsonPath = Paths.get(bundleState.getDestinationPath())
+      .resolve(String.format("%s.json", bundleState.getEntitiesBundle().getAipFileName()));
+    JsonUtils.writeObjectToFile(Collections.emptyList(), aipListJsonPath);
+
+    // DIP List File
+    final Path dipListJsonPath = Paths.get(bundleState.getDestinationPath())
+      .resolve(String.format("%s.json", bundleState.getEntitiesBundle().getDipFileName()));
+    JsonUtils.writeObjectToFile(Collections.emptyList(), dipListJsonPath);
+
+    // Not Necessary
+//    // JOB List File
+//    final Path jobListJsonPath = Paths.get(bundleState.getDestinationPath())
+//      .resolve(String.format("%s.json", bundleState.getEntitiesBundle().getJobFileName()));
+//    JsonUtils.writeObjectToFile(Collections.emptyList(), jobListJsonPath);
+//
+//    // Preservation Agent List File
+//    final Path preservationAgentListJsonPath = Paths.get(bundleState.getDestinationPath())
+//      .resolve(String.format("%s.json", bundleState.getEntitiesBundle().getPreservationAgentFileName()));
+//    JsonUtils.writeObjectToFile(Collections.emptyList(), preservationAgentListJsonPath);
+//
+//    // Repository Event List File
+//    final Path repositoryEventListJsonPath = Paths.get(bundleState.getDestinationPath())
+//      .resolve(String.format("%s.json", bundleState.getEntitiesBundle().getRepositoryEventFileName()));
+//    JsonUtils.writeObjectToFile(Collections.emptyList(), repositoryEventListJsonPath);
+
+    // RISK List File
+    final Path riskListJsonPath = Paths.get(bundleState.getDestinationPath())
+      .resolve(String.format("%s.json", bundleState.getEntitiesBundle().getRiskFileName()));
+    JsonUtils.writeObjectToFile(Collections.emptyList(), riskListJsonPath);
   }
 
 }

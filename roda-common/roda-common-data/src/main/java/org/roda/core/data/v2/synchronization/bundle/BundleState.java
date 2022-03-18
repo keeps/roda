@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.roda.core.data.common.RodaConstants;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -19,7 +18,7 @@ public class BundleState {
   private List<PackageState> packageStateList;
   private List<AttachmentState> attachmentStateList;
   private Status syncStatus;
-  private String aipListFileName = RodaConstants.SYNCHRONIZATION_LOCAL_INSTANCE_AIP_LIST_FILE_NAME;
+  private EntitiesBundle entitiesBundle;
 
   public BundleState() {
     packageStateList = new ArrayList<>();
@@ -87,8 +86,12 @@ public class BundleState {
     return syncStatus;
   }
 
-  public String getAipListFileName() {
-    return aipListFileName;
+  public EntitiesBundle getEntitiesBundle() {
+    return entitiesBundle;
+  }
+
+  public void setEntitiesBundle(final EntitiesBundle entitiesBundle) {
+    this.entitiesBundle = entitiesBundle;
   }
 
   public enum Status {

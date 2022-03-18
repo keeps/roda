@@ -12,7 +12,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
@@ -30,23 +32,34 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.accessToken.AccessToken;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.bundle.AttachmentState;
 import org.roda.core.data.v2.synchronization.bundle.BundleState;
+import org.roda.core.data.v2.synchronization.bundle.EntitiesBundle;
 import org.roda.core.data.v2.synchronization.bundle.PackageState;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
+import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.FileUtility;
+import org.roda.core.util.IdUtils;
 import org.roda.core.util.ZipUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -436,25 +449,34 @@ public class SyncUtils {
     return null;
   }
 
-  public static void deleteAipsInstance(String instanceIdentifier, Path bundleWorkingDir, String aipListName)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException {
-    final Path aipListFile = bundleWorkingDir.resolve(aipListName + ".json");
-    final List<String> aipList = JsonUtils.readObjectFromFile(aipListFile, List.class);
-    final IndexService index = RodaCoreFactory.getIndexService();
-    final List<String> aipToRemove = new ArrayList<>();
-    final Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_INSTANCE_ID, instanceIdentifier));
-    try (IterableIndexResult<IndexedAIP> result = index.findAll(IndexedAIP.class, filter, true,
-      Collections.singletonList(RodaConstants.INDEX_UUID))) {
-      for (IndexedAIP aip : result) {
-        if (!aipList.contains(aip.getId())) {
-          aipToRemove.add(aip.getId());
-        }
-      }
-    } catch (IOException | GenericException | RequestNotValidException e) {
-      LOGGER.error("Error getting AIP iterator when creating aip list", e);
-    }
-    if (!aipToRemove.isEmpty()) {
-      index.delete(IndexedAIP.class, aipToRemove);
-    }
+
+  public static Map<Path, Class<? extends IsIndexed>> createEntitiesPaths(final Path bundleWorkingDir,
+                                                                          final EntitiesBundle entitiesBundle) {
+    final HashMap<Path, Class<? extends IsIndexed>> entitiesPathMap = new HashMap<>();
+    final Path aipListPath = bundleWorkingDir.resolve(entitiesBundle.getAipFileName() + ".json");
+    entitiesPathMap.put(aipListPath, IndexedAIP.class);
+
+    final Path dipListPath = bundleWorkingDir.resolve(entitiesBundle.getDipFileName() + ".json");
+    entitiesPathMap.put(dipListPath, IndexedDIP.class);
+
+    // Not necessary
+    // final Path jobListPath = bundleWorkingDir
+    // .resolve(entitiesBundle.getJobFileName() + ".json");
+    // entitiesPathMap.put(jobListPath, Job.class);
+
+    // final Path preservationAgentListPath = bundleWorkingDir
+    // .resolve(entitiesBundle.getPreservationAgentFileName() + ".json");
+    // entitiesPathMap.put(preservationAgentListPath,
+    // IndexedPreservationAgent.class);
+    //
+    // final Path repositoryEventListPath = bundleWorkingDir
+    // .resolve(entitiesBundle.getRepositoryEventFileName() + ".json");
+    // entitiesPathMap.put(repositoryEventListPath, IndexedPreservationEvent.class);
+
+    final Path riskListPath = bundleWorkingDir.resolve(entitiesBundle.getRiskFileName() + ".json");
+    entitiesPathMap.put(riskListPath, RiskIncidence.class);
+
+    return entitiesPathMap;
   }
+
 }

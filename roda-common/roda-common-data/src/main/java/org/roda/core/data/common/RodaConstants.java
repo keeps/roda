@@ -1800,6 +1800,11 @@ public final class RodaConstants {
   public static final String SYNCHRONIZATION_INCOMING_REMOTE_ACTIONS_PATH = CORE_SYNCHRONIZATION_INCOMING_FOLDER + "/"
     + SYNCHRONIZATION_REMOTE_ACTIONS_FOLDER;
   public static final String SYNCHRONIZATION_LOCAL_INSTANCE_AIP_LIST_FILE_NAME = "aip_list";
+  public static final String SYNCHRONIZATION_LOCAL_INSTANCE_DIP_LIST_FILE_NAME = "dip_list";
+  public static final String SYNCHRONIZATION_LOCAL_INSTANCE_JOB_LIST_FILE_NAME = "job_list";
+  public static final String SYNCHRONIZATION_LOCAL_INSTANCE_PRESERVATION_AGENT_LIST_FILE_NAME = "preservation_agent_list";
+  public static final String SYNCHRONIZATION_LOCAL_INSTANCE_REPOSITORY_EVENT_LIST_FILE_NAME = "repository_event_list";
+  public static final String SYNCHRONIZATION_LOCAL_INSTANCE_RISK_LIST_FILE_NAME = "risk_list";
 
   /** Private empty constructor */
   private RodaConstants() {
