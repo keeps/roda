@@ -8,13 +8,16 @@
 package org.roda.core.events.akka;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.cloud.ZkController;
+import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.akka.AkkaUtils;
@@ -127,6 +130,9 @@ public class AkkaEventsHandlerAndNotifier extends AbstractEventsHandler implemen
       shuttingDown = true;
 
       LOGGER.info("Going to shutdown EVENTS actor system");
+      Cluster cluster = Cluster.get(eventsSystem);
+      cluster.leave(cluster.selfAddress());
+
       Future<Terminated> terminate = eventsSystem.terminate();
       terminate.onComplete(new OnComplete<Terminated>() {
         @Override
@@ -151,7 +157,7 @@ public class AkkaEventsHandlerAndNotifier extends AbstractEventsHandler implemen
   }
 
   private List<Address> getSeedNodesAddresses() {
-    List<Address> seedNodes = new ArrayList<Address>();
+    List<Address> seedNodes = new ArrayList<>();
 
     if (RodaCoreFactory.getProperty("core.events.akka.seeds_via_list", false)) {
       int i = 1;
@@ -168,21 +174,29 @@ public class AkkaEventsHandlerAndNotifier extends AbstractEventsHandler implemen
       ZooKeeper zkClient;
       try {
         String connectString = RodaCoreFactory.getProperty(RodaConstants.CORE_SOLR_CLOUD_URLS, "localhost:2181");
-        String zkSeedsNode = RodaCoreFactory.getProperty("core.events.akka.zk.seeds_path",
-          "/akka/cluster/events/seeds");
+        String zkSeedsNode = RodaCoreFactory.getProperty("core.events.akka.zk.seeds_path", "/akka/nodes");
+        String chRootPath = connectString + zkSeedsNode;
+        ZkController.checkChrootPath(chRootPath, true);
+
         zkClient = new ZooKeeper(connectString, 2000, event -> {
           // do nothing and carry on
         });
 
         zkClient.getChildren(zkSeedsNode, false).forEach(seed -> {
-          try {
-            String node = new String(zkClient.getData(zkSeedsNode + "/" + seed, null, null),
-              RodaConstants.DEFAULT_ENCODING);
-            processAndAddSeedNode(seedNodes, node);
-          } catch (KeeperException | InterruptedException | UnsupportedEncodingException e) {
-            // do nothing and carry on
-          }
+          processAndAddSeedNode(seedNodes, seed);
         });
+
+        String separator = RodaCoreFactory.getProperty("core.events.akka.address.separator", ":");
+
+        String hostName = InetAddress.getLocalHost().getHostAddress() + separator + "2552";
+        zkClient.create(zkSeedsNode + "/" + hostName, null, ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.EPHEMERAL);
+
+        // When using joinSeedNodes you should not include the node itself except for
+        // the node that is supposed to be the first seed node
+        if (seedNodes.isEmpty()) {
+          processAndAddSeedNode(seedNodes, hostName);
+        }
+
       } catch (IOException | KeeperException | InterruptedException e) {
         // do nothing and carry on
       }
@@ -196,7 +210,8 @@ public class AkkaEventsHandlerAndNotifier extends AbstractEventsHandler implemen
       return;
     }
     try {
-      String[] nodeParts = node.split("#", 2);
+      String separator = RodaCoreFactory.getProperty("core.events.akka.address.separator", ":");
+      String[] nodeParts = node.split(separator, 2);
       seedNodes.add(new Address("akka.tcp", EVENTS_SYSTEM, nodeParts[0], Integer.parseInt(nodeParts[1])));
     } catch (NumberFormatException | IndexOutOfBoundsException e) {
       // do nothing and carry on
