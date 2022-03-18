@@ -257,11 +257,6 @@ public class SynchronizeInstancePlugin extends AbstractPlugin<Void> {
     final EntitiesBundle entitiesBundle = new EntitiesBundle();
     entitiesBundle.setAipFileName(RodaConstants.SYNCHRONIZATION_LOCAL_INSTANCE_AIP_LIST_FILE_NAME);
     entitiesBundle.setDipFileName(RodaConstants.SYNCHRONIZATION_LOCAL_INSTANCE_DIP_LIST_FILE_NAME);
-    entitiesBundle.setJobFileName(RodaConstants.SYNCHRONIZATION_LOCAL_INSTANCE_JOB_LIST_FILE_NAME);
-    entitiesBundle
-      .setPreservationAgentFileName(RodaConstants.SYNCHRONIZATION_LOCAL_INSTANCE_PRESERVATION_AGENT_LIST_FILE_NAME);
-    entitiesBundle
-      .setRepositoryEventFileName(RodaConstants.SYNCHRONIZATION_LOCAL_INSTANCE_REPOSITORY_EVENT_LIST_FILE_NAME);
     entitiesBundle.setRiskFileName(RodaConstants.SYNCHRONIZATION_LOCAL_INSTANCE_RISK_LIST_FILE_NAME);
     bundleState.setEntitiesBundle(entitiesBundle);
   }
