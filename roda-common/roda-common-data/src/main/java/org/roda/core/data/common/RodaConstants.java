@@ -1806,6 +1806,13 @@ public final class RodaConstants {
   public static final String SYNCHRONIZATION_LOCAL_INSTANCE_REPOSITORY_EVENT_LIST_FILE_NAME = "repository_event_list";
   public static final String SYNCHRONIZATION_LOCAL_INSTANCE_RISK_LIST_FILE_NAME = "risk_list";
 
+  public static final String SYNCHRONIZATION_REPORT_FILE = "last_synchronization.json";
+  public static final String SYNCHRONIZATION_TEMPORARY_REPORT_FILE = "temporary.json";
+
+  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_AIP = "aip";
+  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_DIP = "dip";
+  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_RISK = "risk";
+
   /** Private empty constructor */
   private RodaConstants() {
     // do nothing

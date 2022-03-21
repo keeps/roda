@@ -10,7 +10,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,35 +30,30 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.utils.RemovedEntitiesJsonUtils;
 import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.bundle.AttachmentState;
 import org.roda.core.data.v2.synchronization.bundle.BundleState;
 import org.roda.core.data.v2.synchronization.bundle.EntitiesBundle;
 import org.roda.core.data.v2.synchronization.bundle.PackageState;
+import org.roda.core.data.v2.synchronization.bundle.RemovedEntities;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
-import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.FileUtility;
-import org.roda.core.util.IdUtils;
 import org.roda.core.util.ZipUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -449,9 +443,8 @@ public class SyncUtils {
     return null;
   }
 
-
   public static Map<Path, Class<? extends IsIndexed>> createEntitiesPaths(final Path bundleWorkingDir,
-                                                                          final EntitiesBundle entitiesBundle) {
+    final EntitiesBundle entitiesBundle) {
     final HashMap<Path, Class<? extends IsIndexed>> entitiesPathMap = new HashMap<>();
     final Path aipListPath = bundleWorkingDir.resolve(entitiesBundle.getAipFileName() + ".json");
     entitiesPathMap.put(aipListPath, IndexedAIP.class);
@@ -477,6 +470,23 @@ public class SyncUtils {
     entitiesPathMap.put(riskListPath, RiskIncidence.class);
 
     return entitiesPathMap;
+  }
+
+  public static void writeRemovedEntitiesFile(final RemovedEntities removedEntities) throws IOException {
+    final Path temporaryPath = RodaCoreFactory.getWorkingDirectory()
+      .resolve(RodaConstants.SYNCHRONIZATION_REPORT_FILE);
+    final Path lastSyncReportPath = RodaCoreFactory.getSynchronizationDirectoryPath()
+      .resolve(RodaConstants.SYNCHRONIZATION_REPORT_FILE);
+
+    try {
+      Files.deleteIfExists(temporaryPath);
+      Files.createFile(temporaryPath);
+      RemovedEntitiesJsonUtils.writeJsonToFile(removedEntities, temporaryPath);
+      Files.move(temporaryPath, lastSyncReportPath, StandardCopyOption.REPLACE_EXISTING);
+      // StandardCopyOption.REPLACE_EXISTING);
+    } catch (final IOException e) {
+      Files.deleteIfExists(temporaryPath);
+    }
   }
 
 }

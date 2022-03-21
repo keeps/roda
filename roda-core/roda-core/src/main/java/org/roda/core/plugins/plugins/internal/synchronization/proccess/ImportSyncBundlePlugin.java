@@ -27,6 +27,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.utils.RemovedEntitiesJsonUtils;
 import org.roda.core.data.utils.URLUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
@@ -34,6 +35,8 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
@@ -44,6 +47,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.synchronization.bundle.BundleState;
 import org.roda.core.data.v2.synchronization.bundle.EntitiesBundle;
 import org.roda.core.data.v2.synchronization.bundle.PackageState;
+import org.roda.core.data.v2.synchronization.bundle.RemovedEntities;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
@@ -63,6 +67,9 @@ import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -328,18 +335,23 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
 
   public void deleteEntities(final String instanceIdentifier, final Path bundleWorkingDir,
     final EntitiesBundle entitiesBundle) throws AuthorizationDeniedException, RequestNotValidException,
-    GenericException, NotFoundException, JobAlreadyStartedException {
+    GenericException, NotFoundException, JobAlreadyStartedException, IOException {
     final Map<Path, Class<? extends IsIndexed>> entitiesPathMap = SyncUtils.createEntitiesPaths(bundleWorkingDir,
       entitiesBundle);
+    RemovedEntities removedEntities = new RemovedEntities();
     for (Map.Entry entry : entitiesPathMap.entrySet()) {
-      deleteBundleEntities((Path) entry.getKey(), (Class<? extends IsIndexed>) entry.getValue(), instanceIdentifier);
+      deleteBundleEntities((Path) entry.getKey(), (Class<? extends IsIndexed>) entry.getValue(), instanceIdentifier,
+        removedEntities);
     }
+
+    SyncUtils.writeRemovedEntitiesFile(removedEntities);
   }
 
   private void deleteBundleEntities(final Path readPath, final Class<? extends IsIndexed> indexedClass,
-    final String instanceIdentifier) throws GenericException, AuthorizationDeniedException, RequestNotValidException,
-    NotFoundException, JobAlreadyStartedException {
+    final String instanceIdentifier, RemovedEntities removedEntities) throws GenericException,
+    AuthorizationDeniedException, RequestNotValidException, NotFoundException, JobAlreadyStartedException {
     final List<String> listToRemove = new ArrayList<>();
+
     final List<String> list = JsonUtils.readObjectFromFile(readPath, List.class);
     final IndexService index = RodaCoreFactory.getIndexService();
     final Filter filter = new Filter();
@@ -352,15 +364,35 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
     try (IterableIndexResult<? extends IsIndexed> result = index.findAll(indexedClass, filter, true,
       Collections.singletonList(RodaConstants.INDEX_UUID))) {
       result.forEach(indexed -> {
-        if (!list.contains(indexed.getId())) {
-          listToRemove.add(indexed.getId());
+        final JsonParser jsonParser = RemovedEntitiesJsonUtils.createJsonParser(readPath);
+        boolean exist = false;
+        try {
+          while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
+            if (jsonParser.getText().equals(indexed.getId())) {
+              exist = true;
+            }
+          }
+          if (!exist) {
+            listToRemove.add(indexed.getId());
+          }
+        } catch (IOException e) {
+            LOGGER.error("Can't read the json file {}", e.getMessage());
         }
+
+//        if (!list.contains(indexed.getId())) {
+//          listToRemove.add(indexed.getId());
+//        }
+
       });
+
     } catch (IOException | GenericException | RequestNotValidException e) {
       LOGGER.error("Error getting AIP iterator when creating aip list", e);
     }
 
     if (!listToRemove.isEmpty()) {
+
+      setRemovedEntities(removedEntities, listToRemove, indexedClass);
+
       final Job job = new Job();
       job.setId(IdUtils.createUUID());
       job.setName("Delete (" + indexedClass.getName() + ")");
@@ -372,5 +404,18 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
 
       PluginHelper.createAndExecuteJob(job);
     }
+  }
+
+  private void setRemovedEntities(final RemovedEntities removedEntities, final List<String> listToRemove,
+    final Class<? extends IsIndexed> indexedClass) {
+
+    if (indexedClass == IndexedAIP.class) {
+      removedEntities.setAipsList(new ArrayList<>(listToRemove));
+    } else if (indexedClass == IndexedDIP.class) {
+      removedEntities.setDipsList(new ArrayList<>(listToRemove));
+    } else {
+      removedEntities.setRisksList(new ArrayList<>(listToRemove));
+    }
+
   }
 }

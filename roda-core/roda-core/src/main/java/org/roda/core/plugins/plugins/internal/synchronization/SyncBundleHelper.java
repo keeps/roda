@@ -20,12 +20,12 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.utils.RemovedEntitiesJsonUtils;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.bundle.BundleState;
@@ -162,7 +162,7 @@ public class SyncBundleHelper {
     }
   }
 
-  public static void createLocalInstanceLists(BundleState bundleState) throws GenericException {
+  public static void createLocalInstanceLists(BundleState bundleState) throws GenericException, IOException {
     final Map<Path, Class<? extends IsIndexed>> localInstanceListsMap = createLocalInstanceListPaths(bundleState);
     for (Map.Entry entry : localInstanceListsMap.entrySet()) {
       createLocalInstanceList((Path) entry.getKey(), (Class<? extends IsIndexed>) entry.getValue());
@@ -180,17 +180,23 @@ public class SyncBundleHelper {
     localInstanceListsMap.put(dipListPath, IndexedDIP.class);
 
     // Not necessary
-//     final Path jobListPath = Paths.get(bundleState.getDestinationPath())
-//     .resolve(bundleState.getEntitiesBundle().getJobFileName() + ".json");
-//     localInstanceListsMap.put(jobListPath, Job.class);
+    // final Path jobListPath = Paths.get(bundleState.getDestinationPath())
+    // .resolve(bundleState.getEntitiesBundle().getJobFileName() + ".json");
+    // localInstanceListsMap.put(jobListPath, Job.class);
 
-//    final Path preservationAgentListPath = Paths.get(bundleState.getDestinationPath())
-//      .resolve(bundleState.getEntitiesBundle().getPreservationAgentFileName() + ".json");
-//    localInstanceListsMap.put(preservationAgentListPath, IndexedPreservationAgent.class);
-//
-//    final Path repositoryEventListPath = Paths.get(bundleState.getDestinationPath())
-//      .resolve(bundleState.getEntitiesBundle().getRepositoryEventFileName() + ".json");
-//    localInstanceListsMap.put(repositoryEventListPath, IndexedPreservationEvent.class);
+    // final Path preservationAgentListPath =
+    // Paths.get(bundleState.getDestinationPath())
+    // .resolve(bundleState.getEntitiesBundle().getPreservationAgentFileName() +
+    // ".json");
+    // localInstanceListsMap.put(preservationAgentListPath,
+    // IndexedPreservationAgent.class);
+    //
+    // final Path repositoryEventListPath =
+    // Paths.get(bundleState.getDestinationPath())
+    // .resolve(bundleState.getEntitiesBundle().getRepositoryEventFileName() +
+    // ".json");
+    // localInstanceListsMap.put(repositoryEventListPath,
+    // IndexedPreservationEvent.class);
 
     final Path riskListPath = Paths.get(bundleState.getDestinationPath())
       .resolve(bundleState.getEntitiesBundle().getRiskFileName() + ".json");
@@ -200,7 +206,7 @@ public class SyncBundleHelper {
   }
 
   private static void createLocalInstanceList(final Path destinationPath, final Class<? extends IsIndexed> indexedClass)
-    throws GenericException {
+    throws GenericException, IOException {
     final List<String> list = new ArrayList<>();
     final IndexService index = RodaCoreFactory.getIndexService();
     final Filter filter = new Filter();
@@ -215,7 +221,8 @@ public class SyncBundleHelper {
     } catch (IOException | GenericException | RequestNotValidException e) {
       LOGGER.error("Error getting AIP iterator when creating aip list", e);
     }
-    JsonUtils.writeObjectToFile(list, destinationPath);
+
+    RemovedEntitiesJsonUtils.writeListToFile(list, destinationPath);
 
   }
 }
