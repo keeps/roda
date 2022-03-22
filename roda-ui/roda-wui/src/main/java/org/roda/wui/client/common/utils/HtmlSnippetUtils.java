@@ -13,11 +13,8 @@ import java.util.Set;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.accessKey.AccessKey;
-import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
-import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
-import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
@@ -39,6 +36,9 @@ import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.risks.IncidenceStatus;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.risks.SeverityLevel;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
+import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.MetadataValue;
@@ -722,7 +722,7 @@ public class HtmlSnippetUtils {
       "<span class='" + labelClass + "'>" + messages.disposalScheduleActionCode(disposalAction.name()) + CLOSE_SPAN);
   }
 
-  public static SafeHtml getDistributedInstanceStateHtml(DistributedInstance distributedInstance) {
+  public static SafeHtml getDistributedInstanceStateHtml(DistributedInstance distributedInstance, boolean download) {
     SafeHtml ret = null;
     if (distributedInstance != null && distributedInstance.getStatus() != null) {
       SafeHtmlBuilder b = new SafeHtmlBuilder();
@@ -741,6 +741,25 @@ public class HtmlSnippetUtils {
 
       b.append(SafeHtmlUtils.fromString(messages.distributedInstanceStatusValue(distributedInstance.getStatus())));
       b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+      b.append(SafeHtmlUtils.fromString(" "));
+      SafeHtmlBuilder syncErrorsBuilder = new SafeHtmlBuilder();
+      switch (distributedInstance.getSyncErrors()) {
+        case 0:
+          syncErrorsBuilder.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
+          break;
+        default:
+          syncErrorsBuilder.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER));
+          break;
+      }
+      syncErrorsBuilder.append(SafeHtmlUtils.fromString(String.valueOf(distributedInstance.getSyncErrors()) + " "));
+      if (download) {
+        syncErrorsBuilder.append(SafeHtmlUtils.fromString(" "));
+        SafeHtmlBuilder downloadButton = new SafeHtmlBuilder();
+
+      }
+      syncErrorsBuilder.append(SafeHtmlUtils.fromString(messages.distributedInstanceSyncErrorsLabel()));
+      syncErrorsBuilder.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+      b.append(syncErrorsBuilder.toSafeHtml());
       ret = b.toSafeHtml();
     }
     return ret;

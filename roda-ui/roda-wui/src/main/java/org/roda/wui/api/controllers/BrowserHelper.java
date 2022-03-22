@@ -3769,4 +3769,8 @@ public class BrowserHelper {
     deleteLocalInstanceConfiguration();
     createLocalInstanceConfiguration(localInstance);
   }
+
+  public static EntityResponse retrieveLastSyncStatusFile(String instanceIdentifier, String acceptFormat) throws GenericException {
+    throw new GenericException("Unsupported accept format: " + acceptFormat);
+  }
 }

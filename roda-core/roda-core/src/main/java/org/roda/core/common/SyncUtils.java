@@ -29,8 +29,8 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.CentralEntitiesJsonUtils;
 import org.roda.core.data.utils.JsonUtils;
-import org.roda.core.data.utils.RemovedEntitiesJsonUtils;
 import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -42,9 +42,9 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.bundle.AttachmentState;
 import org.roda.core.data.v2.synchronization.bundle.BundleState;
+import org.roda.core.data.v2.synchronization.bundle.CentralEntities;
 import org.roda.core.data.v2.synchronization.bundle.EntitiesBundle;
 import org.roda.core.data.v2.synchronization.bundle.PackageState;
-import org.roda.core.data.v2.synchronization.bundle.RemovedEntities;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
@@ -472,18 +472,18 @@ public class SyncUtils {
     return entitiesPathMap;
   }
 
-  public static void writeRemovedEntitiesFile(final RemovedEntities removedEntities) throws IOException {
+  public static void writeEntitiesFile(final CentralEntities centralEntities, String instanceIdentifier)
+    throws IOException {
     final Path temporaryPath = RodaCoreFactory.getWorkingDirectory()
-      .resolve(RodaConstants.SYNCHRONIZATION_REPORT_FILE);
+      .resolve(RodaConstants.SYNCHRONIZATION_REPORT_FILE + instanceIdentifier);
     final Path lastSyncReportPath = RodaCoreFactory.getSynchronizationDirectoryPath()
-      .resolve(RodaConstants.SYNCHRONIZATION_REPORT_FILE);
+      .resolve(RodaConstants.SYNCHRONIZATION_REPORT_FILE + instanceIdentifier);
 
     try {
       Files.deleteIfExists(temporaryPath);
       Files.createFile(temporaryPath);
-      RemovedEntitiesJsonUtils.writeJsonToFile(removedEntities, temporaryPath);
+      CentralEntitiesJsonUtils.writeJsonToFile(centralEntities, temporaryPath);
       Files.move(temporaryPath, lastSyncReportPath, StandardCopyOption.REPLACE_EXISTING);
-      // StandardCopyOption.REPLACE_EXISTING);
     } catch (final IOException e) {
       Files.deleteIfExists(temporaryPath);
     }

@@ -139,8 +139,7 @@ public class ShowDistributedInstance extends Composite {
       lastSyncDateValue.setHTML(messages.permanentlyRetained());
     }
 
-    statusValue.setHTML(HtmlSnippetUtils.getDistributedInstanceStateHtml(distributedInstance));
-
+    statusValue.setHTML(HtmlSnippetUtils.getDistributedInstanceStateHtml(distributedInstance, true));
     if (StringUtils.isNotBlank(distributedInstance.getUsername())) {
       UserManagementService.Util.getInstance().retrieveUser(distributedInstance.getUsername(),
         new AsyncCallback<User>() {

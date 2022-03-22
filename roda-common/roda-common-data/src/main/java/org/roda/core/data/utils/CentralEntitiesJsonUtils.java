@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.synchronization.bundle.RemovedEntities;
+import org.roda.core.data.v2.synchronization.bundle.CentralEntities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,10 +21,10 @@ import com.fasterxml.jackson.core.JsonParser;
 /**
  * {@author João Gomes <jgomes@keep.pt>}.
  */
-public final class RemovedEntitiesJsonUtils {
-  private static final Logger LOGGER = LoggerFactory.getLogger(RemovedEntitiesJsonUtils.class);
+public final class CentralEntitiesJsonUtils {
+  private static final Logger LOGGER = LoggerFactory.getLogger(CentralEntitiesJsonUtils.class);
 
-  public RemovedEntitiesJsonUtils() {
+  public CentralEntitiesJsonUtils() {
     // do Nothing
   }
 
@@ -53,7 +53,7 @@ public final class RemovedEntitiesJsonUtils {
     close(outputStream, jsonGenerator);
   }
 
-  public static void writeJsonToFile(final RemovedEntities removedEntities, final Path path) throws IOException {
+  public static void writeJsonToFile(final CentralEntities centralEntities, final Path path) throws IOException {
     if (!Files.exists(path)) {
       Files.createFile(path);
     }
@@ -66,15 +66,21 @@ public final class RemovedEntitiesJsonUtils {
       final JsonFactory jsonFactory = new JsonFactory();
       jsonGenerator = jsonFactory.createGenerator(outputStream, JsonEncoding.UTF8).useDefaultPrettyPrinter();
       jsonGenerator.writeStartObject();
-      writeJsonArray(jsonGenerator, removedEntities.getAipsList(), RodaConstants.SYNCHRONIZATION_REPORT_KEY_LIST_AIP);
-      writeJsonArray(jsonGenerator, removedEntities.getDipsList(), RodaConstants.SYNCHRONIZATION_REPORT_KEY_LIST_DIP);
-      writeJsonArray(jsonGenerator, removedEntities.getRisksList(), RodaConstants.SYNCHRONIZATION_REPORT_KEY_LIST_RISK);
+      writeJsonArray(jsonGenerator, centralEntities.getAipsList(), RodaConstants.SYNCHRONIZATION_REPORT_KEY_LIST_AIP);
+      writeJsonArray(jsonGenerator, centralEntities.getDipsList(), RodaConstants.SYNCHRONIZATION_REPORT_KEY_LIST_DIP);
+      writeJsonArray(jsonGenerator, centralEntities.getRisksList(), RodaConstants.SYNCHRONIZATION_REPORT_KEY_LIST_RISK);
+      writeJsonArray(jsonGenerator, centralEntities.getMissingAips(),
+        RodaConstants.SYNCHRONIZATION_REPORT_KEY_LIST_MISSING_AIP);
+      writeJsonArray(jsonGenerator, centralEntities.getMissingDips(),
+        RodaConstants.SYNCHRONIZATION_REPORT_KEY_LIST_MISSING_DIP);
+      writeJsonArray(jsonGenerator, centralEntities.getMissingRisks(),
+        RodaConstants.SYNCHRONIZATION_REPORT_KEY_LIST_MISSING_RISK);
       jsonGenerator.writeEndObject();
     } catch (final IOException e) {
       LOGGER.error("Can't create report for removed entities {}", e.getMessage());
+    } finally {
+      close(outputStream, jsonGenerator);
     }
-
-    close(outputStream, jsonGenerator);
   }
 
   private static void writeJsonArray(final JsonGenerator jsonGenerator, List<String> array, String key)
@@ -97,8 +103,8 @@ public final class RemovedEntitiesJsonUtils {
 
   }
 
-  public static JsonParser createJsonParser(Path path) {
+  public static JsonParser createJsonParser(Path path) throws IOException {
     JsonFactory jfactory = new JsonFactory();
-    return jfactory.createParser(path);
+    return jfactory.createParser(path.toFile());
   }
 }

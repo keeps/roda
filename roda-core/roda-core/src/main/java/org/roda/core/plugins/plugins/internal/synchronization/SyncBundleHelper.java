@@ -20,7 +20,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
-import org.roda.core.data.utils.RemovedEntitiesJsonUtils;
+import org.roda.core.data.utils.CentralEntitiesJsonUtils;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -222,7 +222,7 @@ public class SyncBundleHelper {
       LOGGER.error("Error getting AIP iterator when creating aip list", e);
     }
 
-    RemovedEntitiesJsonUtils.writeListToFile(list, destinationPath);
+    CentralEntitiesJsonUtils.writeListToFile(list, destinationPath);
 
   }
 }

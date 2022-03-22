@@ -1813,6 +1813,10 @@ public final class RodaConstants {
   public static final String SYNCHRONIZATION_REPORT_KEY_LIST_DIP = "dip";
   public static final String SYNCHRONIZATION_REPORT_KEY_LIST_RISK = "risk";
 
+  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_MISSING_AIP = "missing_aip";
+  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_MISSING_DIP = "missing_dip";
+  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_MISSING_RISK = "missing_risk";
+
   /** Private empty constructor */
   private RodaConstants() {
     // do nothing

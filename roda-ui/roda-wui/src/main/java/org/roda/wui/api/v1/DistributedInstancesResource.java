@@ -146,4 +146,21 @@ public class DistributedInstancesResource {
     User user = UserUtility.getApiUser(request);
     return Response.ok(Browser.retrieveLocalInstanceStatus(user, instanceIdentifier), mediaType).build();
   }
+
+  @GET
+  @Path("/synchronization/{" + RodaConstants.API_PATH_PARAM_INSTANCE_IDENTIFIER + "}")
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "OK", response = org.roda.core.data.v2.ip.TransferredResource.class),
+          @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
+  public Response synchronizationStatus(
+          @ApiParam(value = "The instance identifier", required = true) @PathParam(RodaConstants.API_PATH_PARAM_INSTANCE_IDENTIFIER) String instanceIdentifier,
+          @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) throws RODAException {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+    // get user
+    User user = UserUtility.getApiUser(request);
+    // Criar método para ir buscar o ficheiro
+    return Response.ok(Browser.retrieveLocalInstanceStatus(user, instanceIdentifier), mediaType).build();
+  }
 }
