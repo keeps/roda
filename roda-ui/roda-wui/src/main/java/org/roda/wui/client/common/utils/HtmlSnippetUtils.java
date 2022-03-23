@@ -45,6 +45,7 @@ import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.RepresentationInformationHelper;
 import org.roda.wui.client.planning.RepresentationInformationAssociations;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -57,6 +58,7 @@ import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -722,7 +724,18 @@ public class HtmlSnippetUtils {
       "<span class='" + labelClass + "'>" + messages.disposalScheduleActionCode(disposalAction.name()) + CLOSE_SPAN);
   }
 
-  public static SafeHtml getDistributedInstanceStateHtml(DistributedInstance distributedInstance, boolean download) {
+  /**
+   * Create a {@link SafeHtml} with the status and the issues in synchronization.
+   * 
+   * @param distributedInstance
+   *          {@link DistributedInstance}.
+   * @param download
+   *          if this flag is true return a link to download a file with problems.
+   *
+   * @return {@link SafeHtml}.
+   */
+  public static SafeHtml getDistributedInstanceStateHtml(final DistributedInstance distributedInstance,
+    final boolean download) {
     SafeHtml ret = null;
     if (distributedInstance != null && distributedInstance.getStatus() != null) {
       SafeHtmlBuilder b = new SafeHtmlBuilder();
@@ -742,23 +755,26 @@ public class HtmlSnippetUtils {
       b.append(SafeHtmlUtils.fromString(messages.distributedInstanceStatusValue(distributedInstance.getStatus())));
       b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
       b.append(SafeHtmlUtils.fromString(" "));
-      SafeHtmlBuilder syncErrorsBuilder = new SafeHtmlBuilder();
-      switch (distributedInstance.getSyncErrors()) {
-        case 0:
+      final SafeHtmlBuilder syncErrorsBuilder = new SafeHtmlBuilder();
+      if (!download) {
+        if (distributedInstance.getSyncErrors() == 0) {
           syncErrorsBuilder.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
-          break;
-        default:
+        } else {
           syncErrorsBuilder.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER));
-          break;
+        }
+        syncErrorsBuilder.append(SafeHtmlUtils.fromString(String.valueOf(distributedInstance.getSyncErrors()) + " "));
+        syncErrorsBuilder.append(SafeHtmlUtils.fromString(messages.distributedInstanceSyncErrorsLabel()));
+        syncErrorsBuilder.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+      } else {
+        final SafeUri synchronizationLastStatusDownloadUri = RestUtils
+          .createSynchronizationLastStatusDownloadUri(distributedInstance.getId());
+        syncErrorsBuilder.append(SafeHtmlUtils.fromSafeConstant("<a href='"));
+        syncErrorsBuilder.append(SafeHtmlUtils.fromString(synchronizationLastStatusDownloadUri.asString()));
+        syncErrorsBuilder.append(SafeHtmlUtils.fromSafeConstant("' class='btn btn-link'>"));
+        syncErrorsBuilder.append(SafeHtmlUtils.fromString(
+          String.valueOf(distributedInstance.getSyncErrors()) + " " + messages.distributedInstanceSyncErrorsLabel()));
+        syncErrorsBuilder.append(SafeHtmlUtils.fromSafeConstant("</a>"));
       }
-      syncErrorsBuilder.append(SafeHtmlUtils.fromString(String.valueOf(distributedInstance.getSyncErrors()) + " "));
-      if (download) {
-        syncErrorsBuilder.append(SafeHtmlUtils.fromString(" "));
-        SafeHtmlBuilder downloadButton = new SafeHtmlBuilder();
-
-      }
-      syncErrorsBuilder.append(SafeHtmlUtils.fromString(messages.distributedInstanceSyncErrorsLabel()));
-      syncErrorsBuilder.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
       b.append(syncErrorsBuilder.toSafeHtml());
       ret = b.toSafeHtml();
     }

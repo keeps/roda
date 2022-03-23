@@ -10,7 +10,6 @@ package org.roda.wui.common.client.tools;
 import java.util.ArrayList;
 import java.util.List;
 
-import jnr.ffi.Struct;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -434,6 +433,25 @@ public class RestUtils {
       .append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
       .append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
 
+    return UriUtils.fromSafeConstant(b.toString());
+  }
+
+  /**
+   * Creates a uri to
+   * api/v1/distributed_instances/synchronization/{instanceIdentifier}.
+   * 
+   * @param instanceIdentifier
+   *          the instanceIdentifier.
+   * @return {@link SafeUri}
+   *
+   */
+  public static SafeUri createSynchronizationLastStatusDownloadUri(String instanceIdentifier) {
+
+    // api/v1/distributed_instances/synchronization/{instanceIdentifier}
+    final StringBuilder b = new StringBuilder();
+    // base uri
+    b.append(RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE).append(RodaConstants.API_SYNCRONIZATION)
+      .append(RodaConstants.API_SEP).append(instanceIdentifier);
     return UriUtils.fromSafeConstant(b.toString());
   }
 

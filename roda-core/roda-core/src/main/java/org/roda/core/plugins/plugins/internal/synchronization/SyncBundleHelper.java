@@ -19,8 +19,8 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.utils.CentralEntitiesJsonUtils;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -162,6 +162,16 @@ public class SyncBundleHelper {
     }
   }
 
+  /**
+   * Iterates over the files in bundle (AIP, DIP, Risks) and creates the Files.
+   * 
+   * @param bundleState
+   *          {@link BundleState}.
+   * @throws GenericException
+   *           if some error occurs.
+   * @throws IOException
+   *           if some i/o error occurs.
+   */
   public static void createLocalInstanceLists(BundleState bundleState) throws GenericException, IOException {
     final Map<Path, Class<? extends IsIndexed>> localInstanceListsMap = createLocalInstanceListPaths(bundleState);
     for (Map.Entry entry : localInstanceListsMap.entrySet()) {
@@ -169,6 +179,14 @@ public class SyncBundleHelper {
     }
   }
 
+  /**
+   * Creates {@link Map} with the List of entities path in bundle and the indexed
+   * {@link Class<? extends IsIndexed>}.
+   * 
+   * @param bundleState
+   *          {@link BundleState}.
+   * @return {@link Map}.
+   */
   private static Map<Path, Class<? extends IsIndexed>> createLocalInstanceListPaths(final BundleState bundleState) {
     final HashMap<Path, Class<? extends IsIndexed>> localInstanceListsMap = new HashMap<>();
     final Path aipListPath = Paths.get(bundleState.getDestinationPath())
@@ -205,6 +223,18 @@ public class SyncBundleHelper {
     return localInstanceListsMap;
   }
 
+  /**
+   * Write the List in the file to bundle.
+   * 
+   * @param destinationPath
+   *          {@link Path}.
+   * @param indexedClass
+   *          {@link Class<? extends IsIndexed>}.
+   * @throws GenericException
+   *           if some error occurs.
+   * @throws IOException
+   *           if some i/o error occurs.
+   */
   private static void createLocalInstanceList(final Path destinationPath, final Class<? extends IsIndexed> indexedClass)
     throws GenericException, IOException {
     final List<String> list = new ArrayList<>();

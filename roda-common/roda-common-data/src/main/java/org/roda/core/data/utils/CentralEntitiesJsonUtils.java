@@ -28,6 +28,16 @@ public final class CentralEntitiesJsonUtils {
     // do Nothing
   }
 
+  /**
+   * Write to the file the given {@link List}.
+   * 
+   * @param list
+   *          {@link List}
+   * @param path
+   *          {@link Path}
+   * @throws IOException
+   *           if some i/o error occurs.
+   */
   public static void writeListToFile(final List<String> list, final Path path) throws IOException {
     if (!Files.exists(path)) {
       Files.createFile(path);
@@ -53,6 +63,16 @@ public final class CentralEntitiesJsonUtils {
     close(outputStream, jsonGenerator);
   }
 
+  /**
+   * Write the {@link CentralEntities} lists to a file.
+   * 
+   * @param centralEntities
+   *          {@link CentralEntities}.
+   * @param path
+   *          {@link Path}.
+   * @throws IOException
+   *           if some i/o error occurs.
+   */
   public static void writeJsonToFile(final CentralEntities centralEntities, final Path path) throws IOException {
     if (!Files.exists(path)) {
       Files.createFile(path);
@@ -83,16 +103,39 @@ public final class CentralEntitiesJsonUtils {
     }
   }
 
+  /**
+   * Write an JSON array in the file.
+   * 
+   * @param jsonGenerator
+   *          {@link JsonGenerator}.
+   * @param array
+   *          {@link List}.
+   * @param key
+   *          the key to array object.
+   * @throws IOException
+   *           if some i/o error occurs.
+   */
   private static void writeJsonArray(final JsonGenerator jsonGenerator, List<String> array, String key)
     throws IOException {
     jsonGenerator.writeFieldName(key);
     jsonGenerator.writeStartArray();
-    for (String value : array) {
-      jsonGenerator.writeString(value);
+    if (!array.isEmpty()) {
+      for (String value : array) {
+        jsonGenerator.writeString(value);
+      }
     }
     jsonGenerator.writeEndArray();
   }
 
+  /**
+   * Close the {@link JsonGenerator} and the {@link OutputStream}.
+   * @param outputStream
+   *        {@link OutputStream}.
+   * @param jsonGenerator
+   *        {@link JsonGenerator}.
+   * @throws IOException
+   *        if some i/o error occurs.
+   */
   private static void close(final OutputStream outputStream, final JsonGenerator jsonGenerator) throws IOException {
     if (jsonGenerator != null) {
       jsonGenerator.close();
@@ -103,8 +146,16 @@ public final class CentralEntitiesJsonUtils {
 
   }
 
+  /**
+   * Create {@link JsonParser} to read the file.
+   * @param path
+   *      {@link Path}.
+   * @return {@link JsonParser}.
+   * @throws IOException
+   *        if some i/o error occurs.
+   */
   public static JsonParser createJsonParser(Path path) throws IOException {
-    JsonFactory jfactory = new JsonFactory();
+    final JsonFactory jfactory = new JsonFactory();
     return jfactory.createParser(path.toFile());
   }
 }

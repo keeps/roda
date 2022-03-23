@@ -3,7 +3,13 @@ package org.roda.wui.api.v1;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -24,7 +30,11 @@ import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ExtraMediaType;
 
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -152,15 +162,15 @@ public class DistributedInstancesResource {
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
   @ApiResponses(value = {
-          @ApiResponse(code = 200, message = "OK", response = org.roda.core.data.v2.ip.TransferredResource.class),
-          @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
+    @ApiResponse(code = 200, message = "OK", response = org.roda.core.data.v2.ip.TransferredResource.class),
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
   public Response synchronizationStatus(
-          @ApiParam(value = "The instance identifier", required = true) @PathParam(RodaConstants.API_PATH_PARAM_INSTANCE_IDENTIFIER) String instanceIdentifier,
-          @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) throws RODAException {
-    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+    @ApiParam(value = "The instance identifier", required = true) @PathParam(RodaConstants.API_PATH_PARAM_INSTANCE_IDENTIFIER) String instanceIdentifier)
+    throws RODAException {
     // get user
-    User user = UserUtility.getApiUser(request);
-    // Criar método para ir buscar o ficheiro
-    return Response.ok(Browser.retrieveLocalInstanceStatus(user, instanceIdentifier), mediaType).build();
+    final User user = UserUtility.getApiUser(request);
+    // delegate action to controller.
+    EntityResponse response = Browser.retrieveLocalInstanceLastSyncStatus(user, instanceIdentifier);
+    return ApiUtils.okResponse((StreamResponse) response);
   }
 }

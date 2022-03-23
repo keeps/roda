@@ -318,6 +318,7 @@ public final class RodaConstants {
   public static final String API_REST_V1_AUTH = "api/v1/auth/";
   public static final String API_REST_V1_DISTRIBUTED_INSTANCE = "api/v1/distributed_instances/";
   public static final String API_REST_V1_JOBS = "api/v1/jobs/";
+
   // sub-resources strings
   public static final String API_DATA = "data";
   public static final Object API_FILE = "file";
@@ -328,6 +329,7 @@ public final class RodaConstants {
   public static final String API_ACKNOWLEDGE = "acknowledge";
   public static final String API_STOP = "stop";
   public static final String API_REPORTS = "reports";
+  public static final String API_SYNCRONIZATION = "synchronization";
   // "http query string" related strings
   public static final String API_QUERY_START = "?";
   public static final String API_QUERY_ASSIGN_SYMBOL = "=";
@@ -1806,8 +1808,7 @@ public final class RodaConstants {
   public static final String SYNCHRONIZATION_LOCAL_INSTANCE_REPOSITORY_EVENT_LIST_FILE_NAME = "repository_event_list";
   public static final String SYNCHRONIZATION_LOCAL_INSTANCE_RISK_LIST_FILE_NAME = "risk_list";
 
-  public static final String SYNCHRONIZATION_REPORT_FILE = "last_synchronization.json";
-  public static final String SYNCHRONIZATION_TEMPORARY_REPORT_FILE = "temporary.json";
+  public static final String SYNCHRONIZATION_REPORT_FILE = "last_synchronization";
 
   public static final String SYNCHRONIZATION_REPORT_KEY_LIST_AIP = "aip";
   public static final String SYNCHRONIZATION_REPORT_KEY_LIST_DIP = "dip";

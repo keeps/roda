@@ -443,6 +443,16 @@ public class SyncUtils {
     return null;
   }
 
+  /**
+   * Creates {@link Map} with the List of entities path in bundle and the indexed
+   * {@link Class<? extends IsIndexed>}.
+   * 
+   * @param bundleWorkingDir
+   *          {@link Path} to blunde dir
+   * @param entitiesBundle
+   *          {@link EntitiesBundle}
+   * @return {@link Map}
+   */
   public static Map<Path, Class<? extends IsIndexed>> createEntitiesPaths(final Path bundleWorkingDir,
     final EntitiesBundle entitiesBundle) {
     final HashMap<Path, Class<? extends IsIndexed>> entitiesPathMap = new HashMap<>();
@@ -472,12 +482,26 @@ public class SyncUtils {
     return entitiesPathMap;
   }
 
+  /**
+   * Write the file with the entities removed and the missing entities from the
+   * last synchronization.
+   * 
+   * @param centralEntities
+   *          {@link CentralEntities}.
+   * @param instanceIdentifier
+   *          The instance identifier.
+   * @throws IOException
+   *           if some i/o error occurs.
+   */
   public static void writeEntitiesFile(final CentralEntities centralEntities, String instanceIdentifier)
     throws IOException {
-    final Path temporaryPath = RodaCoreFactory.getWorkingDirectory()
-      .resolve(RodaConstants.SYNCHRONIZATION_REPORT_FILE + instanceIdentifier);
+    final StringBuilder fileNameBuilder = new StringBuilder();
+    fileNameBuilder.append(RodaConstants.SYNCHRONIZATION_REPORT_FILE).append("_").append(instanceIdentifier)
+      .append(".json");
+
+    final Path temporaryPath = RodaCoreFactory.getWorkingDirectory().resolve(fileNameBuilder.toString());
     final Path lastSyncReportPath = RodaCoreFactory.getSynchronizationDirectoryPath()
-      .resolve(RodaConstants.SYNCHRONIZATION_REPORT_FILE + instanceIdentifier);
+      .resolve(fileNameBuilder.toString());
 
     try {
       Files.deleteIfExists(temporaryPath);
@@ -489,4 +513,14 @@ public class SyncUtils {
     }
   }
 
+  /**
+   * Get the stream response from the given path.
+   * 
+   * @param path
+   *          {@link Path}
+   * @return {@link StreamResponse}.
+   */
+  public static StreamResponse createLastSyncFileStreamResponse(Path path) {
+    return createBundleStreamResponse(path);
+  }
 }

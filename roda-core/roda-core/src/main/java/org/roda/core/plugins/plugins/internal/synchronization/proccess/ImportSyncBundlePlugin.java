@@ -335,6 +335,29 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
     return new Report();
   }
 
+  /**
+   * Iterates over the files in bundle (AIP, DIP, Risks) and deletes and validate
+   * the Central Entities.
+   * 
+   * @param instanceIdentifier
+   *          the instance identifier.
+   * @param bundleWorkingDir
+   *          {@link Path}.
+   * @param entitiesBundle
+   *          {@link EntitiesBundle}.
+   * @throws GenericException
+   *           if some error occurs.
+   * @throws AuthorizationDeniedException
+   *           if does not have permission to do this action.
+   * @throws RequestNotValidException
+   *           if the request is not valid
+   * @throws NotFoundException
+   *           if some error occurs
+   * @throws JobAlreadyStartedException
+   *           if the job is already in execution.
+   * @throws IOException
+   *           if some i/o error occurs.
+   */
   public void deleteAndValidateEntities(final String instanceIdentifier, final Path bundleWorkingDir,
     final EntitiesBundle entitiesBundle) throws AuthorizationDeniedException, RequestNotValidException,
     GenericException, NotFoundException, JobAlreadyStartedException, IOException {
@@ -350,6 +373,28 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
     SyncUtils.writeEntitiesFile(centralEntities, instanceIdentifier);
   }
 
+  /**
+   * Checks and delete entities from Central instance.
+   * 
+   * @param readPath
+   *          {@link Path}.
+   * @param indexedClass
+   *          {@link Class<? extends IsIndexed>}.
+   * @param instanceIdentifier
+   *          Instance identifier.
+   * @param centralEntities
+   *          {@link CentralEntities}.
+   * @throws GenericException
+   *           if some error occurs.
+   * @throws AuthorizationDeniedException
+   *           if does not have permission to do this action.
+   * @throws RequestNotValidException
+   *           if the request is not valid
+   * @throws NotFoundException
+   *           if some error occurs
+   * @throws JobAlreadyStartedException
+   *           if the job is already in execution.
+   */
   private void deleteBundleEntities(final Path readPath, final Class<? extends IsIndexed> indexedClass,
     final String instanceIdentifier, final CentralEntities centralEntities) throws GenericException,
     AuthorizationDeniedException, RequestNotValidException, NotFoundException, JobAlreadyStartedException {
@@ -369,7 +414,9 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
         try {
           final JsonParser jsonParser = CentralEntitiesJsonUtils.createJsonParser(readPath);
           while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
-            if (jsonParser.getText().equals(indexed.getId())) {
+            JsonToken token = jsonParser.currentToken();
+            if ((token != JsonToken.START_ARRAY) && (token != JsonToken.END_ARRAY)
+              && jsonParser.getText().equals(indexed.getId())) {
               exist = true;
             }
           }
@@ -402,6 +449,17 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
     }
   }
 
+  /**
+   * Sets the lists of removed entities in {@link CentralEntities} by the given
+   * {@link Class<? extends IsIndexed>}.
+   * 
+   * @param centralEntities
+   *          {@link CentralEntities}.
+   * @param listToRemove
+   *          {@link List}.
+   * @param indexedClass
+   *          {@link Class<? extends IsIndexed>}.
+   */
   private void setRemovedEntities(final CentralEntities centralEntities, final List<String> listToRemove,
     final Class<? extends IsIndexed> indexedClass) {
 
@@ -414,6 +472,17 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
     }
   }
 
+  /**
+   * Read the Local Instance list of entities and checks if Central instance have
+   * this entity.
+   * 
+   * @param centralEntities
+   *          {@link CentralEntities}
+   * @param readPath
+   *          {@link Path}.
+   * @param indexedClass
+   *          {@link Class<? extends IsIndexed>}.
+   */
   public void validateCentralEntities(final CentralEntities centralEntities, final Path readPath,
     final Class<? extends IsIndexed> indexedClass) {
     final IndexService index = RodaCoreFactory.getIndexService();
@@ -423,7 +492,8 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
       final JsonParser jsonParser = CentralEntitiesJsonUtils.createJsonParser(readPath);
       while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
         id = jsonParser.getText();
-        if (id != null && !id.isEmpty()) {
+        final JsonToken token = jsonParser.currentToken();
+        if ((id != null) && !id.isEmpty() && (token != JsonToken.START_ARRAY) && (token != JsonToken.END_ARRAY)) {
           index.retrieve(indexedClass, id, Collections.singletonList(RodaConstants.INDEX_UUID));
         }
       }
@@ -437,6 +507,17 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
     setMissingEntities(centralEntities, missingList, indexedClass);
   }
 
+  /**
+   * Sets the lists of missing entities in {@link CentralEntities} by the given
+   * {@link Class<? extends IsIndexed>}.
+   * 
+   * @param centralEntities
+   *          {@link CentralEntities}.
+   * @param missingList
+   *          {@link List}.
+   * @param indexedClass
+   *          {@link Class<? extends IsIndexed>}.
+   */
   private void setMissingEntities(final CentralEntities centralEntities, final List<String> missingList,
     final Class<? extends IsIndexed> indexedClass) {
 

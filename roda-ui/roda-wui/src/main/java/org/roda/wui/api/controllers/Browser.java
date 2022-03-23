@@ -4045,29 +4045,25 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static EntityResponse retrieveLocalInstanceLastSyncStatus(User user, String instanceIdentifier,
-    String acceptFormat) throws AuthorizationDeniedException, RequestNotValidException, GenericException {
+  public static EntityResponse retrieveLocalInstanceLastSyncStatus(final User user, final String instanceIdentifier)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // validate input
-    BrowserHelper.validateGetFileParams(acceptFormat);
 
     // check user permissions
     controllerAssistant.checkRoles(user);
 
     LogEntryState state = LogEntryState.SUCCESS;
-    IndexedFile file = null;
 
     try {
       // delegate
-      return BrowserHelper.retrieveLastSyncStatusFile(instanceIdentifier, acceptFormat);
+      return BrowserHelper.retrieveLastSyncStatusFile(instanceIdentifier);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
     } finally {
       // register action
-      String id = file == null ? instanceIdentifier : file.getAipId();
-      controllerAssistant.registerAction(user, id, state, RodaConstants.CONTROLLER_FILE_UUID_PARAM, instanceIdentifier);
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM,
+        instanceIdentifier);
     }
   }
 
