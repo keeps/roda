@@ -447,10 +447,10 @@ public class RestUtils {
    */
   public static SafeUri createSynchronizationLastStatusDownloadUri(String instanceIdentifier) {
 
-    // api/v1/distributed_instances/synchronization/{instanceIdentifier}
+    // api/v1/distributed_instances/download_last_sync/{instanceIdentifier}
     final StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE).append(RodaConstants.API_SYNCRONIZATION)
+    b.append(RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE).append(RodaConstants.API_PATH_LAST_SYNC_STATUS)
       .append(RodaConstants.API_SEP).append(instanceIdentifier);
     return UriUtils.fromSafeConstant(b.toString());
   }

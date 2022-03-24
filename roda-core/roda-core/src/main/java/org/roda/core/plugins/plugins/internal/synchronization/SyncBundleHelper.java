@@ -197,25 +197,6 @@ public class SyncBundleHelper {
       .resolve(bundleState.getEntitiesBundle().getDipFileName() + ".json");
     localInstanceListsMap.put(dipListPath, IndexedDIP.class);
 
-    // Not necessary
-    // final Path jobListPath = Paths.get(bundleState.getDestinationPath())
-    // .resolve(bundleState.getEntitiesBundle().getJobFileName() + ".json");
-    // localInstanceListsMap.put(jobListPath, Job.class);
-
-    // final Path preservationAgentListPath =
-    // Paths.get(bundleState.getDestinationPath())
-    // .resolve(bundleState.getEntitiesBundle().getPreservationAgentFileName() +
-    // ".json");
-    // localInstanceListsMap.put(preservationAgentListPath,
-    // IndexedPreservationAgent.class);
-    //
-    // final Path repositoryEventListPath =
-    // Paths.get(bundleState.getDestinationPath())
-    // .resolve(bundleState.getEntitiesBundle().getRepositoryEventFileName() +
-    // ".json");
-    // localInstanceListsMap.put(repositoryEventListPath,
-    // IndexedPreservationEvent.class);
-
     final Path riskListPath = Paths.get(bundleState.getDestinationPath())
       .resolve(bundleState.getEntitiesBundle().getRiskFileName() + ".json");
     localInstanceListsMap.put(riskListPath, RiskIncidence.class);
@@ -230,29 +211,32 @@ public class SyncBundleHelper {
    *          {@link Path}.
    * @param indexedClass
    *          {@link Class<? extends IsIndexed>}.
-   * @throws GenericException
-   *           if some error occurs.
    * @throws IOException
    *           if some i/o error occurs.
    */
   private static void createLocalInstanceList(final Path destinationPath, final Class<? extends IsIndexed> indexedClass)
-    throws GenericException, IOException {
-    final List<String> list = new ArrayList<>();
+    throws IOException {
     final IndexService index = RodaCoreFactory.getIndexService();
     final Filter filter = new Filter();
     if (indexedClass == IndexedPreservationEvent.class) {
       filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS,
         IndexedPreservationEvent.PreservationMetadataEventClass.REPOSITORY.toString()));
     }
-
+    CentralEntitiesJsonUtils.init(destinationPath);
     try (IterableIndexResult<? extends IsIndexed> result = index.findAll(indexedClass, filter, true,
       Collections.singletonList(RodaConstants.INDEX_UUID))) {
-      result.forEach(indexed -> list.add(indexed.getId()));
+      result.forEach(indexed -> {
+        try {
+          CentralEntitiesJsonUtils.writeString(indexed.getId());
+        } catch (final IOException e) {
+          LOGGER.error("Error writing the ID {} {}", indexed.getId(), e);
+        }
+      });
     } catch (IOException | GenericException | RequestNotValidException e) {
-      LOGGER.error("Error getting AIP iterator when creating aip list", e);
+      LOGGER.error("Error getting iterator when creating aip list", e);
     }
 
-    CentralEntitiesJsonUtils.writeListToFile(list, destinationPath);
+    CentralEntitiesJsonUtils.close(true);
 
   }
 }

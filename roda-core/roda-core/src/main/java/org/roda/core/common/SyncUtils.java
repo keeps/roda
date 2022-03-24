@@ -462,20 +462,6 @@ public class SyncUtils {
     final Path dipListPath = bundleWorkingDir.resolve(entitiesBundle.getDipFileName() + ".json");
     entitiesPathMap.put(dipListPath, IndexedDIP.class);
 
-    // Not necessary
-    // final Path jobListPath = bundleWorkingDir
-    // .resolve(entitiesBundle.getJobFileName() + ".json");
-    // entitiesPathMap.put(jobListPath, Job.class);
-
-    // final Path preservationAgentListPath = bundleWorkingDir
-    // .resolve(entitiesBundle.getPreservationAgentFileName() + ".json");
-    // entitiesPathMap.put(preservationAgentListPath,
-    // IndexedPreservationAgent.class);
-    //
-    // final Path repositoryEventListPath = bundleWorkingDir
-    // .resolve(entitiesBundle.getRepositoryEventFileName() + ".json");
-    // entitiesPathMap.put(repositoryEventListPath, IndexedPreservationEvent.class);
-
     final Path riskListPath = bundleWorkingDir.resolve(entitiesBundle.getRiskFileName() + ".json");
     entitiesPathMap.put(riskListPath, RiskIncidence.class);
 

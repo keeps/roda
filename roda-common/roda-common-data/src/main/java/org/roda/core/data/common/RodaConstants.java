@@ -329,7 +329,7 @@ public final class RodaConstants {
   public static final String API_ACKNOWLEDGE = "acknowledge";
   public static final String API_STOP = "stop";
   public static final String API_REPORTS = "reports";
-  public static final String API_SYNCRONIZATION = "synchronization";
+
   // "http query string" related strings
   public static final String API_QUERY_START = "?";
   public static final String API_QUERY_ASSIGN_SYMBOL = "=";
@@ -390,6 +390,7 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_DISTRIBUTED_INSTANCE_REGISTER = "register";
   public static final String API_PATH_PARAM_DISTRIBUTED_INSTANCE_SYNC = "sync";
   public static final String API_PATH_PARAM_INSTANCE_IDENTIFIER = "instance_identifier";
+  public static final String API_PATH_LAST_SYNC_STATUS = "sync/status";
 
   public static final String API_PATH_PARAM_PART = "part";
   public static final String API_PATH_PARAM_NAME = "name";
@@ -1810,9 +1811,9 @@ public final class RodaConstants {
 
   public static final String SYNCHRONIZATION_REPORT_FILE = "last_synchronization";
 
-  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_AIP = "aip";
-  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_DIP = "dip";
-  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_RISK = "risk";
+  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_REMOVED_AIP = "removed_aip";
+  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_REMOVED_DIP = "removed_dip";
+  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_REMOVED_RISK = "removed_risk";
 
   public static final String SYNCHRONIZATION_REPORT_KEY_LIST_MISSING_AIP = "missing_aip";
   public static final String SYNCHRONIZATION_REPORT_KEY_LIST_MISSING_DIP = "missing_dip";

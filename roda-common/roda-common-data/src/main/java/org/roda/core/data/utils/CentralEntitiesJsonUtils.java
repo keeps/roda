@@ -21,46 +21,31 @@ import com.fasterxml.jackson.core.JsonParser;
 /**
  * {@author João Gomes <jgomes@keep.pt>}.
  */
-public final class CentralEntitiesJsonUtils {
+public class CentralEntitiesJsonUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(CentralEntitiesJsonUtils.class);
+  private static OutputStream outputStream = null;
+  private static JsonGenerator jsonGenerator = null;
 
   public CentralEntitiesJsonUtils() {
     // do Nothing
   }
 
-  /**
-   * Write to the file the given {@link List}.
-   * 
-   * @param list
-   *          {@link List}
-   * @param path
-   *          {@link Path}
-   * @throws IOException
-   *           if some i/o error occurs.
-   */
-  public static void writeListToFile(final List<String> list, final Path path) throws IOException {
+  public static void init(Path path) throws IOException {
     if (!Files.exists(path)) {
       Files.createFile(path);
     }
-    OutputStream outputStream = null;
-    JsonGenerator jsonGenerator = null;
-    try {
-      if (path != null) {
-        outputStream = new BufferedOutputStream(new FileOutputStream(path.toFile()));
-      }
+
+    if (path != null) {
+      outputStream = new BufferedOutputStream(new FileOutputStream(path.toFile()));
       final JsonFactory jsonFactory = new JsonFactory();
       jsonGenerator = jsonFactory.createGenerator(outputStream, JsonEncoding.UTF8).useDefaultPrettyPrinter();
-      jsonGenerator.writeStartArray();
-      for (String value : list) {
-        jsonGenerator.writeString(value);
-      }
-      jsonGenerator.writeEndArray();
-
-    } catch (final IOException e) {
-      LOGGER.error("Can't create report for removed entities {}", e.getMessage());
     }
 
-    close(outputStream, jsonGenerator);
+    jsonGenerator.writeStartArray();
+  }
+
+  public static void writeString(String value) throws IOException {
+    jsonGenerator.writeString(value);
   }
 
   /**
@@ -77,18 +62,20 @@ public final class CentralEntitiesJsonUtils {
     if (!Files.exists(path)) {
       Files.createFile(path);
     }
-    OutputStream outputStream = null;
-    JsonGenerator jsonGenerator = null;
     try {
-      if (path != null) {
+      if (path != null && outputStream == null && jsonGenerator == null) {
         outputStream = new BufferedOutputStream(new FileOutputStream(path.toFile()));
+        final JsonFactory jsonFactory = new JsonFactory();
+        jsonGenerator = jsonFactory.createGenerator(outputStream, JsonEncoding.UTF8).useDefaultPrettyPrinter();
       }
-      final JsonFactory jsonFactory = new JsonFactory();
-      jsonGenerator = jsonFactory.createGenerator(outputStream, JsonEncoding.UTF8).useDefaultPrettyPrinter();
+
       jsonGenerator.writeStartObject();
-      writeJsonArray(jsonGenerator, centralEntities.getAipsList(), RodaConstants.SYNCHRONIZATION_REPORT_KEY_LIST_AIP);
-      writeJsonArray(jsonGenerator, centralEntities.getDipsList(), RodaConstants.SYNCHRONIZATION_REPORT_KEY_LIST_DIP);
-      writeJsonArray(jsonGenerator, centralEntities.getRisksList(), RodaConstants.SYNCHRONIZATION_REPORT_KEY_LIST_RISK);
+      writeJsonArray(jsonGenerator, centralEntities.getAipsList(),
+        RodaConstants.SYNCHRONIZATION_REPORT_KEY_LIST_REMOVED_AIP);
+      writeJsonArray(jsonGenerator, centralEntities.getDipsList(),
+        RodaConstants.SYNCHRONIZATION_REPORT_KEY_LIST_REMOVED_DIP);
+      writeJsonArray(jsonGenerator, centralEntities.getRisksList(),
+        RodaConstants.SYNCHRONIZATION_REPORT_KEY_LIST_REMOVED_RISK);
       writeJsonArray(jsonGenerator, centralEntities.getMissingAips(),
         RodaConstants.SYNCHRONIZATION_REPORT_KEY_LIST_MISSING_AIP);
       writeJsonArray(jsonGenerator, centralEntities.getMissingDips(),
@@ -99,7 +86,7 @@ public final class CentralEntitiesJsonUtils {
     } catch (final IOException e) {
       LOGGER.error("Can't create report for removed entities {}", e.getMessage());
     } finally {
-      close(outputStream, jsonGenerator);
+      close(false);
     }
   }
 
@@ -129,14 +116,15 @@ public final class CentralEntitiesJsonUtils {
 
   /**
    * Close the {@link JsonGenerator} and the {@link OutputStream}.
-   * @param outputStream
-   *        {@link OutputStream}.
-   * @param jsonGenerator
-   *        {@link JsonGenerator}.
+   *
    * @throws IOException
-   *        if some i/o error occurs.
+   *           if some i/o error occurs.
    */
-  private static void close(final OutputStream outputStream, final JsonGenerator jsonGenerator) throws IOException {
+  public static void close(boolean closeArray) throws IOException {
+    if (closeArray) {
+      jsonGenerator.writeEndArray();
+    }
+
     if (jsonGenerator != null) {
       jsonGenerator.close();
     }
@@ -148,11 +136,12 @@ public final class CentralEntitiesJsonUtils {
 
   /**
    * Create {@link JsonParser} to read the file.
+   * 
    * @param path
-   *      {@link Path}.
+   *          {@link Path}.
    * @return {@link JsonParser}.
    * @throws IOException
-   *        if some i/o error occurs.
+   *           if some i/o error occurs.
    */
   public static JsonParser createJsonParser(Path path) throws IOException {
     final JsonFactory jfactory = new JsonFactory();
