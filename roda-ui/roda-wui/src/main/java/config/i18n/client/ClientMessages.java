@@ -2465,6 +2465,8 @@ public interface ClientMessages extends Messages {
 
   String distributedInstancesFileNotAccessibleMessage();
 
+  String distributedInstanceSyncErrorsLabel();
+
   /** Local instance configuration **/
 
   String createLocalInstanceConfigurationTitle();
