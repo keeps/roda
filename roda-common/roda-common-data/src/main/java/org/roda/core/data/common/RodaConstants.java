@@ -318,6 +318,7 @@ public final class RodaConstants {
   public static final String API_REST_V1_AUTH = "api/v1/auth/";
   public static final String API_REST_V1_DISTRIBUTED_INSTANCE = "api/v1/distributed_instances/";
   public static final String API_REST_V1_JOBS = "api/v1/jobs/";
+
   // sub-resources strings
   public static final String API_DATA = "data";
   public static final Object API_FILE = "file";
@@ -328,6 +329,7 @@ public final class RodaConstants {
   public static final String API_ACKNOWLEDGE = "acknowledge";
   public static final String API_STOP = "stop";
   public static final String API_REPORTS = "reports";
+
   // "http query string" related strings
   public static final String API_QUERY_START = "?";
   public static final String API_QUERY_ASSIGN_SYMBOL = "=";
@@ -388,6 +390,7 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_DISTRIBUTED_INSTANCE_REGISTER = "register";
   public static final String API_PATH_PARAM_DISTRIBUTED_INSTANCE_SYNC = "sync";
   public static final String API_PATH_PARAM_INSTANCE_IDENTIFIER = "instance_identifier";
+  public static final String API_PATH_LAST_SYNC_STATUS = "sync/status";
 
   public static final String API_PATH_PARAM_PART = "part";
   public static final String API_PATH_PARAM_NAME = "name";
@@ -1799,6 +1802,22 @@ public final class RodaConstants {
   public static final String SYNCHRONIZATION_REMOTE_ACTIONS_FOLDER = "remote_actions";
   public static final String SYNCHRONIZATION_INCOMING_REMOTE_ACTIONS_PATH = CORE_SYNCHRONIZATION_INCOMING_FOLDER + "/"
     + SYNCHRONIZATION_REMOTE_ACTIONS_FOLDER;
+  public static final String SYNCHRONIZATION_LOCAL_INSTANCE_AIP_LIST_FILE_NAME = "aip_list";
+  public static final String SYNCHRONIZATION_LOCAL_INSTANCE_DIP_LIST_FILE_NAME = "dip_list";
+  public static final String SYNCHRONIZATION_LOCAL_INSTANCE_JOB_LIST_FILE_NAME = "job_list";
+  public static final String SYNCHRONIZATION_LOCAL_INSTANCE_PRESERVATION_AGENT_LIST_FILE_NAME = "preservation_agent_list";
+  public static final String SYNCHRONIZATION_LOCAL_INSTANCE_REPOSITORY_EVENT_LIST_FILE_NAME = "repository_event_list";
+  public static final String SYNCHRONIZATION_LOCAL_INSTANCE_RISK_LIST_FILE_NAME = "risk_list";
+
+  public static final String SYNCHRONIZATION_REPORT_FILE = "last_synchronization";
+
+  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_REMOVED_AIP = "removed_aip";
+  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_REMOVED_DIP = "removed_dip";
+  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_REMOVED_RISK = "removed_risk";
+
+  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_MISSING_AIP = "missing_aip";
+  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_MISSING_DIP = "missing_dip";
+  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_MISSING_RISK = "missing_risk";
 
   /** Private empty constructor */
   private RodaConstants() {

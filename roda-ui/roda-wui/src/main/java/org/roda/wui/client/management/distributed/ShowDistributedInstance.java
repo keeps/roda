@@ -5,6 +5,7 @@ import java.util.List;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlHostedModeUtils;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.user.User;
@@ -139,8 +140,7 @@ public class ShowDistributedInstance extends Composite {
       lastSyncDateValue.setHTML(messages.permanentlyRetained());
     }
 
-    statusValue.setHTML(HtmlSnippetUtils.getDistributedInstanceStateHtml(distributedInstance));
-
+    statusValue.setHTML(HtmlSnippetUtils.getDistributedInstanceStateHtml(distributedInstance, true));
     if (StringUtils.isNotBlank(distributedInstance.getUsername())) {
       UserManagementService.Util.getInstance().retrieveUser(distributedInstance.getUsername(),
         new AsyncCallback<User>() {

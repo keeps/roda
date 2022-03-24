@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.custommonkey.xmlunit.Diff;
@@ -171,7 +170,6 @@ import org.roda.core.plugins.plugins.internal.disposal.hold.LiftDisposalHoldPlug
 import org.roda.core.plugins.plugins.internal.disposal.rules.ApplyDisposalRulesPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.schedule.AssociateDisposalScheduleToAIPPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.schedule.DisassociateDisposalScheduleToAIPPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateSyncBundlePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierAIPEventPlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierAIPPlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierDIPPlugin;
@@ -1682,7 +1680,7 @@ public class BrowserHelper {
   private static JobParallelism getJobParallelismFromConfiguration() {
     // Fetch priority
     String parallelism = RodaCoreFactory.getRodaConfigurationAsString(RodaConstants.CORE_ORCHESTRATOR_PREFIX,
-        RodaConstants.CORE_ORCHESTRATOR_PROP_INTERNAL_JOBS_PARALLELISM);
+      RodaConstants.CORE_ORCHESTRATOR_PROP_INTERNAL_JOBS_PARALLELISM);
 
     if (parallelism == null) {
       return JobParallelism.NORMAL;
@@ -3759,7 +3757,7 @@ public class BrowserHelper {
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, path.toString());
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, instanceIdentifier);
       return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(), ImportSyncBundlePlugin.class,
-              user, pluginParameters, "Could not execute bundle job");
+        user, pluginParameters, "Could not execute bundle job");
     } catch (IOException e) {
       throw new GenericException("Failed during sync package import", e);
     }
@@ -3768,5 +3766,27 @@ public class BrowserHelper {
   public static void updateLocalInstanceConfiguration(LocalInstance localInstance, String id) throws GenericException {
     deleteLocalInstanceConfiguration();
     createLocalInstanceConfiguration(localInstance);
+  }
+
+  /**
+   * Get the last synchronization file to this instance.
+   * 
+   * @param instanceIdentifier
+   *          The instance identifier.
+   * @return {@link EntityResponse}.
+   * @throws GenericException
+   *           if some error occurs.
+   * @throws NotFoundException
+   *           if file does not exists.
+   */
+  public static EntityResponse retrieveLastSyncStatusFile(final String instanceIdentifier)
+    throws GenericException, NotFoundException {
+    final StringBuilder fileNameBuilder = new StringBuilder();
+    fileNameBuilder.append(RodaConstants.SYNCHRONIZATION_REPORT_FILE).append("_").append(instanceIdentifier)
+      .append(".json");
+
+    final Path filePath = RodaCoreFactory.getSynchronizationDirectoryPath().resolve(fileNameBuilder.toString());
+
+    return SyncUtils.createLastSyncFileStreamResponse(filePath);
   }
 }

@@ -2,9 +2,6 @@ package org.roda.wui.client.management.distributed;
 
 import java.util.List;
 
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Label;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.central.DistributedInstances;
 import org.roda.wui.client.browse.BrowserService;
@@ -24,6 +21,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.cellview.client.Column;
@@ -32,6 +30,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -50,7 +50,8 @@ public class DistributedInstancesManagement extends Composite {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {DistributedInstancesManagement.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {DistributedInstancesManagement.RESOLVER}, false,
+        callback);
     }
 
     @Override
@@ -139,7 +140,8 @@ public class DistributedInstancesManagement extends Composite {
       distributedInstancesManagementTablePanel.add(label);
     } else {
       FlowPanel DistributedInstancesPanel = new FlowPanel();
-      BasicTablePanel<DistributedInstance> tableDistributedInstances = getBasicTableForDistributedInstances(distributedInstances);
+      BasicTablePanel<DistributedInstance> tableDistributedInstances = getBasicTableForDistributedInstances(
+        distributedInstances);
       tableDistributedInstances.getSelectionModel().addSelectionChangeHandler(event -> {
         DistributedInstance selectedObject = tableDistributedInstances.getSelectionModel().getSelectedObject();
         if (selectedObject != null) {
@@ -155,28 +157,32 @@ public class DistributedInstancesManagement extends Composite {
     }
   }
 
-  private BasicTablePanel<DistributedInstance> getBasicTableForDistributedInstances(DistributedInstances distributedInstances) {
+  private BasicTablePanel<DistributedInstance> getBasicTableForDistributedInstances(
+    DistributedInstances distributedInstances) {
     if (distributedInstances.getObjects().isEmpty()) {
       return new BasicTablePanel<>(messages.noItemsToDisplay(messages.distributedInstancesLabel()));
     } else {
       return new BasicTablePanel<DistributedInstance>(distributedInstances.getObjects().iterator(),
-        new BasicTablePanel.ColumnInfo<DistributedInstance>(messages.distributedInstanceNameLabel(), 15, new TextColumn<DistributedInstance>() {
-          @Override
-          public String getValue(DistributedInstance distributedInstance) {
-            return distributedInstance.getName();
-          }
-        }), new BasicTablePanel.ColumnInfo<DistributedInstance>(messages.distributedInstanceStatusLabel(), 15,
+        new BasicTablePanel.ColumnInfo<DistributedInstance>(messages.distributedInstanceNameLabel(), 15,
+          new TextColumn<DistributedInstance>() {
+            @Override
+            public String getValue(DistributedInstance distributedInstance) {
+              return distributedInstance.getName();
+            }
+          }),
+        new BasicTablePanel.ColumnInfo<DistributedInstance>(messages.distributedInstanceStatusLabel(), 15,
           new Column<DistributedInstance, SafeHtml>(new SafeHtmlCell()) {
             @Override
             public SafeHtml getValue(DistributedInstance distributedInstance) {
-              return HtmlSnippetUtils.getDistributedInstanceStateHtml(distributedInstance);
+              return HtmlSnippetUtils.getDistributedInstanceStateHtml(distributedInstance, false);
             }
           }),
         new BasicTablePanel.ColumnInfo<DistributedInstance>(messages.distributedInstanceLastSyncDateLabel(), 15,
           new TextColumn<DistributedInstance>() {
             @Override
             public String getValue(DistributedInstance distributedInstance) {
-              return distributedInstance.getLastSyncDate() != null ? distributedInstance.getLastSyncDate().toString() : "None";
+              return distributedInstance.getLastSyncDate() != null ? distributedInstance.getLastSyncDate().toString()
+                : "None";
             }
           }),
         new BasicTablePanel.ColumnInfo<DistributedInstance>(messages.loginUsername(), 15,
