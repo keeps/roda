@@ -18,6 +18,7 @@ public class BundleState {
   private List<PackageState> packageStateList;
   private List<AttachmentState> attachmentStateList;
   private Status syncStatus;
+  private EntitiesBundle entitiesBundle;
 
   public BundleState() {
     packageStateList = new ArrayList<>();
@@ -83,6 +84,14 @@ public class BundleState {
 
   public Status getSyncStatus() {
     return syncStatus;
+  }
+
+  public EntitiesBundle getEntitiesBundle() {
+    return entitiesBundle;
+  }
+
+  public void setEntitiesBundle(final EntitiesBundle entitiesBundle) {
+    this.entitiesBundle = entitiesBundle;
   }
 
   public enum Status {

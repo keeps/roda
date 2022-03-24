@@ -11,7 +11,9 @@ import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
@@ -27,14 +29,21 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.CentralEntitiesJsonUtils;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.accessToken.AccessToken;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.bundle.AttachmentState;
 import org.roda.core.data.v2.synchronization.bundle.BundleState;
+import org.roda.core.data.v2.synchronization.bundle.CentralEntities;
+import org.roda.core.data.v2.synchronization.bundle.EntitiesBundle;
 import org.roda.core.data.v2.synchronization.bundle.PackageState;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
@@ -432,5 +441,72 @@ public class SyncUtils {
       }
     }
     return null;
+  }
+
+  /**
+   * Creates {@link Map} with the List of entities path in bundle and the indexed
+   * {@link Class<? extends IsIndexed>}.
+   * 
+   * @param bundleWorkingDir
+   *          {@link Path} to blunde dir
+   * @param entitiesBundle
+   *          {@link EntitiesBundle}
+   * @return {@link Map}
+   */
+  public static Map<Path, Class<? extends IsIndexed>> createEntitiesPaths(final Path bundleWorkingDir,
+    final EntitiesBundle entitiesBundle) {
+    final HashMap<Path, Class<? extends IsIndexed>> entitiesPathMap = new HashMap<>();
+    final Path aipListPath = bundleWorkingDir.resolve(entitiesBundle.getAipFileName() + ".json");
+    entitiesPathMap.put(aipListPath, IndexedAIP.class);
+
+    final Path dipListPath = bundleWorkingDir.resolve(entitiesBundle.getDipFileName() + ".json");
+    entitiesPathMap.put(dipListPath, IndexedDIP.class);
+
+    final Path riskListPath = bundleWorkingDir.resolve(entitiesBundle.getRiskFileName() + ".json");
+    entitiesPathMap.put(riskListPath, RiskIncidence.class);
+
+    return entitiesPathMap;
+  }
+
+  /**
+   * Write the file with the entities removed and the missing entities from the
+   * last synchronization.
+   * 
+   * @param centralEntities
+   *          {@link CentralEntities}.
+   * @param instanceIdentifier
+   *          The instance identifier.
+   * @throws IOException
+   *           if some i/o error occurs.
+   */
+  public static void writeEntitiesFile(final CentralEntities centralEntities, String instanceIdentifier)
+    throws IOException {
+    final StringBuilder fileNameBuilder = new StringBuilder();
+    fileNameBuilder.append(RodaConstants.SYNCHRONIZATION_REPORT_FILE).append("_").append(instanceIdentifier)
+      .append(".json");
+
+    final Path temporaryPath = RodaCoreFactory.getWorkingDirectory().resolve(fileNameBuilder.toString());
+    final Path lastSyncReportPath = RodaCoreFactory.getSynchronizationDirectoryPath()
+      .resolve(fileNameBuilder.toString());
+
+    try {
+      Files.deleteIfExists(temporaryPath);
+      Files.createFile(temporaryPath);
+      CentralEntitiesJsonUtils.writeJsonToFile(centralEntities, temporaryPath);
+      Files.move(temporaryPath, lastSyncReportPath, StandardCopyOption.REPLACE_EXISTING);
+    } catch (final IOException e) {
+      Files.deleteIfExists(temporaryPath);
+    }
+  }
+
+  /**
+   * Get the stream response from the given path.
+   * 
+   * @param path
+   *          {@link Path}
+   * @return {@link StreamResponse}.
+   */
+  public static StreamResponse createLastSyncFileStreamResponse(Path path) {
+    return createBundleStreamResponse(path);
   }
 }

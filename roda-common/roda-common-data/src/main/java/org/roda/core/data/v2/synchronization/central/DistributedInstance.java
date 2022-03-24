@@ -1,11 +1,12 @@
 package org.roda.core.data.v2.synchronization.central;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.Date;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 
-import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -30,9 +31,12 @@ public class DistributedInstance implements IsModelObject {
   private Date updatedOn;
   private String updatedBy;
 
+  private int syncErrors;
+
   public DistributedInstance() {
     status = DistributedInstanceStatus.CREATED;
     lastSyncDate = null;
+    syncErrors = 0;
   }
 
   @Override
@@ -132,6 +136,14 @@ public class DistributedInstance implements IsModelObject {
     this.lastSyncDate = lastSyncDate;
   }
 
+  public int getSyncErrors() {
+    return this.syncErrors;
+  }
+
+  public void setSyncErrors(int syncErrors) {
+    this.syncErrors = syncErrors;
+  }
+
   @JsonIgnore
   @Override
   public int getClassVersion() {
@@ -195,6 +207,6 @@ public class DistributedInstance implements IsModelObject {
       + nameIdentifier + '\'' + ", description='" + description + '\'' + ", accessKeyId='" + accessKeyId + '\''
       + ", username='" + username + '\'' + ", lastSyncDate=" + lastSyncDate + ", status=" + status + ", createdOn="
       + createdOn + ", createdBy='" + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\''
-      + '}';
+      + ", syncErrors='" + syncErrors + '\'' + '}';
   }
 }
