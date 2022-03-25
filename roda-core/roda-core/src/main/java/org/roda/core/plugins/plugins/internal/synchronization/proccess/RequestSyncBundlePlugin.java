@@ -8,6 +8,7 @@ import java.util.List;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.SyncUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
@@ -31,6 +32,7 @@ import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -141,7 +143,7 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
       if (path != null) {
         SyncUtils.extractBundle(localInstance.getId(), path);
         try {
-          int jobs = createJobs(localInstance.getId());
+          final int jobs = createJobs(localInstance.getId());
           outcomeDetailsText = "Received " + jobs + " jobs";
         } catch (JobAlreadyStartedException e) {
           // Do nothing
@@ -162,17 +164,83 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
   }
 
-  public static int createJobs(String instanceId) throws GenericException, AuthorizationDeniedException,
+  public static int createJobs(final String instanceId) throws GenericException, AuthorizationDeniedException,
     RequestNotValidException, JobAlreadyStartedException, NotFoundException {
 
-    PackageState packageState = SyncUtils.getIncomingEntityPackageState(instanceId, "job");
-    for (String jobId : packageState.getIdList()) {
-      Path jobPath = SyncUtils.getEntityStoragePath(instanceId, RodaConstants.CORE_JOB_FOLDER).resolve(jobId + ".json");
-      Job job = JsonUtils.readObjectFromFile(jobPath, Job.class);
-      PluginHelper.createAndExecuteJob(job);
+    PackageState packageState = null;
+    int count = 0;
+    try {
+      packageState = SyncUtils.getIncomingEntityPackageState(instanceId, "job");
+    } catch (final NotFoundException e) {
+      // do nothing
     }
 
-    return packageState.getCount();
+    if (packageState != null) {
+      for (String jobId : packageState.getIdList()) {
+        final Path jobPath = SyncUtils.getEntityStoragePath(instanceId, RodaConstants.CORE_JOB_FOLDER)
+          .resolve(jobId + ".json");
+        final Job job = JsonUtils.readObjectFromFile(jobPath, Job.class);
+        PluginHelper.createAndExecuteJob(job);
+      }
+
+      count = packageState.getCount();
+    }
+    return count;
+  }
+
+  public static int createRepresentationInformation(final String instanceId)
+    throws GenericException, NotFoundException, AlreadyExistsException {
+
+    PackageState packageState = null;
+    int count = 0;
+    try {
+      packageState = SyncUtils.getIncomingEntityPackageState(instanceId, "representationInformation");
+    } catch (final NotFoundException e) {
+      // do nothing
+    }
+
+    if (packageState != null) {
+      for (String representationInformationId : packageState.getIdList()) {
+        final Path representationInformationFolder = SyncUtils
+          .getEntityStoragePath(instanceId, RodaConstants.CORE_REPRESENTATION_INFORMATION_FOLDER)
+          .resolve(representationInformationId + RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION);
+
+        final Path destinationPath = RodaCoreFactory.getStoragePath()
+          .resolve(RodaConstants.CORE_REPRESENTATION_INFORMATION_FOLDER);
+
+        FSUtils.copy(representationInformationFolder, destinationPath, true);
+      }
+
+      count = packageState.getCount();
+    }
+    return count;
+  }
+
+  public static int createRisks(final String instanceId)
+    throws GenericException, NotFoundException, AlreadyExistsException {
+
+    PackageState packageState = null;
+    int count = 0;
+    try {
+      packageState = SyncUtils.getIncomingEntityPackageState(instanceId, "risk");
+    } catch (final NotFoundException e) {
+      // do nothing
+    }
+
+    if (packageState != null) {
+      for (String riskId : packageState.getIdList()) {
+        final Path riskFolder = SyncUtils.getEntityStoragePath(instanceId, RodaConstants.CORE_RISK_FOLDER)
+          .resolve(riskId + RodaConstants.RISK_FILE_EXTENSION);
+
+        final Path destinationPath = RodaCoreFactory.getStoragePath().resolve(RodaConstants.CORE_RISK_FOLDER);
+
+        FSUtils.copy(riskFolder, destinationPath, true);
+      }
+
+      count = packageState.getCount();
+    }
+
+    return count;
   }
 
   @Override
