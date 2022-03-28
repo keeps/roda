@@ -21,6 +21,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.synchronization.bundle.BundleState;
 import org.roda.core.data.v2.synchronization.bundle.PackageState;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
@@ -127,25 +128,29 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
         } catch (GenericException e) {
           throw new PluginException("Unable to retrieve local instance configuration", e);
         }
-        requestRemoteActions(model, report, jobPluginInfo, cachedJob);
+        requestRemoteActions(model, storage, report, jobPluginInfo, cachedJob);
       }
     }, index, model, storage);
   }
 
-  private void requestRemoteActions(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job cachedJob) {
+  private void requestRemoteActions(ModelService model, StorageService storage, Report report,
+    JobPluginInfo jobPluginInfo, Job cachedJob) {
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
     PluginState pluginState = PluginState.SKIPPED;
     String outcomeDetailsText = "There are no updates from the central instance";
 
     try {
-      Path path = SyncUtils.requestRemoteActions(localInstance);
+      final Path path = SyncUtils.requestRemoteActions(localInstance);
       if (path != null) {
-        SyncUtils.extractBundle(localInstance.getId(), path);
         try {
           final int jobs = createJobs(localInstance.getId());
-          outcomeDetailsText = "Received " + jobs + " jobs";
-        } catch (JobAlreadyStartedException e) {
+          final Path bundleWorkingDir = SyncUtils.extractBundle(localInstance.getId(), path);
+          final BundleState bundleState = SyncUtils.getIncomingBundleState(localInstance.getId());
+          final int imported = SyncUtils.importStorage(storage, bundleWorkingDir, bundleState, jobPluginInfo, false);
+          outcomeDetailsText = "Received " + jobs + " jobs. Imported " + imported
+            + "representations information and risks from Central";
+        } catch (AlreadyExistsException | JobAlreadyStartedException e) {
           // Do nothing
         }
       }

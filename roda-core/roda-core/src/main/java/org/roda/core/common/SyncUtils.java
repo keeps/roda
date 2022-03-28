@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -23,11 +24,13 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.CentralEntitiesJsonUtils;
@@ -36,10 +39,12 @@ import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
@@ -55,10 +60,15 @@ import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.plugins.internal.synchronization.SyncBundleHelper;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.storage.Container;
+import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.util.FileUtility;
+import org.roda.core.util.IdUtils;
 import org.roda.core.util.ZipUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -401,15 +411,15 @@ public class SyncUtils {
       final Path destinationPath = getSyncBundleWorkingDirectory(OUTCOME_PREFIX, instanceIdentifier)
         .resolve(RodaConstants.CORE_STORAGE_FOLDER).resolve(RodaConstants.STORAGE_CONTAINER_RISK);
 
-      final StoragePath representationInformationContainerPath = ModelUtils.getRiskContainerPath();
+      final StoragePath riskContainerPath = ModelUtils.getRiskContainerPath();
       final PackageState packageState = createEntityPackageState(instanceIdentifier, "risk");
       packageState.setClassName(Risk.class);
       packageState.setCount((int) risks.getTotalCount());
       packageState.setStatus(PackageState.Status.CREATED);
       for (IndexedRisk risk : risks) {
         riskList.add(risk.getId());
-        final String riskFile = risk.getId() + RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION;
-        storage.copy(storage, representationInformationContainerPath, destinationPath.resolve(riskFile), riskFile);
+        final String riskFile = risk.getId() + RodaConstants.RISK_FILE_EXTENSION;
+        storage.copy(storage, riskContainerPath, destinationPath.resolve(riskFile), riskFile);
       }
       packageState.setIdList(riskList);
       SyncUtils.updateEntityPackageState(instanceIdentifier, "risk", packageState);
@@ -596,4 +606,92 @@ public class SyncUtils {
   public static StreamResponse createLastSyncFileStreamResponse(Path path) {
     return createBundleStreamResponse(path);
   }
+
+  // Import methods
+
+  public static int importStorage(final StorageService storage, final Path tempDirectory,
+    final BundleState bundleState, final JobPluginInfo jobPluginInfo, final boolean moveJob)
+    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException,
+    AlreadyExistsException, JobAlreadyStartedException {
+    int count = 0;
+    final FileStorageService temporaryStorage = new FileStorageService(
+      tempDirectory.resolve(RodaConstants.CORE_STORAGE_FOLDER), false, null, false);
+    final CloseableIterable<Container> containers = temporaryStorage.listContainers();
+    final Iterator<Container> containerIterator = containers.iterator();
+    while (containerIterator.hasNext()) {
+      final Container container = containerIterator.next();
+      final StoragePath containerStoragePath = container.getStoragePath();
+
+      final CloseableIterable<Resource> resources = temporaryStorage.listResourcesUnderContainer(containerStoragePath,
+        false);
+      final Iterator<Resource> resourceIterator = resources.iterator();
+      while (resourceIterator.hasNext()) {
+        final Resource resource = resourceIterator.next();
+        final StoragePath storagePath = resource.getStoragePath();
+
+        // if the resource already exists, remove it before moving the updated resource
+        if (!resource.getStoragePath().getContainerName().equals(RodaConstants.STORAGE_CONTAINER_JOB)) {
+          if (storage.exists(storagePath)) {
+            storage.deleteResource(storagePath);
+          }
+          storage.move(temporaryStorage, storagePath, storagePath);
+        }
+
+        // Job and job reports (This step is for Local Instance job)
+        if (moveJob && resource.getStoragePath().getContainerName().equals(RodaConstants.STORAGE_CONTAINER_JOB)) {
+          moveJobsAndJobsReports(storage, resource, storagePath, temporaryStorage);
+        }
+
+        count++;
+      }
+    }
+    reindexBundle(bundleState, jobPluginInfo);
+    return count;
+  }
+
+  private static void reindexBundle(final BundleState bundleState, final JobPluginInfo jobPluginInfo)
+    throws NotFoundException, AuthorizationDeniedException, JobAlreadyStartedException, GenericException,
+    RequestNotValidException {
+    final List<PackageState> packageStateList = bundleState.getPackageStateList();
+    jobPluginInfo.setSourceObjectsCount(packageStateList.size());
+    for (PackageState packageState : packageStateList) {
+      if (packageState.getCount() > 0) {
+        final Job job = new Job();
+        job.setId(IdUtils.createUUID());
+        job.setName("Reindex RODA entity (" + packageState.getClassName() + ")");
+        job.setPluginType(PluginType.INTERNAL);
+        job.setUsername(RodaConstants.ADMIN);
+
+        job.setPlugin(PluginHelper.getReindexPluginName(packageState.getClassName()));
+        job.setSourceObjects(SelectedItemsList.create(packageState.getClassName(), packageState.getIdList()));
+
+        PluginHelper.createAndExecuteJob(job);
+      }
+      jobPluginInfo.incrementObjectsProcessedWithSuccess();
+    }
+  }
+
+  private static void moveJobsAndJobsReports(final StorageService storage, final Resource resource,
+    final StoragePath storagePath, final FileStorageService temporaryStorage) throws AlreadyExistsException,
+    AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    if (storage.exists(storagePath)) {
+      storage.deleteResource(storagePath);
+    }
+    storage.move(temporaryStorage, storagePath, storagePath);
+
+    if (!resource.isDirectory()) {
+      try (InputStream inputStream = storage.getBinary(resource.getStoragePath()).getContent().createInputStream()) {
+        final Job jobToImport = JsonUtils.getObjectFromJson(inputStream, Job.class);
+        final StoragePath jobReportsContainerPath = ModelUtils.getJobReportsStoragePath(jobToImport.getId());
+        if (storage.exists(jobReportsContainerPath)) {
+          storage.deleteResource(jobReportsContainerPath);
+        }
+        storage.createDirectory(jobReportsContainerPath);
+      } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
+        | IOException e) {
+        LOGGER.error("Error getting Job json from binary", e);
+      }
+    }
+  }
+
 }
