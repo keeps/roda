@@ -609,10 +609,36 @@ public class SyncUtils {
 
   // Import methods
 
-  public static int importStorage(final StorageService storage, final Path tempDirectory,
-    final BundleState bundleState, final JobPluginInfo jobPluginInfo, final boolean moveJob)
-    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException,
-    AlreadyExistsException, JobAlreadyStartedException {
+  /**
+   * Imports from synchronization bundle to RODA storage.
+   * 
+   * @param storage
+   *          {@link StorageService}
+   * @param tempDirectory
+   *          {@link Path} to temporary directory.
+   * @param bundleState
+   *          {@link BundleState}.
+   * @param jobPluginInfo
+   *          {@link JobPluginInfo}.
+   * @param moveJob
+   *          flag if is to move jobs and jobs reports or not.
+   * @return the value of moved files.
+   * @throws GenericException
+   *           if some error occurs.
+   * @throws NotFoundException
+   *           if some error occurs.
+   * @throws AuthorizationDeniedException
+   *           if some error occurs.
+   * @throws RequestNotValidException
+   *           if some error occurs.
+   * @throws AlreadyExistsException
+   *           if some error occurs.
+   * @throws JobAlreadyStartedException
+   *           if some error occurs.
+   */
+  public static int importStorage(final StorageService storage, final Path tempDirectory, final BundleState bundleState,
+    final JobPluginInfo jobPluginInfo, final boolean moveJob) throws GenericException, NotFoundException,
+    AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, JobAlreadyStartedException {
     int count = 0;
     final FileStorageService temporaryStorage = new FileStorageService(
       tempDirectory.resolve(RodaConstants.CORE_STORAGE_FOLDER), false, null, false);
@@ -649,6 +675,24 @@ public class SyncUtils {
     return count;
   }
 
+  /**
+   * Reindex all objects moved from bundle to storage.
+   * 
+   * @param bundleState
+   *          {@link BundleState}.
+   * @param jobPluginInfo
+   *          {@link JobPluginInfo}.
+   * @throws NotFoundException
+   *           if some error occurs.
+   * @throws AuthorizationDeniedException
+   *           if some error occurs.
+   * @throws JobAlreadyStartedException
+   *           if some error occurs.
+   * @throws GenericException
+   *           if some error occurs.
+   * @throws RequestNotValidException
+   *           if some error occurs.
+   */
   private static void reindexBundle(final BundleState bundleState, final JobPluginInfo jobPluginInfo)
     throws NotFoundException, AuthorizationDeniedException, JobAlreadyStartedException, GenericException,
     RequestNotValidException {
@@ -671,6 +715,28 @@ public class SyncUtils {
     }
   }
 
+  /**
+   * Move Jobs and Jobs reports from local bundle to RODA central storage.
+   * 
+   * @param storage
+   *          {@link StorageService}.
+   * @param resource
+   *          {@link Resource}
+   * @param storagePath
+   *          {@link Path} to storage.
+   * @param temporaryStorage
+   *          {@link Path} to temporary storage
+   * @throws AlreadyExistsException
+   *           if some error occurs.
+   * @throws AuthorizationDeniedException
+   *           if some error occurs.
+   * @throws NotFoundException
+   *           if some error occurs.
+   * @throws GenericException
+   *           if some error occurs.
+   * @throws RequestNotValidException
+   *           if some error occurs.
+   */
   private static void moveJobsAndJobsReports(final StorageService storage, final Resource resource,
     final StoragePath storagePath, final FileStorageService temporaryStorage) throws AlreadyExistsException,
     AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
