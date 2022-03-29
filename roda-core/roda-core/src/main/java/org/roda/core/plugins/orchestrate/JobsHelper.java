@@ -51,6 +51,8 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.JobStats;
+import org.roda.core.data.v2.ri.RepresentationInformation;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
@@ -448,6 +450,45 @@ public final class JobsHelper {
     return dipsToReturn;
   }
 
+  public static List<RepresentationInformation> getRepresentationInformations(final ModelService model,
+    final List<String> uuids) throws NotFoundException {
+    final List<RepresentationInformation> representationInformationsToReturn = new ArrayList<>();
+    if (!uuids.isEmpty()) {
+      for (String uuid : uuids) {
+        try {
+          representationInformationsToReturn.add(model.retrieveRepresentationInformation(uuid));
+        } catch (RODAException | RuntimeException e) {
+          LOGGER.error("Error while retrieving Representation Information from model", e);
+        }
+      }
+    }
+
+    if (representationInformationsToReturn.isEmpty()) {
+      throw new NotFoundException("Could not retrieve the Representation Informations");
+    }
+
+    return representationInformationsToReturn;
+  }
+
+  public static List<Risk> getRisks(final ModelService model, final List<String> uuids) throws NotFoundException {
+    final List<Risk> risksToReturn = new ArrayList<>();
+    if (!uuids.isEmpty()) {
+      for (String uuid : uuids) {
+        try {
+          risksToReturn.add(model.retrieveRisk(uuid));
+        } catch (RODAException | RuntimeException e) {
+          LOGGER.error("Error while retrieving Risk from model", e);
+        }
+      }
+    }
+
+    if (risksToReturn.isEmpty()) {
+      throw new NotFoundException("Could not retrieve the Risks");
+    }
+
+    return risksToReturn;
+  }
+
   public static <T extends IsRODAObject> List<T> getObjectsFromUUID(ModelService model, IndexService index,
     Class<T> objectClass, List<String> uuids) throws NotFoundException, GenericException, RequestNotValidException {
     if (AIP.class.equals(objectClass)) {
@@ -466,6 +507,10 @@ public final class JobsHelper {
       return (List<T>) getPreservationAgents(model, uuids);
     } else if (DIP.class.equals(objectClass)) {
       return (List<T>) getDIPs(model, uuids);
+    } else if (RepresentationInformation.class.equals(objectClass)) {
+      return (List<T>) getRepresentationInformations(model, uuids);
+    } else if (Risk.class.equals(objectClass)) {
+      return (List<T>) getRisks(model, uuids);
     } else {
       return getObjectsFromIndex(index, objectClass, uuids);
     }
@@ -578,7 +623,8 @@ public final class JobsHelper {
     }
   }
 
-  public static void createJobAttachment(String jobId, Path input) throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+  public static void createJobAttachment(String jobId, Path input)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     ModelService model = RodaCoreFactory.getModelService();
     Path path = RodaCoreFactory.getJobAttachmentsDirectoryPath().resolve(jobId);
     try {
