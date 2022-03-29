@@ -205,7 +205,7 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
         bundleWorkingDir = SyncUtils.extractBundle(instanceIdentifier, Paths.get(bundlePath));
         BundleState bundleState = SyncUtils.getIncomingBundleState(instanceIdentifier);
         validateChecksum(bundleWorkingDir, bundleState);
-        importStorage(storage, bundleWorkingDir, bundleState, jobPluginInfo);
+        SyncUtils.importStorage(storage, bundleWorkingDir, bundleState, jobPluginInfo, true);
         SyncUtils.copyAttachments(instanceIdentifier);
         deleteAndValidateEntities(instanceIdentifier, bundleWorkingDir, bundleState.getEntitiesBundle());
 
@@ -229,52 +229,6 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
       report.setPluginState(PluginState.FAILURE).setPluginDetails("Cannot find bundle on path " + bundlePath);
       jobPluginInfo.incrementObjectsProcessedWithFailure();
     }
-  }
-
-  private void importStorage(StorageService storage, Path tempDirectory, BundleState bundleState,
-    JobPluginInfo jobPluginInfo) throws GenericException, NotFoundException, AuthorizationDeniedException,
-    RequestNotValidException, AlreadyExistsException, JobAlreadyStartedException {
-    FileStorageService temporaryStorage = new FileStorageService(
-      tempDirectory.resolve(RodaConstants.CORE_STORAGE_FOLDER), false, null, false);
-    CloseableIterable<Container> containers = temporaryStorage.listContainers();
-    Iterator<Container> containerIterator = containers.iterator();
-    while (containerIterator.hasNext()) {
-      Container container = containerIterator.next();
-      StoragePath containerStoragePath = container.getStoragePath();
-
-      CloseableIterable<Resource> resources = temporaryStorage.listResourcesUnderContainer(containerStoragePath, false);
-      Iterator<Resource> resourceIterator = resources.iterator();
-      while (resourceIterator.hasNext()) {
-        Resource resource = resourceIterator.next();
-        StoragePath storagePath = resource.getStoragePath();
-
-        // if the resource already exists, remove it before moving the updated resource
-        if (storage.exists(storagePath)) {
-          storage.deleteResource(storagePath);
-        }
-        storage.move(temporaryStorage, storagePath, storagePath);
-
-        // Job and job reports
-        if (resource.getStoragePath().getContainerName().equals(RodaConstants.STORAGE_CONTAINER_JOB)) {
-          if (!resource.isDirectory()) {
-            try (
-              InputStream inputStream = storage.getBinary(resource.getStoragePath()).getContent().createInputStream()) {
-              Job jobToImport = JsonUtils.getObjectFromJson(inputStream, Job.class);
-              StoragePath jobReportsContainerPath = ModelUtils.getJobReportsStoragePath(jobToImport.getId());
-              if (storage.exists(jobReportsContainerPath)) {
-                storage.deleteResource(jobReportsContainerPath);
-              }
-              storage.createDirectory(jobReportsContainerPath);
-            } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
-              | IOException e) {
-              LOGGER.error("Error getting Job json from binary", e);
-            }
-          }
-        }
-
-      }
-    }
-    reindexBundle(bundleState, jobPluginInfo);
   }
 
   private void importJobAttachments(Path tempDirectory) {
@@ -301,27 +255,6 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
 
   private void validateChecksum(Path tempDirectory, BundleState bundleState) {
     // TODO validate checksum
-  }
-
-  private void reindexBundle(BundleState bundleState, JobPluginInfo jobPluginInfo) throws NotFoundException,
-    AuthorizationDeniedException, JobAlreadyStartedException, GenericException, RequestNotValidException {
-    List<PackageState> packageStateList = bundleState.getPackageStateList();
-    jobPluginInfo.setSourceObjectsCount(packageStateList.size());
-    for (PackageState packageState : packageStateList) {
-      if (packageState.getCount() > 0) {
-        Job job = new Job();
-        job.setId(IdUtils.createUUID());
-        job.setName("Reindex RODA entity (" + packageState.getClassName() + ")");
-        job.setPluginType(PluginType.INTERNAL);
-        job.setUsername(RodaConstants.ADMIN);
-
-        job.setPlugin(PluginHelper.getReindexPluginName(packageState.getClassName()));
-        job.setSourceObjects(SelectedItemsList.create(packageState.getClassName(), packageState.getIdList()));
-
-        PluginHelper.createAndExecuteJob(job);
-      }
-      jobPluginInfo.incrementObjectsProcessedWithSuccess();
-    }
   }
 
   @Override
