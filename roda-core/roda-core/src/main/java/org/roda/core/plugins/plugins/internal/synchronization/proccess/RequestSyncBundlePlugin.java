@@ -8,6 +8,7 @@ import java.util.List;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.SyncUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
@@ -20,6 +21,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.synchronization.bundle.BundleState;
 import org.roda.core.data.v2.synchronization.bundle.PackageState;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
@@ -125,25 +127,29 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
         } catch (GenericException e) {
           throw new PluginException("Unable to retrieve local instance configuration", e);
         }
-        requestRemoteActions(model, report, jobPluginInfo, cachedJob);
+        requestRemoteActions(model, storage, report, jobPluginInfo, cachedJob);
       }
     }, index, model, storage);
   }
 
-  private void requestRemoteActions(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job cachedJob) {
+  private void requestRemoteActions(ModelService model, StorageService storage, Report report,
+    JobPluginInfo jobPluginInfo, Job cachedJob) {
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
     PluginState pluginState = PluginState.SKIPPED;
     String outcomeDetailsText = "There are no updates from the central instance";
 
     try {
-      Path path = SyncUtils.requestRemoteActions(localInstance);
+      final Path path = SyncUtils.requestRemoteActions(localInstance);
       if (path != null) {
-        SyncUtils.extractBundle(localInstance.getId(), path);
         try {
-          int jobs = createJobs(localInstance.getId());
-          outcomeDetailsText = "Received " + jobs + " jobs";
-        } catch (JobAlreadyStartedException e) {
+          final Path bundleWorkingDir = SyncUtils.extractBundle(localInstance.getId(), path);
+          final int jobs = createJobs(localInstance.getId());
+          final BundleState bundleState = SyncUtils.getIncomingBundleState(localInstance.getId());
+          final int imported = SyncUtils.importStorage(storage, bundleWorkingDir, bundleState, jobPluginInfo, false);
+          outcomeDetailsText = "Received " + jobs + " jobs. Imported " + imported
+            + " representations information and risks from Central";
+        } catch (AlreadyExistsException | JobAlreadyStartedException e) {
           // Do nothing
         }
       }
@@ -162,17 +168,45 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
   }
 
-  public static int createJobs(String instanceId) throws GenericException, AuthorizationDeniedException,
+  /**
+   * Creates the Jobs from RODA Central in RODA local and executes.
+   * 
+   * @param instanceId
+   *          the instance identifier.
+   * @return number of jobs created and executed.
+   * @throws GenericException
+   *           if some error occurs.
+   * @throws AuthorizationDeniedException
+   *           if some error occurs.
+   * @throws RequestNotValidException
+   *           if some error occurs.
+   * @throws JobAlreadyStartedException
+   *           if some error occurs.
+   * @throws NotFoundException
+   *           if some error occurs.
+   */
+  public static int createJobs(final String instanceId) throws GenericException, AuthorizationDeniedException,
     RequestNotValidException, JobAlreadyStartedException, NotFoundException {
 
-    PackageState packageState = SyncUtils.getIncomingEntityPackageState(instanceId, "job");
-    for (String jobId : packageState.getIdList()) {
-      Path jobPath = SyncUtils.getEntityStoragePath(instanceId, RodaConstants.CORE_JOB_FOLDER).resolve(jobId + ".json");
-      Job job = JsonUtils.readObjectFromFile(jobPath, Job.class);
-      PluginHelper.createAndExecuteJob(job);
+    PackageState packageState = null;
+    int count = 0;
+    try {
+      packageState = SyncUtils.getIncomingEntityPackageState(instanceId, RodaConstants.CORE_JOB_FOLDER);
+    } catch (final NotFoundException e) {
+      // do nothing
     }
 
-    return packageState.getCount();
+    if (packageState != null) {
+      for (String jobId : packageState.getIdList()) {
+        final Path jobPath = SyncUtils.getEntityStoragePath(instanceId, RodaConstants.CORE_JOB_FOLDER)
+          .resolve(jobId + ".json");
+        final Job job = JsonUtils.readObjectFromFile(jobPath, Job.class);
+        PluginHelper.createAndExecuteJob(job);
+      }
+
+      count = packageState.getCount();
+    }
+    return count;
   }
 
   @Override
