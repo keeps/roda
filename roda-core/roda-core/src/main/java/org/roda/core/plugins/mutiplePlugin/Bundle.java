@@ -1,4 +1,4 @@
-package org.roda.core.mutiplePlugin;
+package org.roda.core.plugins.mutiplePlugin;
 
 import java.util.List;
 import java.util.Map;
@@ -105,21 +105,6 @@ public interface Bundle {
    *          {@link Map}.
    */
   void setParameterValues(Map<String, String> parameterValues);
-
-  /**
-   * Get the list of {@link AIP}.
-   * 
-   * @return {@link List}.
-   */
-  List<AIP> getAips();
-
-  /**
-   * Set the list of {@link AIP}.
-   * 
-   * @param aips
-   *          {@link List}.
-   */
-  void setAips(List<AIP> aips);
 
   /**
    * Set the {@link Job}.
