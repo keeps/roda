@@ -143,12 +143,12 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
       final Path path = SyncUtils.requestRemoteActions(localInstance);
       if (path != null) {
         try {
-          final int jobs = createJobs(localInstance.getId());
           final Path bundleWorkingDir = SyncUtils.extractBundle(localInstance.getId(), path);
+          final int jobs = createJobs(localInstance.getId());
           final BundleState bundleState = SyncUtils.getIncomingBundleState(localInstance.getId());
           final int imported = SyncUtils.importStorage(storage, bundleWorkingDir, bundleState, jobPluginInfo, false);
           outcomeDetailsText = "Received " + jobs + " jobs. Imported " + imported
-            + "representations information and risks from Central";
+            + " representations information and risks from Central";
         } catch (AlreadyExistsException | JobAlreadyStartedException e) {
           // Do nothing
         }
