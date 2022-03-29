@@ -191,7 +191,7 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
     PackageState packageState = null;
     int count = 0;
     try {
-      packageState = SyncUtils.getIncomingEntityPackageState(instanceId, "job");
+      packageState = SyncUtils.getIncomingEntityPackageState(instanceId, RodaConstants.CORE_JOB_FOLDER);
     } catch (final NotFoundException e) {
       // do nothing
     }

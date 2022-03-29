@@ -458,13 +458,13 @@ public final class JobsHelper {
         try {
           representationInformationsToReturn.add(model.retrieveRepresentationInformation(uuid));
         } catch (RODAException | RuntimeException e) {
-          LOGGER.error("Error while retrieving DIP from model", e);
+          LOGGER.error("Error while retrieving Representation Information from model", e);
         }
       }
     }
 
     if (representationInformationsToReturn.isEmpty()) {
-      throw new NotFoundException("Could not retrieve the DIPs");
+      throw new NotFoundException("Could not retrieve the Representation Informations");
     }
 
     return representationInformationsToReturn;
@@ -477,13 +477,13 @@ public final class JobsHelper {
         try {
           risksToReturn.add(model.retrieveRisk(uuid));
         } catch (RODAException | RuntimeException e) {
-          LOGGER.error("Error while retrieving DIP from model", e);
+          LOGGER.error("Error while retrieving Risk from model", e);
         }
       }
     }
 
     if (risksToReturn.isEmpty()) {
-      throw new NotFoundException("Could not retrieve the DIPs");
+      throw new NotFoundException("Could not retrieve the Risks");
     }
 
     return risksToReturn;

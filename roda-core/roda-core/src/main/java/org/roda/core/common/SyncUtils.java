@@ -377,7 +377,8 @@ public class SyncUtils {
         .resolve(RodaConstants.CORE_STORAGE_FOLDER).resolve(RodaConstants.STORAGE_CONTAINER_REPRESENTATION_INFORMATION);
 
       final StoragePath representationInformationContainerPath = ModelUtils.getRepresentationInformationContainerPath();
-      final PackageState packageState = createEntityPackageState(instanceIdentifier, "representationInformation");
+      final PackageState packageState = createEntityPackageState(instanceIdentifier,
+        RodaConstants.CORE_REPRESENTATION_INFORMATION_FOLDER);
       packageState.setClassName(RepresentationInformation.class);
       packageState.setCount((int) representationInformations.getTotalCount());
       packageState.setStatus(PackageState.Status.CREATED);
@@ -389,7 +390,8 @@ public class SyncUtils {
           destinationPath.resolve(representationInformationFile), representationInformationFile);
       }
       packageState.setIdList(representationInformationList);
-      SyncUtils.updateEntityPackageState(instanceIdentifier, "representationInformation", packageState);
+      SyncUtils.updateEntityPackageState(instanceIdentifier, RodaConstants.CORE_REPRESENTATION_INFORMATION_FOLDER,
+        packageState);
       createdBundle = true;
     }
     return createdBundle;
@@ -412,7 +414,7 @@ public class SyncUtils {
         .resolve(RodaConstants.CORE_STORAGE_FOLDER).resolve(RodaConstants.STORAGE_CONTAINER_RISK);
 
       final StoragePath riskContainerPath = ModelUtils.getRiskContainerPath();
-      final PackageState packageState = createEntityPackageState(instanceIdentifier, "risk");
+      final PackageState packageState = createEntityPackageState(instanceIdentifier, RodaConstants.CORE_RISK_FOLDER);
       packageState.setClassName(Risk.class);
       packageState.setCount((int) risks.getTotalCount());
       packageState.setStatus(PackageState.Status.CREATED);
@@ -422,7 +424,7 @@ public class SyncUtils {
         storage.copy(storage, riskContainerPath, destinationPath.resolve(riskFile), riskFile);
       }
       packageState.setIdList(riskList);
-      SyncUtils.updateEntityPackageState(instanceIdentifier, "risk", packageState);
+      SyncUtils.updateEntityPackageState(instanceIdentifier, RodaConstants.CORE_RISK_FOLDER, packageState);
       createdBundle = true;
     }
     return createdBundle;
