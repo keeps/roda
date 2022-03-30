@@ -1,11 +1,17 @@
 package org.roda.core.plugins.plugins;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -13,12 +19,20 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.RODAObjectsProcessingLogic;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.storage.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@author João Gomes <jgomes@keep.pt>}.
  */
 public class MutipleBundlePlugin extends AbstractPlugin<AIP> {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(MutipleBundlePlugin.class);
+  private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
+
   @Override
   public String getVersionImpl() {
     return "1.0";
@@ -66,17 +80,29 @@ public class MutipleBundlePlugin extends AbstractPlugin<AIP> {
 
   @Override
   public Plugin<AIP> cloneMe() {
-    return null;
+    return new MutipleBundlePlugin();
   }
 
   @Override
   public boolean areParameterValuesValid() {
-    return false;
+    return true;
   }
 
   @Override
   public void init() throws PluginException {
 
+  }
+
+  @Override
+  public List<PluginParameter> getParameters() {
+    ArrayList<PluginParameter> parameters = new ArrayList<>();
+    return parameters;
+  }
+
+  @Override
+  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
+    getParameterValues().put(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS, getClass().getName());
   }
 
   @Override
@@ -93,7 +119,15 @@ public class MutipleBundlePlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> list) throws PluginException {
-    return null;
+    return PluginHelper.processObjects(this,
+      (RODAObjectsProcessingLogic<AIP>) (index1, model1, storage1, report, cachedJob, jobPluginInfo, plugin,
+        objects) -> process(index1, model1, storage1, report, cachedJob, jobPluginInfo, objects),
+      index, model, storage, list);
+  }
+
+  private void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+                          JobPluginInfo jobPluginInfo, List<AIP> aips) {
+
   }
 
   @Override
