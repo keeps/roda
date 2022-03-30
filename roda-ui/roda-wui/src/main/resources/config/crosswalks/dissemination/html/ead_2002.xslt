@@ -248,12 +248,13 @@
 				</xsl:call-template>
 
 				<!-- Extent -->
-				<xsl:call-template name="simpleField">
-					<xsl:with-param name="label" select="$i18n.extent"/>
-					<xsl:with-param name="value"
-						select="string-join((/ead:ead/ead:archdesc/ead:did/ead:physdesc/text(),/ead:ead/ead:archdesc/ead:did/ead:physdesc/ead:extent/text()), ' ')" />
-				</xsl:call-template>
-
+				<xsl:if test="/ead:ead/ead:archdesc/ead:did/ead:physdesc/ead:extent/text()">
+					<xsl:call-template name="simpleField">
+						<xsl:with-param name="label" select="$i18n.extent"/>
+						<xsl:with-param name="value"
+							select="string-join((/ead:ead/ead:archdesc/ead:did/ead:physdesc/ead:extent/text(),/ead:ead/ead:archdesc/ead:did/ead:physdesc/ead:extent/@unit), ' ')" />
+					</xsl:call-template>
+				</xsl:if>
 				<!-- Material specification -->
 				<xsl:call-template name="simpleField">
 					<xsl:with-param name="label" select="$i18n.materialspec"/>
@@ -537,18 +538,19 @@
 
 
 				<!-- Status of description -->
-				<xsl:variable name="statusDescriptionTranslated">
-					<xsl:variable name="statusDescriptionValue">
-						<xsl:value-of select="/*:ead/*:archdesc/*:odd[@type = 'statusDescription']/*:p/text()"/>
+				<xsl:if test="/*:ead/*:archdesc/*:odd[@type = 'statusDescription']/*:p/text()">
+					<xsl:variable name="statusDescriptionTranslated">
+						<xsl:variable name="statusDescriptionValue">
+							<xsl:value-of select="/*:ead/*:archdesc/*:odd[@type = 'statusDescription']/*:p/text()"/>
+						</xsl:variable>
+						<xsl:value-of select="$statusDescriptionTranslationMap/entry[@key=$statusDescriptionValue]/text()"/>
 					</xsl:variable>
-					<xsl:value-of select="$statusDescriptionTranslationMap/entry[@key=$statusDescriptionValue]/text()"/>
-				</xsl:variable>
 
-				<xsl:call-template name="simpleField">
-					<xsl:with-param name="label" select="$i18n.statusdescription"/>
-					<xsl:with-param name="value" select="$statusDescriptionTranslated"/>
-				</xsl:call-template>
-
+					<xsl:call-template name="simpleField">
+						<xsl:with-param name="label" select="$i18n.statusdescription"/>
+						<xsl:with-param name="value" select="$statusDescriptionTranslated"/>
+					</xsl:call-template>
+				</xsl:if>
 <!--
 				$statusDescriptionValue = <xsl:value-of select="$statusDescriptionValue"/>
 				$statusDescriptionTranslated = <xsl:value-of select="$statusDescriptionTranslated"/>
@@ -557,19 +559,21 @@
 -->
 
 				<!-- Level of detail -->
-				<xsl:variable name="levelOfDetailTranslated">
-					<xsl:variable name="levelOfDetailValue">
-						<xsl:value-of select="/*:ead/*:archdesc/*:odd[@type = 'levelOfDetail']/*:p/text()"/>
+				<xsl:if test="/*:ead/*:archdesc/*:odd[@type = 'levelOfDetail']/*:p/text()">
+					<xsl:variable name="levelOfDetailTranslated">
+						<xsl:variable name="levelOfDetailValue">
+							<xsl:value-of select="/*:ead/*:archdesc/*:odd[@type = 'levelOfDetail']/*:p/text()"/>
+						</xsl:variable>
+						<xsl:value-of select="$levelOfDetailTranslationMap/entry[@key=$levelOfDetailValue]/text()"/>
 					</xsl:variable>
-					<xsl:value-of select="$levelOfDetailTranslationMap/entry[@key=$levelOfDetailValue]/text()"/>
-				</xsl:variable>
 
-				<xsl:call-template name="simpleField">
-					<xsl:with-param name="label" select="$i18n.levelofdetail"/>
-					<xsl:with-param name="value"
-						select="$levelOfDetailTranslated"/>
-				</xsl:call-template>
 
+					<xsl:call-template name="simpleField">
+						<xsl:with-param name="label" select="$i18n.levelofdetail"/>
+						<xsl:with-param name="value"
+							select="$levelOfDetailTranslated"/>
+					</xsl:call-template>
+				</xsl:if>
 				<!-- Date of creation or revision -->
 				<xsl:call-template name="simpleField">
 					<xsl:with-param name="label" select="$i18n.processdates"/>
