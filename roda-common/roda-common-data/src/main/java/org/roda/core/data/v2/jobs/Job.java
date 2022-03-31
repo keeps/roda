@@ -37,7 +37,8 @@ public class Job implements IsModelObject, IsIndexed, HasId {
   private static final long serialVersionUID = 615993757726175203L;
 
   public enum JOB_STATE {
-    CREATED, STARTED, COMPLETED, FAILED_DURING_CREATION, FAILED_TO_COMPLETE, STOPPED, STOPPING, TO_BE_CLEANED;
+    CREATED, STARTED, COMPLETED, FAILED_DURING_CREATION, FAILED_TO_COMPLETE, STOPPED, STOPPING, TO_BE_CLEANED,
+    PENDING_APPROVAL, REJECTED, SCHEDULED;
   }
 
   // job identifier
@@ -250,7 +251,8 @@ public class Job implements IsModelObject, IsIndexed, HasId {
 
   public static boolean isFinalState(JOB_STATE state) {
     return JOB_STATE.COMPLETED == state || JOB_STATE.FAILED_TO_COMPLETE == state || JOB_STATE.STOPPED == state
-      || JOB_STATE.FAILED_DURING_CREATION == state;
+      || JOB_STATE.FAILED_DURING_CREATION == state || JOB_STATE.REJECTED == state || JOB_STATE.PENDING_APPROVAL == state
+      || JOB_STATE.SCHEDULED == state;
   }
 
   public static List<String> nonFinalStateList() {

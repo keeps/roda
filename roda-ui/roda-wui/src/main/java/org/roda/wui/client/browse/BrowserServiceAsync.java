@@ -18,9 +18,6 @@ import java.util.Set;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.synchronization.central.DistributedInstance;
-import org.roda.core.data.v2.synchronization.central.DistributedInstances;
-import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -54,6 +51,9 @@ import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
+import org.roda.core.data.v2.synchronization.central.DistributedInstances;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseDipBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
@@ -124,6 +124,10 @@ public interface BrowserServiceAsync {
   void createJob(Job job, AsyncCallback<Job> callback);
 
   void stopJob(String jobId, AsyncCallback<Void> callback);
+
+  void approveJob(Job job, AsyncCallback<Void> callback);
+
+  void rejectJob(Job job, String details, AsyncCallback<Void> callback);
 
   void retrievePluginsInfo(List<PluginType> type, AsyncCallback<List<PluginInfo>> callback);
 

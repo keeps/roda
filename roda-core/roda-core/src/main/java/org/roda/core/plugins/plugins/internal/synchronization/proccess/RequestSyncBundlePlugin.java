@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.SyncUtils;
 import org.roda.core.data.common.RodaConstants;
@@ -129,6 +130,7 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
         }
         requestRemoteActions(model, storage, report, jobPluginInfo, cachedJob);
       }
+
     }, index, model, storage);
   }
 
@@ -201,7 +203,17 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
         final Path jobPath = SyncUtils.getEntityStoragePath(instanceId, RodaConstants.CORE_JOB_FOLDER)
           .resolve(jobId + ".json");
         final Job job = JsonUtils.readObjectFromFile(jobPath, Job.class);
-        PluginHelper.createAndExecuteJob(job);
+
+        String SYNC_ACTION_TYPE = RodaCoreFactory.getRodaConfigurationAsString("core.synchronization_action.type");
+        if(!StringUtils.isNotBlank(SYNC_ACTION_TYPE)){
+          PluginHelper.createAndExecuteJob(job);
+        }else if ("APPROVAL".equals(SYNC_ACTION_TYPE)) {
+          job.setState(Job.JOB_STATE.PENDING_APPROVAL);
+          PluginHelper.createJob(job);
+        } else {
+          job.setState(Job.JOB_STATE.SCHEDULED);
+          PluginHelper.createJob(job);
+        }
       }
 
       count = packageState.getCount();

@@ -18,6 +18,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.actions.callbacks.ActionAsyncCallback;
+import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
@@ -30,6 +31,7 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import config.i18n.client.ClientMessages;
@@ -45,7 +47,8 @@ public class JobActions extends AbstractActionable<Job> {
   public enum JobAction implements Action<Job> {
     NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB), STOP(RodaConstants.PERMISSION_METHOD_STOP_JOB),
     INGEST_APPRAISAL(RodaConstants.PERMISSION_METHOD_APPRAISAL),
-    INGEST_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB);
+    INGEST_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB), APPROVE(RodaConstants.PERMISSION_METHOD_APPROVE_JOB),
+    REJECT(RodaConstants.PERMISSION_METHOD_REJECT_JOB);
 
     private List<String> methods;
 
@@ -85,8 +88,13 @@ public class JobActions extends AbstractActionable<Job> {
   @Override
   public boolean canAct(Action<Job> action, Job object) {
     if (hasPermissions(action) && object != null) {
+      GWT.log(action.toString());
       if (JobAction.STOP.equals(action)) {
         return !object.isInFinalState() && !object.isStopping();
+      } else if (JobAction.APPROVE.equals(action)) {
+        return object.getState().equals(Job.JOB_STATE.PENDING_APPROVAL);
+      } else if (JobAction.REJECT.equals(action)) {
+        return object.getState().equals(Job.JOB_STATE.PENDING_APPROVAL);
       } else if (JobAction.INGEST_APPRAISAL.equals(action)) {
         return object.getJobStats() != null && object.getJobStats().getOutcomeObjectsWithManualIntervention() > 0;
       } else if (JobAction.INGEST_PROCESS.equals(action)) {
@@ -113,6 +121,11 @@ public class JobActions extends AbstractActionable<Job> {
       ingestAppraisal(object, callback);
     } else if (JobAction.INGEST_PROCESS.equals(action)) {
       ingestProcess(object, callback);
+    } else if (JobAction.APPROVE.equals(action)) {
+      GWT.log("Initial job info: " + object);
+      approve(object, callback);
+    } else if (JobAction.REJECT.equals(action)) {
+      reject(object, callback);
     } else {
       unsupportedAction(action, callback);
     }
@@ -158,6 +171,70 @@ public class JobActions extends AbstractActionable<Job> {
       });
   }
 
+  private void approve(Job object, AsyncCallback<ActionImpact> callback) {
+    Dialogs.showConfirmDialog(messages.jobApproveConfirmDialogTitle(), messages.jobApproveConfirmDialogMessage(),
+      messages.dialogCancel(), messages.dialogYes(), new ActionAsyncCallback<Boolean>(callback) {
+
+        @Override
+        public void onSuccess(Boolean confirmed) {
+          if (confirmed) {
+            GWT.log("Job Info:" + object.toString());
+            BrowserService.Util.getInstance().approveJob(object, new ActionAsyncCallback<Void>(callback) {
+              @Override
+              public void onFailure(Throwable caught) {
+                // FIXME 20160826 hsilva: do proper handling of the failure
+                super.onFailure(caught);
+                doActionCallbackDestroyed();
+              }
+
+              @Override
+              public void onSuccess(Void result) {
+                // FIXME 20160826 hsilva: do proper handling of the success
+                doActionCallbackDestroyed();
+              }
+            });
+          } else {
+            doActionCallbackNone();
+          }
+        }
+      });
+  }
+
+  private void reject(Job object, AsyncCallback<ActionImpact> callback) {
+    Dialogs.showConfirmDialog(messages.jobRejectConfirmDialogTitle(), messages.jobRejectConfirmDialogMessage(),
+      messages.dialogCancel(), messages.dialogYes(), new ActionAsyncCallback<Boolean>(callback) {
+
+        @Override
+        public void onSuccess(Boolean confirmed) {
+          if (confirmed) {
+            Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
+              RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+              new ActionNoAsyncCallback<String>(callback) {
+
+                public void onSuccess(final String details) {
+                  BrowserService.Util.getInstance().rejectJob(object, details, new ActionAsyncCallback<Void>(callback) {
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      // FIXME 20160826 hsilva: do proper handling of the failure
+                      super.onFailure(caught);
+                      doActionCallbackNone();
+                    }
+
+                    @Override
+                    public void onSuccess(Void result) {
+                      // FIXME 20160826 hsilva: do proper handling of the success
+                      doActionCallbackUpdated();
+                    }
+                  });
+                }
+              });
+          } else {
+            doActionCallbackNone();
+          }
+        }
+      });
+  }
+
   private void newProcess(AsyncCallback<ActionImpact> callback) {
     callback.onSuccess(ActionImpact.NONE);
     if (newProcessResolver != null) {
@@ -174,6 +251,8 @@ public class JobActions extends AbstractActionable<Job> {
     managementGroup.addButton(messages.newProcessPreservation(), JobAction.NEW_PROCESS, ActionImpact.UPDATED,
       "btn-plus-circle");
     managementGroup.addButton(messages.stopButton(), JobAction.STOP, ActionImpact.DESTROYED, "btn-stop");
+    managementGroup.addButton(messages.approveButton(), JobAction.APPROVE, ActionImpact.UPDATED, "btn-check");
+    managementGroup.addButton(messages.rejectButton(), JobAction.REJECT, ActionImpact.UPDATED, "btn-times");
 
     // FIXME 20180731 bferreira: JobAction.INGEST_APPRAISAL button text should be
     // dynamic and equal to messages.appraisalTitle() + " (" +

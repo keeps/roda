@@ -66,7 +66,7 @@ public class JobList extends AsyncTableCell<Job> {
     RodaConstants.JOB_SOURCE_OBJECTS_COUNT, RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SUCCESS,
     RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_PARTIAL_SUCCESS,
     RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE, RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SKIPPED,
-    RodaConstants.JOB_COMPLETION_PERCENTAGE);
+    RodaConstants.JOB_COMPLETION_PERCENTAGE, RodaConstants.JOB_PLUGIN, RodaConstants.JOB_SOURCE_OBJECTS);
 
   @Override
   protected void adjustOptions(AsyncTableCellOptions<Job> options) {

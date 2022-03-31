@@ -22,15 +22,13 @@ import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
+import org.roda.core.data.exceptions.JobStateNotPendingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.synchronization.central.DistributedInstance;
-import org.roda.core.data.v2.synchronization.central.DistributedInstances;
-import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -64,6 +62,9 @@ import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
+import org.roda.core.data.v2.synchronization.central.DistributedInstances;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseDipBundle;
@@ -181,8 +182,12 @@ public interface BrowserService extends RemoteService {
   Job createJob(Job job) throws AuthorizationDeniedException, NotFoundException, RequestNotValidException,
     GenericException, JobAlreadyStartedException;
 
-  void stopJob(String jobId)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
+  void stopJob(String jobId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
+
+  void approveJob(Job job) throws RequestNotValidException, GenericException, NotFoundException, JobAlreadyStartedException, AuthorizationDeniedException, JobStateNotPendingException;
+
+  void rejectJob(Job job, String details) throws RequestNotValidException, GenericException, NotFoundException,
+          JobAlreadyStartedException, AuthorizationDeniedException, JobStateNotPendingException;
 
   List<PluginInfo> retrievePluginsInfo(List<PluginType> type);
 

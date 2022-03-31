@@ -28,6 +28,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
+import org.roda.core.data.exceptions.JobStateNotPendingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
@@ -59,6 +60,8 @@ import org.roda.wui.api.v1.utils.ApiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gwt.core.client.GWT;
+
 public class JobsHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(JobsHelper.class);
 
@@ -78,6 +81,16 @@ public class JobsHelper {
       job.setName(job.getId());
     }
     job.setUsername(user.getName());
+  }
+
+  protected static void validateJobInformation(User user, Job job) throws RequestNotValidException, JobStateNotPendingException {
+    LOGGER.debug("Job being validated: {}", job);
+    validateJobPluginInformation(job);
+
+    if (!Job.JOB_STATE.PENDING_APPROVAL.equals(job.getState())) {
+      throw new JobStateNotPendingException();
+    }
+
   }
 
   private static void validateJobPluginInformation(Job job) throws RequestNotValidException {
@@ -137,6 +150,19 @@ public class JobsHelper {
     RodaCoreFactory.getIndexService().commit(Job.class);
 
     return updatedJob;
+  }
+
+  protected static Job rejectJob(Job job, String details) throws NotFoundException, GenericException,
+    JobAlreadyStartedException, RequestNotValidException, AuthorizationDeniedException {
+
+    job.setState(Job.JOB_STATE.REJECTED);
+    job.setStateDetails(details);
+    GWT.log("Job after rejected" + job);
+    // serialize job to file & index it
+    job.setEndDate(new Date());
+    RodaCoreFactory.getModelService().createOrUpdateJob(job);
+
+    return job;
   }
 
   private static boolean jobCanRun(String jobInstanceId) {
