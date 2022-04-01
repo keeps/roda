@@ -1,4 +1,4 @@
-package org.roda.core.plugins.mutiplePlugin;
+package org.roda.core.plugins.plugins.multiple;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,13 +8,12 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
-import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.orchestrate.MutipleJobPluginInfo;
+import org.roda.core.plugins.orchestrate.MultipleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,13 +29,13 @@ public class MutipleStepUtils {
     // do nothing
   }
 
-  public static void executePlugin(final MutipleStepBlundle bundle, final MutipleStep step, final Class classOfplugin) {
-    final Report pluginReport = MutipleStepUtils.executeStep(bundle, step, classOfplugin);
+  public static void executePlugin(final MultipleStepBundle bundle, final Step step) {
+    final Report pluginReport = MutipleStepUtils.executeStep(bundle, step);
     mergeReports(bundle.getJobPluginInfo(), pluginReport);
   }
 
-  public static Report executeStep(final MutipleStepBlundle bundle, final MutipleStep step, final Class classOfplugin) {
-    Plugin<?> plugin = RodaCoreFactory.getPluginManager().getPlugin(step.getPluginName(), classOfplugin);
+  public static Report executeStep(final MultipleStepBundle bundle, final Step step) {
+    Plugin<?> plugin = RodaCoreFactory.getPluginManager().getPlugin(step.getPluginName(), null);
     plugin.setMandatory(step.isMandatory());
     Map<String, String> mergedParams = new HashMap<>(bundle.getParameterValues());
     if (step.getParameters() != null) {
@@ -53,8 +52,7 @@ public class MutipleStepUtils {
 
       Report report = PluginHelper.initPluginReport(plugin);
       for (IsRODAObject rodaObject : bundle.getObjects()) {
-        Report reportItem = PluginHelper.initPluginReportItem(plugin, rodaObject.getId(), classOfplugin,
-          AIPState.INGEST_PROCESSING);
+        Report reportItem = PluginHelper.initPluginReportItem(plugin, rodaObject.getId(), IsRODAObject.class);
         reportItem.setPluginDetails(e.getMessage());
         reportItem.setPluginState(PluginState.FAILURE);
         report.addReport(reportItem);
@@ -67,7 +65,7 @@ public class MutipleStepUtils {
     }
   }
 
-  public static void mergeReports(final MutipleJobPluginInfo jobPluginInfo, final Report pluginReport) {
+  public static void mergeReports(final MultipleJobPluginInfo jobPluginInfo, final Report pluginReport) {
     if (pluginReport != null) {
       for (Report reportItem : pluginReport.getReports()) {
         jobPluginInfo.addReport(reportItem);

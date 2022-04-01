@@ -1,29 +1,32 @@
-package org.roda.core.plugins.mutiplePlugin;
+package org.roda.core.plugins.plugins.multiple;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.roda.core.data.exceptions.JobException;
+import org.roda.core.plugins.plugins.PluginHelper;
 
 /**
  * {@author João Gomes <jgomes@keep.pt>}.
  */
-public class MutipleStep {
+public class Step {
 
   private String pluginName;
+  private Class<?> pluginClass;
   private String parameterName;
   private boolean usesCorePlugin;
   private boolean mandatory;
   private Map<String, String> parameters;
 
-  public MutipleStep(final String pluginName, final String parameterName, final boolean usesCorePlugin,
-    final boolean mandatory, final boolean needsAips, final boolean removesAIPs) {
-    this(pluginName, parameterName, usesCorePlugin, mandatory, new HashMap<>());
+  public Step(final String pluginName, final Class<?> pluginClass, final String parameterName,
+    final boolean usesCorePlugin, final boolean mandatory) {
+    this(pluginName, pluginClass, parameterName, usesCorePlugin, mandatory, new HashMap<>());
   }
 
-  public MutipleStep(final String pluginName, final String parameterName, final boolean usesCorePlugin,
-    final boolean mandatory, final Map<String, String> parameters) {
+  public Step(final String pluginName, final Class<?> pluginClass, final String parameterName,
+    final boolean usesCorePlugin, final boolean mandatory, final Map<String, String> parameters) {
     this.pluginName = pluginName;
+    this.pluginClass = pluginClass;
     this.parameterName = parameterName;
     this.usesCorePlugin = usesCorePlugin;
     this.mandatory = mandatory;
@@ -36,6 +39,14 @@ public class MutipleStep {
 
   public void setPluginName(final String pluginName) {
     this.pluginName = pluginName;
+  }
+
+  public Class<?> getPluginClass() {
+    return pluginClass;
+  }
+
+  public void setPluginClass(Class<?> pluginClass) {
+    this.pluginClass = pluginClass;
   }
 
   public String getParameterName() {
@@ -70,7 +81,9 @@ public class MutipleStep {
     this.parameters = parameters;
   }
 
-  public void execute(final MutipleStepBlundle bundle, final Class classOfPlugin) throws JobException {
-    MutipleStepUtils.executePlugin(bundle, this, classOfPlugin);
+  public void execute(MultipleStepBundle bundle) throws JobException {
+    MutipleStepUtils.executePlugin(bundle, this);
+    PluginHelper.updateJobInformationAsync(bundle.getPlugin(),
+      bundle.getJobPluginInfo().incrementStepsCompletedByOne());
   }
 }

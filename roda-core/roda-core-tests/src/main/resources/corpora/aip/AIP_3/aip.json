@@ -10,10 +10,12 @@
   "representations": [{
     "id": "representation_1",
     "original": true,
-    "type": "MIXED"
+    "type": "MIXED",
+    "hasShallowFiles": false
   }, {
     "id": "representation_2",
     "original": false,
-    "type": "MIXED"
+    "type": "MIXED",
+    "hasShallowFiles": false
   }]
 }

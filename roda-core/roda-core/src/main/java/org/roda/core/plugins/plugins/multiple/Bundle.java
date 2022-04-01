@@ -1,4 +1,4 @@
-package org.roda.core.plugins.mutiplePlugin;
+package org.roda.core.plugins.plugins.multiple;
 
 import java.util.List;
 import java.util.Map;

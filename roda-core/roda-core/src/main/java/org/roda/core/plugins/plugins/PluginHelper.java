@@ -96,6 +96,7 @@ import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.plugins.orchestrate.MultipleJobPluginInfo;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateAipPackagePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateDipPackagePlugin;
@@ -530,6 +531,25 @@ public final class PluginHelper {
   }
 
   public static <T extends IsRODAObject> void updateJobReportMetaPluginInformation(Plugin<T> plugin, ModelService model,
+      Report metaPluginReport, Job cachedJob, MultipleJobPluginInfo jobPluginInfo) {
+
+    jobPluginInfo.getAllReports().forEach((key,reports) -> {
+      reports.forEach(report -> {
+        try {
+          Report jobReport = model.retrieveJobReport(cachedJob.getId(), report.getSourceObjectId(), report.getOutcomeObjectId());
+          jobReport.setTitle(cachedJob.getName());
+          jobReport.setPlugin(metaPluginReport.getPlugin());
+          jobReport.setPluginName(metaPluginReport.getPluginName());
+          jobReport.setPluginVersion(metaPluginReport.getPluginVersion());
+          model.createOrUpdateJobReport(jobReport, cachedJob);
+        } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+          LOGGER.error("Error while updating Job Report", e);
+        }
+      });
+    });
+  }
+
+  public static <T extends IsRODAObject> void updateJobReportMetaPluginInformation(Plugin<T> plugin, ModelService model,
     Report metaPluginReport, Job cachedJob, IngestJobPluginInfo jobPluginInfo) {
 
     jobPluginInfo.getAllReports().keySet().forEach((sourceObjectId) -> {
@@ -700,7 +720,11 @@ public final class PluginHelper {
     try {
       jobPluginInfo = plugin.getJobPluginInfo(SimpleJobPluginInfo.class);
     } catch (ClassCastException e) {
-      jobPluginInfo = plugin.getJobPluginInfo(IngestJobPluginInfo.class);
+      try {
+        jobPluginInfo = plugin.getJobPluginInfo(IngestJobPluginInfo.class);
+      } catch (ClassCastException ex) {
+        jobPluginInfo = plugin.getJobPluginInfo(MultipleJobPluginInfo.class);
+      }
     }
 
     if (jobPluginInfo != null) {
