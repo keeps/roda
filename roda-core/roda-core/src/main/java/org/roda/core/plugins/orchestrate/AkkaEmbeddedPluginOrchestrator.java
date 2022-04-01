@@ -394,6 +394,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   private <T extends IsRODAObject> JobPluginInfo getJobPluginInfo(Plugin<T> plugin) {
     if (PluginType.INGEST == plugin.getType()) {
       return new IngestJobPluginInfo();
+    } else if (PluginType.MULTI == plugin.getType()) {
+      return new MultipleJobPluginInfo();
     } else {
       return new SimpleJobPluginInfo();
     }

@@ -1,9 +1,13 @@
 package org.roda.core.plugins.orchestrate;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.plugins.Plugin;
@@ -13,16 +17,17 @@ import org.slf4j.LoggerFactory;
 /**
  * {@author João Gomes <jgomes@keep.pt>}.
  */
-public class MutipleJobPluginInfo extends JobPluginInfo {
+public class MultipleJobPluginInfo extends JobPluginInfo {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(MutipleJobPluginInfo.class);
-  private ArrayList<Report> allReports = new ArrayList<>();
+  private static final long serialVersionUID = 7384501181657834153L;
+  private static final Logger LOGGER = LoggerFactory.getLogger(MultipleJobPluginInfo.class);
+  private Map<String, List<Report>> allReports = new HashMap<>();
 
-  public MutipleJobPluginInfo() {
+  public MultipleJobPluginInfo() {
     super();
   }
 
-  public void update(final MutipleJobPluginInfo mutipleJobPluginInfo) {
+  public void update(final MultipleJobPluginInfo mutipleJobPluginInfo) {
     this.setTotalSteps(mutipleJobPluginInfo.getTotalSteps());
     this.setStepsCompleted(mutipleJobPluginInfo.getStepsCompleted());
     this.setCompletionPercentage(mutipleJobPluginInfo.getCompletionPercentage());
@@ -49,7 +54,7 @@ public class MutipleJobPluginInfo extends JobPluginInfo {
     int sourceObjectsProcessedWithSkipped = 0;
     int outcomeObjectsWithManualIntervention = 0;
     for (JobPluginInfo jpi : jobInfos.values()) {
-      final MutipleJobPluginInfo pluginInfo = (MutipleJobPluginInfo) jpi;
+      final MultipleJobPluginInfo pluginInfo = (MultipleJobPluginInfo) jpi;
       if (pluginInfo.getTotalSteps() > 0) {
         float pluginPercentage = pluginInfo.getCompletionPercentage() == 100 ? 1.0f : 0.0f;
         if (pluginInfo.getCompletionPercentage() != 100) {
@@ -68,7 +73,7 @@ public class MutipleJobPluginInfo extends JobPluginInfo {
       sourceObjectsCount += pluginInfo.getSourceObjectsCount();
     }
 
-    final MutipleJobPluginInfo mutipleJobPluginInfo = new MutipleJobPluginInfo();
+    final MultipleJobPluginInfo mutipleJobPluginInfo = new MultipleJobPluginInfo();
     mutipleJobPluginInfo.setCompletionPercentage(Math.round((percentage * 100)));
     mutipleJobPluginInfo.setSourceObjectsCount(sourceObjectsCount);
     mutipleJobPluginInfo.setSourceObjectsBeingProcessed(sourceObjectsBeingProcessed);
@@ -80,24 +85,30 @@ public class MutipleJobPluginInfo extends JobPluginInfo {
     return mutipleJobPluginInfo;
   }
 
-  public ArrayList<Report> getAllReports() {
+  public Map<String, List<Report>> getAllReports() {
     return this.allReports;
   }
 
   public void addReport(final Report report) {
-    allReports.add(report);
+    if (allReports.get(report.getSourceObjectId()) != null) {
+      allReports.get(report.getSourceObjectId()).add(report);
+    } else {
+      List<Report> reports = new ArrayList<>();
+      reports.add(report);
+      allReports.put(report.getSourceObjectId(), reports);
+    }
   }
 
   public void updateSourceObjectsProcessed() {
     int countSuccess = 0;
     int countPartialSuccess = 0;
     int countFailure = 0;
-    for (Report rootReport : getAllReports()) {
+    for (List<Report> reports : getAllReports().values()) {
       PluginState pluginState = PluginState.SUCCESS;
-      for (Report innerReport : rootReport.getReports()) {
-        switch (innerReport.getPluginState()) {
+      for (Report report : reports) {
+        switch (report.getPluginState()) {
           case FAILURE:
-            pluginState = innerReport.getPluginState();
+            pluginState = report.getPluginState();
             break;
           case PARTIAL_SUCCESS:
             if (!PluginState.FAILURE.equals(pluginState))
@@ -121,6 +132,7 @@ public class MutipleJobPluginInfo extends JobPluginInfo {
           break;
       }
     }
+
     setSourceObjectsProcessedWithFailure(countFailure);
     setSourceObjectsProcessedWithPartialSuccess(countPartialSuccess);
     setSourceObjectsProcessedWithSuccess(countSuccess);
@@ -129,8 +141,20 @@ public class MutipleJobPluginInfo extends JobPluginInfo {
 
   @Override
   public void finalizeInfo() {
+    super.finalizeInfo();
     setStepsCompleted(getTotalSteps());
     allReports = null;
+  }
+
+  public void updateMetaPluginInformation(Report metaReport, Job cachedJob) {
+    this.getAllReports().forEach((k, v) -> {
+      v.forEach(report -> {
+        report.setTitle(cachedJob.getName());
+        report.setPlugin(metaReport.getPlugin());
+        report.setPluginName(metaReport.getPluginName());
+        report.setPluginVersion(metaReport.getPluginVersion());
+      });
+    });
   }
 
   @Override

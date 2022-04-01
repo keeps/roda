@@ -8,5 +8,5 @@
 package org.roda.core.data.v2.jobs;
 
 public enum PluginType {
-  INGEST, INTERNAL, SIP_TO_AIP, AIP_TO_SIP, AIP_TO_AIP, MISC;
+  INGEST, INTERNAL, SIP_TO_AIP, AIP_TO_SIP, AIP_TO_AIP, MISC, MULTI;
 }

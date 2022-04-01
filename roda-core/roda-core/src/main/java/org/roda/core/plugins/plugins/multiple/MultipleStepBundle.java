@@ -1,4 +1,4 @@
-package org.roda.core.plugins.mutiplePlugin;
+package org.roda.core.plugins.plugins.multiple;
 
 import java.util.List;
 import java.util.Map;
@@ -9,27 +9,27 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.plugins.orchestrate.MutipleJobPluginInfo;
+import org.roda.core.plugins.orchestrate.MultipleJobPluginInfo;
 import org.roda.core.storage.StorageService;
 
 /**
  * {@author João Gomes <jgomes@keep.pt>}.
  */
-public class MutipleStepBlundle implements Bundle {
+public class MultipleStepBundle {
 
   private Plugin<?> plugin;
   private IndexService index;
   private ModelService model;
   private StorageService storage;
-  private MutipleJobPluginInfo mutipleJobPluginInfo;
+  private MultipleJobPluginInfo mutipleJobPluginInfo;
   private PluginParameter pluginParameter;
   private Map<String, String> parameterValues;
-  private List<IsRODAObject> objects;
+  private List<? extends IsRODAObject> objects;
   private Job cachedJob;
 
-  public MutipleStepBlundle(final Plugin<?> plugin, final IndexService index, final ModelService model,
-    final StorageService storage, final MutipleJobPluginInfo mutipleJobPluginInfo,
-    final PluginParameter pluginParameter, final Map<String, String> parameterValues, final List<IsRODAObject> objects,
+  public MultipleStepBundle(final Plugin<?> plugin, final IndexService index, final ModelService model,
+    final StorageService storage, final MultipleJobPluginInfo mutipleJobPluginInfo,
+    final PluginParameter pluginParameter, final Map<String, String> parameterValues, final List<? extends IsRODAObject> objects,
     final Job cachedJob) {
 
     this.plugin = plugin;
@@ -43,89 +43,75 @@ public class MutipleStepBlundle implements Bundle {
     this.cachedJob = cachedJob;
   }
 
-  @Override
   public Plugin<?> getPlugin() {
     return plugin;
   }
 
-  @Override
   public void setPlugin(final Plugin<?> plugin) {
     this.plugin = plugin;
   }
 
-  @Override
   public IndexService getIndex() {
     return index;
   }
 
-  @Override
   public void setIndex(final IndexService index) {
     this.index = index;
   }
 
-  @Override
   public ModelService getModel() {
     return model;
   }
 
-  @Override
   public void setModel(final ModelService model) {
     this.model = model;
   }
 
-  @Override
   public StorageService getStorage() {
     return storage;
   }
 
-  @Override
   public void setStorage(final StorageService storage) {
     this.storage = storage;
   }
 
-  public MutipleJobPluginInfo getJobPluginInfo() {
+  public MultipleJobPluginInfo getJobPluginInfo() {
     return mutipleJobPluginInfo;
   }
 
-  public void setJobPluginInfo(MutipleJobPluginInfo mutipleJobPluginInfo) {
-    this.mutipleJobPluginInfo = mutipleJobPluginInfo;
+  public void setJobPluginInfo(MultipleJobPluginInfo multipleJobPluginInfo) {
+    this.mutipleJobPluginInfo = multipleJobPluginInfo;
   }
 
-  @Override
   public PluginParameter getPluginParameter() {
     return pluginParameter;
   }
 
-  @Override
   public void setPluginParameter(final PluginParameter pluginParameter) {
     this.pluginParameter = pluginParameter;
   }
 
-  @Override
   public Map<String, String> getParameterValues() {
     return parameterValues;
   }
 
-  @Override
   public void setParameterValues(final Map<String, String> parameterValues) {
     this.parameterValues = parameterValues;
   }
 
-  @Override
   public Job getCachedJob() {
     return cachedJob;
   }
 
-  @Override
   public void setCachedJob(final Job cachedJob) {
     this.cachedJob = cachedJob;
   }
 
-  public List<IsRODAObject> getObjects() {
+  public List<? extends IsRODAObject> getObjects() {
     return objects;
   }
 
-  public void setObjects(final List<IsRODAObject> objects) {
+  public void setObjects(final List<? extends IsRODAObject> objects) {
     this.objects = objects;
   }
 }

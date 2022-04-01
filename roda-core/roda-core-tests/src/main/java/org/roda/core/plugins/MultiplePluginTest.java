@@ -10,7 +10,7 @@ package org.roda.core.plugins;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.roda.core.CorporaConstants;
@@ -18,19 +18,14 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.plugins.DummyPlugin;
-import org.roda.core.plugins.plugins.MultiplePlugin;
-import org.roda.core.plugins.plugins.characterization.PremisSkeletonPlugin;
+import org.roda.core.plugins.plugins.multiple.MultiplePlugin;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -39,8 +34,8 @@ import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 /**
@@ -58,7 +53,7 @@ public class MultiplePluginTest {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MultiplePluginTest.class);
 
-  @BeforeMethod
+  @BeforeClass
   public void setUp() throws Exception {
     basePath = TestsHelper.createBaseTempDir(getClass(), true);
 
@@ -69,9 +64,11 @@ public class MultiplePluginTest {
     boolean deployPluginManager = true;
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-      deployPluginManager, deployDefaultResources);
+      deployPluginManager, deployDefaultResources, false);
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
+
+    RodaCoreFactory.getPluginManager().registerPlugin(new MultiplePlugin());
 
     URL corporaURL = MultiplePluginTest.class.getResource("/corpora");
     corporaPath = Paths.get(corporaURL.toURI());
@@ -80,28 +77,28 @@ public class MultiplePluginTest {
     LOGGER.info("Running AIP corruption risk assessment tests under storage {}", basePath);
   }
 
-  @AfterMethod
+  @AfterClass
   public void tearDown() throws Exception {
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }
 
   @Test
-  public void testMutiplePlugin() throws RODAException {
-    String aipId = IdUtils.createUUID();
-    model.createAIP(aipId, corporaService,
-      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_CORRUPTED),
-      RodaConstants.ADMIN);
+  public void testMultiplePlugin() throws RODAException {
+    // generate AIP ID
+    final String aipCorporaId = CorporaConstants.SOURCE_AIP_ID_3;
+    final String aipId = IdUtils.createUUID();
+    final DefaultStoragePath aipPath = DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, aipCorporaId);
+    model.createAIP(aipId, corporaService, aipPath, RodaConstants.ADMIN);
 
-    Job job = TestsHelper.executeJob(MultiplePlugin.class, PluginType.AIP_TO_AIP,
-      SelectedItemsList.create(AIP.class, Arrays.asList(aipId)));
-    
+    Job job = TestsHelper.executeJob(MultiplePlugin.class, PluginType.MULTI,
+      SelectedItemsList.create(AIP.class, Collections.singletonList(aipId)));
+
     List<Report> jobReports = TestsHelper.getJobReports(index, job, false);
 
-    // 3 errors: 1 checksum checking error, 1 file without premis, 1 premis
-    // without file
-    Assert.assertEquals(jobReports.get(0).getReports().size(), 2);
-    Assert.assertEquals(jobReports.get(0).getTotalSteps().intValue(), 2);
+    Assert.assertEquals(job.getJobStats().getSourceObjectsBeingProcessed(), 0);
+    Assert.assertEquals(jobReports.get(0).getReports().size(), 3);
+    Assert.assertEquals(jobReports.get(0).getTotalSteps().intValue(), 3);
     Assert.assertEquals(jobReports.get(0).getCompletionPercentage().intValue(), 100);
   }
 }
