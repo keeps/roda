@@ -88,8 +88,7 @@ public class InternalWebAuthFilter implements Filter {
     } else if (requestURI.endsWith("/logout")) {
       UserLogin.logout(httpRequest, Collections.emptyList());
 
-      redirect(httpResponse, uri);
-
+      redirect(httpResponse, uri.setFragment("welcome"));
     } else {
       chain.doFilter(request, response);
     }
