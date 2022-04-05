@@ -1,7 +1,6 @@
 package org.roda.core.plugins.orchestrate;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +60,10 @@ public class MultipleJobPluginInfo extends JobPluginInfo {
           pluginPercentage = ((float) pluginInfo.getStepsCompleted()) / pluginInfo.getTotalSteps();
         }
         float pluginWeight = ((float) pluginInfo.getSourceObjectsCount()) / taskObjectsCount;
+        if (Float.isNaN(pluginWeight)) {
+          pluginWeight = 1;
+        }
+
         percentage += (pluginPercentage * pluginWeight);
 
         sourceObjectsProcessedWithSuccess += pluginInfo.getSourceObjectsProcessedWithSuccess();

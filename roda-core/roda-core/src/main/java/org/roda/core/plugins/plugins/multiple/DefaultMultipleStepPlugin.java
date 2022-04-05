@@ -11,6 +11,7 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -41,6 +42,11 @@ public abstract class DefaultMultipleStepPlugin<T extends IsRODAObject> extends 
   @Override
   public void shutdown() {
     // do nothing
+  }
+
+  @Override
+  public PluginType getType() {
+    return PluginType.MULTI;
   }
 
   @Override
