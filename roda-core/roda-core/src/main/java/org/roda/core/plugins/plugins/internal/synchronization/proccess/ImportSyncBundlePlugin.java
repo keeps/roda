@@ -35,6 +35,7 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -115,6 +116,7 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER)) {
       instanceIdentifier = parameters.get(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER);
     }
+    getParameterValues().put(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS, getClass().getName());
   }
 
   @Override
@@ -200,8 +202,9 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
   }
 
   private void importSyncBundle(final ModelService model, final IndexService index, final StorageService storage,
-    final Report report, final Job cachedJob, final JobPluginInfo jobPluginInfo) {
+    final Report report, final Job cachedJob, final JobPluginInfo jobPluginInfo) throws PluginException {
     if (Files.exists(Paths.get(bundlePath))) {
+      report.setSourceAndOutcomeObjectClass(AIP.class.getName(), AIP.class.getName());
       Path bundleWorkingDir = null;
       try {
         bundleWorkingDir = SyncUtils.extractBundle(instanceIdentifier, Paths.get(bundlePath));
@@ -209,9 +212,10 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
         validateChecksum(bundleWorkingDir, bundleState);
         importStorage(model, index, storage, cachedJob, bundleWorkingDir, bundleState, jobPluginInfo, report);
         SyncUtils.copyAttachments(instanceIdentifier);
-        // Vai ser feito depois do reindex
-        // deleteAndValidateEntities(instanceIdentifier, bundleWorkingDir,
-        // bundleState.getEntitiesBundle());
+
+        // Delete entities
+        ImportUtils.deleteBundleEntities(model, index, storage, cachedJob, this, jobPluginInfo, instanceIdentifier,
+          bundleWorkingDir, bundleState.getEntitiesBundle(), report);
 
         DistributedInstance distributedInstance = model.retrieveDistributedInstance(instanceIdentifier);
         distributedInstance.setLastSyncDate(bundleState.getToDate());
