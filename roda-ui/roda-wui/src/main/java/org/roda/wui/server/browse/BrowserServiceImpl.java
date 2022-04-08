@@ -34,6 +34,7 @@ import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
+import org.roda.core.data.exceptions.JobStateNotPendingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -43,9 +44,6 @@ import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.synchronization.central.DistributedInstance;
-import org.roda.core.data.v2.synchronization.central.DistributedInstances;
-import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
@@ -87,6 +85,9 @@ import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
+import org.roda.core.data.v2.synchronization.central.DistributedInstances;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.schema.SolrCollectionRegistry;
@@ -548,6 +549,18 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Jobs.stopJob(user, jobId);
+  }
+
+  public void approveJob(Job job) throws RequestNotValidException, AuthorizationDeniedException, NotFoundException,
+          GenericException, JobAlreadyStartedException, JobStateNotPendingException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Jobs.approveJob(user, job, true);
+  }
+
+  public void rejectJob(Job job, String details) throws RequestNotValidException, AuthorizationDeniedException, NotFoundException,
+          GenericException, JobAlreadyStartedException, JobStateNotPendingException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Jobs.rejectJob(user, job, details);
   }
 
   @Override

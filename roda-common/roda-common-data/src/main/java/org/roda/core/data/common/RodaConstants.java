@@ -361,6 +361,7 @@ public final class RodaConstants {
   public static final String API_QUERY_KEY_EXPORT_FACETS = "exportFacets";
   public static final String API_QUERY_KEY_FILENAME = "filename";
   public static final String API_QUERY_KEY_FILE = "file";
+  public static final String API_QUERY_JOB_DETAILS = "details";
   // "http path param" related strings
   public static final String API_PATH_PARAM_AIP_ID = "aip_id";
   public static final String API_PATH_PARAM_REPRESENTATION_ID = "representation_id";
@@ -1765,6 +1766,10 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_LIST_DISPOSAL_HOLDS = "org.roda.wui.api.controllers.Browser.listDisposalHolds";
 
   public static final String PERMISSION_METHOD_STOP_JOB = "org.roda.wui.api.controllers.Jobs.stopJob";
+
+  public static final String PERMISSION_METHOD_APPROVE_JOB = "org.roda.wui.api.controllers.Jobs.approveJob";
+
+  public static final String PERMISSION_METHOD_REJECT_JOB = "org.roda.wui.api.controllers.Jobs.rejectJob";
 
   public static final String ENV_CONFIG_SYMBOLIC_LINKS_FORBIDDEN = "RODA_CONFIG_SYMBOLIC_LINKS_FORBIDDEN";
 
