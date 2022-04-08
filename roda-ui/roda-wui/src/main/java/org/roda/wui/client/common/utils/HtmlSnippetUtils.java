@@ -282,6 +282,10 @@ public class HtmlSnippetUtils {
         ret = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + messages.showJobStatusCreated() + CLOSE_SPAN);
       } else if (JOB_STATE.STARTED.equals(state)) {
         ret = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + messages.showJobStatusStarted() + CLOSE_SPAN);
+      } else if (JOB_STATE.PENDING_APPROVAL.equals(state)) {
+        ret = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusPendingApproval() + CLOSE_SPAN);
+      } else if (JOB_STATE.REJECTED.equals(state)) {
+        ret = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.showJobStatusApprovalRejected() + CLOSE_SPAN);
       } else if (JOB_STATE.TO_BE_CLEANED.equals(state)) {
         ret = SafeHtmlUtils
           .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusToBeCleaned() + CLOSE_SPAN);

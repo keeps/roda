@@ -22,8 +22,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
 import org.glassfish.jersey.server.JSONP;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.StreamResponse;
@@ -42,6 +40,8 @@ import org.roda.wui.api.v1.utils.ExtraMediaType;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @Path(JobsResource.ENDPOINT)
 @Api(value = JobsResource.SWAGGER_ENDPOINT)
@@ -146,6 +146,51 @@ public class JobsResource {
     org.roda.wui.api.controllers.Jobs.stopJob(user, jobId);
     return Response.ok("Stopped", mediaType).build();
   }
+
+  @GET
+  @Path("/{" + RodaConstants.API_PATH_PARAM_JOB_ID + "}/approve")
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
+  @ApiOperation(value = "Approve job", notes = "Approve a particular job.", response = Job.class)
+  public Response approveJob(@PathParam(RodaConstants.API_PATH_PARAM_JOB_ID) String jobId,
+                            @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+                            @ApiParam(value = "JSONP callback name", required = false, allowMultiple = false, defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+          throws RODAException {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+
+    // get user
+    User user = UserUtility.getApiUser(request);
+
+    //getJob
+    Job job = org.roda.wui.api.controllers.Browser.retrieve(user, Job.class, jobId, new ArrayList<>());
+    // delegate action to controller
+    org.roda.wui.api.controllers.Jobs.approveJob(user, job, true);
+    return Response.ok("Approved", mediaType).build();
+  }
+
+  @GET
+  @Path("/{" + RodaConstants.API_PATH_PARAM_JOB_ID + "}/reject")
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
+  @ApiOperation(value = "Reject job", notes = "Reject a particular job.", response = Job.class)
+  public Response rejectJob(@PathParam(RodaConstants.API_PATH_PARAM_JOB_ID) String jobId,
+                          @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+                          @QueryParam(RodaConstants.API_QUERY_JOB_DETAILS) String details,
+                          @ApiParam(value = "JSONP callback name", required = false, allowMultiple = false, defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+          throws RODAException {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+
+    // get user
+    User user = UserUtility.getApiUser(request);
+
+    //getJob
+    Job job = org.roda.wui.api.controllers.Browser.retrieve(user, Job.class, jobId, new ArrayList<>());
+
+    // delegate action to controller
+    org.roda.wui.api.controllers.Jobs.rejectJob(user, job, details);
+    return Response.ok("Rejected", mediaType).build();
+  }
+
 
   @DELETE
   @Path("/{" + RodaConstants.API_PATH_PARAM_JOB_ID + "}")
