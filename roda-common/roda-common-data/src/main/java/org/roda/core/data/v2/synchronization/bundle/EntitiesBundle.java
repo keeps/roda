@@ -10,9 +10,6 @@ public class EntitiesBundle implements Serializable {
 
   private String aipFileName;
   private String dipFileName;
-  private String jobFileName;
-  private String preservationAgentFileName;
-  private String repositoryEventFileName;
   private String riskFileName;
 
   public EntitiesBundle() {
@@ -32,30 +29,6 @@ public class EntitiesBundle implements Serializable {
 
   public void setDipFileName(String dipFileName) {
     this.dipFileName = dipFileName;
-  }
-
-  public String getJobFileName() {
-    return jobFileName;
-  }
-
-  public void setJobFileName(String jobFileName) {
-    this.jobFileName = jobFileName;
-  }
-
-  public String getPreservationAgentFileName() {
-    return preservationAgentFileName;
-  }
-
-  public void setPreservationAgentFileName(String preservationAgentFileName) {
-    this.preservationAgentFileName = preservationAgentFileName;
-  }
-
-  public String getRepositoryEventFileName() {
-    return repositoryEventFileName;
-  }
-
-  public void setRepositoryEventFileName(String repositoryEventFileName) {
-    this.repositoryEventFileName = repositoryEventFileName;
   }
 
   public String getRiskFileName() {

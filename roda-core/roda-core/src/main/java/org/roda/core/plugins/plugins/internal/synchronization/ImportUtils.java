@@ -1,12 +1,19 @@
 package org.roda.core.plugins.plugins.internal.synchronization;
 
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.SyncUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
@@ -15,11 +22,14 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.utils.CentralEntitiesJsonUtils;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -29,7 +39,10 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.synchronization.bundle.BundleState;
 import org.roda.core.data.v2.synchronization.bundle.CentralEntities;
 import org.roda.core.data.v2.synchronization.bundle.EntitiesBundle;
+import org.roda.core.data.v2.synchronization.bundle.Issue;
 import org.roda.core.data.v2.synchronization.bundle.PackageState;
+import org.roda.core.data.v2.synchronization.bundle.RemovedEntity;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelObserver;
@@ -46,6 +59,9 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 
@@ -209,25 +225,32 @@ public class ImportUtils {
     }
   }
 
-  public static void deleteBundleEntities(final ModelService model, final IndexService index, StorageService storage,
+  public static int deleteBundleEntities(final ModelService model, final IndexService index, StorageService storage,
     final Job cachedJob, Plugin<? extends IsRODAObject> plugin, final JobPluginInfo jobPluginInfo,
     final String instanceIdentifier, final Path bundleWorkingDir, final EntitiesBundle entitiesBundle,
-    final Report reportItem) {
+    final Report reportItem, final CentralEntities centralEntities) {
     final Map<Path, Class<? extends IsIndexed>> entitiesPathMap = SyncUtils.createEntitiesPaths(bundleWorkingDir,
       entitiesBundle);
-    final CentralEntities centralEntities = new CentralEntities();
+    final StringBuilder fileNameBuilder = new StringBuilder();
+    fileNameBuilder.append(RodaConstants.SYNCHRONIZATION_REMOVED_FILE).append("_").append(instanceIdentifier)
+      .append(".jsonl");
+    final Path temporaryReportPath = bundleWorkingDir.resolve(fileNameBuilder.toString());
+    createReport(temporaryReportPath);
+    int removed = 0;
     for (Map.Entry entry : entitiesPathMap.entrySet()) {
-      deleteRodaObject(model, index, cachedJob, jobPluginInfo, plugin, (Path) entry.getKey(),
-        (Class<? extends IsIndexed>) entry.getValue(), instanceIdentifier, centralEntities, reportItem);
+      removed += deleteRodaObject(model, index, cachedJob, jobPluginInfo, plugin, (Path) entry.getKey(),
+        (Class<? extends IsIndexed>) entry.getValue(), instanceIdentifier, temporaryReportPath, reportItem);
     }
+    moveReportToSynchronizationFolder(temporaryReportPath);
+    return removed;
   }
 
-  private static void deleteRodaObject(final ModelService model, final IndexService index, final Job cachedJob,
+  private static int deleteRodaObject(final ModelService model, final IndexService index, final Job cachedJob,
     final JobPluginInfo jobPluginInfo, Plugin<? extends IsRODAObject> plugin, final Path readPath,
-    final Class<? extends IsIndexed> indexedClass, final String instanceIdentifier,
-    final CentralEntities centralEntities, final Report report) {
+    final Class<? extends IsIndexed> indexedClass, final String instanceIdentifier, final Path temporaryReportPath,
+    final Report report) {
     final List<String> listToRemove = getListToRemove(index, readPath, indexedClass, instanceIdentifier);
-
+    int removed = 0;
     if (!listToRemove.isEmpty()) {
       try {
         final List<? extends IsRODAObject> objectsToRemove = JobsHelper.getObjectsFromUUID(model, index,
@@ -235,16 +258,43 @@ public class ImportUtils {
         int sourceObjects = jobPluginInfo.getSourceObjectsCount() + listToRemove.size();
         jobPluginInfo.setSourceObjectsCount(sourceObjects);
         for (IsRODAObject object : objectsToRemove) {
+          final String id = object.getId();
           DeleteRodaObjectPluginUtils.process(index, model, report, cachedJob, jobPluginInfo, plugin, object, "", true,
             false);
+          final RemovedEntity removedEntity = new RemovedEntity(id, indexedClass.getName());
+          writeJsonLinesReport(temporaryReportPath, removedEntity);
         }
+        removed = listToRemove.size();
 
       } catch (final Exception e) {
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         report.addPluginDetails(e.getMessage());
         report.setPluginState(PluginState.FAILURE);
       }
+    }
+    return removed;
+  }
 
+  /**
+   * Sets the lists of removed entities in {@link CentralEntities} by the given
+   * {@link Class<? extends IsIndexed>}.
+   *
+   * @param centralEntities
+   *          {@link CentralEntities}.
+   * @param listToRemove
+   *          {@link List}.
+   * @param indexedClass
+   *          {@link Class<? extends IsIndexed>}.
+   */
+  private static void setRemovedEntities(final CentralEntities centralEntities, final List<String> listToRemove,
+    final Class<? extends IsIndexed> indexedClass) {
+
+    if (indexedClass == IndexedAIP.class) {
+      centralEntities.setAipsList(new ArrayList<>(listToRemove));
+    } else if (indexedClass == IndexedDIP.class) {
+      centralEntities.setDipsList(new ArrayList<>(listToRemove));
+    } else {
+      centralEntities.setRisksList(new ArrayList<>(listToRemove));
     }
   }
 
@@ -286,5 +336,205 @@ public class ImportUtils {
       LOGGER.error("Error getting AIP iterator when creating aip list", e);
     }
     return listToRemove;
+  }
+
+  // Validate Roda Central Entities
+
+  /**
+   * Creates and Iterates through the {@link Map} with the class and the path to
+   * the entities.
+   * 
+   * @param index
+   *          {@link IndexService}
+   * @param bundleWorkingDir
+   *          {@link Path}
+   * @param entitiesBundle
+   *          {@link EntitiesBundle}
+   * @param instanceIdentifier
+   *          {@link String}
+   * @param syncErrors
+   *          number of errors in synchronization
+   */
+  public static void validateEntitiesBundle(final IndexService index, final Path bundleWorkingDir,
+    final EntitiesBundle entitiesBundle, final String instanceIdentifier, int syncErrors) {
+    final Map<Path, Class<? extends IsIndexed>> entitiesPathMap = SyncUtils.createEntitiesPaths(bundleWorkingDir,
+      entitiesBundle);
+    final StringBuilder fileNameBuilder = new StringBuilder();
+    fileNameBuilder.append(RodaConstants.SYNCHRONIZATION_ISSUES_FILE).append("_").append(instanceIdentifier)
+      .append(".jsonl");
+    final Path temporaryReportPath = bundleWorkingDir.resolve(fileNameBuilder.toString());
+    createReport(temporaryReportPath);
+    for (Map.Entry entry : entitiesPathMap.entrySet()) {
+      syncErrors += validateCentralEntities(index, temporaryReportPath, (Path) entry.getKey(),
+        (Class<? extends IsIndexed>) entry.getValue());
+    }
+    moveReportToSynchronizationFolder(temporaryReportPath);
+  }
+
+  /**
+   * Read the Local Instance list of entities and checks if Central instance have
+   * this entity.
+   *
+   * @param temporaryReportPath
+   *          {@link Path}
+   * @param readPath
+   *          {@link Path}.
+   * @param indexedClass
+   *          {@link Class<? extends IsIndexed>}.
+   */
+  private static int validateCentralEntities(final IndexService index, final Path temporaryReportPath,
+    final Path readPath, final Class<? extends IsIndexed> indexedClass) {
+    String id = null;
+    int errors = 0;
+    try {
+      final JsonParser jsonParser = CentralEntitiesJsonUtils.createJsonParser(readPath);
+      while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
+        id = jsonParser.getText();
+        final JsonToken token = jsonParser.currentToken();
+        if ((id != null) && !id.isEmpty() && (token != JsonToken.START_ARRAY) && (token != JsonToken.END_ARRAY)) {
+          index.retrieve(indexedClass, id, Collections.singletonList(RodaConstants.INDEX_UUID));
+        }
+      }
+    } catch (NotFoundException | GenericException e) {
+      final Issue issue = new Issue(id, RodaConstants.SYNCHRONIZATION_ISSUE_TYPE_MISSING, indexedClass.getName());
+      writeJsonLinesReport(temporaryReportPath, issue);
+      errors++;
+    } catch (final IOException e) {
+      LOGGER.error("Can't read the json file {}", e.getMessage());
+    }
+
+    return errors;
+  }
+
+  /**
+   * Sets the lists of missing entities in {@link CentralEntities} by the given
+   * {@link Class<? extends IsIndexed>}.
+   *
+   * @param centralEntities
+   *          {@link CentralEntities}.
+   * @param missingList
+   *          {@link List}.
+   * @param indexedClass
+   *          {@link Class<? extends IsIndexed>}.
+   */
+  private static void setMissingEntities(final CentralEntities centralEntities, final List<String> missingList,
+    final Class<? extends IsIndexed> indexedClass) {
+
+    if (indexedClass == IndexedAIP.class) {
+      centralEntities.setMissingAips(new ArrayList<>(missingList));
+    } else if (indexedClass == IndexedDIP.class) {
+      centralEntities.setDipsList(new ArrayList<>(missingList));
+    } else {
+      centralEntities.setRisksList(new ArrayList<>(missingList));
+    }
+  }
+
+  private static void createReport(final Path temporaryReportPath) {
+    try {
+      Files.deleteIfExists(temporaryReportPath);
+      Files.createFile(temporaryReportPath);
+    } catch (final IOException e) {
+      LOGGER.error("Can't create Report file {} because {}", temporaryReportPath, e.getMessage());
+    }
+  }
+
+  private static void moveReportToSynchronizationFolder(final Path temporaryReportPath) {
+    final Path reportPath = RodaCoreFactory.getSynchronizationDirectoryPath()
+      .resolve(temporaryReportPath.getFileName().toString());
+    try {
+      Files.move(temporaryReportPath, reportPath, StandardCopyOption.REPLACE_EXISTING);
+    } catch (final IOException e) {
+      LOGGER.error("Can't move Report file to {} because {}", reportPath, e.getMessage());
+    }
+  }
+
+  private static void writeJsonLinesReport(final Path path, final Object object) {
+    try {
+      JsonUtils.appendObjectToFile(object, path);
+    } catch (final GenericException e) {
+      LOGGER.error("Can't write the object in file {} because {}", path, e.getMessage());
+    }
+  }
+
+  public static void createLastSyncFile(final Path bundleWorkingDir, final DistributedInstance distributedInstance,
+    final int updatedInstances, final int removed) throws IOException {
+    final StringBuilder fileNameBuilder = new StringBuilder();
+    fileNameBuilder.append(RodaConstants.SYNCHRONIZATION_REPORT_FILE).append("_").append(distributedInstance.getId())
+      .append(".json");
+    final Path temporaryReportPath = bundleWorkingDir.resolve(fileNameBuilder.toString());
+    createReport(temporaryReportPath);
+    OutputStream outputStream = null;
+    JsonGenerator jsonGenerator = null;
+    try {
+      if (temporaryReportPath != null) {
+        outputStream = new BufferedOutputStream(new FileOutputStream(temporaryReportPath.toFile()));
+        final JsonFactory jsonFactory = new JsonFactory();
+        jsonGenerator = jsonFactory.createGenerator(outputStream, JsonEncoding.UTF8).useDefaultPrettyPrinter();
+      }
+
+      writeLastSyncFile(jsonGenerator, distributedInstance, updatedInstances, removed);
+    } catch (final IOException e) {
+      LOGGER.error("Can't create report with the summary of synchronization {}", e.getMessage());
+    } finally {
+      if (jsonGenerator != null) {
+        jsonGenerator.close();
+      }
+      if (outputStream != null) {
+        outputStream.close();
+      }
+    }
+    moveReportToSynchronizationFolder(temporaryReportPath);
+  }
+
+  private static void writeLastSyncFile(final JsonGenerator jsonGenerator,
+    final DistributedInstance distributedInstance, final int updatedInstances, final int removed) {
+
+    try {
+      jsonGenerator.writeStartObject();
+      jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_UUID, null);
+      jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_INSTANCE_ID, distributedInstance.getId());
+      jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_FROM_DATE,
+        distributedInstance.getLastSyncDate().toString());
+      jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_STATUS,
+        distributedInstance.getStatus().toString());
+      jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_JOB, null);
+
+      // Updated / Added object
+      jsonGenerator.writeFieldName(RodaConstants.SYNCHRONIZATION_REPORT_KEY_UPDATED_AND_ADDED);
+      jsonGenerator.writeStartObject();
+      jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_DESCRIPTION,
+        RodaConstants.SYNCHRONIZATION_REPORT_VALUE_UPDATED_AND_ADDED_DESCRIPTION);
+      jsonGenerator.writeNumberField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_COUNT, updatedInstances);
+      jsonGenerator.writeEndObject();
+
+      // Removed object
+      jsonGenerator.writeFieldName(RodaConstants.SYNCHRONIZATION_REPORT_KEY_REMOVED);
+      jsonGenerator.writeStartObject();
+      jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_DESCRIPTION,
+        RodaConstants.SYNCHRONIZATION_REPORT_VALUE_REMOVED_DESCRIPTION);
+      jsonGenerator.writeNumberField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_COUNT, removed);
+      jsonGenerator.writeEndObject();
+
+      // ISSUES object
+      jsonGenerator.writeFieldName(RodaConstants.SYNCHRONIZATION_REPORT_KEY_ISSUES);
+      jsonGenerator.writeStartObject();
+      jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_DESCRIPTION,
+        RodaConstants.SYNCHRONIZATION_REPORT_VALUE_ISSUES_DESCRIPTION);
+      jsonGenerator.writeNumberField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_COUNT,
+        distributedInstance.getSyncErrors());
+      jsonGenerator.writeEndObject();
+
+      jsonGenerator.writeEndObject();
+    } catch (final IOException e) {
+      LOGGER.error("Can't write report with the summary of synchronization {}", e.getMessage());
+    }
+
+  }
+
+  public static int getUpdatedInstances(final BundleState bundleState) {
+    final AtomicInteger count = new AtomicInteger(0);
+    final List<PackageState> packageStateList = bundleState.getPackageStateList();
+    packageStateList.stream().forEach(packageState -> count.addAndGet(packageState.getCount()));
+    return count.get();
   }
 }

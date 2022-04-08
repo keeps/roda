@@ -571,37 +571,6 @@ public class SyncUtils {
   }
 
   /**
-   * Write the file with the entities removed and the missing entities from the
-   * last synchronization.
-   * 
-   * @param centralEntities
-   *          {@link CentralEntities}.
-   * @param instanceIdentifier
-   *          The instance identifier.
-   * @throws IOException
-   *           if some i/o error occurs.
-   */
-  public static void writeEntitiesFile(final CentralEntities centralEntities, String instanceIdentifier)
-    throws IOException {
-    final StringBuilder fileNameBuilder = new StringBuilder();
-    fileNameBuilder.append(RodaConstants.SYNCHRONIZATION_REPORT_FILE).append("_").append(instanceIdentifier)
-      .append(".json");
-
-    final Path temporaryPath = RodaCoreFactory.getWorkingDirectory().resolve(fileNameBuilder.toString());
-    final Path lastSyncReportPath = RodaCoreFactory.getSynchronizationDirectoryPath()
-      .resolve(fileNameBuilder.toString());
-
-    try {
-      Files.deleteIfExists(temporaryPath);
-      Files.createFile(temporaryPath);
-      CentralEntitiesJsonUtils.writeJsonToFile(centralEntities, temporaryPath);
-      Files.move(temporaryPath, lastSyncReportPath, StandardCopyOption.REPLACE_EXISTING);
-    } catch (final IOException e) {
-      Files.deleteIfExists(temporaryPath);
-    }
-  }
-
-  /**
    * Get the stream response from the given path.
    * 
    * @param path

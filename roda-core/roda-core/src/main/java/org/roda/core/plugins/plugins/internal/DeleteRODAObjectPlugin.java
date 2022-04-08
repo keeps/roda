@@ -132,23 +132,8 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<T> plugin, T object) {
-        if (object instanceof AIP) {
-          processAIP(index, model, report, jobPluginInfo, cachedJob, (AIP) object);
-        } else if (object instanceof File) {
-          processFile(index, model, report, jobPluginInfo, cachedJob, (File) object);
-        } else if (object instanceof Representation) {
-          processRepresentation(index, model, report, jobPluginInfo, cachedJob, (Representation) object);
-        } else if (object instanceof Risk) {
-          processRisk(index, model, report, jobPluginInfo, cachedJob, (Risk) object);
-        } else if (object instanceof RepresentationInformation) {
-          processRepresentationInformation(model, report, jobPluginInfo, cachedJob, (RepresentationInformation) object);
-        } else if (object instanceof RiskIncidence) {
-          processRiskIncidence(model, report, jobPluginInfo, cachedJob, (RiskIncidence) object);
-        } else if (object instanceof DIP) {
-          processDIP(model, report, jobPluginInfo, cachedJob, (DIP) object);
-        } else if (object instanceof DIPFile) {
-          processDIPFile(model, report, jobPluginInfo, cachedJob, (DIPFile) object);
-        }
+        DeleteRodaObjectPluginUtils.process(index, model, report, cachedJob, jobPluginInfo, plugin, object, details,
+          dontCheckRelatives);
       }
     }, index, model, storage, liteList);
   }
