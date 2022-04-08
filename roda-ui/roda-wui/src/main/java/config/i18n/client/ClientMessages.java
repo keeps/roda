@@ -485,6 +485,10 @@ public interface ClientMessages extends Messages {
 
   String stopButton();
 
+  String approveButton();
+
+  String rejectButton();
+
   String listButton();
 
   String downloadButton();
@@ -593,6 +597,10 @@ public interface ClientMessages extends Messages {
 
   String showJobStatusStarted();
 
+  String showJobStatusPendingApproval();
+
+  String showJobStatusApprovalRejected();
+
   String showJobStatusCompleted();
 
   String showJobStatusFailedDuringCreation();
@@ -640,6 +648,14 @@ public interface ClientMessages extends Messages {
   String jobStopConfirmDialogTitle();
 
   String jobStopConfirmDialogMessage();
+
+  String jobApproveConfirmDialogTitle();
+
+  String jobApproveConfirmDialogMessage();
+
+  String jobRejectConfirmDialogTitle();
+
+  String jobRejectConfirmDialogMessage();
 
   /************* Generic remove toast and dialog ****************/
 

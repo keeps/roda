@@ -1637,6 +1637,12 @@ public final class PluginHelper {
     RodaCoreFactory.getIndexService().commit(Job.class);
   }
 
+  public static void createJob(Job job) throws GenericException, JobAlreadyStartedException, RequestNotValidException,
+    NotFoundException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().createJob(job);
+    RodaCoreFactory.getIndexService().commit(Job.class);
+  }
+
   public static String getReindexPluginName(Class<?> reindexClass) throws NotFoundException {
     if (reindexClass.equals(AIP.class)) {
       return ReindexAIPPlugin.class.getName();
