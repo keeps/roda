@@ -204,7 +204,7 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
           .resolve(jobId + ".json");
         final Job job = JsonUtils.readObjectFromFile(jobPath, Job.class);
 
-        String SYNC_ACTION_TYPE = RodaCoreFactory.getRodaConfigurationAsString("core.synchronization_action.type");
+        String SYNC_ACTION_TYPE = RodaCoreFactory.getRodaConfigurationAsString("core.synchronization.preservationActionExecution.type");
         if(!StringUtils.isNotBlank(SYNC_ACTION_TYPE)){
           PluginHelper.createAndExecuteJob(job);
         }else if ("APPROVAL".equals(SYNC_ACTION_TYPE)) {

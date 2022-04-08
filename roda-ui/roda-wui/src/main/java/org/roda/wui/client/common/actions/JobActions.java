@@ -88,13 +88,12 @@ public class JobActions extends AbstractActionable<Job> {
   @Override
   public boolean canAct(Action<Job> action, Job object) {
     if (hasPermissions(action) && object != null) {
-      GWT.log(action.toString());
       if (JobAction.STOP.equals(action)) {
         return !object.isInFinalState() && !object.isStopping();
       } else if (JobAction.APPROVE.equals(action)) {
-        return object.getState().equals(Job.JOB_STATE.PENDING_APPROVAL);
+        return Job.JOB_STATE.PENDING_APPROVAL.equals(object.getState());
       } else if (JobAction.REJECT.equals(action)) {
-        return object.getState().equals(Job.JOB_STATE.PENDING_APPROVAL);
+        return Job.JOB_STATE.PENDING_APPROVAL.equals(object.getState());
       } else if (JobAction.INGEST_APPRAISAL.equals(action)) {
         return object.getJobStats() != null && object.getJobStats().getOutcomeObjectsWithManualIntervention() > 0;
       } else if (JobAction.INGEST_PROCESS.equals(action)) {
@@ -122,7 +121,6 @@ public class JobActions extends AbstractActionable<Job> {
     } else if (JobAction.INGEST_PROCESS.equals(action)) {
       ingestProcess(object, callback);
     } else if (JobAction.APPROVE.equals(action)) {
-      GWT.log("Initial job info: " + object);
       approve(object, callback);
     } else if (JobAction.REJECT.equals(action)) {
       reject(object, callback);
@@ -178,7 +176,6 @@ public class JobActions extends AbstractActionable<Job> {
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
-            GWT.log("Job Info:" + object.toString());
             BrowserService.Util.getInstance().approveJob(object, new ActionAsyncCallback<Void>(callback) {
               @Override
               public void onFailure(Throwable caught) {
@@ -252,7 +249,7 @@ public class JobActions extends AbstractActionable<Job> {
       "btn-plus-circle");
     managementGroup.addButton(messages.stopButton(), JobAction.STOP, ActionImpact.DESTROYED, "btn-stop");
     managementGroup.addButton(messages.approveButton(), JobAction.APPROVE, ActionImpact.UPDATED, "btn-check");
-    managementGroup.addButton(messages.rejectButton(), JobAction.REJECT, ActionImpact.UPDATED, "btn-times");
+    managementGroup.addButton(messages.rejectButton(), JobAction.REJECT, ActionImpact.DESTROYED, "btn-times");
 
     // FIXME 20180731 bferreira: JobAction.INGEST_APPRAISAL button text should be
     // dynamic and equal to messages.appraisalTitle() + " (" +

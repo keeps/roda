@@ -60,7 +60,6 @@ import org.roda.wui.api.v1.utils.ApiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gwt.core.client.GWT;
 
 public class JobsHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(JobsHelper.class);
@@ -157,7 +156,6 @@ public class JobsHelper {
 
     job.setState(Job.JOB_STATE.REJECTED);
     job.setStateDetails(details);
-    GWT.log("Job after rejected" + job);
     // serialize job to file & index it
     job.setEndDate(new Date());
     RodaCoreFactory.getModelService().createOrUpdateJob(job);
