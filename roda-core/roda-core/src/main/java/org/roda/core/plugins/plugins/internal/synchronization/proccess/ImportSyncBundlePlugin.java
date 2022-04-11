@@ -37,7 +37,6 @@ import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.synchronization.bundle.BundleState;
-import org.roda.core.data.v2.synchronization.bundle.CentralEntities;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -197,9 +196,8 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
         SyncUtils.copyAttachments(instanceIdentifier);
 
         // Delete entities
-        final CentralEntities centralEntities = new CentralEntities();
-        final int removed = ImportUtils.deleteBundleEntities(model, index, storage, cachedJob, this, jobPluginInfo,
-          instanceIdentifier, bundleWorkingDir, bundleState.getEntitiesBundle(), report, centralEntities);
+        final int removed = ImportUtils.deleteBundleEntities(model, index, cachedJob, this, jobPluginInfo,
+          instanceIdentifier, bundleWorkingDir, bundleState.getEntitiesBundle(), report);
 
         // Validate entities
         ImportUtils.validateEntitiesBundle(index, bundleWorkingDir, bundleState.getEntitiesBundle(), instanceIdentifier,
@@ -208,9 +206,11 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
         DistributedInstance distributedInstance = model.retrieveDistributedInstance(instanceIdentifier);
         distributedInstance.setLastSyncDate(bundleState.getToDate());
         distributedInstance.setSyncErrors(syncErrors);
+        distributedInstance.setRemovedEntities(removed);
+        distributedInstance.setUpdatedEntities(ImportUtils.getUpdatedInstances(bundleState));
 
         ImportUtils.createLastSyncFile(bundleWorkingDir, distributedInstance,
-          ImportUtils.getUpdatedInstances(bundleState), removed);
+          ImportUtils.getUpdatedInstances(bundleState), removed, cachedJob.getId(), bundleState.getId());
 
         model.updateDistributedInstance(distributedInstance, cachedJob.getUsername());
         report.setPluginState(PluginState.SUCCESS);

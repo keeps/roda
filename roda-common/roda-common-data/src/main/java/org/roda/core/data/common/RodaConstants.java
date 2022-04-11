@@ -1838,13 +1838,8 @@ public final class RodaConstants {
   public static final String SYNCHRONIZATION_REPORT_VALUE_ISSUES_DESCRIPTION = "An entity was found is central "
     + "instance but is not listed in local instance or is listed as being removed from local instance";
 
-  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_REMOVED_AIP = "removed_aip";
-  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_REMOVED_DIP = "removed_dip";
-  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_REMOVED_RISK = "removed_risk";
-
-  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_MISSING_AIP = "missing_aip";
-  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_MISSING_DIP = "missing_dip";
-  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_MISSING_RISK = "missing_risk";
+  public static final String SYNCHRONIZATION_REPORT_VALUE_STATUS_SUCCESS = "Successful Synchronization";
+  public static final String SYNCHRONIZATION_REPORT_VALUE_STATUS_ERROR = "Synchronization with errors";
 
   /** Private empty constructor */
   private RodaConstants() {

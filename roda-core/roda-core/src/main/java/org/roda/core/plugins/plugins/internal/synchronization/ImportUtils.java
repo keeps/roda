@@ -21,15 +21,12 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.ReturnWithExceptions;
-import org.roda.core.data.utils.CentralEntitiesJsonUtils;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -37,7 +34,6 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.synchronization.bundle.BundleState;
-import org.roda.core.data.v2.synchronization.bundle.CentralEntities;
 import org.roda.core.data.v2.synchronization.bundle.EntitiesBundle;
 import org.roda.core.data.v2.synchronization.bundle.Issue;
 import org.roda.core.data.v2.synchronization.bundle.PackageState;
@@ -55,7 +51,6 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.internal.DeleteRodaObjectPluginUtils;
 import org.roda.core.plugins.plugins.reindex.ReindexPreservationAgentPlugin;
 import org.roda.core.plugins.plugins.reindex.ReindexPreservationRepositoryEventPlugin;
-import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -225,10 +220,9 @@ public class ImportUtils {
     }
   }
 
-  public static int deleteBundleEntities(final ModelService model, final IndexService index, StorageService storage,
-    final Job cachedJob, Plugin<? extends IsRODAObject> plugin, final JobPluginInfo jobPluginInfo,
-    final String instanceIdentifier, final Path bundleWorkingDir, final EntitiesBundle entitiesBundle,
-    final Report reportItem, final CentralEntities centralEntities) {
+  public static int deleteBundleEntities(final ModelService model, final IndexService index, final Job cachedJob,
+    Plugin<? extends IsRODAObject> plugin, final JobPluginInfo jobPluginInfo, final String instanceIdentifier,
+    final Path bundleWorkingDir, final EntitiesBundle entitiesBundle, final Report reportItem) {
     final Map<Path, Class<? extends IsIndexed>> entitiesPathMap = SyncUtils.createEntitiesPaths(bundleWorkingDir,
       entitiesBundle);
     final StringBuilder fileNameBuilder = new StringBuilder();
@@ -275,29 +269,6 @@ public class ImportUtils {
     return removed;
   }
 
-  /**
-   * Sets the lists of removed entities in {@link CentralEntities} by the given
-   * {@link Class<? extends IsIndexed>}.
-   *
-   * @param centralEntities
-   *          {@link CentralEntities}.
-   * @param listToRemove
-   *          {@link List}.
-   * @param indexedClass
-   *          {@link Class<? extends IsIndexed>}.
-   */
-  private static void setRemovedEntities(final CentralEntities centralEntities, final List<String> listToRemove,
-    final Class<? extends IsIndexed> indexedClass) {
-
-    if (indexedClass == IndexedAIP.class) {
-      centralEntities.setAipsList(new ArrayList<>(listToRemove));
-    } else if (indexedClass == IndexedDIP.class) {
-      centralEntities.setDipsList(new ArrayList<>(listToRemove));
-    } else {
-      centralEntities.setRisksList(new ArrayList<>(listToRemove));
-    }
-  }
-
   private static List<String> getListToRemove(final IndexService index, final Path readPath,
     final Class<? extends IsIndexed> indexedClass, final String instanceIdentifier) {
     final List<String> listToRemove = new ArrayList<>();
@@ -316,7 +287,7 @@ public class ImportUtils {
       result.forEach(indexed -> {
         boolean exist = false;
         try {
-          final JsonParser jsonParser = CentralEntitiesJsonUtils.createJsonParser(readPath);
+          final JsonParser jsonParser = SyncUtils.createJsonParser(readPath);
           while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
             JsonToken token = jsonParser.currentToken();
             if ((token != JsonToken.START_ARRAY) && (token != JsonToken.END_ARRAY)
@@ -387,7 +358,7 @@ public class ImportUtils {
     String id = null;
     int errors = 0;
     try {
-      final JsonParser jsonParser = CentralEntitiesJsonUtils.createJsonParser(readPath);
+      final JsonParser jsonParser = SyncUtils.createJsonParser(readPath);
       while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
         id = jsonParser.getText();
         final JsonToken token = jsonParser.currentToken();
@@ -404,29 +375,6 @@ public class ImportUtils {
     }
 
     return errors;
-  }
-
-  /**
-   * Sets the lists of missing entities in {@link CentralEntities} by the given
-   * {@link Class<? extends IsIndexed>}.
-   *
-   * @param centralEntities
-   *          {@link CentralEntities}.
-   * @param missingList
-   *          {@link List}.
-   * @param indexedClass
-   *          {@link Class<? extends IsIndexed>}.
-   */
-  private static void setMissingEntities(final CentralEntities centralEntities, final List<String> missingList,
-    final Class<? extends IsIndexed> indexedClass) {
-
-    if (indexedClass == IndexedAIP.class) {
-      centralEntities.setMissingAips(new ArrayList<>(missingList));
-    } else if (indexedClass == IndexedDIP.class) {
-      centralEntities.setDipsList(new ArrayList<>(missingList));
-    } else {
-      centralEntities.setRisksList(new ArrayList<>(missingList));
-    }
   }
 
   private static void createReport(final Path temporaryReportPath) {
@@ -457,7 +405,7 @@ public class ImportUtils {
   }
 
   public static void createLastSyncFile(final Path bundleWorkingDir, final DistributedInstance distributedInstance,
-    final int updatedInstances, final int removed) throws IOException {
+    final int updatedInstances, final int removed, final String jobID, final String bundleId) throws IOException {
     final StringBuilder fileNameBuilder = new StringBuilder();
     fileNameBuilder.append(RodaConstants.SYNCHRONIZATION_REPORT_FILE).append("_").append(distributedInstance.getId())
       .append(".json");
@@ -472,7 +420,7 @@ public class ImportUtils {
         jsonGenerator = jsonFactory.createGenerator(outputStream, JsonEncoding.UTF8).useDefaultPrettyPrinter();
       }
 
-      writeLastSyncFile(jsonGenerator, distributedInstance, updatedInstances, removed);
+      writeLastSyncFile(jsonGenerator, distributedInstance, updatedInstances, removed, jobID, bundleId);
     } catch (final IOException e) {
       LOGGER.error("Can't create report with the summary of synchronization {}", e.getMessage());
     } finally {
@@ -487,17 +435,23 @@ public class ImportUtils {
   }
 
   private static void writeLastSyncFile(final JsonGenerator jsonGenerator,
-    final DistributedInstance distributedInstance, final int updatedInstances, final int removed) {
+    final DistributedInstance distributedInstance, final int updatedInstances, final int removed, final String jobID,
+    final String bundleId) {
 
     try {
       jsonGenerator.writeStartObject();
-      jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_UUID, null);
+      jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_UUID, bundleId);
       jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_INSTANCE_ID, distributedInstance.getId());
       jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_FROM_DATE,
         distributedInstance.getLastSyncDate().toString());
-      jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_STATUS,
-        distributedInstance.getStatus().toString());
-      jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_JOB, null);
+      if (distributedInstance.getSyncErrors() > 0) {
+        jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_STATUS,
+          RodaConstants.SYNCHRONIZATION_REPORT_VALUE_STATUS_ERROR);
+      } else {
+        jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_STATUS,
+          RodaConstants.SYNCHRONIZATION_REPORT_VALUE_STATUS_SUCCESS);
+      }
+      jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_JOB, jobID);
 
       // Updated / Added object
       jsonGenerator.writeFieldName(RodaConstants.SYNCHRONIZATION_REPORT_KEY_UPDATED_AND_ADDED);
