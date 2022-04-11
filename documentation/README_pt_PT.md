@@ -11,6 +11,7 @@ Esta documentação cobre os seguintes tópicos:
   - [Início rápido](Quickstart.md)
   - [Pesquisa avançada](Advanced_Search_pt_PT.md)
   - [Pré-ingestão](Pre_Ingest_pt_PT.md)
+  - [Tipos de metadados descritivos](Descriptive_Metadata_Types.md)
   - [Informação de representação](Representation_Information.md)
   - [Tratamento de riscos](Risk_Assessment.md)
   - [Politicas de normalização de formatos](Format_Normalization_Policy.md)
