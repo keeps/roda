@@ -40,6 +40,7 @@ import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -585,6 +586,159 @@ public class SyncUtils {
    */
   public static StreamResponse createLastSyncFileStreamResponse(Path path) {
     return createBundleStreamResponse(path);
+  }
+
+  // Import methods
+
+  /**
+   * Imports from synchronization bundle to RODA storage.
+   *
+   * @param storage
+   *          {@link StorageService}
+   * @param tempDirectory
+   *          {@link Path} to temporary directory.
+   * @param bundleState
+   *          {@link BundleState}.
+   * @param jobPluginInfo
+   *          {@link JobPluginInfo}.
+   * @param moveJob
+   *          flag if is to move jobs and jobs reports or not.
+   * @return the value of moved files.
+   * @throws GenericException
+   *           if some error occurs.
+   * @throws NotFoundException
+   *           if some error occurs.
+   * @throws AuthorizationDeniedException
+   *           if some error occurs.
+   * @throws RequestNotValidException
+   *           if some error occurs.
+   * @throws AlreadyExistsException
+   *           if some error occurs.
+   * @throws JobAlreadyStartedException
+   *           if some error occurs.
+   */
+  public static int importStorage(final StorageService storage, final Path tempDirectory, final BundleState bundleState,
+    final JobPluginInfo jobPluginInfo, final boolean moveJob) throws GenericException, NotFoundException,
+    AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, JobAlreadyStartedException {
+    int count = 0;
+    final FileStorageService temporaryStorage = new FileStorageService(
+      tempDirectory.resolve(RodaConstants.CORE_STORAGE_FOLDER), false, null, false);
+    final CloseableIterable<Container> containers = temporaryStorage.listContainers();
+    final Iterator<Container> containerIterator = containers.iterator();
+    while (containerIterator.hasNext()) {
+      final Container container = containerIterator.next();
+      final StoragePath containerStoragePath = container.getStoragePath();
+
+      final CloseableIterable<Resource> resources = temporaryStorage.listResourcesUnderContainer(containerStoragePath,
+        false);
+      final Iterator<Resource> resourceIterator = resources.iterator();
+      while (resourceIterator.hasNext()) {
+        final Resource resource = resourceIterator.next();
+        final StoragePath storagePath = resource.getStoragePath();
+
+        // if the resource already exists, remove it before moving the updated resource
+        if (!resource.getStoragePath().getContainerName().equals(RodaConstants.STORAGE_CONTAINER_JOB)) {
+          if (storage.exists(storagePath)) {
+            storage.deleteResource(storagePath);
+          }
+          storage.move(temporaryStorage, storagePath, storagePath);
+        }
+
+        // Job and job reports (This step is for Local Instance job)
+        if (moveJob && resource.getStoragePath().getContainerName().equals(RodaConstants.STORAGE_CONTAINER_JOB)) {
+          moveJobsAndJobsReports(storage, resource, storagePath, temporaryStorage);
+        }
+
+        count++;
+      }
+    }
+    reindexBundle(bundleState, jobPluginInfo);
+    return count;
+  }
+
+  /**
+   * Reindex all objects moved from bundle to storage.
+   *
+   * @param bundleState
+   *          {@link BundleState}.
+   * @param jobPluginInfo
+   *          {@link JobPluginInfo}.
+   * @throws NotFoundException
+   *           if some error occurs.
+   * @throws AuthorizationDeniedException
+   *           if some error occurs.
+   * @throws JobAlreadyStartedException
+   *           if some error occurs.
+   * @throws GenericException
+   *           if some error occurs.
+   * @throws RequestNotValidException
+   *           if some error occurs.
+   */
+  private static void reindexBundle(final BundleState bundleState, final JobPluginInfo jobPluginInfo)
+    throws NotFoundException, AuthorizationDeniedException, JobAlreadyStartedException, GenericException,
+    RequestNotValidException {
+    final List<PackageState> packageStateList = bundleState.getPackageStateList();
+    jobPluginInfo.setSourceObjectsCount(packageStateList.size());
+    for (PackageState packageState : packageStateList) {
+      if (packageState.getCount() > 0) {
+        final Job job = new Job();
+        job.setId(IdUtils.createUUID());
+        job.setName("Reindex RODA entity (" + packageState.getClassName() + ")");
+        job.setPluginType(PluginType.INTERNAL);
+        job.setUsername(RodaConstants.ADMIN);
+
+        job.setPlugin(PluginHelper.getReindexPluginName(packageState.getClassName()));
+        job.setSourceObjects(SelectedItemsList.create(packageState.getClassName(), packageState.getIdList()));
+
+        PluginHelper.createAndExecuteJob(job);
+      }
+      jobPluginInfo.incrementObjectsProcessedWithSuccess();
+    }
+  }
+
+  /**
+   * Move Jobs and Jobs reports from local bundle to RODA central storage.
+   *
+   * @param storage
+   *          {@link StorageService}.
+   * @param resource
+   *          {@link Resource}
+   * @param storagePath
+   *          {@link Path} to storage.
+   * @param temporaryStorage
+   *          {@link Path} to temporary storage
+   * @throws AlreadyExistsException
+   *           if some error occurs.
+   * @throws AuthorizationDeniedException
+   *           if some error occurs.
+   * @throws NotFoundException
+   *           if some error occurs.
+   * @throws GenericException
+   *           if some error occurs.
+   * @throws RequestNotValidException
+   *           if some error occurs.
+   */
+  private static void moveJobsAndJobsReports(final StorageService storage, final Resource resource,
+    final StoragePath storagePath, final FileStorageService temporaryStorage) throws AlreadyExistsException,
+    AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    if (storage.exists(storagePath)) {
+      storage.deleteResource(storagePath);
+    }
+    storage.move(temporaryStorage, storagePath, storagePath);
+
+    if (!resource.isDirectory()) {
+      try (InputStream inputStream = storage.getBinary(resource.getStoragePath()).getContent().createInputStream()) {
+        final Job jobToImport = JsonUtils.getObjectFromJson(inputStream, Job.class);
+        final StoragePath jobReportsContainerPath = ModelUtils.getJobReportsStoragePath(jobToImport.getId());
+        if (storage.exists(jobReportsContainerPath)) {
+          storage.deleteResource(jobReportsContainerPath);
+        }
+        storage.createDirectory(jobReportsContainerPath);
+      } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
+        | IOException e) {
+        LOGGER.error("Error getting Job json from binary", e);
+      }
+    }
   }
 
   // Write Bundle JSON Lists
