@@ -1,10 +1,3 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE file at the root of the source
- * tree and available online at
- *
- * https://github.com/keeps/roda
- */
 package org.roda.core.plugins.plugins.multiple;
 
 import java.util.ArrayList;
@@ -19,10 +12,16 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
+import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.index.IndexService;
+import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.plugins.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.characterization.SiegfriedPlugin;
+import org.roda.core.storage.StorageService;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -30,12 +29,14 @@ import org.roda.core.plugins.plugins.characterization.SiegfriedPlugin;
 public class MultiplePlugin extends DefaultMultipleStepPlugin<AIP> {
   private static List<Step> steps = new ArrayList<>();
   static {
-    steps.add(new Step(PremisSkeletonPlugin.class.getName(), "", true, true));
-    steps.add(new Step(SiegfriedPlugin.class.getName(), "", true, true));
-    steps.add(new Step(AntivirusPlugin.class.getName(), "", true, true));
+    steps.add(new Step(AntivirusPlugin.class.getName(), AntivirusPlugin.class, RodaConstants.PLUGIN_PARAMS_DO_VIRUS_CHECK, true, true));
+    steps.add(new Step(PremisSkeletonPlugin.class.getName(), PremisSkeletonPlugin.class, "",
+        true, true));
+    steps.add(new Step(SiegfriedPlugin.class.getName(), SiegfriedPlugin.class, "",
+      true, true));
   }
 
-  private final Map<String, PluginParameter> pluginParameters = new HashMap<>();
+  private Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
   @Override
   public String getVersionImpl() {
@@ -111,6 +112,14 @@ public class MultiplePlugin extends DefaultMultipleStepPlugin<AIP> {
   }
 
   /**
+   * Method to return Plugin type (so it can be grouped for different purposes)
+   */
+  @Override
+  public PluginType getType() {
+    return PluginType.MULTI;
+  }
+
+  /**
    * Method to return Plugin categories
    */
   @Override
@@ -142,6 +151,20 @@ public class MultiplePlugin extends DefaultMultipleStepPlugin<AIP> {
     return Collections.singletonList(AIP.class);
   }
 
+  /**
+   * Method executed by {@link PluginOrchestrator} after all workers have finished
+   * their work
+   *
+   * @param index
+   * @param model
+   * @param storage
+   * @throws PluginException
+   */
+  @Override
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+    return null;
+  }
+
   @Override
   public void setTotalSteps() {
     this.totalSteps = steps.size();
@@ -168,8 +191,8 @@ public class MultiplePlugin extends DefaultMultipleStepPlugin<AIP> {
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_VIRUS_CHECK,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_VIRUS_CHECK, AntivirusPlugin.getStaticName(),
-        PluginParameterType.BOOLEAN, "true", true, true, AntivirusPlugin.getStaticDescription()));
+        new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_VIRUS_CHECK, AntivirusPlugin.getStaticName(),
+            PluginParameterType.BOOLEAN, "true", true, true, AntivirusPlugin.getStaticDescription()));
     setTotalSteps();
     super.setParameterValues(parameters);
   }

@@ -1,15 +1,9 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE file at the root of the source
- * tree and available online at
- *
- * https://github.com/keeps/roda
- */
 package org.roda.core.plugins.plugins.multiple;
 
 import java.util.List;
-import java.util.Map;
 
+import java.util.Map;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
@@ -48,6 +42,11 @@ public abstract class DefaultMultipleStepPlugin<T extends IsRODAObject> extends 
   @Override
   public void shutdown() {
     // do nothing
+  }
+
+  @Override
+  public PluginType getType() {
+    return PluginType.MULTI;
   }
 
   @Override
@@ -102,24 +101,11 @@ public abstract class DefaultMultipleStepPlugin<T extends IsRODAObject> extends 
   }
 
   @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    return null;
-  }
-
-  @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
 
     getParameterValues().put(RodaConstants.PLUGIN_PARAMS_TOTAL_STEPS, Integer.toString(getTotalSteps()));
     getParameterValues().put(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS, getClass().getName());
-  }
-
-  /**
-   * Method to return Plugin type (so it can be grouped for different purposes)
-   */
-  @Override
-  public PluginType getType() {
-    return PluginType.MULTI;
   }
 
   public int getTotalSteps() {

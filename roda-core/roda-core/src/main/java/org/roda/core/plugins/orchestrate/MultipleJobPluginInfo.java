@@ -1,10 +1,3 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE file at the root of the source
- * tree and available online at
- *
- * https://github.com/keeps/roda
- */
 package org.roda.core.plugins.orchestrate;
 
 import java.util.ArrayList;
@@ -16,7 +9,6 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.jobs.ReportUtils;
 import org.roda.core.plugins.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +60,10 @@ public class MultipleJobPluginInfo extends JobPluginInfo {
           pluginPercentage = ((float) pluginInfo.getStepsCompleted()) / pluginInfo.getTotalSteps();
         }
         float pluginWeight = ((float) pluginInfo.getSourceObjectsCount()) / taskObjectsCount;
+        if (Float.isNaN(pluginWeight)) {
+          pluginWeight = 1;
+        }
+
         percentage += (pluginPercentage * pluginWeight);
 
         sourceObjectsProcessedWithSuccess += pluginInfo.getSourceObjectsProcessedWithSuccess();
@@ -110,13 +106,20 @@ public class MultipleJobPluginInfo extends JobPluginInfo {
     int countSuccess = 0;
     int countPartialSuccess = 0;
     int countFailure = 0;
-    int countSkipped = 0;
-
     for (List<Report> reports : getAllReports().values()) {
-      PluginState pluginState = PluginState.RUNNING;
+      PluginState pluginState = PluginState.SUCCESS;
       for (Report report : reports) {
-        pluginState = ReportUtils.calculatePluginState(pluginState,
-            report.getPluginState(), report.getPluginIsMandatory());
+        switch (report.getPluginState()) {
+          case FAILURE:
+            pluginState = report.getPluginState();
+            break;
+          case PARTIAL_SUCCESS:
+            if (!PluginState.FAILURE.equals(pluginState))
+              pluginState = PluginState.PARTIAL_SUCCESS;
+            break;
+          default:
+            break;
+        }
       }
       switch (pluginState) {
         case SUCCESS:
@@ -128,9 +131,6 @@ public class MultipleJobPluginInfo extends JobPluginInfo {
         case FAILURE:
           countFailure++;
           break;
-        case SKIPPED:
-          countSkipped++;
-          break;
         default:
           break;
       }
@@ -139,7 +139,7 @@ public class MultipleJobPluginInfo extends JobPluginInfo {
     setSourceObjectsProcessedWithFailure(countFailure);
     setSourceObjectsProcessedWithPartialSuccess(countPartialSuccess);
     setSourceObjectsProcessedWithSuccess(countSuccess);
-    setSourceObjectsProcessedWithSkipped(countSkipped);
+    setSourceObjectsProcessedWithSkipped(0);
   }
 
   @Override

@@ -53,6 +53,8 @@ public class MultiplePluginTest {
   private static StorageService corporaService;
   private static Path corporaPath;
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(MultiplePluginTest.class);
+
   @BeforeClass
   public void setUp() throws Exception {
     basePath = TestsHelper.createBaseTempDir(getClass(), true);
@@ -64,7 +66,7 @@ public class MultiplePluginTest {
     boolean deployPluginManager = true;
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-      deployPluginManager, deployDefaultResources);
+      deployPluginManager, deployDefaultResources, false);
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
 

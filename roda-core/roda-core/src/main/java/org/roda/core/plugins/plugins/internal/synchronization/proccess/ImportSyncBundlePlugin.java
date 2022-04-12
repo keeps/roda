@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -26,31 +25,20 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.utils.CentralEntitiesJsonUtils;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.utils.URLUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
-import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.index.select.SelectedItemsList;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.synchronization.bundle.BundleState;
-import org.roda.core.data.v2.synchronization.bundle.CentralEntities;
-import org.roda.core.data.v2.synchronization.bundle.EntitiesBundle;
-import org.roda.core.data.v2.synchronization.bundle.PackageState;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
@@ -59,17 +47,13 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.plugins.plugins.internal.DeleteRODAObjectPlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.ImportUtils;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FileStorageService;
-import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -80,6 +64,7 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
   private String bundlePath = null;
   private String instanceIdentifier = null;
   private int syncErrors = 0;
+  private List<String> aipsToRemove = new ArrayList<>();
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
@@ -113,6 +98,7 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER)) {
       instanceIdentifier = parameters.get(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER);
     }
+    getParameterValues().put(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS, getClass().getName());
   }
 
   @Override
@@ -192,26 +178,40 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<Void> plugin) throws PluginException {
-        importSyncBundle(model, storage, report, cachedJob, jobPluginInfo);
+        importSyncBundle(model, index, storage, report, cachedJob, jobPluginInfo);
       }
     }, index, model, storage);
   }
 
-  private void importSyncBundle(ModelService model, StorageService storage, Report report, Job cachedJob,
-    JobPluginInfo jobPluginInfo) {
+  private void importSyncBundle(final ModelService model, final IndexService index, final StorageService storage,
+    final Report report, final Job cachedJob, final JobPluginInfo jobPluginInfo) throws PluginException {
     if (Files.exists(Paths.get(bundlePath))) {
+      report.setSourceAndOutcomeObjectClass(AIP.class.getName(), AIP.class.getName());
       Path bundleWorkingDir = null;
       try {
         bundleWorkingDir = SyncUtils.extractBundle(instanceIdentifier, Paths.get(bundlePath));
         BundleState bundleState = SyncUtils.getIncomingBundleState(instanceIdentifier);
         validateChecksum(bundleWorkingDir, bundleState);
-        SyncUtils.importStorage(storage, bundleWorkingDir, bundleState, jobPluginInfo, true);
+        importStorage(model, index, storage, cachedJob, bundleWorkingDir, bundleState, jobPluginInfo, report);
         SyncUtils.copyAttachments(instanceIdentifier);
-        deleteAndValidateEntities(instanceIdentifier, bundleWorkingDir, bundleState.getEntitiesBundle());
+
+        // Delete entities
+        final int removed = ImportUtils.deleteBundleEntities(model, index, cachedJob, this, jobPluginInfo,
+          instanceIdentifier, bundleWorkingDir, bundleState.getEntitiesBundle(), report);
+
+        // Validate entities
+        ImportUtils.validateEntitiesBundle(index, bundleWorkingDir, bundleState.getEntitiesBundle(), instanceIdentifier,
+          syncErrors);
 
         DistributedInstance distributedInstance = model.retrieveDistributedInstance(instanceIdentifier);
         distributedInstance.setLastSyncDate(bundleState.getToDate());
         distributedInstance.setSyncErrors(syncErrors);
+        distributedInstance.setRemovedEntities(removed);
+        distributedInstance.setUpdatedEntities(ImportUtils.getUpdatedInstances(bundleState));
+
+        ImportUtils.createLastSyncFile(bundleWorkingDir, distributedInstance,
+          ImportUtils.getUpdatedInstances(bundleState), removed, cachedJob.getId(), bundleState.getId());
+
         model.updateDistributedInstance(distributedInstance, cachedJob.getUsername());
         report.setPluginState(PluginState.SUCCESS);
       } catch (IOException e) {
@@ -229,6 +229,54 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
       report.setPluginState(PluginState.FAILURE).setPluginDetails("Cannot find bundle on path " + bundlePath);
       jobPluginInfo.incrementObjectsProcessedWithFailure();
     }
+  }
+
+  private void importStorage(final ModelService model, final IndexService index, final StorageService storage,
+    final Job job, final Path tempDirectory, final BundleState bundleState, final JobPluginInfo jobPluginInfo,
+    final Report report) throws GenericException, NotFoundException, AuthorizationDeniedException,
+    RequestNotValidException, AlreadyExistsException, JobAlreadyStartedException {
+    FileStorageService temporaryStorage = new FileStorageService(
+      tempDirectory.resolve(RodaConstants.CORE_STORAGE_FOLDER), false, null, false);
+    CloseableIterable<Container> containers = temporaryStorage.listContainers();
+    Iterator<Container> containerIterator = containers.iterator();
+    while (containerIterator.hasNext()) {
+      Container container = containerIterator.next();
+      StoragePath containerStoragePath = container.getStoragePath();
+
+      CloseableIterable<Resource> resources = temporaryStorage.listResourcesUnderContainer(containerStoragePath, false);
+      Iterator<Resource> resourceIterator = resources.iterator();
+      while (resourceIterator.hasNext()) {
+        Resource resource = resourceIterator.next();
+        StoragePath storagePath = resource.getStoragePath();
+
+        // if the resource already exists, remove it before moving the updated resource
+        if (storage.exists(storagePath)) {
+          storage.deleteResource(storagePath);
+        }
+        storage.move(temporaryStorage, storagePath, storagePath);
+
+        // Job and job reports
+        if (resource.getStoragePath().getContainerName().equals(RodaConstants.STORAGE_CONTAINER_JOB)) {
+          if (!resource.isDirectory()) {
+            try (
+              InputStream inputStream = storage.getBinary(resource.getStoragePath()).getContent().createInputStream()) {
+              Job jobToImport = JsonUtils.getObjectFromJson(inputStream, Job.class);
+              StoragePath jobReportsContainerPath = ModelUtils.getJobReportsStoragePath(jobToImport.getId());
+              if (storage.exists(jobReportsContainerPath)) {
+                storage.deleteResource(jobReportsContainerPath);
+              }
+              storage.createDirectory(jobReportsContainerPath);
+            } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
+              | IOException e) {
+              LOGGER.error("Error getting Job json from binary", e);
+            }
+          }
+        }
+
+      }
+    }
+    ImportUtils.reindexBundle(model, index, bundleState, jobPluginInfo, report);
+    PluginHelper.updatePartialJobReport(this, model, report, true, job);
   }
 
   private void importJobAttachments(Path tempDirectory) {
@@ -266,200 +314,5 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     return new Report();
-  }
-
-  /**
-   * Iterates over the files in bundle (AIP, DIP, Risks) and deletes and validate
-   * the Central Entities.
-   * 
-   * @param instanceIdentifier
-   *          the instance identifier.
-   * @param bundleWorkingDir
-   *          {@link Path}.
-   * @param entitiesBundle
-   *          {@link EntitiesBundle}.
-   * @throws GenericException
-   *           if some error occurs.
-   * @throws AuthorizationDeniedException
-   *           if does not have permission to do this action.
-   * @throws RequestNotValidException
-   *           if the request is not valid
-   * @throws NotFoundException
-   *           if some error occurs
-   * @throws JobAlreadyStartedException
-   *           if the job is already in execution.
-   * @throws IOException
-   *           if some i/o error occurs.
-   */
-  public void deleteAndValidateEntities(final String instanceIdentifier, final Path bundleWorkingDir,
-    final EntitiesBundle entitiesBundle) throws AuthorizationDeniedException, RequestNotValidException,
-    GenericException, NotFoundException, JobAlreadyStartedException, IOException {
-    final Map<Path, Class<? extends IsIndexed>> entitiesPathMap = SyncUtils.createEntitiesPaths(bundleWorkingDir,
-      entitiesBundle);
-    final CentralEntities centralEntities = new CentralEntities();
-    for (Map.Entry entry : entitiesPathMap.entrySet()) {
-      deleteBundleEntities((Path) entry.getKey(), (Class<? extends IsIndexed>) entry.getValue(), instanceIdentifier,
-        centralEntities);
-      validateCentralEntities(centralEntities, (Path) entry.getKey(), (Class<? extends IsIndexed>) entry.getValue());
-    }
-
-    SyncUtils.writeEntitiesFile(centralEntities, instanceIdentifier);
-  }
-
-  /**
-   * Checks and delete entities from Central instance.
-   * 
-   * @param readPath
-   *          {@link Path}.
-   * @param indexedClass
-   *          {@link Class<? extends IsIndexed>}.
-   * @param instanceIdentifier
-   *          Instance identifier.
-   * @param centralEntities
-   *          {@link CentralEntities}.
-   * @throws GenericException
-   *           if some error occurs.
-   * @throws AuthorizationDeniedException
-   *           if does not have permission to do this action.
-   * @throws RequestNotValidException
-   *           if the request is not valid
-   * @throws NotFoundException
-   *           if some error occurs
-   * @throws JobAlreadyStartedException
-   *           if the job is already in execution.
-   */
-  private void deleteBundleEntities(final Path readPath, final Class<? extends IsIndexed> indexedClass,
-    final String instanceIdentifier, final CentralEntities centralEntities) throws GenericException,
-    AuthorizationDeniedException, RequestNotValidException, NotFoundException, JobAlreadyStartedException {
-    final List<String> listToRemove = new ArrayList<>();
-    final IndexService index = RodaCoreFactory.getIndexService();
-    final Filter filter = new Filter();
-    filter.add(new SimpleFilterParameter(RodaConstants.AIP_INSTANCE_ID, instanceIdentifier));
-    if (indexedClass == IndexedPreservationEvent.class) {
-      filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS,
-        IndexedPreservationEvent.PreservationMetadataEventClass.REPOSITORY.toString()));
-    }
-
-    try (IterableIndexResult<? extends IsIndexed> result = index.findAll(indexedClass, filter, true,
-      Collections.singletonList(RodaConstants.INDEX_UUID))) {
-      result.forEach(indexed -> {
-        boolean exist = false;
-        try {
-          final JsonParser jsonParser = CentralEntitiesJsonUtils.createJsonParser(readPath);
-          while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
-            JsonToken token = jsonParser.currentToken();
-            if ((token != JsonToken.START_ARRAY) && (token != JsonToken.END_ARRAY)
-              && jsonParser.getText().equals(indexed.getId())) {
-              exist = true;
-            }
-          }
-          if (!exist) {
-            listToRemove.add(indexed.getId());
-          }
-        } catch (IOException e) {
-          LOGGER.error("Can't read the json file {}", e.getMessage());
-        }
-      });
-
-    } catch (IOException | GenericException | RequestNotValidException e) {
-      LOGGER.error("Error getting AIP iterator when creating aip list", e);
-    }
-
-    if (!listToRemove.isEmpty()) {
-
-      setRemovedEntities(centralEntities, listToRemove, indexedClass);
-
-      final Job job = new Job();
-      job.setId(IdUtils.createUUID());
-      job.setName("Delete (" + indexedClass.getName() + ")");
-      job.setPluginType(PluginType.INTERNAL);
-      job.setUsername(RodaConstants.ADMIN);
-
-      job.setPlugin(DeleteRODAObjectPlugin.class.getName());
-      job.setSourceObjects(SelectedItemsList.create(indexedClass.getName(), listToRemove));
-
-      PluginHelper.createAndExecuteJob(job);
-    }
-  }
-
-  /**
-   * Sets the lists of removed entities in {@link CentralEntities} by the given
-   * {@link Class<? extends IsIndexed>}.
-   * 
-   * @param centralEntities
-   *          {@link CentralEntities}.
-   * @param listToRemove
-   *          {@link List}.
-   * @param indexedClass
-   *          {@link Class<? extends IsIndexed>}.
-   */
-  private void setRemovedEntities(final CentralEntities centralEntities, final List<String> listToRemove,
-    final Class<? extends IsIndexed> indexedClass) {
-
-    if (indexedClass == IndexedAIP.class) {
-      centralEntities.setAipsList(new ArrayList<>(listToRemove));
-    } else if (indexedClass == IndexedDIP.class) {
-      centralEntities.setDipsList(new ArrayList<>(listToRemove));
-    } else {
-      centralEntities.setRisksList(new ArrayList<>(listToRemove));
-    }
-  }
-
-  /**
-   * Read the Local Instance list of entities and checks if Central instance have
-   * this entity.
-   * 
-   * @param centralEntities
-   *          {@link CentralEntities}
-   * @param readPath
-   *          {@link Path}.
-   * @param indexedClass
-   *          {@link Class<? extends IsIndexed>}.
-   */
-  public void validateCentralEntities(final CentralEntities centralEntities, final Path readPath,
-    final Class<? extends IsIndexed> indexedClass) {
-    final IndexService index = RodaCoreFactory.getIndexService();
-    final List<String> missingList = new ArrayList<>();
-    String id = null;
-    try {
-      final JsonParser jsonParser = CentralEntitiesJsonUtils.createJsonParser(readPath);
-      while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
-        id = jsonParser.getText();
-        final JsonToken token = jsonParser.currentToken();
-        if ((id != null) && !id.isEmpty() && (token != JsonToken.START_ARRAY) && (token != JsonToken.END_ARRAY)) {
-          index.retrieve(indexedClass, id, Collections.singletonList(RodaConstants.INDEX_UUID));
-        }
-      }
-    } catch (NotFoundException | GenericException e) {
-      missingList.add(id);
-    } catch (final IOException e) {
-      LOGGER.error("Can't read the json file {}", e.getMessage());
-    }
-
-    syncErrors += missingList.size();
-    setMissingEntities(centralEntities, missingList, indexedClass);
-  }
-
-  /**
-   * Sets the lists of missing entities in {@link CentralEntities} by the given
-   * {@link Class<? extends IsIndexed>}.
-   * 
-   * @param centralEntities
-   *          {@link CentralEntities}.
-   * @param missingList
-   *          {@link List}.
-   * @param indexedClass
-   *          {@link Class<? extends IsIndexed>}.
-   */
-  private void setMissingEntities(final CentralEntities centralEntities, final List<String> missingList,
-    final Class<? extends IsIndexed> indexedClass) {
-
-    if (indexedClass == IndexedAIP.class) {
-      centralEntities.setMissingAips(new ArrayList<>(missingList));
-    } else if (indexedClass == IndexedDIP.class) {
-      centralEntities.setDipsList(new ArrayList<>(missingList));
-    } else {
-      centralEntities.setRisksList(new ArrayList<>(missingList));
-    }
   }
 }

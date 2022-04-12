@@ -1,33 +1,19 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE file at the root of the source
- * tree and available online at
- *
- * https://github.com/keeps/roda
- */
 package org.roda.core.plugins.plugins.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
-import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
@@ -40,107 +26,64 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
-import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.PluginParameter;
-import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginState;
-import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.utils.LocalInstanceUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(DeleteRODAObjectPlugin.class);
+/**
+ * {@author João Gomes <jgomes@keep.pt>}.
+ */
+public class DeleteRodaObjectPluginUtils {
   private static final String EVENT_DESCRIPTION = "The process of deleting an object of the repository";
-  private String details = null;
-  private boolean dontCheckRelatives;
 
-  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
-  static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DETAILS, new PluginParameter(RodaConstants.PLUGIN_PARAMS_DETAILS,
-      "Event details", PluginParameterType.STRING, "", false, false, "Details that will be used when creating event"));
-
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DONT_CHECK_RELATIVES,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DONT_CHECK_RELATIVES, "Don't check relatives",
-        PluginParameterType.BOOLEAN, "false", false, false, "If relatives shouldn't be checked for deletion"));
-
-  }
-
-  @Override
-  public void init() throws PluginException {
+  private DeleteRodaObjectPluginUtils() {
     // do nothing
   }
 
-  @Override
-  public void shutdown() {
-    // do nothing
-  }
-
-  @Override
-  public String getName() {
-    return "Delete RODA entities";
-  }
-
-  @Override
-  public String getDescription() {
-    return "Delete any removable type of RODA entities";
-  }
-
-  @Override
-  public String getVersionImpl() {
-    return "1.0";
-  }
-
-  @Override
-  public List<PluginParameter> getParameters() {
-    ArrayList<PluginParameter> parameters = new ArrayList<>();
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DETAILS));
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DONT_CHECK_RELATIVES));
-    return parameters;
-  }
-
-  @Override
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    super.setParameterValues(parameters);
-
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DETAILS)) {
-      details = parameters.get(RodaConstants.PLUGIN_PARAMS_DETAILS);
+  public static void process(final IndexService index, final ModelService model, final Report report,
+    final Job cachedJob, final JobPluginInfo jobPluginInfo, final Plugin<? extends IsRODAObject> plugin,
+    final IsRODAObject object, final String details, final boolean dontCheckRelatives, final boolean doReport) {
+    if (object instanceof AIP) {
+      processAIP(index, model, report, jobPluginInfo, cachedJob, plugin, (AIP) object, details, dontCheckRelatives,
+        doReport);
+    } else if (object instanceof File) {
+      processFile(index, model, report, jobPluginInfo, cachedJob, plugin, (File) object, details, doReport);
+    } else if (object instanceof Representation) {
+      processRepresentation(index, model, report, jobPluginInfo, cachedJob, plugin, (Representation) object, details,
+        doReport);
+    } else if (object instanceof Risk) {
+      processRisk(index, model, report, jobPluginInfo, cachedJob, plugin, (Risk) object, doReport);
+    } else if (object instanceof RepresentationInformation) {
+      processRepresentationInformation(model, report, jobPluginInfo, cachedJob, plugin,
+        (RepresentationInformation) object, doReport);
+    } else if (object instanceof RiskIncidence) {
+      processRiskIncidence(model, report, jobPluginInfo, cachedJob, plugin, (RiskIncidence) object, doReport);
+    } else if (object instanceof DIP) {
+      processDIP(model, report, jobPluginInfo, cachedJob, plugin, (DIP) object, doReport);
+    } else if (object instanceof DIPFile) {
+      processDIPFile(model, report, jobPluginInfo, cachedJob, plugin, (DIPFile) object, doReport);
     }
-
-    dontCheckRelatives = PluginHelper.getBooleanFromParameters(this,
-      pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DONT_CHECK_RELATIVES));
   }
 
-  @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
-
-    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<T>() {
-      @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        JobPluginInfo jobPluginInfo, Plugin<T> plugin, T object) {
-        DeleteRodaObjectPluginUtils.process(index, model, report, cachedJob, jobPluginInfo, plugin, object, details,
-          dontCheckRelatives);
-      }
-    }, index, model, storage, liteList);
+  public static void process(final IndexService index, final ModelService model, final Report report,
+    final Job cachedJob, final JobPluginInfo jobPluginInfo, final Plugin<? extends IsRODAObject> plugin,
+    final IsRODAObject object, final String details, final boolean dontCheckRelatives) {
+    process(index, model, report, cachedJob, jobPluginInfo, plugin, object, details, dontCheckRelatives, true);
   }
 
-  private void updateReport(ModelService model, Report reportItem, JobPluginInfo jobPluginInfo, Report report, Job job,
-    String entityName, String entityId, String disposalType, String parentId) {
+  private static void updateReport(ModelService model, Report reportItem, JobPluginInfo jobPluginInfo, Report report,
+    Job job, final Plugin<? extends IsRODAObject> plugin, String entityName, String entityId, String disposalType,
+    String parentId, String details, final boolean doReport) {
 
     reportItem.setPluginState(PluginState.FAILURE);
 
@@ -152,8 +95,10 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
         + parentId + "] be associated to a disposal " + disposalType);
     }
 
-    report.addReport(reportItem);
-    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+    if (doReport) {
+      report.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, job);
+    }
     jobPluginInfo.incrementObjectsProcessed(reportItem.getPluginState());
     String outcomeText;
 
@@ -168,20 +113,23 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     List<LinkingIdentifier> sources = new ArrayList<>();
     sources.add(PluginHelper.getLinkingIdentifier(entityId, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-    model.createEvent(entityId, null, null, null, PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null,
-      reportItem.getPluginState(), outcomeText, details, job.getUsername(), true);
+    model.createEvent(entityId, null, null, null, RodaConstants.PreservationEventType.DELETION, EVENT_DESCRIPTION,
+      sources, null, reportItem.getPluginState(), outcomeText, details, job.getUsername(), true);
   }
 
-  private void processAIP(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
-    AIP aip) {
-    Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIP.class, AIPState.ACTIVE);
+  private static void processAIP(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo,
+    Job job, final Plugin<? extends IsRODAObject> plugin, AIP aip, final String details,
+    final boolean dontCheckRelatives, final boolean doReport) {
+
+    Report reportItem = PluginHelper.initPluginReportItem(plugin, aip.getId(), AIP.class, AIPState.ACTIVE);
     reportItem.setPluginState(PluginState.SUCCESS);
 
     if (StringUtils.isNotBlank(aip.getDisposalScheduleId())) {
-      updateReport(model, reportItem, jobPluginInfo, report, job, AIP.class.getSimpleName(), aip.getId(), "schedule",
-        null);
+      updateReport(model, reportItem, jobPluginInfo, report, job, plugin, AIP.class.getSimpleName(), aip.getId(),
+        "schedule", null, details, doReport);
     } else if (aip.onHold()) {
-      updateReport(model, reportItem, jobPluginInfo, report, job, AIP.class.getSimpleName(), aip.getId(), "hold", null);
+      updateReport(model, reportItem, jobPluginInfo, report, job, plugin, AIP.class.getSimpleName(), aip.getId(),
+        "hold", null, details, doReport);
     } else {
       if (!dontCheckRelatives) {
         try {
@@ -212,8 +160,8 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
                 sources.add(
                   PluginHelper.getLinkingIdentifier(item.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-                model.createEvent(item.getId(), null, null, null, PreservationEventType.DELETION, EVENT_DESCRIPTION,
-                  sources, null, state, outcomeText, details, job.getUsername(), true);
+                model.createEvent(item.getId(), null, null, null, RodaConstants.PreservationEventType.DELETION,
+                  EVENT_DESCRIPTION, sources, null, state, outcomeText, details, job.getUsername(), true);
               }
             }, e -> {
               reportItem.setPluginState(PluginState.FAILURE);
@@ -225,8 +173,10 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
         }
       }
 
-      report.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+      if (doReport) {
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, job);
+      }
       jobPluginInfo.incrementObjectsProcessed(reportItem.getPluginState());
 
       IndexedAIP item = null;
@@ -260,24 +210,25 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
       List<LinkingIdentifier> sources = new ArrayList<>();
       sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-      model.createEvent(aip.getId(), null, null, null, PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null,
-        reportItem.getPluginState(), outcomeText, details, job.getUsername(), true);
+      model.createEvent(aip.getId(), null, null, null, RodaConstants.PreservationEventType.DELETION, EVENT_DESCRIPTION,
+        sources, null, reportItem.getPluginState(), outcomeText, details, job.getUsername(), true);
     }
   }
 
-  private void processFile(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
-    File file) {
+  private static void processFile(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo,
+    Job job, final Plugin<? extends IsRODAObject> plugin, File file, final String details, final boolean doReport) {
     PluginState state = PluginState.SUCCESS;
-    Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class);
+
+    Report reportItem = PluginHelper.initPluginReportItem(plugin, file.getId(), File.class);
 
     try {
       AIP retrievedAIP = model.retrieveAIP(file.getAipId());
       if (StringUtils.isNotBlank(retrievedAIP.getDisposalScheduleId())) {
-        updateReport(model, reportItem, jobPluginInfo, report, job, File.class.getSimpleName(), file.getId(),
-          "schedule", retrievedAIP.getId());
+        updateReport(model, reportItem, jobPluginInfo, report, job, plugin, File.class.getSimpleName(), file.getId(),
+          "schedule", retrievedAIP.getId(), details, doReport);
       } else if (retrievedAIP.onHold()) {
-        updateReport(model, reportItem, jobPluginInfo, report, job, File.class.getSimpleName(), file.getId(), "hold",
-          retrievedAIP.getId());
+        updateReport(model, reportItem, jobPluginInfo, report, job, plugin, File.class.getSimpleName(), file.getId(),
+          "hold", retrievedAIP.getId(), details, doReport);
       } else {
         try {
           // model.deleteFile(file, true);
@@ -303,16 +254,17 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
 
         // removing PREMIS file
         try {
-          String pmId = URNUtils.getPremisPrefix(PreservationMetadataType.FILE,
+          String pmId = URNUtils.getPremisPrefix(PreservationMetadata.PreservationMetadataType.FILE,
             LocalInstanceUtils.getLocalInstanceIdentifier()) + file.getId();
-          model.deletePreservationMetadata(PreservationMetadataType.FILE, file.getAipId(), file.getRepresentationId(),
-            pmId, false);
+          model.deletePreservationMetadata(PreservationMetadata.PreservationMetadataType.FILE, file.getAipId(),
+            file.getRepresentationId(), pmId, false);
         } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
           reportItem.addPluginDetails("Could not delete associated PREMIS file: " + e.getMessage());
         }
-
-        report.addReport(reportItem.setPluginState(state));
-        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+        if (doReport) {
+          report.addReport(reportItem.setPluginState(state));
+          PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, job);
+        }
         jobPluginInfo.incrementObjectsProcessed(state);
 
         String outcomeText;
@@ -327,32 +279,35 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
           file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
         model.createEvent(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-          PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null, state, outcomeText, details,
+          RodaConstants.PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null, state, outcomeText, details,
           job.getUsername(), true);
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       state = PluginState.FAILURE;
       reportItem.addPluginDetails("Could not delete File: " + e.getMessage());
-      report.addReport(reportItem.setPluginState(state));
-      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+      if (doReport) {
+        report.addReport(reportItem.setPluginState(state));
+        PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, job);
+      }
       jobPluginInfo.incrementObjectsProcessed(state);
     }
 
   }
 
-  private void processRepresentation(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo,
-    Job job, Representation representation) {
+  private static void processRepresentation(IndexService index, ModelService model, Report report,
+    JobPluginInfo jobPluginInfo, Job job, final Plugin<? extends IsRODAObject> plugin, Representation representation,
+    final String details, final boolean doReport) {
     PluginState state = PluginState.SUCCESS;
-    Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), Representation.class);
+    Report reportItem = PluginHelper.initPluginReportItem(plugin, representation.getId(), Representation.class);
 
     try {
       AIP retrievedAIP = model.retrieveAIP(representation.getAipId());
       if (StringUtils.isNotBlank(retrievedAIP.getDisposalScheduleId())) {
-        updateReport(model, reportItem, jobPluginInfo, report, job, Representation.class.getSimpleName(),
-          representation.getId(), "schedule", retrievedAIP.getId());
+        updateReport(model, reportItem, jobPluginInfo, report, job, plugin, Representation.class.getSimpleName(),
+          representation.getId(), "schedule", retrievedAIP.getId(), details, doReport);
       } else if (retrievedAIP.onHold()) {
-        updateReport(model, reportItem, jobPluginInfo, report, job, Representation.class.getSimpleName(),
-          representation.getId(), "hold", retrievedAIP.getId());
+        updateReport(model, reportItem, jobPluginInfo, report, job, plugin, Representation.class.getSimpleName(),
+          representation.getId(), "hold", retrievedAIP.getId(), details, doReport);
       } else {
         try {
           model.deleteRepresentation(representation.getAipId(), representation.getId());
@@ -374,16 +329,18 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
 
         // removing PREMIS file
         try {
-          String pmId = URNUtils.getPremisPrefix(PreservationMetadataType.REPRESENTATION,
+          String pmId = URNUtils.getPremisPrefix(PreservationMetadata.PreservationMetadataType.REPRESENTATION,
             LocalInstanceUtils.getLocalInstanceIdentifier()) + representation.getId();
-          model.deletePreservationMetadata(PreservationMetadataType.REPRESENTATION, representation.getAipId(),
-            representation.getId(), pmId, false);
+          model.deletePreservationMetadata(PreservationMetadata.PreservationMetadataType.REPRESENTATION,
+            representation.getAipId(), representation.getId(), pmId, false);
         } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
           reportItem.addPluginDetails("Could not delete associated PREMIS file: " + e.getMessage());
         }
+        if (doReport) {
+          report.addReport(reportItem.setPluginState(state));
+          PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, job);
+        }
 
-        report.addReport(reportItem.setPluginState(state));
-        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
         jobPluginInfo.incrementObjectsProcessed(state);
 
         String outcomeText;
@@ -397,21 +354,25 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
         sources.add(PluginHelper.getLinkingIdentifier(representation.getAipId(), representation.getId(),
           RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
-        model.createEvent(representation.getAipId(), representation.getId(), null, null, PreservationEventType.DELETION,
-          EVENT_DESCRIPTION, sources, null, state, outcomeText, details, job.getUsername(), true);
+        model.createEvent(representation.getAipId(), representation.getId(), null, null,
+          RodaConstants.PreservationEventType.DELETION, EVENT_DESCRIPTION, sources, null, state, outcomeText, details,
+          job.getUsername(), true);
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       state = PluginState.FAILURE;
       reportItem.addPluginDetails("Could not delete representation: " + e.getMessage());
-      report.addReport(reportItem.setPluginState(state));
-      PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+      if (doReport) {
+        report.addReport(reportItem.setPluginState(state));
+        PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, job);
+      }
+
       jobPluginInfo.incrementObjectsProcessed(state);
     }
   }
 
-  private void processRisk(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
-    Risk risk) {
-    Report reportItem = PluginHelper.initPluginReportItem(this, risk.getId(), Risk.class);
+  private static void processRisk(IndexService index, ModelService model, Report report, JobPluginInfo jobPluginInfo,
+    Job job, final Plugin<? extends IsRODAObject> plugin, Risk risk, final boolean doReport) {
+    Report reportItem = PluginHelper.initPluginReportItem(plugin, risk.getId(), Risk.class);
     PluginState state = PluginState.SUCCESS;
 
     try {
@@ -428,15 +389,17 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
       state = PluginState.FAILURE;
     }
+    if (doReport) {
+      report.addReport(reportItem.setPluginState(state));
+      PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, job);
+    }
 
-    report.addReport(reportItem.setPluginState(state));
-    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
     jobPluginInfo.incrementObjectsProcessed(state);
   }
 
-  private void processRepresentationInformation(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
-    RepresentationInformation ri) {
-    Report reportItem = PluginHelper.initPluginReportItem(this, ri.getId(), RepresentationInformation.class);
+  private static void processRepresentationInformation(ModelService model, Report report, JobPluginInfo jobPluginInfo,
+    Job job, final Plugin<? extends IsRODAObject> plugin, RepresentationInformation ri, final boolean doReport) {
+    Report reportItem = PluginHelper.initPluginReportItem(plugin, ri.getId(), RepresentationInformation.class);
     PluginState state = PluginState.SUCCESS;
 
     try {
@@ -444,13 +407,15 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
       state = PluginState.FAILURE;
     }
+    if (doReport) {
+      report.addReport(reportItem.setPluginState(state));
+      PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, job);
+    }
 
-    report.addReport(reportItem.setPluginState(state));
-    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
     jobPluginInfo.incrementObjectsProcessed(state);
   }
 
-  private void deleteRelatedIncidences(ModelService model, IndexService index, Filter incidenceFilter)
+  private static void deleteRelatedIncidences(ModelService model, IndexService index, Filter incidenceFilter)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     Long incidenceCounter = index.count(RiskIncidence.class, incidenceFilter);
     IndexResult<RiskIncidence> incidences = index.find(RiskIncidence.class, incidenceFilter, Sorter.NONE,
@@ -462,9 +427,9 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     }
   }
 
-  private void processRiskIncidence(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
-    RiskIncidence incidence) {
-    Report reportItem = PluginHelper.initPluginReportItem(this, incidence.getId(), RiskIncidence.class);
+  private static void processRiskIncidence(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
+    final Plugin<? extends IsRODAObject> plugin, RiskIncidence incidence, final boolean doReport) {
+    Report reportItem = PluginHelper.initPluginReportItem(plugin, incidence.getId(), RiskIncidence.class);
     PluginState state = PluginState.SUCCESS;
 
     try {
@@ -473,14 +438,17 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
       state = PluginState.FAILURE;
     }
 
-    report.addReport(reportItem.setPluginState(state));
-    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+    if (doReport) {
+      report.addReport(reportItem.setPluginState(state));
+      PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, job);
+    }
     jobPluginInfo.incrementObjectsProcessed(state);
   }
 
-  private void processDIP(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job, DIP dip) {
+  private static void processDIP(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
+    final Plugin<? extends IsRODAObject> plugin, DIP dip, final boolean doReport) {
     PluginState state = PluginState.SUCCESS;
-    Report reportItem = PluginHelper.initPluginReportItem(this, dip.getId(), DIP.class);
+    Report reportItem = PluginHelper.initPluginReportItem(plugin, dip.getId(), DIP.class);
 
     try {
       model.deleteDIP(dip.getId());
@@ -489,15 +457,17 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
       reportItem.addPluginDetails("Could not delete DIP: " + e.getMessage());
     }
 
-    report.addReport(reportItem.setPluginState(state));
-    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+    if (doReport) {
+      report.addReport(reportItem.setPluginState(state));
+      PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, job);
+    }
     jobPluginInfo.incrementObjectsProcessed(state);
   }
 
-  private void processDIPFile(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
-    DIPFile dipFile) {
+  private static void processDIPFile(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
+    final Plugin<? extends IsRODAObject> plugin, DIPFile dipFile, final boolean doReport) {
     PluginState state = PluginState.SUCCESS;
-    Report reportItem = PluginHelper.initPluginReportItem(this, dipFile.getId(), DIPFile.class);
+    Report reportItem = PluginHelper.initPluginReportItem(plugin, dipFile.getId(), DIPFile.class);
 
     try {
       model.deleteDIPFile(dipFile.getDipId(), dipFile.getPath(), dipFile.getId(), false);
@@ -506,81 +476,10 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
       reportItem.addPluginDetails("Could not delete DIP file: " + e.getMessage());
     }
 
-    report.addReport(reportItem.setPluginState(state));
-    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
-    jobPluginInfo.incrementObjectsProcessed(state);
-  }
-
-  @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    return new Report();
-  }
-
-  @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    try {
-      Job job = PluginHelper.getJob(this, index);
-      index.commit((Class<? extends IsIndexed>) Class.forName(job.getSourceObjects().getSelectedClass()));
-    } catch (NotFoundException | GenericException | ClassNotFoundException | RequestNotValidException
-      | AuthorizationDeniedException e) {
-      LOGGER.error("Could not commit after delete operation", e);
+    if (doReport) {
+      report.addReport(reportItem.setPluginState(state));
+      PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, job);
     }
-
-    return new Report();
-  }
-
-  @Override
-  public Plugin<T> cloneMe() {
-    return new DeleteRODAObjectPlugin<>();
-  }
-
-  @Override
-  public PluginType getType() {
-    return PluginType.INTERNAL;
-  }
-
-  @Override
-  public boolean areParameterValuesValid() {
-    return true;
-  }
-
-  @Override
-  public PreservationEventType getPreservationEventType() {
-    return PreservationEventType.DELETION;
-  }
-
-  @Override
-  public String getPreservationEventDescription() {
-    return "Deletes RODA entities";
-  }
-
-  @Override
-  public String getPreservationEventSuccessMessage() {
-    return "RODA entities were successfully removed";
-  }
-
-  @Override
-  public String getPreservationEventFailureMessage() {
-    return "RODA entities were not successfully removed";
-  }
-
-  @Override
-  public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
-  }
-
-  @Override
-  public List<Class<T>> getObjectClasses() {
-    List<Class<? extends IsRODAObject>> list = new ArrayList<>();
-    list.add(AIP.class);
-    list.add(Representation.class);
-    list.add(File.class);
-    list.add(Risk.class);
-    list.add(RepresentationInformation.class);
-    list.add(RiskIncidence.class);
-    list.add(DIP.class);
-    list.add(DIPFile.class);
-    return (List) list;
+    jobPluginInfo.incrementObjectsProcessed(state);
   }
 }
