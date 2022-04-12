@@ -775,6 +775,15 @@ public class HtmlSnippetUtils {
         syncErrorsBuilder.append(SafeHtmlUtils.fromSafeConstant("<a href='"));
         syncErrorsBuilder.append(SafeHtmlUtils.fromString(synchronizationLastStatusDownloadUri.asString()));
         syncErrorsBuilder.append(SafeHtmlUtils.fromSafeConstant("' class='btn btn-link'>"));
+        syncErrorsBuilder
+          .append(SafeHtmlUtils.fromString(String.valueOf(distributedInstance.getRemovedEntities()) + " "));
+        syncErrorsBuilder.append(SafeHtmlUtils.fromString(messages.distributedInstanceRemovedEntitiesLabel()));
+        syncErrorsBuilder.append(SafeHtmlUtils.fromString(" "));
+        syncErrorsBuilder
+          .append(SafeHtmlUtils.fromString(String.valueOf(distributedInstance.getUpdatedEntities()) + " "));
+        syncErrorsBuilder.append(SafeHtmlUtils.fromString(messages.distributedInstanceUpdatedEntitiesLabel()));
+        syncErrorsBuilder.append(SafeHtmlUtils.fromString(" "));
+
         syncErrorsBuilder.append(SafeHtmlUtils.fromString(
           String.valueOf(distributedInstance.getSyncErrors()) + " " + messages.distributedInstanceSyncErrorsLabel()));
         syncErrorsBuilder.append(SafeHtmlUtils.fromSafeConstant("</a>"));

@@ -1815,14 +1815,31 @@ public final class RodaConstants {
   public static final String SYNCHRONIZATION_LOCAL_INSTANCE_RISK_LIST_FILE_NAME = "risk_list";
 
   public static final String SYNCHRONIZATION_REPORT_FILE = "last_synchronization";
+  public static final String SYNCHRONIZATION_ISSUES_FILE = "issues";
+  public static final String SYNCHRONIZATION_REMOVED_FILE = "removed";
+  public static final String SYNCHRONIZATION_ISSUE_TYPE_MISSING = "missing";
 
-  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_REMOVED_AIP = "removed_aip";
-  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_REMOVED_DIP = "removed_dip";
-  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_REMOVED_RISK = "removed_risk";
+  public static final String SYNCHRONIZATION_REPORT_KEY_UUID = "uuid";
+  public static final String SYNCHRONIZATION_REPORT_KEY_INSTANCE_ID = "instanceId";
+  public static final String SYNCHRONIZATION_REPORT_KEY_FROM_DATE = "fromDate";
+  public static final String SYNCHRONIZATION_REPORT_KEY_STATUS = "status";
+  public static final String SYNCHRONIZATION_REPORT_KEY_JOB = "job";
+  public static final String SYNCHRONIZATION_REPORT_KEY_UPDATED_AND_ADDED = "updated/added";
+  public static final String SYNCHRONIZATION_REPORT_KEY_REMOVED = "REMOVED";
+  public static final String SYNCHRONIZATION_REPORT_KEY_ISSUES = "ISSUES";
 
-  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_MISSING_AIP = "missing_aip";
-  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_MISSING_DIP = "missing_dip";
-  public static final String SYNCHRONIZATION_REPORT_KEY_LIST_MISSING_RISK = "missing_risk";
+  public static final String SYNCHRONIZATION_REPORT_KEY_DESCRIPTION = "description";
+  public static final String SYNCHRONIZATION_REPORT_KEY_COUNT = "count";
+
+  public static final String SYNCHRONIZATION_REPORT_VALUE_ADDED_DESCRIPTION = "entities added in central instance";
+  public static final String SYNCHRONIZATION_REPORT_VALUE_UPDATED_AND_ADDED_DESCRIPTION = "entities updated or added in central instance";
+  public static final String SYNCHRONIZATION_REPORT_VALUE_REMOVED_DESCRIPTION = "entities removed from central "
+    + "instance because they were removed from local instance";
+  public static final String SYNCHRONIZATION_REPORT_VALUE_ISSUES_DESCRIPTION = "An entity was found is central "
+    + "instance but is not listed in local instance or is listed as being removed from local instance";
+
+  public static final String SYNCHRONIZATION_REPORT_VALUE_STATUS_SUCCESS = "Successful Synchronization";
+  public static final String SYNCHRONIZATION_REPORT_VALUE_STATUS_ERROR = "Synchronization with errors";
 
   /** Private empty constructor */
   private RodaConstants() {

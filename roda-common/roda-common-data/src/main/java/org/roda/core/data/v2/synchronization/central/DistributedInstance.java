@@ -32,11 +32,15 @@ public class DistributedInstance implements IsModelObject {
   private String updatedBy;
 
   private int syncErrors;
+  private int removedEntities;
+  private int updatedEntities;
 
   public DistributedInstance() {
     status = DistributedInstanceStatus.CREATED;
     lastSyncDate = null;
     syncErrors = 0;
+    removedEntities = 0;
+    updatedEntities = 0;
   }
 
   @Override
@@ -142,6 +146,22 @@ public class DistributedInstance implements IsModelObject {
 
   public void setSyncErrors(int syncErrors) {
     this.syncErrors = syncErrors;
+  }
+
+  public int getRemovedEntities() {
+    return this.removedEntities;
+  }
+
+  public void setRemovedEntities(int removedEntities) {
+    this.removedEntities = removedEntities;
+  }
+
+  public int getUpdatedEntities() {
+    return this.updatedEntities;
+  }
+
+  public void setUpdatedEntities(int updatedEntities) {
+    this.updatedEntities = updatedEntities;
   }
 
   @JsonIgnore

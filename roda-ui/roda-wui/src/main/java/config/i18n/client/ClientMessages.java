@@ -2483,6 +2483,10 @@ public interface ClientMessages extends Messages {
 
   String distributedInstanceSyncErrorsLabel();
 
+  String distributedInstanceRemovedEntitiesLabel();
+
+  String distributedInstanceUpdatedEntitiesLabel();
+
   /** Local instance configuration **/
 
   String createLocalInstanceConfigurationTitle();

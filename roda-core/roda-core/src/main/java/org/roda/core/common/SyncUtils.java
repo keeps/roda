@@ -1,6 +1,8 @@
 package org.roda.core.common;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -33,7 +35,6 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.utils.CentralEntitiesJsonUtils;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -51,7 +52,6 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.bundle.AttachmentState;
 import org.roda.core.data.v2.synchronization.bundle.BundleState;
-import org.roda.core.data.v2.synchronization.bundle.CentralEntities;
 import org.roda.core.data.v2.synchronization.bundle.EntitiesBundle;
 import org.roda.core.data.v2.synchronization.bundle.PackageState;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
@@ -73,6 +73,11 @@ import org.roda.core.util.ZipUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
@@ -83,6 +88,9 @@ public class SyncUtils {
   private final static String ATTACHMENTS_DIR = "job-attachments";
   private final static String INCOMING_PREFIX = "incoming_sync_";
   private final static String OUTCOME_PREFIX = "outcome_sync_";
+
+  private static OutputStream outputStream = null;
+  private static JsonGenerator jsonGenerator = null;
 
   /**
    * Common Bundle methods
@@ -176,6 +184,7 @@ public class SyncUtils {
     Path syncBundleWorkingDirectory = createSyncBundleWorkingDirectory(OUTCOME_PREFIX, instanceIdentifier);
     Path bundleStateFilePath = syncBundleWorkingDirectory.resolve(STATE_FILE);
     BundleState bundleState = new BundleState();
+    bundleState.setId(IdUtils.createUUID());
     bundleState.setDestinationPath(syncBundleWorkingDirectory.toString());
     bundleState.setToDate(new Date());
 
@@ -228,7 +237,8 @@ public class SyncUtils {
   public static Path compressBundle(String instanceIdentifier) throws PluginException {
     try {
       BundleState bundleState = getOutcomeBundleState(instanceIdentifier);
-      String fileName = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'.zip'").format(bundleState.getToDate());
+      final String date = new SimpleDateFormat("yyyyMMdd'T'hhmmss'.zip'").format(bundleState.getToDate());
+      final String fileName = bundleState.getId() + "_" + date;
       Path filePath = RodaCoreFactory.getSynchronizationDirectoryPath()
         .resolve(RodaConstants.CORE_SYNCHRONIZATION_OUTCOME_FOLDER).resolve(fileName);
       if (FSUtils.exists(filePath)) {
@@ -568,37 +578,6 @@ public class SyncUtils {
   }
 
   /**
-   * Write the file with the entities removed and the missing entities from the
-   * last synchronization.
-   * 
-   * @param centralEntities
-   *          {@link CentralEntities}.
-   * @param instanceIdentifier
-   *          The instance identifier.
-   * @throws IOException
-   *           if some i/o error occurs.
-   */
-  public static void writeEntitiesFile(final CentralEntities centralEntities, String instanceIdentifier)
-    throws IOException {
-    final StringBuilder fileNameBuilder = new StringBuilder();
-    fileNameBuilder.append(RodaConstants.SYNCHRONIZATION_REPORT_FILE).append("_").append(instanceIdentifier)
-      .append(".json");
-
-    final Path temporaryPath = RodaCoreFactory.getWorkingDirectory().resolve(fileNameBuilder.toString());
-    final Path lastSyncReportPath = RodaCoreFactory.getSynchronizationDirectoryPath()
-      .resolve(fileNameBuilder.toString());
-
-    try {
-      Files.deleteIfExists(temporaryPath);
-      Files.createFile(temporaryPath);
-      CentralEntitiesJsonUtils.writeJsonToFile(centralEntities, temporaryPath);
-      Files.move(temporaryPath, lastSyncReportPath, StandardCopyOption.REPLACE_EXISTING);
-    } catch (final IOException e) {
-      Files.deleteIfExists(temporaryPath);
-    }
-  }
-
-  /**
    * Get the stream response from the given path.
    * 
    * @param path
@@ -613,7 +592,7 @@ public class SyncUtils {
 
   /**
    * Imports from synchronization bundle to RODA storage.
-   * 
+   *
    * @param storage
    *          {@link StorageService}
    * @param tempDirectory
@@ -679,7 +658,7 @@ public class SyncUtils {
 
   /**
    * Reindex all objects moved from bundle to storage.
-   * 
+   *
    * @param bundleState
    *          {@link BundleState}.
    * @param jobPluginInfo
@@ -719,7 +698,7 @@ public class SyncUtils {
 
   /**
    * Move Jobs and Jobs reports from local bundle to RODA central storage.
-   * 
+   *
    * @param storage
    *          {@link StorageService}.
    * @param resource
@@ -760,6 +739,78 @@ public class SyncUtils {
         LOGGER.error("Error getting Job json from binary", e);
       }
     }
+  }
+
+  // Write Bundle JSON Lists
+
+  /**
+   * Init the {@link OutputStream} and the {@link JsonGenerator} and init the json
+   * array.
+   * 
+   * @param path
+   *          {@link Path}
+   * @throws IOException
+   *           if some i/o error occur
+   */
+  public static void init(final Path path) throws IOException {
+    if (!Files.exists(path)) {
+      Files.createFile(path);
+    }
+
+    if (path != null) {
+      outputStream = new BufferedOutputStream(new FileOutputStream(path.toFile()));
+      final JsonFactory jsonFactory = new JsonFactory();
+      jsonGenerator = jsonFactory.createGenerator(outputStream, JsonEncoding.UTF8).useDefaultPrettyPrinter();
+    }
+
+    jsonGenerator.writeStartArray();
+  }
+
+  /**
+   * Write a json string.
+   * 
+   * @param value
+   *          the value.
+   * @throws IOException
+   *           if some i/o error occur
+   */
+  public static void writeString(final String value) throws IOException {
+    jsonGenerator.writeString(value);
+  }
+
+  /**
+   * Close the {@link JsonGenerator} and the {@link OutputStream}.
+   * 
+   * @param closeArray
+   *          if is to close the json array.
+   * @throws IOException
+   *           if some i/o error occur
+   */
+  public static void close(final boolean closeArray) throws IOException {
+    if (closeArray) {
+      jsonGenerator.writeEndArray();
+    }
+
+    if (jsonGenerator != null) {
+      jsonGenerator.close();
+    }
+    if (outputStream != null) {
+      outputStream.close();
+    }
+  }
+
+  /**
+   * Create {@link JsonParser} to read the file.
+   *
+   * @param path
+   *          {@link Path}.
+   * @return {@link JsonParser}.
+   * @throws IOException
+   *           if some i/o error occurs.
+   */
+  public static JsonParser createJsonParser(Path path) throws IOException {
+    final JsonFactory jfactory = new JsonFactory();
+    return jfactory.createParser(path.toFile());
   }
 
 }

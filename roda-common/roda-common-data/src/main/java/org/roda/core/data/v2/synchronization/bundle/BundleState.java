@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 public class BundleState {
+  private String id;
   private Date fromDate;
   private Date toDate;
   private String destinationPath;
@@ -24,6 +25,14 @@ public class BundleState {
     packageStateList = new ArrayList<>();
     attachmentStateList = new ArrayList<>();
     syncStatus = Status.NONE;
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public void setId(final String id) {
+    this.id = id;
   }
 
   public Date getFromDate() {
@@ -93,6 +102,8 @@ public class BundleState {
   public void setEntitiesBundle(final EntitiesBundle entitiesBundle) {
     this.entitiesBundle = entitiesBundle;
   }
+
+
 
   public enum Status {
     NONE, PREPARED, FAILED, SENT
