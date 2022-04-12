@@ -98,12 +98,6 @@ import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.MultipleJobPluginInfo;
 import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
-import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateAipPackagePlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateDipPackagePlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateJobPackagePlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreatePreservationAgentPackagePlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateRepositoryEventPackagePlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.bundle.CreateRiskIncidencePackagePlugin;
 import org.roda.core.plugins.plugins.notifications.GenericJobNotification;
 import org.roda.core.plugins.plugins.notifications.JobNotification;
 import org.roda.core.plugins.plugins.reindex.ReindexAIPPlugin;
@@ -531,12 +525,13 @@ public final class PluginHelper {
   }
 
   public static <T extends IsRODAObject> void updateJobReportMetaPluginInformation(Plugin<T> plugin, ModelService model,
-      Report metaPluginReport, Job cachedJob, MultipleJobPluginInfo jobPluginInfo) {
+    Report metaPluginReport, Job cachedJob, MultipleJobPluginInfo jobPluginInfo) {
 
-    jobPluginInfo.getAllReports().forEach((key,reports) -> {
+    jobPluginInfo.getAllReports().forEach((key, reports) -> {
       reports.forEach(report -> {
         try {
-          Report jobReport = model.retrieveJobReport(cachedJob.getId(), report.getSourceObjectId(), report.getOutcomeObjectId());
+          Report jobReport = model.retrieveJobReport(cachedJob.getId(), report.getSourceObjectId(),
+            report.getOutcomeObjectId());
           jobReport.setTitle(cachedJob.getName());
           jobReport.setPlugin(metaPluginReport.getPlugin());
           jobReport.setPluginName(metaPluginReport.getPluginName());
@@ -1696,24 +1691,6 @@ public final class PluginHelper {
       return ReindexDisposalConfirmationPlugin.class.getName();
     } else {
       throw new NotFoundException("No reindex plugin available");
-    }
-  }
-
-  public static String getBundlePluginName(Class<?> bundleClass) throws NotFoundException {
-    if (bundleClass.equals(AIP.class)) {
-      return CreateAipPackagePlugin.class.getName();
-    } else if (bundleClass.equals(DIP.class)) {
-      return CreateDipPackagePlugin.class.getName();
-    } else if (bundleClass.equals(RiskIncidence.class)) {
-      return CreateRiskIncidencePackagePlugin.class.getName();
-    } else if (bundleClass.equals(Job.class)) {
-      return CreateJobPackagePlugin.class.getName();
-    } else if (bundleClass.equals(IndexedPreservationEvent.class)) {
-      return CreateRepositoryEventPackagePlugin.class.getName();
-    } else if (bundleClass.equals(IndexedPreservationAgent.class)) {
-      return CreatePreservationAgentPackagePlugin.class.getName();
-    } else {
-      throw new NotFoundException("No Bundle plugin available");
     }
   }
 
