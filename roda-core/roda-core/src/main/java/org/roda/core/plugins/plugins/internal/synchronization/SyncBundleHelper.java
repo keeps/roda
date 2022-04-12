@@ -19,7 +19,6 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.utils.CentralEntitiesJsonUtils;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -38,6 +37,7 @@ import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
 import org.roda.core.util.FileUtility;
+import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +67,7 @@ public class SyncBundleHelper {
     bundleState.setDestinationPath(localInstance.getBundlePath());
     bundleState.setFromDate(distributedInstance.getLastSyncDate());
     bundleState.setToDate(new Date());
+    bundleState.setId(IdUtils.createUUID());
     Path bundleStateFilePath = Paths.get(localInstance.getBundlePath()).resolve(STATE_FILE);
     JsonUtils.writeObjectToFile(bundleState, bundleStateFilePath);
 
@@ -222,12 +223,12 @@ public class SyncBundleHelper {
       filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS,
         IndexedPreservationEvent.PreservationMetadataEventClass.REPOSITORY.toString()));
     }
-    CentralEntitiesJsonUtils.init(destinationPath);
+    SyncUtils.init(destinationPath);
     try (IterableIndexResult<? extends IsIndexed> result = index.findAll(indexedClass, filter, true,
       Collections.singletonList(RodaConstants.INDEX_UUID))) {
       result.forEach(indexed -> {
         try {
-          CentralEntitiesJsonUtils.writeString(indexed.getId());
+          SyncUtils.writeString(indexed.getId());
         } catch (final IOException e) {
           LOGGER.error("Error writing the ID {} {}", indexed.getId(), e);
         }
@@ -236,7 +237,7 @@ public class SyncBundleHelper {
       LOGGER.error("Error getting iterator when creating aip list", e);
     }
 
-    CentralEntitiesJsonUtils.close(true);
+    SyncUtils.close(true);
 
   }
 }
