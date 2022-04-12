@@ -1820,8 +1820,8 @@ public final class RodaConstants {
   public static final String SYNCHRONIZATION_ISSUE_TYPE_MISSING = "missing";
 
   public static final String SYNCHRONIZATION_REPORT_KEY_UUID = "uuid";
-  public static final String SYNCHRONIZATION_REPORT_KEY_INSTANCE_ID = "instance_id";
-  public static final String SYNCHRONIZATION_REPORT_KEY_FROM_DATE = "from_date";
+  public static final String SYNCHRONIZATION_REPORT_KEY_INSTANCE_ID = "instanceId";
+  public static final String SYNCHRONIZATION_REPORT_KEY_FROM_DATE = "fromDate";
   public static final String SYNCHRONIZATION_REPORT_KEY_STATUS = "status";
   public static final String SYNCHRONIZATION_REPORT_KEY_JOB = "job";
   public static final String SYNCHRONIZATION_REPORT_KEY_UPDATED_AND_ADDED = "updated/added";

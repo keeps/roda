@@ -8,13 +8,13 @@ import java.io.Serializable;
 public class Issue implements Serializable {
 
   private String id = null;
-  private String issue_type = null;
-  private String entity_class = null;
+  private String issueType = null;
+  private String entityClass = null;
 
-  public Issue(final String id, final String issue_type, final String entity_class) {
+  public Issue(final String id, final String issueType, final String entityClass) {
     this.id = id;
-    this.issue_type = issue_type;
-    this.entity_class = entity_class;
+    this.issueType = issueType;
+    this.entityClass = entityClass;
   }
 
   public String getId() {
@@ -25,19 +25,19 @@ public class Issue implements Serializable {
     this.id = id;
   }
 
-  public String getIssue_type() {
-    return issue_type;
+  public String getIssueType() {
+    return issueType;
   }
 
-  public void setIssue_type(final String issue_type) {
-    this.issue_type = issue_type;
+  public void setIssueType(final String issueType) {
+    this.issueType = issueType;
   }
 
-  public String getEntity_class() {
-    return entity_class;
+  public String getEntityClass() {
+    return entityClass;
   }
 
-  public void setEntity_class(final String entity_class) {
-    this.entity_class = entity_class;
+  public void setEntityClass(final String entityClass) {
+    this.entityClass = entityClass;
   }
 }

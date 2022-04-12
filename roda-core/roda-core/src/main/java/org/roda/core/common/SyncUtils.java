@@ -237,7 +237,7 @@ public class SyncUtils {
   public static Path compressBundle(String instanceIdentifier) throws PluginException {
     try {
       BundleState bundleState = getOutcomeBundleState(instanceIdentifier);
-      final String date = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'.zip'").format(bundleState.getToDate());
+      final String date = new SimpleDateFormat("yyyyMMdd'T'hhmmss'.zip'").format(bundleState.getToDate());
       final String fileName = bundleState.getId() + "_" + date;
       Path filePath = RodaCoreFactory.getSynchronizationDirectoryPath()
         .resolve(RodaConstants.CORE_SYNCHRONIZATION_OUTCOME_FOLDER).resolve(fileName);
