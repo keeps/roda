@@ -7,7 +7,6 @@
  */
 package org.roda.wui.common.server;
 
-import org.apache.log4j.LogManager;
 import org.roda.wui.common.client.ClientLoggerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,7 +138,6 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
   @Override
   public void destroy() {
     super.destroy();
-    LogManager.shutdown();
   }
 
   /**
