@@ -209,7 +209,7 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
             .getRodaConfigurationAsString("core.synchronization.preservationActionExecution.type");
           if (!StringUtils.isNotBlank(SYNC_ACTION_TYPE)) {
             PluginHelper.createAndExecuteJob(job);
-          } else if ("APPROVAL".equals(SYNC_ACTION_TYPE)) {
+          } else if (RodaConstants.JOB_EXECUTION_TYPE_APPROVAL.equals(SYNC_ACTION_TYPE)) {
             job.setState(Job.JOB_STATE.PENDING_APPROVAL);
             PluginHelper.createJob(job);
           } else {
