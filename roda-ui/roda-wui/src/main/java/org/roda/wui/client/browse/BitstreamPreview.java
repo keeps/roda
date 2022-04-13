@@ -7,13 +7,17 @@
  */
 package org.roda.wui.client.browse;
 
+import com.google.gwt.safehtml.shared.UriUtils;
 import org.apache.commons.httpclient.HttpStatus;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.common.utils.IndexedDIPUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -79,6 +83,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   private Permissions permissions;
 
   private final T object;
+  private boolean fileIsFromDistributedInstance;
 
   public BitstreamPreview(Viewers viewers, SafeUri bitstreamDownloadUri, FileFormat format, String filename, long size,
     boolean isDirectory, T object) {
@@ -148,27 +153,32 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   private void init() {
     if (!isDirectory) {
       String type = viewerType();
-      if (type != null) {
-        if (type.equals(VIEWER_TYPE_IMAGE)) {
-          imagePreview();
-        } else if (type.equals(VIEWER_TYPE_PDF)) {
-          pdfPreview();
-        } else if (type.equals(VIEWER_TYPE_TEXT)) {
-          textPreview();
-        } else if (type.equals(VIEWER_TYPE_HTML)) {
-          htmlPreview();
-        } else if (type.equals(VIEWER_TYPE_AUDIO)) {
-          audioPreview();
-        } else if (type.equals(VIEWER_TYPE_VIDEO)) {
-          videoPreview();
+      fileIsFromDistributedInstance = isFileFromDistributedInstance();
+      if (fileIsFromDistributedInstance) {
+        notSupportedPreviewDistributedInstance();
+      } else {
+        if (type != null) {
+          if (type.equals(VIEWER_TYPE_IMAGE)) {
+            imagePreview();
+          } else if (type.equals(VIEWER_TYPE_PDF)) {
+            pdfPreview();
+          } else if (type.equals(VIEWER_TYPE_TEXT)) {
+            textPreview();
+          } else if (type.equals(VIEWER_TYPE_HTML)) {
+            htmlPreview();
+          } else if (type.equals(VIEWER_TYPE_AUDIO)) {
+            audioPreview();
+          } else if (type.equals(VIEWER_TYPE_VIDEO)) {
+            videoPreview();
+          } else {
+            notSupportedPreview();
+          }
+        } else if (object instanceof IndexedDIP) {
+          IndexedDIP dip = (IndexedDIP) object;
+          dipUrlPreview(dip);
         } else {
           notSupportedPreview();
         }
-      } else if (object instanceof IndexedDIP) {
-        IndexedDIP dip = (IndexedDIP) object;
-        dipUrlPreview(dip);
-      } else {
-        notSupportedPreview();
       }
     } else {
       panel.add(directoryPreview());
@@ -454,6 +464,22 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
   }
 
+  private void notSupportedPreviewDistributedInstance() {
+    HTML html = new HTML();
+    SafeHtmlBuilder b = new SafeHtmlBuilder();
+
+    b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-picture-o fa-5'></i>"));
+    b.append(SafeHtmlUtils.fromSafeConstant("<h4 class='errormessage'>"));
+    b.append(SafeHtmlUtils.fromString(messages.viewRepresentationNotSupportedPreviewCentralInstance()));
+    b.append(SafeHtmlUtils.fromSafeConstant("</h4>"));
+
+    html.setHTML(b.toSafeHtml());
+    panel.add(html);
+    html.setStyleName("viewRepresentationNotSupportedPreview");
+
+    onPreviewFailure.execute();
+  }
+
   protected Widget directoryPreview() {
     HTML html = new HTML();
     SafeHtmlBuilder b = new SafeHtmlBuilder();
@@ -486,4 +512,16 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     return permissions;
   }
 
+  public boolean isFileFromDistributedInstance() {
+    String distributedMode = ConfigurationManager.getStringWithDefault(
+      RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
+
+    if (this.object instanceof IndexedFile) {
+      IndexedFile file = (IndexedFile) this.object;
+      if (distributedMode.equals(RodaConstants.DistributedModeType.CENTRAL.name()) && file.isReference()) {
+        return UriUtils.extractScheme(file.getReferenceURL()).equals("roda");
+      }
+    }
+    return false;
+  }
 }

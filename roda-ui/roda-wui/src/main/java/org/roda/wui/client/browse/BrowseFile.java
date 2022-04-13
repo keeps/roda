@@ -150,49 +150,37 @@ public class BrowseFile extends Composite {
 
   public BrowseFile(Viewers viewers, final BrowseFileBundle bundle) {
     final boolean justActive = AIPState.ACTIVE.equals(bundle.getAip().getState());
+    // initialize preview
+    filePreview = new IndexedFilePreview(viewers, bundle.getFile(), justActive, bundle.getAip().getPermissions(),
+      new Command() {
 
-    if (!canPreview(bundle.getFile())) {
-      Dialogs.showInformationDialog(messages.distributedInstancesLabel(),
-        messages.distributedInstancesFileNotAccessibleMessage(), messages.closeButton(), false,
-        new NoAsyncCallback<Void>() {
-          @Override
-          public void onSuccess(Void unused) {
-            HistoryUtils.newHistory(BrowseRepresentation.RESOLVER, bundle.getAip().getId(),
-              bundle.getRepresentation().getId());
-          }
-        });
-    } else {
-      // initialize preview
-      filePreview = new IndexedFilePreview(viewers, bundle.getFile(), justActive, bundle.getAip().getPermissions(),
-        new Command() {
+        @Override
+        public void execute() {
+          Scheduler.get().scheduleDeferred(new Command() {
+            @Override
+            public void execute() {
+              Filter filter = new Filter(
+                new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, bundle.getFile().getUUID()));
+              BrowserService.Util.getInstance().count(IndexedDIP.class.getName(), filter, justActive,
+                new AsyncCallback<Long>() {
 
-          @Override
-          public void execute() {
-            Scheduler.get().scheduleDeferred(new Command() {
-              @Override
-              public void execute() {
-                Filter filter = new Filter(
-                  new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, bundle.getFile().getUUID()));
-                BrowserService.Util.getInstance().count(IndexedDIP.class.getName(), filter, justActive,
-                  new AsyncCallback<Long>() {
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    AsyncCallbackUtils.defaultFailureTreatment(caught);
+                  }
 
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      AsyncCallbackUtils.defaultFailureTreatment(caught);
+                  @Override
+                  public void onSuccess(Long dipCount) {
+                    if (dipCount > 0) {
+                      disseminationsSlider.open();
                     }
+                  }
+                });
+            }
+          });
+        }
+      });
 
-                    @Override
-                    public void onSuccess(Long dipCount) {
-                      if (dipCount > 0) {
-                        disseminationsSlider.open();
-                      }
-                    }
-                  });
-              }
-            });
-          }
-        });
-    }
     // initialize widget
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -223,16 +211,5 @@ public class BrowseFile extends Composite {
     }
 
     WCAGUtilities.getInstance().makeAccessible(center.getElement());
-  }
-
-  public boolean canPreview(IndexedFile file) {
-    String distributedMode = ConfigurationManager.getStringWithDefault(
-      RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
-    if (distributedMode.equals(RodaConstants.DistributedModeType.CENTRAL.name()) && file.isReference()) {
-      if (UriUtils.extractScheme(file.getReferenceURL()).equals("roda")) {
-        return false;
-      }
-    }
-    return true;
   }
 }
