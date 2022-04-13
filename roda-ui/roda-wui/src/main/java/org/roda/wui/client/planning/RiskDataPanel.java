@@ -353,6 +353,13 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
       identifiedBy.removeStyleName("isWrong");
     }
 
+    if (categories.getTextBoxesValue() == null || categories.getTextBoxesValue().isEmpty()) {
+      valid = false;
+      categories.addStyleName("isWrong");
+    } else {
+      categories.removeStyleName("isWrong");
+    }
+
     checked = true;
     return valid;
   }
