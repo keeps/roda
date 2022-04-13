@@ -926,6 +926,29 @@ public final class ModelUtils {
     }
   }
 
+  public static <T extends IsRODAObject> Class<T> giveRespectiveModelClassFromContainerName(
+    final String containerName) {
+    // TODO: add agent Class and Notification (Maybe)
+    if (RodaConstants.STORAGE_CONTAINER_AIP.equals(containerName)) {
+      return (Class<T>) AIP.class;
+    } else if (RodaConstants.STORAGE_CONTAINER_DIP.equals(containerName)) {
+      return (Class<T>) DIP.class;
+    } else if (RodaConstants.STORAGE_CONTAINER_JOB.equals(containerName)) {
+      return (Class<T>) Job.class;
+    } else if (RodaConstants.STORAGE_CONTAINER_JOB_REPORT.equals(containerName)) {
+      return (Class<T>) Report.class;
+    } else if (RodaConstants.STORAGE_CONTAINER_RISK.equals(containerName)) {
+      return (Class<T>) Risk.class;
+    } else if (RodaConstants.STORAGE_CONTAINER_RISK_INCIDENCE.equals(containerName)) {
+      return (Class<T>) RiskIncidence.class;
+    } else if (RodaConstants.STORAGE_CONTAINER_REPRESENTATION_INFORMATION.equals(containerName)) {
+      return (Class<T>) RepresentationInformation.class;
+    } else if (RodaConstants.STORAGE_CONTAINER_PRESERVATION.equals(containerName)) {
+      return (Class<T>) PreservationMetadata.class;
+    } else
+      return null;
+  }
+
   public static StoragePath getDisposalRuleStoragePath(String disposalRuleId) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_DISPOSAL_RULE,
       disposalRuleId + RodaConstants.JOB_FILE_EXTENSION);

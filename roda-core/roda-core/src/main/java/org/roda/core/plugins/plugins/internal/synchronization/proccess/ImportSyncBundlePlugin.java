@@ -189,28 +189,31 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
       report.setSourceAndOutcomeObjectClass(AIP.class.getName(), AIP.class.getName());
       Path bundleWorkingDir = null;
       try {
+        DistributedInstance distributedInstance = model.retrieveDistributedInstance(instanceIdentifier);
+        distributedInstance.cleanEntitiesSummaries();
         bundleWorkingDir = SyncUtils.extractBundle(instanceIdentifier, Paths.get(bundlePath));
         BundleState bundleState = SyncUtils.getIncomingBundleState(instanceIdentifier);
-        validateChecksum(bundleWorkingDir, bundleState);
-        importStorage(model, index, storage, cachedJob, bundleWorkingDir, bundleState, jobPluginInfo, report);
+        importStorage(model, index, storage, cachedJob, bundleWorkingDir, bundleState, jobPluginInfo, report,
+          instanceIdentifier);
         SyncUtils.copyAttachments(instanceIdentifier);
 
         // Delete entities
+
         final int removed = ImportUtils.deleteBundleEntities(model, index, cachedJob, this, jobPluginInfo,
-          instanceIdentifier, bundleWorkingDir, bundleState.getEntitiesBundle(), report);
+          distributedInstance, bundleWorkingDir, bundleState.getEntitiesBundle(), report);
 
         // Validate entities
-        ImportUtils.validateEntitiesBundle(index, bundleWorkingDir, bundleState.getEntitiesBundle(), instanceIdentifier,
-          syncErrors);
+        ImportUtils.validateEntitiesBundle(index, bundleWorkingDir, bundleState.getEntitiesBundle(),
+          distributedInstance, syncErrors);
 
-        DistributedInstance distributedInstance = model.retrieveDistributedInstance(instanceIdentifier);
         distributedInstance.setLastSyncDate(bundleState.getToDate());
         distributedInstance.setSyncErrors(syncErrors);
         distributedInstance.setRemovedEntities(removed);
-        distributedInstance.setUpdatedEntities(ImportUtils.getUpdatedInstances(bundleState));
-
+        distributedInstance.setUpdatedEntities(ImportUtils.getUpdatedInstances(bundleState, distributedInstance));
+        ImportUtils.updateEntityCounter(bundleState, distributedInstance);
         ImportUtils.createLastSyncFile(bundleWorkingDir, distributedInstance,
-          ImportUtils.getUpdatedInstances(bundleState), removed, cachedJob.getId(), bundleState.getId());
+          ImportUtils.getUpdatedInstances(bundleState, distributedInstance), removed, cachedJob.getId(),
+          bundleState.getId());
 
         model.updateDistributedInstance(distributedInstance, cachedJob.getUsername());
         report.setPluginState(PluginState.SUCCESS);
@@ -233,8 +236,8 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
 
   private void importStorage(final ModelService model, final IndexService index, final StorageService storage,
     final Job job, final Path tempDirectory, final BundleState bundleState, final JobPluginInfo jobPluginInfo,
-    final Report report) throws GenericException, NotFoundException, AuthorizationDeniedException,
-    RequestNotValidException, AlreadyExistsException, JobAlreadyStartedException {
+    final Report report, String instanceIdentifier) throws GenericException, NotFoundException,
+    AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, JobAlreadyStartedException {
     FileStorageService temporaryStorage = new FileStorageService(
       tempDirectory.resolve(RodaConstants.CORE_STORAGE_FOLDER), false, null, false);
     CloseableIterable<Container> containers = temporaryStorage.listContainers();

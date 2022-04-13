@@ -1,12 +1,15 @@
 package org.roda.core.data.v2.synchronization.central;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.roda.core.data.v2.synchronization.EntitySummary;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -35,12 +38,19 @@ public class DistributedInstance implements IsModelObject {
   private int removedEntities;
   private int updatedEntities;
 
+  List<EntitySummary> removedEntitiesSummary;
+  List<EntitySummary> updatedEntitiesSummary;
+  List<EntitySummary> issuesSummary;
+
   public DistributedInstance() {
     status = DistributedInstanceStatus.CREATED;
     lastSyncDate = null;
     syncErrors = 0;
     removedEntities = 0;
     updatedEntities = 0;
+    removedEntitiesSummary = new ArrayList<>();
+    updatedEntitiesSummary = new ArrayList<>();
+    issuesSummary = new ArrayList<>();
   }
 
   @Override
@@ -204,6 +214,30 @@ public class DistributedInstance implements IsModelObject {
     return updatedBy != null ? updatedBy.equals(that.updatedBy) : that.updatedBy == null;
   }
 
+  public List<EntitySummary> getRemovedEntitiesSummary() {
+    return removedEntitiesSummary;
+  }
+
+  public void setRemovedEntitiesSummary(List<EntitySummary> removedEntitiesSummary) {
+    this.removedEntitiesSummary = removedEntitiesSummary;
+  }
+
+  public List<EntitySummary> getUpdatedEntitiesSummary() {
+    return updatedEntitiesSummary;
+  }
+
+  public void setUpdatedEntitiesSummary(List<EntitySummary> updatedEntitiesSummary) {
+    this.updatedEntitiesSummary = updatedEntitiesSummary;
+  }
+
+  public List<EntitySummary> getIssuesSummary() {
+    return issuesSummary;
+  }
+
+  public void setIssuesSummary(List<EntitySummary> issuesSummary) {
+    this.issuesSummary = issuesSummary;
+  }
+
   @Override
   public int hashCode() {
     int result = id != null ? id.hashCode() : 0;
@@ -228,5 +262,78 @@ public class DistributedInstance implements IsModelObject {
       + ", username='" + username + '\'' + ", lastSyncDate=" + lastSyncDate + ", status=" + status + ", createdOn="
       + createdOn + ", createdBy='" + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\''
       + ", syncErrors='" + syncErrors + '\'' + '}';
+  }
+
+  @JsonIgnore
+  public void incrementEntityCounters(final String type, final String entityClass) {
+    if (RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_REMOVED.equals(type)) {
+      incrementCounter(removedEntitiesSummary, entityClass);
+    } else if (RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_UPDATED.equals(type)) {
+      incrementCounter(updatedEntitiesSummary, entityClass);
+    } else if (RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_ISSUE.equals(type)) {
+      incrementCounter(issuesSummary, entityClass);
+    }
+  }
+
+  @JsonIgnore
+  private void incrementCounter(final List<EntitySummary> entitySummaries, final String entityClass) {
+    if (checkIfExistsEntitySummary(entitySummaries, entityClass)) {
+      for (EntitySummary entitySummary : entitySummaries) {
+        if (entitySummary.getEntityClass().equals(entityClass)) {
+          entitySummary.increment();
+        }
+      }
+    } else {
+      EntitySummary newEntitySummary = new EntitySummary();
+      newEntitySummary.setEntityClass(entityClass);
+      newEntitySummary.increment();
+      entitySummaries.add(newEntitySummary);
+    }
+  }
+
+  @JsonIgnore
+  public void sumValueToEntitiesCounter(final String type, final String entityClass, final int value) {
+    if (RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_REMOVED.equals(type)) {
+      sumValue(removedEntitiesSummary, entityClass, value);
+    } else if (RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_UPDATED.equals(type)) {
+      sumValue(updatedEntitiesSummary, entityClass, value);
+    } else if (RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_ISSUE.equals(type)) {
+      sumValue(issuesSummary, entityClass, value);
+    }
+  }
+
+  @JsonIgnore
+  private void sumValue(final List<EntitySummary> entitySummaries, final String entityClass, final int value) {
+    if (checkIfExistsEntitySummary(entitySummaries, entityClass)) {
+      for (EntitySummary entitySummary : entitySummaries) {
+        if (entitySummary.getEntityClass().equals(entityClass)) {
+          entitySummary.setCount(entitySummary.getCount() + value);
+        }
+      }
+    } else {
+      EntitySummary newEntitySummary = new EntitySummary();
+      newEntitySummary.setEntityClass(entityClass);
+      newEntitySummary.setCount(value);
+      entitySummaries.add(newEntitySummary);
+    }
+  }
+
+  @JsonIgnore
+  private boolean checkIfExistsEntitySummary(final List<EntitySummary> entitySummaries, final String entityClass) {
+    boolean found = false;
+    for (EntitySummary entitySummary : entitySummaries) {
+      if (entitySummary.getEntityClass().equals(entityClass)) {
+        found = true;
+        break;
+      }
+    }
+    return found;
+  }
+
+  @JsonIgnore
+  public void cleanEntitiesSummaries() {
+    removedEntitiesSummary = new ArrayList<>();
+    updatedEntitiesSummary = new ArrayList<>();
+    issuesSummary = new ArrayList<>();
   }
 }
