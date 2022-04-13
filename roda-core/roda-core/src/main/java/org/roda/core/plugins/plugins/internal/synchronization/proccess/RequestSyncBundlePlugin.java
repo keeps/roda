@@ -3,6 +3,7 @@ package org.roda.core.plugins.plugins.internal.synchronization.proccess;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -128,13 +129,13 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
         } catch (GenericException e) {
           throw new PluginException("Unable to retrieve local instance configuration", e);
         }
-        requestRemoteActions(model, storage, report, jobPluginInfo, cachedJob);
+        requestRemoteActions(model, index, storage, report, jobPluginInfo, cachedJob);
       }
 
     }, index, model, storage);
   }
 
-  private void requestRemoteActions(ModelService model, StorageService storage, Report report,
+  private void requestRemoteActions(ModelService model, IndexService index, StorageService storage, Report report,
     JobPluginInfo jobPluginInfo, Job cachedJob) {
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
@@ -146,7 +147,7 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
       if (path != null) {
         try {
           final Path bundleWorkingDir = SyncUtils.extractBundle(localInstance.getId(), path);
-          final int jobs = createJobs(localInstance.getId());
+          final int jobs = createJobs(localInstance.getId(), index);
           final BundleState bundleState = SyncUtils.getIncomingBundleState(localInstance.getId());
           final int imported = SyncUtils.importStorage(storage, bundleWorkingDir, bundleState, jobPluginInfo, false);
           outcomeDetailsText = "Received " + jobs + " jobs. Imported " + imported
@@ -187,8 +188,8 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
    * @throws NotFoundException
    *           if some error occurs.
    */
-  public static int createJobs(final String instanceId) throws GenericException, AuthorizationDeniedException,
-    RequestNotValidException, JobAlreadyStartedException, NotFoundException {
+  public static int createJobs(final String instanceId, final IndexService index) throws GenericException,
+    AuthorizationDeniedException, RequestNotValidException, JobAlreadyStartedException, NotFoundException {
 
     PackageState packageState = null;
     int count = 0;
@@ -203,16 +204,18 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
         final Path jobPath = SyncUtils.getEntityStoragePath(instanceId, RodaConstants.CORE_JOB_FOLDER)
           .resolve(jobId + ".json");
         final Job job = JsonUtils.readObjectFromFile(jobPath, Job.class);
-
-        String SYNC_ACTION_TYPE = RodaCoreFactory.getRodaConfigurationAsString("core.synchronization.preservationActionExecution.type");
-        if(!StringUtils.isNotBlank(SYNC_ACTION_TYPE)){
-          PluginHelper.createAndExecuteJob(job);
-        }else if ("APPROVAL".equals(SYNC_ACTION_TYPE)) {
-          job.setState(Job.JOB_STATE.PENDING_APPROVAL);
-          PluginHelper.createJob(job);
-        } else {
-          job.setState(Job.JOB_STATE.SCHEDULED);
-          PluginHelper.createJob(job);
+        if (checkIfJobExist(index, job.getId())) {
+          String SYNC_ACTION_TYPE = RodaCoreFactory
+            .getRodaConfigurationAsString("core.synchronization.preservationActionExecution.type");
+          if (!StringUtils.isNotBlank(SYNC_ACTION_TYPE)) {
+            PluginHelper.createAndExecuteJob(job);
+          } else if ("APPROVAL".equals(SYNC_ACTION_TYPE)) {
+            job.setState(Job.JOB_STATE.PENDING_APPROVAL);
+            PluginHelper.createJob(job);
+          } else {
+            job.setState(Job.JOB_STATE.SCHEDULED);
+            PluginHelper.createJob(job);
+          }
         }
       }
 
@@ -229,5 +232,16 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
   @Override
   public void shutdown() {
 
+  }
+
+  private static boolean checkIfJobExist(final IndexService index, final String jobId) {
+    try {
+      index.retrieve(Job.class, jobId, Collections.singletonList(RodaConstants.INDEX_UUID));
+    } catch (NotFoundException e) {
+      return true;
+    } catch (GenericException e) {
+      LOGGER.error("Can't retrieve the JOB {} ", e.getMessage());
+    }
+    return false;
   }
 }
