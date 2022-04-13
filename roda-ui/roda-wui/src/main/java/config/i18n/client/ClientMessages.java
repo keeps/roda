@@ -545,6 +545,8 @@ public interface ClientMessages extends Messages {
 
   String viewRepresentationNotSupportedPreview();
 
+  String viewRepresentationNotSupportedPreviewCentralInstance();
+
   String viewRepresentationInfoTitle();
 
   String viewRepresentationFileDisseminationTitle();
@@ -2478,8 +2480,6 @@ public interface ClientMessages extends Messages {
   String distributedInstanceStatusButtonDeactivateLabel();
 
   String distributedInstanceStatistics();
-
-  String distributedInstancesFileNotAccessibleMessage();
 
   String distributedInstanceSyncErrorsLabel();
 
