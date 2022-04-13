@@ -1828,11 +1828,12 @@ public final class RodaConstants {
   public static final String SYNCHRONIZATION_REPORT_KEY_STATUS = "status";
   public static final String SYNCHRONIZATION_REPORT_KEY_JOB = "job";
   public static final String SYNCHRONIZATION_REPORT_KEY_UPDATED_AND_ADDED = "updated/added";
-  public static final String SYNCHRONIZATION_REPORT_KEY_REMOVED = "REMOVED";
-  public static final String SYNCHRONIZATION_REPORT_KEY_ISSUES = "ISSUES";
+  public static final String SYNCHRONIZATION_REPORT_KEY_REMOVED = "removed";
+  public static final String SYNCHRONIZATION_REPORT_KEY_ISSUES = "issues";
 
   public static final String SYNCHRONIZATION_REPORT_KEY_DESCRIPTION = "description";
   public static final String SYNCHRONIZATION_REPORT_KEY_COUNT = "count";
+  public static final String SYNCHRONIZATION_REPORT_KEY_ENTITY_CLASS = "entityClass";
 
   public static final String SYNCHRONIZATION_REPORT_VALUE_ADDED_DESCRIPTION = "entities added in central instance";
   public static final String SYNCHRONIZATION_REPORT_VALUE_UPDATED_AND_ADDED_DESCRIPTION = "entities updated or added in central instance";
@@ -1841,8 +1842,14 @@ public final class RodaConstants {
   public static final String SYNCHRONIZATION_REPORT_VALUE_ISSUES_DESCRIPTION = "An entity was found is central "
     + "instance but is not listed in local instance or is listed as being removed from local instance";
 
+
+
   public static final String SYNCHRONIZATION_REPORT_VALUE_STATUS_SUCCESS = "Successful Synchronization";
   public static final String SYNCHRONIZATION_REPORT_VALUE_STATUS_ERROR = "Synchronization with errors";
+
+  public static final String SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_REMOVED = "removed";
+  public static final String SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_UPDATED = "updated";
+  public static final String SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_ISSUE = "issue";
 
   /** Private empty constructor */
   private RodaConstants() {
