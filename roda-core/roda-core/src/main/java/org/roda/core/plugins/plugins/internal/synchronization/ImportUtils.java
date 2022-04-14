@@ -227,17 +227,30 @@ public class ImportUtils {
     final Report reportItem) {
     final Map<Path, Class<? extends IsIndexed>> entitiesPathMap = SyncUtils.createEntitiesPaths(bundleWorkingDir,
       entitiesBundle);
-    final StringBuilder fileNameBuilder = new StringBuilder();
-    fileNameBuilder.append(RodaConstants.SYNCHRONIZATION_REMOVED_FILE).append("_").append(distributedInstance.getId())
-      .append(".jsonl");
-    final Path temporaryReportPath = bundleWorkingDir.resolve(fileNameBuilder.toString());
-    createReport(temporaryReportPath);
+
+    Path temporaryReportPath = null;
     int removed = 0;
+    final List<Path> reportPaths = new ArrayList<>();
     for (Map.Entry entry : entitiesPathMap.entrySet()) {
-      removed += deleteRodaObject(model, index, cachedJob, jobPluginInfo, plugin, (Path) entry.getKey(),
-        (Class<? extends IsIndexed>) entry.getValue(), distributedInstance, temporaryReportPath, reportItem);
+      Class<? extends IsIndexed> indexedClass = (Class<? extends IsIndexed>) entry.getValue();
+      final StringBuilder fileNameBuilder = new StringBuilder();
+      final String[] className = ModelUtils.giveRespectiveModelClass(indexedClass).getName().split("\\.");
+      fileNameBuilder.append(RodaConstants.SYNCHRONIZATION_REMOVED_FILE).append("_").append(distributedInstance.getId())
+        .append("_");
+      fileNameBuilder.append(className[className.length - 1]).append(".jsonl");
+      temporaryReportPath = bundleWorkingDir.resolve(fileNameBuilder.toString());
+      if (!Files.exists(temporaryReportPath)) {
+        createReport(temporaryReportPath);
+        reportPaths.add(temporaryReportPath);
+      }
+      removed += deleteRodaObject(model, index, cachedJob, jobPluginInfo, plugin, (Path) entry.getKey(), indexedClass,
+        distributedInstance, temporaryReportPath, reportItem);
     }
-    moveReportToSynchronizationFolder(temporaryReportPath);
+    if (!reportPaths.isEmpty()) {
+      for (final Path reportPath : reportPaths) {
+        moveReportToSynchronizationFolder(reportPath);
+      }
+    }
     return removed;
   }
 
@@ -334,16 +347,30 @@ public class ImportUtils {
     final EntitiesBundle entitiesBundle, final DistributedInstance distributedInstance, int syncErrors) {
     final Map<Path, Class<? extends IsIndexed>> entitiesPathMap = SyncUtils.createEntitiesPaths(bundleWorkingDir,
       entitiesBundle);
-    final StringBuilder fileNameBuilder = new StringBuilder();
-    fileNameBuilder.append(RodaConstants.SYNCHRONIZATION_ISSUES_FILE).append("_").append(distributedInstance.getId())
-      .append(".jsonl");
-    final Path temporaryReportPath = bundleWorkingDir.resolve(fileNameBuilder.toString());
-    createReport(temporaryReportPath);
+
+    Path temporaryReportPath = null;
+    final List<Path> reportPaths = new ArrayList<>();
     for (Map.Entry entry : entitiesPathMap.entrySet()) {
-      syncErrors += validateCentralEntities(index, temporaryReportPath, (Path) entry.getKey(),
-        (Class<? extends IsIndexed>) entry.getValue(), distributedInstance);
+      final StringBuilder fileNameBuilder = new StringBuilder();
+
+      fileNameBuilder.append(RodaConstants.SYNCHRONIZATION_ISSUES_FILE).append("_").append(distributedInstance.getId())
+        .append("_");
+      Class<? extends IsIndexed> indexedClass = (Class<? extends IsIndexed>) entry.getValue();
+      final String[] className = ModelUtils.giveRespectiveModelClass(indexedClass).getName().split("\\.");
+      fileNameBuilder.append(className[className.length - 1]).append(".jsonl");
+      temporaryReportPath = bundleWorkingDir.resolve(fileNameBuilder.toString());
+      if (!Files.exists(temporaryReportPath)) {
+        createReport(temporaryReportPath);
+        reportPaths.add(temporaryReportPath);
+      }
+      syncErrors += validateCentralEntities(index, temporaryReportPath, (Path) entry.getKey(), indexedClass,
+        distributedInstance);
     }
-    moveReportToSynchronizationFolder(temporaryReportPath);
+    if (temporaryReportPath != null) {
+      for (final Path reportPath : reportPaths) {
+        moveReportToSynchronizationFolder(reportPath);
+      }
+    }
   }
 
   /**
@@ -371,7 +398,8 @@ public class ImportUtils {
         }
       }
     } catch (NotFoundException | GenericException e) {
-      final Issue issue = new Issue(id, RodaConstants.SYNCHRONIZATION_ISSUE_TYPE_MISSING, indexedClass.getName());
+      final Issue issue = new Issue(id, RodaConstants.SYNCHRONIZATION_ISSUE_TYPE_MISSING,
+        ModelUtils.giveRespectiveModelClass(indexedClass).getName());
       writeJsonLinesReport(temporaryReportPath, issue);
       errors++;
       distributedInstance.incrementEntityCounters(RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_ISSUE,
@@ -460,16 +488,8 @@ public class ImportUtils {
       jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_JOB, jobID);
 
       // Updated / Added object
-      jsonGenerator.writeFieldName(RodaConstants.SYNCHRONIZATION_REPORT_KEY_UPDATED_AND_ADDED);
-      writeSummaryLists(jsonGenerator, distributedInstance.getUpdatedEntitiesSummary());
-
-      // Removed object
-      jsonGenerator.writeFieldName(RodaConstants.SYNCHRONIZATION_REPORT_KEY_REMOVED);
-      writeSummaryLists(jsonGenerator, distributedInstance.getRemovedEntitiesSummary());
-
-      // ISSUES object
-      jsonGenerator.writeFieldName(RodaConstants.SYNCHRONIZATION_REPORT_KEY_ISSUES);
-      writeSummaryLists(jsonGenerator, distributedInstance.getIssuesSummary());
+      jsonGenerator.writeFieldName(RodaConstants.SYNCHRONIZATION_REPORT_KEY_SUMMARY);
+      writeSummaryLists(jsonGenerator, distributedInstance.getEntitySummaries());
 
       jsonGenerator.writeEndObject();
     } catch (final IOException e) {
@@ -485,13 +505,16 @@ public class ImportUtils {
       jsonGenerator.writeStartObject();
       jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_ENTITY_CLASS,
         entitySummary.getEntityClass());
-      jsonGenerator.writeNumberField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_COUNT, entitySummary.getCount());
+      jsonGenerator.writeNumberField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_UPDATED_AND_ADDED,
+        entitySummary.getCountAddedUpdated());
+      jsonGenerator.writeNumberField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_REMOVED, entitySummary.getCountRemoved());
+      jsonGenerator.writeNumberField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_ISSUES, entitySummary.getCountIssues());
       jsonGenerator.writeEndObject();
     }
     jsonGenerator.writeEndArray();
   }
 
-  public static int getUpdatedInstances(final BundleState bundleState, DistributedInstance distributedInstance) {
+  public static int getUpdatedInstances(final BundleState bundleState) {
     final AtomicInteger count = new AtomicInteger(0);
     final List<PackageState> packageStateList = bundleState.getPackageStateList();
 

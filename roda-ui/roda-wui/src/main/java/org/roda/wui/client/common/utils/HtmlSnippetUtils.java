@@ -36,6 +36,7 @@ import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.risks.IncidenceStatus;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.risks.SeverityLevel;
+import org.roda.core.data.v2.synchronization.EntitySummary;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
@@ -283,9 +284,11 @@ public class HtmlSnippetUtils {
       } else if (JOB_STATE.STARTED.equals(state)) {
         ret = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + messages.showJobStatusStarted() + CLOSE_SPAN);
       } else if (JOB_STATE.PENDING_APPROVAL.equals(state)) {
-        ret = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusPendingApproval() + CLOSE_SPAN);
+        ret = SafeHtmlUtils
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusPendingApproval() + CLOSE_SPAN);
       } else if (JOB_STATE.REJECTED.equals(state)) {
-        ret = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.showJobStatusApprovalRejected() + CLOSE_SPAN);
+        ret = SafeHtmlUtils
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.showJobStatusApprovalRejected() + CLOSE_SPAN);
       } else if (JOB_STATE.TO_BE_CLEANED.equals(state)) {
         ret = SafeHtmlUtils
           .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusToBeCleaned() + CLOSE_SPAN);
@@ -733,13 +736,13 @@ public class HtmlSnippetUtils {
    * 
    * @param distributedInstance
    *          {@link DistributedInstance}.
-   * @param download
-   *          if this flag is true return a link to download a file with problems.
+   * @param togetherWithStatus
+   *          if this flag is true put the issues together with the status
    *
    * @return {@link SafeHtml}.
    */
   public static SafeHtml getDistributedInstanceStateHtml(final DistributedInstance distributedInstance,
-    final boolean download) {
+    final boolean togetherWithStatus) {
     SafeHtml ret = null;
     if (distributedInstance != null && distributedInstance.getStatus() != null) {
       SafeHtmlBuilder b = new SafeHtmlBuilder();
@@ -760,7 +763,7 @@ public class HtmlSnippetUtils {
       b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
       b.append(SafeHtmlUtils.fromString(" "));
       final SafeHtmlBuilder syncErrorsBuilder = new SafeHtmlBuilder();
-      if (!download) {
+      if (togetherWithStatus) {
         if (distributedInstance.getSyncErrors() == 0) {
           syncErrorsBuilder.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
         } else {
@@ -769,28 +772,31 @@ public class HtmlSnippetUtils {
         syncErrorsBuilder.append(SafeHtmlUtils.fromString(String.valueOf(distributedInstance.getSyncErrors()) + " "));
         syncErrorsBuilder.append(SafeHtmlUtils.fromString(messages.distributedInstanceSyncErrorsLabel()));
         syncErrorsBuilder.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
-      } else {
-        final SafeUri synchronizationLastStatusDownloadUri = RestUtils
-          .createSynchronizationLastStatusDownloadUri(distributedInstance.getId());
-        syncErrorsBuilder.append(SafeHtmlUtils.fromSafeConstant("<a href='"));
-        syncErrorsBuilder.append(SafeHtmlUtils.fromString(synchronizationLastStatusDownloadUri.asString()));
-        syncErrorsBuilder.append(SafeHtmlUtils.fromSafeConstant("' class='btn btn-link'>"));
-        syncErrorsBuilder
-          .append(SafeHtmlUtils.fromString(String.valueOf(distributedInstance.getRemovedEntities()) + " "));
-        syncErrorsBuilder.append(SafeHtmlUtils.fromString(messages.distributedInstanceRemovedEntitiesLabel()));
-        syncErrorsBuilder.append(SafeHtmlUtils.fromString(" "));
-        syncErrorsBuilder
-          .append(SafeHtmlUtils.fromString(String.valueOf(distributedInstance.getUpdatedEntities()) + " "));
-        syncErrorsBuilder.append(SafeHtmlUtils.fromString(messages.distributedInstanceUpdatedEntitiesLabel()));
-        syncErrorsBuilder.append(SafeHtmlUtils.fromString(" "));
-
-        syncErrorsBuilder.append(SafeHtmlUtils.fromString(
-          String.valueOf(distributedInstance.getSyncErrors()) + " " + messages.distributedInstanceSyncErrorsLabel()));
-        syncErrorsBuilder.append(SafeHtmlUtils.fromSafeConstant("</a>"));
       }
       b.append(syncErrorsBuilder.toSafeHtml());
       ret = b.toSafeHtml();
     }
+    return ret;
+  }
+
+  public static SafeHtml getCounters(final String instanceIdentifier, final List<EntitySummary> entitySummaries, final String type) {
+    SafeHtml ret = null;
+    final SafeHtmlBuilder entitySummaryBuilder = new SafeHtmlBuilder();
+    if (entitySummaries != null && !entitySummaries.isEmpty()) {
+      for (final EntitySummary entitySummary : entitySummaries) {
+        String[] splitEntityClass = entitySummary.getEntityClass().split("\\.");
+        String entityClass = splitEntityClass[splitEntityClass.length - 1];
+        SafeUri downloadUri = RestUtils.createLastSynchronizationDownloadUri(instanceIdentifier,entityClass,type);
+        entitySummaryBuilder.append(SafeHtmlUtils.fromSafeConstant("<a href='"));
+        entitySummaryBuilder.append(SafeHtmlUtils.fromString(downloadUri.asString()));
+        entitySummaryBuilder.append(SafeHtmlUtils.fromSafeConstant("' class='btn btn-link'>"));
+        entitySummaryBuilder.append(SafeHtmlUtils.fromString(entityClass + ": "));
+        entitySummaryBuilder.append(SafeHtmlUtils.fromString(String.valueOf(entitySummary.getCount())));
+        entitySummaryBuilder.append(SafeHtmlUtils.fromSafeConstant("</a>"));
+        entitySummaryBuilder.append(SafeHtmlUtils.fromSafeConstant("<br>"));
+      }
+    }
+    ret = entitySummaryBuilder.toSafeHtml();
     return ret;
   }
 

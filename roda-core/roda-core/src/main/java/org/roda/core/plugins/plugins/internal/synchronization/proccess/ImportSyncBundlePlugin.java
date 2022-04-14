@@ -208,11 +208,14 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
 
         distributedInstance.setLastSyncDate(bundleState.getToDate());
         distributedInstance.setSyncErrors(syncErrors);
-        distributedInstance.setRemovedEntities(removed);
-        distributedInstance.setUpdatedEntities(ImportUtils.getUpdatedInstances(bundleState, distributedInstance));
+
+        //TODO: Remove getUpdatedInstances
+        
         ImportUtils.updateEntityCounter(bundleState, distributedInstance);
+
+        //TODO: Remove getUpdatedInstances
         ImportUtils.createLastSyncFile(bundleWorkingDir, distributedInstance,
-          ImportUtils.getUpdatedInstances(bundleState, distributedInstance), removed, cachedJob.getId(),
+          ImportUtils.getUpdatedInstances(bundleState), removed, cachedJob.getId(),
           bundleState.getId());
 
         model.updateDistributedInstance(distributedInstance, cachedJob.getUsername());

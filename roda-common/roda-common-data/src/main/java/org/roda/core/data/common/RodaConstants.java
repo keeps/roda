@@ -361,6 +361,9 @@ public final class RodaConstants {
   public static final String API_QUERY_KEY_EXPORT_FACETS = "exportFacets";
   public static final String API_QUERY_KEY_FILENAME = "filename";
   public static final String API_QUERY_KEY_FILE = "file";
+
+  public static final String API_QUERY_KEY_CLASS = "class";
+  public static final String API_QUERY_KEY_TYPE = "type";
   public static final String API_QUERY_JOB_DETAILS = "details";
   // "http path param" related strings
   public static final String API_PATH_PARAM_AIP_ID = "aip_id";
@@ -1827,6 +1830,8 @@ public final class RodaConstants {
   public static final String SYNCHRONIZATION_REPORT_KEY_FROM_DATE = "fromDate";
   public static final String SYNCHRONIZATION_REPORT_KEY_STATUS = "status";
   public static final String SYNCHRONIZATION_REPORT_KEY_JOB = "job";
+
+  public static final String SYNCHRONIZATION_REPORT_KEY_SUMMARY = "summary";
   public static final String SYNCHRONIZATION_REPORT_KEY_UPDATED_AND_ADDED = "updated/added";
   public static final String SYNCHRONIZATION_REPORT_KEY_REMOVED = "removed";
   public static final String SYNCHRONIZATION_REPORT_KEY_ISSUES = "issues";

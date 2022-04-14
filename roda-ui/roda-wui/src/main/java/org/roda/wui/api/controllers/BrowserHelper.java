@@ -3779,11 +3779,11 @@ public class BrowserHelper {
    * @throws NotFoundException
    *           if file does not exists.
    */
-  public static EntityResponse retrieveLastSyncStatusFile(final String instanceIdentifier)
-    throws GenericException, NotFoundException {
+  public static EntityResponse retrieveLastSyncFileByClass(final String instanceIdentifier, final String entityClass,
+    final String type) throws GenericException, NotFoundException {
     final StringBuilder fileNameBuilder = new StringBuilder();
-    fileNameBuilder.append(RodaConstants.SYNCHRONIZATION_REPORT_FILE).append("_").append(instanceIdentifier)
-      .append(".json");
+    fileNameBuilder.append(type).append("_").append(instanceIdentifier).append("_").append(entityClass)
+      .append(".jsonl");
 
     final Path filePath = RodaCoreFactory.getSynchronizationDirectoryPath().resolve(fileNameBuilder.toString());
 

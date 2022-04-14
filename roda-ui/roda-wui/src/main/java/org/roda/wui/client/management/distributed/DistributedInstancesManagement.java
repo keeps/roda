@@ -174,7 +174,7 @@ public class DistributedInstancesManagement extends Composite {
           new Column<DistributedInstance, SafeHtml>(new SafeHtmlCell()) {
             @Override
             public SafeHtml getValue(DistributedInstance distributedInstance) {
-              return HtmlSnippetUtils.getDistributedInstanceStateHtml(distributedInstance, false);
+              return HtmlSnippetUtils.getDistributedInstanceStateHtml(distributedInstance, true);
             }
           }),
         new BasicTablePanel.ColumnInfo<DistributedInstance>(messages.distributedInstanceLastSyncDateLabel(), 15,

@@ -7,6 +7,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlHostedModeUtils;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ScrollPanel;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowserService;
@@ -101,6 +102,22 @@ public class ShowDistributedInstance extends Composite {
   HTML lastSyncDateValue;
 
   @UiField
+  Label lastSyncAddedUpdatedCountersLabel;
+
+  @UiField
+  HTML lastSyncAddedUpdatedCountersValue;
+
+  @UiField
+  Label lastSyncRemovedCountersLabel;
+  @UiField
+  HTML lastSyncRemovedCountersValue;
+
+  @UiField
+  Label lastSyncIssuesCountersLabel;
+  @UiField
+  HTML lastSyncIssuesCountersValue;
+
+  @UiField
   HTML statusValue;
 
   @UiField
@@ -140,7 +157,25 @@ public class ShowDistributedInstance extends Composite {
       lastSyncDateValue.setHTML(messages.permanentlyRetained());
     }
 
-    statusValue.setHTML(HtmlSnippetUtils.getDistributedInstanceStateHtml(distributedInstance, true));
+    if (distributedInstance.getUpdatedEntitiesSummary().isEmpty()) {
+      lastSyncAddedUpdatedCountersLabel.setVisible(false);
+    }
+    if (distributedInstance.getRemovedEntitiesSummary().isEmpty()) {
+      lastSyncRemovedCountersLabel.setVisible(false);
+    }
+
+    if (distributedInstance.getSyncErrorsSummary().isEmpty()) {
+      lastSyncIssuesCountersLabel.setVisible(false);
+    }
+
+    lastSyncAddedUpdatedCountersValue.setHTML(
+      HtmlSnippetUtils.getCounters(distributedInstance.getId(), distributedInstance.getUpdatedEntitiesSummary(), ""));
+    lastSyncRemovedCountersValue.setHTML(HtmlSnippetUtils.getCounters(distributedInstance.getId(),
+      distributedInstance.getRemovedEntitiesSummary(), RodaConstants.SYNCHRONIZATION_REMOVED_FILE));
+    lastSyncIssuesCountersValue.setHTML(HtmlSnippetUtils.getCounters(distributedInstance.getId(),
+      distributedInstance.getSyncErrorsSummary(), RodaConstants.SYNCHRONIZATION_ISSUES_FILE));
+
+    statusValue.setHTML(HtmlSnippetUtils.getDistributedInstanceStateHtml(distributedInstance, false));
     if (StringUtils.isNotBlank(distributedInstance.getUsername())) {
       UserManagementService.Util.getInstance().retrieveUser(distributedInstance.getUsername(),
         new AsyncCallback<User>() {
