@@ -164,12 +164,13 @@ public class DistributedInstancesResource {
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = StreamResponse.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
   public Response synchronizationStatus(
-    @ApiParam(value = "The instance identifier", required = true) @PathParam(RodaConstants.API_PATH_PARAM_INSTANCE_IDENTIFIER) String instanceIdentifier)
+    @ApiParam(value = "The instance identifier", required = true) @PathParam(RodaConstants.API_PATH_PARAM_INSTANCE_IDENTIFIER) String instanceIdentifier,
+    @QueryParam(RodaConstants.API_QUERY_KEY_CLASS) String entityClass, @QueryParam(RodaConstants.API_QUERY_KEY_TYPE) String type)
     throws RODAException {
     // get user
     final User user = UserUtility.getApiUser(request);
     // delegate action to controller.
-    EntityResponse response = Browser.retrieveLocalInstanceLastSyncStatus(user, instanceIdentifier);
+    EntityResponse response = Browser.retrieveLastSyncFile(user, instanceIdentifier,entityClass, type);
     return ApiUtils.okResponse((StreamResponse) response);
   }
 }

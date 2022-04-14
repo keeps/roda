@@ -35,22 +35,25 @@ public class DistributedInstance implements IsModelObject {
   private String updatedBy;
 
   private int syncErrors;
-  private int removedEntities;
-  private int updatedEntities;
+
+  List<EntitySummary> entitySummaries;
+
+  // TODO:Remove this lists
 
   List<EntitySummary> removedEntitiesSummary;
   List<EntitySummary> updatedEntitiesSummary;
-  List<EntitySummary> issuesSummary;
+  List<EntitySummary> syncErrorsSummary;
 
   public DistributedInstance() {
     status = DistributedInstanceStatus.CREATED;
     lastSyncDate = null;
     syncErrors = 0;
-    removedEntities = 0;
-    updatedEntities = 0;
+    entitySummaries = new ArrayList<>();
+
+    // TODO:Remove this counters and Lists
     removedEntitiesSummary = new ArrayList<>();
     updatedEntitiesSummary = new ArrayList<>();
-    issuesSummary = new ArrayList<>();
+    syncErrorsSummary = new ArrayList<>();
   }
 
   @Override
@@ -158,20 +161,38 @@ public class DistributedInstance implements IsModelObject {
     this.syncErrors = syncErrors;
   }
 
-  public int getRemovedEntities() {
-    return this.removedEntities;
+  public List<EntitySummary> getEntitySummaries() {
+    return entitySummaries;
   }
 
-  public void setRemovedEntities(int removedEntities) {
-    this.removedEntities = removedEntities;
+  public void setEntitySummaries(List<EntitySummary> entitySummaries) {
+    this.entitySummaries = entitySummaries;
   }
 
-  public int getUpdatedEntities() {
-    return this.updatedEntities;
+  //TODO:Remove this gets and Sets
+
+  public List<EntitySummary> getRemovedEntitiesSummary() {
+    return removedEntitiesSummary;
   }
 
-  public void setUpdatedEntities(int updatedEntities) {
-    this.updatedEntities = updatedEntities;
+  public void setRemovedEntitiesSummary(List<EntitySummary> removedEntitiesSummary) {
+    this.removedEntitiesSummary = removedEntitiesSummary;
+  }
+
+  public List<EntitySummary> getUpdatedEntitiesSummary() {
+    return updatedEntitiesSummary;
+  }
+
+  public void setUpdatedEntitiesSummary(List<EntitySummary> updatedEntitiesSummary) {
+    this.updatedEntitiesSummary = updatedEntitiesSummary;
+  }
+
+  public List<EntitySummary> getSyncErrorsSummary() {
+    return syncErrorsSummary;
+  }
+
+  public void setSyncErrorsSummary(List<EntitySummary> syncErrorsSummary) {
+    this.syncErrorsSummary = syncErrorsSummary;
   }
 
   @JsonIgnore
@@ -214,30 +235,6 @@ public class DistributedInstance implements IsModelObject {
     return updatedBy != null ? updatedBy.equals(that.updatedBy) : that.updatedBy == null;
   }
 
-  public List<EntitySummary> getRemovedEntitiesSummary() {
-    return removedEntitiesSummary;
-  }
-
-  public void setRemovedEntitiesSummary(List<EntitySummary> removedEntitiesSummary) {
-    this.removedEntitiesSummary = removedEntitiesSummary;
-  }
-
-  public List<EntitySummary> getUpdatedEntitiesSummary() {
-    return updatedEntitiesSummary;
-  }
-
-  public void setUpdatedEntitiesSummary(List<EntitySummary> updatedEntitiesSummary) {
-    this.updatedEntitiesSummary = updatedEntitiesSummary;
-  }
-
-  public List<EntitySummary> getIssuesSummary() {
-    return issuesSummary;
-  }
-
-  public void setIssuesSummary(List<EntitySummary> issuesSummary) {
-    this.issuesSummary = issuesSummary;
-  }
-
   @Override
   public int hashCode() {
     int result = id != null ? id.hashCode() : 0;
@@ -264,60 +261,65 @@ public class DistributedInstance implements IsModelObject {
       + ", syncErrors='" + syncErrors + '\'' + '}';
   }
 
+  /**
+   * Choose the {@link List} to pass to the incremet method by the given type
+   * 
+   * @param type
+   *          type of {@link List}
+   * @param entityClass
+   *          the entity class name.
+   */
   @JsonIgnore
   public void incrementEntityCounters(final String type, final String entityClass) {
-    if (RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_REMOVED.equals(type)) {
-      incrementCounter(removedEntitiesSummary, entityClass);
-    } else if (RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_UPDATED.equals(type)) {
-      incrementCounter(updatedEntitiesSummary, entityClass);
-    } else if (RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_ISSUE.equals(type)) {
-      incrementCounter(issuesSummary, entityClass);
-    }
-  }
-
-  @JsonIgnore
-  private void incrementCounter(final List<EntitySummary> entitySummaries, final String entityClass) {
     if (checkIfExistsEntitySummary(entitySummaries, entityClass)) {
       for (EntitySummary entitySummary : entitySummaries) {
         if (entitySummary.getEntityClass().equals(entityClass)) {
-          entitySummary.increment();
+          entitySummary.increment(type);
         }
       }
     } else {
       EntitySummary newEntitySummary = new EntitySummary();
       newEntitySummary.setEntityClass(entityClass);
-      newEntitySummary.increment();
+      newEntitySummary.increment(type);
       entitySummaries.add(newEntitySummary);
     }
   }
 
+  /**
+   * Uses the given {@link String} type to choose the list to sum the value.
+   * 
+   * @param type
+   *          the type
+   * @param entityClass
+   *          the entity class name.
+   * @param value
+   *          the value to sum to the list.
+   */
   @JsonIgnore
   public void sumValueToEntitiesCounter(final String type, final String entityClass, final int value) {
-    if (RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_REMOVED.equals(type)) {
-      sumValue(removedEntitiesSummary, entityClass, value);
-    } else if (RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_UPDATED.equals(type)) {
-      sumValue(updatedEntitiesSummary, entityClass, value);
-    } else if (RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_ISSUE.equals(type)) {
-      sumValue(issuesSummary, entityClass, value);
-    }
-  }
-
-  @JsonIgnore
-  private void sumValue(final List<EntitySummary> entitySummaries, final String entityClass, final int value) {
     if (checkIfExistsEntitySummary(entitySummaries, entityClass)) {
       for (EntitySummary entitySummary : entitySummaries) {
         if (entitySummary.getEntityClass().equals(entityClass)) {
-          entitySummary.setCount(entitySummary.getCount() + value);
+          entitySummary.sumValue(type, value);
         }
       }
     } else {
       EntitySummary newEntitySummary = new EntitySummary();
       newEntitySummary.setEntityClass(entityClass);
-      newEntitySummary.setCount(value);
+      newEntitySummary.sumValue(type, value);
       entitySummaries.add(newEntitySummary);
     }
   }
 
+  /**
+   * Checks if exists the entity in the given {@link List}
+   * 
+   * @param entitySummaries
+   *          {@link List}
+   * @param entityClass
+   *          the entity class name
+   * @return true if exists, false if not exists
+   */
   @JsonIgnore
   private boolean checkIfExistsEntitySummary(final List<EntitySummary> entitySummaries, final String entityClass) {
     boolean found = false;
@@ -330,10 +332,16 @@ public class DistributedInstance implements IsModelObject {
     return found;
   }
 
+  /**
+   * Clean all {@link List} (removedEntitiesSummary, updatedEntitiesSummary,
+   * syncErrorsSummary).
+   */
   @JsonIgnore
   public void cleanEntitiesSummaries() {
+    entitySummaries = new ArrayList<>();
+    // TODO:REMOVE this Lists
     removedEntitiesSummary = new ArrayList<>();
     updatedEntitiesSummary = new ArrayList<>();
-    issuesSummary = new ArrayList<>();
+    syncErrorsSummary = new ArrayList<>();
   }
 }

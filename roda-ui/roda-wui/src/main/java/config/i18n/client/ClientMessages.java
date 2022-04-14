@@ -2487,6 +2487,7 @@ public interface ClientMessages extends Messages {
 
   String distributedInstanceUpdatedEntitiesLabel();
 
+
   /** Local instance configuration **/
 
   String createLocalInstanceConfigurationTitle();

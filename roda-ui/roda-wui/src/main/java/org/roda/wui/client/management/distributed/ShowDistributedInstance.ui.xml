@@ -49,6 +49,30 @@
                             </g:FlowPanel>
                             <g:FlowPanel styleName="field">
                                 <g:Label styleName="label"
+                                         ui:field="lastSyncAddedUpdatedCountersLabel">
+                                    <ui:text from='{messages.distributedInstanceUpdatedEntitiesLabel}'/>
+                                </g:Label>
+                                <g:HTML styleName="value"
+                                        ui:field="lastSyncAddedUpdatedCountersValue"/>
+                            </g:FlowPanel>
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label"
+                                         ui:field="lastSyncRemovedCountersLabel">
+                                    <ui:text from='{messages.distributedInstanceRemovedEntitiesLabel}'/>
+                                </g:Label>
+                                <g:HTML styleName="value"
+                                        ui:field="lastSyncRemovedCountersValue"/>
+                            </g:FlowPanel>
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label"
+                                         ui:field="lastSyncIssuesCountersLabel">
+                                    <ui:text from='{messages.distributedInstanceSyncErrorsLabel}'/>
+                                </g:Label>
+                                <g:HTML styleName="value"
+                                        ui:field="lastSyncIssuesCountersValue"/>
+                            </g:FlowPanel>
+                            <g:FlowPanel styleName="field">
+                                <g:Label styleName="label"
                                          ui:field="statusLabel">
                                     <ui:text from='{messages.distributedInstanceStatusLabel}'/>
                                 </g:Label>

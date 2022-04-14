@@ -4046,7 +4046,7 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static EntityResponse retrieveLocalInstanceLastSyncStatus(final User user, final String instanceIdentifier)
+  public static EntityResponse retrieveLastSyncFile(final User user, final String instanceIdentifier, final String entityClass, final String type)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
@@ -4057,7 +4057,7 @@ public class Browser extends RodaWuiController {
 
     try {
       // delegate
-      return BrowserHelper.retrieveLastSyncStatusFile(instanceIdentifier);
+      return BrowserHelper.retrieveLastSyncFileByClass(instanceIdentifier,entityClass,type);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
