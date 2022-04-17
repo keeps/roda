@@ -60,7 +60,6 @@ public final class MetadataUtils {
       JAXBContext jaxbContext = JAXBContext.newInstance(tClass);
       Marshaller marshaller = jaxbContext.createMarshaller();
       marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
       marshaller.marshal(object, writer);
       return new ByteArrayInputStream(writer.toString().getBytes(StandardCharsets.UTF_8));
 

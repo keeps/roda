@@ -693,7 +693,6 @@ public class InternalPluginsTest {
     final Binary binary = model.retrievePreservationRepresentation(aip.getId(),
       aip.getRepresentations().get(0).getId());
     final Representation representation = PremisV3Utils.binaryToRepresentation(binary.getContent(), false);
-
     List<String> collect = representation.getRelationship().stream()
       .map(p -> p.getRelatedObjectIdentifier().get(0).getRelatedObjectIdentifierValue()).collect(Collectors.toList());
 
