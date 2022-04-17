@@ -214,14 +214,10 @@
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>Saxon-HE</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.roda-project</groupId>
-			<artifactId>premis-v3.0</artifactId>
-		</dependency>
-		<dependency>
+		<!--<dependency>
 			<groupId>org.w3c</groupId>
 			<artifactId>w3c-utils</artifactId>
-		</dependency>
+		</dependency>-->
 		<dependency>
 			<groupId>org.apache.xmlbeans</groupId>
 			<artifactId>xmlbeans</artifactId>

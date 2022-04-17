@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.xmlbeans.XmlException;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -177,7 +176,7 @@ public class InventoryReportPluginUtils {
             try {
               fixities = PremisV3Utils.extractFixities(model.retrievePreservationFile(file));
             } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException
-              | XmlException | IOException e) {
+              | IOException e) {
               LOGGER.error("Error extracting fixities from premis file.", e);
             }
           }

@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.xmlbeans.XmlException;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
@@ -233,7 +232,7 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
               }
             }
           }
-        } catch (IOException | RODAException | XmlException e) {
+        } catch (IOException | RODAException e) {
           LOGGER.error("Error processing representation {}", r.getId(), e);
         }
       }

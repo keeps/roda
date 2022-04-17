@@ -17,6 +17,7 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -268,8 +269,8 @@ public class InternalPluginsTest {
             EventComplexType event = PremisV3Utils
               .binaryToEvent(model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(),
                 pm.getFileDirectoryPath(), pm.getFileId(), pm.getId()).getContent().createInputStream());
-            if (event.getLinkingAgentIdentifierArray() != null && event.getLinkingAgentIdentifierArray().length > 0) {
-              for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierArray()) {
+            if (event.getLinkingAgentIdentifier() != null && !event.getLinkingAgentIdentifier().isEmpty()) {
+              for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifier()) {
                 if (laict.getLinkingAgentIdentifierValue() != null
                   && laict.getLinkingAgentIdentifierValue().equalsIgnoreCase(agentID)) {
                   found = true;
@@ -318,24 +319,24 @@ public class InternalPluginsTest {
     Representation rpo = PremisV3Utils.binaryToRepresentation(rpo_bin.getContent(), true);
 
     // Relates to files
-    AssertJUnit.assertEquals(CORPORA_FILES_COUNT, rpo.getRelationshipArray().length);
+    AssertJUnit.assertEquals(CORPORA_FILES_COUNT, rpo.getRelationship().size());
 
     Binary fpo_bin = model.retrievePreservationFile(aip.getId(), aip.getRepresentations().get(0).getId(),
       Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT);
 
     gov.loc.premis.v3.File fpo = PremisV3Utils.binaryToFile(fpo_bin.getContent(), true);
 
-    ObjectCharacteristicsComplexType fileCharacteristics = fpo.getObjectCharacteristicsArray(0);
+    ObjectCharacteristicsComplexType fileCharacteristics = fpo.getObjectCharacteristics().get(0);
 
     // check a fixity was generated
-    AssertJUnit.assertTrue("No fixity checks", fileCharacteristics.getFixityArray().length > 0);
+    AssertJUnit.assertFalse("No fixity checks", fileCharacteristics.getFixity().isEmpty());
 
     // check file size
     long size = fileCharacteristics.getSize();
     AssertJUnit.assertTrue("File size is zero", size > 0);
 
     // check file original name
-    String originalName = fpo.getOriginalName().getStringValue();
+    String originalName = fpo.getOriginalName().getValue();
     AssertJUnit.assertEquals(CORPORA_TEST1_TXT, originalName);
   }
 
@@ -371,23 +372,23 @@ public class InternalPluginsTest {
 
     gov.loc.premis.v3.File fpo = PremisV3Utils.binaryToFile(fpo_bin.getContent(), true);
 
-    FormatComplexType format = fpo.getObjectCharacteristicsArray(0).getFormatArray(0);
-    AssertJUnit.assertEquals("Plain Text File", format.getFormatDesignation().getFormatName().getStringValue());
+    FormatComplexType format = fpo.getObjectCharacteristics().get(0).getFormat().get(0);
+    AssertJUnit.assertEquals("Plain Text File", format.getFormatDesignation().get(0).getFormatName().getValue());
     FormatRegistryComplexType pronomRegistry = PremisV3Utils.getFormatRegistry(fpo,
       RodaConstants.PRESERVATION_REGISTRY_PRONOM);
     AssertJUnit.assertEquals(RodaConstants.PRESERVATION_REGISTRY_PRONOM,
-      pronomRegistry.getFormatRegistryName().getStringValue());
-    AssertJUnit.assertEquals("x-fmt/111", pronomRegistry.getFormatRegistryKey().getStringValue());
+      pronomRegistry.getFormatRegistryName().getValue());
+    AssertJUnit.assertEquals("x-fmt/111", pronomRegistry.getFormatRegistryKey().getValue());
 
     FormatRegistryComplexType mimeRegistry = PremisV3Utils.getFormatRegistry(fpo,
       RodaConstants.PRESERVATION_REGISTRY_MIME);
     String mimetype = "text/plain";
-    AssertJUnit.assertEquals(mimetype, mimeRegistry.getFormatRegistryKey().getStringValue());
+    AssertJUnit.assertEquals(mimetype, mimeRegistry.getFormatRegistryKey().getValue());
 
     index.commitAIPs();
 
     IndexedFile indFile = index.retrieve(IndexedFile.class, IdUtils.getFileId(aip.getId(),
-      aip.getRepresentations().get(0).getId(), Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT), new ArrayList<>());
+      aip.getRepresentations().get(0).getId(), Collections.singletonList(CORPORA_TEST1), CORPORA_TEST1_TXT), new ArrayList<>());
 
     AssertJUnit.assertEquals(mimetype, indFile.getFileFormat().getMimeType());
     AssertJUnit.assertEquals("x-fmt/111", indFile.getFileFormat().getPronom());
@@ -412,8 +413,8 @@ public class InternalPluginsTest {
             EventComplexType event = PremisV3Utils
               .binaryToEvent(model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(),
                 pm.getFileDirectoryPath(), pm.getFileId(), pm.getId()).getContent().createInputStream());
-            if (event.getLinkingAgentIdentifierArray() != null && event.getLinkingAgentIdentifierArray().length > 0) {
-              for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierArray()) {
+            if (event.getLinkingAgentIdentifier() != null && !event.getLinkingAgentIdentifier().isEmpty()) {
+              for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifier()) {
                 if (laict.getLinkingAgentIdentifierValue() != null
                   && laict.getLinkingAgentIdentifierValue().equalsIgnoreCase(agentID)) {
                   found = true;
@@ -472,18 +473,18 @@ public class InternalPluginsTest {
 
     gov.loc.premis.v3.File fpo = PremisV3Utils.binaryToFile(fpo_bin.getContent(), true);
 
-    FormatComplexType format = fpo.getObjectCharacteristicsArray(0).getFormatArray(0);
-    AssertJUnit.assertEquals("Plain Text File", format.getFormatDesignation().getFormatName().getStringValue());
+    FormatComplexType format = fpo.getObjectCharacteristics().get(0).getFormat().get(0);
+    AssertJUnit.assertEquals("Plain Text File", format.getFormatDesignation().get(0).getFormatName().getValue());
     FormatRegistryComplexType pronomRegistry = PremisV3Utils.getFormatRegistry(fpo,
       RodaConstants.PRESERVATION_REGISTRY_PRONOM);
     AssertJUnit.assertEquals(RodaConstants.PRESERVATION_REGISTRY_PRONOM,
-      pronomRegistry.getFormatRegistryName().getStringValue());
-    AssertJUnit.assertEquals("x-fmt/111", pronomRegistry.getFormatRegistryKey().getStringValue());
+      pronomRegistry.getFormatRegistryName().getValue());
+    AssertJUnit.assertEquals("x-fmt/111", pronomRegistry.getFormatRegistryKey().getValue());
 
     FormatRegistryComplexType mimeRegistry = PremisV3Utils.getFormatRegistry(fpo,
       RodaConstants.PRESERVATION_REGISTRY_MIME);
     String mimetype = "text/plain";
-    AssertJUnit.assertEquals(mimetype, mimeRegistry.getFormatRegistryKey().getStringValue());
+    AssertJUnit.assertEquals(mimetype, mimeRegistry.getFormatRegistryKey().getValue());
 
     index.commitAIPs();
 
@@ -513,8 +514,8 @@ public class InternalPluginsTest {
             EventComplexType event = PremisV3Utils
               .binaryToEvent(model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(),
                 pm.getFileDirectoryPath(), pm.getFileId(), pm.getId()).getContent().createInputStream());
-            if (event.getLinkingAgentIdentifierArray() != null && event.getLinkingAgentIdentifierArray().length > 0) {
-              for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierArray()) {
+            if (event.getLinkingAgentIdentifier() != null && !event.getLinkingAgentIdentifier().isEmpty()) {
+              for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifier()) {
                 if (laict.getLinkingAgentIdentifierValue() != null
                   && laict.getLinkingAgentIdentifierValue().equalsIgnoreCase(agentID)) {
                   found = true;
@@ -573,18 +574,18 @@ public class InternalPluginsTest {
 
     gov.loc.premis.v3.File fpo = PremisV3Utils.binaryToFile(fpo_bin.getContent(), true);
 
-    FormatComplexType format = fpo.getObjectCharacteristicsArray(0).getFormatArray(0);
-    AssertJUnit.assertEquals("Plain Text File", format.getFormatDesignation().getFormatName().getStringValue());
+    FormatComplexType format = fpo.getObjectCharacteristics().get(0).getFormat().get(0);
+    AssertJUnit.assertEquals("Plain Text File", format.getFormatDesignation().get(0).getFormatName().getValue());
     FormatRegistryComplexType pronomRegistry = PremisV3Utils.getFormatRegistry(fpo,
             RodaConstants.PRESERVATION_REGISTRY_PRONOM);
     AssertJUnit.assertEquals(RodaConstants.PRESERVATION_REGISTRY_PRONOM,
-            pronomRegistry.getFormatRegistryName().getStringValue());
-    AssertJUnit.assertEquals("x-fmt/111", pronomRegistry.getFormatRegistryKey().getStringValue());
+            pronomRegistry.getFormatRegistryName().getValue());
+    AssertJUnit.assertEquals("x-fmt/111", pronomRegistry.getFormatRegistryKey().getValue());
 
     FormatRegistryComplexType mimeRegistry = PremisV3Utils.getFormatRegistry(fpo,
             RodaConstants.PRESERVATION_REGISTRY_MIME);
     String mimetype = "text/plain";
-    AssertJUnit.assertEquals(mimetype, mimeRegistry.getFormatRegistryKey().getStringValue());
+    AssertJUnit.assertEquals(mimetype, mimeRegistry.getFormatRegistryKey().getValue());
 
     index.commitAIPs();
 
@@ -614,8 +615,8 @@ public class InternalPluginsTest {
             EventComplexType event = PremisV3Utils
                     .binaryToEvent(model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(),
                             pm.getFileDirectoryPath(), pm.getFileId(), pm.getId()).getContent().createInputStream());
-            if (event.getLinkingAgentIdentifierArray() != null && event.getLinkingAgentIdentifierArray().length > 0) {
-              for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierArray()) {
+            if (event.getLinkingAgentIdentifier() != null && !event.getLinkingAgentIdentifier().isEmpty()) {
+              for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifier()) {
                 if (laict.getLinkingAgentIdentifierValue() != null
                         && laict.getLinkingAgentIdentifierValue().equalsIgnoreCase(agentID)) {
                   found = true;
@@ -681,10 +682,10 @@ public class InternalPluginsTest {
     final Binary binary = model.retrievePreservationRepresentation(aip.getId(), aip.getRepresentations().get(0).getId());
     final Representation representation = PremisV3Utils.binaryToRepresentation(binary.getContent(), false);
     Assert.assertEquals(
-            representation.getRelationshipArray(0).getRelatedObjectIdentifierArray(0).getRelatedObjectIdentifierValue(),
-            "urn:roda:premis:file:f2-image (1).png");
-    Assert.assertEquals(
-            representation.getRelationshipArray(1).getRelatedObjectIdentifierArray(0).getRelatedObjectIdentifierValue(),
+            representation.getRelationship().get(0).getRelatedObjectIdentifier().get(0).getRelatedObjectIdentifierValue(),
             "urn:roda:premis:file:f1-image (1).png");
+    Assert.assertEquals(
+            representation.getRelationship().get(1).getRelatedObjectIdentifier().get(0).getRelatedObjectIdentifierValue(),
+            "urn:roda:premis:file:f2-image (1).png");
   }
 }

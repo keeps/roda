@@ -32,11 +32,11 @@
             <name>GitHub Packages</name>
             <url>https://maven.pkg.github.com/keeps/*</url>
         </repository>
-        <repository>
+        <!--<repository>
             <id>keeps_artifactory</id>
             <name>KEEP SOLUTIONS artifactory</name>
             <url>https://artifactory.keep.pt/artifactory/keep</url>
-        </repository>
+        </repository>-->
         <repository>
             <id>maven-restlet</id>
             <name>Public online Restlet repository</name>
@@ -605,27 +605,6 @@
                 <version>1.4.1</version>
             </dependency>
             <dependency>
-                <groupId>org.w3c</groupId>
-                <artifactId>w3c-utils</artifactId>
-                <version>1.0.0</version>
-            </dependency>
-            <dependency>
-                <groupId>pt.gov.dgarq.roda</groupId>
-                <artifactId>ead-c.2014</artifactId>
-                <version>1.0.0</version>
-            </dependency>
-            <!-- RODA own modules dependencies - start -->
-            <dependency>
-                <groupId>pt.gov.dgarq.roda</groupId>
-                <artifactId>mets-1.9.1</artifactId>
-                <version>1.0.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.roda-project</groupId>
-                <artifactId>premis-v3.0</artifactId>
-                <version>1.0.0</version>
-            </dependency>
-            <dependency>
                 <groupId>org.roda-project</groupId>
                 <artifactId>roda-common-data</artifactId>
                 <classifier>sources</classifier>
@@ -881,11 +860,11 @@
                 <version>${solr.version}</version>
                 <!-- Removing log4j dependency -->
                 <exclusions>
-                    <exclusion>  
-                      <groupId>org.apache.logging.log4j</groupId>
-                      <artifactId>*</artifactId>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>*</artifactId>
                     </exclusion>
-                  </exclusions> 
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>net.sf.saxon</groupId>

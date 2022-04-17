@@ -172,7 +172,7 @@ public class AppraisalPlugin extends AbstractPlugin<AIP> {
 
               model.createPreservationMetadata(PreservationMetadata.PreservationMetadataType.EVENT, id, aipId, null,
                 null, null, premisEvent, true);
-            } catch (AlreadyExistsException | ValidationException e) {
+            } catch (AlreadyExistsException /*| ValidationException*/ e) {
               throw new GenericException(e);
             }
 

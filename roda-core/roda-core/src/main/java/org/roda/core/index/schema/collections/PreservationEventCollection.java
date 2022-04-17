@@ -160,45 +160,45 @@ public class PreservationEventCollection
 
       doc.addField(RodaConstants.PRESERVATION_EVENT_DATETIME, event.getEventDateTime());
 
-      if (event.getEventDetailInformationArray().length > 0) {
+      if (!event.getEventDetailInformation().isEmpty()) {
         doc.addField(RodaConstants.PRESERVATION_EVENT_DETAIL,
-          event.getEventDetailInformationArray()[0].getEventDetail());
+          event.getEventDetailInformation().get(0).getEventDetail());
       }
 
-      doc.addField(RodaConstants.PRESERVATION_EVENT_TYPE, event.getEventType().getStringValue());
+      doc.addField(RodaConstants.PRESERVATION_EVENT_TYPE, event.getEventType().getValue());
 
-      if (event.getEventOutcomeInformationArray().length > 0) {
+      if (!event.getEventOutcomeInformation().isEmpty()) {
         doc.addField(RodaConstants.PRESERVATION_EVENT_OUTCOME,
-          event.getEventOutcomeInformationArray(0).getEventOutcome().getStringValue());
+          event.getEventOutcomeInformation().get(0).getEventOutcome().get(0).getValue());
       }
 
-      if (event.getLinkingAgentIdentifierArray() != null && event.getLinkingAgentIdentifierArray().length > 0) {
-        for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierArray()) {
+      if (event.getLinkingAgentIdentifier() != null && !event.getLinkingAgentIdentifier().isEmpty()) {
+        for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifier()) {
           LinkingIdentifier li = new LinkingIdentifier();
-          li.setType(laict.getLinkingAgentIdentifierType().getStringValue());
+          li.setType(laict.getLinkingAgentIdentifierType().getValue());
           li.setValue(laict.getLinkingAgentIdentifierValue());
-          li.setRoles(PremisV3Utils.toStringList(laict.getLinkingAgentRoleArray()));
+          li.setRoles(PremisV3Utils.toStringList(laict.getLinkingAgentRole()));
           doc.addField(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER, JsonUtils.getJsonFromObject(li));
         }
       }
 
-      if (event.getLinkingObjectIdentifierArray() != null && event.getLinkingObjectIdentifierArray().length > 0) {
-        for (LinkingObjectIdentifierComplexType loict : event.getLinkingObjectIdentifierArray()) {
+      if (event.getLinkingObjectIdentifier() != null && !event.getLinkingObjectIdentifier().isEmpty()) {
+        for (LinkingObjectIdentifierComplexType loict : event.getLinkingObjectIdentifier()) {
           LinkingIdentifier li = new LinkingIdentifier();
-          li.setType(loict.getLinkingObjectIdentifierType().getStringValue());
+          li.setType(loict.getLinkingObjectIdentifierType().getValue());
           li.setValue(loict.getLinkingObjectIdentifierValue());
-          li.setRoles(PremisV3Utils.toStringList(loict.getLinkingObjectRoleArray()));
+          li.setRoles(PremisV3Utils.toStringList(loict.getLinkingObjectRole()));
           doc.addField(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER,
             JsonUtils.getJsonFromObject(li));
         }
       }
 
-      if (event.getLinkingObjectIdentifierArray() != null && event.getLinkingObjectIdentifierArray().length > 0) {
-        for (LinkingObjectIdentifierComplexType loict : event.getLinkingObjectIdentifierArray()) {
+      if (event.getLinkingObjectIdentifier() != null && !event.getLinkingObjectIdentifier().isEmpty()) {
+        for (LinkingObjectIdentifierComplexType loict : event.getLinkingObjectIdentifier()) {
           LinkingIdentifier li = new LinkingIdentifier();
-          li.setType(loict.getLinkingObjectIdentifierType().getStringValue());
+          li.setType(loict.getLinkingObjectIdentifierType().getValue());
           li.setValue(loict.getLinkingObjectIdentifierValue());
-          li.setRoles(PremisV3Utils.toStringList(loict.getLinkingObjectRoleArray()));
+          li.setRoles(PremisV3Utils.toStringList(loict.getLinkingObjectRole()));
           doc.addField(RodaConstants.PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER,
             JsonUtils.getJsonFromObject(li));
         }
