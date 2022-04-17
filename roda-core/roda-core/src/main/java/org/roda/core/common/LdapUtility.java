@@ -14,7 +14,6 @@ import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -70,6 +69,7 @@ import org.apache.directory.server.core.partition.impl.btree.jdbm.JdbmPartition;
 import org.apache.directory.server.core.partition.ldif.LdifPartition;
 import org.apache.directory.server.ldap.LdapServer;
 import org.apache.directory.server.protocol.shared.transport.TcpTransport;
+import org.joda.time.DateTime;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
@@ -86,7 +86,6 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.util.DateParser;
 
 /**
  * @author Rui Castro
@@ -239,44 +238,39 @@ public class LdapUtility {
    * Constructs a new LdapUtility class with the given parameters.
    *
    * @param ldapStartServer
-   *                                      start the LDAP server?
+   *          start the LDAP server?
    * @param ldapPort
-   *                                      the port where LDAP server should bind.
+   *          the port where LDAP server should bind.
    * @param ldapRootDN
-   *                                      the root DN.
+   *          the root DN.
    * @param ldapPeopleDN
-   *                                      the DN for the people entry. Users
-   *                                      should be located under this entry.
+   *          the DN for the people entry. Users should be located under this
+   *          entry.
    * @param ldapGroupsDN
-   *                                      the DN for the groups entry. Groups
-   *                                      should be located under this entry.
+   *          the DN for the groups entry. Groups should be located under this
+   *          entry.
    * @param ldapRolesDN
-   *                                      the DN for the roles entry. Roles should
-   *                                      be located under this entry.
+   *          the DN for the roles entry. Roles should be located under this
+   *          entry.
    * @param ldapAdminDN
-   *                                      the DN (Distinguished Name) of the LDAP
-   *                                      administrator.
+   *          the DN (Distinguished Name) of the LDAP administrator.
    * @param ldapAdminPassword
-   *                                      the password of the LDAP administrator.
+   *          the password of the LDAP administrator.
    * @param ldapPasswordDigestAlgorithm
-   *                                      the algorithm to use for password
-   *                                      encryption (crypt, sha, md5). The
-   *                                      default is MD5.
+   *          the algorithm to use for password encryption (crypt, sha, md5). The
+   *          default is MD5.
    * @param ldapProtectedUsers
-   *                                      list of protected users. Users in the
-   *                                      protected list cannot be modified.
+   *          list of protected users. Users in the protected list cannot be
+   *          modified.
    * @param ldapProtectedGroups
-   *                                      list of protected groups. Groups in the
-   *                                      protected list cannot be modified.
+   *          list of protected groups. Groups in the protected list cannot be
+   *          modified.
    * @param rodaGuestDN
-   *                                      the DN (Distinguished Name) of the RODA
-   *                                      guest.
+   *          the DN (Distinguished Name) of the RODA guest.
    * @param rodaAdminDN
-   *                                      the DN (Distinguished Name) of the RODA
-   *                                      administrator.
+   *          the DN (Distinguished Name) of the RODA administrator.
    * @param dataDirectory
-   *                                      Directory where ApacheDS data will be
-   *                                      stored.
+   *          Directory where ApacheDS data will be stored.
    */
   public LdapUtility(final boolean ldapStartServer, final int ldapPort, final String ldapRootDN,
     final String ldapPeopleDN, final String ldapGroupsDN, final String ldapRolesDN, final String ldapAdminDN,
@@ -320,7 +314,7 @@ public class LdapUtility {
    * Stop the directory service and LDAP server if it is running.
    *
    * @throws GenericException
-   *                            is some error occurred during shutdown.
+   *           is some error occurred during shutdown.
    */
   public void stopService() throws GenericException {
     if (this.server != null && this.server.isStarted()) {
@@ -337,7 +331,7 @@ public class LdapUtility {
    * Initialize the server. It creates the partition and adds the index.
    *
    * @throws Exception
-   *                     if there were some problems while initializing the system
+   *           if there were some problems while initializing the system
    */
   public void initDirectoryService() throws Exception {
     initDirectoryService(null);
@@ -348,9 +342,9 @@ public class LdapUtility {
    * the context entries for the created partitions.
    *
    * @param ldifs
-   *                LDIF files to apply to Directory Service.
+   *          LDIF files to apply to Directory Service.
    * @throws Exception
-   *                     if there were some problems while initializing the system
+   *           if there were some problems while initializing the system
    */
   public void initDirectoryService(final List<String> ldifs) throws Exception {
     // Initialize the LDAP service
@@ -409,7 +403,7 @@ public class LdapUtility {
    * @return a list of {@link User}'s.
    *
    * @throws GenericException
-   *                            if some error occurs.
+   *           if some error occurs.
    */
   public List<User> getUsers() throws GenericException {
     try {
@@ -446,14 +440,14 @@ public class LdapUtility {
    * doesn't exist.
    *
    * @param name
-   *               the name of the desired User.
+   *          the name of the desired User.
    *
    * @return the User with name <code>name</code> or <code>null</code> if it
    *         doesn't exist.
    *
    * @throws GenericException
-   *                            if the user information could not be retrieved
-   *                            from the LDAP server.
+   *           if the user information could not be retrieved from the LDAP
+   *           server.
    */
   public User getUser(final String name) throws GenericException {
     try {
@@ -468,14 +462,14 @@ public class LdapUtility {
    * if it doesn't exist.
    *
    * @param email
-   *                the email of the desired {@link User}.
+   *          the email of the desired {@link User}.
    *
    * @return the {@link User} with email <code>email</code> or <code>null</code>
    *         if it doesn't exist.
    *
    * @throws GenericException
-   *                            if the user information could not be retrieved
-   *                            from the LDAP server.
+   *           if the user information could not be retrieved from the LDAP
+   *           server.
    */
   public User getUserWithEmail(final String email) throws GenericException {
     try {
@@ -489,19 +483,16 @@ public class LdapUtility {
    * Adds a new {@link User}.
    *
    * @param user
-   *               the {@link User} to add.
+   *          the {@link User} to add.
    *
    * @return the newly created {@link User}.
    *
    * @throws UserAlreadyExistsException
-   *                                       if a User with the same name already
-   *                                       exists.
+   *           if a User with the same name already exists.
    * @throws EmailAlreadyExistsException
-   *                                       if the {@link User}'s email is already
-   *                                       used.
+   *           if the {@link User}'s email is already used.
    * @throws GenericException
-   *                                       if something goes wrong with the
-   *                                       creation of the new user.
+   *           if something goes wrong with the creation of the new user.
    */
   public User addUser(final User user)
     throws UserAlreadyExistsException, EmailAlreadyExistsException, GenericException {
@@ -550,21 +541,18 @@ public class LdapUtility {
    * Modify the {@link User}'s information.
    *
    * @param modifiedUser
-   *                       the {@link User} to modify.
+   *          the {@link User} to modify.
    *
    * @return the modified {@link User}.
    *
    * @throws NotFoundException
-   *                                       if the {@link User} being modified
-   *                                       doesn't exist.
+   *           if the {@link User} being modified doesn't exist.
    * @throws EmailAlreadyExistsException
-   *                                       if the specified email is already used
-   *                                       by another user.
+   *           if the specified email is already used by another user.
    * @throws IllegalOperationException
-   *                                       if the user is one of the protected
-   *                                       users.
+   *           if the user is one of the protected users.
    * @throws GenericException
-   *                                       if some error occurred.
+   *           if some error occurred.
    */
   public User modifyUser(final User modifiedUser)
     throws NotFoundException, IllegalOperationException, EmailAlreadyExistsException, GenericException {
@@ -576,17 +564,16 @@ public class LdapUtility {
    * Sets the user's password.
    *
    * @param username
-   *                   the username.
+   *          the username.
    * @param password
-   *                   the password.
+   *          the password.
    *
    * @throws NotFoundException
-   *                                     if specified {@link User} doesn't exist.
+   *           if specified {@link User} doesn't exist.
    * @throws IllegalOperationException
-   *                                     if the user is one of the protected
-   *                                     users.
+   *           if the user is one of the protected users.
    * @throws GenericException
-   *                                     if some error occurs.
+   *           if some error occurs.
    */
   public void setUserPassword(final String username, final String password)
     throws IllegalOperationException, NotFoundException, GenericException {
@@ -603,25 +590,22 @@ public class LdapUtility {
    * Modify the {@link User}'s information.
    *
    * @param modifiedUser
-   *                       the {@link User} to modify.
+   *          the {@link User} to modify.
    *
    * @param newPassword
-   *                       the new {@link User}'s password. To maintain the
-   *                       current password, use <code>null</code>.
+   *          the new {@link User}'s password. To maintain the current password,
+   *          use <code>null</code>.
    *
    * @return the modified {@link User}.
    *
    * @throws NotFoundException
-   *                                       if the Use being modified doesn't
-   *                                       exist.
+   *           if the Use being modified doesn't exist.
    * @throws EmailAlreadyExistsException
-   *                                       if the specified email is already used
-   *                                       by another user.
+   *           if the specified email is already used by another user.
    * @throws IllegalOperationException
-   *                                       if the user is one of the protected
-   *                                       users.
+   *           if the user is one of the protected users.
    * @throws GenericException
-   *                                       if some error occurred.
+   *           if some error occurred.
    */
   public User modifySelfUser(final User modifiedUser, final String newPassword)
     throws NotFoundException, EmailAlreadyExistsException, IllegalOperationException, GenericException {
@@ -633,13 +617,12 @@ public class LdapUtility {
    * Removes a {@link User}.
    *
    * @param username
-   *                   the name of the user to remove.
+   *          the name of the user to remove.
    *
    * @throws IllegalOperationException
-   *                                     if the user is one of the protected
-   *                                     users.
+   *           if the user is one of the protected users.
    * @throws GenericException
-   *                                     if some error occurred.
+   *           if some error occurred.
    */
   public void removeUser(final String username) throws IllegalOperationException, GenericException {
     final String userDN = getUserDN(username);
@@ -660,7 +643,7 @@ public class LdapUtility {
    * @return an array of {@link Group}'s.
    *
    * @throws GenericException
-   *                            if some error occurred.
+   *           if some error occurred.
    */
   public List<Group> getGroups() throws GenericException {
 
@@ -695,15 +678,15 @@ public class LdapUtility {
    * Returns the group named <code>grpName</code>.
    *
    * @param name
-   *               the name of the group.
+   *          the name of the group.
    *
    * @return a Group if the group exists, otherwise <code>null</code>.
    *
    * @throws GenericException
-   *                             if the group information could not be retrieved
-   *                             from the LDAP server.
+   *           if the group information could not be retrieved from the LDAP
+   *           server.
    * @throws NotFoundException
-   *                             if the group doesn't exist.
+   *           if the group doesn't exist.
    */
   public Group getGroup(final String name) throws GenericException, NotFoundException {
     try {
@@ -719,14 +702,12 @@ public class LdapUtility {
    * Add a new {@link Group}.
    *
    * @param group
-   *                the {@link Group} to add.
+   *          the {@link Group} to add.
    * @return the newly created {@link Group}.
    * @throws GroupAlreadyExistsException
-   *                                       if a Group with the same name already
-   *                                       exists.
+   *           if a Group with the same name already exists.
    * @throws GenericException
-   *                                       if something goes wrong with the
-   *                                       creation of the new group.
+   *           if something goes wrong with the creation of the new group.
    */
   public Group addGroup(final Group group) throws GroupAlreadyExistsException, GenericException {
     if (!group.isNameValid()) {
@@ -771,20 +752,18 @@ public class LdapUtility {
    * Modify the {@link Group}'s information.
    *
    * @param modifiedGroup
-   *                        the {@link Group} to modify.
+   *          the {@link Group} to modify.
    *
    * @return the modified {@link Group}.
    *
    * @throws NotFoundException
-   *                                     if the group with being modified doesn't
-   *                                     exist.
+   *           if the group with being modified doesn't exist.
    * @throws IllegalOperationException
-   *                                     if the user is one of the protected
-   *                                     users.
+   *           if the user is one of the protected users.
    * @throws GenericException
-   *                                     if some error occurred.
+   *           if some error occurred.
    * @throws GenericException
-   *                                     if some error occurred.
+   *           if some error occurred.
    */
   public Group modifyGroup(final Group modifiedGroup)
     throws NotFoundException, IllegalOperationException, GenericException {
@@ -795,12 +774,11 @@ public class LdapUtility {
    * Removes a group.
    *
    * @param groupname
-   *                    the name of the group to remove.
+   *          the name of the group to remove.
    * @throws IllegalOperationException
-   *                                     if the user is one of the protected
-   *                                     users.
+   *           if the user is one of the protected users.
    * @throws GenericException
-   *                                     if some error occurred.
+   *           if some error occurred.
    */
   public void removeGroup(final String groupname) throws GenericException, IllegalOperationException {
     if (this.rodaAdministratorsDN.equals(getGroupDN(groupname)) || this.ldapProtectedGroups.contains(groupname)) {
@@ -820,17 +798,16 @@ public class LdapUtility {
    * the parameters are valid.
    *
    * @param username
-   *                   the user's username.
+   *          the user's username.
    * @param password
-   *                   the user's password.
+   *          the user's password.
    *
    * @return the {@link User} registered in LDAP.
    *
    * @throws AuthenticationDeniedException
-   *                                         if the provided credentials are not
-   *                                         valid.
+   *           if the provided credentials are not valid.
    * @throws GenericException
-   *                                         if some error occurred.
+   *           if some error occurred.
    */
   public User getAuthenticatedUser(final String username, final String password)
     throws AuthenticationDeniedException, GenericException {
@@ -861,29 +838,24 @@ public class LdapUtility {
    * email validation token will be generated.
    *
    * @param user
-   *                   the new {@link User} to create.
+   *          the new {@link User} to create.
    * @param password
-   *                   the new {@link User} password.
+   *          the new {@link User} password.
    *
    * @return the newly created {@link User}.
    *
    * @throws UserAlreadyExistsException
-   *                                       if a {@link User} with the same name
-   *                                       already exists.
+   *           if a {@link User} with the same name already exists.
    * @throws EmailAlreadyExistsException
-   *                                       if the {@link User}'s email is already
-   *                                       used.
+   *           if the {@link User}'s email is already used.
    * @throws GenericException
-   *                                       if something goes wrong with the
-   *                                       register process.
+   *           if something goes wrong with the register process.
    */
   public User registerUser(final User user, final String password)
     throws UserAlreadyExistsException, EmailAlreadyExistsException, GenericException {
 
     // Generate an email verification token with 1 day expiration date.
-    final Calendar calendar = Calendar.getInstance();
-    calendar.add(Calendar.DAY_OF_MONTH, 1);
-    final String isoDateNoMillis = DateParser.getIsoDateNoMillis(calendar.getTime());
+    final String isoDateNoMillis = DateTime.now().plusDays(1).toDateTimeISO().toInstant().toString();
 
     user.setEmailConfirmationToken(IdUtils.createUUID());
     user.setEmailConfirmationTokenExpirationDate(isoDateNoMillis);
@@ -909,26 +881,23 @@ public class LdapUtility {
    * </p>
    *
    * @param username
-   *                                 the name of the {@link User}.
+   *          the name of the {@link User}.
    * @param email
-   *                                 the email address of the {@link User}.
+   *          the email address of the {@link User}.
    * @param emailConfirmationToken
-   *                                 the email confirmation token.
+   *          the email confirmation token.
    *
    * @return the {@link User} whose email has been confirmed.
    *
    * @throws NotFoundException
-   *                                    if the username and email don't exist.
+   *           if the username and email don't exist.
    * @throws IllegalArgumentException
-   *                                    if username and email are
-   *                                    <code>null</code>.
+   *           if username and email are <code>null</code>.
    * @throws InvalidTokenException
-   *                                    if the specified token doesn't exist, has
-   *                                    already expired or it doesn't correspond
-   *                                    to the stored token.
+   *           if the specified token doesn't exist, has already expired or it
+   *           doesn't correspond to the stored token.
    * @throws GenericException
-   *                                    if something goes wrong with the
-   *                                    operation.
+   *           if something goes wrong with the operation.
    */
   public User confirmUserEmail(final String username, final String email, final String emailConfirmationToken)
     throws NotFoundException, InvalidTokenException, GenericException {
@@ -936,40 +905,28 @@ public class LdapUtility {
     final User user = getUserByNameOrEmail(username, email);
 
     if (user == null) {
-
       final String message;
       if (username != null) {
         message = userMessage(username, " doesn't exist");
       } else {
         message = "Email " + email + " is not registered by any user";
       }
-
       throw new NotFoundException(message);
-
     } else {
-
       if (user.getEmailConfirmationToken() == null) {
-
         throw new InvalidTokenException("There's no active email confirmation token.");
-
       } else if (!user.getEmailConfirmationToken().equals(emailConfirmationToken)
         || user.getEmailConfirmationTokenExpirationDate() == null) {
-
         // Token argument is not equal to stored token, or
         // No expiration date
         throw new InvalidTokenException("Email confirmation token is invalid.");
 
       } else {
-
-        final String currentIsoDate = DateParser.getIsoDateNoMillis(Calendar.getInstance().getTime());
-
-        if (currentIsoDate.compareToIgnoreCase(user.getEmailConfirmationTokenExpirationDate()) > 0) {
-
+        boolean after = DateTime.now().isAfter(DateTime.parse(user.getEmailConfirmationTokenExpirationDate()));
+        if (after) {
           throw new InvalidTokenException(
             "Email confirmation token expired in " + user.getEmailConfirmationTokenExpirationDate());
-
         }
-
       }
 
       user.setActive(true);
@@ -977,9 +934,7 @@ public class LdapUtility {
       user.setEmailConfirmationTokenExpirationDate(null);
 
       try {
-
         return modifyUser(user);
-
       } catch (final IllegalOperationException | EmailAlreadyExistsException e) {
         throw new GenericException("Error confirming user email - " + e.getMessage(), e);
       }
@@ -995,55 +950,40 @@ public class LdapUtility {
    * </p>
    *
    * @param username
-   *                   the username of the {@link User} for whom the password
-   *                   needs to be reset.
+   *          the username of the {@link User} for whom the password needs to be
+   *          reset.
    *
    * @param email
-   *                   the email of the {@link User} for whom the password needs
-   *                   to be reset.
+   *          the email of the {@link User} for whom the password needs to be
+   *          reset.
    *
    * @return the {@link User} with the password reset token and expiration date.
    *
    * @throws NotFoundException
-   *                                     if username or email doesn't correspond
-   *                                     to any registered {@link User}.
+   *           if username or email doesn't correspond to any registered
+   *           {@link User}.
    * @throws IllegalOperationException
-   *                                     if email corresponds to a protected
-   *                                     {@link User}.
+   *           if email corresponds to a protected {@link User}.
    * @throws GenericException
-   *                                     if something goes wrong with the
-   *                                     operation.
+   *           if something goes wrong with the operation.
    */
   public User requestPasswordReset(final String username, final String email)
     throws NotFoundException, IllegalOperationException, GenericException {
-
     final User user = getUserByNameOrEmail(username, email);
-
     if (user == null) {
-
       final String message;
       if (username != null) {
         message = userMessage(username, " doesn't exist");
       } else {
         message = "Email " + email + " is not registered by any user";
       }
-
       throw new NotFoundException(message);
-
     } else {
-
       // Generate a password reset token with 1 day expiration date.
-      final Calendar calendar = Calendar.getInstance();
-      calendar.add(Calendar.DAY_OF_MONTH, 1);
-      final String isoDateNoMillis = DateParser.getIsoDateNoMillis(calendar.getTime());
-
       user.setResetPasswordToken(IdUtils.createUUID());
-      user.setResetPasswordTokenExpirationDate(isoDateNoMillis);
-
+      user.setResetPasswordTokenExpirationDate(DateTime.now().plusDays(1).toDateTimeISO().toInstant().toString());
       try {
-
         return modifyUser(user);
-
       } catch (final EmailAlreadyExistsException e) {
         throw new GenericException("Error setting password reset token - " + e.getMessage(), e);
       }
@@ -1054,27 +994,23 @@ public class LdapUtility {
    * Reset {@link User}'s password given a previously generated token.
    *
    * @param username
-   *                             the {@link User}'s username.
+   *          the {@link User}'s username.
    * @param password
-   *                             the {@link User}'s password.
+   *          the {@link User}'s password.
    * @param resetPasswordToken
-   *                             the token to reset {@link User}'s password.
+   *          the token to reset {@link User}'s password.
    *
    * @return the modified {@link User}.
    *
    * @throws NotFoundException
-   *                                     if a {@link User} with the same name
-   *                                     already exists.
+   *           if a {@link User} with the same name already exists.
    * @throws InvalidTokenException
-   *                                     if the specified token doesn't exist, has
-   *                                     already expired or it doesn't correspond
-   *                                     to the stored token.
+   *           if the specified token doesn't exist, has already expired or it
+   *           doesn't correspond to the stored token.
    * @throws IllegalOperationException
-   *                                     if the username corresponds to a
-   *                                     protected {@link User}.
+   *           if the username corresponds to a protected {@link User}.
    * @throws GenericException
-   *                                     if something goes wrong with the
-   *                                     operation.
+   *           if something goes wrong with the operation.
    */
   public User resetUserPassword(final String username, final String password, final String resetPasswordToken)
     throws NotFoundException, InvalidTokenException, IllegalOperationException, GenericException {
@@ -1099,22 +1035,17 @@ public class LdapUtility {
         throw new InvalidTokenException("Password reset token is invalid.");
 
       } else {
-        final String currentIsoDate = DateParser.getIsoDateNoMillis(Calendar.getInstance().getTime());
-        if (currentIsoDate.compareToIgnoreCase(user.getResetPasswordTokenExpirationDate()) > 0) {
+        if (DateTime.now().isAfter(DateTime.parse(user.getEmailConfirmationTokenExpirationDate()))) {
           throw new InvalidTokenException(
             "Password reset token expired in " + user.getResetPasswordTokenExpirationDate());
         }
       }
 
       try {
-
         setUserPassword(username, password);
-
         user.setResetPasswordToken(null);
         user.setResetPasswordTokenExpirationDate(null);
-
         return modifyUser(user);
-
       } catch (final IllegalOperationException | EmailAlreadyExistsException e) {
         throw new GenericException("Error reseting user password - " + e.getMessage(), e);
       }
@@ -1125,13 +1056,11 @@ public class LdapUtility {
    * Add a new role with the specified name.
    *
    * @param roleName
-   *                   the role to add.
+   *          the role to add.
    * @throws RoleAlreadyExistsException
-   *                                      if a role with the same name already
-   *                                      exists.
+   *           if a role with the same name already exists.
    * @throws GenericException
-   *                                      if something goes wrong with the
-   *                                      creation of the new role.
+   *           if something goes wrong with the creation of the new role.
    */
   public void addRole(final String roleName) throws RoleAlreadyExistsException, GenericException {
     try {
@@ -1161,7 +1090,7 @@ public class LdapUtility {
    *
    * @return RODA {@link JdbmPartition}
    * @throws Exception
-   *                     if some error occurs.
+   *           if some error occurs.
    */
   private Partition instantiateDirectoryService() throws Exception {
     this.service = new DefaultDirectoryService();
@@ -1402,22 +1331,20 @@ public class LdapUtility {
    * Modify the {@link Group}'s information.
    *
    * @param modifiedGroup
-   *                        the {@link Group} to modify.
+   *          the {@link Group} to modify.
    * @param force
-   *                        ignore protected groups configuration.
+   *          ignore protected groups configuration.
    *
    * @return the modified {@link Group}.
    *
    * @throws NotFoundException
-   *                                     if the group with being modified doesn't
-   *                                     exist.
+   *           if the group with being modified doesn't exist.
    * @throws IllegalOperationException
-   *                                     if the user is one of the protected
-   *                                     users.
+   *           if the user is one of the protected users.
    * @throws GenericException
-   *                                     if some error occurred.
+   *           if some error occurred.
    * @throws GenericException
-   *                                     if some error occurred.
+   *           if some error occurred.
    */
   private Group modifyGroup(final Group modifiedGroup, final boolean force)
     throws NotFoundException, IllegalOperationException, GenericException {
@@ -1501,7 +1428,7 @@ public class LdapUtility {
    * Returns the DN of a user given is username.
    *
    * @param username
-   *                   the username of the user.
+   *          the username of the user.
    * @return the DN of a user given is username.
    */
   private String getUserDN(final String username) {
@@ -1512,7 +1439,7 @@ public class LdapUtility {
    * Returns the DN of a group given is groupName.
    *
    * @param groupName
-   *                    the name of the group.
+   *          the name of the group.
    * @return the DN of a group given is groupName.
    */
   private String getGroupDN(final String groupName) {
@@ -1523,7 +1450,7 @@ public class LdapUtility {
    * Returns the DN of a role given is roleName.
    *
    * @param roleName
-   *                   the name of the role.
+   *          the name of the role.
    * @return the DN of a role given is roleName.
    */
   private String getRoleDN(final String roleName) {
@@ -1534,29 +1461,25 @@ public class LdapUtility {
    * Modify the {@link User}'s information.
    *
    * @param session
-   *                               the session.
+   *          the session.
    * @param modifiedUser
-   *                               the {@link User} to modify.
+   *          the {@link User} to modify.
    * @param newPassword
-   *                               the new {@link User}'s password. To maintain
-   *                               the current password, use <code>null</code>.
+   *          the new {@link User}'s password. To maintain the current password,
+   *          use <code>null</code>.
    * @param modifyRolesAndGroups
-   *                               <code>true</code> if User's groups and roles
-   *                               should be updated also.
+   *          <code>true</code> if User's groups and roles should be updated also.
    * @param force
-   *                               ignore protected users configuration.
+   *          ignore protected users configuration.
    *
    * @throws NotFoundException
-   *                                       if the {@link User} being modified
-   *                                       doesn't exist.
+   *           if the {@link User} being modified doesn't exist.
    * @throws EmailAlreadyExistsException
-   *                                       if the specified email is already used
-   *                                       by another user.
+   *           if the specified email is already used by another user.
    * @throws IllegalOperationException
-   *                                       if the user is one of the protected
-   *                                       users.
+   *           if the user is one of the protected users.
    * @throws GenericException
-   *                                       if some error occurred.
+   *           if some error occurred.
    */
   private void modifyUser(final CoreSession session, final User modifiedUser, final String newPassword,
     final boolean modifyRolesAndGroups, final boolean force)
@@ -1610,15 +1533,15 @@ public class LdapUtility {
    * Modifies user password.
    *
    * @param session
-   *                   the session.
+   *          the session.
    * @param username
-   *                   the username.
+   *          the username.
    * @param password
-   *                   the password.
+   *          the password.
    * @throws LdapException
-   *                                    if some error occurs.
+   *           if some error occurs.
    * @throws NoSuchAlgorithmException
-   *                                    the the algorithm doesn't exist.
+   *           the the algorithm doesn't exist.
    */
   private void modifyUserPassword(final CoreSession session, final String username, final String password)
     throws LdapException, NoSuchAlgorithmException {
@@ -1684,12 +1607,12 @@ public class LdapUtility {
    * Returns the DN of groups that contain the given member.
    *
    * @param session
-   *                   the session.
+   *          the session.
    * @param memberDN
-   *                   the DN of the member.
+   *          the DN of the member.
    * @return the DNs of the groups that has memberDN as member.
    * @throws LdapException
-   *                         if some error occurs.
+   *           if some error occurs.
    */
   private Set<String> getDNsOfGroupsContainingMember(final CoreSession session, final String memberDN)
     throws LdapException {
@@ -1706,12 +1629,12 @@ public class LdapUtility {
    * Returns the DN of active groups that contain the given member.
    *
    * @param session
-   *                   the session.
+   *          the session.
    * @param memberDN
-   *                   the DN of the member.
+   *          the DN of the member.
    * @return the DNs of the groups that has memberDN as member.
    * @throws LdapException
-   *                         if some error occurs.
+   *           if some error occurs.
    */
   private Set<String> getDNsOfActiveGroupsContainingMember(final CoreSession session, final String memberDN)
     throws LdapException {
@@ -1739,10 +1662,10 @@ public class LdapUtility {
    * Get all roles.
    * 
    * @param session
-   *                  the session.
+   *          the session.
    * @return a {@link Set} with all role names.
    * @throws LdapException
-   *                         if some error occurs.
+   *           if some error occurs.
    */
   private Set<String> getRoles(final CoreSession session) throws LdapException {
     final Set<String> roles = new HashSet<>();
@@ -1802,7 +1725,7 @@ public class LdapUtility {
 
     if (user != null) {
       String username = user.getName();
-      
+
       // Add all roles assigned to this user
       final Set<String> memberRoles = getMemberRoles(session, getUserDN(username));
       user.setAllRoles(memberRoles);
@@ -1828,13 +1751,13 @@ public class LdapUtility {
    * Sets the roles that a member owns.
    *
    * @param session
-   *                   the session
+   *          the session
    * @param memberDN
-   *                   the DN of the member to change the roles for.
+   *          the DN of the member to change the roles for.
    * @param roles
-   *                   a list of roles that this member should own.
+   *          a list of roles that this member should own.
    * @throws LdapException
-   *                         if some error occurs.
+   *           if some error occurs.
    */
   private void setMemberDirectRoles(final CoreSession session, final String memberDN, final Set<String> roles)
     throws LdapException {
@@ -1872,13 +1795,13 @@ public class LdapUtility {
    * Sets the groups to which a member belongs to.
    *
    * @param session
-   *                   the session.
+   *          the session.
    * @param memberDN
-   *                   the DN of the member to change the groups for.
+   *          the DN of the member to change the groups for.
    * @param groups
-   *                   a list of groups that this member should belong to.
+   *          a list of groups that this member should belong to.
    * @throws LdapException
-   *                         if some error occurs.
+   *           if some error occurs.
    */
   private void setMemberGroups(final CoreSession session, final String memberDN, final Set<String> groups)
     throws LdapException {
@@ -1924,14 +1847,14 @@ public class LdapUtility {
    * Sets the user's password without checking admin and guest users.
    *
    * @param username
-   *                   the username.
+   *          the username.
    * @param password
-   *                   the password.
+   *          the password.
    *
    * @throws NotFoundException
-   *                             if specified {@link User} doesn't exist.
+   *           if specified {@link User} doesn't exist.
    * @throws GenericException
-   *                             if some error occurs.
+   *           if some error occurs.
    */
   private void setUserPasswordUnchecked(final String username, final String password)
     throws NotFoundException, GenericException {
@@ -1950,10 +1873,10 @@ public class LdapUtility {
    * <i>administrators</i>.
    *
    * @param dn
-   *             the Distinguished Name.
+   *          the Distinguished Name.
    * @return a {@link String} with the first name.
    * @throws LdapInvalidDnException
-   *                                  if the DN is not valid.
+   *           if the DN is not valid.
    */
   private String getFirstNameFromDN(final String dn) throws LdapInvalidDnException {
     return getFirstNameFromDN(new Dn(dn));
@@ -1965,7 +1888,7 @@ public class LdapUtility {
    * <i>administrators</i>.
    *
    * @param dn
-   *             the Distinguished Name.
+   *          the Distinguished Name.
    * @return a {@link String} with the first name.
    */
   private String getFirstNameFromDN(final Dn dn) {
@@ -1981,7 +1904,7 @@ public class LdapUtility {
    * service.
    *
    * @throws Exception
-   *                     if the schema LDIF files are not found on the classpath
+   *           if the schema LDIF files are not found on the classpath
    */
   private void initSchemaPartition() throws Exception {
     final InstanceLayout instanceLayout = this.service.getInstanceLayout();
@@ -2040,14 +1963,14 @@ public class LdapUtility {
    * Add a new partition to the server.
    *
    * @param partitionId
-   *                      The partition Id
+   *          The partition Id
    * @param partitionDn
-   *                      The partition DN
+   *          The partition DN
    * @param dnFactory
-   *                      the DN factory
+   *          the DN factory
    * @return The newly added partition
    * @throws Exception
-   *                     If the partition can't be added
+   *           If the partition can't be added
    */
   private Partition addPartition(final String partitionId, final String partitionDn) throws Exception {
     // Create a new partition with the given partition id
@@ -2071,11 +1994,11 @@ public class LdapUtility {
    * Apply LDIF text.
    *
    * @param ldif
-   *               LDIF text.
+   *          LDIF text.
    * @throws LdapException
-   *                         if some LDAP related error occurs.
+   *           if some LDAP related error occurs.
    * @throws IOException
-   *                         if stream could not be closed.
+   *           if stream could not be closed.
    */
   private void applyLdif(final String ldif) throws LdapException, IOException {
     try (LdifReader entries = new LdifReader(new StringReader(ldif))) {
@@ -2091,9 +2014,9 @@ public class LdapUtility {
    * Add a new set of index on the given attributes.
    *
    * @param partition
-   *                    The partition on which we want to add index
+   *          The partition on which we want to add index
    * @param attrs
-   *                    The list of attributes to index
+   *          The list of attributes to index
    */
   private void addIndex(final Partition partition, final String... attrs) {
     // Index some attributes on the apache partition

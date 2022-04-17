@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.xmlbeans.XmlException;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
@@ -86,12 +85,11 @@ public class PreservationMetadataFileToVersion2 implements MigrationAction<Prese
       StoragePath oldStoragePath = binary.getStoragePath();
 
       File file = PremisV3Utils.binaryToFile(inputStream);
-      String originalName = file.getOriginalName().getStringValue();
+      String originalName = file.getOriginalName().getValue();
       String value = null;
 
-      for (ObjectIdentifierComplexType objectIdentifier : file.getObjectIdentifierArray()) {
-        if (RodaConstants.PREMIS_IDENTIFIER_TYPE_URN
-          .equals(objectIdentifier.getObjectIdentifierType().getStringValue())) {
+      for (ObjectIdentifierComplexType objectIdentifier : file.getObjectIdentifier()) {
+        if (RodaConstants.PREMIS_IDENTIFIER_TYPE_URN.equals(objectIdentifier.getObjectIdentifierType().getValue())) {
           value = objectIdentifier.getObjectIdentifierValue();
           value = value.substring(0, value.lastIndexOf(RodaConstants.URN_SEPARATOR) + 1);
           value += originalName;
@@ -113,8 +111,8 @@ public class PreservationMetadataFileToVersion2 implements MigrationAction<Prese
       boolean asReference = false;
       boolean createIfNotExists = false;
       storage.updateBinaryContent(newStoragePath, newPremis, asReference, createIfNotExists);
-    } catch (XmlException | GenericException | IOException | ValidationException | NotFoundException
-      | RequestNotValidException | AuthorizationDeniedException | AlreadyExistsException e) {
+    } catch (GenericException | IOException | ValidationException | NotFoundException | RequestNotValidException
+      | AuthorizationDeniedException | AlreadyExistsException e) {
       LOGGER.error("Could not migrate preservation metadata file {}", binary.getStoragePath(), e);
     }
   }

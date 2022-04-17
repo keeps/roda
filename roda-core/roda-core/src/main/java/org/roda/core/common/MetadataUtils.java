@@ -7,18 +7,29 @@
  */
 package org.roda.core.common;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.apache.xmlbeans.XmlValidationError;
@@ -54,8 +65,8 @@ public final class MetadataUtils {
    * @throws GenericException
    * 
    * @throws MetadataException
-   *           if the XML object is not valid or if something goes wrong with
-   *           the serialisation.
+   *           if the XML object is not valid or if something goes wrong with the
+   *           serialisation.
    */
   public static byte[] saveToByteArray(XmlObject xmlObject) throws GenericException, ValidationException {
     return saveToByteArray(xmlObject, true);
@@ -92,6 +103,17 @@ public final class MetadataUtils {
     return byteArrayStream.toString();
   }
 
+  public static ContentPayload saveToContentPayload(final JAXBElement<?> object, final Class<?> tClass,
+    final boolean writeXMLDeclaration) {
+    return new InputStreamContentPayload(() -> {
+      try {
+        return createInputStream(object, tClass, writeXMLDeclaration);
+      } catch (ValidationException e) {
+        throw new IOException(e);
+      }
+    });
+  }
+
   public static ContentPayload saveToContentPayload(final XmlObject xmlObject, final boolean writeXMLDeclaration) {
     return new InputStreamContentPayload(new ProvidesInputStream() {
 
@@ -115,8 +137,8 @@ public final class MetadataUtils {
    *          the {@link File}.
    * 
    * @throws MetadataException
-   *           if the XML object is not valid or if something goes wrong with
-   *           the serialisation.
+   *           if the XML object is not valid or if something goes wrong with the
+   *           serialisation.
    * 
    * @throws FileNotFoundException
    *           if the specified {@link File} couldn't be opened.
@@ -177,6 +199,22 @@ public final class MetadataUtils {
 
     } else {
       throw new ValidationException(xmlValidationErrorsToValidationReport(errorList));
+    }
+  }
+
+  public static InputStream createInputStream(final JAXBElement<?> object, final Class<?> tClass,
+    final boolean writeXMLDeclaration) throws ValidationException {
+    try {
+      StringWriter writer = new StringWriter();
+      JAXBContext jaxbContext = JAXBContext.newInstance(tClass);
+      Marshaller marshaller = jaxbContext.createMarshaller();
+      marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+      marshaller.marshal(object, writer);
+     return new ByteArrayInputStream(writer.toString().getBytes(StandardCharsets.UTF_8));
+
+    } catch (JAXBException e) {
+      throw new ValidationException(e.getMessage());
     }
   }
 

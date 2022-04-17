@@ -10,11 +10,11 @@ package org.roda.wui.api.controllers;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.joda.time.DateTime;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.notifications.EmailNotificationProcessor;
@@ -41,7 +41,6 @@ import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
 import org.roda.wui.common.server.ServerTools;
-import org.w3c.util.DateParser;
 
 public class UserManagement extends RodaWuiController {
 
@@ -298,12 +297,8 @@ public class UserManagement extends RodaWuiController {
 
     try {
       if (generateNewToken) {
-        final Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
-        final String isoDateNoMillis = DateParser.getIsoDateNoMillis(calendar.getTime());
-
         user.setEmailConfirmationToken(IdUtils.createUUID());
-        user.setEmailConfirmationTokenExpirationDate(isoDateNoMillis);
+        user.setEmailConfirmationTokenExpirationDate(DateTime.now().plusDays(1).toDateTimeISO().toInstant().toString());
 
         try {
           user = UserManagementHelper.updateUser(user, null, null);

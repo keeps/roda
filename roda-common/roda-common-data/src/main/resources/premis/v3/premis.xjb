@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jaxb:bindings
+        xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.1"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:simplify="http://jaxb2-commons.dev.java.net/basic/simplify"
+        jaxb:extensionBindingPrefixes="... simplify">
+
+    <jaxb:globalBindings choiceContentProperty="true"/>
+
+    <jaxb:bindings schemaLocation="premis.xsd" node="//xs:complexType[@name='formatComplexType']/xs:sequence/xs:choice">
+        <simplify:as-element-property/>
+    </jaxb:bindings>
+
+    <jaxb:bindings schemaLocation="premis.xsd" node="//xs:complexType[@name='eventOutcomeDetailComplexType']/xs:choice">
+        <simplify:as-element-property/>
+    </jaxb:bindings>
+
+    <jaxb:bindings schemaLocation="premis.xsd"
+                   node="//xs:complexType[@name='eventOutcomeInformationComplexType']/xs:choice">
+        <simplify:as-element-property/>
+    </jaxb:bindings>
+
+    <jaxb:bindings schemaLocation="premis.xsd"
+                   node="//xs:complexType[@name='signatureInformationComplexType']/xs:choice">
+        <simplify:as-element-property/>
+    </jaxb:bindings>
+
+    <jaxb:bindings schemaLocation="premis.xsd"
+                   node="//xs:complexType[@name='significantPropertiesComplexType']/xs:choice">
+        <simplify:as-element-property/>
+    </jaxb:bindings>
+
+    <jaxb:bindings schemaLocation="premis.xsd" node="//xs:complexType[@name='storageComplexType']/xs:choice">
+        <simplify:as-element-property/>
+    </jaxb:bindings>
+
+    <jaxb:bindings schemaLocation="premis.xsd" node="//xs:complexType[@name='licenseInformationComplexType']">
+        <simplify:property name="licenseDocumentationIdentifierAndLicenseTermsAndLicenseNote">
+            <simplify:as-element-property/>
+        </simplify:property>
+    </jaxb:bindings>
+
+    <jaxb:bindings schemaLocation="premis.xsd" node="//xs:complexType[@name='creatingApplicationComplexType']">
+        <simplify:property name="creatingApplicationNameAndCreatingApplicationVersionAndDateCreatedByApplication">
+            <simplify:as-element-property/>
+        </simplify:property>
+    </jaxb:bindings>
+</jaxb:bindings>

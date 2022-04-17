@@ -9,11 +9,11 @@ package org.roda.core.index.schema.collections;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.xmlbeans.XmlOptions;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
@@ -96,15 +96,19 @@ public class PreservationAgentCollection
     boolean validate = false;
     try {
       AgentComplexType agent = PremisV3Utils.binaryToAgent(binary.getContent(), validate);
-      doc.addField(RodaConstants.PRESERVATION_AGENT_NAME, PremisV3Utils.toStringList(agent.getAgentNameArray()));
-      doc.addField(RodaConstants.PRESERVATION_AGENT_TYPE, agent.getAgentType().getStringValue());
+      doc.addField(RodaConstants.PRESERVATION_AGENT_NAME, PremisV3Utils.toStringList(agent.getAgentName()));
+      doc.addField(RodaConstants.PRESERVATION_AGENT_TYPE, agent.getAgentType().getValue());
 
-      String extensions = "";
-      for (ExtensionComplexType e : agent.getAgentExtensionArray()) {
-        extensions += e.xmlText(new XmlOptions().setSavePrettyPrint());
+      StringBuilder extensions = new StringBuilder();
+      for (ExtensionComplexType e : agent.getAgentExtension()) {
+        for (Object o : e.getAny()) {
+          if (o instanceof String) {
+            extensions.append(o);
+          }
+        }
       }
-      doc.addField(RodaConstants.PRESERVATION_AGENT_EXTENSION, extensions);
-      doc.addField(RodaConstants.PRESERVATION_AGENT_NOTE, Arrays.asList(agent.getAgentNoteArray()));
+      doc.addField(RodaConstants.PRESERVATION_AGENT_EXTENSION, extensions.toString());
+      doc.addField(RodaConstants.PRESERVATION_AGENT_NOTE, Collections.singletonList(agent.getAgentNote()));
       doc.addField(RodaConstants.PRESERVATION_AGENT_VERSION, agent.getAgentVersion());
 
     } catch (ValidationException e) {
