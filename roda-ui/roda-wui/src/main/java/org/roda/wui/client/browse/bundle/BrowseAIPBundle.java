@@ -25,6 +25,7 @@ public class BrowseAIPBundle implements Bundle {
   private Long riskIncidenceCount;
   private Long preservationEventCount;
   private Long logCount;
+  private String instanceName;
 
   public BrowseAIPBundle() {
     super();
@@ -126,7 +127,13 @@ public class BrowseAIPBundle implements Bundle {
   public void setRepresentationInformationFields(List<String> representationInformationFields) {
     this.representationInformationFields = representationInformationFields;
   }
+  public String getInstanceName() {
+    return instanceName;
+  }
 
+  public void setInstanceName(String instanceName) {
+    this.instanceName = instanceName;
+  }
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();

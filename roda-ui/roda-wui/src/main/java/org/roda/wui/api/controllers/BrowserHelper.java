@@ -322,7 +322,13 @@ public class BrowserHelper {
     } else {
       bundle.setRepresentationInformationFields(Collections.emptyList());
     }
-
+    ModelService model = RodaCoreFactory.getModelService();
+    try{
+      DistributedInstance distributedInstance = model.retrieveDistributedInstance(aip.getInstanceId());
+      bundle.setInstanceName(distributedInstance.getName());
+    } catch (NotFoundException e) {
+      e.printStackTrace();
+    }
     return bundle;
   }
 

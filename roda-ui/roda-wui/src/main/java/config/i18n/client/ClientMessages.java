@@ -714,6 +714,8 @@ public interface ClientMessages extends Messages {
 
   String itemInstanceId();
 
+  String itemInstance();
+
   String aipType();
 
   String aipTypeItem();

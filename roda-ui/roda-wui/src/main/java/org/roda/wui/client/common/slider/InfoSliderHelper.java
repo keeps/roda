@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -23,6 +24,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.browse.RepresentationInformationHelper;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
@@ -30,7 +32,9 @@ import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.common.actions.AipActions;
 import org.roda.wui.client.ingest.process.ShowJob;
+import org.roda.wui.client.management.distributed.ShowDistributedInstance;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -184,7 +188,17 @@ public class InfoSliderHelper {
     }
 
     if (StringUtils.isNotBlank(aip.getInstanceId())) {
-      values.put(messages.itemInstanceId(), createAipInstanceIdHTML(bundle));
+      String distributedMode = ConfigurationManager.getStringWithDefault(
+        RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
+      if (distributedMode.equals(RodaConstants.DistributedModeType.CENTRAL.name())) {
+        String instancename = bundle.getInstanceName();
+        Anchor anchor = new Anchor();
+        anchor.setText(instancename);
+        anchor.setHref(HistoryUtils.createHistoryHashLink(ShowDistributedInstance.RESOLVER, aip.getInstanceId()));
+        values.put(messages.itemInstance(), anchor);
+      } else {
+        values.put(messages.itemInstanceId(), createAipInstanceIdHTML(bundle));
+      }
     }
 
     if (!aip.getIngestSIPIds().isEmpty()) {
