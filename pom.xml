@@ -116,7 +116,7 @@
         <metrics.version>3.2.6</metrics.version>
         <roda_community_url>https://roda-community.org</roda_community_url>
         <testng.groups>all</testng.groups>
-        <springboot.version>2.3.3.RELEASE</springboot.version>
+        <springboot.version>2.6.6</springboot.version>
         <scope.gwt-dev>provided</scope.gwt-dev>
     </properties>
     <profiles>
@@ -879,6 +879,13 @@
                 <groupId>org.apache.solr</groupId>
                 <artifactId>solr-core</artifactId>
                 <version>${solr.version}</version>
+                <!-- Removing log4j dependency -->
+                <exclusions>
+                    <exclusion>  
+                      <groupId>org.apache.logging.log4j</groupId>
+                      <artifactId>*</artifactId>
+                    </exclusion>
+                  </exclusions> 
             </dependency>
             <dependency>
                 <groupId>net.sf.saxon</groupId>
@@ -984,6 +991,12 @@
                 <groupId>gov.loc</groupId>
                 <artifactId>bagit</artifactId>
                 <version>4.12.0</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>log4j</groupId>
+                        <artifactId>log4j</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>xalan</groupId>
