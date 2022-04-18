@@ -81,7 +81,6 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.ShallowFile;
 import org.roda.core.data.v2.ip.ShallowFiles;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -1483,7 +1482,7 @@ public class ModelService extends ModelObservable {
   public Binary retrievePreservationFile(String aipId, String representationId, List<String> fileDirectoryPath,
     String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     AIP aip = retrieveAIP(aipId);
-    String identifier = IdUtils.getPreservationFileId(fileId, aip.getInstanceId());
+    String identifier = IdUtils.getPreservationFileId(fileDirectoryPath, fileId, aip.getInstanceId());
     StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(identifier, PreservationMetadataType.FILE,
       aipId, representationId, fileDirectoryPath, fileId);
     return storage.getBinary(filePath);
@@ -1493,7 +1492,7 @@ public class ModelService extends ModelObservable {
     String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
     AIP aip = retrieveAIP(aipId);
-    String identifier = IdUtils.getPreservationFileId(fileId, aip.getInstanceId());
+    String identifier = IdUtils.getPreservationFileId(fileDirectoryPath, fileId, aip.getInstanceId());
     StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(identifier, PreservationMetadataType.FILE,
       aipId, representationId, fileDirectoryPath, fileId);
     return storage.exists(filePath);
@@ -1533,7 +1532,7 @@ public class ModelService extends ModelObservable {
       identifier = IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId);
     }
 
-    String urn = URNUtils.createRodaPreservationURN(type, identifier, LocalInstanceUtils.getLocalInstanceIdentifier());
+    String urn = URNUtils.createRodaPreservationURN(type, fileDirectoryPath, identifier, LocalInstanceUtils.getLocalInstanceIdentifier());
     return createPreservationMetadata(type, urn, aipId, representationId, fileDirectoryPath, fileId, payload, notify);
   }
 

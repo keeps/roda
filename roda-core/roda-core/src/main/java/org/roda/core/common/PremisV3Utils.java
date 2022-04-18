@@ -378,7 +378,8 @@ public final class PremisV3Utils {
     if (agentIds != null) {
       for (LinkingIdentifier agentId : agentIds) {
         LinkingAgentIdentifierComplexType linkingAgentIdentifier = FACTORY.createLinkingAgentIdentifierComplexType();
-        linkingAgentIdentifier.setLinkingAgentIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
+        linkingAgentIdentifier
+          .setLinkingAgentIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
         linkingAgentIdentifier.setLinkingAgentIdentifierValue(agentId.getValue());
         eventComplexType.getLinkingAgentIdentifier().add(linkingAgentIdentifier);
       }
@@ -454,14 +455,14 @@ public final class PremisV3Utils {
     // URN-local identifier
     ObjectIdentifierComplexType objectIdentifier = FACTORY.createObjectIdentifierComplexType();
     objectIdentifier.setObjectIdentifierValue(URNUtils.createRodaPreservationURN(PreservationMetadataType.FILE,
-      originalFile.getId(), LocalInstanceUtils.getLocalInstanceIdentifier()));
+      originalFile.getPath(), originalFile.getId(), LocalInstanceUtils.getLocalInstanceIdentifier()));
     objectIdentifier.setObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN_LOCAL));
     file.getObjectIdentifier().add(objectIdentifier);
 
     // URN identifier (UUID)
     ObjectIdentifierComplexType objectIdentifier2 = FACTORY.createObjectIdentifierComplexType();
     objectIdentifier2.setObjectIdentifierValue(URNUtils.createRodaPreservationURN(PreservationMetadataType.FILE,
-      IdUtils.getFileId(originalFile), LocalInstanceUtils.getLocalInstanceIdentifier()));
+      originalFile.getPath(), IdUtils.getFileId(originalFile), LocalInstanceUtils.getLocalInstanceIdentifier()));
     objectIdentifier2.setObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
     file.getObjectIdentifier().add(objectIdentifier2);
 
@@ -1051,7 +1052,7 @@ public final class PremisV3Utils {
       PremisV3Utils.updateFileFormat(premisFile, format, version, pronom, mime);
 
       PreservationMetadataType type = PreservationMetadataType.FILE;
-      String id = IdUtils.getPreservationFileId(fileId, LocalInstanceUtils.getLocalInstanceIdentifier());
+      String id = IdUtils.getPreservationFileId(fileDirectoryPath, fileId, LocalInstanceUtils.getLocalInstanceIdentifier());
 
       ContentPayload premisFilePayload = fileToBinary(premisFile);
       model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, premisFilePayload,
@@ -1082,7 +1083,7 @@ public final class PremisV3Utils {
         dateCreatedByApplication);
 
       PreservationMetadataType type = PreservationMetadataType.FILE;
-      String id = IdUtils.getPreservationFileId(fileId, LocalInstanceUtils.getLocalInstanceIdentifier());
+      String id = IdUtils.getPreservationFileId(fileDirectoryPath, fileId, LocalInstanceUtils.getLocalInstanceIdentifier());
 
       ContentPayload premisFilePayload = fileToBinary(premisFile);
       model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, premisFilePayload,

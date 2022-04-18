@@ -295,7 +295,7 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
     try {
       Binary premisFile = model.retrievePreservationFile(file);
       fixities = PremisV3Utils.extractFixities(premisFile);
-    } catch (NotFoundException | XmlException | IOException e) {
+    } catch (NotFoundException | IOException e) {
       ValidationIssue issue = new ValidationIssue("File " + file.getId() + " of representation "
         + file.getRepresentationId() + " of AIP " + file.getAipId() + " was found but the PREMIS file does not exist");
       validationReport.addIssue(issue);
