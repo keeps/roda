@@ -2,10 +2,6 @@ package org.roda.wui.client.management.distributed;
 
 import java.util.List;
 
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlHostedModeUtils;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
@@ -99,24 +95,7 @@ public class ShowDistributedInstance extends Composite {
   HTML IDValue;
 
   @UiField
-  HTML lastSyncDateValue;
-
-  @UiField
-  Label lastSyncAddedUpdatedCountersLabel;
-
-  @UiField
-  HTML lastSyncAddedUpdatedCountersValue;
-
-  @UiField
-  Label lastSyncRemovedCountersLabel;
-  @UiField
-  HTML lastSyncRemovedCountersValue;
-
-  @UiField
-  Label lastSyncIssuesCountersLabel;
-  @UiField
-  HTML lastSyncIssuesCountersValue;
-
+  HTML lastSyncValue;
   @UiField
   HTML statusValue;
 
@@ -151,29 +130,7 @@ public class ShowDistributedInstance extends Composite {
     }
 
     IDValue.setHTML(distributedInstance.getId());
-    if (distributedInstance.getLastSyncDate() != null) {
-      lastSyncDateValue.setHTML(Humanize.formatDateTime(distributedInstance.getLastSyncDate()));
-    } else {
-      lastSyncDateValue.setHTML(messages.permanentlyRetained());
-    }
-
-    if (distributedInstance.getUpdatedEntitiesSummary().isEmpty()) {
-      lastSyncAddedUpdatedCountersLabel.setVisible(false);
-    }
-    if (distributedInstance.getRemovedEntitiesSummary().isEmpty()) {
-      lastSyncRemovedCountersLabel.setVisible(false);
-    }
-
-    if (distributedInstance.getSyncErrorsSummary().isEmpty()) {
-      lastSyncIssuesCountersLabel.setVisible(false);
-    }
-
-    lastSyncAddedUpdatedCountersValue.setHTML(
-      HtmlSnippetUtils.getCounters(distributedInstance.getId(), distributedInstance.getUpdatedEntitiesSummary(), ""));
-    lastSyncRemovedCountersValue.setHTML(HtmlSnippetUtils.getCounters(distributedInstance.getId(),
-      distributedInstance.getRemovedEntitiesSummary(), RodaConstants.SYNCHRONIZATION_REMOVED_FILE));
-    lastSyncIssuesCountersValue.setHTML(HtmlSnippetUtils.getCounters(distributedInstance.getId(),
-      distributedInstance.getSyncErrorsSummary(), RodaConstants.SYNCHRONIZATION_ISSUES_FILE));
+    lastSyncValue.setHTML(HtmlSnippetUtils.getLastSyncHtml(distributedInstance));
 
     statusValue.setHTML(HtmlSnippetUtils.getDistributedInstanceStateHtml(distributedInstance, false));
     if (StringUtils.isNotBlank(distributedInstance.getUsername())) {

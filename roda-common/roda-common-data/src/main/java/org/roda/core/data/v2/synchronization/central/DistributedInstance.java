@@ -34,26 +34,12 @@ public class DistributedInstance implements IsModelObject {
   private Date updatedOn;
   private String updatedBy;
 
-  private int syncErrors;
-
   List<EntitySummary> entitySummaries;
-
-  // TODO:Remove this lists
-
-  List<EntitySummary> removedEntitiesSummary;
-  List<EntitySummary> updatedEntitiesSummary;
-  List<EntitySummary> syncErrorsSummary;
 
   public DistributedInstance() {
     status = DistributedInstanceStatus.CREATED;
     lastSyncDate = null;
-    syncErrors = 0;
     entitySummaries = new ArrayList<>();
-
-    // TODO:Remove this counters and Lists
-    removedEntitiesSummary = new ArrayList<>();
-    updatedEntitiesSummary = new ArrayList<>();
-    syncErrorsSummary = new ArrayList<>();
   }
 
   @Override
@@ -153,46 +139,12 @@ public class DistributedInstance implements IsModelObject {
     this.lastSyncDate = lastSyncDate;
   }
 
-  public int getSyncErrors() {
-    return this.syncErrors;
-  }
-
-  public void setSyncErrors(int syncErrors) {
-    this.syncErrors = syncErrors;
-  }
-
   public List<EntitySummary> getEntitySummaries() {
     return entitySummaries;
   }
 
   public void setEntitySummaries(List<EntitySummary> entitySummaries) {
     this.entitySummaries = entitySummaries;
-  }
-
-  //TODO:Remove this gets and Sets
-
-  public List<EntitySummary> getRemovedEntitiesSummary() {
-    return removedEntitiesSummary;
-  }
-
-  public void setRemovedEntitiesSummary(List<EntitySummary> removedEntitiesSummary) {
-    this.removedEntitiesSummary = removedEntitiesSummary;
-  }
-
-  public List<EntitySummary> getUpdatedEntitiesSummary() {
-    return updatedEntitiesSummary;
-  }
-
-  public void setUpdatedEntitiesSummary(List<EntitySummary> updatedEntitiesSummary) {
-    this.updatedEntitiesSummary = updatedEntitiesSummary;
-  }
-
-  public List<EntitySummary> getSyncErrorsSummary() {
-    return syncErrorsSummary;
-  }
-
-  public void setSyncErrorsSummary(List<EntitySummary> syncErrorsSummary) {
-    this.syncErrorsSummary = syncErrorsSummary;
   }
 
   @JsonIgnore
@@ -258,7 +210,7 @@ public class DistributedInstance implements IsModelObject {
       + nameIdentifier + '\'' + ", description='" + description + '\'' + ", accessKeyId='" + accessKeyId + '\''
       + ", username='" + username + '\'' + ", lastSyncDate=" + lastSyncDate + ", status=" + status + ", createdOn="
       + createdOn + ", createdBy='" + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\''
-      + ", syncErrors='" + syncErrors + '\'' + '}';
+      + '}';
   }
 
   /**
@@ -339,9 +291,14 @@ public class DistributedInstance implements IsModelObject {
   @JsonIgnore
   public void cleanEntitiesSummaries() {
     entitySummaries = new ArrayList<>();
-    // TODO:REMOVE this Lists
-    removedEntitiesSummary = new ArrayList<>();
-    updatedEntitiesSummary = new ArrayList<>();
-    syncErrorsSummary = new ArrayList<>();
+  }
+
+  @JsonIgnore
+  public int getSyncErrors() {
+    int errors = 0;
+    for(EntitySummary entitySummary: entitySummaries){
+      errors += entitySummary.getCountIssues();
+    }
+    return errors;
   }
 }
