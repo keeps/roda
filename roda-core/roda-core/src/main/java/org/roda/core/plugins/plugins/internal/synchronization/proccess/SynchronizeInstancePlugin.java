@@ -3,6 +3,7 @@ package org.roda.core.plugins.plugins.internal.synchronization.proccess;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +46,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-public class SynchronizeInstancePlugin<T extends IsRODAObject> extends DefaultMultipleStepPlugin<T> {
+public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAObject> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SynchronizeInstancePlugin.class);
   private LocalInstance localInstance;
   private BundleState bundleState;
@@ -57,14 +58,11 @@ public class SynchronizeInstancePlugin<T extends IsRODAObject> extends DefaultMu
     steps.add(new Step(JobPackagePlugin.class.getName(), Job.class, "", true, true));
     steps.add(new Step(DipPackagePlugin.class.getName(), DIP.class, "", true, true));
     steps.add(new Step(RiskIncidencePackagePlugin.class.getName(), RiskIncidence.class, "", true, true));
-    steps.add(
-      new Step(RepositoryEventPackagePlugin.class.getName(), IndexedPreservationEvent.class, "", true, true));
-    steps.add(new Step(PreservationAgentPackagePlugin.class.getName(), IndexedPreservationAgent.class, "",
-      true, true));
+    steps.add(new Step(RepositoryEventPackagePlugin.class.getName(), IndexedPreservationEvent.class, "", true, true));
+    steps.add(new Step(PreservationAgentPackagePlugin.class.getName(), IndexedPreservationAgent.class, "", true, true));
 
     steps.add(new Step(SendSyncBundlePlugin.class.getName(), SendSyncBundlePlugin.class, "", true, true));
-    steps
-      .add(new Step(RequestSyncBundlePlugin.class.getName(), RequestSyncBundlePlugin.class, "", true, true));
+    steps.add(new Step(RequestSyncBundlePlugin.class.getName(), RequestSyncBundlePlugin.class, "", true, true));
   }
 
   @Override
@@ -108,7 +106,7 @@ public class SynchronizeInstancePlugin<T extends IsRODAObject> extends DefaultMu
   }
 
   @Override
-  public Plugin<T> cloneMe() {
+  public Plugin<IsRODAObject> cloneMe() {
     return new SynchronizeInstancePlugin();
   }
 
@@ -119,11 +117,12 @@ public class SynchronizeInstancePlugin<T extends IsRODAObject> extends DefaultMu
 
   @Override
   public void init() throws PluginException {
+    // do nothing
   }
 
   @Override
-  public List<Class<T>> getObjectClasses() {
-    return null;
+  public List<Class<IsRODAObject>> getObjectClasses() {
+    return Collections.emptyList();
   }
 
   @Override
@@ -135,8 +134,6 @@ public class SynchronizeInstancePlugin<T extends IsRODAObject> extends DefaultMu
   public List<Step> getPluginSteps() {
     return steps;
   }
-
-
 
   @Override
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
@@ -167,7 +164,7 @@ public class SynchronizeInstancePlugin<T extends IsRODAObject> extends DefaultMu
 
   @Override
   public void shutdown() {
-
+    // do nothing
   }
 
   @Override
