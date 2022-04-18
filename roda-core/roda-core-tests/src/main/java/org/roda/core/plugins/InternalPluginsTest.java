@@ -681,11 +681,14 @@ public class InternalPluginsTest {
 
     final Binary binary = model.retrievePreservationRepresentation(aip.getId(), aip.getRepresentations().get(0).getId());
     final Representation representation = PremisV3Utils.binaryToRepresentation(binary.getContent(), false);
-    Assert.assertEquals(
-            representation.getRelationship().get(0).getRelatedObjectIdentifier().get(0).getRelatedObjectIdentifierValue(),
-            "urn:roda:premis:file:f1-image (1).png");
-    Assert.assertEquals(
-            representation.getRelationship().get(1).getRelatedObjectIdentifier().get(0).getRelatedObjectIdentifierValue(),
-            "urn:roda:premis:file:f2-image (1).png");
+    List<String> relatedObjectIdentifierValue = new ArrayList<>();
+    relatedObjectIdentifierValue.add(representation.getRelationship().get(0).getRelatedObjectIdentifier().get(0).getRelatedObjectIdentifierValue());
+    relatedObjectIdentifierValue.add(representation.getRelationship().get(1).getRelatedObjectIdentifier().get(0).getRelatedObjectIdentifierValue());
+
+    List<String> toBecheckedAgainst = new ArrayList<>();
+    toBecheckedAgainst.add("urn:roda:premis:file:f2-image (1).png");
+    toBecheckedAgainst.add("urn:roda:premis:file:f1-image (1).png");
+
+    Assert.assertTrue(relatedObjectIdentifierValue.containsAll(toBecheckedAgainst));
   }
 }
