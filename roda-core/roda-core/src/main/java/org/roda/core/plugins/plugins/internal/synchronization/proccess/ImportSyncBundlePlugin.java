@@ -199,7 +199,7 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
 
         // Delete entities
 
-        final int removed = ImportUtils.deleteBundleEntities(model, index, cachedJob, this, jobPluginInfo,
+        ImportUtils.deleteBundleEntities(model, index, cachedJob, this, jobPluginInfo,
           distributedInstance, bundleWorkingDir, bundleState.getEntitiesBundle(), report);
 
         // Validate entities
@@ -207,15 +207,10 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
           distributedInstance, syncErrors);
 
         distributedInstance.setLastSyncDate(bundleState.getToDate());
-        distributedInstance.setSyncErrors(syncErrors);
 
-        //TODO: Remove getUpdatedInstances
-        
         ImportUtils.updateEntityCounter(bundleState, distributedInstance);
 
-        //TODO: Remove getUpdatedInstances
-        ImportUtils.createLastSyncFile(bundleWorkingDir, distributedInstance,
-          ImportUtils.getUpdatedInstances(bundleState), removed, cachedJob.getId(),
+        ImportUtils.createLastSyncFile(bundleWorkingDir, distributedInstance, cachedJob.getId(),
           bundleState.getId());
 
         model.updateDistributedInstance(distributedInstance, cachedJob.getUsername());

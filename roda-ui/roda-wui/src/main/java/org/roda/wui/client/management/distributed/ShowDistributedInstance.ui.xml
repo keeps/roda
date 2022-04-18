@@ -41,35 +41,11 @@
                             </g:FlowPanel>
                             <g:FlowPanel styleName="field">
                                 <g:Label styleName="label"
-                                         ui:field="lastSyncDateLabel">
-                                    <ui:text from='{messages.distributedInstanceLastSyncDateLabel}'/>
+                                         ui:field="lastSyncLabel">
+                                    <ui:text from='{messages.distributedInstanceLastSyncLabel}'/>
                                 </g:Label>
                                 <g:HTML styleName="value"
-                                        ui:field="lastSyncDateValue"/>
-                            </g:FlowPanel>
-                            <g:FlowPanel styleName="field">
-                                <g:Label styleName="label"
-                                         ui:field="lastSyncAddedUpdatedCountersLabel">
-                                    <ui:text from='{messages.distributedInstanceUpdatedEntitiesLabel}'/>
-                                </g:Label>
-                                <g:HTML styleName="value"
-                                        ui:field="lastSyncAddedUpdatedCountersValue"/>
-                            </g:FlowPanel>
-                            <g:FlowPanel styleName="field">
-                                <g:Label styleName="label"
-                                         ui:field="lastSyncRemovedCountersLabel">
-                                    <ui:text from='{messages.distributedInstanceRemovedEntitiesLabel}'/>
-                                </g:Label>
-                                <g:HTML styleName="value"
-                                        ui:field="lastSyncRemovedCountersValue"/>
-                            </g:FlowPanel>
-                            <g:FlowPanel styleName="field">
-                                <g:Label styleName="label"
-                                         ui:field="lastSyncIssuesCountersLabel">
-                                    <ui:text from='{messages.distributedInstanceSyncErrorsLabel}'/>
-                                </g:Label>
-                                <g:HTML styleName="value"
-                                        ui:field="lastSyncIssuesCountersValue"/>
+                                        ui:field="lastSyncValue"/>
                             </g:FlowPanel>
                             <g:FlowPanel styleName="field">
                                 <g:Label styleName="label"

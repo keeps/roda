@@ -928,7 +928,6 @@ public final class ModelUtils {
 
   public static <T extends IsRODAObject> Class<T> giveRespectiveModelClassFromContainerName(
     final String containerName) {
-    // TODO: add agent Class and Notification (Maybe)
     if (RodaConstants.STORAGE_CONTAINER_AIP.equals(containerName)) {
       return (Class<T>) AIP.class;
     } else if (RodaConstants.STORAGE_CONTAINER_DIP.equals(containerName)) {

@@ -17,6 +17,7 @@ import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
@@ -25,6 +26,8 @@ import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation;
 import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobParallelism;
@@ -46,6 +49,7 @@ import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.RepresentationInformationHelper;
 import org.roda.wui.client.planning.RepresentationInformationAssociations;
 import org.roda.wui.common.client.tools.HistoryUtils;
+import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 
@@ -80,6 +84,10 @@ public class HtmlSnippetUtils {
   private static final String OPEN_SPAN_ORIGINAL_LABEL_SUCCESS = "<span class='label-success browseRepresentationOriginalIcon'>";
   private static final String OPEN_H2_CLASS_LABEL_SUCCESS = "<span class='h2'>";
   private static final String CLOSE_SPAN = "</span>";
+
+  private static final String OPEN_DIV_FONT_STYLE_1_REM = "<div style='font-size: 1rem; padding-top:0.5rem;'>";
+  private static final String OPEN_DIV = "<div>";
+  private static final String ClOSE_DIV = "</div>";
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -779,25 +787,83 @@ public class HtmlSnippetUtils {
     return ret;
   }
 
-  public static SafeHtml getCounters(final String instanceIdentifier, final List<EntitySummary> entitySummaries, final String type) {
+  public static SafeHtml getLastSyncHtml(final DistributedInstance distributedInstance) {
     SafeHtml ret = null;
-    final SafeHtmlBuilder entitySummaryBuilder = new SafeHtmlBuilder();
-    if (entitySummaries != null && !entitySummaries.isEmpty()) {
-      for (final EntitySummary entitySummary : entitySummaries) {
-        String[] splitEntityClass = entitySummary.getEntityClass().split("\\.");
-        String entityClass = splitEntityClass[splitEntityClass.length - 1];
-        SafeUri downloadUri = RestUtils.createLastSynchronizationDownloadUri(instanceIdentifier,entityClass,type);
-        entitySummaryBuilder.append(SafeHtmlUtils.fromSafeConstant("<a href='"));
-        entitySummaryBuilder.append(SafeHtmlUtils.fromString(downloadUri.asString()));
-        entitySummaryBuilder.append(SafeHtmlUtils.fromSafeConstant("' class='btn btn-link'>"));
-        entitySummaryBuilder.append(SafeHtmlUtils.fromString(entityClass + ": "));
-        entitySummaryBuilder.append(SafeHtmlUtils.fromString(String.valueOf(entitySummary.getCount())));
-        entitySummaryBuilder.append(SafeHtmlUtils.fromSafeConstant("</a>"));
-        entitySummaryBuilder.append(SafeHtmlUtils.fromSafeConstant("<br>"));
-      }
+    final SafeHtmlBuilder lastSyncBuilder = new SafeHtmlBuilder();
+    // div to last sync date
+    lastSyncBuilder.append(SafeHtmlUtils.fromSafeConstant("<div>"));
+    if (distributedInstance.getLastSyncDate() != null) {
+      lastSyncBuilder.append(SafeHtmlUtils.fromString(Humanize.formatDateTime(distributedInstance.getLastSyncDate())));
+    } else {
+      lastSyncBuilder.append(SafeHtmlUtils.fromString(messages.permanentlyRetained()));
     }
-    ret = entitySummaryBuilder.toSafeHtml();
+    lastSyncBuilder.append(SafeHtmlUtils.fromSafeConstant("</div>"));
+
+    // div to entities
+    List<EntitySummary> entitySummaries = distributedInstance.getEntitySummaries();
+    if (entitySummaries != null && !entitySummaries.isEmpty()) {
+      lastSyncBuilder.append(SafeHtmlUtils.fromSafeConstant(OPEN_DIV));
+      for (final EntitySummary entitySummary : entitySummaries) {
+        String entityClassUiName = getNameByEntityClassName(entitySummary.getEntityClass());
+        String entityClass = getEntityClassNameSplit(entitySummary.getEntityClass());
+        SafeUri downloadUriRemoved = RestUtils.createLastSynchronizationDownloadUri(distributedInstance.getId(),
+          entityClass, RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_REMOVED);
+        SafeUri downloadUriIssue = RestUtils.createLastSynchronizationDownloadUri(distributedInstance.getId(),
+          entityClass, RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_ISSUE);
+
+        lastSyncBuilder.append(SafeHtmlUtils.fromSafeConstant(OPEN_DIV_FONT_STYLE_1_REM));
+        lastSyncBuilder.append(SafeHtmlUtils.fromString(entityClassUiName + ": "));
+        // Added/ Updated
+        createAddedUpdatedSpan(lastSyncBuilder, entitySummary);
+        // Removed
+        createRemovedAndIssuesLink(lastSyncBuilder, entitySummary.getCountRemoved(),
+          messages.distributedInstanceRemovedEntitiesLabel(), downloadUriRemoved, "label-warning");
+        // Issues
+        createRemovedAndIssuesLink(lastSyncBuilder, entitySummary.getCountIssues(),
+          messages.distributedInstanceSyncErrorsLabel(), downloadUriIssue, "label-danger");
+
+        lastSyncBuilder.append(SafeHtmlUtils.fromSafeConstant(ClOSE_DIV));
+      }
+      lastSyncBuilder.append(SafeHtmlUtils.fromSafeConstant(ClOSE_DIV));
+    }
+    ret = lastSyncBuilder.toSafeHtml();
     return ret;
+  }
+
+  private static void createAddedUpdatedSpan(SafeHtmlBuilder safeHtmlBuilder, EntitySummary entitySummary) {
+    safeHtmlBuilder.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
+    safeHtmlBuilder.append(SafeHtmlUtils.fromString(
+      String.valueOf(entitySummary.getCountAddedUpdated()) + " " + messages.distributedInstanceUpdatedEntitiesLabel()));
+    safeHtmlBuilder.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+  }
+
+  private static void createRemovedAndIssuesLink(SafeHtmlBuilder safeHtmlBuilder, int count, String message,
+    SafeUri safeUri, String labelStyle) {
+    safeHtmlBuilder.append(SafeHtmlUtils.fromSafeConstant(" <a href='"));
+    safeHtmlBuilder.append(SafeHtmlUtils.fromString(safeUri.asString()));
+    safeHtmlBuilder.append(SafeHtmlUtils.fromSafeConstant("' class='" + labelStyle + "'>"));
+    safeHtmlBuilder.append(SafeHtmlUtils.fromString(String.valueOf(count) + " " + message));
+    safeHtmlBuilder.append(SafeHtmlUtils.fromSafeConstant("</a>"));
+  }
+
+  private static String getNameByEntityClassName(String entityClass) {
+    if (AIP.class.getName().equals(entityClass)) {
+      return messages.intellectualEntity();
+    } else if (DIP.class.getName().equals(entityClass)) {
+      return messages.catalogueDIPTitle();
+    } else if (IndexedPreservationEvent.class.getName().equals(entityClass)) {
+      return messages.preservationEventsTitle();
+    } else if (IndexedPreservationAgent.class.getName().equals(entityClass)) {
+      return messages.preservationAgentsTitle();
+    } else {
+      return getEntityClassNameSplit(entityClass);
+    }
+  }
+
+  private static String getEntityClassNameSplit(String entityClass){
+    String[] splitEntityClass = entityClass.split("\\.");
+    String entityClassName = splitEntityClass[splitEntityClass.length - 1];
+    return entityClassName;
   }
 
   public static SafeHtml getAccessKeyStateHtml(AccessKey accessKey) {

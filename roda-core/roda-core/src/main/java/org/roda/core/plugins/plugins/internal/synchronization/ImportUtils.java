@@ -439,7 +439,7 @@ public class ImportUtils {
   }
 
   public static void createLastSyncFile(final Path bundleWorkingDir, final DistributedInstance distributedInstance,
-    final int updatedInstances, final int removed, final String jobID, final String bundleId) throws IOException {
+    final String jobID, final String bundleId) throws IOException {
     final StringBuilder fileNameBuilder = new StringBuilder();
     fileNameBuilder.append(RodaConstants.SYNCHRONIZATION_REPORT_FILE).append("_").append(distributedInstance.getId())
       .append(".json");
@@ -454,7 +454,7 @@ public class ImportUtils {
         jsonGenerator = jsonFactory.createGenerator(outputStream, JsonEncoding.UTF8).useDefaultPrettyPrinter();
       }
 
-      writeLastSyncFile(jsonGenerator, distributedInstance, updatedInstances, removed, jobID, bundleId);
+      writeLastSyncFile(jsonGenerator, distributedInstance, jobID, bundleId);
     } catch (final IOException e) {
       LOGGER.error("Can't create report with the summary of synchronization {}", e.getMessage());
     } finally {
@@ -469,8 +469,7 @@ public class ImportUtils {
   }
 
   private static void writeLastSyncFile(final JsonGenerator jsonGenerator,
-    final DistributedInstance distributedInstance, final int updatedInstances, final int removed, final String jobID,
-    final String bundleId) {
+    final DistributedInstance distributedInstance, final String jobID, final String bundleId) {
 
     try {
       jsonGenerator.writeStartObject();
@@ -487,7 +486,6 @@ public class ImportUtils {
       }
       jsonGenerator.writeStringField(RodaConstants.SYNCHRONIZATION_REPORT_KEY_JOB, jobID);
 
-      // Updated / Added object
       jsonGenerator.writeFieldName(RodaConstants.SYNCHRONIZATION_REPORT_KEY_SUMMARY);
       writeSummaryLists(jsonGenerator, distributedInstance.getEntitySummaries());
 

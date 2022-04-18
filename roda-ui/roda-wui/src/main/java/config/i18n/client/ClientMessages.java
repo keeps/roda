@@ -2469,6 +2469,8 @@ public interface ClientMessages extends Messages {
 
   String distributedInstanceLastSyncDateLabel();
 
+  String distributedInstanceLastSyncLabel();
+
   String distributedInstanceAccessKeyLabel();
 
   String distributedInstanceStatusLabel();
