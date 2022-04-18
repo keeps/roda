@@ -1439,7 +1439,7 @@ public class BrowserHelper {
           fileId, payload, notify);
       } else {
         PreservationMetadataType type = PreservationMetadataType.FILE;
-        String id = IdUtils.getPreservationFileId(fileId, LocalInstanceUtils.getLocalInstanceIdentifier());
+        String id = IdUtils.getPreservationFileId(fileDirectoryPath, fileId, LocalInstanceUtils.getLocalInstanceIdentifier());
         model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, payload, notify);
       }
     } catch (IOException e) {
