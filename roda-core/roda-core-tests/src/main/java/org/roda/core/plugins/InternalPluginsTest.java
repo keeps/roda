@@ -388,7 +388,8 @@ public class InternalPluginsTest {
     index.commitAIPs();
 
     IndexedFile indFile = index.retrieve(IndexedFile.class, IdUtils.getFileId(aip.getId(),
-      aip.getRepresentations().get(0).getId(), Collections.singletonList(CORPORA_TEST1), CORPORA_TEST1_TXT), new ArrayList<>());
+      aip.getRepresentations().get(0).getId(), Collections.singletonList(CORPORA_TEST1), CORPORA_TEST1_TXT),
+      new ArrayList<>());
 
     AssertJUnit.assertEquals(mimetype, indFile.getFileFormat().getMimeType());
     AssertJUnit.assertEquals("x-fmt/111", indFile.getFileFormat().getPronom());
@@ -548,77 +549,77 @@ public class InternalPluginsTest {
 
     // ensure PREMIS objects are created
     TestsHelper.executeJob(PremisSkeletonPlugin.class, PluginType.AIP_TO_AIP,
-            SelectedItemsList.create(AIP.class, aip.getId()));
+      SelectedItemsList.create(AIP.class, aip.getId()));
 
     // run siegfried
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS, FAKE_REPORTING_CLASS);
     Job job = TestsHelper.executeJob(SiegfriedPlugin.class, parameters, PluginType.AIP_TO_AIP,
-            SelectedItemsAll.create(org.roda.core.data.v2.ip.File.class));
+      SelectedItemsAll.create(org.roda.core.data.v2.ip.File.class));
     TestsHelper.getJobReports(index, job, true);
 
     aip = model.retrieveAIP(aip.getId());
 
     // Files with Siegfried output
     AssertJUnit.assertEquals(CORPORA_FILES_COUNT,
-            Iterables.size(model.listOtherMetadata(aip.getId(), RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, true)));
+      Iterables.size(model.listOtherMetadata(aip.getId(), RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, true)));
 
     Binary om = model.retrieveOtherMetadataBinary(aip.getId(), aip.getRepresentations().get(0).getId(),
-            Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT, SiegfriedPlugin.FILE_SUFFIX,
-            RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED);
+      Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT, SiegfriedPlugin.FILE_SUFFIX,
+      RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED);
 
     AssertJUnit.assertNotNull(om);
 
     Binary fpo_bin = model.retrievePreservationFile(aip.getId(), aip.getRepresentations().get(0).getId(),
-            Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT);
+      Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT);
 
     gov.loc.premis.v3.File fpo = PremisV3Utils.binaryToFile(fpo_bin.getContent(), true);
 
     FormatComplexType format = fpo.getObjectCharacteristics().get(0).getFormat().get(0);
     AssertJUnit.assertEquals("Plain Text File", format.getFormatDesignation().get(0).getFormatName().getValue());
     FormatRegistryComplexType pronomRegistry = PremisV3Utils.getFormatRegistry(fpo,
-            RodaConstants.PRESERVATION_REGISTRY_PRONOM);
+      RodaConstants.PRESERVATION_REGISTRY_PRONOM);
     AssertJUnit.assertEquals(RodaConstants.PRESERVATION_REGISTRY_PRONOM,
-            pronomRegistry.getFormatRegistryName().getValue());
+      pronomRegistry.getFormatRegistryName().getValue());
     AssertJUnit.assertEquals("x-fmt/111", pronomRegistry.getFormatRegistryKey().getValue());
 
     FormatRegistryComplexType mimeRegistry = PremisV3Utils.getFormatRegistry(fpo,
-            RodaConstants.PRESERVATION_REGISTRY_MIME);
+      RodaConstants.PRESERVATION_REGISTRY_MIME);
     String mimetype = "text/plain";
     AssertJUnit.assertEquals(mimetype, mimeRegistry.getFormatRegistryKey().getValue());
 
     index.commitAIPs();
 
     IndexedFile indFile = index.retrieve(IndexedFile.class, IdUtils.getFileId(aip.getId(),
-            aip.getRepresentations().get(0).getId(), Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT), new ArrayList<>());
+      aip.getRepresentations().get(0).getId(), Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT), new ArrayList<>());
 
     AssertJUnit.assertEquals(mimetype, indFile.getFileFormat().getMimeType());
     AssertJUnit.assertEquals("x-fmt/111", indFile.getFileFormat().getPronom());
     AssertJUnit.assertEquals("Plain Text File", indFile.getFileFormat().getFormatDesignationName());
 
     List<String> suggest = index.suggest(IndexedFile.class, RodaConstants.FILE_FORMAT_MIMETYPE,
-            mimetype.substring(0, 1), null, false, false);
+      mimetype.substring(0, 1), null, false, false);
     MatcherAssert.assertThat(suggest, Matchers.contains(mimetype));
 
     Plugin<? extends IsRODAObject> plugin = RodaCoreFactory.getPluginManager()
-            .getPlugin(SiegfriedPlugin.class.getName());
+      .getPlugin(SiegfriedPlugin.class.getName());
     String agentID = PluginHelper.getPluginAgentId(plugin);
 
     boolean found = false;
 
     try (CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadataList = model
-            .listPreservationMetadata(aip.getId(), true)) {
+      .listPreservationMetadata(aip.getId(), true)) {
       for (OptionalWithCause<PreservationMetadata> opm : preservationMetadataList) {
         if (opm.isPresent()) {
           PreservationMetadata pm = opm.get();
           if (pm.getType().equals(PreservationMetadataType.EVENT)) {
             EventComplexType event = PremisV3Utils
-                    .binaryToEvent(model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(),
-                            pm.getFileDirectoryPath(), pm.getFileId(), pm.getId()).getContent().createInputStream());
+              .binaryToEvent(model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(),
+                pm.getFileDirectoryPath(), pm.getFileId(), pm.getId()).getContent().createInputStream());
             if (event.getLinkingAgentIdentifier() != null && !event.getLinkingAgentIdentifier().isEmpty()) {
               for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifier()) {
                 if (laict.getLinkingAgentIdentifierValue() != null
-                        && laict.getLinkingAgentIdentifierValue().equalsIgnoreCase(agentID)) {
+                  && laict.getLinkingAgentIdentifierValue().equalsIgnoreCase(agentID)) {
                   found = true;
                   break;
                 }
@@ -636,10 +637,10 @@ public class InternalPluginsTest {
 
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_TYPE,
-            PreservationEventType.FORMAT_IDENTIFICATION.toString()));
+      PreservationEventType.FORMAT_IDENTIFICATION.toString()));
     filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId()));
     IndexResult<IndexedPreservationEvent> events = index.find(IndexedPreservationEvent.class, filter, null,
-            new Sublist(0, 10), new ArrayList<>());
+      new Sublist(0, 10), new ArrayList<>());
     AssertJUnit.assertEquals(16, events.getTotalCount());
   }
 
@@ -661,31 +662,38 @@ public class InternalPluginsTest {
     final Path corporaPath = Paths.get(corporaURL.toURI());
 
     final TransferredResource transferredResource = EARKSIPPluginsTest.createIngestCorpora(corporaPath, index,
-            "earkSip_twoFiles_with_same_name.zip");
+      "earkSip_twoFiles_with_same_name.zip");
 
-    final Map<String, String > parameters = new HashMap<>();
+    final Map<String, String> parameters = new HashMap<>();
     parameters.put("parameter.sip_to_aip_class", EARKSIP2ToAIPPlugin.class.getName());
 
     final Job job = TestsHelper.executeJob(MinimalIngestPlugin.class, parameters, PluginType.SIP_TO_AIP,
-            SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
+      SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
 
     TestsHelper.getJobReports(index, job, true);
 
     index.commitAIPs();
     final IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
-            new Filter(new SimpleFilterParameter(RodaConstants.INGEST_JOB_ID, job.getId())), null, new Sublist(0, 10),
-            new ArrayList<>());
+      new Filter(new SimpleFilterParameter(RodaConstants.INGEST_JOB_ID, job.getId())), null, new Sublist(0, 10),
+      new ArrayList<>());
     final IndexedAIP indexedAIP = find.getResults().get(0);
 
     final AIP aip = model.retrieveAIP(indexedAIP.getId());
 
-    final Binary binary = model.retrievePreservationRepresentation(aip.getId(), aip.getRepresentations().get(0).getId());
+    final Binary binary = model.retrievePreservationRepresentation(aip.getId(),
+      aip.getRepresentations().get(0).getId());
     final Representation representation = PremisV3Utils.binaryToRepresentation(binary.getContent(), false);
-    Assert.assertEquals(
-            representation.getRelationship().get(0).getRelatedObjectIdentifier().get(0).getRelatedObjectIdentifierValue(),
-            "urn:roda:premis:file:f1-image (1).png");
-    Assert.assertEquals(
-            representation.getRelationship().get(1).getRelatedObjectIdentifier().get(0).getRelatedObjectIdentifierValue(),
-            "urn:roda:premis:file:f2-image (1).png");
+
+    List<String> relatedObjectIdentifierValue = new ArrayList<>();
+    relatedObjectIdentifierValue.add(
+      representation.getRelationship().get(0).getRelatedObjectIdentifier().get(0).getRelatedObjectIdentifierValue());
+    relatedObjectIdentifierValue.add(
+      representation.getRelationship().get(1).getRelatedObjectIdentifier().get(0).getRelatedObjectIdentifierValue());
+
+    List<String> toBecheckedAgainst = new ArrayList<>();
+    toBecheckedAgainst.add("urn:roda:premis:file:f2-image (1).png");
+    toBecheckedAgainst.add("urn:roda:premis:file:f1-image (1).png");
+
+    Assert.assertTrue(relatedObjectIdentifierValue.containsAll(toBecheckedAgainst));
   }
 }
