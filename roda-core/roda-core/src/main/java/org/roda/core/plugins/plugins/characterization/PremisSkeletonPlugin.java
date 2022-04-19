@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.xmlbeans.XmlException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -150,7 +149,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
                 jobPluginInfo.incrementObjectsProcessedWithSuccess();
                 reportItem.setPluginState(PluginState.SUCCESS);
               }
-            } catch (RODAException | XmlException | IOException e) {
+            } catch (RODAException | IOException e) {
               LOGGER.error("Error processing AIP {}", aip.getId(), e);
               jobPluginInfo.incrementObjectsProcessedWithFailure();
               reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
@@ -172,7 +171,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
                     representation.getId(), algorithms);
                   model.notifyRepresentationUpdated(representation);
                   state = PluginState.SUCCESS;
-                } catch (RODAException | XmlException | IOException e) {
+                } catch (RODAException | IOException e) {
                   state = PluginState.FAILURE;
                   LOGGER.error("Failed to execute premis skeleton plugin on representation {} from AIP {}",
                     representation.getId(), representation.getAipId(), e);
@@ -191,7 +190,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
                   PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, algorithms);
                   jobPluginInfo.incrementObjectsProcessedWithSuccess();
                   state = PluginState.SUCCESS;
-                } catch (RODAException | XmlException | IOException e) {
+                } catch (RODAException | IOException e) {
                   state = PluginState.FAILURE;
                   LOGGER.error("Failed to execute premis skeleton plugin on file {} from AIP {}", fileString,
                     aip.getId(), e);
@@ -243,7 +242,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
           representation.getId(), algorithms);
         model.notifyRepresentationUpdated(representation);
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
-      } catch (RODAException | XmlException | IOException e) {
+      } catch (RODAException | IOException e) {
         LOGGER.error("Error processing representation {}", representation.getId(), e);
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         reportItem.setPluginState(PluginState.FAILURE).addPluginDetails(e.getMessage() + "\n");
@@ -280,7 +279,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
       try {
         PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, algorithms);
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
-      } catch (RODAException | XmlException | IOException e) {
+      } catch (RODAException | IOException e) {
         LOGGER.error("Error processing file {}", file.getId(), e);
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         reportItem.setPluginState(PluginState.FAILURE).addPluginDetails(e.getMessage() + "\n");

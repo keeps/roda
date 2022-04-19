@@ -10,7 +10,6 @@ package org.roda.core.plugins.plugins.characterization;
 import java.io.IOException;
 import java.util.Collection;
 
-import org.apache.xmlbeans.XmlException;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
@@ -40,7 +39,7 @@ public class PremisSkeletonPluginUtils {
 
   public static void createPremisSkeletonOnRepresentation(ModelService model, String aipId, String representationId,
     Collection<String> fixityAlgorithms) throws IOException, RequestNotValidException, GenericException,
-    NotFoundException, AuthorizationDeniedException, XmlException, ValidationException {
+    NotFoundException, AuthorizationDeniedException, ValidationException {
     gov.loc.premis.v3.Representation representation;
 
     if (model.preservationRepresentationExists(aipId, representationId)) {
@@ -79,7 +78,7 @@ public class PremisSkeletonPluginUtils {
 
   public static void createPremisSkeletonOnFile(ModelService model, File file, Collection<String> fixityAlgorithms)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, NotFoundException,
-    ValidationException, XmlException, IOException {
+    ValidationException, IOException {
     gov.loc.premis.v3.Representation representation;
 
     try {
@@ -95,8 +94,8 @@ public class PremisSkeletonPluginUtils {
   }
 
   public static void createPremisSkeletonOnFile(ModelService model, File file, Collection<String> fixityAlgorithms,
-    gov.loc.premis.v3.Representation representation) throws RequestNotValidException, GenericException,
-    AuthorizationDeniedException, NotFoundException, ValidationException, XmlException, IOException {
+    gov.loc.premis.v3.Representation representation)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, NotFoundException {
     boolean notifyInSteps = false;
 
     if (!file.isDirectory()) {

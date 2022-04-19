@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.xmlbeans.XmlException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
@@ -403,7 +402,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                 Representation rep = model.retrieveRepresentation(aip.getId(), newRepresentationID);
                 createPremisSkeletonOnRepresentation(model, aip.getId(), rep);
               } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
-                | ValidationException | IOException | XmlException e) {
+                | ValidationException | IOException e) {
                 LOGGER.error("Error running premis skeleton on new representation: {}", e.getMessage());
               }
             }
@@ -617,7 +616,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
           Representation rep = model.retrieveRepresentation(representation.getAipId(), newRepresentationID);
           createPremisSkeletonOnRepresentation(model, representation.getAipId(), rep);
         } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
-          | ValidationException | IOException | XmlException e) {
+          | ValidationException | IOException e) {
           LOGGER.error("Error running premis skeleton on new representation: {}", e.getMessage());
         }
       }
@@ -788,7 +787,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
           Representation rep = model.retrieveRepresentation(file.getAipId(), newRepresentationID);
           createPremisSkeletonOnRepresentation(model, file.getAipId(), rep);
         } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
-          | ValidationException | IOException | XmlException e) {
+          | ValidationException | IOException e) {
           LOGGER.error("Error running premis skeleton on new representation: {}", e.getMessage());
         }
       }
@@ -802,7 +801,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
   private void createPremisSkeletonOnRepresentation(ModelService model, String aipId, Representation representation)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
-    ValidationException, IOException, XmlException {
+    ValidationException, IOException {
     List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
     PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representation.getId(), algorithms);
     model.notifyRepresentationUpdated(representation).failOnError();

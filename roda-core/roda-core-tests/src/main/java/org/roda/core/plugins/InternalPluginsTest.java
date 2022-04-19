@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.xmlbeans.XmlException;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.hamcrest.core.Is;
@@ -245,7 +244,7 @@ public class InternalPluginsTest {
   }
 
   @Test
-  public void testVirusCheck() throws RODAException, IOException, XmlException {
+  public void testVirusCheck() throws RODAException, IOException {
     AIP aip = ingestCorpora();
 
     Job job = TestsHelper.executeJob(AntivirusPlugin.class, PluginType.AIP_TO_AIP,
@@ -341,7 +340,7 @@ public class InternalPluginsTest {
   }
 
   @Test
-  public void testSiegfried() throws RODAException, IOException, XmlException {
+  public void testSiegfried() throws RODAException, IOException {
     AIP aip = ingestCorpora();
 
     // ensure PREMIS objects are created
@@ -443,7 +442,7 @@ public class InternalPluginsTest {
   }
 
   @Test
-  public void testSiegfriedUsingRepresentation() throws RODAException, IOException, XmlException {
+  public void testSiegfriedUsingRepresentation() throws RODAException, IOException {
     AIP aip = ingestCorpora();
 
     // ensure PREMIS objects are created
@@ -544,7 +543,7 @@ public class InternalPluginsTest {
   }
 
   @Test
-  public void testSiegfriedUsingFile() throws RODAException, IOException, XmlException {
+  public void testSiegfriedUsingFile() throws RODAException, IOException {
     AIP aip = ingestCorpora();
 
     // ensure PREMIS objects are created
