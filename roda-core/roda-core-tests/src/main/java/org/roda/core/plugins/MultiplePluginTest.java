@@ -64,7 +64,7 @@ public class MultiplePluginTest {
     boolean deployPluginManager = true;
     boolean deployDefaultResources = false;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
-      deployPluginManager, deployDefaultResources, false);
+      deployPluginManager, deployDefaultResources);
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
 
