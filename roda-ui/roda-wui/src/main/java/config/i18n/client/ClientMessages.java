@@ -714,8 +714,6 @@ public interface ClientMessages extends Messages {
 
   String itemInstanceId();
 
-  String itemInstance();
-
   String aipType();
 
   String aipTypeItem();
@@ -2458,6 +2456,8 @@ public interface ClientMessages extends Messages {
   String showDistributedInstanceTitle();
 
   String editDistributedInstanceTitle();
+
+  String distributedInstanceLabel();
 
   String distributedInstancesLabel();
 

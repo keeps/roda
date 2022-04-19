@@ -327,7 +327,7 @@ public class BrowserHelper {
       DistributedInstance distributedInstance = model.retrieveDistributedInstance(aip.getInstanceId());
       bundle.setInstanceName(distributedInstance.getName());
     } catch (NotFoundException e) {
-      e.printStackTrace();
+      LOGGER.warn("Could not retrieve the distributed instance", e);
     }
     return bundle;
   }
@@ -392,6 +392,13 @@ public class BrowserHelper {
       bundle.setRepresentationInformationFields(rodaConfigurationAsList);
     } else {
       bundle.setRepresentationInformationFields(Collections.emptyList());
+    }
+    ModelService model = RodaCoreFactory.getModelService();
+    try {
+      DistributedInstance distributedInstance = model.retrieveDistributedInstance(aip.getInstanceId());
+      bundle.setInstanceName(distributedInstance.getName());
+    } catch (NotFoundException e) {
+      LOGGER.warn("Could not retrieve the distributed instance", e);
     }
 
     return bundle;
@@ -466,6 +473,17 @@ public class BrowserHelper {
     } else {
       bundle.setRepresentationInformationFields(Collections.emptyList());
     }
+
+    ModelService model = RodaCoreFactory.getModelService();
+    DistributedInstance distributedInstance = null;
+    try {
+      distributedInstance = model.retrieveDistributedInstance(aip.getInstanceId());
+    } catch (NotFoundException e) {
+      LOGGER.warn("Could not retrieve the distributed instance", e);
+    } catch (AuthorizationDeniedException e) {
+      LOGGER.warn("Do not have Authorization", e);
+    }
+    bundle.setInstanceName(distributedInstance.getName());
 
     return bundle;
   }

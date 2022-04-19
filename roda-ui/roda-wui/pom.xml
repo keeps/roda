@@ -152,9 +152,9 @@
                         <version>${springboot.version}</version>
                         <configuration>
                             <skip>false</skip>
-                            <folders>
-                                <folder>${project.build.directory}/${project.build.finalName}</folder>
-                            </folders>
+                            <directories>
+                                <directory>${project.build.directory}/${project.build.finalName}</directory>
+                            </directories>
                             <jvmArguments>
                                 -Dserver.port=8081
                                 -Droda.distributed.mode.type=CENTRAL

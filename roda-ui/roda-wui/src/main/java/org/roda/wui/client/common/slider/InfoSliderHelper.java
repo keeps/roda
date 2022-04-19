@@ -15,7 +15,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -24,7 +23,6 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
-import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.browse.RepresentationInformationHelper;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
@@ -154,7 +152,22 @@ public class InfoSliderHelper {
     }
 
     if (StringUtils.isNotBlank(representation.getInstanceId())) {
-      values.put(messages.itemInstanceId(), createRepresentationInstanceIdHTML(bundle));
+      String distributedMode = ConfigurationManager.getStringWithDefault(
+        RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
+      if (distributedMode.equals(RodaConstants.DistributedModeType.CENTRAL.name())) {
+        String instancename = bundle.getInstanceName();
+        Anchor anchor = new Anchor();
+        if (StringUtils.isNotBlank(instancename)) {
+          anchor.setText(instancename);
+        } else {
+          anchor.setText(representation.getInstanceId());
+        }
+        anchor.setHref(
+          HistoryUtils.createHistoryHashLink(ShowDistributedInstance.RESOLVER, representation.getInstanceId()));
+        values.put(messages.distributedInstancesLabel(), anchor);
+      } else {
+        values.put(messages.itemInstanceId(), createRepresentationInstanceIdHTML(bundle));
+      }
     }
 
     populate(infoSliderPanel, values);
@@ -193,9 +206,13 @@ public class InfoSliderHelper {
       if (distributedMode.equals(RodaConstants.DistributedModeType.CENTRAL.name())) {
         String instancename = bundle.getInstanceName();
         Anchor anchor = new Anchor();
-        anchor.setText(instancename);
+        if (StringUtils.isNotBlank(instancename)) {
+          anchor.setText(instancename);
+        } else {
+          anchor.setText(aip.getInstanceId());
+        }
         anchor.setHref(HistoryUtils.createHistoryHashLink(ShowDistributedInstance.RESOLVER, aip.getInstanceId()));
-        values.put(messages.itemInstance(), anchor);
+        values.put(messages.distributedInstanceLabel(), anchor);
       } else {
         values.put(messages.itemInstanceId(), createAipInstanceIdHTML(bundle));
       }
@@ -458,8 +475,23 @@ public class InfoSliderHelper {
       }
     }
 
+
     if (StringUtils.isNotBlank(file.getInstanceId())) {
-      values.put(messages.itemInstanceId(), createFileInstanceIdHTML(bundle));
+      String distributedMode = ConfigurationManager.getStringWithDefault(
+        RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
+      if (distributedMode.equals(RodaConstants.DistributedModeType.CENTRAL.name())) {
+        String instancename = bundle.getInstanceName();
+        Anchor anchor = new Anchor();
+        if (StringUtils.isNotBlank(instancename)) {
+          anchor.setText(instancename);
+        } else {
+          anchor.setText(file.getInstanceId());
+        }
+        anchor.setHref(HistoryUtils.createHistoryHashLink(ShowDistributedInstance.RESOLVER, file.getInstanceId()));
+        values.put(messages.distributedInstanceLabel(), anchor);
+      } else {
+        values.put(messages.itemInstanceId(), createFileInstanceIdHTML(bundle));
+      }
     }
 
     List<String> history = new ArrayList<>();

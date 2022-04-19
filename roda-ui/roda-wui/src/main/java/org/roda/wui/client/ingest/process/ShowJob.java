@@ -17,8 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.safehtml.shared.SafeUri;
-import com.google.gwt.user.client.Window;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -44,6 +42,7 @@ import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
@@ -62,8 +61,10 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
+import org.roda.wui.client.management.distributed.ShowDistributedInstance;
 import org.roda.wui.client.process.Process;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -78,10 +79,13 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
@@ -185,7 +189,7 @@ public class ShowJob extends Composite {
   Label instanceIdLabel;
 
   @UiField
-  Label instanceIdValue;
+  Anchor instanceIdValue;
 
   @UiField
   Label name;
@@ -296,7 +300,31 @@ public class ShowJob extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     if (job.getInstanceId() != null) {
-      instanceIdValue.setText(job.getInstanceId());
+      String distributedMode = ConfigurationManager.getStringWithDefault(
+        RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
+      if (distributedMode.equals(RodaConstants.DistributedModeType.CENTRAL.name())) {
+        BrowserService.Util.getInstance().retrieveDistributedInstance(job.getInstanceId(),
+          new NoAsyncCallback<DistributedInstance>() {
+            @Override
+            public void onFailure(Throwable caught) {
+              instanceIdValue
+                .setHref(HistoryUtils.createHistoryHashLink(ShowDistributedInstance.RESOLVER, job.getInstanceId()));
+              instanceIdValue.setText(job.getInstanceId());
+            }
+
+            @Override
+            public void onSuccess(DistributedInstance distributedInstance) {
+              String instanceName = distributedInstance.getName();
+
+              instanceIdValue
+                .setHref(HistoryUtils.createHistoryHashLink(ShowDistributedInstance.RESOLVER, job.getInstanceId()));
+              instanceIdValue.setText(instanceName);
+            }
+          });
+
+      } else {
+        instanceIdValue.setText(job.getInstanceId());
+      }
     } else {
       instanceIdLabel.setVisible(false);
       instanceIdValue.setVisible(false);
