@@ -151,27 +151,12 @@ public class InfoSliderHelper {
       values.put(messages.representationType(), createRepresentationTypeHTML(bundle));
     }
 
-    if (StringUtils.isNotBlank(representation.getInstanceId())) {
-      String distributedMode = ConfigurationManager.getStringWithDefault(
-        RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
-      if (distributedMode.equals(RodaConstants.DistributedModeType.CENTRAL.name())) {
-        String instancename = bundle.getInstanceName();
-        Anchor anchor = new Anchor();
-        if (StringUtils.isNotBlank(instancename)) {
-          anchor.setText(instancename);
-        } else {
-          anchor.setText(representation.getInstanceId());
-        }
-        anchor.setHref(
-          HistoryUtils.createHistoryHashLink(ShowDistributedInstance.RESOLVER, representation.getInstanceId()));
-        values.put(messages.distributedInstancesLabel(), anchor);
-      } else {
-        values.put(messages.itemInstanceId(), createRepresentationInstanceIdHTML(bundle));
-      }
-    }
+    String instanceId = representation.getInstanceId();
+    addLinkifCentralInstance(values, bundle.getInstanceName(), instanceId);
 
     populate(infoSliderPanel, values);
   }
+
 
   public static void updateInfoSliderPanel(BrowseAIPBundle bundle, SliderPanel infoSliderPanel) {
     IndexedAIP aip = bundle.getAip();
@@ -200,23 +185,8 @@ public class InfoSliderHelper {
       values.put(messages.aipType(), createAipTypeHTML(bundle));
     }
 
-    if (StringUtils.isNotBlank(aip.getInstanceId())) {
-      String distributedMode = ConfigurationManager.getStringWithDefault(
-        RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
-      if (distributedMode.equals(RodaConstants.DistributedModeType.CENTRAL.name())) {
-        String instancename = bundle.getInstanceName();
-        Anchor anchor = new Anchor();
-        if (StringUtils.isNotBlank(instancename)) {
-          anchor.setText(instancename);
-        } else {
-          anchor.setText(aip.getInstanceId());
-        }
-        anchor.setHref(HistoryUtils.createHistoryHashLink(ShowDistributedInstance.RESOLVER, aip.getInstanceId()));
-        values.put(messages.distributedInstanceLabel(), anchor);
-      } else {
-        values.put(messages.itemInstanceId(), createAipInstanceIdHTML(bundle));
-      }
-    }
+    String instanceId = aip.getInstanceId();
+    addLinkifCentralInstance(values, bundle.getInstanceName(), instanceId);
 
     if (!aip.getIngestSIPIds().isEmpty()) {
       FlowPanel sipIds = new FlowPanel();
@@ -475,24 +445,8 @@ public class InfoSliderHelper {
       }
     }
 
-
-    if (StringUtils.isNotBlank(file.getInstanceId())) {
-      String distributedMode = ConfigurationManager.getStringWithDefault(
-        RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
-      if (distributedMode.equals(RodaConstants.DistributedModeType.CENTRAL.name())) {
-        String instancename = bundle.getInstanceName();
-        Anchor anchor = new Anchor();
-        if (StringUtils.isNotBlank(instancename)) {
-          anchor.setText(instancename);
-        } else {
-          anchor.setText(file.getInstanceId());
-        }
-        anchor.setHref(HistoryUtils.createHistoryHashLink(ShowDistributedInstance.RESOLVER, file.getInstanceId()));
-        values.put(messages.distributedInstanceLabel(), anchor);
-      } else {
-        values.put(messages.itemInstanceId(), createFileInstanceIdHTML(bundle));
-      }
-    }
+    String instanceId = file.getInstanceId();
+    addLinkifCentralInstance(values, bundle.getInstanceName(), instanceId);
 
     List<String> history = new ArrayList<>();
     history.add(file.getAipId());
@@ -662,6 +616,24 @@ public class InfoSliderHelper {
     return panel;
   }
 
+  public static void addLinkifCentralInstance(HashMap<String, Widget> values, String instancename, String instanceId) {
+    if (StringUtils.isNotBlank(instanceId)) {
+      String distributedMode = ConfigurationManager.getStringWithDefault(
+        RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
+      if (distributedMode.equals(RodaConstants.DistributedModeType.CENTRAL.name())) {
+        Anchor anchor = new Anchor();
+        if (StringUtils.isNotBlank(instancename)) {
+          anchor.setText(instancename);
+        } else {
+          anchor.setText(instanceId);
+        }
+        anchor.setHref(HistoryUtils.createHistoryHashLink(ShowDistributedInstance.RESOLVER, instanceId));
+        values.put(messages.distributedInstanceLabel(), anchor);
+      } else {
+        values.put(messages.itemInstanceId(), new Label(instanceId));
+      }
+    }
+  }
   private static FlowPanel createAipInstanceIdHTML(BrowseAIPBundle bundle) {
     IndexedAIP aip = bundle.getAip();
     FlowPanel panel = new FlowPanel();

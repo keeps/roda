@@ -14,8 +14,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.roda.core.data.v2.accessKey.AccessKeyStatus;
-import org.roda.core.data.v2.synchronization.central.DistributedInstanceStatus;
-import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
@@ -26,6 +24,8 @@ import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.risks.IncidenceStatus;
 import org.roda.core.data.v2.risks.SeverityLevel;
+import org.roda.core.data.v2.synchronization.central.DistributedInstanceStatus;
+import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 
 import com.google.gwt.i18n.client.Messages;

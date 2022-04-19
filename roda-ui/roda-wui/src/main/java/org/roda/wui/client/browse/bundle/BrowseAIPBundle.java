@@ -171,6 +171,11 @@ public class BrowseAIPBundle implements Bundle {
     if (representationInformationFields != null) {
       builder.append("representationInformationFields=");
       builder.append(representationInformationFields);
+      builder.append(", ");
+    }
+    if (instanceName != null) {
+      builder.append("instanceName=");
+      builder.append(instanceName);
     }
     builder.append("]");
     return builder.toString();
