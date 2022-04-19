@@ -35,7 +35,6 @@ import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.synchronization.EntitySummary;
 import org.roda.core.data.v2.synchronization.bundle.BundleState;
-import org.roda.core.data.v2.synchronization.bundle.EntitiesBundle;
 import org.roda.core.data.v2.synchronization.bundle.Issue;
 import org.roda.core.data.v2.synchronization.bundle.PackageState;
 import org.roda.core.data.v2.synchronization.bundle.RemovedEntity;
@@ -223,18 +222,16 @@ public class ImportUtils {
 
   public static int deleteBundleEntities(final ModelService model, final IndexService index, final Job cachedJob,
     Plugin<? extends IsRODAObject> plugin, final JobPluginInfo jobPluginInfo,
-    final DistributedInstance distributedInstance, final Path bundleWorkingDir, final EntitiesBundle entitiesBundle,
-    final Report reportItem) {
-    final Map<Path, Class<? extends IsIndexed>> entitiesPathMap = SyncUtils.createEntitiesPaths(bundleWorkingDir,
-      entitiesBundle);
-
+    final DistributedInstance distributedInstance, final Path bundleWorkingDir,
+    final List<PackageState> validationEntityList, final Report reportItem) {
     Path temporaryReportPath = null;
     int removed = 0;
     final List<Path> reportPaths = new ArrayList<>();
-    for (Map.Entry entry : entitiesPathMap.entrySet()) {
-      Class<? extends IsIndexed> indexedClass = (Class<? extends IsIndexed>) entry.getValue();
+    for (PackageState packageState : validationEntityList) {
+      Class<? extends IsIndexed> indexedClass = (Class<? extends IsIndexed>) ModelUtils
+        .giveRespectiveIndexedClass(packageState.getClassName());
       final StringBuilder fileNameBuilder = new StringBuilder();
-      final String[] className = ModelUtils.giveRespectiveModelClass(indexedClass).getName().split("\\.");
+      final String[] className = packageState.getClassName().getName().split("\\.");
       fileNameBuilder.append(RodaConstants.SYNCHRONIZATION_REMOVED_FILE).append("_").append(distributedInstance.getId())
         .append("_");
       fileNameBuilder.append(className[className.length - 1]).append(".jsonl");
@@ -243,7 +240,8 @@ public class ImportUtils {
         createReport(temporaryReportPath);
         reportPaths.add(temporaryReportPath);
       }
-      removed += deleteRodaObject(model, index, cachedJob, jobPluginInfo, plugin, (Path) entry.getKey(), indexedClass,
+      final Path listPath = bundleWorkingDir.resolve(packageState.getFilePath());
+      removed += deleteRodaObject(model, index, cachedJob, jobPluginInfo, plugin, listPath, indexedClass,
         distributedInstance, temporaryReportPath, reportItem);
     }
     if (!reportPaths.isEmpty()) {
@@ -336,26 +334,24 @@ public class ImportUtils {
    *          {@link IndexService}
    * @param bundleWorkingDir
    *          {@link Path}
-   * @param entitiesBundle
-   *          {@link EntitiesBundle}
+   * @param validationEntityList
+   *          {@link List}
    * @param distributedInstance
    *          {@link DistributedInstance}
    * @param syncErrors
    *          number of errors in synchronization
    */
   public static void validateEntitiesBundle(final IndexService index, final Path bundleWorkingDir,
-    final EntitiesBundle entitiesBundle, final DistributedInstance distributedInstance, int syncErrors) {
-    final Map<Path, Class<? extends IsIndexed>> entitiesPathMap = SyncUtils.createEntitiesPaths(bundleWorkingDir,
-      entitiesBundle);
+    final List<PackageState> validationEntityList, final DistributedInstance distributedInstance, int syncErrors) {
 
     Path temporaryReportPath = null;
     final List<Path> reportPaths = new ArrayList<>();
-    for (Map.Entry entry : entitiesPathMap.entrySet()) {
+    for (PackageState packageState : validationEntityList) {
+      Class<? extends IsIndexed> indexedClass = (Class<? extends IsIndexed>) ModelUtils
+        .giveRespectiveIndexedClass(packageState.getClassName());
       final StringBuilder fileNameBuilder = new StringBuilder();
-
       fileNameBuilder.append(RodaConstants.SYNCHRONIZATION_ISSUES_FILE).append("_").append(distributedInstance.getId())
         .append("_");
-      Class<? extends IsIndexed> indexedClass = (Class<? extends IsIndexed>) entry.getValue();
       final String[] className = ModelUtils.giveRespectiveModelClass(indexedClass).getName().split("\\.");
       fileNameBuilder.append(className[className.length - 1]).append(".jsonl");
       temporaryReportPath = bundleWorkingDir.resolve(fileNameBuilder.toString());
@@ -363,8 +359,8 @@ public class ImportUtils {
         createReport(temporaryReportPath);
         reportPaths.add(temporaryReportPath);
       }
-      syncErrors += validateCentralEntities(index, temporaryReportPath, (Path) entry.getKey(), indexedClass,
-        distributedInstance);
+      syncErrors += validateCentralEntities(index, temporaryReportPath,
+        bundleWorkingDir.resolve(packageState.getFilePath()), indexedClass, distributedInstance);
     }
     if (temporaryReportPath != null) {
       for (final Path reportPath : reportPaths) {

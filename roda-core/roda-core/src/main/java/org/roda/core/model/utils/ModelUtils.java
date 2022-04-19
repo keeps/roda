@@ -30,6 +30,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
@@ -921,6 +922,16 @@ public final class ModelUtils {
       return (Class<T>) DIP.class;
     } else if (IndexedReport.class.equals(inputClass)) {
       return (Class<T>) Report.class;
+    } else {
+      return inputClass;
+    }
+  }
+
+  public static Class<?> giveRespectiveIndexedClass(Class<?> inputClass) {
+    if (AIP.class.equals(inputClass)) {
+      return IndexedAIP.class;
+    } else if (DIP.class.equals(inputClass)) {
+      return IndexedDIP.class;
     } else {
       return inputClass;
     }

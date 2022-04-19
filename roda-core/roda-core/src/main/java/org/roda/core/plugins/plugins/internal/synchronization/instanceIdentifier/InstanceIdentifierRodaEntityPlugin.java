@@ -36,7 +36,7 @@ import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.utils.LocalInstanceUtils;
+import org.roda.core.storage.utils.DistributedInstancesUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +53,7 @@ public abstract class InstanceIdentifierRodaEntityPlugin<T extends IsRODAObject>
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, "Instance Identifier",
-        PluginParameter.PluginParameterType.STRING, LocalInstanceUtils.retrieveLocalInstanceIdentifierToPlugin(), true,
+        PluginParameter.PluginParameterType.STRING, DistributedInstancesUtils.retrieveLocalInstanceIdentifierToPlugin(), true,
         true, "Identifier from the RODA local instance"));
   }
 

@@ -56,11 +56,12 @@ public class EntitySummary implements Serializable {
     this.countIssues = countIssues;
   }
 
-  @JsonIgnore
-  public void increment() {
-    count++;
-  }
-
+  /**
+   * Increment the counters by type.
+   * 
+   * @param type
+   *          {@link String}
+   */
   @JsonIgnore
   public void increment(String type) {
     if (RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_REMOVED.equals(type)) {
@@ -72,6 +73,14 @@ public class EntitySummary implements Serializable {
     }
   }
 
+  /**
+   * Sum the value given to the counter by the type.
+   * 
+   * @param type
+   *          {@link String}
+   * @param value
+   *          the value
+   */
   @JsonIgnore
   public void sumValue(String type, int value) {
     if (RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_REMOVED.equals(type)) {

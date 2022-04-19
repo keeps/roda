@@ -1,6 +1,8 @@
 package org.roda.core.data.v2.synchronization.local;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 import org.roda.core.data.common.RodaConstants;
@@ -8,6 +10,7 @@ import org.roda.core.data.v2.IsModelObject;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.roda.core.data.v2.synchronization.EntitySummary;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -32,8 +35,11 @@ public class LocalInstance implements IsModelObject {
   private Date updatedOn;
   private String updatedBy;
 
+  private List<EntitySummary> entitySummaryList;
+
   public LocalInstance() {
     isRegistered = false;
+    entitySummaryList = new ArrayList<>();
   }
 
   @Override
@@ -161,4 +167,11 @@ public class LocalInstance implements IsModelObject {
     result = 31 * result + (updatedBy != null ? updatedBy.hashCode() : 0);
     return result;
   }
+
+  public void cleanEntitySummaryList() {
+    entitySummaryList = new ArrayList<>();
+  }
+
+  
+
 }

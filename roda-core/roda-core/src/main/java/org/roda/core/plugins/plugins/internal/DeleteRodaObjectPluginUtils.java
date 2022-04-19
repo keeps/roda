@@ -38,7 +38,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.storage.utils.LocalInstanceUtils;
+import org.roda.core.storage.utils.DistributedInstancesUtils;
 
 /**
  * {@author João Gomes <jgomes@keep.pt>}.
@@ -255,7 +255,7 @@ public class DeleteRodaObjectPluginUtils {
         // removing PREMIS file
         try {
           String pmId = URNUtils.getPremisPrefix(PreservationMetadata.PreservationMetadataType.FILE,
-            LocalInstanceUtils.getLocalInstanceIdentifier()) + file.getId();
+            DistributedInstancesUtils.getLocalInstanceIdentifier()) + file.getId();
           model.deletePreservationMetadata(PreservationMetadata.PreservationMetadataType.FILE, file.getAipId(),
             file.getRepresentationId(), pmId, false);
         } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
@@ -330,7 +330,7 @@ public class DeleteRodaObjectPluginUtils {
         // removing PREMIS file
         try {
           String pmId = URNUtils.getPremisPrefix(PreservationMetadata.PreservationMetadataType.REPRESENTATION,
-            LocalInstanceUtils.getLocalInstanceIdentifier()) + representation.getId();
+            DistributedInstancesUtils.getLocalInstanceIdentifier()) + representation.getId();
           model.deletePreservationMetadata(PreservationMetadata.PreservationMetadataType.REPRESENTATION,
             representation.getAipId(), representation.getId(), pmId, false);
         } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {

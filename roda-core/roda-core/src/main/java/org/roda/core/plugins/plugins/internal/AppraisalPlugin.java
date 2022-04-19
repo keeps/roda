@@ -50,7 +50,7 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.ingest.AutoAcceptSIPPlugin;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.utils.LocalInstanceUtils;
+import org.roda.core.storage.utils.DistributedInstancesUtils;
 import org.roda.core.util.IdUtils;
 
 public class AppraisalPlugin extends AbstractPlugin<AIP> {
@@ -138,7 +138,7 @@ public class AppraisalPlugin extends AbstractPlugin<AIP> {
           true);
         userAgentId = pm.getId();
       } catch (AlreadyExistsException e) {
-        userAgentId = IdUtils.getUserAgentId(job.getUsername(), LocalInstanceUtils.getLocalInstanceIdentifier());
+        userAgentId = IdUtils.getUserAgentId(job.getUsername(), DistributedInstancesUtils.getLocalInstanceIdentifier());
       } catch (ValidationException e) {
         throw new GenericException(e);
       }
@@ -159,7 +159,7 @@ public class AppraisalPlugin extends AbstractPlugin<AIP> {
 
             // create preservation event
             String id = IdUtils.createPreservationMetadataId(PreservationMetadata.PreservationMetadataType.EVENT,
-              LocalInstanceUtils.getLocalInstanceIdentifier());
+              DistributedInstancesUtils.getLocalInstanceIdentifier());
             PreservationEventType type = PreservationEventType.ACCESSION;
             String preservationEventDescription = AutoAcceptSIPPlugin.DESCRIPTION;
             List<LinkingIdentifier> sources = new ArrayList<>();

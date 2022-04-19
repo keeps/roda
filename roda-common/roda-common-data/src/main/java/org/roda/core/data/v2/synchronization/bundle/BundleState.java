@@ -19,12 +19,13 @@ public class BundleState {
   private List<PackageState> packageStateList;
   private List<AttachmentState> attachmentStateList;
   private Status syncStatus;
-  private EntitiesBundle entitiesBundle;
+  private List<PackageState> validationEntityList;
 
   public BundleState() {
     packageStateList = new ArrayList<>();
     attachmentStateList = new ArrayList<>();
     syncStatus = Status.NONE;
+    validationEntityList = new ArrayList<>();
   }
 
   public String getId() {
@@ -95,15 +96,14 @@ public class BundleState {
     return syncStatus;
   }
 
-  public EntitiesBundle getEntitiesBundle() {
-    return entitiesBundle;
+  @JsonProperty(value = "validationEntities")
+  public List<PackageState> getValidationEntityList() {
+    return validationEntityList;
   }
 
-  public void setEntitiesBundle(final EntitiesBundle entitiesBundle) {
-    this.entitiesBundle = entitiesBundle;
+  public void setValidationEntityList(List<PackageState> validationEntityList) {
+    this.validationEntityList = validationEntityList;
   }
-
-
 
   public enum Status {
     NONE, PREPARED, FAILED, SENT

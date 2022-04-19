@@ -150,6 +150,7 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
           final int jobs = createJobs(localInstance.getId(), index);
           final BundleState bundleState = SyncUtils.getIncomingBundleState(localInstance.getId());
           final int imported = SyncUtils.importStorage(storage, bundleWorkingDir, bundleState, jobPluginInfo, false);
+
           outcomeDetailsText = "Received " + jobs + " jobs. Imported " + imported
             + " representations information and risks from Central";
         } catch (AlreadyExistsException | JobAlreadyStartedException e) {

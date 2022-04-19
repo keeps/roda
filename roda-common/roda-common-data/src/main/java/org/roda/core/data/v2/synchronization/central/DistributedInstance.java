@@ -293,10 +293,15 @@ public class DistributedInstance implements IsModelObject {
     entitySummaries = new ArrayList<>();
   }
 
+  /**
+   * Get the total of issues (Errors) in synchronization.
+   * 
+   * @return the total of issues.
+   */
   @JsonIgnore
   public int getSyncErrors() {
     int errors = 0;
-    for(EntitySummary entitySummary: entitySummaries){
+    for (EntitySummary entitySummary : entitySummaries) {
       errors += entitySummary.getCountIssues();
     }
     return errors;

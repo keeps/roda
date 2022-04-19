@@ -14,10 +14,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
@@ -41,18 +39,15 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
-import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.bundle.AttachmentState;
 import org.roda.core.data.v2.synchronization.bundle.BundleState;
-import org.roda.core.data.v2.synchronization.bundle.EntitiesBundle;
 import org.roda.core.data.v2.synchronization.bundle.PackageState;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
@@ -85,6 +80,8 @@ public class SyncUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(SyncUtils.class);
   private final static String STATE_FILE = "state.json";
   private final static String PACKAGES_DIR = "packages";
+
+  private final static String VALIDATION_ENTITIES_DIR = "validation";
   private final static String ATTACHMENTS_DIR = "job-attachments";
   private final static String INCOMING_PREFIX = "incoming_sync_";
   private final static String OUTCOME_PREFIX = "outcome_sync_";
@@ -299,6 +296,67 @@ public class SyncUtils {
       Files.createDirectories(packagesPath);
     }
     JsonUtils.writeObjectToFile(entityPackageState, entityPackageStatePath);
+  }
+
+  /**
+   * Iterates over the files in bundle (AIP, DIP, Risks) and creates the Files.
+   *
+   * @param bundleState
+   *          {@link BundleState}.
+   * @throws GenericException
+   *           if some error occurs.
+   * @throws IOException
+   *           if some i/o error occurs.
+   */
+  public static void createLocalInstanceLists(BundleState bundleState, String instanceIdentifier)
+    throws GenericException, IOException {
+    Path syncBundleWorkingDirectory = getSyncBundleWorkingDirectory(OUTCOME_PREFIX, instanceIdentifier);
+    Path validationEntitiesDirectoryPath = syncBundleWorkingDirectory.resolve(VALIDATION_ENTITIES_DIR);
+    Files.createDirectory(validationEntitiesDirectoryPath);
+    for (PackageState packageState : bundleState.getValidationEntityList()) {
+      final Path path = syncBundleWorkingDirectory.resolve(packageState.getFilePath());
+      Class<?> indexdedClass = ModelUtils.giveRespectiveIndexedClass(packageState.getClassName());
+      int count = createLocalInstanceList(path, (Class<? extends IsIndexed>) indexdedClass);
+      packageState.setCount(count);
+    }
+  }
+
+  /**
+   * Write the List in the file to bundle.
+   *
+   * @param destinationPath
+   *          {@link Path}.
+   * @param indexedClass
+   *          {@link Class<? extends IsIndexed>}.
+   * @throws IOException
+   *           if some i/o error occurs.
+   */
+  private static int createLocalInstanceList(final Path destinationPath, final Class<? extends IsIndexed> indexedClass)
+    throws IOException {
+    final IndexService index = RodaCoreFactory.getIndexService();
+    final Filter filter = new Filter();
+    if (indexedClass == IndexedPreservationEvent.class) {
+      filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS,
+        IndexedPreservationEvent.PreservationMetadataEventClass.REPOSITORY.toString()));
+    }
+    SyncUtils.init(destinationPath);
+    int count = 0;
+    try (IterableIndexResult<? extends IsIndexed> result = index.findAll(indexedClass, filter, true,
+      Collections.singletonList(RodaConstants.INDEX_UUID))) {
+      count = (int) result.getTotalCount();
+      result.forEach(indexed -> {
+        try {
+          SyncUtils.writeString(indexed.getId());
+        } catch (final IOException e) {
+          LOGGER.error("Error writing the ID {} {}", indexed.getId(), e);
+        }
+      });
+    } catch (IOException | GenericException | RequestNotValidException e) {
+      LOGGER.error("Error getting iterator when creating aip list", e);
+    }
+
+    SyncUtils.close(true);
+    return count;
   }
 
   /**
@@ -550,31 +608,6 @@ public class SyncUtils {
       }
     }
     return null;
-  }
-
-  /**
-   * Creates {@link Map} with the List of entities path in bundle and the indexed
-   * {@link Class<? extends IsIndexed>}.
-   * 
-   * @param bundleWorkingDir
-   *          {@link Path} to blunde dir
-   * @param entitiesBundle
-   *          {@link EntitiesBundle}
-   * @return {@link Map}
-   */
-  public static Map<Path, Class<? extends IsIndexed>> createEntitiesPaths(final Path bundleWorkingDir,
-    final EntitiesBundle entitiesBundle) {
-    final HashMap<Path, Class<? extends IsIndexed>> entitiesPathMap = new HashMap<>();
-    final Path aipListPath = bundleWorkingDir.resolve(entitiesBundle.getAipFileName() + ".json");
-    entitiesPathMap.put(aipListPath, IndexedAIP.class);
-
-    final Path dipListPath = bundleWorkingDir.resolve(entitiesBundle.getDipFileName() + ".json");
-    entitiesPathMap.put(dipListPath, IndexedDIP.class);
-
-    final Path riskListPath = bundleWorkingDir.resolve(entitiesBundle.getRiskFileName() + ".json");
-    entitiesPathMap.put(riskListPath, RiskIncidence.class);
-
-    return entitiesPathMap;
   }
 
   /**
