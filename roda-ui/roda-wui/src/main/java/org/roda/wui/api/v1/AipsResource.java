@@ -7,6 +7,7 @@
  */
 package org.roda.wui.api.v1;
 
+import com.google.json.JsonSanitizer;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +35,7 @@ import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -43,6 +45,7 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPs;
+import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataList;
@@ -156,6 +159,10 @@ public class AipsResource {
 
     // get user
     User user = UserUtility.getApiUser(request);
+
+    // sanitize the input
+    String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(aip));
+    aip = JsonUtils.getObjectFromJson(sanitize, AIP.class);
 
     // delegate action to controller
     AIP updatedAIP = Browser.updateAIP(user, aip);

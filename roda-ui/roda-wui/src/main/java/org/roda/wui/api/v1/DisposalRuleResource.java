@@ -7,6 +7,7 @@
  */
 package org.roda.wui.api.v1;
 
+import com.google.json.JsonSanitizer;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,8 +28,10 @@ import org.glassfish.jersey.server.JSONP;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalRules;
+import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.controllers.Disposals;
@@ -115,6 +118,10 @@ public class DisposalRuleResource {
     // get user
     User user = UserUtility.getApiUser(request);
 
+    // sanitize the input
+    String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(rule));
+    rule = JsonUtils.getObjectFromJson(sanitize, DisposalRule.class);
+
     // delegate action to controller
     DisposalRule disposalRule = Disposals.createDisposalRule(user, rule);
     return Response.ok(disposalRule, mediaType).build();
@@ -135,6 +142,10 @@ public class DisposalRuleResource {
 
     // get user
     User user = UserUtility.getApiUser(request);
+
+    // sanitize the input
+    String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(rule));
+    rule = JsonUtils.getObjectFromJson(sanitize, DisposalRule.class);
 
     // delegate action to controller
     DisposalRule updateDisposalRule = Disposals.updateDisposalRule(user, rule);

@@ -7,6 +7,7 @@
  */
 package org.roda.wui.api.v1;
 
+import com.google.json.JsonSanitizer;
 import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +30,7 @@ import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -38,6 +40,7 @@ import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPs;
 import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.controllers.Dips;
@@ -134,6 +137,10 @@ public class DipsResource {
     // get user
     User user = UserUtility.getApiUser(request);
 
+    // sanitize the input
+    String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(dip));
+    dip = JsonUtils.getObjectFromJson(sanitize, DIP.class);
+
     // delegate action to controller
     DIP createdDip = Dips.createDIP(user, dip);
     return Response.ok(createdDip, mediaType).build();
@@ -154,6 +161,10 @@ public class DipsResource {
 
     // get user
     User user = UserUtility.getApiUser(request);
+
+    // sanitize the input
+    String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(dip));
+    dip = JsonUtils.getObjectFromJson(sanitize, DIP.class);
 
     // delegate action to controller
     DIP updatedDIP = Dips.updateDIP(user, dip);

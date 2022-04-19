@@ -7,6 +7,7 @@
  */
 package org.roda.wui.api.v1;
 
+import com.google.json.JsonSanitizer;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,8 +28,10 @@ import org.glassfish.jersey.server.JSONP;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalHolds;
+import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.controllers.Disposals;
@@ -116,6 +119,10 @@ public class DisposalHoldResource {
     // get user
     User user = UserUtility.getApiUser(request);
 
+    // sanitize the input
+    String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(hold));
+    hold = JsonUtils.getObjectFromJson(sanitize, DisposalHold.class);
+
     // delegate action to controller
     DisposalHold disposalhold = Disposals.createDisposalHold(user, hold);
     return Response.ok(disposalhold, mediaType).build();
@@ -136,6 +143,10 @@ public class DisposalHoldResource {
 
     // get user
     User user = UserUtility.getApiUser(request);
+
+    // sanitize the input
+    String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(hold));
+    hold = JsonUtils.getObjectFromJson(sanitize, DisposalHold.class);
 
     // delegate action to controller
     DisposalHold updateDisposalHold = Disposals.updateDisposalHold(user, hold);

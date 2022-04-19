@@ -7,6 +7,7 @@
  */
 package org.roda.wui.api.v1;
 
+import com.google.json.JsonSanitizer;
 import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +28,7 @@ import org.glassfish.jersey.server.JSONP;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -99,6 +101,10 @@ public class RiskIncidencesResource {
     // get user
     User user = UserUtility.getApiUser(request);
 
+    // sanitize the input
+    String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(incidence));
+    incidence = JsonUtils.getObjectFromJson(sanitize, RiskIncidence.class);
+
     // delegate action to controller
     RiskIncidence newIncidence = org.roda.wui.api.controllers.Risks.createRiskIncidence(user, incidence);
     return Response.ok(newIncidence, mediaType).build();
@@ -120,6 +126,10 @@ public class RiskIncidencesResource {
 
     // get user
     User user = UserUtility.getApiUser(request);
+
+    // sanitize the input
+    String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(incidence));
+    incidence = JsonUtils.getObjectFromJson(sanitize, RiskIncidence.class);
 
     // delegate action to controller
     RiskIncidence updatedIncidence = org.roda.wui.api.controllers.Risks.updateRiskIncidence(user, incidence);

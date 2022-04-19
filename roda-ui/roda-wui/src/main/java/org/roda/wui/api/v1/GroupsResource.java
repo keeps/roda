@@ -7,6 +7,7 @@
  */
 package org.roda.wui.api.v1;
 
+import com.google.json.JsonSanitizer;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
@@ -28,12 +29,14 @@ import org.glassfish.jersey.server.JSONP;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAGroups;
 import org.roda.core.data.v2.user.RODAMember;
@@ -109,6 +112,10 @@ public class GroupsResource {
     // get user
     User user = UserUtility.getApiUser(request);
 
+    // sanitize the input
+    String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(newGroup));
+    newGroup = JsonUtils.getObjectFromJson(sanitize, Group.class);
+
     // delegate action to controller
     UserManagement.createGroup(user, newGroup);
     return Response.ok(newGroup, mediaType).build();
@@ -130,6 +137,10 @@ public class GroupsResource {
 
     // get user
     User user = UserUtility.getApiUser(request);
+
+    // sanitize the input
+    String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(modifiedGroup));
+    modifiedGroup = JsonUtils.getObjectFromJson(sanitize, Group.class);
 
     // delegate action to controller
     UserManagement.updateGroup(user, modifiedGroup);

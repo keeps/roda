@@ -7,6 +7,7 @@
  */
 package org.roda.wui.api.v1;
 
+import com.google.json.JsonSanitizer;
 import java.util.Collections;
 import java.util.stream.Collectors;
 
@@ -28,6 +29,7 @@ import org.glassfish.jersey.server.JSONP;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -131,6 +133,10 @@ public class UsersResource {
 
     // get user
     User user = UserUtility.getApiUser(request);
+
+    // sanitize the input
+    String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(modifiedUser));
+    modifiedUser = JsonUtils.getObjectFromJson(sanitize, User.class);
 
     // delegate action to controller
     UserManagement.updateUser(user, modifiedUser, password, null);

@@ -397,6 +397,11 @@
             <groupId>io.swagger</groupId>
             <artifactId>swagger-jersey2-jaxrs</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.mikesamuel</groupId>
+            <artifactId>json-sanitizer</artifactId>
+            <version>1.2.3</version>
+        </dependency>
         <!-- REST API related dependencies - end -->
         <dependency>
             <groupId>com.github.jknack</groupId>

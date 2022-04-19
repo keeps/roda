@@ -7,6 +7,7 @@
  */
 package org.roda.wui.api.v1;
 
+import com.google.json.JsonSanitizer;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +28,8 @@ import org.glassfish.jersey.server.JSONP;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.user.User;
@@ -116,6 +119,10 @@ public class DisposalScheduleResource {
     // get user
     User user = UserUtility.getApiUser(request);
 
+    // sanitize the input
+    String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(schedule));
+    schedule = JsonUtils.getObjectFromJson(sanitize, DisposalSchedule.class);
+
     // delegate action to controller
     DisposalSchedule disposalSchedule = Disposals.createDisposalSchedule(user, schedule);
     return Response.ok(disposalSchedule, mediaType).build();
@@ -136,6 +143,10 @@ public class DisposalScheduleResource {
 
     // get user
     User user = UserUtility.getApiUser(request);
+
+    // sanitize the input
+    String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(schedule));
+    schedule = JsonUtils.getObjectFromJson(sanitize, DisposalSchedule.class);
 
     // delegate action to controller
     DisposalSchedule updateDisposalSchedule = Disposals.updateDisposalSchedule(user, schedule);

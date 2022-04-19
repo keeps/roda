@@ -7,6 +7,7 @@
  */
 package org.roda.wui.api.v1;
 
+import com.google.json.JsonSanitizer;
 import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +30,7 @@ import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -104,6 +106,10 @@ public class RepresentationInformationResource {
     // get user
     User user = UserUtility.getApiUser(request);
 
+    // sanitize the input
+    String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(ri));
+    ri = JsonUtils.getObjectFromJson(sanitize, RepresentationInformation.class);
+
     // delegate action to controller
     RepresentationInformation newRepresentationInformation = org.roda.wui.api.controllers.RepresentationInformations
       .createRepresentationInformation(user, ri);
@@ -126,6 +132,10 @@ public class RepresentationInformationResource {
 
     // get user
     User user = UserUtility.getApiUser(request);
+
+    // sanitize the input
+    String sanitize = JsonSanitizer.sanitize(JsonUtils.getJsonFromObject(ri));
+    ri = JsonUtils.getObjectFromJson(sanitize, RepresentationInformation.class);
 
     // delegate action to controller
     RepresentationInformation updatedRepresentationInformation = org.roda.wui.api.controllers.RepresentationInformations
