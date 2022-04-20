@@ -151,8 +151,7 @@ public class InfoSliderHelper {
       values.put(messages.representationType(), createRepresentationTypeHTML(bundle));
     }
 
-    String instanceId = representation.getInstanceId();
-    addLinkifCentralInstance(values, bundle.getInstanceName(), instanceId);
+    addLinkifCentralInstance(values, bundle.getInstanceName(), representation.getInstanceId());
 
     populate(infoSliderPanel, values);
   }
@@ -185,8 +184,7 @@ public class InfoSliderHelper {
       values.put(messages.aipType(), createAipTypeHTML(bundle));
     }
 
-    String instanceId = aip.getInstanceId();
-    addLinkifCentralInstance(values, bundle.getInstanceName(), instanceId);
+    addLinkifCentralInstance(values, bundle.getInstanceName(), aip.getInstanceId());
 
     if (!aip.getIngestSIPIds().isEmpty()) {
       FlowPanel sipIds = new FlowPanel();
@@ -385,6 +383,7 @@ public class InfoSliderHelper {
 
         if (StringUtils.isNotBlank(fileFormat.getMimeType())) {
           values.put(messages.viewRepresentationInfoMimetype(), createMimetypeHTML(bundle, fileFormat.getMimeType()));
+          values.put(messages.viewRepresentationInfoMimetype(), createMimetypeHTML(bundle, fileFormat.getMimeType()));
         }
 
         if (StringUtils.isNotBlank(fileFormat.getFormatDesignationName())) {
@@ -445,8 +444,7 @@ public class InfoSliderHelper {
       }
     }
 
-    String instanceId = file.getInstanceId();
-    addLinkifCentralInstance(values, bundle.getInstanceName(), instanceId);
+    addLinkifCentralInstance(values, bundle.getInstanceName(), file.getInstanceId());
 
     List<String> history = new ArrayList<>();
     history.add(file.getAipId());
@@ -634,41 +632,4 @@ public class InfoSliderHelper {
       }
     }
   }
-  private static FlowPanel createAipInstanceIdHTML(BrowseAIPBundle bundle) {
-    IndexedAIP aip = bundle.getAip();
-    FlowPanel panel = new FlowPanel();
-    final String riFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
-      RodaConstants.INDEX_AIP, RodaConstants.AIP_INSTANCE_ID, aip.getInstanceId());
-
-    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
-      SafeHtmlUtils.fromString(aip.getInstanceId()), riFilter, panel,
-      bundle.getRepresentationInformationFields().contains(RodaConstants.AIP_INSTANCE_ID), "browseFileInformationIcon");
-    return panel;
-  }
-
-  private static FlowPanel createRepresentationInstanceIdHTML(BrowseRepresentationBundle bundle) {
-    IndexedRepresentation representation = bundle.getRepresentation();
-    FlowPanel panel = new FlowPanel();
-
-    final String riFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
-      RodaConstants.INDEX_REPRESENTATION, RodaConstants.REPRESENTATION_INSTANCE_ID, representation.getInstanceId());
-    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
-      SafeHtmlUtils.fromString(representation.getInstanceId()), riFilter, panel,
-      bundle.getRepresentationInformationFields().contains(RodaConstants.REPRESENTATION_INSTANCE_ID));
-
-    return panel;
-  }
-
-  private static FlowPanel createFileInstanceIdHTML(BrowseFileBundle bundle) {
-    IndexedFile file = bundle.getFile();
-    FlowPanel panel = new FlowPanel();
-    final String riFilter = RepresentationInformationUtils.createRepresentationInformationFilter(
-      RodaConstants.INDEX_FILE, RodaConstants.FILE_INSTANCE_ID, file.getInstanceId());
-    RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
-      SafeHtmlUtils.fromString(file.getInstanceId()), riFilter, panel,
-      bundle.getRepresentationInformationFields().contains(RodaConstants.FILE_INSTANCE_ID),
-      "browseFileInformationIcon");
-    return panel;
-  }
-
 }

@@ -322,17 +322,8 @@ public class BrowserHelper {
     } else {
       bundle.setRepresentationInformationFields(Collections.emptyList());
     }
-    ModelService model = RodaCoreFactory.getModelService();
-    RodaConstants.DistributedModeType distributedModeType = RodaCoreFactory.getDistributedModeType();
 
-    if (RodaConstants.DistributedModeType.CENTRAL.equals(distributedModeType)) {
-      try {
-        DistributedInstance distributedInstance = model.retrieveDistributedInstance(aip.getInstanceId());
-        bundle.setInstanceName(distributedInstance.getName());
-      } catch (NotFoundException e) {
-        LOGGER.warn("Could not retrieve the distributed instance", e);
-      }
-    }
+    bundle.setInstanceName(retrieveDistributedInstanceName(aip.getInstanceId()));
     return bundle;
   }
 
@@ -397,17 +388,7 @@ public class BrowserHelper {
     } else {
       bundle.setRepresentationInformationFields(Collections.emptyList());
     }
-    ModelService model = RodaCoreFactory.getModelService();
-    RodaConstants.DistributedModeType distributedModeType = RodaCoreFactory.getDistributedModeType();
-
-    if (RodaConstants.DistributedModeType.CENTRAL.equals(distributedModeType)) {
-      try {
-        DistributedInstance distributedInstance = model.retrieveDistributedInstance(aip.getInstanceId());
-        bundle.setInstanceName(distributedInstance.getName());
-      } catch (NotFoundException e) {
-        LOGGER.warn("Could not retrieve the distributed instance", e);
-      }
-    }
+    bundle.setInstanceName(retrieveDistributedInstanceName(aip.getInstanceId()));
 
     return bundle;
   }
@@ -482,23 +463,29 @@ public class BrowserHelper {
       bundle.setRepresentationInformationFields(Collections.emptyList());
     }
 
-    ModelService model = RodaCoreFactory.getModelService();
-    DistributedInstance distributedInstance = null;
-    RodaConstants.DistributedModeType distributedModeType = RodaCoreFactory.getDistributedModeType();
-
-    if (RodaConstants.DistributedModeType.CENTRAL.equals(distributedModeType)) {
-      try {
-        distributedInstance = model.retrieveDistributedInstance(aip.getInstanceId());
-        bundle.setInstanceName(distributedInstance.getName());
-      } catch (NotFoundException e) {
-        LOGGER.warn("Could not retrieve the distributed instance", e);
-      } catch (AuthorizationDeniedException e) {
-        LOGGER.warn("Do not have Authorization", e);
-      }
+    try {
+      bundle.setInstanceName(retrieveDistributedInstanceName(aip.getInstanceId()));
+    } catch (AuthorizationDeniedException e) {
+      LOGGER.warn("Do not have Authorization", e);
     }
     return bundle;
   }
 
+  private static String retrieveDistributedInstanceName(String instanceId)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException {
+    ModelService model = RodaCoreFactory.getModelService();
+    RodaConstants.DistributedModeType distributedModeType = RodaCoreFactory.getDistributedModeType();
+
+    if (RodaConstants.DistributedModeType.CENTRAL.equals(distributedModeType)) {
+      try {
+        DistributedInstance distributedInstance = model.retrieveDistributedInstance(instanceId);
+        return distributedInstance.getName();
+      } catch (NotFoundException e) {
+        LOGGER.warn("Could not retrieve the distributed instance", e);
+      }
+    }
+    return null;
+  }
   private static List<DescriptiveMetadataViewBundle> retrieveDescriptiveMetadataBundles(String aipId, Locale locale)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     return retrieveDescriptiveMetadataBundles(aipId, null, locale);
