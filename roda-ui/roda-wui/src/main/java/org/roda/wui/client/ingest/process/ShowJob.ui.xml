@@ -16,9 +16,9 @@
 							<common:TitlePanel text="{messages.processTitle}" iconClass="Job" />
                             <g:FlowPanel styleName="field">
                                 <g:Label addStyleNames="label" ui:field="instanceIdLabel">
-                                    <ui:text from='{messages.jobInstanceId}'/>
+                                    <ui:text from='{messages.distributedInstanceLabel}'/>
                                 </g:Label>
-                                <g:Label styleName="value" ui:field="instanceIdValue"/>
+								<g:Anchor styleName="btn-link" ui:field="instanceIdValue"/>
                             </g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label">

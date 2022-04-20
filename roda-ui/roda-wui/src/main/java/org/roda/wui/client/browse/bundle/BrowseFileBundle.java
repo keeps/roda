@@ -26,6 +26,7 @@ public class BrowseFileBundle implements Bundle {
   private List<String> representationInformationFields;
   private Long riskIncidenceCount;
   private Long preservationEventCount;
+  private String instanceName;
 
   public BrowseFileBundle() {
     super();
@@ -102,4 +103,13 @@ public class BrowseFileBundle implements Bundle {
   public void setPreservationEventCount(Long preservationEventCount) {
     this.preservationEventCount = preservationEventCount;
   }
+
+  public String getInstanceName() {
+    return instanceName;
+  }
+
+  public void setInstanceName(String instanceName) {
+    this.instanceName = instanceName;
+  }
+
 }
