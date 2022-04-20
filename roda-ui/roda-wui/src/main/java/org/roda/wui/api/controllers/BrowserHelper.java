@@ -3768,6 +3768,12 @@ public class BrowserHelper {
       SynchronizeInstancePlugin.class, user, new HashMap<>(), "Could not execute bundle job");
   }
 
+  public static Job synchronizeBundle2(User user)
+          throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(),
+            SynchronizeInstancePlugin.class, user, new HashMap<>(), "Could not execute bundle job");
+  }
+
   public static Job importSyncBundle(User user, String instanceIdentifier, FormDataMultiPart multiPart)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
     Map<String, String> pluginParameters = new HashMap<>();
