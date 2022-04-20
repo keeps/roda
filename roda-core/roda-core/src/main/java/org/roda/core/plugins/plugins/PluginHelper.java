@@ -118,7 +118,7 @@ import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
-import org.roda.core.storage.utils.DistributedInstancesUtils;
+import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1057,7 +1057,7 @@ public final class PluginHelper {
 
   public static <T extends IsRODAObject> String getPluginAgentId(Plugin<T> plugin) {
     return IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion(),
-      DistributedInstancesUtils.getLocalInstanceIdentifier());
+      RODAInstanceUtils.getLocalInstanceIdentifier());
   }
 
   public static void createSubmission(ModelService model, boolean createSubmission, Path submissionPath, String aipId)
@@ -1279,7 +1279,7 @@ public final class PluginHelper {
     NotFoundException, GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
     List<String> agentIds = new ArrayList<>();
     String agentId = IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion(),
-      DistributedInstancesUtils.getLocalInstanceIdentifier());
+      RODAInstanceUtils.getLocalInstanceIdentifier());
     StoragePath agentPath = ModelUtils.getPreservationMetadataStoragePath(agentId, PreservationMetadataType.AGENT);
 
     try {
@@ -1304,7 +1304,7 @@ public final class PluginHelper {
     }
 
     if (job != null) {
-      String userId = IdUtils.getUserAgentId(job.getUsername(), DistributedInstancesUtils.getLocalInstanceIdentifier());
+      String userId = IdUtils.getUserAgentId(job.getUsername(), RODAInstanceUtils.getLocalInstanceIdentifier());
       StoragePath userAgentPath = ModelUtils.getPreservationMetadataStoragePath(userId, PreservationMetadataType.AGENT);
 
       try {
@@ -1325,7 +1325,7 @@ public final class PluginHelper {
     }
 
     String id = IdUtils.createPreservationMetadataId(PreservationMetadataType.EVENT,
-      DistributedInstancesUtils.getLocalInstanceIdentifier());
+      RODAInstanceUtils.getLocalInstanceIdentifier());
     String outcomeDetailNote;
     switch (outcome) {
       case SKIPPED:
@@ -1361,7 +1361,7 @@ public final class PluginHelper {
   public static LinkingIdentifier getLinkingIdentifier(TransferredResource transferredResource, String role) {
     LinkingIdentifier li = new LinkingIdentifier();
     li.setValue(
-      LinkingObjectUtils.getLinkingIdentifierId(transferredResource, DistributedInstancesUtils.getLocalInstanceIdentifier()));
+      LinkingObjectUtils.getLinkingIdentifierId(transferredResource, RODAInstanceUtils.getLocalInstanceIdentifier()));
     li.setType(RodaConstants.URN_TYPE);
     li.setRoles(Arrays.asList(role));
     return li;
@@ -1382,7 +1382,7 @@ public final class PluginHelper {
 
   private static LinkingIdentifier getLinkingIdentifier(RODA_TYPE type, String uuid, String role) {
     LinkingIdentifier li = new LinkingIdentifier();
-    li.setValue(LinkingObjectUtils.getLinkingIdentifierId(type, uuid, DistributedInstancesUtils.getLocalInstanceIdentifier()));
+    li.setValue(LinkingObjectUtils.getLinkingIdentifierId(type, uuid, RODAInstanceUtils.getLocalInstanceIdentifier()));
     li.setType(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN);
     li.setRoles(Arrays.asList(role));
     return li;

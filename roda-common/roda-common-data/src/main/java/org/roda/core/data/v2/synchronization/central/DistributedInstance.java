@@ -1,102 +1,27 @@
 package org.roda.core.data.v2.synchronization.central;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.IsModelObject;
+import org.roda.core.data.v2.synchronization.RODAInstance;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.roda.core.data.v2.synchronization.EntitySummary;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 @javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISTRIBUTED_INSTANCE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DistributedInstance implements IsModelObject {
-  private static final int VERSION = 1;
+public class DistributedInstance extends RODAInstance {
   private static final long serialVersionUID = 7125122191135652087L;
 
-  private String id;
-  private String name;
-  private String nameIdentifier;
   private String description;
   private String accessKeyId;
   private String username;
-  private Date lastSyncDate;
   private DistributedInstanceStatus status;
-
-  private Date createdOn;
-  private String createdBy;
-  private Date updatedOn;
-  private String updatedBy;
-
-  List<EntitySummary> entitySummaries;
 
   public DistributedInstance() {
     status = DistributedInstanceStatus.CREATED;
-    lastSyncDate = null;
-    entitySummaries = new ArrayList<>();
-  }
-
-  @Override
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public String getNameIdentifier() {
-    return nameIdentifier;
-  }
-
-  public void setNameIdentifier(String nameIdentifier) {
-    this.nameIdentifier = nameIdentifier;
-  }
-
-  public Date getCreatedOn() {
-    return createdOn;
-  }
-
-  public void setCreatedOn(Date createdOn) {
-    this.createdOn = createdOn;
-  }
-
-  public String getCreatedBy() {
-    return createdBy;
-  }
-
-  public void setCreatedBy(String createdBy) {
-    this.createdBy = createdBy;
-  }
-
-  public Date getUpdatedOn() {
-    return updatedOn;
-  }
-
-  public void setUpdatedOn(Date updatedOn) {
-    this.updatedOn = updatedOn;
-  }
-
-  public String getUpdatedBy() {
-    return updatedBy;
-  }
-
-  public void setUpdatedBy(String updatedBy) {
-    this.updatedBy = updatedBy;
+    setLastSynchronizationDate(null);
+    cleanEntitySummaryList();
   }
 
   public String getDescription() {
@@ -131,28 +56,6 @@ public class DistributedInstance implements IsModelObject {
     this.username = username;
   }
 
-  public Date getLastSyncDate() {
-    return lastSyncDate;
-  }
-
-  public void setLastSyncDate(Date lastSyncDate) {
-    this.lastSyncDate = lastSyncDate;
-  }
-
-  public List<EntitySummary> getEntitySummaries() {
-    return entitySummaries;
-  }
-
-  public void setEntitySummaries(List<EntitySummary> entitySummaries) {
-    this.entitySummaries = entitySummaries;
-  }
-
-  @JsonIgnore
-  @Override
-  public int getClassVersion() {
-    return VERSION;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -162,11 +65,9 @@ public class DistributedInstance implements IsModelObject {
 
     DistributedInstance that = (DistributedInstance) o;
 
-    if (id != null ? !id.equals(that.id) : that.id != null)
+    if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null)
       return false;
-    if (name != null ? !name.equals(that.name) : that.name != null)
-      return false;
-    if (nameIdentifier != null ? !nameIdentifier.equals(that.nameIdentifier) : that.nameIdentifier != null)
+    if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null)
       return false;
     if (description != null ? !description.equals(that.description) : that.description != null)
       return false;
@@ -174,136 +75,42 @@ public class DistributedInstance implements IsModelObject {
       return false;
     if (username != null ? !username.equals(that.username) : that.username != null)
       return false;
-    if (lastSyncDate != null ? !lastSyncDate.equals(that.lastSyncDate) : that.lastSyncDate != null)
+    if (getLastSynchronizationDate() != null ? !getLastSynchronizationDate().equals(that.getLastSynchronizationDate())
+      : that.getLastSynchronizationDate() != null)
       return false;
     if (status != that.status)
       return false;
-    if (createdOn != null ? !createdOn.equals(that.createdOn) : that.createdOn != null)
+    if (getCreatedOn() != null ? !getCreatedOn().equals(that.getCreatedOn()) : that.getCreatedOn() != null)
       return false;
-    if (createdBy != null ? !createdBy.equals(that.createdBy) : that.createdBy != null)
+    if (getCreatedBy() != null ? !getCreatedBy().equals(that.getCreatedBy()) : that.getCreatedBy() != null)
       return false;
-    if (updatedOn != null ? !updatedOn.equals(that.updatedOn) : that.updatedOn != null)
+    if (getUpdatedOn() != null ? !getUpdatedOn().equals(that.getUpdatedOn()) : that.getUpdatedOn() != null)
       return false;
-    return updatedBy != null ? updatedBy.equals(that.updatedBy) : that.updatedBy == null;
+    return getUpdatedBy() != null ? getUpdatedBy().equals(that.getUpdatedBy()) : that.getUpdatedBy() == null;
   }
 
   @Override
   public int hashCode() {
-    int result = id != null ? id.hashCode() : 0;
-    result = 31 * result + (name != null ? name.hashCode() : 0);
-    result = 31 * result + (nameIdentifier != null ? nameIdentifier.hashCode() : 0);
+    int result = getId() != null ? getId().hashCode() : 0;
+    result = 31 * result + (getName() != null ? getName().hashCode() : 0);
     result = 31 * result + (description != null ? description.hashCode() : 0);
     result = 31 * result + (accessKeyId != null ? accessKeyId.hashCode() : 0);
     result = 31 * result + (username != null ? username.hashCode() : 0);
-    result = 31 * result + (lastSyncDate != null ? lastSyncDate.hashCode() : 0);
+    result = 31 * result + (getLastSynchronizationDate() != null ? getLastSynchronizationDate().hashCode() : 0);
     result = 31 * result + (status != null ? status.hashCode() : 0);
-    result = 31 * result + (createdOn != null ? createdOn.hashCode() : 0);
-    result = 31 * result + (createdBy != null ? createdBy.hashCode() : 0);
-    result = 31 * result + (updatedOn != null ? updatedOn.hashCode() : 0);
-    result = 31 * result + (updatedBy != null ? updatedBy.hashCode() : 0);
+    result = 31 * result + (getCreatedOn() != null ? getCreatedOn().hashCode() : 0);
+    result = 31 * result + (getCreatedBy() != null ? getCreatedBy().hashCode() : 0);
+    result = 31 * result + (getUpdatedOn() != null ? getUpdatedOn().hashCode() : 0);
+    result = 31 * result + (getUpdatedBy() != null ? getUpdatedBy().hashCode() : 0);
     return result;
   }
 
   @Override
   public String toString() {
-    return "DistributedInstance{" + "id='" + id + '\'' + ", name='" + name + '\'' + ", nameIdentifier='"
-      + nameIdentifier + '\'' + ", description='" + description + '\'' + ", accessKeyId='" + accessKeyId + '\''
-      + ", username='" + username + '\'' + ", lastSyncDate=" + lastSyncDate + ", status=" + status + ", createdOn="
-      + createdOn + ", createdBy='" + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\''
-      + '}';
-  }
-
-  /**
-   * Choose the {@link List} to pass to the incremet method by the given type
-   * 
-   * @param type
-   *          type of {@link List}
-   * @param entityClass
-   *          the entity class name.
-   */
-  @JsonIgnore
-  public void incrementEntityCounters(final String type, final String entityClass) {
-    if (checkIfExistsEntitySummary(entitySummaries, entityClass)) {
-      for (EntitySummary entitySummary : entitySummaries) {
-        if (entitySummary.getEntityClass().equals(entityClass)) {
-          entitySummary.increment(type);
-        }
-      }
-    } else {
-      EntitySummary newEntitySummary = new EntitySummary();
-      newEntitySummary.setEntityClass(entityClass);
-      newEntitySummary.increment(type);
-      entitySummaries.add(newEntitySummary);
-    }
-  }
-
-  /**
-   * Uses the given {@link String} type to choose the list to sum the value.
-   * 
-   * @param type
-   *          the type
-   * @param entityClass
-   *          the entity class name.
-   * @param value
-   *          the value to sum to the list.
-   */
-  @JsonIgnore
-  public void sumValueToEntitiesCounter(final String type, final String entityClass, final int value) {
-    if (checkIfExistsEntitySummary(entitySummaries, entityClass)) {
-      for (EntitySummary entitySummary : entitySummaries) {
-        if (entitySummary.getEntityClass().equals(entityClass)) {
-          entitySummary.sumValue(type, value);
-        }
-      }
-    } else {
-      EntitySummary newEntitySummary = new EntitySummary();
-      newEntitySummary.setEntityClass(entityClass);
-      newEntitySummary.sumValue(type, value);
-      entitySummaries.add(newEntitySummary);
-    }
-  }
-
-  /**
-   * Checks if exists the entity in the given {@link List}
-   * 
-   * @param entitySummaries
-   *          {@link List}
-   * @param entityClass
-   *          the entity class name
-   * @return true if exists, false if not exists
-   */
-  @JsonIgnore
-  private boolean checkIfExistsEntitySummary(final List<EntitySummary> entitySummaries, final String entityClass) {
-    boolean found = false;
-    for (EntitySummary entitySummary : entitySummaries) {
-      if (entitySummary.getEntityClass().equals(entityClass)) {
-        found = true;
-        break;
-      }
-    }
-    return found;
-  }
-
-  /**
-   * Clean all {@link List} (removedEntitiesSummary, updatedEntitiesSummary,
-   * syncErrorsSummary).
-   */
-  @JsonIgnore
-  public void cleanEntitiesSummaries() {
-    entitySummaries = new ArrayList<>();
-  }
-
-  /**
-   * Get the total of issues (Errors) in synchronization.
-   * 
-   * @return the total of issues.
-   */
-  @JsonIgnore
-  public int getSyncErrors() {
-    int errors = 0;
-    for (EntitySummary entitySummary : entitySummaries) {
-      errors += entitySummary.getCountIssues();
-    }
-    return errors;
+    return "DistributedInstance{" + "id='" + getId() + '\'' + ", name='" + getName() + '\'' + ", description='"
+      + description + '\'' + ", accessKeyId='" + accessKeyId + '\'' + ", username='" + username + '\''
+      + ", lastSyncDate=" + getLastSynchronizationDate() + ", status=" + status + ", createdOn=" + getCreatedOn()
+      + ", createdBy='" + getCreatedBy() + '\'' + ", updatedOn=" + getUpdatedOn() + ", updatedBy='" + getUpdatedBy()
+      + '\'' + '}';
   }
 }

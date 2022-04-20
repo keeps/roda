@@ -28,9 +28,9 @@ import java.nio.file.Path;
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 
-public class DistributedInstancesUtils {
+public class RODAInstanceUtils {
 
-  private DistributedInstancesUtils() {
+  private RODAInstanceUtils() {
     // do nothing
   }
 

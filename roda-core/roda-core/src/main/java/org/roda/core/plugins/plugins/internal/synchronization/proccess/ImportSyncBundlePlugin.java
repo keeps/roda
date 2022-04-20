@@ -190,7 +190,7 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
       Path bundleWorkingDir = null;
       try {
         DistributedInstance distributedInstance = model.retrieveDistributedInstance(instanceIdentifier);
-        distributedInstance.cleanEntitiesSummaries();
+        distributedInstance.cleanEntitySummaryList();
         bundleWorkingDir = SyncUtils.extractBundle(instanceIdentifier, Paths.get(bundlePath));
         BundleState bundleState = SyncUtils.getIncomingBundleState(instanceIdentifier);
         importStorage(model, index, storage, cachedJob, bundleWorkingDir, bundleState, jobPluginInfo, report);
@@ -205,7 +205,7 @@ public class ImportSyncBundlePlugin extends AbstractPlugin<Void> {
         ImportUtils.validateEntitiesBundle(index, bundleWorkingDir, bundleState.getValidationEntityList(),
           distributedInstance, syncErrors);
 
-        distributedInstance.setLastSyncDate(bundleState.getToDate());
+        distributedInstance.setLastSynchronizationDate(bundleState.getToDate());
 
         ImportUtils.updateEntityCounter(bundleState, distributedInstance);
 

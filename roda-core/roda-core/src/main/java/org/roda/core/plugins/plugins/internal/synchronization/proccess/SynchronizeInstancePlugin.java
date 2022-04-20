@@ -142,7 +142,7 @@ public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAO
       bundleState = SyncUtils.createBundleState(localInstance.getId());
       DistributedInstance distributedInstance = SyncUtils.requestInstanceStatus(localInstance);
       setValidationEntitiesFilePaths();
-      bundleState.setFromDate(distributedInstance.getLastSyncDate());
+      bundleState.setFromDate(distributedInstance.getLastSynchronizationDate());
       try {
         SyncUtils.createLocalInstanceLists(bundleState, localInstance.getId());
       } catch (IOException | GenericException e) {

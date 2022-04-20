@@ -52,7 +52,7 @@ public class SyncBundleHelper {
 
     Files.createDirectories(bundlePath);
     bundleState.setDestinationPath(localInstance.getBundlePath());
-    bundleState.setFromDate(distributedInstance.getLastSyncDate());
+    bundleState.setFromDate(distributedInstance.getLastSynchronizationDate());
     bundleState.setToDate(new Date());
     bundleState.setId(IdUtils.createUUID());
     Path bundleStateFilePath = Paths.get(localInstance.getBundlePath()).resolve(STATE_FILE);

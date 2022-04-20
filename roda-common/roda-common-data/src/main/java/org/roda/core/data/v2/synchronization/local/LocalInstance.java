@@ -1,54 +1,31 @@
 package org.roda.core.data.v2.synchronization.local;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.IsModelObject;
+import org.roda.core.data.v2.synchronization.RODAInstance;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.roda.core.data.v2.synchronization.EntitySummary;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 @javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_LOCAL_INSTANCE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class LocalInstance implements IsModelObject {
-  private static final int VERSION = 1;
+public class LocalInstance extends RODAInstance {
+
   private static final long serialVersionUID = -1056506624373739060L;
 
-  private String id;
   private String accessKey;
   private String centralInstanceURL;
   private String bundlePath;
   private Boolean isRegistered;
-  private Date lastSynchronizationDate;
 
   private LocalInstanceIdentifierState instanceIdentifierState = LocalInstanceIdentifierState.INACTIVE;
 
-  private Date createdOn;
-  private String createdBy;
-  private Date updatedOn;
-  private String updatedBy;
-
-  private List<EntitySummary> entitySummaryList;
-
   public LocalInstance() {
     isRegistered = false;
-    entitySummaryList = new ArrayList<>();
-  }
-
-  @Override
-  public String getId() {
-    return id;
-  }
-
-  public void setId(String id) {
-    this.id = id;
+    cleanEntitySummaryList();
   }
 
   public String getAccessKey() {
@@ -83,58 +60,12 @@ public class LocalInstance implements IsModelObject {
     isRegistered = registered;
   }
 
-  public Date getLastSynchronizationDate() {
-    return lastSynchronizationDate;
-  }
-
-  public void setLastSynchronizationDate(Date lastSynchronizationDate) {
-    this.lastSynchronizationDate = lastSynchronizationDate;
-  }
-
-  public Date getCreatedOn() {
-    return createdOn;
-  }
-
-  public void setCreatedOn(Date createdOn) {
-    this.createdOn = createdOn;
-  }
-
-  public String getCreatedBy() {
-    return createdBy;
-  }
-
-  public void setCreatedBy(String createdBy) {
-    this.createdBy = createdBy;
-  }
-
-  public Date getUpdatedOn() {
-    return updatedOn;
-  }
-
-  public void setUpdatedOn(Date updatedOn) {
-    this.updatedOn = updatedOn;
-  }
-
-  public String getUpdatedBy() {
-    return updatedBy;
-  }
-
-  public void setUpdatedBy(String updatedBy) {
-    this.updatedBy = updatedBy;
-  }
-
   public LocalInstanceIdentifierState getInstanceIdentifierState() {
     return instanceIdentifierState;
   }
 
   public void setInstanceIdentifierState(LocalInstanceIdentifierState instanceIdentifierState) {
     this.instanceIdentifierState = instanceIdentifierState;
-  }
-
-  @JsonIgnore
-  @Override
-  public int getClassVersion() {
-    return VERSION;
   }
 
   @Override
@@ -144,34 +75,28 @@ public class LocalInstance implements IsModelObject {
     if (o == null || getClass() != o.getClass())
       return false;
     LocalInstance that = (LocalInstance) o;
-    return Objects.equals(id, that.id) && Objects.equals(accessKey, that.accessKey)
+    return Objects.equals(getId(), that.getId()) && Objects.equals(accessKey, that.accessKey)
       && Objects.equals(centralInstanceURL, that.centralInstanceURL) && Objects.equals(bundlePath, that.bundlePath)
       && Objects.equals(isRegistered, that.isRegistered)
-      && Objects.equals(lastSynchronizationDate, that.lastSynchronizationDate)
-      && instanceIdentifierState == that.instanceIdentifierState && Objects.equals(createdOn, that.createdOn)
-      && Objects.equals(createdBy, that.createdBy) && Objects.equals(updatedOn, that.updatedOn)
-      && Objects.equals(updatedBy, that.updatedBy);
+      && Objects.equals(getLastSynchronizationDate(), that.getLastSynchronizationDate())
+      && instanceIdentifierState == that.instanceIdentifierState && Objects.equals(getCreatedOn(), that.getCreatedOn())
+      && Objects.equals(getCreatedBy(), that.getCreatedBy()) && Objects.equals(getUpdatedOn(), that.getUpdatedOn())
+      && Objects.equals(getUpdatedBy(), that.getUpdatedBy());
   }
 
   @Override
   public int hashCode() {
-    int result = id != null ? id.hashCode() : 0;
+    int result = getId() != null ? getId().hashCode() : 0;
     result = 31 * result + (accessKey != null ? accessKey.hashCode() : 0);
     result = 31 * result + (centralInstanceURL != null ? centralInstanceURL.hashCode() : 0);
     result = 31 * result + (bundlePath != null ? bundlePath.hashCode() : 0);
     result = 31 * result + (isRegistered != null ? isRegistered.hashCode() : 0);
-    result = 31 * result + (lastSynchronizationDate != null ? lastSynchronizationDate.hashCode() : 0);
-    result = 31 * result + (createdOn != null ? createdOn.hashCode() : 0);
-    result = 31 * result + (createdBy != null ? createdBy.hashCode() : 0);
-    result = 31 * result + (updatedOn != null ? updatedOn.hashCode() : 0);
-    result = 31 * result + (updatedBy != null ? updatedBy.hashCode() : 0);
+    result = 31 * result + (getLastSynchronizationDate() != null ? getLastSynchronizationDate().hashCode() : 0);
+    result = 31 * result + (getCreatedOn() != null ? getCreatedOn().hashCode() : 0);
+    result = 31 * result + (getCreatedBy() != null ? getCreatedBy().hashCode() : 0);
+    result = 31 * result + (getCreatedOn() != null ? getUpdatedOn().hashCode() : 0);
+    result = 31 * result + (getUpdatedBy() != null ? getUpdatedBy().hashCode() : 0);
     return result;
   }
-
-  public void cleanEntitySummaryList() {
-    entitySummaryList = new ArrayList<>();
-  }
-
-  
 
 }

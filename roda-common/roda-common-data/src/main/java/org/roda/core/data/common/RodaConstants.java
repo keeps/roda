@@ -1817,9 +1817,8 @@ public final class RodaConstants {
   public static final String SYNCHRONIZATION_VALIDATION_AIP_FILE_PATH = "validation/aip_validation_list.json";
   public static final String SYNCHRONIZATION_VALIDATION_DIP_FILE_PATH = "validation/dip_validation_list.json";
   public static final String SYNCHRONIZATION_VALIDATION_RISK_INCIDENT_FILE_PATH = "validation/risk_incident_validation_list.json";
-  public static final String SYNCHRONIZATION_LOCAL_INSTANCE_AIP_LIST_FILE_NAME = "aip_list";
-  public static final String SYNCHRONIZATION_LOCAL_INSTANCE_DIP_LIST_FILE_NAME = "dip_list";
-  public static final String SYNCHRONIZATION_LOCAL_INSTANCE_RISK_LIST_FILE_NAME = "risk_list";
+  public static final String SYNCHRONIZATION_VALIDATION_REPRESENTATION_INFORMATION_FILE_PATH = "validation/representation_information_validation_list.json";
+  public static final String SYNCHRONIZATION_VALIDATION_RISK_FILE_PATH = "validation/risk_validation_list.json";
 
   public static final String SYNCHRONIZATION_REPORT_FILE = "last_synchronization";
   public static final String SYNCHRONIZATION_ISSUES_FILE = "issues";

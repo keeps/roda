@@ -34,6 +34,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.plugins.internal.synchronization.ImportUtils;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,6 +151,9 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
           final int jobs = createJobs(localInstance.getId(), index);
           final BundleState bundleState = SyncUtils.getIncomingBundleState(localInstance.getId());
           final int imported = SyncUtils.importStorage(storage, bundleWorkingDir, bundleState, jobPluginInfo, false);
+
+          ImportUtils.deleteBundleEntities(model, index, cachedJob, this, jobPluginInfo, localInstance,
+                  bundleWorkingDir, bundleState.getValidationEntityList(), report);
 
           outcomeDetailsText = "Received " + jobs + " jobs. Imported " + imported
             + " representations information and risks from Central";
