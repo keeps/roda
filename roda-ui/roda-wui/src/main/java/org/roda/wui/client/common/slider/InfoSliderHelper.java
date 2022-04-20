@@ -383,7 +383,6 @@ public class InfoSliderHelper {
 
         if (StringUtils.isNotBlank(fileFormat.getMimeType())) {
           values.put(messages.viewRepresentationInfoMimetype(), createMimetypeHTML(bundle, fileFormat.getMimeType()));
-          values.put(messages.viewRepresentationInfoMimetype(), createMimetypeHTML(bundle, fileFormat.getMimeType()));
         }
 
         if (StringUtils.isNotBlank(fileFormat.getFormatDesignationName())) {
