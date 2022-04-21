@@ -6,6 +6,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.roda.core.data.v2.ri.RepresentationInformation;
+import org.roda.core.data.v2.risks.Risk;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>

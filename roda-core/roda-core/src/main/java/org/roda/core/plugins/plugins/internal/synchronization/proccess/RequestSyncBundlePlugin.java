@@ -153,7 +153,9 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
           final int imported = SyncUtils.importStorage(storage, bundleWorkingDir, bundleState, jobPluginInfo, false);
 
           ImportUtils.deleteBundleEntities(model, index, cachedJob, this, jobPluginInfo, localInstance,
-                  bundleWorkingDir, bundleState.getValidationEntityList(), report);
+            bundleWorkingDir, bundleState.getValidationEntityList(), report);
+
+          ImportUtils.reindexFromFile(model, index, bundleState, jobPluginInfo, report, bundleWorkingDir);
 
           outcomeDetailsText = "Received " + jobs + " jobs. Imported " + imported
             + " representations information and risks from Central";

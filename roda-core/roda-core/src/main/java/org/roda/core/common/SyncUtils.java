@@ -53,12 +53,10 @@ import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
-import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.plugins.plugins.internal.synchronization.ImportUtils;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
@@ -380,6 +378,7 @@ public class SyncUtils {
         instanceIdentifier, validationList);
       final boolean createdRiskBundle = createCentralRiskPackageState(instanceIdentifier, validationList);
       bundleState.setValidationEntityList(validationList);
+      updateBundleState(bundleState,instanceIdentifier);
       if (createdJobsBundle || createdRepresentationInformationBundle || createdRiskBundle) {
         SyncUtils.buildBundleStateFile(instanceIdentifier);
         return createBundleStreamResponse(compressBundle(instanceIdentifier));
@@ -441,7 +440,6 @@ public class SyncUtils {
     AuthorizationDeniedException, AlreadyExistsException {
     boolean createdBundle = false;
     final Filter filter = new Filter();
-    final PackageState representationPackageState = new PackageState();
     final IterableIndexResult<RepresentationInformation> representationInformations = RodaCoreFactory.getIndexService()
       .findAll(RepresentationInformation.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
 
@@ -453,6 +451,8 @@ public class SyncUtils {
 
       final StoragePath representationInformationContainerPath = ModelUtils.getRepresentationInformationContainerPath();
 
+      final PackageState representationPackageState = createEntityPackageState(instanceIdentifier,
+        "representationInformation");
       representationPackageState.setClassName(RepresentationInformation.class);
       representationPackageState.setCount((int) representationInformations.getTotalCount());
       Path filePath = getSyncBundleWorkingDirectory(OUTCOME_PREFIX, instanceIdentifier)
@@ -469,6 +469,7 @@ public class SyncUtils {
           destinationPath.resolve(representationInformationFile), representationInformationFile);
         writeString(representationInformation.getId());
       }
+      SyncUtils.updateEntityPackageState(instanceIdentifier, "representationInformation", representationPackageState);
       close(true);
       createdBundle = true;
     }
@@ -480,7 +481,6 @@ public class SyncUtils {
     final List<PackageState> validationList) throws RequestNotValidException, GenericException, IOException,
     AuthorizationDeniedException, AlreadyExistsException {
     boolean createdBundle = false;
-    final PackageState riskPackageState = new PackageState();
     final Filter filter = new Filter();
 
     final IterableIndexResult<IndexedRisk> risks = RodaCoreFactory.getIndexService().findAll(IndexedRisk.class, filter,
@@ -495,7 +495,7 @@ public class SyncUtils {
       final StoragePath riskContainerPath = ModelUtils.getRiskContainerPath();
       Path filePath = getSyncBundleWorkingDirectory(OUTCOME_PREFIX, instanceIdentifier)
         .resolve(RodaConstants.SYNCHRONIZATION_VALIDATION_RISK_FILE_PATH);
-
+      final PackageState riskPackageState = createEntityPackageState(instanceIdentifier, "risk");
       riskPackageState.setClassName(Risk.class);
       riskPackageState.setCount((int) risks.getTotalCount());
       riskPackageState.setFilePath(RodaConstants.SYNCHRONIZATION_VALIDATION_RISK_FILE_PATH);
@@ -506,6 +506,7 @@ public class SyncUtils {
         final String riskFile = risk.getId() + RodaConstants.RISK_FILE_EXTENSION;
         storage.copy(storage, riskContainerPath, destinationPath.resolve(riskFile), riskFile);
       }
+      SyncUtils.updateEntityPackageState(instanceIdentifier, "risk", riskPackageState);
       close(true);
       createdBundle = true;
     }
@@ -665,7 +666,7 @@ public class SyncUtils {
    *           if some error occurs.
    */
   public static int importStorage(final StorageService storage, final Path tempDirectory, final BundleState bundleState,
-                                  final JobPluginInfo jobPluginInfo, final boolean moveJob) throws GenericException, NotFoundException,
+    final JobPluginInfo jobPluginInfo, final boolean moveJob) throws GenericException, NotFoundException,
     AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, JobAlreadyStartedException {
     int count = 0;
     final FileStorageService temporaryStorage = new FileStorageService(
