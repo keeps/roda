@@ -7,6 +7,11 @@
  */
 package org.roda.core.plugins;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.hasSize;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -26,7 +31,6 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
 import org.hamcrest.core.Is;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
@@ -396,7 +400,7 @@ public class InternalPluginsTest {
 
     List<String> suggest = index.suggest(IndexedFile.class, RodaConstants.FILE_FORMAT_MIMETYPE,
       mimetype.substring(0, 1), null, false, false);
-    MatcherAssert.assertThat(suggest, Matchers.contains(mimetype));
+    MatcherAssert.assertThat(suggest, contains(mimetype));
 
     Plugin<? extends IsRODAObject> plugin = RodaCoreFactory.getPluginManager()
       .getPlugin(SiegfriedPlugin.class.getName());
@@ -497,7 +501,7 @@ public class InternalPluginsTest {
 
     List<String> suggest = index.suggest(IndexedFile.class, RodaConstants.FILE_FORMAT_MIMETYPE,
       mimetype.substring(0, 1), null, false, false);
-    MatcherAssert.assertThat(suggest, Matchers.contains(mimetype));
+    MatcherAssert.assertThat(suggest, contains(mimetype));
 
     Plugin<? extends IsRODAObject> plugin = RodaCoreFactory.getPluginManager()
       .getPlugin(SiegfriedPlugin.class.getName());
@@ -598,7 +602,7 @@ public class InternalPluginsTest {
 
     List<String> suggest = index.suggest(IndexedFile.class, RodaConstants.FILE_FORMAT_MIMETYPE,
       mimetype.substring(0, 1), null, false, false);
-    MatcherAssert.assertThat(suggest, Matchers.contains(mimetype));
+    MatcherAssert.assertThat(suggest, contains(mimetype));
 
     Plugin<? extends IsRODAObject> plugin = RodaCoreFactory.getPluginManager()
       .getPlugin(SiegfriedPlugin.class.getName());
@@ -683,16 +687,12 @@ public class InternalPluginsTest {
       aip.getRepresentations().get(0).getId());
     final Representation representation = PremisV3Utils.binaryToRepresentation(binary.getContent(), false);
 
-    List<String> relatedObjectIdentifierValue = new ArrayList<>();
-    relatedObjectIdentifierValue.add(
-      representation.getRelationship().get(0).getRelatedObjectIdentifier().get(0).getRelatedObjectIdentifierValue());
-    relatedObjectIdentifierValue.add(
-      representation.getRelationship().get(1).getRelatedObjectIdentifier().get(0).getRelatedObjectIdentifierValue());
+    List<String> collect = representation.getRelationship().stream()
+      .map(p -> p.getRelatedObjectIdentifier().get(0).getRelatedObjectIdentifierValue()).collect(Collectors.toList());
 
-    List<String> toBecheckedAgainst = new ArrayList<>();
-    toBecheckedAgainst.add("urn:roda:premis:file:f2-image (1).png");
-    toBecheckedAgainst.add("urn:roda:premis:file:f1-image (1).png");
+    assertThat(collect, hasSize(2));
 
-    Assert.assertTrue(relatedObjectIdentifierValue.containsAll(toBecheckedAgainst));
+    assertThat(collect,
+      containsInAnyOrder("urn:roda:premis:file:f2-image (1).png", "urn:roda:premis:file:f1-image (1).png"));
   }
 }

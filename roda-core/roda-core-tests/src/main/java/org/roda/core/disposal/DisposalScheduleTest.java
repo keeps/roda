@@ -162,7 +162,9 @@ public class DisposalScheduleTest {
 
     // Associate AIP with Disposal schedule
     DisposalAIPMetadata disposal = new DisposalAIPMetadata();
-    disposal.setSchedule(new DisposalScheduleAIPMetadata());
+    DisposalScheduleAIPMetadata disposalScheduleAIPMetadata = new DisposalScheduleAIPMetadata();
+    disposalScheduleAIPMetadata.setAssociationType(AIPDisposalScheduleAssociationType.MANUAL);
+    disposal.setSchedule(disposalScheduleAIPMetadata);
     disposal.getSchedule().setId(disposalSchedule.getId());
     aip.setDisposal(disposal);
 
