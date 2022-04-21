@@ -10,6 +10,7 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -94,11 +95,24 @@ public abstract class DefaultMultipleStepPlugin<T extends IsRODAObject> extends 
   }
 
   @Override
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+    return null;
+  }
+
+  @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
 
     getParameterValues().put(RodaConstants.PLUGIN_PARAMS_TOTAL_STEPS, Integer.toString(getTotalSteps()));
     getParameterValues().put(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS, getClass().getName());
+  }
+
+  /**
+   * Method to return Plugin type (so it can be grouped for different purposes)
+   */
+  @Override
+  public PluginType getType() {
+    return PluginType.MULTI;
   }
 
   public int getTotalSteps() {
