@@ -133,7 +133,8 @@ public class AppraisalPlugin extends AbstractPlugin<AIP> {
 
       String userAgentId;
       try {
-        PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(job.getUsername(), model, index, true);
+        PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(job.getUsername(), model, index,
+          true);
         userAgentId = pm.getId();
       } catch (AlreadyExistsException e) {
         userAgentId = IdUtils.getUserAgentId(job.getUsername());
@@ -172,7 +173,7 @@ public class AppraisalPlugin extends AbstractPlugin<AIP> {
 
               model.createPreservationMetadata(PreservationMetadata.PreservationMetadataType.EVENT, id, aipId, null,
                 null, null, premisEvent, true);
-            } catch (AlreadyExistsException /*| ValidationException*/ e) {
+            } catch (AlreadyExistsException /* | ValidationException */ e) {
               throw new GenericException(e);
             }
 
@@ -214,11 +215,12 @@ public class AppraisalPlugin extends AbstractPlugin<AIP> {
           StringBuilder outcomeText = new StringBuilder().append("The AIP '").append(aip.getId()).append("' was ");
           if (accept) {
             outcomeText.append("accepted into the repository.");
+
           } else {
             outcomeText.append("rejected from the repository.");
           }
 
-          model.createUpdateAIPEvent(aip.getId(), null, null, null, PreservationEventType.APPRAISAL,
+          model.createRepositoryEvent(PreservationEventType.APPRAISAL,
             "The process of updating an non active object of the repository", state, outcomeText.toString(), null,
             job.getUsername(), true);
 

@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
+import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -35,19 +36,24 @@ import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.plugins.ingest.v2.MinimalIngestPlugin;
+import org.roda.core.plugins.plugins.internal.AppraisalPlugin;
+import org.roda.core.storage.Binary;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +65,7 @@ import org.testng.annotations.Test;
 
 import com.google.common.collect.Iterables;
 
+import gov.loc.premis.v3.EventComplexType;
 import jersey.repackaged.com.google.common.collect.Lists;
 
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
@@ -320,5 +327,58 @@ public class MinimalIngestPluginTest {
         Assert.assertFalse(transferredResource.getFullPath().contains(baseFolder));
       });
     }
+  }
+
+  @Test
+  public void testRejectRepositoryEventInAppraisalPlugin()
+    throws AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, NotFoundException,
+    IOException, IsStillUpdatingException, GenericException, ValidationException {
+    TransferredResource transferredResource = EARKSIPPluginsTest.createIngestCorpora(corporaPath, index);
+    Assert.assertNotNull(transferredResource);
+
+    String parentId = null;
+    String aipType = RodaConstants.AIP_TYPE_MIXED;
+    AIP root = model.createAIP(parentId, aipType, new Permissions(), RodaConstants.ADMIN);
+
+    HashMap<String, String> parameters = new HashMap<>();
+    parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
+    parameters.put(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "true");
+    parameters.put(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT, "false");
+    // ingest corpora
+    Job job = TestsHelper.executeJob(MinimalIngestPlugin.class, parameters, PluginType.SIP_TO_AIP,
+      SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
+
+    index.commitAIPs();
+
+    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10),
+      new ArrayList<>());
+
+    IndexedAIP indexedAIP = find.getResults().get(0);
+
+    HashMap<String, String> parametersAppraisal = new HashMap<>();
+    parametersAppraisal.put(RodaConstants.PLUGIN_PARAMS_ACCEPT, "false");
+
+    AIP aip = model.retrieveAIP(indexedAIP.getId());
+    SelectedItemsList<AIP> indexedAIPSelectedItemsList = SelectedItemsList.create(AIP.class, aip.getId());
+
+    TestsHelper.executeJob(AppraisalPlugin.class, parametersAppraisal, PluginType.AIP_TO_AIP,
+      indexedAIPSelectedItemsList);
+
+    IndexResult<IndexedPreservationEvent> indexedPreservationEventIndexResult = index.find(
+      IndexedPreservationEvent.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS,
+        IndexedPreservationEvent.PreservationMetadataEventClass.REPOSITORY.toString())),
+      Sorter.NONE, new Sublist(0, 5), new ArrayList<>());
+
+    Assert.assertEquals(indexedPreservationEventIndexResult.getTotalCount(), 1);
+
+    Binary event_bin = model.retrievePreservationEvent(null, null, null, null,
+      indexedPreservationEventIndexResult.getResults().get(0).getId());
+    EventComplexType event = PremisV3Utils.binaryToEvent(event_bin.getContent(), true);
+    String outcomeDetail = event.getEventOutcomeInformation().get(0).getEventOutcomeDetail().get(0)
+      .getEventOutcomeDetailNote().get(0);
+
+    Assert.assertEquals("The AIP '" + aip.getId() + "' was rejected from the repository.", outcomeDetail);
   }
 }
