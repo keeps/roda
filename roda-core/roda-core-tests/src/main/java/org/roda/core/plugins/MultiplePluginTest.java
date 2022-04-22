@@ -53,8 +53,6 @@ public class MultiplePluginTest {
   private static StorageService corporaService;
   private static Path corporaPath;
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(MultiplePluginTest.class);
-
   @BeforeClass
   public void setUp() throws Exception {
     basePath = TestsHelper.createBaseTempDir(getClass(), true);
