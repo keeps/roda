@@ -21,6 +21,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -44,14 +45,12 @@ import org.testng.annotations.Test;
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
 public class MultiplePluginTest {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(MultiplePluginTest.class);
   private static Path basePath;
-
   private static ModelService model;
   private static IndexService index;
   private static StorageService corporaService;
   private static Path corporaPath;
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(MultiplePluginTest.class);
 
   @BeforeClass
   public void setUp() throws Exception {
@@ -86,7 +85,7 @@ public class MultiplePluginTest {
   @Test
   public void testMultiplePlugin() throws RODAException {
     // generate AIP ID
-    final String aipCorporaId = CorporaConstants.SOURCE_AIP_ID_3;
+    final String aipCorporaId = CorporaConstants.SOURCE_AIP_WITHOUT_REP;
     final String aipId = IdUtils.createUUID();
     final DefaultStoragePath aipPath = DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, aipCorporaId);
     model.createAIP(aipId, corporaService, aipPath, RodaConstants.ADMIN);
@@ -100,5 +99,6 @@ public class MultiplePluginTest {
     Assert.assertEquals(jobReports.get(0).getReports().size(), 3);
     Assert.assertEquals(jobReports.get(0).getTotalSteps().intValue(), 3);
     Assert.assertEquals(jobReports.get(0).getCompletionPercentage().intValue(), 100);
+    Assert.assertEquals(jobReports.get(0).getPluginState(), PluginState.SUCCESS);
   }
 }

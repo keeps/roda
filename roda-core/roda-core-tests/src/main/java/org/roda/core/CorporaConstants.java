@@ -25,6 +25,7 @@ public final class CorporaConstants {
   public static final String SOURCE_AGENT_CONTAINER = RodaConstants.STORAGE_CONTAINER_AGENT;
   public static final String SOURCE_AIP_ID = "AIP_1";
   public static final String SOURCE_AIP_ID_3 = "AIP_3";
+  public static final String SOURCE_AIP_WITHOUT_REP = "AIP_WITHOUT_REP";
   public static final String SOURCE_AIP_VERSION_EAD_3 = "AIP_VERSION_EAD_3";
   public static final String SOURCE_AIP_VERSION_EAD_UNKNOWN = "AIP_VERSION_EAD_UNKNOWN";
   public static final String SOURCE_AIP_BUGGY_ID = "AIP_BUGGY";

@@ -28,9 +28,9 @@ import org.roda.core.storage.StorageService;
 public class MultiplePlugin extends DefaultMultipleStepPlugin<AIP> {
   private static List<Step> steps = new ArrayList<>();
   static {
-    steps.add(new Step(AntivirusPlugin.class.getName(), RodaConstants.PLUGIN_PARAMS_DO_VIRUS_CHECK, true, true));
     steps.add(new Step(PremisSkeletonPlugin.class.getName(), "", true, true));
     steps.add(new Step(SiegfriedPlugin.class.getName(), "", true, true));
+    steps.add(new Step(AntivirusPlugin.class.getName(), "", true, true));
   }
 
   private final Map<String, PluginParameter> pluginParameters = new HashMap<>();

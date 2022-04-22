@@ -1,7 +1,6 @@
 package org.roda.core.plugins.orchestrate;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,8 +102,10 @@ public class MultipleJobPluginInfo extends JobPluginInfo {
     int countSuccess = 0;
     int countPartialSuccess = 0;
     int countFailure = 0;
+    int countSkipped = 0;
+
     for (List<Report> reports : getAllReports().values()) {
-      PluginState pluginState = PluginState.SUCCESS;
+      PluginState pluginState = PluginState.SKIPPED;
       for (Report report : reports) {
         switch (report.getPluginState()) {
           case FAILURE:
@@ -113,6 +114,9 @@ public class MultipleJobPluginInfo extends JobPluginInfo {
           case PARTIAL_SUCCESS:
             if (!PluginState.FAILURE.equals(pluginState))
               pluginState = PluginState.PARTIAL_SUCCESS;
+            break;
+          case SUCCESS:
+            pluginState = PluginState.SUCCESS;
             break;
           default:
             break;
@@ -128,6 +132,9 @@ public class MultipleJobPluginInfo extends JobPluginInfo {
         case FAILURE:
           countFailure++;
           break;
+        case SKIPPED:
+          countSkipped++;
+          break;
         default:
           break;
       }
@@ -136,7 +143,7 @@ public class MultipleJobPluginInfo extends JobPluginInfo {
     setSourceObjectsProcessedWithFailure(countFailure);
     setSourceObjectsProcessedWithPartialSuccess(countPartialSuccess);
     setSourceObjectsProcessedWithSuccess(countSuccess);
-    setSourceObjectsProcessedWithSkipped(0);
+    setSourceObjectsProcessedWithSkipped(countSkipped);
   }
 
   @Override
