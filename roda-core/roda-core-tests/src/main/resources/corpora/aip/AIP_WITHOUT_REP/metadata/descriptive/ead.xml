@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ead xmlns="urn:isbn:1-931666-22-9">
+ <eadheader>
+      <eadid />
+      <filedesc>
+         <titlestmt>
+            <titleproper />
+         </titlestmt>
+      </filedesc>
+      <profiledesc>
+         <descrules>Rules</descrules>
+      </profiledesc>
+   </eadheader>
+   <archdesc level="fonds">
+  <did>
+    <unitid repositorycode="PT-KEEPS">395</unitid>
+    <unittitle>My example</unittitle>
+    <unitdate normal="0001-01-01/0002-01-01"></unitdate>
+    <physdesc></physdesc>
+    <origination>KEEPS</origination>
+  </did>
+  <acqinfo>
+	<p>Transfer from <corpname>National Park Service, </corpname>
+	<date normal="2016-06-06" type="accession">2016</date>. Accession number 
+	<num type="accession">1</num>.</p>
+</acqinfo>
+  <scopecontent>
+    <p>This is a very nice example</p>
+  </scopecontent>
+  <note>
+    <p>SIP automatically validated by administrator</p>
+  </note>
+  </archdesc>
+</ead>

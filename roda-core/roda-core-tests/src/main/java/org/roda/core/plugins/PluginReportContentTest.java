@@ -47,8 +47,10 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.ReportUtils;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.base.characterization.SiegfriedPlugin;
@@ -270,7 +272,7 @@ public class PluginReportContentTest {
     AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR);
 
     TransferredResource transferredResource = createCorpora();
-    AssertJUnit.assertEquals(transferredResource == null, false);
+    Assert.assertNotNull(transferredResource);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
@@ -295,9 +297,9 @@ public class PluginReportContentTest {
     Report report = jobReports.get(0);
     AssertJUnit.assertEquals(1, report.getReports().size());
     Report innerReport = report.getReports().get(0);
-    AssertJUnit.assertEquals(false, report.getDateCreated().equals(report.getDateUpdated()));
-    AssertJUnit.assertEquals(true, report.getDateCreated().equals(innerReport.getDateCreated()));
-    AssertJUnit.assertEquals(true, report.getDateUpdated().equals(innerReport.getDateUpdated()));
+    Assert.assertNotEquals(report.getDateUpdated(), report.getDateCreated());
+    Assert.assertEquals(innerReport.getDateCreated(), report.getDateCreated());
+    Assert.assertEquals(innerReport.getDateUpdated(), report.getDateUpdated());
   }
 
   @Test
