@@ -48,7 +48,7 @@ public class ProtocolManagerTest {
 
     assertEquals(httpProtocol.getSchema(), httpUri.getScheme());
 
-    URI fileUri = URI.create("file://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf");
+    URI fileUri = URI.create("file:/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf");
     Protocol fileProtocol = RodaCoreFactory.getProtocol(fileUri);
 
     assertEquals(fileProtocol.getSchema(), fileUri.getScheme());
