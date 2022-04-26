@@ -1,15 +1,28 @@
 package org.roda.core.storage.utils;
 
+import java.nio.file.Path;
+import java.util.Date;
+
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.YamlUtils;
+import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.risks.IndexedRisk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.nio.file.Path;
+import org.roda.core.data.v2.user.User;
+import org.roda.core.index.IndexService;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>

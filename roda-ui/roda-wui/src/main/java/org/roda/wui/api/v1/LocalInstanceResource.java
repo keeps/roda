@@ -3,6 +3,7 @@ package org.roda.wui.api.v1;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -13,12 +14,16 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.server.JSONP;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.storage.utils.LocalInstanceUtils;
 import org.roda.wui.api.controllers.Browser;
+import org.roda.wui.api.controllers.BrowserHelper;
+import org.roda.wui.api.controllers.RODAInstance;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 
@@ -59,6 +64,29 @@ public class LocalInstanceResource {
     LocalInstance localInstance = Browser.retrieveLocalInstance(user);
 
     return Response.ok(localInstance, mediaType).build();
+  }
+
+  @GET
+  @Path("/periodic_verification")
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Consumes("multipart/*")
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful response", response = LocalInstance.class),
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
+  public Response synchronizeIfUpdated(@QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
+    throws RODAException {
+
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+    // get user
+    User user = UserUtility.getApiUser(request);
+    LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
+    Long totalUpdates = RODAInstance.synchronizeIfUpdated(user);
+    String message = "There are no updates";
+    if (totalUpdates > 0) {
+      BrowserHelper.synchronizeBundle(user, localInstance);
+      message = "There are " + totalUpdates + " updates";
+    }
+    return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, message), mediaType).build();
   }
 
   @POST
