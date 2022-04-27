@@ -46,16 +46,16 @@ import org.slf4j.LoggerFactory;
 
 public abstract class InstanceIdentifierRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierRodaEntityPlugin.class);
-
-  private String instanceId;
-
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, "Instance Identifier",
         PluginParameter.PluginParameterType.STRING, RODAInstanceUtils.retrieveLocalInstanceIdentifierToPlugin(), true,
         true, "Identifier from the RODA local instance"));
   }
+
+  private String instanceId;
 
   @Override
   public void init() throws PluginException {

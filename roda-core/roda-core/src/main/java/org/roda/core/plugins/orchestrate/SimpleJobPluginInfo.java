@@ -70,5 +70,4 @@ public class SimpleJobPluginInfo extends JobPluginInfo {
     infoUpdated.setSourceObjectsProcessedWithSkipped(sourceObjectsProcessedWithSkipped);
     return infoUpdated;
   }
-
 }
