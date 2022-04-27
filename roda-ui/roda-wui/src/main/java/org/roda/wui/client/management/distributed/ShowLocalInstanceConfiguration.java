@@ -15,7 +15,6 @@ import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.process.InternalProcess;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
-import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -105,11 +104,7 @@ public class ShowLocalInstanceConfiguration extends Composite {
     IDValue.setText(localInstance.getId());
     centralInstanceURLValue.setText(localInstance.getCentralInstanceURL());
     isRegisteredValue.setText(localInstance.getIsRegistered().toString());
-    if (localInstance.getLastSynchronizationDate() != null) {
-      lastSyncValue.setText(Humanize.formatDateTime(localInstance.getLastSynchronizationDate()));
-    } else {
-      lastSyncValue.setText("Never");
-    }
+    lastSyncValue.setHTML(HtmlSnippetUtils.getLastSyncHtml(localInstance, false));
     instanceIdStateValue.setHTML(HtmlSnippetUtils.getInstanceIdStateHtml(localInstance));
   }
 

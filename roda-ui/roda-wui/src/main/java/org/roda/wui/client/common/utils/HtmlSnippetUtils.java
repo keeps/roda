@@ -40,6 +40,7 @@ import org.roda.core.data.v2.risks.IncidenceStatus;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.risks.SeverityLevel;
 import org.roda.core.data.v2.synchronization.EntitySummary;
+import org.roda.core.data.v2.synchronization.RODAInstance;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
@@ -787,30 +788,30 @@ public class HtmlSnippetUtils {
     return ret;
   }
 
-  public static SafeHtml getLastSyncHtml(final DistributedInstance distributedInstance) {
+  public static SafeHtml getLastSyncHtml(final RODAInstance rodaInstance, final boolean showIssues) {
     SafeHtml ret = null;
     final SafeHtmlBuilder lastSyncBuilder = new SafeHtmlBuilder();
     // div to last sync date
     lastSyncBuilder.append(SafeHtmlUtils.fromSafeConstant("<div>"));
-    if (distributedInstance.getLastSynchronizationDate() != null) {
+    if (rodaInstance.getLastSynchronizationDate() != null) {
       lastSyncBuilder
-        .append(SafeHtmlUtils.fromString(Humanize.formatDateTime(distributedInstance.getLastSynchronizationDate())));
+        .append(SafeHtmlUtils.fromString(Humanize.formatDateTime(rodaInstance.getLastSynchronizationDate())));
     } else {
       lastSyncBuilder.append(SafeHtmlUtils.fromString(messages.permanentlyRetained()));
     }
     lastSyncBuilder.append(SafeHtmlUtils.fromSafeConstant("</div>"));
 
     // div to entities
-    List<EntitySummary> entitySummaries = distributedInstance.getEntitySummaryList();
+    List<EntitySummary> entitySummaries = rodaInstance.getEntitySummaryList();
     if (entitySummaries != null && !entitySummaries.isEmpty()) {
       lastSyncBuilder.append(SafeHtmlUtils.fromSafeConstant(OPEN_DIV));
       for (final EntitySummary entitySummary : entitySummaries) {
         String entityClassUiName = getNameByEntityClassName(entitySummary.getEntityClass());
         String entityClass = getEntityClassNameSplit(entitySummary.getEntityClass());
-        SafeUri downloadUriRemoved = RestUtils.createLastSynchronizationDownloadUri(distributedInstance.getId(),
-          entityClass, RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_REMOVED);
-        SafeUri downloadUriIssue = RestUtils.createLastSynchronizationDownloadUri(distributedInstance.getId(),
-          entityClass, RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_ISSUE);
+        SafeUri downloadUriRemoved = RestUtils.createLastSynchronizationDownloadUri(rodaInstance.getId(), entityClass,
+          RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_REMOVED);
+        SafeUri downloadUriIssue = RestUtils.createLastSynchronizationDownloadUri(rodaInstance.getId(), entityClass,
+          RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_ISSUE);
 
         lastSyncBuilder.append(SafeHtmlUtils.fromSafeConstant(OPEN_DIV_FONT_STYLE_1_REM));
         lastSyncBuilder.append(SafeHtmlUtils.fromString(entityClassUiName + ": "));
@@ -820,9 +821,10 @@ public class HtmlSnippetUtils {
         createRemovedAndIssuesLink(lastSyncBuilder, entitySummary.getCountRemoved(),
           messages.distributedInstanceRemovedEntitiesLabel(), downloadUriRemoved, "label-warning");
         // Issues
-        createRemovedAndIssuesLink(lastSyncBuilder, entitySummary.getCountIssues(),
-          messages.distributedInstanceSyncErrorsLabel(), downloadUriIssue, "label-danger");
-
+        if (showIssues) {
+          createRemovedAndIssuesLink(lastSyncBuilder, entitySummary.getCountIssues(),
+            messages.distributedInstanceSyncErrorsLabel(), downloadUriIssue, "label-danger");
+        }
         lastSyncBuilder.append(SafeHtmlUtils.fromSafeConstant(ClOSE_DIV));
       }
       lastSyncBuilder.append(SafeHtmlUtils.fromSafeConstant(ClOSE_DIV));

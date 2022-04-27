@@ -130,7 +130,7 @@ public class ShowDistributedInstance extends Composite {
     }
 
     IDValue.setHTML(distributedInstance.getId());
-    lastSyncValue.setHTML(HtmlSnippetUtils.getLastSyncHtml(distributedInstance));
+    lastSyncValue.setHTML(HtmlSnippetUtils.getLastSyncHtml(distributedInstance, true));
 
     statusValue.setHTML(HtmlSnippetUtils.getDistributedInstanceStateHtml(distributedInstance, false));
     if (StringUtils.isNotBlank(distributedInstance.getUsername())) {
