@@ -1,10 +1,10 @@
 package org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier;
 
-import org.roda.core.data.v2.notifications.Notification;
-import org.roda.core.plugins.Plugin;
-
 import java.util.Arrays;
 import java.util.List;
+
+import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.plugins.Plugin;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
