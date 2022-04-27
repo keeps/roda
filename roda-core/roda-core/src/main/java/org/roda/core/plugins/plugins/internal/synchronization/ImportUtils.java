@@ -329,8 +329,7 @@ public class ImportUtils {
             ModelUtils.giveRespectiveModelClass(indexedClass).getName());
         }
         removed = listToRemove.size();
-
-      } catch (final Exception e) {
+      } catch (RequestNotValidException | NotFoundException | GenericException e) {
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         report.addPluginDetails(e.getMessage());
         report.setPluginState(PluginState.FAILURE);
@@ -397,7 +396,7 @@ public class ImportUtils {
    *          number of errors in synchronization
    */
   public static void validateEntitiesBundle(final IndexService index, final Path bundleWorkingDir,
-    final List<PackageState> validationEntityList, final DistributedInstance distributedInstance, int syncErrors) {
+    final List<PackageState> validationEntityList, final DistributedInstance distributedInstance, int syncErrors) throws GenericException {
 
     Path temporaryReportPath = null;
     final List<Path> reportPaths = new ArrayList<>();
@@ -436,7 +435,7 @@ public class ImportUtils {
    *          {@link Class<? extends IsIndexed>}.
    */
   private static int validateCentralEntities(final IndexService index, final Path temporaryReportPath,
-    final Path readPath, final Class<? extends IsIndexed> indexedClass, final DistributedInstance distributedInstance) {
+    final Path readPath, final Class<? extends IsIndexed> indexedClass, final DistributedInstance distributedInstance) throws GenericException {
     String id = null;
     int errors = 0;
     try {
@@ -481,11 +480,11 @@ public class ImportUtils {
     }
   }
 
-  private static void writeJsonLinesReport(final Path path, final Object object) {
+  private static void writeJsonLinesReport(final Path path, final Object object) throws GenericException {
     try {
       JsonUtils.appendObjectToFile(object, path);
     } catch (final GenericException e) {
-      LOGGER.error("Can't write the object in file {} because {}", path, e.getMessage());
+      throw new GenericException("Can't write the object in file" +  path + " because " +  e.getMessage());
     }
   }
 

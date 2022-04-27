@@ -1,8 +1,6 @@
 package org.roda.core.common;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -57,6 +55,7 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.plugins.internal.synchronization.JsonListHelper;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
@@ -68,9 +67,7 @@ import org.roda.core.util.ZipUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 
 /**
@@ -85,9 +82,6 @@ public class SyncUtils {
   private final static String ATTACHMENTS_DIR = "job-attachments";
   private final static String INCOMING_PREFIX = "incoming_sync_";
   private final static String OUTCOME_PREFIX = "outcome_sync_";
-
-  private static OutputStream outputStream = null;
-  private static JsonGenerator jsonGenerator = null;
 
   /**
    * Common Bundle methods
@@ -318,7 +312,13 @@ public class SyncUtils {
     for (PackageState packageState : bundleState.getValidationEntityList()) {
       final Path path = syncBundleWorkingDirectory.resolve(packageState.getFilePath());
       Class<?> indexdedClass = ModelUtils.giveRespectiveIndexedClass(packageState.getClassName());
-      int count = createLocalInstanceList(path, (Class<? extends IsIndexed>) indexdedClass);
+      int count = 0;
+      try {
+        count = createLocalInstanceList(path, (Class<? extends IsIndexed>) indexdedClass);
+      } catch (IOException e) {
+        Files.deleteIfExists(path);
+        throw new RuntimeException("Can't create the file " + path.getFileName() + e);
+      }
       packageState.setCount(count);
     }
   }
@@ -341,23 +341,19 @@ public class SyncUtils {
       filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS,
         IndexedPreservationEvent.PreservationMetadataEventClass.REPOSITORY.toString()));
     }
-    SyncUtils.init(destinationPath);
+    JsonListHelper jsonListHelper = new JsonListHelper(destinationPath);
     int count = 0;
     try (IterableIndexResult<? extends IsIndexed> result = index.findAll(indexedClass, filter, true,
       Collections.singletonList(RodaConstants.INDEX_UUID))) {
       count = (int) result.getTotalCount();
-      result.forEach(indexed -> {
-        try {
-          SyncUtils.writeString(indexed.getId());
-        } catch (final IOException e) {
-          LOGGER.error("Error writing the ID {} {}", indexed.getId(), e);
-        }
-      });
+      jsonListHelper.init();
+      for (IsIndexed indexed : result) {
+        jsonListHelper.writeString(indexed.getId());
+      }
+      jsonListHelper.close();
     } catch (IOException | GenericException | RequestNotValidException e) {
-      LOGGER.error("Error getting iterator when creating aip list", e);
+      throw new IOException("Error getting iterator when creating aip list " + e);
     }
-
-    SyncUtils.close(true);
     return count;
   }
 
@@ -378,7 +374,7 @@ public class SyncUtils {
         instanceIdentifier, validationList);
       final boolean createdRiskBundle = createCentralRiskPackageState(instanceIdentifier, validationList);
       bundleState.setValidationEntityList(validationList);
-      updateBundleState(bundleState,instanceIdentifier);
+      updateBundleState(bundleState, instanceIdentifier);
       if (createdJobsBundle || createdRepresentationInformationBundle || createdRiskBundle) {
         SyncUtils.buildBundleStateFile(instanceIdentifier);
         return createBundleStreamResponse(compressBundle(instanceIdentifier));
@@ -461,16 +457,17 @@ public class SyncUtils {
         .setFilePath(RodaConstants.SYNCHRONIZATION_VALIDATION_REPRESENTATION_INFORMATION_FILE_PATH);
       validationList.add(representationPackageState);
 
-      SyncUtils.init(filePath);
+      JsonListHelper jsonListHelper = new JsonListHelper(filePath);
+      jsonListHelper.init();
       for (RepresentationInformation representationInformation : representationInformations) {
         final String representationInformationFile = representationInformation.getId()
           + RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION;
         storage.copy(storage, representationInformationContainerPath,
           destinationPath.resolve(representationInformationFile), representationInformationFile);
-        writeString(representationInformation.getId());
+        jsonListHelper.writeString(representationInformation.getId());
       }
       SyncUtils.updateEntityPackageState(instanceIdentifier, "representationInformation", representationPackageState);
-      close(true);
+      jsonListHelper.close();
       createdBundle = true;
     }
     return createdBundle;
@@ -500,14 +497,15 @@ public class SyncUtils {
       riskPackageState.setCount((int) risks.getTotalCount());
       riskPackageState.setFilePath(RodaConstants.SYNCHRONIZATION_VALIDATION_RISK_FILE_PATH);
       validationList.add(riskPackageState);
-      init(filePath);
+      JsonListHelper jsonListHelper = new JsonListHelper(filePath);
+      jsonListHelper.init();
       for (IndexedRisk risk : risks) {
-        writeString(risk.getId());
+        jsonListHelper.writeString(risk.getId());
         final String riskFile = risk.getId() + RodaConstants.RISK_FILE_EXTENSION;
         storage.copy(storage, riskContainerPath, destinationPath.resolve(riskFile), riskFile);
       }
       SyncUtils.updateEntityPackageState(instanceIdentifier, "risk", riskPackageState);
-      close(true);
+      jsonListHelper.close();
       createdBundle = true;
     }
     return createdBundle;
@@ -792,62 +790,6 @@ public class SyncUtils {
   }
 
   // Write Bundle JSON Lists
-
-  /**
-   * Init the {@link OutputStream} and the {@link JsonGenerator} and init the json
-   * array.
-   * 
-   * @param path
-   *          {@link Path}
-   * @throws IOException
-   *           if some i/o error occur
-   */
-  public static void init(final Path path) throws IOException {
-    if (!Files.exists(path)) {
-      Files.createFile(path);
-    }
-
-    if (path != null) {
-      outputStream = new BufferedOutputStream(new FileOutputStream(path.toFile()));
-      final JsonFactory jsonFactory = new JsonFactory();
-      jsonGenerator = jsonFactory.createGenerator(outputStream, JsonEncoding.UTF8).useDefaultPrettyPrinter();
-    }
-
-    jsonGenerator.writeStartArray();
-  }
-
-  /**
-   * Write a json string.
-   * 
-   * @param value
-   *          the value.
-   * @throws IOException
-   *           if some i/o error occur
-   */
-  public static void writeString(final String value) throws IOException {
-    jsonGenerator.writeString(value);
-  }
-
-  /**
-   * Close the {@link JsonGenerator} and the {@link OutputStream}.
-   * 
-   * @param closeArray
-   *          if is to close the json array.
-   * @throws IOException
-   *           if some i/o error occur
-   */
-  public static void close(final boolean closeArray) throws IOException {
-    if (closeArray) {
-      jsonGenerator.writeEndArray();
-    }
-
-    if (jsonGenerator != null) {
-      jsonGenerator.close();
-    }
-    if (outputStream != null) {
-      outputStream.close();
-    }
-  }
 
   /**
    * Create {@link JsonParser} to read the file.
