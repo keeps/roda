@@ -1,11 +1,11 @@
 package org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.plugins.Plugin;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>

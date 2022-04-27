@@ -1,5 +1,11 @@
 package org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -30,12 +36,6 @@ import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
  */
@@ -43,15 +43,16 @@ import java.util.Map;
 public class InstanceIdentifierRepositoryEventPlugin extends AbstractPlugin<PreservationMetadata> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierRepositoryEventPlugin.class);
-  private String instanceId;
-
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, "Instance Identifier",
         PluginParameter.PluginParameterType.STRING, RODAInstanceUtils.retrieveLocalInstanceIdentifierToPlugin(), true,
         true, "Identifier from the RODA local instance"));
   }
+
+  private String instanceId;
 
   @Override
   public String getVersionImpl() {
