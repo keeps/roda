@@ -33,7 +33,7 @@ public class FileProtocol extends AbstractProtocol {
 
   public FileProtocol(URI uri) {
     setConnectionString(uri);
-    this.path = Paths.get(URLUtils.decode(uri.getPath()));
+    this.path = Paths.get(uri);
   }
 
   @Override
