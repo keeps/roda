@@ -18,6 +18,8 @@ public class PackageState implements Serializable {
   private List<String> idList = new ArrayList<>();
   private String checksum;
 
+  private String filePath;
+
   public enum Status {
     CREATED, FAILED, SUCCESS
   }
@@ -67,5 +69,13 @@ public class PackageState implements Serializable {
 
   public void setChecksum(String checksum) {
     this.checksum = checksum;
+  }
+
+  public String getFilePath() {
+    return filePath;
+  }
+
+  public void setFilePath(String filePath) {
+    this.filePath = filePath;
   }
 }

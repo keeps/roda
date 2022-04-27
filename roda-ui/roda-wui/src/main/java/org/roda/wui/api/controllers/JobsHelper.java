@@ -54,7 +54,7 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.storage.utils.LocalInstanceUtils;
+import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.slf4j.Logger;
@@ -164,7 +164,7 @@ public class JobsHelper {
   }
 
   private static boolean jobCanRun(String jobInstanceId) {
-    String rodaInstanceId = LocalInstanceUtils.getLocalInstanceIdentifier();
+    String rodaInstanceId = RODAInstanceUtils.getLocalInstanceIdentifier();
 
     if (rodaInstanceId == null && jobInstanceId == null) {
       return true;
@@ -345,7 +345,7 @@ public class JobsHelper {
           IndexedAIP indexedAIP = index.retrieve(IndexedAIP.class, id, Collections.emptyList());
           addItemToInstancesItems(instancesItems, itemsClass, id, indexedAIP.getInstanceId());
         } else {
-          addItemToInstancesItems(instancesItems, itemsClass, id, LocalInstanceUtils.getLocalInstanceIdentifier());
+          addItemToInstancesItems(instancesItems, itemsClass, id, RODAInstanceUtils.getLocalInstanceIdentifier());
         }
       }
     } else {

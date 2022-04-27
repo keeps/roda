@@ -181,7 +181,8 @@ public class DistributedInstancesManagement extends Composite {
           new TextColumn<DistributedInstance>() {
             @Override
             public String getValue(DistributedInstance distributedInstance) {
-              return distributedInstance.getLastSyncDate() != null ? distributedInstance.getLastSyncDate().toString()
+              return distributedInstance.getLastSynchronizationDate() != null
+                ? distributedInstance.getLastSynchronizationDate().toString()
                 : "None";
             }
           }),

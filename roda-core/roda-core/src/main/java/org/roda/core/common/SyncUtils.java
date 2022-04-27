@@ -1,8 +1,6 @@
 package org.roda.core.common;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,10 +12,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
@@ -41,18 +37,15 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
-import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.bundle.AttachmentState;
 import org.roda.core.data.v2.synchronization.bundle.BundleState;
-import org.roda.core.data.v2.synchronization.bundle.EntitiesBundle;
 import org.roda.core.data.v2.synchronization.bundle.PackageState;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
@@ -62,6 +55,7 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.plugins.internal.synchronization.JsonListHelper;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
@@ -73,9 +67,7 @@ import org.roda.core.util.ZipUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 
 /**
@@ -85,12 +77,11 @@ public class SyncUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(SyncUtils.class);
   private final static String STATE_FILE = "state.json";
   private final static String PACKAGES_DIR = "packages";
+
+  private final static String VALIDATION_ENTITIES_DIR = "validation";
   private final static String ATTACHMENTS_DIR = "job-attachments";
   private final static String INCOMING_PREFIX = "incoming_sync_";
   private final static String OUTCOME_PREFIX = "outcome_sync_";
-
-  private static OutputStream outputStream = null;
-  private static JsonGenerator jsonGenerator = null;
 
   /**
    * Common Bundle methods
@@ -202,10 +193,12 @@ public class SyncUtils {
     BundleState bundleState = getOutcomeBundleState(instanceIdentifier);
     Path packagesPath = getSyncBundleWorkingDirectory(OUTCOME_PREFIX, instanceIdentifier).resolve(PACKAGES_DIR);
     List<PackageState> packageStateList = new ArrayList<>();
-    for (File file : FileUtility.listFilesRecursively(packagesPath.toFile())) {
-      PackageState entityPackageState = JsonUtils.readObjectFromFile(Paths.get(file.getPath()), PackageState.class);
-      if (entityPackageState.getClassName() != null) {
-        packageStateList.add(entityPackageState);
+    if (Files.exists(packagesPath)) {
+      for (File file : FileUtility.listFilesRecursively(packagesPath.toFile())) {
+        PackageState entityPackageState = JsonUtils.readObjectFromFile(Paths.get(file.getPath()), PackageState.class);
+        if (entityPackageState.getClassName() != null) {
+          packageStateList.add(entityPackageState);
+        }
       }
     }
     bundleState.setPackageStateList(packageStateList);
@@ -302,18 +295,86 @@ public class SyncUtils {
   }
 
   /**
+   * Iterates over the files in bundle (AIP, DIP, Risks) and creates the Files.
+   *
+   * @param bundleState
+   *          {@link BundleState}.
+   * @throws GenericException
+   *           if some error occurs.
+   * @throws IOException
+   *           if some i/o error occurs.
+   */
+  public static void createLocalInstanceLists(BundleState bundleState, String instanceIdentifier)
+    throws GenericException, IOException {
+    Path syncBundleWorkingDirectory = getSyncBundleWorkingDirectory(OUTCOME_PREFIX, instanceIdentifier);
+    Path validationEntitiesDirectoryPath = syncBundleWorkingDirectory.resolve(VALIDATION_ENTITIES_DIR);
+    Files.createDirectory(validationEntitiesDirectoryPath);
+    for (PackageState packageState : bundleState.getValidationEntityList()) {
+      final Path path = syncBundleWorkingDirectory.resolve(packageState.getFilePath());
+      Class<?> indexdedClass = ModelUtils.giveRespectiveIndexedClass(packageState.getClassName());
+      int count = 0;
+      try {
+        count = createLocalInstanceList(path, (Class<? extends IsIndexed>) indexdedClass);
+      } catch (IOException e) {
+        Files.deleteIfExists(path);
+        throw new RuntimeException("Can't create the file " + path.getFileName() + e);
+      }
+      packageState.setCount(count);
+    }
+  }
+
+  /**
+   * Write the List in the file to bundle.
+   *
+   * @param destinationPath
+   *          {@link Path}.
+   * @param indexedClass
+   *          {@link Class<? extends IsIndexed>}.
+   * @throws IOException
+   *           if some i/o error occurs.
+   */
+  private static int createLocalInstanceList(final Path destinationPath, final Class<? extends IsIndexed> indexedClass)
+    throws IOException {
+    final IndexService index = RodaCoreFactory.getIndexService();
+    final Filter filter = new Filter();
+    if (indexedClass == IndexedPreservationEvent.class) {
+      filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS,
+        IndexedPreservationEvent.PreservationMetadataEventClass.REPOSITORY.toString()));
+    }
+    JsonListHelper jsonListHelper = new JsonListHelper(destinationPath);
+    int count = 0;
+    try (IterableIndexResult<? extends IsIndexed> result = index.findAll(indexedClass, filter, true,
+      Collections.singletonList(RodaConstants.INDEX_UUID))) {
+      count = (int) result.getTotalCount();
+      jsonListHelper.init();
+      for (IsIndexed indexed : result) {
+        jsonListHelper.writeString(indexed.getId());
+      }
+      jsonListHelper.close();
+    } catch (IOException | GenericException | RequestNotValidException e) {
+      throw new IOException("Error getting iterator when creating aip list " + e);
+    }
+    return count;
+  }
+
+  /**
    * Central instance methods
    */
   public static StreamResponse createCentralSyncBundle(String instanceIdentifier) throws GenericException,
     NotFoundException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
     try {
-      createBundleState(instanceIdentifier);
+      BundleState bundleState = createBundleState(instanceIdentifier);
 
+      Path syncBundleWorkingDirectory = getSyncBundleWorkingDirectory(OUTCOME_PREFIX, instanceIdentifier);
+      Path validationEntitiesDirectoryPath = syncBundleWorkingDirectory.resolve(VALIDATION_ENTITIES_DIR);
+      Files.createDirectory(validationEntitiesDirectoryPath);
+      List<PackageState> validationList = new ArrayList<>();
       final boolean createdJobsBundle = createCentralJobsBundle(instanceIdentifier);
       final boolean createdRepresentationInformationBundle = createCentralRepresentationInformationPackageState(
-        instanceIdentifier);
-      final boolean createdRiskBundle = createCentralRiskPackageState(instanceIdentifier);
-
+        instanceIdentifier, validationList);
+      final boolean createdRiskBundle = createCentralRiskPackageState(instanceIdentifier, validationList);
+      bundleState.setValidationEntityList(validationList);
+      updateBundleState(bundleState, instanceIdentifier);
       if (createdJobsBundle || createdRepresentationInformationBundle || createdRiskBundle) {
         SyncUtils.buildBundleStateFile(instanceIdentifier);
         return createBundleStreamResponse(compressBundle(instanceIdentifier));
@@ -370,13 +431,11 @@ public class SyncUtils {
     return createdBundle;
   }
 
-  private static boolean createCentralRepresentationInformationPackageState(final String instanceIdentifier)
-    throws RequestNotValidException, GenericException, IOException, AuthorizationDeniedException,
-    AlreadyExistsException {
+  private static boolean createCentralRepresentationInformationPackageState(final String instanceIdentifier,
+    final List<PackageState> validationList) throws RequestNotValidException, GenericException, IOException,
+    AuthorizationDeniedException, AlreadyExistsException {
     boolean createdBundle = false;
-    final List<String> representationInformationList = new ArrayList<>();
     final Filter filter = new Filter();
-
     final IterableIndexResult<RepresentationInformation> representationInformations = RodaCoreFactory.getIndexService()
       .findAll(RepresentationInformation.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
 
@@ -387,31 +446,38 @@ public class SyncUtils {
         .resolve(RodaConstants.CORE_STORAGE_FOLDER).resolve(RodaConstants.STORAGE_CONTAINER_REPRESENTATION_INFORMATION);
 
       final StoragePath representationInformationContainerPath = ModelUtils.getRepresentationInformationContainerPath();
-      final PackageState packageState = createEntityPackageState(instanceIdentifier,
-        RodaConstants.CORE_REPRESENTATION_INFORMATION_FOLDER);
-      packageState.setClassName(RepresentationInformation.class);
-      packageState.setCount((int) representationInformations.getTotalCount());
-      packageState.setStatus(PackageState.Status.CREATED);
+
+      final PackageState representationPackageState = createEntityPackageState(instanceIdentifier,
+        "representationInformation");
+      representationPackageState.setClassName(RepresentationInformation.class);
+      representationPackageState.setCount((int) representationInformations.getTotalCount());
+      Path filePath = getSyncBundleWorkingDirectory(OUTCOME_PREFIX, instanceIdentifier)
+        .resolve(RodaConstants.SYNCHRONIZATION_VALIDATION_REPRESENTATION_INFORMATION_FILE_PATH);
+      representationPackageState
+        .setFilePath(RodaConstants.SYNCHRONIZATION_VALIDATION_REPRESENTATION_INFORMATION_FILE_PATH);
+      validationList.add(representationPackageState);
+
+      JsonListHelper jsonListHelper = new JsonListHelper(filePath);
+      jsonListHelper.init();
       for (RepresentationInformation representationInformation : representationInformations) {
-        representationInformationList.add(representationInformation.getId());
         final String representationInformationFile = representationInformation.getId()
           + RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION;
         storage.copy(storage, representationInformationContainerPath,
           destinationPath.resolve(representationInformationFile), representationInformationFile);
+        jsonListHelper.writeString(representationInformation.getId());
       }
-      packageState.setIdList(representationInformationList);
-      SyncUtils.updateEntityPackageState(instanceIdentifier, RodaConstants.CORE_REPRESENTATION_INFORMATION_FOLDER,
-        packageState);
+      SyncUtils.updateEntityPackageState(instanceIdentifier, "representationInformation", representationPackageState);
+      jsonListHelper.close();
       createdBundle = true;
     }
     return createdBundle;
 
   }
 
-  private static boolean createCentralRiskPackageState(final String instanceIdentifier) throws RequestNotValidException,
-    GenericException, IOException, AuthorizationDeniedException, AlreadyExistsException {
+  private static boolean createCentralRiskPackageState(final String instanceIdentifier,
+    final List<PackageState> validationList) throws RequestNotValidException, GenericException, IOException,
+    AuthorizationDeniedException, AlreadyExistsException {
     boolean createdBundle = false;
-    final List<String> riskList = new ArrayList<>();
     final Filter filter = new Filter();
 
     final IterableIndexResult<IndexedRisk> risks = RodaCoreFactory.getIndexService().findAll(IndexedRisk.class, filter,
@@ -424,17 +490,22 @@ public class SyncUtils {
         .resolve(RodaConstants.CORE_STORAGE_FOLDER).resolve(RodaConstants.STORAGE_CONTAINER_RISK);
 
       final StoragePath riskContainerPath = ModelUtils.getRiskContainerPath();
-      final PackageState packageState = createEntityPackageState(instanceIdentifier, RodaConstants.CORE_RISK_FOLDER);
-      packageState.setClassName(Risk.class);
-      packageState.setCount((int) risks.getTotalCount());
-      packageState.setStatus(PackageState.Status.CREATED);
+      Path filePath = getSyncBundleWorkingDirectory(OUTCOME_PREFIX, instanceIdentifier)
+        .resolve(RodaConstants.SYNCHRONIZATION_VALIDATION_RISK_FILE_PATH);
+      final PackageState riskPackageState = createEntityPackageState(instanceIdentifier, "risk");
+      riskPackageState.setClassName(Risk.class);
+      riskPackageState.setCount((int) risks.getTotalCount());
+      riskPackageState.setFilePath(RodaConstants.SYNCHRONIZATION_VALIDATION_RISK_FILE_PATH);
+      validationList.add(riskPackageState);
+      JsonListHelper jsonListHelper = new JsonListHelper(filePath);
+      jsonListHelper.init();
       for (IndexedRisk risk : risks) {
-        riskList.add(risk.getId());
+        jsonListHelper.writeString(risk.getId());
         final String riskFile = risk.getId() + RodaConstants.RISK_FILE_EXTENSION;
         storage.copy(storage, riskContainerPath, destinationPath.resolve(riskFile), riskFile);
       }
-      packageState.setIdList(riskList);
-      SyncUtils.updateEntityPackageState(instanceIdentifier, RodaConstants.CORE_RISK_FOLDER, packageState);
+      SyncUtils.updateEntityPackageState(instanceIdentifier, "risk", riskPackageState);
+      jsonListHelper.close();
       createdBundle = true;
     }
     return createdBundle;
@@ -553,31 +624,6 @@ public class SyncUtils {
   }
 
   /**
-   * Creates {@link Map} with the List of entities path in bundle and the indexed
-   * {@link Class<? extends IsIndexed>}.
-   * 
-   * @param bundleWorkingDir
-   *          {@link Path} to blunde dir
-   * @param entitiesBundle
-   *          {@link EntitiesBundle}
-   * @return {@link Map}
-   */
-  public static Map<Path, Class<? extends IsIndexed>> createEntitiesPaths(final Path bundleWorkingDir,
-    final EntitiesBundle entitiesBundle) {
-    final HashMap<Path, Class<? extends IsIndexed>> entitiesPathMap = new HashMap<>();
-    final Path aipListPath = bundleWorkingDir.resolve(entitiesBundle.getAipFileName() + ".json");
-    entitiesPathMap.put(aipListPath, IndexedAIP.class);
-
-    final Path dipListPath = bundleWorkingDir.resolve(entitiesBundle.getDipFileName() + ".json");
-    entitiesPathMap.put(dipListPath, IndexedDIP.class);
-
-    final Path riskListPath = bundleWorkingDir.resolve(entitiesBundle.getRiskFileName() + ".json");
-    entitiesPathMap.put(riskListPath, RiskIncidence.class);
-
-    return entitiesPathMap;
-  }
-
-  /**
    * Get the stream response from the given path.
    * 
    * @param path
@@ -674,6 +720,8 @@ public class SyncUtils {
    * @throws RequestNotValidException
    *           if some error occurs.
    */
+  // TODO: Remove this reindex method and use the reindex from ImportUtils
+
   private static void reindexBundle(final BundleState bundleState, final JobPluginInfo jobPluginInfo)
     throws NotFoundException, AuthorizationDeniedException, JobAlreadyStartedException, GenericException,
     RequestNotValidException {
@@ -742,62 +790,6 @@ public class SyncUtils {
   }
 
   // Write Bundle JSON Lists
-
-  /**
-   * Init the {@link OutputStream} and the {@link JsonGenerator} and init the json
-   * array.
-   * 
-   * @param path
-   *          {@link Path}
-   * @throws IOException
-   *           if some i/o error occur
-   */
-  public static void init(final Path path) throws IOException {
-    if (!Files.exists(path)) {
-      Files.createFile(path);
-    }
-
-    if (path != null) {
-      outputStream = new BufferedOutputStream(new FileOutputStream(path.toFile()));
-      final JsonFactory jsonFactory = new JsonFactory();
-      jsonGenerator = jsonFactory.createGenerator(outputStream, JsonEncoding.UTF8).useDefaultPrettyPrinter();
-    }
-
-    jsonGenerator.writeStartArray();
-  }
-
-  /**
-   * Write a json string.
-   * 
-   * @param value
-   *          the value.
-   * @throws IOException
-   *           if some i/o error occur
-   */
-  public static void writeString(final String value) throws IOException {
-    jsonGenerator.writeString(value);
-  }
-
-  /**
-   * Close the {@link JsonGenerator} and the {@link OutputStream}.
-   * 
-   * @param closeArray
-   *          if is to close the json array.
-   * @throws IOException
-   *           if some i/o error occur
-   */
-  public static void close(final boolean closeArray) throws IOException {
-    if (closeArray) {
-      jsonGenerator.writeEndArray();
-    }
-
-    if (jsonGenerator != null) {
-      jsonGenerator.close();
-    }
-    if (outputStream != null) {
-      outputStream.close();
-    }
-  }
 
   /**
    * Create {@link JsonParser} to read the file.

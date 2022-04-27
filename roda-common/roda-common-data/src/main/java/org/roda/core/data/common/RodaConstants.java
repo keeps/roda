@@ -1783,7 +1783,7 @@ public final class RodaConstants {
   public static final String RODA_MANIFEST_EXTERNAL_FILES = "external_files.jsonl";
 
   public static final String AIP_DEFAULT_PACKAGE_TYPE = "UNKNOWN";
-  
+
   /* Distributed instances */
   public static final String DISTRIBUTED_INSTANCE_USER_PREFIX = "DISTRIBUTED_";
   public static final String DISTRIBUTED_INSTANCE_ACCESS_KEY_PREFIX = DISTRIBUTED_INSTANCE_USER_PREFIX;
@@ -1813,12 +1813,12 @@ public final class RodaConstants {
   public static final String SYNCHRONIZATION_REMOTE_ACTIONS_FOLDER = "remote_actions";
   public static final String SYNCHRONIZATION_INCOMING_REMOTE_ACTIONS_PATH = CORE_SYNCHRONIZATION_INCOMING_FOLDER + "/"
     + SYNCHRONIZATION_REMOTE_ACTIONS_FOLDER;
-  public static final String SYNCHRONIZATION_LOCAL_INSTANCE_AIP_LIST_FILE_NAME = "aip_list";
-  public static final String SYNCHRONIZATION_LOCAL_INSTANCE_DIP_LIST_FILE_NAME = "dip_list";
-  public static final String SYNCHRONIZATION_LOCAL_INSTANCE_JOB_LIST_FILE_NAME = "job_list";
-  public static final String SYNCHRONIZATION_LOCAL_INSTANCE_PRESERVATION_AGENT_LIST_FILE_NAME = "preservation_agent_list";
-  public static final String SYNCHRONIZATION_LOCAL_INSTANCE_REPOSITORY_EVENT_LIST_FILE_NAME = "repository_event_list";
-  public static final String SYNCHRONIZATION_LOCAL_INSTANCE_RISK_LIST_FILE_NAME = "risk_list";
+
+  public static final String SYNCHRONIZATION_VALIDATION_AIP_FILE_PATH = "validation/aip_validation_list.json";
+  public static final String SYNCHRONIZATION_VALIDATION_DIP_FILE_PATH = "validation/dip_validation_list.json";
+  public static final String SYNCHRONIZATION_VALIDATION_RISK_INCIDENT_FILE_PATH = "validation/risk_incident_validation_list.json";
+  public static final String SYNCHRONIZATION_VALIDATION_REPRESENTATION_INFORMATION_FILE_PATH = "validation/representation_information_validation_list.json";
+  public static final String SYNCHRONIZATION_VALIDATION_RISK_FILE_PATH = "validation/risk_validation_list.json";
 
   public static final String SYNCHRONIZATION_REPORT_FILE = "last_synchronization";
   public static final String SYNCHRONIZATION_ISSUES_FILE = "issues";
@@ -1846,8 +1846,6 @@ public final class RodaConstants {
     + "instance because they were removed from local instance";
   public static final String SYNCHRONIZATION_REPORT_VALUE_ISSUES_DESCRIPTION = "An entity was found is central "
     + "instance but is not listed in local instance or is listed as being removed from local instance";
-
-
 
   public static final String SYNCHRONIZATION_REPORT_VALUE_STATUS_SUCCESS = "Successful Synchronization";
   public static final String SYNCHRONIZATION_REPORT_VALUE_STATUS_ERROR = "Synchronization with errors";

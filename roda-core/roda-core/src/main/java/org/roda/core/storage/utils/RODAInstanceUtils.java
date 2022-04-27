@@ -21,16 +21,16 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
-import org.roda.core.data.v2.user.User;
-import org.roda.core.index.IndexService;
+
+import java.nio.file.Path;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 
-public class LocalInstanceUtils {
+public class RODAInstanceUtils {
 
-  private LocalInstanceUtils() {
+  private RODAInstanceUtils() {
     // do nothing
   }
 
@@ -70,4 +70,6 @@ public class LocalInstanceUtils {
       return null;
     }
   }
+
+
 }

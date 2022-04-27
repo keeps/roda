@@ -61,7 +61,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.plugins.characterization.PremisSkeletonPluginUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
-import org.roda.core.storage.utils.LocalInstanceUtils;
+import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.FileUtility;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -429,7 +429,7 @@ public final class PremisV3Utils {
     ObjectIdentifierComplexType objectIdentifier = FACTORY.createObjectIdentifierComplexType();
     objectIdentifier.setObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
     objectIdentifier.setObjectIdentifierValue(IdUtils.getRepresentationPreservationId(aipId, representationId,
-      LocalInstanceUtils.getLocalInstanceIdentifier()));
+      RODAInstanceUtils.getLocalInstanceIdentifier()));
     representation.getObjectIdentifier().add(objectIdentifier);
     PreservationLevelComplexType preservationLevelComplexType = FACTORY.createPreservationLevelComplexType();
     preservationLevelComplexType.setPreservationLevelValue(getStringPlusAuthority(""));
@@ -450,14 +450,14 @@ public final class PremisV3Utils {
     // URN-local identifier
     ObjectIdentifierComplexType objectIdentifier = FACTORY.createObjectIdentifierComplexType();
     objectIdentifier.setObjectIdentifierValue(URNUtils.createRodaPreservationURN(PreservationMetadataType.FILE,
-      originalFile.getPath(), originalFile.getId(), LocalInstanceUtils.getLocalInstanceIdentifier()));
+      originalFile.getPath(), originalFile.getId(), RODAInstanceUtils.getLocalInstanceIdentifier()));
     objectIdentifier.setObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN_LOCAL));
     file.getObjectIdentifier().add(objectIdentifier);
 
     // URN identifier (UUID)
     ObjectIdentifierComplexType objectIdentifier2 = FACTORY.createObjectIdentifierComplexType();
     objectIdentifier2.setObjectIdentifierValue(URNUtils.createRodaPreservationURN(PreservationMetadataType.FILE,
-      originalFile.getPath(), IdUtils.getFileId(originalFile), LocalInstanceUtils.getLocalInstanceIdentifier()));
+      originalFile.getPath(), IdUtils.getFileId(originalFile), RODAInstanceUtils.getLocalInstanceIdentifier()));
     objectIdentifier2.setObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
     file.getObjectIdentifier().add(objectIdentifier2);
 
@@ -683,7 +683,7 @@ public final class PremisV3Utils {
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
     ValidationException, AlreadyExistsException {
     String id = IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion(),
-      LocalInstanceUtils.getLocalInstanceIdentifier());
+      RODAInstanceUtils.getLocalInstanceIdentifier());
     ContentPayload agentPayload = PremisV3Utils.createPremisAgentBinary(id, plugin.getName(), plugin.getAgentType(), "",
       plugin.getDescription(), plugin.getVersion());
     return model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
@@ -864,7 +864,7 @@ public final class PremisV3Utils {
     PreservationMetadata pm = null;
 
     if (StringUtils.isNotBlank(username)) {
-      String id = IdUtils.getUserAgentId(username, LocalInstanceUtils.getLocalInstanceIdentifier());
+      String id = IdUtils.getUserAgentId(username, RODAInstanceUtils.getLocalInstanceIdentifier());
       String fullName = "";
       String extension = "";
       String note = "";
@@ -934,7 +934,7 @@ public final class PremisV3Utils {
       PremisV3Utils.updateFileFormat(premisFile, format, version, pronom, mime);
 
       PreservationMetadataType type = PreservationMetadataType.FILE;
-      String id = IdUtils.getPreservationFileId(fileDirectoryPath, fileId, LocalInstanceUtils.getLocalInstanceIdentifier());
+      String id = IdUtils.getPreservationFileId(fileDirectoryPath, fileId, RODAInstanceUtils.getLocalInstanceIdentifier());
 
       ContentPayload premisFilePayload = fileToBinary(premisFile);
       model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, premisFilePayload,
@@ -973,7 +973,7 @@ public final class PremisV3Utils {
         dateCreatedByApplication);
 
       PreservationMetadataType type = PreservationMetadataType.FILE;
-      String id = IdUtils.getPreservationFileId(fileDirectoryPath, fileId, LocalInstanceUtils.getLocalInstanceIdentifier());
+      String id = IdUtils.getPreservationFileId(fileDirectoryPath, fileId, RODAInstanceUtils.getLocalInstanceIdentifier());
 
       ContentPayload premisFilePayload = fileToBinary(premisFile);
       model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, premisFilePayload,
