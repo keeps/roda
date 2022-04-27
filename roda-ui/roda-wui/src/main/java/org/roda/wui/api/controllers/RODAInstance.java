@@ -1,5 +1,6 @@
 package org.roda.wui.api.controllers;
 
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -452,5 +453,19 @@ public class RODAInstance extends RodaWuiController {
       // register action
       controllerAssistant.registerAction(user, state);
     }
+  }
+
+
+  public static String removeSyncBundle(String bundleName, User user, String bundleDirectory)
+    throws AuthorizationDeniedException {
+    // check user permissions
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+    controllerAssistant.registerAction(user, state);
+
+    return RODAInstanceHelper.removeSyncBundle(bundleName, bundleDirectory);
+
   }
 }

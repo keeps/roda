@@ -526,6 +526,12 @@ public class RodaCoreFactory {
         instantiateDefaultObjects();
         LOGGER.debug("Finished instantiating default objects");
 
+        instantiateProtocolManager();
+        LOGGER.debug("Finished instantiating protocol manager");
+
+        instantiateDistributedMode();
+        LOGGER.debug("Finished instantiating distributed mode");
+
         // instantiate plugin manager
         // 20160920 hsilva: this must be the last thing to be instantiated as
         // problems may araise when instantiating objects at the same time the
@@ -533,12 +539,6 @@ public class RodaCoreFactory {
         // like Reflections is the blame)
         instantiatePluginManager();
         LOGGER.debug("Finished instantiating plugin manager");
-
-        instantiateProtocolManager();
-        LOGGER.debug("Finished instantiating protocol manager");
-
-        instantiateDistributedMode();
-        LOGGER.debug("Finished instantiating distrib");
 
         // now that plugin manager is up, lets do some tasks that can only be
         // done after it

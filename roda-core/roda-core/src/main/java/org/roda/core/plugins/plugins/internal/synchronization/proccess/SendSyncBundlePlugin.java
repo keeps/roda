@@ -8,12 +8,14 @@ import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.SyncUtils;
 import org.roda.core.common.TokenManager;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
@@ -47,7 +49,7 @@ public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SendSyncBundlePlugin.class);
 
   private LocalInstance localInstance;
-
+  private String bundleName;
   @Override
   public String getVersionImpl() {
     return "1.0";
@@ -179,7 +181,7 @@ public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
 
   private int send(LocalInstance localInstance, BundleState bundleStateFile) throws GenericException {
     try {
-      Path zipPath = SyncUtils.compressBundle(localInstance.getId());
+      Path zipPath = SyncUtils.compressBundle(localInstance.getId(), bundleName);
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
 
       String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE
@@ -195,5 +197,15 @@ public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     return new Report();
+  }
+
+  @Override
+  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
+
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_BUNDLE_NAME)) {
+      bundleName = parameters.get(RodaConstants.PLUGIN_PARAMS_BUNDLE_NAME);
+    }
+
   }
 }
