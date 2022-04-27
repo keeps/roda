@@ -1,24 +1,36 @@
 package org.roda.core.plugins.plugins.internal.synchronization.proccess;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.SyncUtils;
+import org.roda.core.common.TokenManager;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -43,9 +55,10 @@ import org.slf4j.LoggerFactory;
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(SendSyncBundlePlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(RequestSyncBundlePlugin.class);
 
   private LocalInstance localInstance;
+  String bundleName;
 
   @Override
   public String getVersionImpl() {
@@ -157,6 +170,13 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
 
           ImportUtils.reindexFromFile(model, index, bundleState, jobPluginInfo, report, bundleWorkingDir);
 
+          SyncUtils.removeSyncBundleLocal(bundleName,RodaConstants.CORE_SYNCHRONIZATION_OUTCOME_FOLDER);
+          Files.deleteIfExists(path);
+          String centralBundleName = path.toString().split("remote_actions/")[1];
+
+          removeSyncBundlesFromCentral(bundleName, RodaConstants.CORE_SYNCHRONIZATION_INCOMING_FOLDER);
+          removeSyncBundlesFromCentral(centralBundleName, RodaConstants.CORE_SYNCHRONIZATION_OUTCOME_FOLDER);
+
           ImportUtils.updateEntityCounter(bundleState, localInstance);
           ImportUtils.createLastSyncFile(bundleWorkingDir, localInstance, cachedJob.getId(), bundleState.getId());
           RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
@@ -179,6 +199,32 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
     reportItem.setPluginState(pluginState).setPluginDetails(outcomeDetailsText);
     report.addReport(reportItem);
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
+  }
+
+  private void removeSyncBundlesFromCentral(String bundleName, String bundleDirectory) {
+
+    try {
+      AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
+      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE + "remove"
+        + RodaConstants.API_SEP + "bundle" + RodaConstants.API_QUERY_START + RodaConstants.SYNCHRONIZATION_BUNDLE_NAME
+        + RodaConstants.API_QUERY_ASSIGN_SYMBOL + bundleName + RodaConstants.API_QUERY_SEP
+        + RodaConstants.SYNCHRONIZATION_BUNDLE_DIRECTORY + RodaConstants.API_QUERY_ASSIGN_SYMBOL + bundleDirectory;
+
+      CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+      HttpGet httpGet = new HttpGet(localInstance.getCentralInstanceURL() + resource);
+      httpGet.addHeader("Authorization", "Bearer " + accessToken.getToken());
+      httpGet.addHeader("content-type", "application/json");
+      httpGet.addHeader("Accept", "application/json");
+
+      HttpResponse response = httpClient.execute(httpGet);
+
+      if (response.getStatusLine().getStatusCode() == RodaConstants.HTTP_RESPONSE_CODE_SUCCESS) {
+        EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
+      }
+    } catch (AuthenticationDeniedException | GenericException | IOException e) {
+      // do nothing
+    }
+
   }
 
   /**
@@ -253,5 +299,15 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
       LOGGER.error("Can't retrieve the JOB {} ", e.getMessage());
     }
     return false;
+  }
+
+  @Override
+  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
+
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_BUNDLE_NAME)) {
+      bundleName = parameters.get(RodaConstants.PLUGIN_PARAMS_BUNDLE_NAME);
+    }
+
   }
 }

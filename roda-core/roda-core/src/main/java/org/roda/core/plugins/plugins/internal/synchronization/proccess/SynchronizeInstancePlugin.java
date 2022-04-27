@@ -52,7 +52,9 @@ public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAO
   private Map<String, PluginParameter> pluginParameters = new HashMap<>();
   private static List<Step> steps = new ArrayList<>();
 
+
   static {
+
     steps.add(new Step(AipPackagePlugin.class.getName(), AIP.class, "", true, true));
     steps.add(new Step(JobPackagePlugin.class.getName(), Job.class, "", true, true));
     steps.add(new Step(DipPackagePlugin.class.getName(), DIP.class, "", true, true));
@@ -62,6 +64,7 @@ public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAO
 
     steps.add(new Step(SendSyncBundlePlugin.class.getName(), SendSyncBundlePlugin.class, "", true, true));
     steps.add(new Step(RequestSyncBundlePlugin.class.getName(), RequestSyncBundlePlugin.class, "", true, true));
+
   }
 
   @Override
@@ -179,6 +182,16 @@ public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAO
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     setTotalSteps();
     super.setParameterValues(parameters);
+
+    if (RodaConstants.DistributedModeType.LOCAL.equals(RodaCoreFactory.getDistributedModeType())) {
+      try {
+        String instanceId = RodaCoreFactory.getLocalInstance().getId();
+        getParameterValues().put(RodaConstants.PLUGIN_PARAMS_BUNDLE_NAME, SyncUtils.getInstanceBundleName(instanceId));
+      } catch (GenericException e) {
+        throw new InvalidParameterException(e);
+      }
+
+    }
   }
 
   private void setValidationEntitiesFilePaths() {

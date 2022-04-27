@@ -1,6 +1,7 @@
 package org.roda.wui.api.controllers;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
 import java.util.HashMap;
@@ -291,5 +292,36 @@ public class RODAInstanceHelper {
       throw new GenericException("Internal error searching for updates in " + returnClass);
     }
     return updatedItems;
+  }
+  
+  public static String removeSyncBundle(String bundlename, String bundleDirectory) {
+    String message = null;
+
+    if (RodaConstants.CORE_SYNCHRONIZATION_INCOMING_FOLDER.equals(bundleDirectory)) {
+      Path syncBundlePath = SyncUtils.getSyncIncomingBundlePath(bundlename);
+      try {
+        Boolean deleteFromIncome = Files.deleteIfExists(syncBundlePath);
+        if (deleteFromIncome == true) {
+          message = "Deleted bundle from income folder with success";
+        } else {
+          message = "Could not find bundle in income folder";
+        }
+      } catch (IOException e) {
+        LOGGER.error("Can not delete bundle from income folder because " + e.getMessage());
+      }
+    } else {
+      Path syncBundlePath = SyncUtils.getSyncOutcomeBundlePath(bundlename);
+      try {
+        Boolean deleteFromOutcome = Files.deleteIfExists(syncBundlePath);
+        if (deleteFromOutcome == true) {
+          message = "Deleted bundle from outcome folder with success";
+        } else {
+          message = "Could not find bundle in outcome folder";
+        }
+      } catch (IOException e) {
+        LOGGER.error("Can not delete bundle from outcome folder because " + e.getMessage());
+      }
+    }
+    return message;
   }
 }
