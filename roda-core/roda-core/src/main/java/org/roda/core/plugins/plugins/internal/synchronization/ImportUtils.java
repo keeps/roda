@@ -396,7 +396,8 @@ public class ImportUtils {
    *          number of errors in synchronization
    */
   public static void validateEntitiesBundle(final IndexService index, final Path bundleWorkingDir,
-    final List<PackageState> validationEntityList, final DistributedInstance distributedInstance, int syncErrors) throws GenericException {
+    final List<PackageState> validationEntityList, final DistributedInstance distributedInstance, int syncErrors)
+    throws GenericException {
 
     Path temporaryReportPath = null;
     final List<Path> reportPaths = new ArrayList<>();
@@ -435,7 +436,8 @@ public class ImportUtils {
    *          {@link Class<? extends IsIndexed>}.
    */
   private static int validateCentralEntities(final IndexService index, final Path temporaryReportPath,
-    final Path readPath, final Class<? extends IsIndexed> indexedClass, final DistributedInstance distributedInstance) throws GenericException {
+    final Path readPath, final Class<? extends IsIndexed> indexedClass, final DistributedInstance distributedInstance)
+    throws GenericException {
     String id = null;
     int errors = 0;
     try {
@@ -484,7 +486,7 @@ public class ImportUtils {
     try {
       JsonUtils.appendObjectToFile(object, path);
     } catch (final GenericException e) {
-      throw new GenericException("Can't write the object in file" +  path + " because " +  e.getMessage());
+      throw new GenericException("Can't write the object in file" + path, e);
     }
   }
 
