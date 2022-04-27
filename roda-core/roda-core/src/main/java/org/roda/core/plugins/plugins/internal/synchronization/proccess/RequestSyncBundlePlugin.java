@@ -157,6 +157,9 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
 
           ImportUtils.reindexFromFile(model, index, bundleState, jobPluginInfo, report, bundleWorkingDir);
 
+          ImportUtils.updateEntityCounter(bundleState, localInstance);
+          ImportUtils.createLastSyncFile(bundleWorkingDir, localInstance, cachedJob.getId(), bundleState.getId());
+          RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
           outcomeDetailsText = "Received " + jobs + " jobs. Imported " + imported
             + " representations information and risks from Central";
         } catch (AlreadyExistsException | JobAlreadyStartedException e) {
