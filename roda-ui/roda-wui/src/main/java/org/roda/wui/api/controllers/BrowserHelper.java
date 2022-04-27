@@ -191,7 +191,7 @@ import org.roda.core.storage.Directory;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.storage.utils.LocalInstanceUtils;
+import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ObjectResponse;
@@ -1461,7 +1461,7 @@ public class BrowserHelper {
           fileId, payload, notify);
       } else {
         PreservationMetadataType type = PreservationMetadataType.FILE;
-        String id = IdUtils.getPreservationFileId(fileDirectoryPath, fileId, LocalInstanceUtils.getLocalInstanceIdentifier());
+        String id = IdUtils.getPreservationFileId(fileDirectoryPath, fileId, RODAInstanceUtils.getLocalInstanceIdentifier());
         model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, payload, notify);
       }
     } catch (IOException e) {

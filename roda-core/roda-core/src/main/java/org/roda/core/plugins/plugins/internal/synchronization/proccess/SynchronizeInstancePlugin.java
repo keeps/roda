@@ -23,14 +23,13 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.bundle.BundleState;
-import org.roda.core.data.v2.synchronization.bundle.EntitiesBundle;
+import org.roda.core.data.v2.synchronization.bundle.PackageState;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.plugins.internal.synchronization.SyncBundleHelper;
 import org.roda.core.plugins.plugins.internal.synchronization.packages.AipPackagePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.packages.DipPackagePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.packages.JobPackagePlugin;
@@ -142,10 +141,10 @@ public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAO
       localInstance = RodaCoreFactory.getLocalInstance();
       bundleState = SyncUtils.createBundleState(localInstance.getId());
       DistributedInstance distributedInstance = SyncUtils.requestInstanceStatus(localInstance);
-      setPackagesBlundeFileNames();
-      bundleState.setFromDate(distributedInstance.getLastSyncDate());
+      setValidationEntitiesFilePaths();
+      bundleState.setFromDate(distributedInstance.getLastSynchronizationDate());
       try {
-        SyncBundleHelper.createLocalInstanceLists(bundleState);
+        SyncUtils.createLocalInstanceLists(bundleState, localInstance.getId());
       } catch (IOException | GenericException e) {
         LOGGER.debug("Failed to create List of entities", e.getMessage(), e);
       }
@@ -182,11 +181,27 @@ public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAO
     super.setParameterValues(parameters);
   }
 
-  private void setPackagesBlundeFileNames() {
-    final EntitiesBundle entitiesBundle = new EntitiesBundle();
-    entitiesBundle.setAipFileName(RodaConstants.SYNCHRONIZATION_LOCAL_INSTANCE_AIP_LIST_FILE_NAME);
-    entitiesBundle.setDipFileName(RodaConstants.SYNCHRONIZATION_LOCAL_INSTANCE_DIP_LIST_FILE_NAME);
-    entitiesBundle.setRiskFileName(RodaConstants.SYNCHRONIZATION_LOCAL_INSTANCE_RISK_LIST_FILE_NAME);
-    bundleState.setEntitiesBundle(entitiesBundle);
+  private void setValidationEntitiesFilePaths() {
+    final List<PackageState> validationEntityList = new ArrayList<>();
+    // aip validation package state
+    final PackageState aipValidationPackageState = new PackageState();
+    aipValidationPackageState.setClassName(AIP.class);
+    aipValidationPackageState.setFilePath(RodaConstants.SYNCHRONIZATION_VALIDATION_AIP_FILE_PATH);
+
+    // dip validation package state
+    final PackageState dipValidationPackageState = new PackageState();
+    dipValidationPackageState.setClassName(DIP.class);
+    dipValidationPackageState.setFilePath(RodaConstants.SYNCHRONIZATION_VALIDATION_DIP_FILE_PATH);
+
+    // risk incident validation package state
+    final PackageState riskIncidentValidationPackageState = new PackageState();
+    riskIncidentValidationPackageState.setClassName(RiskIncidence.class);
+    riskIncidentValidationPackageState.setFilePath(RodaConstants.SYNCHRONIZATION_VALIDATION_RISK_INCIDENT_FILE_PATH);
+
+    validationEntityList.add(aipValidationPackageState);
+    validationEntityList.add(dipValidationPackageState);
+    validationEntityList.add(riskIncidentValidationPackageState);
+
+    bundleState.setValidationEntityList(validationEntityList);
   }
 }

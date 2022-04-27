@@ -792,15 +792,16 @@ public class HtmlSnippetUtils {
     final SafeHtmlBuilder lastSyncBuilder = new SafeHtmlBuilder();
     // div to last sync date
     lastSyncBuilder.append(SafeHtmlUtils.fromSafeConstant("<div>"));
-    if (distributedInstance.getLastSyncDate() != null) {
-      lastSyncBuilder.append(SafeHtmlUtils.fromString(Humanize.formatDateTime(distributedInstance.getLastSyncDate())));
+    if (distributedInstance.getLastSynchronizationDate() != null) {
+      lastSyncBuilder
+        .append(SafeHtmlUtils.fromString(Humanize.formatDateTime(distributedInstance.getLastSynchronizationDate())));
     } else {
       lastSyncBuilder.append(SafeHtmlUtils.fromString(messages.permanentlyRetained()));
     }
     lastSyncBuilder.append(SafeHtmlUtils.fromSafeConstant("</div>"));
 
     // div to entities
-    List<EntitySummary> entitySummaries = distributedInstance.getEntitySummaries();
+    List<EntitySummary> entitySummaries = distributedInstance.getEntitySummaryList();
     if (entitySummaries != null && !entitySummaries.isEmpty()) {
       lastSyncBuilder.append(SafeHtmlUtils.fromSafeConstant(OPEN_DIV));
       for (final EntitySummary entitySummary : entitySummaries) {
@@ -855,12 +856,14 @@ public class HtmlSnippetUtils {
       return messages.preservationEventsTitle();
     } else if (IndexedPreservationAgent.class.getName().equals(entityClass)) {
       return messages.preservationAgentsTitle();
+    } else if (Job.class.getName().equals(entityClass)) {
+      return messages.processTitle();
     } else {
       return getEntityClassNameSplit(entityClass);
     }
   }
 
-  private static String getEntityClassNameSplit(String entityClass){
+  private static String getEntityClassNameSplit(String entityClass) {
     String[] splitEntityClass = entityClass.split("\\.");
     String entityClassName = splitEntityClass[splitEntityClass.length - 1];
     return entityClassName;

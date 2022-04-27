@@ -20,7 +20,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
-import org.roda.core.storage.utils.LocalInstanceUtils;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.controllers.BrowserHelper;
 import org.roda.wui.api.controllers.RODAInstance;
@@ -94,12 +93,12 @@ public class LocalInstanceResource {
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
   @ApiOperation(value = "Create local instance configuration", notes = "Create a new local instance configuration", response = LocalInstance.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = LocalInstance.class),
-      @ApiResponse(code = 409, message = "Already exists", response = ApiResponseMessage.class)})
+    @ApiResponse(code = 409, message = "Already exists", response = ApiResponseMessage.class)})
 
   public Response createLocalInstanceConfiguration(LocalInstance localInstance,
-                                 @ApiParam(value = "Choose format in which to get the local instance configuration", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-                                 @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
-      throws RODAException {
+    @ApiParam(value = "Choose format in which to get the local instance configuration", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
