@@ -36,9 +36,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
-import org.glassfish.jersey.media.multipart.BodyPartEntity;
-import org.glassfish.jersey.media.multipart.FormDataBodyPart;
-import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ClassificationPlanUtils;
 import org.roda.core.common.ConsumesOutputStream;
@@ -50,7 +47,6 @@ import org.roda.core.common.Messages;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.StreamResponse;
-import org.roda.core.common.SyncUtils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
@@ -71,7 +67,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
-import org.roda.core.data.utils.YamlUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LinkingObjectUtils;
 import org.roda.core.data.v2.common.ObjectPermission;
@@ -92,7 +87,6 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
-import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.index.sort.SortParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
@@ -140,7 +134,6 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
-import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
@@ -170,18 +163,6 @@ import org.roda.core.plugins.plugins.internal.disposal.hold.LiftDisposalHoldPlug
 import org.roda.core.plugins.plugins.internal.disposal.rules.ApplyDisposalRulesPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.schedule.AssociateDisposalScheduleToAIPPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.schedule.DisassociateDisposalScheduleToAIPPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierAIPEventPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierAIPPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierDIPPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierJobPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierNotificationPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierPreservationAgentPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierRepositoryEventPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierRepresentationInformationPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierRiskIncidencePlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierRiskPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.proccess.ImportSyncBundlePlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.proccess.SynchronizeInstancePlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.BinaryVersion;
@@ -486,6 +467,7 @@ public class BrowserHelper {
     }
     return null;
   }
+
   private static List<DescriptiveMetadataViewBundle> retrieveDescriptiveMetadataBundles(String aipId, Locale locale)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     return retrieveDescriptiveMetadataBundles(aipId, null, locale);
@@ -1461,7 +1443,8 @@ public class BrowserHelper {
           fileId, payload, notify);
       } else {
         PreservationMetadataType type = PreservationMetadataType.FILE;
-        String id = IdUtils.getPreservationFileId(fileDirectoryPath, fileId, RODAInstanceUtils.getLocalInstanceIdentifier());
+        String id = IdUtils.getPreservationFileId(fileDirectoryPath, fileId,
+          RODAInstanceUtils.getLocalInstanceIdentifier());
         model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, payload, notify);
       }
     } catch (IOException e) {
@@ -1652,7 +1635,7 @@ public class BrowserHelper {
       "Could not execute move job");
   }
 
-  private static <T extends IsRODAObject> Job createAndExecuteInternalJob(String name, SelectedItems<T> sourceObjects,
+  public static <T extends IsRODAObject> Job createAndExecuteInternalJob(String name, SelectedItems<T> sourceObjects,
     Class<?> plugin, User user, Map<String, String> pluginParameters, String exceptionMessage)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     return createAndExecuteJob(name, sourceObjects, plugin, PluginType.INTERNAL, user, pluginParameters,
@@ -3607,203 +3590,5 @@ public class BrowserHelper {
       new SelectedItemsFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name())),
         IndexedAIP.class.getName(), true),
       ApplyDisposalRulesPlugin.class, user, pluginParameters, "Could not execute apply disposal rules to repository");
-  }
-
-  public static DistributedInstance createDistributedInstance(DistributedInstance distributedInstance, User user)
-    throws GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException,
-    RequestNotValidException, IllegalOperationException {
-    return RodaCoreFactory.getModelService().createDistributedInstance(distributedInstance, user.getName());
-  }
-
-  public static LocalInstance getLocalInstanceConfiguration() throws GenericException {
-    LocalInstance localInstance = null;
-    InputStream configurationFileAsStream = RodaCoreFactory
-      .getConfigurationFileAsStream(RodaConstants.SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE_PATH);
-    if (configurationFileAsStream != null) {
-      localInstance = YamlUtils.getObjectFromYaml(configurationFileAsStream, LocalInstance.class);
-    }
-
-    return localInstance;
-  }
-
-  public static void createLocalInstanceConfiguration(LocalInstance localInstance) throws GenericException {
-    Path localInstanceConfigPath = RodaCoreFactory.getConfigPath()
-      .resolve(RodaConstants.SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FOLDER);
-    if (!Files.isDirectory(localInstanceConfigPath)) {
-      try {
-        Files.createDirectory(localInstanceConfigPath);
-      } catch (IOException e) {
-        throw new GenericException("Unable to create directory " + localInstanceConfigPath.toString(), e);
-      }
-    }
-    YamlUtils.writeObjectToFile(localInstance,
-      localInstanceConfigPath.resolve(RodaConstants.SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE));
-  }
-
-  public static void deleteLocalInstanceConfiguration() throws GenericException {
-    Path configPath = RodaCoreFactory.getConfigPath()
-      .resolve(RodaConstants.SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE_PATH);
-
-    if (Files.exists(configPath)) {
-      try {
-        FSUtils.deletePath(configPath);
-      } catch (NotFoundException exception) {
-        throw new GenericException("Failed to delete local instance configuration file", exception);
-      }
-    }
-  }
-
-  public static void applyInstanceIdToAIP(LocalInstance localInstance, User user)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
-
-    createAndExecuteInternalJob("Apply instance identifier to AIP",
-      new SelectedItemsFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name())),
-        IndexedAIP.class.getName(), true),
-      InstanceIdentifierAIPPlugin.class, user, pluginParameters, "Could not apply instance identifier to AIP");
-  }
-
-  public static void applyInstanceIdToDIP(LocalInstance localInstance, User user)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
-
-    createAndExecuteInternalJob("Apply instance identifier to DIP",
-      new SelectedItemsFilter(new Filter(), IndexedDIP.class.getName(), true), InstanceIdentifierDIPPlugin.class, user,
-      pluginParameters, "Could not apply instance identifier to DIP");
-  }
-
-  public static void applyInstanceIdToRisk(LocalInstance localInstance, User user)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
-
-    createAndExecuteInternalJob("Apply instance identifier to Risk",
-      new SelectedItemsFilter(new Filter(), IndexedRisk.class.getName(), true), InstanceIdentifierRiskPlugin.class,
-      user, pluginParameters, "Could not apply instance identifier to Risk");
-  }
-
-  public static void applyInstanceIdToRiskIncidence(LocalInstance localInstance, User user)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
-
-    createAndExecuteInternalJob("Apply instance identifier to Risk incidence",
-      new SelectedItemsFilter(new Filter(), RiskIncidence.class.getName(), true),
-      InstanceIdentifierRiskIncidencePlugin.class, user, pluginParameters,
-      "Could not apply instance identifier to Risk incidence");
-  }
-
-  public static void applyInstanceIdToRI(LocalInstance localInstance, User user)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
-
-    createAndExecuteInternalJob("Apply instance identifier to Representation Information",
-      new SelectedItemsFilter(new Filter(), RepresentationInformation.class.getName(), true),
-      InstanceIdentifierRepresentationInformationPlugin.class, user, pluginParameters,
-      "Could not apply instance identifier to Representation Information");
-  }
-
-  public static void applyInstanceIdToNotification(LocalInstance localInstance, User user)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
-
-    createAndExecuteInternalJob("Apply instance identifier to Notification",
-      new SelectedItemsFilter(new Filter(), Notification.class.getName(), true),
-      InstanceIdentifierNotificationPlugin.class, user, pluginParameters,
-      "Could not apply instance identifier to Notification");
-  }
-
-  public static void applyInstanceIdToJob(LocalInstance localInstance, User user)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
-
-    createAndExecuteInternalJob("Apply instance identifier to Job",
-      new SelectedItemsFilter(new Filter(), Job.class.getName(), true), InstanceIdentifierJobPlugin.class, user,
-      pluginParameters, "Could not apply instance identifier to Job");
-  }
-
-  public static void applyInstanceIdToAIPPreservationEvent(LocalInstance localInstance, User user)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
-
-    createAndExecuteInternalJob("Apply instance identifier to AIP Preservation Events",
-      new SelectedItemsFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name())),
-        IndexedAIP.class.getName(), true),
-      InstanceIdentifierAIPEventPlugin.class, user, pluginParameters,
-      "Could not apply instance identifier to AIP Preservation Events");
-  }
-
-  public static void applyInstanceIdToRepositoryPreservationEvent(LocalInstance localInstance, User user)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
-
-    createAndExecuteInternalJob("Apply instance identifier to Repository Preservation Events",
-      new SelectedItemsFilter(new Filter(new EmptyKeyFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID)),
-        IndexedPreservationEvent.class.getName(), true),
-      InstanceIdentifierRepositoryEventPlugin.class, user, pluginParameters,
-      "Could not apply instance identifier to Repository Preservation Events");
-  }
-
-  public static void applyInstanceIdToPreservationAgents(LocalInstance localInstance, User user)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
-
-    createAndExecuteInternalJob("Apply instance identifier to Preservation Agents",
-      new SelectedItemsFilter(new Filter(), IndexedPreservationAgent.class.getName(), true),
-      InstanceIdentifierPreservationAgentPlugin.class, user, pluginParameters,
-      "Could not apply instance identifier to Preservation Agents");
-  }
-
-  public static Job synchronizeBundle(User user, LocalInstance localInstance)
-    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
-    return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(),
-      SynchronizeInstancePlugin.class, user, new HashMap<>(), "Could not execute bundle job");
-  }
-
-  public static Job importSyncBundle(User user, String instanceIdentifier, FormDataMultiPart multiPart)
-    throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    FormDataBodyPart file = multiPart.getField(RodaConstants.API_PARAM_FILE);
-    BodyPartEntity bodyPartEntity = (BodyPartEntity) file.getEntity();
-    String fileName = file.getContentDisposition().getFileName();
-    try {
-      Path path = SyncUtils.receiveBundle(fileName, bodyPartEntity.getInputStream());
-      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, path.toString());
-      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, instanceIdentifier);
-      return createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(), ImportSyncBundlePlugin.class,
-        user, pluginParameters, "Could not execute bundle job");
-    } catch (IOException e) {
-      throw new GenericException("Failed during sync package import", e);
-    }
-  }
-
-  /**
-   * Get the last synchronization file to this instance.
-   * 
-   * @param instanceIdentifier
-   *          The instance identifier.
-   * @return {@link EntityResponse}.
-   * @throws GenericException
-   *           if some error occurs.
-   * @throws NotFoundException
-   *           if file does not exists.
-   */
-  public static EntityResponse retrieveLastSyncFileByClass(final String instanceIdentifier, final String entityClass,
-    final String type) throws GenericException, NotFoundException {
-    final StringBuilder fileNameBuilder = new StringBuilder();
-    fileNameBuilder.append(type).append("_").append(instanceIdentifier).append("_").append(entityClass)
-      .append(".jsonl");
-
-    final Path filePath = RodaCoreFactory.getSynchronizationDirectoryPath().resolve(fileNameBuilder.toString());
-
-    return SyncUtils.createLastSyncFileStreamResponse(filePath);
   }
 }
