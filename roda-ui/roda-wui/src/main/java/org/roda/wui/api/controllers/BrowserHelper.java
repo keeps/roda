@@ -3785,11 +3785,6 @@ public class BrowserHelper {
     }
   }
 
-  public static void updateLocalInstanceConfiguration(LocalInstance localInstance, String id) throws GenericException {
-    deleteLocalInstanceConfiguration();
-    createLocalInstanceConfiguration(localInstance);
-  }
-
   /**
    * Get the last synchronization file to this instance.
    * 
