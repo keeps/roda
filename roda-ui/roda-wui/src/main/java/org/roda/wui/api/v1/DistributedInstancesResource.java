@@ -26,6 +26,7 @@ import org.roda.core.data.v2.synchronization.central.DistributedInstances;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
+import org.roda.wui.api.controllers.RODAInstance;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ExtraMediaType;
@@ -66,7 +67,7 @@ public class DistributedInstancesResource {
     // get user
     User user = UserUtility.getApiUser(request);
 
-    DistributedInstances distributedInstances = Browser.listDistributedInstances(user);
+    DistributedInstances distributedInstances = RODAInstance.listDistributedInstances(user);
 
     return Response.ok(distributedInstances, mediaType).build();
   }
@@ -89,7 +90,7 @@ public class DistributedInstancesResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Browser.registerDistributedInstance(user, localInstance);
+    RODAInstance.registerDistributedInstance(user, localInstance);
 
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Distributed instance registered"), mediaType)
       .build();
@@ -111,7 +112,7 @@ public class DistributedInstancesResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Browser.importSyncBundle(user, instanceIdentifier, file);
+    RODAInstance.importSyncBundle(user, instanceIdentifier, file);
 
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Bundle entries imported"), mediaType).build();
   }
@@ -131,7 +132,7 @@ public class DistributedInstancesResource {
     // get user
     User user = UserUtility.getApiUser(request);
 
-    EntityResponse response = Browser.retrieveRemoteActions(user, instanceIdentifier);
+    EntityResponse response = RODAInstance.retrieveRemoteActions(user, instanceIdentifier);
 
     if (response instanceof StreamResponse) {
       return ApiUtils.okResponse((StreamResponse) response);
@@ -154,7 +155,7 @@ public class DistributedInstancesResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
     // get user
     User user = UserUtility.getApiUser(request);
-    return Response.ok(Browser.retrieveLocalInstanceStatus(user, instanceIdentifier), mediaType).build();
+    return Response.ok(RODAInstance.retrieveLocalInstanceStatus(user, instanceIdentifier), mediaType).build();
   }
 
   @GET
@@ -170,7 +171,7 @@ public class DistributedInstancesResource {
     // get user
     final User user = UserUtility.getApiUser(request);
     // delegate action to controller.
-    EntityResponse response = Browser.retrieveLastSyncFile(user, instanceIdentifier,entityClass, type);
+    EntityResponse response = RODAInstance.retrieveLastSyncFile(user, instanceIdentifier,entityClass, type);
     return ApiUtils.okResponse((StreamResponse) response);
   }
 }

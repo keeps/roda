@@ -99,6 +99,7 @@ import org.roda.wui.api.controllers.ApplicationAuth;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.controllers.Disposals;
 import org.roda.wui.api.controllers.Jobs;
+import org.roda.wui.api.controllers.RODAInstance;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.Viewers;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
@@ -1263,35 +1264,35 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws AuthorizationDeniedException, AlreadyExistsException, NotFoundException, GenericException,
     RequestNotValidException, IllegalOperationException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.createDistributedInstance(user, distributedInstance);
+    return RODAInstance.createDistributedInstance(user, distributedInstance);
   }
 
   @Override
   public DistributedInstances listDistributedInstances()
     throws AuthorizationDeniedException, IOException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.listDistributedInstances(user);
+    return RODAInstance.listDistributedInstances(user);
   }
 
   @Override
   public DistributedInstance retrieveDistributedInstance(String distributedInstanceId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.retrieveDistributedInstance(user, distributedInstanceId);
+    return RODAInstance.retrieveDistributedInstance(user, distributedInstanceId);
   }
 
   @Override
   public DistributedInstance updateDistributedInstance(DistributedInstance distributedInstance)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.updateDistributedInstance(user, distributedInstance);
+    return RODAInstance.updateDistributedInstance(user, distributedInstance);
   }
 
   @Override
   public void deleteDistributedInstance(String distributedInstanceId)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.deleteDistributedInstance(user, distributedInstanceId);
+    RODAInstance.deleteDistributedInstance(user, distributedInstanceId);
   }
 
   @Override
@@ -1367,53 +1368,53 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public void createLocalInstance(LocalInstance localInstance) throws AuthorizationDeniedException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.createLocalInstance(user, localInstance);
+    RODAInstance.createLocalInstance(user, localInstance);
   }
 
   @Override
   public LocalInstance retrieveLocalInstance() throws AuthorizationDeniedException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.retrieveLocalInstance(user);
+    return RODAInstance.retrieveLocalInstance(user);
   }
 
   @Override
   public void deleteLocalInstanceConfiguration() throws AuthorizationDeniedException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.deleteLocalInstanceConfiguration(user);
+    RODAInstance.deleteLocalInstanceConfiguration(user);
   }
 
   @Override
   public void updateLocalInstanceConfiguration(LocalInstance localInstance)
     throws AuthorizationDeniedException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.updateLocalInstanceConfiguration(user, localInstance);
+    RODAInstance.updateLocalInstanceConfiguration(user, localInstance);
   }
 
   @Override
   public List<String> testLocalInstanceConfiguration(LocalInstance localInstance)
     throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.testLocalInstanceConfiguration(user, localInstance);
+    return RODAInstance.testLocalInstanceConfiguration(user, localInstance);
   }
 
   @Override
   public LocalInstance registerLocalInstance(LocalInstance localInstance)
     throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.registerLocalInstance(user, localInstance);
+    return RODAInstance.registerLocalInstance(user, localInstance);
   }
 
   @Override
   public Job synchronizeBundle(LocalInstance localInstance)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.synchronizeBundle(user, localInstance);
+    return RODAInstance.synchronizeBundle(user, localInstance);
   }
 
   public void modifyInstanceIdOnRepository(LocalInstance localInstance)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Browser.modifyInstanceIdOnRepository(user, localInstance);
+    RODAInstance.modifyInstanceIdOnRepository(user, localInstance);
   }
 
 }
