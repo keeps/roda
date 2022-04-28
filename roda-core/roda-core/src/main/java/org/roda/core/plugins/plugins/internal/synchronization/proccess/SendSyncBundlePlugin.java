@@ -33,7 +33,6 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.plugins.plugins.internal.synchronization.SyncBundleHelper;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.RESTClientUtility;
@@ -190,26 +189,6 @@ public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
     } catch (RODAException | FileNotFoundException e) {
       LOGGER.error("Unable to send bundle to central instance", e);
       throw new GenericException("Unable to send bundle to central instance", e);
-    }
-  }
-
-  private Path compressBundle(BundleState bundleStateFile) throws PluginException {
-    try {
-      String fileName = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss'.zip'").format(bundleStateFile.getToDate());
-      Path filePath = RodaCoreFactory.getSynchronizationDirectoryPath()
-        .resolve(RodaConstants.CORE_SYNCHRONIZATION_OUTCOME_FOLDER).resolve(fileName);
-      if (FSUtils.exists(filePath)) {
-        FSUtils.deletePath(filePath);
-      }
-      Path file = Files.createFile(filePath);
-      File zipFile = ZipUtility.createZIPFile(file.toFile(), new File(localInstance.getBundlePath()));
-      bundleStateFile.setZipFile(zipFile.getPath());
-      bundleStateFile.setSyncState(BundleState.Status.PREPARED);
-      SyncBundleHelper.updateBundleStateFile(bundleStateFile);
-      return filePath;
-    } catch (GenericException | IOException | NotFoundException e) {
-      LOGGER.error("Unable to read bundle state file", e);
-      throw new PluginException("Unable to read bundle state file", e);
     }
   }
 

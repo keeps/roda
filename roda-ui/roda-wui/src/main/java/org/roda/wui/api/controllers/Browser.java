@@ -3915,26 +3915,6 @@ public class Browser extends RodaWuiController {
 
   }
 
-  public static void updateInstanceIdManagement(User user, LocalInstance localInstance)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    List<String> responseList = new ArrayList();
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      BrowserHelper.updateLocalInstanceConfiguration(localInstance, user.getId());
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
-    }
-  }
-
   public static LocalInstance registerLocalInstance(User user, LocalInstance localInstance)
     throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
