@@ -20,9 +20,8 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.api.controllers.Browser;
-import org.roda.wui.api.controllers.BrowserHelper;
 import org.roda.wui.api.controllers.RODAInstance;
+import org.roda.wui.api.controllers.RODAInstanceHelper;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 
@@ -60,7 +59,7 @@ public class LocalInstanceResource {
     // get user
     User user = UserUtility.getApiUser(request);
 
-    LocalInstance localInstance = Browser.retrieveLocalInstance(user);
+    LocalInstance localInstance = RODAInstance.retrieveLocalInstance(user);
 
     return Response.ok(localInstance, mediaType).build();
   }
@@ -82,7 +81,7 @@ public class LocalInstanceResource {
     Long totalUpdates = RODAInstance.synchronizeIfUpdated(user);
     String message = "There are no updates";
     if (totalUpdates > 0) {
-      BrowserHelper.synchronizeBundle(user, localInstance);
+      RODAInstanceHelper.synchronizeBundle(user, localInstance);
       message = "There are " + totalUpdates + " updates";
     }
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, message), mediaType).build();
@@ -105,7 +104,7 @@ public class LocalInstanceResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Browser.createLocalInstance(user, localInstance);
+    RODAInstance.createLocalInstance(user, localInstance);
     return Response.ok(localInstance, mediaType).build();
   }
 }
