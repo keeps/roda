@@ -36,10 +36,10 @@ import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
+import org.roda.core.plugins.base.synchronization.proccess.ImportSyncBundlePlugin;
+import org.roda.core.plugins.base.synchronization.proccess.SynchronizeInstancePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.BundleManifestCreator;
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.LocalInstanceRegisterPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.proccess.ImportSyncBundlePlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.proccess.SynchronizeInstancePlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,7 +58,7 @@ public class RODAInstanceHelper {
   public static void applyInstanceIdToRodaObject(LocalInstance localInstance, User user, boolean doRegister)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     Map<String, String> pluginParameters = new HashMap<>();
-    if(!doRegister){
+    if (!doRegister) {
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_REGISTER_PLUGIN, "false");
     }
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
