@@ -27,6 +27,7 @@ import org.roda.core.data.v2.synchronization.central.DistributedInstanceStatus;
 import org.roda.core.data.v2.synchronization.central.DistributedInstances;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.RESTClientUtility;
 import org.roda.wui.api.v1.utils.ObjectResponse;
 import org.roda.wui.common.ControllerAssistant;
@@ -314,6 +315,7 @@ public class RODAInstance extends RodaWuiController {
         accessToken);
       localInstance.setIsRegistered(true);
       RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
+      RODAInstanceUtils.createDistributedGroup(user);
       return localInstance;
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;

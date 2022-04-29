@@ -1,28 +1,22 @@
 package org.roda.core.storage.utils;
 
 import java.nio.file.Path;
-import java.util.Date;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.utils.YamlUtils;
-import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
-import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.core.data.v2.risks.IndexedRisk;
-import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
-
-import java.nio.file.Path;
+import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.User;
+import org.roda.core.model.ModelService;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
@@ -71,5 +65,36 @@ public class RODAInstanceUtils {
     }
   }
 
+  public static void createDistributedGroup(User user) throws GenericException, AuthorizationDeniedException {
+    ModelService model = RodaCoreFactory.getModelService();
+    String groupName = RodaConstants.DISTRIBUTED_INSTANCE_GROUP_NAME;
 
+    try {
+      model.retrieveGroup(groupName);
+    } catch (NotFoundException e) {
+      Set<String> roles = new HashSet<>();
+      roles.add(RodaConstants.REPOSITORY_PERMISSIONS_AIP_READ);
+      roles.add(RodaConstants.REPOSITORY_PERMISSIONS_REPRESENTATION_READ);
+      roles.add(RodaConstants.REPOSITORY_PERMISSIONS_DESCRIPTIVE_METADATA_READ);
+      roles.add(RodaConstants.REPOSITORY_PERMISSIONS_PRESERVATION_METADATA_READ);
+      roles.add(RodaConstants.REPOSITORY_PERMISSIONS_JOB_READ);
+      roles.add(RodaConstants.REPOSITORY_PERMISSIONS_JOB_MANAGE);
+      roles.add(RodaConstants.REPOSITORY_PERMISSIONS_RISK_READ);
+      roles.add(RodaConstants.REPOSITORY_PERMISSIONS_REPRESENTATION_INFORMATION_READ);
+      roles.add(RodaConstants.REPOSITORY_PERMISSIONS_DISTRIBUTED_INSTANCES_READ);
+      roles.add(RodaConstants.REPOSITORY_PERMISSIONS_LOCAL_INSTANCES_READ);
+
+      Group group = new Group(groupName);
+      group.setFullName(groupName);
+      group.setUsers(new HashSet<>(Arrays.asList(user.getId())));
+      group.setActive(true);
+      group.setAllRoles(roles);
+      group.setDirectRoles(roles);
+      try {
+        model.createGroup(group, true);
+      } catch (AlreadyExistsException alreadyExistsException) {
+        // do nothing
+      }
+    }
+  }
 }
