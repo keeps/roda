@@ -19,6 +19,8 @@ import org.roda.core.data.v2.SerializableOptional;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
+import org.roda.core.data.v2.jobs.JobStats;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.plugins.Plugin;
@@ -107,20 +109,27 @@ public class Messages {
     }
   }
 
-  public static JobsManagerJobEnded newJobsManagerJobEnded(String jobId, String plugin) {
-    return INSTANCE.new JobsManagerJobEnded(jobId, plugin);
+  public static JobsManagerJobEnded newJobsManagerJobEnded(String jobId, String plugin, PluginType type, long duration,
+    JobStats jobStats) {
+    return INSTANCE.new JobsManagerJobEnded(jobId, plugin, type, duration, jobStats);
   }
 
   public final class JobsManagerJobEnded extends AbstractMessage {
     private static final long serialVersionUID = -2514581679498648676L;
 
-    private String jobId;
-    private String plugin;
+    private final String jobId;
+    private final String plugin;
+    private final PluginType pluginType;
+    private final long duration;
+    private final JobStats jobStats;
 
-    public JobsManagerJobEnded(String jobId, String plugin) {
+    public JobsManagerJobEnded(String jobId, String plugin, PluginType pluginType, long duration, JobStats jobStats) {
       super();
       this.jobId = jobId;
       this.plugin = plugin;
+      this.pluginType = pluginType;
+      this.duration = duration;
+      this.jobStats = jobStats;
     }
 
     public String getJobId() {
@@ -131,9 +140,21 @@ public class Messages {
       return plugin;
     }
 
+    public PluginType getPluginType() {
+      return pluginType;
+    }
+
+    public long getDuration() {
+      return duration;
+    }
+
+    public JobStats getJobStats() {
+      return jobStats;
+    }
+
     @Override
     public String toString() {
-      return "JobsManagerJobEnded [jobId=" + jobId + ", plugin=" + plugin + "]";
+      return "JobsManagerJobEnded [jobId=" + jobId + ", plugin=" + plugin + ", pluginType=" + pluginType + "]";
     }
   }
 
@@ -391,12 +412,12 @@ public class Messages {
     private static final long serialVersionUID = 1946036502369851214L;
 
     private Plugin<?> plugin;
-    private SerializableOptional<String> stateDatails;
+    private SerializableOptional<String> stateDetails;
 
-    public JobStateDetailsUpdated(Plugin<?> plugin, Optional<String> stateDatails) {
+    public JobStateDetailsUpdated(Plugin<?> plugin, Optional<String> stateDetails) {
       super();
       this.plugin = plugin;
-      this.stateDatails = SerializableOptional.setOptional(stateDatails);
+      this.stateDetails = SerializableOptional.setOptional(stateDetails);
     }
 
     public JobStateDetailsUpdated(Plugin<?> plugin, Throwable throwable) {
@@ -407,13 +428,13 @@ public class Messages {
       return plugin;
     }
 
-    public Optional<String> getStateDatails() {
-      return stateDatails.getOptional();
+    public Optional<String> getStateDetails() {
+      return stateDetails.getOptional();
     }
 
     @Override
     public String toString() {
-      return "JobStateDetailsUpdated [plugin=" + plugin + ", stateDatails=" + stateDatails + "]";
+      return "JobStateDetailsUpdated [plugin=" + plugin + ", stateDatails=" + stateDetails + "]";
     }
   }
 
@@ -421,8 +442,8 @@ public class Messages {
     return INSTANCE.new JobStateUpdated(plugin, state);
   }
 
-  public static JobStateUpdated newJobStateUpdated(Plugin<?> plugin, JOB_STATE state, Optional<String> stateDatails) {
-    return INSTANCE.new JobStateUpdated(plugin, state, stateDatails);
+  public static JobStateUpdated newJobStateUpdated(Plugin<?> plugin, JOB_STATE state, Optional<String> stateDetails) {
+    return INSTANCE.new JobStateUpdated(plugin, state, stateDetails);
   }
 
   public static JobStateUpdated newJobStateUpdated(Plugin<?> plugin, JOB_STATE state, Throwable throwable) {
@@ -453,7 +474,7 @@ public class Messages {
 
     @Override
     public String toString() {
-      return "JobStateUpdated [plugin=" + getPlugin() + ", state=" + state + ", stateDatails=" + getStateDatails()
+      return "JobStateUpdated [plugin=" + getPlugin() + ", state=" + state + ", stateDatails=" + getStateDetails()
         + "]";
     }
   }
