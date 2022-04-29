@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -623,7 +624,7 @@ public class BrowserHelper {
       Binary binary = RodaCoreFactory.getModelService().retrieveDescriptiveMetadataBinary(aip.getId(), representationId,
         descriptiveMetadataId);
       inputStream = binary.getContent().createInputStream();
-      String xml = IOUtils.toString(inputStream, "UTF-8");
+      String xml = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
 
       // Get the supported metadata type with the same type and version
       // We need this to try to get the values for the form
@@ -2020,7 +2021,7 @@ public class BrowserHelper {
         String type = id;
         String version = null;
         if (id.contains(RodaConstants.METADATA_VERSION_SEPARATOR)) {
-          version = id.substring(id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1, id.length());
+          version = id.substring(id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1);
           type = id.substring(0, id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
         }
         String key = RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + type;
@@ -3286,7 +3287,7 @@ public class BrowserHelper {
         String type = id;
         String version = null;
         if (id.contains(RodaConstants.METADATA_VERSION_SEPARATOR)) {
-          version = id.substring(id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1, id.length());
+          version = id.substring(id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1);
           type = id.substring(0, id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
         }
         String key = RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + type;
