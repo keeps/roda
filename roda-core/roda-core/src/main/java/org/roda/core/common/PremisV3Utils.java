@@ -63,7 +63,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.plugins.plugins.characterization.PremisSkeletonPluginUtils;
+import org.roda.core.plugins.base.characterization.PremisSkeletonPluginUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.utils.RODAInstanceUtils;

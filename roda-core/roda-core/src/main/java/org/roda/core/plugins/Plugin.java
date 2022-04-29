@@ -22,7 +22,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.plugins.notifications.JobNotification;
+import org.roda.core.plugins.base.notifications.JobNotification;
 import org.roda.core.storage.StorageService;
 
 /**

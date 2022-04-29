@@ -18,7 +18,7 @@ Done with checking producer authorization for AIP fc9c493d-f5af-4787-96ac-067b74
   </eventOutcomeInformation>
   <linkingAgentIdentifier>
     <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
-    <linkingAgentIdentifierValue>urn:roda:premis:agent:org.roda.core.plugins.plugins.ingest.VerifyUserAuthorizationPlugin@1.0</linkingAgentIdentifierValue>
+    <linkingAgentIdentifierValue>urn:roda:premis:agent:org.roda.core.plugins.base.ingest.VerifyUserAuthorizationPlugin@1.0</linkingAgentIdentifierValue>
   </linkingAgentIdentifier>
   <linkingAgentIdentifier>
     <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>

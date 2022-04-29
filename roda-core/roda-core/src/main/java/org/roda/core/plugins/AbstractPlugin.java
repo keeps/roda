@@ -18,7 +18,7 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.ip.SIPInformation;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.plugins.notifications.JobNotification;
+import org.roda.core.plugins.base.notifications.JobNotification;
 
 public abstract class AbstractPlugin<T extends IsRODAObject> implements Plugin<T> {
 

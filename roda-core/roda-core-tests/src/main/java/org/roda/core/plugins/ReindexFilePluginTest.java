@@ -25,7 +25,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.plugins.reindex.ReindexFilePlugin;
+import org.roda.core.plugins.base.maintenance.reindex.ReindexFilePlugin;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;

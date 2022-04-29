@@ -47,7 +47,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.plugins.ingest.v2.MinimalIngestPlugin;
+import org.roda.core.plugins.base.ingest.v2.MinimalIngestPlugin;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
