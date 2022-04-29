@@ -42,6 +42,7 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
@@ -52,10 +53,12 @@ import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
+import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.plugins.internal.synchronization.ImportUtils;
 import org.roda.core.plugins.plugins.internal.synchronization.JsonListHelper;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.Resource;
@@ -706,8 +709,9 @@ public class SyncUtils {
    * @throws JobAlreadyStartedException
    *           if some error occurs.
    */
-  public static int importStorage(final StorageService storage, final Path tempDirectory, final BundleState bundleState,
-    final JobPluginInfo jobPluginInfo, final boolean moveJob) throws GenericException, NotFoundException,
+  public static int importStorage(final ModelService model, final IndexService index, final StorageService storage,
+    final Job job, final Path tempDirectory, final BundleState bundleState, final JobPluginInfo jobPluginInfo,
+    final Report report, final boolean moveJob) throws GenericException, NotFoundException,
     AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, JobAlreadyStartedException {
     int count = 0;
     final FileStorageService temporaryStorage = new FileStorageService(
@@ -741,50 +745,8 @@ public class SyncUtils {
         count++;
       }
     }
-    reindexBundle(bundleState, jobPluginInfo);
+    ImportUtils.reindexFromFile(model, index, bundleState, jobPluginInfo, report, tempDirectory);
     return count;
-  }
-
-  /**
-   * Reindex all objects moved from bundle to storage.
-   *
-   * @param bundleState
-   *          {@link BundleState}.
-   * @param jobPluginInfo
-   *          {@link JobPluginInfo}.
-   * @throws NotFoundException
-   *           if some error occurs.
-   * @throws AuthorizationDeniedException
-   *           if some error occurs.
-   * @throws JobAlreadyStartedException
-   *           if some error occurs.
-   * @throws GenericException
-   *           if some error occurs.
-   * @throws RequestNotValidException
-   *           if some error occurs.
-   */
-  // TODO: Remove this reindex method and use the reindex from ImportUtils
-
-  private static void reindexBundle(final BundleState bundleState, final JobPluginInfo jobPluginInfo)
-    throws NotFoundException, AuthorizationDeniedException, JobAlreadyStartedException, GenericException,
-    RequestNotValidException {
-    final List<PackageState> packageStateList = bundleState.getPackageStateList();
-    jobPluginInfo.setSourceObjectsCount(packageStateList.size());
-    for (PackageState packageState : packageStateList) {
-      if (packageState.getCount() > 0) {
-        final Job job = new Job();
-        job.setId(IdUtils.createUUID());
-        job.setName("Reindex RODA entity (" + packageState.getClassName() + ")");
-        job.setPluginType(PluginType.INTERNAL);
-        job.setUsername(RodaConstants.ADMIN);
-
-        job.setPlugin(PluginHelper.getReindexPluginName(packageState.getClassName()));
-        job.setSourceObjects(SelectedItemsList.create(packageState.getClassName(), packageState.getIdList()));
-
-        PluginHelper.createAndExecuteJob(job);
-      }
-      jobPluginInfo.incrementObjectsProcessedWithSuccess();
-    }
   }
 
   /**

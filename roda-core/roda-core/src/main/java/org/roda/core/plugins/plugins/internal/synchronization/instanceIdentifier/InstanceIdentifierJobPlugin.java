@@ -14,6 +14,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -26,7 +27,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.RODAObjectsProcessingLogic;
+import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
@@ -38,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 
-public class InstanceIdentifierJobPlugin extends AbstractPlugin<Job> {
+public class InstanceIdentifierJobPlugin extends AbstractPlugin<Void> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierJobPlugin.class);
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
@@ -132,13 +133,13 @@ public class InstanceIdentifierJobPlugin extends AbstractPlugin<Job> {
   }
 
   @Override
-  public Plugin<Job> cloneMe() {
+  public Plugin<Void> cloneMe() {
     return new InstanceIdentifierJobPlugin();
   }
 
   @Override
-  public List<Class<Job>> getObjectClasses() {
-    return Arrays.asList(Job.class);
+  public List<Class<Void>> getObjectClasses() {
+    return Arrays.asList(Void.class);
   }
 
   @Override
@@ -150,22 +151,21 @@ public class InstanceIdentifierJobPlugin extends AbstractPlugin<Job> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> list) throws PluginException {
-    return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<Job>() {
+    return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        JobPluginInfo jobPluginInfo, Plugin<Job> plugin, List<Job> lites) {
+        JobPluginInfo jobPluginInfo, Plugin<Void> plugin) throws PluginException {
         try {
           modifyInstanceId(model, index, cachedJob, report, jobPluginInfo);
         } catch (RequestNotValidException | GenericException | NotFoundException e) {
           LOGGER.error("Could not modify Instance ID's in objects");
         }
       }
-    }, index, model, storage, list);
+    }, index, model, storage);
   }
 
   private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
     JobPluginInfo jobPluginInfo) throws RequestNotValidException, GenericException, NotFoundException {
-    PluginState state = PluginState.SUCCESS;
     String details = "";
 
     // Get Jobs from index
@@ -175,15 +175,15 @@ public class InstanceIdentifierJobPlugin extends AbstractPlugin<Job> {
       Report reportItem = PluginHelper.initPluginReportItem(this, indexedJob.getId(), Job.class);
       try {
         model.updateJobInstanceId(model.retrieveJob(indexedJob.getId()));
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
       } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
         details = e.getMessage() + "\n";
-        state = PluginState.FAILURE;
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+        reportItem.setPluginState(PluginState.FAILURE);
+        reportItem.addPluginDetails(details);
+        pluginReport.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
       }
-      jobPluginInfo.incrementObjectsProcessed(state);
-      reportItem.setPluginState(state);
-      reportItem.addPluginDetails(details);
-      pluginReport.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
     }
   }
 
@@ -195,9 +195,6 @@ public class InstanceIdentifierJobPlugin extends AbstractPlugin<Job> {
   private IterableIndexResult<Job> retrieveList(IndexService index) throws RequestNotValidException, GenericException {
     Filter filter = new Filter();
 
-    IterableIndexResult<Job> indexedJobs = index.findAll(Job.class, filter,
-      Collections.singletonList(RodaConstants.INDEX_UUID));
-
-    return indexedJobs;
+    return index.findAll(Job.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
   }
 }

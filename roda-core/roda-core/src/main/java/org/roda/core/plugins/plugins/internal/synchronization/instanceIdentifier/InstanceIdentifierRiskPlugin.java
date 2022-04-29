@@ -14,6 +14,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -28,7 +29,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.RODAObjectsProcessingLogic;
+import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
@@ -40,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 
-public class InstanceIdentifierRiskPlugin extends AbstractPlugin<Risk> {
+public class InstanceIdentifierRiskPlugin extends AbstractPlugin<Void> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierRiskPlugin.class);
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
@@ -134,13 +135,13 @@ public class InstanceIdentifierRiskPlugin extends AbstractPlugin<Risk> {
   }
 
   @Override
-  public Plugin<Risk> cloneMe() {
+  public Plugin<Void> cloneMe() {
     return new InstanceIdentifierRiskPlugin();
   }
 
   @Override
-  public List<Class<Risk>> getObjectClasses() {
-    return Arrays.asList(Risk.class);
+  public List<Class<Void>> getObjectClasses() {
+    return Arrays.asList(Void.class);
   }
 
   @Override
@@ -152,22 +153,21 @@ public class InstanceIdentifierRiskPlugin extends AbstractPlugin<Risk> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> list) throws PluginException {
-    return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<Risk>() {
+    return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        JobPluginInfo jobPluginInfo, Plugin<Risk> plugin, List<Risk> lites) {
+        JobPluginInfo jobPluginInfo, Plugin<Void> plugin) throws PluginException {
         try {
           modifyInstanceId(model, index, cachedJob, report, jobPluginInfo);
         } catch (RequestNotValidException | GenericException | NotFoundException e) {
           LOGGER.error("Could not modify Instance ID's in objects");
         }
       }
-    }, index, model, storage, list);
+    }, index, model, storage);
   }
 
   private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
     JobPluginInfo jobPluginInfo) throws RequestNotValidException, GenericException, NotFoundException {
-    PluginState state = PluginState.SUCCESS;
     String details = "";
 
     // Get Risks from index
@@ -177,15 +177,15 @@ public class InstanceIdentifierRiskPlugin extends AbstractPlugin<Risk> {
       Report reportItem = PluginHelper.initPluginReportItem(this, indexedRisk.getId(), Risk.class);
       try {
         model.updateRiskInstanceId(model.retrieveRisk(indexedRisk.getId()), true);
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
       } catch (GenericException | AuthorizationDeniedException e) {
         details = e.getMessage() + "\n";
-        state = PluginState.FAILURE;
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+        reportItem.setPluginState(PluginState.FAILURE);
+        reportItem.addPluginDetails(details);
+        pluginReport.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
       }
-      jobPluginInfo.incrementObjectsProcessed(state);
-      reportItem.setPluginState(state);
-      reportItem.addPluginDetails(details);
-      pluginReport.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
     }
   }
 
@@ -196,12 +196,8 @@ public class InstanceIdentifierRiskPlugin extends AbstractPlugin<Risk> {
 
   private IterableIndexResult<IndexedRisk> retrieveList(IndexService index)
     throws RequestNotValidException, GenericException {
-
     Filter filter = new Filter();
 
-    IterableIndexResult<IndexedRisk> indexedRisks = index.findAll(IndexedRisk.class, filter,
-      Collections.singletonList(RodaConstants.INDEX_UUID));
-
-    return indexedRisks;
+    return index.findAll(IndexedRisk.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
   }
 }

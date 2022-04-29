@@ -2,6 +2,7 @@ package org.roda.core.plugins.plugins.multiple;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -16,6 +17,7 @@ public class Step {
   private String parameterName;
   private boolean usesCorePlugin;
   private boolean mandatory;
+  private Optional<Integer> sourceObjectsCount;
   private Map<String, String> parameters;
 
   public Step(final String pluginName, final Class<?> pluginClass, final String parameterName,
@@ -31,6 +33,7 @@ public class Step {
     this.usesCorePlugin = usesCorePlugin;
     this.mandatory = mandatory;
     this.parameters = parameters;
+    this.sourceObjectsCount = Optional.empty();
   }
 
   public String getPluginName() {
@@ -81,9 +84,18 @@ public class Step {
     this.parameters = parameters;
   }
 
+  public Optional<Integer> getSourceObjectsCount() {
+    return sourceObjectsCount;
+  }
+
+  public void setSourceObjectsCount(Optional<Integer> sourceObjectsCount) {
+    this.sourceObjectsCount = sourceObjectsCount;
+  }
+
   public void execute(MultipleStepBundle bundle) throws JobException {
     MutipleStepUtils.executePlugin(bundle, this);
     PluginHelper.updateJobInformationAsync(bundle.getPlugin(),
       bundle.getJobPluginInfo().incrementStepsCompletedByOne());
   }
+
 }

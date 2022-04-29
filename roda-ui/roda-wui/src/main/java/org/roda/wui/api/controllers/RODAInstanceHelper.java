@@ -53,6 +53,7 @@ import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierRepresentationInformationPlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierRiskIncidencePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierRiskPlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierRodaObjectPlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.proccess.ImportSyncBundlePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.proccess.SynchronizeInstancePlugin;
 import org.slf4j.Logger;
@@ -68,6 +69,16 @@ public class RODAInstanceHelper {
     throws GenericException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException,
     RequestNotValidException, IllegalOperationException {
     return RodaCoreFactory.getModelService().createDistributedInstance(distributedInstance, user.getName());
+  }
+
+  public static void applyInstanceIdToRodaObject(LocalInstance localInstance, User user)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
+
+    BrowserHelper.createAndExecuteInternalJob("Apply Instance Id to RODA Objects", new SelectedItemsNone<>(),
+      InstanceIdentifierRodaObjectPlugin.class, user, pluginParameters,
+      "Could not apply instance identifier to RODA Object");
   }
 
   public static void applyInstanceIdToAIP(LocalInstance localInstance, User user)

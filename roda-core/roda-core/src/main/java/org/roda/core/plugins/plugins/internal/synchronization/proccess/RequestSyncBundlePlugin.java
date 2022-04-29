@@ -163,7 +163,8 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
           final Path bundleWorkingDir = SyncUtils.extractBundle(localInstance.getId(), path);
           final int jobs = createJobs(localInstance.getId(), index);
           final BundleState bundleState = SyncUtils.getIncomingBundleState(localInstance.getId());
-          final int imported = SyncUtils.importStorage(storage, bundleWorkingDir, bundleState, jobPluginInfo, false);
+          final int imported = SyncUtils.importStorage(model, index, storage, cachedJob, bundleWorkingDir, bundleState,
+            jobPluginInfo, report, false);
 
           ImportUtils.deleteBundleEntities(model, index, cachedJob, this, jobPluginInfo, localInstance,
             bundleWorkingDir, bundleState.getValidationEntityList(), report);

@@ -281,16 +281,19 @@ public class RODAInstance extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      RODAInstanceHelper.applyInstanceIdToAIP(localInstance, user);
-      RODAInstanceHelper.applyInstanceIdToDIP(localInstance, user);
-      RODAInstanceHelper.applyInstanceIdToRisk(localInstance, user);
-      RODAInstanceHelper.applyInstanceIdToRiskIncidence(localInstance, user);
-      RODAInstanceHelper.applyInstanceIdToRI(localInstance, user);
-      RODAInstanceHelper.applyInstanceIdToNotification(localInstance, user);
-      RODAInstanceHelper.applyInstanceIdToJob(localInstance, user);
-      RODAInstanceHelper.applyInstanceIdToAIPPreservationEvent(localInstance, user);
-      RODAInstanceHelper.applyInstanceIdToPreservationAgents(localInstance, user);
-      RODAInstanceHelper.applyInstanceIdToRepositoryPreservationEvent(localInstance, user);
+      RODAInstanceHelper.applyInstanceIdToRodaObject(localInstance, user);
+      // RODAInstanceHelper.applyInstanceIdToAIP(localInstance, user);
+      // RODAInstanceHelper.applyInstanceIdToDIP(localInstance, user);
+      // RODAInstanceHelper.applyInstanceIdToRisk(localInstance, user);
+      // RODAInstanceHelper.applyInstanceIdToRiskIncidence(localInstance, user);
+      // RODAInstanceHelper.applyInstanceIdToRI(localInstance, user);
+      // RODAInstanceHelper.applyInstanceIdToNotification(localInstance, user);
+      // RODAInstanceHelper.applyInstanceIdToJob(localInstance, user);
+      // RODAInstanceHelper.applyInstanceIdToAIPPreservationEvent(localInstance,
+      // user);
+      // RODAInstanceHelper.applyInstanceIdToPreservationAgents(localInstance, user);
+      // RODAInstanceHelper.applyInstanceIdToRepositoryPreservationEvent(localInstance,
+      // user);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;

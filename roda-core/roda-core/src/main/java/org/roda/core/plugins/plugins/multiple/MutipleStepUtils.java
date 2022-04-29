@@ -3,6 +3,7 @@ package org.roda.core.plugins.plugins.multiple;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -71,6 +72,19 @@ public class MutipleStepUtils {
         jobPluginInfo.addReport(reportItem);
       }
     }
+  }
+
+  public static Optional<Integer> getTotalSourceObjectsCount(final List<Step> steps) {
+    int count = 0;
+    for (Step step : steps) {
+      if (step.getSourceObjectsCount().isPresent()) {
+        count += step.getSourceObjectsCount().get();
+      }
+    }
+    if (count == 0) {
+      return Optional.empty();
+    }
+    return Optional.of(count);
   }
 
 }

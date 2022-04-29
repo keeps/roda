@@ -14,6 +14,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
@@ -29,6 +30,7 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
+import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
@@ -40,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 
-public class InstanceIdentifierDIPPlugin extends AbstractPlugin<DIP> {
+public class InstanceIdentifierDIPPlugin extends AbstractPlugin<Void> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierDIPPlugin.class);
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
@@ -134,13 +136,13 @@ public class InstanceIdentifierDIPPlugin extends AbstractPlugin<DIP> {
   }
 
   @Override
-  public Plugin<DIP> cloneMe() {
+  public Plugin<Void> cloneMe() {
     return new InstanceIdentifierDIPPlugin();
   }
 
   @Override
-  public List<Class<DIP>> getObjectClasses() {
-    return Arrays.asList(DIP.class);
+  public List<Class<Void>> getObjectClasses() {
+    return Arrays.asList(Void.class);
   }
 
   @Override
@@ -152,22 +154,20 @@ public class InstanceIdentifierDIPPlugin extends AbstractPlugin<DIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> list) throws PluginException {
-    return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<DIP>() {
+    return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
       @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        JobPluginInfo jobPluginInfo, Plugin<DIP> plugin, List<DIP> lites) {
+      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob, JobPluginInfo jobPluginInfo, Plugin<Void> plugin) throws PluginException {
         try {
           modifyInstanceId(model, index, cachedJob, report, jobPluginInfo);
         } catch (RequestNotValidException | GenericException | NotFoundException e) {
           LOGGER.error("Could not modify Instance ID's in objects");
         }
       }
-    }, index, model, storage, list);
+    }, index, model, storage);
   }
 
   private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
     JobPluginInfo jobPluginInfo) throws RequestNotValidException, GenericException, NotFoundException {
-    PluginState state = PluginState.SUCCESS;
     String details = "";
 
     // Get DIP's from index
@@ -177,15 +177,15 @@ public class InstanceIdentifierDIPPlugin extends AbstractPlugin<DIP> {
       Report reportItem = PluginHelper.initPluginReportItem(this, indexedDIP.getId(), DIP.class);
       try {
         model.updateDIPInstanceId(model.retrieveDIP(indexedDIP.getId()));
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
       } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
         details = e.getMessage() + "\n";
-        state = PluginState.FAILURE;
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+        reportItem.setPluginState(PluginState.FAILURE);
+        reportItem.addPluginDetails(details);
+        pluginReport.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
       }
-      jobPluginInfo.incrementObjectsProcessed(state);
-      reportItem.setPluginState(state);
-      reportItem.addPluginDetails(details);
-      pluginReport.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
     }
   }
 
@@ -198,9 +198,6 @@ public class InstanceIdentifierDIPPlugin extends AbstractPlugin<DIP> {
     throws RequestNotValidException, GenericException {
     Filter filter = new Filter();
 
-    IterableIndexResult<IndexedDIP> indexedDIPS = index.findAll(IndexedDIP.class, filter,
-      Collections.singletonList(RodaConstants.INDEX_UUID));
-
-    return indexedDIPS;
+    return index.findAll(IndexedDIP.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
   }
 }

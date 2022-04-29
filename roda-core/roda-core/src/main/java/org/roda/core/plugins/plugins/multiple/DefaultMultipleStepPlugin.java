@@ -1,9 +1,9 @@
 package org.roda.core.plugins.plugins.multiple;
 
 import java.util.List;
-
 import java.util.Map;
-import org.roda.core.RodaCoreFactory;
+import java.util.Optional;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
@@ -74,10 +74,14 @@ public abstract class DefaultMultipleStepPlugin<T extends IsRODAObject> extends 
     try {
       boolean updateMetaPluginInformation = true;
       final MultipleJobPluginInfo jobPluginInfo = (MultipleJobPluginInfo) outerJobPluginInfo;
-      PluginHelper.updateJobInformationAsync(this, jobPluginInfo.setTotalSteps(getTotalSteps()));
+      jobPluginInfo.setTotalSteps(getTotalSteps());
 
       List<Step> steps = getPluginSteps();
+      Optional<Integer> count = MutipleStepUtils.getTotalSourceObjectsCount(steps);
 
+      count.ifPresent(jobPluginInfo::setSourceObjectsCount);
+
+      PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
       for (Step step : steps) {
         MultipleStepBundle bundle = new MultipleStepBundle(this, index, model, storage, jobPluginInfo,
           getPluginParameter(step.getParameterName()), getParameterValues(), resources, cachedJob);
