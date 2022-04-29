@@ -92,7 +92,7 @@ import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.schema.SolrCollectionRegistry;
-import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.core.util.IdUtils;

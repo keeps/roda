@@ -44,7 +44,7 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.plugins.ingest.MinimalIngestPlugin;
+import org.roda.core.plugins.base.ingest.MinimalIngestPlugin;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

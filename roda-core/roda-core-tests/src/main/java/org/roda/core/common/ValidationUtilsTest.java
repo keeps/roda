@@ -45,7 +45,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceTest;
 import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
+import org.roda.core.plugins.base.preservation.DescriptiveMetadataValidationPlugin;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;

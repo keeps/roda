@@ -17,7 +17,7 @@
   </eventOutcomeInformation>
   <linkingAgentIdentifier>
     <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
-    <linkingAgentIdentifierValue>urn:roda:premis:agent:org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin@1.0</linkingAgentIdentifierValue>
+    <linkingAgentIdentifierValue>urn:roda:premis:agent:org.roda.core.plugins.base.base.DescriptiveMetadataValidationPlugin@1.0</linkingAgentIdentifierValue>
   </linkingAgentIdentifier>
   <linkingAgentIdentifier>
     <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>

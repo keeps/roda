@@ -33,7 +33,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.plugins.internal.UpdatePermissionsPlugin;
+import org.roda.core.plugins.base.maintenance.UpdatePermissionsPlugin;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

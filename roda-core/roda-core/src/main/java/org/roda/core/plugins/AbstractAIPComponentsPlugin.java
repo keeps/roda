@@ -26,7 +26,6 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

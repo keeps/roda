@@ -30,7 +30,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.orchestrate.JobInfo;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobsHelper;
-import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.PluginHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

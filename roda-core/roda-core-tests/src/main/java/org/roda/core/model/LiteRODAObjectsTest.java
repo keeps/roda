@@ -57,7 +57,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.EARKSIPPluginsTest;
-import org.roda.core.plugins.plugins.characterization.PremisSkeletonPlugin;
+import org.roda.core.plugins.base.characterization.PremisSkeletonPlugin;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;

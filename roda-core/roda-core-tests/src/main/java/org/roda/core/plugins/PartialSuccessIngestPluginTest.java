@@ -48,7 +48,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexTestUtils;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.plugins.v2.PartialSuccessIngestPlugin;
+import org.roda.core.plugins.base.v2.PartialSuccessIngestPlugin;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

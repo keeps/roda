@@ -27,7 +27,8 @@ Time: 12.003 sec (0 m 12 s)</eventOutcomeDetailNote>
   </eventOutcomeInformation>
   <linkingAgentIdentifier>
     <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
-    <linkingAgentIdentifierValue>urn:roda:premis:agent:org.roda.core.plugins.plugins.antivirus.AntivirusPlugin@ClamAV 0.99.2/23368/Mon May  8 14:01:15 2017</linkingAgentIdentifierValue>
+    <linkingAgentIdentifierValue>urn:roda:premis:agent:org.roda.core.plugins.base.antivirus.AntivirusPlugin@ClamAV
+      0.99.2/23368/Mon May 8 14:01:15 2017</linkingAgentIdentifierValue>
   </linkingAgentIdentifier>
   <linkingAgentIdentifier>
     <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
