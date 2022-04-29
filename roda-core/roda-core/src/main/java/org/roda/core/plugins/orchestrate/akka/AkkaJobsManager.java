@@ -13,7 +13,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -26,6 +25,8 @@ import org.roda.core.common.akka.Messages.JobsManagerAcquireLock;
 import org.roda.core.common.akka.Messages.JobsManagerReleaseAllLocks;
 import org.roda.core.common.akka.Messages.JobsManagerReleaseLock;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobStats;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +70,13 @@ public class AkkaJobsManager extends AkkaBaseActor {
   private Counter objectsWaitingToAcquireLock;
   private Histogram objectsWaitingToAcquireLockHisto;
   private Histogram messagesProcessingTimeInMilis;
+  private Counter ingestJobsBeingExecuted;
+  private Counter ingestJobsWaitingToBeExecuted;
+  private Histogram ingestJobsDurationHistogram;
+
+  private Counter ingestJobsWithFailures;
+
+  private Counter ingestJobsWithPartialSuccess;
 
   // parallelization
   private List<String> nonParallelizablePlugins;
@@ -157,19 +165,38 @@ public class AkkaJobsManager extends AkkaBaseActor {
   }
 
   private void sendJobForExecution(Job job) {
-    updateJobsBeingExecuted(true);
+    updateJobsBeingExecuted(true, job.getPluginType());
     jobsTimeInTheQueueInMilis.update(0);
     jobsRouter.tell(job, getSender());
     log("Will execute job", job.getId());
   }
 
-  private void updateJobsBeingExecuted(boolean increment) {
+  private void updateJobsBeingExecuted(boolean increment, PluginType pluginType) {
     if (increment) {
+      if (PluginType.INGEST.equals(pluginType)) {
+        ingestJobsBeingExecuted.inc();
+      }
       jobsBeingExecuted.inc();
     } else {
+      if (PluginType.INGEST.equals(pluginType)) {
+        ingestJobsBeingExecuted.dec();
+      }
       jobsBeingExecuted.dec();
     }
     jobsBeingExecutedHisto.update(jobsBeingExecuted.getCount());
+  }
+
+  private void updateIngestJobsDurationHistogram(PluginType pluginType, long duration) {
+    if (PluginType.INGEST.equals(pluginType)) {
+      ingestJobsDurationHistogram.update(duration);
+    }
+  }
+
+  private void updateIngestJobsFailureOrPartialSuccessCounters(PluginType pluginType, JobStats jobStats) {
+    if (PluginType.INGEST.equals(pluginType)) {
+      ingestJobsWithPartialSuccess.inc(jobStats.getSourceObjectsProcessedWithPartialSuccess());
+      ingestJobsWithFailures.inc(jobStats.getSourceObjectsProcessedWithFailure());
+    }
   }
 
   private void queueJob(Job job, boolean jobIsJobParallelizable) {
@@ -178,14 +205,20 @@ public class AkkaJobsManager extends AkkaBaseActor {
     }
     jobsWaiting.offer(new JobWaiting(job));
     jobsWaitingCreators.put(job.getId(), getSender());
-    updateJobsWaitingToBeExecuted(true);
+    updateJobsWaitingToBeExecuted(true, job.getPluginType());
     log("Queued job", job.getId());
   }
 
-  private void updateJobsWaitingToBeExecuted(boolean increment) {
+  private void updateJobsWaitingToBeExecuted(boolean increment, PluginType type) {
     if (increment) {
+      if (PluginType.INGEST.equals(type)) {
+        ingestJobsWaitingToBeExecuted.inc();
+      }
       jobsWaitingToBeExecuted.inc();
     } else {
+      if (PluginType.INGEST.equals(type)) {
+        ingestJobsWaitingToBeExecuted.dec();
+      }
       jobsWaitingToBeExecuted.dec();
     }
     jobsWaitingToBeExecutedHisto.update(jobsWaitingToBeExecuted.getCount());
@@ -243,8 +276,8 @@ public class AkkaJobsManager extends AkkaBaseActor {
       jobsTimeInTheQueueInMilis.update(jobToDequeue.timeInQueueInMillis());
       Job job = jobToDequeue.job;
       ActorRef jobCreator = jobsWaitingCreators.remove(job.getId());
-      updateJobsBeingExecuted(true);
-      updateJobsWaitingToBeExecuted(false);
+      updateJobsBeingExecuted(true, job.getPluginType());
+      updateJobsWaitingToBeExecuted(false, job.getPluginType());
       jobsRouter.tell(job, jobCreator);
       log("Dequeued job", job.getId());
     }
@@ -375,7 +408,9 @@ public class AkkaJobsManager extends AkkaBaseActor {
     if (jobIsNotParallelizable(jobEnded.getPlugin())) {
       nonParallelizableJobIsRunning = false;
     }
-    updateJobsBeingExecuted(false);
+    updateJobsBeingExecuted(false, jobEnded.getPluginType());
+    updateIngestJobsDurationHistogram(jobEnded.getPluginType(), jobEnded.getDuration());
+    updateIngestJobsFailureOrPartialSuccessCounters(jobEnded.getPluginType(), jobEnded.getJobStats());
     log("The end for job", jobEnded.getJobId());
   }
 
@@ -448,6 +483,12 @@ public class AkkaJobsManager extends AkkaBaseActor {
       .histogram(MetricRegistry.name(className, "objectsWaitingToAcquireLockHisto"));
 
     messagesProcessingTimeInMilis = metrics.histogram(MetricRegistry.name(className, "messagesProcessingTimeInMilis"));
+
+    ingestJobsBeingExecuted = metrics.counter(MetricRegistry.name(className, "ingestJobsBeingExecuted"));
+    ingestJobsWaitingToBeExecuted = metrics.counter(MetricRegistry.name(className, "ingestJobsWaitingToBeExecuted"));
+    ingestJobsDurationHistogram = metrics.histogram(MetricRegistry.name(className, "ingestJobsDurationHistogram"));
+    ingestJobsWithFailures = metrics.counter(MetricRegistry.name(className, "ingestJobsWithFailures"));
+    ingestJobsWithPartialSuccess = metrics.counter(MetricRegistry.name(className, "ingestJobsWithPartialSuccess"));
   }
 
   private void loadParallelizationInformation() {

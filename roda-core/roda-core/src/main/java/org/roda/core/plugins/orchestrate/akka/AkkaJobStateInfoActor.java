@@ -24,13 +24,14 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
+import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.index.IndexService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.orchestrate.JobInfo;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobsHelper;
-import org.roda.core.plugins.PluginHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -127,18 +128,20 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
     try {
       Job job = PluginHelper.getJob(p, getIndex());
       LOGGER.info("Setting job '{}' ({}) state to {}. Details: {}", job.getName(), job.getId(), message.getState(),
-        message.getStateDatails().orElse("NO DETAILS"));
+        message.getStateDetails().orElse("NO DETAILS"));
     } catch (NotFoundException | GenericException | RequestNotValidException e) {
       LOGGER.warn("Unable to get Job from index to log its state change. Reason: {}", e.getMessage());
     }
-    JobsHelper.updateJobState(p, getModel(), message.getState(), message.getStateDatails());
+    JobsHelper.updateJobState(p, getModel(), message.getState(), message.getStateDetails());
     if (Job.isFinalState(message.getState())) {
       // 20160817 hsilva: the following instruction is needed for the "sync"
       // execution of a job (i.e. for testing purposes)
       PluginHelper.processNotifications(plugin);
 
       jobCreator.tell("Done", getSelf());
-      jobsManager.tell(Messages.newJobsManagerJobEnded(jobId, plugin.getClass().getName()), getSelf());
+      jobsManager.tell(
+        Messages.newJobsManagerJobEnded(jobId, plugin.getClass().getName(), plugin.getType(), calculateJobDuration(p), getJobStatsFromPlugin(p)),
+        getSelf());
       JobsHelper.deleteJobWorkingDirectory(jobId);
       getContext().stop(getSelf());
     }
@@ -148,7 +151,7 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
   private void handleJobStateDetailsUpdated(Messages.JobStateDetailsUpdated message) {
     markMessageProcessingAsStarted(message);
     Plugin<?> p = message.getPlugin() == null ? this.plugin : message.getPlugin();
-    JobsHelper.updateJobStateDetails(p, getModel(), message.getStateDatails());
+    JobsHelper.updateJobStateDetails(p, getModel(), message.getStateDetails());
     markMessageProcessingAsEnded(message);
   }
 
@@ -341,4 +344,22 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
     message.logProcessingEnded();
   }
 
+  private long calculateJobDuration(Plugin<?> p) {
+    try {
+      Job job = PluginHelper.getJob(p, getIndex());
+      return job.getEndDate().getTime() - job.getStartDate().getTime();
+    } catch (NotFoundException | GenericException | RequestNotValidException e) {
+      return 0;
+    }
+  }
+
+  private JobStats getJobStatsFromPlugin(Plugin<?> p) {
+    try {
+      Job job = PluginHelper.getJob(p, getIndex());
+      return job.getJobStats();
+    } catch (NotFoundException | GenericException | RequestNotValidException e) {
+      LOGGER.warn("Failed to obtain JobStats to update the metrics: {}", e.getMessage(), e);
+      return new JobStats();
+    }
+  }
 }

@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 import java.util.WeakHashMap;
 
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.plugins.Plugin;
 
 public class JobInfo implements Serializable {
