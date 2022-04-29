@@ -1786,6 +1786,7 @@ public final class RodaConstants {
 
   /* Distributed instances */
   public static final String DISTRIBUTED_INSTANCE_USER_PREFIX = "DISTRIBUTED_";
+  public static final String DISTRIBUTED_INSTANCE_GROUP_NAME = "Distributed group";
   public static final String DISTRIBUTED_INSTANCE_ACCESS_KEY_PREFIX = DISTRIBUTED_INSTANCE_USER_PREFIX;
   public static final String DISTRIBUTED_INSTANCE_ACCESS_KEY_SUFFIX = "_KEY";
   public static final String DISTRIBUTED_INSTANCE_STATISTIC_PLACEHOLDER = "INSTANCEID";

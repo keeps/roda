@@ -1532,7 +1532,8 @@ public class ModelService extends ModelObservable {
       identifier = IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId);
     }
 
-    String urn = URNUtils.createRodaPreservationURN(type, fileDirectoryPath, identifier, RODAInstanceUtils.getLocalInstanceIdentifier());
+    String urn = URNUtils.createRodaPreservationURN(type, fileDirectoryPath, identifier,
+      RODAInstanceUtils.getLocalInstanceIdentifier());
     return createPreservationMetadata(type, urn, aipId, representationId, fileDirectoryPath, fileId, payload, notify);
   }
 
@@ -4118,6 +4119,9 @@ public class ModelService extends ModelObservable {
     user.setDirectRoles(roles);
 
     User accessTokenUser = createUser(user, true);
+
+    // Create a new Group
+    RODAInstanceUtils.createDistributedGroup(user);
 
     // Create a new Access token
     AccessKey accessKey = new AccessKey();
