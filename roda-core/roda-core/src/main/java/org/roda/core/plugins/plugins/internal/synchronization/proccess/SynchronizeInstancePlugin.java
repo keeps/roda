@@ -1,18 +1,16 @@
 package org.roda.core.plugins.plugins.internal.synchronization.proccess;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.SyncUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
@@ -22,20 +20,13 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.risks.RiskIncidence;
-import org.roda.core.data.v2.synchronization.bundle.BundleState;
-import org.roda.core.data.v2.synchronization.bundle.PackageState;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.plugins.internal.synchronization.packages.AipPackagePlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.packages.DipPackagePlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.packages.JobPackagePlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.packages.PreservationAgentPackagePlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.packages.RepositoryEventPackagePlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.packages.RiskIncidencePackagePlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.packages.*;
 import org.roda.core.plugins.plugins.multiple.DefaultMultipleStepPlugin;
 import org.roda.core.plugins.plugins.multiple.Step;
 import org.roda.core.storage.StorageService;
@@ -47,9 +38,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAObject> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SynchronizeInstancePlugin.class);
-  private LocalInstance localInstance;
-  private BundleState bundleState;
-  private Map<String, PluginParameter> pluginParameters = new HashMap<>();
+  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   private static List<Step> steps = new ArrayList<>();
 
   static {
@@ -60,6 +49,7 @@ public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAO
     steps.add(new Step(RiskIncidencePackagePlugin.class.getName(), RiskIncidence.class, "", true, true));
     steps.add(new Step(RepositoryEventPackagePlugin.class.getName(), IndexedPreservationEvent.class, "", true, true));
     steps.add(new Step(PreservationAgentPackagePlugin.class.getName(), IndexedPreservationAgent.class, "", true, true));
+    steps.add(new Step(BuildSyncManifestPlugin.class.getName(), BuildSyncManifestPlugin.class, "", true, true));
 
     steps.add(new Step(SendSyncBundlePlugin.class.getName(), SendSyncBundlePlugin.class, "", true, true));
     steps.add(new Step(RequestSyncBundlePlugin.class.getName(), RequestSyncBundlePlugin.class, "", true, true));
@@ -140,27 +130,36 @@ public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAO
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
     try {
-      localInstance = RodaCoreFactory.getLocalInstance();
-      bundleState = SyncUtils.createBundleState(localInstance.getId());
+      LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
+      // Bundle working dir
+      Path workingDir = SyncUtils.getBundleWorkingDirectory(localInstance.getId());
+      getParameterValues().put(RodaConstants.PLUGIN_PARAMS_BUNDLE_WORKING_PATH, workingDir.toString());
+      // From date
       DistributedInstance distributedInstance = SyncUtils.requestInstanceStatus(localInstance);
-      setValidationEntitiesFilePaths();
-      bundleState.setFromDate(distributedInstance.getLastSynchronizationDate());
-      try {
-        SyncUtils.createLocalInstanceLists(bundleState, localInstance.getId());
-      } catch (IOException | GenericException e) {
-        LOGGER.debug("Failed to create List of entities", e.getMessage(), e);
-      }
-      SyncUtils.updateBundleState(bundleState, localInstance.getId());
-    } catch (GenericException | IOException e) {
-      throw new PluginException("Error while creating entity bundle state", e);
+      Date lastSyncDate = distributedInstance.getLastSynchronizationDate();
+      getParameterValues().put(RodaConstants.PLUGIN_PARAMS_BUNDLE_FROM_DATE, JsonUtils.getJsonFromObject(lastSyncDate));
+      // To date
+      getParameterValues().put(RodaConstants.PLUGIN_PARAMS_BUNDLE_TO_DATE, JsonUtils.getJsonFromObject(new Date()));
+    } catch (IOException e) {
+      throw new PluginException("Unable to create working directory", e);
+    } catch (GenericException e) {
+      throw new PluginException("Unable to request information from the central instance", e);
     }
     return new Report();
   }
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    // SyncUtils.deleteSyncBundleWorkingDirectory(localInstance.getId());
-    return null;
+    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_BUNDLE_WORKING_PATH)) {
+      try {
+        LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
+        Path workingDir = SyncUtils.getBundleWorkingDirectory(localInstance.getId());
+        Files.deleteIfExists(workingDir);
+      } catch (GenericException | IOException e) {
+        LOGGER.warn("Failed to delete working dir: " + e.getMessage());
+      }
+    }
+    return new Report();
   }
 
   @Override
@@ -183,38 +182,12 @@ public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAO
     setSourceObjectsCount(1);
     super.setParameterValues(parameters);
 
-    if (RodaConstants.DistributedModeType.LOCAL.equals(RodaCoreFactory.getDistributedModeType())) {
-      try {
-        String instanceId = RodaCoreFactory.getLocalInstance().getId();
-        getParameterValues().put(RodaConstants.PLUGIN_PARAMS_BUNDLE_NAME, SyncUtils.getInstanceBundleName(instanceId));
-      } catch (GenericException e) {
-        throw new InvalidParameterException(e);
-      }
-
+    try {
+      // Bundle name
+      String instanceId = RodaCoreFactory.getLocalInstance().getId();
+      getParameterValues().put(RodaConstants.PLUGIN_PARAMS_BUNDLE_NAME, SyncUtils.getInstanceBundleName(instanceId));
+    } catch (GenericException e) {
+      throw new InvalidParameterException(e);
     }
-  }
-
-  private void setValidationEntitiesFilePaths() {
-    final List<PackageState> validationEntityList = new ArrayList<>();
-    // aip validation package state
-    final PackageState aipValidationPackageState = new PackageState();
-    aipValidationPackageState.setClassName(AIP.class);
-    aipValidationPackageState.setFilePath(RodaConstants.SYNCHRONIZATION_VALIDATION_AIP_FILE_PATH);
-
-    // dip validation package state
-    final PackageState dipValidationPackageState = new PackageState();
-    dipValidationPackageState.setClassName(DIP.class);
-    dipValidationPackageState.setFilePath(RodaConstants.SYNCHRONIZATION_VALIDATION_DIP_FILE_PATH);
-
-    // risk incident validation package state
-    final PackageState riskIncidentValidationPackageState = new PackageState();
-    riskIncidentValidationPackageState.setClassName(RiskIncidence.class);
-    riskIncidentValidationPackageState.setFilePath(RodaConstants.SYNCHRONIZATION_VALIDATION_RISK_INCIDENT_FILE_PATH);
-
-    validationEntityList.add(aipValidationPackageState);
-    validationEntityList.add(dipValidationPackageState);
-    validationEntityList.add(riskIncidentValidationPackageState);
-
-    bundleState.setValidationEntityList(validationEntityList);
   }
 }

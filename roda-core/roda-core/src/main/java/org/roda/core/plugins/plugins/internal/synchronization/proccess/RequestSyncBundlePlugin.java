@@ -1,7 +1,6 @@
 package org.roda.core.plugins.plugins.internal.synchronization.proccess;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -9,45 +8,41 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.util.EntityUtils;
+import org.apache.commons.lang.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.SyncUtils;
-import org.roda.core.common.TokenManager;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
-import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.synchronization.bundle.BundleState;
-import org.roda.core.data.v2.synchronization.bundle.PackageState;
+import org.roda.core.data.v2.synchronization.bundle.v2.BundleManifest;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.ResourceParseUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.plugins.internal.synchronization.BundleManifestCreator;
 import org.roda.core.plugins.plugins.internal.synchronization.ImportUtils;
+import org.roda.core.storage.Container;
+import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -157,32 +152,35 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
     String outcomeDetailsText = "There are no updates from the central instance";
 
     try {
-      final Path path = SyncUtils.requestRemoteActions(localInstance);
-      if (path != null) {
+      final Path bundlePath = SyncUtils.requestRemoteActions(localInstance);
+      if (bundlePath != null) {
         try {
-          final Path bundleWorkingDir = SyncUtils.extractBundle(localInstance.getId(), path);
-          final int jobs = createJobs(localInstance.getId(), index);
-          final BundleState bundleState = SyncUtils.getIncomingBundleState(localInstance.getId());
-          final int imported = SyncUtils.importStorage(model, index, storage, cachedJob, bundleWorkingDir, bundleState,
-            jobPluginInfo, report, false);
+          Path workingDir = SyncUtils.getBundleWorkingDirectory(localInstance.getId());
+          SyncUtils.extract(workingDir, bundlePath);
+          BundleManifestCreator bundleManifestCreator = new BundleManifestCreator(workingDir);
+          BundleManifest manifestFile = bundleManifestCreator.parse();
 
-          ImportUtils.deleteBundleEntities(model, index, cachedJob, this, jobPluginInfo, localInstance,
-            bundleWorkingDir, bundleState.getValidationEntityList(), report);
+          final int imported = ImportUtils.importStorage(model, index, storage, workingDir, false);
+          final int jobs = createJobs(workingDir, index);
 
-          ImportUtils.reindexFromFile(model, index, bundleState, jobPluginInfo, report, bundleWorkingDir);
+          ImportUtils.deleteBundleEntities(model, index, cachedJob, this, jobPluginInfo, localInstance, workingDir,
+            manifestFile.getValidationEntityList(), report);
 
-          SyncUtils.removeSyncBundleLocal(bundleName,RodaConstants.CORE_SYNCHRONIZATION_OUTCOME_FOLDER);
-          Files.deleteIfExists(path);
-          String centralBundleName = path.toString().split("remote_actions/")[1];
-
-          removeSyncBundlesFromCentral(bundleName, RodaConstants.CORE_SYNCHRONIZATION_INCOMING_FOLDER);
-          removeSyncBundlesFromCentral(centralBundleName, RodaConstants.CORE_SYNCHRONIZATION_OUTCOME_FOLDER);
-
-          ImportUtils.updateEntityCounter(bundleState, localInstance);
-          ImportUtils.createLastSyncFile(bundleWorkingDir, localInstance, cachedJob.getId(), bundleState.getId());
+          ImportUtils.updateEntityCounter(manifestFile, localInstance);
+          ImportUtils.createLastSyncFile(workingDir, localInstance, cachedJob.getId(), manifestFile.getId());
           RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
           outcomeDetailsText = "Received " + jobs + " jobs. Imported " + imported
             + " representations information and risks from Central";
+
+          FSUtils.deletePathQuietly(workingDir);
+          Files.deleteIfExists(bundlePath);
+          SyncUtils.removeSyncBundleLocal(bundleName, RodaConstants.CORE_SYNCHRONIZATION_OUTCOME_FOLDER);
+          String centralBundleName = bundlePath.getFileName().toString();
+
+          SyncUtils.removeSyncBundlesFromCentral(bundleName, RodaConstants.CORE_SYNCHRONIZATION_INCOMING_FOLDER,
+            localInstance);
+          SyncUtils.removeSyncBundlesFromCentral(centralBundleName, RodaConstants.CORE_SYNCHRONIZATION_OUTCOME_FOLDER,
+            localInstance);
         } catch (AlreadyExistsException | JobAlreadyStartedException e) {
           // Do nothing
         }
@@ -202,83 +200,39 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
   }
 
-  private void removeSyncBundlesFromCentral(String bundleName, String bundleDirectory) {
-
-    try {
-      AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
-      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE + "remove"
-        + RodaConstants.API_SEP + "bundle" + RodaConstants.API_QUERY_START + RodaConstants.SYNCHRONIZATION_BUNDLE_NAME
-        + RodaConstants.API_QUERY_ASSIGN_SYMBOL + bundleName + RodaConstants.API_QUERY_SEP
-        + RodaConstants.SYNCHRONIZATION_BUNDLE_DIRECTORY + RodaConstants.API_QUERY_ASSIGN_SYMBOL + bundleDirectory;
-
-      CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-      HttpGet httpGet = new HttpGet(localInstance.getCentralInstanceURL() + resource);
-      httpGet.addHeader("Authorization", "Bearer " + accessToken.getToken());
-      httpGet.addHeader("content-type", "application/json");
-      httpGet.addHeader("Accept", "application/json");
-
-      HttpResponse response = httpClient.execute(httpGet);
-
-      if (response.getStatusLine().getStatusCode() == RodaConstants.HTTP_RESPONSE_CODE_SUCCESS) {
-        EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
-      }
-    } catch (AuthenticationDeniedException | GenericException | IOException e) {
-      // do nothing
-    }
-
-  }
-
   /**
    * Creates the Jobs from RODA Central in RODA local and executes.
    * 
-   * @param instanceId
-   *          the instance identifier.
    * @return number of jobs created and executed.
-   * @throws GenericException
-   *           if some error occurs.
-   * @throws AuthorizationDeniedException
-   *           if some error occurs.
-   * @throws RequestNotValidException
-   *           if some error occurs.
-   * @throws JobAlreadyStartedException
-   *           if some error occurs.
-   * @throws NotFoundException
-   *           if some error occurs.
    */
-  public static int createJobs(final String instanceId, final IndexService index) throws GenericException,
-    AuthorizationDeniedException, RequestNotValidException, JobAlreadyStartedException, NotFoundException {
+  private int createJobs(final Path workingDir, IndexService index) throws GenericException, NotFoundException,
+    IOException, RequestNotValidException, AuthorizationDeniedException, JobAlreadyStartedException {
+    FileStorageService tmpStorage = new FileStorageService(workingDir.resolve(RodaConstants.CORE_STORAGE_FOLDER), false,
+      null, false);
 
-    PackageState packageState = null;
-    int count = 0;
-    try {
-      packageState = SyncUtils.getIncomingEntityPackageState(instanceId, RodaConstants.CORE_JOB_FOLDER);
-    } catch (final NotFoundException e) {
-      // do nothing
-    }
-
-    if (packageState != null) {
-      for (String jobId : packageState.getIdList()) {
-        final Path jobPath = SyncUtils.getEntityStoragePath(instanceId, RodaConstants.CORE_JOB_FOLDER)
-          .resolve(jobId + ".json");
-        final Job job = JsonUtils.readObjectFromFile(jobPath, Job.class);
-        if (checkIfJobExist(index, job.getId())) {
-          String SYNC_ACTION_TYPE = RodaCoreFactory
-            .getRodaConfigurationAsString("core.synchronization.preservationActionExecution.type");
-          if (!StringUtils.isNotBlank(SYNC_ACTION_TYPE)) {
-            PluginHelper.createAndExecuteJob(job);
-          } else if (RodaConstants.JOB_EXECUTION_TYPE_APPROVAL.equals(SYNC_ACTION_TYPE)) {
-            job.setState(Job.JOB_STATE.PENDING_APPROVAL);
-            PluginHelper.createJob(job);
-          } else {
-            job.setState(Job.JOB_STATE.SCHEDULED);
-            PluginHelper.createJob(job);
+    int total = 0;
+    for (Container container : tmpStorage.listContainers()) {
+      if (RodaConstants.STORAGE_CONTAINER_JOB.equals(container.getStoragePath().getName())) {
+        for (Resource resource : tmpStorage.listResourcesUnderContainer(container.getStoragePath(), false)) {
+          Job job = ResourceParseUtils.convertResourceToObject(resource, Job.class);
+          total++;
+          if (checkIfJobExist(index, job.getId())) {
+            String SYNC_ACTION_TYPE = RodaCoreFactory
+              .getRodaConfigurationAsString("core.synchronization.preservationActionExecution.type");
+            if (!StringUtils.isNotBlank(SYNC_ACTION_TYPE)) {
+              PluginHelper.createAndExecuteJob(job);
+            } else if (RodaConstants.JOB_EXECUTION_TYPE_APPROVAL.equals(SYNC_ACTION_TYPE)) {
+              job.setState(Job.JOB_STATE.PENDING_APPROVAL);
+              PluginHelper.createJob(job);
+            } else {
+              job.setState(Job.JOB_STATE.SCHEDULED);
+              PluginHelper.createJob(job);
+            }
           }
         }
       }
-
-      count = packageState.getCount();
     }
-    return count;
+    return total;
   }
 
   @Override
@@ -309,6 +263,5 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_BUNDLE_NAME)) {
       bundleName = parameters.get(RodaConstants.PLUGIN_PARAMS_BUNDLE_NAME);
     }
-
   }
 }

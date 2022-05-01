@@ -19,16 +19,14 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.*;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -228,4 +226,13 @@ public class IndexUtils {
     return res;
   }
 
+  public static <T extends IsIndexed> Class<T> giveRespectiveIndexedClassFromModelClass(Class<?> modelClass) {
+    if (AIP.class.equals(modelClass)) {
+      return (Class<T>) IndexedAIP.class;
+    } else if (DIP.class.equals(modelClass)) {
+      return (Class<T>) IndexedDIP.class;
+    } else {
+      return (Class<T>) modelClass;
+    }
+  }
 }

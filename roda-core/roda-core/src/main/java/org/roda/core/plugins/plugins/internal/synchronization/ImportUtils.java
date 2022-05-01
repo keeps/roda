@@ -6,28 +6,28 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.SyncUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.exceptions.ReturnWithExceptions;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
@@ -35,31 +35,30 @@ import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.synchronization.EntitySummary;
 import org.roda.core.data.v2.synchronization.RODAInstance;
-import org.roda.core.data.v2.synchronization.bundle.BundleState;
+import org.roda.core.data.v2.synchronization.bundle.AttachmentState;
 import org.roda.core.data.v2.synchronization.bundle.Issue;
-import org.roda.core.data.v2.synchronization.bundle.PackageState;
 import org.roda.core.data.v2.synchronization.bundle.RemovedEntity;
+import org.roda.core.data.v2.synchronization.bundle.v2.BundleManifest;
+import org.roda.core.data.v2.synchronization.bundle.v2.PackageState;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
-import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.model.utils.ResourceParseUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobsHelper;
-import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.internal.DeleteRodaObjectPluginUtils;
-import org.roda.core.plugins.plugins.reindex.ReindexPreservationAgentPlugin;
-import org.roda.core.plugins.plugins.reindex.ReindexPreservationRepositoryEventPlugin;
+import org.roda.core.storage.Container;
+import org.roda.core.storage.Resource;
+import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.core.*;
 
 /**
  * {@author João Gomes <jgomes@keep.pt>}.
@@ -72,206 +71,100 @@ public class ImportUtils {
     // do nothing
   }
 
-  /**
-   * Reindex the bundle from Local.
-   * 
-   * @param model
-   *          {@link ModelService}.
-   * @param index
-   *          {@link IndexService}.
-   * @param bundleState
-   *          {@link BundleState}
-   * @param jobPluginInfo
-   *          {@link JobPluginInfo}.
-   * @param reportItem
-   *          {@link Report}.
-   */
+  public static int importStorage(final ModelService model, final IndexService index, final StorageService storage,
+    final Path workingDir, final boolean importJobs) throws GenericException, NotFoundException,
+    AuthorizationDeniedException, AlreadyExistsException, RequestNotValidException {
+    FileStorageService tmpStorage = new FileStorageService(workingDir.resolve(RodaConstants.CORE_STORAGE_FOLDER), false,
+      null, false);
 
-  // TODO: Change this method to iterate over jsonl files
-  public static void reindexBundle(final ModelService model, final IndexService index, final BundleState bundleState,
-    final JobPluginInfo jobPluginInfo, final Report reportItem) {
-    final List<PackageState> packageStateList = bundleState.getPackageStateList();
     int total = 0;
-    for (PackageState packageState : packageStateList) {
-      if (packageState.getCount() > 0) {
-        total += packageState.getCount();
-        jobPluginInfo.setSourceObjectsCount(total);
-        try {
-          if (PluginHelper.getReindexPluginName(packageState.getClassName())
-            .equals(ReindexPreservationAgentPlugin.class.getName())) {
-            // acrescentar método para reindexar preservation agents
-            reindexPreservationAgent(model, jobPluginInfo, reportItem);
-          } else if (PluginHelper.getReindexPluginName(packageState.getClassName())
-            .equals(ReindexPreservationRepositoryEventPlugin.class.getName())) {
-            // acrescentar método para reindexar preservation repository Event
-            reindexPreservationRepositoryEvent(model, jobPluginInfo, reportItem);
-          } else {
-            List<? extends IsRODAObject> objectsToReindex = null;
-            try {
-              objectsToReindex = JobsHelper.getObjectsFromUUID(model, index, packageState.getClassName(),
-                packageState.getIdList());
-              defaultReindex(index, jobPluginInfo, reportItem, objectsToReindex);
-            } catch (GenericException | RequestNotValidException e) {
-              jobPluginInfo.incrementObjectsProcessedWithFailure();
-              reportItem.addPluginDetails(e.getMessage());
-              reportItem.setPluginState(PluginState.FAILURE);
+
+    for (Container container : tmpStorage.listContainers()) {
+      // Let local instance handle job creation
+      if (!RodaConstants.STORAGE_CONTAINER_JOB.equals(container.getStoragePath().getName()) || importJobs) {
+        for (Resource resource : tmpStorage.listResourcesUnderContainer(container.getStoragePath(), false)) {
+          StoragePath storagePath = resource.getStoragePath();
+          if (RodaConstants.STORAGE_CONTAINER_PRESERVATION.equals(container.getStoragePath().getName())) {
+            CloseableIterable<Resource> resources = tmpStorage.listResourcesUnderDirectory(container.getStoragePath(),
+              true);
+            for (Resource pmResource : resources) {
+              StoragePath pmStoragePath = pmResource.getStoragePath();
+              importResource(model, index, storage, tmpStorage, pmResource, pmStoragePath);
             }
-          }
-        } catch (final NotFoundException e) {
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-          reportItem.addPluginDetails(e.getMessage());
-          reportItem.setPluginState(PluginState.FAILURE);
-        }
-      }
-    }
-  }
-
-  public static void reindexFromFile(final ModelService model, final IndexService index, final BundleState bundleState,
-    final JobPluginInfo jobPluginInfo, final Report reportItem, final Path bundleWorkingDir) {
-    final List<PackageState> packageStateList = bundleState.getPackageStateList();
-    int total = 0;
-    for (PackageState packageState : packageStateList) {
-      if (packageState.getCount() > 0) {
-        total += packageState.getCount();
-        jobPluginInfo.setSourceObjectsCount(total);
-        try {
-          if (PluginHelper.getReindexPluginName(packageState.getClassName())
-            .equals(ReindexPreservationAgentPlugin.class.getName())) {
-            // acrescentar método para reindexar preservation agents
-            reindexPreservationAgent(model, jobPluginInfo, reportItem);
-          } else if (PluginHelper.getReindexPluginName(packageState.getClassName())
-            .equals(ReindexPreservationRepositoryEventPlugin.class.getName())) {
-            // acrescentar método para reindexar preservation repository Event
-            reindexPreservationRepositoryEvent(model, jobPluginInfo, reportItem);
           } else {
-            try {
-              defaultReindexFromFile(model, index, jobPluginInfo, reportItem, packageState, bundleWorkingDir);
-            } catch (Exception e) {
-              jobPluginInfo.incrementObjectsProcessedWithFailure();
-              reportItem.addPluginDetails(e.getMessage());
-              reportItem.setPluginState(PluginState.FAILURE);
-            }
+            importResource(model, index, storage, tmpStorage, resource, storagePath);
           }
-        } catch (final NotFoundException e) {
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-          reportItem.addPluginDetails(e.getMessage());
-          reportItem.setPluginState(PluginState.FAILURE);
+          total++;
         }
       }
     }
+    return total;
   }
 
-  /**
-   * Do the reindex to all entities excepts {@link IndexedPreservationEvent} or
-   * {@link IndexedPreservationAgent}.
-   *
-   * @param index
-   *          {@link IndexService}
-   * @param jobPluginInfo
-   *          {@link JobPluginInfo}
-   * @param reportItem
-   *          {@link Report}
-   */
-  private static void defaultReindex(final IndexService index, final JobPluginInfo jobPluginInfo,
-    final Report reportItem, final List<? extends IsRODAObject> objectsToReindex) {
-    try {
-      for (IsRODAObject object : objectsToReindex) {
-        final ReturnWithExceptions<Void, ModelObserver> exceptions = index.reindex(object);
-        final List<Exception> exceptionList = exceptions.getExceptions();
-        if (exceptionList.isEmpty()) {
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+  private static void importResource(ModelService model, IndexService index, StorageService storage,
+    FileStorageService tmpStorage, Resource resource, StoragePath storagePath) throws NotFoundException,
+    GenericException, AuthorizationDeniedException, AlreadyExistsException, RequestNotValidException {
+
+    // if the resource already exists, remove it before moving the updated resource
+    if (storage.exists(storagePath)) {
+      storage.deleteResource(storagePath);
+    }
+    storage.copy(tmpStorage, storagePath, storagePath);
+    reindexResource(model, index, resource);
+  }
+
+  private static void reindexResource(ModelService model, IndexService index, Resource resource)
+    throws AuthorizationDeniedException, GenericException {
+    String containerName = resource.getStoragePath().getContainerName();
+    Class<IsRODAObject> objectClass = ModelUtils.giveRespectiveModelClassFromContainerName(containerName);
+
+    if (Report.class.equals(objectClass) || PreservationMetadata.class.equals(objectClass)) {
+      if (resource.isDirectory()) {
+        return;
+      }
+    }
+
+    OptionalWithCause<LiteRODAObject> liteRODAObject = ResourceParseUtils.convertResourceToLite(resource, objectClass);
+    if (liteRODAObject.isPresent()) {
+      OptionalWithCause<IsModelObject> rodaObject = model.retrieveObjectFromLite(liteRODAObject.get());
+      if (rodaObject.isPresent()) {
+        if (PreservationMetadata.class.equals(objectClass)) {
+          model.notifyPreservationMetadataCreated((PreservationMetadata) rodaObject.get()).failOnError();
         } else {
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-
-          for (Exception e : exceptionList) {
-            reportItem.addPluginDetails(e.getMessage() + "\n");
-          }
-          reportItem.setPluginState(PluginState.FAILURE);
+          clearSpecificIndexes(index, objectClass, rodaObject.get());
+          index.reindex(rodaObject.get());
         }
-      }
-    } catch (Exception e) {
-      jobPluginInfo.incrementObjectsProcessedWithFailure();
-      reportItem.addPluginDetails(e.getMessage());
-      reportItem.setPluginState(PluginState.FAILURE);
-    }
-  }
-
-  private static void defaultReindexFromFile(final ModelService model, final IndexService index,
-    final JobPluginInfo jobPluginInfo, final Report reportItem, final PackageState packageState,
-    final Path bundleWorkingDir) throws IOException, RequestNotValidException, NotFoundException, GenericException {
-    final Path path = bundleWorkingDir.resolve(packageState.getFilePath());
-    JsonParser jsonParser = SyncUtils.createJsonParser(path);
-    while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
-      JsonToken token = jsonParser.currentToken();
-      if ((token != JsonToken.START_ARRAY) && (token != JsonToken.END_ARRAY)) {
-        final List<? extends IsRODAObject> objectsToReindex = JobsHelper.getObjectsFromUUID(model, index,
-          packageState.getClassName(), Collections.singletonList(jsonParser.getText()));
-        defaultReindex(index, jobPluginInfo, reportItem, objectsToReindex);
       }
     }
   }
 
-  /**
-   * Do the reindex to {@link IndexedPreservationAgent}.
-   * 
-   * @param model
-   *          {@link ModelService}
-   * @param jobPluginInfo
-   *          {@link JobPluginInfo}
-   * @param reportItem
-   *          {@link Report}
-   */
-  private static void reindexPreservationAgent(final ModelService model, final JobPluginInfo jobPluginInfo,
-    final Report reportItem) {
-    reportItem.setPluginState(PluginState.SUCCESS);
-    try (CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationAgents()) {
-
-      for (OptionalWithCause<PreservationMetadata> opm : iterable) {
-        if (opm.isPresent()) {
-          model.notifyPreservationMetadataCreated(opm.get()).failOnError();
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        } else {
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-          reportItem.setPluginState(PluginState.FAILURE)
-            .addPluginDetails("Could not add preservation agent: " + opm.getCause());
-        }
-      }
-    } catch (Exception e) {
-      LOGGER.error("Error getting preservation agents to be reindexed", e);
-      reportItem.setPluginState(PluginState.FAILURE);
+  private static void clearSpecificIndexes(IndexService index, Class<IsRODAObject> objectClass,
+    IsModelObject rodaObject) throws AuthorizationDeniedException {
+    if (AIP.class.equals(objectClass)) {
+      List<String> ids = Arrays.asList(rodaObject.getId());
+      index.delete(IndexedRepresentation.class,
+        new Filter(new OneOfManyFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, ids)));
+      index.delete(IndexedFile.class, new Filter(new OneOfManyFilterParameter(RodaConstants.FILE_AIP_ID, ids)));
+      index.delete(IndexedPreservationEvent.class,
+        new Filter(new OneOfManyFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, ids)));
     }
   }
 
-  /**
-   * Do the reindex to {@link IndexedPreservationEvent}.
-   * 
-   * @param model
-   *          {@link ModelService}.
-   * @param jobPluginInfo
-   *          {@link JobPluginInfo}.
-   * @param reportItem
-   *          {@link Report}
-   */
-  private static void reindexPreservationRepositoryEvent(final ModelService model, final JobPluginInfo jobPluginInfo,
-    final Report reportItem) {
-    reportItem.setPluginState(PluginState.SUCCESS);
-    try (
-      CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationRepositoryEvents()) {
-
-      for (OptionalWithCause<PreservationMetadata> opm : iterable) {
-        if (opm.isPresent()) {
-          model.notifyPreservationMetadataCreated(opm.get()).failOnError();
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        } else {
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-          reportItem.setPluginState(PluginState.FAILURE)
-            .addPluginDetails("Could not add preservation repository event: " + opm.getCause());
+  public static void importAttachments(Path workingDir, BundleManifest manifest) throws GenericException {
+    for (AttachmentState attachmentState : manifest.getAttachmentStateList()) {
+      for (String attachmentId : attachmentState.getAttachmentIdList()) {
+        try {
+          String fileName = Paths.get(attachmentId).toAbsolutePath().getParent().toUri()
+            .relativize(Paths.get(attachmentId).toAbsolutePath().toUri()).toString();
+          Path sourcePath = workingDir.resolve(RodaConstants.CORE_JOB_ATTACHMENTS_FOLDER)
+            .resolve(attachmentState.getJobId()).resolve(fileName);
+          Path targetPath = RodaCoreFactory.getJobAttachmentsDirectoryPath().resolve(attachmentState.getJobId())
+            .resolve(attachmentId);
+          FSUtils.copy(sourcePath, targetPath, true);
+        } catch (AlreadyExistsException e) {
+          // do nothing
         }
       }
-
-    } catch (final Exception e) {
-      LOGGER.error("Error reindexing RODA entity", e);
-      reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Could not list preservation repository events");
     }
   }
 
@@ -564,7 +457,7 @@ public class ImportUtils {
     jsonGenerator.writeEndArray();
   }
 
-  public static void updateEntityCounter(final BundleState bundleState, RODAInstance rodaInstance) {
+  public static void updateEntityCounter(final BundleManifest bundleState, RODAInstance rodaInstance) {
     final List<PackageState> packageStateList = bundleState.getPackageStateList();
 
     packageStateList.stream().forEach(packageState -> {

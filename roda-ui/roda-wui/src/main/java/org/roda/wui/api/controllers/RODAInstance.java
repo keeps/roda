@@ -7,7 +7,6 @@ import java.util.List;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.EntityResponse;
-import org.roda.core.common.SyncUtils;
 import org.roda.core.common.TokenManager;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -368,7 +367,7 @@ public class RODAInstance extends RodaWuiController {
     try {
       // delegate
       try {
-        return SyncUtils.createCentralSyncBundle(instanceIdentifier);
+        return RODAInstanceHelper.createCentralSyncBundle(instanceIdentifier);
       } catch (NotFoundException e) {
         return new ObjectResponse<>(null, null);
       }

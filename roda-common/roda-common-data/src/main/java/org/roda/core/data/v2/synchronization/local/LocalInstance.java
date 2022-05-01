@@ -18,7 +18,6 @@ public class LocalInstance extends RODAInstance {
 
   private String accessKey;
   private String centralInstanceURL;
-  private String bundlePath;
   private Boolean isRegistered;
 
   private LocalInstanceIdentifierState instanceIdentifierState = LocalInstanceIdentifierState.INACTIVE;
@@ -42,14 +41,6 @@ public class LocalInstance extends RODAInstance {
 
   public void setCentralInstanceURL(String centralInstanceURL) {
     this.centralInstanceURL = centralInstanceURL;
-  }
-
-  public String getBundlePath() {
-    return bundlePath;
-  }
-
-  public void setBundlePath(String bundlePath) {
-    this.bundlePath = bundlePath;
   }
 
   public Boolean getIsRegistered() {
@@ -76,8 +67,7 @@ public class LocalInstance extends RODAInstance {
       return false;
     LocalInstance that = (LocalInstance) o;
     return Objects.equals(getId(), that.getId()) && Objects.equals(accessKey, that.accessKey)
-      && Objects.equals(centralInstanceURL, that.centralInstanceURL) && Objects.equals(bundlePath, that.bundlePath)
-      && Objects.equals(isRegistered, that.isRegistered)
+      && Objects.equals(centralInstanceURL, that.centralInstanceURL) && Objects.equals(isRegistered, that.isRegistered)
       && Objects.equals(getLastSynchronizationDate(), that.getLastSynchronizationDate())
       && instanceIdentifierState == that.instanceIdentifierState && Objects.equals(getCreatedOn(), that.getCreatedOn())
       && Objects.equals(getCreatedBy(), that.getCreatedBy()) && Objects.equals(getUpdatedOn(), that.getUpdatedOn())
@@ -89,7 +79,6 @@ public class LocalInstance extends RODAInstance {
     int result = getId() != null ? getId().hashCode() : 0;
     result = 31 * result + (accessKey != null ? accessKey.hashCode() : 0);
     result = 31 * result + (centralInstanceURL != null ? centralInstanceURL.hashCode() : 0);
-    result = 31 * result + (bundlePath != null ? bundlePath.hashCode() : 0);
     result = 31 * result + (isRegistered != null ? isRegistered.hashCode() : 0);
     result = 31 * result + (getLastSynchronizationDate() != null ? getLastSynchronizationDate().hashCode() : 0);
     result = 31 * result + (getCreatedOn() != null ? getCreatedOn().hashCode() : 0);

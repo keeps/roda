@@ -14,12 +14,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.SyncUtils;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.IllegalOperationException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.*;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -35,6 +30,7 @@ import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
+import org.roda.core.plugins.plugins.internal.synchronization.BundleManifestCreator;
 import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.LocalInstanceRegisterPlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.proccess.ImportSyncBundlePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.proccess.SynchronizeInstancePlugin;
@@ -77,7 +73,10 @@ public class RODAInstanceHelper {
     String fileName = file.getContentDisposition().getFileName();
     try {
       Path path = SyncUtils.receiveBundle(fileName, bodyPartEntity.getInputStream());
+      Path workingDir = SyncUtils.getBundleWorkingDirectory(instanceIdentifier);
+
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_PATH, path.toString());
+      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BUNDLE_WORKING_PATH, workingDir.toString());
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, instanceIdentifier);
       return BrowserHelper.createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(),
         ImportSyncBundlePlugin.class, user, pluginParameters, "Could not execute bundle job");
@@ -177,7 +176,7 @@ public class RODAInstanceHelper {
     }
     return updatedItems;
   }
-  
+
   public static String removeSyncBundle(String bundlename, String bundleDirectory) {
     String message = null;
 
@@ -208,4 +207,24 @@ public class RODAInstanceHelper {
     }
     return message;
   }
+
+  public static EntityResponse createCentralSyncBundle(String instanceIdentifier) throws AuthorizationDeniedException,
+    AlreadyExistsException, RequestNotValidException, GenericException, NotFoundException {
+
+    try {
+      Path workingDir = SyncUtils.getBundleWorkingDirectory(instanceIdentifier);
+      String bundleName = SyncUtils.getInstanceBundleName(instanceIdentifier);
+      if (SyncUtils.createCentralSyncBundle(workingDir, instanceIdentifier)) {
+        BundleManifestCreator bundleManifestCreator = new BundleManifestCreator(
+          RodaConstants.DistributedModeType.CENTRAL, workingDir);
+        bundleManifestCreator.create();
+        Path zipPath = SyncUtils.compress(workingDir, bundleName);
+        return SyncUtils.createBundleStreamResponse(zipPath);
+      }
+      return null;
+    } catch (IOException e) {
+      throw new GenericException("Cannot create temporary directory");
+    }
+  }
+
 }

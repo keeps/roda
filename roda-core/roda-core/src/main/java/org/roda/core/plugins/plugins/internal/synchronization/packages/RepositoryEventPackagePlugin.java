@@ -1,13 +1,15 @@
 package org.roda.core.plugins.plugins.internal.synchronization.packages;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.*;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -52,8 +54,8 @@ public class RepositoryEventPackagePlugin extends RodaEntityPackagesPlugin<Index
   }
 
   @Override
-  protected List<String> retrieveList(IndexService index) throws RequestNotValidException, GenericException {
-    ArrayList<String> eventList = new ArrayList<>();
+  protected List<IterableIndexResult> retrieveList(IndexService index)
+    throws RequestNotValidException, GenericException {
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS,
       IndexedPreservationEvent.PreservationMetadataEventClass.REPOSITORY.toString()));
@@ -61,33 +63,30 @@ public class RepositoryEventPackagePlugin extends RodaEntityPackagesPlugin<Index
       filter.add(new DateIntervalFilterParameter(RodaConstants.PRESERVATION_EVENT_DATETIME,
         RodaConstants.PRESERVATION_EVENT_DATETIME, fromDate, toDate));
     }
-    IterableIndexResult<IndexedPreservationEvent> events = index.findAll(IndexedPreservationEvent.class, filter,
-      Arrays.asList(RodaConstants.INDEX_UUID));
-
-    for (IndexedPreservationEvent event : events) {
-      eventList.add(event.getId());
-    }
-    return eventList;
+    return Arrays
+      .asList(index.findAll(IndexedPreservationEvent.class, filter, Arrays.asList(RodaConstants.INDEX_UUID)));
   }
 
   @Override
-  protected void createPackage(IndexService index, ModelService model, List<String> list) throws GenericException,
-    AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException, IOException {
-    for (String eventId : list) {
-      PreservationMetadata retrieveEvent = model.retrievePreservationMetadata(eventId,
-        PreservationMetadata.PreservationMetadataType.EVENT);
-      createEventBundle(model, retrieveEvent);
+  protected void createPackage(IndexService index, ModelService model, IterableIndexResult objectList)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
+    AlreadyExistsException {
+    for (Object object : objectList) {
+      if (object instanceof IndexedPreservationEvent) {
+        PreservationMetadata preservationMetadata = model.retrievePreservationMetadata(
+          ((IndexedPreservationEvent) object).getId(), PreservationMetadata.PreservationMetadataType.EVENT);
+        createEventBundle(model, preservationMetadata);
+      }
     }
   }
 
-  public void createEventBundle(ModelService model, PreservationMetadata event) throws RequestNotValidException,
-    NotFoundException, AuthorizationDeniedException, GenericException, AlreadyExistsException {
-
+  private void createEventBundle(ModelService model, PreservationMetadata event)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException {
     StorageService storage = model.getStorage();
     StoragePath eventStoragePath = ModelUtils.getPreservationRepositoryEventStoragePath();
     String eventFile = event.getId() + RodaConstants.PREMIS_SUFFIX;
 
-    Path destinationPath = bundlePath.resolve(RodaConstants.CORE_STORAGE_FOLDER)
+    Path destinationPath = workingDirPath.resolve(RodaConstants.CORE_STORAGE_FOLDER)
       .resolve(RodaConstants.STORAGE_CONTAINER_PRESERVATION).resolve(RodaConstants.STORAGE_DIRECTORY_EVENTS);
 
     Path eventPath = destinationPath.resolve(eventFile);
