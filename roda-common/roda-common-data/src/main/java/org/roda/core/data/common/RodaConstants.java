@@ -1083,6 +1083,9 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_EXTRA_INFO = "parameter.disposal_confirmation_extra";
   public static final String PLUGIN_PARAMS_DISPOSAL_CONFIRMATION_DESTROY_EXECUTE_AGAIN = "parameter.disposal_confirmation_re_execute";
 
+  public static final String PLUGIN_PARAMS_BUNDLE_WORKING_PATH = "parameter.bundle_working_path";
+  public static final String PLUGIN_PARAMS_BUNDLE_FROM_DATE = "parameter.bundle_from_date";
+  public static final String PLUGIN_PARAMS_BUNDLE_TO_DATE = "parameter.bundle_to_date";
   public static final String PLUGIN_PARAMS_BUNDLE_PATH = "parameter.destination_path";
   public static final String PLUGIN_PARAMS_CENTRAL_INSTANCE_URL = "parameter.central_instance_url";
   public static final String PLUGIN_PARAMS_BUNDLE_NAME = "parameter.bundle_name";
@@ -1802,21 +1805,11 @@ public final class RodaConstants {
 
   /* Synchronization */
   public static final String SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FOLDER = "local-instance";
-  public static final String SYNCHRONIZATION_BUNDLE_FOLDER = "bundle";
   public static final String SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE = "config.yaml";
-  public static final String SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE_PATH = SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FOLDER
-    + "/" + SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE;
-  public static final String SYNCHRONIZATION_OUTCOME_BUNDLE_PATH = CORE_DATA_FOLDER + "/" + CORE_SYNCHRONIZATION_FOLDER
-    + "/" + CORE_SYNCHRONIZATION_OUTCOME_FOLDER + "/" + SYNCHRONIZATION_BUNDLE_FOLDER;
-  public static final String SYNCHRONIZATION_INCOMING_BUNDLE_PATH = CORE_DATA_FOLDER + "/" + CORE_SYNCHRONIZATION_FOLDER
-    + "/" + CORE_SYNCHRONIZATION_INCOMING_FOLDER + "/" + SYNCHRONIZATION_BUNDLE_FOLDER;
   public static final String PROTOCOL_SEPARATOR = "://";
 
   public static final String SYNCHRONIZATION_BUNDLE_NAME = "bundle_name";
   public static final String SYNCHRONIZATION_BUNDLE_DIRECTORY= "bundle_directory";
-  public static final String SYNCHRONIZATION_REMOTE_ACTIONS_FOLDER = "remote_actions";
-  public static final String SYNCHRONIZATION_INCOMING_REMOTE_ACTIONS_PATH = CORE_SYNCHRONIZATION_INCOMING_FOLDER + "/"
-    + SYNCHRONIZATION_REMOTE_ACTIONS_FOLDER;
 
   public static final String SYNCHRONIZATION_VALIDATION_AIP_FILE_PATH = "validation/aip_validation_list.json";
   public static final String SYNCHRONIZATION_VALIDATION_DIP_FILE_PATH = "validation/dip_validation_list.json";

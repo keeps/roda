@@ -1,13 +1,16 @@
 package org.roda.core.plugins.plugins.internal.synchronization.packages;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.*;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -50,41 +53,39 @@ public class RiskIncidencePackagePlugin extends RodaEntityPackagesPlugin<RiskInc
   }
 
   @Override
-  protected List<String> retrieveList(IndexService index) throws RequestNotValidException, GenericException {
-    ArrayList<String> riskList = new ArrayList<>();
+  protected List<IterableIndexResult> retrieveList(IndexService index)
+    throws RequestNotValidException, GenericException {
     Filter filter = new Filter();
     if (fromDate != null) {
       filter.add(new DateIntervalFilterParameter(RodaConstants.RISK_INCIDENCE_UPDATED_ON,
         RodaConstants.RISK_INCIDENCE_UPDATED_ON, fromDate, toDate));
     }
-    IterableIndexResult<RiskIncidence> incidences = index.findAll(RiskIncidence.class, filter, Collections.emptyList());
-    for (RiskIncidence incidence : incidences) {
-      riskList.add(incidence.getId());
-    }
-    return riskList;
+    return Arrays.asList(index.findAll(RiskIncidence.class, filter, Collections.emptyList()));
   }
 
   @Override
-  protected void createPackage(IndexService index, ModelService model, List<String> list) throws GenericException,
-    AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException, IOException {
-    for (String incidenceId : list) {
-      createRiskIncidenceBundle(model, incidenceId);
+  protected void createPackage(IndexService index, ModelService model, IterableIndexResult objectList)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
+    AlreadyExistsException {
+    for (Object object : objectList) {
+      if (object instanceof RiskIncidence) {
+        RiskIncidence riskIncidence = model.retrieveRiskIncidence(((RiskIncidence) object).getId());
+        createRiskIncidenceBundle(model, riskIncidence.getId());
+      }
     }
   }
 
-  public void createRiskIncidenceBundle(ModelService model, String incidenceId) throws RequestNotValidException,
-    NotFoundException, AuthorizationDeniedException, GenericException, AlreadyExistsException {
-
+  private void createRiskIncidenceBundle(ModelService model, String incidenceId)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException {
     StorageService storage = model.getStorage();
     StoragePath riskIncidenceStoragePath = ModelUtils.getRiskIncidenceContainerPath();
     String incidenceFile = incidenceId + RodaConstants.RISK_INCIDENCE_FILE_EXTENSION;
 
-    Path destinationPath = bundlePath.resolve(RodaConstants.CORE_STORAGE_FOLDER)
+    Path destinationPath = workingDirPath.resolve(RodaConstants.CORE_STORAGE_FOLDER)
       .resolve(RodaConstants.STORAGE_CONTAINER_RISK_INCIDENCE);
 
     Path incidencePath = destinationPath.resolve(incidenceFile);
 
     storage.copy(storage, riskIncidenceStoragePath, incidencePath, incidenceFile);
-
   }
 }

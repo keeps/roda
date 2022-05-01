@@ -1,8 +1,6 @@
 package org.roda.core.plugins.plugins.internal.synchronization.proccess;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -11,22 +9,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.SyncUtils;
-import org.roda.core.common.TokenManager;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
-import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.synchronization.bundle.v2.BundleManifest;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -36,21 +29,44 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.plugins.internal.synchronization.BundleManifestCreator;
 import org.roda.core.storage.StorageService;
-import org.roda.core.util.RESTClientUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(SendSyncBundlePlugin.class);
-
-  private LocalInstance localInstance;
+public class BuildSyncManifestPlugin extends AbstractPlugin<Void> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(BuildSyncManifestPlugin.class);
+  private Path workingDir;
   private String bundleName;
-  private String workingDir;
+  private Date fromDate;
   private Date toDate;
+
+  @Override
+  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
+
+    try {
+      if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_BUNDLE_WORKING_PATH)) {
+        workingDir = Paths.get(parameters.get(RodaConstants.PLUGIN_PARAMS_BUNDLE_WORKING_PATH));
+      }
+      if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_BUNDLE_NAME)) {
+        bundleName = parameters.get(RodaConstants.PLUGIN_PARAMS_BUNDLE_NAME);
+      }
+
+      if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_BUNDLE_FROM_DATE)) {
+        fromDate = JsonUtils.getObjectFromJson(parameters.get(RodaConstants.PLUGIN_PARAMS_BUNDLE_FROM_DATE),
+          Date.class);
+      }
+      if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_BUNDLE_TO_DATE)) {
+        toDate = JsonUtils.getObjectFromJson(parameters.get(RodaConstants.PLUGIN_PARAMS_BUNDLE_TO_DATE), Date.class);
+      }
+    } catch (GenericException e) {
+      throw new InvalidParameterException(e);
+    }
+  }
 
   @Override
   public String getVersionImpl() {
@@ -58,23 +74,13 @@ public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
   }
 
   @Override
-  public void init() throws PluginException {
-
-  }
-
-  @Override
-  public void shutdown() {
-    // do nothing
-  }
-
-  @Override
   public String getName() {
-    return "Send synchronization bundle";
+    return "BuildSyncManifestPlugin";
   }
 
   @Override
   public String getDescription() {
-    return "Send the sync bundle to the central instance";
+    return "Creates manifest sync bundle based on packages";
   }
 
   @Override
@@ -84,17 +90,17 @@ public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Send the sync bundle to the central instance";
+    return null;
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Sync bundle sent successfully";
+    return null;
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Sync bundle not sent successfully";
+    return null;
   }
 
   @Override
@@ -109,12 +115,17 @@ public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
 
   @Override
   public Plugin<Void> cloneMe() {
-    return new SendSyncBundlePlugin();
+    return new BuildSyncManifestPlugin();
   }
 
   @Override
   public boolean areParameterValuesValid() {
     return true;
+  }
+
+  @Override
+  public void init() throws PluginException {
+
   }
 
   @Override
@@ -135,85 +146,47 @@ public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<Void> plugin) throws PluginException {
-        try {
-          localInstance = RodaCoreFactory.getLocalInstance();
-        } catch (GenericException e) {
-          throw new PluginException("Unable to retrieve local instance configuration", e);
-        }
-        sendSyncBundle(model, report, jobPluginInfo, cachedJob);
+        processBundle(index, model, storage, report, jobPluginInfo, cachedJob);
       }
     }, index, model, storage);
   }
 
-  private void sendSyncBundle(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job cachedJob) {
+  private void processBundle(IndexService index, ModelService model, StorageService storage, Report report,
+    JobPluginInfo jobPluginInfo, Job cachedJob) throws PluginException {
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
     PluginState pluginState = PluginState.SKIPPED;
     String pluginDetails = "";
 
     try {
-      Path zipPath = SyncUtils.compress(Paths.get(workingDir), bundleName);
-      if (Files.exists(zipPath)) {
-        int responseCode = send(zipPath);
-        if (responseCode == 200) {
-          localInstance.setLastSynchronizationDate(toDate);
-          RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
-          pluginState = PluginState.SUCCESS;
-          jobPluginInfo.incrementObjectsProcessed(pluginState);
-        } else {
-          pluginDetails = "Server response is " + responseCode;
-          pluginState = PluginState.FAILURE;
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-        }
-      }
-    } catch (GenericException | NotFoundException | IOException e) {
+      BundleManifestCreator manifestCreator = new BundleManifestCreator(RodaConstants.DistributedModeType.LOCAL,
+        workingDir, fromDate, toDate);
+      manifestCreator.create();
+      pluginState = PluginState.SUCCESS;
+      jobPluginInfo.incrementObjectsProcessed(pluginState);
+
+    } catch (GenericException e) {
       jobPluginInfo.incrementObjectsProcessedWithFailure();
-      pluginDetails = e.getMessage();
+      pluginDetails = "Unable to get Local instance configuration: " + e.getMessage();
+      pluginState = PluginState.FAILURE;
+    } catch (NotFoundException | IOException e) {
+      jobPluginInfo.incrementObjectsProcessedWithFailure();
+      pluginDetails = "Unable to create bundle manifest: " + e.getMessage();
       pluginState = PluginState.FAILURE;
     }
+
     reportItem.setPluginState(pluginState).setPluginDetails(pluginDetails);
     report.addReport(reportItem);
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
   }
 
-  private int send(Path zipPath) throws GenericException {
-    try {
-      AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
-
-      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE
-        + RodaConstants.API_PATH_PARAM_DISTRIBUTED_INSTANCE_SYNC + RodaConstants.API_SEP + localInstance.getId();
-      return RESTClientUtility.sendPostRequestWithCompressedFile(localInstance.getCentralInstanceURL(), resource,
-        zipPath, accessToken);
-    } catch (RODAException | FileNotFoundException e) {
-      LOGGER.error("Unable to send bundle to central instance", e);
-      throw new GenericException("Unable to send bundle to central instance", e);
-    }
-  }
-
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    return new Report();
+    return null;
   }
 
   @Override
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    super.setParameterValues(parameters);
-
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_BUNDLE_NAME)) {
-      bundleName = parameters.get(RodaConstants.PLUGIN_PARAMS_BUNDLE_NAME);
-    }
-
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_BUNDLE_WORKING_PATH)) {
-      workingDir = parameters.get(RodaConstants.PLUGIN_PARAMS_BUNDLE_WORKING_PATH);
-    }
-
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_BUNDLE_TO_DATE)) {
-      try {
-        toDate = JsonUtils.getObjectFromJson(parameters.get(RodaConstants.PLUGIN_PARAMS_BUNDLE_TO_DATE), Date.class);
-      } catch (GenericException e) {
-        throw new InvalidParameterException(e);
-      }
-    }
+  public void shutdown() {
 
   }
 }

@@ -182,12 +182,14 @@ public interface BrowserService extends RemoteService {
   Job createJob(Job job) throws AuthorizationDeniedException, NotFoundException, RequestNotValidException,
     GenericException, JobAlreadyStartedException;
 
-  void stopJob(String jobId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
+  void stopJob(String jobId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
-  void approveJob(Job job) throws RequestNotValidException, GenericException, NotFoundException, JobAlreadyStartedException, AuthorizationDeniedException, JobStateNotPendingException;
+  void approveJob(Job job) throws RequestNotValidException, GenericException, NotFoundException,
+    JobAlreadyStartedException, AuthorizationDeniedException, JobStateNotPendingException;
 
   void rejectJob(Job job, String details) throws RequestNotValidException, GenericException, NotFoundException,
-          JobAlreadyStartedException, AuthorizationDeniedException, JobStateNotPendingException;
+    JobAlreadyStartedException, AuthorizationDeniedException, JobStateNotPendingException;
 
   List<PluginInfo> retrievePluginsInfo(List<PluginType> type);
 
@@ -275,7 +277,7 @@ public interface BrowserService extends RemoteService {
     RequestNotValidException, NotFoundException, InvalidParameterException, JobAlreadyStartedException;
 
   <T extends IsIndexed> List<Job> createProcess(String jobName, JobPriority priority, JobParallelism parallelism,
-                                          SelectedItems<T> selected, String id, Map<String, String> value, String selectedClass)
+    SelectedItems<T> selected, String id, Map<String, String> value, String selectedClass)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
     JobAlreadyStartedException;
 
@@ -556,15 +558,15 @@ public interface BrowserService extends RemoteService {
   void updateLocalInstanceConfiguration(LocalInstance localInstance)
     throws AuthorizationDeniedException, GenericException;
 
-   List<String> testLocalInstanceConfiguration(LocalInstance localInstance)
+  List<String> testLocalInstanceConfiguration(LocalInstance localInstance)
     throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException;
 
-  LocalInstance registerLocalInstance(LocalInstance localInstance)
-          throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException, RequestNotValidException, NotFoundException;
+  LocalInstance registerLocalInstance(LocalInstance localInstance) throws AuthorizationDeniedException,
+    GenericException, AuthenticationDeniedException, RequestNotValidException, NotFoundException;
 
   Job synchronizeBundle(LocalInstance localInstance)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
-    
+
   void modifyInstanceIdOnRepository(LocalInstance localInstance)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 }

@@ -1,16 +1,15 @@
 package org.roda.core.plugins.plugins.internal.synchronization.packages;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
-import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.SyncUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.*;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
@@ -18,10 +17,8 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.synchronization.bundle.BundleState;
-import org.roda.core.data.v2.synchronization.bundle.PackageState;
-import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
@@ -40,9 +37,30 @@ public abstract class RodaEntityPackagesPlugin<T extends IsRODAObject> extends A
   private static final Logger LOGGER = LoggerFactory.getLogger(RodaEntityPackagesPlugin.class);
   protected Date fromDate;
   protected Date toDate;
-  protected Path bundlePath;
-  protected BundleState bundleState;
-  private LocalInstance localInstance;
+  protected Path workingDirPath;
+  protected String workingDir;
+  protected long totalCount;
+
+  @Override
+  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
+
+    try {
+      if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_BUNDLE_WORKING_PATH)) {
+        workingDir = parameters.get(RodaConstants.PLUGIN_PARAMS_BUNDLE_WORKING_PATH);
+        workingDirPath = Paths.get(workingDir);
+      }
+      if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_BUNDLE_FROM_DATE)) {
+        fromDate = JsonUtils.getObjectFromJson(parameters.get(RodaConstants.PLUGIN_PARAMS_BUNDLE_FROM_DATE),
+          Date.class);
+      }
+      if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_BUNDLE_TO_DATE)) {
+        toDate = JsonUtils.getObjectFromJson(parameters.get(RodaConstants.PLUGIN_PARAMS_BUNDLE_TO_DATE), Date.class);
+      }
+    } catch (GenericException e) {
+      throw new InvalidParameterException(e);
+    }
+  }
 
   @Override
   public abstract String getVersionImpl();
@@ -128,23 +146,19 @@ public abstract class RodaEntityPackagesPlugin<T extends IsRODAObject> extends A
     String outcomeText = "There are no updates for the entity " + getEntity();
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
-
     try {
-      localInstance = RodaCoreFactory.getLocalInstance();
-      bundleState = SyncUtils.getOutcomeBundleState(localInstance.getId());
-      SyncUtils.createEntityPackageState(localInstance.getId(), getEntity());
-      fromDate = bundleState.getFromDate();
-      toDate = bundleState.getToDate();
-      bundlePath = Paths.get(bundleState.getDestinationPath());
-      List<String> packageList = retrieveList(index);
-      if (!packageList.isEmpty()) {
-        createPackage(index, model, packageList);
-        updateEntityPackageState(getEntityClass(), packageList);
-        state = PluginState.SUCCESS;
-        outcomeText = "Package created with " + packageList.size() + " item(s) of entity " + getEntity();
+      List<IterableIndexResult> indexResultList = retrieveList(index);
+
+      for (IterableIndexResult indexResult : indexResultList) {
+        addTotalCount(indexResult.getTotalCount());
+        createPackage(index, model, indexResult);
       }
+
+
+      state = PluginState.SUCCESS;
+      outcomeText = "Package created with " + totalCount + " item(s) of entity " + getEntity();
       jobPluginInfo.incrementObjectsProcessedWithSuccess();
-    } catch (GenericException | IOException | AuthorizationDeniedException | RequestNotValidException
+    } catch (GenericException | AuthorizationDeniedException | RequestNotValidException
       | NotFoundException | AlreadyExistsException e) {
       LOGGER.error("Error on create package for entity " + getEntity(), e);
       state = PluginState.FAILURE;
@@ -157,25 +171,21 @@ public abstract class RodaEntityPackagesPlugin<T extends IsRODAObject> extends A
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
   }
 
+  // AipPackagePlugin needs to override this method to avoid counting preservation events.
+  public void addTotalCount(long totalCount) {
+    this.totalCount += totalCount;
+  }
+
   protected abstract String getEntity();
 
   protected abstract Class<T> getEntityClass();
 
-  protected abstract List<String> retrieveList(IndexService index) throws RequestNotValidException, GenericException;
+  protected abstract List<IterableIndexResult> retrieveList(IndexService index)
+    throws RequestNotValidException, GenericException;
 
-  protected abstract void createPackage(IndexService index, ModelService model, List<String> list)
+  protected abstract void createPackage(IndexService index, ModelService model, IterableIndexResult objectList)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
-    AlreadyExistsException, IOException;
-
-  protected void updateEntityPackageState(Class<T> entityClass, List<String> idList)
-    throws NotFoundException, GenericException, IOException {
-    PackageState entityPackageState = SyncUtils.getOutcomeEntityPackageState(localInstance.getId(), getEntity());
-    entityPackageState.setClassName(entityClass);
-    entityPackageState.setStatus(PackageState.Status.CREATED);
-    entityPackageState.setIdList(idList);
-    entityPackageState.setCount(idList.size());
-    SyncUtils.updateEntityPackageState(localInstance.getId(), getEntity(), entityPackageState);
-  }
+    AlreadyExistsException;
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {

@@ -2,19 +2,33 @@ package org.roda.core.plugins.plugins.internal.synchronization.packages;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.*;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.Void;
-import org.roda.core.data.v2.index.filter.*;
-import org.roda.core.data.v2.ip.*;
+import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.FilterParameter;
+import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.ShallowFile;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
@@ -27,9 +41,6 @@ import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author Gabriel Barros <gbarros@keep.pt>
- */
 public class AipPackagePlugin extends RodaEntityPackagesPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(AipPackagePlugin.class);
 
@@ -54,31 +65,46 @@ public class AipPackagePlugin extends RodaEntityPackagesPlugin<AIP> {
   }
 
   @Override
-  protected Class<AIP> getEntityClass() {
+  protected Class getEntityClass() {
     return AIP.class;
   }
 
   @Override
-  protected List<String> retrieveList(IndexService index) throws RequestNotValidException, GenericException {
-    Set<String> aipHashSet = new HashSet<>();
+  protected List<IterableIndexResult> retrieveList(IndexService index)
+    throws RequestNotValidException, GenericException {
+    List<IterableIndexResult> list = new ArrayList<>();
+    list.add(listIndexedAip(index));
+    list.add(listPreservationEvents(index));
 
+    return list;
+  }
+
+  @Override
+  protected void createPackage(IndexService index, ModelService model, IterableIndexResult objectList)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
+    AlreadyExistsException {
+    for (Object object : objectList) {
+      if (object instanceof IndexedAIP) {
+        AIP aip = model.retrieveAIP(((IndexedAIP) object).getId());
+        createAIPBundle(model, index, aip);
+      } else if (object instanceof IndexedPreservationEvent) {
+        AIP aip = model.retrieveAIP(((IndexedPreservationEvent) object).getAipID());
+        createAIPBundle(model, index, aip);
+      }
+    }
+  }
+
+  private IterableIndexResult<IndexedAIP> listIndexedAip(IndexService index)
+    throws RequestNotValidException, GenericException {
     Filter filter = new Filter();
     if (fromDate != null) {
       filter.add(
         new DateIntervalFilterParameter(RodaConstants.AIP_UPDATED_ON, RodaConstants.AIP_UPDATED_ON, fromDate, toDate));
     }
-
-    IterableIndexResult<IndexedAIP> aips = index.findAll(IndexedAIP.class, filter,
-      Collections.singletonList(RodaConstants.INDEX_UUID));
-    for (IndexedAIP aip : aips) {
-      aipHashSet.add(aip.getUUID());
-    }
-    retrievePreservationEvents(index, aipHashSet);
-
-    return new ArrayList<>(aipHashSet);
+    return index.findAll(IndexedAIP.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
   }
 
-  private void retrievePreservationEvents(IndexService index, Set<String> aipHashSet)
+  private IterableIndexResult<IndexedPreservationEvent> listPreservationEvents(IndexService index)
     throws RequestNotValidException, GenericException {
     Filter filter = new Filter();
     filter.add(new NotSimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS,
@@ -87,56 +113,44 @@ public class AipPackagePlugin extends RodaEntityPackagesPlugin<AIP> {
       filter.add(new DateIntervalFilterParameter(RodaConstants.PRESERVATION_EVENT_DATETIME,
         RodaConstants.PRESERVATION_EVENT_DATETIME, fromDate, toDate));
     }
-
-    IterableIndexResult<IndexedPreservationEvent> preservationEvents = index.findAll(IndexedPreservationEvent.class,
-      filter, Collections.singletonList(RodaConstants.PRESERVATION_EVENT_AIP_ID));
-    for (IndexedPreservationEvent preservationEvent : preservationEvents) {
-      aipHashSet.add(preservationEvent.getAipID());
-    }
+    return index.findAll(IndexedPreservationEvent.class, filter,
+      Collections.singletonList(RodaConstants.PRESERVATION_EVENT_AIP_ID));
   }
 
-  @Override
-  protected void createPackage(IndexService index, ModelService model, List<String> list) throws GenericException,
-    AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException, IOException {
-
-    for (String aipId : list) {
-      AIP aip = model.retrieveAIP(aipId);
-      createAIPBundle(model, index, aip);
-    }
-  }
-
-  public void createAIPBundle(ModelService model, IndexService index, AIP aip) throws RequestNotValidException,
-    NotFoundException, AuthorizationDeniedException, GenericException, AlreadyExistsException, IOException {
+  public void createAIPBundle(ModelService model, IndexService index, AIP aip)
+    throws RequestNotValidException, AuthorizationDeniedException, GenericException, AlreadyExistsException {
 
     StorageService storage = model.getStorage();
     StoragePath aipStoragePath = ModelUtils.getAIPStoragePath(aip.getId());
-    Path destinationPath = bundlePath.resolve(RodaConstants.CORE_STORAGE_FOLDER)
+    Path destinationPath = workingDirPath.resolve(RodaConstants.CORE_STORAGE_FOLDER)
       .resolve(RodaConstants.STORAGE_CONTAINER_AIP).resolve(aip.getId());
 
-    Path documentationPath = destinationPath.resolve(RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
-    Path metadataPath = destinationPath.resolve(RodaConstants.STORAGE_DIRECTORY_METADATA);
-    Path schemasPath = destinationPath.resolve(RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
-    Path submissionsPath = destinationPath.resolve(RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
-    Path aipMetadataPath = destinationPath.resolve(RodaConstants.STORAGE_AIP_METADATA_FILENAME);
+    if (!Files.exists(destinationPath)) {
+      totalCount++; //
+      Path documentationPath = destinationPath.resolve(RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
+      Path metadataPath = destinationPath.resolve(RodaConstants.STORAGE_DIRECTORY_METADATA);
+      Path schemasPath = destinationPath.resolve(RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
+      Path submissionsPath = destinationPath.resolve(RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
+      Path aipMetadataPath = destinationPath.resolve(RodaConstants.STORAGE_AIP_METADATA_FILENAME);
 
-    storage.copy(storage, aipStoragePath, documentationPath, RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
-    storage.copy(storage, aipStoragePath, metadataPath, RodaConstants.STORAGE_DIRECTORY_METADATA);
-    storage.copy(storage, aipStoragePath, schemasPath, RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
-    storage.copy(storage, aipStoragePath, submissionsPath, RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
-    storage.copy(storage, aipStoragePath, aipMetadataPath, RodaConstants.STORAGE_AIP_METADATA_FILENAME);
+      storage.copy(storage, aipStoragePath, documentationPath, RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
+      storage.copy(storage, aipStoragePath, metadataPath, RodaConstants.STORAGE_DIRECTORY_METADATA);
+      storage.copy(storage, aipStoragePath, schemasPath, RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
+      storage.copy(storage, aipStoragePath, submissionsPath, RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
+      storage.copy(storage, aipStoragePath, aipMetadataPath, RodaConstants.STORAGE_AIP_METADATA_FILENAME);
 
-    for (Representation representation : aip.getRepresentations()) {
-      Path repDataPath = Paths.get(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS, representation.getId(),
-        RodaConstants.STORAGE_DIRECTORY_DATA);
-      Path repDataDestinationPath = destinationPath.resolve(repDataPath);
+      for (Representation representation : aip.getRepresentations()) {
+        Path repDataPath = Paths.get(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS, representation.getId(),
+          RodaConstants.STORAGE_DIRECTORY_DATA);
+        Path repDataDestinationPath = destinationPath.resolve(repDataPath);
 
-      Path repMetadataPath = Paths.get(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS, representation.getId(),
-        RodaConstants.STORAGE_DIRECTORY_METADATA);
-      Path repMetadataDestinationPath = destinationPath.resolve(repMetadataPath);
-      storage.copy(storage, aipStoragePath, repMetadataDestinationPath, repMetadataPath.toString());
+        Path repMetadataPath = Paths.get(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS, representation.getId(),
+          RodaConstants.STORAGE_DIRECTORY_METADATA);
+        Path repMetadataDestinationPath = destinationPath.resolve(repMetadataPath);
+        storage.copy(storage, aipStoragePath, repMetadataDestinationPath, repMetadataPath.toString());
 
-      addFilesToBundle(aip, representation, index, repDataDestinationPath);
-
+        addFilesToBundle(aip, representation, index, repDataDestinationPath);
+      }
     }
   }
 
@@ -160,8 +174,7 @@ public class AipPackagePlugin extends RodaEntityPackagesPlugin<AIP> {
           createFileOnBundle(repDataDestinationPath, indexedFile, shallowFile);
         }
       }
-    } catch (GenericException | RequestNotValidException | IOException | AuthorizationDeniedException
-      | AlreadyExistsException | NotFoundException | URISyntaxException e) {
+    } catch (GenericException | RequestNotValidException | IOException e) {
       LOGGER.error("Error getting Files to convert to shallow", e);
     }
   }
@@ -218,8 +231,7 @@ public class AipPackagePlugin extends RodaEntityPackagesPlugin<AIP> {
   }
 
   private ShallowFile convertFileOnShallow(AIP aip, Representation representation, IndexedFile indexedFile)
-    throws RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, NotFoundException,
-    GenericException, IOException, URISyntaxException {
+    throws GenericException {
     ShallowFile shallowFile = new ShallowFile();
     shallowFile.setName(indexedFile.getId());
     shallowFile.setUUID(IdUtils.getFileId(aip.getId(), representation.getId(), null, shallowFile.getName()));
@@ -236,5 +248,10 @@ public class AipPackagePlugin extends RodaEntityPackagesPlugin<AIP> {
     shallowFile.setChecksumType(indexedFile.getSHA256Type());
 
     return shallowFile;
+  }
+
+  @Override
+  public void addTotalCount(long totalCount) {
+    // do nothing; AIPs are counted during package creation;
   }
 }

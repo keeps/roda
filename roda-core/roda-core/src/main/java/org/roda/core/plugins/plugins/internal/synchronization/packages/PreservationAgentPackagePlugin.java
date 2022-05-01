@@ -1,13 +1,15 @@
 package org.roda.core.plugins.plugins.internal.synchronization.packages;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.*;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -51,34 +53,32 @@ public class PreservationAgentPackagePlugin extends RodaEntityPackagesPlugin<Ind
   }
 
   @Override
-  protected List<String> retrieveList(IndexService index) throws RequestNotValidException, GenericException {
-    ArrayList<String> preservationAgentList = new ArrayList<>();
-    IterableIndexResult<IndexedPreservationAgent> agents = index.findAll(IndexedPreservationAgent.class, new Filter(),
-      Arrays.asList(RodaConstants.INDEX_UUID));
-    for (IndexedPreservationAgent agent : agents) {
-      preservationAgentList.add(agent.getId());
-    }
-    return preservationAgentList;
+  protected List<IterableIndexResult> retrieveList(IndexService index)
+    throws RequestNotValidException, GenericException {
+    return Arrays
+      .asList(index.findAll(IndexedPreservationAgent.class, new Filter(), Arrays.asList(RodaConstants.INDEX_UUID)));
   }
 
   @Override
-  protected void createPackage(IndexService index, ModelService model, List<String> list) throws GenericException,
-    AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException, IOException {
-    for (String agentId : list) {
-      PreservationMetadata retrieveAgent = model.retrievePreservationMetadata(agentId,
-        PreservationMetadata.PreservationMetadataType.AGENT);
-      createAgentBundle(model, retrieveAgent);
+  protected void createPackage(IndexService index, ModelService model, IterableIndexResult objectList)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
+    AlreadyExistsException {
+    for (Object object : objectList) {
+      if (object instanceof IndexedPreservationAgent) {
+        PreservationMetadata retrieveAgent = model.retrievePreservationMetadata(
+          ((IndexedPreservationAgent) object).getId(), PreservationMetadata.PreservationMetadataType.AGENT);
+        createAgentBundle(model, retrieveAgent);
+      }
     }
   }
 
-  public void createAgentBundle(ModelService model, PreservationMetadata agent) throws RequestNotValidException,
-    NotFoundException, AuthorizationDeniedException, GenericException, AlreadyExistsException {
-
+  private void createAgentBundle(ModelService model, PreservationMetadata agent)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException {
     StorageService storage = model.getStorage();
     StoragePath agentStoragePath = ModelUtils.getPreservationAgentStoragePath();
     String agentFile = FSUtils.encodePathPartial(agent.getId() + RodaConstants.PREMIS_SUFFIX);
 
-    Path destinationPath = bundlePath.resolve(RodaConstants.CORE_STORAGE_FOLDER)
+    Path destinationPath = workingDirPath.resolve(RodaConstants.CORE_STORAGE_FOLDER)
       .resolve(RodaConstants.STORAGE_CONTAINER_PRESERVATION).resolve(RodaConstants.STORAGE_DIRECTORY_AGENTS);
 
     Path agentPath = destinationPath.resolve(agentFile);

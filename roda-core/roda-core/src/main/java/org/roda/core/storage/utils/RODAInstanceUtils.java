@@ -24,14 +24,16 @@ import org.roda.core.model.ModelService;
 
 public class RODAInstanceUtils {
 
-  private RODAInstanceUtils() {
-    // do nothing
+
+  private static Path getLocalInstanceConfigFile() {
+    return RodaCoreFactory.getConfigPath()
+        .resolve(RodaConstants.SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FOLDER)
+        .resolve(RodaConstants.SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE);
   }
 
   public static String getLocalInstanceIdentifier() {
     try {
-      Path configFile = RodaCoreFactory.getConfigPath()
-        .resolve(RodaConstants.SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE_PATH);
+      Path configFile = getLocalInstanceConfigFile();
       LocalInstance localInstance = YamlUtils.readObjectFromFile(configFile, LocalInstance.class);
       if (localInstance.getInstanceIdentifierState().equals(LocalInstanceIdentifierState.INACTIVE)) {
         return null;
@@ -45,8 +47,7 @@ public class RODAInstanceUtils {
 
   public static LocalInstanceIdentifierState getLocalInstanceState() {
     try {
-      Path configFile = RodaCoreFactory.getConfigPath()
-        .resolve(RodaConstants.SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE_PATH);
+      Path configFile = getLocalInstanceConfigFile();
       LocalInstance localInstance = YamlUtils.readObjectFromFile(configFile, LocalInstance.class);
       return localInstance.getInstanceIdentifierState();
     } catch (GenericException e) {
@@ -56,8 +57,7 @@ public class RODAInstanceUtils {
 
   public static String retrieveLocalInstanceIdentifierToPlugin() {
     try {
-      Path configFile = RodaCoreFactory.getConfigPath()
-        .resolve(RodaConstants.SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE_PATH);
+      Path configFile = getLocalInstanceConfigFile();
       LocalInstance localInstance = YamlUtils.readObjectFromFile(configFile, LocalInstance.class);
       return localInstance.getId();
     } catch (GenericException e) {
