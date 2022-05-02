@@ -1399,7 +1399,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public LocalInstance registerLocalInstance(LocalInstance localInstance)
-    throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException {
+          throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return RODAInstance.registerLocalInstance(user, localInstance);
   }

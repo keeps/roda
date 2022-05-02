@@ -6,21 +6,30 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RepresentationInformation;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.multiple.DefaultMultipleStepPlugin;
@@ -32,9 +41,8 @@ import org.slf4j.LoggerFactory;
 /**
  * {@author João Gomes <jgomes@keep.pt>}.
  */
-public class InstanceIdentifierRodaObjectPlugin extends DefaultMultipleStepPlugin<IsRODAObject> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierRodaObjectPlugin.class);
-
+public class LocalInstanceRegisterPlugin extends DefaultMultipleStepPlugin<IsRODAObject> {
+  Logger LOGGER = LoggerFactory.getLogger(LocalInstanceRegisterPlugin.class);
   private Map<String, PluginParameter> pluginParameters = new HashMap<>();
   private static List<Step> steps = new ArrayList<>();
 
@@ -47,7 +55,7 @@ public class InstanceIdentifierRodaObjectPlugin extends DefaultMultipleStepPlugi
     steps.add(new Step(InstanceIdentifierRiskPlugin.class.getName(), Risk.class, "", true, true));
     steps.add(new Step(InstanceIdentifierRiskIncidencePlugin.class.getName(), RiskIncidence.class, "", true, true));
     steps.add(new Step(InstanceIdentifierJobPlugin.class.getName(), Job.class, "", true, true));
-
+    steps.add(new Step(RegisterPlugin.class.getName(), null, "", true, true));
   }
 
   @Override
@@ -96,7 +104,7 @@ public class InstanceIdentifierRodaObjectPlugin extends DefaultMultipleStepPlugi
 
   @Override
   public Plugin<IsRODAObject> cloneMe() {
-    return new InstanceIdentifierRodaObjectPlugin();
+    return new LocalInstanceRegisterPlugin();
   }
 
   @Override
@@ -141,6 +149,61 @@ public class InstanceIdentifierRodaObjectPlugin extends DefaultMultipleStepPlugi
   @Override
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
+    for (Step step : steps) {
+      try {
+        int count = 0;
+        if (!RegisterPlugin.class.getName().equals(step.getPluginName())) {
+          count = countObjects(index,
+            (Class<? extends AbstractPlugin<? extends IsRODAObject>>) Class.forName(step.getPluginName()));
+        } else {
+          count++;
+        }
+        step.setSourceObjectsCount(Optional.of(count));
+
+      } catch (ClassNotFoundException | GenericException e) {
+        LOGGER.error("Could define the number of sourceObjectsCount.", e);
+        throw new PluginException("Could define the number of sourceObjectsCount. ", e);
+      }
+
+    }
     return new Report();
+  }
+
+  private int countObjects(IndexService index, Class<? extends AbstractPlugin<? extends IsRODAObject>> pluginClass)
+    throws GenericException {
+    int count = 0;
+    try {
+      Class<? extends IsIndexed> indexedClass = getIndexedClassFromPluginClass(pluginClass);
+      count = index.count(indexedClass, new Filter()).intValue();
+      // Sum one job because this plugin creates a Job.
+      if (indexedClass.getName().equals(Job.class.getName())) {
+        count++;
+      }
+    } catch (GenericException | RequestNotValidException e) {
+      LOGGER.error("Could not define the number of sourceObjectsCount.", e);
+      throw new GenericException("Could not define the number of sourceObjectsCount.", e);
+    }
+    return count;
+  }
+
+  private Class<? extends IsIndexed> getIndexedClassFromPluginClass(
+    Class<? extends AbstractPlugin<? extends IsRODAObject>> pluginClass) {
+    if (InstanceIdentifierAIPPlugin.class.isAssignableFrom(pluginClass)) {
+      return IndexedAIP.class;
+    } else if (InstanceIdentifierDIPPlugin.class.isAssignableFrom(pluginClass)) {
+      return IndexedDIP.class;
+    } else if (InstanceIdentifierRepresentationInformationPlugin.class.isAssignableFrom(pluginClass)) {
+      return RepresentationInformation.class;
+    } else if (InstanceIdentifierNotificationPlugin.class.isAssignableFrom(pluginClass)) {
+      return Notification.class;
+    } else if (InstanceIdentifierRiskPlugin.class.isAssignableFrom(pluginClass)) {
+      return IndexedRisk.class;
+    } else if (InstanceIdentifierRiskIncidencePlugin.class.isAssignableFrom(pluginClass)) {
+      return RiskIncidence.class;
+    } else if (InstanceIdentifierJobPlugin.class.isAssignableFrom(pluginClass)) {
+      return Job.class;
+    } else {
+      return null;
+    }
   }
 }

@@ -16,7 +16,9 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -176,14 +178,15 @@ public class InstanceIdentifierAIPPlugin extends AbstractPlugin<Void> {
       try {
         model.updateAIPInstanceId(model.retrieveAIP(indexedAIP.getId()));
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        reportItem.setPluginState(PluginState.SUCCESS);
       } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
         details = e.getMessage() + "\n";
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         reportItem.setPluginState(PluginState.FAILURE);
         reportItem.addPluginDetails(details);
-        pluginReport.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
       }
+      pluginReport.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
     }
   }
 
@@ -195,7 +198,6 @@ public class InstanceIdentifierAIPPlugin extends AbstractPlugin<Void> {
   private IterableIndexResult<IndexedAIP> retrieveList(IndexService index)
     throws RequestNotValidException, GenericException {
     Filter filter = new Filter();
-
     return index.findAll(IndexedAIP.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
   }
 }

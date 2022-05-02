@@ -2,28 +2,27 @@ package org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifie
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.TokenManager;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
-import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
+import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
@@ -33,16 +32,15 @@ import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.utils.RODAInstanceUtils;
+import org.roda.core.util.RESTClientUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author Tiago Fraga <tfraga@keep.pt>
+ * {@author João Gomes <jgomes@keep.pt>}.
  */
-
-public class InstanceIdentifierRiskIncidencePlugin extends AbstractPlugin<Void> {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierRiskIncidencePlugin.class);
+public class RegisterPlugin extends AbstractPlugin<Void> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierRiskPlugin.class);
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
   static {
@@ -61,16 +59,12 @@ public class InstanceIdentifierRiskIncidencePlugin extends AbstractPlugin<Void> 
 
   @Override
   public String getName() {
-    return "Risk Incidence instance identifier";
+    return "Register of Local Instance";
   }
 
   @Override
   public String getDescription() {
-    return "Add the instance identifier on the data that exists on the storage as also on the index. "
-      + "If an object already has an instance identifier it will be updated by the new one. "
-      + "This task aims to help the synchronization between a RODA central instance and the RODA local instance, "
-      + "since when an local object is accessed in RODA Central it should have the instance identifier in order to "
-      + "inform from which source is it from.";
+    return "Register of Local Instance";
   }
 
   @Override
@@ -135,7 +129,7 @@ public class InstanceIdentifierRiskIncidencePlugin extends AbstractPlugin<Void> 
 
   @Override
   public Plugin<Void> cloneMe() {
-    return new InstanceIdentifierRiskIncidencePlugin();
+    return new RegisterPlugin();
   }
 
   @Override
@@ -156,49 +150,41 @@ public class InstanceIdentifierRiskIncidencePlugin extends AbstractPlugin<Void> 
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<Void> plugin) throws PluginException {
-        try {
-          modifyInstanceId(model, index, cachedJob, report, jobPluginInfo);
-        } catch (RequestNotValidException | GenericException | NotFoundException e) {
-          LOGGER.error("Could not modify Instance ID's in objects");
-        }
+        registerLocalInstance(model, cachedJob, report, jobPluginInfo);
       }
     }, index, model, storage);
   }
 
-  private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
-    JobPluginInfo jobPluginInfo) throws RequestNotValidException, GenericException, NotFoundException {
-    String details = "";
+  private void registerLocalInstance(ModelService model, Job cachedJob, Report pluginReport,
+    JobPluginInfo jobPluginInfo) {
 
-    // Get RiskIncidences from index
-    IterableIndexResult<RiskIncidence> indexedRiskIncidences = retrieveList(index);
-
-    for (RiskIncidence indexedRiskIncidence : indexedRiskIncidences) {
-      Report reportItem = PluginHelper.initPluginReportItem(this, indexedRiskIncidence.getId(), RiskIncidence.class);
-      try {
-        model.updateRiskIncidenceInstanceId(model.retrieveRiskIncidence(indexedRiskIncidence.getId()), true);
-        jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        reportItem.setPluginState(PluginState.SUCCESS);
-      } catch (GenericException | AuthorizationDeniedException e) {
-        details = e.getMessage() + "\n";
-        jobPluginInfo.incrementObjectsProcessedWithFailure();
-        reportItem.setPluginState(PluginState.FAILURE);
-        reportItem.addPluginDetails(details);
-      }
-      pluginReport.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
+    Report reportItem = PluginHelper.initPluginReportItem(this, instanceId, Job.class);
+    try {
+      LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
+      AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
+      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE
+        + RodaConstants.API_PATH_PARAM_DISTRIBUTED_INSTANCE_REGISTER;
+      RESTClientUtility.sendPostRequest(localInstance, null, localInstance.getCentralInstanceURL(), resource,
+        accessToken);
+      localInstance.setIsRegistered(true);
+      localInstance.setInstanceIdentifierState(LocalInstanceIdentifierState.ACTIVE);
+      RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
+      jobPluginInfo.incrementObjectsProcessedWithSuccess();
+      reportItem.setPluginState(PluginState.SUCCESS);
+    } catch (GenericException | AuthenticationDeniedException e) {
+      String details = e.getMessage() + "\n";
+      jobPluginInfo.incrementObjectsProcessedWithFailure();
+      reportItem.setPluginState(PluginState.FAILURE);
+      reportItem.addPluginDetails(details);
     }
+
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
+    pluginReport.addReport(reportItem);
   }
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    return new Report();
-  }
-
-  private IterableIndexResult<RiskIncidence> retrieveList(IndexService index)
-    throws RequestNotValidException, GenericException {
-    Filter filter = new Filter();
-
-    return index.findAll(RiskIncidence.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
+    return null;
   }
 
 }

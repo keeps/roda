@@ -178,14 +178,15 @@ public class InstanceIdentifierRiskPlugin extends AbstractPlugin<Void> {
       try {
         model.updateRiskInstanceId(model.retrieveRisk(indexedRisk.getId()), true);
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        reportItem.setPluginState(PluginState.SUCCESS);
       } catch (GenericException | AuthorizationDeniedException e) {
         details = e.getMessage() + "\n";
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         reportItem.setPluginState(PluginState.FAILURE);
         reportItem.addPluginDetails(details);
-        pluginReport.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
       }
+      pluginReport.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
     }
   }
 

@@ -5,5 +5,5 @@ package org.roda.core.data.v2.synchronization.local;
  */
 
 public enum LocalInstanceIdentifierState {
-  ACTIVE, INACTIVE;
+  ACTIVE, INACTIVE, RUNNING;
 }

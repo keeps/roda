@@ -24,6 +24,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Widget;
@@ -82,6 +83,9 @@ public class ShowLocalInstanceConfiguration extends Composite {
   HTML IDValue;
 
   @UiField
+  Button buttonSynchronize;
+
+  @UiField
   HTML centralInstanceURLValue;
 
   @UiField
@@ -106,6 +110,10 @@ public class ShowLocalInstanceConfiguration extends Composite {
     isRegisteredValue.setText(localInstance.getIsRegistered().toString());
     lastSyncValue.setHTML(HtmlSnippetUtils.getLastSyncHtml(localInstance, false));
     instanceIdStateValue.setHTML(HtmlSnippetUtils.getInstanceIdStateHtml(localInstance));
+    buttonSynchronize.setEnabled(false);
+    if (localInstance.getInstanceIdentifierState().equals(LocalInstanceIdentifierState.ACTIVE)) {
+      buttonSynchronize.setEnabled(true);
+    }
   }
 
   @UiHandler("buttonEdit")
@@ -115,14 +123,29 @@ public class ShowLocalInstanceConfiguration extends Composite {
 
   @UiHandler("buttonRegister")
   void buttonRegisterHandler(ClickEvent e) {
-    BrowserService.Util.getInstance().registerLocalInstance(localInstance, new NoAsyncCallback<LocalInstance>() {
-      @Override
-      public void onSuccess(LocalInstance result) {
-        localInstance = result;
-        initElements(localInstance);
-        Dialogs.showInformationDialog("Register", "Success", messages.closeButton(), false);
-      }
-    });
+    Dialogs.showConfirmDialog(messages.applyInstanceIdToRepository(), messages.applyInstanceIdToRepositoryMessage(),
+      messages.dialogNo(), messages.dialogYes(), new NoAsyncCallback<Boolean>() {
+        @Override
+        public void onSuccess(Boolean result) {
+          BrowserService.Util.getInstance().registerLocalInstance(localInstance, new NoAsyncCallback<LocalInstance>() {
+            @Override
+            public void onSuccess(LocalInstance result) {
+              Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+                @Override
+                public void onFailure(Throwable caught) {
+                  initElements(result);
+                  Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+                }
+
+                @Override
+                public void onSuccess(final Void nothing) {
+                  HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                }
+              });
+            }
+          });
+        }
+      });
   }
 
   @UiHandler("buttonSynchronize")
@@ -134,49 +157,6 @@ public class ShowLocalInstanceConfiguration extends Composite {
         HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
       }
     });
-  }
-
-  @UiHandler("buttonApplyId")
-  void buttonApplyIdHandler(ClickEvent e) {
-    Dialogs.showConfirmDialog(messages.applyInstanceIdToRepository(), messages.applyInstanceIdToRepositoryMessage(),
-      messages.dialogNo(), messages.dialogYes(), new NoAsyncCallback<Boolean>() {
-        @Override
-        public void onSuccess(Boolean result) {
-          if (result) {
-            localInstance.setInstanceIdentifierState(LocalInstanceIdentifierState.ACTIVE);
-            BrowserService.Util.getInstance().updateLocalInstanceConfiguration(localInstance,
-              new NoAsyncCallback<Void>() {
-                @Override
-                public void onSuccess(Void unused) {
-                  BrowserService.Util.getInstance().modifyInstanceIdOnRepository(localInstance,
-                    new AsyncCallback<Job>() {
-                      @Override
-                      public void onFailure(Throwable caught) {
-                        AsyncCallbackUtils.defaultFailureTreatment(caught);
-                        HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                      }
-
-                      @Override
-                      public void onSuccess(Job job) {
-                        Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
-                          @Override
-                          public void onFailure(Throwable caught) {
-                            Toast.showInfo(messages.runningInBackgroundTitle(),
-                              messages.runningInBackgroundDescription());
-                          }
-
-                          @Override
-                          public void onSuccess(final Void nothing) {
-                            HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                          }
-                        });
-                      }
-                    });
-                }
-              });
-          }
-        }
-      });
   }
 
   @UiHandler("buttonRemove")

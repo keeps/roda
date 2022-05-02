@@ -178,14 +178,15 @@ public class InstanceIdentifierDIPPlugin extends AbstractPlugin<Void> {
       try {
         model.updateDIPInstanceId(model.retrieveDIP(indexedDIP.getId()));
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        reportItem.setPluginState(PluginState.SUCCESS);
       } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
         details = e.getMessage() + "\n";
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         reportItem.setPluginState(PluginState.FAILURE);
         reportItem.addPluginDetails(details);
-        pluginReport.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
       }
+      pluginReport.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
     }
   }
 

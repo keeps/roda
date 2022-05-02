@@ -177,14 +177,15 @@ public class InstanceIdentifierNotificationPlugin extends AbstractPlugin<Void> {
       try {
         model.updateNotificationInstanceId(model.retrieveNotification(indexedNotification.getId()));
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        reportItem.setPluginState(PluginState.SUCCESS);
       } catch (GenericException | NotFoundException | AuthorizationDeniedException e) {
         details = e.getMessage() + "\n";
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         reportItem.setPluginState(PluginState.FAILURE);
         reportItem.addPluginDetails(details);
-        pluginReport.addReport(reportItem);
-        PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
       }
+      pluginReport.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
     }
   }
 
