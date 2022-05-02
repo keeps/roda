@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -88,6 +89,33 @@ public class SyncUtils {
    */
   private static Path getSyncBundleWorkingDirectory(String prefix, String instanceIdentifier) {
     return RodaCoreFactory.getWorkingDirectory().resolve(prefix + instanceIdentifier);
+  }
+
+  public static Path getSyncConfigLocalInstanceFilePath() {
+    return Paths.get(RodaConstants.SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FOLDER,
+      RodaConstants.SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE);
+  }
+
+  public static Path getSyncOutcomeBundlePath(String bundleName) {
+    return RodaCoreFactory.getSynchronizationDirectoryPath().resolve(RodaConstants.CORE_SYNCHRONIZATION_OUTCOME_FOLDER)
+      .resolve(bundleName);
+  }
+
+  public static Path getSyncIncomingBundlePath(String bundleName) {
+    return RodaCoreFactory.getSynchronizationDirectoryPath().resolve(RodaConstants.CORE_SYNCHRONIZATION_INCOMING_FOLDER)
+      .resolve(bundleName);
+  }
+
+  public static boolean removeSyncBundleLocal(String bundleName,String deletionDirectory) throws IOException {
+    Path syncBundlePath;
+    if (RodaConstants.CORE_SYNCHRONIZATION_INCOMING_FOLDER.equals(deletionDirectory)){
+      syncBundlePath = SyncUtils.getSyncIncomingBundlePath(bundleName);
+    }else {
+      syncBundlePath = SyncUtils.getSyncOutcomeBundlePath(bundleName);
+    }
+
+    return Files.deleteIfExists(syncBundlePath);
+
   }
 
   private static Path createSyncBundleWorkingDirectory(String prefix, String instanceIdentifier) throws IOException {
@@ -227,11 +255,17 @@ public class SyncUtils {
     return bundleState;
   }
 
-  public static Path compressBundle(String instanceIdentifier) throws PluginException {
+
+  public static String getInstanceBundleName(String instanceId) {
+
+    final String date = new SimpleDateFormat("yyyyMMdd'T'HHmmss'.zip'").format(new Date());
+    final String fileName = instanceId + "_" + date;
+    return fileName;
+
+  }
+  public static Path compressBundle(String instanceIdentifier, String fileName) throws PluginException {
     try {
       BundleState bundleState = getOutcomeBundleState(instanceIdentifier);
-      final String date = new SimpleDateFormat("yyyyMMdd'T'hhmmss'.zip'").format(bundleState.getToDate());
-      final String fileName = bundleState.getId() + "_" + date;
       Path filePath = RodaCoreFactory.getSynchronizationDirectoryPath()
         .resolve(RodaConstants.CORE_SYNCHRONIZATION_OUTCOME_FOLDER).resolve(fileName);
       if (FSUtils.exists(filePath)) {
@@ -377,7 +411,7 @@ public class SyncUtils {
       updateBundleState(bundleState, instanceIdentifier);
       if (createdJobsBundle || createdRepresentationInformationBundle || createdRiskBundle) {
         SyncUtils.buildBundleStateFile(instanceIdentifier);
-        return createBundleStreamResponse(compressBundle(instanceIdentifier));
+        return createBundleStreamResponse(compressBundle(instanceIdentifier, getInstanceBundleName(instanceIdentifier)));
       }
 
     } catch (IOException | PluginException e) {
@@ -613,7 +647,16 @@ public class SyncUtils {
         if (!Files.exists(remoteActionsDir)) {
           Files.createDirectories(remoteActionsDir);
         }
-        Path actionsFile = remoteActionsDir.resolve(instanceId + ".zip");
+        String bundleName;
+        Header contentDisposition = response.getFirstHeader("Content-Disposition");
+        if (contentDisposition != null) {
+          String responseValue = contentDisposition.getValue();
+          bundleName = responseValue.split("filename=")[1].substring(1,
+            responseValue.split("filename=")[1].length() - 1);
+        } else {
+          bundleName = instanceId + ".zip";
+        }
+        Path actionsFile = remoteActionsDir.resolve(bundleName);
         Files.copy(in, actionsFile, StandardCopyOption.REPLACE_EXISTING);
         return actionsFile;
       } catch (IOException e) {

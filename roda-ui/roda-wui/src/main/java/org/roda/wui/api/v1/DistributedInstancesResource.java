@@ -174,4 +174,22 @@ public class DistributedInstancesResource {
     EntityResponse response = RODAInstance.retrieveLastSyncFile(user, instanceIdentifier,entityClass, type);
     return ApiUtils.okResponse((StreamResponse) response);
   }
+
+  @GET
+  @Path("/remove/bundle/")
+  @Produces({MediaType.APPLICATION_JSON})
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = StreamResponse.class),
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
+  public Response removeSyncBundleFromCentral(@QueryParam(RodaConstants.SYNCHRONIZATION_BUNDLE_NAME) String bundleName, @QueryParam(RodaConstants.SYNCHRONIZATION_BUNDLE_DIRECTORY) String bundleDirectory)
+    throws RODAException {
+    // get user
+    final User user = UserUtility.getApiUser(request);
+    // delegate action to controller.
+    String response = RODAInstance.removeSyncBundle(bundleName, user, bundleDirectory);
+
+    return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, response)).build();
+
+
+  }
 }

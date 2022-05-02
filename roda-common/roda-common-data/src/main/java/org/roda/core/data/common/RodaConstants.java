@@ -1085,6 +1085,7 @@ public final class RodaConstants {
 
   public static final String PLUGIN_PARAMS_BUNDLE_PATH = "parameter.destination_path";
   public static final String PLUGIN_PARAMS_CENTRAL_INSTANCE_URL = "parameter.central_instance_url";
+  public static final String PLUGIN_PARAMS_BUNDLE_NAME = "parameter.bundle_name";
 
   public static final String PLUGIN_CATEGORY_CONVERSION = "conversion";
   public static final String PLUGIN_CATEGORY_CHARACTERIZATION = "characterization";
@@ -1811,6 +1812,8 @@ public final class RodaConstants {
     + "/" + CORE_SYNCHRONIZATION_INCOMING_FOLDER + "/" + SYNCHRONIZATION_BUNDLE_FOLDER;
   public static final String PROTOCOL_SEPARATOR = "://";
 
+  public static final String SYNCHRONIZATION_BUNDLE_NAME = "bundle_name";
+  public static final String SYNCHRONIZATION_BUNDLE_DIRECTORY= "bundle_directory";
   public static final String SYNCHRONIZATION_REMOTE_ACTIONS_FOLDER = "remote_actions";
   public static final String SYNCHRONIZATION_INCOMING_REMOTE_ACTIONS_PATH = CORE_SYNCHRONIZATION_INCOMING_FOLDER + "/"
     + SYNCHRONIZATION_REMOTE_ACTIONS_FOLDER;
