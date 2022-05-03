@@ -14,11 +14,14 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
@@ -55,6 +58,8 @@ public class LocalInstanceRegisterPlugin extends DefaultMultipleStepPlugin<IsROD
     steps.add(new Step(InstanceIdentifierRiskPlugin.class.getName(), Risk.class, "", true, true));
     steps.add(new Step(InstanceIdentifierRiskIncidencePlugin.class.getName(), RiskIncidence.class, "", true, true));
     steps.add(new Step(InstanceIdentifierJobPlugin.class.getName(), Job.class, "", true, true));
+    steps.add(
+      new Step(InstanceIdentifierRepositoryEventPlugin.class.getName(), PreservationMetadata.class, "", true, true));
     steps.add(new Step(RegisterPlugin.class.getName(), null, "", true, true));
   }
 
@@ -174,7 +179,11 @@ public class LocalInstanceRegisterPlugin extends DefaultMultipleStepPlugin<IsROD
     int count = 0;
     try {
       Class<? extends IsIndexed> indexedClass = getIndexedClassFromPluginClass(pluginClass);
-      count = index.count(indexedClass, new Filter()).intValue();
+      Filter filter = new Filter();
+      if (IndexedPreservationEvent.class.isAssignableFrom(indexedClass)) {
+        filter = new Filter(new EmptyKeyFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID));
+      }
+      count = index.count(indexedClass, filter).intValue();
       // Sum one job because this plugin creates a Job.
       if (indexedClass.getName().equals(Job.class.getName())) {
         count++;
@@ -202,6 +211,8 @@ public class LocalInstanceRegisterPlugin extends DefaultMultipleStepPlugin<IsROD
       return RiskIncidence.class;
     } else if (InstanceIdentifierJobPlugin.class.isAssignableFrom(pluginClass)) {
       return Job.class;
+    } else if (InstanceIdentifierRepositoryEventPlugin.class.isAssignableFrom(pluginClass)) {
+      return IndexedPreservationEvent.class;
     } else {
       return null;
     }
