@@ -106,43 +106,49 @@ public class InstanceIdentifierPreservationAgentPlugin extends AbstractPlugin<Vo
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<Void> plugin) {
-        modifyInstanceId(model, index, report, jobPluginInfo);
+        modifyInstanceId(model, index, cachedJob, report, jobPluginInfo);
       }
     }, index, model, storage);
   }
 
-  private void modifyInstanceId(ModelService model, IndexService index, Report pluginReport,
+  private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
     JobPluginInfo jobPluginInfo) {
-    pluginReport.setPluginState(PluginState.SUCCESS);
 
     try (CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationAgents()) {
-      int agentCounter = 0;
-
       for (OptionalWithCause<PreservationMetadata> opm : iterable) {
+        Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), PreservationMetadata.class);
         try {
           if (opm.isPresent()) {
             PreservationMetadata pm = opm.get();
             PremisV3Utils.updatePremisUserAgentId(pm, model, index, instanceId);
+            reportItem.setPluginState(PluginState.SUCCESS);
+            String objectId = pm.getId();
+            reportItem.setSourceAndOutcomeObjectId(objectId, objectId);
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
           } else {
             jobPluginInfo.incrementObjectsProcessedWithFailure();
-            pluginReport.setPluginState(PluginState.FAILURE)
+            reportItem.setPluginState(PluginState.FAILURE)
               .addPluginDetails("Could not update preservation agent: " + opm.getCause());
           }
         } catch (AlreadyExistsException e) {
           jobPluginInfo.incrementObjectsProcessedWithSkipped();
+          reportItem.setPluginState(PluginState.SKIPPED);
         } catch (NotFoundException e) {
           jobPluginInfo.incrementObjectsProcessedWithFailure();
-          pluginReport.setPluginState(PluginState.FAILURE)
+          reportItem.setPluginState(PluginState.FAILURE)
             .addPluginDetails("Could not update preservation agent: " + e.getCause());
         }
-        agentCounter++;
+        pluginReport.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
       }
-      jobPluginInfo.setSourceObjectsCount(agentCounter);
     } catch (GenericException | AuthorizationDeniedException | RequestNotValidException | ValidationException
       | IOException e) {
       LOGGER.error("Error getting preservation agents to be reindexed", e);
-      pluginReport.setPluginState(PluginState.FAILURE);
+      Report reportItemFailure = PluginHelper.initPluginReportItem(this, cachedJob.getId(), PreservationMetadata.class);
+      reportItemFailure.setPluginState(PluginState.FAILURE)
+        .setPluginDetails("Error getting preservation agents to be reindexed " + e);
+      pluginReport.addReport(reportItemFailure);
+      PluginHelper.updatePartialJobReport(this, model, reportItemFailure, true, cachedJob);
     }
   }
 

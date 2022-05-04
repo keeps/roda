@@ -1,5 +1,6 @@
 package org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -8,11 +9,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -31,6 +36,7 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
@@ -40,6 +46,8 @@ import org.roda.core.plugins.plugins.multiple.Step;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Iterators;
 
 /**
  * {@author João Gomes <jgomes@keep.pt>}.
@@ -51,6 +59,7 @@ public class LocalInstanceRegisterPlugin extends DefaultMultipleStepPlugin<IsROD
 
   static {
     steps.add(new Step(InstanceIdentifierAIPPlugin.class.getName(), AIP.class, "", true, true));
+    steps.add(new Step(InstanceIdentifierAIPEventPlugin.class.getName(), PreservationMetadata.class, "", true, true));
     steps.add(new Step(InstanceIdentifierDIPPlugin.class.getName(), DIP.class, "", true, true));
     steps.add(new Step(InstanceIdentifierRepresentationInformationPlugin.class.getName(),
       RepresentationInformation.class, "", true, true));
@@ -60,6 +69,8 @@ public class LocalInstanceRegisterPlugin extends DefaultMultipleStepPlugin<IsROD
     steps.add(new Step(InstanceIdentifierJobPlugin.class.getName(), Job.class, "", true, true));
     steps.add(
       new Step(InstanceIdentifierRepositoryEventPlugin.class.getName(), PreservationMetadata.class, "", true, true));
+    steps.add(
+      new Step(InstanceIdentifierPreservationAgentPlugin.class.getName(), PreservationMetadata.class, "", true, true));
     steps.add(new Step(RegisterPlugin.class.getName(), null, "", true, true));
   }
 
@@ -157,15 +168,26 @@ public class LocalInstanceRegisterPlugin extends DefaultMultipleStepPlugin<IsROD
     for (Step step : steps) {
       try {
         int count = 0;
-        if (!RegisterPlugin.class.getName().equals(step.getPluginName())) {
+        if (RegisterPlugin.class.getName().equals(step.getPluginName())) {
+          count++;
+        } else if (InstanceIdentifierPreservationAgentPlugin.class.getName().equals(step.getPluginName())) {
+          try {
+            CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationAgents();
+            count = Iterators.size(iterable.iterator());
+          } catch (RequestNotValidException | AuthorizationDeniedException e) {
+            LOGGER.error("Could define the number of sourceObjectsCount.", e);
+            throw new PluginException("Could define the number of sourceObjectsCount. ", e);
+          }
+        } else if (InstanceIdentifierAIPEventPlugin.class.getName().equals(step.getPluginName())) {
+          count = countAIPEvents(index, model);
+        } else {
           count = countObjects(index,
             (Class<? extends AbstractPlugin<? extends IsRODAObject>>) Class.forName(step.getPluginName()));
-        } else {
-          count++;
         }
+
         step.setSourceObjectsCount(Optional.of(count));
 
-      } catch (ClassNotFoundException | GenericException e) {
+      } catch (ClassNotFoundException | GenericException | RequestNotValidException e) {
         LOGGER.error("Could define the number of sourceObjectsCount.", e);
         throw new PluginException("Could define the number of sourceObjectsCount. ", e);
       }
@@ -184,13 +206,24 @@ public class LocalInstanceRegisterPlugin extends DefaultMultipleStepPlugin<IsROD
         filter = new Filter(new EmptyKeyFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID));
       }
       count = index.count(indexedClass, filter).intValue();
-      // Sum one job because this plugin creates a Job.
-      if (indexedClass.getName().equals(Job.class.getName())) {
-        count++;
-      }
     } catch (GenericException | RequestNotValidException e) {
       LOGGER.error("Could not define the number of sourceObjectsCount.", e);
       throw new GenericException("Could not define the number of sourceObjectsCount.", e);
+    }
+    return count;
+  }
+
+  private int countAIPEvents(IndexService index, ModelService model) throws RequestNotValidException, GenericException {
+    IterableIndexResult<IndexedAIP> indexedAIPS = index.findAll(IndexedAIP.class, new Filter(),
+      Collections.singletonList(RodaConstants.INDEX_UUID));
+    int count = 0;
+    for (IndexedAIP indexedAIP : indexedAIPS) {
+      try (CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model
+        .listPreservationMetadata(indexedAIP.getId(), true)) {
+        count += Iterators.size(iterable.iterator());
+      } catch (AuthorizationDeniedException | NotFoundException | IOException e) {
+        throw new GenericException(e);
+      }
     }
     return count;
   }
