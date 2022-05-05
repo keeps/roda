@@ -52,7 +52,6 @@ public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAO
   private Map<String, PluginParameter> pluginParameters = new HashMap<>();
   private static List<Step> steps = new ArrayList<>();
 
-
   static {
 
     steps.add(new Step(AipPackagePlugin.class.getName(), AIP.class, "", true, true));
@@ -181,6 +180,7 @@ public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAO
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     setTotalSteps();
+    setSourceObjectsCount(1);
     super.setParameterValues(parameters);
 
     if (RodaConstants.DistributedModeType.LOCAL.equals(RodaCoreFactory.getDistributedModeType())) {

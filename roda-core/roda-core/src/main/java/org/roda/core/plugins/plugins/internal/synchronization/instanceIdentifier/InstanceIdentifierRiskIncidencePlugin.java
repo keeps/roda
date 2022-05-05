@@ -168,25 +168,41 @@ public class InstanceIdentifierRiskIncidencePlugin extends AbstractPlugin<Void> 
   private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
     JobPluginInfo jobPluginInfo) throws RequestNotValidException, GenericException, NotFoundException {
     String details = "";
+    PluginState pluginState = PluginState.SKIPPED;
+    int countFail = 0;
+    int countSuccess = 0;
 
     // Get RiskIncidences from index
     IterableIndexResult<RiskIncidence> indexedRiskIncidences = retrieveList(index);
 
+    Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
+
     for (RiskIncidence indexedRiskIncidence : indexedRiskIncidences) {
-      Report reportItem = PluginHelper.initPluginReportItem(this, indexedRiskIncidence.getId(), RiskIncidence.class);
       try {
         model.updateRiskIncidenceInstanceId(model.retrieveRiskIncidence(indexedRiskIncidence.getId()), true);
-        jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        reportItem.setPluginState(PluginState.SUCCESS);
+        pluginState = PluginState.SUCCESS;
+        countSuccess++;
       } catch (GenericException | AuthorizationDeniedException e) {
         details = e.getMessage() + "\n";
-        jobPluginInfo.incrementObjectsProcessedWithFailure();
-        reportItem.setPluginState(PluginState.FAILURE);
-        reportItem.addPluginDetails(details);
+        pluginState = PluginState.FAILURE;
+        countFail++;
       }
-      pluginReport.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
     }
+
+    if (countFail > 0) {
+      details = "Updated the instance identifier on " + countSuccess + " Risk incidences and failed to update "
+        + countFail;
+    } else if (countSuccess > 0) {
+      details = "Updated the instance identifier on " + countSuccess + " Risk incidences event";
+    }
+
+    reportItem.setPluginDetails(details);
+
+    jobPluginInfo.incrementObjectsProcessed(pluginState);
+    reportItem.setPluginState(pluginState);
+    pluginReport.addReport(reportItem);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
   }
 
   @Override

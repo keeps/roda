@@ -158,7 +158,9 @@ public class RegisterPlugin extends AbstractPlugin<Void> {
   private void registerLocalInstance(ModelService model, Job cachedJob, Report pluginReport,
     JobPluginInfo jobPluginInfo) {
 
-    Report reportItem = PluginHelper.initPluginReportItem(this, instanceId, Job.class);
+    Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
+
     try {
       LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);

@@ -176,52 +176,56 @@ public class InstanceIdentifierAIPEventPlugin extends AbstractPlugin<Void> {
 
   private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
     JobPluginInfo jobPluginInfo) throws RequestNotValidException, GenericException {
+    int countFail = 0;
+    int countSuccess = 0;
+    PluginState pluginState = PluginState.SKIPPED;
+    String details = "";
+
+    Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
 
     IterableIndexResult<IndexedAIP> indexedAIPS = retrieveList(index);
     for (IndexedAIP indexedAIP : indexedAIPS) {
       try (CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model
         .listPreservationMetadata(indexedAIP.getId(), true)) {
         for (OptionalWithCause<PreservationMetadata> opm : iterable) {
-          Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), PreservationMetadata.class);
           if (opm.isPresent()) {
             try {
-              String objectId = opm.get().getId();
               PremisV3Utils.updatePremisEventInstanceId(opm.get(), model, index, instanceId);
-              reportItem.setSourceAndOutcomeObjectId(objectId, objectId);
             } catch (InstanceIdNotUpdated e) {
-
-              jobPluginInfo.incrementObjectsProcessedWithFailure();
-              reportItem.setPluginState(PluginState.FAILURE)
-                .addPluginDetails("Could not add update instance id on AIP preservation event: " + e.getCause());
+              pluginState = PluginState.FAILURE;
             }
 
-            jobPluginInfo.incrementObjectsProcessedWithSuccess();
-            reportItem.setPluginState(PluginState.SUCCESS);
+            pluginState = PluginState.SUCCESS;
+            countSuccess++;
           } else {
-            jobPluginInfo.incrementObjectsProcessedWithFailure();
-            reportItem.setPluginState(PluginState.FAILURE)
-              .addPluginDetails("Could not add update instance id on AIP preservation event: " + opm.getCause());
+            pluginState = PluginState.FAILURE;
+            countFail++;
           }
-          pluginReport.addReport(reportItem);
-          PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
         }
       } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
         | ValidationException | AlreadyExistsException | IOException e) {
-        LOGGER.error("Error updating instance id on AIP preservation event", e);
-        Report reportItemFailure = PluginHelper.initPluginReportItem(this, cachedJob.getId(),
-          PreservationMetadata.class);
-        reportItemFailure.setPluginState(PluginState.FAILURE);
-        pluginReport.addReport(reportItemFailure);
-        PluginHelper.updatePartialJobReport(this, model, reportItemFailure, true, cachedJob);
+        LOGGER.error("Error updating instance id on AIP preservation events", e);
+        pluginState = PluginState.FAILURE;
+        details = "Could not add update instance id on AIP preservation events: " + e;
       } catch (AlreadyHasInstanceIdentifier alreadyHasInstanceIdentifier) {
-        Report reportItemSkipped = PluginHelper.initPluginReportItem(this, cachedJob.getId(),
-          PreservationMetadata.class);
-        jobPluginInfo.incrementObjectsProcessedWithSkipped();
-        reportItemSkipped.setPluginState(PluginState.SKIPPED);
-        pluginReport.addReport(reportItemSkipped);
-        PluginHelper.updatePartialJobReport(this, model, reportItemSkipped, true, cachedJob);
+        pluginState = PluginState.SKIPPED;
+        details = "Already has instance identifier " + alreadyHasInstanceIdentifier;
       }
     }
+
+    if (countFail > 0) {
+      details = "Updated the instance identifier on " + countSuccess + " AIP preservation events and failed to update "
+        + countFail;
+    } else if (countSuccess > 0) {
+      details = "Updated the instance identifier on " + countSuccess + " AIP preservation events";
+    }
+
+    reportItem.setPluginDetails(details);
+    jobPluginInfo.incrementObjectsProcessed(pluginState);
+    reportItem.setPluginState(pluginState);
+    pluginReport.addReport(reportItem);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
   }
 
   @Override

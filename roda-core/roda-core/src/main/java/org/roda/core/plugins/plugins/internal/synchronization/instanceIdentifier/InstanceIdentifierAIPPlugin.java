@@ -16,9 +16,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -169,25 +166,37 @@ public class InstanceIdentifierAIPPlugin extends AbstractPlugin<Void> {
 
   private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
     JobPluginInfo jobPluginInfo) throws RequestNotValidException, GenericException, NotFoundException {
+    int countFail = 0;
+    int countSuccess = 0;
     String details = "";
-
+    PluginState pluginState = PluginState.SKIPPED;
     // Get AIP's from index
     IterableIndexResult<IndexedAIP> indexedAIPS = retrieveList(index);
+    Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
     for (IndexedAIP indexedAIP : indexedAIPS) {
-      Report reportItem = PluginHelper.initPluginReportItem(this, indexedAIP.getId(), AIP.class);
       try {
         model.updateAIPInstanceId(model.retrieveAIP(indexedAIP.getId()));
-        jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        reportItem.setPluginState(PluginState.SUCCESS);
+        pluginState = PluginState.SUCCESS;
+        countSuccess++;
       } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
         details = e.getMessage() + "\n";
-        jobPluginInfo.incrementObjectsProcessedWithFailure();
-        reportItem.setPluginState(PluginState.FAILURE);
-        reportItem.addPluginDetails(details);
+        pluginState = PluginState.FAILURE;
+        countFail++;
       }
-      pluginReport.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
     }
+
+    if (countFail > 0) {
+      details = "Updated the instance identifier on " + countSuccess + " AIP's and failed to update " + countFail;
+    } else if (countSuccess > 0) {
+      details = "Updated the instance identifier on " + countSuccess + " AIP's";
+    }
+
+    reportItem.setPluginDetails(details);
+    jobPluginInfo.incrementObjectsProcessed(pluginState);
+    reportItem.setPluginState(pluginState);
+    pluginReport.addReport(reportItem);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
   }
 
   @Override

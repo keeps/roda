@@ -74,17 +74,4 @@ public class MutipleStepUtils {
     }
   }
 
-  public static Optional<Integer> getTotalSourceObjectsCount(final List<Step> steps) {
-    int count = 0;
-    for (Step step : steps) {
-      if (step.getSourceObjectsCount().isPresent()) {
-        count += step.getSourceObjectsCount().get();
-      }
-    }
-    if (count == 0) {
-      return Optional.empty();
-    }
-    return Optional.of(count);
-  }
-
 }

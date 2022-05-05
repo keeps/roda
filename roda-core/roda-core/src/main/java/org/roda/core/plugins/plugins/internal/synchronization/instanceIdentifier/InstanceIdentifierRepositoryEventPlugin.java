@@ -174,27 +174,45 @@ public class InstanceIdentifierRepositoryEventPlugin extends AbstractPlugin<Void
 
   private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
     JobPluginInfo jobPluginInfo) throws RequestNotValidException, GenericException {
+    PluginState pluginState = PluginState.SKIPPED;
+    String details = "";
+
+    int countFail = 0;
+    int countSuccess = 0;
 
     IterableIndexResult<IndexedPreservationEvent> indexedPreservationEvents = retrieveList(index);
+    Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
+
     for (IndexedPreservationEvent indexedPreservationEvent : indexedPreservationEvents) {
-      Report reportItem = PluginHelper.initPluginReportItem(this, indexedPreservationEvent.getId(),
-        PreservationMetadata.class);
       try {
         PremisV3Utils.updatePremisEventInstanceId(model.retrievePreservationMetadata(indexedPreservationEvent.getId(),
           PreservationMetadata.PreservationMetadataType.EVENT), model, index, instanceId);
-        jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        reportItem.setPluginState(PluginState.SUCCESS);
+        pluginState = PluginState.SUCCESS;
+        countSuccess++;
       } catch (AuthorizationDeniedException | RequestNotValidException | GenericException | ValidationException
         | AlreadyExistsException | InstanceIdNotUpdated e) {
-        jobPluginInfo.incrementObjectsProcessedWithFailure();
-        reportItem.setPluginState(PluginState.FAILURE)
-          .addPluginDetails("Could not update instance id on repository preservation event: " + e.getCause());
+        pluginState = PluginState.FAILURE;
+        details = "Could not update instance id on repository preservation event: " + e;
+        countFail++;
       } catch (AlreadyHasInstanceIdentifier alreadyHasInstanceIdentifier) {
-        jobPluginInfo.incrementObjectsProcessedWithSkipped();
+        pluginState = PluginState.SKIPPED;
+        details = "Could not update instance id on repository preservation event: " + alreadyHasInstanceIdentifier;
       }
-      pluginReport.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
     }
+
+    if (countFail > 0) {
+      details = "Updated the instance identifier on " + countSuccess + " Repository Preservation event and failed to update " + countFail;
+    } else if (countSuccess > 0) {
+      details = "Updated the instance identifier on " + countSuccess + " Repository Preservation event";
+    }
+    
+    reportItem.setPluginDetails(details);
+
+    jobPluginInfo.incrementObjectsProcessed(pluginState);
+    reportItem.setPluginState(pluginState);
+    pluginReport.addReport(reportItem);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
   }
 
   @Override

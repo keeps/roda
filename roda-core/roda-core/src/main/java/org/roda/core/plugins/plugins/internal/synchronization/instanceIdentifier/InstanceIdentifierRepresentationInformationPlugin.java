@@ -168,28 +168,41 @@ public class InstanceIdentifierRepresentationInformationPlugin extends AbstractP
   private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
     JobPluginInfo jobPluginInfo) throws RequestNotValidException, GenericException, NotFoundException {
     String details = "";
+    PluginState pluginState = PluginState.SKIPPED;
+    int countFail = 0;
+    int countSuccess = 0;
 
     // Get AIP's from index
     IterableIndexResult<RepresentationInformation> indexedRepresentationInformations = retrieveList(index);
+    Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
 
     for (RepresentationInformation indexedRepresentationInformation : indexedRepresentationInformations) {
-      Report reportItem = PluginHelper.initPluginReportItem(this, indexedRepresentationInformation.getId(),
-        RepresentationInformation.class);
       try {
         model.updateRepresentationInformationInstanceId(
           model.retrieveRepresentationInformation(indexedRepresentationInformation.getId()), cachedJob.getUsername(),
           true);
-        jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        reportItem.setPluginState(PluginState.SUCCESS);
+        pluginState = PluginState.SUCCESS;
+        countSuccess++;
       } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
         details = e.getMessage() + "\n";
-        jobPluginInfo.incrementObjectsProcessedWithFailure();
-        reportItem.setPluginState(PluginState.FAILURE);
-        reportItem.addPluginDetails(details);
+        pluginState = PluginState.FAILURE;
+        countFail++;
       }
-      pluginReport.addReport(reportItem);
-      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
     }
+
+    if (countFail > 0) {
+      details = "Updated the instance identifier on " + countSuccess + " Representation informations and failed to update " + countFail;
+    } else if (countSuccess > 0) {
+      details = "Updated the instance identifier on " + countSuccess + " Representation Informations";
+    }
+
+    reportItem.setPluginDetails(details);
+
+    jobPluginInfo.incrementObjectsProcessed(pluginState);
+    reportItem.setPluginState(pluginState);
+    pluginReport.addReport(reportItem);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
   }
 
   @Override

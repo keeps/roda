@@ -2,7 +2,6 @@ package org.roda.core.plugins.plugins.multiple;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -33,6 +32,10 @@ public abstract class DefaultMultipleStepPlugin<T extends IsRODAObject> extends 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMultipleStepPlugin.class);
 
   protected int totalSteps;
+
+  protected int sourceObjectsCount;
+
+  private boolean sourceObjectsCountSet = false;
 
   @Override
   public void init() throws PluginException {
@@ -77,9 +80,9 @@ public abstract class DefaultMultipleStepPlugin<T extends IsRODAObject> extends 
       jobPluginInfo.setTotalSteps(getTotalSteps());
 
       List<Step> steps = getPluginSteps();
-      Optional<Integer> count = MutipleStepUtils.getTotalSourceObjectsCount(steps);
-
-      count.ifPresent(jobPluginInfo::setSourceObjectsCount);
+      if (sourceObjectsCountSet) {
+        jobPluginInfo.setSourceObjectsCount(sourceObjectsCount);
+      }
 
       PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
       for (Step step : steps) {
@@ -118,6 +121,11 @@ public abstract class DefaultMultipleStepPlugin<T extends IsRODAObject> extends 
   }
 
   public abstract void setTotalSteps();
+
+  public void setSourceObjectsCount(int value) {
+    sourceObjectsCount = value;
+    sourceObjectsCountSet = true;
+  }
 
   public abstract List<Step> getPluginSteps();
 

@@ -1,44 +1,27 @@
 package org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
-import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.common.OptionalWithCause;
-import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
-import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.DIP;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RepresentationInformation;
-import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.multiple.DefaultMultipleStepPlugin;
@@ -46,8 +29,6 @@ import org.roda.core.plugins.plugins.multiple.Step;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Iterators;
 
 /**
  * {@author João Gomes <jgomes@keep.pt>}.
@@ -159,95 +140,13 @@ public class LocalInstanceRegisterPlugin extends DefaultMultipleStepPlugin<IsROD
 
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     setTotalSteps();
+    setSourceObjectsCount(1);
     super.setParameterValues(parameters);
   }
 
   @Override
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-    for (Step step : steps) {
-      try {
-        int count = 0;
-        if (RegisterPlugin.class.getName().equals(step.getPluginName())) {
-          count++;
-        } else if (InstanceIdentifierPreservationAgentPlugin.class.getName().equals(step.getPluginName())) {
-          try {
-            CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationAgents();
-            count = Iterators.size(iterable.iterator());
-          } catch (RequestNotValidException | AuthorizationDeniedException e) {
-            LOGGER.error("Could define the number of sourceObjectsCount.", e);
-            throw new PluginException("Could define the number of sourceObjectsCount. ", e);
-          }
-        } else if (InstanceIdentifierAIPEventPlugin.class.getName().equals(step.getPluginName())) {
-          count = countAIPEvents(index, model);
-        } else {
-          count = countObjects(index,
-            (Class<? extends AbstractPlugin<? extends IsRODAObject>>) Class.forName(step.getPluginName()));
-        }
-
-        step.setSourceObjectsCount(Optional.of(count));
-
-      } catch (ClassNotFoundException | GenericException | RequestNotValidException e) {
-        LOGGER.error("Could define the number of sourceObjectsCount.", e);
-        throw new PluginException("Could define the number of sourceObjectsCount. ", e);
-      }
-
-    }
     return new Report();
-  }
-
-  private int countObjects(IndexService index, Class<? extends AbstractPlugin<? extends IsRODAObject>> pluginClass)
-    throws GenericException {
-    int count = 0;
-    try {
-      Class<? extends IsIndexed> indexedClass = getIndexedClassFromPluginClass(pluginClass);
-      Filter filter = new Filter();
-      if (IndexedPreservationEvent.class.isAssignableFrom(indexedClass)) {
-        filter = new Filter(new EmptyKeyFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID));
-      }
-      count = index.count(indexedClass, filter).intValue();
-    } catch (GenericException | RequestNotValidException e) {
-      LOGGER.error("Could not define the number of sourceObjectsCount.", e);
-      throw new GenericException("Could not define the number of sourceObjectsCount.", e);
-    }
-    return count;
-  }
-
-  private int countAIPEvents(IndexService index, ModelService model) throws RequestNotValidException, GenericException {
-    IterableIndexResult<IndexedAIP> indexedAIPS = index.findAll(IndexedAIP.class, new Filter(),
-      Collections.singletonList(RodaConstants.INDEX_UUID));
-    int count = 0;
-    for (IndexedAIP indexedAIP : indexedAIPS) {
-      try (CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model
-        .listPreservationMetadata(indexedAIP.getId(), true)) {
-        count += Iterators.size(iterable.iterator());
-      } catch (AuthorizationDeniedException | NotFoundException | IOException e) {
-        throw new GenericException(e);
-      }
-    }
-    return count;
-  }
-
-  private Class<? extends IsIndexed> getIndexedClassFromPluginClass(
-    Class<? extends AbstractPlugin<? extends IsRODAObject>> pluginClass) {
-    if (InstanceIdentifierAIPPlugin.class.isAssignableFrom(pluginClass)) {
-      return IndexedAIP.class;
-    } else if (InstanceIdentifierDIPPlugin.class.isAssignableFrom(pluginClass)) {
-      return IndexedDIP.class;
-    } else if (InstanceIdentifierRepresentationInformationPlugin.class.isAssignableFrom(pluginClass)) {
-      return RepresentationInformation.class;
-    } else if (InstanceIdentifierNotificationPlugin.class.isAssignableFrom(pluginClass)) {
-      return Notification.class;
-    } else if (InstanceIdentifierRiskPlugin.class.isAssignableFrom(pluginClass)) {
-      return IndexedRisk.class;
-    } else if (InstanceIdentifierRiskIncidencePlugin.class.isAssignableFrom(pluginClass)) {
-      return RiskIncidence.class;
-    } else if (InstanceIdentifierJobPlugin.class.isAssignableFrom(pluginClass)) {
-      return Job.class;
-    } else if (InstanceIdentifierRepositoryEventPlugin.class.isAssignableFrom(pluginClass)) {
-      return IndexedPreservationEvent.class;
-    } else {
-      return null;
-    }
   }
 }
