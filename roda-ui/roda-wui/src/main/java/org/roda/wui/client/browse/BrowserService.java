@@ -560,7 +560,7 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException;
 
   LocalInstance registerLocalInstance(LocalInstance localInstance)
-      throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException;
+          throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException, RequestNotValidException, NotFoundException;
 
   Job synchronizeBundle(LocalInstance localInstance)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;

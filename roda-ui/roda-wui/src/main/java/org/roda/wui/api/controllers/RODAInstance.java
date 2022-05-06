@@ -1,6 +1,5 @@
 package org.roda.wui.api.controllers;
 
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,16 +19,15 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.central.DistributedInstanceStatus;
 import org.roda.core.data.v2.synchronization.central.DistributedInstances;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
+import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.storage.utils.RODAInstanceUtils;
-import org.roda.core.util.RESTClientUtility;
 import org.roda.wui.api.v1.utils.ObjectResponse;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
@@ -270,6 +268,7 @@ public class RODAInstance extends RodaWuiController {
     return responseList;
   }
 
+  // TODO: Delete this method
   public static void modifyInstanceIdOnRepository(User user, LocalInstance localInstance)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -281,16 +280,9 @@ public class RODAInstance extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      RODAInstanceHelper.applyInstanceIdToAIP(localInstance, user);
-      RODAInstanceHelper.applyInstanceIdToDIP(localInstance, user);
-      RODAInstanceHelper.applyInstanceIdToRisk(localInstance, user);
-      RODAInstanceHelper.applyInstanceIdToRiskIncidence(localInstance, user);
-      RODAInstanceHelper.applyInstanceIdToRI(localInstance, user);
-      RODAInstanceHelper.applyInstanceIdToNotification(localInstance, user);
-      RODAInstanceHelper.applyInstanceIdToJob(localInstance, user);
-      RODAInstanceHelper.applyInstanceIdToAIPPreservationEvent(localInstance, user);
-      RODAInstanceHelper.applyInstanceIdToPreservationAgents(localInstance, user);
-      RODAInstanceHelper.applyInstanceIdToRepositoryPreservationEvent(localInstance, user);
+      RODAInstanceHelper.applyInstanceIdToRodaObject(localInstance, user);
+      localInstance.setInstanceIdentifierState(LocalInstanceIdentifierState.ACTIVE);
+      RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -300,7 +292,8 @@ public class RODAInstance extends RodaWuiController {
   }
 
   public static LocalInstance registerLocalInstance(User user, LocalInstance localInstance)
-    throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException {
+    throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException, RequestNotValidException,
+    NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -309,12 +302,9 @@ public class RODAInstance extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
-      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE
-        + RodaConstants.API_PATH_PARAM_DISTRIBUTED_INSTANCE_REGISTER;
-      RESTClientUtility.sendPostRequest(localInstance, null, localInstance.getCentralInstanceURL(), resource,
-        accessToken);
-      localInstance.setIsRegistered(true);
+      // Apply Identifiers
+      RODAInstanceHelper.applyInstanceIdToRodaObject(localInstance, user);
+      localInstance.setInstanceIdentifierState(LocalInstanceIdentifierState.RUNNING);
       RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
       RODAInstanceUtils.createDistributedGroup(user);
       return localInstance;
@@ -454,7 +444,6 @@ public class RODAInstance extends RodaWuiController {
       controllerAssistant.registerAction(user, state);
     }
   }
-
 
   public static String removeSyncBundle(String bundleName, User user, String bundleDirectory)
     throws AuthorizationDeniedException {

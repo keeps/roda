@@ -906,6 +906,10 @@ public class HtmlSnippetUtils {
         b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
         b.append(
           SafeHtmlUtils.fromString(messages.localInstanceIdentifierState(localInstance.getInstanceIdentifierState())));
+      } else if (localInstance.getInstanceIdentifierState().equals(LocalInstanceIdentifierState.RUNNING)) {
+        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO));
+        b.append(
+          SafeHtmlUtils.fromString(messages.localInstanceIdentifierState(localInstance.getInstanceIdentifierState())));
       } else {
         b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT));
         b.append(

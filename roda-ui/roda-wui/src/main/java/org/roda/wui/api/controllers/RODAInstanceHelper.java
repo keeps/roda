@@ -22,37 +22,20 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
-import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
-import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsNone;
-import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.core.data.v2.notifications.Notification;
-import org.roda.core.data.v2.ri.RepresentationInformation;
-import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
-import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierAIPEventPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierAIPPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierDIPPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierJobPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierNotificationPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierPreservationAgentPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierRepositoryEventPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierRepresentationInformationPlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierRiskIncidencePlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.InstanceIdentifierRiskPlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.LocalInstanceRegisterPlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.proccess.ImportSyncBundlePlugin;
 import org.roda.core.plugins.plugins.internal.synchronization.proccess.SynchronizeInstancePlugin;
 import org.slf4j.Logger;
@@ -70,113 +53,14 @@ public class RODAInstanceHelper {
     return RodaCoreFactory.getModelService().createDistributedInstance(distributedInstance, user.getName());
   }
 
-  public static void applyInstanceIdToAIP(LocalInstance localInstance, User user)
+  // TODO: Rename this method to register
+  public static void applyInstanceIdToRodaObject(LocalInstance localInstance, User user)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
 
-    BrowserHelper.createAndExecuteInternalJob("Apply instance identifier to AIP",
-      new SelectedItemsFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name())),
-        IndexedAIP.class.getName(), true),
-      InstanceIdentifierAIPPlugin.class, user, pluginParameters, "Could not apply instance identifier to AIP");
-  }
-
-  public static void applyInstanceIdToDIP(LocalInstance localInstance, User user)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
-
-    BrowserHelper.createAndExecuteInternalJob("Apply instance identifier to DIP",
-      new SelectedItemsFilter(new Filter(), IndexedDIP.class.getName(), true), InstanceIdentifierDIPPlugin.class, user,
-      pluginParameters, "Could not apply instance identifier to DIP");
-  }
-
-  public static void applyInstanceIdToRisk(LocalInstance localInstance, User user)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
-
-    BrowserHelper.createAndExecuteInternalJob("Apply instance identifier to Risk",
-      new SelectedItemsFilter(new Filter(), IndexedRisk.class.getName(), true), InstanceIdentifierRiskPlugin.class,
-      user, pluginParameters, "Could not apply instance identifier to Risk");
-  }
-
-  public static void applyInstanceIdToRiskIncidence(LocalInstance localInstance, User user)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
-
-    BrowserHelper.createAndExecuteInternalJob("Apply instance identifier to Risk incidence",
-      new SelectedItemsFilter(new Filter(), RiskIncidence.class.getName(), true),
-      InstanceIdentifierRiskIncidencePlugin.class, user, pluginParameters,
-      "Could not apply instance identifier to Risk incidence");
-  }
-
-  public static void applyInstanceIdToRI(LocalInstance localInstance, User user)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
-
-    BrowserHelper.createAndExecuteInternalJob("Apply instance identifier to Representation Information",
-      new SelectedItemsFilter(new Filter(), RepresentationInformation.class.getName(), true),
-      InstanceIdentifierRepresentationInformationPlugin.class, user, pluginParameters,
-      "Could not apply instance identifier to Representation Information");
-  }
-
-  public static void applyInstanceIdToNotification(LocalInstance localInstance, User user)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
-
-    BrowserHelper.createAndExecuteInternalJob("Apply instance identifier to Notification",
-      new SelectedItemsFilter(new Filter(), Notification.class.getName(), true),
-      InstanceIdentifierNotificationPlugin.class, user, pluginParameters,
-      "Could not apply instance identifier to Notification");
-  }
-
-  public static void applyInstanceIdToJob(LocalInstance localInstance, User user)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
-
-    BrowserHelper.createAndExecuteInternalJob("Apply instance identifier to Job",
-      new SelectedItemsFilter(new Filter(), Job.class.getName(), true), InstanceIdentifierJobPlugin.class, user,
-      pluginParameters, "Could not apply instance identifier to Job");
-  }
-
-  public static void applyInstanceIdToAIPPreservationEvent(LocalInstance localInstance, User user)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
-
-    BrowserHelper.createAndExecuteInternalJob("Apply instance identifier to AIP Preservation Events",
-      new SelectedItemsFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name())),
-        IndexedAIP.class.getName(), true),
-      InstanceIdentifierAIPEventPlugin.class, user, pluginParameters,
-      "Could not apply instance identifier to AIP Preservation Events");
-  }
-
-  public static void applyInstanceIdToRepositoryPreservationEvent(LocalInstance localInstance, User user)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
-
-    BrowserHelper.createAndExecuteInternalJob("Apply instance identifier to Repository Preservation Events",
-      new SelectedItemsFilter(new Filter(new EmptyKeyFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID)),
-        IndexedPreservationEvent.class.getName(), true),
-      InstanceIdentifierRepositoryEventPlugin.class, user, pluginParameters,
-      "Could not apply instance identifier to Repository Preservation Events");
-  }
-
-  public static void applyInstanceIdToPreservationAgents(LocalInstance localInstance, User user)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
-
-    BrowserHelper.createAndExecuteInternalJob("Apply instance identifier to Preservation Agents",
-      new SelectedItemsFilter(new Filter(), IndexedPreservationAgent.class.getName(), true),
-      InstanceIdentifierPreservationAgentPlugin.class, user, pluginParameters,
-      "Could not apply instance identifier to Preservation Agents");
+    BrowserHelper.createAndExecuteInternalJob("Local Instance Register", new SelectedItemsNone<>(),
+      LocalInstanceRegisterPlugin.class, user, pluginParameters, "Could not register the localInstance");
   }
 
   public static Job synchronizeBundle(User user, LocalInstance localInstance)

@@ -2,6 +2,7 @@ package org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifie
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,10 @@ import org.roda.core.data.exceptions.InstanceIdNotUpdated;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
+import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -24,11 +29,12 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.RODAObjectProcessingLogic;
+import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
@@ -40,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 
-public class InstanceIdentifierRepositoryEventPlugin extends AbstractPlugin<PreservationMetadata> {
+public class InstanceIdentifierRepositoryEventPlugin extends AbstractPlugin<Void> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierRepositoryEventPlugin.class);
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
@@ -120,7 +126,7 @@ public class InstanceIdentifierRepositoryEventPlugin extends AbstractPlugin<Pres
   }
 
   @Override
-  public Plugin<PreservationMetadata> cloneMe() {
+  public Plugin<Void> cloneMe() {
     return new InstanceIdentifierRepositoryEventPlugin();
   }
 
@@ -140,8 +146,8 @@ public class InstanceIdentifierRepositoryEventPlugin extends AbstractPlugin<Pres
   }
 
   @Override
-  public List<Class<PreservationMetadata>> getObjectClasses() {
-    return Arrays.asList(PreservationMetadata.class);
+  public List<Class<Void>> getObjectClasses() {
+    return Arrays.asList(Void.class);
   }
 
   @Override
@@ -153,35 +159,70 @@ public class InstanceIdentifierRepositoryEventPlugin extends AbstractPlugin<Pres
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<LiteOptionalWithCause> list) throws PluginException {
-    return PluginHelper.processObjects(this, new RODAObjectProcessingLogic<PreservationMetadata>() {
+    return PluginHelper.processVoids(this, new RODAProcessingLogic<Void>() {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        JobPluginInfo jobPluginInfo, Plugin<PreservationMetadata> plugin, PreservationMetadata object) {
-        modifyInstanceId(model, index, report, jobPluginInfo, object);
+        JobPluginInfo jobPluginInfo, Plugin<Void> plugin) throws PluginException {
+        try {
+          modifyInstanceId(model, index, cachedJob, report, jobPluginInfo);
+        } catch (RequestNotValidException | GenericException e) {
+          LOGGER.error("Could not modify Instance ID's in objects");
+        }
       }
-    }, index, model, storage, list);
+    }, index, model, storage);
   }
 
-  private void modifyInstanceId(ModelService model, IndexService index, Report pluginReport,
-    JobPluginInfo jobPluginInfo, PreservationMetadata pm) {
-    pluginReport.setPluginState(PluginState.SUCCESS);
+  private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
+    JobPluginInfo jobPluginInfo) throws RequestNotValidException, GenericException {
+    PluginState pluginState = PluginState.SKIPPED;
+    String details = "";
 
-    try {
-      PremisV3Utils.updatePremisEventInstanceId(pm, model, index, instanceId);
-      jobPluginInfo.incrementObjectsProcessedWithSuccess();
-    } catch (AuthorizationDeniedException | RequestNotValidException | GenericException | ValidationException
-      | AlreadyExistsException | InstanceIdNotUpdated e) {
-      jobPluginInfo.incrementObjectsProcessedWithFailure();
-      pluginReport.setPluginState(PluginState.FAILURE)
-        .addPluginDetails("Could not update instance id on repository preservation event: " + e.getCause());
-    } catch (AlreadyHasInstanceIdentifier alreadyHasInstanceIdentifier) {
-      jobPluginInfo.incrementObjectsProcessedWithSkipped();
+    int countFail = 0;
+    int countSuccess = 0;
+
+    IterableIndexResult<IndexedPreservationEvent> indexedPreservationEvents = retrieveList(index);
+    Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
+
+    for (IndexedPreservationEvent indexedPreservationEvent : indexedPreservationEvents) {
+      try {
+        PremisV3Utils.updatePremisEventInstanceId(model.retrievePreservationMetadata(indexedPreservationEvent.getId(),
+          PreservationMetadata.PreservationMetadataType.EVENT), model, index, instanceId);
+        pluginState = PluginState.SUCCESS;
+        countSuccess++;
+      } catch (AuthorizationDeniedException | RequestNotValidException | GenericException | ValidationException
+        | AlreadyExistsException | InstanceIdNotUpdated e) {
+        pluginState = PluginState.FAILURE;
+        details = "Could not update instance id on repository preservation event: " + e;
+        countFail++;
+      } catch (AlreadyHasInstanceIdentifier alreadyHasInstanceIdentifier) {
+        pluginState = PluginState.SKIPPED;
+        details = "Could not update instance id on repository preservation event: " + alreadyHasInstanceIdentifier;
+      }
     }
 
+    if (countFail > 0) {
+      details = "Updated the instance identifier on " + countSuccess + " Repository Preservation event and failed to update " + countFail;
+    } else if (countSuccess > 0) {
+      details = "Updated the instance identifier on " + countSuccess + " Repository Preservation event";
+    }
+    
+    reportItem.setPluginDetails(details);
+
+    jobPluginInfo.incrementObjectsProcessed(pluginState);
+    reportItem.setPluginState(pluginState);
+    pluginReport.addReport(reportItem);
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
   }
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     return new Report();
+  }
+
+  private IterableIndexResult<IndexedPreservationEvent> retrieveList(IndexService index)
+    throws RequestNotValidException, GenericException {
+    Filter filter = new Filter(new EmptyKeyFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID));
+    return index.findAll(IndexedPreservationEvent.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
   }
 }
