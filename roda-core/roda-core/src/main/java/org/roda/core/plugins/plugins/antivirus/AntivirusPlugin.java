@@ -174,7 +174,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
       jobPluginInfo.incrementObjectsProcessed(reportState);
 
       try {
-        createEvent(virusCheckResult, exception, reportItem.getPluginState(), aip, model, index, true);
+        createEvent(virusCheckResult, exception, reportItem.getPluginState(), aip, model, index, true, job);
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
       } catch (PluginException e) {
@@ -185,7 +185,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
   }
 
   private void createEvent(VirusCheckResult virusCheckResult, Exception exception, PluginState state, AIP aip,
-    ModelService model, IndexService index, boolean notify) throws PluginException {
+    ModelService model, IndexService index, boolean notify, Job job) throws PluginException {
     try {
       StringBuilder outcomeDetailExtension = new StringBuilder();
       outcomeDetailExtension.append(virusCheckResult == null ? "" : virusCheckResult.getReport());
@@ -194,7 +194,8 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
           .append(exception.getMessage());
       }
 
-      PluginHelper.createPluginEvent(this, aip.getId(), model, index, state, outcomeDetailExtension.toString(), notify);
+      PluginHelper.createPluginEvent(this, aip.getId(), model, index, state, outcomeDetailExtension.toString(), notify,
+        job);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | ValidationException | AlreadyExistsException e) {
       throw new PluginException("Error while creating the event", e);
