@@ -1317,19 +1317,6 @@ public final class PluginHelper {
         linkingIdentifierAgent1.setRoles(rolesAgent1);
         addAgent(jobUserDetails.getUsername(), model, linkingIdentifierAgent1, index, agentIds, job);
       }
-
-      if (job.getApprovername() != null) {
-
-        String userApproverId = IdUtils.getUserAgentId(job.getApprovername(),
-          RODAInstanceUtils.getLocalInstanceIdentifier());
-        LinkingIdentifier linkingIdentifierAgent2 = new LinkingIdentifier();
-        linkingIdentifierAgent2.setValue(userApproverId);
-        List<String> rolesAgent2 = new ArrayList<>();
-        rolesAgent2.add(RodaConstants.PreservationAgentRole.AUTHORIZER.toString());
-        linkingIdentifierAgent2.setRoles(rolesAgent2);
-        addAgent(job.getApprovername(), model, linkingIdentifierAgent2, index, agentIds, job);*/
-      }
-
     }
 
     String id = IdUtils.createPreservationMetadataId(PreservationMetadataType.EVENT,
@@ -1345,19 +1332,6 @@ public final class PluginHelper {
       default:
         outcomeDetailNote = plugin.getPreservationEventFailureMessage();
     }
-/*    StringBuilder sbOutcomeNote = new StringBuilder(outcomeDetailNote);
-    if (job.getApprovername() != null) {
-      sbOutcomeNote.append("\n");
-      sbOutcomeNote.append("Person who created the job: ");
-      sbOutcomeNote.append(job.getUsername());
-      sbOutcomeNote.append("\n");
-      sbOutcomeNote.append("Person who approved the job: ");
-      sbOutcomeNote.append(job.getApprovername());
-    } else {
-      sbOutcomeNote.append("\n");
-      sbOutcomeNote.append("Person who created and executed the job: ");
-      sbOutcomeNote.append(job.getUsername());
-    }*/
     /*
      * String outcomeDetailNote = (outcome == PluginState.SUCCESS || outcome ==
      * PluginState.PARTIAL_SUCCESS) ? plugin.getPreservationEventSuccessMessage() :

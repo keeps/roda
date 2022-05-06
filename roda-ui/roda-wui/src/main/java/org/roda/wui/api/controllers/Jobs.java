@@ -95,23 +95,6 @@ public class Jobs extends RodaWuiController {
 
     Job updatedJob = null;
 
-    Job updatedJob = new Job(job);
-    updatedJob.setApprovername(user.getName());
-    updatedJob.setApproverEmail(user.getEmail());
-    updatedJob.setApproverFullName(user.getFullName());*/
-
-    ModelService modelService = RodaCoreFactory.getModelService();
-    Job retrievedJob = modelService.retrieveJob(job.getId());
-    JobUserDetails jobUserDetails = new JobUserDetails();
-    jobUserDetails.setUsername(user.getName());
-    jobUserDetails.setFullname(user.getFullName());
-    jobUserDetails.setRole(RodaConstants.PreservationAgentRole.AUTHORIZER.toString());
-    jobUserDetails.setEmail(user.getEmail());
-    retrievedJob.getJobUsersDetails().add(jobUserDetails);
-    modelService.createOrUpdateJob(retrievedJob);
-
-    Job updatedJob = null;
-
     try {
       // delegate
       updatedJob = JobsHelper.startJob(job.getId());
