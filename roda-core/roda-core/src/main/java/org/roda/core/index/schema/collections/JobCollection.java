@@ -70,6 +70,9 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
 
     fields.add(new Field(RodaConstants.JOB_NAME, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_USERNAME, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.JOB_APPROVER_NAME, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.JOB_APPROVER_FULL_NAME, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.JOB_APPROVER_EMAIL, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_START_DATE, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.JOB_END_DATE, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.JOB_STATE, Field.TYPE_STRING));
@@ -114,6 +117,9 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
 
     doc.addField(RodaConstants.JOB_NAME, job.getName());
     doc.addField(RodaConstants.JOB_USERNAME, job.getUsername());
+    doc.addField(RodaConstants.JOB_APPROVER_NAME, job.getApprovername());
+    doc.addField(RodaConstants.JOB_APPROVER_FULL_NAME, job.getApproverFullName());
+    doc.addField(RodaConstants.JOB_APPROVER_EMAIL, job.getApproverEmail());
     doc.addField(RodaConstants.JOB_START_DATE, SolrUtils.formatDateWithMillis(job.getStartDate()));
     doc.addField(RodaConstants.JOB_END_DATE, SolrUtils.formatDateWithMillis(job.getEndDate()));
     doc.addField(RodaConstants.JOB_STATE, job.getState().toString());
@@ -161,6 +167,9 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
 
     job.setName(SolrUtils.objectToString(doc.get(RodaConstants.JOB_NAME), null));
     job.setUsername(SolrUtils.objectToString(doc.get(RodaConstants.JOB_USERNAME), null));
+    job.setApprovername(SolrUtils.objectToString(doc.get(RodaConstants.JOB_APPROVER_NAME), null));
+    job.setApproverFullName(SolrUtils.objectToString(doc.get(RodaConstants.JOB_APPROVER_FULL_NAME), null));
+    job.setApproverEmail(SolrUtils.objectToString(doc.get(RodaConstants.JOB_APPROVER_EMAIL), null));
     job.setStartDate(SolrUtils.objectToDateWithMillis(doc.get(RodaConstants.JOB_START_DATE)));
     job.setEndDate(SolrUtils.objectToDateWithMillis(doc.get(RodaConstants.JOB_END_DATE)));
     job.setInstanceId(SolrUtils.objectToString(doc.get(RodaConstants.JOB_INSTANCE_ID),null));

@@ -54,6 +54,8 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobUserDetails;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
@@ -274,7 +276,7 @@ public final class PremisV3Utils {
 
   public static ContentPayload createPremisEventBinary(String eventID, Date date, String type, String details,
     List<LinkingIdentifier> sources, List<LinkingIdentifier> outcomes, String outcome, String detailNote,
-    String detailExtension, List<String> agentIds) {
+    String detailExtension, List<LinkingIdentifier> agentIds) {
     EventComplexType ect = FACTORY.createEventComplexType();
     ect.setEventDateTime(DateTime.parse(date.toInstant().toString()).toString());
     ect.setEventType(getStringPlusAuthority(type));
@@ -313,10 +315,13 @@ public final class PremisV3Utils {
     }
 
     if (agentIds != null) {
-      for (String agentId : agentIds) {
+      for (LinkingIdentifier identifier : agentIds) {
         LinkingAgentIdentifierComplexType laict = FACTORY.createLinkingAgentIdentifierComplexType();
         laict.setLinkingAgentIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
-        laict.setLinkingAgentIdentifierValue(agentId);
+        laict.setLinkingAgentIdentifierValue(identifier.getValue());
+        if (identifier.getRoles() != null) {
+          laict.getLinkingAgentRole().addAll(getStringPlusAuthorityArray(identifier.getRoles()));
+        }
         ect.getLinkingAgentIdentifier().add(laict);
       }
     }
@@ -381,6 +386,9 @@ public final class PremisV3Utils {
         linkingAgentIdentifier
           .setLinkingAgentIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
         linkingAgentIdentifier.setLinkingAgentIdentifierValue(agentId.getValue());
+        if (agentId.getRoles() != null) {
+          linkingAgentIdentifier.getLinkingAgentRole().addAll(getStringPlusAuthorityArray(agentId.getRoles()));
+        }
         eventComplexType.getLinkingAgentIdentifier().add(linkingAgentIdentifier);
       }
     }
@@ -976,8 +984,15 @@ public final class PremisV3Utils {
 
   }
 
+
   public static PreservationMetadata createOrUpdatePremisUserAgentBinary(String username, ModelService model,
     IndexService index, boolean notify) throws GenericException, ValidationException, NotFoundException,
+    RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
+    return createOrUpdatePremisUserAgentBinary(username, model, index, notify,null);
+  }
+  public static PreservationMetadata createOrUpdatePremisUserAgentBinary(String username, ModelService model,
+    IndexService index, boolean notify,Job job) throws GenericException, ValidationException,
+    NotFoundException,
     RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
     PreservationMetadata pm = null;
 
@@ -988,17 +1003,28 @@ public final class PremisV3Utils {
       String note = "";
       String version = "";
 
-      try {
-        RODAMember member = index.retrieve(RODAMember.class, IdUtils.getUserId(username),
-          Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.MEMBERS_FULLNAME, RodaConstants.MEMBERS_EMAIL));
-        fullName = member.getFullName();
-        if (member instanceof User) {
-          User user = (User) member;
-          note = user.getEmail();
+      if (job != null){
+        for(JobUserDetails jobUserDetails: job.getJobUsersDetails()){
+          if(jobUserDetails.getUsername().equals(username)){
+            fullName = jobUserDetails.getFullname();
+            note = jobUserDetails.getEmail();
+          }
         }
-      } catch (NotFoundException e) {
-        LOGGER.warn("Could not find user and add its details to the PREMIS agent", e);
+      }else {
+        try {
+          RODAMember member = index.retrieve(RODAMember.class, IdUtils.getUserId(username),
+                  Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.MEMBERS_FULLNAME, RodaConstants.MEMBERS_EMAIL));
+
+          fullName = member.getFullName();
+          if (member instanceof User) {
+            User user = (User) member;
+            note = user.getEmail();
+          }
+        } catch (NotFoundException e) {
+          LOGGER.warn("Could not find user and add its details to the PREMIS agent", e);
+        }
       }
+
 
       ContentPayload agentPayload = PremisV3Utils.createPremisAgentBinary(id, fullName, PreservationAgentType.PERSON,
         extension, note, version);

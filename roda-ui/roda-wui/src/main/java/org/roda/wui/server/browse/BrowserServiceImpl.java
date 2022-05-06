@@ -76,6 +76,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobMixIn;
 import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
+import org.roda.core.data.v2.jobs.JobUserDetails;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -795,6 +796,13 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
       }
     }
 
+    JobUserDetails jobUserDetails = new JobUserDetails();
+    jobUserDetails.setUsername(user.getName());
+    jobUserDetails.setEmail(user.getEmail());
+    jobUserDetails.setFullname(user.getFullName());
+    jobUserDetails.setRole(RodaConstants.PreservationAgentRole.EXECUTING_PROGRAM.toString());
+
+    
     Job job = new Job();
     job.setId(IdUtils.createUUID());
     job.setName(jobName);
@@ -804,6 +812,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     job.setUsername(user.getName());
     job.setPriority(priority);
     job.setParallelism(parallelism);
+    job.getJobUsersDetails().add(jobUserDetails);
 
     String command = RodaCoreFactory.getRodaConfiguration().getString("ui.createJob.curl");
     if (command != null) {

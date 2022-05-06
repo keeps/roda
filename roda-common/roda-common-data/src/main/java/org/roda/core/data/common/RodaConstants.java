@@ -935,6 +935,9 @@ public final class RodaConstants {
   public static final String JOB_ID = "id";
   public static final String JOB_NAME = "name";
   public static final String JOB_USERNAME = "username";
+  public static final String JOB_APPROVER_NAME = "approverName";
+  public static final String JOB_APPROVER_EMAIL = "approverEmail";
+  public static final String JOB_APPROVER_FULL_NAME = "approverFullName";
   public static final String JOB_START_DATE = "startDate";
   public static final String JOB_END_DATE = "endDate";
   public static final String JOB_STATE = "state";
@@ -1471,6 +1474,20 @@ public final class RodaConstants {
     }
 
     @Override
+    public String toString() {
+      return text;
+    }
+  }
+
+  public enum PreservationAgentRole {
+    AUTHORIZER("authorizer"), EXECUTING_PROGRAM("executing program"), IMPLEMENTER("implementer"), VALIDATOR("validator");
+
+    private final String text;
+
+    private PreservationAgentRole(final String text) {
+      this.text = text;
+    }
+
     public String toString() {
       return text;
     }
