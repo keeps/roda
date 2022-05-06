@@ -100,7 +100,6 @@ public abstract class DefaultMultipleStepPlugin<T extends IsRODAObject> extends 
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
     } catch (JobException e) {
-      LOGGER.error("OKOK");
       // do nothing
     } finally {
       // remove locks if any
