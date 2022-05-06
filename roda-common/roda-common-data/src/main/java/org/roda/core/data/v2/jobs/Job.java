@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
@@ -47,6 +48,12 @@ public class Job implements IsModelObject, IsIndexed, HasId {
   private String name = null;
   // job creator
   private String username = null;
+  // Job executor name
+  private String approvername = null;
+  // Job executor fullname
+  private String approverFullName = null;
+  // Job executor email
+  private String approverEmail = null;
   // job start date
   private Date startDate = null;
   // job end date
@@ -58,6 +65,8 @@ public class Job implements IsModelObject, IsIndexed, HasId {
 
   // job instance id
   private String instanceId = null;
+
+  private List<JobUserDetails> jobUsersDetails= new ArrayList<>();
 
   // job statistics (total source objects, etc.)
   JobStats jobStats = new JobStats();
@@ -105,6 +114,7 @@ public class Job implements IsModelObject, IsIndexed, HasId {
     }
     this.instanceId = job.getInstanceId();
     this.attachmentsList = job.getAttachmentsList();
+    this.jobUsersDetails = job.getJobUsersDetails();
   }
 
   @JsonIgnore
@@ -138,6 +148,22 @@ public class Job implements IsModelObject, IsIndexed, HasId {
   public Job setUsername(String username) {
     this.username = username;
     return this;
+  }
+
+  public List<JobUserDetails> getJobUsersDetails() {
+    return jobUsersDetails;
+  }
+
+  public void setJobUsersDetails(List<JobUserDetails> jobUserDetails) {
+    this.jobUsersDetails = jobUserDetails;
+  }
+
+  public List<JobUserDetails> getJobUsersDetails() {
+    return jobUsersDetails;
+  }
+
+  public void setJobUsersDetails(List<JobUserDetails> jobUserDetails) {
+    this.jobUsersDetails = jobUserDetails;
   }
 
   public Date getStartDate() {
@@ -289,7 +315,8 @@ public class Job implements IsModelObject, IsIndexed, HasId {
 
   @Override
   public String toString() {
-    return "Job [id=" + id + ", name=" + name + ", username=" + username + ", startDate=" + startDate + ", endDate="
+    return "Job [id=" + id + ", name=" + name + ", username=" + username + ", approvername=" + approvername
+      + ", approverEmail=" + approverEmail + ", startDate=" + startDate + ", endDate="
       + endDate + ", state=" + state + ", stateDetails=" + stateDetails + ", priority=" + priority + ", type="
       + parallelism + ", jobStats=" + jobStats + ", plugin=" + plugin + ", pluginType=" + pluginType
       + ", pluginParameters=" + pluginParameters + ", sourceObjects=" + sourceObjects + ", outcomeObjectsClass="

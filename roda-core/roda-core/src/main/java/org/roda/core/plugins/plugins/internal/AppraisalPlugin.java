@@ -131,14 +131,14 @@ public class AppraisalPlugin extends AbstractPlugin<AIP> {
       Map<String, Pair<Integer, Integer>> jobState = new HashMap<>();
       List<String> aipsToDelete = new ArrayList<>();
       Date now = new Date();
-
+      LinkingIdentifier linkingIdentifierAgent = new LinkingIdentifier();
       String userAgentId;
       try {
         PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(job.getUsername(), model, index,
-          true);
-        userAgentId = pm.getId();
+          true,job);
+        linkingIdentifierAgent.setValue( pm.getId());
       } catch (AlreadyExistsException e) {
-        userAgentId = IdUtils.getUserAgentId(job.getUsername(), RODAInstanceUtils.getLocalInstanceIdentifier());
+        linkingIdentifierAgent.setValue(IdUtils.getUserAgentId(job.getUsername(), RODAInstanceUtils.getLocalInstanceIdentifier()));
       } catch (ValidationException e) {
         throw new GenericException(e);
       }
@@ -171,7 +171,7 @@ public class AppraisalPlugin extends AbstractPlugin<AIP> {
             try {
               ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, now, type.toString(),
                 preservationEventDescription, sources, outcomes, outcome.name(), outcomeDetailNote, null,
-                Arrays.asList(userAgentId));
+                Arrays.asList(linkingIdentifierAgent));
 
               model.createPreservationMetadata(PreservationMetadata.PreservationMetadataType.EVENT, id, aipId, null,
                 null, null, premisEvent, true);
