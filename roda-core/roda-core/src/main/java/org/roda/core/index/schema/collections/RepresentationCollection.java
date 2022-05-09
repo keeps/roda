@@ -72,6 +72,7 @@ public class RepresentationCollection extends AbstractSolrCollection<IndexedRepr
     fields.add(new Field(RodaConstants.REPRESENTATION_ORIGINAL, Field.TYPE_BOOLEAN));
     fields.add(new Field(RodaConstants.REPRESENTATION_TYPE, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.REPRESENTATION_INSTANCE_ID, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.INDEX_INSTANCE_NAME, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.REPRESENTATION_SIZE_IN_BYTES, Field.TYPE_LONG));
     fields.add(new Field(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES, Field.TYPE_LONG));
     fields.add(new Field(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FOLDERS, Field.TYPE_LONG));
@@ -167,6 +168,13 @@ public class RepresentationCollection extends AbstractSolrCollection<IndexedRepr
     doc.addField(RodaConstants.REPRESENTATION_NUMBER_OF_DOCUMENTATION_FILES, numberOfDocumentationFiles);
     doc.addField(RodaConstants.REPRESENTATION_NUMBER_OF_SCHEMA_FILES, numberOfSchemaFiles);
 
+    String name = null;
+    if (rep.getInstanceId() != null
+      && RodaCoreFactory.getDistributedModeType().equals(RodaConstants.DistributedModeType.CENTRAL)) {
+      name = RodaCoreFactory.getModelService().retrieveDistributedInstance(rep.getInstanceId()).getName();
+    }
+
+    doc.addField(RodaConstants.INDEX_INSTANCE_NAME, name);
     return doc;
   }
 
@@ -229,6 +237,7 @@ public class RepresentationCollection extends AbstractSolrCollection<IndexedRepr
       Boolean.TRUE.equals(SolrUtils.objectToBoolean(doc.get(RodaConstants.REPRESENTATION_ORIGINAL), Boolean.FALSE)));
     ret.setType(SolrUtils.objectToString(doc.get(RodaConstants.REPRESENTATION_TYPE), null));
     ret.setInstanceId(SolrUtils.objectToString(doc.get(RodaConstants.REPRESENTATION_INSTANCE_ID), null));
+    ret.setInstanceName(SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_NAME), null));
     ret.setTitle(SolrUtils.objectToString(doc.get(RodaConstants.REPRESENTATION_TITLE), null));
     ret.setSizeInBytes(SolrUtils.objectToLong(doc.get(RodaConstants.REPRESENTATION_SIZE_IN_BYTES), 0L));
     ret.setNumberOfDataFiles(SolrUtils.objectToLong(doc.get(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES), 0L));

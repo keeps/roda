@@ -34,6 +34,8 @@ public class IndexedReport extends Report implements IsIndexed {
   private List<String> unsuccessfulPlugins = new ArrayList<>();
   private int unsuccessfulPluginsCounter = 0;
 
+  private String instanceName = null;
+
   private Map<String, Object> fields;
 
   public IndexedReport() {
@@ -49,6 +51,7 @@ public class IndexedReport extends Report implements IsIndexed {
     this.successfulPlugins = report.getSuccessfulPlugins();
     this.unsuccessfulPlugins = report.getUnsuccessfulPlugins();
     this.unsuccessfulPluginsCounter = report.getUnsuccessfulPluginsCounter();
+    this.instanceName = report.getInstanceName();
   }
 
   public String getJobName() {
@@ -106,13 +109,21 @@ public class IndexedReport extends Report implements IsIndexed {
     return unsuccessfulPluginsCounter;
   }
 
+  public String getInstanceName() {
+    return instanceName;
+  }
+
+  public void setInstanceName(String instanceName) {
+    this.instanceName = instanceName;
+  }
+
   @Override
   public List<String> toCsvHeaders() {
     return Arrays.asList("id", "jobId", "jobName", "sourceObjectId", "sourceObjectOriginalName", "sourceObjectLabel",
       "sourceObjectClass", "sourceObjectOriginalIds", "outcomeObjectId", "outcomeObjectLabel", "outcomeObjectClass",
       "outcomeObjectState", "title", "dateCreated", "dateUpdated", "completionPercentage", "stepsCompleted",
       "totalSteps", "plugin", "pluginName", "pluginVersion", "pluginState", "pluginDetails", "htmlPluginDetails",
-      "successfulPlugins", "unsuccessfulPlugins", "reports", "instanceId");
+      "successfulPlugins", "unsuccessfulPlugins", "reports", "instanceId", "instanceName");
   }
 
   @Override
@@ -124,7 +135,7 @@ public class IndexedReport extends Report implements IsIndexed {
       super.getDateUpdated(), super.getCompletionPercentage(), super.getStepsCompleted(), super.getTotalSteps(),
       super.getPlugin(), super.getPluginName(), super.getPluginVersion(), super.getPluginState(),
       super.getPluginDetails(), super.isHtmlPluginDetails(), getSuccessfulPlugins(), getUnsuccessfulPlugins(),
-      super.getReports(), super.getInstanceId());
+      super.getReports(), super.getInstanceId(), getInstanceName());
   }
 
   @JsonIgnore

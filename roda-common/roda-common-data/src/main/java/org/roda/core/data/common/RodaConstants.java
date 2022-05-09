@@ -728,6 +728,8 @@ public final class RodaConstants {
   public static final String INDEX_SEARCH = "search";
   public static final String INDEX_WILDCARD = "*";
 
+  public static final String INDEX_INSTANCE_NAME = "instanceName";
+
   /*
    * AIP FIELDS
    */

@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -94,8 +95,8 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
     fields.add(new Field(RodaConstants.JOB_HAS_PARTIAL_SUCCESS, Field.TYPE_BOOLEAN).setStored(false));
     fields.add(new Field(RodaConstants.JOB_HAS_SKIPPED, Field.TYPE_BOOLEAN).setStored(false));
     fields.add(new Field(RodaConstants.JOB_INSTANCE_ID, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.INDEX_INSTANCE_NAME, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_ATTACHMENTS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
-
 
     return fields;
   }
@@ -151,6 +152,14 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
     doc.addField(RodaConstants.JOB_INSTANCE_ID, job.getInstanceId());
     doc.addField(RodaConstants.JOB_ATTACHMENTS, JsonUtils.getJsonFromObject(job.getAttachmentsList()));
 
+    String name = null;
+    if (job.getInstanceId() != null
+      && RodaCoreFactory.getDistributedModeType().equals(RodaConstants.DistributedModeType.CENTRAL)) {
+      name = RodaCoreFactory.getModelService().retrieveDistributedInstance(job.getInstanceId()).getName();
+    }
+
+    doc.addField(RodaConstants.INDEX_INSTANCE_NAME, name);
+
     return doc;
   }
 
@@ -163,7 +172,8 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
     job.setUsername(SolrUtils.objectToString(doc.get(RodaConstants.JOB_USERNAME), null));
     job.setStartDate(SolrUtils.objectToDateWithMillis(doc.get(RodaConstants.JOB_START_DATE)));
     job.setEndDate(SolrUtils.objectToDateWithMillis(doc.get(RodaConstants.JOB_END_DATE)));
-    job.setInstanceId(SolrUtils.objectToString(doc.get(RodaConstants.JOB_INSTANCE_ID),null));
+    job.setInstanceId(SolrUtils.objectToString(doc.get(RodaConstants.JOB_INSTANCE_ID), null));
+    job.setInstanceName(SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_NAME), null));
     if (doc.containsKey(RodaConstants.JOB_STATE)) {
       job.setState(JOB_STATE.valueOf(SolrUtils.objectToString(doc.get(RodaConstants.JOB_STATE), null)));
     }
@@ -210,8 +220,8 @@ public class JobCollection extends AbstractSolrCollection<Job, Job> {
 
     try {
       if (fieldsToReturn.isEmpty() || fieldsToReturn.contains(RodaConstants.JOB_ATTACHMENTS)) {
-        job.setAttachmentsList(JsonUtils.getObjectFromJson(
-                SolrUtils.objectToString(doc.get(RodaConstants.JOB_ATTACHMENTS), ""), List.class));
+        job.setAttachmentsList(JsonUtils
+          .getObjectFromJson(SolrUtils.objectToString(doc.get(RodaConstants.JOB_ATTACHMENTS), ""), List.class));
       }
     } catch (GenericException e) {
       LOGGER.error("Error parsing report in job objects", e);

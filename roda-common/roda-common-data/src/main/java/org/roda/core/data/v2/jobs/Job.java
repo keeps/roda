@@ -61,6 +61,7 @@ public class Job implements IsModelObject, IsIndexed, HasId {
   private String instanceId = null;
 
   private List<JobUserDetails> jobUsersDetails= new ArrayList<>();
+  private String instanceName = null;
 
   // job statistics (total source objects, etc.)
   JobStats jobStats = new JobStats();
@@ -107,6 +108,7 @@ public class Job implements IsModelObject, IsIndexed, HasId {
       jobStats.setSourceObjectsCount(((SelectedItemsList<?>) sourceObjects).getIds().size());
     }
     this.instanceId = job.getInstanceId();
+    this.instanceName = job.getInstanceName();
     this.attachmentsList = job.getAttachmentsList();
     this.jobUsersDetails = job.getJobUsersDetails();
   }
@@ -286,6 +288,14 @@ public class Job implements IsModelObject, IsIndexed, HasId {
 
   public void setInstanceId(String instanceId) {
     this.instanceId = instanceId;
+  }
+
+  public String getInstanceName() {
+    return instanceName;
+  }
+
+  public void setInstanceName(String instanceName) {
+    this.instanceName = instanceName;
   }
 
   public List<String> getAttachmentsList() {

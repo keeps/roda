@@ -10,10 +10,10 @@ package org.roda.core.index.schema.collections;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.dips.DIPUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -89,6 +89,7 @@ public class DIPCollection extends AbstractSolrCollection<IndexedDIP, DIP> {
     fields.add(
       new Field(RodaConstants.DIP_ALL_REPRESENTATION_UUIDS, Field.TYPE_STRING).setStored(false).setMultiValued(true));
     fields.add(new Field(RodaConstants.DIP_INSTANCE_ID, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.INDEX_INSTANCE_NAME, Field.TYPE_STRING));
 
     return fields;
   }
@@ -163,6 +164,14 @@ public class DIPCollection extends AbstractSolrCollection<IndexedDIP, DIP> {
       LOGGER.error("Error indexing DIP open external URL", openURL.getCause());
     }
 
+    String name = null;
+    if (dip.getInstanceId() != null
+      && RodaCoreFactory.getDistributedModeType().equals(RodaConstants.DistributedModeType.CENTRAL)) {
+      name = RodaCoreFactory.getModelService().retrieveDistributedInstance(dip.getInstanceId()).getName();
+    }
+
+    doc.addField(RodaConstants.INDEX_INSTANCE_NAME, name);
+
     return doc;
   }
 
@@ -176,7 +185,7 @@ public class DIPCollection extends AbstractSolrCollection<IndexedDIP, DIP> {
     dip.setLastModified(SolrUtils.objectToDate(doc.get(RodaConstants.DIP_LAST_MODIFIED)));
     dip.setIsPermanent(SolrUtils.objectToBoolean(doc.get(RodaConstants.DIP_IS_PERMANENT), Boolean.FALSE));
     dip.setInstanceId(SolrUtils.objectToString(doc.get(RodaConstants.DIP_INSTANCE_ID), null));
-
+    dip.setInstanceName(SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_NAME), null));
     boolean emptyFields = fieldsToReturn.isEmpty();
 
     if (emptyFields || fieldsToReturn.contains(RodaConstants.DIP_PROPERTIES)) {

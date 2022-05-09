@@ -2422,7 +2422,8 @@ public class ModelService extends ModelObservable {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    if (job.getInstanceId() == null) {
+    if (job.getInstanceId() == null
+      && RodaCoreFactory.getDistributedModeType().equals(RodaConstants.DistributedModeType.CENTRAL)) {
       job.setInstanceId(RODAInstanceUtils.getLocalInstanceIdentifier());
     }
 

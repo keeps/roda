@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.roda.core.RodaCoreFactory;
@@ -82,6 +81,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     fields.add(new Field(RodaConstants.AIP_PARENT_ID, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.AIP_TYPE, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.AIP_INSTANCE_ID, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.INDEX_INSTANCE_NAME, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.AIP_ANCESTORS, Field.TYPE_STRING).setMultiValued(true));
     fields.add(new Field(RodaConstants.AIP_CREATED_ON, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.AIP_CREATED_BY, Field.TYPE_STRING));
@@ -242,6 +242,12 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
       numberOfSchemaFiles = 0L;
     }
 
+    String name = null;
+    if (aip.getInstanceId() != null
+      && RodaCoreFactory.getDistributedModeType().equals(RodaConstants.DistributedModeType.CENTRAL)) {
+      name = model.retrieveDistributedInstance(aip.getInstanceId()).getName();
+    }
+    doc.addField(RodaConstants.INDEX_INSTANCE_NAME, name);
     doc.addField(RodaConstants.AIP_NUMBER_OF_SUBMISSION_FILES, numberOfSubmissionFiles);
     doc.addField(RodaConstants.AIP_NUMBER_OF_DOCUMENTATION_FILES, numberOfDocumentationFiles);
     doc.addField(RodaConstants.AIP_NUMBER_OF_SCHEMA_FILES, numberOfSchemaFiles);
@@ -302,6 +308,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
 
     final String parentId = SolrUtils.objectToString(doc.get(RodaConstants.AIP_PARENT_ID), null);
     final String instanceId = SolrUtils.objectToString(doc.get(RodaConstants.AIP_INSTANCE_ID), null);
+    final String instanceName = SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_NAME), null);
     final List<String> ingestSIPIds = SolrUtils.objectToListString(doc.get(RodaConstants.INGEST_SIP_IDS));
     final String ingestJobId = SolrUtils.objectToString(doc.get(RodaConstants.INGEST_JOB_ID), "");
     final List<String> ingestUpdateJobIds = SolrUtils.objectToListString(doc.get(RodaConstants.INGEST_UPDATE_JOB_IDS));
@@ -368,6 +375,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
 
     ret.setType(type);
     ret.setInstanceId(instanceId);
+    ret.setInstanceName(instanceName);
     ret.setLevel(level);
     ret.setTitle(title);
     ret.setDateInitial(dateInitial);

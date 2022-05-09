@@ -13,14 +13,15 @@ import java.util.List;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
-import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
@@ -76,7 +77,7 @@ public class NotificationCollection extends AbstractSolrCollection<Notification,
 
     fields
       .add(new Field(RodaConstants.NOTIFICATION_INSTANCE_ID, Field.TYPE_TEXT).setRequired(false).setMultiValued(false));
-
+    fields.add(new Field(RodaConstants.INDEX_INSTANCE_NAME, Field.TYPE_STRING));
     return fields;
   }
 
@@ -102,6 +103,14 @@ public class NotificationCollection extends AbstractSolrCollection<Notification,
       JsonUtils.getJsonFromObject(notification.getAcknowledgedUsers()));
     doc.addField(RodaConstants.NOTIFICATION_STATE, notification.getState().toString());
     doc.addField(RodaConstants.NOTIFICATION_INSTANCE_ID, notification.getInstanceId());
+
+    String name = null;
+    if (notification.getInstanceId() != null
+      && RodaCoreFactory.getDistributedModeType().equals(RodaConstants.DistributedModeType.CENTRAL)) {
+      name = RodaCoreFactory.getModelService().retrieveDistributedInstance(notification.getInstanceId()).getName();
+    }
+
+    doc.addField(RodaConstants.INDEX_INSTANCE_NAME, name);
 
     return doc;
   }
@@ -132,7 +141,7 @@ public class NotificationCollection extends AbstractSolrCollection<Notification,
     }
 
     notification.setInstanceId(SolrUtils.objectToString(doc.get(RodaConstants.NOTIFICATION_INSTANCE_ID), null));
-
+    notification.setInstanceName(SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_NAME), null));
     return notification;
 
   }
