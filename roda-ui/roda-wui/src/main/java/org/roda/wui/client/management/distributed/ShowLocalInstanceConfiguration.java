@@ -161,44 +161,68 @@ public class ShowLocalInstanceConfiguration extends Composite {
 
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
+    Dialogs.showConfirmDialog(messages.removeLocalConfiguration(), messages.removeLocalConfigurationMessage(),
+      messages.dialogNo(), messages.dialogYes(), confirmRemoveCallback());
 
-    Dialogs.showConfirmDialog(messages.removeInstanceIdFromRepository(),
-      messages.removeInstanceIdFromRepositoryMessage(), messages.dialogNo(), messages.dialogYes(),
-      new NoAsyncCallback<Boolean>() {
-        @Override
-        public void onSuccess(Boolean result) {
-          if (result) {
-            BrowserService.Util.getInstance().deleteLocalInstanceConfiguration(new NoAsyncCallback<Void>() {
-              @Override
-              public void onSuccess(Void unused) {
-                localInstance.setInstanceIdentifierState(LocalInstanceIdentifierState.INACTIVE);
-                localInstance.setId(null);
-                BrowserService.Util.getInstance().modifyInstanceIdOnRepository(localInstance, new AsyncCallback<Job>() {
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                  }
+  }
 
-                  @Override
-                  public void onSuccess(Job job) {
-                    Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
-                      @Override
-                      public void onFailure(Throwable caught) {
-                        Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
-                      }
+  private NoAsyncCallback<Boolean> confirmRemoveCallback() {
+    return new NoAsyncCallback<Boolean>() {
+      @Override
+      public void onFailure(Throwable caught) {
+        super.onFailure(caught);
+      }
 
-                      @Override
-                      public void onSuccess(final Void nothing) {
-                        HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                      }
-                    });
-                  }
-                });
-              }
-            });
-          }
+      @Override
+      public void onSuccess(Boolean result) {
+        super.onSuccess(result);
+        if (result) {
+          BrowserService.Util.getInstance().deleteLocalInstanceConfiguration(new NoAsyncCallback<Void>() {
+            @Override
+            public void onSuccess(Void unused) {
+              super.onSuccess(unused);
+              Dialogs.showConfirmDialog(messages.removeInstanceIdFromRepository(),
+                messages.removeInstanceIdFromRepositoryMessage(), messages.dialogNo(), messages.dialogYes(),
+                confirmRemoveInstanceIdentifier());
+            }
+          });
         }
-      });
+      }
+    };
+  }
+
+  private NoAsyncCallback<Boolean> confirmRemoveInstanceIdentifier() {
+    return new NoAsyncCallback<Boolean>() {
+      @Override
+      public void onSuccess(Boolean result) {
+        super.onSuccess(result);
+        if (result) {
+          localInstance.setInstanceIdentifierState(LocalInstanceIdentifierState.INACTIVE);
+          localInstance.setId(null);
+          BrowserService.Util.getInstance().modifyInstanceIdOnRepository(localInstance, new AsyncCallback<Job>() {
+            @Override
+            public void onFailure(Throwable caught) {
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
+              HistoryUtils.newHistory(InternalProcess.RESOLVER);
+            }
+
+            @Override
+            public void onSuccess(Job job) {
+              Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+                @Override
+                public void onFailure(Throwable caught) {
+                  Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+                }
+
+                @Override
+                public void onSuccess(final Void nothing) {
+                  HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                }
+              });
+            }
+          });
+        }
+      }
+    };
   }
 }
