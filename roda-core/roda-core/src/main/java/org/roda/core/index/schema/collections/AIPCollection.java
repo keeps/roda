@@ -42,6 +42,7 @@ import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
+import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.Directory;
@@ -242,11 +243,8 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
       numberOfSchemaFiles = 0L;
     }
 
-    String name = null;
-    if (aip.getInstanceId() != null
-      && RodaCoreFactory.getDistributedModeType().equals(RodaConstants.DistributedModeType.CENTRAL)) {
-      name = model.retrieveDistributedInstance(aip.getInstanceId()).getName();
-    }
+    String name = IndexUtils.giveNameFromLocalInstanceIdentifier(aip.getInstanceId());
+
     doc.addField(RodaConstants.INDEX_INSTANCE_NAME, name);
     doc.addField(RodaConstants.AIP_NUMBER_OF_SUBMISSION_FILES, numberOfSubmissionFiles);
     doc.addField(RodaConstants.AIP_NUMBER_OF_DOCUMENTATION_FILES, numberOfDocumentationFiles);

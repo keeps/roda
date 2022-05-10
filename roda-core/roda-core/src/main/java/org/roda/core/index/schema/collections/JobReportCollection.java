@@ -34,6 +34,7 @@ import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
+import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.index.utils.SolrUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,11 +147,8 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     doc.addField(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_CLASS, jobReport.getOutcomeObjectClass());
     doc.addField(RodaConstants.INDEX_INSTANCE_ID, jobReport.getInstanceId());
 
-    String name = null;
-    if (jobReport.getInstanceId() != null
-      && RodaCoreFactory.getDistributedModeType().equals(RodaConstants.DistributedModeType.CENTRAL)) {
-      name = RodaCoreFactory.getModelService().retrieveDistributedInstance(jobReport.getInstanceId()).getName();
-    }
+    String name = IndexUtils.giveNameFromLocalInstanceIdentifier(jobReport.getInstanceId());
+
     doc.addField(RodaConstants.INDEX_INSTANCE_NAME, name);
 
     return doc;

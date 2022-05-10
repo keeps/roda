@@ -28,6 +28,7 @@ import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
+import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.index.utils.SolrUtils;
 
 public class RiskIncidenceCollection extends AbstractSolrCollection<RiskIncidence, RiskIncidence> {
@@ -117,11 +118,8 @@ public class RiskIncidenceCollection extends AbstractSolrCollection<RiskIncidenc
     doc.addField(RodaConstants.INDEX_INSTANCE_ID, incidence.getInstanceId());
     doc.addField(RodaConstants.RISK_INCIDENCE_UPDATED_ON, SolrUtils.formatDate(incidence.getUpdatedOn()));
 
-    String name = null;
-    if (incidence.getInstanceId() != null
-      && RodaCoreFactory.getDistributedModeType().equals(RodaConstants.DistributedModeType.CENTRAL)) {
-      name = RodaCoreFactory.getModelService().retrieveDistributedInstance(incidence.getInstanceId()).getName();
-    }
+    String name = IndexUtils.giveNameFromLocalInstanceIdentifier(incidence.getInstanceId());
+
     doc.addField(RodaConstants.INDEX_INSTANCE_NAME, name);
 
     return doc;

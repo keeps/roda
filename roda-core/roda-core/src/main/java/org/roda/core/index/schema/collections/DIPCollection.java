@@ -32,6 +32,7 @@ import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
+import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -164,11 +165,7 @@ public class DIPCollection extends AbstractSolrCollection<IndexedDIP, DIP> {
       LOGGER.error("Error indexing DIP open external URL", openURL.getCause());
     }
 
-    String name = null;
-    if (dip.getInstanceId() != null
-      && RodaCoreFactory.getDistributedModeType().equals(RodaConstants.DistributedModeType.CENTRAL)) {
-      name = RodaCoreFactory.getModelService().retrieveDistributedInstance(dip.getInstanceId()).getName();
-    }
+    String name = IndexUtils.giveNameFromLocalInstanceIdentifier(dip.getInstanceId());
 
     doc.addField(RodaConstants.INDEX_INSTANCE_NAME, name);
 

@@ -13,7 +13,6 @@ import java.util.List;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -27,6 +26,7 @@ import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
+import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.index.utils.SolrUtils;
 
 public class NotificationCollection extends AbstractSolrCollection<Notification, Notification> {
@@ -75,8 +75,7 @@ public class NotificationCollection extends AbstractSolrCollection<Notification,
     fields.add(new Field(RodaConstants.NOTIFICATION_ACKNOWLEDGED_USERS, Field.TYPE_STRING).setIndexed(false)
       .setDocValues(false));
 
-    fields
-      .add(new Field(RodaConstants.INDEX_INSTANCE_ID, Field.TYPE_TEXT).setRequired(false).setMultiValued(false));
+    fields.add(new Field(RodaConstants.INDEX_INSTANCE_ID, Field.TYPE_TEXT).setRequired(false).setMultiValued(false));
     fields.add(new Field(RodaConstants.INDEX_INSTANCE_NAME, Field.TYPE_STRING));
     return fields;
   }
@@ -104,12 +103,8 @@ public class NotificationCollection extends AbstractSolrCollection<Notification,
     doc.addField(RodaConstants.NOTIFICATION_STATE, notification.getState().toString());
     doc.addField(RodaConstants.INDEX_INSTANCE_ID, notification.getInstanceId());
 
-    String name = null;
-    if (notification.getInstanceId() != null
-      && RodaCoreFactory.getDistributedModeType().equals(RodaConstants.DistributedModeType.CENTRAL)) {
-      name = RodaCoreFactory.getModelService().retrieveDistributedInstance(notification.getInstanceId()).getName();
-    }
-
+    String name = IndexUtils.giveNameFromLocalInstanceIdentifier(notification.getInstanceId());
+    
     doc.addField(RodaConstants.INDEX_INSTANCE_NAME, name);
 
     return doc;

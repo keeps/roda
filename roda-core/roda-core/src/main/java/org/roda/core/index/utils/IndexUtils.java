@@ -30,6 +30,7 @@ import org.roda.core.data.v2.ip.*;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -234,5 +235,20 @@ public class IndexUtils {
     } else {
       return (Class<T>) modelClass;
     }
+  }
+
+  public static String giveNameFromLocalInstanceIdentifier(String instanceId){
+    String name = null;
+
+    if (instanceId != null
+            && RodaCoreFactory.getDistributedModeType().equals(RodaConstants.DistributedModeType.CENTRAL)) {
+      try {
+        final DistributedInstance distributedInstance = RodaCoreFactory.getModelService().retrieveDistributedInstance(instanceId);
+        name = distributedInstance.getName();
+      } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+        name = instanceId;
+      }
+    }
+    return name;
   }
 }
