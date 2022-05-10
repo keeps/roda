@@ -204,8 +204,8 @@ public class JobsResource {
     Job job = org.roda.wui.api.controllers.Browser.retrieve(user, Job.class, jobId, new ArrayList<>());
 
     // delegate action to controller
-    Job rejectedJob = org.roda.wui.api.controllers.Jobs.rejectJob(user, job, details);
-    return Response.ok(rejectedJob, mediaType).build();
+    org.roda.wui.api.controllers.Jobs.rejectJob(user, (SelectedItems<Job>) job, details);
+    return Response.ok("Rejected", mediaType).build();
   }
 
   @DELETE

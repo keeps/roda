@@ -107,28 +107,39 @@ public class Jobs extends RodaWuiController {
     return null;
   }
 
-  public static Job rejectJob(User user, Job job, String details) throws AuthorizationDeniedException,
+  public static Job rejectJob(User user, SelectedItems<Job> jobs, String details) throws AuthorizationDeniedException,
           RequestNotValidException, NotFoundException, GenericException, JobAlreadyStartedException, JobStateNotPendingException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
-    // validate input and set missing information when possible
-    JobsHelper.validateJobInformation(user, job);
+    ModelService model = RodaCoreFactory.getModelService();
 
-    // check user permissions
-    controllerAssistant.checkRoles(user);
+    if (jobs instanceof SelectedItemsList) {
+      SelectedItemsList<Job> jobsList = (SelectedItemsList<Job>) jobs;
+      for (String id : jobsList.getIds()) {
+        Job job = model.retrieveJob(id);
+        if (job.getState().equals(Job.JOB_STATE.PENDING_APPROVAL)) {
+          // validate input and set missing information when possible
+          JobsHelper.validateJobInformation(user, job);
 
-    LogEntryState state = LogEntryState.SUCCESS;
+          // check user permissions
+          controllerAssistant.checkRoles(user);
 
-    try {
-      // delegate
-      return JobsHelper.rejectJob(job, details);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_JOB_PARAM, job);
+          LogEntryState state = LogEntryState.SUCCESS;
+
+          try {
+            // delegate
+            job = JobsHelper.rejectJob(job, details);
+          } catch (RODAException e) {
+            state = LogEntryState.FAILURE;
+            throw e;
+          } finally {
+            // register action
+            controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_JOB_PARAM, job);
+          }
+        }
+      }
     }
+    return null;
   }
 
   public static Job startJob(User user, String jobId) throws RequestNotValidException, GenericException,

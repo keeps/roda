@@ -596,6 +596,8 @@ public interface ClientMessages extends Messages {
 
   String jobSelectedApproveConfirmDialogMessage(Long size);
 
+  String jobSelectedRejectConfirmDialogMessage(Long size);
+
   /************* Generic remove toast and dialog ****************/
 
   String removeSuccessTitle();

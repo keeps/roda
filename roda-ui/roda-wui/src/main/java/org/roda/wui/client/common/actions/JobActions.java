@@ -14,7 +14,6 @@ import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.select.SelectedItems;
-import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -146,7 +145,7 @@ public class JobActions extends AbstractActionable<Job> {
     if (JobAction.APPROVE.equals(action)) {
       approve(jobs, callback);
     } else if (JobAction.REJECT.equals(action)) {
-      //reject(object, callback);
+      reject(jobs, callback);
     } else {
       unsupportedAction(action, callback);
     }
@@ -273,7 +272,8 @@ public class JobActions extends AbstractActionable<Job> {
               new ActionNoAsyncCallback<String>(callback) {
 
                 public void onSuccess(final String details) {
-                  BrowserService.Util.getInstance().rejectJob(object, details, new ActionAsyncCallback<Void>(callback) {
+                  BrowserService.Util.getInstance()
+                    .rejectJob(objectToSelectedItems(object, Job.class), details, new ActionAsyncCallback<Void>(callback) {
                     @Override
                     public void onFailure(Throwable caught) {
                       // FIXME 20160826 hsilva: do proper handling of the failure
@@ -294,6 +294,46 @@ public class JobActions extends AbstractActionable<Job> {
           }
         }
       });
+  }
+
+  private void reject(SelectedItems<Job> objects, AsyncCallback<ActionImpact> callback) {
+    ClientSelectedItemsUtils.size(Job.class, objects, new ActionNoAsyncCallback<Long>(callback) {
+      public void onSuccess(final Long size) {
+        Dialogs.showConfirmDialog(messages.jobRejectConfirmDialogTitle(),
+          messages.jobSelectedRejectConfirmDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
+          new ActionNoAsyncCallback<Boolean>(callback) {
+
+            @Override
+            public void onSuccess(Boolean confirmed) {
+              if (confirmed) {
+                Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
+                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+                  new ActionNoAsyncCallback<String>(callback) {
+
+                    @Override
+                    public void onSuccess(final String details) {
+                      BrowserService.Util.getInstance()
+                              .rejectJob(objects, details, new ActionAsyncCallback<Void>(callback) {
+
+                        @Override
+                        public void onSuccess(Void unused) {
+                          doActionCallbackDestroyed();
+                        }
+
+                        public void onFailure(Throwable caught) {
+                          super.onFailure(caught);
+                          doActionCallbackDestroyed();
+                        }
+                      });
+                    }
+                  });
+              } else {
+                doActionCallbackNone();
+              }
+            }
+          });
+      }
+    });
   }
 
   private void newProcess(AsyncCallback<ActionImpact> callback) {
