@@ -28,6 +28,7 @@ import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Jobs;
 import org.roda.core.data.v2.jobs.Reports;
@@ -178,8 +179,8 @@ public class JobsResource {
     // getJob
     Job job = org.roda.wui.api.controllers.Browser.retrieve(user, Job.class, jobId, new ArrayList<>());
     // delegate action to controller
-    Job approvedJob = org.roda.wui.api.controllers.Jobs.approveJob(user, job, true);
-    return Response.ok(approvedJob, mediaType).build();
+    org.roda.wui.api.controllers.Jobs.approveJob(user, (SelectedItems<Job>) job, true);
+    return Response.ok("Approved", mediaType).build();
   }
 
   @GET

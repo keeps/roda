@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -22,6 +24,7 @@ import org.roda.wui.client.common.actions.callbacks.ActionNoAsyncCallback;
 import org.roda.wui.client.common.actions.model.ActionableBundle;
 import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
 import org.roda.wui.client.common.search.SearchFilters;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
@@ -104,6 +107,15 @@ public class JobActions extends AbstractActionable<Job> {
   }
 
   @Override
+  public boolean canAct(Action<Job> action, SelectedItems<Job> objects) {
+    if (hasPermissions(action) && objects != null) {
+      if (JobAction.APPROVE.equals(action) || JobAction.REJECT.equals(action)) {
+        return true;
+      }
+    }
+    return false;
+  }
+  @Override
   public void act(Action<Job> action, AsyncCallback<ActionImpact> callback) {
     if (JobAction.NEW_PROCESS.equals(action)) {
       newProcess(callback);
@@ -124,6 +136,17 @@ public class JobActions extends AbstractActionable<Job> {
       approve(object, callback);
     } else if (JobAction.REJECT.equals(action)) {
       reject(object, callback);
+    } else {
+      unsupportedAction(action, callback);
+    }
+  }
+
+  public void act(Action<Job> action, SelectedItems<Job> jobs, AsyncCallback<ActionImpact> callback) {
+
+    if (JobAction.APPROVE.equals(action)) {
+      approve(jobs, callback);
+    } else if (JobAction.REJECT.equals(action)) {
+      //reject(object, callback);
     } else {
       unsupportedAction(action, callback);
     }
@@ -176,7 +199,8 @@ public class JobActions extends AbstractActionable<Job> {
         @Override
         public void onSuccess(Boolean confirmed) {
           if (confirmed) {
-            BrowserService.Util.getInstance().approveJob(object, new ActionAsyncCallback<Void>(callback) {
+            BrowserService.Util.getInstance().approveJob(objectToSelectedItems(object, Job.class),
+              new ActionAsyncCallback<Void>(callback) {
               @Override
               public void onFailure(Throwable caught) {
                 // FIXME 20160826 hsilva: do proper handling of the failure
@@ -195,6 +219,46 @@ public class JobActions extends AbstractActionable<Job> {
           }
         }
       });
+  }
+
+  private void approve(SelectedItems<Job> objects, AsyncCallback<ActionImpact> callback) {
+    ClientSelectedItemsUtils.size(Job.class, objects, new ActionNoAsyncCallback<Long>(callback) {
+      @Override
+      public void onSuccess(final Long size) {
+        Dialogs.showConfirmDialog(messages.jobApproveConfirmDialogTitle(),
+          messages.jobSelectedApproveConfirmDialogMessage(size), messages.dialogNo(), messages.dialogYes(),
+          new ActionNoAsyncCallback<Boolean>(callback) {
+
+            @Override
+            public void onSuccess(Boolean confirmed) {
+              if (confirmed) {
+                Dialogs.showPromptDialog(messages.outcomeDetailTitle(), null, null, messages.outcomeDetailPlaceholder(),
+                  RegExp.compile(".*"), messages.cancelButton(), messages.confirmButton(), false, false,
+                  new ActionNoAsyncCallback<String>(callback) {
+
+                    @Override
+                    public void onSuccess(final String details) {
+                      BrowserService.Util.getInstance().approveJob(objects, new ActionAsyncCallback<Void>(callback) {
+
+                        @Override
+                        public void onSuccess(Void unused) {
+                          doActionCallbackDestroyed();
+                        }
+
+                        public void onFailure(Throwable caught) {
+                          super.onFailure(caught);
+                          doActionCallbackDestroyed();
+                        }
+                      });
+                    }
+                  });
+              } else {
+                doActionCallbackNone();
+              }
+            }
+          });
+      }
+    });
   }
 
   private void reject(Job object, AsyncCallback<ActionImpact> callback) {

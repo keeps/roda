@@ -557,10 +557,12 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Jobs.stopJob(user, jobId);
   }
 
-  public void approveJob(Job job) throws RequestNotValidException, AuthorizationDeniedException, NotFoundException,
-    GenericException, JobAlreadyStartedException, JobStateNotPendingException {
+
+
+  public void approveJob(SelectedItems<Job> jobs) throws RequestNotValidException, AuthorizationDeniedException, NotFoundException,
+          GenericException, JobAlreadyStartedException, JobStateNotPendingException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    Jobs.approveJob(user, job, true);
+    Jobs.approveJob(user, jobs, true);
   }
 
   public void rejectJob(Job job, String details) throws RequestNotValidException, AuthorizationDeniedException,

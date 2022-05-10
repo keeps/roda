@@ -125,7 +125,7 @@ public interface BrowserServiceAsync {
 
   void stopJob(String jobId, AsyncCallback<Void> callback);
 
-  void approveJob(Job job, AsyncCallback<Void> callback);
+  void approveJob(SelectedItems<Job> jobs, AsyncCallback<Void> callback);
 
   void rejectJob(Job job, String details, AsyncCallback<Void> callback);
 
