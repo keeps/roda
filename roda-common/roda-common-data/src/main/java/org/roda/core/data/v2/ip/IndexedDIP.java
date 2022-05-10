@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class IndexedDIP extends DIP implements IsIndexed {
   private static final long serialVersionUID = 4188689893034771594L;
   private String openExternalURL = "";
+  private String instanceName = null;
 
   private Map<String, Object> fields;
 
@@ -32,6 +33,7 @@ public class IndexedDIP extends DIP implements IsIndexed {
   public IndexedDIP(IndexedDIP dip) {
     super(dip);
     this.openExternalURL = dip.getOpenExternalURL();
+    this.instanceName = dip.getInstanceName();
   }
 
   public String getOpenExternalURL() {
@@ -60,20 +62,20 @@ public class IndexedDIP extends DIP implements IsIndexed {
 
   @Override
   public String toString() {
-    return "IndexedDIP [super=" + super.toString() + ", openExternalURL=" + openExternalURL + "]";
+    return "IndexedDIP [super=" + super.toString() + ", openExternalURL=" + openExternalURL + ", instanceName=" + instanceName + "]";
   }
 
   @Override
   public List<String> toCsvHeaders() {
     return Arrays.asList("id", "title", "description", "type", "dateCreated", "lastModified", "isPermanent",
-      "properties", "aipIds", "representationIds", "fileIds", "permissions", "openExternalURL", "instanceId");
+      "properties", "aipIds", "representationIds", "fileIds", "permissions", "openExternalURL", "instanceId", "instanceName");
   }
 
   @Override
   public List<Object> toCsvValues() {
     return Arrays.asList(super.getId(), super.getTitle(), super.getDescription(), super.getType(),
       super.getDateCreated(), super.getLastModified(), super.getIsPermanent(), super.getProperties(), super.getAipIds(),
-      super.getRepresentationIds(), super.getFileIds(), super.getPermissions(), openExternalURL, super.getInstanceId());
+      super.getRepresentationIds(), super.getFileIds(), super.getPermissions(), openExternalURL, super.getInstanceId(), instanceName);
   }
 
   @Override
@@ -94,6 +96,14 @@ public class IndexedDIP extends DIP implements IsIndexed {
    */
   public void setFields(Map<String, Object> fields) {
     this.fields = fields;
+  }
+
+  public String getInstanceName() {
+    return instanceName;
+  }
+
+  public void setInstanceName(String instanceName) {
+    this.instanceName = instanceName;
   }
 
 }

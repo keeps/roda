@@ -809,9 +809,9 @@ public class HtmlSnippetUtils {
         String entityClassUiName = getNameByEntityClassName(entitySummary.getEntityClass());
         String entityClass = getEntityClassNameSplit(entitySummary.getEntityClass());
         SafeUri downloadUriRemoved = RestUtils.createLastSynchronizationDownloadUri(rodaInstance.getId(), entityClass,
-          RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_REMOVED);
+          RodaConstants.SYNCHRONIZATION_REPORT_KEY_REMOVED);
         SafeUri downloadUriIssue = RestUtils.createLastSynchronizationDownloadUri(rodaInstance.getId(), entityClass,
-          RodaConstants.SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_ISSUE);
+          RodaConstants.SYNCHRONIZATION_REPORT_KEY_ISSUES);
 
         lastSyncBuilder.append(SafeHtmlUtils.fromSafeConstant(OPEN_DIV_FONT_STYLE_1_REM));
         lastSyncBuilder.append(SafeHtmlUtils.fromString(entityClassUiName + ": "));

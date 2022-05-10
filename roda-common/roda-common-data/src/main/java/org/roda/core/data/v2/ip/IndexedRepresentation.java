@@ -32,6 +32,8 @@ public class IndexedRepresentation extends Representation
   private long numberOfDocumentationFiles;
   private long numberOfSchemaFiles;
 
+  private String instanceName;
+
   private List<String> ancestors;
 
   private Map<String, Object> fields;
@@ -41,7 +43,7 @@ public class IndexedRepresentation extends Representation
   }
 
   public IndexedRepresentation(String uuid, String id, String aipId, boolean original, String type, String title,
-    String instanceId, long sizeInBytes, long totalNumberOfFiles, long totalNumberOfFolders,
+    String instanceId, String instanceName, long sizeInBytes, long totalNumberOfFiles, long totalNumberOfFolders,
     long numberOfDocumentationFiles, long numberOfSchemaFiles, List<String> ancestors) {
     super(id, aipId, original, type);
     this.uuid = uuid;
@@ -53,6 +55,7 @@ public class IndexedRepresentation extends Representation
     this.numberOfDocumentationFiles = numberOfDocumentationFiles;
     this.numberOfSchemaFiles = numberOfSchemaFiles;
     this.ancestors = ancestors;
+    this.instanceName = instanceName;
   }
 
   @Override
@@ -110,6 +113,14 @@ public class IndexedRepresentation extends Representation
 
   public void setNumberOfSchemaFiles(long numberOfSchemaFiles) {
     this.numberOfSchemaFiles = numberOfSchemaFiles;
+  }
+
+  public String getInstanceName() {
+    return instanceName;
+  }
+
+  public void setInstanceName(String instanceName) {
+    this.instanceName = instanceName;
   }
 
   public List<String> getAncestors() {
@@ -172,25 +183,25 @@ public class IndexedRepresentation extends Representation
   @Override
   public String toString() {
     return "IndexedRepresentation [uuid=" + uuid + ", title=" + title + ", instanceId=" + super.getInstanceId()
-      + ", sizeInBytes=" + sizeInBytes + ", numberOfDataFiles=" + numberOfDataFiles + ", numberOfDataFolders="
-      + numberOfDataFolders + " numberOfDocumentationFiles=" + numberOfDocumentationFiles + ", numberOfSchemaFiles="
-      + numberOfSchemaFiles + ", ancestors=" + ancestors + ", createdOn=" + super.getCreatedOn() + ", createdBy="
-      + super.getCreatedBy() + ", updatedOn=" + super.getUpdatedOn() + ", updatedBy=" + super.getUpdatedBy()
-      + ", representationStates=" + super.getRepresentationStates() + ']';
+      + ", instanceName=" + instanceName + ", sizeInBytes=" + sizeInBytes + ", numberOfDataFiles=" + numberOfDataFiles
+      + ", numberOfDataFolders=" + numberOfDataFolders + " numberOfDocumentationFiles=" + numberOfDocumentationFiles
+      + ", numberOfSchemaFiles=" + numberOfSchemaFiles + ", ancestors=" + ancestors + ", createdOn="
+      + super.getCreatedOn() + ", createdBy=" + super.getCreatedBy() + ", updatedOn=" + super.getUpdatedOn()
+      + ", updatedBy=" + super.getUpdatedBy() + ", representationStates=" + super.getRepresentationStates() + ']';
   }
 
   @Override
   public List<String> toCsvHeaders() {
-    return Arrays.asList("uuid", "title", "instanceId", "sizeInBytes", "numberOfDataFiles", "numberOfDataFolders",
-      "numberOfDocumentationFiles", "numberOfSchemaFiles", "ancestors", "createdOn", "createdBy", "updatedOn",
-      "updatedBy", "representationStates");
+    return Arrays.asList("uuid", "title", "instanceId", "instanceName", "sizeInBytes", "numberOfDataFiles",
+      "numberOfDataFolders", "numberOfDocumentationFiles", "numberOfSchemaFiles", "ancestors", "createdOn", "createdBy",
+      "updatedOn", "updatedBy", "representationStates");
   }
 
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(uuid, title, super.getInstanceId(), sizeInBytes, numberOfDataFiles, numberOfDataFolders,
-      numberOfDocumentationFiles, numberOfSchemaFiles, ancestors, super.getCreatedOn(), super.getCreatedBy(),
-      super.getUpdatedOn(), super.getUpdatedBy(), super.getRepresentationStates());
+    return Arrays.asList(uuid, title, super.getInstanceId(), instanceName, sizeInBytes, numberOfDataFiles,
+      numberOfDataFolders, numberOfDocumentationFiles, numberOfSchemaFiles, ancestors, super.getCreatedOn(),
+      super.getCreatedBy(), super.getUpdatedOn(), super.getUpdatedBy(), super.getRepresentationStates());
   }
 
   @Override

@@ -42,6 +42,8 @@ public class Notification implements IsModelObject, IsIndexed, HasId {
 
   private String instanceId = null;
 
+  private String instanceName = null;
+
   public Notification() {
     super();
     this.sentOn = new Date();
@@ -162,6 +164,14 @@ public class Notification implements IsModelObject, IsIndexed, HasId {
     this.instanceId = instanceId;
   }
 
+  public String getInstanceName() {
+    return instanceName;
+  }
+
+  public void setInstanceName(String instanceName) {
+    this.instanceName = instanceName;
+  }
+
   @JsonIgnore
   @Override
   public String getUUID() {
@@ -173,19 +183,19 @@ public class Notification implements IsModelObject, IsIndexed, HasId {
     return "Notification [id=" + id + ", subject=" + subject + ", body=" + body + ", sentOn=" + sentOn + ", fromUser="
       + fromUser + ", recipientUsers=" + recipientUsers + ", acknowledgeToken=" + acknowledgeToken + ", isAcknowledged="
       + isAcknowledged + ", acknowledgedUsers=" + acknowledgedUsers + ", state=" + state + ", instanceId=" + instanceId
-      + "]";
+      + ", instanceName=" + instanceName + "]";
   }
 
   @Override
   public List<String> toCsvHeaders() {
     return Arrays.asList("id", "subject", "body", "sentOn", "fromUser", "recipientUsers", "acknowledgeToken",
-      "isAcknowledged", "acknowledgedUsers", "state", "instanceId");
+      "isAcknowledged", "acknowledgedUsers", "state", "instanceId", "instanceName");
   }
 
   @Override
   public List<Object> toCsvValues() {
     return Arrays.asList(id, subject, body, sentOn, fromUser, recipientUsers, acknowledgeToken, isAcknowledged,
-      acknowledgedUsers, state, instanceId);
+      acknowledgedUsers, state, instanceId, instanceName);
   }
 
   @Override

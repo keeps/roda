@@ -436,7 +436,7 @@ public class IndexModelObserver implements ModelObserver {
 
     // change AIP
     SolrUtils.update(index, IndexedAIP.class, aip.getId(),
-      Collections.singletonMap(RodaConstants.AIP_INSTANCE_ID, aip.getInstanceId()), (ModelObserver) this).addTo(ret);
+      Collections.singletonMap(RodaConstants.INDEX_INSTANCE_ID, aip.getInstanceId()), (ModelObserver) this).addTo(ret);
 
     if (ret.isEmpty()) {
       representationsInstanceIdUpdated(aip).addTo(ret);
@@ -515,7 +515,7 @@ public class IndexModelObserver implements ModelObserver {
       representation.getId(), true)) {
       SolrUtils
         .update(index, IndexedRepresentation.class, IdUtils.getRepresentationId(representation),
-          Collections.singletonMap(RodaConstants.REPRESENTATION_INSTANCE_ID, aip.getInstanceId()), (ModelObserver) this)
+          Collections.singletonMap(RodaConstants.INDEX_INSTANCE_ID, aip.getInstanceId()), (ModelObserver) this)
         .addTo(ret);
 
       if (ret.isEmpty()) {
@@ -581,7 +581,7 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
     SolrUtils.update(index, IndexedFile.class, IdUtils.getFileId(file),
-      Collections.singletonMap(RodaConstants.FILE_INSTANCE_ID, aip.getInstanceId()), (ModelObserver) this).addTo(ret);
+      Collections.singletonMap(RodaConstants.INDEX_INSTANCE_ID, aip.getInstanceId()), (ModelObserver) this).addTo(ret);
 
     if (ret.isEmpty()) {
       if (recursive && file.isDirectory()) {
@@ -635,7 +635,7 @@ public class IndexModelObserver implements ModelObserver {
   private ReturnWithExceptions<Void, ModelObserver> preservationEventInstanceIdUpdated(PreservationMetadata pm,
     String instanceId) {
     Map<String, Object> fieldsToUpdate = new HashMap<>();
-    fieldsToUpdate.put(RodaConstants.AIP_INSTANCE_ID, instanceId);
+    fieldsToUpdate.put(RodaConstants.INDEX_INSTANCE_ID, instanceId);
     fieldsToUpdate.put(RodaConstants.PRESERVATION_EVENT_AIP_ID, pm.getAipId());
     fieldsToUpdate.put(RodaConstants.INDEX_ID, pm.getId());
     return SolrUtils.update(index, IndexedPreservationEvent.class, pm.getId(), fieldsToUpdate, (ModelObserver) this);
@@ -1189,7 +1189,7 @@ public class IndexModelObserver implements ModelObserver {
 
     // change DIP
     SolrUtils.update(index, IndexedDIP.class, dip.getId(),
-      Collections.singletonMap(RodaConstants.DIP_INSTANCE_ID, dip.getInstanceId()), (ModelObserver) this).addTo(ret);
+      Collections.singletonMap(RodaConstants.INDEX_INSTANCE_ID, dip.getInstanceId()), (ModelObserver) this).addTo(ret);
 
     return ret;
   }

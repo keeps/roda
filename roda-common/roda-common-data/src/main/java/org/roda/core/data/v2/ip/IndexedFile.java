@@ -53,6 +53,8 @@ public class IndexedFile implements IsIndexed, HasId, SetsUUID, HasPermissionFil
 
   private String instanceId;
 
+  private String instanceName = null;
+
   public IndexedFile() {
     super();
   }
@@ -62,7 +64,7 @@ public class IndexedFile implements IsIndexed, HasId, SetsUUID, HasPermissionFil
     String referenceManifest, FileFormat fileFormat, String originalName, long size, boolean isDirectory,
     boolean isReference, String creatingApplicationName, String creatingApplicationVersion,
     String dateCreatedByApplication, List<String> hash, String storagePath, List<String> ancestors,
-    Map<String, List<String>> otherProperties, String instanceId) {
+    Map<String, List<String>> otherProperties, String instanceId, String instanceName) {
     this.uuid = uuid;
     this.parentUUID = parentUUID;
 
@@ -90,6 +92,7 @@ public class IndexedFile implements IsIndexed, HasId, SetsUUID, HasPermissionFil
     this.ancestors = ancestors;
     this.otherProperties = otherProperties;
     this.instanceId = instanceId;
+    this.instanceName = instanceName;
   }
 
   @Override
@@ -294,6 +297,14 @@ public class IndexedFile implements IsIndexed, HasId, SetsUUID, HasPermissionFil
     this.instanceId = instanceId;
   }
 
+  public String getInstanceName() {
+    return instanceName;
+  }
+
+  public void setInstanceName(String instanceName) {
+    this.instanceName = instanceName;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -317,6 +328,7 @@ public class IndexedFile implements IsIndexed, HasId, SetsUUID, HasPermissionFil
     result = prime * result + ((storagePath == null) ? 0 : storagePath.hashCode());
     result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
     result = prime * result + ((instanceId == null) ? 0 : instanceId.hashCode());
+    result = prime * result + ((instanceName == null) ? 0 : instanceName.hashCode());
     return result;
   }
 
@@ -417,6 +429,11 @@ public class IndexedFile implements IsIndexed, HasId, SetsUUID, HasPermissionFil
         return false;
     } else if (!instanceId.equals(other.instanceId))
       return false;
+    if (instanceName == null) {
+      if (other.instanceName != null)
+        return false;
+    } else if (!instanceName.equals(other.instanceName))
+      return false;
     return true;
   }
 
@@ -428,7 +445,7 @@ public class IndexedFile implements IsIndexed, HasId, SetsUUID, HasPermissionFil
       + size + ", isDirectory=" + isDirectory + ", creatingApplicationName=" + creatingApplicationName
       + ", creatingApplicationVersion=" + creatingApplicationVersion + ", dateCreatedByApplication="
       + dateCreatedByApplication + ", hash=" + hash + ", storagePath=" + storagePath + ", ancestors=" + ancestors
-      + ", otherProperties=" + otherProperties + ", instanceId=" + instanceId + "]";
+      + ", otherProperties=" + otherProperties + ", instanceId=" + instanceId + ", instanceName=" + instanceName + "]";
   }
 
   @Override
@@ -436,14 +453,14 @@ public class IndexedFile implements IsIndexed, HasId, SetsUUID, HasPermissionFil
     return Arrays.asList("uuid", "parentUUID", "aipId", "representationId", "representationUUID", "path",
       "ancestorsPath", "id", "fileFormat", "originalName", "size", "isDirectory", "creatingApplicationName",
       "creatingApplicationVersion", "dateCreatedByApplication", "hash", "storagePath", "ancestors", "otherProperties",
-      "instanceId");
+      "instanceId", "instanceName");
   }
 
   @Override
   public List<Object> toCsvValues() {
     return Arrays.asList(uuid, parentUUID, aipId, representationId, representationUUID, path, ancestorsPath, id,
       fileFormat, originalName, size, isDirectory, creatingApplicationName, creatingApplicationVersion,
-      dateCreatedByApplication, hash, storagePath, ancestors, otherProperties, instanceId);
+      dateCreatedByApplication, hash, storagePath, ancestors, otherProperties, instanceId, instanceName);
   }
 
   @Override
