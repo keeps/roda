@@ -237,7 +237,7 @@ public class ImportUtils {
 
     // Create Filter to SOLR query
     final Filter filter = new Filter();
-    instanceIdentifier.ifPresent(s -> filter.add(new SimpleFilterParameter(RodaConstants.AIP_INSTANCE_ID, s)));
+    instanceIdentifier.ifPresent(s -> filter.add(new SimpleFilterParameter(RodaConstants.INDEX_INSTANCE_ID, s)));
     if (indexedClass == IndexedPreservationEvent.class) {
       filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS,
         IndexedPreservationEvent.PreservationMetadataEventClass.REPOSITORY.toString()));

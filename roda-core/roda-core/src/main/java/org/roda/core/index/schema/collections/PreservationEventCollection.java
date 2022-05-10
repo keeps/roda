@@ -39,6 +39,7 @@ import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
+import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.util.IdUtils;
@@ -99,7 +100,8 @@ public class PreservationEventCollection
       .setMultiValued(true));
     fields.add(new Field(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER, Field.TYPE_STRING)
       .setMultiValued(true));
-    fields.add(new Field(RodaConstants.PRESERVATION_EVENT_INSTANCE_ID, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.INDEX_INSTANCE_ID, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.INDEX_INSTANCE_NAME, Field.TYPE_STRING));
 
     return fields;
   }
@@ -115,8 +117,11 @@ public class PreservationEventCollection
 
     SolrInputDocument doc = super.toSolrDocument(pm, info);
     String objectClass = PreservationMetadataEventClass.REPOSITORY.toString();
-    doc.addField(RodaConstants.PRESERVATION_EVENT_INSTANCE_ID, pm.getInstanceId());
+    doc.addField(RodaConstants.INDEX_INSTANCE_ID, pm.getInstanceId());
 
+    String name = IndexUtils.giveNameFromLocalInstanceIdentifier(pm.getInstanceId());
+
+    doc.addField(RodaConstants.INDEX_INSTANCE_NAME, name);
 
     if (StringUtils.isNotBlank(pm.getAipId())) {
       doc.addField(RodaConstants.PRESERVATION_EVENT_AIP_ID, pm.getAipId());
@@ -249,10 +254,13 @@ public class PreservationEventCollection
     final String representationUUID = SolrUtils
       .objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID), null);
     final String fileUUID = SolrUtils.objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_FILE_UUID), null);
-
+    final String instanceId = SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_ID), null);
+    final String instanceName = SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_NAME), null);
     ipe.setAipID(aipId);
     ipe.setRepresentationUUID(representationUUID);
     ipe.setFileUUID(fileUUID);
+    ipe.setInstanceId(instanceId);
+    ipe.setInstanceName(instanceName);
 
     String objectClass = SolrUtils.objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_OBJECT_CLASS), null);
     if (StringUtils.isNotBlank(objectClass)) {

@@ -41,6 +41,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
   private String type = null;
   private String instanceId = null;
 
+  private String instanceName = null;
   private String level = null;
   private String title = null;
   private Date dateInitial = null;
@@ -109,15 +110,15 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
    *          the {@link IndexedAIP} to be cloned.
    */
   public IndexedAIP(IndexedAIP other) {
-    this(other.getId(), other.getState(), other.getType(), other.getInstanceId(), other.getLevel(), other.getTitle(),
-      other.getDateInitial(), other.getDateFinal(), other.getDescription(), other.getParentID(), other.getAncestors(),
-      other.getPermissions(), other.getNumberOfSubmissionFiles(), other.getNumberOfDocumentationFiles(),
-      other.getNumberOfSchemaFiles(), other.getHasRepresentations(), other.getGhost(), other.hasShallowFiles(),
-      other.getDisposalScheduleId(), other.getDisposalScheduleName(), other.getRetentionPeriodDuration(),
-      other.getRetentionPeriodInterval(), other.getRetentionPeriodStartDate(), other.getRetentionPeriodDetails(),
-      other.getRetentionPeriodState(), other.getDisposalHoldsId(), other.getTransitiveDisposalHoldsId(),
-      other.getDestroyedOn(), other.getDestroyedBy(), other.getDisposalConfirmationId(),
-      other.getScheduleAssociationType());
+    this(other.getId(), other.getState(), other.getType(), other.getInstanceId(), other.getInstanceName(),
+      other.getLevel(), other.getTitle(), other.getDateInitial(), other.getDateFinal(), other.getDescription(),
+      other.getParentID(), other.getAncestors(), other.getPermissions(), other.getNumberOfSubmissionFiles(),
+      other.getNumberOfDocumentationFiles(), other.getNumberOfSchemaFiles(), other.getHasRepresentations(),
+      other.getGhost(), other.hasShallowFiles(), other.getDisposalScheduleId(), other.getDisposalScheduleName(),
+      other.getRetentionPeriodDuration(), other.getRetentionPeriodInterval(), other.getRetentionPeriodStartDate(),
+      other.getRetentionPeriodDetails(), other.getRetentionPeriodState(), other.getDisposalHoldsId(),
+      other.getTransitiveDisposalHoldsId(), other.getDestroyedOn(), other.getDestroyedBy(),
+      other.getDisposalConfirmationId(), other.getScheduleAssociationType());
   }
 
   /**
@@ -132,8 +133,8 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
    * @param description
    * @param parentID
    */
-  public IndexedAIP(String id, AIPState state, String type, String instanceId, String level, String title,
-    Date dateInitial, Date dateFinal, String description, String parentID, List<String> ancestors,
+  public IndexedAIP(String id, AIPState state, String type, String instanceId, String instanceName, String level,
+    String title, Date dateInitial, Date dateFinal, String description, String parentID, List<String> ancestors,
     Permissions permissions, Long numberOfSubmissionFiles, Long numberOfDocumentationFiles, Long numberOfSchemaFiles,
     Boolean hasRepresentations, Boolean ghost, Boolean hasShallowFiles, String disposalScheduleId,
     String disposalScheduleName, Integer retentionPeriodDuration, RetentionPeriodIntervalCode retentionPeriodInterval,
@@ -145,6 +146,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
     this.state = state;
     this.type = type;
     this.instanceId = instanceId;
+    this.instanceName = instanceName;
     this.level = level;
     this.title = title;
     this.dateInitial = dateInitial;
@@ -650,6 +652,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
     int result = id != null ? id.hashCode() : 0;
     result = 31 * result + (state != null ? state.hashCode() : 0);
     result = 31 * result + (instanceId != null ? instanceId.hashCode() : 0);
+    result = 31 * result + (instanceName != null ? instanceName.hashCode() : 0);
     result = 31 * result + (level != null ? level.hashCode() : 0);
     result = 31 * result + (title != null ? title.hashCode() : 0);
     result = 31 * result + (dateInitial != null ? dateInitial.hashCode() : 0);
@@ -680,7 +683,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
   @Override
   public String toString() {
     return "IndexedAIP{" + "id='" + id + '\'' + ", state=" + state + ", type='" + type + '\'' + ", instanceId='"
-      + instanceId + '\'' + ", level='" + level + '\'' + ", title='" + title + '\'' + ", dateInitial=" + dateInitial
+      + instanceId + '\'' + instanceName + '\'' + ", level='" + level + '\'' + ", title='" + title + '\'' + ", dateInitial=" + dateInitial
       + ", dateFinal=" + dateFinal + ", createdOn=" + createdOn + ", createdBy='" + createdBy + '\'' + ", updatedOn="
       + updatedOn + ", updatedBy='" + updatedBy + '\'' + ", description='" + description + '\'' + ", parentID='"
       + parentID + '\'' + ", ancestors=" + ancestors + ", permissions=" + permissions + ", numberOfSubmissionFiles="
@@ -699,7 +702,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
 
   @Override
   public List<String> toCsvHeaders() {
-    return Arrays.asList("id", "state", "type", "instanceId", "level", "title", "dateInitial", "dateFinal",
+    return Arrays.asList("id", "state", "type", "instanceId", "instanceName" ,"level", "title", "dateInitial", "dateFinal",
       "description", "parentID", "ancestors", "permissions", "numberOfSubmissionFiles", "numberOfDocumentationFiles",
       "numberOfSchemaFiles", "hasRepresentations", "ghost", "ingestSIPId", "ingestJobId", "ingestUpdateJobIds",
       "allIngestJobIds", "createdOn", "createdBy", "updatedOn", "updatedBy", "disposalScheduleId",
@@ -708,8 +711,8 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
 
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(id, state, type, instanceId, level, title, dateInitial, dateFinal, description, parentID,
-      ancestors, permissions, numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles,
+    return Arrays.asList(id, state, type, instanceId, instanceName, level, title, dateInitial, dateFinal, description,
+      parentID, ancestors, permissions, numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles,
       hasRepresentations, ghost, ingestSIPIds, ingestJobId, ingestUpdateJobIds, allIngestJobIds, createdOn, createdBy,
       updatedOn, updatedBy, disposalScheduleId, disposalScheduleName, disposalHoldsId, destroyedOn, destroyedBy,
       scheduleAssociationType);
@@ -756,5 +759,13 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
 
   public void setInstanceId(String instanceId) {
     this.instanceId = instanceId;
+  }
+
+  public String getInstanceName() {
+    return instanceName;
+  }
+
+  public void setInstanceName(String instanceName) {
+    this.instanceName = instanceName;
   }
 }

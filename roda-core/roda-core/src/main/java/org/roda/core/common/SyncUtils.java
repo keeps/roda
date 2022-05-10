@@ -22,7 +22,12 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.*;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthenticationDeniedException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -69,7 +74,7 @@ public class SyncUtils {
   private static boolean createCentralJobsPackage(Path workingDir, String instanceIdentifier)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException {
     final Filter filter = new Filter();
-    filter.add(new SimpleFilterParameter(RodaConstants.JOB_INSTANCE_ID, instanceIdentifier));
+    filter.add(new SimpleFilterParameter(RodaConstants.INDEX_INSTANCE_ID, instanceIdentifier));
     filter.add(new SimpleFilterParameter(RodaConstants.JOB_STATE, "CREATED"));
     final IterableIndexResult<Job> jobs = RodaCoreFactory.getIndexService().findAll(Job.class, filter, true,
       new ArrayList<>());

@@ -10,10 +10,10 @@ package org.roda.core.index.schema.collections;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.dips.DIPUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -32,6 +32,7 @@ import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
+import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -88,7 +89,8 @@ public class DIPCollection extends AbstractSolrCollection<IndexedDIP, DIP> {
     fields.add(new Field(RodaConstants.DIP_ALL_AIP_UUIDS, Field.TYPE_STRING).setStored(false).setMultiValued(true));
     fields.add(
       new Field(RodaConstants.DIP_ALL_REPRESENTATION_UUIDS, Field.TYPE_STRING).setStored(false).setMultiValued(true));
-    fields.add(new Field(RodaConstants.DIP_INSTANCE_ID, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.INDEX_INSTANCE_ID, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.INDEX_INSTANCE_NAME, Field.TYPE_STRING));
 
     return fields;
   }
@@ -104,7 +106,7 @@ public class DIPCollection extends AbstractSolrCollection<IndexedDIP, DIP> {
     SolrInputDocument doc = super.toSolrDocument(dip, info);
 
     doc.addField(RodaConstants.DIP_TITLE, dip.getTitle());
-    doc.addField(RodaConstants.DIP_INSTANCE_ID, dip.getInstanceId());
+    doc.addField(RodaConstants.INDEX_INSTANCE_ID, dip.getInstanceId());
     doc.addField(RodaConstants.DIP_DESCRIPTION, dip.getDescription());
     doc.addField(RodaConstants.DIP_TYPE, dip.getType());
     doc.addField(RodaConstants.DIP_DATE_CREATED, SolrUtils.formatDate(dip.getDateCreated()));
@@ -163,6 +165,10 @@ public class DIPCollection extends AbstractSolrCollection<IndexedDIP, DIP> {
       LOGGER.error("Error indexing DIP open external URL", openURL.getCause());
     }
 
+    String name = IndexUtils.giveNameFromLocalInstanceIdentifier(dip.getInstanceId());
+
+    doc.addField(RodaConstants.INDEX_INSTANCE_NAME, name);
+
     return doc;
   }
 
@@ -175,8 +181,8 @@ public class DIPCollection extends AbstractSolrCollection<IndexedDIP, DIP> {
     dip.setDateCreated(SolrUtils.objectToDate(doc.get(RodaConstants.DIP_DATE_CREATED)));
     dip.setLastModified(SolrUtils.objectToDate(doc.get(RodaConstants.DIP_LAST_MODIFIED)));
     dip.setIsPermanent(SolrUtils.objectToBoolean(doc.get(RodaConstants.DIP_IS_PERMANENT), Boolean.FALSE));
-    dip.setInstanceId(SolrUtils.objectToString(doc.get(RodaConstants.DIP_INSTANCE_ID), null));
-
+    dip.setInstanceId(SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_ID), null));
+    dip.setInstanceName(SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_NAME), null));
     boolean emptyFields = fieldsToReturn.isEmpty();
 
     if (emptyFields || fieldsToReturn.contains(RodaConstants.DIP_PROPERTIES)) {

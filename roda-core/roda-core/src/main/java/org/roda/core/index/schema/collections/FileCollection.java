@@ -36,6 +36,7 @@ import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
+import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
@@ -82,7 +83,8 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
     fields.add(new Field(RodaConstants.FILE_AIP_ID, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.FILE_REPRESENTATION_ID, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.FILE_REPRESENTATION_UUID, Field.TYPE_STRING));
-    fields.add(new Field(RodaConstants.FILE_INSTANCE_ID, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.INDEX_INSTANCE_ID, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.INDEX_INSTANCE_NAME, Field.TYPE_STRING));
 
     fields.add(new Field(RodaConstants.FILE_STORAGE_PATH, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.FILE_FORMAT_MIMETYPE, Field.TYPE_STRING));
@@ -172,8 +174,10 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
       IdUtils.getRepresentationId(file.getAipId(), file.getRepresentationId()));
     doc.addField(RodaConstants.FILE_ISDIRECTORY, file.isDirectory());
     doc.addField(RodaConstants.FILE_ISREFERENCE, file.isReference());
-    doc.addField(RodaConstants.FILE_INSTANCE_ID, file.getInstanceId());
+    doc.addField(RodaConstants.INDEX_INSTANCE_ID, file.getInstanceId());
+    String name = IndexUtils.giveNameFromLocalInstanceIdentifier(file.getInstanceId());
 
+    doc.addField(RodaConstants.INDEX_INSTANCE_NAME, name);
     try {
       if (file.isReference()) {
         doc.addField(RodaConstants.FILE_REFERENCE_UUID, file.getReferenceUUID());
@@ -295,7 +299,8 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
     String parentUUID = SolrUtils.objectToString(doc.get(RodaConstants.FILE_PARENT_UUID), null);
     List<String> ancestorsPath = SolrUtils.objectToListString(doc.get(RodaConstants.FILE_ANCESTORS_PATH));
 
-    String instanceId = SolrUtils.objectToString(doc.get(RodaConstants.FILE_INSTANCE_ID), null);
+    String instanceId = SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_ID), null);
+    String instanceName = SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_NAME), null);
 
     String originalName = SolrUtils.objectToString(doc.get(RodaConstants.FILE_ORIGINALNAME), null);
     List<String> hash = SolrUtils.objectToListString(doc.get(RodaConstants.FILE_HASH));
@@ -366,6 +371,7 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
     ret.setOtherProperties(otherProperties);
     ret.setFields(indexedFields);
     ret.setInstanceId(instanceId);
+    ret.setInstanceName(instanceName);
 
     return ret;
   }

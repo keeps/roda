@@ -19,13 +19,14 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
-import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
+import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.index.utils.SolrUtils;
 
 public class NotificationCollection extends AbstractSolrCollection<Notification, Notification> {
@@ -74,9 +75,8 @@ public class NotificationCollection extends AbstractSolrCollection<Notification,
     fields.add(new Field(RodaConstants.NOTIFICATION_ACKNOWLEDGED_USERS, Field.TYPE_STRING).setIndexed(false)
       .setDocValues(false));
 
-    fields
-      .add(new Field(RodaConstants.NOTIFICATION_INSTANCE_ID, Field.TYPE_TEXT).setRequired(false).setMultiValued(false));
-
+    fields.add(new Field(RodaConstants.INDEX_INSTANCE_ID, Field.TYPE_TEXT).setRequired(false).setMultiValued(false));
+    fields.add(new Field(RodaConstants.INDEX_INSTANCE_NAME, Field.TYPE_STRING));
     return fields;
   }
 
@@ -101,7 +101,11 @@ public class NotificationCollection extends AbstractSolrCollection<Notification,
     doc.addField(RodaConstants.NOTIFICATION_ACKNOWLEDGED_USERS,
       JsonUtils.getJsonFromObject(notification.getAcknowledgedUsers()));
     doc.addField(RodaConstants.NOTIFICATION_STATE, notification.getState().toString());
-    doc.addField(RodaConstants.NOTIFICATION_INSTANCE_ID, notification.getInstanceId());
+    doc.addField(RodaConstants.INDEX_INSTANCE_ID, notification.getInstanceId());
+
+    String name = IndexUtils.giveNameFromLocalInstanceIdentifier(notification.getInstanceId());
+    
+    doc.addField(RodaConstants.INDEX_INSTANCE_NAME, name);
 
     return doc;
   }
@@ -131,8 +135,8 @@ public class NotificationCollection extends AbstractSolrCollection<Notification,
         NotificationState.valueOf(SolrUtils.objectToString(doc.get(RodaConstants.NOTIFICATION_STATE), defaultState)));
     }
 
-    notification.setInstanceId(SolrUtils.objectToString(doc.get(RodaConstants.NOTIFICATION_INSTANCE_ID), null));
-
+    notification.setInstanceId(SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_ID), null));
+    notification.setInstanceName(SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_NAME), null));
     return notification;
 
   }

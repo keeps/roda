@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -1396,6 +1395,7 @@ public class ModelService extends ModelObservable {
     createEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, sources, targets, outcomeState,
       outcomeText, outcomeDetail, agentName, null, notify);
   }
+
   public void createEvent(String aipId, String representationId, List<String> filePath, String fileId,
     PreservationEventType eventType, String eventDescription, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeText, String outcomeDetail,
@@ -1408,13 +1408,11 @@ public class ModelService extends ModelObservable {
       }
       LinkingIdentifier linkingIdentifier = new LinkingIdentifier();
       linkingIdentifier.setValue(IdUtils.getUserAgentId(agentName, RODAInstanceUtils.getLocalInstanceIdentifier()));
-      if(agentRole != null){
+      if (agentRole != null) {
         linkingIdentifier.getRoles().add(agentRole);
       }
       createEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, sources, targets,
-        outcomeState, builder.toString(), "",
-        Collections.singletonList(linkingIdentifier),
-        notify);
+        outcomeState, builder.toString(), "", Collections.singletonList(linkingIdentifier), notify);
     } catch (ValidationException | AlreadyExistsException | GenericException | NotFoundException
       | RequestNotValidException | AuthorizationDeniedException e1) {
       LOGGER.error("Could not create an event for: {}", eventDescription, e1);

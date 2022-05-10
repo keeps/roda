@@ -42,6 +42,8 @@ public class IndexedPreservationEvent implements IsIndexed, HasId, HasPermission
 
   private String instanceId;
 
+  private String instanceName;
+
   @Override
   public String getId() {
     return id;
@@ -147,25 +149,34 @@ public class IndexedPreservationEvent implements IsIndexed, HasId, HasPermission
     this.instanceId = instanceId;
   }
 
+  public String getInstanceName() {
+    return instanceName;
+  }
+
+  public void setInstanceName(String instanceName) {
+    this.instanceName = instanceName;
+  }
+
   @Override
   public String toString() {
     return "IndexedPreservationEvent [id=" + id + ", aipID=" + aipID + ", representationUUID=" + representationUUID
       + ", fileUUID=" + fileUUID + ", objectClass=" + objectClass + ", eventDateTime=" + eventDateTime
       + ", eventDetail=" + eventDetail + ", eventType=" + eventType + ", eventOutcome=" + eventOutcome
       + ", linkingAgentIds=" + linkingAgentIds + ", outcomeObjectIds=" + outcomeObjectIds + ", sourcesObjectIds="
-      + sourcesObjectIds + ", instanceId=" + instanceId + "]";
+      + sourcesObjectIds + ", instanceId=" + instanceId + ", instanceName=" + instanceName + "]";
   }
 
   @Override
   public List<String> toCsvHeaders() {
     return Arrays.asList("id", "aipID", "representationUUID", "fileUUID", "objectClass", "eventDateTime", "eventDetail",
-      "eventType", "eventOutcome", "linkingAgentIds", "outcomeObjectIds", "sourcesObjectIds", "instanceId");
+      "eventType", "eventOutcome", "linkingAgentIds", "outcomeObjectIds", "sourcesObjectIds", "instanceId",
+      "instanceName");
   }
 
   @Override
   public List<Object> toCsvValues() {
     return Arrays.asList(id, aipID, representationUUID, fileUUID, objectClass, eventDateTime, eventDetail, eventType,
-      eventOutcome, linkingAgentIds, outcomeObjectIds, sourcesObjectIds, instanceId);
+      eventOutcome, linkingAgentIds, outcomeObjectIds, sourcesObjectIds, instanceId, instanceName);
   }
 
   @Override
