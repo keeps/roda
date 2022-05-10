@@ -1393,16 +1393,27 @@ public class ModelService extends ModelObservable {
     PreservationEventType eventType, String eventDescription, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeText, String outcomeDetail,
     String agentName, boolean notify) {
+    createEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, sources, targets, outcomeState,
+      outcomeText, outcomeDetail, agentName, null, notify);
+  }
+  public void createEvent(String aipId, String representationId, List<String> filePath, String fileId,
+    PreservationEventType eventType, String eventDescription, List<LinkingIdentifier> sources,
+    List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeText, String outcomeDetail,
+    String agentName, String agentRole, boolean notify) {
     try {
       StringBuilder builder = new StringBuilder(outcomeText);
       if (StringUtils.isNotBlank(outcomeDetail) && !outcomeState.equals(PluginState.SUCCESS)) {
         builder.append("\n").append("The following reason has been reported by the user: ").append(agentName)
           .append("\n").append(outcomeDetail);
       }
-
+      LinkingIdentifier linkingIdentifier = new LinkingIdentifier();
+      linkingIdentifier.setValue(IdUtils.getUserAgentId(agentName, RODAInstanceUtils.getLocalInstanceIdentifier()));
+      if(agentRole != null){
+        linkingIdentifier.getRoles().add(agentRole);
+      }
       createEvent(aipId, representationId, filePath, fileId, eventType, eventDescription, sources, targets,
         outcomeState, builder.toString(), "",
-        Collections.singletonList(IdUtils.getUserAgentId(agentName, RODAInstanceUtils.getLocalInstanceIdentifier())),
+        Collections.singletonList(linkingIdentifier),
         notify);
     } catch (ValidationException | AlreadyExistsException | GenericException | NotFoundException
       | RequestNotValidException | AuthorizationDeniedException e1) {
@@ -1413,7 +1424,7 @@ public class ModelService extends ModelObservable {
   public void createEvent(String aipId, String representationId, List<String> filePath, String fileId,
     PreservationEventType eventType, String eventDescription, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> targets, PluginState outcomeState, String outcomeDetail, String outcomeExtension,
-    List<String> agentIds, boolean notify) throws GenericException, ValidationException, NotFoundException,
+    List<LinkingIdentifier> agentIds, boolean notify) throws GenericException, ValidationException, NotFoundException,
     RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 

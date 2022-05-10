@@ -27,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
@@ -58,6 +59,8 @@ public class Job implements IsModelObject, IsIndexed, HasId {
 
   // job instance id
   private String instanceId = null;
+
+  private List<JobUserDetails> jobUsersDetails= new ArrayList<>();
 
   // job statistics (total source objects, etc.)
   JobStats jobStats = new JobStats();
@@ -105,6 +108,7 @@ public class Job implements IsModelObject, IsIndexed, HasId {
     }
     this.instanceId = job.getInstanceId();
     this.attachmentsList = job.getAttachmentsList();
+    this.jobUsersDetails = job.getJobUsersDetails();
   }
 
   @JsonIgnore
@@ -139,6 +143,15 @@ public class Job implements IsModelObject, IsIndexed, HasId {
     this.username = username;
     return this;
   }
+
+  public List<JobUserDetails> getJobUsersDetails() {
+    return jobUsersDetails;
+  }
+
+  public void setJobUsersDetails(List<JobUserDetails> jobUserDetails) {
+    this.jobUsersDetails = jobUserDetails;
+  }
+
 
   public Date getStartDate() {
     return startDate;
@@ -289,7 +302,7 @@ public class Job implements IsModelObject, IsIndexed, HasId {
 
   @Override
   public String toString() {
-    return "Job [id=" + id + ", name=" + name + ", username=" + username + ", startDate=" + startDate + ", endDate="
+    return "Job [id=" + id + ", name=" + name + ", username=" + username +  ", startDate=" + startDate + ", endDate="
       + endDate + ", state=" + state + ", stateDetails=" + stateDetails + ", priority=" + priority + ", type="
       + parallelism + ", jobStats=" + jobStats + ", plugin=" + plugin + ", pluginType=" + pluginType
       + ", pluginParameters=" + pluginParameters + ", sourceObjects=" + sourceObjects + ", outcomeObjectsClass="

@@ -74,6 +74,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobStats;
+import org.roda.core.data.v2.jobs.JobUserDetails;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
@@ -1277,18 +1278,21 @@ public final class PluginHelper {
     List<LinkingIdentifier> sources, List<LinkingIdentifier> outcomes, PluginState outcome,
     String outcomeDetailExtension, boolean notify, Date startDate, Job cachedJob) throws RequestNotValidException,
     NotFoundException, GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
-    List<String> agentIds = new ArrayList<>();
+
+    List<LinkingIdentifier> agentIds = new ArrayList<>();
     String agentId = IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion(),
       RODAInstanceUtils.getLocalInstanceIdentifier());
     StoragePath agentPath = ModelUtils.getPreservationMetadataStoragePath(agentId, PreservationMetadataType.AGENT);
+    LinkingIdentifier linkingIdentifierPlugin = new LinkingIdentifier();
+    linkingIdentifierPlugin.setValue(agentId);
 
     try {
       if (!RodaCoreFactory.getStorageService().exists(agentPath)) {
         PremisV3Utils.createPremisAgentBinary(plugin, model, true);
       }
-      agentIds.add(agentId);
+      agentIds.add(linkingIdentifierPlugin);
     } catch (AlreadyExistsException e) {
-      agentIds.add(agentId);
+      agentIds.add(linkingIdentifierPlugin);
     } catch (RODAException e) {
       LOGGER.error("Error creating PREMIS agent", e);
     }
@@ -1304,23 +1308,14 @@ public final class PluginHelper {
     }
 
     if (job != null) {
-      String userId = IdUtils.getUserAgentId(job.getUsername(), RODAInstanceUtils.getLocalInstanceIdentifier());
-      StoragePath userAgentPath = ModelUtils.getPreservationMetadataStoragePath(userId, PreservationMetadataType.AGENT);
-
-      try {
-        if (!RodaCoreFactory.getStorageService().exists(userAgentPath)) {
-          PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(job.getUsername(), model, index,
-            true);
-          if (pm != null) {
-            agentIds.add(userId);
-          }
-        } else {
-          agentIds.add(userId);
-        }
-      } catch (AlreadyExistsException e) {
-        agentIds.add(userId);
-      } catch (RODAException e) {
-        LOGGER.error("Error creating PREMIS agent", e);
+      for (JobUserDetails jobUserDetails : job.getJobUsersDetails()) {
+        String userId = IdUtils.getUserAgentId(jobUserDetails.getUsername(), RODAInstanceUtils.getLocalInstanceIdentifier());
+        LinkingIdentifier linkingIdentifierAgent1 = new LinkingIdentifier();
+        linkingIdentifierAgent1.setValue(userId);
+        List<String> rolesAgent1 = new ArrayList<>();
+        rolesAgent1.add(jobUserDetails.getRole());
+        linkingIdentifierAgent1.setRoles(rolesAgent1);
+        addAgent(jobUserDetails.getUsername(), model, linkingIdentifierAgent1, index, agentIds, job);
       }
     }
 
@@ -1358,6 +1353,27 @@ public final class PluginHelper {
     return pm;
   }
 
+  public static void addAgent(String agentName, ModelService model, LinkingIdentifier linkingIdentifierAgent, IndexService index,
+    List<LinkingIdentifier> agentIds, Job job) {
+
+    try {
+      StoragePath userAgentPath = ModelUtils.getPreservationMetadataStoragePath(linkingIdentifierAgent.getValue(),
+              PreservationMetadataType.AGENT);
+      if (!RodaCoreFactory.getStorageService().exists(userAgentPath)) {
+        PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(agentName, model, index,
+          true,job);
+        if (pm != null) {
+          agentIds.add(linkingIdentifierAgent);
+        }
+      } else {
+        agentIds.add(linkingIdentifierAgent);
+      }
+    } catch (AlreadyExistsException e) {
+      agentIds.add(linkingIdentifierAgent);
+    } catch (RODAException e) {
+      LOGGER.error("Error creating PREMIS agent", e);
+    }
+  }
   public static LinkingIdentifier getLinkingIdentifier(TransferredResource transferredResource, String role) {
     LinkingIdentifier li = new LinkingIdentifier();
     li.setValue(

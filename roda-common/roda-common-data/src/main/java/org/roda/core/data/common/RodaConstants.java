@@ -1479,6 +1479,20 @@ public final class RodaConstants {
     }
   }
 
+  public enum PreservationAgentRole {
+    AUTHORIZER("authorizer"), EXECUTING_PROGRAM("executing program"), IMPLEMENTER("implementer"), VALIDATOR("validator");
+
+    private final String text;
+
+    private PreservationAgentRole(final String text) {
+      this.text = text;
+    }
+
+    public String toString() {
+      return text;
+    }
+  }
+
   /*
    * Versions control
    */

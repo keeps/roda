@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -26,8 +27,10 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
+import org.roda.core.data.v2.jobs.JobUserDetails;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.model.ModelService;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
 
@@ -79,7 +82,18 @@ public class Jobs extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     LogEntryState state = LogEntryState.SUCCESS;
-    Job updatedJob = new Job(job);
+
+    ModelService modelService = RodaCoreFactory.getModelService();
+    Job retrievedJob = modelService.retrieveJob(job.getId());
+    JobUserDetails jobUserDetails = new JobUserDetails();
+    jobUserDetails.setUsername(user.getName());
+    jobUserDetails.setFullname(user.getFullName());
+    jobUserDetails.setRole(RodaConstants.PreservationAgentRole.AUTHORIZER.toString());
+    jobUserDetails.setEmail(user.getEmail());
+    retrievedJob.getJobUsersDetails().add(jobUserDetails);
+    modelService.createOrUpdateJob(retrievedJob);
+
+    Job updatedJob = null;
 
     try {
       // delegate
@@ -143,6 +157,12 @@ public class Jobs extends RodaWuiController {
       job.setPriority(priority);
       job.setParallelism(parallelism);
 
+      JobUserDetails jobUserDetails = new JobUserDetails();
+      jobUserDetails.setUsername(user.getName());
+      jobUserDetails.setEmail(user.getEmail());
+      jobUserDetails.setFullname(user.getFullName());
+      jobUserDetails.setRole(RodaConstants.PreservationAgentRole.EXECUTING_PROGRAM.toString());
+      job.getJobUsersDetails().add(jobUserDetails);
       // When it is RODA CENTRAL
       if (instance == null) {
         Job updatedJob = createJob(user, job, async);
