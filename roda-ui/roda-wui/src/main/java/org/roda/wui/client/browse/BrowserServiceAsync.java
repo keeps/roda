@@ -127,7 +127,7 @@ public interface BrowserServiceAsync {
 
   void approveJob(SelectedItems<Job> jobs, AsyncCallback<Void> callback);
 
-  void rejectJob(Job job, String details, AsyncCallback<Void> callback);
+  void rejectJob(SelectedItems<Job> jobs, String details, AsyncCallback<Void> callback);
 
   void retrievePluginsInfo(List<PluginType> type, AsyncCallback<List<PluginInfo>> callback);
 
