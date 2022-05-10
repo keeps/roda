@@ -94,7 +94,7 @@ public class RiskCollection extends AbstractSolrCollection<IndexedRisk, Risk> {
     fields.add(new Field(RodaConstants.RISK_UPDATED_BY, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.RISK_INCIDENCES_COUNT, Field.TYPE_INT));
     fields.add(new Field(RodaConstants.RISK_UNMITIGATED_INCIDENCES_COUNT, Field.TYPE_INT));
-    fields.add(new Field(RodaConstants.RISK_INSTANCE_ID, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.INDEX_INSTANCE_ID, Field.TYPE_STRING));
 
     return fields;
   }
@@ -147,7 +147,7 @@ public class RiskCollection extends AbstractSolrCollection<IndexedRisk, Risk> {
     doc.addField(RodaConstants.RISK_UPDATED_ON, SolrUtils.formatDate(risk.getUpdatedOn()));
     doc.addField(RodaConstants.RISK_UPDATED_BY, risk.getUpdatedBy());
 
-    doc.addField(RodaConstants.RISK_INSTANCE_ID, risk.getInstanceId());
+    doc.addField(RodaConstants.INDEX_INSTANCE_ID, risk.getInstanceId());
 
 
     // TODO calculate incidences count here
@@ -231,7 +231,7 @@ public class RiskCollection extends AbstractSolrCollection<IndexedRisk, Risk> {
     risk.setUnmitigatedIncidencesCount(
       SolrUtils.objectToInteger(doc.get(RodaConstants.RISK_UNMITIGATED_INCIDENCES_COUNT), 0));
 
-    risk.setInstanceId(SolrUtils.objectToString(doc.get(RodaConstants.RISK_INSTANCE_ID), null));
+    risk.setInstanceId(SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_ID), null));
 
     return risk;
 

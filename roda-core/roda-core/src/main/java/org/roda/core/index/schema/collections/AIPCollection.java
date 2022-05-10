@@ -80,7 +80,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
 
     fields.add(new Field(RodaConstants.AIP_PARENT_ID, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.AIP_TYPE, Field.TYPE_STRING));
-    fields.add(new Field(RodaConstants.AIP_INSTANCE_ID, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.INDEX_INSTANCE_ID, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.INDEX_INSTANCE_NAME, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.AIP_ANCESTORS, Field.TYPE_STRING).setMultiValued(true));
     fields.add(new Field(RodaConstants.AIP_CREATED_ON, Field.TYPE_DATE));
@@ -155,7 +155,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     doc.addField(RodaConstants.AIP_PARENT_ID, aip.getParentId());
     doc.addField(RodaConstants.AIP_TYPE, aip.getType());
 
-    doc.addField(RodaConstants.AIP_INSTANCE_ID, aip.getInstanceId());
+    doc.addField(RodaConstants.INDEX_INSTANCE_ID, aip.getInstanceId());
 
     doc.addField(RodaConstants.AIP_CREATED_ON, SolrUtils.formatDate(aip.getCreatedOn()));
     doc.addField(RodaConstants.AIP_CREATED_BY, aip.getCreatedBy());
@@ -307,7 +307,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     final IndexedAIP ret = super.fromSolrDocument(doc, fieldsToReturn);
 
     final String parentId = SolrUtils.objectToString(doc.get(RodaConstants.AIP_PARENT_ID), null);
-    final String instanceId = SolrUtils.objectToString(doc.get(RodaConstants.AIP_INSTANCE_ID), null);
+    final String instanceId = SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_ID), null);
     final String instanceName = SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_NAME), null);
     final List<String> ingestSIPIds = SolrUtils.objectToListString(doc.get(RodaConstants.INGEST_SIP_IDS));
     final String ingestJobId = SolrUtils.objectToString(doc.get(RodaConstants.INGEST_JOB_ID), "");

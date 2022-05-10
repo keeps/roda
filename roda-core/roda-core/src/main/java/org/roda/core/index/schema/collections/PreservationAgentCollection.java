@@ -72,7 +72,8 @@ public class PreservationAgentCollection
     fields.add(new Field(RodaConstants.PRESERVATION_AGENT_EXTENSION, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.PRESERVATION_AGENT_NOTE, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.PRESERVATION_AGENT_VERSION, Field.TYPE_STRING));
-    fields.add(new Field(RodaConstants.PRESERVATION_AGENT_INSTANCE_ID, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.INDEX_INSTANCE_ID, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.INDEX_INSTANCE_NAME, Field.TYPE_STRING));
 
     return fields;
   }
@@ -112,7 +113,15 @@ public class PreservationAgentCollection
       doc.addField(RodaConstants.PRESERVATION_AGENT_NOTE, Collections.singletonList(agent.getAgentNote()));
       doc.addField(RodaConstants.PRESERVATION_AGENT_VERSION, agent.getAgentVersion());
 
-      doc.addField(RodaConstants.PRESERVATION_AGENT_INSTANCE_ID, pm.getInstanceId());
+      doc.addField(RodaConstants.INDEX_INSTANCE_ID, pm.getInstanceId());
+
+      String name = null;
+      if (pm.getInstanceId() != null
+        && RodaCoreFactory.getDistributedModeType().equals(RodaConstants.DistributedModeType.CENTRAL)) {
+        name = RodaCoreFactory.getModelService().retrieveDistributedInstance(pm.getInstanceId()).getName();
+      }
+
+      doc.addField(RodaConstants.INDEX_INSTANCE_NAME, name);
 
     } catch (ValidationException e) {
       throw new GenericException(e);
@@ -134,7 +143,8 @@ public class PreservationAgentCollection
     final String version = SolrUtils.objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_VERSION), null);
     final String note = SolrUtils.objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_NOTE), null);
     final List<String> roles = SolrUtils.objectToListString(doc.get(RodaConstants.PRESERVATION_AGENT_ROLES));
-    final String instanceId = SolrUtils.objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_INSTANCE_ID), null);
+    final String instanceId = SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_ID), null);
+    final String instanceName = SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_NAME), null);
 
     ipa.setId(id);
     ipa.setName(name);
@@ -144,6 +154,7 @@ public class PreservationAgentCollection
     ipa.setNote(note);
     ipa.setRoles(roles);
     ipa.setInstanceId(instanceId);
+    ipa.setInstanceName(instanceName);
 
     return ipa;
 

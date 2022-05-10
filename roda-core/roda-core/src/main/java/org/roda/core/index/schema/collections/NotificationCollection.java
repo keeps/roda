@@ -76,7 +76,7 @@ public class NotificationCollection extends AbstractSolrCollection<Notification,
       .setDocValues(false));
 
     fields
-      .add(new Field(RodaConstants.NOTIFICATION_INSTANCE_ID, Field.TYPE_TEXT).setRequired(false).setMultiValued(false));
+      .add(new Field(RodaConstants.INDEX_INSTANCE_ID, Field.TYPE_TEXT).setRequired(false).setMultiValued(false));
     fields.add(new Field(RodaConstants.INDEX_INSTANCE_NAME, Field.TYPE_STRING));
     return fields;
   }
@@ -102,7 +102,7 @@ public class NotificationCollection extends AbstractSolrCollection<Notification,
     doc.addField(RodaConstants.NOTIFICATION_ACKNOWLEDGED_USERS,
       JsonUtils.getJsonFromObject(notification.getAcknowledgedUsers()));
     doc.addField(RodaConstants.NOTIFICATION_STATE, notification.getState().toString());
-    doc.addField(RodaConstants.NOTIFICATION_INSTANCE_ID, notification.getInstanceId());
+    doc.addField(RodaConstants.INDEX_INSTANCE_ID, notification.getInstanceId());
 
     String name = null;
     if (notification.getInstanceId() != null
@@ -140,7 +140,7 @@ public class NotificationCollection extends AbstractSolrCollection<Notification,
         NotificationState.valueOf(SolrUtils.objectToString(doc.get(RodaConstants.NOTIFICATION_STATE), defaultState)));
     }
 
-    notification.setInstanceId(SolrUtils.objectToString(doc.get(RodaConstants.NOTIFICATION_INSTANCE_ID), null));
+    notification.setInstanceId(SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_ID), null));
     notification.setInstanceName(SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_NAME), null));
     return notification;
 

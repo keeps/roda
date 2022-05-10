@@ -29,6 +29,8 @@ public class IndexedPreservationAgent implements IsIndexed, HasId {
 
   private String instanceId;
 
+  private String instanceName;
+
   public IndexedPreservationAgent() {
     super();
   }
@@ -98,20 +100,29 @@ public class IndexedPreservationAgent implements IsIndexed, HasId {
     this.instanceId = instanceId;
   }
 
+  public String getInstanceName() {
+    return instanceName;
+  }
+
+  public void setInstanceName(String instanceName) {
+    this.instanceName = instanceName;
+  }
+
   @Override
   public String toString() {
     return "IndexedPreservationAgent [id=" + id + ", name=" + name + ", type=" + type + ", note=" + note
-      + ", extension=" + extension + ", roles=" + roles + ", instanceId=" + instanceId + "]";
+      + ", extension=" + extension + ", roles=" + roles + ", instanceId=" + instanceId + ", instanceName="
+      + instanceName + "]";
   }
 
   @Override
   public List<String> toCsvHeaders() {
-    return Arrays.asList("id", "name", "type", "note", "extension", "roles", "instanceId");
+    return Arrays.asList("id", "name", "type", "note", "extension", "roles", "instanceId", "instanceName");
   }
 
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(id, name, type, note, extension, roles, instanceId);
+    return Arrays.asList(id, name, type, note, extension, roles, instanceId, instanceName);
   }
 
   @Override

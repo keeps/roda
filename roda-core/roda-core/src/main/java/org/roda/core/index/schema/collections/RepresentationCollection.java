@@ -71,7 +71,7 @@ public class RepresentationCollection extends AbstractSolrCollection<IndexedRepr
     fields.add(new Field(RodaConstants.REPRESENTATION_AIP_ID, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.REPRESENTATION_ORIGINAL, Field.TYPE_BOOLEAN));
     fields.add(new Field(RodaConstants.REPRESENTATION_TYPE, Field.TYPE_STRING));
-    fields.add(new Field(RodaConstants.REPRESENTATION_INSTANCE_ID, Field.TYPE_STRING));
+    fields.add(new Field(RodaConstants.INDEX_INSTANCE_ID, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.INDEX_INSTANCE_NAME, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.REPRESENTATION_SIZE_IN_BYTES, Field.TYPE_LONG));
     fields.add(new Field(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES, Field.TYPE_LONG));
@@ -127,7 +127,7 @@ public class RepresentationCollection extends AbstractSolrCollection<IndexedRepr
     doc.addField(RodaConstants.REPRESENTATION_AIP_ID, rep.getAipId());
     doc.addField(RodaConstants.REPRESENTATION_ORIGINAL, rep.isOriginal());
     doc.addField(RodaConstants.REPRESENTATION_TYPE, rep.getType());
-    doc.addField(RodaConstants.REPRESENTATION_INSTANCE_ID, rep.getInstanceId());
+    doc.addField(RodaConstants.INDEX_INSTANCE_ID, rep.getInstanceId());
     doc.addField(RodaConstants.REPRESENTATION_HAS_SHALLOW_FILES, rep.getHasShallowFiles());
 
     doc.addField(RodaConstants.REPRESENTATION_CREATED_ON, SolrUtils.formatDate(rep.getCreatedOn()));
@@ -236,7 +236,7 @@ public class RepresentationCollection extends AbstractSolrCollection<IndexedRepr
     ret.setOriginal(
       Boolean.TRUE.equals(SolrUtils.objectToBoolean(doc.get(RodaConstants.REPRESENTATION_ORIGINAL), Boolean.FALSE)));
     ret.setType(SolrUtils.objectToString(doc.get(RodaConstants.REPRESENTATION_TYPE), null));
-    ret.setInstanceId(SolrUtils.objectToString(doc.get(RodaConstants.REPRESENTATION_INSTANCE_ID), null));
+    ret.setInstanceId(SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_ID), null));
     ret.setInstanceName(SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_NAME), null));
     ret.setTitle(SolrUtils.objectToString(doc.get(RodaConstants.REPRESENTATION_TITLE), null));
     ret.setSizeInBytes(SolrUtils.objectToLong(doc.get(RodaConstants.REPRESENTATION_SIZE_IN_BYTES), 0L));
