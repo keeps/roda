@@ -2493,7 +2493,6 @@ public interface ClientMessages extends Messages {
 
   String distributedInstanceUpdatedEntitiesLabel();
 
-
   /** Local instance configuration **/
 
   String createLocalInstanceConfigurationTitle();
@@ -2535,6 +2534,10 @@ public interface ClientMessages extends Messages {
   String applyInstanceIdToRepository();
 
   String applyInstanceIdToRepositoryMessage();
+
+  String removeLocalConfiguration();
+
+  String removeLocalConfigurationMessage();
 
   String removeInstanceIdFromRepository();
 

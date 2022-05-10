@@ -2,8 +2,6 @@ package org.roda.wui.client.management.distributed;
 
 import java.util.List;
 
-import com.google.gwt.user.client.ui.ScrollPanel;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowserService;
@@ -31,6 +29,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -89,6 +88,8 @@ public class ShowDistributedInstance extends Composite {
   Label dateUpdated;
 
   @UiField
+  Label descriptionLabel;
+  @UiField
   HTML descriptionValue;
 
   @UiField
@@ -118,7 +119,12 @@ public class ShowDistributedInstance extends Composite {
   private void initElements() {
     title.setText(distributedInstance.getName());
 
-    descriptionValue.setHTML(distributedInstance.getDescription());
+    if (distributedInstance.getDescription() != null && !distributedInstance.getDescription().isEmpty()) {
+      descriptionValue.setHTML(distributedInstance.getDescription());
+    } else {
+      descriptionLabel.setVisible(false);
+    }
+
     if (distributedInstance.getCreatedOn() != null && StringUtils.isNotBlank(distributedInstance.getCreatedBy())) {
       dateCreated.setText(messages.dateCreated(Humanize.formatDateTime(distributedInstance.getCreatedOn()),
         distributedInstance.getCreatedBy()));
