@@ -17,6 +17,8 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -354,6 +356,30 @@ public class SyncUtils {
   public static JsonParser createJsonParser(Path path) throws IOException {
     final JsonFactory jfactory = new JsonFactory();
     return jfactory.createParser(path.toFile());
+  }
+
+  public static void updateDistributedInstance(LocalInstance localInstance, DistributedInstance distributedInstance)
+    throws GenericException {
+    try {
+      AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
+      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE + "update";
+
+      CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+      HttpPut httpPut = new HttpPut(localInstance.getCentralInstanceURL() + resource);
+      httpPut.setEntity(new StringEntity(JsonUtils.getJsonFromObject(distributedInstance)));
+      httpPut.addHeader("Authorization", "Bearer " + accessToken.getToken());
+      httpPut.addHeader("content-type", "application/json");
+      httpPut.addHeader("Accept", "application/json");
+
+      HttpResponse response = httpClient.execute(httpPut);
+
+      if (response.getStatusLine().getStatusCode() != RodaConstants.HTTP_RESPONSE_CODE_SUCCESS) {
+        throw new GenericException(
+          "Unable to update the distributed instance error code: " + response.getStatusLine().getStatusCode());
+      }
+    } catch (AuthenticationDeniedException | GenericException | IOException e) {
+      throw new GenericException("Unable to retrieve instance status: " + e.getMessage());
+    }
   }
 
 }

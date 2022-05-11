@@ -49,9 +49,22 @@ public class AipPackagePlugin extends RodaEntityPackagesPlugin<AIP> {
     return "1.0";
   }
 
+  public static String getStaticName() {
+    return "AipPackagePlugin";
+  }
+
   @Override
   public String getName() {
-    return "AipPackagePlugin";
+    return getStaticName();
+  }
+
+  public static String getStaticDescription() {
+    return "";
+  }
+
+  @Override
+  public String getDescription() {
+    return getStaticDescription();
   }
 
   @Override

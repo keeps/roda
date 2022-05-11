@@ -32,9 +32,22 @@ public class RiskIncidencePackagePlugin extends RodaEntityPackagesPlugin<RiskInc
     return "1.0";
   }
 
+  public static String getStaticName() {
+    return "RiskIncidencePackagePlugin";
+  }
+
   @Override
   public String getName() {
-    return "RiskIncidencePackagePlugin";
+    return getStaticName();
+  }
+
+  public static String getStaticDescription() {
+    return "";
+  }
+
+  @Override
+  public String getDescription() {
+    return getStaticDescription();
   }
 
   @Override

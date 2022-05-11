@@ -67,16 +67,24 @@ public class InstanceIdentifierPreservationAgentPlugin extends AbstractPlugin<Vo
     // do nothing
   }
 
-  @Override
-  public String getName() {
+  public static String getStaticName() {
     return "Preservation Agent instance identifier";
   }
 
   @Override
-  public String getDescription() {
+  public String getName() {
+    return getStaticName();
+  }
+
+  public static String getStaticDescription() {
     return "Add the instance identifier on the data that exists on the storage as also on the index. "
       + "If an object already has an instance identifier it will be updated by the new one. "
       + "This task aims to help the synchronization between a RODA central instance and the RODA local instance, since when an local object is accessed in RODA Central it should have the instance identifier in order to inform from which source is it from.";
+  }
+
+  @Override
+  public String getDescription() {
+    return getStaticDescription();
   }
 
   @Override
@@ -128,7 +136,7 @@ public class InstanceIdentifierPreservationAgentPlugin extends AbstractPlugin<Vo
             PreservationMetadata pm = opm.get();
             PremisV3Utils.updatePremisUserAgentId(pm, model, index, instanceId);
             pluginState = PluginState.SUCCESS;
-            countSuccess ++;
+            countSuccess++;
           } else {
             jobPluginInfo.incrementObjectsProcessedWithFailure();
             pluginState = PluginState.FAILURE;
@@ -139,7 +147,7 @@ public class InstanceIdentifierPreservationAgentPlugin extends AbstractPlugin<Vo
           pluginState = PluginState.SKIPPED;
         } catch (NotFoundException e) {
           pluginState = PluginState.FAILURE;
-          countFail ++;
+          countFail++;
           details = "Could not update preservation agent: " + e.getCause();
         }
       }
@@ -151,7 +159,8 @@ public class InstanceIdentifierPreservationAgentPlugin extends AbstractPlugin<Vo
     }
 
     if (countFail > 0) {
-      details = "Updated the instance identifier on " + countSuccess + " Preservation agents and failed to update " + countFail;
+      details = "Updated the instance identifier on " + countSuccess + " Preservation agents and failed to update "
+        + countFail;
     } else if (countSuccess > 0) {
       details = "Updated the instance identifier on " + countSuccess + " Preservation agents";
     }

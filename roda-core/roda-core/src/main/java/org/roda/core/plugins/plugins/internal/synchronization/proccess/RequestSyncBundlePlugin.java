@@ -60,14 +60,22 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
     return "1.0";
   }
 
-  @Override
-  public String getName() {
+  public static String getStaticName() {
     return "Request synchronization bundle";
   }
 
   @Override
-  public String getDescription() {
+  public String getName() {
+    return getStaticName();
+  }
+
+  public static String getStaticDescription() {
     return "Request remote actions to central instance";
+  }
+
+  @Override
+  public String getDescription() {
+    return getStaticDescription();
   }
 
   @Override

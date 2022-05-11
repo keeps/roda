@@ -3,7 +3,13 @@ package org.roda.core.plugins.plugins.internal.synchronization.proccess;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.SyncUtils;
@@ -26,7 +32,12 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.plugins.internal.synchronization.packages.*;
+import org.roda.core.plugins.plugins.internal.synchronization.packages.AipPackagePlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.packages.DipPackagePlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.packages.JobPackagePlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.packages.PreservationAgentPackagePlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.packages.RepositoryEventPackagePlugin;
+import org.roda.core.plugins.plugins.internal.synchronization.packages.RiskIncidencePackagePlugin;
 import org.roda.core.plugins.plugins.multiple.DefaultMultipleStepPlugin;
 import org.roda.core.plugins.plugins.multiple.Step;
 import org.roda.core.storage.StorageService;
@@ -43,17 +54,76 @@ public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAO
 
   static {
 
-    steps.add(new Step(AipPackagePlugin.class.getName(), AIP.class, "", true, true));
-    steps.add(new Step(JobPackagePlugin.class.getName(), Job.class, "", true, true));
-    steps.add(new Step(DipPackagePlugin.class.getName(), DIP.class, "", true, true));
-    steps.add(new Step(RiskIncidencePackagePlugin.class.getName(), RiskIncidence.class, "", true, true));
-    steps.add(new Step(RepositoryEventPackagePlugin.class.getName(), IndexedPreservationEvent.class, "", true, true));
-    steps.add(new Step(PreservationAgentPackagePlugin.class.getName(), IndexedPreservationAgent.class, "", true, true));
-    steps.add(new Step(BuildSyncManifestPlugin.class.getName(), BuildSyncManifestPlugin.class, "", true, true));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_AIP_PACKAGE_PLUGIN,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AIP_PACKAGE_PLUGIN, AipPackagePlugin.getStaticName(),
+        PluginParameter.PluginParameterType.BOOLEAN, "true", true, true, AipPackagePlugin.getStaticDescription()));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_JOB_PACKAGE_PLUGIN,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_JOB_PACKAGE_PLUGIN, JobPackagePlugin.getStaticName(),
+        PluginParameter.PluginParameterType.BOOLEAN, "true", true, true, JobPackagePlugin.getStaticDescription()));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_DIP_PACKAGE_PLUGIN,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DIP_PACKAGE_PLUGIN, DipPackagePlugin.getStaticName(),
+        PluginParameter.PluginParameterType.BOOLEAN, "true", true, true, DipPackagePlugin.getStaticDescription()));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_RISK_INCIDENCE_PACKAGE_PLUGIN,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_RISK_INCIDENCE_PACKAGE_PLUGIN,
+        RiskIncidencePackagePlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN, "true", true, true,
+        RiskIncidencePackagePlugin.getStaticDescription()));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_REPOSITORY_EVENT_PACKAGE_PLUGIN,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REPOSITORY_EVENT_PACKAGE_PLUGIN,
+        RepositoryEventPackagePlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN, "true", true, true,
+        RepositoryEventPackagePlugin.getStaticDescription()));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_PRESERVATION_AGENT_PACKAGE_PLUGIN,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_PRESERVATION_AGENT_PACKAGE_PLUGIN,
+        PreservationAgentPackagePlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN, "true", true, true,
+        PreservationAgentPackagePlugin.getStaticDescription()));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_BUILD_SYNC_MANIFEST_PLUGIN,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_BUILD_SYNC_MANIFEST_PLUGIN,
+        BuildSyncManifestPlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN, "true", true, true,
+        BuildSyncManifestPlugin.getStaticDescription()));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_SEND_SYNC_BUNDLE_PLUGIN,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_SEND_SYNC_BUNDLE_PLUGIN, SendSyncBundlePlugin.getStaticName(),
+        PluginParameter.PluginParameterType.BOOLEAN, "true", true, true, SendSyncBundlePlugin.getStaticDescription()));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_REQUEST_SYNC_BUNDLE_PLUGIN,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REQUEST_SYNC_BUNDLE_PLUGIN,
+        RequestSyncBundlePlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN, "true", true, true,
+        RequestSyncBundlePlugin.getStaticDescription()));
 
-    steps.add(new Step(SendSyncBundlePlugin.class.getName(), SendSyncBundlePlugin.class, "", true, true));
-    steps.add(new Step(RequestSyncBundlePlugin.class.getName(), RequestSyncBundlePlugin.class, "", true, true));
+    steps.add(new Step(AipPackagePlugin.class.getName(), AIP.class, RodaConstants.PLUGIN_PARAMS_DO_AIP_PACKAGE_PLUGIN,
+      true, true));
+    steps.add(new Step(JobPackagePlugin.class.getName(), Job.class, RodaConstants.PLUGIN_PARAMS_DO_JOB_PACKAGE_PLUGIN,
+      true, true));
+    steps.add(new Step(DipPackagePlugin.class.getName(), DIP.class, RodaConstants.PLUGIN_PARAMS_DO_DIP_PACKAGE_PLUGIN,
+      true, true));
+    steps.add(new Step(RiskIncidencePackagePlugin.class.getName(), RiskIncidence.class,
+      RodaConstants.PLUGIN_PARAMS_DO_RISK_INCIDENCE_PACKAGE_PLUGIN, true, true));
+    steps.add(new Step(RepositoryEventPackagePlugin.class.getName(), IndexedPreservationEvent.class,
+      RodaConstants.PLUGIN_PARAMS_DO_REPOSITORY_EVENT_PACKAGE_PLUGIN, true, true));
+    steps.add(new Step(PreservationAgentPackagePlugin.class.getName(), IndexedPreservationAgent.class,
+      RodaConstants.PLUGIN_PARAMS_DO_PRESERVATION_AGENT_PACKAGE_PLUGIN, true, true));
+    steps.add(new Step(BuildSyncManifestPlugin.class.getName(), BuildSyncManifestPlugin.class,
+      RodaConstants.PLUGIN_PARAMS_DO_BUILD_SYNC_MANIFEST_PLUGIN, true, true));
 
+    steps.add(new Step(SendSyncBundlePlugin.class.getName(), SendSyncBundlePlugin.class,
+      RodaConstants.PLUGIN_PARAMS_DO_SEND_SYNC_BUNDLE_PLUGIN, true, true));
+    steps.add(new Step(RequestSyncBundlePlugin.class.getName(), RequestSyncBundlePlugin.class,
+      RodaConstants.PLUGIN_PARAMS_DO_REQUEST_SYNC_BUNDLE_PLUGIN, true, true));
+
+  }
+
+  @Override
+  public List<PluginParameter> getParameters() {
+    final ArrayList<PluginParameter> pluginParameters = new ArrayList<>();
+    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AIP_PACKAGE_PLUGIN));
+    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_JOB_PACKAGE_PLUGIN));
+    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DIP_PACKAGE_PLUGIN));
+    pluginParameters
+            .add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_RISK_INCIDENCE_PACKAGE_PLUGIN));
+    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REPOSITORY_EVENT_PACKAGE_PLUGIN));
+    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_PRESERVATION_AGENT_PACKAGE_PLUGIN));
+    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_BUILD_SYNC_MANIFEST_PLUGIN));
+    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_SEND_SYNC_BUNDLE_PLUGIN));
+    pluginParameters
+            .add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REQUEST_SYNC_BUNDLE_PLUGIN));
+    return pluginParameters;
   }
 
   @Override

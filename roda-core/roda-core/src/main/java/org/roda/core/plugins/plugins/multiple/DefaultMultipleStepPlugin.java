@@ -21,6 +21,7 @@ import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.MultipleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.plugins.ingest.v2.steps.IngestStep;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,7 +111,7 @@ public abstract class DefaultMultipleStepPlugin<T extends IsRODAObject> extends 
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-
+    totalSteps = calculateEffectiveTotalSteps();
     getParameterValues().put(RodaConstants.PLUGIN_PARAMS_TOTAL_STEPS, Integer.toString(getTotalSteps()));
     getParameterValues().put(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS, getClass().getName());
   }
@@ -129,4 +130,16 @@ public abstract class DefaultMultipleStepPlugin<T extends IsRODAObject> extends 
   public abstract List<Step> getPluginSteps();
 
   public abstract PluginParameter getPluginParameter(String pluginParameterId);
+
+  private int calculateEffectiveTotalSteps() {
+    int effectiveTotalSteps = getTotalSteps();
+
+    for (Step step : getPluginSteps()) {
+      if (!PluginHelper.verifyIfStepShouldBePerformed(this, getPluginParameter(step.getParameterName()))) {
+        effectiveTotalSteps--;
+      }
+    }
+
+    return effectiveTotalSteps;
+  }
 }

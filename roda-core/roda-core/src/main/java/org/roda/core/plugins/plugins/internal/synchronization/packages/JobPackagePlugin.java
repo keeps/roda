@@ -7,7 +7,11 @@ import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.*;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -32,9 +36,22 @@ public class JobPackagePlugin extends RodaEntityPackagesPlugin<Job> {
     return "1.0";
   }
 
+  public static String getStaticName() {
+    return "JobPackagePlugin";
+  }
+
   @Override
   public String getName() {
-    return "JobPackagePlugin";
+    return getStaticName();
+  }
+
+  public static String getStaticDescription() {
+    return "";
+  }
+
+  @Override
+  public String getDescription() {
+    return getStaticDescription();
   }
 
   @Override

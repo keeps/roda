@@ -5,6 +5,7 @@ import java.util.List;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
+import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
