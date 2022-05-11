@@ -4,8 +4,10 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -20,12 +22,15 @@ import org.roda.core.common.EntityResponse;
 import org.roda.core.common.StreamResponse;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.central.DistributedInstances;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.controllers.RODAInstance;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -166,12 +171,12 @@ public class DistributedInstancesResource {
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
   public Response synchronizationStatus(
     @ApiParam(value = "The instance identifier", required = true) @PathParam(RodaConstants.API_PATH_PARAM_INSTANCE_IDENTIFIER) String instanceIdentifier,
-    @QueryParam(RodaConstants.API_QUERY_KEY_CLASS) String entityClass, @QueryParam(RodaConstants.API_QUERY_KEY_TYPE) String type)
-    throws RODAException {
+    @QueryParam(RodaConstants.API_QUERY_KEY_CLASS) String entityClass,
+    @QueryParam(RodaConstants.API_QUERY_KEY_TYPE) String type) throws RODAException {
     // get user
     final User user = UserUtility.getApiUser(request);
     // delegate action to controller.
-    EntityResponse response = RODAInstance.retrieveLastSyncFile(user, instanceIdentifier,entityClass, type);
+    EntityResponse response = RODAInstance.retrieveLastSyncFile(user, instanceIdentifier, entityClass, type);
     return ApiUtils.okResponse((StreamResponse) response);
   }
 
@@ -181,15 +186,59 @@ public class DistributedInstancesResource {
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = StreamResponse.class),
     @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
-  public Response removeSyncBundleFromCentral(@QueryParam(RodaConstants.SYNCHRONIZATION_BUNDLE_NAME) String bundleName, @QueryParam(RodaConstants.SYNCHRONIZATION_BUNDLE_DIRECTORY) String bundleDirectory)
-    throws RODAException {
+  public Response removeSyncBundleFromCentral(@QueryParam(RodaConstants.SYNCHRONIZATION_BUNDLE_NAME) String bundleName,
+    @QueryParam(RodaConstants.SYNCHRONIZATION_BUNDLE_DIRECTORY) String bundleDirectory) throws RODAException {
     // get user
     final User user = UserUtility.getApiUser(request);
     // delegate action to controller.
     String response = RODAInstance.removeSyncBundle(bundleName, user, bundleDirectory);
 
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, response)).build();
+  }
 
+  /**
+   * Route to delete in the central repository. This route is called when the
+   * instance in a local repository is deleted.
+   * 
+   * @param instanceIdentifier
+   *          The instanceIdentifier of local instance
+   * @return the success message or the failure message.
+   */
+  @DELETE
+  @Path("{" + RodaConstants.API_PATH_PARAM_INSTANCE_IDENTIFIER + "}")
+  @Produces({MediaType.APPLICATION_JSON})
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = StreamResponse.class),
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
+  public Response removeInstanceConfiguration(
+    @ApiParam(value = "The instance identifier", required = true) @PathParam(RodaConstants.API_PATH_PARAM_INSTANCE_IDENTIFIER) String instanceIdentifier) {
+    final User user = UserUtility.getApiUser(request);
+    try {
+      RODAInstance.deleteDistributedInstance(user, instanceIdentifier);
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
+      return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    }
+    return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Instance removed with success")).build();
+  }
 
+  /**
+   * Route to deactivate local instance in central repository.
+   *
+   * @return the success message or the failure message.
+   */
+  @PUT
+  @Path("/update")
+  @Produces({MediaType.APPLICATION_JSON})
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = StreamResponse.class),
+    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
+  public Response update(DistributedInstance distributedInstance) {
+    final User user = UserUtility.getApiUser(request);
+    try {
+      RODAInstance.updateDistributedInstance(user, distributedInstance);
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
+      return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+    }
+    return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Instance removed with success")).build();
   }
 }

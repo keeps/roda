@@ -7,6 +7,7 @@ import java.util.List;
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.EntityResponse;
+import org.roda.core.common.SyncUtils;
 import org.roda.core.common.TokenManager;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -216,6 +217,11 @@ public class RODAInstance extends RodaWuiController {
 
     LogEntryState state = LogEntryState.SUCCESS;
     try {
+      DistributedInstance distributedInstance = SyncUtils.requestInstanceStatus(RodaCoreFactory.getLocalInstance());
+      distributedInstance.setStatus(DistributedInstanceStatus.INACTIVE);
+
+      SyncUtils.updateDistributedInstance(RodaCoreFactory.getLocalInstance(), distributedInstance);
+
       TokenManager.getInstance().removeToken();
       RodaCoreFactory.createOrUpdateLocalInstance(null);
     } catch (GenericException e) {
@@ -279,7 +285,7 @@ public class RODAInstance extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      RODAInstanceHelper.applyInstanceIdToRodaObject(localInstance, user);
+      RODAInstanceHelper.applyInstanceIdToRodaObject(localInstance, user, false);
       localInstance.setInstanceIdentifierState(LocalInstanceIdentifierState.ACTIVE);
       RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
     } catch (RODAException e) {
@@ -302,7 +308,7 @@ public class RODAInstance extends RodaWuiController {
 
     try {
       // Apply Identifiers
-      RODAInstanceHelper.applyInstanceIdToRodaObject(localInstance, user);
+      RODAInstanceHelper.applyInstanceIdToRodaObject(localInstance, user, true);
       localInstance.setInstanceIdentifierState(LocalInstanceIdentifierState.RUNNING);
       RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
       RODAInstanceUtils.createDistributedGroup(user);
@@ -455,5 +461,16 @@ public class RODAInstance extends RodaWuiController {
 
     return RODAInstanceHelper.removeSyncBundle(bundleName, bundleDirectory);
 
+  }
+
+  public static String removeInstanceConfiguration(final User user, final String instanceIdentifier)
+    throws AuthorizationDeniedException {
+    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+    controllerAssistant.registerAction(user, state);
+
+    return "OK";
   }
 }

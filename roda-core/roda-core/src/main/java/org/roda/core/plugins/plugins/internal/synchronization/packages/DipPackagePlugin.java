@@ -33,9 +33,22 @@ public class DipPackagePlugin extends RodaEntityPackagesPlugin<DIP> {
     return "1.0";
   }
 
+  public static String getStaticName() {
+    return "DipPackagePlugin";
+  }
+
   @Override
   public String getName() {
-    return "DipPackagePlugin";
+    return getStaticName();
+  }
+
+  public static String getStaticDescription() {
+    return "";
+  }
+
+  @Override
+  public String getDescription() {
+    return getStaticDescription();
   }
 
   @Override

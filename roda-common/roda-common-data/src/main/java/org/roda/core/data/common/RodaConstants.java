@@ -1089,6 +1089,30 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_CENTRAL_INSTANCE_URL = "parameter.central_instance_url";
   public static final String PLUGIN_PARAMS_BUNDLE_NAME = "parameter.bundle_name";
 
+  // Local Instance Register Plugin
+  public static final String PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_AIP_PLUGIN = "parameter.do_instance_identifier_aip";
+  public static final String PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_AIP_EVENT_PLUGIN = "parameter.do_instance_identifier_aip_event";
+  public static final String PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_DIP_PLUGIN = "parameter.do_instance_identifier_dip";
+  public static final String PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_REPRESENTATION_INFORMATION_PLUGIN = "parameter.do_instance_identifier_representation_information";
+  public static final String PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_NOTIFICATION_PLUGIN = "parameter.do_instance_identifier_notification";
+  public static final String PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_RISK_PLUGIN = "parameter.do_instance_identifier_risk";
+  public static final String PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_RISK_INCIDENCE_PLUGIN = "parameter.do_instance_identifier_risk_incidence";
+  public static final String PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_JOB_PLUGIN = "parameter.do_instance_identifier_job";
+  public static final String PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_REPOSITORY_EVENT_PLUGIN = "parameter.do_instance_identifier_repository_event";
+  public static final String PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_PRESERVATION_AGENT_PLUGIN = "parameter.do_instance_identifier_preservation_agent";
+  public static final String PLUGIN_PARAMS_DO_REGISTER_PLUGIN = "parameter.do_register";
+
+  // Synchronize Plugin Parameters
+
+  public static final String PLUGIN_PARAMS_DO_AIP_PACKAGE_PLUGIN = "parameter.do_aip_package";
+  public static final String PLUGIN_PARAMS_DO_JOB_PACKAGE_PLUGIN = "parameter.do_job_package";
+  public static final String PLUGIN_PARAMS_DO_DIP_PACKAGE_PLUGIN = "parameter.do_dip_package";
+  public static final String PLUGIN_PARAMS_DO_RISK_INCIDENCE_PACKAGE_PLUGIN = "parameter.do_risk_incidence_package";
+  public static final String PLUGIN_PARAMS_DO_REPOSITORY_EVENT_PACKAGE_PLUGIN = "parameter.do_repository_event_package";
+  public static final String PLUGIN_PARAMS_DO_PRESERVATION_AGENT_PACKAGE_PLUGIN = "parameter.do_preservation_agent";
+  public static final String PLUGIN_PARAMS_DO_BUILD_SYNC_MANIFEST_PLUGIN = "parameter.do_build_sync_manifest";
+  public static final String PLUGIN_PARAMS_DO_SEND_SYNC_BUNDLE_PLUGIN = "parameter.do_send_sync_bundle";
+  public static final String PLUGIN_PARAMS_DO_REQUEST_SYNC_BUNDLE_PLUGIN = "parameter.do_request_sync_bundle";
   public static final String PLUGIN_CATEGORY_CONVERSION = "conversion";
   public static final String PLUGIN_CATEGORY_CHARACTERIZATION = "characterization";
   public static final String PLUGIN_CATEGORY_RISK_MANAGEMENT = "risk_management";
@@ -1467,7 +1491,8 @@ public final class RodaConstants {
   }
 
   public enum PreservationAgentRole {
-    AUTHORIZER("authorizer"), EXECUTING_PROGRAM("executing program"), IMPLEMENTER("implementer"), VALIDATOR("validator");
+    AUTHORIZER("authorizer"), EXECUTING_PROGRAM("executing program"), IMPLEMENTER("implementer"),
+    VALIDATOR("validator");
 
     private final String text;
 

@@ -33,9 +33,22 @@ public class RepositoryEventPackagePlugin extends RodaEntityPackagesPlugin<Index
     return "1.0";
   }
 
+  public static String getStaticName() {
+    return "RepositoryEventPackagePlugin";
+  }
+
   @Override
   public String getName() {
-    return "RepositoryEventPackagePlugin";
+    return getStaticName();
+  }
+
+  public static String getStaticDescription() {
+    return "";
+  }
+
+  @Override
+  public String getDescription() {
+    return getStaticDescription();
   }
 
   @Override

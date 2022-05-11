@@ -58,18 +58,26 @@ public class InstanceIdentifierAIPPlugin extends AbstractPlugin<Void> {
     return "1.0";
   }
 
-  @Override
-  public String getName() {
+  public static String getStaticName() {
     return "AIP instance identifier";
   }
 
   @Override
-  public String getDescription() {
+  public String getName() {
+    return getStaticName();
+  }
+
+  public static String getStaticDescription() {
     return "Add the instance identifier on the data that exists on the storage as also on the index. "
       + "If an object already has an instance identifier it will be updated by the new one. "
       + "This task aims to help the synchronization between a RODA central instance and the RODA local instance, "
       + "since when an local object is accessed in RODA Central it should have the instance identifier in order to "
       + "inform from which source is it from.";
+  }
+
+  @Override
+  public String getDescription() {
+    return getStaticDescription();
   }
 
   @Override

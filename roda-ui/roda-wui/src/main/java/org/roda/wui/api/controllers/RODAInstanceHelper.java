@@ -50,9 +50,12 @@ public class RODAInstanceHelper {
   }
 
   // TODO: Rename this method to register
-  public static void applyInstanceIdToRodaObject(LocalInstance localInstance, User user)
+  public static void applyInstanceIdToRodaObject(LocalInstance localInstance, User user, boolean doRegister)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     Map<String, String> pluginParameters = new HashMap<>();
+    if(!doRegister){
+      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_REGISTER_PLUGIN, "false");
+    }
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
 
     BrowserHelper.createAndExecuteInternalJob("Local Instance Register", new SelectedItemsNone<>(),
@@ -226,5 +229,4 @@ public class RODAInstanceHelper {
       throw new GenericException("Cannot create temporary directory");
     }
   }
-
 }
