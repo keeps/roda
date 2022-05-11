@@ -68,18 +68,25 @@ public class InstanceIdentifierAIPEventPlugin extends AbstractPlugin<Void> {
     return "1.0";
   }
 
+  public static String getStaticName() {
+    return "Instance identifier AIP preservation events";
+  }
   @Override
   public String getName() {
-    return "Instance identifier AIP preservation events";
+    return getStaticName();
+  }
+
+  public static String getStaticDescription() {
+    return "Add the instance identifier on the data that exists on the storage as also on the index. "
+            + "If an object already has an instance identifier it will be updated by the new one. "
+            + "This task aims to help the synchronization between a RODA central instance and the RODA local instance, "
+            + "since when an local object is accessed in RODA Central it should have the instance identifier in order to "
+            + "inform from which source is it from.";
   }
 
   @Override
   public String getDescription() {
-    return "Add the instance identifier on the data that exists on the storage as also on the index. "
-      + "If an object already has an instance identifier it will be updated by the new one. "
-      + "This task aims to help the synchronization between a RODA central instance and the RODA local instance, "
-      + "since when an local object is accessed in RODA Central it should have the instance identifier in order to "
-      + "inform from which source is it from.";
+   return getStaticDescription();
   }
 
   @Override

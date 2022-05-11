@@ -57,14 +57,22 @@ public class RegisterPlugin extends AbstractPlugin<Void> {
     return "1.0";
   }
 
+  public static String getStaticName() {
+    return "Register of Local Instance";
+  }
+
   @Override
   public String getName() {
+    return getStaticName();
+  }
+
+  public static String getStaticDescription() {
     return "Register of Local Instance";
   }
 
   @Override
   public String getDescription() {
-    return "Register of Local Instance";
+    return getStaticDescription();
   }
 
   @Override

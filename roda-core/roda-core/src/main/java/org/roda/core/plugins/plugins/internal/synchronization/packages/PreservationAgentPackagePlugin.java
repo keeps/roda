@@ -32,9 +32,22 @@ public class PreservationAgentPackagePlugin extends RodaEntityPackagesPlugin<Ind
     return "1.0";
   }
 
+  public static String getStaticName() {
+    return "PreservationAgentPackagePlugin";
+  }
+
   @Override
   public String getName() {
-    return "PreservationAgentPackagePlugin";
+    return getStaticName();
+  }
+
+  public static String getStaticDescription() {
+    return "";
+  }
+
+  @Override
+  public String getDescription() {
+    return getStaticDescription();
   }
 
   @Override
