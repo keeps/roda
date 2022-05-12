@@ -7,7 +7,6 @@
  */
 package org.roda.wui.client.browse;
 
-import com.google.gwt.safehtml.shared.UriUtils;
 import org.apache.commons.httpclient.HttpStatus;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -40,6 +39,7 @@ import com.google.gwt.media.client.Video;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.safehtml.shared.SafeUri;
+import com.google.gwt.safehtml.shared.UriUtils;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
@@ -75,6 +75,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
   private final String filename;
   private final long size;
   private final boolean isDirectory;
+  private final boolean isAvailable;
 
   // other
   private final Command onPreviewFailure;
@@ -103,6 +104,13 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
   public BitstreamPreview(Viewers viewers, SafeUri bitstreamDownloadUri, FileFormat format, String filename, long size,
     boolean isDirectory, Command onPreviewFailure, T object, boolean justActive, Permissions permissions) {
+    this(viewers, bitstreamDownloadUri, format, filename, size, isDirectory, true, onPreviewFailure, object, false,
+      permissions);
+  }
+
+  public BitstreamPreview(Viewers viewers, SafeUri bitstreamDownloadUri, FileFormat format, String filename, long size,
+    boolean isDirectory, boolean isAvailable, Command onPreviewFailure, T object, boolean justActive,
+    Permissions permissions) {
     super();
     this.object = object;
     this.panel = new FlowPanel();
@@ -114,6 +122,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     this.filename = filename;
     this.size = size;
     this.isDirectory = isDirectory;
+    this.isAvailable = isAvailable;
 
     this.onPreviewFailure = onPreviewFailure;
 
@@ -152,36 +161,42 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
   private void init() {
     if (!isDirectory) {
-      String type = viewerType();
       fileIsFromDistributedInstance = isFileFromDistributedInstance();
       if (fileIsFromDistributedInstance) {
         notSupportedPreviewDistributedInstance();
+      } else if (!isAvailable) {
+        notSupportedShallowFilePreview();
       } else {
-        if (type != null) {
-          if (type.equals(VIEWER_TYPE_IMAGE)) {
-            imagePreview();
-          } else if (type.equals(VIEWER_TYPE_PDF)) {
-            pdfPreview();
-          } else if (type.equals(VIEWER_TYPE_TEXT)) {
-            textPreview();
-          } else if (type.equals(VIEWER_TYPE_HTML)) {
-            htmlPreview();
-          } else if (type.equals(VIEWER_TYPE_AUDIO)) {
-            audioPreview();
-          } else if (type.equals(VIEWER_TYPE_VIDEO)) {
-            videoPreview();
-          } else {
-            notSupportedPreview();
-          }
-        } else if (object instanceof IndexedDIP) {
-          IndexedDIP dip = (IndexedDIP) object;
-          dipUrlPreview(dip);
-        } else {
-          notSupportedPreview();
-        }
+        preview();
       }
     } else {
       panel.add(directoryPreview());
+    }
+  }
+
+  private void preview() {
+    String type = viewerType();
+    if (type != null) {
+      if (type.equals(VIEWER_TYPE_IMAGE)) {
+        imagePreview();
+      } else if (type.equals(VIEWER_TYPE_PDF)) {
+        pdfPreview();
+      } else if (type.equals(VIEWER_TYPE_TEXT)) {
+        textPreview();
+      } else if (type.equals(VIEWER_TYPE_HTML)) {
+        htmlPreview();
+      } else if (type.equals(VIEWER_TYPE_AUDIO)) {
+        audioPreview();
+      } else if (type.equals(VIEWER_TYPE_VIDEO)) {
+        videoPreview();
+      } else {
+        notSupportedPreview();
+      }
+    } else if (object instanceof IndexedDIP) {
+      IndexedDIP dip = (IndexedDIP) object;
+      dipUrlPreview(dip);
+    } else {
+      notSupportedPreview();
     }
   }
 
@@ -471,6 +486,22 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-picture-o fa-5'></i>"));
     b.append(SafeHtmlUtils.fromSafeConstant("<h4 class='errormessage'>"));
     b.append(SafeHtmlUtils.fromString(messages.viewRepresentationNotSupportedPreviewCentralInstance()));
+    b.append(SafeHtmlUtils.fromSafeConstant("</h4>"));
+
+    html.setHTML(b.toSafeHtml());
+    panel.add(html);
+    html.setStyleName("viewRepresentationNotSupportedPreview");
+
+    onPreviewFailure.execute();
+  }
+
+  private void notSupportedShallowFilePreview() {
+    HTML html = new HTML();
+    SafeHtmlBuilder b = new SafeHtmlBuilder();
+
+    b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-picture-o fa-5'></i>"));
+    b.append(SafeHtmlUtils.fromSafeConstant("<h4 class='errormessage'>"));
+    b.append(SafeHtmlUtils.fromString(messages.viewRepresentationNotSupportedPreviewShallowFile()));
     b.append(SafeHtmlUtils.fromSafeConstant("</h4>"));
 
     html.setHTML(b.toSafeHtml());

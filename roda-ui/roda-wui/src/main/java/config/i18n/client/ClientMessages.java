@@ -547,6 +547,8 @@ public interface ClientMessages extends Messages {
 
   String viewRepresentationNotSupportedPreviewCentralInstance();
 
+  String viewRepresentationNotSupportedPreviewShallowFile();
+
   String viewRepresentationInfoTitle();
 
   String viewRepresentationFileDisseminationTitle();
