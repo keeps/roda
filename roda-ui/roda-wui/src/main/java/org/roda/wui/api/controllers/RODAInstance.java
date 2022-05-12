@@ -21,8 +21,8 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
+import org.roda.core.data.v2.synchronization.SynchronizingStatus;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
-import org.roda.core.data.v2.synchronization.central.DistributedInstanceStatus;
 import org.roda.core.data.v2.synchronization.central.DistributedInstances;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
@@ -162,7 +162,7 @@ public class RODAInstance extends RodaWuiController {
     try {
       DistributedInstance distributedInstance = RodaCoreFactory.getModelService()
         .retrieveDistributedInstance(localInstance.getId());
-      distributedInstance.setStatus(DistributedInstanceStatus.ACTIVE);
+      distributedInstance.setStatus(SynchronizingStatus.ACTIVE);
       RodaCoreFactory.getModelService().updateDistributedInstance(distributedInstance, user.getId());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
@@ -328,7 +328,13 @@ public class RODAInstance extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
 
     try {
-      return RODAInstanceHelper.synchronizeBundle(user, localInstance);
+      if (!SynchronizingStatus.ACTIVE.equals(localInstance.getStatus())) {
+        state = LogEntryState.FAILURE;
+        throw new GenericException(
+          "The synchronize proccess already started. Cannot start another synchronize until finished the process.");
+      } else {
+        return RODAInstanceHelper.synchronizeBundle(user, localInstance);
+      }
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;

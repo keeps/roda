@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
-import org.roda.core.data.v2.synchronization.central.DistributedInstanceStatus;
+import org.roda.core.data.v2.synchronization.SynchronizingStatus;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
@@ -104,7 +104,7 @@ public class EditDistributedInstance extends Composite {
         buttonChangeStatus.addClickHandler(new ClickHandler() {
           @Override
           public void onClick(ClickEvent clickEvent) {
-            distributedInstance.setStatus(DistributedInstanceStatus.INACTIVE);
+            distributedInstance.setStatus(SynchronizingStatus.INACTIVE);
             BrowserServiceImpl.Util.getInstance().updateDistributedInstance(distributedInstance, new NoAsyncCallback<DistributedInstance>() {
               @Override
               public void onSuccess(DistributedInstance distributedInstance) {
@@ -120,7 +120,7 @@ public class EditDistributedInstance extends Composite {
         buttonChangeStatus.addClickHandler(new ClickHandler() {
           @Override
           public void onClick(ClickEvent clickEvent) {
-            distributedInstance.setStatus(DistributedInstanceStatus.ACTIVE);
+            distributedInstance.setStatus(SynchronizingStatus.ACTIVE);
             BrowserServiceImpl.Util.getInstance().updateDistributedInstance(distributedInstance, new NoAsyncCallback<DistributedInstance>() {
               @Override
               public void onSuccess(DistributedInstance distributedInstance) {
