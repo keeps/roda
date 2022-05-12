@@ -567,6 +567,6 @@ public interface BrowserService extends RemoteService {
   Job synchronizeBundle(LocalInstance localInstance)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
-  void modifyInstanceIdOnRepository(LocalInstance localInstance)
+  void removeLocalConfiguration(LocalInstance localInstance)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 }

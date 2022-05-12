@@ -273,8 +273,7 @@ public class RODAInstance extends RodaWuiController {
     return responseList;
   }
 
-  // TODO: Delete this method
-  public static void modifyInstanceIdOnRepository(User user, LocalInstance localInstance)
+  public static void removeLocalConfiguration(User user, LocalInstance localInstance)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     List<String> responseList = new ArrayList();
@@ -283,11 +282,8 @@ public class RODAInstance extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     LogEntryState state = LogEntryState.SUCCESS;
-
     try {
       RODAInstanceHelper.applyInstanceIdToRodaObject(localInstance, user, false);
-      localInstance.setInstanceIdentifierState(LocalInstanceIdentifierState.ACTIVE);
-      RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -461,16 +457,5 @@ public class RODAInstance extends RodaWuiController {
 
     return RODAInstanceHelper.removeSyncBundle(bundleName, bundleDirectory);
 
-  }
-
-  public static String removeInstanceConfiguration(final User user, final String instanceIdentifier)
-    throws AuthorizationDeniedException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-    controllerAssistant.checkRoles(user);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-    controllerAssistant.registerAction(user, state);
-
-    return "OK";
   }
 }

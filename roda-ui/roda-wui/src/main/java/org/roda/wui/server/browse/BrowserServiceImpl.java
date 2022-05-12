@@ -1420,10 +1420,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return RODAInstance.synchronizeBundle(user, localInstance);
   }
 
-  public void modifyInstanceIdOnRepository(LocalInstance localInstance)
+  public void removeLocalConfiguration(LocalInstance localInstance)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    RODAInstance.modifyInstanceIdOnRepository(user, localInstance);
+    RODAInstance.removeLocalConfiguration(user, localInstance);
   }
 
 }

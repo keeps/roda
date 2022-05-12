@@ -198,9 +198,7 @@ public class ShowLocalInstanceConfiguration extends Composite {
       public void onSuccess(Boolean result) {
         super.onSuccess(result);
         if (result) {
-          localInstance.setInstanceIdentifierState(LocalInstanceIdentifierState.INACTIVE);
-          localInstance.setId(null);
-          BrowserService.Util.getInstance().modifyInstanceIdOnRepository(localInstance, new AsyncCallback<Job>() {
+          BrowserService.Util.getInstance().removeLocalConfiguration(new LocalInstance(), new AsyncCallback<Job>() {
             @Override
             public void onFailure(Throwable caught) {
               AsyncCallbackUtils.defaultFailureTreatment(caught);

@@ -83,39 +83,47 @@ public class LocalInstanceRegisterPlugin extends DefaultMultipleStepPlugin<IsROD
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REGISTER_PLUGIN, RegisterPlugin.getStaticName(),
         PluginParameter.PluginParameterType.BOOLEAN, "true", true, true, RegisterPlugin.getStaticDescription()));
 
-    steps.add(new Step(InstanceIdentifierAIPPlugin.class.getName(), AIP.class, "", true, true));
-    steps.add(new Step(InstanceIdentifierAIPEventPlugin.class.getName(), PreservationMetadata.class, "", true, true));
-    steps.add(new Step(InstanceIdentifierDIPPlugin.class.getName(), DIP.class, "", true, true));
-    steps.add(new Step(InstanceIdentifierRepresentationInformationPlugin.class.getName(),
-      RepresentationInformation.class, "", true, true));
-    steps.add(new Step(InstanceIdentifierNotificationPlugin.class.getName(), Notification.class, "", true, true));
-    steps.add(new Step(InstanceIdentifierRiskPlugin.class.getName(), Risk.class, "", true, true));
-    steps.add(new Step(InstanceIdentifierRiskIncidencePlugin.class.getName(), RiskIncidence.class, "", true, true));
-    steps.add(new Step(InstanceIdentifierJobPlugin.class.getName(), Job.class, "", true, true));
-    steps.add(
-      new Step(InstanceIdentifierRepositoryEventPlugin.class.getName(), PreservationMetadata.class, "", true, true));
-    steps.add(
-      new Step(InstanceIdentifierPreservationAgentPlugin.class.getName(), PreservationMetadata.class, "", true, true));
-    steps.add(new Step(RegisterPlugin.class.getName(), null, "", true, true));
+    steps.add(new Step(InstanceIdentifierAIPPlugin.class.getName(), AIP.class,
+      RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_AIP_PLUGIN, true, true));
+    steps.add(new Step(InstanceIdentifierAIPEventPlugin.class.getName(), PreservationMetadata.class,
+      RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_AIP_EVENT_PLUGIN, true, true));
+    steps.add(new Step(InstanceIdentifierDIPPlugin.class.getName(), DIP.class,
+      RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_DIP_PLUGIN, true, true));
+    steps
+      .add(new Step(InstanceIdentifierRepresentationInformationPlugin.class.getName(), RepresentationInformation.class,
+        RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_REPRESENTATION_INFORMATION_PLUGIN, true, true));
+    steps.add(new Step(InstanceIdentifierNotificationPlugin.class.getName(), Notification.class,
+      RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_NOTIFICATION_PLUGIN, true, true));
+    steps.add(new Step(InstanceIdentifierRiskPlugin.class.getName(), Risk.class,
+      RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_RISK_PLUGIN, true, true));
+    steps.add(new Step(InstanceIdentifierRiskIncidencePlugin.class.getName(), RiskIncidence.class,
+      RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_RISK_INCIDENCE_PLUGIN, true, true));
+    steps.add(new Step(InstanceIdentifierJobPlugin.class.getName(), Job.class,
+      RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_JOB_PLUGIN, true, true));
+    steps.add(new Step(InstanceIdentifierRepositoryEventPlugin.class.getName(), PreservationMetadata.class,
+      RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_REPOSITORY_EVENT_PLUGIN, true, true));
+    steps.add(new Step(InstanceIdentifierPreservationAgentPlugin.class.getName(), PreservationMetadata.class,
+      RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_PRESERVATION_AGENT_PLUGIN, true, true));
+    steps
+      .add(new Step(RegisterPlugin.class.getName(), null, RodaConstants.PLUGIN_PARAMS_DO_REGISTER_PLUGIN, true, true));
   }
 
   @Override
   public List<PluginParameter> getParameters() {
-    final ArrayList<PluginParameter> pluginParameters = new ArrayList<>();
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_AIP_PLUGIN));
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_AIP_EVENT_PLUGIN));
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_DIP_PLUGIN));
-    pluginParameters
+    final ArrayList<PluginParameter> parameters = new ArrayList<>();
+    parameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_AIP_PLUGIN));
+    parameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_AIP_EVENT_PLUGIN));
+    parameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_DIP_PLUGIN));
+    parameters
       .add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_REPRESENTATION_INFORMATION_PLUGIN));
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_NOTIFICATION_PLUGIN));
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_RISK_PLUGIN));
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_RISK_INCIDENCE_PLUGIN));
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_JOB_PLUGIN));
-    pluginParameters
-      .add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_REPOSITORY_EVENT_PLUGIN));
-    pluginParameters
-      .add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_PRESERVATION_AGENT_PLUGIN));
-    return pluginParameters;
+    parameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_NOTIFICATION_PLUGIN));
+    parameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_RISK_PLUGIN));
+    parameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_RISK_INCIDENCE_PLUGIN));
+    parameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_JOB_PLUGIN));
+    parameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_REPOSITORY_EVENT_PLUGIN));
+    parameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_PRESERVATION_AGENT_PLUGIN));
+    parameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REGISTER_PLUGIN));
+    return parameters;
   }
 
   @Override

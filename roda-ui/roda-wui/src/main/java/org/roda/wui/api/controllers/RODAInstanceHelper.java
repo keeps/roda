@@ -49,7 +49,6 @@ public class RODAInstanceHelper {
     return RodaCoreFactory.getModelService().createDistributedInstance(distributedInstance, user.getName());
   }
 
-  // TODO: Rename this method to register
   public static void applyInstanceIdToRodaObject(LocalInstance localInstance, User user, boolean doRegister)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     Map<String, String> pluginParameters = new HashMap<>();
