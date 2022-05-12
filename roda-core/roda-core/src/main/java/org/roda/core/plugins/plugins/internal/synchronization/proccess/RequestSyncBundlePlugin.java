@@ -25,6 +25,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.synchronization.SynchronizingStatus;
 import org.roda.core.data.v2.synchronization.bundle.v2.BundleManifest;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
@@ -245,7 +246,13 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    return null;
+    try {
+      localInstance.setStatus(SynchronizingStatus.ACTIVE);
+      RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
+    } catch (GenericException e) {
+      throw new PluginException(e);
+    }
+    return new Report();
   }
 
   @Override

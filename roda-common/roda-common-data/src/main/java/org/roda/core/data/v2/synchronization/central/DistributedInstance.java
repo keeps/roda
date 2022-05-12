@@ -4,6 +4,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.synchronization.RODAInstance;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.roda.core.data.v2.synchronization.SynchronizingStatus;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -16,10 +17,9 @@ public class DistributedInstance extends RODAInstance {
   private String description;
   private String accessKeyId;
   private String username;
-  private DistributedInstanceStatus status;
 
   public DistributedInstance() {
-    status = DistributedInstanceStatus.CREATED;
+    setStatus(SynchronizingStatus.CREATED);
     setLastSynchronizationDate(null);
     cleanEntitySummaryList();
   }
@@ -30,14 +30,6 @@ public class DistributedInstance extends RODAInstance {
 
   public void setDescription(String description) {
     this.description = description;
-  }
-
-  public DistributedInstanceStatus getStatus() {
-    return this.status;
-  }
-
-  public void setStatus(DistributedInstanceStatus status) {
-    this.status = status;
   }
 
   public String getAccessKeyId() {
@@ -78,7 +70,7 @@ public class DistributedInstance extends RODAInstance {
     if (getLastSynchronizationDate() != null ? !getLastSynchronizationDate().equals(that.getLastSynchronizationDate())
       : that.getLastSynchronizationDate() != null)
       return false;
-    if (status != that.status)
+    if (getStatus() != that.getStatus())
       return false;
     if (getCreatedOn() != null ? !getCreatedOn().equals(that.getCreatedOn()) : that.getCreatedOn() != null)
       return false;
@@ -97,7 +89,7 @@ public class DistributedInstance extends RODAInstance {
     result = 31 * result + (accessKeyId != null ? accessKeyId.hashCode() : 0);
     result = 31 * result + (username != null ? username.hashCode() : 0);
     result = 31 * result + (getLastSynchronizationDate() != null ? getLastSynchronizationDate().hashCode() : 0);
-    result = 31 * result + (status != null ? status.hashCode() : 0);
+    result = 31 * result + (getStatus() != null ? getStatus().hashCode() : 0);
     result = 31 * result + (getCreatedOn() != null ? getCreatedOn().hashCode() : 0);
     result = 31 * result + (getCreatedBy() != null ? getCreatedBy().hashCode() : 0);
     result = 31 * result + (getUpdatedOn() != null ? getUpdatedOn().hashCode() : 0);
@@ -109,7 +101,7 @@ public class DistributedInstance extends RODAInstance {
   public String toString() {
     return "DistributedInstance{" + "id='" + getId() + '\'' + ", name='" + getName() + '\'' + ", description='"
       + description + '\'' + ", accessKeyId='" + accessKeyId + '\'' + ", username='" + username + '\''
-      + ", lastSyncDate=" + getLastSynchronizationDate() + ", status=" + status + ", createdOn=" + getCreatedOn()
+      + ", lastSyncDate=" + getLastSynchronizationDate() + ", status=" + getStatus() + ", createdOn=" + getCreatedOn()
       + ", createdBy='" + getCreatedBy() + '\'' + ", updatedOn=" + getUpdatedOn() + ", updatedBy='" + getUpdatedBy()
       + '\'' + '}';
   }

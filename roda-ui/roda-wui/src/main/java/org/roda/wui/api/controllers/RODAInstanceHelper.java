@@ -14,7 +14,12 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.SyncUtils;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.*;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IllegalOperationException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -26,6 +31,7 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.synchronization.SynchronizingStatus;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
@@ -63,6 +69,8 @@ public class RODAInstanceHelper {
 
   public static Job synchronizeBundle(User user, LocalInstance localInstance)
     throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException {
+    localInstance.setStatus(SynchronizingStatus.SYNCHRONIZING);
+    RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
     return BrowserHelper.createAndExecuteInternalJob("Synchronize bundle", SelectedItemsNone.create(),
       SynchronizeInstancePlugin.class, user, new HashMap<>(), "Could not execute bundle job");
   }

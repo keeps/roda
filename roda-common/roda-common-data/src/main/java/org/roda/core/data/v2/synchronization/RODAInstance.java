@@ -25,6 +25,8 @@ public abstract class RODAInstance implements IsModelObject {
   private Date updatedOn;
   private String updatedBy;
 
+  private SynchronizingStatus status;
+
   private List<EntitySummary> entitySummaryList;
 
   @Override
@@ -90,6 +92,14 @@ public abstract class RODAInstance implements IsModelObject {
 
   public void setEntitySummaryList(List<EntitySummary> entitySummaryList) {
     this.entitySummaryList = entitySummaryList;
+  }
+
+  public SynchronizingStatus getStatus() {
+    return this.status;
+  }
+
+  public void setStatus(SynchronizingStatus status) {
+    this.status = status;
   }
 
   @JsonIgnore
