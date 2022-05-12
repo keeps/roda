@@ -428,5 +428,5 @@ public interface BrowserServiceAsync {
 
   void synchronizeBundle(LocalInstance localInstance, AsyncCallback<Job> async);
   
-  void modifyInstanceIdOnRepository(LocalInstance localInstance, AsyncCallback<Job> async);
+  void removeLocalConfiguration(LocalInstance localInstance, AsyncCallback<Job> async);
 }

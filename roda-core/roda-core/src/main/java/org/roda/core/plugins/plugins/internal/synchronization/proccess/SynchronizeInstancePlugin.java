@@ -111,19 +111,17 @@ public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAO
 
   @Override
   public List<PluginParameter> getParameters() {
-    final ArrayList<PluginParameter> pluginParameters = new ArrayList<>();
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AIP_PACKAGE_PLUGIN));
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_JOB_PACKAGE_PLUGIN));
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DIP_PACKAGE_PLUGIN));
-    pluginParameters
-            .add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_RISK_INCIDENCE_PACKAGE_PLUGIN));
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REPOSITORY_EVENT_PACKAGE_PLUGIN));
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_PRESERVATION_AGENT_PACKAGE_PLUGIN));
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_BUILD_SYNC_MANIFEST_PLUGIN));
-    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_SEND_SYNC_BUNDLE_PLUGIN));
-    pluginParameters
-            .add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REQUEST_SYNC_BUNDLE_PLUGIN));
-    return pluginParameters;
+    final ArrayList<PluginParameter> parameters = new ArrayList<>();
+    parameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AIP_PACKAGE_PLUGIN));
+    parameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_JOB_PACKAGE_PLUGIN));
+    parameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DIP_PACKAGE_PLUGIN));
+    parameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_RISK_INCIDENCE_PACKAGE_PLUGIN));
+    parameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REPOSITORY_EVENT_PACKAGE_PLUGIN));
+    parameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_PRESERVATION_AGENT_PACKAGE_PLUGIN));
+    parameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_BUILD_SYNC_MANIFEST_PLUGIN));
+    parameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_SEND_SYNC_BUNDLE_PLUGIN));
+    parameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REQUEST_SYNC_BUNDLE_PLUGIN));
+    return parameters;
   }
 
   @Override
