@@ -93,9 +93,12 @@ public class Step {
   }
 
   public void execute(MultipleStepBundle bundle) throws JobException {
-    MutipleStepUtils.executePlugin(bundle, this);
-    PluginHelper.updateJobInformationAsync(bundle.getPlugin(),
-      bundle.getJobPluginInfo().incrementStepsCompletedByOne());
+    if (PluginHelper.verifyIfStepShouldBePerformed(bundle.getPlugin(), bundle.getPluginParameter(),
+      !this.usesCorePlugin ? this.getPluginName() : null)) {
+      MutipleStepUtils.executePlugin(bundle, this);
+      PluginHelper.updateJobInformationAsync(bundle.getPlugin(),
+        bundle.getJobPluginInfo().incrementStepsCompletedByOne());
+    }
   }
 
 }
