@@ -27,6 +27,7 @@ public class BrowseFileBundle implements Bundle {
   private Long riskIncidenceCount;
   private Long preservationEventCount;
   private String instanceName;
+  private Boolean isAvailable;
 
   public BrowseFileBundle() {
     super();
@@ -112,4 +113,11 @@ public class BrowseFileBundle implements Bundle {
     this.instanceName = instanceName;
   }
 
+  public Boolean isAvailable() {
+    return isAvailable;
+  }
+
+  public void setAvailable(Boolean isAvailable) {
+    this.isAvailable = isAvailable;
+  }
 }

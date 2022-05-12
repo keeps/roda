@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.io.FilenameUtils;
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -40,7 +39,6 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.protocols.Protocol;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.ExternalFileManifestContentPayload;
 import org.roda.core.storage.StorageService;
@@ -351,34 +349,26 @@ public class EARKSIP2ToAIPPluginUtils {
 
   private static ContentPayload processIPFileShallow(String aipId, String representationId, IPFileShallow file)
     throws GenericException {
-    ContentPayload contentPayload = null;
-    final Protocol protocol = RodaCoreFactory.getProtocol(file.getFileLocation());
-    if (protocol.isAvailable()) {
-      try {
-        final String decode = URLDecoder.decode(file.getFileLocation().toString(), "UTF-8");
-        FileType fileType = file.getFileType();
-        ShallowFile shallowFile = new ShallowFile();
-        shallowFile.setName(FilenameUtils.getName(decode));
-        shallowFile.setUUID(IdUtils.getFileId(aipId, representationId, null, shallowFile.getName()));
-        shallowFile.setLocation(file.getFileLocation());
-        shallowFile.setSize(fileType.getSIZE());
-        shallowFile.setCreated(fileType.getCREATED());
-        shallowFile.setMimeType(fileType.getMIMETYPE());
-        shallowFile.setChecksum(fileType.getCHECKSUM());
-        shallowFile.setChecksumType(fileType.getCHECKSUMTYPE());
+    try {
+      final String decode = URLDecoder.decode(file.getFileLocation().toString(), "UTF-8");
+      FileType fileType = file.getFileType();
+      ShallowFile shallowFile = new ShallowFile();
+      shallowFile.setName(FilenameUtils.getName(decode));
+      shallowFile.setUUID(IdUtils.getFileId(aipId, representationId, null, shallowFile.getName()));
+      shallowFile.setLocation(file.getFileLocation());
+      shallowFile.setSize(fileType.getSIZE());
+      shallowFile.setCreated(fileType.getCREATED());
+      shallowFile.setMimeType(fileType.getMIMETYPE());
+      shallowFile.setChecksum(fileType.getCHECKSUM());
+      shallowFile.setChecksumType(fileType.getCHECKSUMTYPE());
 
-        ShallowFiles shallowFiles = new ShallowFiles();
-        shallowFiles.addObject(shallowFile);
-        contentPayload = new ExternalFileManifestContentPayload(shallowFiles);
+      ShallowFiles shallowFiles = new ShallowFiles();
+      shallowFiles.addObject(shallowFile);
+      return new ExternalFileManifestContentPayload(shallowFiles);
 
-      } catch (final UnsupportedEncodingException e) {
-        throw new GenericException("Unable to identify the resource name", e);
-      }
-    } else {
-      LOGGER.error("The protocol {} ({}) isn't available to {}", protocol.getName(), protocol.getVersion(),
-        file.getFileLocation());
+    } catch (final UnsupportedEncodingException e) {
+      throw new GenericException("Unable to identify the resource name", e);
     }
-    return contentPayload;
   }
 
   private static String getType(SIP sip) {

@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -163,6 +165,7 @@ import org.roda.core.plugins.plugins.internal.disposal.hold.LiftDisposalHoldPlug
 import org.roda.core.plugins.plugins.internal.disposal.rules.ApplyDisposalRulesPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.schedule.AssociateDisposalScheduleToAIPPlugin;
 import org.roda.core.plugins.plugins.internal.disposal.schedule.DisassociateDisposalScheduleToAIPPlugin;
+import org.roda.core.protocols.Protocol;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
 import org.roda.core.storage.BinaryVersion;
@@ -444,12 +447,35 @@ public class BrowserHelper {
       bundle.setRepresentationInformationFields(Collections.emptyList());
     }
 
+    if (file.isReference()) {
+      bundle.setAvailable(isShallowFileAvailable(file.getUUID()));
+    } else {
+      bundle.setAvailable(true);
+    }
+
     try {
       bundle.setInstanceName(retrieveDistributedInstanceName(aip.getInstanceId()));
     } catch (AuthorizationDeniedException e) {
       LOGGER.warn("Do not have Authorization", e);
     }
     return bundle;
+  }
+
+  private static Boolean isShallowFileAvailable(String fileUUID) {
+    IndexService index = RodaCoreFactory.getIndexService();
+    try {
+      IndexedFile indexedFile = index.retrieve(IndexedFile.class, fileUUID, new ArrayList<>());
+      if (indexedFile.isReference()) {
+        String referenceURL = indexedFile.getReferenceURL();
+        final Protocol protocol = RodaCoreFactory.getProtocol(new URI(referenceURL));
+        return protocol.isAvailable();
+      }
+    } catch (URISyntaxException e) {
+      LOGGER.warn("Cannot convet referenceURL to URI: " + fileUUID);
+    } catch (GenericException | NotFoundException e) {
+      LOGGER.warn("File is not available: " + fileUUID);
+    }
+    return false;
   }
 
   private static String retrieveDistributedInstanceName(String instanceId)

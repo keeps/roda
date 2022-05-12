@@ -37,11 +37,11 @@ public class IndexedFilePreview extends BitstreamPreview<IndexedFile> {
 
   private SearchWrapper searchWrapper = null;
 
-  public IndexedFilePreview(Viewers viewers, IndexedFile file, boolean justActive, Permissions permissions,
+  public IndexedFilePreview(Viewers viewers, IndexedFile file, boolean isAvailable, boolean justActive, Permissions permissions,
     Command onPreviewFailure) {
     super(viewers, RestUtils.createRepresentationFileDownloadUri(file.getUUID(), CONTENT_DISPOSITION_INLINE),
       file.getFileFormat(), file.getOriginalName() != null ? file.getOriginalName() : file.getId(), file.getSize(),
-      file.isDirectory(), onPreviewFailure, file, justActive, permissions);
+      file.isDirectory(), isAvailable, onPreviewFailure, file, justActive, permissions);
   }
 
   @Override
