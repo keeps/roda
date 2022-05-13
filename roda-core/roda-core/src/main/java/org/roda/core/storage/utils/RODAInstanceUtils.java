@@ -12,8 +12,8 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.utils.YamlUtils;
+import org.roda.core.data.v2.synchronization.SynchronizingStatus;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
-import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;
@@ -24,32 +24,20 @@ import org.roda.core.model.ModelService;
 
 public class RODAInstanceUtils {
 
-
   private static Path getLocalInstanceConfigFile() {
-    return RodaCoreFactory.getConfigPath()
-        .resolve(RodaConstants.SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FOLDER)
-        .resolve(RodaConstants.SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE);
+    return RodaCoreFactory.getConfigPath().resolve(RodaConstants.SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FOLDER)
+      .resolve(RodaConstants.SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE);
   }
 
   public static String getLocalInstanceIdentifier() {
     try {
       Path configFile = getLocalInstanceConfigFile();
       LocalInstance localInstance = YamlUtils.readObjectFromFile(configFile, LocalInstance.class);
-      if (localInstance.getInstanceIdentifierState().equals(LocalInstanceIdentifierState.INACTIVE)) {
+      if (localInstance.getStatus().equals(SynchronizingStatus.INACTIVE)) {
         return null;
       } else {
         return localInstance.getId();
       }
-    } catch (GenericException e) {
-      return null;
-    }
-  }
-
-  public static LocalInstanceIdentifierState getLocalInstanceState() {
-    try {
-      Path configFile = getLocalInstanceConfigFile();
-      LocalInstance localInstance = YamlUtils.readObjectFromFile(configFile, LocalInstance.class);
-      return localInstance.getInstanceIdentifierState();
     } catch (GenericException e) {
       return null;
     }
