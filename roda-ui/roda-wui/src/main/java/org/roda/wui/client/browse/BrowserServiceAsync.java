@@ -201,11 +201,11 @@ public interface BrowserServiceAsync {
 
   void deleteRiskIncidences(SelectedItems<RiskIncidence> selected, String details, AsyncCallback<Job> asyncCallback);
 
-  void createProcess(String jobName, JobPriority priority, JobParallelism parallelism, SelectedItems<?> selected, String id,
-                     Map<String, String> value, String selectedClass, AsyncCallback<List<Job>> asyncCallback);
+  void createProcess(String jobName, JobPriority priority, JobParallelism parallelism, SelectedItems<?> selected,
+    String id, Map<String, String> value, String selectedClass, AsyncCallback<Job> asyncCallback);
 
   void createProcess(String jobName, SelectedItems<?> selected, String id, Map<String, String> value,
-    String selectedClass, AsyncCallback<List<Job>> asyncCallback);
+    String selectedClass, AsyncCallback<Job> asyncCallback);
 
   void createProcessJson(String jobName, JobPriority priority, JobParallelism parallelism, SelectedItems<?> selected,
     String id, Map<String, String> value, String selectedClass, AsyncCallback<String> asyncCallback);
@@ -427,6 +427,6 @@ public interface BrowserServiceAsync {
   void registerLocalInstance(LocalInstance localInstance, AsyncCallback<LocalInstance> async);
 
   void synchronizeBundle(LocalInstance localInstance, AsyncCallback<Job> async);
-  
+
   void removeLocalConfiguration(LocalInstance localInstance, AsyncCallback<Job> async);
 }

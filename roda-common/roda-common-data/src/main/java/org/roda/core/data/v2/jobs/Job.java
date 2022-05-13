@@ -27,7 +27,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
@@ -60,7 +59,7 @@ public class Job implements IsModelObject, IsIndexed, HasId {
   // job instance id
   private String instanceId = null;
 
-  private List<JobUserDetails> jobUsersDetails= new ArrayList<>();
+  private List<JobUserDetails> jobUsersDetails = new ArrayList<>();
   private String instanceName = null;
 
   // job statistics (total source objects, etc.)
@@ -153,7 +152,6 @@ public class Job implements IsModelObject, IsIndexed, HasId {
   public void setJobUsersDetails(List<JobUserDetails> jobUserDetails) {
     this.jobUsersDetails = jobUserDetails;
   }
-
 
   public Date getStartDate() {
     return startDate;
@@ -312,7 +310,7 @@ public class Job implements IsModelObject, IsIndexed, HasId {
 
   @Override
   public String toString() {
-    return "Job [id=" + id + ", name=" + name + ", username=" + username +  ", startDate=" + startDate + ", endDate="
+    return "Job [id=" + id + ", name=" + name + ", username=" + username + ", startDate=" + startDate + ", endDate="
       + endDate + ", state=" + state + ", stateDetails=" + stateDetails + ", priority=" + priority + ", type="
       + parallelism + ", jobStats=" + jobStats + ", plugin=" + plugin + ", pluginType=" + pluginType
       + ", pluginParameters=" + pluginParameters + ", sourceObjects=" + sourceObjects + ", outcomeObjectsClass="
@@ -358,4 +356,33 @@ public class Job implements IsModelObject, IsIndexed, HasId {
     this.fields = fields;
   }
 
+  public Job clone() {
+    final Job newJob = new Job();
+    newJob.setName(getName());
+    newJob.setUsername(getUsername());
+    newJob.setInstanceName(getInstanceName());
+    newJob.setStartDate(getStartDate());
+    newJob.setEndDate(getEndDate());
+    newJob.setJobUsersDetails(getJobUsersDetails());
+    newJob.setPluginType(getPluginType());
+    newJob.setPlugin(getPlugin());
+    newJob.setPluginParameters(getPluginParameters());
+    newJob.setPriority(getPriority());
+    newJob.setParallelism(getParallelism());
+    newJob.setState(getState());
+    newJob.setJobUsersDetails(getJobUsersDetails());
+    newJob.setStateDetails(getStateDetails());
+    newJob.setSourceObjects(getSourceObjects());
+    newJob.setOutcomeObjectsClass(getOutcomeObjectsClass());
+    newJob.getJobStats().setCompletionPercentage(getJobStats().getCompletionPercentage());
+    newJob.getJobStats().setSourceObjectsBeingProcessed(getJobStats().getSourceObjectsBeingProcessed());
+    newJob.getJobStats().setOutcomeObjectsWithManualIntervention(getJobStats().getOutcomeObjectsWithManualIntervention());
+    newJob.getJobStats().setSourceObjectsCount(getJobStats().getSourceObjectsCount());
+    newJob.getJobStats().setSourceObjectsProcessedWithPartialSuccess(getJobStats().getSourceObjectsProcessedWithPartialSuccess());
+    newJob.getJobStats().setSourceObjectsProcessedWithSkipped(getJobStats().getSourceObjectsProcessedWithSkipped());
+    newJob.getJobStats().setSourceObjectsProcessedWithSuccess(getJobStats().getSourceObjectsProcessedWithSuccess());
+    newJob.getJobStats().setSourceObjectsProcessedWithFailure(getJobStats().getSourceObjectsProcessedWithFailure());
+    newJob.getJobStats().setSourceObjectsWaitingToBeProcessed(getJobStats().getSourceObjectsWaitingToBeProcessed());
+    return newJob;
+  }
 }

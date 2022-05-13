@@ -139,8 +139,8 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public <T extends IsRODAObject, T1 extends IsIndexed> void runPluginFromIndex(Object context, Job job, Class<T1> classToActOn,
-    Filter filter, Boolean justActive, Plugin<T> plugin) {
+  public <T extends IsRODAObject, T1 extends IsIndexed> void runPluginFromIndex(Object context, Job job,
+    Class<T1> classToActOn, Filter filter, Boolean justActive, Plugin<T> plugin) {
     // do nothing
   }
 
@@ -151,6 +151,11 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
 
   @Override
   public void executeJob(Job job, boolean async) throws JobAlreadyStartedException {
+    // do nothing
+  }
+
+  @Override
+  public void createAndExecuteJobs(Job job, boolean async) throws JobAlreadyStartedException {
     // do nothing
   }
 
@@ -181,13 +186,14 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public <T extends IsRODAObject> void runPluginOnAllObjects(Object context, Plugin<T> plugin, Job job, Class<T> objectClass) {
+  public <T extends IsRODAObject> void runPluginOnAllObjects(Object context, Plugin<T> plugin, Job job,
+    Class<T> objectClass) {
     // do nothing
   }
 
   @Override
-  public <T extends IsRODAObject> void runPluginOnObjects(Object context, Job job, Plugin<T> plugin, Class<T> objectClass,
-    List<String> uuids) {
+  public <T extends IsRODAObject> void runPluginOnObjects(Object context, Job job, Plugin<T> plugin,
+    Class<T> objectClass, List<String> uuids) {
     // do nothing
   }
 
