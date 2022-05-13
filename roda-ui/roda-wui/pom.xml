@@ -143,6 +143,52 @@
             </build>
         </profile>
         <profile>
+            <id>debug-main-local</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <version>${springboot.version}</version>
+                        <configuration>
+                            <skip>false</skip>
+                            <directories>
+                                <directory>${project.build.directory}/${project.build.finalName}</directory>
+                            </directories>
+                            <jvmArguments>
+                                -Dserver.port=8082
+                                -Droda.distributed.mode.type=LOCAL
+                                -Droda.home=${env.HOME}/.roda_local
+                                -Dgwt.codeServerPort=9876 -Xdebug
+                                -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5007
+                            </jvmArguments>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>net.ltgt.gwt.maven</groupId>
+                        <artifactId>gwt-maven-plugin</artifactId>
+                        <extensions>true</extensions>
+                        <configuration>
+                            <moduleName>${gwt.module.main}</moduleName>
+                            <launcherDir>${project.build.directory}/${project.build.finalName}</launcherDir>
+
+                            <classpathScope>compile+runtime</classpathScope>
+                            <skipCompilation>false</skipCompilation>
+                            <draftCompile>true</draftCompile>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>compile</goal>
+                                    <goal>test</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>debug-main-central</id>
             <build>
                 <plugins>
