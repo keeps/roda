@@ -115,8 +115,7 @@ public final class TestsHelper {
     job.setSourceObjects(selectedItems);
     job.setUsername(user);
     try {
-      RodaCoreFactory.getModelService().createJob(job);
-      RodaCoreFactory.getPluginOrchestrator().executeJob(job, false);
+      RodaCoreFactory.getPluginOrchestrator().createAndExecuteJobs(job, false);
     } catch (Exception e) {
       AssertJUnit.fail("Unable to execute job in test mode: [" + e.getClass().getName() + "] " + e.getMessage());
     }
@@ -145,8 +144,7 @@ public final class TestsHelper {
     job.setSourceObjects(selectedItems);
     job.setUsername(RodaConstants.ADMIN);
     try {
-      RodaCoreFactory.getModelService().createJob(job);
-      RodaCoreFactory.getPluginOrchestrator().executeJob(job, false);
+      RodaCoreFactory.getPluginOrchestrator().createAndExecuteJobs(job, false);
     } catch (Exception e) {
       AssertJUnit.fail("Unable to execute job in test mode: [" + e.getClass().getName() + "] " + e.getMessage());
     }

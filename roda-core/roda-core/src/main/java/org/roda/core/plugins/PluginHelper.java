@@ -1492,8 +1492,7 @@ public final class PluginHelper {
 
   public static void createAndExecuteJob(Job job) throws GenericException, JobAlreadyStartedException,
     RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    RodaCoreFactory.getModelService().createJob(job);
-    RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
+    RodaCoreFactory.getPluginOrchestrator().createAndExecuteJobs(job,true);
     RodaCoreFactory.getIndexService().commit(Job.class);
   }
 

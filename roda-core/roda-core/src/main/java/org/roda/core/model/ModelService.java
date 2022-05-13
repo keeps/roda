@@ -2423,12 +2423,10 @@ public class ModelService extends ModelObservable {
     if (job.getInstanceId() == null) {
       job.setInstanceId(RODAInstanceUtils.getLocalInstanceIdentifier());
     }
-
     // create or update job in storage
     String jobAsJson = JsonUtils.getJsonFromObject(job);
     StoragePath jobPath = ModelUtils.getJobStoragePath(job.getId());
     storage.updateBinaryContent(jobPath, new StringContentPayload(jobAsJson), false, true);
-
     // index it
     notifyJobCreatedOrUpdated(job, false).failOnError();
   }

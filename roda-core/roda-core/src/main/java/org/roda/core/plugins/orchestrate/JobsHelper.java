@@ -36,6 +36,8 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIP;
@@ -60,6 +62,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -638,6 +641,59 @@ public final class JobsHelper {
       LOGGER.error("Error while creating job attachments directory (path='{}')", path);
     } catch (AlreadyExistsException e) {
       // do nothing
+    }
+  }
+
+  public static HashMap<String, SelectedItems<?>> splitInstancesItems(SelectedItems<?> selectedItems)
+    throws NotFoundException, GenericException, RequestNotValidException {
+    IndexService index = RodaCoreFactory.getIndexService();
+    HashMap<String, SelectedItems<?>> instancesItems = new HashMap<>();
+
+    if (selectedItems instanceof SelectedItemsList) {
+      SelectedItemsList<?> items = (SelectedItemsList<?>) selectedItems;
+
+      List<String> idsList = items.getIds();
+      String itemsClass = items.getSelectedClass();
+
+      for (String id : idsList) {
+        if (itemsClass.equals(IndexedFile.class.getName())) {
+          IndexedFile indexedFile = index.retrieve(IndexedFile.class, id, Collections.emptyList());
+          addItemToInstancesItems(instancesItems, itemsClass, id, indexedFile.getInstanceId());
+        } else if (itemsClass.equals(IndexedRepresentation.class.getName())) {
+          IndexedRepresentation indexedRepresentation = index.retrieve(IndexedRepresentation.class, id,
+            Collections.emptyList());
+          addItemToInstancesItems(instancesItems, itemsClass, id, indexedRepresentation.getInstanceId());
+        } else if (itemsClass.equals(IndexedAIP.class.getName())) {
+          IndexedAIP indexedAIP = index.retrieve(IndexedAIP.class, id, Collections.emptyList());
+          addItemToInstancesItems(instancesItems, itemsClass, id, indexedAIP.getInstanceId());
+        } else {
+          addItemToInstancesItems(instancesItems, itemsClass, id, RODAInstanceUtils.getLocalInstanceIdentifier());
+        }
+      }
+    } else {
+      // TODO tfraga: change this logic
+      instancesItems.put(null, selectedItems);
+    }
+
+    return instancesItems;
+  }
+
+  private static void addItemToInstancesItems(HashMap<String, SelectedItems<?>> instancesItems, String itemsClass,
+    String id, String instanceId) {
+    SelectedItemsList<? extends IsRODAObject> items = (SelectedItemsList<?>) instancesItems.get(instanceId);
+
+    if (items == null) {
+      items = new SelectedItemsList<>();
+      items.setSelectedClass(itemsClass);
+      List<String> list = items.getIds();
+      list.add(id);
+      items.setIds(list);
+      instancesItems.put(instanceId, items);
+    } else {
+      List<String> list = items.getIds();
+      list.add(id);
+      items.setIds(list);
+      instancesItems.replace(instanceId, items);
     }
   }
 }

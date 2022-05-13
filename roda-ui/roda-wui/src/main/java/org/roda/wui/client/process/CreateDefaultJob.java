@@ -199,7 +199,8 @@ public class CreateDefaultJob extends Composite {
 
   public CreateDefaultJob() {
     highPriorityRadioButton = new RadioButton("priority", HtmlSnippetUtils.getJobPriorityHtml(JobPriority.HIGH, false));
-    mediumPriorityRadioButton = new RadioButton("priority", HtmlSnippetUtils.getJobPriorityHtml(JobPriority.MEDIUM, false));
+    mediumPriorityRadioButton = new RadioButton("priority",
+      HtmlSnippetUtils.getJobPriorityHtml(JobPriority.MEDIUM, false));
     lowPriorityRadioButton = new RadioButton("priority", HtmlSnippetUtils.getJobPriorityHtml(JobPriority.LOW, false));
     normalParallelismRadioButton = new RadioButton("parallelism",
       HtmlSnippetUtils.getJobParallelismTypeHtml(JobParallelism.NORMAL, false));
@@ -539,7 +540,7 @@ public class CreateDefaultJob extends Composite {
 
     BrowserService.Util.getInstance().createProcess(jobName, priority, parallelism, selected,
       getSelectedPlugin().getId(), getWorkflowOptions().getValue(), selected.getSelectedClass(),
-      new AsyncCallback<List<Job>>() {
+      new AsyncCallback<Job>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -548,7 +549,7 @@ public class CreateDefaultJob extends Composite {
         }
 
         @Override
-        public void onSuccess(List<Job> result) {
+        public void onSuccess(Job result) {
           Toast.showInfo(messages.dialogDone(), messages.processCreated());
           HistoryUtils.newHistory(ActionProcess.RESOLVER);
         }

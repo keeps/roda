@@ -1683,8 +1683,7 @@ public class BrowserHelper {
     job.setParallelism(getJobParallelismFromConfiguration());
 
     try {
-      RodaCoreFactory.getModelService().createJob(job);
-      RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
+      RodaCoreFactory.getPluginOrchestrator().createAndExecuteJobs(job, true);
     } catch (JobAlreadyStartedException e) {
       LOGGER.error(exceptionMessage, e);
     }

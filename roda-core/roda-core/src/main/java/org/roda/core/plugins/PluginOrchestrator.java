@@ -33,13 +33,14 @@ public interface PluginOrchestrator {
 
   public void shutdown();
 
-  public <T extends IsRODAObject, T1 extends IsIndexed> void runPluginFromIndex(Object context, Job job, Class<T1> classToActOn,
-    Filter filter, Boolean justActive ,Plugin<T> plugin);
+  public <T extends IsRODAObject, T1 extends IsIndexed> void runPluginFromIndex(Object context, Job job,
+    Class<T1> classToActOn, Filter filter, Boolean justActive, Plugin<T> plugin);
 
-  public <T extends IsRODAObject> void runPluginOnObjects(Object context, Job job, Plugin<T> plugin, Class<T> objectClass,
-    List<String> uuids);
+  public <T extends IsRODAObject> void runPluginOnObjects(Object context, Job job, Plugin<T> plugin,
+    Class<T> objectClass, List<String> uuids);
 
-  public <T extends IsRODAObject> void runPluginOnAllObjects(Object context, Plugin<T> plugin, Job job, Class<T> objectClass);
+  public <T extends IsRODAObject> void runPluginOnAllObjects(Object context, Plugin<T> plugin, Job job,
+    Class<T> objectClass);
 
   public <T extends IsRODAObject> void runPlugin(Object context, Plugin<T> plugin, Job job);
 
@@ -49,6 +50,8 @@ public interface PluginOrchestrator {
    */
   /** 201603 hsilva: only tests should invoke this method synchronously */
   public void executeJob(Job job, boolean async) throws JobAlreadyStartedException;
+
+  public void createAndExecuteJobs(Job job, boolean async) throws JobAlreadyStartedException;
 
   /** 201712 hsilva: this method was known as stopJob */
   public void stopJobAsync(Job job);
