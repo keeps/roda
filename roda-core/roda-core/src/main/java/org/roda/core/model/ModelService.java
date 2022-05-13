@@ -81,6 +81,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.ShallowFile;
 import org.roda.core.data.v2.ip.ShallowFiles;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -1346,6 +1347,12 @@ public class ModelService extends ModelObservable {
 
     StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
     if (!storage.exists(fileStoragePath)) {
+      Path filePath = FSUtils.getEntityPath(RodaCoreFactory.getStoragePath(), fileStoragePath);
+      ShallowFile shallowFile = FSUtils.isResourcePresentOnManifestFile(filePath);
+      if (shallowFile != null) {
+        // TODO: Move shallow content
+        throw new GenericException("Cannot move shallow content: " + shallowFile.getLocation());
+      }
       throw new NotFoundException("File/folder '" + fileStoragePath.toString() + "' were moved or do not exist");
     }
 
