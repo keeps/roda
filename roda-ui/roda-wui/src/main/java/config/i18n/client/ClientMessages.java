@@ -2545,6 +2545,8 @@ public interface ClientMessages extends Messages {
 
   String localInstanceIdentifierState(@Select LocalInstanceIdentifierState state);
 
+  String synchronizingStatus(@Select SynchronizingStatus status);
+
   /** Access Key **/
 
   String addAccessKeyButton();
