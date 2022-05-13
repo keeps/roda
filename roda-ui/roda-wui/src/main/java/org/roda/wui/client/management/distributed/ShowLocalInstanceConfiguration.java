@@ -3,9 +3,8 @@ package org.roda.wui.client.management.distributed;
 import java.util.List;
 
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.synchronization.SynchronizingStatus;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
-import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
-import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
@@ -96,7 +95,7 @@ public class ShowLocalInstanceConfiguration extends Composite {
   HTML lastSyncValue;
 
   @UiField
-  HTML instanceIdStateValue;
+  HTML synchronizationStatusValue;
 
   public ShowLocalInstanceConfiguration(LocalInstance localInstance) {
     initWidget(uiBinder.createAndBindUi(this));
@@ -110,9 +109,9 @@ public class ShowLocalInstanceConfiguration extends Composite {
     centralInstanceURLValue.setText(localInstance.getCentralInstanceURL());
     isRegisteredValue.setText(localInstance.getIsRegistered().toString());
     lastSyncValue.setHTML(HtmlSnippetUtils.getLastSyncHtml(localInstance, false));
-    instanceIdStateValue.setHTML(HtmlSnippetUtils.getInstanceIdStateHtml(localInstance));
+    synchronizationStatusValue.setHTML(HtmlSnippetUtils.getInstanceIdStateHtml(localInstance));
     buttonSynchronize.setEnabled(false);
-    if (localInstance.getInstanceIdentifierState().equals(LocalInstanceIdentifierState.ACTIVE)) {
+    if (localInstance.getStatus().equals(SynchronizingStatus.ACTIVE)) {
       buttonSynchronize.setEnabled(true);
     }
   }

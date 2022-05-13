@@ -246,12 +246,6 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    try {
-      localInstance.setStatus(SynchronizingStatus.ACTIVE);
-      RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
-    } catch (GenericException e) {
-      throw new PluginException(e);
-    }
     return new Report();
   }
 

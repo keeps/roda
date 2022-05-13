@@ -123,7 +123,7 @@ public class RODAInstanceHelper {
     Long total = 0L;
 
     LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
-    if (localInstance != null) {
+    if (localInstance != null && SynchronizingStatus.ACTIVE.equals(localInstance.getStatus())) {
       Date fromDate = localInstance.getLastSynchronizationDate();
       Date toDate = new Date();
 
