@@ -4,6 +4,7 @@ import java.util.Objects;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.synchronization.RODAInstance;
+import org.roda.core.data.v2.synchronization.SynchronizingStatus;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -20,9 +21,8 @@ public class LocalInstance extends RODAInstance {
   private String centralInstanceURL;
   private Boolean isRegistered;
 
-  private LocalInstanceIdentifierState instanceIdentifierState = LocalInstanceIdentifierState.INACTIVE;
-
   public LocalInstance() {
+    setStatus(SynchronizingStatus.INACTIVE);
     isRegistered = false;
     cleanEntitySummaryList();
   }
@@ -51,14 +51,6 @@ public class LocalInstance extends RODAInstance {
     isRegistered = registered;
   }
 
-  public LocalInstanceIdentifierState getInstanceIdentifierState() {
-    return instanceIdentifierState;
-  }
-
-  public void setInstanceIdentifierState(LocalInstanceIdentifierState instanceIdentifierState) {
-    this.instanceIdentifierState = instanceIdentifierState;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -69,7 +61,6 @@ public class LocalInstance extends RODAInstance {
     return Objects.equals(getId(), that.getId()) && Objects.equals(accessKey, that.accessKey)
       && Objects.equals(centralInstanceURL, that.centralInstanceURL) && Objects.equals(isRegistered, that.isRegistered)
       && Objects.equals(getLastSynchronizationDate(), that.getLastSynchronizationDate())
-      && instanceIdentifierState == that.instanceIdentifierState && Objects.equals(getCreatedOn(), that.getCreatedOn())
       && Objects.equals(getCreatedBy(), that.getCreatedBy()) && Objects.equals(getUpdatedOn(), that.getUpdatedOn())
       && Objects.equals(getUpdatedBy(), that.getUpdatedBy());
   }

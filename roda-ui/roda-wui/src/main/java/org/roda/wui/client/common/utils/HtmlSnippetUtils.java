@@ -41,9 +41,9 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.risks.SeverityLevel;
 import org.roda.core.data.v2.synchronization.EntitySummary;
 import org.roda.core.data.v2.synchronization.RODAInstance;
+import org.roda.core.data.v2.synchronization.SynchronizingStatus;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
-import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.MetadataValue;
@@ -914,18 +914,18 @@ public class HtmlSnippetUtils {
     SafeHtml ret = null;
     if (localInstance != null) {
       SafeHtmlBuilder b = new SafeHtmlBuilder();
-      if (localInstance.getInstanceIdentifierState().equals(LocalInstanceIdentifierState.ACTIVE)) {
+      if (SynchronizingStatus.ACTIVE.equals(localInstance.getStatus())) {
         b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
-        b.append(
-          SafeHtmlUtils.fromString(messages.localInstanceIdentifierState(localInstance.getInstanceIdentifierState())));
-      } else if (localInstance.getInstanceIdentifierState().equals(LocalInstanceIdentifierState.RUNNING)) {
+        b.append(SafeHtmlUtils.fromString(messages.synchronizingStatus(localInstance.getStatus())));
+      } else if (SynchronizingStatus.APPLYINGIDENTIFIER.equals(localInstance.getStatus())) {
         b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO));
-        b.append(
-          SafeHtmlUtils.fromString(messages.localInstanceIdentifierState(localInstance.getInstanceIdentifierState())));
+        b.append(SafeHtmlUtils.fromString(messages.synchronizingStatus(localInstance.getStatus())));
+      } else if (localInstance.getStatus().equals(SynchronizingStatus.SYNCHRONIZING)) {
+        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING));
+        b.append(SafeHtmlUtils.fromString(messages.synchronizingStatus(localInstance.getStatus())));
       } else {
         b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT));
-        b.append(
-          SafeHtmlUtils.fromString(messages.localInstanceIdentifierState(localInstance.getInstanceIdentifierState())));
+        b.append(SafeHtmlUtils.fromString(messages.synchronizingStatus(localInstance.getStatus())));
       }
 
       b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
@@ -933,5 +933,4 @@ public class HtmlSnippetUtils {
     }
     return ret;
   }
-
 }
