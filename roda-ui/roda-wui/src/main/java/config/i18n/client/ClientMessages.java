@@ -25,7 +25,6 @@ import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.risks.IncidenceStatus;
 import org.roda.core.data.v2.risks.SeverityLevel;
 import org.roda.core.data.v2.synchronization.SynchronizingStatus;
-import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 
 import com.google.gwt.i18n.client.Messages;
@@ -2527,7 +2526,7 @@ public interface ClientMessages extends Messages {
 
   String localInstanceLastSyncDateLabel();
 
-  String localInstanceIdentifierStateLabel();
+  String synchronizationStatusLabel();
 
   String applyInstanceId();
 
@@ -2542,8 +2541,6 @@ public interface ClientMessages extends Messages {
   String removeInstanceIdFromRepository();
 
   String removeInstanceIdFromRepositoryMessage();
-
-  String localInstanceIdentifierState(@Select LocalInstanceIdentifierState state);
 
   String synchronizingStatus(@Select SynchronizingStatus status);
 

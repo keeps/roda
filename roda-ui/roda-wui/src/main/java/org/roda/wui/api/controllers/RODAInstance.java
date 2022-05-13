@@ -217,7 +217,7 @@ public class RODAInstance extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
     try {
       DistributedInstance distributedInstance = SyncUtils.requestInstanceStatus(RodaCoreFactory.getLocalInstance());
-      distributedInstance.setStatus(DistributedInstanceStatus.INACTIVE);
+      distributedInstance.setStatus(SynchronizingStatus.INACTIVE);
 
       SyncUtils.updateDistributedInstance(RodaCoreFactory.getLocalInstance(), distributedInstance);
 
@@ -283,8 +283,6 @@ public class RODAInstance extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
     try {
       RODAInstanceHelper.applyInstanceIdToRodaObject(localInstance, user, false);
-      localInstance.setStatus(SynchronizingStatus.ACTIVE);
-      RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -331,8 +329,7 @@ public class RODAInstance extends RodaWuiController {
     try {
       if (!SynchronizingStatus.ACTIVE.equals(localInstance.getStatus())) {
         state = LogEntryState.FAILURE;
-        throw new GenericException(
-          "The synchronize proccess already started. Cannot start another synchronize until finished the process.");
+        throw new GenericException("The instance isn't in Active state.");
       } else {
         return RODAInstanceHelper.synchronizeBundle(user, localInstance);
       }

@@ -20,8 +20,8 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.synchronization.SynchronizingStatus;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
-import org.roda.core.data.v2.synchronization.local.LocalInstanceIdentifierState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -177,7 +177,7 @@ public class RegisterPlugin extends AbstractPlugin<Void> {
       RESTClientUtility.sendPostRequest(localInstance, null, localInstance.getCentralInstanceURL(), resource,
         accessToken);
       localInstance.setIsRegistered(true);
-      localInstance.setInstanceIdentifierState(LocalInstanceIdentifierState.ACTIVE);
+      localInstance.setStatus(SynchronizingStatus.ACTIVE);
       RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
       jobPluginInfo.incrementObjectsProcessedWithSuccess();
       reportItem.setPluginState(PluginState.SUCCESS);
