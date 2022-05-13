@@ -27,6 +27,7 @@ public class LocalInstance extends RODAInstance {
     cleanEntitySummaryList();
   }
 
+
   public String getAccessKey() {
     return accessKey;
   }

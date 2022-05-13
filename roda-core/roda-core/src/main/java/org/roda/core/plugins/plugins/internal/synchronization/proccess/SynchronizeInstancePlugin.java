@@ -26,6 +26,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.core.data.v2.synchronization.SynchronizingStatus;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
@@ -218,15 +219,18 @@ public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAO
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_BUNDLE_WORKING_PATH)) {
-      try {
-        LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
+    try {
+      LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
+      if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_BUNDLE_WORKING_PATH)) {
         Path workingDir = SyncUtils.getBundleWorkingDirectory(localInstance.getId());
         Files.deleteIfExists(workingDir);
-      } catch (GenericException | IOException e) {
-        LOGGER.warn("Failed to delete working dir: " + e.getMessage());
       }
+      localInstance.setStatus(SynchronizingStatus.ACTIVE);
+      RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
+    } catch (GenericException | IOException e) {
+      LOGGER.warn("Failed to delete working dir: " + e.getMessage());
     }
+
     return new Report();
   }
 

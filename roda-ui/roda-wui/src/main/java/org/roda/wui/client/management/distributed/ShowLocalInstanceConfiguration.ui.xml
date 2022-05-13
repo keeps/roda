@@ -53,11 +53,11 @@
 
                             <g:FlowPanel styleName="field">
                                 <g:Label styleName="label"
-                                         ui:field="instanceIdLabel">
-                                    <ui:text from='{messages.localInstanceIdentifierStateLabel}' />
+                                         ui:field="synchronizationStatusLabel">
+                                    <ui:text from='{messages.synchronizationStatusLabel}' />
                                 </g:Label>
                                 <g:HTML styleName="value"
-                                        ui:field="instanceIdStateValue" />
+                                        ui:field="synchronizationStatusValue" />
                             </g:FlowPanel>
                         </g:FlowPanel>
                     </g:FlowPanel>
