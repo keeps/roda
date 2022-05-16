@@ -2441,7 +2441,7 @@ td.datePickerMonth, td.datePickerYear {
     vertical-align: top;
 }
 
-.browse_aip .identification {
+.browse_aip .identification, .browse-representation .identification {
   background-color: white;
   padding: 2em;
   border-bottom: 1px solid #dedcdc;
@@ -2449,7 +2449,7 @@ td.datePickerMonth, td.datePickerYear {
   padding-top: 3em;
 }
 
-.browse_aip .cards {
+.browse_aip .cards, .browse-representation .cards {
   padding: 30px;
   background-color: #f7f7f7;
   min-height: 350px;

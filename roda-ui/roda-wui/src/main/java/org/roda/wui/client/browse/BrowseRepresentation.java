@@ -335,7 +335,8 @@ public class BrowseRepresentation extends Composite {
     });
     addTab.addStyleName("addTab");
     addTab.getElement().setId("representationNewDescriptiveMetadata");
-    addTab.getParent().addStyleName("addTabWrapper");
+    addTab.addStyleName("newDescriptiveMetadataTab");
+    // addTab.getParent().addStyleName("addTabWrapper");
 
     PermissionClientUtils.bindPermission(newDescriptiveMetadata, aip.getPermissions(),
       RodaConstants.PERMISSION_METHOD_CREATE_DESCRIPTIVE_METADATA_FILE);
