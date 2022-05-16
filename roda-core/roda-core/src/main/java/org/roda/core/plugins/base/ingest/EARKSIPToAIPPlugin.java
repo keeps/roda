@@ -134,15 +134,15 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     LOGGER.debug("Converting {} to AIP", earkSIPPath);
 
     transformTransferredResourceIntoAnAIP(index, model, storage, transferredResource, earkSIPPath, createSubmission,
-      reportItem, job.getId(), computedSearchScope, forceSearchScope, jobWorkingDirectory);
+      reportItem, job.getId(), computedSearchScope, forceSearchScope, jobWorkingDirectory, job);
     report.addReport(reportItem);
 
-    PluginHelper.createJobReport(this, model, reportItem);
+    PluginHelper.createJobReport(this, model, reportItem, job);
   }
 
   private void transformTransferredResourceIntoAnAIP(IndexService index, ModelService model, StorageService storage,
     TransferredResource transferredResource, Path earkSIPPath, boolean createSubmission, Report reportItem,
-    String jobId, Optional<String> computedSearchScope, boolean forceSearchScope, Path jobWorkingDirectory) {
+    String jobId, Optional<String> computedSearchScope, boolean forceSearchScope, Path jobWorkingDirectory, Job cachedJob) {
     SIP sip = null;
     AIP aip = null;
 
@@ -168,14 +168,14 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         // put SIP inside the created AIP (if it is supposed to do so)
         PluginHelper.createSubmission(model, createSubmission, earkSIPPath, aip.getId());
 
-        createUnpackingEventSuccess(model, index, transferredResource, aip, UNPACK_DESCRIPTION);
+        createUnpackingEventSuccess(model, index, transferredResource, aip, UNPACK_DESCRIPTION, cachedJob);
         reportItem.setSourceAndOutcomeObjectId(reportItem.getSourceObjectId(), aip.getId())
           .setPluginState(PluginState.SUCCESS);
 
         if (sip.getAncestors() != null && !sip.getAncestors().isEmpty() && aip.getParentId() == null) {
           reportItem.setPluginDetails(String.format("Parent with id '%s' not found", parentId));
         }
-        createWellformedEventSuccess(model, index, transferredResource, aip);
+        createWellformedEventSuccess(model, index, transferredResource, aip, cachedJob);
         LOGGER.debug("Done with converting {} to AIP {}", earkSIPPath, aip.getId());
       } else {
         reportItem.setPluginState(PluginState.FAILURE).setHtmlPluginDetails(true)

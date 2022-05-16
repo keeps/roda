@@ -263,17 +263,17 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
           .setPluginDetails(validationReport.toHtml(false, false, false, "Skipped AIP without representations"));
         jobPluginInfo.incrementObjectsProcessedWithSkipped();
         PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, PluginState.SKIPPED,
-          validationReport.toHtml(false, false, false, "Skipped AIP without representations"), true);
+          validationReport.toHtml(false, false, false, "Skipped AIP without representations"), true, job);
       } else if (aipFailed) {
         reportItem.setPluginState(PluginState.FAILURE).setHtmlPluginDetails(true)
           .setPluginDetails(validationReport.toHtml(false, false, false, "Corrupted files and checksums"));
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, PluginState.FAILURE,
-          validationReport.toHtml(false, false, false, "Corrupted files and their checksums"), true);
+          validationReport.toHtml(false, false, false, "Corrupted files and their checksums"), true, job);
       } else {
         reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails("Fixity checking ran successfully");
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, PluginState.SUCCESS, "", true);
+        PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, PluginState.SUCCESS, "", true, job);
       }
 
       report.addReport(reportItem);

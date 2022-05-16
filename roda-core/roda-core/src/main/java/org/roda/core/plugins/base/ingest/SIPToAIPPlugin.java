@@ -91,12 +91,6 @@ public abstract class SIPToAIPPlugin extends AbstractPlugin<TransferredResource>
     this.eventDescription = description;
   }
 
-  /** @deprecated */
-  protected void createUnpackingEventSuccess(ModelService model, IndexService index,
-    TransferredResource transferredResource, AIP aip, String unpackDescription) {
-    createUnpackingEventSuccess(model, index, transferredResource, aip, unpackDescription, (Job) null);
-  }
-
   protected void createUnpackingEventSuccess(ModelService model, IndexService index,
     TransferredResource transferredResource, AIP aip, String unpackDescription, Job cachedJob) {
     setPreservationEventType(UNPACK_EVENT_TYPE);
@@ -111,12 +105,6 @@ public abstract class SIPToAIPPlugin extends AbstractPlugin<TransferredResource>
       | ValidationException | AlreadyExistsException e) {
       LOGGER.warn("Error creating unpacking event: " + e.getMessage(), e);
     }
-  }
-
-  /** @deprecated */
-  protected void createWellformedEventSuccess(ModelService model, IndexService index,
-    TransferredResource transferredResource, AIP aip) {
-    createWellformedEventSuccess(model, index, transferredResource, aip, (Job) null);
   }
 
   protected void createWellformedEventSuccess(ModelService model, IndexService index,

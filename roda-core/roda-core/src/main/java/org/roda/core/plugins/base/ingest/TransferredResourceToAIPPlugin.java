@@ -143,7 +143,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
         processTransferredResourceDirectory(model, transferredResourcePath, aip, representationId);
       }
 
-      createUnpackingEventSuccess(model, index, transferredResource, aip, UNPACK_DESCRIPTION);
+      createUnpackingEventSuccess(model, index, transferredResource, aip, UNPACK_DESCRIPTION, job);
       ContentPayload metadataPayload = MetadataFileUtils.getMetadataPayload(transferredResource);
       model.createDescriptiveMetadata(aip.getId(), METADATA_FILE, metadataPayload, METADATA_TYPE, METADATA_VERSION,
         false);
@@ -154,7 +154,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
 
       reportItem.setSourceAndOutcomeObjectId(reportItem.getSourceObjectId(), aip.getId())
         .setPluginState(PluginState.SUCCESS);
-      createWellformedEventSuccess(model, index, transferredResource, aip);
+      createWellformedEventSuccess(model, index, transferredResource, aip, job);
       LOGGER.debug("Done with converting {} to AIP {}", transferredResourcePath, aip.getId());
     } catch (RODAException | IOException | RuntimeException e) {
       LOGGER.error("Error converting " + transferredResource.getId() + " to AIP", e);
@@ -162,7 +162,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
     }
 
     report.addReport(reportItem);
-    PluginHelper.createJobReport(this, model, reportItem);
+    PluginHelper.createJobReport(this, model, reportItem, job);
   }
 
   @Override
