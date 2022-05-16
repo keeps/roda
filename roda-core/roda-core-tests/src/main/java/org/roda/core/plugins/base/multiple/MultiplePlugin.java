@@ -40,12 +40,11 @@ public class MultiplePlugin extends DefaultMultipleStepPlugin<AIP> {
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FILE_FORMAT_IDENTIFICATION, SiegfriedPlugin.getStaticName(),
         PluginParameterType.BOOLEAN, "true", true, true, SiegfriedPlugin.getStaticDescription()));
 
-    steps.add(new Step(AntivirusPlugin.class.getName(), AntivirusPlugin.class,
-      RodaConstants.PLUGIN_PARAMS_DO_VIRUS_CHECK, true, true));
-    steps.add(new Step(PremisSkeletonPlugin.class.getName(), PremisSkeletonPlugin.class,
-      RodaConstants.PLUGIN_PARAMS_CREATE_PREMIS_SKELETON, true, true));
-    steps.add(new Step(SiegfriedPlugin.class.getName(), SiegfriedPlugin.class,
-      RodaConstants.PLUGIN_PARAMS_DO_FILE_FORMAT_IDENTIFICATION, true, true));
+    steps.add(new Step(AntivirusPlugin.class.getName(), RodaConstants.PLUGIN_PARAMS_DO_VIRUS_CHECK, true, true));
+    steps.add(
+      new Step(PremisSkeletonPlugin.class.getName(), RodaConstants.PLUGIN_PARAMS_CREATE_PREMIS_SKELETON, true, true));
+    steps.add(
+      new Step(SiegfriedPlugin.class.getName(), RodaConstants.PLUGIN_PARAMS_DO_FILE_FORMAT_IDENTIFICATION, true, true));
   }
 
   @Override

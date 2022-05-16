@@ -1,4 +1,4 @@
-package org.roda.core.plugins.base.synchronization;
+package org.roda.core.common.synchronization;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
@@ -40,7 +40,7 @@ public class JsonListHelper {
     }
 
     if (path != null) {
-      outputStream = new BufferedOutputStream(new FileOutputStream(path.toFile()));
+      outputStream = new BufferedOutputStream(Files.newOutputStream(path.toFile().toPath()));
       final JsonFactory jsonFactory = new JsonFactory();
       jsonGenerator = jsonFactory.createGenerator(outputStream, JsonEncoding.UTF8).useDefaultPrettyPrinter();
     }

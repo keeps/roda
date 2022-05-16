@@ -18,14 +18,8 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.DIP;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.synchronization.SynchronizingStatus;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
@@ -33,14 +27,14 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.base.synchronization.packages.DipPackagePlugin;
-import org.roda.core.plugins.base.synchronization.packages.JobPackagePlugin;
-import org.roda.core.plugins.base.synchronization.packages.RiskIncidencePackagePlugin;
-import org.roda.core.plugins.base.synchronization.packages.AipPackagePlugin;
-import org.roda.core.plugins.base.synchronization.packages.PreservationAgentPackagePlugin;
-import org.roda.core.plugins.base.synchronization.packages.RepositoryEventPackagePlugin;
 import org.roda.core.plugins.base.multiple.DefaultMultipleStepPlugin;
 import org.roda.core.plugins.base.multiple.Step;
+import org.roda.core.plugins.base.synchronization.packages.AipPackagePlugin;
+import org.roda.core.plugins.base.synchronization.packages.DipPackagePlugin;
+import org.roda.core.plugins.base.synchronization.packages.JobPackagePlugin;
+import org.roda.core.plugins.base.synchronization.packages.PreservationAgentPackagePlugin;
+import org.roda.core.plugins.base.synchronization.packages.RepositoryEventPackagePlugin;
+import org.roda.core.plugins.base.synchronization.packages.RiskIncidencePackagePlugin;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,24 +82,24 @@ public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAO
         RequestSyncBundlePlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN, "true", true, true,
         RequestSyncBundlePlugin.getStaticDescription()));
 
-    steps.add(new Step(AipPackagePlugin.class.getName(), AIP.class, RodaConstants.PLUGIN_PARAMS_DO_AIP_PACKAGE_PLUGIN,
-      true, true));
-    steps.add(new Step(JobPackagePlugin.class.getName(), Job.class, RodaConstants.PLUGIN_PARAMS_DO_JOB_PACKAGE_PLUGIN,
-      true, true));
-    steps.add(new Step(DipPackagePlugin.class.getName(), DIP.class, RodaConstants.PLUGIN_PARAMS_DO_DIP_PACKAGE_PLUGIN,
-      true, true));
-    steps.add(new Step(RiskIncidencePackagePlugin.class.getName(), RiskIncidence.class,
+    steps
+      .add(new Step(AipPackagePlugin.class.getName(), RodaConstants.PLUGIN_PARAMS_DO_AIP_PACKAGE_PLUGIN, true, true));
+    steps
+      .add(new Step(JobPackagePlugin.class.getName(), RodaConstants.PLUGIN_PARAMS_DO_JOB_PACKAGE_PLUGIN, true, true));
+    steps
+      .add(new Step(DipPackagePlugin.class.getName(), RodaConstants.PLUGIN_PARAMS_DO_DIP_PACKAGE_PLUGIN, true, true));
+    steps.add(new Step(RiskIncidencePackagePlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_RISK_INCIDENCE_PACKAGE_PLUGIN, true, true));
-    steps.add(new Step(RepositoryEventPackagePlugin.class.getName(), IndexedPreservationEvent.class,
+    steps.add(new Step(RepositoryEventPackagePlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_REPOSITORY_EVENT_PACKAGE_PLUGIN, true, true));
-    steps.add(new Step(PreservationAgentPackagePlugin.class.getName(), IndexedPreservationAgent.class,
+    steps.add(new Step(PreservationAgentPackagePlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_PRESERVATION_AGENT_PACKAGE_PLUGIN, true, true));
-    steps.add(new Step(BuildSyncManifestPlugin.class.getName(), BuildSyncManifestPlugin.class,
+    steps.add(new Step(BuildSyncManifestPlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_BUILD_SYNC_MANIFEST_PLUGIN, true, true));
 
-    steps.add(new Step(SendSyncBundlePlugin.class.getName(), SendSyncBundlePlugin.class,
-      RodaConstants.PLUGIN_PARAMS_DO_SEND_SYNC_BUNDLE_PLUGIN, true, true));
-    steps.add(new Step(RequestSyncBundlePlugin.class.getName(), RequestSyncBundlePlugin.class,
+    steps.add(new Step(SendSyncBundlePlugin.class.getName(), RodaConstants.PLUGIN_PARAMS_DO_SEND_SYNC_BUNDLE_PLUGIN,
+      true, true));
+    steps.add(new Step(RequestSyncBundlePlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_REQUEST_SYNC_BUNDLE_PLUGIN, true, true));
 
   }

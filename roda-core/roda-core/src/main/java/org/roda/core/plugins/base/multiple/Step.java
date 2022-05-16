@@ -13,22 +13,20 @@ import org.roda.core.plugins.PluginHelper;
 public class Step {
 
   private String pluginName;
-  private Class<?> pluginClass;
   private String parameterName;
   private boolean usesCorePlugin;
   private boolean mandatory;
   private Optional<Integer> sourceObjectsCount;
   private Map<String, String> parameters;
 
-  public Step(final String pluginName, final Class<?> pluginClass, final String parameterName,
-    final boolean usesCorePlugin, final boolean mandatory) {
-    this(pluginName, pluginClass, parameterName, usesCorePlugin, mandatory, new HashMap<>());
+  public Step(final String pluginName, final String parameterName, final boolean usesCorePlugin,
+    final boolean mandatory) {
+    this(pluginName, parameterName, usesCorePlugin, mandatory, new HashMap<>());
   }
 
-  public Step(final String pluginName, final Class<?> pluginClass, final String parameterName,
-    final boolean usesCorePlugin, final boolean mandatory, final Map<String, String> parameters) {
+  public Step(final String pluginName, final String parameterName, final boolean usesCorePlugin,
+    final boolean mandatory, final Map<String, String> parameters) {
     this.pluginName = pluginName;
-    this.pluginClass = pluginClass;
     this.parameterName = parameterName;
     this.usesCorePlugin = usesCorePlugin;
     this.mandatory = mandatory;
@@ -42,14 +40,6 @@ public class Step {
 
   public void setPluginName(final String pluginName) {
     this.pluginName = pluginName;
-  }
-
-  public Class<?> getPluginClass() {
-    return pluginClass;
-  }
-
-  public void setPluginClass(Class<?> pluginClass) {
-    this.pluginClass = pluginClass;
   }
 
   public String getParameterName() {
