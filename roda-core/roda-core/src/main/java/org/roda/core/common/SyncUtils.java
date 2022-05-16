@@ -17,6 +17,7 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -32,6 +33,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.accessToken.AccessToken;
+import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -376,6 +378,39 @@ public class SyncUtils {
       if (response.getStatusLine().getStatusCode() != RodaConstants.HTTP_RESPONSE_CODE_SUCCESS) {
         throw new GenericException(
           "Unable to update the distributed instance error code: " + response.getStatusLine().getStatusCode());
+      }
+    } catch (AuthenticationDeniedException | GenericException | IOException e) {
+      throw new GenericException("Unable to retrieve instance status: " + e.getMessage());
+    }
+  }
+
+  public static int getJobList(LocalInstance localInstance) throws GenericException {
+    try {
+      AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
+      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_INDEX + RodaConstants.API_FIND;
+
+      CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+      HttpPost httpPost = new HttpPost(localInstance.getCentralInstanceURL() + resource);
+      FindRequest findRequest = new FindRequest();
+      findRequest.filter = new Filter();
+      findRequest.classToReturn = Job.class.getCanonicalName();
+      findRequest.filter
+        .add(new SimpleFilterParameter(RodaConstants.INDEX_INSTANCE_ID, localInstance.getId()));
+      findRequest.filter.add(new SimpleFilterParameter(RodaConstants.JOB_STATE, "CREATED"));
+
+      httpPost.setEntity(new StringEntity(JsonUtils.getJsonFromObject(findRequest)));
+
+      httpPost.addHeader("Authorization", "Bearer " + accessToken.getToken());
+      httpPost.addHeader("content-type", "application/json");
+      httpPost.addHeader("Accept", "application/json");
+
+      HttpResponse response = httpClient.execute(httpPost);
+
+      if (response.getStatusLine().getStatusCode() != RodaConstants.HTTP_RESPONSE_CODE_SUCCESS) {
+        throw new GenericException(
+          "Unable to update the distributed instance error code: " + response.getStatusLine().getStatusCode());
+      } else {
+        return response.getFirstHeader("").getValue().length();
       }
     } catch (AuthenticationDeniedException | GenericException | IOException e) {
       throw new GenericException("Unable to retrieve instance status: " + e.getMessage());
