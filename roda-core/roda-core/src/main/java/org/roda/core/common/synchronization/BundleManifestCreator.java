@@ -1,4 +1,4 @@
-package org.roda.core.plugins.plugins.internal.synchronization;
+package org.roda.core.common.synchronization;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

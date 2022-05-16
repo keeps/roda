@@ -1,4 +1,4 @@
-package org.roda.core.plugins.base.synchronization;
+package org.roda.core.common.synchronization;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;

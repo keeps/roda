@@ -1,4 +1,4 @@
-package org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier;
+package org.roda.core.plugins.base.synchronization.instanceIdentifier;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,22 +10,14 @@ import java.util.Map;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.DIP;
-import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.notifications.Notification;
-import org.roda.core.data.v2.ri.RepresentationInformation;
-import org.roda.core.data.v2.risks.Risk;
-import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.plugins.multiple.DefaultMultipleStepPlugin;
-import org.roda.core.plugins.plugins.multiple.Step;
+import org.roda.core.plugins.base.multiple.DefaultMultipleStepPlugin;
+import org.roda.core.plugins.base.multiple.Step;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,29 +75,27 @@ public class LocalInstanceRegisterPlugin extends DefaultMultipleStepPlugin<IsROD
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REGISTER_PLUGIN, RegisterPlugin.getStaticName(),
         PluginParameter.PluginParameterType.BOOLEAN, "true", true, true, RegisterPlugin.getStaticDescription()));
 
-    steps.add(new Step(InstanceIdentifierAIPPlugin.class.getName(), AIP.class,
+    steps.add(new Step(InstanceIdentifierAIPPlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_AIP_PLUGIN, true, true));
-    steps.add(new Step(InstanceIdentifierAIPEventPlugin.class.getName(), PreservationMetadata.class,
+    steps.add(new Step(InstanceIdentifierAIPEventPlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_AIP_EVENT_PLUGIN, true, true));
-    steps.add(new Step(InstanceIdentifierDIPPlugin.class.getName(), DIP.class,
+    steps.add(new Step(InstanceIdentifierDIPPlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_DIP_PLUGIN, true, true));
-    steps
-      .add(new Step(InstanceIdentifierRepresentationInformationPlugin.class.getName(), RepresentationInformation.class,
-        RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_REPRESENTATION_INFORMATION_PLUGIN, true, true));
-    steps.add(new Step(InstanceIdentifierNotificationPlugin.class.getName(), Notification.class,
+    steps.add(new Step(InstanceIdentifierRepresentationInformationPlugin.class.getName(),
+      RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_REPRESENTATION_INFORMATION_PLUGIN, true, true));
+    steps.add(new Step(InstanceIdentifierNotificationPlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_NOTIFICATION_PLUGIN, true, true));
-    steps.add(new Step(InstanceIdentifierRiskPlugin.class.getName(), Risk.class,
+    steps.add(new Step(InstanceIdentifierRiskPlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_RISK_PLUGIN, true, true));
-    steps.add(new Step(InstanceIdentifierRiskIncidencePlugin.class.getName(), RiskIncidence.class,
+    steps.add(new Step(InstanceIdentifierRiskIncidencePlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_RISK_INCIDENCE_PLUGIN, true, true));
-    steps.add(new Step(InstanceIdentifierJobPlugin.class.getName(), Job.class,
+    steps.add(new Step(InstanceIdentifierJobPlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_JOB_PLUGIN, true, true));
-    steps.add(new Step(InstanceIdentifierRepositoryEventPlugin.class.getName(), PreservationMetadata.class,
+    steps.add(new Step(InstanceIdentifierRepositoryEventPlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_REPOSITORY_EVENT_PLUGIN, true, true));
-    steps.add(new Step(InstanceIdentifierPreservationAgentPlugin.class.getName(), PreservationMetadata.class,
+    steps.add(new Step(InstanceIdentifierPreservationAgentPlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_PRESERVATION_AGENT_PLUGIN, true, true));
-    steps
-      .add(new Step(RegisterPlugin.class.getName(), null, RodaConstants.PLUGIN_PARAMS_DO_REGISTER_PLUGIN, true, true));
+    steps.add(new Step(RegisterPlugin.class.getName(), RodaConstants.PLUGIN_PARAMS_DO_REGISTER_PLUGIN, true, true));
   }
 
   @Override

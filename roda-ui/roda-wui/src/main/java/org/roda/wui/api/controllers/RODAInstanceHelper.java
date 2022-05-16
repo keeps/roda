@@ -38,8 +38,8 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
 import org.roda.core.plugins.base.synchronization.proccess.ImportSyncBundlePlugin;
 import org.roda.core.plugins.base.synchronization.proccess.SynchronizeInstancePlugin;
-import org.roda.core.plugins.plugins.internal.synchronization.BundleManifestCreator;
-import org.roda.core.plugins.plugins.internal.synchronization.instanceIdentifier.LocalInstanceRegisterPlugin;
+import org.roda.core.common.synchronization.BundleManifestCreator;
+import org.roda.core.plugins.base.synchronization.instanceIdentifier.LocalInstanceRegisterPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
