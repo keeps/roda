@@ -2445,14 +2445,12 @@ td.datePickerMonth, td.datePickerYear {
   background-color: white;
   padding: 2em;
   border-bottom: 1px solid #dedcdc;
-  padding-bottom: 3em;
-  padding-top: 3em;
 }
 
 .browse_aip .cards, .browse-representation .cards {
-  padding: 30px;
+  padding: 20px 30px;
   background-color: #f7f7f7;
-  min-height: 350px;
+  min-height: 383px;
 }
 
 .browse.under_appraisal, .browse.deleted, .browse.created, .browse.ingest_processing {
@@ -2568,7 +2566,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .browseItemMetadata .gwt-TabBar {
-    background-color: #eee;
+    background-color: #f7f7f7;
     line-height: 3.5rem;
     width: auto !important; /* needed so buttons appear on the right */
     border-collapse: collapse;
