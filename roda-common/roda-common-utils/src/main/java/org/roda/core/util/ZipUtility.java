@@ -57,44 +57,6 @@ public final class ZipUtility {
    *          the zip file to extract files from.
    * @param outputDir
    *          the output directory to extract files to.
-   * @throws IOException
-   *           if a input/output operation fails, like opening a file or
-   *           reading/writing from/to a stream.
-   */
-  public static void extractZIPFiles(File zipFilename, File outputDir) throws IOException {
-    extractFilesFromZIP(zipFilename, outputDir);
-  }
-
-  /**
-   * Extract files in zipFilename to outputDir.
-   * 
-   * @param zipFilename
-   *          the zip file to extract files from.
-   * @param outputDir
-   *          the output directory to extract files to.
-   * 
-   * @return a {@link List} of with all the extracted {@link File}s.
-   * 
-   * @throws IOException
-   *           if a input/output operation fails, like opening a file or
-   *           reading/writing from/to a stream.
-   * 
-   * @deprecated Use {@link ZipUtility#extractFilesFromZIP(File, File, boolean)}
-   *             instead of this method because in this method is not clear if
-   *             you are going to get a list of files with absolute path or not
-   */
-  @Deprecated
-  public static List<File> extractFilesFromZIP(File zipFilename, File outputDir) throws IOException {
-    return extractFilesFromZIP(zipFilename, outputDir, false);
-  }
-
-  /**
-   * Extract files in zipFilename to outputDir.
-   * 
-   * @param zipFilename
-   *          the zip file to extract files from.
-   * @param outputDir
-   *          the output directory to extract files to.
    * @param filesWithAbsolutePath
    *          determines if the output list of files will contain the absolute
    *          or relative path to the files

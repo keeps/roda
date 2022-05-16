@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -140,31 +141,30 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
-import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.plugins.plugins.characterization.SiegfriedPlugin;
-import org.roda.core.plugins.plugins.internal.AddRepresentationInformationFilterPlugin;
-import org.roda.core.plugins.plugins.internal.AppraisalPlugin;
-import org.roda.core.plugins.plugins.internal.ChangeTypePlugin;
-import org.roda.core.plugins.plugins.internal.DeleteRODAObjectPlugin;
-import org.roda.core.plugins.plugins.internal.MovePlugin;
-import org.roda.core.plugins.plugins.internal.UpdateIncidencesPlugin;
-import org.roda.core.plugins.plugins.internal.UpdatePermissionsPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.confirmation.CreateDisposalConfirmationPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.confirmation.DeleteDisposalConfirmationPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.confirmation.DestroyRecordsPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.confirmation.PermanentlyDeleteRecordsPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.confirmation.RecoverDisposalConfirmationExecutionFailedPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.confirmation.RestoreRecordsPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.hold.ApplyDisposalHoldToAIPPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.hold.DisassociateDisposalHoldFromAIPPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.hold.LiftDisposalHoldPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.rules.ApplyDisposalRulesPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.schedule.AssociateDisposalScheduleToAIPPlugin;
-import org.roda.core.plugins.plugins.internal.disposal.schedule.DisassociateDisposalScheduleToAIPPlugin;
+import org.roda.core.plugins.PluginHelper;
+import org.roda.core.plugins.base.characterization.SiegfriedPlugin;
+import org.roda.core.plugins.base.disposal.confirmation.CreateDisposalConfirmationPlugin;
+import org.roda.core.plugins.base.disposal.confirmation.DeleteDisposalConfirmationPlugin;
+import org.roda.core.plugins.base.disposal.confirmation.DestroyRecordsPlugin;
+import org.roda.core.plugins.base.disposal.confirmation.PermanentlyDeleteRecordsPlugin;
+import org.roda.core.plugins.base.disposal.confirmation.RecoverDisposalConfirmationExecutionFailedPlugin;
+import org.roda.core.plugins.base.disposal.confirmation.RestoreRecordsPlugin;
+import org.roda.core.plugins.base.disposal.hold.ApplyDisposalHoldToAIPPlugin;
+import org.roda.core.plugins.base.disposal.hold.DisassociateDisposalHoldFromAIPPlugin;
+import org.roda.core.plugins.base.disposal.hold.LiftDisposalHoldPlugin;
+import org.roda.core.plugins.base.disposal.rules.ApplyDisposalRulesPlugin;
+import org.roda.core.plugins.base.disposal.schedule.AssociateDisposalScheduleToAIPPlugin;
+import org.roda.core.plugins.base.disposal.schedule.DisassociateDisposalScheduleToAIPPlugin;
+import org.roda.core.plugins.base.maintenance.AddRepresentationInformationFilterPlugin;
+import org.roda.core.plugins.base.maintenance.ChangeTypePlugin;
+import org.roda.core.plugins.base.maintenance.DeleteRODAObjectPlugin;
+import org.roda.core.plugins.base.maintenance.MovePlugin;
+import org.roda.core.plugins.base.maintenance.UpdatePermissionsPlugin;
+import org.roda.core.plugins.base.preservation.AppraisalPlugin;
+import org.roda.core.plugins.base.risks.UpdateIncidencesPlugin;
 import org.roda.core.protocols.Protocol;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryConsumesOutputStream;
@@ -623,7 +623,7 @@ public class BrowserHelper {
       Binary binary = RodaCoreFactory.getModelService().retrieveDescriptiveMetadataBinary(aip.getId(), representationId,
         descriptiveMetadataId);
       inputStream = binary.getContent().createInputStream();
-      String xml = IOUtils.toString(inputStream, "UTF-8");
+      String xml = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
 
       // Get the supported metadata type with the same type and version
       // We need this to try to get the values for the form
@@ -2020,7 +2020,7 @@ public class BrowserHelper {
         String type = id;
         String version = null;
         if (id.contains(RodaConstants.METADATA_VERSION_SEPARATOR)) {
-          version = id.substring(id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1, id.length());
+          version = id.substring(id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1);
           type = id.substring(0, id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
         }
         String key = RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + type;
@@ -2456,32 +2456,6 @@ public class BrowserHelper {
       return ApiUtils.download(directory, part);
     } else {
       throw new GenericException("Unsupported part: " + part);
-    }
-  }
-
-  public static StreamResponse retrieveAIPs(SelectedItems<IndexedAIP> selected, String acceptFormat)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    IndexService index = RodaCoreFactory.getIndexService();
-    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
-      List<ZipEntryInfo> zipEntries = new ArrayList<>();
-      if (selected instanceof SelectedItemsFilter) {
-        SelectedItemsFilter<IndexedAIP> selectedItems = (SelectedItemsFilter<IndexedAIP>) selected;
-        long count = index.count(IndexedAIP.class, selectedItems.getFilter());
-        for (int i = 0; i < count; i += RodaConstants.DEFAULT_PAGINATION_VALUE) {
-          List<IndexedAIP> aips = index.find(IndexedAIP.class, selectedItems.getFilter(), null,
-            new Sublist(i, RodaConstants.DEFAULT_PAGINATION_VALUE), null).getResults();
-          zipEntries.addAll(IndexUtils.zipIndexedAIP(aips));
-        }
-      } else {
-        SelectedItemsList<IndexedAIP> selectedItems = (SelectedItemsList<IndexedAIP>) selected;
-        zipEntries.addAll(IndexUtils.zipIndexedAIP(IndexUtils.getIndexedAIPsFromObjectIds(selectedItems)));
-      }
-      return DownloadUtils.createZipStreamResponse(zipEntries, "export");
-    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
-      || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSONP.equals(acceptFormat)) {
-      throw new GenericException("Not yet supported: " + acceptFormat);
-    } else {
-      throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
   }
 
@@ -3286,7 +3260,7 @@ public class BrowserHelper {
         String type = id;
         String version = null;
         if (id.contains(RodaConstants.METADATA_VERSION_SEPARATOR)) {
-          version = id.substring(id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1, id.length());
+          version = id.substring(id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1);
           type = id.substring(0, id.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
         }
         String key = RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + type;

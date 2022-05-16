@@ -51,9 +51,9 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.plugins.characterization.SiegfriedPlugin;
-import org.roda.core.plugins.plugins.ingest.MinimalIngestPlugin;
-import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
+import org.roda.core.plugins.base.characterization.SiegfriedPlugin;
+import org.roda.core.plugins.base.ingest.TransferredResourceToAIPPlugin;
+import org.roda.core.plugins.base.ingest.v2.MinimalIngestPlugin;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -189,12 +189,12 @@ public class PluginReportContentTest {
     AssertJUnit.assertEquals(1, jobReports.size());
 
     for (Report report : jobReports) {
-      Assert.assertEquals(report.getReports().size(), MinimalIngestPlugin.TOTAL_STEPS);
+      Assert.assertEquals(report.getReports().size(), 5);
       Report first = report.getReports().get(0);
-      Report last = report.getReports().get(MinimalIngestPlugin.TOTAL_STEPS - 1);
-      Assert.assertEquals(report.getDateCreated().equals(report.getDateUpdated()), false);
-      Assert.assertEquals(report.getDateCreated().equals(first.getDateCreated()), true);
-      Assert.assertEquals(report.getDateUpdated().equals(last.getDateUpdated()), true);
+      Report last = report.getReports().get(4);
+      Assert.assertNotEquals(report.getDateUpdated(), report.getDateCreated());
+      Assert.assertEquals(first.getDateCreated(), report.getDateCreated());
+      Assert.assertEquals(last.getDateUpdated(), report.getDateUpdated());
     }
   }
 
@@ -203,7 +203,7 @@ public class PluginReportContentTest {
     AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR);
 
     TransferredResource transferredResource = createCorpora();
-    Assert.assertEquals(transferredResource == null, false);
+    Assert.assertNotNull(transferredResource);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
@@ -223,11 +223,11 @@ public class PluginReportContentTest {
     Assert.assertEquals(jobReports.size(), 1);
 
     Report report = jobReports.get(0);
-    AssertJUnit.assertEquals(1, report.getReports().size());
+    Assert.assertEquals(1, report.getReports().size());
     Report innerReport = report.getReports().get(0);
-    AssertJUnit.assertEquals(false, report.getDateCreated().equals(report.getDateUpdated()));
-    AssertJUnit.assertEquals(true, report.getDateCreated().equals(innerReport.getDateCreated()));
-    AssertJUnit.assertEquals(true, report.getDateUpdated().equals(innerReport.getDateUpdated()));
+    Assert.assertNotEquals(report.getDateCreated(), report.getDateUpdated());
+    Assert.assertEquals(report.getDateCreated(), innerReport.getDateCreated());
+    Assert.assertEquals(report.getDateUpdated(), innerReport.getDateUpdated());
   }
 
   @Test
@@ -333,7 +333,7 @@ public class PluginReportContentTest {
     ingestReports = TestsHelper.getJobReports(index, ingest, true);
     AssertJUnit.assertEquals(2, ingestReports.size());
     for (Report report : ingestReports) {
-      AssertJUnit.assertEquals(MinimalIngestPlugin.TOTAL_STEPS, report.getReports().size());
+      AssertJUnit.assertEquals(5, report.getReports().size());
 
       String jobId = report.getJobId();
       String sourceObjectId = report.getSourceObjectId();

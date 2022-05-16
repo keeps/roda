@@ -49,12 +49,4 @@ public class ActionableButton<T extends IsIndexed> {
   public List<String> getExtraCssClasses() {
     return extraCssClasses;
   }
-
-  @Deprecated
-  public String getId() {
-    // TODO 2018-08-21 bferreira: generate an ID based on the action (and maybe also
-    // something else) to make the button configurable via .properties and in
-    // theme.css
-    return null;
-  }
 }
