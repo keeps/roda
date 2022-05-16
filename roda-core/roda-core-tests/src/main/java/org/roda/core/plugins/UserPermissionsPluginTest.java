@@ -43,7 +43,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.base.ingest.MinimalIngestPlugin;
+import org.roda.core.plugins.base.ingest.v2.MinimalIngestPlugin;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -122,7 +122,7 @@ public class UserPermissionsPluginTest {
       SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()), user.getName());
     TestsHelper.getJobReports(index, job, true);
 
-    IndexResult<IndexedAIP> aipsOnIndex = index.find(IndexedAIP.class, Filter.ALL, Sorter.NONE, Sublist.ALL,
+    IndexResult<IndexedAIP> aipsOnIndex = index.find(IndexedAIP.class, Filter.ALL, Sorter.NONE, new Sublist(),
       Facets.NONE, user, false, Collections.emptyList());
     Assert.assertFalse(aipsOnIndex.getResults().isEmpty(), "No AIP is indexed");
 
@@ -130,7 +130,7 @@ public class UserPermissionsPluginTest {
     Filter eventFilter = new Filter();
     eventFilter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId()));
     IndexResult<IndexedPreservationEvent> eventsOnIndex = index.find(IndexedPreservationEvent.class, eventFilter,
-      Sorter.NONE, Sublist.ALL, Facets.NONE, user, false, Collections.emptyList());
+      Sorter.NONE, new Sublist(), Facets.NONE, user, false, Collections.emptyList());
 
     CloseableIterable<OptionalWithCause<PreservationMetadata>> eventsOnAIP = model.listPreservationMetadata(aip.getId(),
       false);

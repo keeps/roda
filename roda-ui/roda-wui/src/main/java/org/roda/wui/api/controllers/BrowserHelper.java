@@ -141,7 +141,6 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -2457,32 +2456,6 @@ public class BrowserHelper {
       return ApiUtils.download(directory, part);
     } else {
       throw new GenericException("Unsupported part: " + part);
-    }
-  }
-
-  public static StreamResponse retrieveAIPs(SelectedItems<IndexedAIP> selected, String acceptFormat)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    IndexService index = RodaCoreFactory.getIndexService();
-    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
-      List<ZipEntryInfo> zipEntries = new ArrayList<>();
-      if (selected instanceof SelectedItemsFilter) {
-        SelectedItemsFilter<IndexedAIP> selectedItems = (SelectedItemsFilter<IndexedAIP>) selected;
-        long count = index.count(IndexedAIP.class, selectedItems.getFilter());
-        for (int i = 0; i < count; i += RodaConstants.DEFAULT_PAGINATION_VALUE) {
-          List<IndexedAIP> aips = index.find(IndexedAIP.class, selectedItems.getFilter(), null,
-            new Sublist(i, RodaConstants.DEFAULT_PAGINATION_VALUE), null).getResults();
-          zipEntries.addAll(IndexUtils.zipIndexedAIP(aips));
-        }
-      } else {
-        SelectedItemsList<IndexedAIP> selectedItems = (SelectedItemsList<IndexedAIP>) selected;
-        zipEntries.addAll(IndexUtils.zipIndexedAIP(IndexUtils.getIndexedAIPsFromObjectIds(selectedItems)));
-      }
-      return DownloadUtils.createZipStreamResponse(zipEntries, "export");
-    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
-      || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSONP.equals(acceptFormat)) {
-      throw new GenericException("Not yet supported: " + acceptFormat);
-    } else {
-      throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
   }
 

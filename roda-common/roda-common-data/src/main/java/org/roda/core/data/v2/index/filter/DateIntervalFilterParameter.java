@@ -67,25 +67,6 @@ public class DateIntervalFilterParameter extends RangeFilterParameter<Date> {
     this.granularity = granularity;
   }
 
-  /**
-   * @deprecated use {@link #getFromName()} instead
-   */
-  @Deprecated
-  @Override
-  public String getName() {
-    return super.getName();
-  }
-
-  /**
-   * @deprecated use {@link #setFromName(String)} instead
-   * 
-   */
-  @Deprecated
-  @Override
-  public void setName(String name) {
-    super.setName(name);
-  }
-
   public String getFromName() {
     return super.getName();
   }

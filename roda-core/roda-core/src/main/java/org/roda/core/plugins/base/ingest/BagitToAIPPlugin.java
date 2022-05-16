@@ -121,7 +121,7 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
 
       PluginHelper.createSubmission(model, createSubmission, bagitPath, aipCreated.getId());
 
-      createUnpackingEventSuccess(model, index, transferredResource, aipCreated, UNPACK_DESCRIPTION);
+      createUnpackingEventSuccess(model, index, transferredResource, aipCreated, UNPACK_DESCRIPTION, job);
       reportItem.setSourceAndOutcomeObjectId(reportItem.getSourceObjectId(), aipCreated.getId())
         .setPluginState(PluginState.SUCCESS);
 
@@ -129,7 +129,7 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
         reportItem.setPluginDetails(String.format("Parent with id '%s' not found", computedParentId.get()));
       }
 
-      createWellformedEventSuccess(model, index, transferredResource, aipCreated);
+      createWellformedEventSuccess(model, index, transferredResource, aipCreated, job);
       LOGGER.debug("Done with converting {} to AIP {}", bagitPath, aipCreated.getId());
     } catch (RODAException | RuntimeException | ParseException e) {
       reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
@@ -137,7 +137,7 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
     }
 
     report.addReport(reportItem);
-    PluginHelper.createJobReport(this, model, reportItem);
+    PluginHelper.createJobReport(this, model, reportItem, job);
   }
 
   @Override

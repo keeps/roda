@@ -58,9 +58,9 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractAIPComponentsPlugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.base.characterization.PremisSkeletonPluginUtils;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
@@ -432,7 +432,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
         LOGGER.debug("Creating convert plugin event for the AIP {}", aip.getId());
         boolean notifyEvent = false;
         createEvent(model, index, aip.getId(), null, null, null, outputFormat, reportState, alteredFiles, newFiles,
-          notifyEvent);
+          notifyEvent, job);
         model.notifyAipUpdated(aip.getId());
         jobPluginInfo.incrementObjectsProcessed(reportState);
       } catch (PluginException | RequestNotValidException | GenericException | NotFoundException
@@ -627,7 +627,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
       LOGGER.debug("Creating convert plugin event for the representation " + representation.getId());
       boolean notifyEvent = false;
       createEvent(model, index, aipId, representation.getId(), null, null, outputFormat, reportState, alteredFiles,
-        newFiles, notifyEvent);
+        newFiles, notifyEvent, job);
 
       if (!createDIP) {
         try {
@@ -814,7 +814,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
       boolean notifyEvent = true;
       createEvent(model, index, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), outputFormat,
-        reportState, Arrays.asList(file), newFiles, notifyEvent);
+        reportState, Arrays.asList(file), newFiles, notifyEvent, job);
 
       if (!createDIP) {
         try {
@@ -843,7 +843,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
   private void createEvent(ModelService model, IndexService index, String aipId, String representationId,
     List<String> filePath, String fileId, String outputFormat, PluginState outcome, List<File> alteredFiles,
-    List<File> newFiles, boolean notify) throws PluginException {
+    List<File> newFiles, boolean notify, Job cachedJob) throws PluginException {
 
     List<LinkingIdentifier> premisSourceFilesIdentifiers = new ArrayList<>();
     List<LinkingIdentifier> premisTargetFilesIdentifiers = new ArrayList<>();
@@ -877,7 +877,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
     try {
       PluginHelper.createPluginEvent(this, aipId, representationId, filePath, fileId, model, index,
-        premisSourceFilesIdentifiers, premisTargetFilesIdentifiers, outcome, stringBuilder.toString(), notify);
+        premisSourceFilesIdentifiers, premisTargetFilesIdentifiers, outcome, stringBuilder.toString(), notify,
+        cachedJob);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | ValidationException | AlreadyExistsException e) {
       throw new PluginException(e.getMessage(), e);
