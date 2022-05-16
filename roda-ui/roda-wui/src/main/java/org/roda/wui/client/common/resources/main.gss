@@ -2441,6 +2441,20 @@ td.datePickerMonth, td.datePickerYear {
     vertical-align: top;
 }
 
+.browse_aip .identification {
+  background-color: white;
+  padding: 2em;
+  border-bottom: 1px solid #dedcdc;
+  padding-bottom: 3em;
+  padding-top: 3em;
+}
+
+.browse_aip .cards {
+  padding: 30px;
+  background-color: #f7f7f7;
+  min-height: 350px;
+}
+
 .browse.under_appraisal, .browse.deleted, .browse.created, .browse.ingest_processing {
     background-color: #efefef;
     background-image: repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(255, 255, 255, .5) 35px, rgba(255, 255, 255, .5) 70px);
@@ -2589,6 +2603,17 @@ td.datePickerMonth, td.datePickerYear {
 .browseItemMetadata .addTabWrapper {
     padding-left: 13px;
     background-color: transparent;
+}
+
+.browseItemMetadata .newDescriptiveMetadataTab {
+    width: 40px;
+    color: white;
+    background: #999;
+    text-align: center;
+}
+
+.browseItemMetadata .newDescriptiveMetadataTab:hover {
+    background: COLOR_PRIMARY;
 }
 
 .browseItemMetadata .addTabWrapper > div {
