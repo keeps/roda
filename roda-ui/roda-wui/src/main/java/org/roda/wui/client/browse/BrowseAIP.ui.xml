@@ -1,56 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-  xmlns:g="urn:import:com.google.gwt.user.client.ui"
-  xmlns:common="urn:import:org.roda.wui.client.common">
+			 xmlns:g="urn:import:com.google.gwt.user.client.ui"
+			 xmlns:common="urn:import:org.roda.wui.client.common">
 
-  <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
-  <g:FocusPanel ui:field="keyboardFocus">
-    <g:FlowPanel styleName="browse" addStyleNames="skip_padding">
-      <common:NavigationToolbar ui:field="navigationToolbar"
-        header="{messages.catalogueItemTitle}"/>
-      <g:FlowPanel addStyleNames="row full_width skip_padding" ui:field="center">
-        <g:FlowPanel addStyleNames="col_12">
-          <!-- STATUS -->
-          <g:HTML ui:field="aipState"/>
+	<g:FocusPanel ui:field="keyboardFocus">
+		<g:FlowPanel styleName="browse" addStyleNames="wrapper skip_padding">
+			<common:NavigationToolbar ui:field="navigationToolbar" header="{messages.catalogueItemTitle}" />
+			<g:FlowPanel addStyleNames="row full_width skip_padding" ui:field="center">
+				<g:FlowPanel addStyleNames="col_12 content">
+					<!-- STATUS -->
+					<g:HTML ui:field="aipState" />
 
-          <!-- IDENTIFICATION -->
-          <g:FlowPanel addStyleNames="identification">
-            <common:TitlePanel ui:field="title">
-              <g:FlowPanel addStyleNames="browseItemPanelDisposal" ui:field="disposalPolicy"/>
-              <g:FlowPanel addStyleNames="browseItemPanelRisksEventsLogs"
-                ui:field="risksEventsLogs"/>
-              <g:Label addStyleNames="browseItemId" ui:field="dateCreatedAndModified"/>
-            </common:TitlePanel>
-          </g:FlowPanel>
+					<!-- IDENTIFICATION -->
+					<common:TitlePanel ui:field="title">
+						<g:FlowPanel addStyleNames="browseItemPanelDisposal" ui:field="disposalPolicy" />
+						<g:FlowPanel addStyleNames="browseItemPanelRisksEventsLogs" ui:field="risksEventsLogs" />
+						<g:Label addStyleNames="browseItemId" ui:field="dateCreatedAndModified" />
+					</common:TitlePanel>
 
-          <g:FlowPanel addStyleNames="cards">
-            <!-- DESCRIPTIVE METADATA -->
-            <g:Button addStyleNames="btn btn-block btn-plus browseNewDescriptiveMetadataButton"
-              ui:field="newDescriptiveMetadata">
-              <ui:text from='{messages.newDescriptiveMetadataTitle}'/>
-            </g:Button>
-            <g:FlowPanel addStyleNames="card descriptiveMetadataCard">
-              <g:TabPanel ui:field="descriptiveMetadata"
-                addStyleNames="browseItemMetadata"/>
-            </g:FlowPanel>
+					<!-- DESCRIPTIVE METADATA -->
+					<g:Button addStyleNames="btn btn-block btn-plus browseNewDescriptiveMetadataButton" ui:field="newDescriptiveMetadata">
+						<ui:text from='{messages.newDescriptiveMetadataTitle}' />
+					</g:Button>
+					<g:FlowPanel addStyleNames="card descriptiveMetadataCard">
+						<g:TabPanel ui:field="descriptiveMetadata"
+							addStyleNames="browseItemMetadata" />
+					</g:FlowPanel>
 
-            <!-- REPRESENTATIONS -->
-            <g:SimplePanel ui:field="representationsCard" addStyleNames="card representationsCard"/>
+					<!-- REPRESENTATIONS -->
+					<g:SimplePanel ui:field="representationsCard" addStyleNames="card representationsCard"/>
 
-            <!-- DIPs -->
-            <g:SimplePanel ui:field="disseminationsCard" addStyleNames="card disseminationsCard"/>
+					<!-- DIPs -->
+					<g:SimplePanel ui:field="disseminationsCard" addStyleNames="card disseminationsCard"/>
 
-            <!-- AIP CHILDREN -->
-            <g:SimplePanel ui:field="aipChildrenCard" addStyleNames="card aipChildrenCard"/>
+					<!-- AIP CHILDREN -->
+					<g:SimplePanel ui:field="aipChildrenCard" addStyleNames="card aipChildrenCard"/>
 
-            <!-- ADD NEW -->
-            <g:SimplePanel ui:field="addRepresentation" addStyleNames="ActionableStyleButtons"/>
-            <g:SimplePanel ui:field="addChildAip" addStyleNames="ActionableStyleButtons"/>
-          </g:FlowPanel>
-        </g:FlowPanel>
-      </g:FlowPanel>
-    </g:FlowPanel>
-  </g:FocusPanel>
+					<!-- ADD NEW -->
+					<g:SimplePanel ui:field="addRepresentation" addStyleNames="ActionableStyleButtons" />
+					<g:SimplePanel ui:field="addChildAip" addStyleNames="ActionableStyleButtons" />
+				</g:FlowPanel>
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</g:FocusPanel>
 </ui:UiBinder>
