@@ -438,18 +438,18 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void createAndExecuteJobs(Job job, boolean async) throws JobAlreadyStartedException {
+  public void createAndExecuteJobs(Job job, boolean async) throws JobAlreadyStartedException,
+    AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     if (!RodaCoreFactory.getDistributedModeType().equals(RodaConstants.DistributedModeType.CENTRAL)) {
-      try {
+      RodaCoreFactory.getModelService().createJob(job);
+      RodaCoreFactory.getPluginOrchestrator().executeJob(job, async);
+    } else {
+      List<String> jobIds = new ArrayList<>();
+      final HashMap<String, SelectedItems<?>> instancesItems = JobsHelper.splitInstancesItems(job.getSourceObjects());
+      if (instancesItems.keySet().size() == 1 && instancesItems.containsKey(null)) {
         RodaCoreFactory.getModelService().createJob(job);
         RodaCoreFactory.getPluginOrchestrator().executeJob(job, async);
-      } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
-        // for now do nothing
-      }
-    } else {
-      try {
-        List<String> jobIds = new ArrayList<>();
-        final HashMap<String, SelectedItems<?>> instancesItems = JobsHelper.splitInstancesItems(job.getSourceObjects());
+      } else {
         for (String instance : instancesItems.keySet()) {
           Job newJob = job.clone();
           if (instance != null) {
@@ -464,7 +464,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
               .setSourceObjectsCount(((SelectedItemsList<?>) newJob.getSourceObjects()).getIds().size());
           }
           RodaCoreFactory.getModelService().createJob(newJob);
-          RodaCoreFactory.getPluginOrchestrator().executeJob(newJob, false);
+          RodaCoreFactory.getPluginOrchestrator().executeJob(newJob, async);
           jobIds.add(newJob.getId());
         }
         StringBuilder details = new StringBuilder();
@@ -477,8 +477,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         job.setState(JOB_STATE.COMPLETED);
         job.getJobStats().setCompletionPercentage(100);
         RodaCoreFactory.getModelService().createJob(job);
-      } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-        // for now do nothing
       }
     }
   }

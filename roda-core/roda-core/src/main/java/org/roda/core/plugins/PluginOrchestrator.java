@@ -10,9 +10,13 @@ package org.roda.core.plugins;
 import java.util.List;
 
 import org.roda.core.common.akka.Messages.JobPartialUpdate;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.JobException;
 import org.roda.core.data.exceptions.LockingException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -51,7 +55,7 @@ public interface PluginOrchestrator {
   /** 201603 hsilva: only tests should invoke this method synchronously */
   public void executeJob(Job job, boolean async) throws JobAlreadyStartedException;
 
-  public void createAndExecuteJobs(Job job, boolean async) throws JobAlreadyStartedException;
+  public void createAndExecuteJobs(Job job, boolean async) throws JobAlreadyStartedException, AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
   /** 201712 hsilva: this method was known as stopJob */
   public void stopJobAsync(Job job);
