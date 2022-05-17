@@ -421,8 +421,7 @@ public class BrowseAIP extends Composite {
 
       addTab.addStyleName("addTab");
       addTab.getElement().setId("aipNewDescriptiveMetadata");
-      addTab.addStyleName("newDescriptiveMetadataTab");
-      // addTab.getParent().addStyleName("addTabWrapper");
+      addTab.getParent().addStyleName("addTabWrapper");
     }
 
     descriptiveMetadataSavedButtons = new HashMap<>();

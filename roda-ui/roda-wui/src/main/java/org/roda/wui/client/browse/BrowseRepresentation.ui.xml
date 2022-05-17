@@ -8,45 +8,40 @@
   <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
 
   <g:FocusPanel ui:field="keyboardFocus">
-    <g:FlowPanel styleName="wui-browse-representation" addStyleNames="skip_padding">
+    <g:FlowPanel styleName="wui-browse-representation" addStyleNames="wrapper skip_padding">
       <common:NavigationToolbar ui:field="navigationToolbar"
         header="{messages.catalogueRepresentationTitle}"/>
       <g:FlowPanel addStyleNames="row full_width skip_padding" ui:field="center">
-        <g:FlowPanel addStyleNames="col_12">
+        <g:FlowPanel addStyleNames="col_12 content">
           <!-- STATUS -->
           <g:HTML ui:field="aipState"/>
 
           <!-- IDENTIFICATION -->
-          <g:FlowPanel addStyleNames="identification">
-            <g:FlowPanel styleName="browseItemPanel">
-              <g:HTML addStyleNames="h2 browseItemIcon" ui:field="representationIcon"/>
-              <g:FlowPanel addStyleNames="h2 browseItemText" ui:field="representationTitle"/>
+          <g:FlowPanel styleName="browseItemPanel">
+            <g:HTML addStyleNames="h2 browseItemIcon" ui:field="representationIcon"/>
+            <g:FlowPanel addStyleNames="h2 browseItemText" ui:field="representationTitle"/>
 
-              <g:FlowPanel addStyleNames="browseItemPanelRisksEventsLogs"
-                ui:field="risksEventsLogs"/>
-              <g:Label addStyleNames="browseItemId" ui:field="dateCreatedAndModified"/>
-            </g:FlowPanel>
+            <g:FlowPanel addStyleNames="browseItemPanelRisksEventsLogs" ui:field="risksEventsLogs"/>
+            <g:Label addStyleNames="browseItemId" ui:field="dateCreatedAndModified"/>
           </g:FlowPanel>
 
-          <g:FlowPanel addStyleNames="cards">
-            <!-- DESCRIPTIVE METADATA -->
-            <g:Button addStyleNames="btn btn-block btn-plus browseNewDescriptiveMetadataButton"
-              ui:field="newDescriptiveMetadata">
-              <ui:text from='{messages.newDescriptiveMetadataTitle}'/>
-            </g:Button>
-            <g:FlowPanel addStyleNames="card descriptiveMetadataCard">
-              <g:TabPanel ui:field="itemMetadata" addStyleNames="browseItemMetadata"/>
-            </g:FlowPanel>
+          <!-- DESCRIPTIVE METADATA -->
+          <g:Button addStyleNames="btn btn-block btn-plus browseNewDescriptiveMetadataButton"
+            ui:field="newDescriptiveMetadata">
+            <ui:text from='{messages.newDescriptiveMetadataTitle}'/>
+          </g:Button>
+          <g:FlowPanel addStyleNames="card descriptiveMetadataCard">
+            <g:TabPanel ui:field="itemMetadata" addStyleNames="browseItemMetadata"/>
+          </g:FlowPanel>
 
-            <!-- FILES -->
-            <g:FlowPanel addStyleNames="card filesCard">
-              <commonsearch:SearchWrapper ui:field="filesSearch"/>
-            </g:FlowPanel>
+          <!-- FILES -->
+          <g:FlowPanel addStyleNames="card filesCard">
+            <commonsearch:SearchWrapper ui:field="filesSearch"/>
+          </g:FlowPanel>
 
-            <!-- DIPs -->
-            <g:FlowPanel addStyleNames="card disseminationsCard">
-              <commonsearch:SearchWrapper ui:field="disseminationsSearch"/>
-            </g:FlowPanel>
+          <!-- DIPs -->
+          <g:FlowPanel addStyleNames="card disseminationsCard">
+            <commonsearch:SearchWrapper ui:field="disseminationsSearch"/>
           </g:FlowPanel>
         </g:FlowPanel>
       </g:FlowPanel>
