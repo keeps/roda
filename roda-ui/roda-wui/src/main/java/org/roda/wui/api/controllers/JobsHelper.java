@@ -40,6 +40,7 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobUserDetails;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.user.User;
@@ -71,6 +72,14 @@ public class JobsHelper {
       job.setName(job.getId());
     }
     job.setUsername(user.getName());
+
+    // Set the JobUserDetails in Job creation
+    JobUserDetails jobUserDetails = new JobUserDetails();
+    jobUserDetails.setUsername(user.getName());
+    jobUserDetails.setEmail(user.getEmail());
+    jobUserDetails.setFullname(user.getFullName());
+    jobUserDetails.setRole(RodaConstants.PreservationAgentRole.EXECUTING_PROGRAM.toString());
+    job.getJobUsersDetails().add(jobUserDetails);
   }
 
   protected static void validateJobInformation(User user, Job job)
