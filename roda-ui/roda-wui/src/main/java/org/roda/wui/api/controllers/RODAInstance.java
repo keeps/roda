@@ -2,6 +2,7 @@ package org.roda.wui.api.controllers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
@@ -19,13 +20,20 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
+import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.log.LogEntryState;
+import org.roda.core.data.v2.ri.RepresentationInformation;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.synchronization.SynchronizingStatus;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.central.DistributedInstances;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.index.IndexService;
+import org.roda.core.model.ModelService;
 import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.wui.api.v1.utils.ObjectResponse;
 import org.roda.wui.common.ControllerAssistant;
@@ -461,5 +469,45 @@ public class RODAInstance extends RodaWuiController {
 
     return RODAInstanceHelper.removeSyncBundle(bundleName, bundleDirectory);
 
+  }
+
+  public static Long retrieveUpdates(User user, String instanceIdentifier) {
+    Long total = 0L;
+    ModelService model = RodaCoreFactory.getModelService();
+    IndexService index = RodaCoreFactory.getIndexService();
+    try {
+      DistributedInstance distributedInstance = model.retrieveDistributedInstance(instanceIdentifier);
+      Date lastSynchronizationDate = distributedInstance.getLastSynchronizationDate();
+      Date toDate = new Date();
+      // get Jobs
+      final Filter jobFilter = new Filter();
+      jobFilter.add(new SimpleFilterParameter(RodaConstants.INDEX_INSTANCE_ID, instanceIdentifier));
+      jobFilter.add(new SimpleFilterParameter(RodaConstants.JOB_STATE, "CREATED"));
+      jobFilter.add(new DateIntervalFilterParameter(RodaConstants.JOB_START_DATE, RodaConstants.JOB_END_DATE,
+        lastSynchronizationDate, toDate));
+      total += index.count(Job.class, jobFilter);
+
+      // get Risks
+      final Filter riskFilter = new Filter();
+      riskFilter.add(new DateIntervalFilterParameter(RodaConstants.RISK_INCIDENCE_UPDATED_ON,
+        RodaConstants.RISK_INCIDENCE_UPDATED_ON, lastSynchronizationDate, toDate));
+      total += index.count(IndexedRisk.class, riskFilter);
+
+      // get RepresentationInformation
+      final Filter repFilter = new Filter();
+      repFilter.add(new DateIntervalFilterParameter(RodaConstants.REPRESENTATION_INFORMATION_UPDATED_ON,
+              RodaConstants.REPRESENTATION_INFORMATION_UPDATED_ON, lastSynchronizationDate, toDate));
+      total += index.count(RepresentationInformation.class, riskFilter);
+
+    } catch (RequestNotValidException e) {
+      e.printStackTrace();
+    } catch (GenericException e) {
+      e.printStackTrace();
+    } catch (NotFoundException e) {
+      e.printStackTrace();
+    } catch (AuthorizationDeniedException e) {
+      e.printStackTrace();
+    }
+    return total;
   }
 }

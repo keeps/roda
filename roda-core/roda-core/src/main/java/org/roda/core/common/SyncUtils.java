@@ -387,24 +387,27 @@ public class SyncUtils {
   public static int getJobList(LocalInstance localInstance) throws GenericException {
     try {
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
-      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_INDEX + RodaConstants.API_FIND;
+      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE + "updates"
+        + RodaConstants.API_SEP + localInstance.getId();
 
-      CloseableHttpClient httpClient = HttpClientBuilder.create().build();
-      HttpPost httpPost = new HttpPost(localInstance.getCentralInstanceURL() + resource);
-      FindRequest findRequest = new FindRequest();
+
+     /* FindRequest findRequest = new FindRequest();
       findRequest.filter = new Filter();
       findRequest.classToReturn = Job.class.getCanonicalName();
       findRequest.filter
         .add(new SimpleFilterParameter(RodaConstants.INDEX_INSTANCE_ID, localInstance.getId()));
       findRequest.filter.add(new SimpleFilterParameter(RodaConstants.JOB_STATE, "CREATED"));
+      findRequest.fieldsToReturn = new ArrayList<>();
+      httpPost.setEntity(new StringEntity(JsonUtils.getJsonFromObject(findRequest)));*/
 
-      httpPost.setEntity(new StringEntity(JsonUtils.getJsonFromObject(findRequest)));
+      CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+      HttpGet httpGet = new HttpGet(localInstance.getCentralInstanceURL() + resource);
+      httpGet.addHeader("Authorization", "Bearer " + accessToken.getToken());
+      httpGet.addHeader("content-type", "application/json");
+      httpGet.addHeader("Accept", "application/json");
 
-      httpPost.addHeader("Authorization", "Bearer " + accessToken.getToken());
-      httpPost.addHeader("content-type", "application/json");
-      httpPost.addHeader("Accept", "application/json");
+      HttpResponse response = httpClient.execute(httpGet);
 
-      HttpResponse response = httpClient.execute(httpPost);
 
       if (response.getStatusLine().getStatusCode() != RodaConstants.HTTP_RESPONSE_CODE_SUCCESS) {
         throw new GenericException(
