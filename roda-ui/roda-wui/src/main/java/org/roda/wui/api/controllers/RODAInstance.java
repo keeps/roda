@@ -471,26 +471,27 @@ public class RODAInstance extends RodaWuiController {
 
   }
 
-  public static Long retrieveUpdates(User user, String instanceIdentifier) {
+  public static Long retrieveUpdates(User user, String instanceIdentifier)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     Long total = 0L;
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
-    try {
+
       DistributedInstance distributedInstance = model.retrieveDistributedInstance(instanceIdentifier);
       Date lastSynchronizationDate = distributedInstance.getLastSynchronizationDate();
       Date toDate = new Date();
       // get Jobs
       final Filter jobFilter = new Filter();
       jobFilter.add(new SimpleFilterParameter(RodaConstants.INDEX_INSTANCE_ID, instanceIdentifier));
-      jobFilter.add(new SimpleFilterParameter(RodaConstants.JOB_STATE, "CREATED"));
+      jobFilter.add(new SimpleFilterParameter(RodaConstants.JOB_STATE, Job.JOB_STATE.CREATED.name()));
       jobFilter.add(new DateIntervalFilterParameter(RodaConstants.JOB_START_DATE, RodaConstants.JOB_END_DATE,
         lastSynchronizationDate, toDate));
       total += index.count(Job.class, jobFilter);
 
       // get Risks
       final Filter riskFilter = new Filter();
-      riskFilter.add(new DateIntervalFilterParameter(RodaConstants.RISK_INCIDENCE_UPDATED_ON,
-        RodaConstants.RISK_INCIDENCE_UPDATED_ON, lastSynchronizationDate, toDate));
+      riskFilter.add(new DateIntervalFilterParameter(RodaConstants.RISK_UPDATED_ON, RodaConstants.RISK_UPDATED_ON,
+        lastSynchronizationDate, toDate));
       total += index.count(IndexedRisk.class, riskFilter);
 
       // get RepresentationInformation
@@ -499,15 +500,6 @@ public class RODAInstance extends RodaWuiController {
               RodaConstants.REPRESENTATION_INFORMATION_UPDATED_ON, lastSynchronizationDate, toDate));
       total += index.count(RepresentationInformation.class, riskFilter);
 
-    } catch (RequestNotValidException e) {
-      e.printStackTrace();
-    } catch (GenericException e) {
-      e.printStackTrace();
-    } catch (NotFoundException e) {
-      e.printStackTrace();
-    } catch (AuthorizationDeniedException e) {
-      e.printStackTrace();
-    }
     return total;
   }
 }

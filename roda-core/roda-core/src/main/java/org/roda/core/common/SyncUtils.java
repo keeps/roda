@@ -17,7 +17,6 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -33,7 +32,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.accessToken.AccessToken;
-import org.roda.core.data.v2.index.FindRequest;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -384,21 +382,11 @@ public class SyncUtils {
     }
   }
 
-  public static int getJobList(LocalInstance localInstance) throws GenericException {
+  public static Long getUpdatesFromDistributedInstance(LocalInstance localInstance) throws GenericException {
     try {
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
       String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE + "updates"
         + RodaConstants.API_SEP + localInstance.getId();
-
-
-     /* FindRequest findRequest = new FindRequest();
-      findRequest.filter = new Filter();
-      findRequest.classToReturn = Job.class.getCanonicalName();
-      findRequest.filter
-        .add(new SimpleFilterParameter(RodaConstants.INDEX_INSTANCE_ID, localInstance.getId()));
-      findRequest.filter.add(new SimpleFilterParameter(RodaConstants.JOB_STATE, "CREATED"));
-      findRequest.fieldsToReturn = new ArrayList<>();
-      httpPost.setEntity(new StringEntity(JsonUtils.getJsonFromObject(findRequest)));*/
 
       CloseableHttpClient httpClient = HttpClientBuilder.create().build();
       HttpGet httpGet = new HttpGet(localInstance.getCentralInstanceURL() + resource);
@@ -407,13 +395,13 @@ public class SyncUtils {
       httpGet.addHeader("Accept", "application/json");
 
       HttpResponse response = httpClient.execute(httpGet);
-
+      String message = JsonUtils.parseJson(EntityUtils.toString(response.getEntity())).get("message").textValue();
 
       if (response.getStatusLine().getStatusCode() != RodaConstants.HTTP_RESPONSE_CODE_SUCCESS) {
         throw new GenericException(
           "Unable to update the distributed instance error code: " + response.getStatusLine().getStatusCode());
       } else {
-        return response.getFirstHeader("").getValue().length();
+        return Long.parseLong(message);
       }
     } catch (AuthenticationDeniedException | GenericException | IOException e) {
       throw new GenericException("Unable to retrieve instance status: " + e.getMessage());
