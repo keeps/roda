@@ -29,14 +29,15 @@ import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ExtraMediaType;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Path(PermissionsResource.ENDPOINT)
-@Api(value = PermissionsResource.SWAGGER_ENDPOINT)
+@Tag(name = PermissionsResource.SWAGGER_ENDPOINT)
 public class PermissionsResource {
   public static final String ENDPOINT = "/v1/permissions";
   public static final String SWAGGER_ENDPOINT = "v1 permissions";
@@ -48,16 +49,14 @@ public class PermissionsResource {
   @Path("/{" + RodaConstants.API_PATH_PARAM_USERNAME + "}/{" + RodaConstants.API_PATH_PARAM_PERMISSION_TYPE + "}")
   @Produces({MediaType.APPLICATION_JSON, ExtraMediaType.APPLICATION_JAVASCRIPT})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
-  @ApiOperation(value = "Test permissions", notes = "Test if user has permissions.", response = ObjectPermissionResult.class, responseContainer = "List")
-  @ApiResponses(value = {
-    @ApiResponse(code = 200, message = "Successful response", response = ObjectPermissionResult.class, responseContainer = "List"),
-    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
-
+  @Operation(summary = "Test permissions", description = "Test if user has permissions", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = ObjectPermissionResult.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
   public Response getPermissions(
-    @ApiParam(value = "The username to test permission.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_USERNAME) String username,
-    @ApiParam(value = "The permission type to test.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_PERMISSION_TYPE) String permissionType,
+    @Parameter(description = "The username to test permission.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_USERNAME) String username,
+    @Parameter(description = "The permission type to test.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_PERMISSION_TYPE) String permissionType,
     @Context UriInfo uriInfo,
-    @ApiParam(value = "JSONP callback name", required = false, allowMultiple = false, defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    @Parameter(description = "JSONP callback name", required = false, schema = @Schema(defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK)) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
     throws RODAException {
     String mediaType = MediaType.APPLICATION_JSON + "; charset=UTF-8";
     MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();

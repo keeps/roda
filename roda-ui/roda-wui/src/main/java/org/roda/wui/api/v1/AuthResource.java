@@ -22,6 +22,7 @@ import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.accessKey.AccessKey;
+import org.roda.core.data.v2.accessToken.AccessToken;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.ApplicationAuth;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
@@ -30,11 +31,12 @@ import org.roda.wui.api.v1.utils.ExtraMediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST API CAS authentication tickets resource.
@@ -42,7 +44,7 @@ import io.swagger.annotations.ApiResponses;
  * @author Rui Castro <rui.castro@gmail.com>
  */
 @Path("/v1/auth")
-@Api(value = "v1 auth")
+@Tag(name = "v1 auth")
 public class AuthResource {
   /** Logger. */
   private static final Logger LOGGER = LoggerFactory.getLogger(AuthResource.class);
@@ -55,13 +57,12 @@ public class AuthResource {
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
   @Path("/login")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
-  @ApiOperation(value = "GET call to login", notes = "GET call to login", response = User.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = User.class),
-    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
-
+  @Operation(summary = "GET call to login", description = "GET call to login", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = User.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
   public Response loginGet(
-    @ApiParam(value = "Choose format in which to get the User", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-    @ApiParam(value = "JSONP callback name", required = false, allowMultiple = false, defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    @Parameter(description = "Choose format in which to get the User", schema = @Schema(implementation = RodaConstants.ListMediaTypes.class, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON)) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @Parameter(description = "JSONP callback name", required = false, schema = @Schema(defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK)) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
     return Response.ok(UserUtility.getApiUser(request), mediaType).build();
@@ -71,13 +72,12 @@ public class AuthResource {
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
   @Path("/login")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
-  @ApiOperation(value = "POST call to login", notes = "POST call to login", response = User.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = User.class),
-    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
-
+  @Operation(summary = "POST call to login", description = "POST call to login", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = User.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
   public Response loginPost(
-    @ApiParam(value = "Choose format in which to get the User", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-    @ApiParam(value = "JSONP callback name", required = false, allowMultiple = false, defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    @Parameter(description = "Choose format in which to get the User", schema = @Schema(implementation = RodaConstants.ListMediaTypes.class, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON)) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @Parameter(description = "JSONP callback name", required = false, schema = @Schema(defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK)) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
     return Response.ok(UserUtility.getApiUser(request), mediaType).build();
@@ -87,9 +87,13 @@ public class AuthResource {
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Path("/token")
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
-  public Response authenticate(AccessKey accessKey,
-                               @ApiParam(value = "Choose format in which to get the disposal schedule", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-                               @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+  @Operation(summary = "Obtain access token via access key", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = AccessToken.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
+  public Response authenticate(
+    @Parameter(description = "Access key", schema = @Schema(implementation = AccessKey.class)) AccessKey accessKey,
+    @Parameter(description = "Choose format in which to get the API token", schema = @Schema(implementation = RodaConstants.ListMediaTypes.class, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON)) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @Parameter(description = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
     return Response.ok(ApplicationAuth.authenticate(accessKey), mediaType).build();

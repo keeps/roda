@@ -97,8 +97,8 @@
         <gwt.version>2.10.0</gwt.version>
         <cas.client.version>3.6.1</cas.client.version>
         <jersey.version>2.31</jersey.version>
-        <swagger.version>1.6.2</swagger.version>
-        <jackson.version>2.13.2</jackson.version>
+        <swagger.version>2.2.0</swagger.version>
+        <jackson.version>2.11.2</jackson.version>
         <spring.version>4.3.19.RELEASE</spring.version>
         <grizzly.version>2.4.3</grizzly.version>
         <solr.version>8.11.1</solr.version>
@@ -111,7 +111,7 @@
         <metrics.version>3.2.6</metrics.version>
         <roda_community_url>https://roda-community.org</roda_community_url>
         <testng.groups>all</testng.groups>
-        <springboot.version>2.6.6</springboot.version>
+        <springboot.version>2.7.0</springboot.version>
         <scope.gwt-dev>provided</scope.gwt-dev>
     </properties>
     <profiles>
@@ -961,8 +961,13 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>io.swagger</groupId>
-                <artifactId>swagger-jersey2-jaxrs</artifactId>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-jaxrs2</artifactId>
+                <version>${swagger.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-jaxrs2-servlet-initializer-v2</artifactId>
                 <version>${swagger.version}</version>
             </dependency>
             <!-- REST API related dependencies - end -->

@@ -30,14 +30,15 @@ import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ExtraMediaType;
 import org.roda.wui.api.v1.utils.ObjectResponse;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Path(PreservationMetadataAgentsResource.ENDPOINT)
-@Api(value = PreservationMetadataAgentsResource.SWAGGER_ENDPOINT)
+@Tag(name = PreservationMetadataAgentsResource.SWAGGER_ENDPOINT)
 public class PreservationMetadataAgentsResource {
   public static final String ENDPOINT = "/v1/agents";
   public static final String SWAGGER_ENDPOINT = "v1 agents";
@@ -48,14 +49,13 @@ public class PreservationMetadataAgentsResource {
   @GET
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_JAVASCRIPT})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
-  @ApiOperation(value = "Get agent preservation metadata", notes = "Get agent preservation metadata", response = String.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful response", response = String.class),
-    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
-
+  @Operation(summary = "Get agent preservation metadata", description = "Gets an agent preservation metadata", responses = {
+    @ApiResponse(responseCode = "200", description = "OK"),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
   public Response getPreservationMetadataAgent(
-    @ApiParam(value = "The ID of the agent", required = true) @QueryParam(RodaConstants.API_QUERY_PARAM_ID) String id,
-    @ApiParam(value = "Choose format in which to get the agent", allowableValues = RodaConstants.API_GET_METADATA_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-    @ApiParam(value = "JSONP callback name", required = false, allowMultiple = false, defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    @Parameter(description = "The ID of the agent", required = true) @QueryParam(RodaConstants.API_QUERY_PARAM_ID) String id,
+    @Parameter(description = "Choose format in which to get the agent", schema = @Schema(implementation = RodaConstants.MetadataMediaTypes.class, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON)) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @Parameter(description = "JSONP callback name", required = false, schema = @Schema(defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK)) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 

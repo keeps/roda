@@ -446,8 +446,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.swagger</groupId>
-            <artifactId>swagger-jersey2-jaxrs</artifactId>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-jaxrs2</artifactId>
         </dependency>
         <dependency>
             <groupId>com.mikesamuel</groupId>
@@ -551,12 +551,6 @@
             <version>1.12.1</version>
         </dependency>
         <!-- / File upload -->
-        <!-- API docs -->
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>swagger-ui</artifactId>
-            <version>3.22.0</version>
-        </dependency>
         <!-- Statistics -->
         <dependency>
             <groupId>org.webjars.bowergithub.chartjs</groupId>

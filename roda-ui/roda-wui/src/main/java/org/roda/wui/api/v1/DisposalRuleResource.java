@@ -12,7 +12,6 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -38,17 +37,18 @@ import org.roda.wui.api.controllers.Disposals;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 @Path(DisposalRuleResource.ENDPOINT)
-@Api(value = DisposalRuleResource.SWAGGER_ENDPOINT)
+@Tag(name = DisposalRuleResource.SWAGGER_ENDPOINT)
 public class DisposalRuleResource {
   public static final String ENDPOINT = "/v1/disposal/rule";
   public static final String SWAGGER_ENDPOINT = "v1 rule";
@@ -59,14 +59,12 @@ public class DisposalRuleResource {
   @GET
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
-  @ApiOperation(value = "List disposal rules", notes = "Gets a list of disposal rule.", response = DisposalRule.class, responseContainer = "List")
-  @ApiResponses(value = {
-    @ApiResponse(code = 200, message = "Successful response", response = DisposalRule.class, responseContainer = "List"),
-    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
-
+  @Operation(summary = "List disposal rules", description = "Gets a list of disposal rules", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = DisposalRules.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
   public Response listRules(
-    @ApiParam(value = "Choose format in which to get the disposal rule", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-    @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    @Parameter(description = "Choose format in which to get the disposal rule", schema = @Schema(implementation = RodaConstants.ListMediaTypes.class, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON)) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @Parameter(description = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
     throws RODAException, IOException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
@@ -82,14 +80,13 @@ public class DisposalRuleResource {
   @Path("/{" + RodaConstants.API_PATH_PARAM_DISPOSAL_RULE_ID + "}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
-  @ApiOperation(value = "Get Disposal rule", notes = "Get disposal rule information", response = DisposalRule.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DisposalRule.class),
-    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
-
+  @Operation(summary = "Get disposal rule", description = "Get disposal rule information", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = DisposalRule.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
   public Response retrieveRule(
-    @ApiParam(value = "The ID of the disposal rule to retrieve.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_DISPOSAL_RULE_ID) String ruleId,
-    @ApiParam(value = "Choose format in which to get the disposal rule", allowableValues = RodaConstants.API_LIST_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-    @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    @Parameter(description = "The ID of the disposal rule to retrieve.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_DISPOSAL_RULE_ID) String ruleId,
+    @Parameter(description = "Choose format in which to get the disposal rule", schema = @Schema(implementation = RodaConstants.ListMediaTypes.class, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON)) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @Parameter(description = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
@@ -105,14 +102,13 @@ public class DisposalRuleResource {
   @POST
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
-  @ApiOperation(value = "Create disposal rule", notes = "Create a new disposal rule", response = DisposalRule.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DisposalRule.class),
-    @ApiResponse(code = 409, message = "Already exists", response = ApiResponseMessage.class)})
-
+  @Operation(summary = "Create disposal rule", description = "Creates a new disposal rule", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = DisposalRule.class))),
+    @ApiResponse(responseCode = "409", description = "Already exists", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
   public Response createRule(DisposalRule rule,
-    @ApiParam(value = "Choose format in which to get the disposal rule", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-    @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
-          throws RODAException, IOException {
+    @Parameter(description = "Choose format in which to get the disposal rule", schema = @Schema(implementation = RodaConstants.APIMediaTypes.class)) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @Parameter(description = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    throws RODAException, IOException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
@@ -130,13 +126,12 @@ public class DisposalRuleResource {
   @PUT
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
-  @ApiOperation(value = "Update disposal rule", notes = "Update existing disposal rule", response = DisposalRule.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DisposalRule.class),
-    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
-
+  @Operation(summary = "Update disposal rule", description = "Updates existing disposal rule", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = DisposalRule.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
   public Response updateDisposalRule(DisposalRule rule,
-    @ApiParam(value = "Choose format in which to get the disposal rule", allowableValues = RodaConstants.API_POST_PUT_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-    @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    @Parameter(description = "Choose format in which to get the disposal rule", schema = @Schema(implementation = RodaConstants.APIMediaTypes.class)) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @Parameter(description = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
@@ -156,15 +151,13 @@ public class DisposalRuleResource {
   @Path("/{" + RodaConstants.API_PATH_PARAM_DISPOSAL_RULE_ID + "}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
-  @ApiOperation(value = "Delete disposal rule", notes = "Delete disposal rule", response = Void.class)
-  @ApiResponses(value = {@ApiResponse(code = 204, message = "OK", response = Void.class),
-    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
-
+  @Operation(summary = "Delete disposal rule", description = "Deletes a list of rule", responses = {
+    @ApiResponse(responseCode = "204", description = "OK"),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
   public Response deleteRule(
-    @ApiParam(value = "The ID of the disposal rule to delete.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_DISPOSAL_RULE_ID) String disposalRuleId,
-    @ApiParam(value = "Reason to delete disposal rule", required = true) @FormParam(RodaConstants.API_QUERY_PARAM_DETAILS) String details,
-    @ApiParam(value = "Choose format in which to get the response", allowableValues = RodaConstants.API_DELETE_MEDIA_TYPES) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-    @ApiParam(value = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    @Parameter(description = "The ID of the disposal rule to delete.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_DISPOSAL_RULE_ID) String disposalRuleId,
+    @Parameter(description = "Choose format in which to get the response", schema = @Schema(implementation = RodaConstants.APIMediaTypes.class)) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @Parameter(description = "JSONP callback name") @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
@@ -176,5 +169,4 @@ public class DisposalRuleResource {
 
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Disposal rule deleted"), mediaType).build();
   }
-
 }

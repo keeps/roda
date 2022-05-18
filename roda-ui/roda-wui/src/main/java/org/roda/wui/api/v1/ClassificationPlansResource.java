@@ -8,7 +8,6 @@
 package org.roda.wui.api.v1;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -26,14 +25,15 @@ import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiUtils;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
 @Path(ClassificationPlansResource.ENDPOINT)
-@Api(value = ClassificationPlansResource.SWAGGER_ENDPOINT)
+@Tag(name = ClassificationPlansResource.SWAGGER_ENDPOINT)
 public class ClassificationPlansResource {
   public static final String ENDPOINT = "/v1/classification_plans";
   public static final String SWAGGER_ENDPOINT = "v1 classification plans";
@@ -44,7 +44,7 @@ public class ClassificationPlansResource {
   @GET
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   public Response getClassificationPlan(
-    @DefaultValue("plan.json") @ApiParam(value = "Choose file name", defaultValue = "plan.json") @QueryParam(RodaConstants.API_QUERY_KEY_FILENAME) String filename)
+    @Parameter(description = "Choose file name", schema = @Schema(defaultValue = "plan.json")) @QueryParam(RodaConstants.API_QUERY_KEY_FILENAME) String filename)
     throws RODAException {
 
     // get user
@@ -55,5 +55,4 @@ public class ClassificationPlansResource {
 
     return ApiUtils.okResponse(new StreamResponse(cos));
   }
-
 }
