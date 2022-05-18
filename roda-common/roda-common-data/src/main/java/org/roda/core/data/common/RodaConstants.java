@@ -730,6 +730,7 @@ public final class RodaConstants {
 
   public static final String INDEX_INSTANCE_ID = "instanceId";
   public static final String INDEX_INSTANCE_NAME = "instanceName";
+  public static final String INDEX_CREATION_DATE = "creationDate";
 
   /*
    * AIP FIELDS

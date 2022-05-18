@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.util.Date;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
@@ -33,6 +34,8 @@ public class File implements IsModelObject, HasId {
   private String referenceUUID;
 
   private String instanceId;
+
+  private Date creationDate = null;
 
   public File() {
     super();
@@ -144,6 +147,14 @@ public class File implements IsModelObject, HasId {
     this.instanceId = instanceId;
   }
 
+  public Date getCreationDate() {
+    return creationDate;
+  }
+
+  public void setCreationDate(Date creationDate) {
+    this.creationDate = creationDate;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o)
@@ -186,6 +197,7 @@ public class File implements IsModelObject, HasId {
     result = 31 * result + (referenceManifest != null ? referenceManifest.hashCode() : 0);
     result = 31 * result + (referenceUUID != null ? referenceUUID.hashCode() : 0);
     result = 31 * result + (instanceId != null ? instanceId.hashCode() : 0);
+    result = 31 * result + (creationDate != null ? creationDate.hashCode() : 0);
     return result;
   }
 
@@ -194,6 +206,6 @@ public class File implements IsModelObject, HasId {
     return "File{" + "id='" + id + '\'' + ", path=" + path + ", aipId='" + aipId + '\'' + ", representationId='"
       + representationId + '\'' + ", isDirectory=" + isDirectory + ", isReference=" + isReference + ", referenceUrl='"
       + referenceUrl + '\'' + ", referenceManifest='" + referenceManifest + '\'' + ", referenceUUID='" + referenceUUID
-      + ", instanceId='" + instanceId + '\'' + '}';
+      + ", instanceId='" + instanceId + '\'' + ", creationDate='" + creationDate + '\'' + '}';
   }
 }

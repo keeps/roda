@@ -8,6 +8,7 @@
 package org.roda.core.data.v2.ip.metadata;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -24,12 +25,10 @@ public class IndexedPreservationAgent implements IsIndexed, HasId {
   private String note;
   private String extension;
   private List<String> roles;
-
   private Map<String, Object> fields;
-
   private String instanceId;
-
   private String instanceName;
+  private Date creationDate;
 
   public IndexedPreservationAgent() {
     super();
@@ -108,21 +107,29 @@ public class IndexedPreservationAgent implements IsIndexed, HasId {
     this.instanceName = instanceName;
   }
 
+  public Date getCreationDate() {
+    return creationDate;
+  }
+
+  public void setCreationDate(Date creationDate) {
+    this.creationDate = creationDate;
+  }
+
   @Override
   public String toString() {
     return "IndexedPreservationAgent [id=" + id + ", name=" + name + ", type=" + type + ", note=" + note
       + ", extension=" + extension + ", roles=" + roles + ", instanceId=" + instanceId + ", instanceName="
-      + instanceName + "]";
+      + instanceName + ", creationDate=" + creationDate + "]";
   }
 
   @Override
   public List<String> toCsvHeaders() {
-    return Arrays.asList("id", "name", "type", "note", "extension", "roles", "instanceId", "instanceName");
+    return Arrays.asList("id", "name", "type", "note", "extension", "roles", "instanceId", "instanceName", "creationDate");
   }
 
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(id, name, type, note, extension, roles, instanceId, instanceName);
+    return Arrays.asList(id, name, type, note, extension, roles, instanceId, instanceName, creationDate);
   }
 
   @Override

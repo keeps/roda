@@ -9,9 +9,14 @@ package org.roda.core.index;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -339,7 +344,16 @@ public class IndexModelObserver implements ModelObserver {
     file.setInstanceId(aip.getInstanceId());
 
     FileCollection.Info info = new FileCollection.Info(aip, ancestors);
-
+    try {
+      StoragePath binaryPath = ModelUtils.getFileStoragePath(file);
+      Path path = model.getStorage().getDirectAccess(binaryPath).getPath();
+      BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
+      FileTime fileTime = attr.creationTime();
+      file.setCreationDate(new Date(fileTime.toMillis()));
+    } catch (RequestNotValidException | AuthorizationDeniedException | NotFoundException | GenericException |
+             IOException e) {
+      LOGGER.error("Could not set the creation date of File");
+    }
     if (FSUtils.isManifestOfExternalFiles(file.getId())) {
       try (CloseableIterable<OptionalWithCause<File>> allExternalFiles = model.listExternalFilesUnder(file)) {
         for (OptionalWithCause<File> shallowFile : allExternalFiles) {
@@ -988,6 +1002,16 @@ public class IndexModelObserver implements ModelObserver {
     if (PreservationMetadataType.EVENT.equals(type)) {
       indexPreservationEvent(pm).addTo(ret);
     } else if (PreservationMetadataType.AGENT.equals(type)) {
+      try {
+        StoragePath binaryPath = ModelUtils.getPreservationMetadataStoragePath(pm);
+        Path path = model.getStorage().getDirectAccess(binaryPath).getPath();
+        BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
+        FileTime fileTime = attr.creationTime();
+        pm.setCreationDate(new Date(fileTime.toMillis()));
+      } catch (RequestNotValidException | AuthorizationDeniedException | NotFoundException | GenericException |
+               IOException e) {
+        LOGGER.error("Could not set the creation date of Preservation Agent");
+      }
       SolrUtils.create2(index, (ModelObserver) this, IndexedPreservationAgent.class, pm).addTo(ret);
     }
 

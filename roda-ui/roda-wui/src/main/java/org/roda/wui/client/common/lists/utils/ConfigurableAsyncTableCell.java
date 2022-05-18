@@ -301,6 +301,7 @@ public class ConfigurableAsyncTableCell<T extends IsIndexed> extends AsyncTableC
       fieldsToReturn.add(RodaConstants.FILE_AIP_ID);
       fieldsToReturn.add(RodaConstants.FILE_REPRESENTATION_ID);
       fieldsToReturn.add(RodaConstants.FILE_ISREFERENCE);
+      fieldsToReturn.add(RodaConstants.INDEX_CREATION_DATE);
     }
 
     return fieldsToReturn;
