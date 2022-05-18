@@ -133,65 +133,6 @@ public class Jobs extends RodaWuiController {
     }
   }
 
-  public static <T extends IsIndexed> List<Job> createJobs(User user, SelectedItems<T> selectedItems, String jobName,
-    String pluginName, Map<String, String> value, JobPriority priority, JobParallelism parallelism, boolean async)
-    throws AuthorizationDeniedException, RequestNotValidException, JobAlreadyStartedException, NotFoundException,
-    GenericException {
-    ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    List<Job> jobs = new ArrayList<>();
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    // split instances
-    HashMap<String, SelectedItems<T>> instancesItems = JobsHelper.splitInstancesItems(selectedItems);
-
-    for (String instance : instancesItems.keySet()) {
-      Job job = new Job();
-      job.setName(jobName);
-      job.setSourceObjects(instancesItems.get(instance));
-      job.setPlugin(pluginName);
-      job.setPluginParameters(value);
-      job.setInstanceId(instance);
-      job.setPriority(priority);
-      job.setParallelism(parallelism);
-
-      JobUserDetails jobUserDetails = new JobUserDetails();
-      jobUserDetails.setUsername(user.getName());
-      jobUserDetails.setEmail(user.getEmail());
-      jobUserDetails.setFullname(user.getFullName());
-      jobUserDetails.setRole(RodaConstants.PreservationAgentRole.EXECUTING_PROGRAM.toString());
-      job.getJobUsersDetails().add(jobUserDetails);
-      // When it is RODA CENTRAL
-      if (instance == null) {
-        Job updatedJob = createJob(user, job, async);
-        jobs.add(updatedJob);
-      } else {
-
-        // validate input and set missing information when possible
-        JobsHelper.validateAndSetJobInformation(user, job);
-
-        Job updatedJob = new Job(job);
-
-        LogEntryState state = LogEntryState.SUCCESS;
-
-        try {
-          // delegate
-          updatedJob = JobsHelper.createJob(job, async);
-          jobs.add(updatedJob);
-        } catch (RODAException e) {
-          state = LogEntryState.FAILURE;
-          throw e;
-        } finally {
-          // register action
-          controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_JOB_PARAM, updatedJob);
-        }
-      }
-    }
-    return jobs;
-  }
-
   public static Job startJob(User user, String jobId) throws RequestNotValidException, GenericException,
     NotFoundException, AuthorizationDeniedException, JobAlreadyStartedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};

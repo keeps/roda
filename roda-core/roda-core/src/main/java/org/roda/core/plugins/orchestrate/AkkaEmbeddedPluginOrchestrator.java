@@ -43,6 +43,7 @@ import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
@@ -150,8 +151,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public <T extends IsRODAObject, T1 extends IsIndexed> void runPluginFromIndex(Object context, Job job, Class<T1> classToActOn,
-    Filter filter, Boolean justActive ,Plugin<T> plugin) {
+  public <T extends IsRODAObject, T1 extends IsIndexed> void runPluginFromIndex(Object context, Job job,
+    Class<T1> classToActOn, Filter filter, Boolean justActive, Plugin<T> plugin) {
     try {
       LOGGER.info("Starting {} (which will be done asynchronously)", plugin.getName());
       boolean noObjectsOrchestrated = true;
@@ -161,12 +162,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       Plugin<T> innerPlugin;
       Class<T> modelClassToActOn = (Class<T>) ModelUtils.giveRespectiveModelClass(classToActOn);
 
-      jobStateInfoActor.tell(
-        Messages.newPluginBeforeAllExecuteIsReady(plugin).withParallelism(job.getParallelism()).withJobPriority(job.getPriority()),
-        jobActor);
+      jobStateInfoActor.tell(Messages.newPluginBeforeAllExecuteIsReady(plugin).withParallelism(job.getParallelism())
+        .withJobPriority(job.getPriority()), jobActor);
 
       List<String> liteFields = SolrUtils.getClassLiteFields(classToActOn);
-      try (IterableIndexResult<T1> findAll = index.findAll(classToActOn, filter,justActive, liteFields)) {
+      try (IterableIndexResult<T1> findAll = index.findAll(classToActOn, filter, justActive, liteFields)) {
         Iterator<T1> findAllIterator = findAll.iterator();
         List<T1> indexObjects = new ArrayList<>();
 
@@ -221,7 +221,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       JobPriority priority = job.getPriority();
 
       jobStateInfoActor.tell(
-        Messages.newPluginBeforeAllExecuteIsReady(plugin).withParallelism(parallelism).withJobPriority(priority), jobActor);
+        Messages.newPluginBeforeAllExecuteIsReady(plugin).withParallelism(parallelism).withJobPriority(priority),
+        jobActor);
 
       List<T> block = new ArrayList<>();
       while (iter.hasNext()) {
@@ -272,7 +273,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       JobParallelism parallelism = job.getParallelism();
       JobPriority priority = job.getPriority();
       jobStateInfoActor.tell(
-        Messages.newPluginBeforeAllExecuteIsReady(plugin).withParallelism(parallelism).withJobPriority(priority), jobActor);
+        Messages.newPluginBeforeAllExecuteIsReady(plugin).withParallelism(parallelism).withJobPriority(priority),
+        jobActor);
 
       List<LiteOptionalWithCause> block = new ArrayList<>();
       while (iter.hasNext()) {
@@ -323,12 +325,12 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       initJobPluginInfo(plugin, job, 0, jobActor);
       jobStateInfoActor.tell(
-        Messages.newPluginBeforeAllExecuteIsReady(plugin).withParallelism(parallelism).withJobPriority(priority), jobActor);
+        Messages.newPluginBeforeAllExecuteIsReady(plugin).withParallelism(parallelism).withJobPriority(priority),
+        jobActor);
       jobStateInfoActor.tell(Messages.newPluginExecuteIsReady(plugin, Collections.emptyList()).withJobPriority(priority)
         .withParallelism(parallelism), jobActor);
-      jobStateInfoActor.tell(
-        Messages.newJobInitEnded(getJobPluginInfo(plugin), false).withJobPriority(priority).withParallelism(parallelism),
-        jobActor);
+      jobStateInfoActor.tell(Messages.newJobInitEnded(getJobPluginInfo(plugin), false).withJobPriority(priority)
+        .withParallelism(parallelism), jobActor);
 
     } catch (JobIsStoppingException | JobInErrorException e) {
       // do nothing
@@ -411,25 +413,71 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   @Override
   public void executeJob(Job job, boolean async) throws JobAlreadyStartedException {
-    LOGGER.info("Adding job '{}' ({}) to be executed", job.getName(), job.getId());
-
-    if (runningJobs.containsKey(job.getId())) {
-      LOGGER.info("Job '{}' ({}) is already queued to be executed", job.getName(), job.getId());
-      throw new JobAlreadyStartedException();
-    } else {
-      if (async) {
-        jobsManager.tell(job, ActorRef.noSender());
+    if (!RodaConstants.DistributedModeType.CENTRAL.equals(RodaCoreFactory.getDistributedModeType())
+      || job.getInstanceId() == null) {
+      LOGGER.info("Adding job '{}' ({}) to be executed", job.getName(), job.getId());
+      if (runningJobs.containsKey(job.getId())) {
+        LOGGER.info("Job '{}' ({}) is already queued to be executed", job.getName(), job.getId());
+        throw new JobAlreadyStartedException();
       } else {
-        int timeoutInSeconds = JobsHelper.getSyncTimeout();
-        Timeout timeout = new Timeout(Duration.create(timeoutInSeconds, "seconds"));
-        Future<Object> future = Patterns.ask(jobsManager, job, timeout);
-        try {
-          Await.result(future, timeout.duration());
-        } catch (Exception e) {
-          LOGGER.error("Error executing job synchronously", e);
+        if (async) {
+          jobsManager.tell(job, ActorRef.noSender());
+        } else {
+          int timeoutInSeconds = JobsHelper.getSyncTimeout();
+          Timeout timeout = new Timeout(Duration.create(timeoutInSeconds, "seconds"));
+          Future<Object> future = Patterns.ask(jobsManager, job, timeout);
+          try {
+            Await.result(future, timeout.duration());
+          } catch (Exception e) {
+            LOGGER.error("Error executing job synchronously", e);
+          }
         }
+        LOGGER.info("Success adding job '{}' ({}) to be executed", job.getName(), job.getId());
       }
-      LOGGER.info("Success adding job '{}' ({}) to be executed", job.getName(), job.getId());
+    }
+  }
+
+  @Override
+  public void createAndExecuteJobs(Job job, boolean async) throws JobAlreadyStartedException,
+    AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    if (!RodaCoreFactory.getDistributedModeType().equals(RodaConstants.DistributedModeType.CENTRAL)) {
+      RodaCoreFactory.getModelService().createJob(job);
+      RodaCoreFactory.getPluginOrchestrator().executeJob(job, async);
+    } else {
+      List<String> jobIds = new ArrayList<>();
+      final HashMap<String, SelectedItems<?>> instancesItems = JobsHelper.splitInstancesItems(job.getSourceObjects());
+      if (instancesItems.keySet().size() == 1 && instancesItems.containsKey(null)) {
+        RodaCoreFactory.getModelService().createJob(job);
+        RodaCoreFactory.getPluginOrchestrator().executeJob(job, async);
+      } else {
+        for (String instance : instancesItems.keySet()) {
+          Job newJob = job.clone();
+          if (instance != null) {
+            newJob.setId(IdUtils.createUUID());
+          } else {
+            newJob.setId(job.getId());
+          }
+          newJob.setSourceObjects(instancesItems.get(instance));
+          newJob.setInstanceId(instance);
+          if (newJob.getSourceObjects() instanceof SelectedItemsList) {
+            newJob.getJobStats()
+              .setSourceObjectsCount(((SelectedItemsList<?>) newJob.getSourceObjects()).getIds().size());
+          }
+          RodaCoreFactory.getModelService().createJob(newJob);
+          RodaCoreFactory.getPluginOrchestrator().executeJob(newJob, async);
+          jobIds.add(newJob.getId());
+        }
+        StringBuilder details = new StringBuilder();
+        details.append("Created the following jobs");
+        for (String jobId : jobIds) {
+          details.append(", ").append(jobId);
+        }
+        job.setName("Distributed Jobs");
+        job.setStateDetails(details.toString());
+        job.setState(JOB_STATE.COMPLETED);
+        job.getJobStats().setCompletionPercentage(100);
+        RodaCoreFactory.getModelService().createJob(job);
+      }
     }
   }
 
@@ -439,7 +487,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     ActorRef jobStateInfoActor = getJobContextInformation(jobId);
     if (jobStateInfoActor != null) {
       stoppingJobs.add(jobId);
-      jobStateInfoActor.tell(Messages.newJobStop().withJobPriority(job.getPriority()).withParallelism(job.getParallelism()),
+      jobStateInfoActor.tell(
+        Messages.newJobStop().withJobPriority(job.getPriority()).withParallelism(job.getParallelism()),
         ActorRef.noSender());
     }
   }
@@ -466,8 +515,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         job.setPluginType(PluginType.INTERNAL);
         job.setUsername(RodaConstants.ADMIN);
 
-        RodaCoreFactory.getModelService().createJob(job);
-        RodaCoreFactory.getPluginOrchestrator().executeJob(job, true);
+        RodaCoreFactory.getPluginOrchestrator().createAndExecuteJobs(job, true);
       }
     } catch (JobAlreadyStartedException | GenericException | RequestNotValidException | NotFoundException
       | AuthorizationDeniedException | IOException e) {

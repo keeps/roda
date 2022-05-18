@@ -755,7 +755,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public <T extends IsIndexed> List<Job> createProcess(String jobName, JobPriority priority, JobParallelism parallelism,
+  public <T extends IsIndexed> Job createProcess(String jobName, JobPriority priority, JobParallelism parallelism,
     SelectedItems<T> selected, String id, Map<String, String> value, String selectedClass)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
     JobAlreadyStartedException {
@@ -770,11 +770,20 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
       }
     }
 
-    return Jobs.createJobs(user, selectedItems, jobName, id, value, priority, parallelism, true);
+    Job job = new Job();
+    job.setName(jobName);
+    job.setSourceObjects(selectedItems);
+    job.setPlugin(id);
+    job.setPluginParameters(value);
+    job.setUsername(user.getName());
+    job.setPriority(priority);
+    job.setParallelism(parallelism);
+
+    return Jobs.createJob(user, job, true);
   }
 
   @Override
-  public <T extends IsIndexed> List<Job> createProcess(String jobName, SelectedItems<T> selected, String id,
+  public <T extends IsIndexed> Job createProcess(String jobName, SelectedItems<T> selected, String id,
     Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
     NotFoundException, GenericException, JobAlreadyStartedException {
     return createProcess(jobName, JobPriority.MEDIUM, JobParallelism.NORMAL, selected, id, value, selectedClass);
@@ -802,7 +811,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     jobUserDetails.setFullname(user.getFullName());
     jobUserDetails.setRole(RodaConstants.PreservationAgentRole.EXECUTING_PROGRAM.toString());
 
-    
     Job job = new Job();
     job.setId(IdUtils.createUUID());
     job.setName(jobName);
@@ -1407,8 +1415,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public LocalInstance registerLocalInstance(LocalInstance localInstance)
-          throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException, RequestNotValidException, NotFoundException {
+  public LocalInstance registerLocalInstance(LocalInstance localInstance) throws AuthorizationDeniedException,
+    GenericException, AuthenticationDeniedException, RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return RODAInstance.registerLocalInstance(user, localInstance);
   }

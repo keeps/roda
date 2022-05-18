@@ -152,7 +152,7 @@ public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
     }, index, model, storage);
   }
 
-  private void sendSyncBundle(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job cachedJob) {
+  private void  sendSyncBundle(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job cachedJob) {
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
     PluginState pluginState = PluginState.SKIPPED;
