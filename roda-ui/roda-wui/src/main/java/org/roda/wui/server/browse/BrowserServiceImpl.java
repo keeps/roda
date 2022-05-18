@@ -112,6 +112,7 @@ import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.server.ServerTools;
+import org.roda.wui.servlets.ContextListener;
 import org.roda_project.commons_ip.model.RepresentationContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -813,6 +814,9 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     if (command != null) {
       command = command.replace("{{jsonObject}}",
         StringEscapeUtils.escapeJava(JsonUtils.getJsonFromObject(job, JobMixIn.class)));
+
+      command = command.replace("{{RODA_CONTEXT_PATH}}",
+        StringEscapeUtils.escapeJava(ContextListener.getServletContext().getContextPath()));
       return command;
     } else {
       return "";
