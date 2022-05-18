@@ -31,14 +31,15 @@ import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ExtraMediaType;
 import org.roda.wui.api.v1.utils.ObjectResponse;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @Path(PreservationMetadataEventsResource.ENDPOINT)
-@Api(value = PreservationMetadataEventsResource.SWAGGER_ENDPOINT)
+@Tag(name = PreservationMetadataEventsResource.SWAGGER_ENDPOINT)
 public class PreservationMetadataEventsResource {
   public static final String ENDPOINT = "/v1/events";
   public static final String SWAGGER_ENDPOINT = "v1 events";
@@ -50,19 +51,18 @@ public class PreservationMetadataEventsResource {
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_HTML,
     ExtraMediaType.APPLICATION_JAVASCRIPT})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
-  @ApiOperation(value = "Get events preservation metadata", notes = "Get events preservation metadata", response = String.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "Successful response", response = String.class),
-    @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
-
+  @Operation(summary = "Get events preservation metadata", description = "Gets preservation metadata of events", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = String.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
   public Response getPreservationMetadataEvent(
-    @ApiParam(value = "The ID of the event", required = true) @QueryParam(RodaConstants.API_QUERY_PARAM_ID) String id,
-    @ApiParam(value = "The ID of the AIP related to the event") @QueryParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
-    @ApiParam(value = "The UUID of the representation related to the event") @QueryParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID) String representationUUID,
-    @ApiParam(value = "The UUID of the file related to the event") @QueryParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileUUID,
-    @ApiParam(value = "Get only event detail information", defaultValue = "true") @QueryParam(RodaConstants.API_QUERY_PARAM_ONLY_DETAILS) boolean onlyDetails,
-    @ApiParam(value = "Choose format in which to get the event", allowableValues = RodaConstants.API_GET_METADATA_MEDIA_TYPES, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-    @ApiParam(value = "The language for the HTML output", allowableValues = RodaConstants.API_DESCRIPTIVE_METADATA_LANGUAGES, defaultValue = RodaConstants.API_QUERY_VALUE_LANG_DEFAULT) @DefaultValue(RodaConstants.API_QUERY_VALUE_LANG_DEFAULT) @QueryParam(RodaConstants.API_QUERY_KEY_LANG) String language,
-    @ApiParam(value = "JSONP callback name", required = false, allowMultiple = false, defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    @Parameter(description = "The ID of the event", required = true) @QueryParam(RodaConstants.API_QUERY_PARAM_ID) String id,
+    @Parameter(description = "The ID of the AIP related to the event") @QueryParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @Parameter(description = "The UUID of the representation related to the event") @QueryParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_UUID) String representationUUID,
+    @Parameter(description = "The UUID of the file related to the event") @QueryParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileUUID,
+    @Parameter(description = "Get only event detail information", schema = @Schema(defaultValue = "true")) @QueryParam(RodaConstants.API_QUERY_PARAM_ONLY_DETAILS) boolean onlyDetails,
+    @Parameter(description = "Choose format in which to get the event", schema = @Schema(implementation = RodaConstants.MetadataMediaTypes.class, defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON)) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @Parameter(description = "The language for the HTML output", schema = @Schema(implementation = RodaConstants.DescriptibeMetadataLanguages.class, defaultValue = RodaConstants.API_QUERY_VALUE_LANG_DEFAULT)) @DefaultValue(RodaConstants.API_QUERY_VALUE_LANG_DEFAULT) @QueryParam(RodaConstants.API_QUERY_KEY_LANG) String language,
+    @Parameter(description = "JSONP callback name", required = false, schema = @Schema(defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK)) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 

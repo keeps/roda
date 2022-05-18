@@ -61,9 +61,12 @@ import org.roda.wui.common.server.RodaStreamingOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST API resource Index.
@@ -71,7 +74,7 @@ import io.swagger.annotations.ApiParam;
  * @author Rui Castro <rui.castro@gmail.com>
  */
 @Path("/v1/index")
-@Api(value = "v1 index")
+@Tag(name = "v1 index")
 public class IndexResource {
   /**
    * Logger.
@@ -114,55 +117,53 @@ public class IndexResource {
    * Find indexed resources.
    *
    * @param returnClass
-   *                           {@link Class} of resources to return.
+   *          {@link Class} of resources to return.
    * @param filterParameters
-   *                           List of filter parameters. Example:
-   *                           "formatPronom=fmt/19".
+   *          List of filter parameters. Example: "formatPronom=fmt/19".
    * @param sortParameters
-   *                           List of sort parameters. Examples: "formatPronom",
-   *                           "uuid desc".
+   *          List of sort parameters. Examples: "formatPronom", "uuid desc".
    * @param start
-   *                           Index of the first element to return (0-based
-   *                           index).
+   *          Index of the first element to return (0-based index).
    * @param limit
-   *                           Maximum number of elements to return.
+   *          Maximum number of elements to return.
    * @param facetAttributes
-   *                           Facets to return.
+   *          Facets to return.
    * @param facetLimit
-   *                           Maximum number of facets to return.
+   *          Maximum number of facets to return.
    * @param localeString
-   *                           the locale.
+   *          the locale.
    * @param onlyActive
-   *                           Return only active resources?
+   *          Return only active resources?
    * @param exportFacets
-   *                           for CSV results, export only facets?
+   *          for CSV results, export only facets?
    * @param filename
-   *                           the filename for exported CSV.
+   *          the filename for exported CSV.
    * @param <T>
-   *                           Type of the resources to return.
+   *          Type of the resources to return.
    * @return a {@link Response} with the resources.
    * @throws RODAException
-   *                         if some error occurs.
+   *           if some error occurs.
    */
   @GET
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.TEXT_CSV,
     ExtraMediaType.APPLICATION_JAVASCRIPT})
   @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
-  @ApiOperation(value = "Find indexed resources", notes = "Find indexed resources.", response = IndexResult.class, responseContainer = "List")
+  @Operation(summary = "Find indexed resources", description = "Find indexed resources", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = IndexResult.class)))})
   public <T extends IsIndexed> Response list(
-    @ApiParam(value = "Class of resources to return", required = true, example = "org.roda.core.data.v2.ip.IndexedFile") @QueryParam(RodaConstants.API_QUERY_KEY_RETURN_CLASS) final String returnClass,
-    @ApiParam(value = "Filter parameters", example = "formatPronom=fmt/19") @QueryParam(RodaConstants.API_QUERY_KEY_FILTER) final List<String> filterParameters,
-    @ApiParam(value = "Sort parameters", example = "\"formatPronom\", \"uuid desc\"") @QueryParam(RodaConstants.API_QUERY_KEY_SORT) final List<String> sortParameters,
-    @ApiParam(value = "Index of the first element to return (0-based index)", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) final Integer start,
-    @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) final Integer limit,
-    @ApiParam(value = "Facets to return", example = "formatPronom") @QueryParam(RodaConstants.API_QUERY_KEY_FACET) final List<String> facetAttributes,
-    @ApiParam(value = "Facet limit", example = "100", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_FACET_LIMIT) final Integer facetLimit,
-    @ApiParam(value = "Language", example = "en", defaultValue = "en") @QueryParam(RodaConstants.API_QUERY_KEY_LANG) final String localeString,
-    @ApiParam(value = "Return only active resources?", defaultValue = "true") @QueryParam(RodaConstants.API_QUERY_KEY_ONLY_ACTIVE) final Boolean onlyActive,
-    @ApiParam(value = "Export facet data", defaultValue = "false") @QueryParam(RodaConstants.API_QUERY_KEY_EXPORT_FACETS) final boolean exportFacets,
-    @ApiParam(value = "Filename", defaultValue = DEFAULT_CSV_FILENAME) @QueryParam(RodaConstants.API_QUERY_KEY_FILENAME) final String filename,
-    @ApiParam(value = "Choose format in which to get the response") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-    @ApiParam(value = "JSONP callback name", required = false, allowMultiple = false, defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    @Parameter(description = "Class of resources to return", required = true, example = "org.roda.core.data.v2.ip.IndexedFile") @QueryParam(RodaConstants.API_QUERY_KEY_RETURN_CLASS) final String returnClass,
+    @Parameter(description = "Filter parameters", example = "formatPronom=fmt/19") @QueryParam(RodaConstants.API_QUERY_KEY_FILTER) final List<String> filterParameters,
+    @Parameter(description = "Sort parameters", example = "\"formatPronom\", \"uuid desc\"") @QueryParam(RodaConstants.API_QUERY_KEY_SORT) final List<String> sortParameters,
+    @Parameter(description = "Index of the first element to return (0-based index)", schema = @Schema(defaultValue = "0")) @QueryParam(RodaConstants.API_QUERY_KEY_START) final Integer start,
+    @Parameter(description = "Maximum number of elements to return", schema = @Schema(defaultValue = "100")) @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) final Integer limit,
+    @Parameter(description = "Facets to return", example = "formatPronom") @QueryParam(RodaConstants.API_QUERY_KEY_FACET) final List<String> facetAttributes,
+    @Parameter(description = "Facet limit", example = "100", schema = @Schema(defaultValue = "100")) @QueryParam(RodaConstants.API_QUERY_KEY_FACET_LIMIT) final Integer facetLimit,
+    @Parameter(description = "Language", example = "en", schema = @Schema(defaultValue = "en")) @QueryParam(RodaConstants.API_QUERY_KEY_LANG) final String localeString,
+    @Parameter(description = "Return only active resources?", schema = @Schema(defaultValue = "true")) @QueryParam(RodaConstants.API_QUERY_KEY_ONLY_ACTIVE) final Boolean onlyActive,
+    @Parameter(description = "Export facet data", schema = @Schema(defaultValue = "false")) @QueryParam(RodaConstants.API_QUERY_KEY_EXPORT_FACETS) final boolean exportFacets,
+    @Parameter(description = "Filename", schema = @Schema(defaultValue = DEFAULT_CSV_FILENAME)) @QueryParam(RodaConstants.API_QUERY_KEY_FILENAME) final String filename,
+    @Parameter(description = "Choose format in which to get the response") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @Parameter(description = "JSONP callback name", required = false, schema = @Schema(defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK)) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
     throws RODAException {
 
     final String mediaType = ApiUtils.getMediaType(acceptFormat, request);
@@ -231,19 +232,20 @@ public class IndexResource {
    * Find indexed resources.
    *
    * @param findRequest
-   *                      find parameters.
+   *          find parameters.
    * @param <T>
-   *                      Type of the resources to return.
+   *          Type of the resources to return.
    * @return a {@link Response} with the resources.
    * @throws RODAException
-   *                         if some error occurs.
+   *           if some error occurs.
    */
   @POST
   @Path("/find")
   @Consumes({MediaType.APPLICATION_JSON})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.TEXT_CSV})
-  @ApiOperation(value = "Find indexed resources", notes = "Find indexed resources.", response = IsIndexed.class, responseContainer = "List")
-  public <T extends IsIndexed> Response find(@ApiParam(value = "Find parameters") final FindRequest findRequest)
+  @Operation(summary = "Find indexed resources", description = "Finds existing indexed resources", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = IsIndexed.class)))})
+  public <T extends IsIndexed> Response find(@Parameter(description = "Find parameters") final FindRequest findRequest)
     throws RODAException {
 
     final String mediaType = ApiUtils.getMediaType(null, request);
@@ -264,12 +266,12 @@ public class IndexResource {
    * Find indexed resources.
    *
    * @param findRequestString
-   *                            find parameters.
+   *          find parameters.
    * @param type
-   *                            the type of output ("csv").
+   *          the type of output ("csv").
    * @return a {@link Response} with the resources.
    * @throws RODAException
-   *                         if some error occurs.
+   *           if some error occurs.
    */
   @POST
   @Path("/findFORM")
@@ -292,17 +294,19 @@ public class IndexResource {
    * Count indexed resources.
    *
    * @param countRequest
-   *                       count parameters.
+   *          count parameters.
    * @return a {@link Response} with the count.
    * @throws RODAException
-   *                         if some error occurs.
+   *           if some error occurs.
    */
   @POST
   @Path("/count")
   @Consumes({MediaType.APPLICATION_JSON})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "Count indexed resources", notes = "Count indexed resources.", response = Long.class)
-  public Response count(@ApiParam(value = "Count parameters") final CountRequest countRequest) throws RODAException {
+  @Operation(summary = "Count indexed resources", description = "Counts indexed resources", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Long.class)))})
+  public Response count(@Parameter(description = "Count parameters") final CountRequest countRequest)
+    throws RODAException {
     final String mediaType = ApiUtils.getMediaType(null, request);
     final User user = UserUtility.getApiUser(request);
     final long result = Browser.count(user, getClass(countRequest.classToReturn), countRequest.filter,
@@ -314,19 +318,18 @@ public class IndexResource {
    * Produces a CSV response with results or facets.
    * 
    * @param findRequest
-   *                      the request parameters.
+   *          the request parameters.
    * @param user
-   *                      the current {@link User}.
+   *          the current {@link User}.
    * @param <T>
-   *                      Type of the resources to return.
+   *          Type of the resources to return.
    * @return a {@link Response} with CSV.
    * @throws RequestNotValidException
-   *                                        it the request is not valid.
+   *           it the request is not valid.
    * @throws AuthorizationDeniedException
-   *                                        if the user is not authorized to
-   *                                        perform this operation.
+   *           if the user is not authorized to perform this operation.
    * @throws GenericException
-   *                                        if some other error occurs.
+   *           if some other error occurs.
    */
   private <T extends IsIndexed> Response csvResponse(final FindRequest findRequest, final User user,
     String localeString) throws RequestNotValidException, AuthorizationDeniedException, GenericException {
@@ -367,12 +370,12 @@ public class IndexResource {
    * Return the {@link Class} with the specified class name.
    * 
    * @param className
-   *                    the fully qualified name of the desired class.
+   *          the fully qualified name of the desired class.
    * @param <T>
-   *                    the type of {@link Class}.
+   *          the type of {@link Class}.
    * @return the {@link Class} with the specified class name.
    * @throws RequestNotValidException
-   *                                    if the class name is not valid.
+   *           if the class name is not valid.
    */
   @SuppressWarnings("unchecked")
   private <T> Class<T> getClass(final String className) throws RequestNotValidException {

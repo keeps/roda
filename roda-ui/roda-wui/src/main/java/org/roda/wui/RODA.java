@@ -7,14 +7,17 @@
  */
 package org.roda.wui;
 
+import javax.servlet.ServletContextListener;
 import javax.servlet.http.HttpServlet;
 
 import org.jasig.cas.client.session.SingleSignOutHttpSessionListener;
 import org.roda.wui.filter.OnOffFilter;
+import org.roda.wui.servlets.ContextListener;
 import org.roda.wui.servlets.RodaWuiServlet;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,6 +45,11 @@ public class RODA {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
       registry.addResourceHandler("/org.roda.wui.RodaWUI/**").addResourceLocations("classpath:/org.roda.wui.RodaWUI/");
     }
+  }
+
+  @Bean
+  public ServletListenerRegistrationBean<ServletContextListener> registerServletContext() {
+    return new ServletListenerRegistrationBean<>(new ContextListener());
   }
 
   @Bean
