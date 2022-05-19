@@ -11,6 +11,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
@@ -68,8 +69,13 @@ public class PreservationAgentPackagePlugin extends RodaEntityPackagesPlugin<Ind
   @Override
   protected List<IterableIndexResult> retrieveList(IndexService index)
     throws RequestNotValidException, GenericException {
+    Filter filter = new Filter();
+    if (fromDate != null) {
+      filter.add(new DateIntervalFilterParameter(RodaConstants.PRESERVATION_AGENT_CREATED_ON, RodaConstants.PRESERVATION_AGENT_CREATED_ON,
+        fromDate, toDate));
+    }
     return Arrays
-      .asList(index.findAll(IndexedPreservationAgent.class, new Filter(), Arrays.asList(RodaConstants.INDEX_UUID)));
+      .asList(index.findAll(IndexedPreservationAgent.class, filter, Arrays.asList(RodaConstants.INDEX_UUID)));
   }
 
   @Override
