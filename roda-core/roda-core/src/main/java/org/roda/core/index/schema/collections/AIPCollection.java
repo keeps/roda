@@ -84,7 +84,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     fields.add(new Field(RodaConstants.INDEX_INSTANCE_ID, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.INDEX_INSTANCE_NAME, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.AIP_ANCESTORS, Field.TYPE_STRING).setMultiValued(true));
-    fields.add(new Field(RodaConstants.INDEX_CREATED_ON, Field.TYPE_DATE));
+    fields.add(new Field(RodaConstants.AIP_CREATED_ON, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.AIP_CREATED_BY, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.AIP_UPDATED_ON, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.AIP_UPDATED_BY, Field.TYPE_STRING));
@@ -158,7 +158,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
 
     doc.addField(RodaConstants.INDEX_INSTANCE_ID, aip.getInstanceId());
 
-    doc.addField(RodaConstants.INDEX_CREATED_ON, SolrUtils.formatDate(aip.getCreatedOn()));
+    doc.addField(RodaConstants.AIP_CREATED_ON, SolrUtils.formatDate(aip.getCreatedOn()));
     doc.addField(RodaConstants.AIP_CREATED_BY, aip.getCreatedBy());
     doc.addField(RodaConstants.AIP_UPDATED_ON, SolrUtils.formatDate(aip.getUpdatedOn()));
     doc.addField(RodaConstants.AIP_UPDATED_BY, aip.getUpdatedBy());
@@ -333,7 +333,7 @@ public class AIPCollection extends AbstractSolrCollection<IndexedAIP, AIP> {
     final String title = titles.isEmpty() ? null : titles.get(0);
     final String description = descriptions.isEmpty() ? null : descriptions.get(0);
 
-    final Date createdOn = SolrUtils.objectToDate(doc.get(RodaConstants.INDEX_CREATED_ON));
+    final Date createdOn = SolrUtils.objectToDate(doc.get(RodaConstants.AIP_CREATED_ON));
     final String createdBy = SolrUtils.objectToString(doc.get(RodaConstants.AIP_CREATED_BY), "");
     final Date updatedOn = SolrUtils.objectToDate(doc.get(RodaConstants.AIP_UPDATED_ON));
     final String updatedBy = SolrUtils.objectToString(doc.get(RodaConstants.AIP_UPDATED_BY), "");

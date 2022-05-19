@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.roda.core.data.common.RodaConstants;
@@ -88,7 +87,7 @@ public class RiskCollection extends AbstractSolrCollection<IndexedRisk, Risk> {
     fields.add(new Field(RodaConstants.RISK_MITIGATION_OWNER, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_TYPE, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE, Field.TYPE_STRING));
-    fields.add(new Field(RodaConstants.INDEX_CREATED_ON, Field.TYPE_DATE).setRequired(true));
+    fields.add(new Field(RodaConstants.RISK_CREATED_ON, Field.TYPE_DATE).setRequired(true));
     fields.add(new Field(RodaConstants.RISK_CREATED_BY, Field.TYPE_STRING).setRequired(true));
     fields.add(new Field(RodaConstants.RISK_UPDATED_ON, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.RISK_UPDATED_BY, Field.TYPE_STRING));
@@ -142,13 +141,12 @@ public class RiskCollection extends AbstractSolrCollection<IndexedRisk, Risk> {
     doc.addField(RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE,
       risk.getMitigationRelatedEventIdentifierValue());
 
-    doc.addField(RodaConstants.INDEX_CREATED_ON, SolrUtils.formatDate(risk.getCreatedOn()));
+    doc.addField(RodaConstants.RISK_CREATED_ON, SolrUtils.formatDate(risk.getCreatedOn()));
     doc.addField(RodaConstants.RISK_CREATED_BY, risk.getCreatedBy());
     doc.addField(RodaConstants.RISK_UPDATED_ON, SolrUtils.formatDate(risk.getUpdatedOn()));
     doc.addField(RodaConstants.RISK_UPDATED_BY, risk.getUpdatedBy());
 
     doc.addField(RodaConstants.INDEX_INSTANCE_ID, risk.getInstanceId());
-
 
     // TODO calculate incidences count here
 
@@ -222,7 +220,7 @@ public class RiskCollection extends AbstractSolrCollection<IndexedRisk, Risk> {
     risk.setMitigationRelatedEventIdentifierValue(
       SolrUtils.objectToString(doc.get(RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE), null));
 
-    risk.setCreatedOn(SolrUtils.objectToDate(doc.get(RodaConstants.INDEX_CREATED_ON)));
+    risk.setCreatedOn(SolrUtils.objectToDate(doc.get(RodaConstants.RISK_CREATED_ON)));
     risk.setCreatedBy(SolrUtils.objectToString(doc.get(RodaConstants.RISK_CREATED_BY), null));
     risk.setUpdatedOn(SolrUtils.objectToDate(doc.get(RodaConstants.RISK_UPDATED_ON)));
     risk.setUpdatedBy(SolrUtils.objectToString(doc.get(RodaConstants.RISK_UPDATED_BY), null));

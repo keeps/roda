@@ -41,7 +41,7 @@ public class PreservationAgentList extends AsyncTableCell<IndexedPreservationAge
 
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.PRESERVATION_AGENT_ID, RodaConstants.PRESERVATION_AGENT_NAME, RodaConstants.PRESERVATION_AGENT_TYPE,
-    RodaConstants.PRESERVATION_AGENT_VERSION, RodaConstants.INDEX_CREATED_ON);
+    RodaConstants.PRESERVATION_AGENT_VERSION, RodaConstants.PRESERVATION_AGENT_CREATED_ON);
 
   @Override
   protected void adjustOptions(AsyncTableCellOptions<IndexedPreservationAgent> options) {

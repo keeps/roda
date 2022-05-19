@@ -115,7 +115,7 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
     fields.add(new Field(RodaConstants.INGEST_SIP_IDS, Field.TYPE_STRING).setMultiValued(true));
     fields.add(new Field(RodaConstants.INGEST_JOB_ID, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.INGEST_UPDATE_JOB_IDS, Field.TYPE_STRING).setMultiValued(true));
-    fields.add(new Field(RodaConstants.INDEX_CREATED_ON, Field.TYPE_DATE));
+    fields.add(new Field(RodaConstants.FILE_CREATED_ON, Field.TYPE_DATE));
 
     return fields;
   }
@@ -225,7 +225,7 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
       doc.addField(RodaConstants.FILE_FULLTEXT, fulltext);
     }
 
-    doc.addField(RodaConstants.INDEX_CREATED_ON, SolrUtils.formatDate(file.getCreatedOn()));
+    doc.addField(RodaConstants.FILE_CREATED_ON, SolrUtils.formatDate(file.getCreatedOn()));
 
     return doc;
   }
@@ -333,7 +333,7 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
     String dateCreatedByApplication = SolrUtils.objectToString(doc.get(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION),
       null);
     final List<String> ancestors = SolrUtils.objectToListString(doc.get(RodaConstants.AIP_ANCESTORS));
-    final Date createdOn = SolrUtils.objectToDate(doc.get(RodaConstants.INDEX_CREATED_ON));
+    final Date createdOn = SolrUtils.objectToDate(doc.get(RodaConstants.FILE_CREATED_ON));
 
     // handle other properties
     Map<String, List<String>> otherProperties = new HashMap<>();

@@ -80,7 +80,7 @@ public class RepresentationInformationCollection
       .setMultiValued(true));
     fields.add(new Field(RodaConstants.REPRESENTATION_INFORMATION_FILTERS, Field.TYPE_STRING).setMultiValued(true));
 
-    fields.add(new Field(RodaConstants.INDEX_CREATED_ON, Field.TYPE_DATE));
+    fields.add(new Field(RodaConstants.REPRESENTATION_INFORMATION_CREATED_ON, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.REPRESENTATION_INFORMATION_CREATED_BY, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.REPRESENTATION_INFORMATION_UPDATED_ON, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.REPRESENTATION_INFORMATION_UPDATED_BY, Field.TYPE_STRING));
@@ -120,7 +120,7 @@ public class RepresentationInformationCollection
     }
 
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_FILTERS, ri.getFilters());
-    doc.addField(RodaConstants.INDEX_CREATED_ON, SolrUtils.formatDate(ri.getCreatedOn()));
+    doc.addField(RodaConstants.REPRESENTATION_INFORMATION_CREATED_ON, SolrUtils.formatDate(ri.getCreatedOn()));
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_CREATED_BY, ri.getCreatedBy());
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_UPDATED_ON, SolrUtils.formatDate(ri.getUpdatedOn()));
     doc.addField(RodaConstants.REPRESENTATION_INFORMATION_UPDATED_BY, ri.getUpdatedBy());
@@ -147,7 +147,7 @@ public class RepresentationInformationCollection
 
     ri.setFilters(SolrUtils.objectToListString(doc.get(RodaConstants.REPRESENTATION_INFORMATION_FILTERS)));
 
-    ri.setCreatedOn(SolrUtils.objectToDate(doc.get(RodaConstants.INDEX_CREATED_ON)));
+    ri.setCreatedOn(SolrUtils.objectToDate(doc.get(RodaConstants.REPRESENTATION_INFORMATION_CREATED_ON)));
     ri.setCreatedBy(SolrUtils.objectToString(doc.get(RodaConstants.REPRESENTATION_INFORMATION_CREATED_BY), ""));
     ri.setUpdatedOn(SolrUtils.objectToDate(doc.get(RodaConstants.REPRESENTATION_INFORMATION_UPDATED_ON)));
     ri.setUpdatedBy(SolrUtils.objectToString(doc.get(RodaConstants.REPRESENTATION_INFORMATION_UPDATED_BY), ""));
