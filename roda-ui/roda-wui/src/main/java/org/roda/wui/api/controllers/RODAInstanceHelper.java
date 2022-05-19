@@ -117,7 +117,7 @@ public class RODAInstanceHelper {
     return SyncUtils.createLastSyncFileStreamResponse(filePath);
   }
 
-  public static Long synchronizeIfUpdated(User user) throws GenericException, NotFoundException {
+  public static Long retrieveLocalInstanceUpdates(User user) throws GenericException, NotFoundException {
 
     IndexService index = RodaCoreFactory.getIndexService();
     Long total = 0L;

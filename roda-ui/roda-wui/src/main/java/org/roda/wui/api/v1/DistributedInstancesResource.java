@@ -208,7 +208,7 @@ public class DistributedInstancesResource {
     // get user
     final User user = UserUtility.getApiUser(request);
     // delegate action to controller.
-    Long result = RODAInstance.retrieveUpdates( user, instanceIdentifier);
+    Long result = RODAInstance.retrieveCentralInstanceUpdates( user, instanceIdentifier);
 
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, result.toString())).build();
   }

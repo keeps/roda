@@ -385,7 +385,8 @@ public class SyncUtils {
   public static Long getUpdatesFromDistributedInstance(LocalInstance localInstance) throws GenericException {
     try {
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
-      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE + "updates"
+      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE
+        + RodaConstants.API_PATH_PARAM_DISTRIBUTED_INSTANCE_GET_UPDATES
         + RodaConstants.API_SEP + localInstance.getId();
 
       CloseableHttpClient httpClient = HttpClientBuilder.create().build();

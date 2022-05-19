@@ -447,7 +447,7 @@ public class RODAInstance extends RodaWuiController {
     Long totalupdates = 0L;
     try {
       // delegate
-      totalupdates += RODAInstanceHelper.synchronizeIfUpdated(user);
+      totalupdates += RODAInstanceHelper.retrieveLocalInstanceUpdates(user);
       return totalupdates;
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
@@ -471,7 +471,7 @@ public class RODAInstance extends RodaWuiController {
 
   }
 
-  public static Long retrieveUpdates(User user, String instanceIdentifier)
+  public static Long retrieveCentralInstanceUpdates(User user, String instanceIdentifier)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     Long total = 0L;
     ModelService model = RodaCoreFactory.getModelService();
