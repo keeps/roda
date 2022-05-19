@@ -35,7 +35,7 @@ public class PreservationMetadata implements IsModelObject, HasId {
 
   private String instanceId;
 
-  private Date creationDate;
+  private Date createdOn;
 
   public PreservationMetadata() {
     super();
@@ -135,12 +135,12 @@ public class PreservationMetadata implements IsModelObject, HasId {
     this.instanceId = instanceId;
   }
 
-  public Date getCreationDate() {
-    return creationDate;
+  public Date getCreatedOn() {
+    return createdOn;
   }
 
-  public void setCreationDate(Date creationDate) {
-    this.creationDate = creationDate;
+  public void setCreatedOn(Date createdOn) {
+    this.createdOn = createdOn;
   }
 
   @Override
@@ -154,7 +154,7 @@ public class PreservationMetadata implements IsModelObject, HasId {
     result = prime * result + ((representationId == null) ? 0 : representationId.hashCode());
     result = prime * result + ((type == null) ? 0 : type.hashCode());
     result = prime * result + ((instanceId == null) ? 0 : instanceId.hashCode());
-    result = prime * result + ((creationDate == null) ? 0 : creationDate.hashCode());
+    result = prime * result + ((createdOn == null) ? 0 : createdOn.hashCode());
     return result;
   }
 
@@ -206,7 +206,7 @@ public class PreservationMetadata implements IsModelObject, HasId {
   public String toString() {
     return "PreservationMetadata [id=" + id + ", aipId=" + aipId + ", representationId=" + representationId
       + ", fileDirectoryPath=" + fileDirectoryPath + ", fileId=" + fileId + ", type=" + type + ", instanceId="
-      + instanceId + ", creationDate=" + creationDate + "]";
+      + instanceId + ", createdOn=" + createdOn + "]";
   }
 
 }

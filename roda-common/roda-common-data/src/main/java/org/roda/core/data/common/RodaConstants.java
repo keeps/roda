@@ -730,7 +730,7 @@ public final class RodaConstants {
 
   public static final String INDEX_INSTANCE_ID = "instanceId";
   public static final String INDEX_INSTANCE_NAME = "instanceName";
-  public static final String INDEX_CREATION_DATE = "creationDate";
+  public static final String INDEX_CREATED_ON = "createdOn";
 
   /*
    * AIP FIELDS
@@ -771,8 +771,6 @@ public final class RodaConstants {
   public static final String AIP_DESCRIPTION = "description";
   public static final String AIP_STATE = "state";
   public static final String AIP_LABEL = "label";
-
-  public static final String AIP_CREATED_ON = "createdOn";
   public static final String AIP_CREATED_BY = "createdBy";
   public static final String AIP_UPDATED_ON = "updatedOn";
   public static final String AIP_UPDATED_BY = "updatedBy";
@@ -818,8 +816,6 @@ public final class RodaConstants {
   public static final String REPRESENTATION_NUMBER_OF_SCHEMA_FILES = "numberOfSchemaFiles";
   public static final String REPRESENTATION_ANCESTORS = "ancestors";
   public static final String REPRESENTATION_HAS_SHALLOW_FILES = "hasShallowFiles";
-
-  public static final String REPRESENTATION_CREATED_ON = "createdOn";
   public static final String REPRESENTATION_CREATED_BY = "createdBy";
   public static final String REPRESENTATION_UPDATED_ON = "updatedOn";
   public static final String REPRESENTATION_UPDATED_BY = "updatedBy";
@@ -967,7 +963,6 @@ public final class RodaConstants {
   public static final String JOB_ATTACHMENTS = "attachments";
   public static final String JOB_FILE_EXTENSION = ".json";
 
-  public static final String DISPOSAL_CONFIRMATION_CREATED_ON = "createdOn";
   public static final String DISPOSAL_CONFIRMATION_CREATED_BY = "createdBy";
   public static final String DISPOSAL_CONFIRMATION_EXECUTED_ON = "executedOn";
   public static final String DISPOSAL_CONFIRMATION_EXECUTED_BY = "executedBy";
@@ -1227,8 +1222,6 @@ public final class RodaConstants {
   public static final String RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE = "mitigationRelatedEventIdentifierValue";
   public static final String RISK_INCIDENCES_COUNT = "incidencesCount";
   public static final String RISK_UNMITIGATED_INCIDENCES_COUNT = "unmitigatedIncidencesCount";
-
-  public static final String RISK_CREATED_ON = "createdOn";
   public static final String RISK_CREATED_BY = "createdBy";
   public static final String RISK_UPDATED_ON = "updatedOn";
   public static final String RISK_UPDATED_BY = "updatedBy";
@@ -1275,8 +1268,6 @@ public final class RodaConstants {
   public static final String REPRESENTATION_INFORMATION_OBJECT_TYPE = "objectType";
   public static final String REPRESENTATION_INFORMATION_LINK = "link";
   public static final String REPRESENTATION_INFORMATION_TITLE = "title";
-
-  public static final String REPRESENTATION_INFORMATION_CREATED_ON = "createdOn";
   public static final String REPRESENTATION_INFORMATION_CREATED_BY = "createdBy";
   public static final String REPRESENTATION_INFORMATION_UPDATED_ON = "updatedOn";
   public static final String REPRESENTATION_INFORMATION_UPDATED_BY = "updatedBy";

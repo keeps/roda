@@ -28,7 +28,8 @@ public class IndexedPreservationAgent implements IsIndexed, HasId {
   private Map<String, Object> fields;
   private String instanceId;
   private String instanceName;
-  private Date creationDate;
+
+  private Date createdOn;
 
   public IndexedPreservationAgent() {
     super();
@@ -107,29 +108,30 @@ public class IndexedPreservationAgent implements IsIndexed, HasId {
     this.instanceName = instanceName;
   }
 
-  public Date getCreationDate() {
-    return creationDate;
+  public Date getCreatedOn() {
+    return createdOn;
   }
 
-  public void setCreationDate(Date creationDate) {
-    this.creationDate = creationDate;
+  public void setCreatedOn(Date createdOn) {
+    this.createdOn = createdOn;
   }
 
   @Override
   public String toString() {
     return "IndexedPreservationAgent [id=" + id + ", name=" + name + ", type=" + type + ", note=" + note
       + ", extension=" + extension + ", roles=" + roles + ", instanceId=" + instanceId + ", instanceName="
-      + instanceName + ", creationDate=" + creationDate + "]";
+      + instanceName + ", createdOn=" + createdOn + "]";
   }
 
   @Override
   public List<String> toCsvHeaders() {
-    return Arrays.asList("id", "name", "type", "note", "extension", "roles", "instanceId", "instanceName", "creationDate");
+    return Arrays.asList("id", "name", "type", "note", "extension", "roles", "instanceId", "instanceName",
+      "createdOn");
   }
 
   @Override
   public List<Object> toCsvValues() {
-    return Arrays.asList(id, name, type, note, extension, roles, instanceId, instanceName, creationDate);
+    return Arrays.asList(id, name, type, note, extension, roles, instanceId, instanceName, createdOn);
   }
 
   @Override

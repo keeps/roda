@@ -56,7 +56,7 @@ public class IndexedFile implements IsIndexed, HasId, SetsUUID, HasPermissionFil
 
   private String instanceName = null;
 
-  private Date creationDate = null;
+  private Date createdOn = null;
 
   public IndexedFile() {
     super();
@@ -308,14 +308,13 @@ public class IndexedFile implements IsIndexed, HasId, SetsUUID, HasPermissionFil
     this.instanceName = instanceName;
   }
 
-  public Date getCreationDate() {
-    return creationDate;
+  public Date getCreatedOn() {
+    return createdOn;
   }
 
-  public void setCreationDate(Date creationDate) {
-    this.creationDate = creationDate;
+  public void setCreatedOn(Date createdOn) {
+    this.createdOn = createdOn;
   }
-
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -340,7 +339,7 @@ public class IndexedFile implements IsIndexed, HasId, SetsUUID, HasPermissionFil
     result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
     result = prime * result + ((instanceId == null) ? 0 : instanceId.hashCode());
     result = prime * result + ((instanceName == null) ? 0 : instanceName.hashCode());
-    result = prime * result + ((creationDate == null) ? 0 : creationDate.hashCode());
+    result = prime * result + ((createdOn == null) ? 0 : createdOn.hashCode());
     return result;
   }
 
@@ -458,7 +457,7 @@ public class IndexedFile implements IsIndexed, HasId, SetsUUID, HasPermissionFil
       + ", creatingApplicationVersion=" + creatingApplicationVersion + ", dateCreatedByApplication="
       + dateCreatedByApplication + ", hash=" + hash + ", storagePath=" + storagePath + ", ancestors=" + ancestors
       + ", otherProperties=" + otherProperties + ", instanceId=" + instanceId + ", instanceName=" + instanceName
-      + ", creationDate=" + creationDate + "]";
+      + ", createdOn=" + createdOn + "]";
   }
 
   @Override
@@ -466,14 +465,14 @@ public class IndexedFile implements IsIndexed, HasId, SetsUUID, HasPermissionFil
     return Arrays.asList("uuid", "parentUUID", "aipId", "representationId", "representationUUID", "path",
       "ancestorsPath", "id", "fileFormat", "originalName", "size", "isDirectory", "creatingApplicationName",
       "creatingApplicationVersion", "dateCreatedByApplication", "hash", "storagePath", "ancestors", "otherProperties",
-      "instanceId", "instanceName", "creationDate");
+      "instanceId", "instanceName", "createdOn");
   }
 
   @Override
   public List<Object> toCsvValues() {
     return Arrays.asList(uuid, parentUUID, aipId, representationId, representationUUID, path, ancestorsPath, id,
       fileFormat, originalName, size, isDirectory, creatingApplicationName, creatingApplicationVersion,
-      dateCreatedByApplication, hash, storagePath, ancestors, otherProperties, instanceId, instanceName, creationDate);
+      dateCreatedByApplication, hash, storagePath, ancestors, otherProperties, instanceId, instanceName, createdOn);
   }
 
   @Override

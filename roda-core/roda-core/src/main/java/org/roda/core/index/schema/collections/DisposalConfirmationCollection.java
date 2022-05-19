@@ -69,7 +69,7 @@ public class DisposalConfirmationCollection extends AbstractSolrCollection<Dispo
     fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_TITLE, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_EXTRA_INFO, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_CREATED_BY, Field.TYPE_STRING));
-    fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_CREATED_ON, Field.TYPE_DATE));
+    fields.add(new Field(RodaConstants.INDEX_CREATED_ON, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_EXECUTED_BY, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_EXECUTED_ON, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.DISPOSAL_CONFIRMATION_RESTORED_ON, Field.TYPE_DATE));
@@ -91,7 +91,7 @@ public class DisposalConfirmationCollection extends AbstractSolrCollection<Dispo
     doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_EXTRA_INFO,
       JsonUtils.getJsonFromObject(confirmation.getExtraFields()));
     doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_CREATED_BY, confirmation.getCreatedBy());
-    doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_CREATED_ON,
+    doc.addField(RodaConstants.INDEX_CREATED_ON,
       SolrUtils.formatDateWithMillis(confirmation.getCreatedOn()));
     doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_EXECUTED_BY, confirmation.getExecutedBy());
     doc.addField(RodaConstants.DISPOSAL_CONFIRMATION_EXECUTED_ON,
@@ -119,7 +119,7 @@ public class DisposalConfirmationCollection extends AbstractSolrCollection<Dispo
     }
 
     confirmation
-      .setCreatedOn(SolrUtils.objectToDateWithMillis(doc.get(RodaConstants.DISPOSAL_CONFIRMATION_CREATED_ON)));
+      .setCreatedOn(SolrUtils.objectToDateWithMillis(doc.get(RodaConstants.INDEX_CREATED_ON)));
     confirmation.setCreatedBy(SolrUtils.objectToString(doc.get(RodaConstants.DISPOSAL_CONFIRMATION_CREATED_BY), null));
     confirmation
       .setExecutedOn(SolrUtils.objectToDateWithMillis(doc.get(RodaConstants.DISPOSAL_CONFIRMATION_EXECUTED_ON)));

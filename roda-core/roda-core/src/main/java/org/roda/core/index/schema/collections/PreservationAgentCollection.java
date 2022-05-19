@@ -76,7 +76,7 @@ public class PreservationAgentCollection
     fields.add(new Field(RodaConstants.PRESERVATION_AGENT_VERSION, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.INDEX_INSTANCE_ID, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.INDEX_INSTANCE_NAME, Field.TYPE_STRING));
-    fields.add(new Field(RodaConstants.INDEX_CREATION_DATE, Field.TYPE_DATE));
+    fields.add(new Field(RodaConstants.INDEX_CREATED_ON, Field.TYPE_DATE));
 
     return fields;
   }
@@ -120,7 +120,7 @@ public class PreservationAgentCollection
 
       String name = IndexUtils.giveNameFromLocalInstanceIdentifier(pm.getInstanceId());
       doc.addField(RodaConstants.INDEX_INSTANCE_NAME, name);
-      doc.addField(RodaConstants.INDEX_CREATION_DATE, SolrUtils.formatDate(pm.getCreationDate()));
+      doc.addField(RodaConstants.INDEX_CREATED_ON, SolrUtils.formatDate(pm.getCreatedOn()));
 
     } catch (ValidationException e) {
       throw new GenericException(e);
@@ -144,7 +144,7 @@ public class PreservationAgentCollection
     final List<String> roles = SolrUtils.objectToListString(doc.get(RodaConstants.PRESERVATION_AGENT_ROLES));
     final String instanceId = SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_ID), null);
     final String instanceName = SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_NAME), null);
-    final Date creationDate = SolrUtils.objectToDate(doc.get(RodaConstants.INDEX_CREATION_DATE));
+    final Date createdOn = SolrUtils.objectToDate(doc.get(RodaConstants.INDEX_CREATED_ON));
 
     ipa.setId(id);
     ipa.setName(name);
@@ -155,7 +155,7 @@ public class PreservationAgentCollection
     ipa.setRoles(roles);
     ipa.setInstanceId(instanceId);
     ipa.setInstanceName(instanceName);
-    ipa.setCreationDate(creationDate);
+    ipa.setCreatedOn(createdOn);
 
     return ipa;
 

@@ -53,7 +53,7 @@ public class DisposalConfirmationList extends AsyncTableCell<DisposalConfirmatio
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.DISPOSAL_CONFIRMATION_TITLE, RodaConstants.DISPOSAL_CONFIRMATION_ID,
     RodaConstants.DISPOSAL_CONFIRMATION_CREATED_BY, RodaConstants.DISPOSAL_CONFIRMATION_STATE,
-    RodaConstants.DISPOSAL_CONFIRMATION_CREATED_ON, RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_AIPS,
+    RodaConstants.INDEX_CREATED_ON, RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_AIPS,
     RodaConstants.DISPOSAL_CONFIRMATION_STORAGE_SIZE);
 
   @Override
@@ -136,10 +136,10 @@ public class DisposalConfirmationList extends AsyncTableCell<DisposalConfirmatio
     Map<Column<DisposalConfirmation, ?>, List<String>> columnSortingKeyMap = new HashMap<>();
 
     columnSortingKeyMap.put(titleColumn, Collections.singletonList(RodaConstants.DISPOSAL_CONFIRMATION_TITLE));
-    columnSortingKeyMap.put(createdOnColumn, Collections.singletonList(RodaConstants.DISPOSAL_CONFIRMATION_CREATED_ON));
+    columnSortingKeyMap.put(createdOnColumn, Collections.singletonList(RodaConstants.INDEX_CREATED_ON));
     columnSortingKeyMap.put(createdByColumn, Collections.singletonList(RodaConstants.DISPOSAL_CONFIRMATION_CREATED_BY));
     columnSortingKeyMap.put(stateColumn,
-      Arrays.asList(RodaConstants.DISPOSAL_CONFIRMATION_STATE, RodaConstants.DISPOSAL_CONFIRMATION_CREATED_ON));
+      Arrays.asList(RodaConstants.DISPOSAL_CONFIRMATION_STATE, RodaConstants.INDEX_CREATED_ON));
     columnSortingKeyMap.put(sizeColumn, Collections.singletonList(RodaConstants.DISPOSAL_CONFIRMATION_STORAGE_SIZE));
     columnSortingKeyMap.put(numberOfAIPsColumn,
       Collections.singletonList(RodaConstants.DISPOSAL_CONFIRMATION_NUMBER_OF_AIPS));
