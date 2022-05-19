@@ -196,6 +196,23 @@ public class DistributedInstancesResource {
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, response)).build();
   }
 
+  @GET
+  @Path("/updates/{" + RodaConstants.API_PATH_PARAM_INSTANCE_IDENTIFIER + "}")
+  @Produces({MediaType.APPLICATION_JSON})
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = StreamResponse.class),
+          @ApiResponse(code = 404, message = "Not found", response = ApiResponseMessage.class)})
+  public Response getUpdates(
+    @ApiParam(value = "The instance identifier", required = true) @PathParam(RodaConstants.API_PATH_PARAM_INSTANCE_IDENTIFIER) String instanceIdentifier)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    // get user
+    final User user = UserUtility.getApiUser(request);
+    // delegate action to controller.
+    Long result = RODAInstance.retrieveCentralInstanceUpdates( user, instanceIdentifier);
+
+    return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, result.toString())).build();
+  }
+
   /**
    * Route to delete in the central repository. This route is called when the
    * instance in a local repository is deleted.

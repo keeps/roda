@@ -382,4 +382,31 @@ public class SyncUtils {
     }
   }
 
+  public static Long getUpdatesFromDistributedInstance(LocalInstance localInstance) throws GenericException {
+    try {
+      AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
+      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE
+        + RodaConstants.API_PATH_PARAM_DISTRIBUTED_INSTANCE_GET_UPDATES
+        + RodaConstants.API_SEP + localInstance.getId();
+
+      CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+      HttpGet httpGet = new HttpGet(localInstance.getCentralInstanceURL() + resource);
+      httpGet.addHeader("Authorization", "Bearer " + accessToken.getToken());
+      httpGet.addHeader("content-type", "application/json");
+      httpGet.addHeader("Accept", "application/json");
+
+      HttpResponse response = httpClient.execute(httpGet);
+      String message = JsonUtils.parseJson(EntityUtils.toString(response.getEntity())).get("message").textValue();
+
+      if (response.getStatusLine().getStatusCode() != RodaConstants.HTTP_RESPONSE_CODE_SUCCESS) {
+        throw new GenericException(
+          "Unable to update the distributed instance error code: " + response.getStatusLine().getStatusCode());
+      } else {
+        return Long.parseLong(message);
+      }
+    } catch (AuthenticationDeniedException | GenericException | IOException e) {
+      throw new GenericException("Unable to retrieve instance status: " + e.getMessage());
+    }
+  }
+
 }

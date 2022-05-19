@@ -395,6 +395,7 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_DISTRIBUTED_INSTANCE_SYNC = "sync";
   public static final String API_PATH_PARAM_INSTANCE_IDENTIFIER = "instance_identifier";
   public static final String API_PATH_LAST_SYNC_STATUS = "sync/status";
+  public static final String API_PATH_PARAM_DISTRIBUTED_INSTANCE_GET_UPDATES = "updates";
 
   public static final String API_PATH_PARAM_PART = "part";
   public static final String API_PATH_PARAM_NAME = "name";

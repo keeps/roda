@@ -4121,6 +4121,7 @@ public class ModelService extends ModelObservable {
     Set<String> roles = new HashSet<>();
     roles.add(RodaConstants.REPOSITORY_PERMISSIONS_DISTRIBUTED_INSTANCES_MANAGE);
     roles.add(RodaConstants.REPOSITORY_PERMISSIONS_LOCAL_INSTANCES_MANAGE);
+    roles.add(RodaConstants.REPOSITORY_PERMISSIONS_JOB_READ);
 
     User user = new User(username);
     user.setAllRoles(roles);

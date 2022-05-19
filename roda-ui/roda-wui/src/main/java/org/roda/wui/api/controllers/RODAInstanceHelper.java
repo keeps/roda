@@ -117,7 +117,7 @@ public class RODAInstanceHelper {
     return SyncUtils.createLastSyncFileStreamResponse(filePath);
   }
 
-  public static Long synchronizeIfUpdated(User user) throws GenericException, NotFoundException {
+  public static Long retrieveLocalInstanceUpdates(User user) throws GenericException, NotFoundException {
 
     IndexService index = RodaCoreFactory.getIndexService();
     Long total = 0L;
@@ -126,6 +126,7 @@ public class RODAInstanceHelper {
     if (localInstance != null && SynchronizingStatus.ACTIVE.equals(localInstance.getStatus())) {
       Date fromDate = localInstance.getLastSynchronizationDate();
       Date toDate = new Date();
+      total+= SyncUtils.getUpdatesFromDistributedInstance(localInstance);
 
       // check if updates in AIPs
       total += retrieveNumberOfUpdated(IndexedAIP.class, RodaConstants.AIP_UPDATED_ON, RodaConstants.AIP_UPDATED_ON,
