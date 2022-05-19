@@ -9,9 +9,14 @@ package org.roda.core.index;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -340,7 +345,13 @@ public class IndexModelObserver implements ModelObserver {
     file.setInstanceId(aip.getInstanceId());
 
     FileCollection.Info info = new FileCollection.Info(aip, ancestors);
-
+    try {
+      final StoragePath storagePath = ModelUtils.getFileStoragePath(file);
+      file.setCreatedOn(getDateFromStoragePath(storagePath));
+    } catch (RequestNotValidException | AuthorizationDeniedException | NotFoundException | GenericException
+      | IOException e) {
+      LOGGER.error("Could not set the creation date of File");
+    }
     if (FSUtils.isManifestOfExternalFiles(file.getId())) {
       try (CloseableIterable<OptionalWithCause<File>> allExternalFiles = model.listExternalFilesUnder(file)) {
         for (OptionalWithCause<File> shallowFile : allExternalFiles) {
@@ -435,8 +446,10 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
     // change AIP
-    SolrUtils.update(index, IndexedAIP.class, aip.getId(),
-      Collections.singletonMap(RodaConstants.INDEX_INSTANCE_ID, aip.getInstanceId()), (ModelObserver) this).addTo(ret);
+    SolrUtils
+      .update(index, IndexedAIP.class, aip.getId(),
+        Collections.singletonMap(RodaConstants.INDEX_INSTANCE_ID, aip.getInstanceId()), (ModelObserver) this)
+      .addTo(ret);
 
     if (ret.isEmpty()) {
       representationsInstanceIdUpdated(aip).addTo(ret);
@@ -580,8 +593,10 @@ public class IndexModelObserver implements ModelObserver {
   private ReturnWithExceptions<Void, ModelObserver> fileInstanceIdUpdated(AIP aip, File file, boolean recursive) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
-    SolrUtils.update(index, IndexedFile.class, IdUtils.getFileId(file),
-      Collections.singletonMap(RodaConstants.INDEX_INSTANCE_ID, aip.getInstanceId()), (ModelObserver) this).addTo(ret);
+    SolrUtils
+      .update(index, IndexedFile.class, IdUtils.getFileId(file),
+        Collections.singletonMap(RodaConstants.INDEX_INSTANCE_ID, aip.getInstanceId()), (ModelObserver) this)
+      .addTo(ret);
 
     if (ret.isEmpty()) {
       if (recursive && file.isDirectory()) {
@@ -1000,10 +1015,25 @@ public class IndexModelObserver implements ModelObserver {
     if (PreservationMetadataType.EVENT.equals(type)) {
       indexPreservationEvent(pm).addTo(ret);
     } else if (PreservationMetadataType.AGENT.equals(type)) {
+      try {
+        final StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(pm);
+        pm.setCreatedOn(getDateFromStoragePath(storagePath));
+      } catch (RequestNotValidException | AuthorizationDeniedException | NotFoundException | GenericException
+        | IOException e) {
+        LOGGER.error("Could not set the creation date of Preservation Agent");
+      }
       SolrUtils.create2(index, (ModelObserver) this, IndexedPreservationAgent.class, pm).addTo(ret);
     }
 
     return ret;
+  }
+
+  private Date getDateFromStoragePath(StoragePath storagePath)
+    throws IOException, AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    Path path = model.getStorage().getDirectAccess(storagePath).getPath();
+    BasicFileAttributes attr = Files.readAttributes(path, BasicFileAttributes.class);
+    FileTime fileTime = attr.creationTime();
+    return new Date(fileTime.toMillis());
   }
 
   @Override
@@ -1188,8 +1218,10 @@ public class IndexModelObserver implements ModelObserver {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
     // change DIP
-    SolrUtils.update(index, IndexedDIP.class, dip.getId(),
-      Collections.singletonMap(RodaConstants.INDEX_INSTANCE_ID, dip.getInstanceId()), (ModelObserver) this).addTo(ret);
+    SolrUtils
+      .update(index, IndexedDIP.class, dip.getId(),
+        Collections.singletonMap(RodaConstants.INDEX_INSTANCE_ID, dip.getInstanceId()), (ModelObserver) this)
+      .addTo(ret);
 
     return ret;
   }

@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.roda.core.data.common.RodaConstants;
@@ -148,7 +147,6 @@ public class RiskCollection extends AbstractSolrCollection<IndexedRisk, Risk> {
     doc.addField(RodaConstants.RISK_UPDATED_BY, risk.getUpdatedBy());
 
     doc.addField(RodaConstants.INDEX_INSTANCE_ID, risk.getInstanceId());
-
 
     // TODO calculate incidences count here
 

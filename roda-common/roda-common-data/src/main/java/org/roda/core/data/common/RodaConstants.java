@@ -731,6 +731,8 @@ public final class RodaConstants {
   public static final String INDEX_INSTANCE_ID = "instanceId";
   public static final String INDEX_INSTANCE_NAME = "instanceName";
 
+  public static final String INDEX_CREATION_DATE = "creationDate";
+
   /*
    * AIP FIELDS
    */
@@ -1197,6 +1199,8 @@ public final class RodaConstants {
   public static final String FILE_ANCESTORS = "ancestors";
   public static final String FILE_FORMAT_DESIGNATION = "formatDesignation";
 
+  public static final String FILE_CREATED_ON = "createdOn";
+
   /* Risks */
   public static final String RISK_ID = "id";
   public static final String RISK_NAME = "name";
@@ -1408,6 +1412,8 @@ public final class RodaConstants {
 
   public static final String PRESERVATION_EVENT_OBJECT_ROLE_TARGET = "target";
   public static final String PRESERVATION_LEVEL_FULL = "full";
+
+  public static final String PRESERVATION_AGENT_CREATED_ON = "createdOn";
 
   /**
    * Only file integrity is preserved

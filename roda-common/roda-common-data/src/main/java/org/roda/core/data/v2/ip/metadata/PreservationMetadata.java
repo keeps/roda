@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
+import java.util.Date;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
@@ -33,6 +34,8 @@ public class PreservationMetadata implements IsModelObject, HasId {
   private PreservationMetadataType type;
 
   private String instanceId;
+
+  private Date createdOn;
 
   public PreservationMetadata() {
     super();
@@ -132,6 +135,14 @@ public class PreservationMetadata implements IsModelObject, HasId {
     this.instanceId = instanceId;
   }
 
+  public Date getCreatedOn() {
+    return createdOn;
+  }
+
+  public void setCreatedOn(Date createdOn) {
+    this.createdOn = createdOn;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -143,6 +154,7 @@ public class PreservationMetadata implements IsModelObject, HasId {
     result = prime * result + ((representationId == null) ? 0 : representationId.hashCode());
     result = prime * result + ((type == null) ? 0 : type.hashCode());
     result = prime * result + ((instanceId == null) ? 0 : instanceId.hashCode());
+    result = prime * result + ((createdOn == null) ? 0 : createdOn.hashCode());
     return result;
   }
 
@@ -194,7 +206,7 @@ public class PreservationMetadata implements IsModelObject, HasId {
   public String toString() {
     return "PreservationMetadata [id=" + id + ", aipId=" + aipId + ", representationId=" + representationId
       + ", fileDirectoryPath=" + fileDirectoryPath + ", fileId=" + fileId + ", type=" + type + ", instanceId="
-      + instanceId + "]";
+      + instanceId + ", createdOn=" + createdOn + "]";
   }
 
 }
