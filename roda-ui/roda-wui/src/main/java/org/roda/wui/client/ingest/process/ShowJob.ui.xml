@@ -55,25 +55,31 @@
 								<g:Label addStyleNames="label">
 									<ui:text from='{messages.jobDuration}' />
 								</g:Label>
-								<g:Label styleName="value" ui:field="duration" />
+								<g:Label styleName="value" ui:field="duration"/>
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label">
-									<ui:text from='{messages.jobStatus}' />
+									<ui:text from='{messages.jobStatus}'/>
 								</g:Label>
-								<g:HTML ui:field="status" />
+								<g:HTML ui:field="status"/>
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label addStyleNames="label" ui:field="scheduleInfoLabel">
+									<ui:text from='{messages.reportScheduleInfo}'/>
+								</g:Label>
+								<g:Label styleName="value" ui:field="scheduleInfo"/>
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label" ui:field="stateDetailsLabel">
-									<ui:text from='{messages.jobStateDetails}' />
+									<ui:text from='{messages.jobStateDetails}'/>
 								</g:Label>
-								<g:Label styleName="value" ui:field="stateDetailsValue" />
+								<g:Label styleName="value" ui:field="stateDetailsValue"/>
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label">
-									<ui:text from='{messages.jobProgress}' />
+									<ui:text from='{messages.jobProgress}'/>
 								</g:Label>
-								<g:HTML ui:field="progress" />
+								<g:HTML ui:field="progress"/>
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 

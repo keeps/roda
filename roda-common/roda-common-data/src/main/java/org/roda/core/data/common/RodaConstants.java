@@ -941,6 +941,7 @@ public final class RodaConstants {
   public static final String JOB_START_DATE = "startDate";
   public static final String JOB_END_DATE = "endDate";
   public static final String JOB_STATE = "state";
+  public static final String JOB_SCHEDULE_INFO = "scheduleInfo";
   public static final String JOB_EXECUTION_TYPE_APPROVAL = "APPROVAL";
   public static final String JOB_PARALLELISM = "parallelism";
   public static final String JOB_PRIORITY = "priority";

@@ -7,6 +7,8 @@
  */
 package org.roda.wui.server.browse;
 
+import static com.cronutils.model.CronType.UNIX;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -126,6 +128,10 @@ import org.roda_project.commons_ip.model.RepresentationContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.cronutils.descriptor.CronDescriptor;
+import com.cronutils.model.definition.CronDefinition;
+import com.cronutils.model.definition.CronDefinitionBuilder;
+import com.cronutils.parser.CronParser;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
@@ -1432,6 +1438,17 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     RODAInstance.removeLocalConfiguration(user, localInstance);
+  }
+
+  public String getCrontabValue() {
+    String SYNC_SCHEDULE = RodaCoreFactory.getRodaConfigurationAsString("core.synchronization.scheduleInfo");
+    // get a predefined instance
+    CronDefinition cronDefinition = CronDefinitionBuilder.instanceDefinitionFor(UNIX);
+    // create a parser based on provided definition
+    CronParser parser = new CronParser(cronDefinition);
+    CronDescriptor descriptor = CronDescriptor.instance(Locale.ENGLISH);
+    String description = descriptor.describe(parser.parse(SYNC_SCHEDULE));
+    return description;
   }
 
 }
