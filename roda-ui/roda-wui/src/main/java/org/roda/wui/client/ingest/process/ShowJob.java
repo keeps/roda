@@ -219,6 +219,12 @@ public class ShowJob extends Composite {
   HTML status;
 
   @UiField
+  Label scheduleInfoLabel;
+
+  @UiField
+  Label scheduleInfo;
+
+  @UiField
   Label stateDetailsLabel, stateDetailsValue;
 
   @UiField
@@ -616,6 +622,31 @@ public class ShowJob extends Composite {
 
     // set state
     status.setHTML(HtmlSnippetUtils.getJobStateHtml(job));
+
+    scheduleInfoLabel.setVisible(false);
+    scheduleInfo.setVisible(false);
+
+    String distributedMode = ConfigurationManager.getStringWithDefault(
+      RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
+
+    if (distributedMode.equals(RodaConstants.DistributedModeType.LOCAL.name())) {
+      if (Job.JOB_STATE.SCHEDULED.equals(job.getState())) {
+        scheduleInfoLabel.setVisible(true);
+        scheduleInfo.setVisible(true);
+        BrowserService.Util.getInstance().getCrontabValue(new AsyncCallback<String>() {
+          @Override
+          public void onFailure(Throwable throwable) {
+            // do nothing
+          }
+
+          @Override
+          public void onSuccess(String description) {
+            scheduleInfo.setText(description);
+          }
+        });
+
+      }
+    }
 
     // set state details
     boolean hasStateDetails = StringUtils.isNotBlank(job.getStateDetails());

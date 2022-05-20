@@ -62,6 +62,12 @@
                                 </g:FlowPanel>
                                 <g:FlowPanel styleName="field">
                                     <g:Label addStyleNames="label">
+                                        <ui:text from='{messages.reportScheduleInfo}'/>
+                                    </g:Label>
+                                    <g:Label styleName="value" ui:field="scheduleInfo"/>
+                                </g:FlowPanel>
+                                <g:FlowPanel styleName="field">
+                                    <g:Label addStyleNames="label">
                                         <ui:text from='{messages.reportProgress}'/>
                                     </g:Label>
                                     <g:Label styleName="value" ui:field="progress"/>

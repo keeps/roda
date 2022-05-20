@@ -63,7 +63,8 @@ public class JobList extends AsyncTableCell<Job> {
 
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.JOB_NAME,
     RodaConstants.JOB_USERNAME, RodaConstants.JOB_START_DATE, RodaConstants.JOB_END_DATE, RodaConstants.JOB_STATE,
-    RodaConstants.JOB_SOURCE_OBJECTS_COUNT, RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SUCCESS,
+    RodaConstants.JOB_SCHEDULE_INFO, RodaConstants.JOB_SOURCE_OBJECTS_COUNT,
+    RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SUCCESS,
     RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_PARTIAL_SUCCESS,
     RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE, RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SKIPPED,
     RodaConstants.JOB_COMPLETION_PERCENTAGE, RodaConstants.JOB_PLUGIN, RodaConstants.JOB_SOURCE_OBJECTS);
@@ -116,6 +117,7 @@ public class JobList extends AsyncTableCell<Job> {
         return HtmlSnippetUtils.getJobStateHtml(job);
       }
     };
+
 
     objectsTotalCountColumn = new TextColumn<Job>() {
 

@@ -13,6 +13,7 @@ import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.SyncUtils;
+import org.roda.core.common.synchronization.BundleManifestCreator;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -36,10 +37,9 @@ import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
+import org.roda.core.plugins.base.synchronization.instanceIdentifier.LocalInstanceRegisterPlugin;
 import org.roda.core.plugins.base.synchronization.proccess.ImportSyncBundlePlugin;
 import org.roda.core.plugins.base.synchronization.proccess.SynchronizeInstancePlugin;
-import org.roda.core.common.synchronization.BundleManifestCreator;
-import org.roda.core.plugins.base.synchronization.instanceIdentifier.LocalInstanceRegisterPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -167,6 +167,7 @@ public class RODAInstanceHelper {
       filter.add(new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INTERNAL.toString()));
       filter.add(new NotSimpleFilterParameter(RodaConstants.JOB_STATE, Job.JOB_STATE.CREATED.name()));
       filter.add(new NotSimpleFilterParameter(RodaConstants.JOB_STATE, Job.JOB_STATE.PENDING_APPROVAL.name()));
+      filter.add(new NotSimpleFilterParameter(RodaConstants.JOB_STATE, Job.JOB_STATE.SCHEDULED.name()));
     } else if (returnClass.equals(IndexedAIP.class)) {
       Filter pfilter = new Filter();
       pfilter.add(new DateIntervalFilterParameter(RodaConstants.PRESERVATION_EVENT_DATETIME,
