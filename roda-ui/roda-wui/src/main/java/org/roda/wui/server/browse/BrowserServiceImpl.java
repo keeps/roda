@@ -7,8 +7,6 @@
  */
 package org.roda.wui.server.browse;
 
-import static com.cronutils.model.CronType.UNIX;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -123,16 +121,15 @@ import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.common.I18nUtility;
+import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.server.ServerTools;
 import org.roda_project.commons_ip.model.RepresentationContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.cronutils.descriptor.CronDescriptor;
-import com.cronutils.model.definition.CronDefinition;
-import com.cronutils.model.definition.CronDefinitionBuilder;
-import com.cronutils.parser.CronParser;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+
+import it.burning.cron.CronExpressionDescriptor;
 
 /**
  * Browser Service Implementation
@@ -1440,14 +1437,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     RODAInstance.removeLocalConfiguration(user, localInstance);
   }
 
-  public String getCrontabValue() {
+  public String getCrontabValue(String locale) {
     String SYNC_SCHEDULE = RodaCoreFactory.getRodaConfigurationAsString("core.synchronization.scheduleInfo");
-    // get a predefined instance
-    CronDefinition cronDefinition = CronDefinitionBuilder.instanceDefinitionFor(UNIX);
-    // create a parser based on provided definition
-    CronParser parser = new CronParser(cronDefinition);
-    CronDescriptor descriptor = CronDescriptor.instance(Locale.ENGLISH);
-    String description = descriptor.describe(parser.parse(SYNC_SCHEDULE));
+    String description = null;
+    if (StringUtils.isNotBlank(SYNC_SCHEDULE)) {
+      locale = locale.split("_")[0];
+      CronExpressionDescriptor.setDefaultLocale(locale);
+      description = CronExpressionDescriptor.getDescription(SYNC_SCHEDULE);
+    }
     return description;
   }
 

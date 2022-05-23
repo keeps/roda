@@ -321,9 +321,9 @@
         <!-- /gwt -->
 
         <dependency>
-            <groupId>com.cronutils</groupId>
-            <artifactId>cron-utils</artifactId>
-            <version>9.1.6</version>
+            <groupId>it.burning</groupId>
+            <artifactId>cron-expression-descriptor</artifactId>
+            <version>1.2.4</version>
         </dependency>
 
         <dependency>

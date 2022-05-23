@@ -77,6 +77,7 @@ import org.roda.wui.common.client.widgets.Toast;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.safehtml.shared.SafeUri;
@@ -631,9 +632,8 @@ public class ShowJob extends Composite {
 
     if (distributedMode.equals(RodaConstants.DistributedModeType.LOCAL.name())) {
       if (Job.JOB_STATE.SCHEDULED.equals(job.getState())) {
-        scheduleInfoLabel.setVisible(true);
-        scheduleInfo.setVisible(true);
-        BrowserService.Util.getInstance().getCrontabValue(new AsyncCallback<String>() {
+        BrowserService.Util.getInstance().getCrontabValue(LocaleInfo.getCurrentLocale().getLocaleName(),
+          new AsyncCallback<String>() {
           @Override
           public void onFailure(Throwable throwable) {
             // do nothing
@@ -641,7 +641,11 @@ public class ShowJob extends Composite {
 
           @Override
           public void onSuccess(String description) {
-            scheduleInfo.setText(description);
+            if (StringUtils.isNotBlank(description)) {
+              scheduleInfoLabel.setVisible(true);
+              scheduleInfo.setVisible(true);
+              scheduleInfo.setText(description);
+            }
           }
         });
 

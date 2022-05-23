@@ -570,5 +570,5 @@ public interface BrowserService extends RemoteService {
   void removeLocalConfiguration(LocalInstance localInstance)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
-  String getCrontabValue();
+  String getCrontabValue(String locale);
 }
