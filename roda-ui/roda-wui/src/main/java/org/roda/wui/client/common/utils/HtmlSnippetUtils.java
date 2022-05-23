@@ -688,7 +688,6 @@ public class HtmlSnippetUtils {
 
     switch (state) {
       case PENDING:
-      case SCHEDULED:
         labelClass = "label-warning";
         break;
       case APPROVED:
