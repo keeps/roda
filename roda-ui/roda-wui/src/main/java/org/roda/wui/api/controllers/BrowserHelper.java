@@ -1417,9 +1417,9 @@ public class BrowserHelper {
   }
 
   public static void deletePreservationMetadataFile(PreservationMetadataType type, String aipId,
-    String representationId, String id, boolean notify)
+    String representationId, String id, List<String> filePath, boolean notify)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    RodaCoreFactory.getModelService().deletePreservationMetadata(type, aipId, representationId, id, notify);
+    RodaCoreFactory.getModelService().deletePreservationMetadata(type, aipId, representationId, id, filePath, notify);
   }
 
   public static EntityResponse retrievePreservationMetadataEvent(String id, String aipId, String representationUUID,

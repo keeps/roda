@@ -1432,7 +1432,7 @@ public class ModelService extends ModelObservable {
   }
 
   public void deletePreservationMetadata(PreservationMetadataType type, String aipId, String representationId,
-    String id, boolean notify)
+    String id, List<String> filePath, boolean notify)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
@@ -1441,7 +1441,7 @@ public class ModelService extends ModelObservable {
     pm.setId(id);
     pm.setRepresentationId(representationId);
     pm.setType(type);
-
+    pm.setFileDirectoryPath(filePath);
     StoragePath binaryPath = ModelUtils.getPreservationMetadataStoragePath(pm);
     storage.deleteResource(binaryPath);
 

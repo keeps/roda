@@ -9,6 +9,7 @@ package org.roda.core.plugins.plugins.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -265,12 +266,14 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     }
 
     // removing PREMIS file
-    try {
-      String pmId = URNUtils.getPremisPrefix(PreservationMetadataType.FILE) + file.getId();
-      model.deletePreservationMetadata(PreservationMetadataType.FILE, file.getAipId(), file.getRepresentationId(), pmId,
-        false);
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      reportItem.addPluginDetails("Could not delete associated PREMIS file: " + e.getMessage());
+    if (!file.isDirectory()) {
+      try {
+        String pmId = URNUtils.getPremisPrefix(PreservationMetadataType.FILE) + file.getId();
+        model.deletePreservationMetadata(PreservationMetadataType.FILE, file.getAipId(), file.getRepresentationId(),
+          pmId, file.getPath(), false);
+      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+        reportItem.addPluginDetails("Could not delete associated PREMIS file: " + e.getMessage());
+      }
     }
 
     report.addReport(reportItem.setPluginState(state));
@@ -320,7 +323,7 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     try {
       String pmId = URNUtils.getPremisPrefix(PreservationMetadataType.REPRESENTATION) + representation.getId();
       model.deletePreservationMetadata(PreservationMetadataType.REPRESENTATION, representation.getAipId(),
-        representation.getId(), pmId, false);
+        representation.getId(), pmId, Collections.EMPTY_LIST, false);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       reportItem.addPluginDetails("Could not delete associated PREMIS file: " + e.getMessage());
     }
