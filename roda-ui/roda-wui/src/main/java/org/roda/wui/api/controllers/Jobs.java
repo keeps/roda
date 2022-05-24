@@ -93,7 +93,7 @@ public class Jobs extends RodaWuiController {
     retrievedJob.getJobUsersDetails().add(jobUserDetails);
     modelService.createOrUpdateJob(retrievedJob);
 
-    Job updatedJob = null;
+    Job updatedJob = new Job(job);
 
     try {
       // delegate
@@ -122,8 +122,7 @@ public class Jobs extends RodaWuiController {
 
     try {
       // delegate
-      job = JobsHelper.rejectJob(job, details);
-      return job;
+      return JobsHelper.rejectJob(job, details);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;

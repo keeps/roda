@@ -441,18 +441,100 @@ public final class RodaConstants {
   public static final String API_NOTIFICATION_DEFAULT_TEMPLATE = "test-email-template";
 
   // api method allowable values
-  public static final String API_LIST_MEDIA_TYPES = "json, xml, jsonp";
-  public static final String API_GET_MEDIA_TYPES = "json, xml, jsonp";
-  public static final String API_GET_LIST_MEDIA_TYPES = "json, xml, zip, jsonp";
-  public static final String API_GET_FILE_MEDIA_TYPES = "json, xml, bin, jsonp";
-  public static final String API_POST_PUT_MEDIA_TYPES = "json, xml, jsonp";
-  public static final String API_DELETE_MEDIA_TYPES = "json, xml, jsonp";
-  public static final String API_GET_METADATA_MEDIA_TYPES = "json, xml, html, bin, jsonp";
-  public static final String API_DESCRIPTIVE_METADATA_LANGUAGES = "pt_PT, en_US";
+  public enum ListMediaTypes {
+    JSON("json"), XML("xml"), JSONP("jsonp");
 
-  public static final String API_USER_OR_GROUP_MEMBER = "user, group";
-  public static final String API_USER_MEMBER = "user";
-  public static final String API_GROUP_MEMBER = "group";
+    private String value;
+
+    ListMediaTypes(String value) {
+      this.value = value;
+    }
+
+    public void setValue(final String value) {
+      this.value = value;
+    }
+
+    @Override
+    public String toString() {
+      return value;
+    }
+  }
+
+  public enum APIMediaTypes {
+    JSON("json"), XML("xml"), ZIP("zip"), JSONP("jsonp");
+
+    private String value;
+
+    APIMediaTypes(String value) {
+      this.value = value;
+    }
+
+    public void setValue(final String value) {
+      this.value = value;
+    }
+
+    @Override
+    public String toString() {
+      return value;
+    }
+  }
+
+  public enum GetFileMediaTypes {
+    JSON("json"), XML("xml"), BIN("bin"), JSONP("jsonp");
+
+    private String value;
+
+    GetFileMediaTypes(String value) {
+      this.value = value;
+    }
+
+    public void setValue(final String value) {
+      this.value = value;
+    }
+
+    @Override
+    public String toString() {
+      return value;
+    }
+  }
+
+  public enum DescriptibeMetadataLanguages {
+    PT_PT("pt_PT"), EN_US("en_US");
+
+    private String value;
+
+    DescriptibeMetadataLanguages(String value) {
+      this.value = value;
+    }
+
+    public void setValue(final String value) {
+      this.value = value;
+    }
+
+    @Override
+    public String toString() {
+      return value;
+    }
+  }
+
+  public enum MetadataMediaTypes {
+    JSON("json"), XML("xml"), HTML("html"), BIN("bin"), JSONP("jsonp");
+
+    private String value;
+
+    MetadataMediaTypes(String value) {
+      this.value = value;
+    }
+
+    public void setValue(final String value) {
+      this.value = value;
+    }
+
+    @Override
+    public String toString() {
+      return value;
+    }
+  }
 
   public static final String API_METRICS_TO_OBTAIN = "metricsToObtain";
 

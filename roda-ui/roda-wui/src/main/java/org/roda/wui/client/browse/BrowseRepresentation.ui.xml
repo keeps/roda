@@ -1,50 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:m="urn:import:org.roda.wui.client.main"
-	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
-	xmlns:lists="urn:import:org.roda.wui.client.common.lists"
-	xmlns:common="urn:import:org.roda.wui.client.common">
+  xmlns:g="urn:import:com.google.gwt.user.client.ui"
+  xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
+  xmlns:common="urn:import:org.roda.wui.client.common">
 
-	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+  <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
 
-	<g:FocusPanel ui:field="keyboardFocus">
-		<g:FlowPanel styleName="wui-browse-representation" addStyleNames="wrapper skip_padding">
-			<common:NavigationToolbar ui:field="navigationToolbar" header="{messages.catalogueRepresentationTitle}" />
-			<g:FlowPanel addStyleNames="row full_width skip_padding" ui:field="center">
-				<g:FlowPanel addStyleNames="col_12 content">
-					<!-- STATUS -->
-					<g:HTML ui:field="aipState" />
-					
-					<!-- IDENTIFICATION -->
-					<g:FlowPanel styleName="browseItemPanel">
-						<g:HTML addStyleNames="h2 browseItemIcon" ui:field="representationIcon"/>
-						<g:FlowPanel addStyleNames="h2 browseItemText" ui:field="representationTitle"/>
+  <g:FocusPanel ui:field="keyboardFocus">
+    <g:FlowPanel styleName="wui-browse-representation" addStyleNames="wrapper skip_padding">
+      <common:NavigationToolbar ui:field="navigationToolbar"
+        header="{messages.catalogueRepresentationTitle}"/>
+      <g:FlowPanel addStyleNames="row full_width skip_padding" ui:field="center">
+        <g:FlowPanel addStyleNames="col_12 content">
+          <!-- STATUS -->
+          <g:HTML ui:field="aipState"/>
 
-						<g:FlowPanel addStyleNames="browseItemPanelRisksEventsLogs" ui:field="risksEventsLogs" />
-						<g:Label addStyleNames="browseItemId" ui:field="dateCreatedAndModified" />
-					</g:FlowPanel>
+          <!-- IDENTIFICATION -->
+          <g:FlowPanel styleName="browseItemPanel">
+            <g:HTML addStyleNames="h2 browseItemIcon" ui:field="representationIcon"/>
+            <g:FlowPanel addStyleNames="h2 browseItemText" ui:field="representationTitle"/>
 
-					<!-- DESCRIPTIVE METADATA -->
-					<g:Button addStyleNames="btn btn-block btn-plus browseNewDescriptiveMetadataButton" ui:field="newDescriptiveMetadata">
-						<ui:text from='{messages.newDescriptiveMetadataTitle}' />
-					</g:Button>
-					<g:FlowPanel addStyleNames="card descriptiveMetadataCard">
-						<g:TabPanel ui:field="itemMetadata" addStyleNames="browseItemMetadata" />
-					</g:FlowPanel>
+            <g:FlowPanel addStyleNames="browseItemPanelRisksEventsLogs" ui:field="risksEventsLogs"/>
+            <g:Label addStyleNames="browseItemId" ui:field="dateCreatedAndModified"/>
+          </g:FlowPanel>
 
-					<!-- FILES -->
-					<g:FlowPanel addStyleNames="card filesCard">
-						<commonsearch:SearchWrapper ui:field="filesSearch" />
-					</g:FlowPanel>
+          <!-- DESCRIPTIVE METADATA -->
+          <g:Button addStyleNames="btn btn-block btn-plus browseNewDescriptiveMetadataButton"
+            ui:field="newDescriptiveMetadata">
+            <ui:text from='{messages.newDescriptiveMetadataTitle}'/>
+          </g:Button>
+          <g:FlowPanel addStyleNames="card descriptiveMetadataCard">
+            <g:TabPanel ui:field="itemMetadata" addStyleNames="browseItemMetadata"/>
+          </g:FlowPanel>
 
-					<!-- DIPs -->
-					<g:FlowPanel addStyleNames="card disseminationsCard">
-						<commonsearch:SearchWrapper ui:field="disseminationsSearch" />
-					</g:FlowPanel>
-				</g:FlowPanel>
-			</g:FlowPanel>
-		</g:FlowPanel>
-	</g:FocusPanel>
+          <!-- FILES -->
+          <g:FlowPanel addStyleNames="card filesCard">
+            <commonsearch:SearchWrapper ui:field="filesSearch"/>
+          </g:FlowPanel>
+
+          <!-- DIPs -->
+          <g:FlowPanel addStyleNames="card disseminationsCard">
+            <commonsearch:SearchWrapper ui:field="disseminationsSearch"/>
+          </g:FlowPanel>
+        </g:FlowPanel>
+      </g:FlowPanel>
+    </g:FlowPanel>
+  </g:FocusPanel>
 </ui:UiBinder>
