@@ -602,6 +602,8 @@ public interface ClientMessages extends Messages {
 
   String showJobStatusPendingApproval();
 
+  String showJobStatusScheduled();
+
   String showJobStatusApprovalRejected();
 
   String showJobStatusCompleted();
@@ -1191,6 +1193,8 @@ public interface ClientMessages extends Messages {
   String reportDateUpdated();
 
   String reportDuration();
+
+  String reportScheduleInfo();
 
   String reportStatus();
 

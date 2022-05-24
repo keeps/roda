@@ -321,6 +321,12 @@
         <!-- /gwt -->
 
         <dependency>
+            <groupId>it.burning</groupId>
+            <artifactId>cron-expression-descriptor</artifactId>
+            <version>1.2.4</version>
+        </dependency>
+
+        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
         </dependency>

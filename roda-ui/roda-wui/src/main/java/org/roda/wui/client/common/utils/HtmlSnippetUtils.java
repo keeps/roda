@@ -295,6 +295,9 @@ public class HtmlSnippetUtils {
       } else if (JOB_STATE.PENDING_APPROVAL.equals(state)) {
         ret = SafeHtmlUtils
           .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusPendingApproval() + CLOSE_SPAN);
+      } else if (JOB_STATE.SCHEDULED.equals(state)) {
+        ret = SafeHtmlUtils
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusScheduled() + CLOSE_SPAN);
       } else if (JOB_STATE.REJECTED.equals(state)) {
         ret = SafeHtmlUtils
           .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.showJobStatusApprovalRejected() + CLOSE_SPAN);

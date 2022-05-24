@@ -121,12 +121,15 @@ import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.common.I18nUtility;
+import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.server.ServerTools;
 import org.roda_project.commons_ip.model.RepresentationContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+
+import it.burning.cron.CronExpressionDescriptor;
 
 /**
  * Browser Service Implementation
@@ -1432,6 +1435,17 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     RODAInstance.removeLocalConfiguration(user, localInstance);
+  }
+
+  public String getCrontabValue(String locale) {
+    String syncSchedule = RodaCoreFactory.getRodaConfigurationAsString("core.synchronization.scheduleInfo");
+    String description = null;
+    if (StringUtils.isNotBlank(syncSchedule)) {
+      locale = locale.split("_")[0];
+      CronExpressionDescriptor.setDefaultLocale(locale);
+      description = CronExpressionDescriptor.getDescription(syncSchedule);
+    }
+    return description;
   }
 
 }

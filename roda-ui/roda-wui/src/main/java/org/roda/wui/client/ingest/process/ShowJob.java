@@ -77,6 +77,7 @@ import org.roda.wui.common.client.widgets.Toast;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.safehtml.shared.SafeUri;
@@ -217,6 +218,12 @@ public class ShowJob extends Composite {
 
   @UiField
   HTML status;
+
+  @UiField
+  Label scheduleInfoLabel;
+
+  @UiField
+  Label scheduleInfo;
 
   @UiField
   Label stateDetailsLabel, stateDetailsValue;
@@ -616,6 +623,34 @@ public class ShowJob extends Composite {
 
     // set state
     status.setHTML(HtmlSnippetUtils.getJobStateHtml(job));
+
+    scheduleInfoLabel.setVisible(false);
+    scheduleInfo.setVisible(false);
+
+    String distributedMode = ConfigurationManager.getStringWithDefault(
+      RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
+
+    if (distributedMode.equals(RodaConstants.DistributedModeType.LOCAL.name())) {
+      if (Job.JOB_STATE.SCHEDULED.equals(job.getState())) {
+        BrowserService.Util.getInstance().getCrontabValue(LocaleInfo.getCurrentLocale().getLocaleName(),
+          new AsyncCallback<String>() {
+          @Override
+          public void onFailure(Throwable throwable) {
+            // do nothing
+          }
+
+          @Override
+          public void onSuccess(String description) {
+            if (StringUtils.isNotBlank(description)) {
+              scheduleInfoLabel.setVisible(true);
+              scheduleInfo.setVisible(true);
+              scheduleInfo.setText(description);
+            }
+          }
+        });
+
+      }
+    }
 
     // set state details
     boolean hasStateDetails = StringUtils.isNotBlank(job.getStateDetails());
