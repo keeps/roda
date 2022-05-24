@@ -176,7 +176,7 @@ public class InstanceIdentifierAIPPlugin extends AbstractPlugin<Void> {
     JobPluginInfo jobPluginInfo) throws RequestNotValidException, GenericException, NotFoundException {
     int countFail = 0;
     int countSuccess = 0;
-    String details = "";
+    List<String> detailsList = new ArrayList<>();
     PluginState pluginState = PluginState.SKIPPED;
     // Get AIP's from index
     IterableIndexResult<IndexedAIP> indexedAIPS = retrieveList(index);
@@ -185,22 +185,27 @@ public class InstanceIdentifierAIPPlugin extends AbstractPlugin<Void> {
     for (IndexedAIP indexedAIP : indexedAIPS) {
       try {
         model.updateAIPInstanceId(model.retrieveAIP(indexedAIP.getId()));
-        pluginState = PluginState.SUCCESS;
+
         countSuccess++;
       } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-        details = e.getMessage() + "\n";
-        pluginState = PluginState.FAILURE;
+        detailsList.add(e.getMessage());
+
         countFail++;
       }
     }
 
+    StringBuilder details = new StringBuilder();
+
     if (countFail > 0) {
-      details = "Updated the instance identifier on " + countSuccess + " AIP's and failed to update " + countFail;
+      pluginState = PluginState.FAILURE;
+      details.append("Updated the instance identifier on ").append(countSuccess).append(" AIP's and failed to update ")
+        .append(countFail).append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
     } else if (countSuccess > 0) {
-      details = "Updated the instance identifier on " + countSuccess + " AIP's";
+      pluginState = PluginState.SUCCESS;
+      details.append("Updated the instance identifier on ").append(countSuccess).append(" AIP's");
     }
 
-    reportItem.setPluginDetails(details);
+    reportItem.setPluginDetails(details.toString());
     jobPluginInfo.incrementObjectsProcessed(pluginState);
     reportItem.setPluginState(pluginState);
     pluginReport.addReport(reportItem);

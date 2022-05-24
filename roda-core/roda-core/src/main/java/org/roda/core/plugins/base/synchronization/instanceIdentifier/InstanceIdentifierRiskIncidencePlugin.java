@@ -175,7 +175,6 @@ public class InstanceIdentifierRiskIncidencePlugin extends AbstractPlugin<Void> 
 
   private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
     JobPluginInfo jobPluginInfo) throws RequestNotValidException, GenericException, NotFoundException {
-    String details = "";
     PluginState pluginState = PluginState.SKIPPED;
     int countFail = 0;
     int countSuccess = 0;
@@ -185,27 +184,29 @@ public class InstanceIdentifierRiskIncidencePlugin extends AbstractPlugin<Void> 
 
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
-
+    final List<String> detailsList = new ArrayList<>();
     for (RiskIncidence indexedRiskIncidence : indexedRiskIncidences) {
       try {
         model.updateRiskIncidenceInstanceId(model.retrieveRiskIncidence(indexedRiskIncidence.getId()), true);
-        pluginState = PluginState.SUCCESS;
         countSuccess++;
       } catch (GenericException | AuthorizationDeniedException e) {
-        details = e.getMessage() + "\n";
-        pluginState = PluginState.FAILURE;
+        detailsList.add(e.getMessage());
         countFail++;
       }
     }
 
+    StringBuilder details = new StringBuilder();
     if (countFail > 0) {
-      details = "Updated the instance identifier on " + countSuccess + " Risk incidences and failed to update "
-        + countFail;
+      pluginState = PluginState.FAILURE;
+      details.append("Updated the instance identifier on ").append(countSuccess)
+        .append(" Risk incidences and failed to update ").append(countFail).append(".\n")
+        .append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
     } else if (countSuccess > 0) {
-      details = "Updated the instance identifier on " + countSuccess + " Risk incidences event";
+      pluginState = PluginState.SUCCESS;
+      details.append("Updated the instance identifier on ").append(countSuccess).append(" Risk incidences event");
     }
 
-    reportItem.setPluginDetails(details);
+    reportItem.setPluginDetails(details.toString());
 
     jobPluginInfo.incrementObjectsProcessed(pluginState);
     reportItem.setPluginState(pluginState);

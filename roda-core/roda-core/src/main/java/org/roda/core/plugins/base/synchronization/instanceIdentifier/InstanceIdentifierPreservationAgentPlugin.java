@@ -122,9 +122,10 @@ public class InstanceIdentifierPreservationAgentPlugin extends AbstractPlugin<Vo
   private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
     JobPluginInfo jobPluginInfo) {
     PluginState pluginState = PluginState.SKIPPED;
-    String details = "";
+    List<String> detailsList = new ArrayList<>();
     int countFail = 0;
     int countSuccess = 0;
+    int countSkipped = 0;
 
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
@@ -135,37 +136,47 @@ public class InstanceIdentifierPreservationAgentPlugin extends AbstractPlugin<Vo
           if (opm.isPresent()) {
             PreservationMetadata pm = opm.get();
             PremisV3Utils.updatePremisUserAgentId(pm, model, index, instanceId);
-            pluginState = PluginState.SUCCESS;
             countSuccess++;
           } else {
             jobPluginInfo.incrementObjectsProcessedWithFailure();
             pluginState = PluginState.FAILURE;
             countFail++;
-            details = "Could not update preservation agent: " + opm.getCause();
+            detailsList.add("" + opm.getCause());
           }
         } catch (AlreadyExistsException e) {
           pluginState = PluginState.SKIPPED;
+          countSkipped++;
+          detailsList.add(e.getMessage());
         } catch (NotFoundException e) {
-          pluginState = PluginState.FAILURE;
           countFail++;
-          details = "Could not update preservation agent: " + e.getCause();
+          detailsList.add("" + e.getCause());
         }
       }
     } catch (GenericException | AuthorizationDeniedException | RequestNotValidException | ValidationException
       | IOException e) {
       LOGGER.error("Error getting preservation agents to be reindexed", e);
       pluginState = PluginState.FAILURE;
-      details = "Error getting preservation agents to be reindexed " + e;
+      countFail++;
+      detailsList.add("Error getting preservation agents to be reindexed " + e);
     }
 
+    StringBuilder details = new StringBuilder();
     if (countFail > 0) {
-      details = "Updated the instance identifier on " + countSuccess + " Preservation agents and failed to update "
-        + countFail;
+      pluginState = PluginState.FAILURE;
+      details.append("Updated the instance identifier on ").append(countSuccess).append(". Skipped")
+        .append(countSkipped).append(" Preservation agents. And failed to update ").append(countFail).append(".\n")
+        .append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
     } else if (countSuccess > 0) {
-      details = "Updated the instance identifier on " + countSuccess + " Preservation agents";
+      pluginState = PluginState.SUCCESS;
+      details.append("Updated the instance identifier on ").append(countSuccess)
+        .append(" Preservation agents and failed to update. Skipped").append(countSkipped)
+        .append(" preservation agents.\n ").append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
+    } else {
+      details.append("Skipped").append(countSkipped).append(" preservation agents.\n ")
+        .append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
     }
 
-    reportItem.setPluginDetails(details);
+    reportItem.setPluginDetails(details.toString());
     jobPluginInfo.incrementObjectsProcessed(pluginState);
     reportItem.setPluginState(pluginState);
     pluginReport.addReport(reportItem);

@@ -175,8 +175,8 @@ public class InstanceIdentifierNotificationPlugin extends AbstractPlugin<Void> {
 
   private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
     JobPluginInfo jobPluginInfo) throws RequestNotValidException, GenericException, NotFoundException {
-    String details = "";
     PluginState pluginState = PluginState.SKIPPED;
+    List<String> detailsList = new ArrayList<>();
     int countFail = 0;
     int countSuccess = 0;
     // Get Notifications from index
@@ -187,23 +187,24 @@ public class InstanceIdentifierNotificationPlugin extends AbstractPlugin<Void> {
     for (Notification indexedNotification : indexedNotifications) {
       try {
         model.updateNotificationInstanceId(model.retrieveNotification(indexedNotification.getId()));
-        pluginState = PluginState.SUCCESS;
         countSuccess++;
       } catch (GenericException | NotFoundException | AuthorizationDeniedException e) {
-        details = e.getMessage() + "\n";
-        pluginState = PluginState.FAILURE;
+        detailsList.add(e.getMessage());
         countFail++;
       }
     }
-
+    StringBuilder details = new StringBuilder();
     if (countFail > 0) {
-      details = "Updated the instance identifier on " + countSuccess + " Notifications and failed to update "
-        + countFail;
+      pluginState = PluginState.FAILURE;
+      details.append("Updated the instance identifier on ").append(countSuccess)
+        .append(" Notifications and failed to update ").append(countFail).append(".\n")
+        .append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
     } else if (countSuccess > 0) {
-      details = "Updated the instance identifier on " + countSuccess + " Notifications";
+      pluginState = PluginState.SUCCESS;
+      details.append("Updated the instance identifier on ").append(countSuccess).append(" Notifications.");
     }
 
-    reportItem.setPluginDetails(details);
+    reportItem.setPluginDetails(details.toString());
     jobPluginInfo.incrementObjectsProcessed(pluginState);
     reportItem.setPluginState(pluginState);
     pluginReport.addReport(reportItem);
