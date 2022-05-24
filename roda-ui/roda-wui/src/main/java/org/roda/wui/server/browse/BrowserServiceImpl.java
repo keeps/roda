@@ -1438,12 +1438,12 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   public String getCrontabValue(String locale) {
-    String SYNC_SCHEDULE = RodaCoreFactory.getRodaConfigurationAsString("core.synchronization.scheduleInfo");
+    String syncSchedule = RodaCoreFactory.getRodaConfigurationAsString("core.synchronization.scheduleInfo");
     String description = null;
-    if (StringUtils.isNotBlank(SYNC_SCHEDULE)) {
+    if (StringUtils.isNotBlank(syncSchedule)) {
       locale = locale.split("_")[0];
       CronExpressionDescriptor.setDefaultLocale(locale);
-      description = CronExpressionDescriptor.getDescription(SYNC_SCHEDULE);
+      description = CronExpressionDescriptor.getDescription(syncSchedule);
     }
     return description;
   }
