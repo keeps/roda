@@ -1445,8 +1445,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     String syncSchedule = RodaCoreFactory.getRodaConfigurationAsString("core.synchronization.scheduleInfo");
     String description = null;
     if (StringUtils.isNotBlank(syncSchedule)) {
-      locale = locale.split("_")[0];
-      CronExpressionDescriptor.setDefaultLocale(locale);
+      CronExpressionDescriptor.setDefaultLocale(locale.split("_")[0]);
       description = CronExpressionDescriptor.getDescription(syncSchedule);
     }
     return description;
