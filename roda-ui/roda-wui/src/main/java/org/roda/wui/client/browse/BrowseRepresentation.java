@@ -407,15 +407,27 @@ public class BrowseRepresentation extends Composite {
     representationIcon.setHTML(DescriptionLevelUtils.getRepresentationTypeIcon(representation.getType(), false));
     Sliders.createRepresentationInfoSlider(center, navigationToolbar.getInfoSidebarButton(), bundle);
 
-    Anchor risksLink = new Anchor(messages.aipRiskIncidences(bundle.getRiskIncidenceCount()), HistoryUtils
-      .createHistoryHashLink(RiskIncidenceRegister.RESOLVER, representation.getAipId(), representation.getId()));
-    Anchor eventsLink = new Anchor(messages.aipEvents(bundle.getPreservationEventCount()), HistoryUtils
-      .createHistoryHashLink(PreservationEvents.BROWSE_RESOLVER, representation.getAipId(), representation.getUUID()));
+    long incidenceCount = bundle.getRiskIncidenceCount();
+    long eventCount = bundle.getPreservationEventCount();
 
     risksEventsLogs.clear();
-    risksEventsLogs.add(risksLink);
-    risksEventsLogs.add(new Label(" " + messages.and() + " "));
-    risksEventsLogs.add(eventsLink);
+
+    if (incidenceCount >= 0) {
+      Anchor risksLink = new Anchor(messages.aipRiskIncidences(bundle.getRiskIncidenceCount()), HistoryUtils
+              .createHistoryHashLink(RiskIncidenceRegister.RESOLVER, representation.getAipId(), representation.getId()));
+      risksEventsLogs.add(risksLink);
+    }
+
+    if (eventCount >= 0) {
+      Anchor eventsLink = new Anchor(messages.aipEvents(bundle.getPreservationEventCount()), HistoryUtils
+              .createHistoryHashLink(PreservationEvents.BROWSE_RESOLVER, representation.getAipId(), representation.getUUID()));
+
+      if (incidenceCount >= 0) {
+        risksEventsLogs.add(new Label(" " + messages.and() + " "));
+      }
+
+      risksEventsLogs.add(eventsLink);
+    }
 
     if (representation.getCreatedOn() != null && StringUtils.isNotBlank(representation.getCreatedBy())
       && representation.getUpdatedOn() != null && StringUtils.isNotBlank(representation.getUpdatedBy())) {

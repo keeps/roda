@@ -190,9 +190,8 @@ public class InfoSliderHelper {
     if (StringUtils.isNotBlank(aip.getIngestJobId())) {
       Anchor anchor = new Anchor();
       anchor.setText(aip.getIngestJobId());
-      anchor
-        .setHref(HistoryUtils.createHistoryHashLink(ShowJob.RESOLVER, aip.getIngestJobId(),
-          RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID, aip.getId()));
+      anchor.setHref(HistoryUtils.createHistoryHashLink(ShowJob.RESOLVER, aip.getIngestJobId(),
+        RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID, aip.getId()));
 
       values.put(messages.processIdTitle(), anchor);
     }
@@ -435,14 +434,22 @@ public class InfoSliderHelper {
     history.add(file.getRepresentationId());
     history.addAll(file.getPath());
     history.add(file.getId());
-    Anchor risksLink = new Anchor(messages.aipRiskIncidences(bundle.getRiskIncidenceCount()),
-      HistoryUtils.createHistoryHashLink(RiskIncidenceRegister.RESOLVER, history));
-    values.put(messages.preservationRisks(), risksLink);
 
-    Anchor eventsLink = new Anchor(messages.aipEvents(bundle.getPreservationEventCount()),
-      HistoryUtils.createHistoryHashLink(PreservationEvents.BROWSE_RESOLVER, file.getAipId(),
-        file.getRepresentationUUID(), file.getUUID()));
-    values.put(messages.preservationEvents(), eventsLink);
+    Long preservationEventCount = bundle.getPreservationEventCount();
+    Long riskIncidenceCount = bundle.getRiskIncidenceCount();
+
+    if (riskIncidenceCount >= 0) {
+      Anchor risksLink = new Anchor(messages.aipRiskIncidences(bundle.getRiskIncidenceCount()),
+        HistoryUtils.createHistoryHashLink(RiskIncidenceRegister.RESOLVER, history));
+      values.put(messages.preservationRisks(), risksLink);
+    }
+
+    if (preservationEventCount >= 0) {
+      Anchor eventsLink = new Anchor(messages.aipEvents(bundle.getPreservationEventCount()),
+        HistoryUtils.createHistoryHashLink(PreservationEvents.BROWSE_RESOLVER, file.getAipId(),
+          file.getRepresentationUUID(), file.getUUID()));
+      values.put(messages.preservationEvents(), eventsLink);
+    }
 
     populate(infoSliderPanel, values);
   }
