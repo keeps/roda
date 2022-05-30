@@ -83,7 +83,8 @@ public class SyncUtils {
 
     final Path destinationPath = workingDir.resolve(RodaConstants.CORE_STORAGE_FOLDER)
       .resolve(RodaConstants.STORAGE_CONTAINER_JOB);
-    return createCentralPackage(jobs, RodaConstants.JOB_FILE_EXTENSION, destinationPath);
+    return createCentralPackage(ModelUtils.getJobContainerPath(), jobs, RodaConstants.JOB_FILE_EXTENSION,
+      destinationPath);
   }
 
   private static boolean createCentralRiskPackage(Path workingDir)
@@ -95,7 +96,8 @@ public class SyncUtils {
     final Path destinationPath = workingDir.resolve(RodaConstants.CORE_STORAGE_FOLDER)
       .resolve(RodaConstants.STORAGE_CONTAINER_RISK);
 
-    return createCentralPackage(risks, RodaConstants.RISK_FILE_EXTENSION, destinationPath);
+    return createCentralPackage(ModelUtils.getRiskContainerPath(), risks, RodaConstants.RISK_FILE_EXTENSION,
+      destinationPath);
   }
 
   private static boolean createCentralRepresentationInformationPackage(Path workingDir)
@@ -107,16 +109,15 @@ public class SyncUtils {
     final Path destinationPath = workingDir.resolve(RodaConstants.CORE_STORAGE_FOLDER)
       .resolve(RodaConstants.STORAGE_CONTAINER_REPRESENTATION_INFORMATION);
 
-    return createCentralPackage(representationInformation, RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION,
-      destinationPath);
+    return createCentralPackage(ModelUtils.getRepresentationInformationContainerPath(), representationInformation,
+      RodaConstants.REPRESENTATION_INFORMATION_FILE_EXTENSION, destinationPath);
   }
 
-  private static boolean createCentralPackage(IterableIndexResult<? extends IsIndexed> indexedObject,
-    String fileExtension, Path destinationPath)
-    throws RequestNotValidException, AlreadyExistsException, GenericException, AuthorizationDeniedException {
+  private static boolean createCentralPackage(StoragePath containerPath,
+    IterableIndexResult<? extends IsIndexed> indexedObject, String fileExtension, Path destinationPath)
+    throws AlreadyExistsException, GenericException, AuthorizationDeniedException {
     if (indexedObject.getTotalCount() > 0) {
       final StorageService storage = RodaCoreFactory.getStorageService();
-      final StoragePath containerPath = ModelUtils.getJobContainerPath();
 
       for (IsIndexed object : indexedObject) {
         final String filename = object.getId() + fileExtension;
@@ -335,7 +336,7 @@ public class SyncUtils {
 
   /**
    * Get the stream response from the given path.
-   * 
+   *
    * @param path
    *          {@link Path}
    * @return {@link StreamResponse}.
@@ -386,8 +387,7 @@ public class SyncUtils {
     try {
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
       String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE
-        + RodaConstants.API_PATH_PARAM_DISTRIBUTED_INSTANCE_GET_UPDATES
-        + RodaConstants.API_SEP + localInstance.getId();
+        + RodaConstants.API_PATH_PARAM_DISTRIBUTED_INSTANCE_GET_UPDATES + RodaConstants.API_SEP + localInstance.getId();
 
       CloseableHttpClient httpClient = HttpClientBuilder.create().build();
       HttpGet httpGet = new HttpGet(localInstance.getCentralInstanceURL() + resource);
