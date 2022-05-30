@@ -174,7 +174,7 @@ public class InternalPluginsTest {
 
   private ByteArrayInputStream generateContentData() {
     return new ByteArrayInputStream(RandomStringUtils.randomAscii(GENERATED_FILE_SIZE)
-            .replaceAll("\\{", RandomStringUtils.randomAlphabetic(1)).getBytes());
+      .replaceAll("\\{", RandomStringUtils.randomAlphabetic(1)).getBytes());
   }
 
   private TransferredResource createCorpora() throws NotFoundException, GenericException, RequestNotValidException,
