@@ -7,11 +7,6 @@
  */
 package org.roda.wui.api.controllers;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.data.common.RodaConstants;
@@ -22,11 +17,7 @@ import org.roda.core.data.exceptions.JobStateNotPendingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.JobParallelism;
-import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.JobUserDetails;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
@@ -85,6 +76,7 @@ public class Jobs extends RodaWuiController {
 
     ModelService modelService = RodaCoreFactory.getModelService();
     Job retrievedJob = modelService.retrieveJob(job.getId());
+    retrievedJob.setState(Job.JOB_STATE.STARTED);
     JobUserDetails jobUserDetails = new JobUserDetails();
     jobUserDetails.setUsername(user.getName());
     jobUserDetails.setFullname(user.getFullName());
