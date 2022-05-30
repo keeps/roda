@@ -988,9 +988,10 @@ public class Browser extends RodaWuiController {
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, aip);
-
+      IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, id, RodaConstants.FILE_FIELDS_TO_RETURN);
       // delegate
-      BrowserHelper.deletePreservationMetadataFile(PreservationMetadataType.valueOf(type), aipId, null, id, false);
+      BrowserHelper.deletePreservationMetadataFile(PreservationMetadataType.valueOf(type), aipId, null, id,
+        file.getPath(), false);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -1015,10 +1016,10 @@ public class Browser extends RodaWuiController {
       IndexedRepresentation rep = BrowserHelper.retrieve(IndexedRepresentation.class,
         IdUtils.getRepresentationId(aipId, representationId), RodaConstants.REPRESENTATION_FIELDS_TO_RETURN);
       controllerAssistant.checkObjectPermissions(user, rep);
-
+      IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, id, RodaConstants.FILE_FIELDS_TO_RETURN);
       // delegate
       BrowserHelper.deletePreservationMetadataFile(PreservationMetadataType.valueOf(type), rep.getAipId(), rep.getId(),
-        id, false);
+        id, file.getPath(), false);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
