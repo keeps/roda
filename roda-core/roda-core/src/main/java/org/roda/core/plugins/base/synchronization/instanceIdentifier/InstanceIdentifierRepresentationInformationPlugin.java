@@ -175,10 +175,10 @@ public class InstanceIdentifierRepresentationInformationPlugin extends AbstractP
 
   private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
     JobPluginInfo jobPluginInfo) throws RequestNotValidException, GenericException, NotFoundException {
-    String details = "";
     PluginState pluginState = PluginState.SKIPPED;
     int countFail = 0;
     int countSuccess = 0;
+    List<String> detailsList = new ArrayList<>();
 
     // Get AIP's from index
     IterableIndexResult<RepresentationInformation> indexedRepresentationInformations = retrieveList(index);
@@ -190,23 +190,27 @@ public class InstanceIdentifierRepresentationInformationPlugin extends AbstractP
         model.updateRepresentationInformationInstanceId(
           model.retrieveRepresentationInformation(indexedRepresentationInformation.getId()), cachedJob.getUsername(),
           true);
-        pluginState = PluginState.SUCCESS;
         countSuccess++;
       } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-        details = e.getMessage() + "\n";
-        pluginState = PluginState.FAILURE;
+        detailsList.add(e.getMessage());
         countFail++;
       }
     }
 
+    StringBuilder details = new StringBuilder();
+
     if (countFail > 0) {
-      details = "Updated the instance identifier on " + countSuccess
-        + " Representation informations and failed to update " + countFail;
+      pluginState = PluginState.FAILURE;
+      details.append("Updated the instance identifier on ").append(countSuccess)
+        .append(" Representation informations and failed to update ").append(countFail).append(".\n")
+        .append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
     } else if (countSuccess > 0) {
-      details = "Updated the instance identifier on " + countSuccess + " Representation Informations";
+      pluginState = PluginState.SUCCESS;
+      details.append("Updated the instance identifier on ").append(countSuccess)
+        .append(" Representation Informations.");
     }
 
-    reportItem.setPluginDetails(details);
+    reportItem.setPluginDetails(details.toString());
 
     jobPluginInfo.incrementObjectsProcessed(pluginState);
     reportItem.setPluginState(pluginState);

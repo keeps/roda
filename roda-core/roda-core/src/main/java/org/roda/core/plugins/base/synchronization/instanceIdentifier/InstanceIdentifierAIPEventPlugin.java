@@ -37,9 +37,9 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.slf4j.Logger;
@@ -71,6 +71,7 @@ public class InstanceIdentifierAIPEventPlugin extends AbstractPlugin<Void> {
   public static String getStaticName() {
     return "Instance identifier AIP preservation events";
   }
+
   @Override
   public String getName() {
     return getStaticName();
@@ -78,15 +79,15 @@ public class InstanceIdentifierAIPEventPlugin extends AbstractPlugin<Void> {
 
   public static String getStaticDescription() {
     return "Add the instance identifier on the data that exists on the storage as also on the index. "
-            + "If an object already has an instance identifier it will be updated by the new one. "
-            + "This task aims to help the synchronization between a RODA central instance and the RODA local instance, "
-            + "since when an local object is accessed in RODA Central it should have the instance identifier in order to "
-            + "inform from which source is it from.";
+      + "If an object already has an instance identifier it will be updated by the new one. "
+      + "This task aims to help the synchronization between a RODA central instance and the RODA local instance, "
+      + "since when an local object is accessed in RODA Central it should have the instance identifier in order to "
+      + "inform from which source is it from.";
   }
 
   @Override
   public String getDescription() {
-   return getStaticDescription();
+    return getStaticDescription();
   }
 
   @Override
@@ -185,8 +186,9 @@ public class InstanceIdentifierAIPEventPlugin extends AbstractPlugin<Void> {
     JobPluginInfo jobPluginInfo) throws RequestNotValidException, GenericException {
     int countFail = 0;
     int countSuccess = 0;
+    int countSkipped = 0;
     PluginState pluginState = PluginState.SKIPPED;
-    String details = "";
+    List<String> detailsList = new ArrayList<>();
 
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
@@ -200,35 +202,39 @@ public class InstanceIdentifierAIPEventPlugin extends AbstractPlugin<Void> {
             try {
               PremisV3Utils.updatePremisEventInstanceId(opm.get(), model, index, instanceId);
             } catch (InstanceIdNotUpdated e) {
-              pluginState = PluginState.FAILURE;
+              countFail++;
             }
-
-            pluginState = PluginState.SUCCESS;
             countSuccess++;
           } else {
-            pluginState = PluginState.FAILURE;
             countFail++;
           }
         }
       } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
         | ValidationException | AlreadyExistsException | IOException e) {
         LOGGER.error("Error updating instance id on AIP preservation events", e);
-        pluginState = PluginState.FAILURE;
-        details = "Could not add update instance id on AIP preservation events: " + e;
+        countFail++;
+        detailsList.add(e.getMessage());
       } catch (AlreadyHasInstanceIdentifier alreadyHasInstanceIdentifier) {
         pluginState = PluginState.SKIPPED;
-        details = "Already has instance identifier " + alreadyHasInstanceIdentifier;
+        countSkipped++;
+        detailsList.add("" + alreadyHasInstanceIdentifier);
       }
     }
 
-    if (countFail > 0) {
-      details = "Updated the instance identifier on " + countSuccess + " AIP preservation events and failed to update "
-        + countFail;
-    } else if (countSuccess > 0) {
-      details = "Updated the instance identifier on " + countSuccess + " AIP preservation events";
-    }
+    StringBuilder details = new StringBuilder();
 
-    reportItem.setPluginDetails(details);
+    if (countFail > 0) {
+      pluginState = PluginState.FAILURE;
+
+    } else if (countSuccess > 0) {
+      pluginState = PluginState.SUCCESS;
+    }
+    details.append("Updated the instance identifier on ").append(countSuccess)
+      .append(" AIP preservation events and failed to update ").append(countFail).append(". Skipped ")
+      .append(countSkipped).append(" AIP preservation events ")
+      .append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
+
+    reportItem.setPluginDetails(details.toString());
     jobPluginInfo.incrementObjectsProcessed(pluginState);
     reportItem.setPluginState(pluginState);
     pluginReport.addReport(reportItem);

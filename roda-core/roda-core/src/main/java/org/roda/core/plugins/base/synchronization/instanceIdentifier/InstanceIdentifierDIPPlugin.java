@@ -175,7 +175,7 @@ public class InstanceIdentifierDIPPlugin extends AbstractPlugin<Void> {
 
   private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
     JobPluginInfo jobPluginInfo) throws RequestNotValidException, GenericException, NotFoundException {
-    String details = "";
+    List<String> detaislList = new ArrayList<>();
     PluginState pluginState = PluginState.SKIPPED;
     int countFail = 0;
     int countSuccess = 0;
@@ -187,22 +187,24 @@ public class InstanceIdentifierDIPPlugin extends AbstractPlugin<Void> {
     for (IndexedDIP indexedDIP : indexedDIPS) {
       try {
         model.updateDIPInstanceId(model.retrieveDIP(indexedDIP.getId()));
-        pluginState = PluginState.SUCCESS;
         countSuccess++;
       } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
-        details = e.getMessage() + "\n";
-        pluginState = PluginState.FAILURE;
+        detaislList.add(e.getMessage());
         countFail++;
       }
     }
 
+    StringBuilder details = new StringBuilder();
     if (countFail > 0) {
-      details = "Updated the instance identifier on " + countSuccess + " DIP's and failed to update " + countFail;
+      pluginState = PluginState.FAILURE;
+      details.append("Updated the instance identifier on ").append(countSuccess).append(" DIP's and failed to update ")
+        .append(countFail).append(".\n").append(LocalInstanceRegisterUtils.getDetailsFromList(detaislList));
     } else if (countSuccess > 0) {
-      details = "Updated the instance identifier on " + countSuccess + " DIP's";
+      pluginState = PluginState.SUCCESS;
+      details.append("Updated the instance identifier on ").append(countSuccess).append(" DIP's");
     }
 
-    reportItem.setPluginDetails(details);
+    reportItem.setPluginDetails(details.toString());
     jobPluginInfo.incrementObjectsProcessed(pluginState);
     reportItem.setPluginState(pluginState);
     pluginReport.addReport(reportItem);

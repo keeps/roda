@@ -34,9 +34,9 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.slf4j.Logger;
@@ -182,10 +182,11 @@ public class InstanceIdentifierRepositoryEventPlugin extends AbstractPlugin<Void
   private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
     JobPluginInfo jobPluginInfo) throws RequestNotValidException, GenericException {
     PluginState pluginState = PluginState.SKIPPED;
-    String details = "";
+    List<String> detailsList = new ArrayList<>();
 
     int countFail = 0;
     int countSuccess = 0;
+    int countSkipped = 0;
 
     IterableIndexResult<IndexedPreservationEvent> indexedPreservationEvents = retrieveList(index);
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
@@ -195,27 +196,36 @@ public class InstanceIdentifierRepositoryEventPlugin extends AbstractPlugin<Void
       try {
         PremisV3Utils.updatePremisEventInstanceId(model.retrievePreservationMetadata(indexedPreservationEvent.getId(),
           PreservationMetadata.PreservationMetadataType.EVENT), model, index, instanceId);
-        pluginState = PluginState.SUCCESS;
+
         countSuccess++;
       } catch (AuthorizationDeniedException | RequestNotValidException | GenericException | ValidationException
         | AlreadyExistsException | InstanceIdNotUpdated e) {
-        pluginState = PluginState.FAILURE;
-        details = "Could not update instance id on repository preservation event: " + e;
+        detailsList.add(e.getMessage());
         countFail++;
       } catch (AlreadyHasInstanceIdentifier alreadyHasInstanceIdentifier) {
-        pluginState = PluginState.SKIPPED;
-        details = "Could not update instance id on repository preservation event: " + alreadyHasInstanceIdentifier;
+        countSkipped++;
+        detailsList.add(alreadyHasInstanceIdentifier.getMessage());
       }
     }
 
+    StringBuilder details = new StringBuilder();
     if (countFail > 0) {
-      details = "Updated the instance identifier on " + countSuccess
-        + " Repository Preservation event and failed to update " + countFail;
+      pluginState = PluginState.FAILURE;
+      details.append("Updated the instance identifier on ").append(countSuccess).append(" Skipped ")
+        .append(countSkipped).append(" Repository preservation events, ")
+        .append("Repository Preservation event and failed to update ").append(countFail).append(".\n")
+        .append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
     } else if (countSuccess > 0) {
-      details = "Updated the instance identifier on " + countSuccess + " Repository Preservation event";
+      pluginState = PluginState.SUCCESS;
+      details.append("Updated the instance identifier on ").append(countSuccess).append(", Skipped ")
+        .append(countSkipped).append(" Repository preservation events.\n ")
+        .append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
+    } else {
+      details.append("Skipped ").append(countSkipped).append(" Repository preservation events.\n ")
+        .append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
     }
 
-    reportItem.setPluginDetails(details);
+    reportItem.setPluginDetails(details.toString());
 
     jobPluginInfo.incrementObjectsProcessed(pluginState);
     reportItem.setPluginState(pluginState);
