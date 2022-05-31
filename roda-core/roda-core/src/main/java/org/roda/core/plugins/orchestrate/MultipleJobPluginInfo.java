@@ -16,6 +16,7 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.ReportUtils;
 import org.roda.core.plugins.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,22 +113,10 @@ public class MultipleJobPluginInfo extends JobPluginInfo {
     int countSkipped = 0;
 
     for (List<Report> reports : getAllReports().values()) {
-      PluginState pluginState = PluginState.SKIPPED;
+      PluginState pluginState = PluginState.RUNNING;
       for (Report report : reports) {
-        switch (report.getPluginState()) {
-          case FAILURE:
-            pluginState = report.getPluginState();
-            break;
-          case PARTIAL_SUCCESS:
-            if (!PluginState.FAILURE.equals(pluginState))
-              pluginState = PluginState.PARTIAL_SUCCESS;
-            break;
-          case SUCCESS:
-            pluginState = PluginState.SUCCESS;
-            break;
-          default:
-            break;
-        }
+        pluginState = ReportUtils.calculatePluginState(pluginState,
+            report.getPluginState(), report.getPluginIsMandatory());
       }
       switch (pluginState) {
         case SUCCESS:
