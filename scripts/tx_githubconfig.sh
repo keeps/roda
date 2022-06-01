@@ -32,11 +32,11 @@ function map {
       if ! grep -Fxq ${relativepath:1} $IGNORED_FILE
       then
         filename=$(basename "$file" | cut -f 1 -d '.')
-        yq -i '.filters[0].filter_type="file"' $PARTIAL
-        yq -i ".filters[0].file_format=\"$TYPE\"" $PARTIAL
-        yq -i ".filters[0].source_file=\"$DIR/$filename$EXTENSION\"" $PARTIAL
-        yq -i ".filters[0].source_language=\"$SOURCE_LANGUAGE\"" $PARTIAL
-        yq -i ".filters[0].translation_files_expression=\"$DIR/${filename}_<lang>$EXTENSION\"" $PARTIAL
+        yq -i '.git.filters[0].filter_type="file"' $PARTIAL
+        yq -i ".git.filters[0].file_format=\"$TYPE\"" $PARTIAL
+        yq -i ".git.filters[0].source_file=\"$DIR/$filename$EXTENSION\"" $PARTIAL
+        yq -i ".git.filters[0].source_language=\"$SOURCE_LANGUAGE\"" $PARTIAL
+        yq -i ".git.filters[0].translation_files_expression=\"$DIR/${filename}_<lang>$EXTENSION\"" $PARTIAL
 
         yq -i eval-all '. as $item ireduce ({}; . *+ $item)' $CONFIG $PARTIAL
 
@@ -58,18 +58,18 @@ fi
 
 
 # Set server messages
-yq -i '.filters[0].filter_type="file"' $CONFIG
-yq -i '.filters[0].file_format="UNICODEPROPERTIES"' $CONFIG
-yq -i ".filters[0].source_language=\"$SOURCE_LANGUAGE\"" $CONFIG
-yq -i '.filters[0].source_file="roda-ui/roda-wui/src/main/resources/config/i18n/ServerMessages.properties"' $CONFIG
-yq -i '.filters[0].translation_files_expression="roda-ui/roda-wui/src/main/resources/config/i18n/ServerMessages_<lang>.properties"' $CONFIG
+yq -i '.git.filters[0].filter_type="file"' $CONFIG
+yq -i '.git.filters[0].file_format="UNICODEPROPERTIES"' $CONFIG
+yq -i ".git.filters[0].source_language=\"$SOURCE_LANGUAGE\"" $CONFIG
+yq -i '.git.filters[0].source_file="roda-ui/roda-wui/src/main/resources/config/i18n/ServerMessages.properties"' $CONFIG
+yq -i '.git.filters[0].translation_files_expression="roda-ui/roda-wui/src/main/resources/config/i18n/ServerMessages_<lang>.properties"' $CONFIG
 
 # Set client messages
-yq -i '.filters[1].filter_type="file"' $CONFIG
-yq -i '.filters[1].file_format="UNICODEPROPERTIES"' $CONFIG
-yq -i ".filters[1].source_language=\"$SOURCE_LANGUAGE\"" $CONFIG
-yq -i '.filters[1].source_file="roda-ui/roda-wui/src/main/resources/config/i18n/client/ClientMessages.properties"' $CONFIG
-yq -i '.filters[1].translation_files_expression="roda-ui/roda-wui/src/main/resources/config/i18n/client/ClientMessages_<lang>.properties"' $CONFIG
+yq -i '.git.filters[1].filter_type="file"' $CONFIG
+yq -i '.git.filters[1].file_format="UNICODEPROPERTIES"' $CONFIG
+yq -i ".git.filters[1].source_language=\"$SOURCE_LANGUAGE\"" $CONFIG
+yq -i '.git.filters[1].source_file="roda-ui/roda-wui/src/main/resources/config/i18n/client/ClientMessages.properties"' $CONFIG
+yq -i '.git.filters[1].translation_files_expression="roda-ui/roda-wui/src/main/resources/config/i18n/client/ClientMessages_<lang>.properties"' $CONFIG
 
 map "documentation" '.md' 'GITHUBMARKDOWN'
 map "roda-ui/roda-wui/src/main/resources/config/theme" '.html' 'HTML'
