@@ -1,3 +1,5 @@
 # path inside the roda project (one per line)
 # example:
 # documentation/Pre_Ingest.md
+documentation/Installation_Production_Environments.md
+documentation/Installation_Testing_Environments.md
