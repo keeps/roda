@@ -424,7 +424,7 @@ public interface BrowserServiceAsync {
 
   void testLocalInstanceConfiguration(LocalInstance localInstance, AsyncCallback<List<String>> async);
 
-  void registerLocalInstance(LocalInstance localInstance, AsyncCallback<LocalInstance> async);
+  void subscribeLocalInstance(LocalInstance localInstance, AsyncCallback<LocalInstance> async);
 
   void synchronizeBundle(LocalInstance localInstance, AsyncCallback<Job> async);
 

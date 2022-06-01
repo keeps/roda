@@ -35,11 +35,11 @@
 
                             <g:FlowPanel styleName="field">
                                 <g:Label styleName="label"
-                                         ui:field="isRegisteredLabel">
-                                    <ui:text from='{messages.localInstanceIsRegisteredLabel}' />
+                                         ui:field="isSubscribedLabel">
+                                    <ui:text from='{messages.localInstanceIsSubscribedLabel}' />
                                 </g:Label>
                                 <g:HTML styleName="value"
-                                        ui:field="isRegisteredValue" />
+                                        ui:field="isSubscribedValue" />
                             </g:FlowPanel>
 
                             <g:FlowPanel styleName="field">
@@ -72,8 +72,8 @@
                         <g:Button addStyleNames="btn btn-block btn-edit" ui:field="buttonEdit">
                             <ui:text from='{messages.editButton}'/>
                         </g:Button>
-                        <g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonRegister">
-                            <ui:text from='{messages.registerLocalInstanceConfigurationButton}'/>
+                        <g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonSubscribe">
+                            <ui:text from='{messages.subscribeLocalInstanceConfigurationButton}'/>
                         </g:Button>
 <!--                        <g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonCreateBundle">-->
 <!--                            <ui:text from='{messages.createBundleButton}'/>-->

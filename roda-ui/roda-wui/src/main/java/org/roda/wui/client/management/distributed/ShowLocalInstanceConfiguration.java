@@ -86,10 +86,13 @@ public class ShowLocalInstanceConfiguration extends Composite {
   Button buttonSynchronize;
 
   @UiField
+  Button buttonSubscribe;
+
+  @UiField
   HTML centralInstanceURLValue;
 
   @UiField
-  HTML isRegisteredValue;
+  HTML isSubscribedValue;
 
   @UiField
   HTML lastSyncValue;
@@ -107,11 +110,12 @@ public class ShowLocalInstanceConfiguration extends Composite {
   private void initElements(LocalInstance localInstance) {
     IDValue.setText(localInstance.getId());
     centralInstanceURLValue.setText(localInstance.getCentralInstanceURL());
-    isRegisteredValue.setText(localInstance.getIsRegistered().toString());
+    isSubscribedValue.setText(localInstance.getIsSubscribed().toString());
     lastSyncValue.setHTML(HtmlSnippetUtils.getLastSyncHtml(localInstance, false));
     synchronizationStatusValue.setHTML(HtmlSnippetUtils.getInstanceIdStateHtml(localInstance));
     buttonSynchronize.setEnabled(false);
     if (localInstance.getStatus().equals(SynchronizingStatus.ACTIVE)) {
+      buttonSubscribe.setVisible(false);
       buttonSynchronize.setEnabled(true);
     }
   }
@@ -121,29 +125,35 @@ public class ShowLocalInstanceConfiguration extends Composite {
     HistoryUtils.newHistory(EditLocalInstanceConfiguration.RESOLVER);
   }
 
-  @UiHandler("buttonRegister")
-  void buttonRegisterHandler(ClickEvent e) {
+  @UiHandler("buttonSubscribe")
+  void buttonSubscribeHandler(ClickEvent e) {
     Dialogs.showConfirmDialog(messages.applyInstanceIdToRepository(), messages.applyInstanceIdToRepositoryMessage(),
       messages.dialogNo(), messages.dialogYes(), new NoAsyncCallback<Boolean>() {
+
         @Override
         public void onSuccess(Boolean result) {
-          BrowserService.Util.getInstance().registerLocalInstance(localInstance, new NoAsyncCallback<LocalInstance>() {
-            @Override
-            public void onSuccess(LocalInstance result) {
-              Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+          if (result == true) {
+            BrowserService.Util.getInstance().subscribeLocalInstance(localInstance,
+              new NoAsyncCallback<LocalInstance>() {
                 @Override
-                public void onFailure(Throwable caught) {
-                  initElements(result);
-                  Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
-                }
+                public void onSuccess(LocalInstance result) {
+                  buttonSubscribe.setVisible(false);
+                  Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      initElements(result);
+                      Toast.showInfo(messages.runningInBackgroundTitle(), messages.runningInBackgroundDescription());
+                    }
 
-                @Override
-                public void onSuccess(final Void nothing) {
-                  HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                    @Override
+                    public void onSuccess(final Void nothing) {
+                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
+
+                    }
+                  });
                 }
               });
-            }
-          });
+          }
         }
       });
   }

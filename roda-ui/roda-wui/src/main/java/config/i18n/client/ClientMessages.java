@@ -2197,7 +2197,7 @@ public interface ClientMessages extends Messages {
 
   String testLocalInstanceConfigurationButton();
 
-  String registerLocalInstanceConfigurationButton();
+  String subscribeLocalInstanceConfigurationButton();
 
   String synchronizeLocalInstanceConfigurationButton();
 
@@ -2211,7 +2211,7 @@ public interface ClientMessages extends Messages {
 
   String localInstanceConfigurationInvalidURL();
 
-  String localInstanceIsRegisteredLabel();
+  String localInstanceIsSubscribedLabel();
 
   String localInstanceLastSyncDateLabel();
 
