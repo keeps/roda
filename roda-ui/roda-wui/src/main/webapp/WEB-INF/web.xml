@@ -123,15 +123,15 @@
 		</init-param>
 		<init-param>
 			<param-name>proxyCallbackUrl</param-name>
-			<param-value>https://localhost:8888/callback</param-value>
+			<param-value/>
 		</init-param>
 		<init-param>
 			<param-name>proxyReceptorUrl</param-name>
-			<param-value>/callback</param-value>
+			<param-value/>
 		</init-param>
 		<init-param>
 			<param-name>acceptAnyProxy</param-name>
-			<param-value>true</param-value>
+			<param-value>false</param-value>
 		</init-param>
 	</filter>
 	<filter-mapping>

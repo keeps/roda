@@ -122,9 +122,9 @@ public class RODA {
     registrationBean.addInitParameter("serverName", "https://localhost:8888");
     registrationBean.addInitParameter("exceptionOnValidationFailure", "false");
     registrationBean.addInitParameter("redirectAfterValidation", "false");
-    registrationBean.addInitParameter("proxyCallbackUrl", "https://localhost:8888/callback");
-    registrationBean.addInitParameter("proxyReceptorUrl", "/callback");
-    registrationBean.addInitParameter("acceptAnyProxy", "true");
+    registrationBean.addInitParameter("proxyCallbackUrl", "");
+    registrationBean.addInitParameter("proxyReceptorUrl", "");
+    registrationBean.addInitParameter("acceptAnyProxy", "false");
     registrationBean.addUrlPatterns("/*");
 
     return registrationBean;
