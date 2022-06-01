@@ -81,8 +81,8 @@
                         <g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonSynchronize">
                             <ui:text from='{messages.synchronizeLocalInstanceConfigurationButton}'/>
                         </g:Button>
-                        <g:Button addStyleNames="btn btn-block btn-danger btn-times-circle" ui:field="buttonRemove">
-                            <ui:text from='{messages.removeButton}'/>
+                        <g:Button addStyleNames="btn btn-block btn-danger btn-times-circle" ui:field="buttonUnsubscribe">
+                            <ui:text from='{messages.unsubscribeButton}'/>
                         </g:Button>
                     </g:FlowPanel>
                 </g:FlowPanel>

@@ -169,14 +169,14 @@ public class ShowLocalInstanceConfiguration extends Composite {
     });
   }
 
-  @UiHandler("buttonRemove")
-  void buttonRemoveHandler(ClickEvent e) {
+  @UiHandler("buttonUnsubscribe")
+  void buttonUnsubscribeHandler(ClickEvent e) {
     Dialogs.showConfirmDialog(messages.removeLocalConfiguration(), messages.removeLocalConfigurationMessage(),
-      messages.dialogNo(), messages.dialogYes(), confirmRemoveCallback());
+      messages.dialogNo(), messages.dialogYes(), confirmUnsubscribeCallback());
 
   }
 
-  private NoAsyncCallback<Boolean> confirmRemoveCallback() {
+  private NoAsyncCallback<Boolean> confirmUnsubscribeCallback() {
     return new NoAsyncCallback<Boolean>() {
       @Override
       public void onFailure(Throwable caught) {

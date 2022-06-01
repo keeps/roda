@@ -398,6 +398,8 @@ public interface ClientMessages extends Messages {
 
   String removeButton();
 
+  String unsubscribeButton();
+
   String refreshButton();
 
   String newButton();
