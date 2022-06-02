@@ -27,7 +27,7 @@ function map {
     PARTIAL=partial.yml
     touch $PARTIAL
 
-    find "$(readlink -m $DIR)" -type f -name \*${EXTENSION}  -regextype egrep  -not  -regex ".*/.+_[a-z]{2}_[A-Z]{2}\\${EXTENSION}" | while IFS= read -r file; do
+    find "$(readlink -m $DIR)" -type f -name \*${EXTENSION}  -regextype egrep  -not  -regex ".*/.+_[a-z]{2}(_[A-Z]{2})?\\${EXTENSION}" | while IFS= read -r file; do
       relativepath=${file#${RODA_PROJECT_DIR}}
       if ! grep -Fxq ${relativepath:1} $IGNORED_FILE
       then
