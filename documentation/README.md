@@ -4,7 +4,6 @@ RODA is a **digital repository solution** that delivers functionality for all th
 
 This page links to an assortment of **technical information articles** that will help users, developers, translators and implementers to adapt this product to their particular needs.
 
-
 ## Table of contents
 
 Among others articles, in this series of documentation you will find information on:
@@ -54,7 +53,6 @@ Among others articles, in this series of documentation you will find information
 * [ISO 14721:2012 - Space data and information transfer systems - Open archival information system (OAIS) - Reference model](http://www.iso.org/iso/catalogue_detail.htm?csnumber=57284) ([Magenta book](http://public.ccsds.org/publications/archive/650x0m2.pdf))
 * [ISO 16363:2012 - Space data and information transfer systems - Audit and certification of trustworthy digital repositories](http://www.iso.org/iso/catalogue_detail.htm?csnumber=56510) ([TRAC version](https://www.crl.edu/sites/default/files/d6/attachments/pages/trac_0.pdf))
 * [eCH-0165 SIARD Format Specification 2.0](https://www.ech.ch/vechweb/page?p=dossier&documentNumber=eCH-0165&documentVersion=2.0)
-
 
 ### Other
 
