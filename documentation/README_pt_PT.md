@@ -11,10 +11,12 @@ Esta documentação cobre os seguintes tópicos:
   - [Início rápido](Quickstart.md)
   - [Pesquisa avançada](Advanced_Search_pt_PT.md)
   - [Pré-ingestão](Pre_Ingest_pt_PT.md)
-  - [Tipos de metadados descritivos](Descriptive_Metadata_Types.md)
+  - [Tipos de metainformação descritiva](Descriptive_Metadata_Types.md)
+  - [Editar metainformação descritiva](EditDescriptiveMetadata.md)
   - [Informação de representação](Representation_Information.md)
   - [Tratamento de riscos](Risk_Assessment.md)
-  - [Politicas de normalização de formatos](Format_Normalization_Policy.md)
+  - [Politica de normalização de formatos](Format_Normalization_Policy.md)
+  - [Política de avaliação e seleção](Disposal_Policies.md)
 - Suporte
   - [Suporte pela comunidade](Community_Support.md)
   - [Suporte profissional](Professional_Support.md)
@@ -25,6 +27,7 @@ Esta documentação cobre os seguintes tópicos:
   - [Estatísticas](Statistics_pt_PT.md)
   - [Formatos de metadados](Metadata_Formats.md)
   - [Central Authentication Service (CAS)](Central_Authentication_Service.md)
+  - [Avaliação e seleção](Disposal.md)
 - Contribuir para o projeto
   - [Guia para desenvolvimento](Developers_Guide.md)
   - [Guia de tradução](Translation_Guide.md)
