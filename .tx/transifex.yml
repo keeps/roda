@@ -62,19 +62,9 @@ git:
       translation_files_expression: documentation/Professional_Support_<lang>.md
     - filter_type: file
       file_format: GITHUBMARKDOWN
-      source_file: documentation/EditDescriptiveMetadata_hr.md
-      source_language: en
-      translation_files_expression: documentation/EditDescriptiveMetadata_hr_<lang>.md
-    - filter_type: file
-      file_format: GITHUBMARKDOWN
       source_file: documentation/License.md
       source_language: en
       translation_files_expression: documentation/License_<lang>.md
-    - filter_type: file
-      file_format: GITHUBMARKDOWN
-      source_file: documentation/Community_Support_hr.md
-      source_language: en
-      translation_files_expression: documentation/Community_Support_hr_<lang>.md
     - filter_type: file
       file_format: GITHUBMARKDOWN
       source_file: documentation/Disposal.md
@@ -102,19 +92,9 @@ git:
       translation_files_expression: documentation/Pre_Ingest_<lang>.md
     - filter_type: file
       file_format: GITHUBMARKDOWN
-      source_file: documentation/Documentation_Guide_hr.md
-      source_language: en
-      translation_files_expression: documentation/Documentation_Guide_hr_<lang>.md
-    - filter_type: file
-      file_format: GITHUBMARKDOWN
       source_file: documentation/Translation_Guide.md
       source_language: en
       translation_files_expression: documentation/Translation_Guide_<lang>.md
-    - filter_type: file
-      file_format: GITHUBMARKDOWN
-      source_file: documentation/Advanced_Search_hr.md
-      source_language: en
-      translation_files_expression: documentation/Advanced_Search_hr_<lang>.md
     - filter_type: file
       file_format: GITHUBMARKDOWN
       source_file: documentation/Metadata_Formats.md
@@ -142,11 +122,6 @@ git:
       translation_files_expression: documentation/Overview_<lang>.md
     - filter_type: file
       file_format: GITHUBMARKDOWN
-      source_file: documentation/Acknowledgements_hr.md
-      source_language: en
-      translation_files_expression: documentation/Acknowledgements_hr_<lang>.md
-    - filter_type: file
-      file_format: GITHUBMARKDOWN
       source_file: documentation/Documentation_Guide.md
       source_language: en
       translation_files_expression: documentation/Documentation_Guide_<lang>.md
@@ -172,19 +147,9 @@ git:
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/IngestProcessDescription_<lang>.html
     - filter_type: file
       file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/IngestProcessDescription_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/IngestProcessDescription_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
       source_file: roda-ui/roda-wui/src/main/resources/config/theme/ErrorInactiveAccount.html
       source_language: en
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/ErrorInactiveAccount_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/PreservationProcessDescription_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/PreservationProcessDescription_hr_<lang>.html
     - filter_type: file
       file_format: HTML
       source_file: roda-ui/roda-wui/src/main/resources/config/theme/MissingRepresentationInformation.html
@@ -212,16 +177,6 @@ git:
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/OrderDisposalRulesDescription_<lang>.html
     - filter_type: file
       file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/MissingRepresentationInformation_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/MissingRepresentationInformation_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/Statistics_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/Statistics_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
       source_file: roda-ui/roda-wui/src/main/resources/config/theme/InternalProcessDescription.html
       source_language: en
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/InternalProcessDescription_<lang>.html
@@ -237,16 +192,6 @@ git:
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/Error404_<lang>.html
     - filter_type: file
       file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/UserLogDescription_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/UserLogDescription_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/EditPermissionsDescription_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/EditPermissionsDescription_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
       source_file: roda-ui/roda-wui/src/main/resources/config/theme/CreateDisposalConfirmationDescription.html
       source_language: en
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/CreateDisposalConfirmationDescription_<lang>.html
@@ -255,26 +200,6 @@ git:
       source_file: roda-ui/roda-wui/src/main/resources/config/theme/PreMetadataPortal.html
       source_language: en
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/PreMetadataPortal_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/RiskRegisterDescription_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/RiskRegisterDescription_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/RIRelationsDescriptionWithText_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/RIRelationsDescriptionWithText_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/Publications_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/Publications_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/DisposalDestroyedRecordsDescription_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/DisposalDestroyedRecordsDescription_hr_<lang>.html
     - filter_type: file
       file_format: HTML
       source_file: roda-ui/roda-wui/src/main/resources/config/theme/BrowseDescription.html
@@ -312,34 +237,14 @@ git:
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/RIRelationsWithIntellectualEntity_<lang>.html
     - filter_type: file
       file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/MemberManagementDescription_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/MemberManagementDescription_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
       source_file: roda-ui/roda-wui/src/main/resources/config/theme/IngestTransferDescription.html
       source_language: en
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/IngestTransferDescription_<lang>.html
     - filter_type: file
       file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/RIRelationsDescriptionWithRI_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/RIRelationsDescriptionWithRI_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
       source_file: roda-ui/roda-wui/src/main/resources/config/theme/WelcomePortal.html
       source_language: en
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/WelcomePortal_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/Welcome_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/Welcome_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/IngestTransferDescription_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/IngestTransferDescription_hr_<lang>.html
     - filter_type: file
       file_format: HTML
       source_file: roda-ui/roda-wui/src/main/resources/config/theme/UserLogDescription.html
@@ -372,29 +277,9 @@ git:
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/CreateDisposalConfirmationExtraDescription_<lang>.html
     - filter_type: file
       file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/NotificationDescription_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/NotificationDescription_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
       source_file: roda-ui/roda-wui/src/main/resources/config/theme/DisposalRuleDescription.html
       source_language: en
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/DisposalRuleDescription_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/CookiesPolicy_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/CookiesPolicy_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/BrowseDescription_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/BrowseDescription_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/RIRelationsWithIntellectualEntity_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/RIRelationsWithIntellectualEntity_hr_<lang>.html
     - filter_type: file
       file_format: HTML
       source_file: roda-ui/roda-wui/src/main/resources/config/theme/RIRelationsDescriptionWithRI.html
@@ -412,16 +297,6 @@ git:
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/Banner_<lang>.html
     - filter_type: file
       file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/Error404_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/Error404_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/Error500_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/Error500_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
       source_file: roda-ui/roda-wui/src/main/resources/config/theme/RiskRegisterDescription.html
       source_language: en
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/RiskRegisterDescription_<lang>.html
@@ -430,16 +305,6 @@ git:
       source_file: roda-ui/roda-wui/src/main/resources/config/theme/PreservationProcessDescription.html
       source_language: en
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/PreservationProcessDescription_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/InternalProcessDescription_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/InternalProcessDescription_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/RIRelationsDescriptionHelp_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/RIRelationsDescriptionHelp_hr_<lang>.html
     - filter_type: file
       file_format: HTML
       source_file: roda-ui/roda-wui/src/main/resources/config/theme/RepresentationInformationNetworkDescription.html
@@ -452,11 +317,6 @@ git:
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/DisposalHoldDescription_<lang>.html
     - filter_type: file
       file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/RIAssociationsDescription_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/RIAssociationsDescription_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
       source_file: roda-ui/roda-wui/src/main/resources/config/theme/RIRelationsDescriptionWithText.html
       source_language: en
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/RIRelationsDescriptionWithText_<lang>.html
@@ -467,24 +327,9 @@ git:
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/MemberManagementDescription_<lang>.html
     - filter_type: file
       file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/IngestAppraisalDescription_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/IngestAppraisalDescription_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
       source_file: roda-ui/roda-wui/src/main/resources/config/theme/RIRelationsDescriptionWithWeb.html
       source_language: en
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/RIRelationsDescriptionWithWeb_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/WelcomePortal_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/WelcomePortal_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/DisposalConfirmationDescription_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/DisposalConfirmationDescription_hr_<lang>.html
     - filter_type: file
       file_format: HTML
       source_file: roda-ui/roda-wui/src/main/resources/config/theme/SearchDescription.html
@@ -497,39 +342,9 @@ git:
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/IngestAppraisalDescription_<lang>.html
     - filter_type: file
       file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/EditRiskIncidenceDescription_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/EditRiskIncidenceDescription_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/RIRelationsDescriptionWithWeb_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/RIRelationsDescriptionWithWeb_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/DisposalPolicyDescription_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/DisposalPolicyDescription_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/Footer_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/Footer_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/ErrorInactiveAccount_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/ErrorInactiveAccount_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
       source_file: roda-ui/roda-wui/src/main/resources/config/theme/DisposalDestroyedRecordsDescription.html
       source_language: en
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/DisposalDestroyedRecordsDescription_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/RepresentationInformationNetworkDescription_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/RepresentationInformationNetworkDescription_hr_<lang>.html
     - filter_type: file
       file_format: HTML
       source_file: roda-ui/roda-wui/src/main/resources/config/theme/DistributedInstancesDescription.html
@@ -552,26 +367,6 @@ git:
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/DisposalScheduleDescription_<lang>.html
     - filter_type: file
       file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/SearchDescription_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/SearchDescription_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/PreservationEventsDescription_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/PreservationEventsDescription_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/RiskIncidenceRegisterDescription_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/RiskIncidenceRegisterDescription_hr_<lang>.html
-    - filter_type: file
-      file_format: HTML
       source_file: roda-ui/roda-wui/src/main/resources/config/theme/Publications.html
       source_language: en
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/Publications_<lang>.html
-    - filter_type: file
-      file_format: HTML
-      source_file: roda-ui/roda-wui/src/main/resources/config/theme/Banner_hr.html
-      source_language: en
-      translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/Banner_hr_<lang>.html
