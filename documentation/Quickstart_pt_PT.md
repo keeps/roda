@@ -17,3 +17,5 @@ Depois, pode iniciar usando o RODA:
 6. Depois de configurar a ingestão, clique no botão **Iniciar**.
 7. Agora a ingestão irá começar e pode ver o seu estado em **Ingestão > Estado**, também pode inspecionar o estado ao clicar na linha da tabela.
 8. Assim que terminado, pode ir até **Catálogo** ou **Pesquisa** para encontrar o seu novo conteúdo ingerido.
+
+
