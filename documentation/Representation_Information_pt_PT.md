@@ -39,6 +39,7 @@ No entanto, o OAIS necessita de monitorar isto cuidadosamente porque um dia deix
 ## Software de acesso e emulação
 
 A curto prazo, a maioria dos registos são provavelmente abertos por exatamente o mesmo software no qual foram criados. Alguém que abra um documento arquivado, mas que foi recentemente criado, irá provavelmente usar a sua própria app MS Word. Então isto leva à possibilidade de as redes de Representação estendidas poderem ser abandonadas, e nós simplesmente usarmos o software original, ou algo muito semelhante.
+
 O OAIS chama a isto Software de Acesso, e alerta contra o mesmo, porque significa que temos de tentar manter o software a funcionar. No entanto, apercebo-me que isto é o principal objetivo da emulação HW. Se tiver a única frase "documento MS Word" como a sua Informação de Representação, e mantiver uma cópia de trabalho da app do Word em HW e OS emulados, então não precisa de nenhuma rede de Representação. Pelo menos, até tudo dar para o torto.
 
 ## Informação de Representação na prática
