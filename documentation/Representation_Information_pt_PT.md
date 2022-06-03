@@ -39,13 +39,14 @@ No entanto, o OAIS necessita de monitorar isto cuidadosamente porque um dia deix
 ## Software de acesso e emulação
 
 A curto prazo, a maioria dos registos são provavelmente abertos por exatamente o mesmo software no qual foram criados. Alguém que abra um documento arquivado, mas que foi recentemente criado, irá provavelmente usar a sua própria app MS Word. Então isto leva à possibilidade de as redes de Representação estendidas poderem ser abandonadas, e nós simplesmente usarmos o software original, ou algo muito semelhante.
-
 O OAIS chama a isto Software de Acesso, e alerta contra o mesmo, porque significa que temos de tentar manter o software a funcionar. No entanto, apercebo-me que isto é o principal objetivo da emulação HW. Se tiver a única frase "documento MS Word" como a sua Informação de Representação, e mantiver uma cópia de trabalho da app do Word em HW e OS emulados, então não precisa de nenhuma rede de Representação. Pelo menos, até tudo dar para o torto.
 
-## Informação de Representação na prática
+Informação de Representação na prática
 
-Peguemos num ficheiro de imagem JPEG como exemplo. Penso que podemos partir do princípio de que a nossa Comunidade Designada atual compreende o que é um JPEG: na terminologia do OAIS, a Base de Conhecimento da Comunidade Designada inclui o conceito e o termo "JPEG". Logo, a nossa Informação de Representação para esse ficheiro poderia, em teoria, simplesmente ser uma afirmação a dizer que é uma imagem JPEG. Isso é suficiente. Para o formato JPEG, e para muitos outros, a Informação de Representação mais útil é na verdade uma app que pode visualizá-la e abri-la. (Qualquer PC atual será capaz de abrir o JPEG de qualquer das maneiras.)
+## Peguemos num ficheiro de imagem JPEG como exemplo. Penso que podemos partir do princípio de que a nossa Comunidade Designada atual compreende o que é um JPEG: na terminologia do OAIS, a Base de Conhecimento da Comunidade Designada inclui o conceito e o termo "JPEG". Logo, a nossa Informação de Representação para esse ficheiro poderia, em teoria, simplesmente ser uma afirmação a dizer que é uma imagem JPEG. Isso é suficiente. Para o formato JPEG, e para muitos outros, a Informação de Representação mais útil é na verdade uma app que pode visualizá-la e abri-la. (Qualquer PC atual será capaz de abrir o JPEG de qualquer das maneiras.)
 
 No entanto, a longo prazo, temos de nos preparar para um mundo no qual a Comunidade Designada se afastou dos JPEGs. Logo, também devemos adicionar uma ligação ao website da norma JPEG, para explicar o que é um JPEG. E poderíamos incluir informação sobre quais apps de software podem abrir uma imagem JPEG. Adicionalmente, deveria existir uma ligação na rede de Representação para um lugar na web onde podemos descarregar um visualizador de JPEG.
+
+Isto significa que a rede de Representação muda ao longo do tempo. Temos de ser capazes de atualizá-la de acordo com o desenvolvimento da tecnologia.
 
 Isto significa que a rede de Representação muda ao longo do tempo. Temos de ser capazes de atualizá-la de acordo com o desenvolvimento da tecnologia.
