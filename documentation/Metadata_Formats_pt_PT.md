@@ -100,7 +100,7 @@ A atividade de _indexação_ é suportada por  [XSLT (eXtensible Stylesheet Lang
 
 O ficheiro de mapa de índices deverá ser adicionado à pasta de configuração do repositório em: `[RODA_HOME]/config/crosswalks/ingest/`.
 
-Índice de processos
+O seguinte exemplo demonstra um ficheiro de mapa de índices para a metainformação Simple Dublin Core.
 
 No. total de processos de ingestão
 
