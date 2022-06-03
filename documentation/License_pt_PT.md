@@ -38,8 +38,7 @@ Seguem-se os termos e condições precisos para copiar, distribuir e modificar.
 
 "Direitos de autor" também significa leis semelhantes de direitos de autor que se aplicam a outros tipos de trabalhos, como máscaras semicondutoras.
 
-"O Programa" refere-se a qualquer trabalho que pode ser objeto de direitos de autor licenciados sob esta Licença. Cada titular é dirigido por "você". "Licenciados" e
-"beneficiários" podem ser indivíduos ou organizações.
+"O Programa" refere-se a qualquer trabalho que pode ser objeto de direitos de autor licenciados sob esta Licença. Cada titular é dirigido por "você". "Licenciados" e "beneficiários" podem ser indivíduos ou organizações.
 
 "Modificar" um trabalho significa copiar de ou adaptar todo ou parte do trabalho de um modo que requira permissão de direitos de autor, para além de fazer uma cópia exata. O trabalho resultante denomina-se "versão modificada" do projeto inicial ou de um trabalho "baseado no" trabalho inicial.
 
@@ -49,8 +48,7 @@ Um "trabalho coberto" significa ou o programa sem modificações ou um trabalho 
 
 "Transmitir" um trabalho significa qualquer tipo de propagação que permita que terceiros façam ou recebam cópias. A mera interação com um utilizador através de um rede de computadores, sem a transferência de uma cópia, não é transmitir.
 
-Uma interface de utilizador interativa apresenta "Avisos Legais Apropriados" ao ponto de incluir uma funcionalidade conveniente e proeminentemente visível que (1) apresenta um aviso de direitos de autor apropriado, e (2)
-conta ao utilizador que não há qualquer garantia para o trabalho (exceto até ao ponto em que as garantias são fornecidas), que os titulares podem transmitir o trabalho sob esta Licença, e como ver uma cópia desta Licença. Se a interface apresentar uma lista de comandos ou opções para utilizadores, como um menu, um item proeminente na lista vai de encontro com este critério.
+Uma interface de utilizador interativa apresenta "Avisos Legais Apropriados" ao ponto de incluir uma funcionalidade conveniente e proeminentemente visível que (1) apresenta um aviso de direitos de autor apropriado, e (2) conta ao utilizador que não há qualquer garantia para o trabalho (exceto até ao ponto em que as garantias são fornecidas), que os titulares podem transmitir o trabalho sob esta Licença, e como ver uma cópia desta Licença. Se a interface apresentar uma lista de comandos ou opções para utilizadores, como um menu, um item proeminente na lista vai de encontro com este critério.
 
 #### 1. Código-fonte.
 
@@ -90,21 +88,10 @@ Pode cobrar qualquer preço ou nenhum por cada cópia que transmitir, e pode ofe
 
 Pode transmitir um trabalho baseado no Programa, ou as modificações para produzi-lo a partir do Programa, na forma de código-fonte sob os termos da secção 4, desde que também cumpra as seguintes condições:
 
--   a) O trabalho deve conter avisos proeminentes afirmando que o modificou,
-    e dando-lhe uma data relevante.
--   b) O trabalho deve conter avisos proeminentes afirmando que
-    foi lançado sob esta Licença e quaisquer condições adicionadas sob a
-    secção 7. Este requisito modifica o requisito na secção 4
-    para "manter todos os avisos intactos".
--   c) Deve licenciar a totalidade do trabalho, como um todo, sob esta
-    Licença a todos que adquirirem uma cópia. Então, esta
-    Licença irá aplicar-se, juntamente com quaisquer termos aplicáveis da secção 7,
-    à totalidade do trabalho, e todas as suas partes,
-    independentemente de como foram empacotadas. Esta Licença não fornece
-    permissão para licenciar o trabalho de qualquer outra forma, mas não
-    invalida tal permissão se a recebeu separadamente.
--   d) Se o trabalho tiver interfaces de utilizador interativas, cada uma deve exibir
-    Avisos Legais Apropriados; contudo, se o Programa tiver interfaces interativas que não exibam Avisos Legais Apropriados, o seu trabalho não tem de o fazer.
+-   a) O trabalho deve conter avisos proeminentes afirmando que o modificou, e dando-lhe uma data relevante.
+-   b) O trabalho deve conter avisos proeminentes afirmando que foi lançado sob esta Licença e quaisquer condições adicionadas sob a secção 7. Este requisito modifica o requisito na secção 4 para "manter todos os avisos intactos".
+-   c) Deve licenciar a totalidade do trabalho, como um todo, sob esta Licença a todos que adquirirem uma cópia. Então, esta Licença irá aplicar-se, juntamente com quaisquer termos aplicáveis da secção 7, à totalidade do trabalho, e todas as suas partes, independentemente de como foram empacotadas. Esta Licença não fornece permissão para licenciar o trabalho de qualquer outra forma, mas não invalida tal permissão se a recebeu separadamente.
+-   d) Se o trabalho tiver interfaces de utilizador interativas, cada uma deve exibir Avisos Legais Apropriados; contudo, se o Programa tiver interfaces interativas que não exibam Avisos Legais Apropriados, o seu trabalho não tem de o fazer.
 
 Uma compilação de um trabalho coberto com outros trabalhos separados e independentes, que por natureza não são extensões do trabalho coberto, e que não são combinados com o mesmo de modo a formar um programa maior, em ou sobre um volume de um meio de armazenamento ou distribuição, é denominado de "agregado" se a compilação e os resultantes direitos de autor não forem usados para limitar o acesso ou os direitos legais dos utilizadores da compilação para lá do que é permitido pelos trabalhos individuais. A inclusão de um trabalho coberto num agregado não faz com que esta Licença se aplique às outras partes do agregado.
 
@@ -112,42 +99,11 @@ Uma compilação de um trabalho coberto com outros trabalhos separados e indepen
 
 Pode transmitir um trabalho coberto na forma de código-objeto sob os termos das secções 4 e 5, desde que também transmita a Fonte Correspondente legível pela máquina sob os termos desta Licença, numa destas maneiras:
 
--   a) Transmitir o código-objeto num, ou embutido num, produto físico
-    (incluindo um meio de distribuição físico), acompanhado pela
-    Fonte Correspondente fixada num meio físico durável
-    habitualmente usado para intercâmbio de software.
--   b) Transmitir o código-objeto num, ou embutido num, produto físico
-    (incluindo um meio de distribuição físico), acompanhado por uma
-    oferta escrita, válida por pelo menos três anos e válida
-    enquanto oferecer peças suplementes ou apoio ao cliente para aquele modelo do produto,
-    para fornecer a todos que adquirirem o código-objeto ou (1) uma
-    cópia da Fonte Correspondente para todo o software no
-    produto que for coberto por esta Licença, num meio físico durável
-    habitualmente usado para intercâmbio de software, por um preço que não seja
-    superior aos custos razoáveis para desempenhar fisicamente esta
-    transmissão de fonte, ou (2) acesso para copiar a Fonte 
-    Correspondente de um servidor de rede sem quaisquer custos.
--   c) Transmitir cópias individuais do código-objeto com uma cópia da
-    oferta escrita para fornecer a Fonte Correspondente. Esta
-    alternativa é apenas permitida ocasionalmente e não comercialmente, e
-    apenas se você receber o código-objeto com uma tal oferta, de acordo
-    com a subsecção 6b.
--   d) Transmitir o código-objeto oferecendo acesso a um determinado
-    lugar (grátis ou por uma taxa), e oferecer acesso equivalente à
-    Fonte Correspondente da mesma maneira através do mesmo lugar sem
-    custos adicionais. Não necessita de beneficiários para copiar a
-    Fonte Correspondente juntamente com o código-objeto. Se o lugar para
-    copiar o código-objeto for um servidor de rede, a Fonte Correspondente
-    pode encontrar-se num servidor diferente (operado por si ou por terceiros)
-    que suporte instalações de cópia equivalentes, desde que mantenha
-    as direções claras próximas do código-objeto a dizer onde encontrar a
-    Fonte Correspondente. Independentemente do servidor que está a hospedar a
-    Fonte Correspondente, você permanece obrigado a garantir que fica
-    disponível por tanto tempo quanto necessário para satisfazer esses requisitos.
--   e) Transmitir o código-objeto usando a transmissão peer-to-peer,
-    desde que informe os outros pares sobre onde o objeto-código e
-    a Fonte Correspondente do trabalho estão a ser oferecidos ao público
-    geral sem qualquer custo sob a subsecção 6d.
+-   a) Transmitir o código-objeto num, ou embutido num, produto físico (incluindo um meio de distribuição físico), acompanhado pela Fonte Correspondente fixada num meio físico durável habitualmente usado para intercâmbio de software.
+-   b) Transmitir o código-objeto num, ou embutido num, produto físico (incluindo um meio de distribuição físico), acompanhado por uma oferta escrita, válida por pelo menos três anos e válida enquanto oferecer peças suplementes ou apoio ao cliente para aquele modelo do produto, para fornecer a todos que adquirirem o código-objeto ou (1) uma cópia da Fonte Correspondente para todo o software no produto que for coberto por esta Licença, num meio físico durável habitualmente usado para intercâmbio de software, por um preço que não seja superior aos custos razoáveis para desempenhar fisicamente esta transmissão de fonte, ou (2) acesso para copiar a Fonte Correspondente de um servidor de rede sem quaisquer custos.
+-   c) Transmitir cópias individuais do código-objeto com uma cópia da oferta escrita para fornecer a Fonte Correspondente. Esta alternativa é apenas permitida ocasionalmente e não comercialmente, e apenas se você receber o código-objeto com uma tal oferta, de acordo com a subsecção 6b.
+-   d) Transmitir o código-objeto oferecendo acesso a um determinado lugar (grátis ou por uma taxa), e oferecer acesso equivalente à Fonte Correspondente da mesma maneira através do mesmo lugar sem custos adicionais. Não necessita de beneficiários para copiar a Fonte Correspondente juntamente com o código-objeto. Se o lugar para copiar o código-objeto for um servidor de rede, a Fonte Correspondente pode encontrar-se num servidor diferente (operado por si ou por terceiros)que suporte instalações de cópia equivalentes, desde que mantenha as direções claras próximas do código-objeto a dizer onde encontrar a Fonte Correspondente. Independentemente do servidor que está a hospedar a Fonte Correspondente, você permanece obrigado a garantir que fica disponível por tanto tempo quanto necessário para satisfazer esses requisitos.
+-   e) Transmitir o código-objeto usando a transmissão peer-to-peer, desde que informe os outros pares sobre onde o objeto-código e a Fonte Correspondente do trabalho estão a ser oferecidos ao público geral sem qualquer custo sob a subsecção 6d.
 
 Uma porção separável do código-objeto, cujo código-fonte está excluído da Fonte Correspondente como uma Biblioteca de Sistema, não sendo necessário inclui-lo na transmissão do trabalho do código-objeto.
 
@@ -169,18 +125,12 @@ Quando transmite uma cópia do trabalho coberto, se assim o desejar, pode remove
 
 Não obstante de qualquer outra provisão desta Licença, para o material que adiciona ao trabalho coberto, pode (se autorizado pelos detentores dos direitos de autor desse material) suplementar os termos desta Licença com termos que:
 
--   a) Negam a garantia ou limitação da responsabilidade de uma maneira diferente da dos
-    termos das secções 15 e 16 desta Licença; ou que
--   b) Necessitam a preservação de determinados avisos legais razoáveis ou
-    atribuições do autor nesse material ou nos Avisos Legais Apropriados exibidos por trabalhos que o contêm; ou que
--   c) Proíbem a deturpação da origem do material,
-    ou necessitam que as versões modificadas de tal material sejam marcadas de maneiras razoáveis como diferentes da versão original; ou que
--   d) Limitam o uso para fins publicitários de nomes de licenciantes
-    ou de autores do material; ou que
--   e) Recusam conceder direitos sob a legislação de marcas para o uso de alguns
-    nomes de marcas, marcas registadas, ou marcas comerciais; ou que
--   f) Necessitam a indemnização dos licenciantes e autores daquele
-    material por todos os que transmitirem o material (ou versões modificadas do mesmo) com premissas contratuais de responsabilidade para com o destinatário, por qualquer responsabilidade que estas premissas contratuais impõem diretamente naqueles licenciantes e autores.
+-   a) Negam a garantia ou limitação da responsabilidade de uma maneira diferente da dos termos das secções 15 e 16 desta Licença; ou que
+-   b) Necessitam a preservação de determinados avisos legais razoáveis ou atribuições do autor nesse material ou nos Avisos Legais Apropriados exibidos por trabalhos que o contêm; ou que
+-   c) Proíbem a deturpação da origem do material, ou necessitam que as versões modificadas de tal material sejam marcadas de maneiras razoáveis como diferentes da versão original; ou que
+-   d) Limitam o uso para fins publicitários de nomes de licenciantes ou de autores do material; ou que
+-   e) Recusam conceder direitos sob a legislação de marcas para o uso de alguns nomes de marcas, marcas registadas, ou marcas comerciais; ou que
+-   f) Necessitam a indemnização dos licenciantes e autores daquele material por todos os que transmitirem o material (ou versões modificadas do mesmo) com premissas contratuais de responsabilidade para com o destinatário, por qualquer responsabilidade que estas premissas contratuais impõem diretamente naqueles licenciantes e autores.
 
 Todos os outros termos adicionais não permissivos são considerados "restrições adicionais" no que respeita à secção 10. Se o Programa como o recebeu, ou qualquer parte do mesmo, contiver um aviso que afirma que este é governado por esta Licença juntamente com um termo que é uma restrição adicional, pode remover esse termo. Se uma licença contiver uma restrição adicional, mas permite o relicenciamento ou transmissão sob esta Licença, pode adicionar ao trabalho coberto material governado pelos termos dessa licença, desde que a restrição adicional não sobreviva a tal relicenciamento ou transmissão.
 
@@ -200,8 +150,7 @@ A cessação dos seus direitos sob esta secção não rescinde as licenças de p
 
 #### 9. A Aceitação Não É Necessária Para Ter Cópias.
 
-Não necessita de aceitar esta Licença para receber ou correr uma cópia do Programa. You are not required to accept this License in order to receive or run
-a copy of the Program. A propagação auxiliar de um trabalho coberto a ocorrer unicamente como uma consequência do uso da transmissão peer-to-peer para receber uma cópia também não necessita aceitação. No entanto, nada para além desta Licença concede-lhe permissão para propagar ou modificar qualquer trabalho coberto. Estas ações infringem os direitos de autor se não aceitar esta Licença. Logo, ao modificar ou propagar um trabalho coberto, está a indicar a sua aceitação desta Licença para o fazer.
+Não necessita de aceitar esta Licença para receber ou correr uma cópia do Programa. A propagação auxiliar de um trabalho coberto a ocorrer unicamente como uma consequência do uso da transmissão peer-to-peer para receber uma cópia também não necessita aceitação. No entanto, nada para além desta Licença concede-lhe permissão para propagar ou modificar qualquer trabalho coberto. Estas ações infringem os direitos de autor se não aceitar esta Licença. Logo, ao modificar ou propagar um trabalho coberto, está a indicar a sua aceitação desta Licença para o fazer.
 
 #### 10. Licenciamento Automático de Beneficiários Downstream.
 
