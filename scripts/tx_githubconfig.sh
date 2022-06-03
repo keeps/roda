@@ -73,4 +73,4 @@ yq -i '.git.filters[1].translation_files_expression="roda-ui/roda-wui/src/main/r
 map "documentation" '.md' 'GITHUBMARKDOWN'
 map "roda-ui/roda-wui/src/main/resources/config/theme" '.html' 'HTML'
 
-yq -i '.git.settings.pr_branch_name="tx_translations_<br_uniq_id>"' $CONFIG
+yq -i '.git.settings.pr_branch_name="tx_translations_<br_unique_id>"' $CONFIG
