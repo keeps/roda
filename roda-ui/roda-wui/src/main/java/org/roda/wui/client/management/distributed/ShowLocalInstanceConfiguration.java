@@ -163,13 +163,15 @@ public class ShowLocalInstanceConfiguration extends Composite {
     BrowserService.Util.getInstance().synchronizeBundle(localInstance, new NoAsyncCallback<Job>() {
       @Override
       public void onSuccess(Job job) {
-        if (localInstance.getStatus().equals(SynchronizingStatus.ACTIVE)) {
           Toast.showInfo("Create Job", "Success");
           HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-        }else{
-          Toast.showInfo("Instance was deactivated", "Error");
-        }
       }
+
+      @Override
+      public void onFailure(Throwable caught) {
+        super.onFailure(caught);
+      }
+
     });
 
   }

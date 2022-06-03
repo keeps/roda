@@ -18,7 +18,6 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.synchronization.SynchronizingStatus;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.RODAInstance;
@@ -81,15 +80,10 @@ public class LocalInstanceResource {
     User user = UserUtility.getApiUser(request);
     LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
     Long totalUpdates = RODAInstance.synchronizeIfUpdated(user);
-    String message;
-    if (localInstance.getStatus().equals(SynchronizingStatus.INACTIVE)) {
-      message = "Instance is deactivated! Cannot Synchronize!";
-    }else {
-      message = "There are no updates";
-      if (totalUpdates > 0) {
-        RODAInstanceHelper.synchronizeBundle(user, localInstance);
-        message = "There are " + totalUpdates + " updates";
-      }
+    String message = "There are no updates";
+    if (totalUpdates > 0) {
+      RODAInstanceHelper.synchronizeBundle(user, localInstance);
+      message = "There are " + totalUpdates + " updates";
     }
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, message), mediaType).build();
   }
