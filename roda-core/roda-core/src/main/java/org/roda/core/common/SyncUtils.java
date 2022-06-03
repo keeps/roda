@@ -249,10 +249,12 @@ public class SyncUtils {
 
       HttpResponse response = httpClient.execute(httpGet);
 
-      if (response.getStatusLine().getStatusCode() != RodaConstants.HTTP_RESPONSE_CODE_SUCCESS) {
+      if (response.getStatusLine().getStatusCode() != RodaConstants.HTTP_RESPONSE_CODE_SUCCESS
+        && response.getStatusLine().getStatusCode() != RodaConstants.HTTP_RESPONSE_CODE_NOT_FOUND) {
         throw new GenericException(
           "Unable to retrieve instance status error code: " + response.getStatusLine().getStatusCode());
       }
+
       return JsonUtils.getObjectFromJson(response.getEntity().getContent(), DistributedInstance.class);
     } catch (AuthenticationDeniedException | GenericException | IOException e) {
       throw new GenericException("Unable to retrieve instance status: " + e.getMessage());
