@@ -15,7 +15,7 @@ Por favor recorra a *Ajuda* > *Manual de utilização* > *Política de avaliaç�
 
 ### 1. Configurar o RODA para mostrar valores no método de seleção 'campo de metainformação'
 
-O campo de metainformação é povoada usando os itens de pesquisa avançada. A partir desses campos aqueles que tiverem como tipo de dados `text` serão usados. RODA pode ser configurado para ignorar campos da pesquisa anterior. Para o fazer, altere o `roda-wui.properties`  para adicionar o campo à lista a ignorar. Por omissão, o RODA mostra todos os campos do tipo `text`.
+O campo de metainformação é povoada usando os itens de pesquisa avançada. A partir desses campos aqueles que tiverem como tipo de dados `text` serão usados. RODA pode ser configurado para ignorar campos da pesquisa anterior. Para o fazer, altere o `roda-wui.properties`  para adicionar o campo à lista a ignorar. Por omissão, o RODA mostra todos os campos do tipo `text`.
 
 ```javaproperties
 ui.disposal.rule.blacklist.condition = description
