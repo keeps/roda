@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.roda.core.RodaCoreFactory;
@@ -224,11 +225,17 @@ public class RODAInstance extends RodaWuiController {
 
     LogEntryState state = LogEntryState.SUCCESS;
     try {
+      // Deleting from distributed
       DistributedInstance distributedInstance = SyncUtils.requestInstanceStatus(RodaCoreFactory.getLocalInstance());
       distributedInstance.setStatus(SynchronizingStatus.INACTIVE);
 
       SyncUtils.updateDistributedInstance(RodaCoreFactory.getLocalInstance(), distributedInstance);
+    }catch (GenericException e){
+      // Do nothing distributed instance was removed
+    }
 
+    try {
+      // Deleting from remote
       TokenManager.getInstance().removeToken();
       RodaCoreFactory.createOrUpdateLocalInstance(null);
     } catch (GenericException e) {
