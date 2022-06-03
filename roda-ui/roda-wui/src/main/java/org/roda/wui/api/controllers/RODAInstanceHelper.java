@@ -58,8 +58,8 @@ public class RODAInstanceHelper {
   public static void applyInstanceIdToRodaObject(LocalInstance localInstance, User user, boolean doRegister)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     Map<String, String> pluginParameters = new HashMap<>();
-    if (!doRegister) {
-      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_REGISTER_PLUGIN, "false");
+    if (doRegister) {
+      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_REGISTER_PLUGIN, "true");
     }
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, localInstance.getId());
 

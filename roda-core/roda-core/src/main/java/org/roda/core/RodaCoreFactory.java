@@ -120,6 +120,7 @@ import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.synchronization.SynchronizingStatus;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
@@ -149,6 +150,7 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceWrapper;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
+import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -598,11 +600,11 @@ public class RodaCoreFactory {
 
   private static void initializeLocalInstanceConfigDirectory() {
     try {
-      String localInstanceFolder = getConfigurationString("local_instance.folder",
+      final String localInstanceFolder = getConfigurationString("local_instance.folder",
         RodaConstants.CORE_LOCAL_INSTANCE_FOLDER);
       localInstanceConfigPath = getConfigPath().resolve(localInstanceFolder);
       Files.createDirectories(localInstanceConfigPath);
-    } catch (IOException e) {
+    } catch (final IOException e) {
       throw new RuntimeException(
         "Unable to create RODA local instance config DIRECTORY " + localInstanceConfigPath + ". Aborting...", e);
     }
@@ -1500,6 +1502,20 @@ public class RodaCoreFactory {
         RodaConstants.DEFAULT_ACCESS_KEY_VALIDITY);
       accessTokenValidity = RodaCoreFactory.getRodaConfiguration().getLong(RodaConstants.ACCESS_TOKEN_VALIDITY,
         RodaConstants.DEFAULT_ACCESS_TOKEN_VALIDITY);
+      try {
+        initializeLocalInstanceConfigDirectory();
+        if (getLocalInstance() == null) {
+          final LocalInstance rodaCentralInstance = new LocalInstance();
+          rodaCentralInstance.setId(IdUtils.createUUID());
+          rodaCentralInstance.setStatus(SynchronizingStatus.ACTIVE);
+          rodaCentralInstance.setName("RODA Central");
+          rodaCentralInstance.setIsRegistered(true);
+          createOrUpdateLocalInstance(rodaCentralInstance);
+        }
+      } catch (final GenericException e) {
+        LOGGER.error("Can't initialize ", e);
+        instantiatedWithoutErrors = false;
+      }
     } else if (DistributedModeType.LOCAL.equals(distributedModeType)) {
       initializeLocalInstanceConfigDirectory();
     }
@@ -1844,7 +1860,6 @@ public class RodaCoreFactory {
   public static Path getJobAttachmentsDirectoryPath() {
     return jobAttachmentsDirectoryPath;
   }
-
 
   public static Path getDataPath() {
     return dataPath;

@@ -7,9 +7,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -25,7 +28,7 @@ import org.slf4j.LoggerFactory;
 /**
  * {@author João Gomes <jgomes@keep.pt>}.
  */
-public class LocalInstanceRegisterPlugin extends DefaultMultipleStepPlugin<IsRODAObject> {
+public class LocalInstanceRegisterPlugin extends DefaultMultipleStepPlugin<Void> {
   Logger LOGGER = LoggerFactory.getLogger(LocalInstanceRegisterPlugin.class);
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   private static List<Step> steps = new ArrayList<>();
@@ -73,7 +76,7 @@ public class LocalInstanceRegisterPlugin extends DefaultMultipleStepPlugin<IsROD
         true, true, InstanceIdentifierPreservationAgentPlugin.getStaticDescription()));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_REGISTER_PLUGIN,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REGISTER_PLUGIN, RegisterPlugin.getStaticName(),
-        PluginParameter.PluginParameterType.BOOLEAN, "true", true, true, RegisterPlugin.getStaticDescription()));
+        PluginParameter.PluginParameterType.BOOLEAN, "false", true, true, RegisterPlugin.getStaticDescription()));
 
     steps.add(new Step(InstanceIdentifierAIPPlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_AIP_PLUGIN, true, true));
@@ -157,11 +160,11 @@ public class LocalInstanceRegisterPlugin extends DefaultMultipleStepPlugin<IsROD
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_MANAGEMENT);
   }
 
   @Override
-  public Plugin<IsRODAObject> cloneMe() {
+  public Plugin<Void> cloneMe() {
     return new LocalInstanceRegisterPlugin();
   }
 
@@ -171,8 +174,8 @@ public class LocalInstanceRegisterPlugin extends DefaultMultipleStepPlugin<IsROD
   }
 
   @Override
-  public List<Class<IsRODAObject>> getObjectClasses() {
-    return Collections.emptyList();
+  public List<Class<Void>> getObjectClasses() {
+    return Arrays.asList(Void.class);
   }
 
   @Override
