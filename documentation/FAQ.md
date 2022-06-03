@@ -85,13 +85,7 @@ This is a complex question that cannot be answered in just a few lines of text. 
 
 ### How does the application support appraisal, selection the definition of retention periods?
 
-No inherent support for retention periods. Records that enter the system are expected to be preserved indefinitely. Suggested approach to solve this issue is: 
-
-- Record at the `Series` level the period of retention (e.g. in years). 
-- Develop a plugin that based on a record’s publication date, calculates its destruction date. 
-- Use this date to select the records to be eliminated and delete them from the system.
-
-If more advanced actions are required, e.g. reports, removal of digital representations but the safeguard of the record metadata, etc., we suggest developing a dedicated plugin.
+RODA provides a complex workflow for disposal of records. Please refer to [Disposal](Disposal.md) for more information.
 
 ### Is the system logging search interactions?
 
