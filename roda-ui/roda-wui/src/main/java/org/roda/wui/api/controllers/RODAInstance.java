@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Logger;
 
 import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.roda.core.RodaCoreFactory;

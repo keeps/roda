@@ -38,6 +38,7 @@ import org.roda.core.plugins.base.synchronization.packages.RiskIncidencePackageP
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import scala.concurrent.java8.FuturesConvertersImpl;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -199,6 +200,9 @@ public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAO
       getParameterValues().put(RodaConstants.PLUGIN_PARAMS_BUNDLE_WORKING_PATH, workingDir.toString());
       // From date
       DistributedInstance distributedInstance = SyncUtils.requestInstanceStatus(localInstance);
+      if(distributedInstance.getStatus().equals(SynchronizingStatus.INACTIVE)){
+        throw new PluginException("Instance is inactive");
+      }
       Date lastSyncDate = distributedInstance.getLastSynchronizationDate();
       getParameterValues().put(RodaConstants.PLUGIN_PARAMS_BUNDLE_FROM_DATE, JsonUtils.getJsonFromObject(lastSyncDate));
       // To date
