@@ -371,4 +371,4 @@ git:
       source_language: en
       translation_files_expression: roda-ui/roda-wui/src/main/resources/config/theme/ErrorInactiveAccount_<lang>.html
   settings:
-    pr_branch_name: tx_translations_<br_uniq_id>
+    pr_branch_name: tx_translations_<br_unique_id>
