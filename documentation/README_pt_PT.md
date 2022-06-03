@@ -27,7 +27,7 @@ Esta documentação cobre os seguintes tópicos:
     - [Produção](Installation_Production_Environments.md)
 - Configuração
     - [Estatísticas](Statistics_pt_PT.md)
-    - [Formatos de metadados](Metadata_Formats.md)
+    - [Formatos de metainformação](Metadata_Formats.md)
     - [Central Authentication Service (CAS)](Central_Authentication_Service.md)
     - [Avaliação e seleção](Disposal.md)
 - Contribuir para o projeto
