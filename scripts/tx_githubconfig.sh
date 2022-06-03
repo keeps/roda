@@ -11,13 +11,12 @@ echo "Changing to $RODA_PROJECT_DIR"
 
 cd "$RODA_PROJECT_DIR"
 
-PROJECT="roda2"
 SOURCE_LANGUAGE="en"
 
 CONFIG='.tx/transifex.yml'
 IGNORED_FILE=".tx/ignored"
 
-echo $RODA_PROJECT_DIR
+echo "$RODA_PROJECT_DIR"
 
 function map {
     DIR=$1
@@ -27,9 +26,9 @@ function map {
     PARTIAL=partial.yml
     touch $PARTIAL
 
-    find "$(readlink -m $DIR)" -type f -name \*${EXTENSION}  -regextype egrep  -not  -regex ".*/.+_[a-z]{2}(_[A-Z]{2})?\\${EXTENSION}" | while IFS= read -r file; do
+    find "$(readlink -m "$DIR")" -type f -name \*"${EXTENSION}"  -regextype egrep  -not  -regex ".*/.+_[a-z]{2}(_[A-Z]{2})?\\${EXTENSION}" | while IFS= read -r file; do
       relativepath=${file#${RODA_PROJECT_DIR}}
-      if ! grep -Fxq ${relativepath:1} $IGNORED_FILE
+      if ! grep -Fxq "${relativepath:1}" $IGNORED_FILE
       then
         filename=$(basename "$file" | cut -f 1 -d '.')
         yq -i '.git.filters[0].filter_type="file"' $PARTIAL
@@ -73,3 +72,5 @@ yq -i '.git.filters[1].translation_files_expression="roda-ui/roda-wui/src/main/r
 
 map "documentation" '.md' 'GITHUBMARKDOWN'
 map "roda-ui/roda-wui/src/main/resources/config/theme" '.html' 'HTML'
+
+yq -i '.git.settings.pr_branch_name="tx_translations_<br_uniq_id>"' $CONFIG
