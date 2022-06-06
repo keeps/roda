@@ -293,6 +293,10 @@ table .label-success, table .label-danger, table .label-warning, table .label-in
     margin-right:5px;
 }
 
+.token-infoMessage{
+    width: 600px;
+}
+
 .small {
     font-size: 75%;
 }
@@ -7432,10 +7436,8 @@ span.code {
     color: #000000;
     text-align: center;
     border-radius: .25em;
-
+    margin-top:10px;
 }
-
-
 
 #closeButton {
     margin-right: 10px;
