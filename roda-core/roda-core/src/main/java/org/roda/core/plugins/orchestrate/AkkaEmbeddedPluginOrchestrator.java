@@ -418,7 +418,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     if (!RodaConstants.DistributedModeType.BASE.equals(RodaCoreFactory.getDistributedModeType())) {
       try {
         localInstance = RodaCoreFactory.getLocalInstance();
-        if (localInstance == null || job.getInstanceId() == null || localInstance.getId().equals(job.getInstanceId())) {
+        if (PluginType.INTERNAL.equals(job.getPluginType()) || localInstance == null || job.getInstanceId() == null
+          || localInstance.getId().equals(job.getInstanceId())) {
           executeLocalJob(job, async);
         }
       } catch (GenericException e) {
@@ -454,7 +455,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public void createAndExecuteJobs(final Job job, final boolean async) throws JobAlreadyStartedException,
     AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    if (!RodaCoreFactory.getDistributedModeType().equals(RodaConstants.DistributedModeType.CENTRAL)) {
+    if (!RodaCoreFactory.getDistributedModeType().equals(RodaConstants.DistributedModeType.CENTRAL)
+      || PluginType.INTERNAL.equals(job.getPluginType())) {
       RodaCoreFactory.getModelService().createJob(job);
       RodaCoreFactory.getPluginOrchestrator().executeJob(job, async);
     } else {
