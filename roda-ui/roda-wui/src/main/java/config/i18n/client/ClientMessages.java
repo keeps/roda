@@ -2263,6 +2263,8 @@ public interface ClientMessages extends Messages {
 
   String accessKeyWarningLabel();
 
+  String accessKeyInfo();
+
   String accessKeyEditButton();
 
   String accessKeyUpdateButton();

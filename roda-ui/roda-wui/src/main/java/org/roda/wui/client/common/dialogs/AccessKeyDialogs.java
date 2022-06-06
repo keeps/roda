@@ -30,6 +30,7 @@ public class AccessKeyDialogs {
     final FlowPanel layout = new FlowPanel();
     final FlowPanel header = new FlowPanel();
     final FlowPanel footer = new FlowPanel();
+    final Label infoMessage = new Label(messages.accessKeyInfo());
     final Label warningMessage = new Label(messages.accessKeyWarningLabel());
     final Label tokenMessage = new Label(accessKey.getKey());
     tokenMessage.getElement().setId("token_message");
@@ -38,6 +39,7 @@ public class AccessKeyDialogs {
     dialogBox.setText(title);
     layout.add(header);
     layout.add(footer);
+    header.add(infoMessage);
     header.add(tokenMessage);
     header.add(warningMessage);
     footer.add(closeButton);
@@ -78,6 +80,7 @@ public class AccessKeyDialogs {
     header.addStyleName("wui-dialog-message");
     footer.addStyleName("wui-dialog-layout-footer");
 
+    infoMessage.addStyleName("token-infoMessage");
     warningMessage.addStyleName("label-tokenInfo");
     copyAndCloseButton.addStyleName("btn btn-times-circle");
     closeButton.addStyleName("btn btn-times-circle");
