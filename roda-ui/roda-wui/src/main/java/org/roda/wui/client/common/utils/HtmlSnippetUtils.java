@@ -851,17 +851,7 @@ public class HtmlSnippetUtils {
       safeHtmlBuilder.append(SafeHtmlUtils.fromSafeConstant("' class='" + labelStyle + "'>"));
       safeHtmlBuilder.append(SafeHtmlUtils.fromString(String.valueOf(count) + " " + message));
       safeHtmlBuilder.append(SafeHtmlUtils.fromSafeConstant("</a>"));
-    } else {
-      if ("label-warning".equals(labelStyle)) {
-        safeHtmlBuilder.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING));
-      } else if ("label-danger".equals(labelStyle)) {
-        safeHtmlBuilder.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER));
-      }
-      safeHtmlBuilder.append(
-        SafeHtmlUtils.fromString(String.valueOf(count) + " " + messages.distributedInstanceUpdatedEntitiesLabel()));
-      safeHtmlBuilder.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
     }
-
   }
 
   private static String getNameByEntityClassName(String entityClass) {
