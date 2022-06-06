@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
+import org.apache.jute.Index;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
@@ -26,6 +27,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
@@ -35,7 +37,9 @@ import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
@@ -69,6 +73,11 @@ public class PermissionsTest {
     corporaService = new FileStorageService(Paths.get(corporaURL.toURI()));
 
     LOGGER.debug("Running index tests under storage {}", basePath);
+  }
+
+  @BeforeMethod
+  public static void resetIndex() {
+    IndexTestUtils.resetIndex();
   }
 
   @AfterClass

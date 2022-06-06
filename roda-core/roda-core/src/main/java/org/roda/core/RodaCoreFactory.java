@@ -18,7 +18,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -59,13 +58,14 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.impl.Http2SolrClient;
+import org.apache.solr.client.solrj.impl.ZkClientClusterStateProvider;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest.Create;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.cloud.ZkConfigSetService;
 import org.apache.solr.cloud.ZkController;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -74,7 +74,8 @@ import org.apache.solr.common.cloud.ClusterState;
 import org.apache.solr.common.cloud.DocCollection;
 import org.apache.solr.common.cloud.Replica;
 import org.apache.solr.common.cloud.Slice;
-import org.apache.solr.common.cloud.ZkStateReader;
+import org.apache.solr.common.cloud.SolrZkClient;
+import org.apache.solr.core.ConfigSetService;
 import org.apache.zookeeper.KeeperException;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
@@ -1233,15 +1234,15 @@ public class RodaCoreFactory {
       String solrBaseUrl = getConfigurationString(RodaConstants.CORE_SOLR_HTTP_URL, "http://localhost:8983/solr/");
       LOGGER.info("Instantiating SOLR HTTP at {}", solrBaseUrl);
 
-      return new HttpSolrClient.Builder(solrBaseUrl).build();
-    } else if (solrType == RodaConstants.SolrType.CLOUD) {
+      return new Http2SolrClient.Builder(solrBaseUrl).build();
+    } else {
       String solrCloudZooKeeperUrls = getConfigurationString(RodaConstants.CORE_SOLR_CLOUD_URLS,
         "localhost:2181,localhost:2182,localhost:2183");
       LOGGER.info("Instantiating SOLR Cloud at {}", solrCloudZooKeeperUrls);
 
       try {
         ZkController.checkChrootPath(solrCloudZooKeeperUrls, true);
-      } catch (KeeperException | InterruptedException e) {
+      } catch (InterruptedException | KeeperException e) {
         LOGGER.error("Could not check zookeeper chroot path", e);
       }
 
@@ -1269,38 +1270,6 @@ public class RodaCoreFactory {
         bootstrap(cloudSolrClient, solrHome);
       }
       return cloudSolrClient;
-    } else {
-      // default to Embedded
-      System.setProperty("solr.data.dir", indexDataPath.toString());
-
-      try {
-
-        // Create base config for each collection
-        Path commonConf = Files.createTempDirectory("solr-base-config");
-
-        copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/"
-          + SolrUtils.COMMON + "/" + SolrUtils.CONF + "/", commonConf, true);
-
-        for (String collection : SolrCollectionRegistry.registryIndexNames()) {
-          Path collectionPath = solrHome.resolve(collection);
-          FSUtils.copy(commonConf, collectionPath.resolve(SolrUtils.CONF), true);
-
-          // create core.properties
-          Files.write(collectionPath.resolve("core.properties"),
-            ("name=" + collection).getBytes(StandardCharsets.UTF_8));
-        }
-
-        FSUtils.deletePathQuietly(commonConf);
-
-        // create empty solr.xml
-        Files.write(solrHome.resolve("solr.xml"), "<solr></solr>".getBytes(StandardCharsets.UTF_8));
-
-      } catch (IOException | AlreadyExistsException e) {
-        LOGGER.info("Error instantiating SOLR Embedded", e);
-      }
-
-      LOGGER.info("Instantiating SOLR Embedded");
-      return new EmbeddedSolrServer(solrHome, "schema");
     }
   }
 
@@ -1338,8 +1307,7 @@ public class RodaCoreFactory {
       throw new GenericException("Could not connect to Solr Cloud", e);
     }
 
-    ZkStateReader zkStateReader = cloudSolrClient.getZkStateReader();
-    ClusterState clusterState = zkStateReader.getClusterState();
+    ClusterState clusterState = cloudSolrClient.getClusterState();
 
     Map<String, DocCollection> collectionStates = clusterState.getCollectionsMap();
     Set<String> allCollections = new HashSet<>();
@@ -1432,11 +1400,12 @@ public class RodaCoreFactory {
       int numShards = getEnvInt("SOLR_NUM_SHARDS", 1);
       int numReplicas = getEnvInt("SOLR_REPLICATION_FACTOR", 1);
 
-      cloudSolrClient.getZkStateReader().getZkClient().upConfig(configPath, collection);
+      String zkHost = ZkClientClusterStateProvider.from(cloudSolrClient).getZkHost();
+      SolrZkClient zkClient = new SolrZkClient(zkHost, 10000);
+      ConfigSetService configSetService = new ZkConfigSetService(zkClient);
+      configSetService.uploadConfig(collection, configPath);
 
       Create createCollection = CollectionAdminRequest.createCollection(collection, collection, numShards, numReplicas);
-      createCollection.setMaxShardsPerNode(getEnvInt("SOLR_MAX_SHARDS_PER_NODE", 1));
-      createCollection.setAutoAddReplicas(getEnvBoolean("SOLR_AUTO_ADD_REPLICAS", false));
 
       CollectionAdminResponse response = createCollection.process(cloudSolrClient);
       if (!response.isSuccess()) {
@@ -1844,7 +1813,6 @@ public class RodaCoreFactory {
   public static Path getJobAttachmentsDirectoryPath() {
     return jobAttachmentsDirectoryPath;
   }
-
 
   public static Path getDataPath() {
     return dataPath;
