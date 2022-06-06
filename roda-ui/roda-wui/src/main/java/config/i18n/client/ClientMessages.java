@@ -454,6 +454,8 @@ public interface ClientMessages extends Messages {
 
   String closeButton();
 
+  String copyAndCloseButton();
+
   String selectButton();
 
   String printButton();
