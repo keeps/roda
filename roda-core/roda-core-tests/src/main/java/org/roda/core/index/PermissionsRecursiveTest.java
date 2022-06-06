@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_TRAVIS})
@@ -66,6 +67,11 @@ public class PermissionsRecursiveTest {
     index = RodaCoreFactory.getIndexService();
 
     LOGGER.debug("Running index tests under storage {}", basePath);
+  }
+
+  @BeforeMethod
+  public static void resetIndex() {
+    IndexTestUtils.resetIndex();
   }
 
   @AfterClass

@@ -145,6 +145,12 @@
 	</profiles>
 	<dependencies>
 		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>4.0.1</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
@@ -164,6 +170,12 @@
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.zookeeper/zookeeper -->
+		<dependency>
+			<groupId>org.apache.zookeeper</groupId>
+			<artifactId>zookeeper</artifactId>
+			<version>3.8.0</version>
+		</dependency>
 		<dependency>
 			<groupId>org.apache.solr</groupId>
 			<artifactId>solr-solrj</artifactId>
@@ -177,10 +189,10 @@
 				<!-- <exclusion> <artifactId>asm</artifactId> <groupId>org.ow2.asm</groupId> 
 					</exclusion> <exclusion> <artifactId>asm-commons</artifactId> <groupId>org.ow2.asm</groupId> 
 					</exclusion> -->
-				<exclusion>
+				<!--exclusion>
 					<artifactId>*</artifactId>
 					<groupId>org.eclipse.jetty</groupId>
-				</exclusion>
+				</exclusion-->
 				<exclusion>
 					<groupId>org.apache.hadoop</groupId>
 					<artifactId>hadoop-hdfs</artifactId>

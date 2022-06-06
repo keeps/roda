@@ -151,7 +151,7 @@ public class SolrUtils {
 
   public static final String COMMON = "common";
   public static final String CONF = "conf";
-  public static final String SCHEMA = "managed-schema";
+  public static final String SCHEMA = "managed-schema.xml";
 
   private SolrUtils() {
     // do nothing

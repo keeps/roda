@@ -35,7 +35,7 @@ public class SolrBootstrapUtils {
     FieldsResponse response;
     try {
       response = fields.process(client, collectionName);
-      return response.getFields().stream().map(f -> new Field(f))
+      return response.getFields().stream().map(Field::new)
         .collect(Collectors.toMap(Field::getName, Function.identity()));
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Could not get schema fields", e);
@@ -115,10 +115,11 @@ public class SolrBootstrapUtils {
 
   public static void bootstrapSchemas(SolrClient client) throws GenericException {
     LOGGER.info("Bootstrapping schemas");
-
     for (SolrCollection<? extends IsIndexed, ? extends IsModelObject> collection : SolrCollectionRegistry.registry()) {
       bootstrapCollection(client, collection);
     }
+
+    LOGGER.info("Finishing bootstrapping schemas");
   }
 
 }

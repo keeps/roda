@@ -59,10 +59,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
+import org.apache.solr.client.solrj.impl.Http2SolrClient;
+import org.apache.solr.client.solrj.impl.ZkClientClusterStateProvider;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest.Create;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.cloud.ZkConfigSetService;
 import org.apache.solr.cloud.ZkController;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -71,7 +74,8 @@ import org.apache.solr.common.cloud.ClusterState;
 import org.apache.solr.common.cloud.DocCollection;
 import org.apache.solr.common.cloud.Replica;
 import org.apache.solr.common.cloud.Slice;
-import org.apache.solr.common.cloud.ZkStateReader;
+import org.apache.solr.common.cloud.SolrZkClient;
+import org.apache.solr.core.ConfigSetService;
 import org.apache.zookeeper.KeeperException;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
@@ -1226,15 +1230,21 @@ public class RodaCoreFactory {
 
     Field.initialize();
 
-    String solrCloudZooKeeperUrls = getConfigurationString(RodaConstants.CORE_SOLR_CLOUD_URLS,
-      "localhost:2181,localhost:2182,localhost:2183");
-    LOGGER.info("Instantiating SOLR Cloud at {}", solrCloudZooKeeperUrls);
+    if (solrType == RodaConstants.SolrType.HTTP) {
+      String solrBaseUrl = getConfigurationString(RodaConstants.CORE_SOLR_HTTP_URL, "http://localhost:8983/solr/");
+      LOGGER.info("Instantiating SOLR HTTP at {}", solrBaseUrl);
 
-    try {
-      ZkController.checkChrootPath(solrCloudZooKeeperUrls, true);
-    } catch (KeeperException | InterruptedException e) {
-      LOGGER.error("Could not check zookeeper chroot path", e);
-    }
+      return new Http2SolrClient.Builder(solrBaseUrl).build();
+    } else {
+      String solrCloudZooKeeperUrls = getConfigurationString(RodaConstants.CORE_SOLR_CLOUD_URLS,
+        "localhost:2181,localhost:2182,localhost:2183");
+      LOGGER.info("Instantiating SOLR Cloud at {}", solrCloudZooKeeperUrls);
+
+      try {
+        ZkController.checkChrootPath(solrCloudZooKeeperUrls, true);
+      } catch (InterruptedException | KeeperException e) {
+        LOGGER.error("Could not check zookeeper chroot path", e);
+      }
 
     List<String> zkHosts;
     Optional<String> zkChroot;
@@ -1256,10 +1266,11 @@ public class RodaCoreFactory {
 
     waitForSolrCluster(cloudSolrClient);
 
-    if (writeIsAllowed) {
-      bootstrap(cloudSolrClient, solrHome);
+      if (writeIsAllowed) {
+        bootstrap(cloudSolrClient, solrHome);
+      }
+      return cloudSolrClient;
     }
-    return cloudSolrClient;
   }
 
   private static void waitForSolrCluster(CloudSolrClient cloudSolrClient) throws GenericException {
@@ -1296,8 +1307,7 @@ public class RodaCoreFactory {
       throw new GenericException("Could not connect to Solr Cloud", e);
     }
 
-    ZkStateReader zkStateReader = cloudSolrClient.getZkStateReader();
-    ClusterState clusterState = zkStateReader.getClusterState();
+    ClusterState clusterState = cloudSolrClient.getClusterState();
 
     Map<String, DocCollection> collectionStates = clusterState.getCollectionsMap();
     Set<String> allCollections = new HashSet<>();
@@ -1390,11 +1400,12 @@ public class RodaCoreFactory {
       int numShards = getEnvInt("SOLR_NUM_SHARDS", 1);
       int numReplicas = getEnvInt("SOLR_REPLICATION_FACTOR", 1);
 
-      cloudSolrClient.getZkStateReader().getZkClient().upConfig(configPath, collection);
+      String zkHost = ZkClientClusterStateProvider.from(cloudSolrClient).getZkHost();
+      SolrZkClient zkClient = new SolrZkClient(zkHost, 10000);
+      ConfigSetService configSetService = new ZkConfigSetService(zkClient);
+      configSetService.uploadConfig(collection, configPath);
 
       Create createCollection = CollectionAdminRequest.createCollection(collection, collection, numShards, numReplicas);
-      createCollection.setMaxShardsPerNode(getEnvInt("SOLR_MAX_SHARDS_PER_NODE", 1));
-      createCollection.setAutoAddReplicas(getEnvBoolean("SOLR_AUTO_ADD_REPLICAS", false));
 
       CollectionAdminResponse response = createCollection.process(cloudSolrClient);
       if (!response.isSuccess()) {
@@ -1802,7 +1813,6 @@ public class RodaCoreFactory {
   public static Path getJobAttachmentsDirectoryPath() {
     return jobAttachmentsDirectoryPath;
   }
-
 
   public static Path getDataPath() {
     return dataPath;
