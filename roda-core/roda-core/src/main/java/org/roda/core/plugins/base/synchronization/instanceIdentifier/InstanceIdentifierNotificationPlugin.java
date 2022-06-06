@@ -222,10 +222,7 @@ public class InstanceIdentifierNotificationPlugin extends AbstractPlugin<Void> {
   private IterableIndexResult<Notification> retrieveList(final IndexService index)
     throws RequestNotValidException, GenericException {
     final Filter filter = new Filter();
-    if (RodaConstants.DistributedModeType.CENTRAL.equals(RodaCoreFactory.getDistributedModeType())) {
-      final LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
-      filter.add(new SimpleFilterParameter(RodaConstants.INDEX_INSTANCE_ID, localInstance.getId()));
-    }
+    RODAInstanceUtils.addLocalInstanceFilter(filter);
 
     return index.findAll(Notification.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
   }
