@@ -398,8 +398,6 @@ public interface ClientMessages extends Messages {
 
   String removeButton();
 
-  String unsubscribeButton();
-
   String refreshButton();
 
   String newButton();
@@ -2214,6 +2212,8 @@ public interface ClientMessages extends Messages {
   String localInstanceConfigurationInvalidURL();
 
   String localInstanceIsSubscribedLabel();
+
+  String localInstanceUnsubscribeButton();
 
   String localInstanceLastSyncDateLabel();
 
