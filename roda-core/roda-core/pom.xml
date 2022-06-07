@@ -236,11 +236,6 @@
 		</dependency>
 
 		<!-- APACHEDS -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.apache.directory.server</groupId> -->
-		<!-- <artifactId>apacheds-all</artifactId> -->
-		<!-- </dependency> -->
-
 		<!--Not using apacheds-all because it is a fat-jar, using its dependencies 
 			instead, from: https://github.com/apache/directory-server/blob/2.0.0-M21/all/pom.xml -->
 
@@ -411,10 +406,6 @@
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-csv</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.jdom</groupId>
-			<artifactId>jdom2</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>javax.mail</groupId>
