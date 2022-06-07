@@ -4,6 +4,9 @@ services:
       image: zookeeper:3.8
       environment:
         - ZOO_4LW_COMMANDS_WHITELIST=mntr,conf,ruok
+      volumes:
+        - zookeeper_data:/data
+        - zookeeper_datalog:/datalog
     solr:
         image: solr:9
         restart: unless-stopped
@@ -13,6 +16,9 @@ services:
             SOLR_HEAP: 2g
             ZK_HOST: zoo:2181
         command: -c
+        volumes:
+          - solr_data:/var/solr
+
     clamd:
       image: clamav/clamav:stable
       volumes:
@@ -54,6 +60,9 @@ services:
         - JPDA_TRANSPORT=dt_socket
       command: catalina.sh jpda run
 volumes:
+  zookeeper_data:
+  zookeeper_datalog:
+  solr_data:
   clam_data:
   siegfried_data:
   roda_data_storage:
