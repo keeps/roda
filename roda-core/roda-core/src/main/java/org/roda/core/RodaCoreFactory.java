@@ -280,9 +280,10 @@ public class RodaCoreFactory {
     "roda-roles.properties", "roda-permissions.properties", "roda-instance.properties"));
 
   /**
-   * Shared configuration and message properties (cache). Includes properties from
-   * {@code rodaConfiguration} and translations from ServerMessages, filtered by
-   * the {@code ui.sharedProperties.*} properties in {@code roda-wui.properties}.
+   * Shared configuration and message properties (cache). Includes properties
+   * from {@code rodaConfiguration} and translations from ServerMessages,
+   * filtered by the {@code ui.sharedProperties.*} properties in
+   * {@code roda-wui.properties}.
    *
    * This cache provides the complete set of properties to be shared with the
    * client browser.
@@ -639,11 +640,11 @@ public class RodaCoreFactory {
 
   /**
    * Try to get property from 1) system property (passed in command-line via -D;
-   * if property does not start by "roda.", it will be prepended); 2) environment
-   * variable (upper case, replace '.' by '_' and if property does not start by
-   * "RODA_" after replacements, it will be prepended); 3) RODA configuration
-   * files (with original property value, ensuring that it does not start by
-   * "roda."); 4) return default value
+   * if property does not start by "roda.", it will be prepended); 2)
+   * environment variable (upper case, replace '.' by '_' and if property does
+   * not start by "RODA_" after replacements, it will be prepended); 3) RODA
+   * configuration files (with original property value, ensuring that it does
+   * not start by "roda."); 4) return default value
    * 
    * <p>
    * Example 1: for property = 'roda.node.type' this method will try to find the
@@ -684,11 +685,11 @@ public class RodaCoreFactory {
 
   /**
    * Try to get property from 1) system property (passed in command-line via -D;
-   * if property does not start by "roda.", it will be prepended); 2) environment
-   * variable (upper case, replace '.' by '_' and if property does not start by
-   * "RODA_" after replacements, it will be prepended); 3) RODA configuration
-   * files (with original property value, ensuring that it does not start by
-   * "roda."); 4) return default value
+   * if property does not start by "roda.", it will be prepended); 2)
+   * environment variable (upper case, replace '.' by '_' and if property does
+   * not start by "RODA_" after replacements, it will be prepended); 3) RODA
+   * configuration files (with original property value, ensuring that it does
+   * not start by "roda."); 4) return default value
    * 
    * <p>
    * Example 1: for property = 'roda.node.type' this method will try to find the
@@ -713,11 +714,11 @@ public class RodaCoreFactory {
 
   /**
    * Try to get property from 1) system property (passed in command-line via -D;
-   * if property does not start by "roda.", it will be prepended); 2) environment
-   * variable (upper case, replace '.' by '_' and if property does not start by
-   * "RODA_" after replacements, it will be prepended); 3) RODA configuration
-   * files (with original property value, ensuring that it does not start by
-   * "roda."); 4) return default value
+   * if property does not start by "roda.", it will be prepended); 2)
+   * environment variable (upper case, replace '.' by '_' and if property does
+   * not start by "RODA_" after replacements, it will be prepended); 3) RODA
+   * configuration files (with original property value, ensuring that it does
+   * not start by "roda."); 4) return default value
    * 
    * <p>
    * Example 1: for property = 'roda.node.type' this method will try to find the
@@ -1310,6 +1311,12 @@ public class RodaCoreFactory {
     }
 
     ClusterState clusterState = cloudSolrClient.getClusterState();
+    LOGGER.info("Live nodes: {}", clusterState.getLiveNodes());
+
+    
+    if(clusterState.getLiveNodes().isEmpty()) {
+      return false;
+    }
 
     Map<String, DocCollection> collectionStates = clusterState.getCollectionsMap();
     Set<String> allCollections = new HashSet<>();
@@ -1339,11 +1346,18 @@ public class RodaCoreFactory {
               break;
             } else {
               LOGGER.info("Replica {} on node {} is {}", replica.getName(), replica.getNodeName(),
-                replica.getState().name());
+                replica.getState());
             }
           }
 
           collectionHealthy &= sliceHealthy;
+        }
+
+        try {
+          cloudSolrClient.getById(col, "");
+        } catch (SolrServerException | IOException | SolrException e) {
+          LOGGER.info("Query test failed: [{}] {}", e.getClass().getSimpleName(), e.getMessage());
+          collectionHealthy = false;
         }
 
         if (collectionHealthy) {
@@ -2155,7 +2169,8 @@ public class RodaCoreFactory {
    * {@code rodaConfiguration}.
    *
    * The properties that should be shared with the client browser are defined by
-   * the {@code ui.sharedProperties.*} properties in {@code roda-wui.properties}.
+   * the {@code ui.sharedProperties.*} properties in
+   * {@code roda-wui.properties}.
    *
    * @return The configuration properties that should be shared with the client
    *         browser.
