@@ -246,9 +246,10 @@ public class InstanceIdentifierAIPEventPlugin extends AbstractPlugin<Void> {
     return new Report();
   }
 
-  private IterableIndexResult<IndexedAIP> retrieveList(IndexService index)
+  private IterableIndexResult<IndexedAIP> retrieveList(final IndexService index)
     throws RequestNotValidException, GenericException {
-    Filter filter = new Filter();
+    final Filter filter = new Filter();
+    RODAInstanceUtils.addLocalInstanceFilter(filter);
     return index.findAll(IndexedAIP.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
   }
 

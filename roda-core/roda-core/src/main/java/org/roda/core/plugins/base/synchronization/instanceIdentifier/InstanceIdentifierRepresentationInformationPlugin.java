@@ -223,10 +223,10 @@ public class InstanceIdentifierRepresentationInformationPlugin extends AbstractP
     return new Report();
   }
 
-  private IterableIndexResult<RepresentationInformation> retrieveList(IndexService index)
+  private IterableIndexResult<RepresentationInformation> retrieveList(final IndexService index)
     throws RequestNotValidException, GenericException {
-    Filter filter = new Filter();
-
+    final Filter filter = new Filter();
+    RODAInstanceUtils.addLocalInstanceFilter(filter);
     return index.findAll(RepresentationInformation.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
   }
 }
