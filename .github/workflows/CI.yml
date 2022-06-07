@@ -24,6 +24,7 @@ jobs:
         env:
           ZK_HOST: zookeeper:2181
         options: -e cloud
+
     steps:
       - uses: actions/checkout@v3
         with:
@@ -31,8 +32,8 @@ jobs:
       - name: Set up JDK 8
         uses: actions/setup-java@v3
         with:
-          java-version: 8
-          distribution: 'adopt'
+          java-version: 11
+          distribution: 'temurin'
       - name: Cache
         uses: actions/cache@v3
         with:
@@ -53,3 +54,5 @@ jobs:
           mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" -Denforcer.skip=true clean org.jacoco:jacoco-maven-plugin:prepare-agent install
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RODA_CORE_SOLR_TYPE: CLOUD
+          RODA_CORE_SOLR_CLOUD_URLS: localhost:2181
