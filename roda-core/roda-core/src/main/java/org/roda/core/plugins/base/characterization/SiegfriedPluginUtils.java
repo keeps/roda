@@ -49,6 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 
 public class SiegfriedPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPluginUtils.class);
@@ -89,32 +90,53 @@ public class SiegfriedPluginUtils {
   }
 
   public static String getVersion() {
-    try {
-      String siegfriedPath = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "siegfried", "binary");
-      List<String> command = new ArrayList<>(Arrays.asList(siegfriedPath, "--version"));
-      String siegfriedOutput = CommandUtility.execute(command);
-      StringBuilder result = new StringBuilder();
+    String version = null;
 
-      if (siegfriedOutput.contains("\n")) {
-        result.append(siegfriedOutput.split("\\n")[0].split(" ")[1]);
+    String siegfriedMode = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "siegfried", "mode");
+    if ("server".equalsIgnoreCase(siegfriedMode)) {
+      LOGGER.debug("Running Siegfried on server mode");
+      String endpoint = getSiegfriedServerEndpoint(Paths.get("/dev/null"));
+      try {
+        String json = HTTPUtility.doGet(endpoint);
+        JsonNode jn = JsonUtils.parseJson(json);
+        StringBuilder result = new StringBuilder();
+        result.append(jn.get("siegfried").asText());
+
+        version = result.toString();
+      } catch(GenericException ce) {
+        LOGGER.error("Error getting Siegfried version: " + ce.getMessage(), ce);
       }
 
-      if (siegfriedOutput.contains("DROID_SignatureFile_")) {
-        result.append(" w/ ");
+    } else {
+      LOGGER.debug("Running Siegfried on standalone mode");
+      try {
+        String siegfriedPath = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "siegfried", "binary");
+        List<String> command = new ArrayList<>(Arrays.asList(siegfriedPath, "--version"));
 
-        Pattern pattern = Pattern.compile("DROID_SignatureFile_V[0-9]+");
-        Matcher matcher = pattern.matcher(siegfriedOutput);
-        if (matcher.find()) {
-          result.append(matcher.group(0));
+        String siegfriedOutput = CommandUtility.execute(command);
+        StringBuilder result = new StringBuilder();
+
+        if (siegfriedOutput.contains("\n")) {
+          result.append(siegfriedOutput.split("\\n")[0].split(" ")[1]);
         }
-      }
 
-      return result.toString();
-    } catch (CommandException ce) {
-      LOGGER.error("Error getting Siegfried version: " + ce.getMessage(), ce);
+        if (siegfriedOutput.contains("DROID_SignatureFile_")) {
+          result.append(" w/ ");
+
+          Pattern pattern = Pattern.compile("DROID_SignatureFile_V[0-9]+");
+          Matcher matcher = pattern.matcher(siegfriedOutput);
+          if (matcher.find()) {
+            result.append(matcher.group(0));
+          }
+        }
+
+        version = result.toString(); 
+      } catch (CommandException ce) {
+        LOGGER.error("Error getting Siegfried version: " + ce.getMessage(), ce);
+      }
     }
 
-    return null;
+    return version;
   }
 
   public static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnRepresentation(ModelService model,
@@ -126,7 +148,7 @@ public class SiegfriedPluginUtils {
 
     if (representation.getHasShallowFiles()) {
       StorageService tmpStorageService = ModelUtils.resolveTemporaryResourceShallow(jobId, model.getStorage(),
-          ModelUtils.getAIPStoragePath(representation.getAipId()));
+        ModelUtils.getAIPStoragePath(representation.getAipId()));
       try (DirectResourceAccess directAccess = tmpStorageService.getDirectAccess(representationDataPath)) {
         Path representationFsPath = directAccess.getPath();
         return runSiegfriedOnRepresentationOrFile(model, representation.getAipId(), representation.getId(),
