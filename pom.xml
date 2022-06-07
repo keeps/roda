@@ -107,14 +107,13 @@
     <jersey.version>2.31</jersey.version>
     <swagger.version>2.2.0</swagger.version>
     <jackson.version>2.13.3</jackson.version>
-    <spring.version>4.3.19.RELEASE</spring.version>
+    <spring.version>5.3.20</spring.version>
     <grizzly.version>2.4.3</grizzly.version>
     <solr.version>9.0.0</solr.version>
     <akka.version>2.5.26</akka.version>
     <!--<akka_management.version>0.17.0</akka_management.version> -->
     <apacheds.version>2.0.0-M24</apacheds.version>
     <httpcomponents.version>4.5.13</httpcomponents.version>
-    <poi.version>3.17</poi.version>
     <commons_ip2.version>2.1.0</commons_ip2.version>
     <metrics.version>3.2.6</metrics.version>
     <roda_community_url>https://roda-community.org</roda_community_url>
@@ -517,11 +516,6 @@
         <version>2.8.0</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.poi</groupId>
-        <artifactId>poi-ooxml</artifactId>
-        <version>${poi.version}</version>
-      </dependency>
-      <dependency>
         <groupId>commons-logging</groupId>
         <artifactId>commons-logging</artifactId>
         <version>1.2</version>
@@ -534,7 +528,7 @@
       <dependency>
         <groupId>com.thoughtworks.xstream</groupId>
         <artifactId>xstream</artifactId>
-        <version>1.4.18</version>
+        <version>1.4.19</version>
       </dependency>
       <dependency>
         <groupId>com.toedter</groupId>
@@ -1079,11 +1073,6 @@
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-csv</artifactId>
         <version>1.8</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jdom</groupId>
-        <artifactId>jdom2</artifactId>
-        <version>2.0.6</version>
       </dependency>
       <dependency>
         <groupId>org.seleniumhq.selenium</groupId>
