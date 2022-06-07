@@ -10,6 +10,7 @@ package org.roda.core.index;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNotNull;
 import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.AssertJUnit.fail;
 
 import java.io.IOException;
 import java.net.URL;
@@ -232,8 +233,8 @@ public class IndexServiceTest {
       sroIDs.add(sro.getId());
     }
 
-    List<String> representationIds = aip.getRepresentations().stream().map(r -> r.getId()).collect(Collectors.toList());
-    MatcherAssert.assertThat(sroIDs, Matchers.contains(representationIds.toArray()));
+    MatcherAssert.assertThat(sroIDs, Matchers.contains(
+        aip.getRepresentations().stream().map(Representation::getId).toArray()));
 
     model.deleteAIP(aipId);
     try {
@@ -476,7 +477,7 @@ public class IndexServiceTest {
   @Test
   public void testReindexLogEntry()
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
-    Long number = 10L;
+    long number = 10L;
 
     for (int i = 0; i < number; i++) {
       LogEntry entry = new LogEntry();
@@ -620,7 +621,7 @@ public class IndexServiceTest {
       risk.setDescription("Risk description");
       risk.setIdentifiedOn(new Date());
       risk.setIdentifiedBy("Risk identifier");
-      risk.setCategories(Arrays.asList("Risk category"));
+      risk.setCategories(List.of("Risk category"));
       risk.setNotes("Risk notes");
 
       risk.setPreMitigationProbability(4);
@@ -677,7 +678,7 @@ public class IndexServiceTest {
 
     } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
       e.printStackTrace(System.err);
-      assertTrue(false);
+      fail();
     }
   }
 
@@ -686,7 +687,7 @@ public class IndexServiceTest {
     RepresentationInformation ri = new RepresentationInformation();
     ri.setName("Portable Document Format");
     ri.setDescription("PDF definition");
-    ri.setTags(Arrays.asList("Page Layout Files"));
+    ri.setTags(List.of("Page Layout Files"));
     ri.setExtras("<extras></extras>");
     ri.setSupport(RepresentationInformationSupport.SUPPORTED);
     model.createRepresentationInformation(ri, RodaConstants.ADMIN, false);

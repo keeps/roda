@@ -58,7 +58,6 @@ import org.testng.annotations.Test;
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
 public class DisposalHoldTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(DisposalHoldTest.class);
-
   private Path basePath;
   private Path storagePath;
 

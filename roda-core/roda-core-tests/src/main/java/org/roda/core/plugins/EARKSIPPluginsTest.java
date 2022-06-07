@@ -35,7 +35,6 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItemsAll;
@@ -53,8 +52,8 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.base.maintenance.FixAncestorsPlugin;
 import org.roda.core.plugins.base.ingest.EARKSIPToAIPPlugin;
+import org.roda.core.plugins.base.maintenance.FixAncestorsPlugin;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexAIPPlugin;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
@@ -113,14 +112,11 @@ public class EARKSIPPluginsTest {
 
   @AfterMethod
   public void cleanUp() throws RODAException {
-    index.execute(IndexedAIP.class, Filter.ALL, new ArrayList<>(), new IndexRunnable<IndexedAIP>() {
-      @Override
-      public void run(IndexedAIP item) throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-        try {
-          model.deleteAIP(item.getId());
-        } catch (NotFoundException e) {
-          // do nothing
-        }
+    index.execute(IndexedAIP.class, Filter.ALL, new ArrayList<>(), item -> {
+      try {
+        model.deleteAIP(item.getId());
+      } catch (NotFoundException e) {
+        // do nothing
       }
     }, e -> Assert.fail("Error cleaning up", e));
 
@@ -142,14 +138,14 @@ public class EARKSIPPluginsTest {
   }
 
   public static TransferredResource createIngestCorpora(Path corporaPath, IndexService index)
-    throws IOException, NotFoundException, GenericException, RequestNotValidException, IsStillUpdatingException,
-    AlreadyExistsException, AuthorizationDeniedException {
+    throws IOException, NotFoundException, GenericException, IsStillUpdatingException, AlreadyExistsException,
+    AuthorizationDeniedException {
     return createIngestCorpora(corporaPath, index, CorporaConstants.EARK_SIP, null);
   }
 
   public static TransferredResource createIngestUpdateCorpora(Path corporaPath, IndexService index,
-    String renameSipFileTo) throws IOException, NotFoundException, GenericException, RequestNotValidException,
-    IsStillUpdatingException, AlreadyExistsException, AuthorizationDeniedException {
+    String renameSipFileTo) throws IOException, NotFoundException, GenericException, IsStillUpdatingException,
+    AlreadyExistsException, AuthorizationDeniedException {
     return createIngestCorpora(corporaPath, index, CorporaConstants.EARK_SIP_UPDATE, renameSipFileTo);
   }
 
@@ -163,9 +159,8 @@ public class EARKSIPPluginsTest {
     IndexService index, Path corporaPath, boolean failIfReportNotSucceeded)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException, IOException, IsStillUpdatingException {
-    String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
-    AIP root = model.createAIP(parentId, aipType, new Permissions(), RodaConstants.ADMIN);
+    AIP root = model.createAIP(null, aipType, new Permissions(), RodaConstants.ADMIN);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
@@ -226,8 +221,8 @@ public class EARKSIPPluginsTest {
     CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
       aip.getRepresentations().get(0).getId(), true);
     List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles,
-      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
+    Iterables.addAll(reusableAllFiles, Lists.newArrayList(allFiles).stream().filter(OptionalWithCause::isPresent)
+      .map(OptionalWithCause::get).collect(Collectors.toList()));
 
     // All folders and files
     Assert.assertEquals(reusableAllFiles.size(), CORPORA_FOLDERS_COUNT + CORPORA_FILES_COUNT);
@@ -277,9 +272,8 @@ public class EARKSIPPluginsTest {
 
   private void ingestCorporaAncestors() throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, IOException, IsStillUpdatingException {
-    String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
-    AIP root = model.createAIP(parentId, aipType, new Permissions(), RodaConstants.ADMIN);
+    AIP root = model.createAIP(null, aipType, new Permissions(), RodaConstants.ADMIN);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());

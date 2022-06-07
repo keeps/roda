@@ -45,8 +45,6 @@ public class DisposalConfirmationTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(DisposalConfirmationTest.class);
 
   private Path basePath;
-  private Path storagePath;
-
   private ModelService model;
   private SolrClient solrClient;
 
@@ -63,7 +61,6 @@ public class DisposalConfirmationTest {
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
       deployPluginManager, deployDefaultResources, false);
     model = RodaCoreFactory.getModelService();
-    storagePath = RodaCoreFactory.getStoragePath();
     solrClient = RodaCoreFactory.getSolr();
 
     LOGGER.info("Running disposal confirmation tests under storage {}", basePath);

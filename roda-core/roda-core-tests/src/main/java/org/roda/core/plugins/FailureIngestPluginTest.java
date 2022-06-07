@@ -31,7 +31,6 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
@@ -106,14 +105,11 @@ public class FailureIngestPluginTest {
 
   @AfterMethod
   public void cleanUp() throws RODAException {
-    index.execute(IndexedAIP.class, Filter.ALL, new ArrayList<>(), new IndexRunnable<IndexedAIP>() {
-      @Override
-      public void run(IndexedAIP item) throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-        try {
-          model.deleteAIP(item.getId());
-        } catch (NotFoundException e) {
-          // do nothing
-        }
+    index.execute(IndexedAIP.class, Filter.ALL, new ArrayList<>(), item -> {
+      try {
+        model.deleteAIP(item.getId());
+      } catch (NotFoundException e) {
+        // do nothing
       }
     }, e -> Assert.fail("Error cleaning up", e));
 
@@ -276,8 +272,8 @@ public class FailureIngestPluginTest {
     CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
       aip.getRepresentations().get(0).getId(), true);
     List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles,
-      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
+    Iterables.addAll(reusableAllFiles, Lists.newArrayList(allFiles).stream().filter(OptionalWithCause::isPresent)
+      .map(OptionalWithCause::get).collect(Collectors.toList()));
 
     // All folders and files
     Assert.assertEquals(reusableAllFiles.size(), CORPORA_FOLDERS_COUNT + CORPORA_FILES_COUNT);

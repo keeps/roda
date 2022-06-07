@@ -76,5 +76,4 @@ public class ReindexFilePluginTest {
     Job job = TestsHelper.executeJob(ReindexFilePlugin.class, PluginType.MISC, SelectedItemsAll.create(File.class));
     TestsHelper.getJobReports(index, job, true);
   }
-
 }

@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.roda.core.CorporaConstants;
@@ -31,6 +32,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
@@ -56,7 +58,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 @Test(groups = {RodaConstants.TEST_GROUP_DEV})
-public class FilterTest {
+public class  FilterTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(FilterTest.class);
 
   private static Path basePath;
@@ -145,7 +147,7 @@ public class FilterTest {
 
     index.commit(IndexedFile.class);
     Filter filter = new Filter(new EmptyKeyFilterParameter(RodaConstants.FILE_HASH));
-    SelectedItemsFilter selectedItems = new SelectedItemsFilter(filter, IndexedFile.class.getName(), false);
+    SelectedItems<IndexedFile> selectedItems = new SelectedItemsFilter<>(filter, IndexedFile.class.getName(), false);
 
     Job premisJob = TestsHelper.executeJob(PremisSkeletonPlugin.class, PluginType.AIP_TO_AIP, selectedItems);
 
@@ -176,26 +178,23 @@ public class FilterTest {
 
     index.commit(IndexedFile.class);
     Filter filter = new Filter(new EmptyKeyFilterParameter(RodaConstants.FILE_HASH));
-    SelectedItemsFilter selectedItems = new SelectedItemsFilter(filter, IndexedFile.class.getName(), false);
+    SelectedItems<IndexedFile> selectedItems = new SelectedItemsFilter<>(filter, IndexedFile.class.getName(), false);
 
-    Thread removeThread = new Thread(new Runnable() {
-      @Override
-      public void run() {
-        for (int i = 0; i < PREMIS_CORPORA_SIZE; i++) {
-          try {
-            String id = "file_" + i;
-            String uuid = IdUtils.getFileId(aip.getId(), REPRESENTATION_ID, filePath, id);
-            index.delete(IndexedFile.class, Arrays.asList(uuid));
+    Thread removeThread = new Thread(() -> {
+      for (int i = 0; i < PREMIS_CORPORA_SIZE; i++) {
+        try {
+          String id = "file_" + i;
+          String uuid = IdUtils.getFileId(aip.getId(), REPRESENTATION_ID, filePath, id);
+          index.delete(IndexedFile.class, Collections.singletonList(uuid));
 
-            if (i % 5 == 0) {
-              index.commit(IndexedFile.class);
-            }
-
-            Thread.sleep(10);
-          } catch (RequestNotValidException | GenericException | InterruptedException
-            | AuthorizationDeniedException e) {
-            // do nothing
+          if (i % 5 == 0) {
+            index.commit(IndexedFile.class);
           }
+
+          Thread.sleep(10);
+        } catch (RequestNotValidException | GenericException | InterruptedException
+          | AuthorizationDeniedException e) {
+          // do nothing
         }
       }
     });

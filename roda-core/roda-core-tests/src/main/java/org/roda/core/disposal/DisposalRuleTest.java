@@ -46,15 +46,10 @@ import org.testng.annotations.Test;
  */
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
 public class DisposalRuleTest {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(DisposalRuleTest.class);
 
   private Path basePath;
-  private Path storagePath;
-
   private ModelService model;
-  private static StorageService corporaService;
-  private static IndexService index;
 
   @BeforeClass
   public void setUp() throws Exception {
@@ -69,11 +64,6 @@ public class DisposalRuleTest {
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
       deployPluginManager, deployDefaultResources, false);
     model = RodaCoreFactory.getModelService();
-    storagePath = RodaCoreFactory.getStoragePath();
-    index = RodaCoreFactory.getIndexService();
-
-    URL corporaURL = IndexServiceTest.class.getResource("/corpora");
-    corporaService = new FileStorageService(Paths.get(corporaURL.toURI()));
 
     LOGGER.info("Running Disposal rule tests under storage {}", basePath);
   }
@@ -121,8 +111,6 @@ public class DisposalRuleTest {
   private DisposalRule createDisposalRule() throws AlreadyExistsException, AuthorizationDeniedException,
     GenericException, NotFoundException, RequestNotValidException {
     String title = "Normal";
-    String key = "metadataKey";
-    String value = "metadataValue";
     String createdBy = "admin";
     Integer order = 1;
 

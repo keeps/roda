@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.MatcherAssert;
@@ -52,7 +53,6 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
-import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
@@ -60,11 +60,13 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
-import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
+import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.index.IndexServiceTest;
+import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultStoragePath;
@@ -106,15 +108,13 @@ public class ModelServiceTest {
   private static Path logPath;
   private static StorageService storage;
   private static ModelService model;
-
-  private static Path corporaPath;
   private static StorageService corporaService;
   private static int fileCounter = 0;
 
   @BeforeClass
   public static void setUp() throws IOException, URISyntaxException, GenericException {
     URL corporaURL = ModelServiceTest.class.getResource("/corpora");
-    corporaPath = Paths.get(corporaURL.toURI());
+    Path corporaPath = Paths.get(corporaURL.toURI());
     corporaService = new FileStorageService(corporaPath);
 
     LOGGER.debug("Running model test under storage: {}", basePath);
@@ -143,7 +143,7 @@ public class ModelServiceTest {
   @AfterClass
   public void cleanup() throws NotFoundException, GenericException, IOException {
     RodaCoreFactory.shutdown();
-    //FSUtils.deletePath(basePath);
+    // FSUtils.deletePath(basePath);
   }
 
   @Test
@@ -162,11 +162,11 @@ public class ModelServiceTest {
     assertNull("AIP_1 should not have a parent", aip.getParentId());
     assertThat(aip.getState(), Is.is(AIPState.ACTIVE));
 
-    List<String> descriptiveMetadataIds = aip.getDescriptiveMetadata().stream().map(dm -> dm.getId())
+    List<String> descriptiveMetadataIds = aip.getDescriptiveMetadata().stream().map(DescriptiveMetadata::getId)
       .collect(Collectors.toList());
     assertThat(descriptiveMetadataIds, containsInAnyOrder(CorporaConstants.DESCRIPTIVE_METADATA_ID));
 
-    List<String> representationIds = aip.getRepresentations().stream().map(rep -> rep.getId())
+    List<String> representationIds = aip.getRepresentations().stream().map(Representation::getId)
       .collect(Collectors.toList());
 
     assertThat(representationIds,
@@ -196,7 +196,7 @@ public class ModelServiceTest {
 
     CloseableIterable<OptionalWithCause<File>> allRep1Files = model.listFilesUnder(aipId,
       CorporaConstants.REPRESENTATION_1_ID, true);
-    List<String> allRep1FileIds = Lists.newArrayList(allRep1Files).stream().filter(f -> f.isPresent())
+    List<String> allRep1FileIds = Lists.newArrayList(allRep1Files).stream().filter(OptionalWithCause::isPresent)
       .map(f -> f.get().getId()).collect(Collectors.toList());
     allRep1Files.close();
 
@@ -210,7 +210,7 @@ public class ModelServiceTest {
 
     CloseableIterable<OptionalWithCause<File>> allRep2Files = model.listFilesUnder(aipId,
       CorporaConstants.REPRESENTATION_2_ID, true);
-    List<String> allRep2FileIds = Lists.newArrayList(allRep2Files).stream().filter(f -> f.isPresent())
+    List<String> allRep2FileIds = Lists.newArrayList(allRep2Files).stream().filter(OptionalWithCause::isPresent)
       .map(f -> f.get().getId()).collect(Collectors.toList());
     allRep2Files.close();
 
@@ -312,11 +312,11 @@ public class ModelServiceTest {
     assertNull("AIP_1 should not have a parent", aip.getParentId());
     assertThat(aip.getState(), Is.is(AIPState.ACTIVE));
 
-    List<String> descriptiveMetadataIds = aip.getDescriptiveMetadata().stream().map(dm -> dm.getId())
+    List<String> descriptiveMetadataIds = aip.getDescriptiveMetadata().stream().map(DescriptiveMetadata::getId)
       .collect(Collectors.toList());
     assertThat(descriptiveMetadataIds, containsInAnyOrder(CorporaConstants.DESCRIPTIVE_METADATA_ID_EAD3));
 
-    List<String> representationIds = aip.getRepresentations().stream().map(rep -> rep.getId())
+    List<String> representationIds = aip.getRepresentations().stream().map(Representation::getId)
       .collect(Collectors.toList());
 
     assertThat(representationIds,
@@ -358,11 +358,11 @@ public class ModelServiceTest {
     assertNull("AIP_1 should not have a parent", aip.getParentId());
     assertThat(aip.getState(), Is.is(AIPState.ACTIVE));
 
-    List<String> descriptiveMetadataIds = aip.getDescriptiveMetadata().stream().map(dm -> dm.getId())
+    List<String> descriptiveMetadataIds = aip.getDescriptiveMetadata().stream().map(DescriptiveMetadata::getId)
       .collect(Collectors.toList());
     assertThat(descriptiveMetadataIds, containsInAnyOrder(CorporaConstants.DESCRIPTIVE_METADATA_ID_EADUNKNOWN));
 
-    List<String> representationIds = aip.getRepresentations().stream().map(rep -> rep.getId())
+    List<String> representationIds = aip.getRepresentations().stream().map(Representation::getId)
       .collect(Collectors.toList());
 
     assertThat(representationIds,
@@ -403,8 +403,8 @@ public class ModelServiceTest {
       CorporaConstants.REPRESENTATION_1_ID, true);
 
     List<File> reusableList = new ArrayList<>();
-    Iterables.addAll(reusableList,
-      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
+    Iterables.addAll(reusableList, Lists.newArrayList(allFiles).stream().filter(OptionalWithCause::isPresent)
+      .map(OptionalWithCause::get).collect(Collectors.toList()));
     allFiles.close();
 
     assertTrue(reusableList.contains(
@@ -412,14 +412,14 @@ public class ModelServiceTest {
     assertTrue(
       reusableList.contains(new File("folder", aipId, CorporaConstants.REPRESENTATION_1_ID, new ArrayList<>(), true)));
     assertTrue(reusableList
-      .contains(new File("subfolder", aipId, CorporaConstants.REPRESENTATION_1_ID, Arrays.asList("folder"), true)));
+      .contains(new File("subfolder", aipId, CorporaConstants.REPRESENTATION_1_ID, List.of("folder"), true)));
     assertTrue(reusableList.contains(new File("RODA 2 logo.svg", aipId, CorporaConstants.REPRESENTATION_1_ID,
       Arrays.asList("folder", "subfolder"), false)));
 
-    assertTrue(reusableList.contains(new File("RODA 2 logo-circle-black.svg", aipId,
-      CorporaConstants.REPRESENTATION_1_ID, Arrays.asList("folder"), false)));
-    assertTrue(reusableList.contains(new File("RODA 2 logo-circle-white.svg", aipId,
-      CorporaConstants.REPRESENTATION_1_ID, Arrays.asList("folder"), false)));
+    assertTrue(reusableList.contains(
+      new File("RODA 2 logo-circle-black.svg", aipId, CorporaConstants.REPRESENTATION_1_ID, List.of("folder"), false)));
+    assertTrue(reusableList.contains(
+      new File("RODA 2 logo-circle-white.svg", aipId, CorporaConstants.REPRESENTATION_1_ID, List.of("folder"), false)));
 
     // cleanup
     model.deleteAIP(aipId);
@@ -497,8 +497,8 @@ public class ModelServiceTest {
 
     Iterable<OptionalWithCause<AIP>> listAIPs = model.listAIPs();
     List<AIP> reusableList = new ArrayList<>();
-    Iterables.addAll(reusableList,
-      Lists.newArrayList(listAIPs).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
+    Iterables.addAll(reusableList, Lists.newArrayList(listAIPs).stream().filter(OptionalWithCause::isPresent)
+      .map(OptionalWithCause::get).collect(Collectors.toList()));
 
     assertThat(reusableList, containsInAnyOrder(aip1, aip2, aip3));
 
@@ -691,7 +691,9 @@ public class ModelServiceTest {
     assertThat(list, containsInAnyOrder(representation1, representation2));
 
     CloseableIterable<OptionalWithCause<Representation>> list2 = model.list(Representation.class);
-    assertThat(Iterables.transform(list2, i -> i.get()), containsInAnyOrder(representation1, representation2));
+    assertThat(
+      StreamSupport.stream(list2.spliterator(), false).map(OptionalWithCause::get).collect(Collectors.toList()),
+      containsInAnyOrder(representation1, representation2));
 
     // cleanup
     model.deleteAIP(aipId);
@@ -976,6 +978,7 @@ public class ModelServiceTest {
     try {
       Files.createDirectories(logPath);
     } catch (IOException e) {
+      // do nothing
     }
   }
 
@@ -985,7 +988,7 @@ public class ModelServiceTest {
     Group group1 = new Group("group-1");
     group1.setActive(true);
     group1.setFullName("NAMEGROUP1");
-    group1.setDirectRoles(new HashSet<>(Arrays.asList(ROLE1)));
+    group1.setDirectRoles(new HashSet<>(List.of(ROLE1)));
     model.createGroup(group1, true);
 
     // gen. asserts for group 1
@@ -996,7 +999,7 @@ public class ModelServiceTest {
     Group group2 = new Group("group2");
     group2.setActive(true);
     group2.setFullName("NAMEGROUP2");
-    group2.setDirectRoles(new HashSet<>(Arrays.asList(ROLE2)));
+    group2.setDirectRoles(new HashSet<>(List.of(ROLE2)));
     model.createGroup(group2, true);
 
     // gen. asserts for group 2
@@ -1056,7 +1059,7 @@ public class ModelServiceTest {
     Group group1 = new Group("group_1");
     group1.setActive(true);
     group1.setFullName("NAMEGROUP1");
-    group1.setDirectRoles(new HashSet<>(Arrays.asList(ROLE1)));
+    group1.setDirectRoles(new HashSet<>(List.of(ROLE1)));
     model.createGroup(group1, true);
 
     // update user
@@ -1158,43 +1161,4 @@ public class ModelServiceTest {
     } while (i < min || i > max);
     return i;
   }
-
-  // TODO: Create a test with separate setup. The following tests must be in distributed mode
-//  @Test
-//  public void createDistributedInstanceTest() throws RODAException, IOException {
-//    DistributedInstance distributedInstance = new DistributedInstance();
-//    distributedInstance.setName("TEST_1");
-//
-//    DistributedInstance createdDistributedInstance = model.createDistributedInstance(distributedInstance, RodaConstants.ADMIN);
-//
-//    DistributedInstance ret = model.retrieveDistributedInstance(createdDistributedInstance.getId());
-//    assertEquals(ret, distributedInstance);
-//  }
-//
-//  @Test
-//  public void deleteDistributedInstanceTest() throws RODAException, IOException {
-//    DistributedInstance distributedInstance = new DistributedInstance();
-//    distributedInstance.setName("TEST_1");
-//
-//    DistributedInstance distributedInstance1 = model.createDistributedInstance(distributedInstance, RodaConstants.ADMIN);
-//
-//    DistributedInstance ret = model.retrieveDistributedInstance(distributedInstance1.getId());
-//    assertEquals(ret, distributedInstance);
-//
-//    model.deleteDistributedInstance(distributedInstance1.getId());
-//  }
-//
-//  @Test
-//  public void updateDistributedInstanceTest() throws RODAException, IOException {
-//    DistributedInstance distributedInstance = new DistributedInstance();
-//    distributedInstance.setName("TEST_1");
-//
-//    DistributedInstance distributedInstance1 = model.createDistributedInstance(distributedInstance, RodaConstants.ADMIN);
-//
-//    distributedInstance.setName("updated");
-//    model.updateDistributedInstance(distributedInstance, RodaConstants.ADMIN);
-//
-//    DistributedInstance ret = model.retrieveDistributedInstance(distributedInstance1.getId());
-//    assertEquals(ret.getName(), "updated");
-//  }
 }

@@ -102,8 +102,7 @@ public class BagitSIPPluginsTest {
   }
 
   private TransferredResource createCorpora()
-    throws IOException, NotFoundException, GenericException, RequestNotValidException, AlreadyExistsException,
-    AuthorizationDeniedException {
+    throws IOException, NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
 
     Path sip = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(CorporaConstants.BAGIT_SIP);
@@ -117,10 +116,9 @@ public class BagitSIPPluginsTest {
 
   private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, IOException {
-    String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
 
-    AIP root = model.createAIP(parentId, aipType, new Permissions(), RodaConstants.ADMIN);
+    AIP root = model.createAIP(null, aipType, new Permissions(), RodaConstants.ADMIN);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
@@ -154,8 +152,8 @@ public class BagitSIPPluginsTest {
     CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
       aip.getRepresentations().get(0).getId(), true);
     List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles,
-      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
+    Iterables.addAll(reusableAllFiles, Lists.newArrayList(allFiles).stream().filter(OptionalWithCause::isPresent)
+      .map(OptionalWithCause::get).collect(Collectors.toList()));
 
     // All folders and files
     AssertJUnit.assertEquals(CORPORA_FOLDERS_COUNT + CORPORA_FILES_COUNT, reusableAllFiles.size());

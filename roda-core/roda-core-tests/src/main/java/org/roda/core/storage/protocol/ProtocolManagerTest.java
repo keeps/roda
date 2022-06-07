@@ -9,7 +9,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.protocols.Protocol;
-import org.roda.core.protocols.ProtocolManager;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -19,12 +18,9 @@ import org.testng.annotations.Test;
  */
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
 public class ProtocolManagerTest {
-  private static ProtocolManager protocolManager;
 
   @BeforeMethod
   public static void setUp() throws Exception {
-    System.out.println("setup");
-
     boolean deploySolr = false;
     boolean deployLdap = false;
     boolean deployFolderMonitor = false;

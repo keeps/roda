@@ -27,7 +27,6 @@ public class LocalInstance extends RODAInstance {
     cleanEntitySummaryList();
   }
 
-
   public String getAccessKey() {
     return accessKey;
   }
@@ -79,5 +78,4 @@ public class LocalInstance extends RODAInstance {
     result = 31 * result + (getUpdatedBy() != null ? getUpdatedBy().hashCode() : 0);
     return result;
   }
-
 }

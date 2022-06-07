@@ -119,7 +119,7 @@ public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStora
     LOGGER.debug("Cleanning up");
     try {
       // recursively delete directory
-      Files.walkFileTree(basePath, new SimpleFileVisitor<Path>() {
+      Files.walkFileTree(basePath, new SimpleFileVisitor<>() {
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
           Files.delete(file);

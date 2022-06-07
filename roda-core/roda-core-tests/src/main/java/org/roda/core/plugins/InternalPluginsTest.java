@@ -48,7 +48,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItemsAll;
@@ -151,25 +150,17 @@ public class InternalPluginsTest {
   public void cleanUp() throws RODAException {
 
     // delete all AIPs
-    index.execute(IndexedAIP.class, Filter.ALL, new ArrayList<>(), new IndexRunnable<IndexedAIP>() {
-      @Override
-      public void run(IndexedAIP item) throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-        try {
-          model.deleteAIP(item.getId());
-        } catch (NotFoundException e) {
-          // do nothing
-        }
+    index.execute(IndexedAIP.class, Filter.ALL, new ArrayList<>(), item -> {
+      try {
+        model.deleteAIP(item.getId());
+      } catch (NotFoundException e) {
+        // do nothing
       }
     }, e -> Assert.fail("Error cleaning up", e));
 
     // delete all Transferred Resources
-    index.execute(TransferredResource.class, Filter.ALL, new ArrayList<>(), new IndexRunnable<TransferredResource>() {
-
-      @Override
-      public void run(TransferredResource item) throws GenericException, AuthorizationDeniedException {
-        model.deleteTransferredResource(item);
-      }
-    }, e -> Assert.fail("Error cleaning up", e));
+    index.execute(TransferredResource.class, Filter.ALL, new ArrayList<>(),
+      item -> model.deleteTransferredResource(item), e -> Assert.fail("Error cleaning up", e));
   }
 
   private ByteArrayInputStream generateContentData() {
@@ -177,8 +168,8 @@ public class InternalPluginsTest {
       .replaceAll("\\{", RandomStringUtils.randomAlphabetic(1)).getBytes());
   }
 
-  private TransferredResource createCorpora() throws NotFoundException, GenericException, RequestNotValidException,
-    AlreadyExistsException, AuthorizationDeniedException {
+  private TransferredResource createCorpora()
+    throws NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
 
     String parentUUID = f.createFolder(null, "test").getUUID();
@@ -203,16 +194,13 @@ public class InternalPluginsTest {
 
     index.commit(TransferredResource.class);
 
-    TransferredResource transferredResource = index.retrieve(TransferredResource.class, IdUtils.createUUID("test"),
-      new ArrayList<>());
-    return transferredResource;
+    return index.retrieve(TransferredResource.class, IdUtils.createUUID("test"), new ArrayList<>());
   }
 
   private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException {
-    String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
-    AIP root = model.createAIP(parentId, aipType, new Permissions(), RodaConstants.ADMIN);
+    AIP root = model.createAIP(null, aipType, new Permissions(), RodaConstants.ADMIN);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
@@ -233,8 +221,7 @@ public class InternalPluginsTest {
     AssertJUnit.assertEquals(1L, find.getTotalCount());
     IndexedAIP indexedAIP = find.getResults().get(0);
 
-    AIP aip = model.retrieveAIP(indexedAIP.getId());
-    return aip;
+    return model.retrieveAIP(indexedAIP.getId());
   }
 
   @Test
@@ -245,8 +232,8 @@ public class InternalPluginsTest {
     CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
       aip.getRepresentations().get(0).getId(), true);
     List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles,
-      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
+    Iterables.addAll(reusableAllFiles, Lists.newArrayList(allFiles).stream().filter(OptionalWithCause::isPresent)
+      .map(OptionalWithCause::get).collect(Collectors.toList()));
 
     // All folders and files
     AssertJUnit.assertEquals(CORPORA_FOLDERS_COUNT + CORPORA_FILES_COUNT, reusableAllFiles.size());
@@ -330,7 +317,7 @@ public class InternalPluginsTest {
     AssertJUnit.assertEquals(CORPORA_FILES_COUNT, rpo.getRelationship().size());
 
     Binary fpo_bin = model.retrievePreservationFile(aip.getId(), aip.getRepresentations().get(0).getId(),
-      Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT);
+      List.of(CORPORA_TEST1), CORPORA_TEST1_TXT);
 
     gov.loc.premis.v3.File fpo = PremisV3Utils.binaryToFile(fpo_bin.getContent(), true);
 
@@ -370,13 +357,13 @@ public class InternalPluginsTest {
       Iterables.size(model.listOtherMetadata(aip.getId(), RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, true)));
 
     Binary om = model.retrieveOtherMetadataBinary(aip.getId(), aip.getRepresentations().get(0).getId(),
-      Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT, SiegfriedPlugin.FILE_SUFFIX,
+      List.of(CORPORA_TEST1), CORPORA_TEST1_TXT, SiegfriedPlugin.FILE_SUFFIX,
       RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED);
 
     AssertJUnit.assertNotNull(om);
 
     Binary fpo_bin = model.retrievePreservationFile(aip.getId(), aip.getRepresentations().get(0).getId(),
-      Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT);
+      List.of(CORPORA_TEST1), CORPORA_TEST1_TXT);
 
     gov.loc.premis.v3.File fpo = PremisV3Utils.binaryToFile(fpo_bin.getContent(), true);
 
@@ -472,13 +459,13 @@ public class InternalPluginsTest {
       Iterables.size(model.listOtherMetadata(aip.getId(), RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, true)));
 
     Binary om = model.retrieveOtherMetadataBinary(aip.getId(), aip.getRepresentations().get(0).getId(),
-      Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT, SiegfriedPlugin.FILE_SUFFIX,
+      List.of(CORPORA_TEST1), CORPORA_TEST1_TXT, SiegfriedPlugin.FILE_SUFFIX,
       RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED);
 
     AssertJUnit.assertNotNull(om);
 
     Binary fpo_bin = model.retrievePreservationFile(aip.getId(), aip.getRepresentations().get(0).getId(),
-      Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT);
+      List.of(CORPORA_TEST1), CORPORA_TEST1_TXT);
 
     gov.loc.premis.v3.File fpo = PremisV3Utils.binaryToFile(fpo_bin.getContent(), true);
 
@@ -498,7 +485,7 @@ public class InternalPluginsTest {
     index.commitAIPs();
 
     IndexedFile indFile = index.retrieve(IndexedFile.class, IdUtils.getFileId(aip.getId(),
-      aip.getRepresentations().get(0).getId(), Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT), new ArrayList<>());
+      aip.getRepresentations().get(0).getId(), List.of(CORPORA_TEST1), CORPORA_TEST1_TXT), new ArrayList<>());
 
     AssertJUnit.assertEquals(mimetype, indFile.getFileFormat().getMimeType());
     AssertJUnit.assertEquals("x-fmt/111", indFile.getFileFormat().getPronom());
@@ -573,13 +560,13 @@ public class InternalPluginsTest {
       Iterables.size(model.listOtherMetadata(aip.getId(), RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, true)));
 
     Binary om = model.retrieveOtherMetadataBinary(aip.getId(), aip.getRepresentations().get(0).getId(),
-      Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT, SiegfriedPlugin.FILE_SUFFIX,
+      List.of(CORPORA_TEST1), CORPORA_TEST1_TXT, SiegfriedPlugin.FILE_SUFFIX,
       RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED);
 
     AssertJUnit.assertNotNull(om);
 
     Binary fpo_bin = model.retrievePreservationFile(aip.getId(), aip.getRepresentations().get(0).getId(),
-      Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT);
+      List.of(CORPORA_TEST1), CORPORA_TEST1_TXT);
 
     gov.loc.premis.v3.File fpo = PremisV3Utils.binaryToFile(fpo_bin.getContent(), true);
 
@@ -599,7 +586,7 @@ public class InternalPluginsTest {
     index.commitAIPs();
 
     IndexedFile indFile = index.retrieve(IndexedFile.class, IdUtils.getFileId(aip.getId(),
-      aip.getRepresentations().get(0).getId(), Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT), new ArrayList<>());
+      aip.getRepresentations().get(0).getId(), List.of(CORPORA_TEST1), CORPORA_TEST1_TXT), new ArrayList<>());
 
     AssertJUnit.assertEquals(mimetype, indFile.getFileFormat().getMimeType());
     AssertJUnit.assertEquals("x-fmt/111", indFile.getFileFormat().getPronom());

@@ -105,7 +105,7 @@ public class PartialSuccessIngestPluginTest {
 
   @AfterMethod
   public void cleanUp() throws RODAException {
-    index.execute(IndexedAIP.class, Filter.ALL, new ArrayList<>(), new IndexRunnable<IndexedAIP>() {
+    index.execute(IndexedAIP.class, Filter.ALL, new ArrayList<>(), new IndexRunnable<>() {
       @Override
       public void run(IndexedAIP item) throws GenericException, RequestNotValidException, AuthorizationDeniedException {
         try {
@@ -125,10 +125,10 @@ public class PartialSuccessIngestPluginTest {
   @Test
   public void testWithEARKSIPAndNoMoveWhenAutoAcceptAndRemove() throws IOException, RODAException {
     RodaCoreFactory.getRodaConfiguration()
-        .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT, false);
+      .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT, false);
 
     RodaCoreFactory.getRodaConfiguration()
-        .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_DELETE_WHEN_SUCCESSFULLY_INGESTED, true);
+      .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_DELETE_WHEN_SUCCESSFULLY_INGESTED, true);
 
     AIP aip = EARKSIPPluginsTest.ingestCorpora(PartialSuccessIngestPlugin.class, model, index, corporaPath, false);
     assessAIP(aip);
@@ -151,7 +151,7 @@ public class PartialSuccessIngestPluginTest {
       .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_INGEST_MOVE_WHEN_AUTOACCEPT, false);
 
     RodaCoreFactory.getRodaConfiguration()
-        .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_DELETE_WHEN_SUCCESSFULLY_INGESTED, false);
+      .setProperty(RodaConstants.CORE_TRANSFERRED_RESOURCES_DELETE_WHEN_SUCCESSFULLY_INGESTED, false);
 
     AIP aip = EARKSIPPluginsTest.ingestCorpora(PartialSuccessIngestPlugin.class, model, index, corporaPath, false);
     assessAIP(aip);
@@ -253,8 +253,8 @@ public class PartialSuccessIngestPluginTest {
     CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
       aip.getRepresentations().get(0).getId(), true);
     List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles,
-      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
+    Iterables.addAll(reusableAllFiles, Lists.newArrayList(allFiles).stream().filter(OptionalWithCause::isPresent)
+      .map(OptionalWithCause::get).collect(Collectors.toList()));
 
     // All folders and files
     Assert.assertEquals(reusableAllFiles.size(), CORPORA_FOLDERS_COUNT + CORPORA_FILES_COUNT);
