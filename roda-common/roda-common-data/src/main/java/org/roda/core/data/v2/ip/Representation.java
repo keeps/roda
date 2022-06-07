@@ -33,7 +33,7 @@ public class Representation implements IsModelObject, HasId {
 
   private String type;
   private String instanceId;
-  private Boolean hasShallowFiles = null;
+  private Boolean hasShallowFiles = false;
 
   private Date createdOn = null;
   private String createdBy = null;
