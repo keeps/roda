@@ -20,14 +20,10 @@ import org.roda.core.TestsHelper;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -42,6 +38,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.base.ingest.v2.MinimalIngestPlugin;
 import org.roda.core.storage.fs.FSUtils;
@@ -57,8 +54,6 @@ import org.testng.annotations.Test;
 public class UserPermissionsPluginTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(UserPermissionsPluginTest.class);
 
-  private static final int CORPORA_FILES_COUNT = 4;
-  private static final int CORPORA_FOLDERS_COUNT = 2;
   private Path basePath;
 
   private ModelService model;
@@ -89,20 +84,18 @@ public class UserPermissionsPluginTest {
 
   @AfterClass
   public void tearDown() throws Exception {
+    IndexTestUtils.resetIndex();
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }
 
   @AfterMethod
   public void cleanUp() throws RODAException {
-    index.execute(IndexedAIP.class, Filter.ALL, new ArrayList<>(), new IndexRunnable<IndexedAIP>() {
-      @Override
-      public void run(IndexedAIP item) throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-        try {
-          model.deleteAIP(item.getId());
-        } catch (NotFoundException e) {
-          // do nothing
-        }
+    index.execute(IndexedAIP.class, Filter.ALL, new ArrayList<>(), item -> {
+      try {
+        model.deleteAIP(item.getId());
+      } catch (NotFoundException e) {
+        // do nothing
       }
     }, e -> Assert.fail("Error cleaning up", e));
 

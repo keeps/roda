@@ -26,6 +26,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
+import org.roda.core.index.IndexTestUtils;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.fs.FSUtils;
@@ -44,8 +45,6 @@ public class DisposalConfirmationTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(DisposalConfirmationTest.class);
 
   private Path basePath;
-  private Path storagePath;
-
   private ModelService model;
   private SolrClient solrClient;
 
@@ -62,7 +61,6 @@ public class DisposalConfirmationTest {
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
       deployPluginManager, deployDefaultResources, false);
     model = RodaCoreFactory.getModelService();
-    storagePath = RodaCoreFactory.getStoragePath();
     solrClient = RodaCoreFactory.getSolr();
 
     LOGGER.info("Running disposal confirmation tests under storage {}", basePath);
@@ -70,6 +68,7 @@ public class DisposalConfirmationTest {
 
   @AfterClass
   public void tearDown() throws Exception {
+    IndexTestUtils.resetIndex();
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }

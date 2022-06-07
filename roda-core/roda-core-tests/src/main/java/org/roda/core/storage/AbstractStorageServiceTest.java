@@ -362,7 +362,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     getStorage().deleteContainer(containerStoragePath);
   }
 
-  public void testListResourcesUnderDirectory() throws RODAException, IOException {
+  public void testListResourcesUnderDirectory() throws RODAException {
 
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
@@ -395,7 +395,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
     resources = getStorage().listResourcesUnderDirectory(directoryStoragePath, false);
     assertNotNull(resources);
-    assertThat(resources, Matchers.<Resource> iterableWithSize(2));
+    assertThat(resources, Matchers.iterableWithSize(2));
 
     // TODO test recursive listing
 

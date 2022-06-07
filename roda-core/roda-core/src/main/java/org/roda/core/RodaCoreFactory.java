@@ -1478,7 +1478,7 @@ public class RodaCoreFactory {
           rodaCentralInstance.setId(IdUtils.createUUID());
           rodaCentralInstance.setStatus(SynchronizingStatus.ACTIVE);
           rodaCentralInstance.setName("RODA Central");
-          rodaCentralInstance.setIsRegistered(true);
+          rodaCentralInstance.setIsSubscribed(true);
           createOrUpdateLocalInstance(rodaCentralInstance);
         }
       } catch (final GenericException e) {

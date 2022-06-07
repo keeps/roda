@@ -9,7 +9,6 @@ package org.roda.core.plugins;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,7 +34,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.Sorter;
@@ -47,11 +45,10 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.jobs.ReportUtils;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.base.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.base.ingest.TransferredResourceToAIPPlugin;
@@ -110,6 +107,7 @@ public class PluginReportContentTest {
 
   @AfterClass
   public void tearDown() throws Exception {
+    IndexTestUtils.resetIndex();
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }
@@ -118,33 +116,25 @@ public class PluginReportContentTest {
   public void cleanUp() throws RODAException {
 
     // delete all AIPs
-    index.execute(IndexedAIP.class, Filter.ALL, new ArrayList<>(), new IndexRunnable<IndexedAIP>() {
-      @Override
-      public void run(IndexedAIP item) throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-        try {
-          model.deleteAIP(item.getId());
-        } catch (NotFoundException e) {
-          // do nothing
-        }
+    index.execute(IndexedAIP.class, Filter.ALL, new ArrayList<>(), item -> {
+      try {
+        model.deleteAIP(item.getId());
+      } catch (NotFoundException e) {
+        // do nothing
       }
     }, e -> Assert.fail("Error cleaning up", e));
 
     // delete all Transferred Resources
-    index.execute(TransferredResource.class, Filter.ALL, new ArrayList<>(), new IndexRunnable<TransferredResource>() {
-
-      @Override
-      public void run(TransferredResource item) throws GenericException, AuthorizationDeniedException {
-        model.deleteTransferredResource(item);
-      }
-    }, e -> Assert.fail("Error cleaning up", e));
+    index.execute(TransferredResource.class, Filter.ALL, new ArrayList<>(),
+      item -> model.deleteTransferredResource(item), e -> Assert.fail("Error cleaning up", e));
   }
 
   private ByteArrayInputStream generateContentData() {
     return new ByteArrayInputStream(RandomStringUtils.randomAscii(GENERATED_FILE_SIZE).getBytes());
   }
 
-  private TransferredResource createCorpora() throws NotFoundException, GenericException, RequestNotValidException,
-    AlreadyExistsException, AuthorizationDeniedException {
+  private TransferredResource createCorpora()
+    throws NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
 
     String parentUUID = f.createFolder(null, "test").getUUID();
@@ -178,7 +168,7 @@ public class PluginReportContentTest {
     AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR);
 
     TransferredResource transferredResource = createCorpora();
-    Assert.assertEquals(transferredResource == null, false);
+    Assert.assertNotNull(transferredResource);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
@@ -237,7 +227,7 @@ public class PluginReportContentTest {
     AIP root = model.createAIP(null, RodaConstants.AIP_TYPE_MIXED, new Permissions(), AIP_CREATOR);
 
     TransferredResource transferredResource = createCorpora();
-    AssertJUnit.assertEquals(transferredResource == null, false);
+    AssertJUnit.assertNotNull(transferredResource);
 
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
@@ -263,8 +253,8 @@ public class PluginReportContentTest {
     AssertJUnit.assertEquals(1, report.getReports().size());
     Report innerReport = report.getReports().get(0);
     AssertJUnit.assertEquals(false, report.getDateCreated().equals(report.getDateUpdated()));
-    AssertJUnit.assertEquals(true, report.getDateCreated().equals(innerReport.getDateCreated()));
-    AssertJUnit.assertEquals(true, report.getDateUpdated().equals(innerReport.getDateUpdated()));
+    AssertJUnit.assertEquals(report.getDateCreated(), innerReport.getDateCreated());
+    AssertJUnit.assertEquals(report.getDateUpdated(), innerReport.getDateUpdated());
   }
 
   @Test
@@ -303,7 +293,7 @@ public class PluginReportContentTest {
   }
 
   @Test
-  public void testIngestReportsInNto1Scenario() throws RODAException, URISyntaxException, IOException {
+  public void testIngestReportsInNto1Scenario() throws RODAException, IOException {
     Map<String, String> parameters = new HashMap<>();
 
     // create & ingest SIP

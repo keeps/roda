@@ -37,6 +37,7 @@ import org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalAIPMetadata;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceTest;
+import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.DefaultStoragePath;
@@ -57,7 +58,6 @@ import org.testng.annotations.Test;
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
 public class DisposalHoldTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(DisposalHoldTest.class);
-
   private Path basePath;
   private Path storagePath;
 
@@ -89,6 +89,7 @@ public class DisposalHoldTest {
 
   @AfterClass
   public void tearDown() throws Exception {
+    IndexTestUtils.resetIndex();
     RodaCoreFactory.shutdown();
     // FSUtils.deletePath(basePath);
   }

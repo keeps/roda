@@ -24,6 +24,7 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexFilePlugin;
 import org.roda.core.storage.fs.FSUtils;
@@ -62,6 +63,7 @@ public class ReindexFilePluginTest {
 
   @AfterClass
   public void tearDown() throws Exception {
+    IndexTestUtils.resetIndex();
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }
@@ -74,5 +76,4 @@ public class ReindexFilePluginTest {
     Job job = TestsHelper.executeJob(ReindexFilePlugin.class, PluginType.MISC, SelectedItemsAll.create(File.class));
     TestsHelper.getJobReports(index, job, true);
   }
-
 }

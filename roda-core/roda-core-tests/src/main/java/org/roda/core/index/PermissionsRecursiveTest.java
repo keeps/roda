@@ -8,6 +8,7 @@
 package org.roda.core.index;
 
 import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertTrue;
 
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -76,6 +77,7 @@ public class PermissionsRecursiveTest {
 
   @AfterClass
   public static void tearDown() throws Exception {
+    IndexTestUtils.resetIndex();
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }
@@ -106,7 +108,7 @@ public class PermissionsRecursiveTest {
 
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, parent.getId()),
       new NotSimpleFilterParameter("permission_users_READ", user.getName()));
-    SelectedItemsFilter<IndexedAIP> selectedItems = new SelectedItemsFilter<>(filter, IndexedAIP.class.getName(),
+    SelectedItems<IndexedAIP> selectedItems = new SelectedItemsFilter<>(filter, IndexedAIP.class.getName(),
       Boolean.FALSE);
 
     Map<String, String> pluginParameters = new HashMap<>();
@@ -119,11 +121,11 @@ public class PermissionsRecursiveTest {
       "Parent permissions were updated and all sublevels will be too");
 
     Job job = TestsHelper.executeJob(UpdatePermissionsPlugin.class, pluginParameters, PluginType.INTERNAL,
-      (SelectedItems) selectedItems);
+      selectedItems);
     assertEquals(2, job.getJobStats().getSourceObjectsCount());
 
     Set<PermissionType> permissions = model.retrieveAIP(otherChild.getId()).getPermissions()
       .getUserPermissions(user.getName());
-    assertEquals(permissions.contains(PermissionType.READ), true);
+    assertTrue(permissions.contains(PermissionType.READ));
   }
 }
