@@ -59,12 +59,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
-import org.apache.solr.client.solrj.impl.Http2SolrClient;
 import org.apache.solr.client.solrj.impl.ZkClientClusterStateProvider;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest.Create;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.response.SolrPingResponse;
 import org.apache.solr.cloud.ZkConfigSetService;
 import org.apache.solr.cloud.ZkController;
 import org.apache.solr.common.SolrDocument;
@@ -280,10 +280,9 @@ public class RodaCoreFactory {
     "roda-roles.properties", "roda-permissions.properties", "roda-instance.properties"));
 
   /**
-   * Shared configuration and message properties (cache). Includes properties
-   * from {@code rodaConfiguration} and translations from ServerMessages,
-   * filtered by the {@code ui.sharedProperties.*} properties in
-   * {@code roda-wui.properties}.
+   * Shared configuration and message properties (cache). Includes properties from
+   * {@code rodaConfiguration} and translations from ServerMessages, filtered by
+   * the {@code ui.sharedProperties.*} properties in {@code roda-wui.properties}.
    *
    * This cache provides the complete set of properties to be shared with the
    * client browser.
@@ -640,11 +639,11 @@ public class RodaCoreFactory {
 
   /**
    * Try to get property from 1) system property (passed in command-line via -D;
-   * if property does not start by "roda.", it will be prepended); 2)
-   * environment variable (upper case, replace '.' by '_' and if property does
-   * not start by "RODA_" after replacements, it will be prepended); 3) RODA
-   * configuration files (with original property value, ensuring that it does
-   * not start by "roda."); 4) return default value
+   * if property does not start by "roda.", it will be prepended); 2) environment
+   * variable (upper case, replace '.' by '_' and if property does not start by
+   * "RODA_" after replacements, it will be prepended); 3) RODA configuration
+   * files (with original property value, ensuring that it does not start by
+   * "roda."); 4) return default value
    * 
    * <p>
    * Example 1: for property = 'roda.node.type' this method will try to find the
@@ -685,11 +684,11 @@ public class RodaCoreFactory {
 
   /**
    * Try to get property from 1) system property (passed in command-line via -D;
-   * if property does not start by "roda.", it will be prepended); 2)
-   * environment variable (upper case, replace '.' by '_' and if property does
-   * not start by "RODA_" after replacements, it will be prepended); 3) RODA
-   * configuration files (with original property value, ensuring that it does
-   * not start by "roda."); 4) return default value
+   * if property does not start by "roda.", it will be prepended); 2) environment
+   * variable (upper case, replace '.' by '_' and if property does not start by
+   * "RODA_" after replacements, it will be prepended); 3) RODA configuration
+   * files (with original property value, ensuring that it does not start by
+   * "roda."); 4) return default value
    * 
    * <p>
    * Example 1: for property = 'roda.node.type' this method will try to find the
@@ -714,11 +713,11 @@ public class RodaCoreFactory {
 
   /**
    * Try to get property from 1) system property (passed in command-line via -D;
-   * if property does not start by "roda.", it will be prepended); 2)
-   * environment variable (upper case, replace '.' by '_' and if property does
-   * not start by "RODA_" after replacements, it will be prepended); 3) RODA
-   * configuration files (with original property value, ensuring that it does
-   * not start by "roda."); 4) return default value
+   * if property does not start by "roda.", it will be prepended); 2) environment
+   * variable (upper case, replace '.' by '_' and if property does not start by
+   * "RODA_" after replacements, it will be prepended); 3) RODA configuration
+   * files (with original property value, ensuring that it does not start by
+   * "roda."); 4) return default value
    * 
    * <p>
    * Example 1: for property = 'roda.node.type' this method will try to find the
@@ -1233,47 +1232,40 @@ public class RodaCoreFactory {
 
     Field.initialize();
 
-    if (solrType == RodaConstants.SolrType.HTTP) {
-      String solrBaseUrl = getConfigurationString(RodaConstants.CORE_SOLR_HTTP_URL, "http://localhost:8983/solr/");
-      LOGGER.info("Instantiating SOLR HTTP at {}", solrBaseUrl);
+    String solrCloudZooKeeperUrls = getConfigurationString(RodaConstants.CORE_SOLR_CLOUD_URLS,
+      "localhost:2181,localhost:2182,localhost:2183");
+    LOGGER.info("Instantiating SOLR Cloud at {}", solrCloudZooKeeperUrls);
 
-      return new Http2SolrClient.Builder(solrBaseUrl).build();
-    } else {
-      String solrCloudZooKeeperUrls = getConfigurationString(RodaConstants.CORE_SOLR_CLOUD_URLS,
-        "localhost:2181,localhost:2182,localhost:2183");
-      LOGGER.info("Instantiating SOLR Cloud at {}", solrCloudZooKeeperUrls);
-
-      try {
-        ZkController.checkChrootPath(solrCloudZooKeeperUrls, true);
-      } catch (InterruptedException | KeeperException e) {
-        LOGGER.error("Could not check zookeeper chroot path", e);
-      }
-
-      List<String> zkHosts;
-      Optional<String> zkChroot;
-
-      // parse config
-      int indexOfSlash = solrCloudZooKeeperUrls.indexOf('/');
-
-      if (indexOfSlash > 0) {
-        // has chroot
-        zkHosts = Arrays.asList(solrCloudZooKeeperUrls.substring(0, indexOfSlash).split(","));
-        zkChroot = Optional.of(solrCloudZooKeeperUrls.substring(indexOfSlash));
-      } else {
-        // does not have chroot
-        zkHosts = Arrays.asList(solrCloudZooKeeperUrls.split(","));
-        zkChroot = Optional.empty();
-      }
-
-      CloudSolrClient cloudSolrClient = new CloudSolrClient.Builder(zkHosts, zkChroot).build();
-
-      waitForSolrCluster(cloudSolrClient);
-
-      if (writeIsAllowed) {
-        bootstrap(cloudSolrClient, solrHome);
-      }
-      return cloudSolrClient;
+    try {
+      ZkController.checkChrootPath(solrCloudZooKeeperUrls, true);
+    } catch (InterruptedException | KeeperException e) {
+      LOGGER.error("Could not check zookeeper chroot path", e);
     }
+
+    List<String> zkHosts;
+    Optional<String> zkChroot;
+
+    // parse config
+    int indexOfSlash = solrCloudZooKeeperUrls.indexOf('/');
+
+    if (indexOfSlash > 0) {
+      // has chroot
+      zkHosts = Arrays.asList(solrCloudZooKeeperUrls.substring(0, indexOfSlash).split(","));
+      zkChroot = Optional.of(solrCloudZooKeeperUrls.substring(indexOfSlash));
+    } else {
+      // does not have chroot
+      zkHosts = Arrays.asList(solrCloudZooKeeperUrls.split(","));
+      zkChroot = Optional.empty();
+    }
+
+    CloudSolrClient cloudSolrClient = new CloudSolrClient.Builder(zkHosts, zkChroot).build();
+
+    waitForSolrCluster(cloudSolrClient);
+
+    if (writeIsAllowed) {
+      bootstrap(cloudSolrClient, solrHome);
+    }
+    return cloudSolrClient;
   }
 
   private static void waitForSolrCluster(CloudSolrClient cloudSolrClient) throws GenericException {
@@ -1313,8 +1305,7 @@ public class RodaCoreFactory {
     ClusterState clusterState = cloudSolrClient.getClusterState();
     LOGGER.info("Live nodes: {}", clusterState.getLiveNodes());
 
-    
-    if(clusterState.getLiveNodes().isEmpty()) {
+    if (clusterState.getLiveNodes().isEmpty()) {
       return false;
     }
 
@@ -1345,8 +1336,7 @@ public class RodaCoreFactory {
               sliceHealthy = true;
               break;
             } else {
-              LOGGER.info("Replica {} on node {} is {}", replica.getName(), replica.getNodeName(),
-                replica.getState());
+              LOGGER.info("Replica {} on node {} is {}", replica.getName(), replica.getNodeName(), replica.getState());
             }
           }
 
@@ -1354,9 +1344,13 @@ public class RodaCoreFactory {
         }
 
         try {
-          cloudSolrClient.getById(col, "");
+          SolrPingResponse ping = cloudSolrClient.ping(col);
+          if (ping.getStatus() != 0) {
+            collectionHealthy = false;
+            LOGGER.info("Ping collection {} return code: {}", col, ping);
+          }
         } catch (SolrServerException | IOException | SolrException e) {
-          LOGGER.info("Query test failed: [{}] {}", e.getClass().getSimpleName(), e.getMessage());
+          LOGGER.info("Ping test failed: [{}] {}", e.getClass().getSimpleName(), e.getMessage());
           collectionHealthy = false;
         }
 
@@ -2169,8 +2163,7 @@ public class RodaCoreFactory {
    * {@code rodaConfiguration}.
    *
    * The properties that should be shared with the client browser are defined by
-   * the {@code ui.sharedProperties.*} properties in
-   * {@code roda-wui.properties}.
+   * the {@code ui.sharedProperties.*} properties in {@code roda-wui.properties}.
    *
    * @return The configuration properties that should be shared with the client
    *         browser.
