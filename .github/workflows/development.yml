@@ -22,7 +22,7 @@ jobs:
           - 8983:8983
         env:
           ZK_HOST: zookeeper:2181
-        options: -c
+        options: -e cloud
 
     steps:
       - uses: actions/checkout@v2
