@@ -299,7 +299,7 @@ public class RODAInstance extends RodaWuiController {
     }
   }
 
-  public static LocalInstance registerLocalInstance(User user, LocalInstance localInstance)
+  public static LocalInstance subscribeLocalInstance(User user, LocalInstance localInstance)
     throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException, RequestNotValidException,
     NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
