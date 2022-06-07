@@ -26,6 +26,7 @@ import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,12 +105,18 @@ public class IndexUtils {
   public static String giveNameFromLocalInstanceIdentifier(String instanceId) {
     String name = null;
 
-    if (instanceId != null
-      && RodaCoreFactory.getDistributedModeType().equals(RodaConstants.DistributedModeType.CENTRAL)) {
+    if (instanceId != null) {
       try {
-        final DistributedInstance distributedInstance = RodaCoreFactory.getModelService()
-          .retrieveDistributedInstance(instanceId);
-        name = distributedInstance.getName();
+        final LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
+
+        if (localInstance.getId().equals(instanceId)) {
+          name = localInstance.getName();
+        } else {
+          final DistributedInstance distributedInstance = RodaCoreFactory.getModelService()
+            .retrieveDistributedInstance(instanceId);
+          name = distributedInstance.getName();
+        }
+
       } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
         name = instanceId;
       }

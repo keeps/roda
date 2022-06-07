@@ -216,10 +216,10 @@ public class InstanceIdentifierDIPPlugin extends AbstractPlugin<Void> {
     return new Report();
   }
 
-  private IterableIndexResult<IndexedDIP> retrieveList(IndexService index)
+  private IterableIndexResult<IndexedDIP> retrieveList(final IndexService index)
     throws RequestNotValidException, GenericException {
-    Filter filter = new Filter();
-
+    final Filter filter = new Filter();
+    RODAInstanceUtils.addLocalInstanceFilter(filter);
     return index.findAll(IndexedDIP.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
   }
 }

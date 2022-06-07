@@ -217,9 +217,10 @@ public class InstanceIdentifierRiskPlugin extends AbstractPlugin<Void> {
     return new Report();
   }
 
-  private IterableIndexResult<IndexedRisk> retrieveList(IndexService index)
+  private IterableIndexResult<IndexedRisk> retrieveList(final IndexService index)
     throws RequestNotValidException, GenericException {
-    Filter filter = new Filter();
+    final Filter filter = new Filter();
+    RODAInstanceUtils.addLocalInstanceFilter(filter);
 
     return index.findAll(IndexedRisk.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
   }

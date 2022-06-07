@@ -238,9 +238,10 @@ public class InstanceIdentifierRepositoryEventPlugin extends AbstractPlugin<Void
     return new Report();
   }
 
-  private IterableIndexResult<IndexedPreservationEvent> retrieveList(IndexService index)
+  private IterableIndexResult<IndexedPreservationEvent> retrieveList(final IndexService index)
     throws RequestNotValidException, GenericException {
-    Filter filter = new Filter(new EmptyKeyFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID));
+    final Filter filter = new Filter(new EmptyKeyFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID));
+    RODAInstanceUtils.addLocalInstanceFilter(filter);
     return index.findAll(IndexedPreservationEvent.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
   }
 }

@@ -58,48 +58,48 @@ public class ListFactory {
     AsyncTableCellOptions<? extends IsIndexed> options;
     Supplier<AsyncTableCell<? extends IsIndexed>> listConstructor;
 
-    if (actualClass.equals(AIP.class.getName()) || actualClass.equals(IndexedAIP.class.getName())) {
+    if (AIP.class.getName().equals(actualClass) || IndexedAIP.class.getName().equals(actualClass)) {
       options = new AsyncTableCellOptions<>(IndexedAIP.class, listIdPrefix + "_AIP");
       listConstructor = () -> new ConfigurableAsyncTableCell<>();
-    } else if (actualClass.equals(Representation.class.getName())
-      || actualClass.equals(IndexedRepresentation.class.getName())) {
+    } else if (Representation.class.getName().equals(actualClass)
+      || IndexedRepresentation.class.getName().equals(actualClass)) {
       options = new AsyncTableCellOptions<>(IndexedRepresentation.class, listIdPrefix + "_representation");
       listConstructor = () -> new ConfigurableAsyncTableCell<>();
-    } else if (actualClass.equals(File.class.getName()) || actualClass.equals(IndexedFile.class.getName())) {
+    } else if (File.class.getName().equals(actualClass) || IndexedFile.class.getName().equals(actualClass)) {
       options = new AsyncTableCellOptions<>(IndexedFile.class, listIdPrefix + "_simpleFile");
       listConstructor = () -> new ConfigurableAsyncTableCell<>();
-    } else if (actualClass.equals(RepresentationInformation.class.getName())) {
+    } else if (RepresentationInformation.class.getName().equals(actualClass)) {
       options = new AsyncTableCellOptions<>(RepresentationInformation.class,
         listIdPrefix + "_representationInformation");
       listConstructor = () -> new RepresentationInformationList();
-    } else if (actualClass.equals(IndexedRisk.class.getName()) || actualClass.equals(Risk.class.getName())) {
+    } else if (IndexedRisk.class.getName().equals(actualClass) || Risk.class.getName().equals(actualClass)) {
       options = new AsyncTableCellOptions<>(IndexedRisk.class, listIdPrefix + "_risk");
       listConstructor = () -> new RiskList();
-    } else if (actualClass.equals(RiskIncidence.class.getName())) {
+    } else if (RiskIncidence.class.getName().equals(actualClass)) {
       options = new AsyncTableCellOptions<>(RiskIncidence.class, listIdPrefix + "_riskIncidence");
       listConstructor = () -> new RiskIncidenceList();
-    } else if (actualClass.equals(Job.class.getName())) {
+    } else if (Job.class.getName().equals(actualClass)) {
       options = new AsyncTableCellOptions<>(Job.class, listIdPrefix + "_job");
       listConstructor = () -> new JobList();
-    } else if (actualClass.equals(Report.class.getName()) || actualClass.equals(IndexedReport.class.getName())) {
+    } else if (Report.class.getName().equals(actualClass) || IndexedReport.class.getName().equals(actualClass)) {
       options = new AsyncTableCellOptions<>(IndexedReport.class, listIdPrefix + "_simpleJob");
       listConstructor = () -> new SimpleJobReportList();
-    } else if (actualClass.equals(TransferredResource.class.getName())) {
+    } else if (TransferredResource.class.getName().equals(actualClass)) {
       options = new AsyncTableCellOptions<>(TransferredResource.class, listIdPrefix + "_transferredResource");
       listConstructor = () -> new TransferredResourceList();
-    } else if (actualClass.equals(Notification.class.getName())) {
+    } else if (Notification.class.getName().equals(actualClass)) {
       options = new AsyncTableCellOptions<>(Notification.class, listIdPrefix + "_notification");
       listConstructor = () -> new NotificationList();
-    } else if (actualClass.equals(LogEntry.class.getName())) {
+    } else if (LogEntry.class.getName().equals(actualClass)) {
       options = new AsyncTableCellOptions<>(LogEntry.class, listIdPrefix + "_logEntry");
       listConstructor = () -> new LogEntryList();
-    } else if (actualClass.equals(RODAMember.class.getName())) {
+    } else if (RODAMember.class.getName().equals(actualClass)) {
       options = new AsyncTableCellOptions<>(RODAMember.class, listIdPrefix + "_rodaMember");
       listConstructor = () -> new RodaMemberList();
-    } else if (actualClass.equals(DIP.class.getName()) || actualClass.equals(IndexedDIP.class.getName())) {
+    } else if (DIP.class.getName().equals(actualClass) || IndexedDIP.class.getName().equals(actualClass)) {
       options = new AsyncTableCellOptions<>(IndexedDIP.class, listIdPrefix + "_DIP");
       listConstructor = () -> new DIPList();
-    } else if (actualClass.equals(DIPFile.class.getName())) {
+    } else if (DIPFile.class.getName().equals(actualClass)) {
       options = new AsyncTableCellOptions<>(DIPFile.class, listIdPrefix + "_DIPFile");
       listConstructor = () -> new DIPFileList();
     } else {
@@ -110,14 +110,14 @@ public class ListFactory {
     options.withInitialPageSize(pageSize);
     options.withPageSizeIncrement(incrementPage);
 
-    if (actualClass.equals(AIP.class.getName()) || actualClass.equals(IndexedAIP.class.getName())) {
+    if (AIP.class.getName().equals(actualClass) || IndexedAIP.class.getName().equals(actualClass)) {
       options.withSummary(messages.selectAipSearchResults());
       options.withJustActive(LastSelectedItemsSingleton.getInstance().isSelectedJustActive());
-    } else if (actualClass.equals(Representation.class.getName())
-      || actualClass.equals(IndexedRepresentation.class.getName())) {
+    } else if (Representation.class.getName().equals(actualClass)
+      || IndexedRepresentation.class.getName().equals(actualClass)) {
       options.withSummary(messages.selectRepresentationSearchResults());
       options.withJustActive(LastSelectedItemsSingleton.getInstance().isSelectedJustActive());
-    } else if (actualClass.equals(File.class.getName()) || actualClass.equals(IndexedFile.class.getName())) {
+    } else if (File.class.getName().equals(actualClass) || IndexedFile.class.getName().equals(actualClass)) {
       options.withSummary(messages.selectFileSearchResults());
       options.withJustActive(LastSelectedItemsSingleton.getInstance().isSelectedJustActive());
     } else {

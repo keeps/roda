@@ -50,6 +50,7 @@ import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.index.utils.SolrUtils;
@@ -57,10 +58,10 @@ import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.plugins.PluginOrchestrator;
-import org.roda.core.plugins.orchestrate.akka.AkkaJobsManager;
 import org.roda.core.plugins.PluginHelper;
+import org.roda.core.plugins.PluginOrchestrator;
 import org.roda.core.plugins.base.maintenance.CleanUnfinishedJobsPlugin;
+import org.roda.core.plugins.orchestrate.akka.AkkaJobsManager;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -413,50 +414,62 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   @Override
   public void executeJob(Job job, boolean async) throws JobAlreadyStartedException {
-    if (!RodaConstants.DistributedModeType.CENTRAL.equals(RodaCoreFactory.getDistributedModeType())
-      || job.getInstanceId() == null) {
-      LOGGER.info("Adding job '{}' ({}) to be executed", job.getName(), job.getId());
-      if (runningJobs.containsKey(job.getId())) {
-        LOGGER.info("Job '{}' ({}) is already queued to be executed", job.getName(), job.getId());
-        throw new JobAlreadyStartedException();
-      } else {
-        if (async) {
-          jobsManager.tell(job, ActorRef.noSender());
-        } else {
-          int timeoutInSeconds = JobsHelper.getSyncTimeout();
-          Timeout timeout = new Timeout(Duration.create(timeoutInSeconds, "seconds"));
-          Future<Object> future = Patterns.ask(jobsManager, job, timeout);
-          try {
-            Await.result(future, timeout.duration());
-          } catch (Exception e) {
-            LOGGER.error("Error executing job synchronously", e);
-          }
+    LocalInstance localInstance = null;
+    if (!RodaConstants.DistributedModeType.BASE.equals(RodaCoreFactory.getDistributedModeType())) {
+      try {
+        localInstance = RodaCoreFactory.getLocalInstance();
+        if (PluginType.INTERNAL.equals(job.getPluginType()) || localInstance == null || job.getInstanceId() == null
+          || localInstance.getId().equals(job.getInstanceId())) {
+          executeLocalJob(job, async);
         }
-        LOGGER.info("Success adding job '{}' ({}) to be executed", job.getName(), job.getId());
+      } catch (GenericException e) {
+        LOGGER.error("Error retrieving local Instance", e);
       }
+    } else {
+      executeLocalJob(job, async);
+    }
+  }
+
+  private void executeLocalJob(final Job job, final boolean async) throws JobAlreadyStartedException {
+    LOGGER.info("Adding job '{}' ({}) to be executed", job.getName(), job.getId());
+    if (runningJobs.containsKey(job.getId())) {
+      LOGGER.info("Job '{}' ({}) is already queued to be executed", job.getName(), job.getId());
+      throw new JobAlreadyStartedException();
+    } else {
+      if (async) {
+        jobsManager.tell(job, ActorRef.noSender());
+      } else {
+        int timeoutInSeconds = JobsHelper.getSyncTimeout();
+        Timeout timeout = new Timeout(Duration.create(timeoutInSeconds, "seconds"));
+        Future<Object> future = Patterns.ask(jobsManager, job, timeout);
+        try {
+          Await.result(future, timeout.duration());
+        } catch (Exception e) {
+          LOGGER.error("Error executing job synchronously", e);
+        }
+      }
+      LOGGER.info("Success adding job '{}' ({}) to be executed", job.getName(), job.getId());
     }
   }
 
   @Override
-  public void createAndExecuteJobs(Job job, boolean async) throws JobAlreadyStartedException,
+  public void createAndExecuteJobs(final Job job, final boolean async) throws JobAlreadyStartedException,
     AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    if (!RodaCoreFactory.getDistributedModeType().equals(RodaConstants.DistributedModeType.CENTRAL)) {
+    if (!RodaCoreFactory.getDistributedModeType().equals(RodaConstants.DistributedModeType.CENTRAL)
+      || PluginType.INTERNAL.equals(job.getPluginType())) {
       RodaCoreFactory.getModelService().createJob(job);
       RodaCoreFactory.getPluginOrchestrator().executeJob(job, async);
     } else {
-      List<String> jobIds = new ArrayList<>();
+      final List<String> jobIds = new ArrayList<>();
       final HashMap<String, SelectedItems<?>> instancesItems = JobsHelper.splitInstancesItems(job.getSourceObjects());
-      if (instancesItems.keySet().size() == 1 && instancesItems.containsKey(null)) {
+      if (instancesItems.keySet().size() == 1 && instancesItems.get(RodaCoreFactory.getLocalInstance().getId()) != null
+        || instancesItems.containsKey(null)) {
         RodaCoreFactory.getModelService().createJob(job);
         RodaCoreFactory.getPluginOrchestrator().executeJob(job, async);
       } else {
         for (String instance : instancesItems.keySet()) {
-          Job newJob = job.clone();
-          if (instance != null) {
-            newJob.setId(IdUtils.createUUID());
-          } else {
-            newJob.setId(job.getId());
-          }
+          final Job newJob = job.clone();
+          newJob.setId(IdUtils.createUUID());
           newJob.setSourceObjects(instancesItems.get(instance));
           newJob.setInstanceId(instance);
           if (newJob.getSourceObjects() instanceof SelectedItemsList) {
@@ -467,7 +480,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
           RodaCoreFactory.getPluginOrchestrator().executeJob(newJob, async);
           jobIds.add(newJob.getId());
         }
-        StringBuilder details = new StringBuilder();
+        final StringBuilder details = new StringBuilder();
         details.append("Created the following jobs");
         for (String jobId : jobIds) {
           details.append(", ").append(jobId);

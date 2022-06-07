@@ -215,9 +215,10 @@ public class InstanceIdentifierJobPlugin extends AbstractPlugin<Void> {
     return new Report();
   }
 
-  private IterableIndexResult<Job> retrieveList(IndexService index) throws RequestNotValidException, GenericException {
-    Filter filter = new Filter();
-
+  private IterableIndexResult<Job> retrieveList(final IndexService index)
+    throws RequestNotValidException, GenericException {
+    final Filter filter = new Filter();
+    RODAInstanceUtils.addLocalInstanceFilter(filter);
     return index.findAll(Job.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
   }
 }
