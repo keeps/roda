@@ -163,10 +163,17 @@ public class ShowLocalInstanceConfiguration extends Composite {
     BrowserService.Util.getInstance().synchronizeBundle(localInstance, new NoAsyncCallback<Job>() {
       @Override
       public void onSuccess(Job job) {
-        Toast.showInfo("Create Job", "Success");
-        HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+          Toast.showInfo("Create Job", "Success");
+          HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
       }
+
+      @Override
+      public void onFailure(Throwable caught) {
+        super.onFailure(caught);
+      }
+
     });
+
   }
 
   @UiHandler("buttonUnsubscribe")

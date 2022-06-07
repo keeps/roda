@@ -126,30 +126,35 @@ public class RODAInstanceHelper {
     if (localInstance != null && SynchronizingStatus.ACTIVE.equals(localInstance.getStatus())) {
       Date fromDate = localInstance.getLastSynchronizationDate();
       Date toDate = new Date();
-      total+= SyncUtils.getUpdatesFromDistributedInstance(localInstance);
+      DistributedInstance distributedInstance = SyncUtils.requestInstanceStatus(localInstance);
+      if (SynchronizingStatus.ACTIVE.equals(distributedInstance.getStatus())) {
+        total += SyncUtils.getUpdatesFromDistributedInstance(localInstance);
 
-      // check if updates in AIPs
-      total += retrieveNumberOfUpdated(IndexedAIP.class, RodaConstants.AIP_UPDATED_ON, RodaConstants.AIP_UPDATED_ON,
-        index, fromDate, toDate);
+        // check if updates in AIPs
+        total += retrieveNumberOfUpdated(IndexedAIP.class, RodaConstants.AIP_UPDATED_ON, RodaConstants.AIP_UPDATED_ON,
+          index, fromDate, toDate);
 
-      // check if updates in Jobs
-      total += retrieveNumberOfUpdated(Job.class, RodaConstants.JOB_START_DATE, RodaConstants.JOB_END_DATE, index,
-        fromDate, toDate);
-      // check if updates in Dips
-      total += retrieveNumberOfUpdated(IndexedDIP.class, RodaConstants.DIP_LAST_MODIFIED,
-        RodaConstants.DIP_LAST_MODIFIED, index, fromDate, toDate);
-      // check if updates in RiskIncidences
-      total += retrieveNumberOfUpdated(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_UPDATED_ON,
-        RodaConstants.RISK_INCIDENCE_UPDATED_ON, index, fromDate, toDate);
-      // check if updates in RepositoryEvent
-      total += retrieveNumberOfUpdated(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_DATETIME,
-        RodaConstants.PRESERVATION_EVENT_DATETIME, index, fromDate, toDate);
-      // TODO check if updates in PreservationAgents
-      /*
-       * total += retrieveNumberOfUpdated(IndexedPreservationAgent.class,
-       * RodaConstants.PRESERVATION_EVENT_DATETIME,
-       * RodaConstants.PRESERVATION_EVENT_DATETIME, index, fromDate, toDate);
-       */
+        // check if updates in Jobs
+        total += retrieveNumberOfUpdated(Job.class, RodaConstants.JOB_START_DATE, RodaConstants.JOB_END_DATE, index,
+          fromDate, toDate);
+        // check if updates in Dips
+        total += retrieveNumberOfUpdated(IndexedDIP.class, RodaConstants.DIP_LAST_MODIFIED,
+          RodaConstants.DIP_LAST_MODIFIED, index, fromDate, toDate);
+        // check if updates in RiskIncidences
+        total += retrieveNumberOfUpdated(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_UPDATED_ON,
+          RodaConstants.RISK_INCIDENCE_UPDATED_ON, index, fromDate, toDate);
+        // check if updates in RepositoryEvent
+        total += retrieveNumberOfUpdated(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_DATETIME,
+          RodaConstants.PRESERVATION_EVENT_DATETIME, index, fromDate, toDate);
+        // TODO check if updates in PreservationAgents
+        /*
+         * total += retrieveNumberOfUpdated(IndexedPreservationAgent.class,
+         * RodaConstants.PRESERVATION_EVENT_DATETIME,
+         * RodaConstants.PRESERVATION_EVENT_DATETIME, index, fromDate, toDate);
+         */
+      } else {
+        throw new GenericException("Instance is inactive!");
+      }
     } else {
       LOGGER.warn("Could not find local instance");
       throw new NotFoundException("Could not find local instance");

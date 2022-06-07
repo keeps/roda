@@ -39,6 +39,7 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
+import org.roda.core.data.v2.synchronization.SynchronizingStatus;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.utils.IterableIndexResult;
@@ -249,10 +250,12 @@ public class SyncUtils {
 
       HttpResponse response = httpClient.execute(httpGet);
 
-      if (response.getStatusLine().getStatusCode() != RodaConstants.HTTP_RESPONSE_CODE_SUCCESS) {
+      if (response.getStatusLine().getStatusCode() != RodaConstants.HTTP_RESPONSE_CODE_SUCCESS
+        && response.getStatusLine().getStatusCode() != RodaConstants.HTTP_RESPONSE_CODE_NOT_FOUND) {
         throw new GenericException(
           "Unable to retrieve instance status error code: " + response.getStatusLine().getStatusCode());
       }
+
       return JsonUtils.getObjectFromJson(response.getEntity().getContent(), DistributedInstance.class);
     } catch (AuthenticationDeniedException | GenericException | IOException e) {
       throw new GenericException("Unable to retrieve instance status: " + e.getMessage());
@@ -398,6 +401,9 @@ public class SyncUtils {
       HttpResponse response = httpClient.execute(httpGet);
       String message = JsonUtils.parseJson(EntityUtils.toString(response.getEntity())).get("message").textValue();
 
+      if (SynchronizingStatus.INACTIVE.equals(localInstance.getStatus())) {
+        throw new GenericException("Instance is Inactive");
+      }
       if (response.getStatusLine().getStatusCode() != RodaConstants.HTTP_RESPONSE_CODE_SUCCESS) {
         throw new GenericException(
           "Unable to update the distributed instance error code: " + response.getStatusLine().getStatusCode());
