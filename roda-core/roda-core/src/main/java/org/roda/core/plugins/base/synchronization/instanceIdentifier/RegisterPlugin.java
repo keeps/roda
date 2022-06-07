@@ -58,7 +58,7 @@ public class RegisterPlugin extends AbstractPlugin<Void> {
   }
 
   public static String getStaticName() {
-    return "Register of Local Instance";
+    return "Subscription of Local Instance";
   }
 
   @Override
@@ -67,7 +67,7 @@ public class RegisterPlugin extends AbstractPlugin<Void> {
   }
 
   public static String getStaticDescription() {
-    return "Register of Local Instance";
+    return "Subscription of Local Instance";
   }
 
   @Override
@@ -158,12 +158,12 @@ public class RegisterPlugin extends AbstractPlugin<Void> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<Void> plugin) throws PluginException {
-        registerLocalInstance(model, cachedJob, report, jobPluginInfo);
+        subscribeLocalInstance(model, cachedJob, report, jobPluginInfo);
       }
     }, index, model, storage);
   }
 
-  private void registerLocalInstance(ModelService model, Job cachedJob, Report pluginReport,
+  private void subscribeLocalInstance(ModelService model, Job cachedJob, Report pluginReport,
     JobPluginInfo jobPluginInfo) {
 
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
@@ -176,7 +176,7 @@ public class RegisterPlugin extends AbstractPlugin<Void> {
         + RodaConstants.API_PATH_PARAM_DISTRIBUTED_INSTANCE_REGISTER;
       RESTClientUtility.sendPostRequest(localInstance, null, localInstance.getCentralInstanceURL(), resource,
         accessToken);
-      localInstance.setIsRegistered(true);
+      localInstance.setIsSubscribed(true);
       localInstance.setStatus(SynchronizingStatus.ACTIVE);
       RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
       jobPluginInfo.incrementObjectsProcessedWithSuccess();
