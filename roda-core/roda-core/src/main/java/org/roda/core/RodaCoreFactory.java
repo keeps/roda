@@ -1154,9 +1154,10 @@ public class RodaCoreFactory {
    * </p>
    * 
    * @throws GenericException
+   * @throws InterruptedException
    * 
    */
-  private static void instantiateSolrAndIndexService(NodeType nodeType) throws GenericException {
+  private static void instantiateSolrAndIndexService(NodeType nodeType) throws GenericException, InterruptedException {
     if (INSTANTIATE_SOLR) {
       Path solrHome = null;
 
@@ -1222,7 +1223,7 @@ public class RodaCoreFactory {
     return value;
   }
 
-  private static SolrClient instantiateSolr(Path solrHome, boolean writeIsAllowed) throws GenericException {
+  private static SolrClient instantiateSolr(Path solrHome, boolean writeIsAllowed) throws GenericException, InterruptedException {
     SolrType solrType = SolrType
       .valueOf(getConfigurationString(RodaConstants.CORE_SOLR_TYPE, RodaConstants.DEFAULT_SOLR_TYPE.toString()));
 
@@ -1238,7 +1239,7 @@ public class RodaCoreFactory {
 
     try {
       ZkController.checkChrootPath(solrCloudZooKeeperUrls, true);
-    } catch (InterruptedException | KeeperException e) {
+    } catch (KeeperException e) {
       LOGGER.error("Could not check zookeeper chroot path", e);
     }
 
@@ -1268,7 +1269,7 @@ public class RodaCoreFactory {
     return cloudSolrClient;
   }
 
-  private static void waitForSolrCluster(CloudSolrClient cloudSolrClient) throws GenericException {
+  private static void waitForSolrCluster(CloudSolrClient cloudSolrClient) throws GenericException, InterruptedException {
     int retries = getRodaConfiguration().getInt("core.solr.cloud.healthcheck.retries", 100);
     long timeout = getRodaConfiguration().getInt("core.solr.cloud.healthcheck.timeout_ms", 10000);
 
@@ -1281,6 +1282,7 @@ public class RodaCoreFactory {
         Thread.sleep(timeout);
       } catch (InterruptedException e) {
         LOGGER.warn("Sleep interrupted");
+        throw e;
       }
     }
 
@@ -1291,14 +1293,14 @@ public class RodaCoreFactory {
 
   }
 
-  private static boolean checkSolrCluster(CloudSolrClient cloudSolrClient) throws GenericException {
+  private static boolean checkSolrCluster(CloudSolrClient cloudSolrClient) throws GenericException, InterruptedException {
     int connectTimeout = getRodaConfiguration().getInt("core.solr.cloud.connect.timeout_ms", 60000);
 
     try {
       LOGGER.info("Connecting to Solr Cloud with a timeout of {} ms...", connectTimeout);
       cloudSolrClient.connect(connectTimeout, TimeUnit.MILLISECONDS);
       LOGGER.info("Connected to Solr Cloud");
-    } catch (TimeoutException | InterruptedException e) {
+    } catch (TimeoutException e) {
       throw new GenericException("Could not connect to Solr Cloud", e);
     }
 
