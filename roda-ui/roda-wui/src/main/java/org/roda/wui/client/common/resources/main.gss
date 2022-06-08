@@ -276,6 +276,27 @@ table .label-success, table .label-danger, table .label-warning, table .label-in
     border-radius: .25em;
 }
 
+.label-tokenInfo {
+    border:2px solid COLOR_LABEL_WARNING;
+    border-left-width: 5px;
+    border-radius: .25em;
+    margin-top:20px;
+    margin-bottom:20px;
+    padding: 1em 2em 1em;
+    width: 550px;
+}
+
+.label-tokenInfo:before {
+    content: '\f071';
+    @mixin fontawesome();
+    color: COLOR_LABEL_WARNING;
+    margin-right:5px;
+}
+
+.token-infoMessage{
+    width: 600px;
+}
+
 .small {
     font-size: 75%;
 }
@@ -7405,7 +7426,24 @@ span.code {
 }
 
 #token_message {
-    max-width: 460px;
+    width: 580px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border:2px solid silver;
+    padding: 0.7em 1em 0.7em;
+    line-height: 1;
+    color: #000000;
     text-align: center;
-    word-break: break-all;
+    border-radius: .25em;
+    margin-top:10px;
+}
+
+#closeButton {
+    margin-right: 10px;
+}
+
+.fa-solid fa-triangle-exclamation {
+      content: '\f071';
+        @mixin fontawesome();
 }

@@ -18,6 +18,7 @@ import config.i18n.client.ClientMessages;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
+
 public class AccessKeyDialogs {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -25,25 +26,40 @@ public class AccessKeyDialogs {
                                          final AsyncCallback<Boolean> callback) {
     final DialogBox dialogBox = new DialogBox(false, true);
     final Button closeButton = new Button(messages.closeButton());
+    final Button copyAndCloseButton = new Button(messages.copyAndCloseButton());
     final FlowPanel layout = new FlowPanel();
     final FlowPanel header = new FlowPanel();
     final FlowPanel footer = new FlowPanel();
+    final Label infoMessage = new Label(messages.accessKeyInfo());
     final Label warningMessage = new Label(messages.accessKeyWarningLabel());
     final Label tokenMessage = new Label(accessKey.getKey());
     tokenMessage.getElement().setId("token_message");
+    closeButton.getElement().setId("closeButton");
 
     dialogBox.setText(title);
     layout.add(header);
     layout.add(footer);
-    header.add(warningMessage);
+    header.add(infoMessage);
     header.add(tokenMessage);
+    header.add(warningMessage);
     footer.add(closeButton);
+    footer.add(copyAndCloseButton);
 
     tokenMessage.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent clickEvent) {
         JavascriptUtils.copyToClipboard("token_message");
         Toast.showInfo(messages.copiedToClipboardTitle(), messages.copiedToClipboardMessage());
+      }
+    });
+
+    copyAndCloseButton.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent clickEvent) {
+        JavascriptUtils.copyToClipboard("token_message");
+        Toast.showInfo(messages.copiedToClipboardTitle(), messages.copiedToClipboardMessage());
+        dialogBox.hide();
+        callback.onSuccess(true);
       }
     });
 
@@ -64,7 +80,9 @@ public class AccessKeyDialogs {
     header.addStyleName("wui-dialog-message");
     footer.addStyleName("wui-dialog-layout-footer");
 
-    warningMessage.addStyleName("label-warning");
+    infoMessage.addStyleName("token-infoMessage");
+    warningMessage.addStyleName("label-tokenInfo");
+    copyAndCloseButton.addStyleName("btn btn-times-circle");
     closeButton.addStyleName("btn btn-times-circle");
 
     dialogBox.center();

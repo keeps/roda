@@ -454,6 +454,8 @@ public interface ClientMessages extends Messages {
 
   String closeButton();
 
+  String copyAndCloseButton();
+
   String selectButton();
 
   String printButton();
@@ -2260,6 +2262,8 @@ public interface ClientMessages extends Messages {
   String accessKeyStatusValue(@Select AccessKeyStatus status);
 
   String accessKeyWarningLabel();
+
+  String accessKeyInfo();
 
   String accessKeyEditButton();
 
