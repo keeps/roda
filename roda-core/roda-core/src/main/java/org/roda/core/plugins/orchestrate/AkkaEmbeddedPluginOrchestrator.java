@@ -489,6 +489,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         job.setStateDetails(details.toString());
         job.setState(JOB_STATE.COMPLETED);
         job.getJobStats().setCompletionPercentage(100);
+        job.getJobStats().setSourceObjectsCount(jobIds.size());
+        job.getJobStats().setSourceObjectsProcessedWithSuccess(jobIds.size());
         RodaCoreFactory.getModelService().createJob(job);
       }
     }
