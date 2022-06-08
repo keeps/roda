@@ -23,11 +23,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.LoadEvent;
-import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.event.logical.shared.AttachEvent.Handler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -253,33 +250,14 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
 
   private void pdfPreview() {
 
-    String viewerPdf = GWT.getHostPageBaseURL() + "webjars/pdfjs-dist-viewer-min/2.3.200/build/minified/web/viewer.html"
-      + "?file=" + encode(GWT.getHostPageBaseURL() + bitstreamDownloadUri.asString()) + "#" + viewers.getOptions();
+    String viewerPdf = GWT.getHostPageBaseURL() + "webjars/pdf-js/2.13.216/web/viewer.html" + "?file="
+      + encode(GWT.getHostPageBaseURL() + bitstreamDownloadUri.asString()) + "#" + viewers.getOptions();
 
     final Frame frame = new Frame(viewerPdf);
-    frame.addAttachHandler(new Handler() {
-      private HandlerRegistration handlerRegistration;
-
-      @Override
-      public void onAttachOrDetach(AttachEvent attachEvent) {
-        if (attachEvent.isAttached()) {
-          adjustPdfPreviewHeight(frame);
-          handlerRegistration = Window.addResizeHandler(resizeEvent -> adjustPdfPreviewHeight(frame));
-        } else if (handlerRegistration != null) {
-          handlerRegistration.removeHandler();
-        }
-      }
-    });
+    frame.addLoadHandler(ev-> JavascriptUtils.runIframeResizer(frame.getElement()));
 
     panel.add(frame);
     frame.setStyleName("viewRepresentationPDFFilePreview");
-  }
-
-  private void adjustPdfPreviewHeight(Frame frame) {
-    int top = frame.getAbsoluteTop();
-    int bottom = JavascriptUtils.pdfDipViewerBottomPosition();
-    int height = bottom - top;
-    frame.setHeight(height + "px");
   }
 
   private void textPreview() {
@@ -407,12 +385,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     final Frame frame = new Frame(url);
     frame.setStyleName("viewDIPPreview");
     frame.setTitle(dip.getTitle());
-    frame.addLoadHandler(new LoadHandler() {
-      @Override
-      public void onLoad(LoadEvent event) {
-        JavascriptUtils.runIframeResizer(frame.getElement());
-      }
-    });
+    frame.addLoadHandler(ev-> JavascriptUtils.runIframeResizer(frame.getElement()));
     panel.add(frame);
   }
 
