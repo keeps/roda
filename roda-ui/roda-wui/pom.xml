@@ -526,16 +526,11 @@
             <artifactId>jquery</artifactId>
             <version>3.6.0</version>
         </dependency>
-        <dependency>
-            <groupId>org.webjars</groupId>
-            <artifactId>respond</artifactId>
-            <version>1.4.2-1</version>
-        </dependency>
         <!-- DBViewer iframe resize -->
         <dependency>
-            <groupId>org.webjars.bower</groupId>
+            <groupId>org.webjars.npm</groupId>
             <artifactId>iframe-resizer</artifactId>
-            <version>3.6.1</version>
+            <version>4.3.2</version>
         </dependency>
         <!-- Sidebar sticky -->
         <dependency>
@@ -551,9 +546,9 @@
         </dependency>
         <!-- Code highlight for viewer and others -->
         <dependency>
-            <groupId>org.webjars.bower</groupId>
+            <groupId>org.webjars</groupId>
             <artifactId>highlightjs</artifactId>
-            <version>9.12.0</version>
+            <version>11.5.0</version>
         </dependency>
         <!-- PDF viewer -->
         <dependency>
@@ -594,9 +589,9 @@
         <!-- / File upload -->
         <!-- Statistics -->
         <dependency>
-            <groupId>org.webjars.bowergithub.chartjs</groupId>
+            <groupId>org.webjars.npm</groupId>
             <artifactId>chart.js</artifactId>
-            <version>3.6.0</version>
+            <version>2.9.4</version>
         </dependency>
         <dependency>
             <groupId>org.webjars.bowergithub.eligrey</groupId>
