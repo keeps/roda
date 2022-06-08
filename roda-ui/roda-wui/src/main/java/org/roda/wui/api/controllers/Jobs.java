@@ -7,6 +7,11 @@
  */
 package org.roda.wui.api.controllers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.data.common.RodaConstants;
@@ -17,6 +22,9 @@ import org.roda.core.data.exceptions.JobStateNotPendingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobUserDetails;
 import org.roda.core.data.v2.log.LogEntryState;
@@ -62,66 +70,76 @@ public class Jobs extends RodaWuiController {
     }
   }
 
-  public static Job approveJob(User user, Job job, boolean async) throws AuthorizationDeniedException,
+  public static Job approveJob(User user, SelectedItems<Job> jobs, boolean async) throws AuthorizationDeniedException,
           RequestNotValidException, NotFoundException, GenericException, JobAlreadyStartedException, JobStateNotPendingException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
-    // validate input and set missing information when possible
-    JobsHelper.validateJobInformation(user, job);
+    ModelService model = RodaCoreFactory.getModelService();
 
-    // check user permissions
-    controllerAssistant.checkRoles(user);
+    if (jobs instanceof SelectedItemsList) {
+      SelectedItemsList<Job> jobsList = (SelectedItemsList<Job>) jobs;
+      for (String id : jobsList.getIds()) {
+        Job job = model.retrieveJob(id);
+        if(job.getState().equals(Job.JOB_STATE.PENDING_APPROVAL)) {
+          // validate input and set missing information when possible
+          JobsHelper.validateJobInformation(user, job);
 
-    LogEntryState state = LogEntryState.SUCCESS;
+          // check user permissions
+          controllerAssistant.checkRoles(user);
 
-    ModelService modelService = RodaCoreFactory.getModelService();
-    Job retrievedJob = modelService.retrieveJob(job.getId());
-    retrievedJob.setState(Job.JOB_STATE.STARTED);
-    JobUserDetails jobUserDetails = new JobUserDetails();
-    jobUserDetails.setUsername(user.getName());
-    jobUserDetails.setFullname(user.getFullName());
-    jobUserDetails.setRole(RodaConstants.PreservationAgentRole.AUTHORIZER.toString());
-    jobUserDetails.setEmail(user.getEmail());
-    retrievedJob.getJobUsersDetails().add(jobUserDetails);
-    modelService.createOrUpdateJob(retrievedJob);
+          LogEntryState state = LogEntryState.SUCCESS;
+          Job updatedJob = new Job(job);
 
-    Job updatedJob = new Job(job);
-
-    try {
-      // delegate
-      updatedJob = JobsHelper.startJob(job.getId());
-      return updatedJob;
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_JOB_PARAM, updatedJob);
+          try {
+            // delegate
+            updatedJob = JobsHelper.startJob(job.getId());
+            //return updatedJob;
+          } catch (RODAException e) {
+            state = LogEntryState.FAILURE;
+            throw e;
+          } finally {
+            // register action
+            controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_JOB_PARAM, updatedJob);
+          }
+        }
+      }
     }
+    return null;
   }
 
-  public static Job rejectJob(User user, Job job, String details) throws AuthorizationDeniedException,
+  public static Job rejectJob(User user, SelectedItems<Job> jobs, String details) throws AuthorizationDeniedException,
           RequestNotValidException, NotFoundException, GenericException, JobAlreadyStartedException, JobStateNotPendingException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
-    // validate input and set missing information when possible
-    JobsHelper.validateJobInformation(user, job);
+    ModelService model = RodaCoreFactory.getModelService();
 
-    // check user permissions
-    controllerAssistant.checkRoles(user);
+    if (jobs instanceof SelectedItemsList) {
+      SelectedItemsList<Job> jobsList = (SelectedItemsList<Job>) jobs;
+      for (String id : jobsList.getIds()) {
+        Job job = model.retrieveJob(id);
+        if (job.getState().equals(Job.JOB_STATE.PENDING_APPROVAL)) {
+          // validate input and set missing information when possible
+          JobsHelper.validateJobInformation(user, job);
 
-    LogEntryState state = LogEntryState.SUCCESS;
+          // check user permissions
+          controllerAssistant.checkRoles(user);
 
-    try {
-      // delegate
-      return JobsHelper.rejectJob(job, details);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_JOB_PARAM, job);
+          LogEntryState state = LogEntryState.SUCCESS;
+
+          try {
+            // delegate
+            job = JobsHelper.rejectJob(job, details);
+          } catch (RODAException e) {
+            state = LogEntryState.FAILURE;
+            throw e;
+          } finally {
+            // register action
+            controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_JOB_PARAM, job);
+          }
+        }
+      }
     }
+    return null;
   }
 
   public static Job startJob(User user, String jobId) throws RequestNotValidException, GenericException,
