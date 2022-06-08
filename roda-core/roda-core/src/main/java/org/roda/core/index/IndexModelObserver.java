@@ -319,15 +319,16 @@ public class IndexModelObserver implements ModelObserver {
 
         Map<String, String> retentionPeriod = SolrUtils.getRetentionPeriod(disposalSchedule, aip);
         indexAIP(aip, ancestors, disposalSchedule, retentionPeriod, onDisposalHold).addTo(ret);
-        if (StringUtils.isNotBlank(retentionPeriod.get(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_DETAILS))) {
-          throw new RetentionPeriodCalculationException(
-            retentionPeriod.get(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_DETAILS));
-        }
+        // if
+        // (StringUtils.isNotBlank(retentionPeriod.get(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_DETAILS)))
+        // {
+        // throw new RetentionPeriodCalculationException(
+        // retentionPeriod.get(RodaConstants.AIP_DISPOSAL_RETENTION_PERIOD_DETAILS));
+        // }
       } else {
         indexAIP(aip, ancestors, null, null, onDisposalHold).addTo(ret);
       }
-    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException
-      | RetentionPeriodCalculationException e) {
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException e) {
       LOGGER.error("Cannot index retention period", e);
       ret.add(e);
     }
@@ -795,7 +796,13 @@ public class IndexModelObserver implements ModelObserver {
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
 
       if (descriptiveMetadata.isFromAIP()) {
-        indexAIP(aip, ancestors).addTo(ret);
+        if (StringUtils.isNotBlank(aip.getDisposalScheduleId())) {
+          DisposalSchedule disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
+          Map<String, String> retentionPeriodCalculation = SolrUtils.getRetentionPeriod(disposalSchedule, aip);
+          indexAIP(aip, ancestors, disposalSchedule, retentionPeriodCalculation).addTo(ret);
+        } else {
+          indexAIP(aip, ancestors).addTo(ret);
+        }
       } else {
         Representation representation = model.retrieveRepresentation(descriptiveMetadata.getAipId(),
           descriptiveMetadata.getRepresentationId());
@@ -817,13 +824,12 @@ public class IndexModelObserver implements ModelObserver {
       List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
 
       if (descriptiveMetadata.isFromAIP()) {
-        indexAIP(aip, ancestors).addTo(ret);
-        if (ret.isEmpty()) {
-          if (StringUtils.isNotBlank(aip.getDisposalScheduleId())) {
-            DisposalSchedule disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
-            Map<String, String> retentionPeriodCalculation = SolrUtils.getRetentionPeriod(disposalSchedule, aip);
-            indexAIP(aip, ancestors, disposalSchedule, retentionPeriodCalculation).addTo(ret);
-          }
+        if (StringUtils.isNotBlank(aip.getDisposalScheduleId())) {
+          DisposalSchedule disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
+          Map<String, String> retentionPeriodCalculation = SolrUtils.getRetentionPeriod(disposalSchedule, aip);
+          indexAIP(aip, ancestors, disposalSchedule, retentionPeriodCalculation).addTo(ret);
+        } else {
+          indexAIP(aip, ancestors).addTo(ret);
         }
       } else {
         Representation representation = model.retrieveRepresentation(descriptiveMetadata.getAipId(),
@@ -846,7 +852,13 @@ public class IndexModelObserver implements ModelObserver {
       try {
         AIP aip = model.retrieveAIP(aipId);
         List<String> ancestors = SolrUtils.getAncestors(aip.getParentId(), model);
-        indexAIP(aip, ancestors).addTo(ret);
+        if (StringUtils.isNotBlank(aip.getDisposalScheduleId())) {
+          DisposalSchedule disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
+          Map<String, String> retentionPeriodCalculation = SolrUtils.getRetentionPeriod(disposalSchedule, aip);
+          indexAIP(aip, ancestors, disposalSchedule, retentionPeriodCalculation).addTo(ret);
+        } else {
+          indexAIP(aip, ancestors).addTo(ret);
+        }
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
         LOGGER.error("Error when descriptive metadata deleted on retrieving the full AIP", e);
         ret.add(e);

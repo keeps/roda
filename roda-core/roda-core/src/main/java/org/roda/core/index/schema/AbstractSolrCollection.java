@@ -91,7 +91,7 @@ public abstract class AbstractSolrCollection<I extends IsIndexed, M extends IsMo
     }
 
     if (info.getPreCalculatedFields() != null) {
-      info.getPreCalculatedFields().forEach((k, v) -> doc.addField(k, v));
+      info.getPreCalculatedFields().forEach(doc::addField);
     }
 
     return doc;
