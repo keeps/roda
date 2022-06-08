@@ -225,7 +225,6 @@ public class AppraisalPlugin extends AbstractPlugin<AIP> {
           model.createRepositoryEvent(PreservationEventType.APPRAISAL,
             "The process of updating an non active object of the repository", state, outcomeText.toString(), null,
             job.getUsername(), true);
-
           reportItem.setPluginState(state).setPluginDetails(outcomeText.toString());
           report.addReport(reportItem);
           PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
