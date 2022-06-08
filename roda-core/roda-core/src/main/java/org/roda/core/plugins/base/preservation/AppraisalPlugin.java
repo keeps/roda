@@ -217,13 +217,13 @@ public class AppraisalPlugin extends AbstractPlugin<AIP> {
           StringBuilder outcomeText = new StringBuilder().append("The AIP '").append(aip.getId()).append("' was ");
           if (accept) {
             outcomeText.append("accepted into the repository.");
+            
+            model.createUpdateAIPEvent(aip.getId(), null, null, null, PreservationEventType.APPRAISAL,
+              "The process of updating an non active object of the repository", state, outcomeText.toString(), null,
+              job.getUsername(), true);
           } else {
             outcomeText.append("rejected from the repository.");
           }
-
-          model.createUpdateAIPEvent(aip.getId(), null, null, null, PreservationEventType.APPRAISAL,
-            "The process of updating an non active object of the repository", state, outcomeText.toString(), null,
-            job.getUsername(), true);
 
           reportItem.setPluginState(state).setPluginDetails(outcomeText.toString());
           report.addReport(reportItem);
