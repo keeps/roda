@@ -819,7 +819,7 @@ public class HtmlSnippetUtils {
         lastSyncBuilder.append(SafeHtmlUtils.fromSafeConstant(OPEN_DIV_FONT_STYLE_1_REM));
         lastSyncBuilder.append(SafeHtmlUtils.fromString(entityClassUiName + ": "));
         // Added/ Updated
-        createAddedUpdatedSpan(lastSyncBuilder, entitySummary);
+        createAddedUpdatedSpan(lastSyncBuilder, entitySummary, entitySummary.getCountAddedUpdated());
         // Removed
         createRemovedAndIssuesLink(lastSyncBuilder, entitySummary.getCountRemoved(),
           messages.distributedInstanceRemovedEntitiesLabel(), downloadUriRemoved, "label-warning");
@@ -836,11 +836,13 @@ public class HtmlSnippetUtils {
     return ret;
   }
 
-  private static void createAddedUpdatedSpan(SafeHtmlBuilder safeHtmlBuilder, EntitySummary entitySummary) {
-    safeHtmlBuilder.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
-    safeHtmlBuilder.append(SafeHtmlUtils.fromString(
-      String.valueOf(entitySummary.getCountAddedUpdated()) + " " + messages.distributedInstanceUpdatedEntitiesLabel()));
-    safeHtmlBuilder.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+  private static void createAddedUpdatedSpan(SafeHtmlBuilder safeHtmlBuilder, EntitySummary entitySummary, int count) {
+    if (count > 0) {
+      safeHtmlBuilder.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
+      safeHtmlBuilder.append(SafeHtmlUtils.fromString(String.valueOf(entitySummary.getCountAddedUpdated()) + " "
+        + messages.distributedInstanceUpdatedEntitiesLabel()));
+      safeHtmlBuilder.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+    }
   }
 
   private static void createRemovedAndIssuesLink(SafeHtmlBuilder safeHtmlBuilder, int count, String message,
