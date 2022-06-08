@@ -5,9 +5,6 @@ LABEL maintainer="admin@keep.pt" vendor="KEEP SOLUTIONS"
 RUN set -ex; \
     apt-get -qq update && \
     apt-get -qq -y install software-properties-common; \
-    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 20F802FE798E6857; \
-    add-apt-repository "deb https://www.itforarchivists.com/ buster main" && \
-    apt-get -qq update && \
     apt-get -qq -y --no-install-recommends install clamdscan cron supervisor zip rsync jq && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
