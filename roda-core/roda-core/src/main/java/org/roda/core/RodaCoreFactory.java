@@ -443,6 +443,8 @@ public class RodaCoreFactory {
     INSTANTIATE_DEFAULT_RESOURCES = false;
     INSTANTIATE_CONFIGURE_LOGBACK = false;
     INSTANTIATE_EXAMPLE_RESOURCES = false;
+    INSTANTIATE_PLUGIN_MANAGER = false;
+    INSTANTIATE_PROTOCOL_MANAGER = false;
     instantiate(NodeType.CONFIGS);
   }
 
