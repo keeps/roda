@@ -26,7 +26,7 @@ public abstract class CommandConvertPlugin<T extends IsRODAObject> extends Abstr
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS, "Command arguments",
-        PluginParameterType.STRING, "", true, true,
+        PluginParameterType.STRING, "", true, false,
         "Command arguments that will be passed to the command of the tool as configured (advanced users only!)"));
   }
 
@@ -39,7 +39,7 @@ public abstract class CommandConvertPlugin<T extends IsRODAObject> extends Abstr
   protected Map<String, PluginParameter> getDefaultParameters() {
     Map<String, PluginParameter> defaultParameters = super.getDefaultParameters();
     defaultParameters.putAll(pluginParameters.entrySet().stream()
-      .collect(Collectors.toMap(e -> e.getKey(), e -> new PluginParameter(e.getValue()))));
+      .collect(Collectors.toMap(Map.Entry::getKey, e -> new PluginParameter(e.getValue()))));
     return defaultParameters;
   }
 
