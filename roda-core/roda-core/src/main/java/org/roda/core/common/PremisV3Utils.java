@@ -960,7 +960,7 @@ public final class PremisV3Utils {
       PremisV3Utils.updateFileFormat(premisFile, format, version, pronom, mime);
 
       PreservationMetadataType type = PreservationMetadataType.FILE;
-      String id = IdUtils.getPreservationFileId(fileDirectoryPath, fileId, RODAInstanceUtils.getLocalInstanceIdentifier());
+      String id = IdUtils.getPreservationFileId(fileId, RODAInstanceUtils.getLocalInstanceIdentifier());
 
       ContentPayload premisFilePayload = fileToBinary(premisFile);
       model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, premisFilePayload,
@@ -999,7 +999,7 @@ public final class PremisV3Utils {
         dateCreatedByApplication);
 
       PreservationMetadataType type = PreservationMetadataType.FILE;
-      String id = IdUtils.getPreservationFileId(fileDirectoryPath, fileId, RODAInstanceUtils.getLocalInstanceIdentifier());
+      String id = IdUtils.getPreservationFileId(fileId, RODAInstanceUtils.getLocalInstanceIdentifier());
 
       ContentPayload premisFilePayload = fileToBinary(premisFile);
       model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, premisFilePayload,
