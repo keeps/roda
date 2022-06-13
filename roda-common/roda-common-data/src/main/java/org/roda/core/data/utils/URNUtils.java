@@ -33,11 +33,7 @@ public final class URNUtils {
     sb.append(id);
     return sb.toString().toLowerCase();
   }
-
-  public static String createRodaPreservationURN(File file) {
-    return createRodaPreservationURN(PreservationMetadataType.FILE, file.getPath(), file.getId());
-  }
-
+  
   public static String createRodaPreservationURN(PreservationMetadataType preservationType, String id) {
     return createRodaPreservationURN(preservationType, Collections.emptyList(), id);
   }

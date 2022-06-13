@@ -1346,7 +1346,7 @@ public class ModelService extends ModelObservable {
 
   public Binary retrievePreservationFile(String aipId, String representationId, List<String> fileDirectoryPath,
     String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    String identifier = IdUtils.getPreservationFileId(fileDirectoryPath, fileId);
+    String identifier = IdUtils.getPreservationFileId(fileId);
     StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(identifier, PreservationMetadataType.FILE,
       aipId, representationId, fileDirectoryPath, fileId);
     return storage.getBinary(filePath);
@@ -1354,7 +1354,7 @@ public class ModelService extends ModelObservable {
 
   public boolean preservationFileExists(String aipId, String representationId, List<String> fileDirectoryPath,
     String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    String identifier = IdUtils.getPreservationFileId(fileDirectoryPath, fileId);
+    String identifier = IdUtils.getPreservationFileId( fileId);
     StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(identifier, PreservationMetadataType.FILE,
       aipId, representationId, fileDirectoryPath, fileId);
     return storage.exists(filePath);
@@ -1385,7 +1385,7 @@ public class ModelService extends ModelObservable {
     if (!PreservationMetadataType.FILE.equals(type)) {
       identifier = IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId);
     }
-    String urn = URNUtils.createRodaPreservationURN(type, fileDirectoryPath, identifier);
+    String urn = URNUtils.createRodaPreservationURN(type, identifier);
     return createPreservationMetadata(type, urn, aipId, representationId, fileDirectoryPath, fileId, payload, notify);
   }
 
