@@ -176,11 +176,11 @@ public final class IdUtils {
   }
 
   public static String getPreservationFileId(String fileId, String instanceId) {
-    return URNUtils.createRodaPreservationURN(PreservationMetadataType.FILE, fileId,instanceId);
+    return URNUtils.createRodaPreservationURN(PreservationMetadataType.FILE, fileId, instanceId);
   }
 
-  public static String getPreservationFileId(final List<String> path, String fileId, String instanceId) {
-    return URNUtils.createRodaPreservationURN(PreservationMetadataType.FILE, path, fileId, instanceId);
+  public static String getPreservationFileId(final List<String> path, String fileId) {
+    return URNUtils.createRodaPreservationURN(PreservationMetadataType.FILE, path, fileId, null);
   }
 
   public static PreservationMetadataType getPreservationTypeFromId(String id) {

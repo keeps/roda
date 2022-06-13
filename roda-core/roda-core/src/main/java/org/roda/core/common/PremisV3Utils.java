@@ -441,8 +441,8 @@ public final class PremisV3Utils {
 
     ObjectIdentifierComplexType objectIdentifier = FACTORY.createObjectIdentifierComplexType();
     objectIdentifier.setObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
-    objectIdentifier.setObjectIdentifierValue(IdUtils.getRepresentationPreservationId(aipId, representationId,
-      RODAInstanceUtils.getLocalInstanceIdentifier()));
+    objectIdentifier.setObjectIdentifierValue(
+      IdUtils.getRepresentationPreservationId(aipId, representationId, RODAInstanceUtils.getLocalInstanceIdentifier()));
     representation.getObjectIdentifier().add(objectIdentifier);
     PreservationLevelComplexType preservationLevelComplexType = FACTORY.createPreservationLevelComplexType();
     preservationLevelComplexType.setPreservationLevelType(getStringPlusAuthority(""));
@@ -463,14 +463,14 @@ public final class PremisV3Utils {
     // URN-local identifier
     ObjectIdentifierComplexType objectIdentifier = FACTORY.createObjectIdentifierComplexType();
     objectIdentifier.setObjectIdentifierValue(URNUtils.createRodaPreservationURN(PreservationMetadataType.FILE,
-      originalFile.getPath(), originalFile.getId(), RODAInstanceUtils.getLocalInstanceIdentifier()));
+      originalFile.getId(), RODAInstanceUtils.getLocalInstanceIdentifier()));
     objectIdentifier.setObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN_LOCAL));
     file.getObjectIdentifier().add(objectIdentifier);
 
     // URN identifier (UUID)
     ObjectIdentifierComplexType objectIdentifier2 = FACTORY.createObjectIdentifierComplexType();
     objectIdentifier2.setObjectIdentifierValue(URNUtils.createRodaPreservationURN(PreservationMetadataType.FILE,
-      originalFile.getPath(), IdUtils.getFileId(originalFile), RODAInstanceUtils.getLocalInstanceIdentifier()));
+      IdUtils.getFileId(originalFile), RODAInstanceUtils.getLocalInstanceIdentifier()));
     objectIdentifier2.setObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
     file.getObjectIdentifier().add(objectIdentifier2);
 
@@ -984,15 +984,14 @@ public final class PremisV3Utils {
 
   }
 
-
   public static PreservationMetadata createOrUpdatePremisUserAgentBinary(String username, ModelService model,
     IndexService index, boolean notify) throws GenericException, ValidationException, NotFoundException,
     RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
-    return createOrUpdatePremisUserAgentBinary(username, model, index, notify,null);
+    return createOrUpdatePremisUserAgentBinary(username, model, index, notify, null);
   }
+
   public static PreservationMetadata createOrUpdatePremisUserAgentBinary(String username, ModelService model,
-    IndexService index, boolean notify,Job job) throws GenericException, ValidationException,
-    NotFoundException,
+    IndexService index, boolean notify, Job job) throws GenericException, ValidationException, NotFoundException,
     RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
     PreservationMetadata pm = null;
 
@@ -1003,17 +1002,17 @@ public final class PremisV3Utils {
       String note = "";
       String version = "";
 
-      if (job != null){
-        for(JobUserDetails jobUserDetails: job.getJobUsersDetails()){
-          if(jobUserDetails.getUsername().equals(username)){
+      if (job != null) {
+        for (JobUserDetails jobUserDetails : job.getJobUsersDetails()) {
+          if (jobUserDetails.getUsername().equals(username)) {
             fullName = jobUserDetails.getFullname();
             note = jobUserDetails.getEmail();
           }
         }
-      }else {
+      } else {
         try {
           RODAMember member = index.retrieve(RODAMember.class, IdUtils.getUserId(username),
-                  Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.MEMBERS_FULLNAME, RodaConstants.MEMBERS_EMAIL));
+            Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.MEMBERS_FULLNAME, RodaConstants.MEMBERS_EMAIL));
 
           fullName = member.getFullName();
           if (member instanceof User) {
@@ -1024,7 +1023,6 @@ public final class PremisV3Utils {
           LOGGER.warn("Could not find user and add its details to the PREMIS agent", e);
         }
       }
-
 
       ContentPayload agentPayload = PremisV3Utils.createPremisAgentBinary(id, fullName, PreservationAgentType.PERSON,
         extension, note, version);
