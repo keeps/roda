@@ -43,8 +43,14 @@ public final class URNUtils {
     return sb.toString().toLowerCase();
   }
 
-  public static String createRodaPreservationURN(PreservationMetadataType preservationType, List<String> path,String id,
-    String instanceId) {
+
+  
+  public static String createRodaPreservationURN(PreservationMetadataType preservationType, String id, String instanceId) {
+    return createRodaPreservationURN(preservationType, Collections.emptyList(), id, instanceId);
+  }
+
+  public static String createRodaPreservationURN(PreservationMetadataType preservationType, List<String> path,
+    String id, String instanceId) {
     StringBuilder sb = new StringBuilder();
     sb.append(getPremisPrefix(preservationType, instanceId));
     if (!path.isEmpty()) {

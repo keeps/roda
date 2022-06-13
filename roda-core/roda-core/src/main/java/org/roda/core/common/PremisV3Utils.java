@@ -815,14 +815,14 @@ public final class PremisV3Utils {
     return model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
   }
 
-  public static void linkFileToRepresentation(String fileId, String relationshipType, String relationshipSubType,
-    Representation representation) {
+  public static void linkFileToRepresentation(String fileId, List<String> filePath, String relationshipType,
+    String relationshipSubType, Representation representation) {
     RelationshipComplexType relationship = FACTORY.createRelationshipComplexType();
     relationship.setRelationshipType(getStringPlusAuthority(relationshipType));
     relationship.setRelationshipSubType(getStringPlusAuthority(relationshipSubType));
     RelatedObjectIdentifierComplexType roict = FACTORY.createRelatedObjectIdentifierComplexType();
     roict.setRelatedObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_URN));
-    roict.setRelatedObjectIdentifierValue(fileId);
+    roict.setRelatedObjectIdentifierValue(IdUtils.getPreservationFileId(filePath, fileId));
     relationship.getRelatedObjectIdentifier().add(roict);
 
     representation.getRelationship().add(relationship);
@@ -1078,7 +1078,7 @@ public final class PremisV3Utils {
       PremisV3Utils.updateFileFormat(premisFile, format, version, pronom, mime);
 
       PreservationMetadataType type = PreservationMetadataType.FILE;
-      String id = IdUtils.getPreservationFileId(fileDirectoryPath, fileId, RODAInstanceUtils.getLocalInstanceIdentifier());
+      String id = IdUtils.getPreservationFileId(fileId, RODAInstanceUtils.getLocalInstanceIdentifier());
 
       ContentPayload premisFilePayload = fileToBinary(premisFile);
       model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, premisFilePayload,
@@ -1109,7 +1109,7 @@ public final class PremisV3Utils {
         dateCreatedByApplication);
 
       PreservationMetadataType type = PreservationMetadataType.FILE;
-      String id = IdUtils.getPreservationFileId(fileDirectoryPath, fileId, RODAInstanceUtils.getLocalInstanceIdentifier());
+      String id = IdUtils.getPreservationFileId(fileId, RODAInstanceUtils.getLocalInstanceIdentifier());
 
       ContentPayload premisFilePayload = fileToBinary(premisFile);
       model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, premisFilePayload,
