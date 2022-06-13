@@ -12,7 +12,6 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.RODA_TYPE;
-import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 
 public final class URNUtils {
@@ -33,7 +32,7 @@ public final class URNUtils {
     sb.append(id);
     return sb.toString().toLowerCase();
   }
-  
+
   public static String createRodaPreservationURN(PreservationMetadataType preservationType, String id) {
     return createRodaPreservationURN(preservationType, Collections.emptyList(), id);
   }
