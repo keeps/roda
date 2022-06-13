@@ -78,7 +78,7 @@ public class JobsHelper {
     jobUserDetails.setUsername(user.getName());
     jobUserDetails.setEmail(user.getEmail());
     jobUserDetails.setFullname(user.getFullName());
-    jobUserDetails.setRole(RodaConstants.PreservationAgentRole.EXECUTING_PROGRAM.toString());
+    jobUserDetails.setRole(RodaConstants.PreservationAgentRole.IMPLEMENTER.toString());
     job.getJobUsersDetails().add(jobUserDetails);
   }
 
