@@ -815,7 +815,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     jobUserDetails.setUsername(user.getName());
     jobUserDetails.setEmail(user.getEmail());
     jobUserDetails.setFullname(user.getFullName());
-    jobUserDetails.setRole(RodaConstants.PreservationAgentRole.EXECUTING_PROGRAM.toString());
+    jobUserDetails.setRole(RodaConstants.PreservationAgentRole.IMPLEMENTER.toString());
 
     Job job = new Job();
     job.setId(IdUtils.createUUID());
