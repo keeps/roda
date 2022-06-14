@@ -9,6 +9,7 @@ package org.roda.core.plugins.base.characterization;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -40,8 +41,8 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractAIPComponentsPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.PluginHelper;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -351,7 +352,6 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION);
+    return Collections.singletonList(RodaConstants.PLUGIN_CATEGORY_CHARACTERIZATION);
   }
-
 }
