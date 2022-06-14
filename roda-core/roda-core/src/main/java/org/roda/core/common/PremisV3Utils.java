@@ -932,14 +932,13 @@ public final class PremisV3Utils {
     } else if (pm.getType().equals(PreservationMetadataType.REPRESENTATION)
       || pm.getType().equals(PreservationMetadataType.FILE)) {
       try {
-        StoragePath path = ModelUtils.getPreservationMetadataStoragePath(pm.getId(), pm.getType(), pm.getAipId(),
-          pm.getRepresentationId());
+        StoragePath path = ModelUtils.getPreservationMetadataStoragePath(pm);
         ContentPayload payload = model.getStorage().getBinary(path).getContent();
 
         model.createPreservationMetadata(pm.getType(), updatedId, pm.getAipId(), pm.getRepresentationId(),
           pm.getFileDirectoryPath(), pm.getFileId(), payload, false);
 
-        model.deletePreservationMetadata(pm.getType(), pm.getAipId(), pm.getRepresentationId(), pm.getId(), false);
+        model.deletePreservationMetadata(pm, false);
       } catch (NotFoundException e) {
         throw new InstanceIdNotUpdated(e);
       }
