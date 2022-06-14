@@ -65,6 +65,7 @@ import org.roda.core.storage.JsonContentPayload;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -177,15 +178,7 @@ public class ResourceParseUtils {
     } else if (URNUtils.verifyPremisPrefix(PreservationMetadataType.FILE, filename)) {
       type = PreservationMetadataType.FILE;
       id = filename.substring(0, filename.length() - RodaConstants.PREMIS_SUFFIX.length());
-      try {
-        String separator = URLEncoder.encode(RodaConstants.URN_SEPARATOR, RodaConstants.DEFAULT_ENCODING);
-        if (StringUtils.countMatches(id, separator) > 0) {
-          fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
-          fileId = id.substring(id.lastIndexOf(separator) + 1);
-        }
-      } catch (UnsupportedEncodingException e) {
-        LOGGER.error("Error encoding urn separator when converting file event preservation metadata");
-      }
+      fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
     } else if (filename.endsWith(RodaConstants.OTHER_TECH_METADATA_FILE_SUFFIX)) {
       type = PreservationMetadataType.OTHER;
       fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
