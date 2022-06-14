@@ -581,7 +581,7 @@ public final class JobsHelper {
   }
 
   public static void cleanJobObjects(Job job, ModelService model, IndexService index) {
-    if (RodaCoreFactory.getNodeType() == NodeType.MASTER) {
+    if (RodaCoreFactory.getNodeType() == NodeType.PRIMARY) {
       // find all AIPs that should be removed
       Filter filter = new Filter();
       // FIXME 20161128 hsilva: perhaps we should avoid ghosts???

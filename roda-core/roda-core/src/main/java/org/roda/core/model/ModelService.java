@@ -2030,7 +2030,7 @@ public class ModelService extends ModelObservable {
       entryLogLineNumber++;
 
       // emit event
-      boolean slaveWriteInSolr = RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_SLAVE_WRITE_IN_SOLR, false);
+      boolean slaveWriteInSolr = RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_REPLICA_WRITE_IN_SOLR, false);
       if (notify && (writeIsAllowed || slaveWriteInSolr)) {
         notifyLogEntryCreated(logEntry).failOnError();
       }
@@ -2044,10 +2044,10 @@ public class ModelService extends ModelObservable {
 
   public synchronized void findOldLogsAndSendThemToMaster(Path logDirectory, Path currentLogFile) {
 
-    String username = RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_MASTER_USER, "");
-    String password = RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_MASTER_PASS, "");
-    String url = RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_MASTER_URL, "");
-    String resource = RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_MASTER_RESOURCE, "");
+    String username = RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_PRIMARY_USER, "");
+    String password = RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_PRIMARY_PASS, "");
+    String url = RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_PRIMARY_URL, "");
+    String resource = RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_PRIMARY_RESOURCE, "");
 
     try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(logDirectory)) {
       for (Path path : directoryStream) {
