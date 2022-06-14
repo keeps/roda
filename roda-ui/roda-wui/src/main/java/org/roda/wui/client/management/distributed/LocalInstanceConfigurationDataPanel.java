@@ -216,7 +216,7 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
           @Override
           public void onSuccess(List<String> result) {
             if (result.isEmpty()) {
-              Dialogs.showInformationDialog("Test Instance", "Success " + centralInstanceURLValue.getText() , messages.closeButton(), false);
+              Dialogs.showInformationDialog(messages.testLocalInstanceConfigurationDialogTitle(), messages.testLocalInstanceConfigurationDialogMessage(centralInstanceURLValue.getText()) , messages.closeButton(), false);
             } else {
               Toast.showError("Test instance", "Error: " + result.toString());
             }
