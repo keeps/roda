@@ -101,7 +101,7 @@
         <jackson.version>2.13.2</jackson.version>
         <spring.version>4.3.19.RELEASE</spring.version>
         <grizzly.version>2.4.3</grizzly.version>
-        <solr.version>7.7.3</solr.version>
+        <solr.version>8.11.1</solr.version>
         <akka.version>2.5.26</akka.version>
         <!--<akka_management.version>0.17.0</akka_management.version> -->
         <apacheds.version>2.0.0-M24</apacheds.version>
