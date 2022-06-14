@@ -111,13 +111,13 @@ public class PremisSkeletonPluginUtils {
           pmId = pm.getId();
           model.notifyFileCreated(file).failOnError();
         } catch (AlreadyExistsException e1) {
-          pmId = IdUtils.getPreservationFileId(file.getPath(), file.getId(), RODAInstanceUtils.getLocalInstanceIdentifier());
+          pmId = IdUtils.getPreservationFileId(file.getId(), RODAInstanceUtils.getLocalInstanceIdentifier());
           model.updatePreservationMetadata(pmId, PreservationMetadataType.FILE, file.getAipId(),
             file.getRepresentationId(), file.getPath(), file.getId(), filePreservation, notifyInSteps);
           model.notifyFileUpdated(file).failOnError();
         }
 
-        PremisV3Utils.linkFileToRepresentation(pmId, RodaConstants.PREMIS_RELATIONSHIP_TYPE_STRUCTURAL,
+        PremisV3Utils.linkFileToRepresentation(file.getId(), file.getPath(), RodaConstants.PREMIS_RELATIONSHIP_TYPE_STRUCTURAL,
           RodaConstants.PREMIS_RELATIONSHIP_SUBTYPE_HASPART, representation);
       }
     }

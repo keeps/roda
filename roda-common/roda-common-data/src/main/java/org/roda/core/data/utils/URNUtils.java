@@ -8,6 +8,7 @@
 package org.roda.core.data.utils;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
@@ -43,8 +44,17 @@ public final class URNUtils {
     return sb.toString().toLowerCase();
   }
 
-  public static String createRodaPreservationURN(PreservationMetadataType preservationType, List<String> path,String id,
+  public static String createRodaPreservationURN(PreservationMetadataType preservationType, String id,
     String instanceId) {
+    return createRodaPreservationURN(preservationType, Collections.emptyList(), id, instanceId);
+  }
+
+  public static String createRodaPreservationURN(PreservationMetadataType preservationType, String id) {
+    return createRodaPreservationURN(preservationType, Collections.emptyList(), id, null);
+  }
+
+  public static String createRodaPreservationURN(PreservationMetadataType preservationType, List<String> path,
+    String id, String instanceId) {
     StringBuilder sb = new StringBuilder();
     sb.append(getPremisPrefix(preservationType, instanceId));
     if (!path.isEmpty()) {

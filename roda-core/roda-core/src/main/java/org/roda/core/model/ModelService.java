@@ -1499,7 +1499,7 @@ public class ModelService extends ModelObservable {
   public Binary retrievePreservationFile(String aipId, String representationId, List<String> fileDirectoryPath,
     String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     AIP aip = retrieveAIP(aipId);
-    String identifier = IdUtils.getPreservationFileId(fileDirectoryPath, fileId, aip.getInstanceId());
+    String identifier = IdUtils.getPreservationFileId(fileId, aip.getInstanceId());
     StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(identifier, PreservationMetadataType.FILE,
       aipId, representationId, fileDirectoryPath, fileId);
     return storage.getBinary(filePath);
@@ -1509,7 +1509,7 @@ public class ModelService extends ModelObservable {
     String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
     AIP aip = retrieveAIP(aipId);
-    String identifier = IdUtils.getPreservationFileId(fileDirectoryPath, fileId, aip.getInstanceId());
+    String identifier = IdUtils.getPreservationFileId(fileId, aip.getInstanceId());
     StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(identifier, PreservationMetadataType.FILE,
       aipId, representationId, fileDirectoryPath, fileId);
     return storage.exists(filePath);
@@ -1549,8 +1549,7 @@ public class ModelService extends ModelObservable {
       identifier = IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId);
     }
 
-    String urn = URNUtils.createRodaPreservationURN(type, fileDirectoryPath, identifier,
-      RODAInstanceUtils.getLocalInstanceIdentifier());
+    String urn = URNUtils.createRodaPreservationURN(type, identifier, RODAInstanceUtils.getLocalInstanceIdentifier());
     return createPreservationMetadata(type, urn, aipId, representationId, fileDirectoryPath, fileId, payload, notify);
   }
 
@@ -1635,6 +1634,17 @@ public class ModelService extends ModelObservable {
     }
 
     return pm;
+  }
+
+  public void deletePreservationMetadata(PreservationMetadata pm, boolean notify)
+    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
+    RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
+    StoragePath binaryPath = ModelUtils.getPreservationMetadataStoragePath(pm);
+    storage.deleteResource(binaryPath);
+
+    if (notify) {
+      notifyPreservationMetadataDeleted(pm).failOnError();
+    }
   }
 
   public void deletePreservationMetadata(PreservationMetadataType type, String aipId, String representationId,
@@ -4216,9 +4226,9 @@ public class ModelService extends ModelObservable {
 
     String distributedInstanceAsJson = JsonUtils.getJsonFromObject(distributedInstance);
     StoragePath distributedInstancePath = ModelUtils.getDistributedInstanceStoragePath(distributedInstance.getId());
-    if(distributedInstancePath != null) {
+    if (distributedInstancePath != null) {
       storage.updateBinaryContent(distributedInstancePath, new StringContentPayload(distributedInstanceAsJson), false,
-              false);
+        false);
     }
     return distributedInstance;
   }
