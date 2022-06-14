@@ -35,15 +35,6 @@
 
                             <g:FlowPanel styleName="field">
                                 <g:Label styleName="label"
-                                         ui:field="isSubscribedLabel">
-                                    <ui:text from='{messages.localInstanceIsSubscribedLabel}' />
-                                </g:Label>
-                                <g:HTML styleName="value"
-                                        ui:field="isSubscribedValue" />
-                            </g:FlowPanel>
-
-                            <g:FlowPanel styleName="field">
-                                <g:Label styleName="label"
                                          ui:field="lastSyncLabel">
                                     <ui:text from='{messages.localInstanceLastSyncDateLabel}' />
                                 </g:Label>
