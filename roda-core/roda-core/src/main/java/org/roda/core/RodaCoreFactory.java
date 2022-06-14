@@ -368,22 +368,22 @@ public class RodaCoreFactory {
   }
 
   public static boolean checkIfWriteIsAllowed(NodeType nodeType) {
-    return nodeType != NodeType.SLAVE;
+    return nodeType != NodeType.REPLICA;
   }
 
   public static void instantiate() {
     NodeType nodeType = NodeType
       .valueOf(getProperty(RodaConstants.CORE_NODE_TYPE, RodaConstants.DEFAULT_NODE_TYPE.name()));
 
-    if (nodeType == NodeType.MASTER) {
-      instantiate(NodeType.MASTER);
+    if (nodeType == NodeType.PRIMARY) {
+      instantiate(NodeType.PRIMARY);
     } else if (nodeType == NodeType.TEST) {
       instantiateTest();
     } else if (nodeType == NodeType.WORKER) {
       instantiateWorker();
     } else if (nodeType == NodeType.CONFIGS) {
       instantiateInConfigsMode();
-    } else if (nodeType == NodeType.SLAVE) {
+    } else if (nodeType == NodeType.REPLICA) {
       instantiateSlaveMode();
     } else {
       LOGGER.error("Unknown node type '{}'", nodeType);
@@ -456,7 +456,7 @@ public class RodaCoreFactory {
     INSTANTIATE_SCANNER = false;
     INSTANTIATE_PLUGIN_ORCHESTRATOR = false;
     INSTANTIATE_DEFAULT_RESOURCES = false;
-    instantiate(NodeType.SLAVE);
+    instantiate(NodeType.REPLICA);
   }
 
   private static void instantiate(NodeType nodeType) {
@@ -524,7 +524,7 @@ public class RodaCoreFactory {
 
         // verify if is necessary to perform a model/index migration
         MigrationManager migrationManager = new MigrationManager(dataPath);
-        if (NodeType.MASTER == nodeType
+        if (NodeType.PRIMARY == nodeType
           && migrationManager.isNecessaryToPerformMigration(getSolr(), tempIndexConfigsPath)) {
           // migrationManager.setupModelMigrations();
           // migrationManager.performModelMigrations();
@@ -550,7 +550,7 @@ public class RodaCoreFactory {
 
         // now that plugin manager is up, lets do some tasks that can only be
         // done after it
-        if (nodeType == NodeType.MASTER && pluginOrchestrator != null) {
+        if (nodeType == NodeType.PRIMARY && pluginOrchestrator != null) {
           pluginOrchestrator.cleanUnfinishedJobsAsync();
           LOGGER.debug("Finished clean unfinished jobs operation (doing jobs clean up asynchronously)");
         }
@@ -1163,7 +1163,7 @@ public class RodaCoreFactory {
     if (INSTANTIATE_SOLR) {
       Path solrHome = null;
 
-      if (nodeType == NodeType.MASTER || nodeType == NodeType.SLAVE) {
+      if (nodeType == NodeType.PRIMARY || nodeType == NodeType.REPLICA) {
         tempIndexConfigsPath = Optional.empty();
         solrHome = configPath.resolve(RodaConstants.CORE_INDEX_FOLDER);
         if (!FSUtils.exists(solrHome) || FEATURE_OVERRIDE_INDEX_CONFIGS) {
@@ -1462,7 +1462,7 @@ public class RodaCoreFactory {
       instantiateOrchestrator();
     }
 
-    if (nodeType == NodeType.MASTER) {
+    if (nodeType == NodeType.PRIMARY) {
       processPreservationEventTypeProperties();
     } else if (nodeType == NodeType.TEST && !INSTANTIATE_LDAP && INSTANTIATE_SOLR) {
       try {
@@ -2594,7 +2594,7 @@ public class RodaCoreFactory {
 
     preInstantiateSteps(args);
     instantiate();
-    if (nodeType == NodeType.MASTER) {
+    if (nodeType == NodeType.PRIMARY) {
       if (!args.isEmpty()) {
         mainMasterTasks(args);
       } else {

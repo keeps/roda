@@ -46,11 +46,11 @@ public final class RodaConstants {
   public static final String CORE_EVENTS_NOTIFIER_CLASS = "core.events.notifier_class";
   public static final String CORE_EVENTS_HANDLER_CLASS = "core.events.handler_class";
 
-  public static final String CORE_ACTION_LOGS_MASTER_USER = "core.action_logs.master.user";
-  public static final String CORE_ACTION_LOGS_MASTER_PASS = "core.action_logs.master.pass";
-  public static final String CORE_ACTION_LOGS_MASTER_URL = "core.action_logs.master.url";
-  public static final String CORE_ACTION_LOGS_MASTER_RESOURCE = "core.action_logs.master.resource";
-  public static final String CORE_ACTION_LOGS_SLAVE_WRITE_IN_SOLR = "core.action_logs.slave.write.solr";
+  public static final String CORE_ACTION_LOGS_PRIMARY_USER = "core.action_logs.primary.user";
+  public static final String CORE_ACTION_LOGS_PRIMARY_PASS = "core.action_logs.primary.pass";
+  public static final String CORE_ACTION_LOGS_PRIMARY_URL = "core.action_logs.primary.url";
+  public static final String CORE_ACTION_LOGS_PRIMARY_RESOURCE = "core.action_logs.primary.resource";
+  public static final String CORE_ACTION_LOGS_REPLICA_WRITE_IN_SOLR = "core.action_logs.replica.write.solr";
 
   public static final String CORE_SYNCHRONIZATION_BUNDLE_PATH = "core.synchronization.bundle.path";
 
@@ -669,10 +669,10 @@ public final class RodaConstants {
   public static final SolrType DEFAULT_SOLR_TYPE = SolrType.HTTP;
 
   public enum NodeType {
-    MASTER, WORKER, TEST, CONFIGS, SLAVE
+    PRIMARY, WORKER, TEST, CONFIGS, REPLICA
   }
 
-  public static final NodeType DEFAULT_NODE_TYPE = NodeType.MASTER;
+  public static final NodeType DEFAULT_NODE_TYPE = NodeType.PRIMARY;
 
   public enum DistributedModeType {
     CENTRAL, LOCAL, BASE

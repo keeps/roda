@@ -116,7 +116,7 @@ public class ActionableWidgetBuilder<T extends IsIndexed> {
     panel.addStyleName("actionable-menu");
 
     boolean isReadonly = NodeType.valueOf(ConfigurationManager.getString(RodaConstants.RODA_NODE_TYPE_KEY))
-      .equals(NodeType.SLAVE);
+      .equals(NodeType.REPLICA);
     int addedButtonCount = 0;
 
     for (ActionableGroup<T> actionGroup : actionableBundle.getGroups()) {
