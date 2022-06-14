@@ -2203,6 +2203,10 @@ public interface ClientMessages extends Messages {
 
   String testLocalInstanceConfigurationButton();
 
+  String testLocalInstanceConfigurationDialogTitle();
+
+  String testLocalInstanceConfigurationDialogMessage(String value);
+
   String subscribeLocalInstanceConfigurationButton();
 
   String synchronizeLocalInstanceConfigurationButton();
