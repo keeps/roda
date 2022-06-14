@@ -92,9 +92,6 @@ public class ShowLocalInstanceConfiguration extends Composite {
   HTML centralInstanceURLValue;
 
   @UiField
-  HTML isSubscribedValue;
-
-  @UiField
   HTML lastSyncValue;
 
   @UiField
@@ -110,7 +107,6 @@ public class ShowLocalInstanceConfiguration extends Composite {
   private void initElements(LocalInstance localInstance) {
     IDValue.setText(localInstance.getId());
     centralInstanceURLValue.setText(localInstance.getCentralInstanceURL());
-    isSubscribedValue.setText(localInstance.getIsSubscribed().toString());
     lastSyncValue.setHTML(HtmlSnippetUtils.getLastSyncHtml(localInstance, false));
     synchronizationStatusValue.setHTML(HtmlSnippetUtils.getInstanceIdStateHtml(localInstance));
     buttonSynchronize.setEnabled(false);
@@ -132,7 +128,7 @@ public class ShowLocalInstanceConfiguration extends Composite {
 
         @Override
         public void onSuccess(Boolean result) {
-          if (result == true) {
+          if (result) {
             BrowserService.Util.getInstance().subscribeLocalInstance(localInstance,
               new NoAsyncCallback<LocalInstance>() {
                 @Override
@@ -163,8 +159,8 @@ public class ShowLocalInstanceConfiguration extends Composite {
     BrowserService.Util.getInstance().synchronizeBundle(localInstance, new NoAsyncCallback<Job>() {
       @Override
       public void onSuccess(Job job) {
-          Toast.showInfo("Create Job", "Success");
-          HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+        Toast.showInfo("Create Job", "Success");
+        HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
       }
 
       @Override
