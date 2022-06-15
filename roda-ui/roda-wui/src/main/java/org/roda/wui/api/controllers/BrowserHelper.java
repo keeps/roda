@@ -420,7 +420,7 @@ public class BrowserHelper {
     // Count risk incidences
     if (UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_FIND_RISK_INCIDENCE)) {
       Filter riskIncidenceFilter = new Filter(
-        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_ID, file.getUUID()));
+        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_FILE_ID, file.getId()));
       Long riskIncidenceCount = RodaCoreFactory.getIndexService().count(RiskIncidence.class, riskIncidenceFilter);
       bundle.setRiskIncidenceCount(riskIncidenceCount);
     } else {
