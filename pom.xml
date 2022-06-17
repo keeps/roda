@@ -94,7 +94,7 @@
         <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
         <roda.temporary.repository>${user.dir}</roda.temporary.repository>
         <java_version>1.8</java_version>
-        <gwt.version>2.9.0</gwt.version>
+        <gwt.version>2.10.0</gwt.version>
         <cas.client.version>3.6.1</cas.client.version>
         <jersey.version>2.31</jersey.version>
         <swagger.version>1.6.2</swagger.version>
@@ -280,7 +280,7 @@
                     <skip>true</skip>
                     <excludes>
                         <exclude>
-                            <groupId>com.google.gwt</groupId>
+                            <groupId>org.gwtproject</groupId>
                             <artifactId>gwt-dev</artifactId>
                         </exclude>
                     </excludes>
@@ -458,13 +458,13 @@
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.google.gwt</groupId>
+                <groupId>org.gwtproject</groupId>
                 <artifactId>gwt-dev</artifactId>
                 <version>${gwt.version}</version>
                 <scope>${scope.gwt-dev}</scope>
             </dependency>
             <dependency>
-                <groupId>com.google.gwt</groupId>
+                <groupId>org.gwtproject</groupId>
                 <artifactId>gwt-user</artifactId>
                 <version>${gwt.version}</version>
             </dependency>
