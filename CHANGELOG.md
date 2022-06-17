@@ -1,5 +1,20 @@
 # Changelog
 
+## v4.4.0 (17/06/2022)
+### :warning: Breaking Changes
+Solr 7.7 reached EOL meaning that is no longer supported and will not receive any security patches. As such RODA from version 4.4 onward will use Solr 8 as index system. If you have any implementation with Solr 7 you need to upgrade the Solr to version 8 and then rebuild all indexes on RODA.
+
+#### New features:
+
+- Upgrade Solr version from 7.7 to Solr 8.11.1
+- Upgrade GWT version from 2.9.0 to 2.10.0
+
+Install for demonstration:
+```
+docker pull keeps/roda:v4.4.0
+```
+---
+
 ## v4.3.1 (17/06/2022)
 #### Bug Fixes:
 
@@ -514,29 +529,3 @@ docker pull keeps/roda:v3.1.1
 -  Stop job button missing [#1470](https://github.com/keeps/roda/issues/1470)
 -  Cannot create an AIP using web user interface [#1468](https://github.com/keeps/roda/issues/1468)
 -  Page information on navigation bar is not generic to files or other possible RODA objects [#1463](https://github.com/keeps/roda/issues/1463)
-
----
-
-## v3.1.0 (30/04/2019)
-Install for demonstration:
-```
-docker pull keeps/roda:v3.1.0
-```
-
-#### New features:
--  Configurable columns in all search results [#1459](https://github.com/keeps/roda/issues/1459)
--  Create Portal UI endpoint [#1452](https://github.com/keeps/roda/issues/1452)
-
-#### Enhancements:
--  Upgrading **Solr version to 7.7**
--  Upgrading PDFjs to 2.0.943 [#1461](https://github.com/keeps/roda/issues/1461)
--  Possibility to orderly show descriptive metadata on UI [#1451](https://github.com/keeps/roda/issues/1451)
--  Configuring a ui.list should not need to override all lists [#1445](https://github.com/keeps/roda/issues/1445)
-
-#### Bug Fixes:
-
--  Stemming for single-valued fields not ative [#1460](https://github.com/keeps/roda/issues/1460)
--  Repository preservation events are not being re-indexed [#1447](https://github.com/keeps/roda/issues/1447)
--  Report verification on ingest does not properly support transformation of resources to multiple AIPs [#1444](https://github.com/keeps/roda/issues/1444)
--  Being processed counter is not being correctly calculated [#1443](https://github.com/keeps/roda/issues/1443)
--  Bug while searching for filename [#1432](https://github.com/keeps/roda/issues/1432)
