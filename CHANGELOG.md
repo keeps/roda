@@ -3,9 +3,9 @@
 ## v4.3.1 (17/06/2022)
 #### Bug Fixes:
 
-Edit descriptive metadata from an AIP with a disposal schedule gives an error #2190 
-Multiple plugin assumes last plugin state in final report #2067
-Preservation event and incident risk counters on representation panel #2064
+- Edit descriptive metadata from an AIP with a disposal schedule gives an error #2190 
+- Multiple plugin assumes last plugin state in final report #2067
+- Preservation event and incident risk counters on representation panel #2064
 
 Install for demonstration:
 ```
