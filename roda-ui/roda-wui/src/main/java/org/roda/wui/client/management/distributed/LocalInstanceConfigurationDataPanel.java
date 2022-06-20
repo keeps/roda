@@ -9,7 +9,6 @@ import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.tools.ValidationUtils;
-import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -218,7 +217,15 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
             if (result.isEmpty()) {
               Dialogs.showInformationDialog(messages.testLocalInstanceConfigurationDialogTitle(), messages.testLocalInstanceConfigurationDialogMessage(centralInstanceURLValue.getText()) , messages.closeButton(), false);
             } else {
-              Toast.showError("Test instance", "Error: " + result.toString());
+              StringBuilder errorMessage = new StringBuilder();
+              result.forEach(i -> {
+                errorMessage.append("\n");
+                errorMessage.append(i);
+              });
+              Dialogs.showInformationDialog(
+                messages.testLocalInstanceConfigurationDialogTitle(), messages
+                  .testLocalInstanceConfigurationDialogMessageError(centralInstanceURLValue.getText() + errorMessage),
+                messages.closeButton(), false);
             }
           }
         });

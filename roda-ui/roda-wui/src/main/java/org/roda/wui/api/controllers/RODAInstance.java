@@ -266,7 +266,7 @@ public class RODAInstance extends RodaWuiController {
   }
 
   public static List<String> testLocalInstanceConfiguration(User user, LocalInstance localInstance)
-    throws AuthorizationDeniedException, GenericException, AuthenticationDeniedException {
+    throws AuthorizationDeniedException{
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     List<String> responseList = new ArrayList();
 
@@ -276,9 +276,10 @@ public class RODAInstance extends RodaWuiController {
 
     try {
       TokenManager.getInstance().getAccessToken(localInstance);
+      TokenManager.getInstance().removeToken();
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
-      throw e;
+      responseList.add(e.toString());
     } finally {
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_LOCAL_INSTANCE_PARAM);
     }
