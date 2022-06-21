@@ -2207,6 +2207,8 @@ public interface ClientMessages extends Messages {
 
   String testLocalInstanceConfigurationDialogMessage(String value);
 
+  String testLocalInstanceConfigurationDialogMessageError(String value);
+
   String subscribeLocalInstanceConfigurationButton();
 
   String synchronizeLocalInstanceConfigurationButton();
