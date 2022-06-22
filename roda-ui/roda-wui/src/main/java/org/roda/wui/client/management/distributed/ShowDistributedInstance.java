@@ -11,6 +11,7 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.client.management.access.AccessKeyTablePanel;
+import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -165,11 +166,17 @@ public class ShowDistributedInstance extends Composite {
   private void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
       BrowserService.Util.getInstance().retrieveDistributedInstance(historyTokens.get(0),
-        new NoAsyncCallback<DistributedInstance>() {
+        new AsyncCallback<DistributedInstance>() {
           @Override
           public void onSuccess(DistributedInstance result) {
             ShowDistributedInstance showDistributedInstance = new ShowDistributedInstance(result);
             callback.onSuccess(showDistributedInstance);
+          }
+
+          @Override
+          public void onFailure(Throwable caught) {
+            callback.onFailure(caught);
+            HistoryUtils.newHistory(Welcome.RESOLVER);
           }
         });
     }
