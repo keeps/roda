@@ -4197,7 +4197,12 @@ public class ModelService extends ModelObservable {
   public DistributedInstance retrieveDistributedInstance(String distributedInstanceId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     StoragePath distributedInstancePath = ModelUtils.getDistributedInstanceStoragePath(distributedInstanceId);
-    Binary binary = storage.getBinary(distributedInstancePath);
+    Binary binary = null;
+    try {
+      binary = storage.getBinary(distributedInstancePath);
+    } catch (NotFoundException e) {
+      throw new GenericException("Could not find the distributed instance" + distributedInstanceId, e);
+    }
     DistributedInstance ret;
 
     try (InputStream inputStream = binary.getContent().createInputStream()) {
