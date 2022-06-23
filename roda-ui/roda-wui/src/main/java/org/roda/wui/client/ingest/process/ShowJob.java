@@ -27,7 +27,6 @@ import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
-import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
@@ -554,11 +553,12 @@ public class ShowJob extends Composite {
         Filter filter = ((SelectedItemsFilter<?>) selected).getFilter();
         HTML filterHTML = new HTML(SearchPreFilterUtils.getFilterHTML(filter, selected.getSelectedClass()));
         selectedList.add(filterHTML);
-      } else if (selected instanceof SelectedItemsAll || selected instanceof SelectedItemsNone) {
+      } else if (selected instanceof SelectedItemsAll) {
+
         Label objectLabel = new Label();
         objectLabel.addStyleName("value");
 
-        if (StringUtils.isBlank(selected.getSelectedClass())) {
+        if (!StringUtils.isBlank(selected.getSelectedClass())) {
           objectLabel.setText(messages.noItemsToDisplay(messages.someOfAObject(selected.getSelectedClass())));
         } else if (AIP.class.getName().equals(selected.getSelectedClass())
           || IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
