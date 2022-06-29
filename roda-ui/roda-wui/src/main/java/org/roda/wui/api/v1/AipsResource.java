@@ -130,7 +130,8 @@ public class AipsResource {
     @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
   public Response retrieveAIPPart(
     @Parameter(description = "The ID of the AIP to retrieve.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
-    @Parameter(description = "The part of the AIP to download.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_PART) String part)
+    @Parameter(description = "The part of the AIP to download.", required = true, schema = @Schema(allowableValues = {
+      "submission", "documentation", "schemas"})) @PathParam(RodaConstants.API_PATH_PARAM_PART) String part)
     throws RODAException {
     // get user
     User user = UserUtility.getApiUser(request);
