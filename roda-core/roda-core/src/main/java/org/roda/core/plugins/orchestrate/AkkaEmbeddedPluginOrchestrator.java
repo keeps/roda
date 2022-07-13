@@ -93,7 +93,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   private ActorSystem jobsSystem;
   private ActorRef jobsManager;
-  private int maxNumberOfJobsInParallel;
 
   // Map<jobId, ActorRef>
   private Map<String, ActorRef> runningJobs;
@@ -103,7 +102,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   private List<String> inErrorJobs;
 
   public AkkaEmbeddedPluginOrchestrator() {
-    maxNumberOfJobsInParallel = JobsHelper.getMaxNumberOfJobsInParallel();
+    int maxNumberOfJobsInParallel = JobsHelper.getMaxNumberOfJobsInParallel();
+    int maxNumberOfLimitedJobsInParallel = JobsHelper.getMaxNumberOfLimitedJobsInParallel();
 
     index = RodaCoreFactory.getIndexService();
     model = RodaCoreFactory.getModelService();
@@ -117,7 +117,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     // 20170105 hsilva: subscribe all dead letter so they are logged
     jobsSystem.eventStream().subscribe(jobsSystem.actorOf(Props.create(DeadLetterActor.class)), AllDeadLetters.class);
 
-    jobsManager = jobsSystem.actorOf(Props.create(AkkaJobsManager.class, maxNumberOfJobsInParallel), "jobsManager");
+    jobsManager = jobsSystem.actorOf(Props.create(AkkaJobsManager.class, maxNumberOfJobsInParallel, maxNumberOfLimitedJobsInParallel), "jobsManager");
 
   }
 

@@ -110,8 +110,8 @@ public class Messages {
   }
 
   public static JobsManagerJobEnded newJobsManagerJobEnded(String jobId, String plugin, PluginType type, long duration,
-    JobStats jobStats) {
-    return INSTANCE.new JobsManagerJobEnded(jobId, plugin, type, duration, jobStats);
+    JobStats jobStats, JobParallelism jobParallelism) {
+    return INSTANCE.new JobsManagerJobEnded(jobId, plugin, type, duration, jobStats, jobParallelism);
   }
 
   public final class JobsManagerJobEnded extends AbstractMessage {
@@ -122,14 +122,17 @@ public class Messages {
     private final PluginType pluginType;
     private final long duration;
     private final JobStats jobStats;
+    private final JobParallelism parallelism;
 
-    public JobsManagerJobEnded(String jobId, String plugin, PluginType pluginType, long duration, JobStats jobStats) {
+    public JobsManagerJobEnded(String jobId, String plugin, PluginType pluginType, long duration, JobStats jobStats,
+      JobParallelism parallelism) {
       super();
       this.jobId = jobId;
       this.plugin = plugin;
       this.pluginType = pluginType;
       this.duration = duration;
       this.jobStats = jobStats;
+      this.parallelism = parallelism;
     }
 
     public String getJobId() {
@@ -152,9 +155,15 @@ public class Messages {
       return jobStats;
     }
 
+    public JobParallelism getJobParallelism() {
+      return parallelism;
+    }
+
     @Override
     public String toString() {
-      return "JobsManagerJobEnded [jobId=" + jobId + ", plugin=" + plugin + ", pluginType=" + pluginType + "]";
+      return "JobsManagerJobEnded [jobId=" + jobId + ", plugin=" + plugin + ", pluginType=" + pluginType
+        + ", jobParallelism=" + parallelism + "]";
+
     }
   }
 

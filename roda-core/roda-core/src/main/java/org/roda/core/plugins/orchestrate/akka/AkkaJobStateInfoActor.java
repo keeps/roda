@@ -125,8 +125,10 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
   private void handleJobStateUpdated(Messages.JobStateUpdated message) {
     markMessageProcessingAsStarted(message);
     Plugin<?> p = message.getPlugin() == null ? this.plugin : message.getPlugin();
+    JobParallelism parallelism = null;
     try {
       Job job = PluginHelper.getJob(p, getIndex());
+      parallelism = job.getParallelism();
       LOGGER.info("Setting job '{}' ({}) state to {}. Details: {}", job.getName(), job.getId(), message.getState(),
         message.getStateDetails().orElse("NO DETAILS"));
     } catch (NotFoundException | GenericException | RequestNotValidException e) {
@@ -140,7 +142,8 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
 
       jobCreator.tell("Done", getSelf());
       jobsManager.tell(Messages.newJobsManagerJobEnded(jobId, plugin.getClass().getName(), plugin.getType(),
-        calculateJobDuration(p), getJobStatsFromPlugin(p)), getSelf());
+        calculateJobDuration(p), getJobStatsFromPlugin(p), parallelism != null ? parallelism : JobParallelism.NORMAL),
+        getSelf());
       JobsHelper.deleteJobWorkingDirectory(jobId);
       getContext().stop(getSelf());
     }
