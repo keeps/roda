@@ -13,7 +13,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -26,6 +25,7 @@ import org.roda.core.common.akka.Messages.JobsManagerAcquireLock;
 import org.roda.core.common.akka.Messages.JobsManagerReleaseAllLocks;
 import org.roda.core.common.akka.Messages.JobsManagerReleaseLock;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobParallelism;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,10 +47,17 @@ public class AkkaJobsManager extends AkkaBaseActor {
   private static final int DEFAULT_LOCK_TIMEOUT = 600;
 
   // state
-  private int maxNumberOfJobsInParallel;
+  private final int maxNumberOfJobsInParallel;
+  private final int maxNumberOfLimitedJobsInParallel;
   private PriorityBlockingQueue<JobWaiting> jobsWaiting;
+
+  private PriorityBlockingQueue<JobWaiting> limitedJobsWaiting;
   private Map<String, ActorRef> jobsWaitingCreators;
-  private ActorRef jobsRouter;
+
+  private Map<String, ActorRef> limitedJobsWaitingCreators;
+  private final ActorRef jobsRouter;
+
+  private final ActorRef limitedJobsRouter;
   // <Lite, LockInfo>
   private Map<String, LockInfo> objectsLocked;
   // <RequestUUID, List<Lite>>
@@ -60,9 +67,13 @@ public class AkkaJobsManager extends AkkaBaseActor {
   // metrics
   private Counter ticksWaitingToBeProcessed;
   private Counter jobsBeingExecuted;
+  private Counter limitedJobsBeingExecuted;
   private Counter jobsWaitingToBeExecuted;
+  private Counter limitedJobsWaitingToBeExecuted;
   private Histogram jobsBeingExecutedHisto;
+  private Histogram limitedJobsBeingExecutedHisto;
   private Histogram jobsWaitingToBeExecutedHisto;
+  private Histogram limitedJobsWaitingToBeExecutedHisto;
   private Histogram jobsTimeInTheQueueInMilis;
   private Counter lockRequestsWaitingToAcquireLock;
   private Histogram lockRequestsWaitingToAcquireLockHisto;
@@ -75,17 +86,25 @@ public class AkkaJobsManager extends AkkaBaseActor {
   private boolean nonParallelizableJobIsRunning = false;
   private int nonParallelizableJobsQueued = 0;
 
-  public AkkaJobsManager(int maxNumberOfJobsInParallel) {
+  public AkkaJobsManager(int maxNumberOfJobsInParallel, int maxNumberOfLimitedJobsInParallel) {
     super();
     this.maxNumberOfJobsInParallel = maxNumberOfJobsInParallel;
+    this.maxNumberOfLimitedJobsInParallel = maxNumberOfLimitedJobsInParallel;
     this.jobsWaiting = new PriorityBlockingQueue<>(maxNumberOfJobsInParallel, new SortByPriority());
+    this.limitedJobsWaiting = new PriorityBlockingQueue<>(maxNumberOfLimitedJobsInParallel, new SortByPriority());
     this.jobsWaitingCreators = new HashMap<>();
+    this.limitedJobsWaitingCreators = new HashMap<>();
     this.objectsLocked = new HashMap<>();
     this.requestUuidLites = new HashMap<>();
     this.waitingToAcquireLockRequests = new ArrayList<>();
 
-    Props jobsProps = new RoundRobinPool(maxNumberOfJobsInParallel).props(Props.create(AkkaJobActor.class, getSelf()));
+    Props jobsProps = new RoundRobinPool(maxNumberOfJobsInParallel-2).props(Props.create(AkkaJobActor.class, getSelf()));
+    Props backgroundJobsProps = new RoundRobinPool(2).props(Props.create(AkkaBackgroundJobActor.class, getSelf()));
     jobsRouter = getContext().actorOf(jobsProps, "JobsRouter");
+
+    Props limitedJobsProps = new RoundRobinPool(maxNumberOfLimitedJobsInParallel)
+      .props(Props.create(AkkaLimitedJobActor.class, getSelf()));
+    limitedJobsRouter = getContext().actorOf(limitedJobsProps, "LimitedJobsRouter");
 
     initMetrics(maxNumberOfJobsInParallel);
 
@@ -94,7 +113,7 @@ public class AkkaJobsManager extends AkkaBaseActor {
     getContext().system().scheduler().schedule(Duration.create(0, TimeUnit.MILLISECONDS),
       Duration.create(2, TimeUnit.SECONDS), () -> {
         if (jobsWaitingToBeExecuted.getCount() > 0 || !waitingToAcquireLockRequests.isEmpty()
-          || !objectsLocked.isEmpty()) {
+          || !objectsLocked.isEmpty() || limitedJobsWaitingToBeExecuted.getCount() > 0) {
           sendTick();
         }
       }, getContext().system().dispatcher());
@@ -131,6 +150,33 @@ public class AkkaJobsManager extends AkkaBaseActor {
   }
 
   private void handleJob(Job job) {
+    if (job.getParallelism() != null && JobParallelism.LIMITED.equals(job.getParallelism())) {
+      handleLimitedJob(job);
+    } else {
+      handleNormalJob(job);
+    }
+  }
+
+  private void handleLimitedJob(Job job) {
+    if (jobIsNotParallelizable(job)) {
+      if (!nonParallelizableJobIsRunning && limitedJobsWaitingToBeExecuted.getCount() == 0
+        && limitedJobsBeingExecuted.getCount() < maxNumberOfLimitedJobsInParallel) {
+        nonParallelizableJobIsRunning = true;
+        sendJobForExecution(job);
+      } else {
+        queueJob(job, true);
+      }
+    } else {
+      if (limitedJobsWaitingToBeExecuted.getCount() == 0
+        && limitedJobsBeingExecuted.getCount() < maxNumberOfLimitedJobsInParallel) {
+        sendJobForExecution(job);
+      } else {
+        queueJob(job, false);
+      }
+    }
+  }
+
+  private void handleNormalJob(Job job) {
     if (jobIsNotParallelizable(job)) {
       if (!nonParallelizableJobIsRunning && jobsWaitingToBeExecuted.getCount() == 0
         && jobsBeingExecuted.getCount() < maxNumberOfJobsInParallel) {
@@ -157,38 +203,67 @@ public class AkkaJobsManager extends AkkaBaseActor {
   }
 
   private void sendJobForExecution(Job job) {
-    updateJobsBeingExecuted(true);
+    updateJobsBeingExecuted(true, job.getParallelism());
     jobsTimeInTheQueueInMilis.update(0);
-    jobsRouter.tell(job, getSender());
+    if (job.getParallelism() != null && JobParallelism.LIMITED.equals(job.getParallelism())) {
+      limitedJobsRouter.tell(job, getSender());
+    } else {
+      jobsRouter.tell(job, getSender());
+    }
     log("Will execute job", job.getId());
   }
 
-  private void updateJobsBeingExecuted(boolean increment) {
-    if (increment) {
-      jobsBeingExecuted.inc();
+  private void updateJobsBeingExecuted(boolean increment, JobParallelism jobParallelism) {
+    if (JobParallelism.LIMITED.equals(jobParallelism)) {
+      if (increment) {
+        limitedJobsBeingExecuted.inc();
+      } else {
+        limitedJobsBeingExecuted.dec();
+      }
+      limitedJobsBeingExecutedHisto.update(limitedJobsBeingExecuted.getCount());
     } else {
-      jobsBeingExecuted.dec();
+      if (increment) {
+        jobsBeingExecuted.inc();
+      } else {
+        jobsBeingExecuted.dec();
+      }
+      jobsBeingExecutedHisto.update(jobsBeingExecuted.getCount());
     }
-    jobsBeingExecutedHisto.update(jobsBeingExecuted.getCount());
   }
 
   private void queueJob(Job job, boolean jobIsJobParallelizable) {
     if (jobIsJobParallelizable) {
       nonParallelizableJobsQueued++;
     }
-    jobsWaiting.offer(new JobWaiting(job));
-    jobsWaitingCreators.put(job.getId(), getSender());
-    updateJobsWaitingToBeExecuted(true);
+
+    if (job.getParallelism() != null && JobParallelism.LIMITED.equals(job.getParallelism())) {
+      limitedJobsWaiting.offer(new JobWaiting(job));
+      limitedJobsWaitingCreators.put(job.getId(), getSender());
+    } else {
+      jobsWaiting.offer(new JobWaiting(job));
+      jobsWaitingCreators.put(job.getId(), getSender());
+    }
+
+    updateJobsWaitingToBeExecuted(true, job.getParallelism());
     log("Queued job", job.getId());
   }
 
-  private void updateJobsWaitingToBeExecuted(boolean increment) {
-    if (increment) {
-      jobsWaitingToBeExecuted.inc();
+  private void updateJobsWaitingToBeExecuted(boolean increment, JobParallelism jobParallelism) {
+    if (JobParallelism.LIMITED.equals(jobParallelism)) {
+      if (increment) {
+        limitedJobsWaitingToBeExecuted.inc();
+      } else {
+        limitedJobsWaitingToBeExecuted.dec();
+      }
+      limitedJobsWaitingToBeExecutedHisto.update(limitedJobsWaitingToBeExecuted.getCount());
     } else {
-      jobsWaitingToBeExecuted.dec();
+      if (increment) {
+        jobsWaitingToBeExecuted.inc();
+      } else {
+        jobsWaitingToBeExecuted.dec();
+      }
+      jobsWaitingToBeExecutedHisto.update(jobsWaitingToBeExecuted.getCount());
     }
-    jobsWaitingToBeExecutedHisto.update(jobsWaitingToBeExecuted.getCount());
   }
 
   private void handleTick(boolean decrementTicksWaitingCounter) {
@@ -196,6 +271,10 @@ public class AkkaJobsManager extends AkkaBaseActor {
     if (jobsWaitingToBeExecuted.getCount() > 0 && jobsBeingExecuted.getCount() < maxNumberOfJobsInParallel) {
       dequeueJobs(
         Math.min(jobsWaitingToBeExecuted.getCount(), maxNumberOfJobsInParallel - jobsBeingExecuted.getCount()));
+    }
+
+    if (limitedJobsWaitingToBeExecuted.getCount() > 0 && limitedJobsBeingExecuted.getCount() < maxNumberOfLimitedJobsInParallel) {
+      dequeueLimitedJobs(Math.min(limitedJobsWaitingToBeExecuted.getCount(), maxNumberOfLimitedJobsInParallel - limitedJobsBeingExecuted.getCount()));
     }
 
     // lock requests waiting related
@@ -243,9 +322,58 @@ public class AkkaJobsManager extends AkkaBaseActor {
       jobsTimeInTheQueueInMilis.update(jobToDequeue.timeInQueueInMillis());
       Job job = jobToDequeue.job;
       ActorRef jobCreator = jobsWaitingCreators.remove(job.getId());
-      updateJobsBeingExecuted(true);
-      updateJobsWaitingToBeExecuted(false);
-      jobsRouter.tell(job, jobCreator);
+      updateJobsBeingExecuted(true, job.getParallelism());
+      updateJobsWaitingToBeExecuted(false, job.getParallelism());
+      if (job.getParallelism() != null && JobParallelism.LIMITED.equals(job.getParallelism())) {
+        limitedJobsRouter.tell(job, jobCreator);
+      } else {
+        jobsRouter.tell(job, jobCreator);
+      }
+      log("Dequeued job", job.getId());
+    }
+  }
+
+  private void dequeueLimitedJobs(long numberOfJobsToDequeue) {
+    List<JobWaiting> jobsToDequeued = new ArrayList<>();
+    boolean dequeueOneNonParallelizableJob = !nonParallelizableJobIsRunning;
+
+    // 20180104 hsilva: Optimization 1 - if one non-parallelizable job is
+    // already running & all waiting are non-parallelizable, there is no point
+    // in doing the for cycle
+    if (nonParallelizableJobIsRunning && limitedJobsWaiting.size() == nonParallelizableJobsQueued) {
+      return;
+    }
+
+    for (JobWaiting jobWaiting : limitedJobsWaiting) {
+      boolean jobIsNotParallelizable = jobIsNotParallelizable(jobWaiting.job);
+      if (jobIsNotParallelizable) {
+        if (dequeueOneNonParallelizableJob) {
+          nonParallelizableJobsQueued--;
+          dequeueOneNonParallelizableJob = false;
+          nonParallelizableJobIsRunning = true;
+          jobsToDequeued.add(jobWaiting);
+        }
+      } else {
+        jobsToDequeued.add(jobWaiting);
+      }
+
+      if (jobsToDequeued.size() == numberOfJobsToDequeue) {
+        break;
+      }
+    }
+
+    for (JobWaiting jobToDequeue : jobsToDequeued) {
+      limitedJobsWaiting.remove(jobToDequeue);
+      jobsTimeInTheQueueInMilis.update(jobToDequeue.timeInQueueInMillis());
+      Job job = jobToDequeue.job;
+      ActorRef jobCreator = limitedJobsWaitingCreators.remove(job.getId());
+      updateJobsBeingExecuted(true, job.getParallelism());
+      updateJobsWaitingToBeExecuted(false, job.getParallelism());
+      if (job.getParallelism() != null && JobParallelism.LIMITED.equals(job.getParallelism())) {
+        limitedJobsRouter.tell(job, jobCreator);
+      } else {
+        jobsRouter.tell(job, jobCreator);
+      }
       log("Dequeued job", job.getId());
     }
   }
@@ -375,7 +503,7 @@ public class AkkaJobsManager extends AkkaBaseActor {
     if (jobIsNotParallelizable(jobEnded.getPlugin())) {
       nonParallelizableJobIsRunning = false;
     }
-    updateJobsBeingExecuted(false);
+    updateJobsBeingExecuted(false, jobEnded.getJobParallelism());
     log("The end for job", jobEnded.getJobId());
   }
 
@@ -448,6 +576,13 @@ public class AkkaJobsManager extends AkkaBaseActor {
       .histogram(MetricRegistry.name(className, "objectsWaitingToAcquireLockHisto"));
 
     messagesProcessingTimeInMilis = metrics.histogram(MetricRegistry.name(className, "messagesProcessingTimeInMilis"));
+
+    limitedJobsBeingExecuted = metrics.counter(MetricRegistry.name(className, "limtedJobsBeingExecuted"));
+    limitedJobsWaitingToBeExecuted = metrics.counter(MetricRegistry.name(className, "limitedJobsWaitingToBeExecuted"));
+    limitedJobsBeingExecutedHisto = metrics
+      .histogram(MetricRegistry.name(className, "limitedJobsBeingExecutedHistogram"));
+    limitedJobsWaitingToBeExecutedHisto = metrics
+      .histogram(MetricRegistry.name(className, "limiteJobsWaitingToBeExecutedHistogram"));
   }
 
   private void loadParallelizationInformation() {
