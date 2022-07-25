@@ -45,7 +45,8 @@ jobs:
           sudo add-apt-repository "deb https://www.itforarchivists.com/ buster main"
           sudo apt-get -qq update
           sudo apt-get -qq install siegfried -y
-          sudo rm /usr/bin/clamscan /usr/bin/clamdscan
+          sudo rm -f /usr/bin/clamscan /usr/bin/clamdscan
+          sudo mkdir -p /usr/bin
           sudo cp .github/workflows/bin/clamscan /usr/bin/clamscan
           sudo cp .github/workflows/bin/clamscan /usr/bin/clamdscan
           sudo chmod a+rx /usr/bin/clamscan /usr/bin/clamdscan
