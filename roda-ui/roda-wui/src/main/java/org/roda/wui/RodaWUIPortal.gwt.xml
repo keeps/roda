@@ -13,18 +13,19 @@
 	<extend-property name="locale" values="pt_PT" />
 	<extend-property name="locale" values="es_CL" />
 	<extend-property name="locale" values="fr" />
-	<set-property-fallback name="locale" value="en"/>
+	<extend-property name="locale" values="hu" />
+	<set-property-fallback name="locale" value="en" />
 
 	<!-- Locale -->
-	<set-configuration-property name="locale.useragent" value="Y"/>
-	<set-configuration-property name="locale.searchorder" value="queryparam,cookie,meta,useragent"/>
-	
+	<set-configuration-property name="locale.useragent" value="Y" />
+	<set-configuration-property name="locale.searchorder" value="queryparam,cookie,meta,useragent" />
+
 	<!-- GSS -->
 	<set-configuration-property name="CssResource.enableGss" value="true" />
 	<set-configuration-property name="CssResource.gssDefaultInUiBinder" value="true" />
 	<!-- Still needing conversion mode because default CellTable style is still provided in CSS instead of GSS  -->
 	<set-configuration-property name="CssResource.conversionMode" value="strict" />
-	
+
 
 	<!-- Inherit required libraries -->
 	<inherits name="com.github.nmorel.gwtjackson.GwtJackson" />
