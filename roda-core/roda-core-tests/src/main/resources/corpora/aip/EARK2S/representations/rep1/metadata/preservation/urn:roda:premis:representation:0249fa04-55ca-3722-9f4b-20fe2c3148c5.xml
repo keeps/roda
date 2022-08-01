@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<object xsi:type="representation" xmlns="http://www.loc.gov/premis/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <objectIdentifier>
+        <objectIdentifierType>URN</objectIdentifierType>
+        <objectIdentifierValue>urn:roda:premis:representation:0249fa04-55ca-3722-9f4b-20fe2c3148c5</objectIdentifierValue>
+    </objectIdentifier>
+    <preservationLevel>
+        <preservationLevelType></preservationLevelType>
+    </preservationLevel>
+    <relationship>
+        <relationshipType>structural</relationshipType>
+        <relationshipSubType>hasPart</relationshipSubType>
+        <relatedObjectIdentifier>
+            <relatedObjectIdentifierType>URN</relatedObjectIdentifierType>
+            <relatedObjectIdentifierValue>urn:roda:premis:file:external_files.jsonl</relatedObjectIdentifierValue>
+        </relatedObjectIdentifier>
+    </relationship>
+</object>
