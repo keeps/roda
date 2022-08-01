@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<event xmlns="http://www.loc.gov/premis/v3">
+    <eventIdentifier>
+        <eventIdentifierType>URN</eventIdentifierType>
+        <eventIdentifierValue>urn:roda:premis:event:f2ac5b08-f22f-4c76-874f-f0c515b5d130</eventIdentifierValue>
+    </eventIdentifier>
+    <eventType>wellformedness check</eventType>
+    <eventDateTime>2022-08-02T13:55:00.731Z</eventDateTime>
+    <eventDetailInformation>
+        <eventDetail>Checked that the received SIP is well formed, complete and that no unexpected files were included.</eventDetail>
+    </eventDetailInformation>
+    <eventOutcomeInformation>
+        <eventOutcome>SUCCESS</eventOutcome>
+        <eventOutcomeDetail>
+            <eventOutcomeDetailNote>The SIP was well formed and complete.</eventOutcomeDetailNote>
+        </eventOutcomeDetail>
+    </eventOutcomeInformation>
+    <linkingAgentIdentifier>
+        <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+        <linkingAgentIdentifierValue>urn:roda:premis:agent:org.roda.core.plugins.base.ingest.EARKSIP2ToAIPPlugin@1.0</linkingAgentIdentifierValue>
+    </linkingAgentIdentifier>
+    <linkingAgentIdentifier>
+        <linkingAgentIdentifierType>URN</linkingAgentIdentifierType>
+        <linkingAgentIdentifierValue>urn:roda:premis:agent:admin</linkingAgentIdentifierValue>
+        <linkingAgentRole>implementer</linkingAgentRole>
+    </linkingAgentIdentifier>
+    <linkingObjectIdentifier>
+        <linkingObjectIdentifierType>URN</linkingObjectIdentifierType>
+        <linkingObjectIdentifierValue>urn:roda:transferred_resource:sips - uuid-f3c94fdf-bb42-4174-ab73-ac9e086f1347.zip</linkingObjectIdentifierValue>
+        <linkingObjectRole>source</linkingObjectRole>
+    </linkingObjectIdentifier>
+    <linkingObjectIdentifier>
+        <linkingObjectIdentifierType>URN</linkingObjectIdentifierType>
+        <linkingObjectIdentifierValue>urn:roda:aip:e987b729-bddf-43cf-97d4-596749f0642d</linkingObjectIdentifierValue>
+        <linkingObjectRole>outcome</linkingObjectRole>
+    </linkingObjectIdentifier>
+</event>

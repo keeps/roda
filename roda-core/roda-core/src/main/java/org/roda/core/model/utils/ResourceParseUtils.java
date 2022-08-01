@@ -42,6 +42,7 @@ import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.ShallowFile;
+import org.roda.core.data.v2.ip.ShallowFiles;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
@@ -61,11 +62,12 @@ import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultBinary;
 import org.roda.core.storage.DefaultDirectory;
 import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.ExternalFileManifestContentPayload;
+import org.roda.core.storage.InputStreamContentPayload;
 import org.roda.core.storage.JsonContentPayload;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,6 +100,26 @@ public class ResourceParseUtils {
           String url = shallowFile.getLocation().toString();
           String originFile = FSUtils.getStoragePathAsString(resource.getStoragePath(), true);
           String referenceUUID = shallowFile.getUUID();
+          return new File(shallowFile.getName(), aipId, representationId, filePath, false, true, url, originFile,
+            referenceUUID, null);
+        } catch (IOException e) {
+          throw new GenericException("Error while trying to convert shallow file into a representation file");
+        }
+      } else if (content instanceof InputStreamContentPayload && ((DefaultBinary) resource).isReference()) {
+        try {
+          final ShallowFiles shallowFiles = FSUtils.retrieveManifestFileContent(FSUtils
+            .getEntityPath(RodaCoreFactory.getStoragePath(),
+              ModelUtils.getRepresentationDataStoragePath(aipId, representationId))
+            .resolve(RodaConstants.RODA_MANIFEST_EXTERNAL_FILES));
+          ShallowFile shallowFile = null;
+          for (ShallowFile shallow : shallowFiles.getObjects()) {
+            if (shallow.getName().equals(id)) {
+              shallowFile = shallow;
+            }
+          }
+          final String url = shallowFile.getLocation().toString();
+          final String originFile = FSUtils.getStoragePathAsString(resource.getStoragePath(), true);
+          final String referenceUUID = shallowFile.getUUID();
           return new File(shallowFile.getName(), aipId, representationId, filePath, false, true, url, originFile,
             referenceUUID, null);
         } catch (IOException e) {

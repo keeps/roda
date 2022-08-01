@@ -30,6 +30,8 @@ public final class CorporaConstants {
   public static final String SOURCE_AIP_VERSION_EAD_UNKNOWN = "AIP_VERSION_EAD_UNKNOWN";
   public static final String SOURCE_AIP_BUGGY_ID = "AIP_BUGGY";
   public static final String SOURCE_AIP_ID_REAL = "REAL";
+
+  public static final String SOURCE_AIP_ID_EARK2S = "EARK2S";
   public static final String SOURCE_AIP_REP_WITH_SUBFOLDERS = "AIP_REP_WITH_SUBFOLDERS";
   public static final String SOURCE_AIP_CONVERTER_1 = "AIP_CONVERTER_1";
   public static final String SOURCE_AIP_CONVERTER_2 = "AIP_CONVERTER_2";

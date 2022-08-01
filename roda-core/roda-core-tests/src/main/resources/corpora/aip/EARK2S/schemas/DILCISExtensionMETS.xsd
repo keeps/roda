@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="https://DILCIS.eu/XML/METS/CSIPExtensionMETS"
+    targetNamespace="https://DILCIS.eu/XML/METS/CSIPExtensionMETS" elementFormDefault="qualified">
+    <xs:attribute name="CONTENTINFORMATIONTYPE">
+        <xs:simpleType>
+            <xs:restriction base="xs:string">
+                <xs:enumeration value="ERMS"/>
+                <xs:enumeration value="SIARD1"/>
+                <xs:enumeration value="SIARD2"/>
+                <xs:enumeration value="SIARDDK"/>
+                <xs:enumeration value="GeoData"/>
+                <xs:enumeration value="citcarchival_v1_0"/>
+                <xs:enumeration value="citspremis_v1_0"/>
+                <xs:enumeration value="citserms_v2_1"/>
+                <xs:enumeration value="citsehpj_v1_0"/>
+                <xs:enumeration value="citsehcr_v1_0"/>
+                <xs:enumeration value="citssiard_v1_0"/>
+                <xs:enumeration value="citsgeospatial_v3_0"/>
+                <xs:enumeration value="MIXED"/>
+                <xs:enumeration value="OTHER"/>
+            </xs:restriction>
+        </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="OTHERCONTENTINFORMATIONTYPE" type="xs:string"/>
+    <xs:attribute name="OAISPACKAGETYPE">
+        <xs:simpleType>
+            <xs:restriction base="xs:string">
+                <xs:enumeration value="SIP"/>
+                <xs:enumeration value="AIP"/>
+                <xs:enumeration value="DIP"/>
+                <xs:enumeration value="AIU"/>
+                <xs:enumeration value="AIC"/>
+            </xs:restriction>
+        </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="NOTETYPE">
+        <xs:simpleType>
+            <xs:restriction base="xs:string">
+              <xs:enumeration value="SOFTWARE VERSION"/>
+              <xs:enumeration value="IDENTIFICATIONCODE"/>
+            </xs:restriction>
+        </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="OTHERTYPE" type="xs:string"/>
+</xs:schema>
