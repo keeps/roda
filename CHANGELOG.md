@@ -1,5 +1,69 @@
 # Changelog
 
+## v3.7.1 (01/08/2022)
+#### Bug Fixes:
+
+- Processes with different types of parallelism are sharing the same pool of workers #2211
+- Deleting a Representation is also deleting PREMIS file #2033
+
+Install for demonstration:
+```
+docker pull keeps/roda:v3.7.1
+```
+---
+
+## v4.4.0 (17/06/2022)
+### :warning: Breaking Changes
+Solr 7.7 reached EOL meaning that is no longer supported and will not receive any security patches. As such RODA from version 4.4 onward will use Solr 8 as index system. If you have any implementation with Solr 7 you need to upgrade the Solr to version 8 and then rebuild all indexes on RODA.
+
+#### New features:
+
+- Upgrade Solr version from 7.7 to Solr 8.11.1
+- Upgrade GWT version from 2.9.0 to 2.10.0
+
+Install for demonstration:
+```
+docker pull keeps/roda:v4.4.0
+```
+---
+
+## v4.3.1 (17/06/2022)
+#### Bug Fixes:
+
+- Edit descriptive metadata from an AIP with a disposal schedule gives an error #2190 
+- Multiple plugin assumes last plugin state in final report #2067
+- Preservation event and incident risk counters on representation panel #2064
+
+Install for demonstration:
+```
+docker pull keeps/roda:v4.3.1
+```
+
+
+---
+
+## v4.3.0 (26/04/2022)
+#### New features:
+
+-  Akka events with Zookeeper seed registration [#2001](https://github.com/keeps/roda/issues/2001)
+
+#### Enhancements:
+
+-  Add error message to ClientLogger for fatal method [#2002](https://github.com/keeps/roda/issues/2002)
+
+#### Bug Fixes:
+
+-  Ambiguous representation PREMIS relatedObjectIdentifierValue [#1993](https://github.com/keeps/roda/issues/1993)
+-  Classification scheme won't load because of unrecognized field "type" [#1986](https://github.com/keeps/roda/issues/1986)
+-  Reject assessment is creating premis events on AIP, change this event for Repository level [#1984](https://github.com/keeps/roda/issues/1984)
+
+Install for demonstration:
+```
+docker pull keeps/roda:v4.3.0
+```
+
+---
+
 ## v3.7.0 (21/04/2022)
 
 #### New features:
@@ -454,104 +518,3 @@ docker pull keeps/roda:v3.2.0
 #### Security:
 
 - Upgrading jackson to fix CVE-2019-14540 and CVE-2019-16335 fixes #1495
-
----
-
-## v3.1.1 (30/05/2019)
-Install for demonstration:
-```
-docker pull keeps/roda:v3.1.1
-```
-
-#### Enhancements:
-
--  Create a way to define orchestrator block size per plugin [#1476](https://github.com/keeps/roda/issues/1476)
--  Introduce cache strategies to improve ingest performance [#1475](https://github.com/keeps/roda/issues/1475)
--  Add HTTP notification support on MinimalIngestPlugin [#1473](https://github.com/keeps/roda/issues/1473)
--  Reindex plugins must deal with org.apache.solr.client.solrj.impl.CloudSolrClient$RouteException [#1469](https://github.com/keeps/roda/issues/1469)
--  Add descriptive metadata config to open specific tab by default [#1464](https://github.com/keeps/roda/issues/1464)
-
-#### Bug Fixes:
-
--  Fix translation disparities between english and portuguese languages [#1474](https://github.com/keeps/roda/issues/1474)
--  Stop job button missing [#1470](https://github.com/keeps/roda/issues/1470)
--  Cannot create an AIP using web user interface [#1468](https://github.com/keeps/roda/issues/1468)
--  Page information on navigation bar is not generic to files or other possible RODA objects [#1463](https://github.com/keeps/roda/issues/1463)
-
----
-
-## v3.1.0 (30/04/2019)
-Install for demonstration:
-```
-docker pull keeps/roda:v3.1.0
-```
-
-#### New features:
--  Configurable columns in all search results [#1459](https://github.com/keeps/roda/issues/1459)
--  Create Portal UI endpoint [#1452](https://github.com/keeps/roda/issues/1452)
-
-#### Enhancements:
--  Upgrading **Solr version to 7.7**
--  Upgrading PDFjs to 2.0.943 [#1461](https://github.com/keeps/roda/issues/1461)
--  Possibility to orderly show descriptive metadata on UI [#1451](https://github.com/keeps/roda/issues/1451)
--  Configuring a ui.list should not need to override all lists [#1445](https://github.com/keeps/roda/issues/1445)
-
-#### Bug Fixes:
-
--  Stemming for single-valued fields not ative [#1460](https://github.com/keeps/roda/issues/1460)
--  Repository preservation events are not being re-indexed [#1447](https://github.com/keeps/roda/issues/1447)
--  Report verification on ingest does not properly support transformation of resources to multiple AIPs [#1444](https://github.com/keeps/roda/issues/1444)
--  Being processed counter is not being correctly calculated [#1443](https://github.com/keeps/roda/issues/1443)
--  Bug while searching for filename [#1432](https://github.com/keeps/roda/issues/1432)
-
----
-
-## v3.0.2 (31/01/2019)
-### Install for demonstration
-```
-docker pull keeps/roda:v3.0.2
-```
-#### Security fixes
-- Fixing CVE-2018-19360, CVE-2018-19362, CVE-2018-19361 by updating jackson library
-
-#### Enhancements:
-
--  Chart.js and FileSaver.js as webjars [#1440](https://github.com/keeps/roda/issues/1440)
--  After login the browser back shows login panel although user is already logged in [#860](https://github.com/keeps/roda/issues/860)
-- Adding menu text color configurations
-
-#### Bug Fixes:
-
--  Ingest events not being indexed correctly [#1438](https://github.com/keeps/roda/issues/1438)
--  When executing an action over all objects of a specific entity, the humanized filter on UI is not properly showed [#1437](https://github.com/keeps/roda/issues/1437)
--  When ingesting with multiple SIPs, in the end of the job each AIP has multiple ingest ended events [#1436](https://github.com/keeps/roda/issues/1436)
--  Node selection window grows vertically forever [#1433](https://github.com/keeps/roda/issues/1433)
--  Button text overflow [#1431](https://github.com/keeps/roda/issues/1431)
--  Fixed problem related with updating old to new transferred resource identifier when moving SIP after ingest
-
----
-
-## v3.0.1 (14/12/2018)
-### Install for demonstration
-```
-docker pull keeps/roda:v3.0.1
-```
-
-#### New features:
-
--  Plugin parameter TextBox in read-only mode [#1234](https://github.com/keeps/roda/issues/1234)
-
-#### Enhancements:
-
--  Hiding the advanced search and searching uses advanced search fields [#1426](https://github.com/keeps/roda/issues/1426)
-
-#### Bug Fixes:
-
--  Users/groups REST API endpoint error when using XML as output format [#1429](https://github.com/keeps/roda/issues/1429)
--  AntiVirus does not show the version correctly [#1428](https://github.com/keeps/roda/issues/1428)
--  Wrong input box's title in advanced search for representations/files [#1424](https://github.com/keeps/roda/issues/1424)
--  Links between representation information and files is not working [#1420](https://github.com/keeps/roda/issues/1420)
--  Dynamic _txt field should be multivalued [#1419](https://github.com/keeps/roda/issues/1419)
--  Risk incidences table UI for a specific risk is messed up [#1417](https://github.com/keeps/roda/issues/1417)
--  Partial duplicate of preservation event [#1416](https://github.com/keeps/roda/issues/1416)
--  MP4 video is not playing in Safari in the HTML5 video [#907](https://github.com/keeps/roda/issues/907)
