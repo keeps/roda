@@ -14,11 +14,10 @@
 					<g:FlowPanel addStyleNames="row full_width no_padding">
 						<g:FlowPanel addStyleNames="wui-data-panel">
 							<common:TitlePanel text="{messages.processTitle}" iconClass="Job" />
-                            <g:FlowPanel styleName="field">
-                                <g:Label addStyleNames="label" ui:field="instanceIdLabel">
+                            <g:FlowPanel styleName="field" ui:field="instancePanel">
+                                <g:Label addStyleNames="label" ui:field="instanceLabel">
                                     <ui:text from='{messages.distributedInstanceLabel}'/>
                                 </g:Label>
-								<g:Anchor styleName="btn-link" ui:field="instanceIdValue"/>
                             </g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label">

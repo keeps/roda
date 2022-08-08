@@ -23,6 +23,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
+import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.browse.RepresentationInformationHelper;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
@@ -151,7 +152,7 @@ public class InfoSliderHelper {
       values.put(messages.representationType(), createRepresentationTypeHTML(bundle));
     }
 
-    addLinkifCentralInstance(values, bundle.getInstanceName(), representation.getInstanceId());
+    addLinkIfCentralInstance(values, bundle.getInstanceName(), bundle.isLocalToInstance(), representation.getInstanceId());
 
     populate(infoSliderPanel, values);
   }
@@ -184,7 +185,7 @@ public class InfoSliderHelper {
       values.put(messages.aipType(), createAipTypeHTML(bundle));
     }
 
-    addLinkifCentralInstance(values, bundle.getInstanceName(), aip.getInstanceId());
+    addLinkIfCentralInstance(values, bundle.getInstanceName(), bundle.isLocalToInstance(), aip.getInstanceId());
 
     if (!aip.getIngestSIPIds().isEmpty()) {
       FlowPanel sipIds = new FlowPanel();
@@ -443,7 +444,7 @@ public class InfoSliderHelper {
       }
     }
 
-    addLinkifCentralInstance(values, bundle.getInstanceName(), file.getInstanceId());
+    addLinkIfCentralInstance(values, bundle.getInstanceName(), bundle.isLocalToInstance(), file.getInstanceId());
 
     List<String> history = new ArrayList<>();
     history.add(file.getAipId());
@@ -613,19 +614,23 @@ public class InfoSliderHelper {
     return panel;
   }
 
-  public static void addLinkifCentralInstance(HashMap<String, Widget> values, String instancename, String instanceId) {
+  public static void addLinkIfCentralInstance(HashMap<String, Widget> values, String instanceName, boolean localToInstance, String instanceId) {
     if (StringUtils.isNotBlank(instanceId)) {
       String distributedMode = ConfigurationManager.getStringWithDefault(
         RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
-      if (distributedMode.equals(RodaConstants.DistributedModeType.CENTRAL.name())) {
-        Anchor anchor = new Anchor();
-        if (StringUtils.isNotBlank(instancename)) {
-          anchor.setText(instancename);
+      if (RodaConstants.DistributedModeType.CENTRAL.name().equals(distributedMode)) {
+        if (localToInstance) {
+          values.put(messages.distributedInstanceLabel(), new Label(instanceName));
         } else {
-          anchor.setText(instanceId);
+          Anchor anchor = new Anchor();
+          if (StringUtils.isNotBlank(instanceName)) {
+            anchor.setText(instanceName);
+          } else {
+            anchor.setText(instanceId);
+          }
+          anchor.setHref(HistoryUtils.createHistoryHashLink(ShowDistributedInstance.RESOLVER, instanceId));
+          values.put(messages.distributedInstanceLabel(), anchor);
         }
-        anchor.setHref(HistoryUtils.createHistoryHashLink(ShowDistributedInstance.RESOLVER, instanceId));
-        values.put(messages.distributedInstanceLabel(), anchor);
       } else {
         values.put(messages.itemInstanceId(), new Label(instanceId));
       }

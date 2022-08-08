@@ -307,7 +307,13 @@ public class BrowserHelper {
       bundle.setRepresentationInformationFields(Collections.emptyList());
     }
 
-    bundle.setInstanceName(retrieveDistributedInstanceName(aip.getInstanceId()));
+    if (RODAInstanceUtils.isConfiguredAsDistributedMode()
+      && RodaCoreFactory.getDistributedModeType().equals(RodaConstants.DistributedModeType.CENTRAL)) {
+      bundle.setLocalToInstance(aip.getInstanceId().equals(RODAInstanceUtils.getLocalInstanceIdentifier()));
+      retrieveDistributedInstanceName(aip.getInstanceId(), bundle.isLocalToInstance())
+        .ifPresent(bundle::setInstanceName);
+    }
+
     return bundle;
   }
 
@@ -372,13 +378,18 @@ public class BrowserHelper {
     } else {
       bundle.setRepresentationInformationFields(Collections.emptyList());
     }
-    bundle.setInstanceName(retrieveDistributedInstanceName(aip.getInstanceId()));
+
+    if (RODAInstanceUtils.isConfiguredAsDistributedMode()) {
+      bundle.setLocalToInstance(aip.getInstanceId().equals(RODAInstanceUtils.getLocalInstanceIdentifier()));
+      retrieveDistributedInstanceName(aip.getInstanceId(), bundle.isLocalToInstance())
+        .ifPresent(bundle::setInstanceName);
+    }
 
     return bundle;
   }
 
   public static BrowseFileBundle retrieveBrowseFileBundle(IndexedAIP aip, IndexedRepresentation representation,
-    IndexedFile file, User user) throws GenericException, RequestNotValidException {
+    IndexedFile file, User user) throws GenericException, RequestNotValidException, AuthorizationDeniedException {
     BrowseFileBundle bundle = new BrowseFileBundle();
 
     bundle.setAip(aip);
@@ -453,11 +464,12 @@ public class BrowserHelper {
       bundle.setAvailable(true);
     }
 
-    try {
-      bundle.setInstanceName(retrieveDistributedInstanceName(aip.getInstanceId()));
-    } catch (AuthorizationDeniedException e) {
-      LOGGER.warn("Do not have Authorization", e);
+    if (RODAInstanceUtils.isConfiguredAsDistributedMode()) {
+      bundle.setLocalToInstance(aip.getInstanceId().equals(RODAInstanceUtils.getLocalInstanceIdentifier()));
+      retrieveDistributedInstanceName(aip.getInstanceId(), bundle.isLocalToInstance())
+        .ifPresent(bundle::setInstanceName);
     }
+
     return bundle;
   }
 
@@ -478,20 +490,26 @@ public class BrowserHelper {
     return false;
   }
 
-  private static String retrieveDistributedInstanceName(String instanceId)
+  private static Optional<String> retrieveDistributedInstanceName(String instanceId, boolean isLocalInstance)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException {
     ModelService model = RodaCoreFactory.getModelService();
     RodaConstants.DistributedModeType distributedModeType = RodaCoreFactory.getDistributedModeType();
 
     if (RodaConstants.DistributedModeType.CENTRAL.equals(distributedModeType)) {
-      try {
-        DistributedInstance distributedInstance = model.retrieveDistributedInstance(instanceId);
-        return distributedInstance.getName();
-      } catch (NotFoundException e) {
-        LOGGER.warn("Could not retrieve the distributed instance", e);
+      if (isLocalInstance) {
+        return Optional.of(RodaCoreFactory.getProperty(RodaConstants.CENTRAL_INSTANCE_NAME_PROPERTY,
+          RodaConstants.DEFAULT_CENTRAL_INSTANCE_NAME));
+      } else {
+        try {
+          DistributedInstance distributedInstance = model.retrieveDistributedInstance(instanceId);
+          return Optional.of(distributedInstance.getName());
+        } catch (NotFoundException e) {
+          LOGGER.warn("Could not retrieve the distributed instance", e);
+        }
       }
     }
-    return null;
+
+    return Optional.empty();
   }
 
   private static List<DescriptiveMetadataViewBundle> retrieveDescriptiveMetadataBundles(String aipId, Locale locale)
@@ -1469,8 +1487,7 @@ public class BrowserHelper {
           fileId, payload, notify);
       } else {
         PreservationMetadataType type = PreservationMetadataType.FILE;
-        String id = IdUtils.getPreservationFileId(fileId,
-          RODAInstanceUtils.getLocalInstanceIdentifier());
+        String id = IdUtils.getPreservationFileId(fileId, RODAInstanceUtils.getLocalInstanceIdentifier());
         model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, payload, notify);
       }
     } catch (IOException e) {

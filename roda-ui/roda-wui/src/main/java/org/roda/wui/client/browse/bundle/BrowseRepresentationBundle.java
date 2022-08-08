@@ -27,6 +27,8 @@ public class BrowseRepresentationBundle implements Bundle {
   private Long preservationEventCount;
   private String instanceName;
 
+  private boolean localToInstance;
+
   public BrowseRepresentationBundle() {
     super();
   }
@@ -114,5 +116,13 @@ public class BrowseRepresentationBundle implements Bundle {
 
   public void setInstanceName(String instanceName) {
     this.instanceName = instanceName;
+  }
+
+  public boolean isLocalToInstance() {
+    return localToInstance;
+  }
+
+  public void setLocalToInstance(boolean localToInstance) {
+    this.localToInstance = localToInstance;
   }
 }

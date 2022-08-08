@@ -42,6 +42,7 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
+import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
@@ -60,6 +61,7 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
+import org.roda.wui.client.management.Statistics;
 import org.roda.wui.client.management.distributed.ShowDistributedInstance;
 import org.roda.wui.client.process.Process;
 import org.roda.wui.common.client.HistoryResolver;
@@ -186,10 +188,9 @@ public class ShowJob extends Composite {
   private Map<String, PluginInfo> pluginsInfo;
 
   @UiField
-  Label instanceIdLabel;
-
+  FlowPanel instancePanel;
   @UiField
-  Anchor instanceIdValue;
+  Label instanceLabel;
 
   @UiField
   Label name;
@@ -309,31 +310,33 @@ public class ShowJob extends Composite {
       String distributedMode = ConfigurationManager.getStringWithDefault(
         RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
       if (distributedMode.equals(RodaConstants.DistributedModeType.CENTRAL.name())) {
-        BrowserService.Util.getInstance().retrieveDistributedInstance(job.getInstanceId(),
-          new NoAsyncCallback<DistributedInstance>() {
-            @Override
-            public void onFailure(Throwable caught) {
-              instanceIdValue
-                .setHref(HistoryUtils.createHistoryHashLink(ShowDistributedInstance.RESOLVER, job.getInstanceId()));
-              instanceIdValue.setText(job.getInstanceId());
-            }
+        BrowserService.Util.getInstance().retrieveDistributedInstance(job.getInstanceId(), new NoAsyncCallback<>() {
+          @Override
+          public void onFailure(Throwable caught) {
+            BrowserService.Util.getInstance().retrieveLocalInstance(new NoAsyncCallback<LocalInstance>() {
+              @Override
+              public void onSuccess(LocalInstance localInstance) {
+                Label instanceNameLabel = new Label(localInstance.getName());
+                instanceNameLabel.addStyleName("value");
+                instancePanel.add(instanceNameLabel);
+              }
+            });
+          }
 
-            @Override
-            public void onSuccess(DistributedInstance distributedInstance) {
-              String instanceName = distributedInstance.getName();
-
-              instanceIdValue
-                .setHref(HistoryUtils.createHistoryHashLink(ShowDistributedInstance.RESOLVER, job.getInstanceId()));
-              instanceIdValue.setText(instanceName);
-            }
-          });
-
+          @Override
+          public void onSuccess(DistributedInstance distributedInstance) {
+            Anchor anchor = new Anchor();
+            anchor.setHref(HistoryUtils.createHistoryHashLink(ShowDistributedInstance.RESOLVER, job.getInstanceId()));
+            anchor.setText(distributedInstance.getName());
+            anchor.addStyleName("btn-link");
+            instancePanel.add(anchor);
+          }
+        });
       } else {
-        instanceIdValue.setText(job.getInstanceId());
+        instancePanel.setVisible(false);
       }
     } else {
-      instanceIdLabel.setVisible(false);
-      instanceIdValue.setVisible(false);
+      instancePanel.setVisible(false);
     }
 
     name.setText(job.getName());
@@ -580,8 +583,8 @@ public class ShowJob extends Composite {
     }
   }
 
-  private void showAttachments(List<String> attachments){
-    if(attachments.isEmpty()) {
+  private void showAttachments(List<String> attachments) {
+    if (attachments.isEmpty()) {
       attachmentsPanel.setVisible(false);
       attachmentsList.setVisible(false);
     } else {
@@ -634,20 +637,20 @@ public class ShowJob extends Composite {
       if (Job.JOB_STATE.SCHEDULED.equals(job.getState())) {
         BrowserService.Util.getInstance().getCrontabValue(LocaleInfo.getCurrentLocale().getLocaleName(),
           new AsyncCallback<String>() {
-          @Override
-          public void onFailure(Throwable throwable) {
-            // do nothing
-          }
-
-          @Override
-          public void onSuccess(String description) {
-            if (StringUtils.isNotBlank(description)) {
-              scheduleInfoLabel.setVisible(true);
-              scheduleInfo.setVisible(true);
-              scheduleInfo.setText(description);
+            @Override
+            public void onFailure(Throwable throwable) {
+              // do nothing
             }
-          }
-        });
+
+            @Override
+            public void onSuccess(String description) {
+              if (StringUtils.isNotBlank(description)) {
+                scheduleInfoLabel.setVisible(true);
+                scheduleInfo.setVisible(true);
+                scheduleInfo.setText(description);
+              }
+            }
+          });
 
       }
     }

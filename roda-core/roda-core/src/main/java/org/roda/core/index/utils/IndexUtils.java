@@ -9,6 +9,7 @@ package org.roda.core.index.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;

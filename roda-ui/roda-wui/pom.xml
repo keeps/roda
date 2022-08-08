@@ -163,7 +163,7 @@
                                 -Droda.distributed.mode.type=LOCAL
                                 -Droda.home=${env.HOME}/.roda_local
                                 -Dgwt.codeServerPort=9876 -Xdebug
-                                -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5007
+                                -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5007
                             </jvmArguments>
                         </configuration>
                     </plugin>
@@ -212,7 +212,7 @@
                                 -Droda.distributed.mode.type=CENTRAL
                                 -Droda.home=${env.HOME}/.roda_central
                                 -Dgwt.codeServerPort=9876 -Xdebug
-                                -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5006
+                                -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5006
                             </jvmArguments>
                         </configuration>
                     </plugin>
@@ -255,7 +255,7 @@
                             </directories>
                             <jvmArguments>
                                 -Dgwt.codeServerPort=9876 -Xdebug
-                                -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
+                                -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
                             </jvmArguments>
                         </configuration>
                     </plugin>
@@ -296,7 +296,7 @@
                             <skip>false</skip>
                             <jvmArguments>
                                 -Dgwt.codeServerPort=9876 -Xdebug
-                                -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
+                                -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
                             </jvmArguments>
                         </configuration>
                     </plugin>
