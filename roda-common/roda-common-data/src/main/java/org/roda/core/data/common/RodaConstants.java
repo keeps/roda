@@ -684,6 +684,10 @@ public final class RodaConstants {
   public static final String DEFAULT_API_SECRET_KEY = "changeit";
   public static final String API_SECRET_KEY_PROPERTY = "roda.distributed.api.secret";
 
+  public static final String CENTRAL_INSTANCE_NAME_PROPERTY = "roda.distributed.localinstance.name";
+
+  public static final String DEFAULT_CENTRAL_INSTANCE_NAME = "Central";
+
   public static final long DEFAULT_ACCESS_KEY_VALIDITY = 31536000000L; // 1 year in ms
   public static final String ACCESS_KEY_VALIDITY = "roda.distributed.api.access.key.validity";
   public static final long DEFAULT_ACCESS_TOKEN_VALIDITY = 7200000L; // 2 hours in ms

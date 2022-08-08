@@ -27,6 +27,8 @@ public class BrowseAIPBundle implements Bundle {
   private Long logCount;
   private String instanceName;
 
+  private boolean localToInstance;
+
   public BrowseAIPBundle() {
     super();
   }
@@ -134,6 +136,15 @@ public class BrowseAIPBundle implements Bundle {
   public void setInstanceName(String instanceName) {
     this.instanceName = instanceName;
   }
+
+  public boolean isLocalToInstance() {
+    return localToInstance;
+  }
+
+  public void setLocalToInstance(boolean localToInstance) {
+    this.localToInstance = localToInstance;
+  }
+
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();

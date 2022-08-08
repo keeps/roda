@@ -26,6 +26,9 @@ import org.roda.core.model.ModelService;
 
 public class RODAInstanceUtils {
 
+  public static boolean isConfiguredAsDistributedMode() {
+    return !RodaCoreFactory.getDistributedModeType().equals(RodaConstants.DistributedModeType.BASE);
+  }
   private static Path getLocalInstanceConfigFile() {
     return RodaCoreFactory.getConfigPath().resolve(RodaConstants.SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FOLDER)
       .resolve(RodaConstants.SYNCHRONIZATION_CONFIG_LOCAL_INSTANCE_FILE);

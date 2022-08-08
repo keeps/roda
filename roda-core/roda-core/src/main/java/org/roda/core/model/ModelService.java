@@ -2030,7 +2030,8 @@ public class ModelService extends ModelObservable {
       entryLogLineNumber++;
 
       // emit event
-      boolean slaveWriteInSolr = RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_REPLICA_WRITE_IN_SOLR, false);
+      boolean slaveWriteInSolr = RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_REPLICA_WRITE_IN_SOLR,
+        false);
       if (notify && (writeIsAllowed || slaveWriteInSolr)) {
         notifyLogEntryCreated(logEntry).failOnError();
       }
@@ -4205,11 +4206,11 @@ public class ModelService extends ModelObservable {
     }
     DistributedInstance ret;
 
-    try (InputStream inputStream = binary.getContent().createInputStream()) {
-      ret = JsonUtils.getObjectFromJson(inputStream, DistributedInstance.class);
-    } catch (IOException | GenericException e) {
-      throw new GenericException("Error reading distributed instance: " + distributedInstanceId, e);
-    }
+      try (InputStream inputStream = binary.getContent().createInputStream()) {
+        ret = JsonUtils.getObjectFromJson(inputStream, DistributedInstance.class);
+      } catch (IOException | GenericException e) {
+        throw new GenericException("Error reading distributed instance: " + distributedInstanceId, e);
+      }
 
     return ret;
   }

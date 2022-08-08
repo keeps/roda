@@ -1489,7 +1489,7 @@ public class RodaCoreFactory {
           final LocalInstance rodaCentralInstance = new LocalInstance();
           rodaCentralInstance.setId(IdUtils.createUUID());
           rodaCentralInstance.setStatus(SynchronizingStatus.ACTIVE);
-          rodaCentralInstance.setName("RODA Central");
+          rodaCentralInstance.setName(getProperty(RodaConstants.CENTRAL_INSTANCE_NAME_PROPERTY, RodaConstants.DEFAULT_CENTRAL_INSTANCE_NAME));
           rodaCentralInstance.setIsSubscribed(true);
           createOrUpdateLocalInstance(rodaCentralInstance);
         }
