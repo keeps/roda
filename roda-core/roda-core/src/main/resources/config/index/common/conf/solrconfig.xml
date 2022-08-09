@@ -35,7 +35,7 @@
        that you fully re-index after changing this setting as it can
        affect both how text is indexed and queried.
   -->
-  <luceneMatchVersion>8.8.1</luceneMatchVersion>
+  <luceneMatchVersion>8.11.2</luceneMatchVersion>
 
   <!-- <lib/> directives can be used to instruct Solr to load any Jars
        identified and use them to resolve any "plugins" specified in
@@ -89,7 +89,7 @@
        replication is in use, this should match the replication
        configuration.
     -->
-  <!--dataDir>${solr.data.dir:.}/${solr.core.name}</dataDir -->
+  <dataDir>${solr.data.dir:}</dataDir>
 
 
   <!-- The DirectoryFactory to use for indexes.
@@ -246,7 +246,18 @@
       -->
     <!-- <infoStream file="INFOSTREAM.txt">false</infoStream> -->
   </indexConfig>
-  
+
+
+  <!-- JMX
+
+       This example enables JMX if and only if an existing MBeanServer
+       is found, use this if you want to configure JMX through JVM
+       parameters. Remove this to disable exposing Solr configuration
+       and statistics to JMX.
+
+       For more details see http://wiki.apache.org/solr/SolrJmx
+    -->
+  <jmx />
   <!-- If you want to connect to a particular server, specify the
        agentId
     -->
@@ -1188,7 +1199,6 @@
        <processor class="solr.processor.SignatureUpdateProcessorFactory">
          <bool name="enabled">true</bool>
          <str name="signatureField">id</str>
-         <bool name="overwriteDupes">false</bool>
          <str name="fields">name,features,cat</str>
          <str name="signatureClass">solr.processor.Lookup3Signature</str>
        </processor>

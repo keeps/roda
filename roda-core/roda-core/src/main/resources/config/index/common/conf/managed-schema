@@ -109,19 +109,22 @@
          WARNING: The _text_ catch-all field will significantly increase your index size.
          If you don't need it, consider removing it and the corresponding copyField directive.
     -->
-      <!-- docValues are enabled by default for long type so we don't need to index the version field  -->
-     <field name="_version_" type="plong" indexed="false" stored="false"/>
 
-    <!-- points to the root document of a block of nested documents. Required for nested
-       document support, may be removed otherwise
-    -->
-    <field name="_root_" type="string" indexed="true" stored="false" docValues="false" />
-
-    <!-- Only remove the "id" field if you have a very good reason to. While not strictly
-      required, it is highly recommended. A <uniqueKey> is present in almost all Solr
-      installations. See the <uniqueKey> declaration below where <uniqueKey> is set to "id".
-    -->
     <field name="uuid" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+    <!-- docValues are enabled by default for long type so we don't need to index the version field  -->
+    <field name="_version_" type="plong" indexed="false" stored="false"/>
+
+    <!-- If you don't use child/nested documents, then you should remove the next two fields:  -->
+    <!-- for nested documents (minimal; points to root document) -->
+    <field name="_root_" type="string" indexed="true" stored="false" docValues="false" />
+    <!-- for nested documents (relationship tracking) -->
+    <field name="_nest_path_" type="_nest_path_" /><fieldType name="_nest_path_" class="solr.NestPathField" />
+
+    <field name="_text_" type="text_general" indexed="true" stored="false" multiValued="true"/>
+
+    <!-- This can be enabled, in case the client does not know what fields may be searched. It isn't enabled by default
+         because it's very expensive to index everything twice. -->
+    <!-- <copyField source="*" dest="_text_"/> -->
 
     <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names.
