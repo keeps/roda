@@ -437,5 +437,10 @@
 			<artifactId>simpleclient_logback</artifactId>
 			<version>${io.prometheus.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>dev.failsafe</groupId>
+			<artifactId>failsafe</artifactId>
+			<version>3.2.4</version>
+		</dependency>
 	</dependencies>
 </project>

@@ -568,6 +568,14 @@ public final class RodaConstants {
   public static final String CORE_LDAP_BACKEND_MAVIBOT = "MAVIBOT";
 
   /*
+   * Solr Retry
+   */
+  public static final String SOLR_RETRY_DELAY = "core.solr.retry.delay";
+  public static final String SOLR_RETRY_MAX_DELAY = "core.solr.retry.maxDelay";
+  public static final String SOLR_RETRY_DELAY_FACTOR = "core.solr.retry.delayFactor";
+  public static final String SOLR_RETRY_MAX_RETRIES = "core.solr.retry.maxRetries";
+
+  /*
    * INDEX NAMES
    */
   public static final String INDEX_AIP = "AIP";
@@ -618,7 +626,6 @@ public final class RodaConstants {
   public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_SCHEDULES_FILENAME = "schedules.jsonl";
   public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_HOLDS_FILENAME = "holds.jsonl";
   public static final String STORAGE_DIRECTORY_DISPOSAL_CONFIRMATION_TRANSITIVE_HOLDS_FILENAME = "transitive-holds.jsonl";
-
 
   public static final String STORAGE_HISTORY_CONTAINER_DATA = "data";
   public static final String STORAGE_HISTORY_CONTAINER_METADATA = "metadata";

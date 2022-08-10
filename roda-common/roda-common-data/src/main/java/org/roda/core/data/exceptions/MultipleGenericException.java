@@ -42,9 +42,7 @@ public class MultipleGenericException extends GenericException {
     List<Exception> causes = new ArrayList<>();
 
     for (ReturnWithExceptions<?, ?> item : list) {
-      for (Exception e : item.getExceptions()) {
-        causes.add(e);
-      }
+      causes.addAll(item.getExceptions());
     }
 
     return new MultipleGenericException(causes);

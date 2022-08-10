@@ -73,6 +73,7 @@ import org.roda.core.data.exceptions.NotSupportedException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.ReturnWithExceptions;
+import org.roda.core.data.exceptions.SolrRetryException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.LiteRODAObject;
@@ -133,6 +134,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+import dev.failsafe.Failsafe;
+import dev.failsafe.Fallback;
+
 /**
  * Utilities class related to Apache Solr
  * 
@@ -146,6 +150,7 @@ public class SolrUtils {
   private static final String DEFAULT_QUERY_PARSER_OPERATOR = "AND";
   private static final Set<String> NON_REPEATABLE_FIELDS = new HashSet<>(Arrays.asList(RodaConstants.AIP_TITLE,
     RodaConstants.AIP_LEVEL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL));
+  public static final String ALL_RETRY_ATTEMPTS_FAILED = "All retry attempts failed";
 
   private static Map<String, List<String>> liteFieldsForEachClass = new HashMap<>();
 
@@ -1179,11 +1184,9 @@ public class SolrUtils {
     boolean softCommit = true;
 
     for (String collection : collections) {
-      try {
-        index.commit(collection, waitFlush, waitSearcher, softCommit);
-      } catch (SolrServerException | IOException | SolrException e) {
-        LOGGER.error("Error commiting into collection: {}", collection, e);
-      }
+      Failsafe.with(RetryPolicyUtils.getInstance().getRetryPolicy()).onFailure(e -> {
+        LOGGER.error("Error committing into collection: {}", collection, e.getException());
+      }).run(() -> index.commit(collection, waitFlush, waitSearcher, softCommit));
     }
   }
 
@@ -1209,13 +1212,13 @@ public class SolrUtils {
     String classToCreate, SolrInputDocument instance, S source) {
     ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>(source);
 
+    Fallback<Object> fallback = Fallback.of(() -> new SolrRetryException(ALL_RETRY_ATTEMPTS_FAILED));
+
     if (instance != null) {
-      try {
-        index.add(classToCreate, instance);
-      } catch (SolrServerException | IOException | SolrException e) {
-        LOGGER.error("Error adding document to index", e);
-        ret.add(e);
-      }
+      Failsafe.with(fallback, RetryPolicyUtils.getInstance().getRetryPolicy()).onFailure(e -> {
+        LOGGER.error("Error adding document to index", e.getException());
+        ret.add((SolrRetryException) e.getResult());
+      }).run(() -> index.add(classToCreate, instance));
     }
 
     return ret;
@@ -1224,15 +1227,22 @@ public class SolrUtils {
   public static <I extends IsIndexed, M extends IsModelObject, S extends Object> ReturnWithExceptions<Void, S> create2(
     SolrClient index, S source, Class<I> indexClass, M object, IndexingAdditionalInfo utils) {
     ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>(source);
+
+    Fallback<Object> fallback = Fallback.of(() -> new SolrRetryException(ALL_RETRY_ATTEMPTS_FAILED));
+
     if (object != null) {
       try {
         SolrInputDocument solrDocument = SolrCollectionRegistry.toSolrDocument(indexClass, object, utils);
         if (solrDocument != null) {
-          index.add(SolrCollectionRegistry.getIndexName(indexClass), solrDocument);
+          Failsafe.with(fallback, RetryPolicyUtils.getInstance().getRetryPolicy()).onFailure(e -> {
+            LOGGER.error("Error adding document to index", e.getException());
+            ret.add((SolrRetryException) e.getResult());
+          }).run(() -> {
+            index.add(SolrCollectionRegistry.getIndexName(indexClass), solrDocument);
+          });
         }
-
       } catch (GenericException | NotSupportedException | RequestNotValidException | NotFoundException
-        | AuthorizationDeniedException | SolrServerException | IOException e) {
+        | AuthorizationDeniedException e) {
         LOGGER.error("Error adding document to index", e);
         ret.add(e);
       }
@@ -1277,7 +1287,7 @@ public class SolrUtils {
     ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>();
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.INDEX_UUID, uuid);
-    fields.entrySet().forEach(e -> doc.addField(e.getKey(), set(e.getValue())));
+    fields.forEach((key, value) -> doc.addField(key, set(value)));
     try {
       create(index, SolrCollectionRegistry.getIndexName(classToCreate), doc, source).addTo(ret);
     } catch (NotSupportedException e) {
@@ -1370,6 +1380,8 @@ public class SolrUtils {
   public static <T extends IsIndexed> String getObjectLabel(SolrClient index, String className, String id) {
     // TODO move this logic to Solr Collections
 
+    Fallback<Object> fallback = Fallback.of(e -> null);
+
     if (StringUtils.isNotBlank(className) && StringUtils.isNotBlank(id)) {
       try {
         Class<T> objectClass = (Class<T>) Class.forName(className);
@@ -1377,7 +1389,12 @@ public class SolrUtils {
           return null;
         }
         String field = SolrCollectionRegistry.getIndexName(objectClass);
-        SolrDocument doc = index.getById(field, id);
+
+        SolrDocument doc = Failsafe.with(fallback, RetryPolicyUtils.getInstance().getRetryPolicy()).onFailure(e -> {
+          LOGGER.error(ALL_RETRY_ATTEMPTS_FAILED);
+          e.getResult();
+        }).get(() -> index.getById(field, id));
+
         if (doc != null) {
           if (objectClass.equals(AIP.class)) {
             return objectToString(doc.get(RodaConstants.AIP_TITLE), null);
@@ -1395,7 +1412,7 @@ public class SolrUtils {
             return objectToString(doc.get(RodaConstants.INDEX_UUID), null);
           }
         }
-      } catch (ClassNotFoundException | SolrServerException | IOException | SolrException | NotSupportedException e) {
+      } catch (ClassNotFoundException | NotSupportedException e) {
         LOGGER.error("Could not return object label of {} {}", className, id, e);
       }
     }
@@ -1564,15 +1581,18 @@ public class SolrUtils {
   public static <T extends IsIndexed, S extends Object> ReturnWithExceptions<Void, S> delete(SolrClient index,
     Class<T> classToDelete, List<String> ids, S source, boolean commit) {
     ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>();
-    try {
+
+    Fallback<Object> fallback = Fallback.of(() -> new SolrRetryException(ALL_RETRY_ATTEMPTS_FAILED));
+
+    Failsafe.with(fallback, RetryPolicyUtils.getInstance().getRetryPolicy()).onFailure(e -> {
+      LOGGER.error("Error deleting document from index");
+      ret.add((SolrRetryException) e.getResult());
+    }).run(() -> {
       index.deleteById(SolrCollectionRegistry.getIndexName(classToDelete), ids);
       if (commit) {
         commit(index, classToDelete);
       }
-    } catch (SolrServerException | IOException | SolrException | GenericException | NotSupportedException e) {
-      LOGGER.error("Error deleting document from index");
-      ret.add(e);
-    }
+    });
 
     return ret;
   }
@@ -1670,7 +1690,7 @@ public class SolrUtils {
     throws RequestNotValidException, GenericException, AuthorizationDeniedException {
     DisposalSchedule disposalSchedule;
     try {
-      if(StringUtils.isNoneBlank(aip.getDisposalScheduleId())){
+      if (StringUtils.isNoneBlank(aip.getDisposalScheduleId())) {
         disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
       } else {
         return null;
