@@ -50,7 +50,7 @@ Among others articles, in this series of documentation you will find information
 
 ### Standards
 
-* [ISO 14721:2012 - Space data and information transfer systems - Open archival information system (OAIS) - Reference model](http://www.iso.org/iso/catalogue_detail.htm?csnumber=57284) ([Magenta book](http://public.ccsds.org/publications/archive/650x0m2.pdf))
+* [ISO 14721:2012 - Space data and information transfer systems - Open archival information system (OAIS) - Reference model](http://www.iso.org/iso/catalogue_detail.htm?csnumber=57284) ([Magenta book](https://public.ccsds.org/pubs/650x0m2.pdf))
 * [ISO 16363:2012 - Space data and information transfer systems - Audit and certification of trustworthy digital repositories](http://www.iso.org/iso/catalogue_detail.htm?csnumber=56510) ([TRAC version](https://www.crl.edu/sites/default/files/d6/attachments/pages/trac_0.pdf))
 * [eCH-0165 SIARD Format Specification 2.0](https://www.ech.ch/vechweb/page?p=dossier&documentNumber=eCH-0165&documentVersion=2.0)
 
