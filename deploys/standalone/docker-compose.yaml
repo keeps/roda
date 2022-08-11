@@ -1,7 +1,7 @@
 version: '3.3'
 services:
     zoo:
-      image: zookeeper:3.8
+      image: docker.io/zookeeper:3.8
       restart: unless-stopped
       environment:
         - ZOO_4LW_COMMANDS_WHITELIST=mntr,conf,ruok
@@ -9,7 +9,7 @@ services:
         - zookeeper_data:/data
         - zookeeper_datalog:/datalog
     solr:
-      image: solr:9
+      image: docker.io/solr:9
       restart: unless-stopped
       ports:
         - 8983:8983
@@ -21,13 +21,13 @@ services:
         - solr_data:/var/solr
 
     clamd:
-      image: clamav/clamav:stable
+      image: docker.io/clamav/clamav:stable
       restart: unless-stopped
       volumes:
         - clam_data:/var/lib/clamav
         - roda_data_storage:/roda/data/storage
     siegfried:
-      image: keeps/siegfried:v1.9.3
+      image: docker.io/keeps/siegfried:v1.9.4
       restart: unless-stopped
       environment:
         SIEGFRIED_HOST: siegfried
@@ -36,7 +36,7 @@ services:
         - siegfried_data:/root/siegfried/
         - roda_data_storage:/roda/data/storage
     roda:
-      image: keeps/roda:development
+      image: docker.io/keeps/roda:development
       restart: unless-stopped
       ports:
         - 8080:8080
