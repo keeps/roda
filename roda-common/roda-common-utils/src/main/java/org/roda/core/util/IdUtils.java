@@ -166,14 +166,6 @@ public final class IdUtils {
     return getPreservationId(PreservationMetadataType.REPRESENTATION, aipId, representationId, null, null, instanceId);
   }
 
-  public static String getRepresentationPreservationId(String aipId, String representationId, String instanceId) {
-    return getPreservationId(PreservationMetadataType.REPRESENTATION, aipId, representationId, null, null, instanceId);
-  }
-
-<<<<<<< HEAD
-  public static String getPreservationFileId(String fileId) {
-    return URNUtils.createRodaPreservationURN(PreservationMetadataType.FILE, fileId);
-=======
   public static String getPreservationId(PreservationMetadataType type, String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId, String instanceId) {
     if (fileDirectoryPath == null) {

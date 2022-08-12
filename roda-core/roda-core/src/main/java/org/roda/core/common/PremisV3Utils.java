@@ -18,10 +18,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.util.ValidationEventCollector;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -402,7 +404,7 @@ public final class PremisV3Utils {
     eventOutcomeInformation.getEventOutcomeDetail().add(eventOutcomeDetail);
     eventComplexType.getEventOutcomeInformation().add(eventOutcomeInformation);
 
-    return MetadataUtils.saveToContentPayload(FACTORY.createEvent(eventComplexType), eventComplexType.getClass(), true);
+    return MetadataUtils.saveToContentPayload(FACTORY.createEvent(eventComplexType), eventComplexType.getClass());
   }
 
   public static ContentPayload createPremisAgentBinary(String id, String name, PreservationAgentType type,
@@ -571,39 +573,27 @@ public final class PremisV3Utils {
     return null;
   }
 
-  public static Representation binaryToRepresentation(ContentPayload payload, boolean validate)
-    throws ValidationException, GenericException {
-    try (InputStream inputStream = payload.createInputStream()) {
-      return binaryToRepresentation(inputStream, validate);
-    } catch (IOException e) {
-      throw new GenericException("Error loading representation premis file", e);
+  public static Representation binaryToRepresentation(InputStream binaryInputStream) throws GenericException {
+    JAXBContext jaxbContext;
+    try {
+      jaxbContext = JAXBContext.newInstance(gov.loc.premis.v3.Representation.class);
+      Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+      Object unmarshal = jaxbUnmarshaller.unmarshal(binaryInputStream);
+      return ((gov.loc.premis.v3.Representation) ((JAXBElement<?>) unmarshal).getValue());
+    } catch (JAXBException e) {
+      throw new GenericException("Failed to load representation: " + e.getMessage(), e);
     }
   }
 
-  public static gov.loc.premis.v3.File binaryToFile(ContentPayload payload, boolean validate)
-    throws ValidationException, GenericException {
-    try (InputStream inputStream = payload.createInputStream()) {
-      return binaryToFile(inputStream, validate);
-    } catch (IOException e) {
-      throw new GenericException("Error loading representation premis file", e);
-    }
-  }
-
-  public static EventComplexType binaryToEvent(ContentPayload payload, boolean validate)
-    throws ValidationException, GenericException {
-    try (InputStream inputStream = payload.createInputStream()) {
-      return binaryToEvent(inputStream, validate);
-    } catch (IOException e) {
-      throw new GenericException("Error loading representation premis file", e);
-    }
-  }
-
-  public static AgentComplexType binaryToAgent(ContentPayload payload, boolean validate)
-    throws ValidationException, GenericException {
-    try (InputStream inputStream = payload.createInputStream()) {
-      return binaryToAgent(inputStream, validate);
-    } catch (IOException e) {
-      throw new GenericException("Error loading representation premis file", e);
+  public static AgentComplexType binaryToAgent(InputStream binaryInputStream) throws IOException, GenericException {
+    JAXBContext jaxbContext;
+    try {
+      jaxbContext = JAXBContext.newInstance(gov.loc.premis.v3.AgentComplexType.class);
+      Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+      Object unmarshal = jaxbUnmarshaller.unmarshal(binaryInputStream);
+      return ((gov.loc.premis.v3.AgentComplexType) ((JAXBElement<?>) unmarshal).getValue());
+    } catch (JAXBException e) {
+      throw new GenericException("Failed to load Agent: " + e.getMessage(), e);
     }
   }
 
@@ -807,7 +797,8 @@ public final class PremisV3Utils {
         model.createPreservationMetadata(pm.getType(), updatedId, pm.getAipId(), pm.getRepresentationId(),
           pm.getFileDirectoryPath(), pm.getFileId(), payload, true);
 
-        model.deletePreservationMetadata(pm.getType(), pm.getAipId(), pm.getRepresentationId(), pm.getId(), true);
+        model.deletePreservationMetadata(pm.getType(), pm.getAipId(), pm.getRepresentationId(), pm.getId(),
+          pm.getFileDirectoryPath(), true);
       } catch (NotFoundException e) {
         throw new InstanceIdNotUpdated(e);
       }
@@ -844,7 +835,7 @@ public final class PremisV3Utils {
       model.createPreservationMetadata(PreservationMetadataType.AGENT, updatedId, agentPayload, true);
 
       model.deletePreservationMetadata(PreservationMetadataType.AGENT, pm.getAipId(), pm.getRepresentationId(),
-        pm.getId(), true);
+        pm.getId(), pm.getFileDirectoryPath(), true);
 
     } catch (NotFoundException e) {
       RODAMember member = index.retrieve(RODAMember.class,
@@ -859,7 +850,7 @@ public final class PremisV3Utils {
         model.createPreservationMetadata(PreservationMetadataType.AGENT, updatedId, agentPayload, true);
 
         model.deletePreservationMetadata(PreservationMetadataType.AGENT, pm.getAipId(), pm.getRepresentationId(),
-          pm.getId(), true);
+          pm.getId(), pm.getFileDirectoryPath(), true);
       }
     }
 
@@ -967,6 +958,42 @@ public final class PremisV3Utils {
     }
   }
 
+  public static Representation binaryToRepresentation(ContentPayload payload, boolean validate)
+    throws ValidationException, GenericException {
+    try (InputStream inputStream = payload.createInputStream()) {
+      return binaryToRepresentation(inputStream, validate);
+    } catch (IOException e) {
+      throw new GenericException("Error loading representation premis file", e);
+    }
+  }
+
+  public static gov.loc.premis.v3.File binaryToFile(ContentPayload payload, boolean validate)
+    throws ValidationException, GenericException {
+    try (InputStream inputStream = payload.createInputStream()) {
+      return binaryToFile(inputStream, validate);
+    } catch (IOException e) {
+      throw new GenericException("Error loading representation premis file", e);
+    }
+  }
+
+  public static EventComplexType binaryToEvent(ContentPayload payload, boolean validate)
+    throws ValidationException, GenericException {
+    try (InputStream inputStream = payload.createInputStream()) {
+      return binaryToEvent(inputStream, validate);
+    } catch (IOException e) {
+      throw new GenericException("Error loading representation premis file", e);
+    }
+  }
+
+  public static AgentComplexType binaryToAgent(ContentPayload payload, boolean validate)
+    throws ValidationException, GenericException {
+    try (InputStream inputStream = payload.createInputStream()) {
+      return binaryToAgent(inputStream, validate);
+    } catch (IOException e) {
+      throw new GenericException("Error loading representation premis file", e);
+    }
+  }
+
   public static ContentPayload fileToBinary(gov.loc.premis.v3.File file) throws GenericException, ValidationException {
     return MetadataUtils.saveToContentPayload(FACTORY.createObject(file), gov.loc.premis.v3.File.class);
   }
@@ -1003,6 +1030,141 @@ public final class PremisV3Utils {
         notify);
     } catch (RODAException | IOException e) {
       LOGGER.error("PREMIS will not be updated due to an error", e);
+    }
+  }
+
+  private static Representation binaryToRepresentation(InputStream binaryInputStream, boolean validate)
+    throws GenericException, ValidationException {
+    JAXBContext jaxbContext;
+    ValidationEventCollector validationCollector = new ValidationEventCollector();
+
+    try {
+      jaxbContext = JAXBContext.newInstance(gov.loc.premis.v3.Representation.class);
+      Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+
+      if (validate) {
+        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        StreamSource source = new StreamSource(
+          PremisV3Utils.class.getClassLoader().getResourceAsStream("premis/v3/premis.xsd"));
+        Schema schema = sf.newSchema(source);
+        jaxbUnmarshaller.setSchema(schema);
+        jaxbUnmarshaller.setEventHandler(validationCollector);
+      }
+
+      Object unmarshal = jaxbUnmarshaller.unmarshal(binaryInputStream);
+      return ((Representation) ((JAXBElement<?>) unmarshal).getValue());
+    } catch (SAXException | JAXBException e) {
+      if (validate && validationCollector.hasEvents()) {
+        throw new ValidationException(MetadataUtils.xmlValidationErrorsToValidationReport(validationCollector));
+      } else {
+        throw new GenericException("Failed to load representation: " + e.getMessage(), e);
+      }
+    }
+  }
+
+  private static AgentComplexType binaryToAgent(InputStream binaryInputStream, boolean validate)
+    throws IOException, GenericException, ValidationException {
+    JAXBContext jaxbContext;
+    ValidationEventCollector validationCollector = new ValidationEventCollector();
+
+    try {
+      jaxbContext = JAXBContext.newInstance(gov.loc.premis.v3.AgentComplexType.class);
+      Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+
+      if (validate) {
+        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        StreamSource source = new StreamSource(
+          PremisV3Utils.class.getClassLoader().getResourceAsStream("premis/v3/premis.xsd"));
+        Schema schema = sf.newSchema(source);
+        jaxbUnmarshaller.setSchema(schema);
+        jaxbUnmarshaller.setEventHandler(validationCollector);
+      }
+
+      Object unmarshal = jaxbUnmarshaller.unmarshal(binaryInputStream);
+      return ((AgentComplexType) ((JAXBElement<?>) unmarshal).getValue());
+    } catch (JAXBException | SAXException e) {
+      if (validate && validationCollector.hasEvents()) {
+        throw new ValidationException(MetadataUtils.xmlValidationErrorsToValidationReport(validationCollector));
+      } else {
+        throw new GenericException("Failed to load Agent: " + e.getMessage(), e);
+      }
+    }
+  }
+
+  private static gov.loc.premis.v3.File binaryToFile(InputStream binaryInputStream, boolean validate)
+    throws GenericException, ValidationException {
+    JAXBContext jaxbContext;
+    ValidationEventCollector validationCollector = new ValidationEventCollector();
+
+    try {
+      jaxbContext = JAXBContext.newInstance(gov.loc.premis.v3.File.class);
+      Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+
+      if (validate) {
+        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        StreamSource source = new StreamSource(
+          PremisV3Utils.class.getClassLoader().getResourceAsStream("premis/v3/premis.xsd"));
+        Schema schema = sf.newSchema(source);
+        jaxbUnmarshaller.setSchema(schema);
+        jaxbUnmarshaller.setEventHandler(validationCollector);
+      }
+
+      Object unmarshal = jaxbUnmarshaller.unmarshal(binaryInputStream);
+      return ((gov.loc.premis.v3.File) ((JAXBElement<?>) unmarshal).getValue());
+
+    } catch (SAXException | JAXBException e) {
+      if (validate && validationCollector.hasEvents()) {
+        throw new ValidationException(MetadataUtils.xmlValidationErrorsToValidationReport(validationCollector));
+      } else {
+        throw new GenericException("Failed to load representation: " + e.getMessage(), e);
+      }
+    }
+  }
+
+  private static EventComplexType binaryToEvent(InputStream binaryInputStream, boolean validate)
+    throws GenericException, ValidationException {
+    JAXBContext jaxbContext;
+    ValidationEventCollector validationCollector = new ValidationEventCollector();
+
+    try {
+      jaxbContext = JAXBContext.newInstance(gov.loc.premis.v3.EventComplexType.class);
+      Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+
+      if (validate) {
+        SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        StreamSource source = new StreamSource(
+          PremisV3Utils.class.getClassLoader().getResourceAsStream("premis/v3/premis.xsd"));
+        Schema schema = sf.newSchema(source);
+        jaxbUnmarshaller.setSchema(schema);
+        jaxbUnmarshaller.setEventHandler(validationCollector);
+      }
+
+      Object unmarshal = jaxbUnmarshaller.unmarshal(binaryInputStream);
+      return ((EventComplexType) ((JAXBElement<?>) unmarshal).getValue());
+    } catch (JAXBException | SAXException e) {
+      if (validate && validationCollector.hasEvents()) {
+        throw new ValidationException(MetadataUtils.xmlValidationErrorsToValidationReport(validationCollector));
+      } else {
+        throw new GenericException("Failed to load Event: " + e.getMessage(), e);
+      }
+    }
+  }
+
+  public static gov.loc.premis.v3.File binaryToFile(InputStream binaryInputStream) throws GenericException {
+    try {
+      return binaryToFile(binaryInputStream, false);
+    } catch (ValidationException e) {
+      // do nothing
+      throw new GenericException();
+    }
+  }
+
+  public static EventComplexType binaryToEvent(InputStream binaryInputStream) throws GenericException {
+    try {
+      return binaryToEvent(binaryInputStream, false);
+    } catch (ValidationException e) {
+      // do nothing
+      throw new GenericException();
     }
   }
 

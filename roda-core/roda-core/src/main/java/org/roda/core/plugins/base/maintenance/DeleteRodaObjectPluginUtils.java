@@ -1,7 +1,15 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
 package org.roda.core.plugins.base.maintenance;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -257,7 +265,7 @@ public class DeleteRodaObjectPluginUtils {
           String pmId = URNUtils.getPremisPrefix(PreservationMetadata.PreservationMetadataType.FILE,
             RODAInstanceUtils.getLocalInstanceIdentifier()) + file.getId();
           model.deletePreservationMetadata(PreservationMetadata.PreservationMetadataType.FILE, file.getAipId(),
-            file.getRepresentationId(), pmId, false);
+            file.getRepresentationId(), pmId, file.getPath(), false);
         } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
           reportItem.addPluginDetails("Could not delete associated PREMIS file: " + e.getMessage());
         }
@@ -332,7 +340,7 @@ public class DeleteRodaObjectPluginUtils {
           String pmId = URNUtils.getPremisPrefix(PreservationMetadata.PreservationMetadataType.REPRESENTATION,
             RODAInstanceUtils.getLocalInstanceIdentifier()) + representation.getId();
           model.deletePreservationMetadata(PreservationMetadata.PreservationMetadataType.REPRESENTATION,
-            representation.getAipId(), representation.getId(), pmId, false);
+            representation.getAipId(), representation.getId(), pmId, Collections.emptyList(),false);
         } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
           reportItem.addPluginDetails("Could not delete associated PREMIS file: " + e.getMessage());
         }

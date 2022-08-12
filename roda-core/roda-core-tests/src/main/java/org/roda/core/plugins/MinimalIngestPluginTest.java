@@ -52,6 +52,8 @@ import org.roda.core.index.IndexTestUtils;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.base.ingest.v2.MinimalIngestPlugin;
+import org.roda.core.plugins.base.preservation.AppraisalPlugin;
+import org.roda.core.storage.Binary;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -265,7 +267,7 @@ public class MinimalIngestPluginTest {
     Assert.assertEquals(aip.getRepresentations().size(), 1);
 
     CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
-      aip.getRepresentations().get(0).getId(), true);
+            aip.getRepresentations().get(0).getId(), true);
     List<File> reusableAllFiles = new ArrayList<>();
     Iterables.addAll(reusableAllFiles, Lists.newArrayList(allFiles).stream().filter(OptionalWithCause::isPresent)
       .map(OptionalWithCause::get).collect(Collectors.toList()));

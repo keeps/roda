@@ -106,7 +106,7 @@
        solr.RAMDirectoryFactory is memory based and not persistent.
     -->
   <directoryFactory name="DirectoryFactory"
-    class="${solr.directoryFactory:solr.NRTCachingDirectoryFactory}"/>
+                    class="${solr.directoryFactory:solr.NRTCachingDirectoryFactory}"/>
 
   <!-- The CodecFactory for defining the format of the inverted index.
        The default implementation is SchemaCodecFactory, which is the official Lucene
@@ -151,15 +151,6 @@
          Lucene will flush based on whichever limit is hit first.  -->
     <!-- <ramBufferSizeMB>100</ramBufferSizeMB> -->
     <!-- <maxBufferedDocs>1000</maxBufferedDocs> -->
-
-    <!-- Expert: ramPerThreadHardLimitMB sets the maximum amount of RAM that can be consumed
-         per thread before they are flushed. When limit is exceeded, this triggers a forced
-         flush even if ramBufferSizeMB has not been exceeded.
-         This is a safety limit to prevent Lucene's DocumentsWriterPerThread from address space
-         exhaustion due to its internal 32 bit signed integer based memory addressing.
-         The specified value should be greater than 0 and less than 2048MB. When not specified,
-         Solr uses Lucene's default value 1945. -->
-    <!-- <ramPerThreadHardLimitMB>1945</ramPerThreadHardLimitMB> -->
 
     <!-- Expert: ramPerThreadHardLimitMB sets the maximum amount of RAM that can be consumed
          per thread before they are flushed. When limit is exceeded, this triggers a forced
@@ -395,8 +386,8 @@
                       and initialSize parameters are ignored.
       -->
     <filterCache size="512"
-      initialSize="512"
-      autowarmCount="0"/>
+                 initialSize="512"
+                 autowarmCount="0"/>
 
     <!-- Query Result Cache
 
@@ -407,8 +398,8 @@
                        to occupy
       -->
     <queryResultCache size="512"
-      initialSize="512"
-      autowarmCount="0"/>
+                      initialSize="512"
+                      autowarmCount="0"/>
 
     <!-- Document Cache
 
@@ -417,16 +408,16 @@
          this cache will not be autowarmed.
       -->
     <documentCache size="512"
-      initialSize="512"
-      autowarmCount="0"/>
+                   initialSize="512"
+                   autowarmCount="0"/>
 
     <!-- custom cache currently used by block join -->
     <cache name="perSegFilter"
-      class="solr.CaffeineCache"
-      size="10"
-      initialSize="0"
-      autowarmCount="10"
-      regenerator="solr.NoOpRegenerator" />
+           class="solr.CaffeineCache"
+           size="10"
+           initialSize="0"
+           autowarmCount="10"
+           regenerator="solr.NoOpRegenerator" />
 
     <!-- Field Value Cache
 
@@ -470,33 +461,33 @@
     -->
     <enableLazyFieldLoading>true</enableLazyFieldLoading>
 
-     <!-- Use Filter For Sorted Query
+    <!-- Use Filter For Sorted Query
 
-          A possible optimization that attempts to use a filter to
-          satisfy a search.  If the requested sort does not include
-          score, then the filterCache will be checked for a filter
-          matching the query. If found, the filter will be used as the
-          source of document ids, and then the sort will be applied to
-          that.
+         A possible optimization that attempts to use a filter to
+         satisfy a search.  If the requested sort does not include
+         score, then the filterCache will be checked for a filter
+         matching the query. If found, the filter will be used as the
+         source of document ids, and then the sort will be applied to
+         that.
 
-          For most situations, this will not be useful unless you
-          frequently get the same search repeatedly with different sort
-          options, and none of them ever use "score"
-       -->
-     <!--
-        <useFilterForSortedQuery>true</useFilterForSortedQuery>
-       -->
+         For most situations, this will not be useful unless you
+         frequently get the same search repeatedly with different sort
+         options, and none of them ever use "score"
+      -->
+    <!--
+       <useFilterForSortedQuery>true</useFilterForSortedQuery>
+      -->
 
-     <!-- Result Window Size
+    <!-- Result Window Size
 
-          An optimization for use with the queryResultCache.  When a search
-          is requested, a superset of the requested number of document ids
-          are collected.  For example, if a search for a particular query
-          requests matching documents 10 through 19, and queryWindowSize is 50,
-          then documents 0 through 49 will be collected and cached.  Any further
-          requests in that range can be satisfied via the cache.
-       -->
-     <queryResultWindowSize>20</queryResultWindowSize>
+         An optimization for use with the queryResultCache.  When a search
+         is requested, a superset of the requested number of document ids
+         are collected.  For example, if a search for a particular query
+         requests matching documents 10 through 19, and queryWindowSize is 50,
+         then documents 0 through 49 will be collected and cached.  Any further
+         requests in that range can be satisfied via the cache.
+      -->
+    <queryResultWindowSize>20</queryResultWindowSize>
 
     <!-- Maximum number of documents to cache for any entry in the
          queryResultCache.
@@ -522,21 +513,20 @@
 
     <!-- Query Related Event Listeners
 
-          Various IndexSearcher related events can trigger Listeners to
-          take actions.
+         Various IndexSearcher related events can trigger Listeners to
+         take actions.
 
-          newSearcher - fired whenever a new searcher is being prepared
-          and there is a current searcher handling requests (aka
-          registered).  It can be used to prime certain caches to
-          prevent long request times for certain requests.
+         newSearcher - fired whenever a new searcher is being prepared
+         and there is a current searcher handling requests (aka
+         registered).  It can be used to prime certain caches to
+         prevent long request times for certain requests.
 
-          firstSearcher - fired whenever a new searcher is being
-          prepared but there is no current registered searcher to handle
-          requests or to gain autowarming data from.
+         firstSearcher - fired whenever a new searcher is being
+         prepared but there is no current registered searcher to handle
+         requests or to gain autowarming data from.
 
->>>>>>> Solr 9 + Java 11 + Tomcat 9
 
-       -->
+      -->
     <!-- QuerySenderListener takes an array of NamedList and executes a
          local query request for each NamedList in sequence.
       -->
@@ -862,8 +852,8 @@
       <!-- Configure the standard fragmenter -->
       <!-- This could most likely be commented out in the "default" case -->
       <fragmenter name="gap"
-        default="true"
-        class="solr.highlight.GapFragmenter">
+                  default="true"
+                  class="solr.highlight.GapFragmenter">
         <lst name="defaults">
           <int name="hl.fragsize">100</int>
         </lst>
@@ -873,7 +863,7 @@
            (for sentence extraction)
         -->
       <fragmenter name="regex"
-        class="solr.highlight.RegexFragmenter">
+                  class="solr.highlight.RegexFragmenter">
         <lst name="defaults">
           <!-- slightly smaller fragsizes work better because of slop -->
           <int name="hl.fragsize">70</int>
@@ -886,8 +876,8 @@
 
       <!-- Configure the standard formatter -->
       <formatter name="html"
-        default="true"
-        class="solr.highlight.HtmlFormatter">
+                 default="true"
+                 class="solr.highlight.HtmlFormatter">
         <lst name="defaults">
           <str name="hl.simple.pre"><![CDATA[<em>]]></str>
           <str name="hl.simple.post"><![CDATA[</em>]]></str>
@@ -896,25 +886,25 @@
 
       <!-- Configure the standard encoder -->
       <encoder name="html"
-        class="solr.highlight.HtmlEncoder" />
+               class="solr.highlight.HtmlEncoder" />
 
       <!-- Configure the standard fragListBuilder -->
       <fragListBuilder name="simple"
-        class="solr.highlight.SimpleFragListBuilder"/>
+                       class="solr.highlight.SimpleFragListBuilder"/>
 
       <!-- Configure the single fragListBuilder -->
       <fragListBuilder name="single"
-        class="solr.highlight.SingleFragListBuilder"/>
+                       class="solr.highlight.SingleFragListBuilder"/>
 
       <!-- Configure the weighted fragListBuilder -->
       <fragListBuilder name="weighted"
-        default="true"
-        class="solr.highlight.WeightedFragListBuilder"/>
+                       default="true"
+                       class="solr.highlight.WeightedFragListBuilder"/>
 
       <!-- default tag FragmentsBuilder -->
       <fragmentsBuilder name="default"
-        default="true"
-        class="solr.highlight.ScoreOrderFragmentsBuilder">
+                        default="true"
+                        class="solr.highlight.ScoreOrderFragmentsBuilder">
         <!--
         <lst name="defaults">
           <str name="hl.multiValuedSeparatorChar">/</str>
@@ -924,7 +914,7 @@
 
       <!-- multi-colored tag FragmentsBuilder -->
       <fragmentsBuilder name="colored"
-        class="solr.highlight.ScoreOrderFragmentsBuilder">
+                        class="solr.highlight.ScoreOrderFragmentsBuilder">
         <lst name="defaults">
           <str name="hl.tag.pre"><![CDATA[
                <b style="background:yellow">,<b style="background:lawgreen">,
@@ -937,8 +927,8 @@
       </fragmentsBuilder>
 
       <boundaryScanner name="default"
-        default="true"
-        class="solr.highlight.SimpleBoundaryScanner">
+                       default="true"
+                       class="solr.highlight.SimpleBoundaryScanner">
         <lst name="defaults">
           <str name="hl.bs.maxScan">10</str>
           <str name="hl.bs.chars">.,!? &#9;&#10;&#13;</str>
@@ -946,7 +936,7 @@
       </boundaryScanner>
 
       <boundaryScanner name="breakIterator"
-        class="solr.highlight.BreakIteratorBoundaryScanner">
+                       class="solr.highlight.BreakIteratorBoundaryScanner">
         <lst name="defaults">
           <!-- type should be one of CHARACTER, WORD(default), LINE and SENTENCE -->
           <str name="hl.bs.type">WORD</str>
@@ -1034,7 +1024,7 @@
 
   <!-- The update.autoCreateFields property can be turned to false to disable schemaless mode -->
   <updateRequestProcessorChain name="add-unknown-fields-to-the-schema" default="${update.autoCreateFields:true}"
-    processor="uuid,remove-blank,field-name-mutating,parse-boolean,parse-long,parse-double,parse-date,add-schema-fields">
+                               processor="uuid,remove-blank,field-name-mutating,parse-boolean,parse-long,parse-double,parse-date,add-schema-fields">
     <processor class="solr.LogUpdateProcessorFactory"/>
     <processor class="solr.DistributedUpdateProcessorFactory"/>
     <processor class="solr.RunUpdateProcessorFactory"/>

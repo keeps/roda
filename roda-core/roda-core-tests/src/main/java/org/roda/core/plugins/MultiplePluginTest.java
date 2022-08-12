@@ -81,7 +81,6 @@ public class MultiplePluginTest {
   public void tearDown() throws Exception {
     IndexTestUtils.resetIndex();
     RodaCoreFactory.shutdown();
-    FSUtils.deletePath(basePath);
   }
 
   @Test
