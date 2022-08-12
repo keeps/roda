@@ -9,7 +9,7 @@ package org.roda.core.data.v2.index.filter;
 
 /**
  * @author Hélder Silva <hsilva@keep.pt>
- * 
+ *
  */
 public class EmptyKeyFilterParameter extends FilterParameter {
   private static final long serialVersionUID = 5888125949326684987L;

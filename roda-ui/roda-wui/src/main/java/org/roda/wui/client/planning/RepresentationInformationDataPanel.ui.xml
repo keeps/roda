@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:l="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
@@ -12,39 +11,41 @@
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.representationInformationName}' />
 				</g:Label>
-				<g:TextBox title="{messages.representationInformationName}"
-					ui:field="name" addStyleNames="form-textbox" />
+				<g:TextBox title="{messages.representationInformationName}" ui:field="name" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.representationInformationDescription}' />
 				</g:Label>
-				<g:TextArea title="{messages.representationInformationDescription}"
-					ui:field="description" addStyleNames="form-textbox metadata-form-text-area ri-edit-description" />
+				<g:TextArea title="{messages.representationInformationDescription}" ui:field="description"
+					addStyleNames="form-textbox metadata-form-text-area ri-edit-description" />
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.representationInformationTags}' />
 				</g:Label>
-				<l:IncrementalList ui:field="tags"></l:IncrementalList>
+				<l:IncrementalList ui:field="tags">
+				</l:IncrementalList>
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.representationInformationSupport}' />
 				</g:Label>
-				<g:ListBox title="{messages.representationInformationSupport}"
-					ui:field="support" addStyleNames="form-listbox" />
-					<g:Label addStyleNames="form-label">
+				<g:ListBox title="{messages.representationInformationSupport}" ui:field="support"
+					addStyleNames="form-listbox" />
+				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.representationInformationFamily}' />
 				</g:Label>
-				<g:ListBox title="{messages.representationInformationFamily}"
-					ui:field="family" addStyleNames="form-listbox" />
-					
-				<g:FlowPanel ui:field="extras"></g:FlowPanel>
+				<g:ListBox title="{messages.representationInformationFamily}" ui:field="family"
+					addStyleNames="form-listbox" />
+
+				<g:FlowPanel ui:field="extras">
+				</g:FlowPanel>
 
 				<g:FlowPanel addStyleNames="ri-form-separator">
 					<g:Label addStyleNames="form-label">
-						<ui:text
-							from='{messages.representationInformationAdditionalInformation}' />
+						<ui:text from='{messages.representationInformationAdditionalInformation}' />
 					</g:Label>
 				</g:FlowPanel>
-				<l:IncrementalRelationList ui:field="relations"></l:IncrementalRelationList>
+				<l:IncrementalRelationList ui:field="relations">
+				</l:IncrementalRelationList>
 
-				<l:IncrementalFilterList ui:field="filters"></l:IncrementalFilterList>
+				<l:IncrementalFilterList ui:field="filters">
+				</l:IncrementalFilterList>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

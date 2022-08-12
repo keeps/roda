@@ -42,19 +42,21 @@ public class EditDistributedInstance extends Composite {
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
-        BrowserService.Util.getInstance().retrieveDistributedInstance(historyTokens.get(0), new NoAsyncCallback<DistributedInstance>() {
-          @Override
-          public void onSuccess(DistributedInstance result) {
-            EditDistributedInstance editDistributedInstance = new EditDistributedInstance(result);
-            callback.onSuccess(editDistributedInstance);
-          }
-        });
+        BrowserService.Util.getInstance().retrieveDistributedInstance(historyTokens.get(0),
+          new NoAsyncCallback<DistributedInstance>() {
+            @Override
+            public void onSuccess(DistributedInstance result) {
+              EditDistributedInstance editDistributedInstance = new EditDistributedInstance(result);
+              callback.onSuccess(editDistributedInstance);
+            }
+          });
       }
     }
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {DistributedInstancesManagement.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {DistributedInstancesManagement.RESOLVER}, false,
+        callback);
     }
 
     @Override
@@ -97,7 +99,6 @@ public class EditDistributedInstance extends Composite {
     this.distributedInstanceDataPanel = new DistributedInstanceDataPanel(distributedInstance, true);
     this.distributedInstanceDataPanel.setDistributedInstance(distributedInstance);
 
-
     initWidget(uiBinder.createAndBindUi(this));
     initStatusButton(distributedInstance);
   }
@@ -112,12 +113,13 @@ public class EditDistributedInstance extends Composite {
           @Override
           public void onClick(ClickEvent clickEvent) {
             distributedInstance.setStatus(SynchronizingStatus.INACTIVE);
-            BrowserServiceImpl.Util.getInstance().updateDistributedInstance(distributedInstance, new NoAsyncCallback<DistributedInstance>() {
-              @Override
-              public void onSuccess(DistributedInstance distributedInstance) {
-                HistoryUtils.newHistory(DistributedInstancesManagement.RESOLVER);
-              }
-            });
+            BrowserServiceImpl.Util.getInstance().updateDistributedInstance(distributedInstance,
+              new NoAsyncCallback<DistributedInstance>() {
+                @Override
+                public void onSuccess(DistributedInstance distributedInstance) {
+                  HistoryUtils.newHistory(DistributedInstancesManagement.RESOLVER);
+                }
+              });
           }
         });
         break;
@@ -128,12 +130,13 @@ public class EditDistributedInstance extends Composite {
           @Override
           public void onClick(ClickEvent clickEvent) {
             distributedInstance.setStatus(SynchronizingStatus.ACTIVE);
-            BrowserServiceImpl.Util.getInstance().updateDistributedInstance(distributedInstance, new NoAsyncCallback<DistributedInstance>() {
-              @Override
-              public void onSuccess(DistributedInstance distributedInstance) {
-                HistoryUtils.newHistory(DistributedInstancesManagement.RESOLVER);
-              }
-            });
+            BrowserServiceImpl.Util.getInstance().updateDistributedInstance(distributedInstance,
+              new NoAsyncCallback<DistributedInstance>() {
+                @Override
+                public void onSuccess(DistributedInstance distributedInstance) {
+                  HistoryUtils.newHistory(DistributedInstancesManagement.RESOLVER);
+                }
+              });
           }
         });
         break;
@@ -154,24 +157,26 @@ public class EditDistributedInstance extends Composite {
       DistributedInstance distributedInstanceUpdated = distributedInstanceDataPanel.getDistributedInstance();
       distributedInstance.setName(distributedInstanceUpdated.getName());
       distributedInstance.setDescription(distributedInstanceUpdated.getDescription());
-      //distributedInstance.setNameIdentifier(distributedInstanceUpdated.getNameIdentifier());
-      BrowserServiceImpl.Util.getInstance().updateDistributedInstance(this.distributedInstance, new NoAsyncCallback<DistributedInstance>() {
-        @Override
-        public void onSuccess(DistributedInstance distributedInstance) {
-          HistoryUtils.newHistory(DistributedInstancesManagement.RESOLVER);
-        }
-      });
+      // distributedInstance.setNameIdentifier(distributedInstanceUpdated.getNameIdentifier());
+      BrowserServiceImpl.Util.getInstance().updateDistributedInstance(this.distributedInstance,
+        new NoAsyncCallback<DistributedInstance>() {
+          @Override
+          public void onSuccess(DistributedInstance distributedInstance) {
+            HistoryUtils.newHistory(DistributedInstancesManagement.RESOLVER);
+          }
+        });
     }
   }
 
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
-    BrowserServiceImpl.Util.getInstance().deleteDistributedInstance(distributedInstance.getId(), new NoAsyncCallback<Void>() {
-      @Override
-      public void onSuccess(Void result) {
-        HistoryUtils.newHistory(DistributedInstancesManagement.RESOLVER);
-      }
-    });
+    BrowserServiceImpl.Util.getInstance().deleteDistributedInstance(distributedInstance.getId(),
+      new NoAsyncCallback<Void>() {
+        @Override
+        public void onSuccess(Void result) {
+          HistoryUtils.newHistory(DistributedInstancesManagement.RESOLVER);
+        }
+      });
   }
 
   @UiHandler("buttonCancel")

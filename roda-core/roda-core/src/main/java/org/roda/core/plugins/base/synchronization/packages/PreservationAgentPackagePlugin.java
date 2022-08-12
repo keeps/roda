@@ -78,8 +78,8 @@ public class PreservationAgentPackagePlugin extends RodaEntityPackagesPlugin<Ind
     throws RequestNotValidException, GenericException {
     Filter filter = new Filter();
     if (fromDate != null) {
-      filter.add(new DateIntervalFilterParameter(RodaConstants.PRESERVATION_AGENT_CREATED_ON, RodaConstants.PRESERVATION_AGENT_CREATED_ON,
-        fromDate, toDate));
+      filter.add(new DateIntervalFilterParameter(RodaConstants.PRESERVATION_AGENT_CREATED_ON,
+        RodaConstants.PRESERVATION_AGENT_CREATED_ON, fromDate, toDate));
     }
     return Arrays
       .asList(index.findAll(IndexedPreservationAgent.class, filter, Arrays.asList(RodaConstants.INDEX_UUID)));

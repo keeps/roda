@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.main;
 
@@ -54,7 +54,7 @@ import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class Login extends Composite {
 
@@ -161,7 +161,7 @@ public class Login extends Composite {
   }
 
   @UiHandler("homepage")
-  void handleHomepage(ClickEvent e){
+  void handleHomepage(ClickEvent e) {
     HistoryUtils.newHistory(Welcome.RESOLVER);
   }
 

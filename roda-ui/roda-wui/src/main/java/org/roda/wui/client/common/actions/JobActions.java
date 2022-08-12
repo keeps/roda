@@ -114,6 +114,7 @@ public class JobActions extends AbstractActionable<Job> {
     }
     return false;
   }
+
   @Override
   public void act(Action<Job> action, AsyncCallback<ActionImpact> callback) {
     if (JobAction.NEW_PROCESS.equals(action)) {
@@ -200,19 +201,19 @@ public class JobActions extends AbstractActionable<Job> {
           if (confirmed) {
             BrowserService.Util.getInstance().approveJob(objectToSelectedItems(object, Job.class),
               new ActionAsyncCallback<Void>(callback) {
-              @Override
-              public void onFailure(Throwable caught) {
-                // FIXME 20160826 hsilva: do proper handling of the failure
-                super.onFailure(caught);
-                doActionCallbackDestroyed();
-              }
+                @Override
+                public void onFailure(Throwable caught) {
+                  // FIXME 20160826 hsilva: do proper handling of the failure
+                  super.onFailure(caught);
+                  doActionCallbackDestroyed();
+                }
 
-              @Override
-              public void onSuccess(Void result) {
-                // FIXME 20160826 hsilva: do proper handling of the success
-                doActionCallbackDestroyed();
-              }
-            });
+                @Override
+                public void onSuccess(Void result) {
+                  // FIXME 20160826 hsilva: do proper handling of the success
+                  doActionCallbackDestroyed();
+                }
+              });
           } else {
             doActionCallbackNone();
           }
@@ -272,21 +273,21 @@ public class JobActions extends AbstractActionable<Job> {
               new ActionNoAsyncCallback<String>(callback) {
 
                 public void onSuccess(final String details) {
-                  BrowserService.Util.getInstance()
-                    .rejectJob(objectToSelectedItems(object, Job.class), details, new ActionAsyncCallback<Void>(callback) {
-                    @Override
-                    public void onFailure(Throwable caught) {
-                      // FIXME 20160826 hsilva: do proper handling of the failure
-                      super.onFailure(caught);
-                      doActionCallbackNone();
-                    }
+                  BrowserService.Util.getInstance().rejectJob(objectToSelectedItems(object, Job.class), details,
+                    new ActionAsyncCallback<Void>(callback) {
+                      @Override
+                      public void onFailure(Throwable caught) {
+                        // FIXME 20160826 hsilva: do proper handling of the failure
+                        super.onFailure(caught);
+                        doActionCallbackNone();
+                      }
 
-                    @Override
-                    public void onSuccess(Void result) {
-                      // FIXME 20160826 hsilva: do proper handling of the success
-                      doActionCallbackUpdated();
-                    }
-                  });
+                      @Override
+                      public void onSuccess(Void result) {
+                        // FIXME 20160826 hsilva: do proper handling of the success
+                        doActionCallbackUpdated();
+                      }
+                    });
                 }
               });
           } else {
@@ -312,19 +313,19 @@ public class JobActions extends AbstractActionable<Job> {
 
                     @Override
                     public void onSuccess(final String details) {
-                      BrowserService.Util.getInstance()
-                              .rejectJob(objects, details, new ActionAsyncCallback<Void>(callback) {
+                      BrowserService.Util.getInstance().rejectJob(objects, details,
+                        new ActionAsyncCallback<Void>(callback) {
 
-                        @Override
-                        public void onSuccess(Void unused) {
-                          doActionCallbackDestroyed();
-                        }
+                          @Override
+                          public void onSuccess(Void unused) {
+                            doActionCallbackDestroyed();
+                          }
 
-                        public void onFailure(Throwable caught) {
-                          super.onFailure(caught);
-                          doActionCallbackDestroyed();
-                        }
-                      });
+                          public void onFailure(Throwable caught) {
+                            super.onFailure(caught);
+                            doActionCallbackDestroyed();
+                          }
+                        });
                     }
                   });
               } else {

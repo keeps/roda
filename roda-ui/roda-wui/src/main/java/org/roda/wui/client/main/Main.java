@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.main;
 
@@ -43,7 +43,7 @@ import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class Main extends Composite implements EntryPoint {
 

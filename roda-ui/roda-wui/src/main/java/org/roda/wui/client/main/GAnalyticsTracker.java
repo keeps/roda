@@ -24,7 +24,7 @@ public class GAnalyticsTracker {
 
   /**
    * track an event
-   * 
+   *
    * @param historyToken
    */
   public static void track(String historyToken) {
@@ -43,7 +43,7 @@ public class GAnalyticsTracker {
 
   private static native void setAccount(String accountId)
   /*-{
-		$wnd.ga('create', accountId, 'auto');
+  	$wnd.ga('create', accountId, 'auto');
   }-*/;
 
   /**
@@ -53,8 +53,8 @@ public class GAnalyticsTracker {
    */
   private static native void pageview(String page)
   /*-{
-		$wnd.ga('set', 'page', page);
-		$wnd.ga('send', 'pageview');
+  	$wnd.ga('set', 'page', page);
+  	$wnd.ga('send', 'pageview');
   }-*/;
 
 }

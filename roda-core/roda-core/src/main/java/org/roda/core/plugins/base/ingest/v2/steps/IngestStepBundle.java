@@ -35,8 +35,8 @@ public class IngestStepBundle {
   private SIPInformation sipInformation;
 
   public IngestStepBundle(Plugin<?> ingestPlugin, IndexService index, ModelService model, StorageService storage,
-                          IngestJobPluginInfo jobPluginInfo, PluginParameter pluginParameter, Map<String, String> parameterValues,
-                          List<TransferredResource> resources, List<AIP> aips, Job cachedJob, SIPInformation sipInformation) {
+    IngestJobPluginInfo jobPluginInfo, PluginParameter pluginParameter, Map<String, String> parameterValues,
+    List<TransferredResource> resources, List<AIP> aips, Job cachedJob, SIPInformation sipInformation) {
     this.ingestPlugin = ingestPlugin;
     this.index = index;
     this.model = model;

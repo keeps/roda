@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.welcome;
 
@@ -23,7 +23,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class Help {
 
@@ -54,7 +54,7 @@ public class Help {
 
   /**
    * Get the singleton instance
-   * 
+   *
    * @return the instance
    */
   public static Help getInstance() {

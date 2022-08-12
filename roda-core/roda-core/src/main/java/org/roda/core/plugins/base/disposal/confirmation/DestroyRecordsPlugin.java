@@ -251,7 +251,8 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
       }
 
       reportItem.setPluginDetails(outcomeText);
-    } catch (IOException | CommandException | RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException | AlreadyExistsException e) {
+    } catch (IOException | CommandException | RequestNotValidException | GenericException | AuthorizationDeniedException
+      | NotFoundException | AlreadyExistsException e) {
       LOGGER.error("Failed to destroy AIP '{}': {}", aip.getId(), e.getMessage(), e);
       state = PluginState.FAILURE;
       outcomeText = "AIP '" + aip.getId() + "' has not been destroyed with disposal confirmation '"
@@ -311,8 +312,8 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
     aip.getDisposal().getConfirmation().setDestruction(destruction);
   }
 
-  private void executeApplyStylesheet(AIP aip, ModelService model)
-      throws NotFoundException, AuthorizationDeniedException, GenericException, RequestNotValidException, IOException, AlreadyExistsException {
+  private void executeApplyStylesheet(AIP aip, ModelService model) throws NotFoundException,
+    AuthorizationDeniedException, GenericException, RequestNotValidException, IOException, AlreadyExistsException {
     // Apply stylesheet to descriptive metadata
     for (DescriptiveMetadata metadata : aip.getDescriptiveMetadata()) {
       Binary binary = model.retrieveDescriptiveMetadataBinary(aip.getId(), metadata.getId());
@@ -323,7 +324,8 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
 
       model.deleteDescriptiveMetadata(aip.getId(), metadata.getId());
 
-      model.createDescriptiveMetadata(aip.getId(), metadata.getId(), new StringContentPayload(content), metadata.getType(), metadata.getVersion());
+      model.createDescriptiveMetadata(aip.getId(), metadata.getId(), new StringContentPayload(content),
+        metadata.getType(), metadata.getVersion());
     }
   }
 

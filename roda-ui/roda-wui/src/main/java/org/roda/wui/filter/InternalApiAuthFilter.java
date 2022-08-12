@@ -135,10 +135,10 @@ public class InternalApiAuthFilter implements Filter {
 
   /**
    * Is the requested path in the list of exclusions?
-   * 
+   *
    * @param request
    *          the request.
-   * 
+   *
    * @return <code>true</code> if it is excluded and <code>false</code> otherwise.
    */
   private boolean isRequestUrlExcluded(final HttpServletRequest request) {

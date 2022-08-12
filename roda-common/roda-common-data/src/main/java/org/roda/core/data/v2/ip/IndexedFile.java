@@ -315,6 +315,7 @@ public class IndexedFile implements IsIndexed, HasId, SetsUUID, HasPermissionFil
   public void setCreatedOn(Date createdOn) {
     this.createdOn = createdOn;
   }
+
   @Override
   public int hashCode() {
     final int prime = 31;

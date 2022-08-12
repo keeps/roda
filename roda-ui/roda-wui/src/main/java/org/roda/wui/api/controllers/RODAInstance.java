@@ -236,7 +236,7 @@ public class RODAInstance extends RodaWuiController {
       distributedInstance.setStatus(SynchronizingStatus.INACTIVE);
 
       SyncUtils.updateDistributedInstance(RodaCoreFactory.getLocalInstance(), distributedInstance);
-    }catch (GenericException e){
+    } catch (GenericException e) {
       // Do nothing distributed instance was removed
     }
 
@@ -273,7 +273,7 @@ public class RODAInstance extends RodaWuiController {
   }
 
   public static List<String> testLocalInstanceConfiguration(User user, LocalInstance localInstance)
-    throws AuthorizationDeniedException{
+    throws AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
     List<String> responseList = new ArrayList();
 
@@ -491,28 +491,28 @@ public class RODAInstance extends RodaWuiController {
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
 
-      DistributedInstance distributedInstance = model.retrieveDistributedInstance(instanceIdentifier);
-      Date lastSynchronizationDate = distributedInstance.getLastSynchronizationDate();
-      Date toDate = new Date();
-      // get Jobs
-      final Filter jobFilter = new Filter();
-      jobFilter.add(new SimpleFilterParameter(RodaConstants.INDEX_INSTANCE_ID, instanceIdentifier));
-      jobFilter.add(new SimpleFilterParameter(RodaConstants.JOB_STATE, Job.JOB_STATE.CREATED.name()));
-      jobFilter.add(new DateIntervalFilterParameter(RodaConstants.JOB_START_DATE, RodaConstants.JOB_END_DATE,
-        lastSynchronizationDate, toDate));
-      total += index.count(Job.class, jobFilter);
+    DistributedInstance distributedInstance = model.retrieveDistributedInstance(instanceIdentifier);
+    Date lastSynchronizationDate = distributedInstance.getLastSynchronizationDate();
+    Date toDate = new Date();
+    // get Jobs
+    final Filter jobFilter = new Filter();
+    jobFilter.add(new SimpleFilterParameter(RodaConstants.INDEX_INSTANCE_ID, instanceIdentifier));
+    jobFilter.add(new SimpleFilterParameter(RodaConstants.JOB_STATE, Job.JOB_STATE.CREATED.name()));
+    jobFilter.add(new DateIntervalFilterParameter(RodaConstants.JOB_START_DATE, RodaConstants.JOB_END_DATE,
+      lastSynchronizationDate, toDate));
+    total += index.count(Job.class, jobFilter);
 
-      // get Risks
-      final Filter riskFilter = new Filter();
-      riskFilter.add(new DateIntervalFilterParameter(RodaConstants.RISK_UPDATED_ON, RodaConstants.RISK_UPDATED_ON,
-        lastSynchronizationDate, toDate));
-      total += index.count(IndexedRisk.class, riskFilter);
+    // get Risks
+    final Filter riskFilter = new Filter();
+    riskFilter.add(new DateIntervalFilterParameter(RodaConstants.RISK_UPDATED_ON, RodaConstants.RISK_UPDATED_ON,
+      lastSynchronizationDate, toDate));
+    total += index.count(IndexedRisk.class, riskFilter);
 
-      // get RepresentationInformation
-      final Filter repFilter = new Filter();
-      repFilter.add(new DateIntervalFilterParameter(RodaConstants.REPRESENTATION_INFORMATION_UPDATED_ON,
-              RodaConstants.REPRESENTATION_INFORMATION_UPDATED_ON, lastSynchronizationDate, toDate));
-      total += index.count(RepresentationInformation.class, riskFilter);
+    // get RepresentationInformation
+    final Filter repFilter = new Filter();
+    repFilter.add(new DateIntervalFilterParameter(RodaConstants.REPRESENTATION_INFORMATION_UPDATED_ON,
+      RodaConstants.REPRESENTATION_INFORMATION_UPDATED_ON, lastSynchronizationDate, toDate));
+    total += index.count(RepresentationInformation.class, riskFilter);
 
     return total;
   }

@@ -10,7 +10,7 @@ package org.roda.core.data.exceptions;
 /**
  * Thrown to indicate that was not possible to authenticate {@link User} because
  * it's email address is not verified.
- * 
+ *
  * @author Rui Castro <rui.castro@gmail.com>
  */
 public class EmailUnverifiedException extends AuthenticationDeniedException {

@@ -164,8 +164,7 @@ public class EditRisk extends Composite {
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
     BrowserService.Util.getInstance().deleteRisk(
-      new SelectedItemsList<>(Arrays.asList(risk.getUUID()), IndexedRisk.class.getName()),
-      new AsyncCallback<Job>() {
+      new SelectedItemsList<>(Arrays.asList(risk.getUUID()), IndexedRisk.class.getName()), new AsyncCallback<Job>() {
         @Override
         public void onFailure(Throwable caught) {
           HistoryUtils.newHistory(InternalProcess.RESOLVER);

@@ -578,7 +578,7 @@ public final class PluginHelper {
   /**
    * 20160329 hsilva: use this method only to get job information that most
    * certainly won't change in time (e.g. username, etc.)
-   * 
+   *
    * @throws RequestNotValidException
    */
   public static <T extends IsRODAObject> Job getJob(Plugin<T> plugin, IndexService index)
@@ -873,7 +873,7 @@ public final class PluginHelper {
   /***************** Plugin related *****************/
   /**************************************************/
   /**
-   * 
+   *
    * @param plugin
    *          uniq identifier of this request
    */
@@ -895,7 +895,7 @@ public final class PluginHelper {
   }
 
   /**
-   * 
+   *
    * @param requestUuid
    *          uniq identifier of this request
    */
@@ -904,7 +904,7 @@ public final class PluginHelper {
   }
 
   /**
-   * 
+   *
    * @param requestUuid
    *          uniq identifier of this request
    */
@@ -922,7 +922,7 @@ public final class PluginHelper {
   }
 
   /**
-   * 
+   *
    * @param plugin
    *          uniq identifier of this request
    */
@@ -944,7 +944,7 @@ public final class PluginHelper {
   }
 
   /**
-   * 
+   *
    * @param requestUuid
    *          uniq identifier of this request
    */
@@ -953,7 +953,7 @@ public final class PluginHelper {
   }
 
   /**
-   * 
+   *
    * @param requestUuid
    *          uniq identifier of this request
    */
@@ -1144,7 +1144,8 @@ public final class PluginHelper {
 
     if (job != null) {
       for (JobUserDetails jobUserDetails : job.getJobUsersDetails()) {
-        String userId = IdUtils.getUserAgentId(jobUserDetails.getUsername(), RODAInstanceUtils.getLocalInstanceIdentifier());
+        String userId = IdUtils.getUserAgentId(jobUserDetails.getUsername(),
+          RODAInstanceUtils.getLocalInstanceIdentifier());
         LinkingIdentifier linkingIdentifierAgent1 = new LinkingIdentifier();
         linkingIdentifierAgent1.setValue(userId);
         List<String> rolesAgent1 = new ArrayList<>();
@@ -1188,15 +1189,14 @@ public final class PluginHelper {
     return pm;
   }
 
-  public static void addAgent(String agentName, ModelService model, LinkingIdentifier linkingIdentifierAgent, IndexService index,
-    List<LinkingIdentifier> agentIds, Job job) {
+  public static void addAgent(String agentName, ModelService model, LinkingIdentifier linkingIdentifierAgent,
+    IndexService index, List<LinkingIdentifier> agentIds, Job job) {
 
     try {
       StoragePath userAgentPath = ModelUtils.getPreservationMetadataStoragePath(linkingIdentifierAgent.getValue(),
-              PreservationMetadataType.AGENT);
+        PreservationMetadataType.AGENT);
       if (!RodaCoreFactory.getStorageService().exists(userAgentPath)) {
-        PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(agentName, model, index,
-          true,job);
+        PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(agentName, model, index, true, job);
         if (pm != null) {
           agentIds.add(linkingIdentifierAgent);
         }
@@ -1209,6 +1209,7 @@ public final class PluginHelper {
       LOGGER.error("Error creating PREMIS agent", e);
     }
   }
+
   public static LinkingIdentifier getLinkingIdentifier(TransferredResource transferredResource, String role) {
     LinkingIdentifier li = new LinkingIdentifier();
     li.setValue(
@@ -1492,7 +1493,7 @@ public final class PluginHelper {
 
   public static void createAndExecuteJob(Job job) throws GenericException, JobAlreadyStartedException,
     RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    RodaCoreFactory.getPluginOrchestrator().createAndExecuteJobs(job,true);
+    RodaCoreFactory.getPluginOrchestrator().createAndExecuteJobs(job, true);
     RodaCoreFactory.getIndexService().commit(Job.class);
   }
 
@@ -1537,9 +1538,9 @@ public final class PluginHelper {
   /**
    * 20180525 hsilva: autoLocking=true should only be used by
    * PluginHelper.processObjects methods
-   * 
+   *
    * @throws LockingException
-   * 
+   *
    * @deprecated 20180525 hsilva: this methods should not be used directly, but
    *             instead one should use PluginHelper.processObjects methods, that
    *             is why this method will become private in a near future

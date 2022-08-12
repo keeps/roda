@@ -9,7 +9,7 @@ package org.roda.core.data.exceptions;
 
 /**
  * Thrown to indicate that the execution of some operation is not permited.
- * 
+ *
  * @author Rui Castro
  */
 public class IllegalOperationException extends RODAServiceException {
@@ -24,7 +24,7 @@ public class IllegalOperationException extends RODAServiceException {
 
   /**
    * Constructs a new IllegalOperationException with the given message.
-   * 
+   *
    * @param message
    */
   public IllegalOperationException(String message) {
@@ -33,7 +33,7 @@ public class IllegalOperationException extends RODAServiceException {
 
   /**
    * Constructs a new IllegalOperationException with the given cause Exception.
-   * 
+   *
    * @param cause
    */
   public IllegalOperationException(Throwable cause) {
@@ -43,7 +43,7 @@ public class IllegalOperationException extends RODAServiceException {
   /**
    * Constructs a new IllegalOperationException with the given message and cause
    * Exception.
-   * 
+   *
    * @param message
    * @param cause
    */

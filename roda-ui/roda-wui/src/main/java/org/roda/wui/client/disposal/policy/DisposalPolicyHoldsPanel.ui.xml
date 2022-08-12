@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
->
-    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
-    <g:FlowPanel>
-        <g:FlowPanel ui:field="disposalHoldsDescription"/>
-        <g:ScrollPanel ui:field="disposalHoldsTablePanel"/>
-        <g:FlowPanel ui:field="disposalHoldsButtonsPanel"/>
-    </g:FlowPanel>
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+	<g:FlowPanel>
+		<g:FlowPanel ui:field="disposalHoldsDescription" />
+		<g:ScrollPanel ui:field="disposalHoldsTablePanel" />
+		<g:FlowPanel ui:field="disposalHoldsButtonsPanel" />
+	</g:FlowPanel>
 </ui:UiBinder>

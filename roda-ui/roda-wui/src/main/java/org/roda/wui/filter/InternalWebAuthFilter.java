@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Internal authentication filter for web requests.
- * 
+ *
  * @author Hélder Silva <hsilva@keep.pt>
  * @author Luis Faria <lfaria@keep.pt>
  */

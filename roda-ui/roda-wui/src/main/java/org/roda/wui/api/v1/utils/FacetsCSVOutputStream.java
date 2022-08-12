@@ -19,7 +19,7 @@ import org.roda.core.data.v2.index.facet.FacetValue;
 
 /**
  * CSV output stream for {@link FacetFieldResult}.
- * 
+ *
  * @author Rui Castro <rui.castro@gmail.com>
  */
 public class FacetsCSVOutputStream extends CSVOutputStream {

@@ -12,7 +12,6 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.RODAObjectList;
 

@@ -19,7 +19,7 @@ import org.roda.core.plugins.PluginManager;
 /**
  * This interface should be implemented by any class that want to be a RODA
  * protocol.
- * 
+ *
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 public interface Protocol extends IsRODAObject {
@@ -27,14 +27,14 @@ public interface Protocol extends IsRODAObject {
   /**
    * Initializes this {@link Protocol}. This method is called by the
    * {@link ProtocolManager} before any other methods in the protocol.
-   * 
+   *
    * @throws ProtocolException
    */
   void init() throws ProtocolException;
 
   /**
    * Returns the name of this {@link Protocol}.
-   * 
+   *
    * @return a {@link String} with the name of this {@link Protocol}.
    */
   String getName();
@@ -54,15 +54,15 @@ public interface Protocol extends IsRODAObject {
    */
   String getDescription();
 
-
   /**
-   * Method used by ProtocolManager to obtain a new instance of a protocol, from the
-   * current loaded Protocol
+   * Method used by ProtocolManager to obtain a new instance of a protocol, from
+   * the current loaded Protocol
    */
   Protocol cloneMe(URI uri);
 
   /**
    * Get the URI scheme
+   *
    * @return the URI scheme
    */
   String getSchema();
@@ -76,7 +76,8 @@ public interface Protocol extends IsRODAObject {
   InputStream getInputStream() throws IOException;
 
   /**
-   * checks if a resource is available, used at the time of ingestion and when accessing
+   * checks if a resource is available, used at the time of ingestion and when
+   * accessing
    *
    * @return Boolean
    */
@@ -84,6 +85,7 @@ public interface Protocol extends IsRODAObject {
 
   /**
    * Obtained the total size in bytes of the resource
+   *
    * @return Long
    * @throws IOException
    */

@@ -439,7 +439,7 @@ public class RestUtils {
   /**
    * Creates a uri to
    * api/v1/distributed_instances/synchronization/{instanceIdentifier}.
-   * 
+   *
    * @param instanceIdentifier
    *          the instanceIdentifier.
    * @return {@link SafeUri}

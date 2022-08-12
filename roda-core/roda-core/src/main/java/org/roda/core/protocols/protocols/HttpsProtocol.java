@@ -25,6 +25,7 @@ public class HttpsProtocol extends HttpProtocol {
   public HttpsProtocol() {
     super();
   }
+
   public HttpsProtocol(URI uri) {
     super(uri);
   }

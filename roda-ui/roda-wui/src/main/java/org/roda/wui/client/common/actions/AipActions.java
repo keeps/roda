@@ -775,7 +775,8 @@ public class AipActions extends AbstractActionable<IndexedAIP> {
         @Override
         public void onSuccess(Boolean result) {
           if (result) {
-            BrowserService.Util.getInstance().disassociateDisposalSchedule(aips, new ActionAsyncCallback<Job>(callback) {
+            BrowserService.Util.getInstance().disassociateDisposalSchedule(aips,
+              new ActionAsyncCallback<Job>(callback) {
                 @Override
                 public void onFailure(Throwable caught) {
                   callback.onFailure(caught);

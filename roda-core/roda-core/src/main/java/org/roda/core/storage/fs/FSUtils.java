@@ -70,7 +70,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * File System related utility class
- * 
+ *
  * @author Luis Faria <lfaria@keep.pt>
  * @author Hélder Silva <hsilva@keep.pt>
  */
@@ -96,15 +96,15 @@ public class FSUtils {
    * useful for ensuring thread safety. </br>
    * </br>
    * NOTE: the stream is closed in the end.
-   * 
+   *
    * @param stream
    *          stream with the content to be updated
    * @param toPath
    *          location of the file being updated
-   * 
+   *
    * @throws IOException
    *           if an error occurs while copying/moving
-   * 
+   *
    */
   public static void safeUpdate(InputStream stream, Path toPath) throws IOException {
     try {
@@ -118,7 +118,7 @@ public class FSUtils {
 
   /**
    * Moves a directory/file from one path to another
-   * 
+   *
    * @param sourcePath
    *          source path
    * @param targetPath
@@ -129,7 +129,7 @@ public class FSUtils {
    * @throws AlreadyExistsException
    * @throws GenericException
    * @throws NotFoundException
-   * 
+   *
    */
   public static void move(final Path sourcePath, final Path targetPath, boolean replaceExisting)
     throws AlreadyExistsException, GenericException, NotFoundException {
@@ -217,7 +217,7 @@ public class FSUtils {
 
   /**
    * Copies a directory/file from one path to another
-   * 
+   *
    * @param sourcePath
    *          source path
    * @param targetPath
@@ -284,7 +284,7 @@ public class FSUtils {
 
   /**
    * Deletes a directory/file
-   * 
+   *
    * @param path
    *          path to the directory/file that will be deleted. in case of a
    *          directory, if not empty, everything in it will be deleted as well.
@@ -337,7 +337,7 @@ public class FSUtils {
 
   /**
    * Get path
-   * 
+   *
    * @param basePath
    *          base path
    * @param storagePath
@@ -400,7 +400,7 @@ public class FSUtils {
 
   /**
    * List content of the certain folder
-   * 
+   *
    * @param basePath
    *          base path
    * @param path
@@ -1004,7 +1004,7 @@ public class FSUtils {
   /**
    * We are using java.io because sonar has suggested as a performance update
    * https://sonarqube.com/coding_rules#rule_key=squid%3AS3725
-   * 
+   *
    * @since 2017-03-16
    */
   public static boolean isFile(Path file) {

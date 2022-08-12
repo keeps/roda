@@ -7,8 +7,6 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
-
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 

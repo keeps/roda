@@ -407,7 +407,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
                     public void onFailureImpl(Throwable caught) {
                       if (caught instanceof NotFoundException) {
                         Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-                      }else{
+                      } else {
                         super.onFailureImpl(caught);
                       }
                     }
@@ -450,7 +450,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
                       if (caught instanceof AlreadyExistsException) {
                         Dialogs.showInformationDialog(messages.createFolderAlreadyExistsTitle(),
                           messages.createFolderAlreadyExistsMessage(), messages.dialogOk(), false);
-                      }else{
+                      } else {
                         super.onFailureImpl(caught);
                       }
                     }
@@ -623,8 +623,7 @@ public class FileActions extends AbstractActionable<IndexedFile> {
     managementGroup.addButton(messages.uploadFilesButton(), FileAction.UPLOAD_FILES, ActionImpact.UPDATED, "btn-upload",
       "fileUploadButton");
     managementGroup.addButton(messages.createFolderButton(), FileAction.CREATE_FOLDER, ActionImpact.UPDATED,
-      "btn-plus-circle",
-      "fileCreateFolderButton");
+      "btn-plus-circle", "fileCreateFolderButton");
     managementGroup.addButton(messages.removeButton(), FileAction.REMOVE, ActionImpact.DESTROYED, "btn-ban",
       "fileRemoveButton");
 

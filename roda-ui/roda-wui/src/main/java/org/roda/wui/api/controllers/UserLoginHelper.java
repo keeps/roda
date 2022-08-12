@@ -35,7 +35,7 @@ public class UserLoginHelper {
 
   /**
    * Login the specified user.
-   * 
+   *
    * @param username
    *          the username.
    * @param password

@@ -77,19 +77,17 @@ public class CasApiAuthFilter implements Filter {
         filterChain.doFilter(request, response);
       } catch (InactiveUserException e) {
         LOGGER.error("Inactive user '" + request.getUserPrincipal().getName() + "': " + e.getMessage());
-        response.sendError(HttpServletResponse.SC_UNAUTHORIZED,
-          "Error authenticating user");
+        response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error authenticating user");
       } catch (RODAException e) {
         LOGGER.error("Error authenticating user '" + request.getUserPrincipal().getName() + "': " + e.getMessage());
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-          "Error authenticating user");
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error authenticating user");
       }
       return;
     }
 
     // try bearer token auth
     final String token = new BearerAuthRequestWrapper(request).getBearerToken();
-    if(token != null){
+    if (token != null) {
       try {
         doFilterWithToken(request, response, filterChain, token);
       } catch (NotFoundException | AuthenticationDeniedException e) {
@@ -166,8 +164,7 @@ public class CasApiAuthFilter implements Filter {
    * @param request
    *          the request.
    *
-   * @return <code>true</code> if it is excluded and <code>false</code>
-   *         otherwise.
+   * @return <code>true</code> if it is excluded and <code>false</code> otherwise.
    */
   private boolean isRequestUrlExcluded(final HttpServletRequest request) {
     for (String exclusion : this.exclusions) {
@@ -182,7 +179,7 @@ public class CasApiAuthFilter implements Filter {
   /**
    * A {@link HttpServletRequestWrapper} that adds a <code>ticket</code> query
    * string parameter.
-   * 
+   *
    * @author Rui Castro <rui.castro@gmai.com>
    */
   private class ServiceTicketRequestWrapper extends HttpServletRequestWrapper {
@@ -198,7 +195,7 @@ public class CasApiAuthFilter implements Filter {
 
     /**
      * Constructor.
-     * 
+     *
      * @param request
      *          the HTTP request.
      * @param serviceTicket

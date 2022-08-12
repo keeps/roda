@@ -12,7 +12,7 @@ import org.roda.core.data.v2.user.User;
 /**
  * Thrown to indicate that was not possible to authenticate {@link User} because
  * it is not active.
- * 
+ *
  * @author Rui Castro <rui.castro@gmail.com>
  */
 public class InactiveUserException extends AuthenticationDeniedException {
@@ -26,8 +26,7 @@ public class InactiveUserException extends AuthenticationDeniedException {
   }
 
   /**
-   * Constructs a new {@link InactiveUserException} with the given error
-   * message.
+   * Constructs a new {@link InactiveUserException} with the given error message.
    *
    * @param message
    *          the error message.

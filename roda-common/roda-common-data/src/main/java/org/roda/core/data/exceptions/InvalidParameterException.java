@@ -11,7 +11,7 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 
 /**
  * Thrown to indicate that a {@link PluginParameter} is wrong.
- * 
+ *
  * @author Rui Castro
  */
 public class InvalidParameterException extends RODAException {
@@ -27,7 +27,7 @@ public class InvalidParameterException extends RODAException {
   /**
    * Constructs a new {@link InvalidParameterException} with the given error
    * message.
-   * 
+   *
    * @param message
    *          the error message.
    */
@@ -38,7 +38,7 @@ public class InvalidParameterException extends RODAException {
   /**
    * Constructs a new {@link InvalidParameterException} with the given cause
    * exception.
-   * 
+   *
    * @param cause
    *          the cause exception.
    */
@@ -49,7 +49,7 @@ public class InvalidParameterException extends RODAException {
   /**
    * Constructs a new {@link InvalidParameterException} with the given error
    * message and cause exception.
-   * 
+   *
    * @param message
    *          the error message.
    * @param cause

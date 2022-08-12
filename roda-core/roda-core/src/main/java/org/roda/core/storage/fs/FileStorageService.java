@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Class that persists binary files and their containers in the File System.
- * 
+ *
  * <p>
  * 20160718 hsilva: it has been decided that all Filesystem Storage Service
  * delete methods would not effectively delete files/folders but instead move

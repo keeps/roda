@@ -76,7 +76,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Model related utility class
- * 
+ *
  * @author Hélder Silva <hsilva@keep.pt>
  * @author Luis Faria <lfaria@keep.pt>
  */

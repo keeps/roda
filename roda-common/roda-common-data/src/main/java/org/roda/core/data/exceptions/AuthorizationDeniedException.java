@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * @author Luis Faria <lfaria@keep.pt>
- * 
+ *
  */
 public class AuthorizationDeniedException extends RODAException {
 

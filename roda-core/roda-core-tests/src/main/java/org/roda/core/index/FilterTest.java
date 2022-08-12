@@ -58,7 +58,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 @Test(groups = {RodaConstants.TEST_GROUP_DEV})
-public class  FilterTest {
+public class FilterTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(FilterTest.class);
 
   private static Path basePath;
@@ -192,8 +192,7 @@ public class  FilterTest {
           }
 
           Thread.sleep(10);
-        } catch (RequestNotValidException | GenericException | InterruptedException
-          | AuthorizationDeniedException e) {
+        } catch (RequestNotValidException | GenericException | InterruptedException | AuthorizationDeniedException e) {
           // do nothing
         }
       }

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
-	xmlns:common="urn:import:org.roda.wui.client.common">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:d="urn:import:com.google.gwt.user.datepicker.client" xmlns:common="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
@@ -18,7 +16,8 @@
 					<g:Label ui:field="incidenceId" addStyleNames="value" />
 				</g:FlowPanel>
 				<g:FlowPanel>
-					<g:Label addStyleNames="form-label" ui:field="objectLabel"></g:Label>
+					<g:Label addStyleNames="form-label" ui:field="objectLabel">
+					</g:Label>
 					<g:Anchor ui:field="objectLink" />
 				</g:FlowPanel>
 				<g:FlowPanel>
@@ -63,13 +62,15 @@
 					<g:Label addStyleNames="form-label">
 						<ui:text from='{messages.riskIncidenceMitigatedOn}' />
 					</g:Label>
-					<d:DateBox title="{messages.riskIncidenceMitigatedOn}" ui:field="mitigatedOn" addStyleNames="form-textbox form-textbox-small" />
+					<d:DateBox title="{messages.riskIncidenceMitigatedOn}" ui:field="mitigatedOn"
+						addStyleNames="form-textbox form-textbox-small" />
 				</g:FlowPanel>
 				<g:FlowPanel>
 					<g:Label addStyleNames="form-label">
 						<ui:text from='{messages.riskIncidenceMitigatedBy}' />
 					</g:Label>
-					<g:TextBox title="{messages.riskIncidenceMitigatedBy}" ui:field="mitigatedBy" addStyleNames="form-textbox" />
+					<g:TextBox title="{messages.riskIncidenceMitigatedBy}" ui:field="mitigatedBy"
+						addStyleNames="form-textbox" />
 				</g:FlowPanel>
 				<g:FlowPanel>
 					<g:Label addStyleNames="form-label">
@@ -89,8 +90,7 @@
 						<g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonApply">
 							<ui:text from='{messages.saveButton}' />
 						</g:Button>
-						<g:Button addStyleNames="btn btn-block btn-default btn-times-circle"
-							ui:field="buttonCancel">
+						<g:Button addStyleNames="btn btn-block btn-default btn-times-circle" ui:field="buttonCancel">
 							<ui:text from='{messages.cancelButton}' />
 						</g:Button>
 					</g:FlowPanel>

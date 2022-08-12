@@ -66,7 +66,7 @@ public class PackageState implements Serializable {
     this.idList = idList;
   }
 
-  public void addIdList(String idList){
+  public void addIdList(String idList) {
     this.idList.add(idList);
   }
 

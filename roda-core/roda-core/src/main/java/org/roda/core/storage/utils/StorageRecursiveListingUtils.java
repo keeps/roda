@@ -102,7 +102,7 @@ public class StorageRecursiveListingUtils {
 
   /**
    * Emulates recursive listing using non-recursive listing
-   * 
+   *
    * @param storage
    * @param storagePath
    * @return
@@ -121,7 +121,7 @@ public class StorageRecursiveListingUtils {
 
   /**
    * Emulates recursive listing using non-recursive listing
-   * 
+   *
    * @param storage
    * @param storagePath
    * @return

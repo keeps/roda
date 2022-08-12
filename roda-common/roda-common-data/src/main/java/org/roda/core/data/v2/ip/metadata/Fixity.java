@@ -28,7 +28,7 @@ public class Fixity implements Serializable {
 
   /**
    * Constructs a new {@link Fixity} cloning an existing {@link Fixity}.
-   * 
+   *
    * @param fixity
    */
   public Fixity(Fixity fixity) {
@@ -37,11 +37,11 @@ public class Fixity implements Serializable {
 
   /**
    * Constructs a new {@link Fixity} with the given parameters.
-   * 
+   *
    * @param messageDigestAlgorithm
    * @param messageDigest
    * @param messageDigestOriginator
-   * 
+   *
    */
   public Fixity(String messageDigestAlgorithm, String messageDigest, String messageDigestOriginator) {
     setMessageDigestAlgorithm(messageDigestAlgorithm);

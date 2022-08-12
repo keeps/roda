@@ -12,7 +12,7 @@ import org.roda.core.data.v2.user.Group;
 /**
  * Thrown to indicate that a {@link Group} with the same name already exists
  * when a new one is trying to be created.
- * 
+ *
  * @author Rui Castro
  */
 public class GroupAlreadyExistsException extends AlreadyExistsException {
@@ -28,7 +28,7 @@ public class GroupAlreadyExistsException extends AlreadyExistsException {
 
   /**
    * Constructs a new GroupAlreadyExistsException with the given error message.
-   * 
+   *
    * @param message
    *          the error message
    */
@@ -37,9 +37,8 @@ public class GroupAlreadyExistsException extends AlreadyExistsException {
   }
 
   /**
-   * Constructs a new GroupAlreadyExistsException with the given cause
-   * exception.
-   * 
+   * Constructs a new GroupAlreadyExistsException with the given cause exception.
+   *
    * @param cause
    *          the cause exception
    */
@@ -48,9 +47,9 @@ public class GroupAlreadyExistsException extends AlreadyExistsException {
   }
 
   /**
-   * Constructs a new GroupAlreadyExistsException with the given error message
-   * and cause exception.
-   * 
+   * Constructs a new GroupAlreadyExistsException with the given error message and
+   * cause exception.
+   *
    * @param message
    *          the error message
    * @param cause

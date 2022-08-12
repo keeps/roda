@@ -49,7 +49,7 @@ public class SeleniumUtils {
   }
 
   /**
-   * 
+   *
    * @param args:
    *          the first argument is the RODA base url and the second argument is
    *          the driver path

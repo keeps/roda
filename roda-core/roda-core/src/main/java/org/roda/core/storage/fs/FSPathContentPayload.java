@@ -18,7 +18,7 @@ import org.roda.core.storage.ContentPayload;
 
 /**
  * Class that implements {@code ContentPayload} for File System
- * 
+ *
  * @author Luis Faria <lfaria@keep.pt>
  */
 public class FSPathContentPayload implements ContentPayload {

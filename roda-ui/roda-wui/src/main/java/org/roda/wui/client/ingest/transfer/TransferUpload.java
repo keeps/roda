@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.ingest.transfer;
 
@@ -52,7 +52,7 @@ import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria <lfaria@keep.pt>
- * 
+ *
  */
 public class TransferUpload extends Composite {
 
@@ -149,7 +149,7 @@ public class TransferUpload extends Composite {
 
   /**
    * Get the singleton instance
-   * 
+   *
    * @return the instance
    */
   public static TransferUpload getInstance() {

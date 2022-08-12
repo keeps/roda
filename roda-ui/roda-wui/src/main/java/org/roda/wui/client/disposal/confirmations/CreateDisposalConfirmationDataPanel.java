@@ -111,7 +111,8 @@ public class CreateDisposalConfirmationDataPanel extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     initActions();
-    createDisposalConfirmationFormDescription.add(new HTMLWidgetWrapper("CreateDisposalConfirmationExtraDescription.html"));
+    createDisposalConfirmationFormDescription
+      .add(new HTMLWidgetWrapper("CreateDisposalConfirmationExtraDescription.html"));
 
     errors.setVisible(false);
 
@@ -164,8 +165,8 @@ public class CreateDisposalConfirmationDataPanel extends Composite {
       Toast.showInfo("Error", "Error");
       HistoryUtils.newHistory(ShowDisposalConfirmation.RESOLVER);
     } else {
-      BrowserService.Util.getInstance().createDisposalConfirmationReport(selectedItemsList, title.getText(), disposalConfirmationExtra,
-        new AsyncCallback<Job>() {
+      BrowserService.Util.getInstance().createDisposalConfirmationReport(selectedItemsList, title.getText(),
+        disposalConfirmationExtra, new AsyncCallback<Job>() {
           @Override
           public void onFailure(Throwable throwable) {
             HistoryUtils.newHistory(InternalProcess.RESOLVER);

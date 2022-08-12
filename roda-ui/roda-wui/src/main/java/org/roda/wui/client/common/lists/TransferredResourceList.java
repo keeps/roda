@@ -36,7 +36,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import config.i18n.client.ClientMessages;
 
 /**
- * 
+ *
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
@@ -65,7 +65,6 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
     super();
     this.addParentPath = addParentPath;
   }
-
 
   @Override
   protected void adjustOptions(AsyncTableCellOptions<TransferredResource> options) {

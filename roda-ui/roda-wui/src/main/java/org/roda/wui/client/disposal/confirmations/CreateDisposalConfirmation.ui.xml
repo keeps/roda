@@ -1,24 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
-             xmlns:common="urn:import:org.roda.wui.client.common">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search" xmlns:common="urn:import:org.roda.wui.client.common">
 
-    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
-    <g:FlowPanel styleName="wui-create-disposal-confirmation" addStyleNames="wrapper skip_padding">
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+	<g:FlowPanel styleName="wui-create-disposal-confirmation" addStyleNames="wrapper skip_padding">
 
-        <g:FlowPanel addStyleNames="row full_width skip_padding">
-            <g:FlowPanel addStyleNames="col_12 content" ui:field="content">
-                <common:TitlePanel text="{messages.createDisposalConfirmationTitle}" iconClass="DisposalConfirmations"/>
-                <g:FlowPanel addStyleNames="page-description" ui:field="createDisposalConfirmationDescription"/>
-                <g:FlowPanel addStyleNames="disposal-confirmation-select">
-                    <g:RadioButton name="disposalAction" ui:field="destroyScheduleOpt" checked="true"/>
-                    <g:RadioButton name="disposalAction" ui:field="reviewScheduleOpt"/>
-                    <g:RadioButton name="disposalAction" ui:field="retentionCalculationFailedOpt"/>
-                </g:FlowPanel>
-                <commonsearch:SearchWrapper ui:field="overdueRecordsSearch"/>
-            </g:FlowPanel>
-        </g:FlowPanel>
-    </g:FlowPanel>
+		<g:FlowPanel addStyleNames="row full_width skip_padding">
+			<g:FlowPanel addStyleNames="col_12 content" ui:field="content">
+				<common:TitlePanel text="{messages.createDisposalConfirmationTitle}" iconClass="DisposalConfirmations" />
+				<g:FlowPanel addStyleNames="page-description" ui:field="createDisposalConfirmationDescription" />
+				<g:FlowPanel addStyleNames="disposal-confirmation-select">
+					<g:RadioButton name="disposalAction" ui:field="destroyScheduleOpt" checked="true" />
+					<g:RadioButton name="disposalAction" ui:field="reviewScheduleOpt" />
+					<g:RadioButton name="disposalAction" ui:field="retentionCalculationFailedOpt" />
+				</g:FlowPanel>
+				<commonsearch:SearchWrapper ui:field="overdueRecordsSearch" />
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</g:FlowPanel>
 </ui:UiBinder>

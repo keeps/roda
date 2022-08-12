@@ -37,7 +37,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import config.i18n.client.ClientMessages;
 
 /**
- * 
+ *
  * @author Luis Faria <lfaria@keep.pt>
  *
  */

@@ -150,9 +150,10 @@ public class DisposalPolicySchedulesPanel extends Composite {
             if (schedule.getRetentionPeriodDuration() == null && schedule.getRetentionPeriodIntervalCode() == null) {
               return "";
             } else if (schedule.getRetentionPeriodDuration() == null) {
-              return messages.retentionPeriod(0,schedule.getRetentionPeriodIntervalCode().toString());
+              return messages.retentionPeriod(0, schedule.getRetentionPeriodIntervalCode().toString());
             } else {
-              return messages.retentionPeriod(schedule.getRetentionPeriodDuration(),schedule.getRetentionPeriodIntervalCode().toString());
+              return messages.retentionPeriod(schedule.getRetentionPeriodDuration(),
+                schedule.getRetentionPeriodIntervalCode().toString());
             }
           }
         }),

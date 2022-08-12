@@ -12,8 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
-
 import org.roda.core.data.common.RodaConstants;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -21,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * This is a group in RODA.
- * 
+ *
  * @author Rui Castro
  * @author Luis Faria <lfaria@keep.pt>
  */
@@ -43,7 +41,7 @@ public class Group extends RodaPrincipal {
 
   /**
    * Constructs a new Group with the given name.
-   * 
+   *
    * @param name
    *          the name of the group.
    */
@@ -53,7 +51,7 @@ public class Group extends RodaPrincipal {
 
   /**
    * Constructs a new Group cloning a given Group.
-   * 
+   *
    * @param group
    *          the Group to be cloned.
    */
@@ -89,7 +87,7 @@ public class Group extends RodaPrincipal {
 
   /**
    * Adds a new member name to the list of member names.
-   * 
+   *
    * @param memberUserName
    *          the name of the new member to add.
    * @return true if the member was added, false otherwise.
@@ -100,7 +98,7 @@ public class Group extends RodaPrincipal {
 
   /**
    * Removes a member name to the list of member names.
-   * 
+   *
    * @param memberUserName
    *          the name of the member to remove.
    * @return true if the member was removed, false otherwise.
@@ -139,9 +137,9 @@ public class Group extends RodaPrincipal {
     return true;
   }
 
-
-
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   *
    * @see java.lang.Object#toString()
    */
   @Override

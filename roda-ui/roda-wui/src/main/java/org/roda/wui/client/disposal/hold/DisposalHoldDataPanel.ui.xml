@@ -1,48 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
->
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
 
-    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
-    <ui:style>
+	<ui:style>
         .section {
             margin-top: 20px;
         }
     </ui:style>
 
-    <g:FlowPanel styleName="wui-disposal-hold-data wui-user-data" addStyleNames="wrapper skip_padding">
-        <g:FlowPanel addStyleNames="row full_width no_padding">
-            <g:FlowPanel addStyleNames="wui-data-panel">
-                <g:FlowPanel addStyleNames="wui-error-panel">
-                    <g:HTML ui:field="errors"/>
-                </g:FlowPanel>
-                <g:Label addStyleNames="form-label">
-                    <ui:text from='{messages.disposalHoldTitle}'/>
+	<g:FlowPanel styleName="wui-disposal-hold-data wui-user-data" addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="row full_width no_padding">
+			<g:FlowPanel addStyleNames="wui-data-panel">
+				<g:FlowPanel addStyleNames="wui-error-panel">
+					<g:HTML ui:field="errors" />
+				</g:FlowPanel>
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{messages.disposalHoldTitle}' />
                     *
                 </g:Label>
-                <g:TextBox title="{messages.disposalHoldTitle}" ui:field="title" addStyleNames="form-textbox"/>
-                <g:Label ui:field="titleError" addStyleNames="form-label-error"/>
-                <g:Label addStyleNames="form-label">
-                    <ui:text from='{messages.disposalHoldDescription}'/>
-                </g:Label>
-                <g:TextBox title="{messages.disposalHoldDescription}" ui:field="description"
-                           addStyleNames="form-textbox"/>
-                <g:Label addStyleNames="form-label">
-                    <ui:text from='{messages.disposalHoldMandate}'/>
-                </g:Label>
-                <g:TextBox title="{messages.disposalHoldMandate}" ui:field="mandate" addStyleNames="form-textbox"/>
-                <g:Label addStyleNames="form-label">
-                    <ui:text from='{messages.disposalHoldNotes}'/>
-                </g:Label>
-                <g:TextArea title="{messages.disposalHoldNotes}" ui:field="notes"
-                            addStyleNames="form-textbox disposalScopeNotes"/>
+				<g:TextBox title="{messages.disposalHoldTitle}" ui:field="title" addStyleNames="form-textbox" />
+				<g:Label ui:field="titleError" addStyleNames="form-label-error" />
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{messages.disposalHoldDescription}' />
+				</g:Label>
+				<g:TextBox title="{messages.disposalHoldDescription}" ui:field="description"
+					addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{messages.disposalHoldMandate}' />
+				</g:Label>
+				<g:TextBox title="{messages.disposalHoldMandate}" ui:field="mandate" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{messages.disposalHoldNotes}' />
+				</g:Label>
+				<g:TextArea title="{messages.disposalHoldNotes}" ui:field="notes"
+					addStyleNames="form-textbox disposalScopeNotes" />
 
-                <g:Label styleName="wui-required-fields-note">
-                    <ui:text from="{messages.disposalConfirmationDataNote}"/>
-                </g:Label>
-            </g:FlowPanel>
-        </g:FlowPanel>
-    </g:FlowPanel>
+				<g:Label styleName="wui-required-fields-note">
+					<ui:text from="{messages.disposalConfirmationDataNote}" />
+				</g:Label>
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</g:FlowPanel>
 </ui:UiBinder>

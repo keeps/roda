@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:u="urn:import:org.roda.wui.client.management"
-	xmlns:common="urn:import:org.roda.wui.client.common">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:u="urn:import:org.roda.wui.client.management" xmlns:common="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
@@ -23,12 +21,10 @@
 						<g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonApply">
 							<ui:text from='{messages.editGroupApply}' />
 						</g:Button>
-						<g:Button addStyleNames="btn btn-block btn-danger btn-ban"
-							ui:field="buttonRemove">
+						<g:Button addStyleNames="btn btn-block btn-danger btn-ban" ui:field="buttonRemove">
 							<ui:text from='{messages.editGroupRemove}' />
 						</g:Button>
-						<g:Button addStyleNames="btn btn-block btn-default btn-times-circle"
-							ui:field="buttonCancel">
+						<g:Button addStyleNames="btn btn-block btn-default btn-times-circle" ui:field="buttonCancel">
 							<ui:text from='{messages.editGroupCancel}' />
 						</g:Button>
 					</g:FlowPanel>

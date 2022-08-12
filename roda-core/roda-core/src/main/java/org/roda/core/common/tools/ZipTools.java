@@ -18,9 +18,9 @@ import org.apache.commons.io.IOUtils;
 
 /**
  * Tools to handle Zips
- * 
+ *
  * @author Luis Faria
- * 
+ *
  */
 public class ZipTools {
 
@@ -30,7 +30,7 @@ public class ZipTools {
 
   /**
    * Zip a list of files into an output stream
-   * 
+   *
    * @param files
    * @param out
    * @throws IOException

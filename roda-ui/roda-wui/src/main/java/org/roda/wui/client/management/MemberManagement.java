@@ -90,7 +90,6 @@ public class MemberManagement extends Composite {
 
   public MemberManagement() {
 
-
     ListBuilder<RODAMember> rodaMemberListBuilder = new ListBuilder<>(() -> new RodaMemberList(),
       new AsyncTableCellOptions<>(RODAMember.class, "MemberManagement_rodaMembers")
         .withSummary(messages.usersAndGroupsTitle()).bindOpener()

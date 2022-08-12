@@ -20,7 +20,7 @@ import org.roda.core.data.v2.ip.StoragePath;
  *
  * @author Hélder Silva <hsilva@keep.pt>
  * @author Luis Faria <lfaria@keep.pt>
- * 
+ *
  * @see Container
  *
  */

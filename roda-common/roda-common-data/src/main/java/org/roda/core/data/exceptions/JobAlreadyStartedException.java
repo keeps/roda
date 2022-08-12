@@ -9,7 +9,7 @@ package org.roda.core.data.exceptions;
 
 /**
  * @author Hélder Silva <hsilva@keep.pt>
- * 
+ *
  */
 public class JobAlreadyStartedException extends JobException {
 

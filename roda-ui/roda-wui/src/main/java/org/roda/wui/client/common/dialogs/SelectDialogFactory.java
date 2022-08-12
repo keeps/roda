@@ -33,8 +33,7 @@ public class SelectDialogFactory {
     return getSelectDialog(actualClass.getName(), title, filter);
   }
 
-  public DefaultSelectDialog getSelectDialog(String actualClass, String title, Filter filter)
-    throws NotFoundException {
+  public DefaultSelectDialog getSelectDialog(String actualClass, String title, Filter filter) throws NotFoundException {
     if (actualClass.equals(AIP.class.getName()) || actualClass.equals(IndexedAIP.class.getName())) {
       return new SelectAipDialog(title, filter, true);
     } else if (actualClass.equals(Representation.class.getName())

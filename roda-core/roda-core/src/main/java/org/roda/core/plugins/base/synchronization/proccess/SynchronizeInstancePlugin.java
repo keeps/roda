@@ -207,7 +207,7 @@ public class SynchronizeInstancePlugin extends DefaultMultipleStepPlugin<IsRODAO
       getParameterValues().put(RodaConstants.PLUGIN_PARAMS_BUNDLE_WORKING_PATH, workingDir.toString());
       // From date
       DistributedInstance distributedInstance = SyncUtils.requestInstanceStatus(localInstance);
-      if(distributedInstance.getStatus().equals(SynchronizingStatus.INACTIVE)){
+      if (distributedInstance.getStatus().equals(SynchronizingStatus.INACTIVE)) {
         throw new PluginException("Instance is inactive");
       }
       Date lastSyncDate = distributedInstance.getLastSynchronizationDate();

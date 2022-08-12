@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This is an utility class for metadata helpers.
- * 
+ *
  * @author Luis Faria <lfaria@keep.pt>
  */
 public final class MetadataUtils {

@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.common.client;
 
@@ -19,7 +19,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public interface ClientLoggerService extends RemoteService {
 
@@ -30,27 +30,27 @@ public interface ClientLoggerService extends RemoteService {
 
   /**
    * Utilities
-   * 
+   *
    */
   public static class Util {
 
     /**
      * Get service instance
-     * 
+     *
      * @return
      */
     public static ClientLoggerServiceAsync getInstance() {
 
       ClientLoggerServiceAsync instance = (ClientLoggerServiceAsync) GWT.create(ClientLoggerService.class);
       ServiceDefTarget target = (ServiceDefTarget) instance;
-      target.setServiceEntryPoint(GWT.getHostPageBaseURL()  + RodaConstants.GWT_RPC_BASE_URL + SERVICE_URI);
+      target.setServiceEntryPoint(GWT.getHostPageBaseURL() + RodaConstants.GWT_RPC_BASE_URL + SERVICE_URI);
       return instance;
     }
   }
 
   /**
    * Log at trace level
-   * 
+   *
    * @param classname
    * @param object
    */
@@ -58,7 +58,7 @@ public interface ClientLoggerService extends RemoteService {
 
   /**
    * Log at trace level
-   * 
+   *
    * @param classname
    * @param object
    * @param error
@@ -67,7 +67,7 @@ public interface ClientLoggerService extends RemoteService {
 
   /**
    * Log at debug level
-   * 
+   *
    * @param classname
    * @param object
    */
@@ -75,7 +75,7 @@ public interface ClientLoggerService extends RemoteService {
 
   /**
    * Log at debug level
-   * 
+   *
    * @param classname
    * @param object
    * @param error
@@ -84,7 +84,7 @@ public interface ClientLoggerService extends RemoteService {
 
   /**
    * Log at info level
-   * 
+   *
    * @param classname
    * @param object
    */
@@ -92,7 +92,7 @@ public interface ClientLoggerService extends RemoteService {
 
   /**
    * Log at info level
-   * 
+   *
    * @param classname
    * @param object
    * @param error
@@ -101,7 +101,7 @@ public interface ClientLoggerService extends RemoteService {
 
   /**
    * Log at warn level
-   * 
+   *
    * @param classname
    * @param object
    */
@@ -109,7 +109,7 @@ public interface ClientLoggerService extends RemoteService {
 
   /**
    * Log at warn level
-   * 
+   *
    * @param classname
    * @param object
    * @param error
@@ -118,7 +118,7 @@ public interface ClientLoggerService extends RemoteService {
 
   /**
    * Log at error level
-   * 
+   *
    * @param classname
    * @param object
    */
@@ -126,7 +126,7 @@ public interface ClientLoggerService extends RemoteService {
 
   /**
    * Log at error level
-   * 
+   *
    * @param classname
    * @param object
    * @param error
@@ -135,7 +135,7 @@ public interface ClientLoggerService extends RemoteService {
 
   /**
    * Log at fatal level
-   * 
+   *
    * @param classname
    * @param object
    */
@@ -143,7 +143,7 @@ public interface ClientLoggerService extends RemoteService {
 
   /**
    * Log at fatal level
-   * 
+   *
    * @param classname
    * @param object
    * @param error
@@ -152,7 +152,7 @@ public interface ClientLoggerService extends RemoteService {
 
   /**
    * Log a page hit
-   * 
+   *
    * @param pagename
    * @throws LoginException
    * @throws LoggerException

@@ -14,7 +14,7 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 
 /**
- * 
+ *
  * @author Luis Faria <lfaria@keep.pt>
  *
  */

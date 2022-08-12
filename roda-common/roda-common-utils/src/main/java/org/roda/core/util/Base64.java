@@ -35,7 +35,7 @@ package org.roda.core.util;
 /**
  * Provides encoding of raw bytes to base64-encoded characters, and decoding of
  * base64 characters to raw bytes.
- * 
+ *
  */
 public class Base64 {
 
@@ -46,7 +46,7 @@ public class Base64 {
   /**
    * returns an array of base64-encoded characters to represent the passed data
    * array.
-   * 
+   *
    * @param data
    *          the array of bytes to encode
    * @return base64-coded character array.
@@ -86,14 +86,14 @@ public class Base64 {
 
   /**
    * Decodes a BASE-64 encoded stream to recover the original data. White space
-   * before and after will be trimmed away, but no other manipulation of the
-   * input will be performed.
-   * 
+   * before and after will be trimmed away, but no other manipulation of the input
+   * will be performed.
+   *
    * As of version 1.2 this method will properly handle input containing junk
    * characters (newlines and the like) rather than throwing an error. It does
-   * this by pre-parsing the input and generating from that a count of VALID
-   * input characters.
-   * 
+   * this by pre-parsing the input and generating from that a count of VALID input
+   * characters.
+   *
    * @param data
    *          the data to decode
    * @return the decoded data.

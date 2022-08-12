@@ -13,9 +13,9 @@ import java.util.Date;
 
 public interface ConsumesOutputStream {
   void consumeOutputStream(OutputStream out) throws IOException;
-  
+
   long getSize();
-  
+
   Date getLastModified();
 
   String getFileName();

@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
 /***
  * https://docs.google.com/spreadsheets/d/
  * 1Ncu0My6tf19umSClIA6iXeYlJ4_FP6MygRwFCe0EzyM
- * 
+ *
  * @author Hélder Silva <hsilva@keep.pt>
  */
 public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
@@ -218,7 +218,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
       PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
 
       try {
-        PluginHelper.createPluginEvent(this, aip.getId(), model, index, state, "", true,job);
+        PluginHelper.createPluginEvent(this, aip.getId(), model, index, state, "", true, job);
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
         | ValidationException | AlreadyExistsException e) {
         LOGGER.error("Could not create a risk job plugin event");
@@ -261,7 +261,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
 
       try {
         PluginHelper.createPluginEvent(this, representation.getAipId(), representation.getId(), model, index, null,
-          null, state, "", true,job);
+          null, state, "", true, job);
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
         | ValidationException | AlreadyExistsException e) {
         LOGGER.error("Could not create a risk job plugin event");
@@ -304,7 +304,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
 
       try {
         PluginHelper.createPluginEvent(this, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-          model, index, null, null, state, "", true,job);
+          model, index, null, null, state, "", true, job);
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
         | ValidationException | AlreadyExistsException e) {
         LOGGER.error("Could not create a risk job plugin event");

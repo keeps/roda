@@ -121,8 +121,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
    * @param editmode
    *          if user name should be editable
    * @param enableGroupSelect
-   *          if the list of groups to which the user belong to should be
-   *          editable
+   *          if the list of groups to which the user belong to should be editable
    *
    */
   public UserDataPanel(boolean editmode, boolean enableGroupSelect) {
@@ -135,8 +134,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
    * @param editmode
    *          if user name should be editable
    * @param enableGroupSelect
-   *          if the list of groups to which the user belong to should be
-   *          editable
+   *          if the list of groups to which the user belong to should be editable
    *
    */
   public UserDataPanel(boolean visible, boolean editmode, boolean enableGroupSelect) {

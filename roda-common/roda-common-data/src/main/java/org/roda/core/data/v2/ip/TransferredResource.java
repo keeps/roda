@@ -12,8 +12,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -39,7 +37,7 @@ public class TransferredResource implements IsModelObject, IsIndexed, HasId, Set
   private Date lastScanDate;
   private String name;
   private boolean file;
-  
+
   private Map<String, Object> fields;
 
   @JsonIgnore
@@ -276,7 +274,8 @@ public class TransferredResource implements IsModelObject, IsIndexed, HasId, Set
   }
 
   /**
-   * @param fields the fields to set
+   * @param fields
+   *          the fields to set
    */
   public void setFields(Map<String, Object> fields) {
     this.fields = fields;

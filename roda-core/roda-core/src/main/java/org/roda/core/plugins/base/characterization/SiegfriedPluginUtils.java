@@ -103,7 +103,7 @@ public class SiegfriedPluginUtils {
         result.append(jn.get("siegfried").asText());
 
         version = result.toString();
-      } catch(GenericException ce) {
+      } catch (GenericException ce) {
         LOGGER.error("Error getting Siegfried version: " + ce.getMessage(), ce);
       }
 
@@ -130,7 +130,7 @@ public class SiegfriedPluginUtils {
           }
         }
 
-        version = result.toString(); 
+        version = result.toString();
       } catch (CommandException ce) {
         LOGGER.error("Error getting Siegfried version: " + ce.getMessage(), ce);
       }

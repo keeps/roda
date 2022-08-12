@@ -65,7 +65,7 @@ public class EntitySummary implements Serializable {
 
   /**
    * Increment the counters by type.
-   * 
+   *
    * @param type
    *          {@link String}
    */
@@ -82,7 +82,7 @@ public class EntitySummary implements Serializable {
 
   /**
    * Sum the value given to the counter by the type.
-   * 
+   *
    * @param type
    *          {@link String}
    * @param value

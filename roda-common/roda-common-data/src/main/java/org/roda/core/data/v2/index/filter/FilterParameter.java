@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  * This is a parameter of a {@link Filter}.
- * 
+ *
  * @author Rui Castro
  */
 

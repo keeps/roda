@@ -9,7 +9,7 @@ package org.roda.core.plugins.base.antivirus;
 
 /**
  * This class contains the result of a virus check.
- * 
+ *
  * @author Rui Castro
  */
 public class VirusCheckResult {
@@ -34,7 +34,7 @@ public class VirusCheckResult {
 
   /**
    * Constructs a new {@link VirusCheckResult} with the given parameters.
-   * 
+   *
    * @param clean
    *          <code>true</code> if no virus/warning was found, <code>false</code>
    *          otherwise.

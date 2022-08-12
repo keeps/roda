@@ -11,7 +11,7 @@ import org.roda.core.data.exceptions.RODAException;
 
 /**
  * Thrown to indicate that some went wrong inside a {@link PluginManager}.
- * 
+ *
  * @author Rui Castro
  */
 public class PluginManagerException extends RODAException {
@@ -26,7 +26,7 @@ public class PluginManagerException extends RODAException {
 
   /**
    * Constructs a new {@link PluginManagerException} with the given error message.
-   * 
+   *
    * @param message
    *          the error message.
    */
@@ -37,7 +37,7 @@ public class PluginManagerException extends RODAException {
   /**
    * Constructs a new {@link PluginManagerException} with the given cause
    * exception.
-   * 
+   *
    * @param cause
    *          the cause exception.
    */
@@ -48,7 +48,7 @@ public class PluginManagerException extends RODAException {
   /**
    * Constructs a new {@link PluginManagerException} with the given error message
    * and cause exception.
-   * 
+   *
    * @param message
    *          the error message.
    * @param cause

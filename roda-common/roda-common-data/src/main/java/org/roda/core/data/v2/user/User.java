@@ -315,12 +315,13 @@ public class User extends RodaPrincipal {
     return true;
   }
 
-  @Override public String toString() {
-    return "User{ " + super.toString() + ", groups=" + groups + ", email='" + email + '\'' + ", guest=" + guest + ", ipAddress='" + ipAddress
-      + '\'' + ", resetPasswordToken='" + resetPasswordToken + '\'' + ", resetPasswordTokenExpirationDate='"
-      + resetPasswordTokenExpirationDate + '\'' + ", emailConfirmationToken='" + emailConfirmationToken + '\''
-      + ", emailConfirmationTokenExpirationDate='" + emailConfirmationTokenExpirationDate + '\'' + ", extra='" + extra
-      + "\'}";
+  @Override
+  public String toString() {
+    return "User{ " + super.toString() + ", groups=" + groups + ", email='" + email + '\'' + ", guest=" + guest
+      + ", ipAddress='" + ipAddress + '\'' + ", resetPasswordToken='" + resetPasswordToken + '\''
+      + ", resetPasswordTokenExpirationDate='" + resetPasswordTokenExpirationDate + '\'' + ", emailConfirmationToken='"
+      + emailConfirmationToken + '\'' + ", emailConfirmationTokenExpirationDate='"
+      + emailConfirmationTokenExpirationDate + '\'' + ", extra='" + extra + "\'}";
   }
 
   @Override

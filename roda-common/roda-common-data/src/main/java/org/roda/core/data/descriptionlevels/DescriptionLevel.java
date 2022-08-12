@@ -10,8 +10,8 @@ package org.roda.core.data.descriptionlevels;
 import java.io.Serializable;
 
 /**
- * 
- * 
+ *
+ *
  * @author Rui Castro
  * @author Hélder Silva
  * @author Luis Faria <lfaria@keep.pt>

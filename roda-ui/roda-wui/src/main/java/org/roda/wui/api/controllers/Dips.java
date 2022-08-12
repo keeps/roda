@@ -32,8 +32,7 @@ public class Dips extends RodaWuiController {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static DIP createDIP(User user, DIP dip)
-    throws GenericException, AuthorizationDeniedException {
+  public static DIP createDIP(User user, DIP dip) throws GenericException, AuthorizationDeniedException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions

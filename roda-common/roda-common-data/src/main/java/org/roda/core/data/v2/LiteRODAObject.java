@@ -12,7 +12,7 @@ import java.io.Serializable;
 /**
  * One string based "lite" representation of a RODA object. Great for keeping in
  * memory for long periods of time (e.g. orchestration messages)
- * 
+ *
  * @author Hélder Silva <hsilva@keep.pt>
  */
 public class LiteRODAObject implements Serializable {

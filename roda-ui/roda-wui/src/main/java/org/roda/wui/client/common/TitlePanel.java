@@ -39,7 +39,7 @@ public class TitlePanel extends FlowPanel {
     add(textLabel);
   }
 
-  public void setIconClass(String classSimpleName){
+  public void setIconClass(String classSimpleName) {
     setIcon(ConfigurationManager.getString(RodaConstants.UI_ICONS_CLASS, classSimpleName));
   }
 

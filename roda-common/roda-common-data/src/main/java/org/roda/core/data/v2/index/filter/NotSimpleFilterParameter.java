@@ -9,7 +9,7 @@ package org.roda.core.data.v2.index.filter;
 
 /**
  * @author Luis Faria <lfaria@keep.pt>
- * 
+ *
  */
 public class NotSimpleFilterParameter extends FilterParameter {
   private static final long serialVersionUID = -2122986808484304112L;
@@ -26,7 +26,7 @@ public class NotSimpleFilterParameter extends FilterParameter {
   /**
    * Constructs a {@link NotSimpleFilterParameter} cloning an existing
    * {@link NotSimpleFilterParameter}.
-   * 
+   *
    * @param simpleFilterParameter
    *          the {@link NotSimpleFilterParameter} to clone.
    */
@@ -36,7 +36,7 @@ public class NotSimpleFilterParameter extends FilterParameter {
 
   /**
    * Constructs a {@link NotSimpleFilterParameter} with the given parameters.
-   * 
+   *
    * @param name
    * @param value
    */

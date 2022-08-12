@@ -122,7 +122,7 @@ public class CreateAccessKey extends Composite {
       BrowserServiceImpl.Util.getInstance().createAccessKey(this.accessKey, new NoAsyncCallback<AccessKey>() {
         @Override
         public void onSuccess(AccessKey accessKey) {
-          AccessKeyDialogs.showAccessKeyDialog(messages.accessKeyLabel(), accessKey, new NoAsyncCallback<Boolean>(){
+          AccessKeyDialogs.showAccessKeyDialog(messages.accessKeyLabel(), accessKey, new NoAsyncCallback<Boolean>() {
             @Override
             public void onSuccess(Boolean result) {
               HistoryUtils.newHistory(EditUser.RESOLVER, accessKey.getUserName());

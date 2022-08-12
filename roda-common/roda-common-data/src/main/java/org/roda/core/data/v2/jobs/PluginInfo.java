@@ -15,7 +15,7 @@ import java.util.Set;
 
 /**
  * This class contains information about a plugin.
- * 
+ *
  * @author Rui Castro
  */
 public class PluginInfo implements Serializable {
@@ -42,7 +42,7 @@ public class PluginInfo implements Serializable {
 
   /**
    * Constructs a new {@link PluginInfo} cloning an existing {@link PluginInfo}.
-   * 
+   *
    * @param pluginInfo
    *          the {@link PluginInfo} to clone.
    */
@@ -53,7 +53,7 @@ public class PluginInfo implements Serializable {
 
   /**
    * Constructs a new {@link PluginInfo} with the given parametes.
-   * 
+   *
    * @param id
    * @param name
    * @param version

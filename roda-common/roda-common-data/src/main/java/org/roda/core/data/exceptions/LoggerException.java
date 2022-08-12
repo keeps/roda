@@ -9,7 +9,7 @@ package org.roda.core.data.exceptions;
 
 /**
  * Thrown to indicate that some error occurred in the Logger.
- * 
+ *
  * @author Rui Castro
  */
 public class LoggerException extends RODAException {
@@ -24,7 +24,7 @@ public class LoggerException extends RODAException {
 
   /**
    * Constructs a new {@link LoggerException} with the given error message.
-   * 
+   *
    * @param message
    *          the error message.
    */
@@ -34,7 +34,7 @@ public class LoggerException extends RODAException {
 
   /**
    * Constructs a new {@link LoggerException} with the given cause exception.
-   * 
+   *
    * @param cause
    *          the cause exception.
    */
@@ -45,7 +45,7 @@ public class LoggerException extends RODAException {
   /**
    * Constructs a new {@link LoggerException} with the given error message and
    * cause exception.
-   * 
+   *
    * @param message
    *          the error message.
    * @param cause

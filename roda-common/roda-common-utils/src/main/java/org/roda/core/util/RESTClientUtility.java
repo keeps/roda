@@ -39,7 +39,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 /**
  * 20160824 hsilva: I think someone, outside RODA code base, is using this
  * method via maven dependency
- * 
+ *
  * @author Hélder Silva <hsilva@keep.pt>
  */
 public final class RESTClientUtility {

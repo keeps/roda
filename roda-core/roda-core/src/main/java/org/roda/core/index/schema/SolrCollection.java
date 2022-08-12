@@ -82,8 +82,6 @@ public interface SolrCollection<I extends IsIndexed, M extends IsModelObject> {
     return HasState.class.isAssignableFrom(resultClass);
   }
 
-
-
   Class<I> getIndexClass();
 
   Class<M> getModelClass();
@@ -102,15 +100,15 @@ public interface SolrCollection<I extends IsIndexed, M extends IsModelObject> {
 
   /**
    * Map an model object to a Solr Document ready to index
-   * 
+   *
    * @param object
    *          The model object
    * @param preCalculatedFields
    *          Fields that are pre-calculated because they can be shared for
    *          several objects, like the list of ancestors for sibling objects.
    * @param accumulators
-   *          Fields to be added on upper-level collections that are calculated
-   *          by accumulating values on every lower-level collection.
+   *          Fields to be added on upper-level collections that are calculated by
+   *          accumulating values on every lower-level collection.
    * @param flags
    *          Flags to control indexing, as {@link Flags#SAFE_MODE_ON}.
    * @return the Solr Document ready to index.
@@ -123,6 +121,5 @@ public interface SolrCollection<I extends IsIndexed, M extends IsModelObject> {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
   I fromSolrDocument(SolrDocument doc, List<String> fieldsToReturn) throws GenericException;
-  
 
 }

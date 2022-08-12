@@ -10,7 +10,7 @@ package org.roda.core.data.exceptions;
 /**
  * Thrown when something wrong happens inside a RODA service and the request
  * could not be complete.
- * 
+ *
  * @author Rui Castro
  */
 public class RODAServiceException extends RODAException {
@@ -25,7 +25,7 @@ public class RODAServiceException extends RODAException {
 
   /**
    * Constructs a new RODAServiceException with the given message.
-   * 
+   *
    * @param message
    */
   public RODAServiceException(String message) {
@@ -34,7 +34,7 @@ public class RODAServiceException extends RODAException {
 
   /**
    * Constructs a new RODAServiceException with the given cause Exception.
-   * 
+   *
    * @param cause
    */
   public RODAServiceException(Throwable cause) {
@@ -44,7 +44,7 @@ public class RODAServiceException extends RODAException {
   /**
    * Constructs a new RODAServiceException with the given message and cause
    * Exception.
-   * 
+   *
    * @param message
    * @param cause
    */

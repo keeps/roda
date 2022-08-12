@@ -51,7 +51,6 @@ public class DIPList extends AsyncTableCell<IndexedDIP> {
     options.withFieldsToReturn(fieldsToReturn);
   }
 
-
   @Override
   protected void configureDisplay(CellTable<IndexedDIP> display) {
 

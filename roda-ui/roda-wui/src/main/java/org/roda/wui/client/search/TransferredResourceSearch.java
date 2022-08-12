@@ -29,7 +29,8 @@ public class TransferredResourceSearch extends SimplePanel {
   public TransferredResourceSearch(String resourcesListId, Filter filter,
     TransferredResourceActions transferredResourceActions, AsyncCallback<Actionable.ActionImpact> actionCallback) {
 
-    ListBuilder<TransferredResource> transferredResourceListBuilder = new ListBuilder<>(() -> new TransferredResourceList(),
+    ListBuilder<TransferredResource> transferredResourceListBuilder = new ListBuilder<>(
+      () -> new TransferredResourceList(),
       new AsyncTableCellOptions<>(TransferredResource.class, resourcesListId).withFilter(filter).bindOpener()
         .withActionable(transferredResourceActions).withActionableCallback(actionCallback));
 

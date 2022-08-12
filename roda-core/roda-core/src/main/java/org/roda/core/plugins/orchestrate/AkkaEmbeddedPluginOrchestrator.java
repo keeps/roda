@@ -81,9 +81,9 @@ import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
 
 /*
- * 20160520 hsilva: use kamon to obtain metrics about akka, Graphite & Grafana for collecting and dashboard (http://kamon.io/integrations/akka/overview/ & 
+ * 20160520 hsilva: use kamon to obtain metrics about akka, Graphite & Grafana for collecting and dashboard (http://kamon.io/integrations/akka/overview/ &
  * http://www.lightbend.com/activator/template/akka-monitoring-kamon-statsd)
- * 
+ *
  * */
 public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   private static final Logger LOGGER = LoggerFactory.getLogger(AkkaEmbeddedPluginOrchestrator.class);

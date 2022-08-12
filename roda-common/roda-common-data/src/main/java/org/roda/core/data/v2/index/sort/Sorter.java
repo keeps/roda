@@ -32,7 +32,7 @@ public class Sorter implements Serializable {
 
   /**
    * Constructs a {@link Sorter} cloning an existing {@link Sorter}.
-   * 
+   *
    * @param sorter
    *          the {@link Sorter} to clone.
    */
@@ -46,7 +46,7 @@ public class Sorter implements Serializable {
 
   /**
    * Constructs a {@link Sorter} with the given parameters.
-   * 
+   *
    * @param parameters
    *          the sort parameters.
    */
@@ -114,7 +114,7 @@ public class Sorter implements Serializable {
 
   /**
    * Adds the given parameters.
-   * 
+   *
    * @param parameters
    */
   public void add(SortParameter[] parameters) {
@@ -125,7 +125,7 @@ public class Sorter implements Serializable {
 
   /**
    * Adds the given parameter.
-   * 
+   *
    * @param parameter
    */
   public void add(SortParameter parameter) {

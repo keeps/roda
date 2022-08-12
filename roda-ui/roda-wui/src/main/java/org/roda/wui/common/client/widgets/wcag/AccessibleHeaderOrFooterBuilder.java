@@ -30,7 +30,7 @@ public class AccessibleHeaderOrFooterBuilder<T> extends AbstractHeaderOrFooterBu
 
   /**
    * Create a new DefaultHeaderBuilder for the header of footer section.
-   * 
+   *
    * @param table
    *          the table being built
    * @param isFooter
@@ -45,7 +45,7 @@ public class AccessibleHeaderOrFooterBuilder<T> extends AbstractHeaderOrFooterBu
 
   /**
    * Append the extra style names for the header.
-   * 
+   *
    * @param header
    *          the header that may contain extra styles, it can be null
    * @param classesBuilder

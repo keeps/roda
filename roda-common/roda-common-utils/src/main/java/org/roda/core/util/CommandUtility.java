@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * System command utility.
- * 
+ *
  * @author Rui Castro
  * @author Luis Faria
  */
@@ -33,12 +33,12 @@ public class CommandUtility {
 
   /**
    * Execute the given command line.
-   * 
+   *
    * @param args
    *          the command line as a list of arguments.
-   * 
+   *
    * @return a {@link String} with the output of the command.
-   * 
+   *
    * @throws CommandException
    */
   public static String execute(String... args) throws CommandException {
@@ -47,12 +47,12 @@ public class CommandUtility {
 
   /**
    * Execute the given command line.
-   * 
+   *
    * @param args
    *          the command line as a list of arguments.
-   * 
+   *
    * @return a {@link String} with the output of the command.
-   * 
+   *
    * @throws CommandException
    */
   public static String execute(boolean withErrorStream, String... args) throws CommandException {
@@ -114,12 +114,12 @@ public class CommandUtility {
 
   /**
    * Execute the given command line.
-   * 
+   *
    * @param args
    *          the command line as a list of arguments.
-   * 
+   *
    * @return a {@link String} with the output of the command.
-   * 
+   *
    * @throws CommandException
    */
   public static String execute(List<String> args) throws CommandException {

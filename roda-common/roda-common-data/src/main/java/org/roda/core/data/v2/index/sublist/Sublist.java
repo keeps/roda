@@ -19,8 +19,8 @@ public class Sublist implements Serializable {
   public static final Sublist NONE = new Sublist(0, 0);
   /**
    * 20170512 hsilva: this should not be used at all and, because it can be very
-   * harmful for Solr, I'll set the maximumElementCount to a default value
-   * (which is a very low number like 100)
+   * harmful for Solr, I'll set the maximumElementCount to a default value (which
+   * is a very low number like 100)
    */
   @Deprecated
   public static final Sublist ALL = new Sublist(0, RodaConstants.DEFAULT_PAGINATION_VALUE);
@@ -37,7 +37,7 @@ public class Sublist implements Serializable {
 
   /**
    * Constructs a {@link Sublist} cloning an existing {@link Sublist}.
-   * 
+   *
    * @param sublist
    *          the {@link Sublist} to clone.
    */
@@ -47,7 +47,7 @@ public class Sublist implements Serializable {
 
   /**
    * Constructs a {@link Sublist} with the given parameters.
-   * 
+   *
    * @param firstElementIndex
    * @param maximumElementCount
    */

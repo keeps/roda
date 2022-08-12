@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.common.client.widgets;
 
@@ -25,7 +25,7 @@ import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class Toast extends PopupPanel {
   private static final int PADDING = 10;
@@ -74,7 +74,7 @@ public class Toast extends PopupPanel {
 
   /**
    * Create a new message popup
-   * 
+   *
    * @param type
    * @param title
    * @param message
@@ -154,7 +154,7 @@ public class Toast extends PopupPanel {
 
   /**
    * Show a error message
-   * 
+   *
    * @param message
    */
   public static void showError(String message) {
@@ -164,7 +164,7 @@ public class Toast extends PopupPanel {
 
   /**
    * Show an error message
-   * 
+   *
    * @param title
    * @param message
    */
@@ -175,7 +175,7 @@ public class Toast extends PopupPanel {
 
   /**
    * Show a error message
-   * 
+   *
    * @param message
    */
   public static void showInfo(String title, String message) {
@@ -185,7 +185,7 @@ public class Toast extends PopupPanel {
 
   /**
    * Get the message popup type
-   * 
+   *
    * @return
    */
   public MessagePopupType getType() {

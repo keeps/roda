@@ -139,9 +139,8 @@ public class AkkaJobStateInfoActor extends AkkaBaseActor {
       PluginHelper.processNotifications(plugin);
 
       jobCreator.tell("Done", getSelf());
-      jobsManager.tell(
-        Messages.newJobsManagerJobEnded(jobId, plugin.getClass().getName(), plugin.getType(), calculateJobDuration(p), getJobStatsFromPlugin(p)),
-        getSelf());
+      jobsManager.tell(Messages.newJobsManagerJobEnded(jobId, plugin.getClass().getName(), plugin.getType(),
+        calculateJobDuration(p), getJobStatsFromPlugin(p)), getSelf());
       JobsHelper.deleteJobWorkingDirectory(jobId);
       getContext().stop(getSelf());
     }

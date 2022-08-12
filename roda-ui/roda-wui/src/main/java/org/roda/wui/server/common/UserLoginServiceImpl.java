@@ -26,9 +26,9 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
  * User login servlet
- * 
+ *
  * @author Luis Faria
- * 
+ *
  */
 public class UserLoginServiceImpl extends RemoteServiceServlet implements UserLoginService {
 

@@ -8,7 +8,7 @@
 package org.roda.core.data.exceptions;
 
 /**
- * 
+ *
  * @author Luis Faria <lfaria@keep.pt>
  */
 public class AuthenticationDeniedException extends RODAException {
@@ -24,7 +24,7 @@ public class AuthenticationDeniedException extends RODAException {
   /**
    * Constructs a new {@link AuthenticationDeniedException} with the given error
    * message.
-   * 
+   *
    * @param message
    *          the error message.
    */
@@ -35,7 +35,7 @@ public class AuthenticationDeniedException extends RODAException {
   /**
    * Constructs a new {@link AuthenticationDeniedException} with the given cause
    * exception.
-   * 
+   *
    * @param cause
    *          the cause exception.
    */
@@ -46,7 +46,7 @@ public class AuthenticationDeniedException extends RODAException {
   /**
    * Constructs a new {@link AuthenticationDeniedException} with the given error
    * message and cause exception.
-   * 
+   *
    * @param message
    *          the error message.
    * @param cause

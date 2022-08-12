@@ -284,16 +284,14 @@ public class EARKSIPToAIPPluginUtils {
       try {
         File createdFile = model.createFile(aipId, representation.getId(), directoryPath, fileId, payload, notify);
         if (reportItem != null && update) {
-          reportItem.getSipInformation().addFileData(aipId, IdUtils.getRepresentationId(representation),
-            createdFile);
+          reportItem.getSipInformation().addFileData(aipId, IdUtils.getRepresentationId(representation), createdFile);
         }
       } catch (AlreadyExistsException e) {
         if (update) {
           File updatedFile = model.updateFile(aipId, representation.getId(), directoryPath, fileId, payload, true,
             notify);
           if (reportItem != null) {
-            reportItem.getSipInformation().addFileData(aipId, IdUtils.getRepresentationId(representation),
-              updatedFile);
+            reportItem.getSipInformation().addFileData(aipId, IdUtils.getRepresentationId(representation), updatedFile);
           }
         } else
           throw e;

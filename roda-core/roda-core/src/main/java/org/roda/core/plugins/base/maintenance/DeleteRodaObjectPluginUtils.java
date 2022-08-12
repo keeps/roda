@@ -340,7 +340,7 @@ public class DeleteRodaObjectPluginUtils {
           String pmId = URNUtils.getPremisPrefix(PreservationMetadata.PreservationMetadataType.REPRESENTATION,
             RODAInstanceUtils.getLocalInstanceIdentifier()) + representation.getId();
           model.deletePreservationMetadata(PreservationMetadata.PreservationMetadataType.REPRESENTATION,
-            representation.getAipId(), representation.getId(), pmId, Collections.emptyList(),false);
+            representation.getAipId(), representation.getId(), pmId, Collections.emptyList(), false);
         } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
           reportItem.addPluginDetails("Could not delete associated PREMIS file: " + e.getMessage());
         }

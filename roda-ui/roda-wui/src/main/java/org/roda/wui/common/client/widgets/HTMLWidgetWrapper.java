@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.common.client.widgets;
 
@@ -30,14 +30,14 @@ import com.google.gwt.user.client.ui.HTML;
 
 /**
  * @author Luís Faria
- * 
+ *
  */
 public class HTMLWidgetWrapper extends HTML {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   public HTMLWidgetWrapper(String resourceId) {
-    this(resourceId,null, new AsyncCallback<Void>() {
+    this(resourceId, null, new AsyncCallback<Void>() {
 
       @Override
       public void onFailure(Throwable caught) {
@@ -122,8 +122,8 @@ public class HTMLWidgetWrapper extends HTML {
               RegExp imgDocRegExp = RegExp
                 .compile("<img src=\"(" + RodaConstants.CORE_MARKDOWN_FOLDER + "/images/.*?)\"", "g");
               String imgDocReplacement = ("<img src=\""
-                + RestUtils.createThemeResourceUri(filenameToken, null, false).asString() + "\"").replace(filenameToken,
-                  "$1");
+                + RestUtils.createThemeResourceUri(filenameToken, null, false).asString() + "\"")
+                .replace(filenameToken, "$1");
 
               html = imgDocRegExp.replace(html, imgDocReplacement);
 
@@ -131,8 +131,8 @@ public class HTMLWidgetWrapper extends HTML {
               // them with proper "#theme/images/..." links
               RegExp imgRegExp = RegExp.compile("<img src=\"(images/.*?)\"", "g");
               String imgReplacement = ("<img src=\""
-                + RestUtils.createThemeResourceUri(filenameToken, null, false).asString() + "\"").replace(filenameToken,
-                  RodaConstants.CORE_MARKDOWN_FOLDER + "/$1");
+                + RestUtils.createThemeResourceUri(filenameToken, null, false).asString() + "\"")
+                .replace(filenameToken, RodaConstants.CORE_MARKDOWN_FOLDER + "/$1");
 
               html = imgRegExp.replace(html, imgReplacement);
             } else {

@@ -129,6 +129,7 @@ public class BrowseAIPBundle implements Bundle {
   public void setRepresentationInformationFields(List<String> representationInformationFields) {
     this.representationInformationFields = representationInformationFields;
   }
+
   public String getInstanceName() {
     return instanceName;
   }

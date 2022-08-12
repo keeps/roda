@@ -60,7 +60,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Factory for IsRODAObject <-> LiteRODAObject conversions. Brief information
  * about how objects information is stored in a LiteRODAObject:
- * 
+ *
  * <table>
  * <tr>
  * <td>AIP</td>
@@ -126,10 +126,10 @@ import org.slf4j.LoggerFactory;
  * <td>org.roda.core.data.v2.user.Group|name</td>
  * </tr>
  * </table>
- * 
- * 
+ *
+ *
  * @author Hélder Silva <hsilva@keep.pt>
- * 
+ *
  */
 public final class LiteRODAObjectFactory {
   private static final Logger LOGGER = LoggerFactory.getLogger(LiteRODAObjectFactory.class);
@@ -227,8 +227,7 @@ public final class LiteRODAObjectFactory {
       ret = create(objectClass, ids.size(), ids);
     } else if (objectClass == IndexedPreservationEvent.class) {
       ret = create(PreservationMetadata.class, ids.size(), ids);
-    }
-    else if (objectClass == IndexedPreservationAgent.class) {
+    } else if (objectClass == IndexedPreservationAgent.class) {
       ret = create(PreservationMetadata.class, ids.size(), ids);
     }
 
@@ -296,7 +295,6 @@ public final class LiteRODAObjectFactory {
     IndexedPreservationAgent o = (IndexedPreservationAgent) object;
     return get(IndexedPreservationAgent.class, Arrays.asList(o.getId()), false);
   }
-
 
   private static <T extends IsRODAObject> Optional<LiteRODAObject> getDIPFile(T object) {
     DIPFile o = (DIPFile) object;

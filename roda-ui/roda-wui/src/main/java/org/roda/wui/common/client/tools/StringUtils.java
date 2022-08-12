@@ -33,7 +33,7 @@ public class StringUtils {
 
   /**
    * Join all tokens dividing by a separator
-   * 
+   *
    * @param tokens
    *          the string tokens
    * @param separator
@@ -64,7 +64,7 @@ public class StringUtils {
 
   /**
    * remove leading whitespace
-   * 
+   *
    * @param source
    * @return string without leading whitespace
    */
@@ -74,7 +74,7 @@ public class StringUtils {
 
   /**
    * remove trailing whitespace
-   * 
+   *
    * @param source
    * @return string without trailing whitespace
    */
@@ -84,10 +84,10 @@ public class StringUtils {
 
   /**
    * replace multiple whitespaces between words with single blank
-   * 
+   *
    * @param source
    * @return string without multiple whitespaces between words
-   * 
+   *
    */
   public static String itrim(String source) {
     return source.replaceAll("\\b\\s{2,}\\b", " ");
@@ -95,7 +95,7 @@ public class StringUtils {
 
   /**
    * remove all superfluous whitespaces in source string
-   * 
+   *
    * @param source
    * @return string without superfluos whitespaces
    */
@@ -105,7 +105,7 @@ public class StringUtils {
 
   /**
    * Remove leading and trailing whitespace
-   * 
+   *
    * @param source
    * @return string without leading or trailing whitespace
    */
@@ -115,7 +115,7 @@ public class StringUtils {
 
   /**
    * Replace new line, line feed and tab by a single white space
-   * 
+   *
    * @param source
    * @return string without new lines, line feeds nor tabs
    */
@@ -125,7 +125,7 @@ public class StringUtils {
 
   /**
    * Normalize string spaces
-   * 
+   *
    * @param source
    * @return string without new lines, line feeds, tabs or superfluous white
    *         spaces

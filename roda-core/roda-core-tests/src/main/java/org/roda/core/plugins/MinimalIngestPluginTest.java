@@ -267,7 +267,7 @@ public class MinimalIngestPluginTest {
     Assert.assertEquals(aip.getRepresentations().size(), 1);
 
     CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
-            aip.getRepresentations().get(0).getId(), true);
+      aip.getRepresentations().get(0).getId(), true);
     List<File> reusableAllFiles = new ArrayList<>();
     Iterables.addAll(reusableAllFiles, Lists.newArrayList(allFiles).stream().filter(OptionalWithCause::isPresent)
       .map(OptionalWithCause::get).collect(Collectors.toList()));

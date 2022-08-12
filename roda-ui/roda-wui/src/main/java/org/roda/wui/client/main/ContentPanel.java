@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.main;
 
@@ -51,7 +51,7 @@ import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class ContentPanel extends SimplePanel {
 
@@ -74,7 +74,7 @@ public class ContentPanel extends SimplePanel {
 
   /**
    * Get the singleton instance
-   * 
+   *
    * @return the singleton instance
    */
   public static ContentPanel getInstance() {
@@ -124,7 +124,7 @@ public class ContentPanel extends SimplePanel {
 
   /**
    * Update the content panel with the new history
-   * 
+   *
    * @param historyTokens
    *          the history tokens
    */

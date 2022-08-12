@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.portal;
 
@@ -39,9 +39,9 @@ import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
- * 
- * 
- * 
+ *
+ *
+ *
  */
 public class UserLoginPortal {
 
@@ -79,7 +79,7 @@ public class UserLoginPortal {
   /**
    * Get current authenticated user. User is cached and only refreshed when login
    * or logout actions are called.
-   * 
+   *
    * @param callback
    *          call back handler that receives error if failed or AuthOfficeUser if
    *          success.
@@ -137,7 +137,7 @@ public class UserLoginPortal {
     String hash = Window.Location.getHash();
     if (hash.length() > 0) {
       logout(hash.substring(1));
-    }else{
+    } else {
       logout(null);
     }
   }
@@ -161,7 +161,7 @@ public class UserLoginPortal {
 
   /**
    * Add a login status listener
-   * 
+   *
    * @param listener
    */
   public void addLoginStatusListener(LoginStatusListener listener) {
@@ -170,7 +170,7 @@ public class UserLoginPortal {
 
   /**
    * Remove a login status listener
-   * 
+   *
    * @param listener
    */
   public void removeLoginStatusListener(LoginStatusListener listener) {
@@ -186,7 +186,7 @@ public class UserLoginPortal {
   /**
    * Check if the changing of the permissions of the RODA member affects current
    * authenticated user and alert login status listeners
-   * 
+   *
    * @param member
    *          the member which had his permissions changed
    */
@@ -215,7 +215,7 @@ public class UserLoginPortal {
 
   /**
    * Check if current user has permission to access a history resolver
-   * 
+   *
    * @param res
    * @param callback
    */
@@ -246,7 +246,7 @@ public class UserLoginPortal {
 
   /**
    * Check if current authenticated user can access some history resolvers
-   * 
+   *
    * @param res
    * @param exclusive
    * @param callback

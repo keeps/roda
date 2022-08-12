@@ -11,7 +11,7 @@ package org.roda.core.data.exceptions;
  * Thrown to indicate the the email confirmation token or password change token
  * is invalid. A token can be invalid because is not the expected token or
  * because it already expired.
- * 
+ *
  * @author Rui Castro
  */
 public class InvalidTokenException extends RODAException {
@@ -25,9 +25,8 @@ public class InvalidTokenException extends RODAException {
   }
 
   /**
-   * Constructs a new {@link InvalidTokenException} with the given error
-   * message.
-   * 
+   * Constructs a new {@link InvalidTokenException} with the given error message.
+   *
    * @param message
    *          the error message.
    */
@@ -38,7 +37,7 @@ public class InvalidTokenException extends RODAException {
   /**
    * Constructs a new {@link InvalidTokenException} with the given cause
    * exception.
-   * 
+   *
    * @param cause
    *          the cause exception.
    */
@@ -49,7 +48,7 @@ public class InvalidTokenException extends RODAException {
   /**
    * Constructs a new {@link InvalidTokenException} with the given error message
    * and cause exception.
-   * 
+   *
    * @param message
    *          the error message.
    * @param cause

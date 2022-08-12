@@ -691,7 +691,7 @@ public class RodaCoreFactory {
    * "RODA_" after replacements, it will be prepended); 3) RODA configuration
    * files (with original property value, ensuring that it does not start by
    * "roda."); 4) return default value
-   * 
+   *
    * <p>
    * Example 1: for property = 'roda.node.type' this method will try to find the
    * following:
@@ -720,7 +720,7 @@ public class RodaCoreFactory {
    * "RODA_" after replacements, it will be prepended); 3) RODA configuration
    * files (with original property value, ensuring that it does not start by
    * "roda."); 4) return default value
-   * 
+   *
    * <p>
    * Example 1: for property = 'roda.node.type' this method will try to find the
    * following:
@@ -1154,10 +1154,10 @@ public class RodaCoreFactory {
    * parameters in RODA solr configurations. The warning will be removed and as
    * soon as that happens, this messages should be deleted as well.
    * </p>
-   * 
+   *
    * @throws GenericException
    * @throws InterruptedException
-   * 
+   *
    */
   private static void instantiateSolrAndIndexService(NodeType nodeType) throws GenericException, InterruptedException {
     if (INSTANTIATE_SOLR) {
@@ -1225,7 +1225,8 @@ public class RodaCoreFactory {
     return value;
   }
 
-  private static SolrClient instantiateSolr(Path solrHome, boolean writeIsAllowed) throws GenericException, InterruptedException {
+  private static SolrClient instantiateSolr(Path solrHome, boolean writeIsAllowed)
+    throws GenericException, InterruptedException {
     SolrType solrType = SolrType
       .valueOf(getConfigurationString(RodaConstants.CORE_SOLR_TYPE, RodaConstants.DEFAULT_SOLR_TYPE.toString()));
 
@@ -1271,7 +1272,8 @@ public class RodaCoreFactory {
     return cloudSolrClient;
   }
 
-  private static void waitForSolrCluster(CloudSolrClient cloudSolrClient) throws GenericException, InterruptedException {
+  private static void waitForSolrCluster(CloudSolrClient cloudSolrClient)
+    throws GenericException, InterruptedException {
     int retries = getRodaConfiguration().getInt("core.solr.cloud.healthcheck.retries", 100);
     long timeout = getRodaConfiguration().getInt("core.solr.cloud.healthcheck.timeout_ms", 10000);
 
@@ -1295,7 +1297,8 @@ public class RodaCoreFactory {
 
   }
 
-  private static boolean checkSolrCluster(CloudSolrClient cloudSolrClient) throws GenericException, InterruptedException {
+  private static boolean checkSolrCluster(CloudSolrClient cloudSolrClient)
+    throws GenericException, InterruptedException {
     int connectTimeout = getRodaConfiguration().getInt("core.solr.cloud.connect.timeout_ms", 60000);
 
     try {
@@ -1489,7 +1492,8 @@ public class RodaCoreFactory {
           final LocalInstance rodaCentralInstance = new LocalInstance();
           rodaCentralInstance.setId(IdUtils.createUUID());
           rodaCentralInstance.setStatus(SynchronizingStatus.ACTIVE);
-          rodaCentralInstance.setName(getProperty(RodaConstants.CENTRAL_INSTANCE_NAME_PROPERTY, RodaConstants.DEFAULT_CENTRAL_INSTANCE_NAME));
+          rodaCentralInstance.setName(
+            getProperty(RodaConstants.CENTRAL_INSTANCE_NAME_PROPERTY, RodaConstants.DEFAULT_CENTRAL_INSTANCE_NAME));
           rodaCentralInstance.setIsSubscribed(true);
           createOrUpdateLocalInstance(rodaCentralInstance);
         }
@@ -1686,7 +1690,7 @@ public class RodaCoreFactory {
   /**
    * For each role in roda-roles.properties create the role in LDAP if it don't
    * exist already.
-   * 
+   *
    * @param rodaConfig
    *          roda configuration
    * @throws GenericException

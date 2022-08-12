@@ -35,7 +35,7 @@ public class ClassLoaderUtility {
 
   /**
    * Add file to CLASSPATH
-   * 
+   *
    * @param s
    *          File name
    * @throws IOException
@@ -48,7 +48,7 @@ public class ClassLoaderUtility {
 
   /**
    * Add file to CLASSPATH
-   * 
+   *
    * @param f
    *          File object
    * @throws IOException
@@ -60,7 +60,7 @@ public class ClassLoaderUtility {
 
   /**
    * Add URL to CLASSPATH
-   * 
+   *
    * @param url
    *          {@link URL}
    * @throws IOException
@@ -89,11 +89,11 @@ public class ClassLoaderUtility {
 
   /**
    * Creates an instance of an object of the given class name.
-   * 
+   *
    * @param className
    *          the name of the class to create an instance.
    * @return the instance created.
-   * 
+   *
    * @throws ClassNotFoundException
    * @throws IllegalAccessException
    * @throws InstantiationException
@@ -113,13 +113,13 @@ public class ClassLoaderUtility {
   /**
    * Adds the given {@link URL}s to the classpath and creates an instance of the
    * given class.
-   * 
+   *
    * @param urls
    *          a list of {@link URL}s to be added to the classpath.
    * @param className
    *          the name of the class for which to create an instance.
    * @return the instance created.
-   * 
+   *
    * @throws ClassNotFoundException
    * @throws IllegalAccessException
    * @throws InstantiationException
@@ -141,13 +141,13 @@ public class ClassLoaderUtility {
   /**
    * Adds the given file path to the classpath and creates an instance of the
    * given class name.
-   * 
+   *
    * @param filePath
    *          the path of the file to add to the classpath.
    * @param className
    *          the name of the class for which to create an instance.
    * @return the instance created.
-   * 
+   *
    * @throws IOException
    * @throws ClassNotFoundException
    * @throws IllegalAccessException

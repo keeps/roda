@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.common;
 
@@ -38,9 +38,9 @@ import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
- * 
- * 
- * 
+ *
+ *
+ *
  */
 public class UserLogin {
 
@@ -51,7 +51,7 @@ public class UserLogin {
 
   /**
    * Get the singleton instance
-   * 
+   *
    * @return the instance
    */
   public static UserLogin getInstance() {
@@ -78,7 +78,7 @@ public class UserLogin {
   /**
    * Get current authenticated user. User is cached and only refreshed when login
    * or logout actions are called.
-   * 
+   *
    * @param callback
    *          call back handler that receives error if failed or AuthOfficeUser if
    *          success.
@@ -136,7 +136,7 @@ public class UserLogin {
     String hash = Window.Location.getHash();
     if (hash.length() > 0) {
       logout(hash.substring(1));
-    }else{
+    } else {
       logout(null);
     }
   }
@@ -160,7 +160,7 @@ public class UserLogin {
 
   /**
    * Add a login status listener
-   * 
+   *
    * @param listener
    */
   public void addLoginStatusListener(LoginStatusListener listener) {
@@ -169,7 +169,7 @@ public class UserLogin {
 
   /**
    * Remove a login status listener
-   * 
+   *
    * @param listener
    */
   public void removeLoginStatusListener(LoginStatusListener listener) {
@@ -185,7 +185,7 @@ public class UserLogin {
   /**
    * Check if the changing of the permissions of the RODA member affects current
    * authenticated user and alert login status listeners
-   * 
+   *
    * @param member
    *          the member which had his permissions changed
    */
@@ -214,7 +214,7 @@ public class UserLogin {
 
   /**
    * Check if current user has permission to access a history resolver
-   * 
+   *
    * @param res
    * @param callback
    */
@@ -245,7 +245,7 @@ public class UserLogin {
 
   /**
    * Check if current authenticated user can access some history resolvers
-   * 
+   *
    * @param res
    * @param exclusive
    * @param callback

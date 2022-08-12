@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.planning;
 
@@ -24,7 +24,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class Planning {
 
@@ -37,8 +37,8 @@ public class Planning {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(
-        new HistoryResolver[] {RepresentationInformationNetwork.RESOLVER, RiskRegister.RESOLVER, PreservationEvents.PLANNING_RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {RepresentationInformationNetwork.RESOLVER,
+        RiskRegister.RESOLVER, PreservationEvents.PLANNING_RESOLVER}, false, callback);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class Planning {
 
   /**
    * Get the singleton instance
-   * 
+   *
    * @return the instance
    */
   public static Planning getInstance() {

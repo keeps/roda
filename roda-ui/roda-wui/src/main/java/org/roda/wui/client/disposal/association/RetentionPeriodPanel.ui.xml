@@ -1,56 +1,55 @@
-<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
-             xmlns:g='urn:import:com.google.gwt.user.client.ui'>
-    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
-    <g:FlowPanel addStyleNames="wui-retention-period-panel" ui:field="retentionPeriodPanel">
-        <g:FlowPanel addStyleNames="panel">
-            <g:FlowPanel addStyleNames="panel-heading">
-                <g:Label addStyleNames="panel-title">
-                    <ui:text from='{messages.disposalScheduleAssociationInformationTitle}'/>
-                </g:Label>
-            </g:FlowPanel>
-            <g:FlowPanel addStyleNames="panel-body">
-                <g:FlowPanel addStyleNames="field" ui:field="scheduleInfo">
-                    <g:Label addStyleNames="label">
-                        <ui:text from='{messages.disposalScheduleAssociationTitle}'/>
-                    </g:Label>
-                </g:FlowPanel>
-                <g:FlowPanel addStyleNames="field">
-                    <g:Label addStyleNames="label">
-                        <ui:text from='{messages.disposalRetentionStartDateLabel}'/>
-                    </g:Label>
-                    <g:Label addStyleNames="value" ui:field="disposalRetentionStartDate"/>
-                </g:FlowPanel>
-                <g:FlowPanel addStyleNames="field">
-                    <g:Label addStyleNames="label" ui:field="retentionOverdueDateLabel">
-                        <ui:text from='{messages.disposalRetentionDueDateLabel}'/>
-                    </g:Label>
-                    <g:Label addStyleNames="value" ui:field="disposalRetentionDueDate"/>
-                </g:FlowPanel>
-                <g:FlowPanel addStyleNames="field">
-                    <g:Label addStyleNames="label" ui:field="retentionPeriodLabel">
-                        <ui:text from='{messages.disposalRetentionPeriodLabel}'/>
-                    </g:Label>
-                    <g:Label addStyleNames="value" ui:field="disposalRetentionPeriod"/>
-                </g:FlowPanel>
-                <g:FlowPanel addStyleNames="field">
-                    <g:Label addStyleNames="label">
-                        <ui:text from='{messages.disposalScheduleAssociationTypeLabel}'/>
-                    </g:Label>
-                    <g:Label addStyleNames="value" ui:field="disposalAssociationType"/>
-                </g:FlowPanel>
-                <g:FlowPanel addStyleNames="field">
-                    <g:Label addStyleNames="label">
-                        <ui:text from='{messages.disposalActionLabel}'/>
-                    </g:Label>
-                    <g:HTML ui:field="disposalDisposalAction"/>
-                </g:FlowPanel>
-                <g:FlowPanel addStyleNames="field">
-                    <g:Label addStyleNames="label">
-                        <ui:text from='{messages.holdStatusLabel}'/>
-                    </g:Label>
-                    <g:HTML ui:field="disposalDisposalStatus"/>
-                </g:FlowPanel>
-            </g:FlowPanel>
-        </g:FlowPanel>
-    </g:FlowPanel>
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder' xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+	<g:FlowPanel addStyleNames="wui-retention-period-panel" ui:field="retentionPeriodPanel">
+		<g:FlowPanel addStyleNames="panel">
+			<g:FlowPanel addStyleNames="panel-heading">
+				<g:Label addStyleNames="panel-title">
+					<ui:text from='{messages.disposalScheduleAssociationInformationTitle}' />
+				</g:Label>
+			</g:FlowPanel>
+			<g:FlowPanel addStyleNames="panel-body">
+				<g:FlowPanel addStyleNames="field" ui:field="scheduleInfo">
+					<g:Label addStyleNames="label">
+						<ui:text from='{messages.disposalScheduleAssociationTitle}' />
+					</g:Label>
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="field">
+					<g:Label addStyleNames="label">
+						<ui:text from='{messages.disposalRetentionStartDateLabel}' />
+					</g:Label>
+					<g:Label addStyleNames="value" ui:field="disposalRetentionStartDate" />
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="field">
+					<g:Label addStyleNames="label" ui:field="retentionOverdueDateLabel">
+						<ui:text from='{messages.disposalRetentionDueDateLabel}' />
+					</g:Label>
+					<g:Label addStyleNames="value" ui:field="disposalRetentionDueDate" />
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="field">
+					<g:Label addStyleNames="label" ui:field="retentionPeriodLabel">
+						<ui:text from='{messages.disposalRetentionPeriodLabel}' />
+					</g:Label>
+					<g:Label addStyleNames="value" ui:field="disposalRetentionPeriod" />
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="field">
+					<g:Label addStyleNames="label">
+						<ui:text from='{messages.disposalScheduleAssociationTypeLabel}' />
+					</g:Label>
+					<g:Label addStyleNames="value" ui:field="disposalAssociationType" />
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="field">
+					<g:Label addStyleNames="label">
+						<ui:text from='{messages.disposalActionLabel}' />
+					</g:Label>
+					<g:HTML ui:field="disposalDisposalAction" />
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="field">
+					<g:Label addStyleNames="label">
+						<ui:text from='{messages.holdStatusLabel}' />
+					</g:Label>
+					<g:HTML ui:field="disposalDisposalStatus" />
+				</g:FlowPanel>
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</g:FlowPanel>
 </ui:UiBinder>

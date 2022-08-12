@@ -135,7 +135,7 @@ import org.xml.sax.SAXException;
 
 /**
  * Utilities class related to Apache Solr
- * 
+ *
  * @author Hélder Silva <hsilva@keep.pt>
  * @author Luís Faria <lfaria@keep.pt>
  * @author Sébastien Leroux <sleroux@keep.pt>
@@ -268,7 +268,7 @@ public class SolrUtils {
   /**
    * Find using cursors. Set initial cursor to
    * {@link CursorMarkParams#CURSOR_MARK_START}.
-   * 
+   *
    * @param index
    * @param classToRetrieve
    * @param filter
@@ -368,7 +368,7 @@ public class SolrUtils {
    * <p>
    * Note: chars <code>'*'</code> are not being escaped on purpose
    * </p>
-   * 
+   *
    * @return a string with special characters escaped
    */
   // FIXME perhaps && and || are not being properly escaped: see how to do it
@@ -1485,7 +1485,7 @@ public class SolrUtils {
 
   /**
    * WARNING: this should only be used to debug/tests only
-   * 
+   *
    * @return
    * @throws IOException
    * @throws SolrServerException
@@ -1670,7 +1670,7 @@ public class SolrUtils {
     throws RequestNotValidException, GenericException, AuthorizationDeniedException {
     DisposalSchedule disposalSchedule;
     try {
-      if(StringUtils.isNoneBlank(aip.getDisposalScheduleId())){
+      if (StringUtils.isNoneBlank(aip.getDisposalScheduleId())) {
         disposalSchedule = model.retrieveDisposalSchedule(aip.getDisposalScheduleId());
       } else {
         return null;

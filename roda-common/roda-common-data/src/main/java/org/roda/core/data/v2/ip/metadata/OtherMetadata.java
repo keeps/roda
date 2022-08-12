@@ -9,8 +9,6 @@ package org.roda.core.data.v2.ip.metadata;
 
 import java.util.List;
 
-
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 
@@ -108,7 +106,7 @@ public class OtherMetadata implements IsModelObject {
   public void setFileDirectoryPath(List<String> fileDirectoryPath) {
     this.fileDirectoryPath = fileDirectoryPath;
   }
-  
+
   @JsonIgnore
   @Override
   public int getClassVersion() {

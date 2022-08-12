@@ -101,7 +101,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 /**
- * 
+ *
  * @author Luis Faria <lfaria@keep.pt>
  *
  */

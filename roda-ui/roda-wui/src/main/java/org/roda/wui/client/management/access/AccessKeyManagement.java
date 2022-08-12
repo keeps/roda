@@ -144,8 +144,7 @@ public class AccessKeyManagement extends Composite {
         AccessKey selectedObject = table.getSelectionModel().getSelectedObject();
         if (selectedObject != null) {
           table.getSelectionModel().clear();
-          List<String> path = HistoryUtils.getHistory(ShowAccessKey.RESOLVER.getHistoryPath(),
-            selectedObject.getId());
+          List<String> path = HistoryUtils.getHistory(ShowAccessKey.RESOLVER.getHistoryPath(), selectedObject.getId());
           HistoryUtils.newHistory(path);
         }
       });

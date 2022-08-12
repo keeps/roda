@@ -9,8 +9,6 @@ package org.roda.core.data.v2.index.facet;
 
 import java.io.Serializable;
 
-
-
 import org.roda.core.data.common.RodaConstants;
 
 @javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_FACET_VALUE)

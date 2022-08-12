@@ -151,8 +151,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Class that "relates" Model & Storage
- * 
- * 
+ *
+ *
  * @author Luis Faria <lfaria@keep.pt>
  * @author Hélder Silva <hsilva@keep.pt>
  */
@@ -282,7 +282,7 @@ public class ModelService extends ModelObservable {
 
   /**
    * Create a new AIP
-   * 
+   *
    * @param aipId
    *          Suggested ID for the AIP, if <code>null</code> then an ID will be
    *          automatically generated. If ID cannot be allowed because it already
@@ -4206,11 +4206,11 @@ public class ModelService extends ModelObservable {
     }
     DistributedInstance ret;
 
-      try (InputStream inputStream = binary.getContent().createInputStream()) {
-        ret = JsonUtils.getObjectFromJson(inputStream, DistributedInstance.class);
-      } catch (IOException | GenericException e) {
-        throw new GenericException("Error reading distributed instance: " + distributedInstanceId, e);
-      }
+    try (InputStream inputStream = binary.getContent().createInputStream()) {
+      ret = JsonUtils.getObjectFromJson(inputStream, DistributedInstance.class);
+    } catch (IOException | GenericException e) {
+      throw new GenericException("Error reading distributed instance: " + distributedInstanceId, e);
+    }
 
     return ret;
   }

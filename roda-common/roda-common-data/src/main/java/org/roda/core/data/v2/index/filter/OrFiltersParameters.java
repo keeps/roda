@@ -22,7 +22,7 @@ public class OrFiltersParameters extends FiltersParameters {
   /**
    * Constructs a {@link OrFiltersParameters} cloning an existing
    * {@link OrFiltersParameters}.
-   * 
+   *
    * @param orFiltersParameters
    *          the {@link OrFiltersParameters} to clone.
    */
@@ -32,7 +32,7 @@ public class OrFiltersParameters extends FiltersParameters {
 
   /**
    * Constructs a {@link OrFiltersParameters} from a list of values.
-   * 
+   *
    * @param name
    *          the name of the attribute.
    * @param values

@@ -57,22 +57,20 @@ public class OptionsSliderHelper {
 
   private static void updateOptionsSliderPanel(final IndexedFile file, final SliderPanel slider) {
     slider.clear();
-    slider
-      .addContent(
-        new ActionableWidgetBuilder<>(FileActions.get()).buildListWithObjects(new ActionableObject<>((file))));
+    slider.addContent(
+      new ActionableWidgetBuilder<>(FileActions.get()).buildListWithObjects(new ActionableObject<>((file))));
   }
 
   private static void updateOptionsSliderPanel(final IndexedDIP dip, final SliderPanel slider) {
     slider.clear();
-    slider.addContent(
-      new ActionableWidgetBuilder<>(DisseminationActions.get(dip.getPermissions())).buildListWithObjects(new ActionableObject<>((dip))));
+    slider.addContent(new ActionableWidgetBuilder<>(DisseminationActions.get(dip.getPermissions()))
+      .buildListWithObjects(new ActionableObject<>((dip))));
   }
 
   private static void updateOptionsSliderPanel(final DIPFile file, final SliderPanel slider) {
     slider.clear();
-    slider.addContent(
-      new ActionableWidgetBuilder<>(DisseminationFileActions.get())
-        .buildListWithObjects(new ActionableObject<>((file))));
+    slider.addContent(new ActionableWidgetBuilder<>(DisseminationFileActions.get())
+      .buildListWithObjects(new ActionableObject<>((file))));
   }
 
 }

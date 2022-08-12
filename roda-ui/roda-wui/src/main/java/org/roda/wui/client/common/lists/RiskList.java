@@ -35,7 +35,7 @@ import com.google.gwt.view.client.ProvidesKey;
 import config.i18n.client.ClientMessages;
 
 /**
- * 
+ *
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
@@ -59,7 +59,6 @@ public class RiskList extends AsyncTableCell<IndexedRisk> {
   protected void adjustOptions(AsyncTableCellOptions<IndexedRisk> options) {
     options.withFieldsToReturn(fieldsToReturn);
   }
-
 
   @Override
   protected void configureDisplay(CellTable<IndexedRisk> display) {

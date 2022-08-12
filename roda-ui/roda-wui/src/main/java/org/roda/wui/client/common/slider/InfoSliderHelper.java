@@ -152,11 +152,11 @@ public class InfoSliderHelper {
       values.put(messages.representationType(), createRepresentationTypeHTML(bundle));
     }
 
-    addLinkIfCentralInstance(values, bundle.getInstanceName(), bundle.isLocalToInstance(), representation.getInstanceId());
+    addLinkIfCentralInstance(values, bundle.getInstanceName(), bundle.isLocalToInstance(),
+      representation.getInstanceId());
 
     populate(infoSliderPanel, values);
   }
-
 
   public static void updateInfoSliderPanel(BrowseAIPBundle bundle, SliderPanel infoSliderPanel) {
     IndexedAIP aip = bundle.getAip();
@@ -622,7 +622,8 @@ public class InfoSliderHelper {
     return panel;
   }
 
-  public static void addLinkIfCentralInstance(HashMap<String, Widget> values, String instanceName, boolean localToInstance, String instanceId) {
+  public static void addLinkIfCentralInstance(HashMap<String, Widget> values, String instanceName,
+    boolean localToInstance, String instanceId) {
     if (StringUtils.isNotBlank(instanceId)) {
       String distributedMode = ConfigurationManager.getStringWithDefault(
         RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);

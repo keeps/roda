@@ -29,46 +29,43 @@ public class DisposalRuleActions {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public static void applyDisposalRulesAction() {
-    Dialogs.showConfirmDialog(messages.applyDisposalRulesDialogTitle(),
-        messages.applyDisposalRulesDialogMessage(), messages.dialogNo(), messages.dialogYes(),
-        new NoAsyncCallback<Boolean>() {
-          @Override
-          public void onSuccess(Boolean result) {
-            HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
-            if (result) {
-              DisposalDialogs.showApplyRules(messages.applyDisposalRulesDialogTitle(),
-                  new NoAsyncCallback<Boolean>() {
+    Dialogs.showConfirmDialog(messages.applyDisposalRulesDialogTitle(), messages.applyDisposalRulesDialogMessage(),
+      messages.dialogNo(), messages.dialogYes(), new NoAsyncCallback<Boolean>() {
+        @Override
+        public void onSuccess(Boolean result) {
+          HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+          if (result) {
+            DisposalDialogs.showApplyRules(messages.applyDisposalRulesDialogTitle(), new NoAsyncCallback<Boolean>() {
+              @Override
+              public void onSuccess(Boolean applyToManuallyInclusive) {
+                BrowserService.Util.getInstance().applyDisposalRules(applyToManuallyInclusive,
+                  new AsyncCallback<Job>() {
                     @Override
-                    public void onSuccess(Boolean applyToManuallyInclusive) {
-                      BrowserService.Util.getInstance().applyDisposalRules(applyToManuallyInclusive,
-                          new AsyncCallback<Job>() {
-                            @Override
-                            public void onFailure(Throwable caught) {
-                              AsyncCallbackUtils.defaultFailureTreatment(caught);
-                              HistoryUtils.newHistory(InternalProcess.RESOLVER);
-                            }
+                    public void onFailure(Throwable caught) {
+                      AsyncCallbackUtils.defaultFailureTreatment(caught);
+                      HistoryUtils.newHistory(InternalProcess.RESOLVER);
+                    }
 
-                            @Override
-                            public void onSuccess(Job job) {
-                              Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(),
-                                  new AsyncCallback<Void>() {
-                                    @Override
-                                    public void onFailure(Throwable caught) {
-                                      Toast.showInfo(messages.runningInBackgroundTitle(),
-                                          messages.runningInBackgroundDescription());
-                                    }
+                    @Override
+                    public void onSuccess(Job job) {
+                      Dialogs.showJobRedirectDialog(messages.jobCreatedMessage(), new AsyncCallback<Void>() {
+                        @Override
+                        public void onFailure(Throwable caught) {
+                          Toast.showInfo(messages.runningInBackgroundTitle(),
+                            messages.runningInBackgroundDescription());
+                        }
 
-                                    @Override
-                                    public void onSuccess(final Void nothing) {
-                                      HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
-                                    }
-                                  });
-                            }
-                          });
+                        @Override
+                        public void onSuccess(final Void nothing) {
+                          HistoryUtils.newHistory(ShowJob.RESOLVER, job.getId());
+                        }
+                      });
                     }
                   });
-            }
+              }
+            });
           }
-        });
+        }
+      });
   }
 }

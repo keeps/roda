@@ -8,7 +8,7 @@
 package org.roda.core.data.exceptions;
 
 /**
- * 
+ *
  * @author Luis Faria <lfaria@keep.pt>
  *
  */

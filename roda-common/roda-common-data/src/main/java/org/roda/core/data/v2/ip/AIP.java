@@ -115,7 +115,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
   /**
    * Get the identifier of the parent AIP or <code>null</code> if this AIP is on
    * the top-level.
-   * 
+   *
    * @return
    */
   public String getParentId() {

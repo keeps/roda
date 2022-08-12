@@ -9,7 +9,7 @@ package org.roda.core.data.exceptions;
 
 /**
  * @author Hélder Silva <hsilva@keep.pt>
- * 
+ *
  */
 public class JobIsStoppingException extends JobException {
   private static final long serialVersionUID = 668519344542236907L;

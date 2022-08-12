@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.main;
 
@@ -27,7 +27,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class BreadcrumbPanel extends FlowPanel {
 
@@ -36,7 +36,7 @@ public class BreadcrumbPanel extends FlowPanel {
 
   /**
    * Create a new Breadcrumb panel
-   * 
+   *
    * @param contentPanel
    *          the content panel this breadcrumb panel will manage
    */
@@ -63,10 +63,10 @@ public class BreadcrumbPanel extends FlowPanel {
 
   /**
    * Update the breadcrumb panel
-   * 
+   *
    * @param path
    *          the new history path
-   * 
+   *
    */
   public void updatePath(List<BreadcrumbItem> path) {
 
@@ -116,7 +116,7 @@ public class BreadcrumbPanel extends FlowPanel {
 
     /**
      * Create a new breadcrumb
-     * 
+     *
      * @param path
      *          the history path that this breadcrumb points to
      */
@@ -134,7 +134,7 @@ public class BreadcrumbPanel extends FlowPanel {
 
     /**
      * Is this breadcrumb enabled
-     * 
+     *
      * @return true if enabled
      */
     public boolean isEnabled() {
@@ -143,9 +143,9 @@ public class BreadcrumbPanel extends FlowPanel {
 
     /**
      * Set if this breadcrumb is enabled. Overrides the click event
-     * 
+     *
      * @param enabled
-     * 
+     *
      */
     public void setEnabled(boolean enabled) {
       this.enabled = enabled;
@@ -153,7 +153,7 @@ public class BreadcrumbPanel extends FlowPanel {
 
     /**
      * Is this the last breadcrumb in list (current active breadcrumb)
-     * 
+     *
      * @return true if this breadcrumb is the last one. The last breadcrumb is
      *         disabled and has a different style.
      */
@@ -163,7 +163,7 @@ public class BreadcrumbPanel extends FlowPanel {
 
     /**
      * Get the history path defined by this breadcrumb
-     * 
+     *
      * @return the breadcrumb history path
      */
     public BreadcrumbItem getItem() {
@@ -171,9 +171,9 @@ public class BreadcrumbPanel extends FlowPanel {
     }
 
     /**
-     * Set if this breadcrumb is the last one. The last breadcrumb will be
-     * disabled and has a different style.
-     * 
+     * Set if this breadcrumb is the last one. The last breadcrumb will be disabled
+     * and has a different style.
+     *
      * @param last
      */
     public void setLast(boolean last) {

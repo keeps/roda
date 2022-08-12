@@ -171,7 +171,7 @@ public class RichTextToolbar extends Composite {
 
   /**
    * Creates a new toolbar that drives the given rich text area.
-   * 
+   *
    * @param richText
    *          the rich text area to be controlled
    */

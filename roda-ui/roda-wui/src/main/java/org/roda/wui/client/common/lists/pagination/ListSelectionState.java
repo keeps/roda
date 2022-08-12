@@ -29,8 +29,8 @@ public class ListSelectionState<T extends IsIndexed> implements Serializable {
     super();
   }
 
-  public ListSelectionState(T selected, Filter filter, Boolean justActive, Facets facets, Sorter sorter,
-    Integer index, Long total) {
+  public ListSelectionState(T selected, Filter filter, Boolean justActive, Facets facets, Sorter sorter, Integer index,
+    Long total) {
     super();
     this.selected = selected;
     this.filter = filter;

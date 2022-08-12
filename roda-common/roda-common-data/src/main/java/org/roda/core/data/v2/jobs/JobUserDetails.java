@@ -7,7 +7,6 @@
  */
 package org.roda.core.data.v2.jobs;
 
-
 import java.io.Serializable;
 
 /**
@@ -15,64 +14,60 @@ import java.io.Serializable;
  */
 public class JobUserDetails implements Serializable {
 
-    private static final long serialVersionUID = -4032562078756591923L;
+  private static final long serialVersionUID = -4032562078756591923L;
 
-    public JobUserDetails(JobUserDetails jobUser) {
-        this.username = jobUser.getUsername();
-        this.fullname = jobUser.getFullname();
-        this.email = jobUser.getEmail();
-        this.role = jobUser.getRole();
-    }
-    public JobUserDetails(){
+  public JobUserDetails(JobUserDetails jobUser) {
+    this.username = jobUser.getUsername();
+    this.fullname = jobUser.getFullname();
+    this.email = jobUser.getEmail();
+    this.role = jobUser.getRole();
+  }
 
-    }
+  public JobUserDetails() {
 
-    private String username;
-    private String fullname;
-    private String email;
-    private String role;
+  }
 
+  private String username;
+  private String fullname;
+  private String email;
+  private String role;
 
-    public String getUsername() {
-        return username;
-    }
+  public String getUsername() {
+    return username;
+  }
 
-    public String getFullname() {
-        return fullname;
-    }
+  public String getFullname() {
+    return fullname;
+  }
 
-    public String getEmail() {
-        return email;
-    }
+  public String getEmail() {
+    return email;
+  }
 
-    public void setUsername(String cusername) {
-        this.username = cusername;
-    }
+  public void setUsername(String cusername) {
+    this.username = cusername;
+  }
 
-    public void setFullname(String cfullname) {
-        this.fullname = cfullname;
-    }
+  public void setFullname(String cfullname) {
+    this.fullname = cfullname;
+  }
 
-    public void setEmail(String cemail) {
-        this.email = cemail;
-    }
+  public void setEmail(String cemail) {
+    this.email = cemail;
+  }
 
-    public String getRole() {
-        return role;
-    }
+  public String getRole() {
+    return role;
+  }
 
-    public void setRole(String cRole) {
-        this.role = cRole;
-    }
+  public void setRole(String cRole) {
+    this.role = cRole;
+  }
 
-    @Override
-    public String toString() {
-        return "CentralUser{" +
-                "username='" + username + '\'' +
-                ", fullname='" + fullname + '\'' +
-                ", email='" + email + '\'' +
-                ", role='" + role + '\'' +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "CentralUser{" + "username='" + username + '\'' + ", fullname='" + fullname + '\'' + ", email='" + email
+      + '\'' + ", role='" + role + '\'' + '}';
+  }
 
 }

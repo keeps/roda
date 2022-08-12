@@ -18,7 +18,7 @@ public interface IsIndexed extends IsRODAObject {
 
   /**
    * Return CSV header names for this object.
-   * 
+   *
    * @return a {@link List} of {@link String} with the header names.
    */
   List<String> toCsvHeaders();
@@ -39,14 +39,14 @@ public interface IsIndexed extends IsRODAObject {
 
   /**
    * Return fields as they are indexed
-   * 
+   *
    * @return
    */
   Map<String, Object> getFields();
 
   /**
    * Set fields as they are indexed
-   * 
+   *
    * @return
    */
   void setFields(Map<String, Object> fields);

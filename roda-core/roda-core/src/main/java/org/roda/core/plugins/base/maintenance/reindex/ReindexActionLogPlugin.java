@@ -160,7 +160,8 @@ public class ReindexActionLogPlugin extends AbstractPlugin<Void> {
         } catch (Exception e) {
           jobPluginInfo.incrementObjectsProcessedWithFailure();
           Report reportItem = PluginHelper.initPluginReportItem(this, entry.getId(), LogEntry.class);
-          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Error when indexing action log " + entry.getId());
+          reportItem.setPluginState(PluginState.FAILURE)
+            .setPluginDetails("Error when indexing action log " + entry.getId());
           report.addReport(reportItem);
           PluginHelper.updatePartialJobReport(this, model, reportItem, false, job);
         }

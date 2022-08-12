@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * Plugin that does nothing (including not throwing any type of exception) and
  * therefore it must be possible to execute a Job with this plugin and ending up
  * with a Job in the state completed
- * 
+ *
  * @author Hélder Silva <hsilva@keep.pt>
  */
 public class DummyPlugin extends AbstractPlugin<Void> {

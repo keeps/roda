@@ -24,7 +24,7 @@ import com.codahale.metrics.Histogram;
 /**
  * Does search in the index, using the Solr.find() method, and if configured
  * removes duplicate objects (via uuid comparison) thus providing iterator
- * 
+ *
  * @author Hélder Silva <hsilva@keep.pt>
  */
 

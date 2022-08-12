@@ -25,9 +25,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * 
+ *
  * @author Luis Faria
- * 
+ *
  */
 public class Ingest {
 
@@ -59,7 +59,7 @@ public class Ingest {
 
   /**
    * Get the singleton instance
-   * 
+   *
    * @return the instance
    */
   public static Ingest getInstance() {

@@ -103,14 +103,17 @@ public class ControllerAssistant {
   }
 
   public void checkAIPstate(IndexedAIP aip) throws RequestNotValidException {
-    if(aip.getState().equals(AIPState.DESTROYED)){
-      throw new RequestNotValidException("The AIP [id: " + aip.getId() + "] is destroyed, therefore the request is not valid.");
+    if (aip.getState().equals(AIPState.DESTROYED)) {
+      throw new RequestNotValidException(
+        "The AIP [id: " + aip.getId() + "] is destroyed, therefore the request is not valid.");
     }
   }
 
-    public void checkIfAIPInConfirmation(IndexedAIP indexedAip) throws RequestNotValidException {
-      if(StringUtils.isNotBlank(indexedAip.getDisposalConfirmationId())){
-        throw new RequestNotValidException("The AIP [id: " + indexedAip.getId() + "] is under a disposal confirmation [id: " + indexedAip.getDisposalConfirmationId() + "]  , therefore the request is not valid.");
-      }
+  public void checkIfAIPInConfirmation(IndexedAIP indexedAip) throws RequestNotValidException {
+    if (StringUtils.isNotBlank(indexedAip.getDisposalConfirmationId())) {
+      throw new RequestNotValidException(
+        "The AIP [id: " + indexedAip.getId() + "] is under a disposal confirmation [id: "
+          + indexedAip.getDisposalConfirmationId() + "]  , therefore the request is not valid.");
     }
+  }
 }

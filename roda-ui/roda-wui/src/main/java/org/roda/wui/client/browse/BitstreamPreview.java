@@ -254,7 +254,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
       + encode(GWT.getHostPageBaseURL() + bitstreamDownloadUri.asString()) + "#" + viewers.getOptions();
 
     final Frame frame = new Frame(viewerPdf);
-    frame.addLoadHandler(ev-> JavascriptUtils.runIframeResizer(frame.getElement()));
+    frame.addLoadHandler(ev -> JavascriptUtils.runIframeResizer(frame.getElement()));
 
     panel.add(frame);
     frame.setStyleName("viewRepresentationPDFFilePreview");
@@ -385,7 +385,7 @@ public class BitstreamPreview<T extends IsIndexed> extends Composite {
     final Frame frame = new Frame(url);
     frame.setStyleName("viewDIPPreview");
     frame.setTitle(dip.getTitle());
-    frame.addLoadHandler(ev-> JavascriptUtils.runIframeResizer(frame.getElement()));
+    frame.addLoadHandler(ev -> JavascriptUtils.runIframeResizer(frame.getElement()));
     panel.add(frame);
   }
 

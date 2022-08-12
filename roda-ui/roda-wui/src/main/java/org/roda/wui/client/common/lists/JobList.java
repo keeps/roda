@@ -41,7 +41,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import config.i18n.client.ClientMessages;
 
 /**
- * 
+ *
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
@@ -117,7 +117,6 @@ public class JobList extends AsyncTableCell<Job> {
         return HtmlSnippetUtils.getJobStateHtml(job);
       }
     };
-
 
     objectsTotalCountColumn = new TextColumn<Job>() {
 
@@ -246,13 +245,13 @@ public class JobList extends AsyncTableCell<Job> {
     columnSortingKeyMap.put(progressColumn, Collections.singletonList(RodaConstants.JOB_COMPLETION_PERCENTAGE));
     columnSortingKeyMap.put(objectsTotalCountColumn, Collections.singletonList(RodaConstants.JOB_SOURCE_OBJECTS_COUNT));
     columnSortingKeyMap.put(objectsSuccessCountColumn,
-        Collections.singletonList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SUCCESS));
+      Collections.singletonList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SUCCESS));
     columnSortingKeyMap.put(objectsPartialSuccessCountColumn,
-        Collections.singletonList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_PARTIAL_SUCCESS));
+      Collections.singletonList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_PARTIAL_SUCCESS));
     columnSortingKeyMap.put(objectsFailureCountColumn,
-        Collections.singletonList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE));
+      Collections.singletonList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE));
     columnSortingKeyMap.put(objectsSkippedCountColumn,
-        Collections.singletonList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SKIPPED));
+      Collections.singletonList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SKIPPED));
     columnSortingKeyMap.put(usernameColumn, Collections.singletonList(RodaConstants.JOB_USERNAME));
     return createSorter(columnSortList, columnSortingKeyMap);
   }

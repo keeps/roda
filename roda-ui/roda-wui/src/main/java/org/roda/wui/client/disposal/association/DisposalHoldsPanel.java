@@ -263,7 +263,7 @@ public class DisposalHoldsPanel extends Composite {
     List<DisposalHoldAIPMetadata> disposalHoldAssociations) {
     Label headerHolds = new Label();
     HTMLPanel info = new HTMLPanel(SafeHtmlUtils.EMPTY_SAFE_HTML);
-    
+
     return new BasicTablePanel<DisposalHoldAIPMetadata>(headerHolds, info, disposalHoldAssociations.iterator(),
 
       new BasicTablePanel.ColumnInfo<>(messages.disposalHoldTitle(), 0, new TextColumn<DisposalHoldAIPMetadata>() {

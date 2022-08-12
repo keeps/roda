@@ -24,19 +24,19 @@ import org.roda.core.data.v2.ip.StoragePath;
  * Interface that abstract the persistence of binary files and their containers.
  * The interface is based on Fedora 4 and OpenStack Swift APIs.
  * </p>
- * 
+ *
  * It organizes the content into:
  * <ul>
  * <li>container: a top-level unique namespace for binaries and directories.
  * </li>
- * 
+ *
  * <li>directory: a nestable structure (blank node) that allows organization of
  * content.</li>
- * 
+ *
  * <li>binary: a resource that stores the binary content, such as documents,
  * images and so on.</li>
  * </ul>
- * 
+ *
  * @author Luis Faria <lfaria@keep.pt>
  */
 public interface StorageService {
@@ -49,7 +49,7 @@ public interface StorageService {
 
   /**
    * List all existing containers.
-   * 
+   *
    * @throws GenericException
    * @throws NotFoundException
    * @throws RequestNotValidException
@@ -60,25 +60,25 @@ public interface StorageService {
 
   /**
    * Creates a new container with the specified name.
-   * 
+   *
    * @param storagePath
    *          storage path with a unique name for the new container.
-   * 
+   *
    * @throws GenericException
    * @throws AlreadyExistsException
    * @throws AuthorizationDeniedException
    * @throws RequestNotValidException
-   * 
+   *
    */
   Container createContainer(StoragePath storagePath)
     throws GenericException, AlreadyExistsException, AuthorizationDeniedException, RequestNotValidException;
 
   /**
    * Get an existing container.
-   * 
+   *
    * @param name
    *          storage path that identifies the container.
-   * 
+   *
    * @throws GenericException
    * @throws RequestNotValidException
    * @throws NotFoundException
@@ -89,10 +89,10 @@ public interface StorageService {
 
   /**
    * Delete an existing container.
-   * 
+   *
    * @param storagePath
    *          storage path that identifies the container.
-   * 
+   *
    * @throws GenericException
    * @throws NotFoundException
    * @throws AuthorizationDeniedException
@@ -102,10 +102,10 @@ public interface StorageService {
 
   /**
    * List all resources under this container.
-   * 
+   *
    * @param storagePath
    *          storage path that identifies the container.
-   * 
+   *
    * @throws GenericException
    * @throws NotFoundException
    * @throws RequestNotValidException
@@ -116,10 +116,10 @@ public interface StorageService {
 
   /**
    * Count all resources under this container.
-   * 
+   *
    * @param storagePath
    *          storage path that identifies the container.
-   * 
+   *
    * @throws AuthorizationDeniedException
    * @throws GenericException
    * @throws NotFoundException
@@ -130,40 +130,40 @@ public interface StorageService {
 
   /**
    * Creates a new directory with the specified name.
-   * 
+   *
    * @param storagePath
    *          storage path that identifies the directory
-   * 
+   *
    * @throws AlreadyExistsException
    * @throws GenericException
    * @throws AuthorizationDeniedException
-   * 
+   *
    */
   Directory createDirectory(StoragePath storagePath)
     throws AlreadyExistsException, GenericException, AuthorizationDeniedException;
 
   /**
    * Creates a new directory with a random name.
-   * 
+   *
    * @param parentStoragePath
    *          storage path that identifies parent of the directory
-   * 
+   *
    * @throws RequestNotValidException
    * @throws GenericException
    * @throws NotFoundException
    * @throws AlreadyExistsException
    * @throws AuthorizationDeniedException
-   * 
+   *
    */
   Directory createRandomDirectory(StoragePath parentStoragePath) throws RequestNotValidException, GenericException,
     NotFoundException, AlreadyExistsException, AuthorizationDeniedException;
 
   /**
    * Get an existing directory.
-   * 
+   *
    * @param storagePath
    *          storage path that identifies the directory
-   * 
+   *
    * @throws RequestNotValidException
    * @throws GenericException
    * @throws NotFoundException
@@ -174,19 +174,19 @@ public interface StorageService {
 
   /**
    * Tests if directory exists.
-   * 
+   *
    * @param storagePath
    *          storage path that identifies the directory
-   * 
+   *
    */
   boolean hasDirectory(StoragePath storagePath);
 
   /**
    * List all resources, container or binaries, under this directory.
-   * 
+   *
    * @param storagePath
    *          storage path that identifies the directory
-   * 
+   *
    * @throws GenericException
    * @throws NotFoundException
    * @throws RequestNotValidException
@@ -200,10 +200,10 @@ public interface StorageService {
 
   /**
    * Count all resources, container or binaries, under this directory.
-   * 
+   *
    * @param storagePath
    *          storage path that identifies the directory
-   * 
+   *
    * @throws GenericException
    * @throws NotFoundException
    * @throws AuthorizationDeniedException
@@ -214,7 +214,7 @@ public interface StorageService {
 
   /**
    * Create a binary resource with a defined content.
-   * 
+   *
    * @param storagePath
    *          storage path that identifies the binary
    * @param payload
@@ -235,7 +235,7 @@ public interface StorageService {
 
   /**
    * Create a binary resource with a defined content with a generated id.
-   * 
+   *
    * @param parentStoragePath
    *          storage path that identifies the parent of the binary
    * @param payload
@@ -255,31 +255,31 @@ public interface StorageService {
 
   /**
    * Get an existing binary resource.
-   * 
+   *
    * @param storagePath
    *          storage path that identifies the binary
    *
    * @throws NotFoundException
    * @throws RequestNotValidException
    * @throws AuthorizationDeniedException
-   * 
+   *
    */
   Binary getBinary(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException;
 
   /**
    * Tests if binary exists.
-   * 
+   *
    * @param storagePath
    *          storage path that identifies the binary
-   * 
+   *
    */
   boolean hasBinary(StoragePath storagePath);
 
   /**
    * Replace existing binary content with given one, not changing any associated
    * metadata.
-   * 
+   *
    * @param storagePath
    *          storage path that identifies the binary
    * @param payload
@@ -293,7 +293,7 @@ public interface StorageService {
    *          create. If <code>false</code> and binary does not exist then a
    *          {@link StorageServiceException} will be thrown with code
    *          <code>StorageActionException.NOT_FOUND</code>.
-   * 
+   *
    * @throws GenericException
    * @throws NotFoundException
    * @throws RequestNotValidException
@@ -306,7 +306,7 @@ public interface StorageService {
   /**
    * Delete an existing resource, being it a container or a binary. If it is a
    * container, recursively delete all resources under it.
-   * 
+   *
    * @param storagePath
    *          storage path that identifies the resource
    * @throws GenericException
@@ -317,7 +317,7 @@ public interface StorageService {
 
   /**
    * Get entity class
-   * 
+   *
    * @param storagePath
    *          storage path that identifies the resource
    *
@@ -331,11 +331,11 @@ public interface StorageService {
 
   /**
    * Copy resources from another (or the same) storage service.
-   * 
+   *
    * @param fromService
    * @param fromContainer
    * @param toStoragePath
-   * 
+   *
    * @throws GenericException
    * @throws AlreadyExistsException
    * @throws NotFoundException
@@ -351,11 +351,11 @@ public interface StorageService {
 
   /**
    * Move resources from another (or the same) storage service.
-   * 
+   *
    * @param fromService
    * @param fromStoragePath
    * @param toStoragePath
-   * 
+   *
    * @throws GenericException
    * @throws AlreadyExistsException
    * @throws NotFoundException

@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.main;
 
@@ -26,7 +26,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class Theme extends Composite {
 
@@ -72,7 +72,7 @@ public class Theme extends Composite {
   private HTMLWidgetWrapper layout;
 
   private Theme(String htmlPage) {
-    layout = new HTMLWidgetWrapper(htmlPage,null, new AsyncCallback<Void>() {
+    layout = new HTMLWidgetWrapper(htmlPage, null, new AsyncCallback<Void>() {
 
       @Override
       public void onFailure(Throwable caught) {

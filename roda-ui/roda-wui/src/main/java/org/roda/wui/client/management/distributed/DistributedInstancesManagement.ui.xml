@@ -1,29 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:common="urn:import:org.roda.wui.client.common">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:common="urn:import:org.roda.wui.client.common">
 
-    <ui:with field='messages' type='config.i18n.client.ClientMessages' />
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
-    <g:FlowPanel styleName="wui-representation-information-network" addStyleNames="wrapper skip_padding">
-        <g:FlowPanel addStyleNames="row full_width skip_padding">
-            <g:FlowPanel ui:field="contentFlowPanel" addStyleNames="col_10 content">
-                <common:TitlePanel text="{messages.manageDistributedInstanceTitle}" iconClass="DistributedInstance"/>
-                <g:FlowPanel addStyleNames="page-description" ui:field="distributedInstancesManagementDescription" />
-                <g:ScrollPanel ui:field="distributedInstancesManagementTablePanel"/>
-            </g:FlowPanel>
+	<g:FlowPanel styleName="wui-representation-information-network" addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="row full_width skip_padding">
+			<g:FlowPanel ui:field="contentFlowPanel" addStyleNames="col_10 content">
+				<common:TitlePanel text="{messages.manageDistributedInstanceTitle}" iconClass="DistributedInstance" />
+				<g:FlowPanel addStyleNames="page-description" ui:field="distributedInstancesManagementDescription" />
+				<g:ScrollPanel ui:field="distributedInstancesManagementTablePanel" />
+			</g:FlowPanel>
 
-            <g:FlowPanel ui:field="sidebarFlowPanel" addStyleNames="col_2 last sidebar">
-                <g:FlowPanel addStyleNames="sticky-flow">
-                    <g:FlowPanel addStyleNames="sticky-padding">
-                        <g:Label addStyleNames="h4">
-                            <ui:text from="{messages.actions}"/>
-                        </g:Label>
-                        <g:FlowPanel ui:field="sidebarButtonsPanel"/>
-                    </g:FlowPanel>
-                </g:FlowPanel>
-            </g:FlowPanel>
-        </g:FlowPanel>
-    </g:FlowPanel>
+			<g:FlowPanel ui:field="sidebarFlowPanel" addStyleNames="col_2 last sidebar">
+				<g:FlowPanel addStyleNames="sticky-flow">
+					<g:FlowPanel addStyleNames="sticky-padding">
+						<g:Label addStyleNames="h4">
+							<ui:text from="{messages.actions}" />
+						</g:Label>
+						<g:FlowPanel ui:field="sidebarButtonsPanel" />
+					</g:FlowPanel>
+				</g:FlowPanel>
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</g:FlowPanel>
 </ui:UiBinder>

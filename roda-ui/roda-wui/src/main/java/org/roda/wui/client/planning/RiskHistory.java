@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.planning;
 
@@ -46,7 +46,7 @@ import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class RiskHistory extends Composite {
 
@@ -120,7 +120,7 @@ public class RiskHistory extends Composite {
 
   /**
    * Create a new panel to edit a user
-   * 
+   *
    * @param user
    *          the user to edit
    */

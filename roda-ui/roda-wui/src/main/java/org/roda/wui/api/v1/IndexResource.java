@@ -316,7 +316,7 @@ public class IndexResource {
 
   /**
    * Produces a CSV response with results or facets.
-   * 
+   *
    * @param findRequest
    *          the request parameters.
    * @param user
@@ -368,7 +368,7 @@ public class IndexResource {
 
   /**
    * Return the {@link Class} with the specified class name.
-   * 
+   *
    * @param className
    *          the fully qualified name of the desired class.
    * @param <T>

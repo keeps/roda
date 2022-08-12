@@ -116,8 +116,9 @@ public class PremisSkeletonPluginUtils {
           model.notifyFileUpdated(file).failOnError();
         }
 
-        PremisV3Utils.linkFileToRepresentation(file.getId(), file.getPath(), RodaConstants.PREMIS_RELATIONSHIP_TYPE_STRUCTURAL,
-          RodaConstants.PREMIS_RELATIONSHIP_SUBTYPE_HASPART, representation);
+        PremisV3Utils.linkFileToRepresentation(file.getId(), file.getPath(),
+          RodaConstants.PREMIS_RELATIONSHIP_TYPE_STRUCTURAL, RodaConstants.PREMIS_RELATIONSHIP_SUBTYPE_HASPART,
+          representation);
       }
     }
   }

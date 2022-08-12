@@ -71,7 +71,7 @@ public class TransferredResourcesScanner {
     }
 
     try {
-      String sanitizedFolderName = folderName.replaceAll("/","");
+      String sanitizedFolderName = folderName.replaceAll("/", "");
       Path createdPath = Files.createDirectories(parentPath.resolve(sanitizedFolderName));
       BasicFileAttributes attrs = Files.readAttributes(createdPath, BasicFileAttributes.class);
       TransferredResource resource = createTransferredResource(createdPath, attrs, 0L, basePath, new Date());
@@ -223,15 +223,15 @@ public class TransferredResourcesScanner {
     boolean isWithin;
     Path resolvedBasePath;
     Optional<String> normalizedRelativePath;
-    if(folderRelativePath.isPresent() && !folderRelativePath.get().isEmpty()) {
+    if (folderRelativePath.isPresent() && !folderRelativePath.get().isEmpty()) {
       resolvedBasePath = basePath.resolve(Paths.get(folderRelativePath.get())).normalize();
       isWithin = RodaCoreFactory.checkPathIsWithin(resolvedBasePath, basePath);
-      if(resolvedBasePath.equals(basePath)){
+      if (resolvedBasePath.equals(basePath)) {
         normalizedRelativePath = Optional.empty();
-      }else{
+      } else {
         normalizedRelativePath = Optional.of(basePath.relativize(resolvedBasePath).toString());
       }
-    }else{
+    } else {
       isWithin = true;
       normalizedRelativePath = Optional.empty();
     }
@@ -239,7 +239,7 @@ public class TransferredResourcesScanner {
       if (!RodaCoreFactory.getTransferredResourcesScannerUpdateStatus(folderRelativePath)) {
         if (index != null) {
           ReindexTransferredResourcesRunnable reindexRunnable = new ReindexTransferredResourcesRunnable(index, basePath,
-                  folderRelativePath);
+            folderRelativePath);
 
           if (waitToFinish) {
             reindexRunnable.run();
@@ -254,9 +254,11 @@ public class TransferredResourcesScanner {
         LOGGER.warn("Could not update transferred resources because it is still updating");
         throw new IsStillUpdatingException("Could not update transferred resources because it is still updating");
       }
-    }else{
-        LOGGER.warn("Request trying to access folders outside the transfer resources folder ({})", folderRelativePath.get());
-        throw new AuthorizationDeniedException("Request trying to access folders outside the transfer resources folder (" + folderRelativePath.get() + ")");
+    } else {
+      LOGGER.warn("Request trying to access folders outside the transfer resources folder ({})",
+        folderRelativePath.get());
+      throw new AuthorizationDeniedException(
+        "Request trying to access folders outside the transfer resources folder (" + folderRelativePath.get() + ")");
     }
     return normalizedRelativePath;
   }
@@ -268,7 +270,7 @@ public class TransferredResourcesScanner {
 
     if (folderRelativePath.isPresent()) {
       Path resolvedBasePath = basePath.resolve(Paths.get(folderRelativePath.get()));
-      boolean isWithin = RodaCoreFactory.checkPathIsWithin(resolvedBasePath,basePath);
+      boolean isWithin = RodaCoreFactory.checkPathIsWithin(resolvedBasePath, basePath);
 
       if (isWithin) {
         Path parent = resolvedBasePath.getParent();
@@ -277,8 +279,10 @@ public class TransferredResourcesScanner {
         payload.writeToPath(parent.resolve(name));
         updateTransferredResources(Optional.ofNullable(parentToBase.toString()), waitToFinish);
       } else {
-        LOGGER.warn("Request trying to access folders outside the transfer resources folder ({})", folderRelativePath.get());
-        throw new AuthorizationDeniedException("Request trying to access folders outside the transfer resources folder (" + folderRelativePath.get() + ")");
+        LOGGER.warn("Request trying to access folders outside the transfer resources folder ({})",
+          folderRelativePath.get());
+        throw new AuthorizationDeniedException(
+          "Request trying to access folders outside the transfer resources folder (" + folderRelativePath.get() + ")");
       }
     }
   }

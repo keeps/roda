@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This is the Clam anti-virus.
- * 
+ *
  * @author Rui Castro
  */
 @SuppressWarnings("unused")
@@ -117,12 +117,12 @@ public class ClamAntiVirus implements AntiVirus {
 
   /**
    * Performs a virus check on the specified path.
-   * 
+   *
    * @param path
    *          a path to scan.
-   * 
+   *
    * @return the results of the virus check as a {@link VirusCheckResult}.
-   * 
+   *
    * @throws RuntimeException
    *           if some problem prevented the virus check from run a normal test.
    * @see AntiVirus
@@ -164,7 +164,7 @@ public class ClamAntiVirus implements AntiVirus {
       .getString("core.plugins.internal.virus_check.clamav.get_version", "clamscan --version");
     List<String> command = new ArrayList<>(Arrays.asList(clamavGetVersion.split(" ")));
     try {
-      String executeOutput = CommandUtility.execute(command,false);
+      String executeOutput = CommandUtility.execute(command, false);
       if (executeOutput.contains("\n")) {
         return executeOutput.split("\n")[0];
       }

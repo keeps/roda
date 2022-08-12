@@ -915,7 +915,8 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     T selectedObject = getSelectionModel().getSelectedObject();
     if (selectedObject != null) {
       int index = getIndexOfVisibleObject(selectedObject);
-      ret = ListSelectionUtils.create(selectedObject, getFilter(), getJustActive(), getFacets(), getSorter(), index, getResult().getTotalCount());
+      ret = ListSelectionUtils.create(selectedObject, getFilter(), getJustActive(), getFacets(), getSorter(), index,
+        getResult().getTotalCount());
     }
     return ret;
   }

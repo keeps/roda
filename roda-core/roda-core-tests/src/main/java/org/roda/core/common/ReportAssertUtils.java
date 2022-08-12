@@ -39,7 +39,8 @@ public final class ReportAssertUtils {
     }
 
     for (Report report : reports) {
-      if (!PluginState.SUCCESS.equals(report.getPluginState()) && !PluginState.PARTIAL_SUCCESS.equals(report.getPluginState())) {
+      if (!PluginState.SUCCESS.equals(report.getPluginState())
+        && !PluginState.PARTIAL_SUCCESS.equals(report.getPluginState())) {
         Assert.fail("Report failure: " + report);
       }
 

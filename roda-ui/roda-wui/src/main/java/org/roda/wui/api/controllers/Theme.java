@@ -38,11 +38,11 @@ public class Theme extends RodaWuiController {
     URL url = RodaCoreFactory.getConfigurationFile(RodaConstants.CORE_THEME_FOLDER + "/" + id);
 
     if (url != null) {
-      ret = Pair.of(id, () -> RodaCoreFactory.getConfigurationFileAsStream(
-              RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER), id));
+      ret = Pair.of(id, () -> RodaCoreFactory
+        .getConfigurationFileAsStream(RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER), id));
     } else {
       ret = Pair.of(fallbackResourceId, () -> RodaCoreFactory.getConfigurationFileAsStream(
-              RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER), fallbackResourceId));
+        RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER), fallbackResourceId));
     }
 
     return ret;

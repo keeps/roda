@@ -49,7 +49,7 @@ public class DisposalTransitiveHoldAIPMetadata implements Serializable {
   }
 
   @JsonIgnore
-  public void addFromAip(String aipId){
+  public void addFromAip(String aipId) {
     this.fromAIPs.add(aipId);
   }
 
@@ -80,11 +80,11 @@ public class DisposalTransitiveHoldAIPMetadata implements Serializable {
   }
 
   public String findAIP(String aipId) {
-    if(fromAIPs != null && !fromAIPs.isEmpty()) {
+    if (fromAIPs != null && !fromAIPs.isEmpty()) {
       for (String fromAIP : fromAIPs) {
-       if(fromAIP.equals(aipId)){
-         return aipId;
-       }
+        if (fromAIP.equals(aipId)) {
+          return aipId;
+        }
       }
     }
     return null;

@@ -12,7 +12,7 @@ import org.roda.core.data.v2.jobs.Report;
 
 /**
  * Thrown to indicate that some went wrong inside a {@link Plugin}.
- * 
+ *
  * @author Rui Castro
  */
 public class PluginException extends RODAException {
@@ -29,7 +29,7 @@ public class PluginException extends RODAException {
 
   /**
    * Constructs a new {@link PluginException} with the given error message.
-   * 
+   *
    * @param message
    *          the error message.
    */
@@ -39,7 +39,7 @@ public class PluginException extends RODAException {
 
   /**
    * Constructs a new {@link PluginException} with the given cause exception.
-   * 
+   *
    * @param cause
    *          the cause exception.
    */
@@ -50,7 +50,7 @@ public class PluginException extends RODAException {
   /**
    * Constructs a new {@link PluginException} with the given error message and
    * cause exception.
-   * 
+   *
    * @param message
    *          the error message.
    * @param cause
@@ -63,7 +63,7 @@ public class PluginException extends RODAException {
   /**
    * Constructs a new {@link PluginException} with the given error message and
    * cause exception.
-   * 
+   *
    * @param message
    *          the error message.
    * @param cause

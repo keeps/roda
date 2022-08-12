@@ -63,7 +63,7 @@ public class CreateDisposalConfirmation extends Composite {
 
   private static final Filter SHOW_RECORDS_TO_DESTROY = new Filter(
     new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_ACTION, DisposalActionCode.DESTROY.name()),
-      new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name()),
+    new SimpleFilterParameter(RodaConstants.AIP_STATE, AIPState.ACTIVE.name()),
     new DateIntervalFilterParameter(RodaConstants.AIP_OVERDUE_DATE, RodaConstants.AIP_OVERDUE_DATE, null,
       formatter.parse(formatter.format(new Date()))),
     new SimpleFilterParameter(RodaConstants.AIP_DISPOSAL_HOLD_STATUS, Boolean.FALSE.toString()),

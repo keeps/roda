@@ -12,8 +12,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -25,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * @author Rui Castro
- * 
+ *
  */
 @javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_LOG)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -48,7 +46,7 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
   private List<LogEntryParameter> parameters;
 
   private LogEntryState state;
-  
+
   private Map<String, Object> fields;
 
   /**
@@ -60,7 +58,7 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
 
   /**
    * Constructs a new {@link LogEntry} cloning an existing {@link LogEntry}.
-   * 
+   *
    * @param logEntry
    *          the {@link LogEntry} to clone.
    */
@@ -73,7 +71,7 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
 
   /**
    * Constructs a new {@link LogEntry} from the specified parameters.
-   * 
+   *
    * @param id
    *          the unique identifier.
    * @param address
@@ -90,8 +88,8 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
    *          the ID of the object related with this action.
    */
   public LogEntry(String uuid, String id, String address, Date datetime, String username, String actionComponent,
-    String actionMethod, List<LogEntryParameter> parameters, String relatedObjectID, long duration,
-    LogEntryState state, String instanceId, long lineNumber) {
+    String actionMethod, List<LogEntryParameter> parameters, String relatedObjectID, long duration, LogEntryState state,
+    String instanceId, long lineNumber) {
 
     setId(id);
     setAddress(address);
@@ -135,7 +133,8 @@ public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
   }
 
   /**
-   * @param fields the fields to set
+   * @param fields
+   *          the fields to set
    */
   public void setFields(Map<String, Object> fields) {
     this.fields = fields;

@@ -29,7 +29,7 @@ public abstract class RangeFilterParameter<T extends Serializable> extends Filte
   /**
    * Constructs a {@link RangeFilterParameter} cloning an existing
    * {@link RangeFilterParameter}.
-   * 
+   *
    * @param rangeFilterParameter
    *          the {@link RangeFilterParameter} to clone.
    */
@@ -39,7 +39,7 @@ public abstract class RangeFilterParameter<T extends Serializable> extends Filte
 
   /**
    * Constructs a {@link RangeFilterParameter} with the given parameters.
-   * 
+   *
    * @param name
    * @param fromValue
    * @param toValue

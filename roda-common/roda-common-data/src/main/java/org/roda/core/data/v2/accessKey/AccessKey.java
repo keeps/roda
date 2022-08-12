@@ -153,23 +153,35 @@ public class AccessKey implements IsModelObject {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
 
     AccessKey that = (AccessKey) o;
 
-    if (id != null ? !id.equals(that.id) : that.id != null) return false;
-    if (name != null ? !name.equals(that.name) : that.name != null) return false;
-    if (key != null ? !key.equals(that.key) : that.key != null) return false;
-    if (lastUsageDate != null ? !lastUsageDate.equals(that.lastUsageDate) : that.lastUsageDate != null) return false;
+    if (id != null ? !id.equals(that.id) : that.id != null)
+      return false;
+    if (name != null ? !name.equals(that.name) : that.name != null)
+      return false;
+    if (key != null ? !key.equals(that.key) : that.key != null)
+      return false;
+    if (lastUsageDate != null ? !lastUsageDate.equals(that.lastUsageDate) : that.lastUsageDate != null)
+      return false;
     if (expirationDate != null ? !expirationDate.equals(that.expirationDate) : that.expirationDate != null)
       return false;
-    if (userName != null ? !userName.equals(that.userName) : that.userName != null) return false;
-    if (status != that.status) return false;
-    if (claims != null ? !claims.equals(that.claims) : that.claims != null) return false;
-    if (createdOn != null ? !createdOn.equals(that.createdOn) : that.createdOn != null) return false;
-    if (createdBy != null ? !createdBy.equals(that.createdBy) : that.createdBy != null) return false;
-    if (updatedOn != null ? !updatedOn.equals(that.updatedOn) : that.updatedOn != null) return false;
+    if (userName != null ? !userName.equals(that.userName) : that.userName != null)
+      return false;
+    if (status != that.status)
+      return false;
+    if (claims != null ? !claims.equals(that.claims) : that.claims != null)
+      return false;
+    if (createdOn != null ? !createdOn.equals(that.createdOn) : that.createdOn != null)
+      return false;
+    if (createdBy != null ? !createdBy.equals(that.createdBy) : that.createdBy != null)
+      return false;
+    if (updatedOn != null ? !updatedOn.equals(that.updatedOn) : that.updatedOn != null)
+      return false;
     return updatedBy != null ? updatedBy.equals(that.updatedBy) : that.updatedBy == null;
   }
 

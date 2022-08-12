@@ -40,7 +40,8 @@ public class RodaExceptionMapper implements ExceptionMapper<RODAException> {
   public Response toResponse(RODAException e) {
     ContainerRequest containerRequest = containerRequestProvider.get();
     String parameter = containerRequest.getProperty("acceptFormat") != null
-      ? (String) containerRequest.getProperty("acceptFormat") : "";
+      ? (String) containerRequest.getProperty("acceptFormat")
+      : "";
     String header = containerRequest.getHeaderString("Accept");
     String mediaType = ApiUtils.getMediaType(parameter, header);
 
@@ -64,9 +65,10 @@ public class RodaExceptionMapper implements ExceptionMapper<RODAException> {
     } else if (e instanceof NotFoundException) {
       responseBuilder = Response.status(Status.NOT_FOUND)
         .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, message));
-    } else if (e instanceof AlreadyExistsException || e instanceof JobAlreadyStartedException || e instanceof IsStillUpdatingException) {
+    } else if (e instanceof AlreadyExistsException || e instanceof JobAlreadyStartedException
+      || e instanceof IsStillUpdatingException) {
       responseBuilder = Response.status(Status.CONFLICT)
-          .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, message));
+        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, message));
     } else {
       responseBuilder = Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()));
     }

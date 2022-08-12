@@ -29,8 +29,7 @@ import config.i18n.client.ClientMessages;
 public class AccessKeyDialogs {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
-  public static void showAccessKeyDialog(String title, AccessKey accessKey,
-                                         final AsyncCallback<Boolean> callback) {
+  public static void showAccessKeyDialog(String title, AccessKey accessKey, final AsyncCallback<Boolean> callback) {
     final DialogBox dialogBox = new DialogBox(false, true);
     final Button closeButton = new Button(messages.closeButton());
     final Button copyAndCloseButton = new Button(messages.copyAndCloseButton());

@@ -15,9 +15,9 @@ import org.roda.core.storage.fs.FSPathContentPayload;
 
 /**
  * Information for zipping
- * 
+ *
  * @author Luis Faria
- * 
+ *
  */
 public class ZipEntryInfo {
   private final String name;
@@ -26,7 +26,7 @@ public class ZipEntryInfo {
 
   /**
    * Create a new zip entry info
-   * 
+   *
    * @param name
    * @param file
    * @throws FileNotFoundException
@@ -37,7 +37,7 @@ public class ZipEntryInfo {
 
   /**
    * Create a new zip entry info
-   * 
+   *
    * @param name
    * @param payload
    */
@@ -48,7 +48,7 @@ public class ZipEntryInfo {
 
   /**
    * Get zip entry name
-   * 
+   *
    * @return the name of the zip entry
    */
   public String getName() {

@@ -39,7 +39,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import config.i18n.client.ClientMessages;
 
 /**
- * 
+ *
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
@@ -76,7 +76,8 @@ public class SimpleJobReportList extends AsyncTableCell<IndexedReport> {
     this.pluginsInfo = Collections.emptyMap();
   }
 
-  public SimpleJobReportList(Map<String, PluginInfo> pluginsInfo, boolean insideJob, boolean jobRunning, boolean jobComplex) {
+  public SimpleJobReportList(Map<String, PluginInfo> pluginsInfo, boolean insideJob, boolean jobRunning,
+    boolean jobComplex) {
     super();
     this.pluginsInfo = pluginsInfo;
     this.insideJob = insideJob;
@@ -191,7 +192,7 @@ public class SimpleJobReportList extends AsyncTableCell<IndexedReport> {
               break;
             case SKIPPED:
               ret = SafeHtmlUtils.fromSafeConstant(
-                  "<span class='label-warning'>" + messages.pluginStateMessage(PluginState.SKIPPED) + "</span>");
+                "<span class='label-warning'>" + messages.pluginStateMessage(PluginState.SKIPPED) + "</span>");
               break;
             case FAILURE:
             default:

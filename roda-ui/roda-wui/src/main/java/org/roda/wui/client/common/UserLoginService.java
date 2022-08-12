@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.common;
 
@@ -24,7 +24,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public interface UserLoginService extends RemoteService {
 
@@ -40,21 +40,21 @@ public interface UserLoginService extends RemoteService {
 
     /**
      * Get service instance
-     * 
+     *
      * @return
      */
     public static UserLoginServiceAsync getInstance() {
 
       UserLoginServiceAsync instance = (UserLoginServiceAsync) GWT.create(UserLoginService.class);
       ServiceDefTarget target = (ServiceDefTarget) instance;
-      target.setServiceEntryPoint(GWT.getHostPageBaseURL()  + RodaConstants.GWT_RPC_BASE_URL + SERVICE_URI);
+      target.setServiceEntryPoint(GWT.getHostPageBaseURL() + RodaConstants.GWT_RPC_BASE_URL + SERVICE_URI);
       return instance;
     }
   }
 
   /**
    * Get the authenticated user
-   * 
+   *
    * @return
    * @throws RODAException
    */
@@ -62,13 +62,12 @@ public interface UserLoginService extends RemoteService {
 
   /**
    * Login into RODA Core
-   * 
+   *
    * @param username
    * @param password
    * @return
    * @throws RODAException
    */
   public User login(String username, String password) throws AuthenticationDeniedException, GenericException;
-
 
 }

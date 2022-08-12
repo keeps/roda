@@ -1,28 +1,27 @@
-<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
-             xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder' xmlns:g='urn:import:com.google.gwt.user.client.ui'>
 
-    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
-    <g:FlowPanel addStyleNames="wui-disposal-confirmation-panel" ui:field="disposalConfirmationPanel">
-        <g:FlowPanel addStyleNames="panel">
-            <g:FlowPanel addStyleNames="panel-heading">
-                <g:Label addStyleNames="panel-title">
-                    <ui:text from='{messages.disposalConfirmationAssociationInformationTitle}'/>
-                </g:Label>
-            </g:FlowPanel>
-            <g:FlowPanel addStyleNames="panel-body" ui:field="content">
-                <g:FlowPanel addStyleNames="field" ui:field="confirmationInfo">
-                    <g:Label addStyleNames="label">
-                        <ui:text from='{messages.disposalConfirmationAssociationTitle}'/>
-                    </g:Label>
-                </g:FlowPanel>
-                <g:FlowPanel addStyleNames="field">
-                    <g:Label addStyleNames="label">
-                        <ui:text from='{messages.disposalConfirmationCreationDate}'/>
-                    </g:Label>
-                    <g:Label addStyleNames="value" ui:field="disposalConfirmationCreationDate"/>
-                </g:FlowPanel>
-            </g:FlowPanel>
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+	<g:FlowPanel addStyleNames="wui-disposal-confirmation-panel" ui:field="disposalConfirmationPanel">
+		<g:FlowPanel addStyleNames="panel">
+			<g:FlowPanel addStyleNames="panel-heading">
+				<g:Label addStyleNames="panel-title">
+					<ui:text from='{messages.disposalConfirmationAssociationInformationTitle}' />
+				</g:Label>
+			</g:FlowPanel>
+			<g:FlowPanel addStyleNames="panel-body" ui:field="content">
+				<g:FlowPanel addStyleNames="field" ui:field="confirmationInfo">
+					<g:Label addStyleNames="label">
+						<ui:text from='{messages.disposalConfirmationAssociationTitle}' />
+					</g:Label>
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="field">
+					<g:Label addStyleNames="label">
+						<ui:text from='{messages.disposalConfirmationCreationDate}' />
+					</g:Label>
+					<g:Label addStyleNames="value" ui:field="disposalConfirmationCreationDate" />
+				</g:FlowPanel>
+			</g:FlowPanel>
 
-        </g:FlowPanel>
-    </g:FlowPanel>
+		</g:FlowPanel>
+	</g:FlowPanel>
 </ui:UiBinder>

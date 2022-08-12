@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.common.client.widgets;
 
@@ -19,7 +19,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class LoadingPopup extends PopupPanel {
 
@@ -33,7 +33,7 @@ public class LoadingPopup extends PopupPanel {
 
   /**
    * Show loading popup
-   * 
+   *
    * @param widgetCenter
    *          widget in which the popup will center
    */
@@ -99,7 +99,7 @@ public class LoadingPopup extends PopupPanel {
 
   /**
    * Center the loading popup on a widget
-   * 
+   *
    * @param w
    */
   public void centerOn(Widget w) {

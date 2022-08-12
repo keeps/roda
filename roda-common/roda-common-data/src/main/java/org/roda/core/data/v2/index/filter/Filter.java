@@ -16,7 +16,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 /**
  * This is a filter of data. It's used by some service methods that deal with
  * sets or lists, to filter the elements in the set or list.
- * 
+ *
  * @author Rui Castro
  * @author Luis Faria <lfaria@keep.pt>
  */
@@ -38,7 +38,7 @@ public class Filter implements Serializable {
 
   /**
    * Constructs a {@link Filter} cloning an existing {@link Filter}.
-   * 
+   *
    * @param filter
    *          the {@link Filter} to clone.
    */
@@ -48,7 +48,7 @@ public class Filter implements Serializable {
 
   /**
    * Constructs a {@link Filter} with a single parameter.
-   * 
+   *
    * @param parameter
    */
   public Filter(FilterParameter parameter) {
@@ -65,7 +65,7 @@ public class Filter implements Serializable {
 
   /**
    * Constructs a {@link Filter} with the given parameters.
-   * 
+   *
    * @param parameters
    */
   public Filter(List<FilterParameter> parameters) {
@@ -112,7 +112,7 @@ public class Filter implements Serializable {
 
   /**
    * Gets the list of {@link FilterParameter}s.
-   * 
+   *
    * @return an array of {@link FilterParameter} with this filter parameters.
    */
   public List<FilterParameter> getParameters() {
@@ -121,7 +121,7 @@ public class Filter implements Serializable {
 
   /**
    * Sets this filter's {@link FilterParameter}s.
-   * 
+   *
    * @param parameters
    *          an array of {@link FilterParameter} to set.
    */
@@ -132,7 +132,7 @@ public class Filter implements Serializable {
 
   /**
    * Adds the given parameter.
-   * 
+   *
    * @param parameter
    * @return
    */

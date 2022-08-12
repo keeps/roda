@@ -37,7 +37,7 @@ public class SchemaBuilder {
 
   /**
    * @see https://lucene.apache.org/solr/guide/defining-fields.html
-   * 
+   *
    * @param name
    * @param type
    * @return

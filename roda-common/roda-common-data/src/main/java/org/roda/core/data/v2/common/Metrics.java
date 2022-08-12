@@ -10,8 +10,6 @@ package org.roda.core.data.v2.common;
 import java.util.HashMap;
 import java.util.Map;
 
-
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 

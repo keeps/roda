@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:u="urn:import:org.roda.wui.client.management">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
@@ -32,8 +31,7 @@
 				</g:Label>
 			</g:FlowPanel>
 		</g:FlowPanel>
-		<g:FlowPanel ui:field="permissionsSelectPanel"
-			addStyleNames="row full_width no_padding {style.section}">
+		<g:FlowPanel ui:field="permissionsSelectPanel" addStyleNames="row full_width no_padding {style.section}">
 			<g:FlowPanel addStyleNames="col_12">
 				<g:Label styleName="h4">
 					<ui:text from="{messages.groupPermissions}" />

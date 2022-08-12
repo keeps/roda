@@ -1,64 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:r="urn:import:org.roda.wui.client.disposal.rule"
->
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:r="urn:import:org.roda.wui.client.disposal.rule">
 
-    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
-    <ui:style>
+	<ui:style>
         .section {
         margin-top: 20px;
         }
     </ui:style>
 
-    <g:FlowPanel styleName="wui-disposal-rule-data wui-user-data" addStyleNames="wrapper skip_padding">
-        <g:FlowPanel addStyleNames="row full_width no_padding">
-            <g:FlowPanel addStyleNames="wui-data-panel">
-                <g:FlowPanel addStyleNames="wui-error-panel">
-                    <g:HTML ui:field="errors"/>
-                </g:FlowPanel>
+	<g:FlowPanel styleName="wui-disposal-rule-data wui-user-data" addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="row full_width no_padding">
+			<g:FlowPanel addStyleNames="wui-data-panel">
+				<g:FlowPanel addStyleNames="wui-error-panel">
+					<g:HTML ui:field="errors" />
+				</g:FlowPanel>
 
-                <!-- Title -->
-                <g:Label addStyleNames="form-label">
-                    <ui:text from='{messages.disposalRuleTitle}'/>
+				<!-- Title -->
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{messages.disposalRuleTitle}' />
                     *
                 </g:Label>
-                <g:TextBox title="{messages.disposalRuleTitle}" ui:field="title" addStyleNames="form-textbox"/>
-                <g:Label ui:field="titleError" addStyleNames="form-label-error"/>
+				<g:TextBox title="{messages.disposalRuleTitle}" ui:field="title" addStyleNames="form-textbox" />
+				<g:Label ui:field="titleError" addStyleNames="form-label-error" />
 
-                <!-- Description -->
-                <g:Label addStyleNames="form-label">
-                    <ui:text from='{messages.disposalRuleDescription}'/>
-                </g:Label>
-                <g:TextArea title="{messages.disposalRuleDescription}" ui:field="description"
-                            addStyleNames="form-textbox disposalRuleDescription"/>
+				<!-- Description -->
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{messages.disposalRuleDescription}' />
+				</g:Label>
+				<g:TextArea title="{messages.disposalRuleDescription}" ui:field="description"
+					addStyleNames="form-textbox disposalRuleDescription" />
 
-                <!-- Schedules -->
-                <g:Label addStyleNames="form-label" ui:field="disposalSchedulesListLabel">
-                    <ui:text from='{messages.disposalRuleScheduleName}'/>
+				<!-- Schedules -->
+				<g:Label addStyleNames="form-label" ui:field="disposalSchedulesListLabel">
+					<ui:text from='{messages.disposalRuleScheduleName}' />
                     *
                 </g:Label>
-                <g:ListBox addStyleNames="form-textbox" ui:field="disposalSchedulesList"/>
-                <g:Label ui:field="disposalSchedulesListError" addStyleNames="form-label-error"/>
+				<g:ListBox addStyleNames="form-textbox" ui:field="disposalSchedulesList" />
+				<g:Label ui:field="disposalSchedulesListError" addStyleNames="form-label-error" />
 
-                <!-- Condition Types -->
-                <g:Label ui:field="conditionTypeListLabel" addStyleNames="form-label">
-                    <ui:text from='{messages.disposalRuleType}'/>
+				<!-- Condition Types -->
+				<g:Label ui:field="conditionTypeListLabel" addStyleNames="form-label">
+					<ui:text from='{messages.disposalRuleType}' />
                     *
                 </g:Label>
-                <g:ListBox addStyleNames="form-textbox" ui:field="conditionTypeList"/>
-                <g:Label ui:field="conditionTypeListError" addStyleNames="form-label-error"/>
+				<g:ListBox addStyleNames="form-textbox" ui:field="conditionTypeList" />
+				<g:Label ui:field="conditionTypeListError" addStyleNames="form-label-error" />
 
-                <!-- Condition Values -->
-                <r:ChildOfPanel ui:field="childOfPanel"/>
-                <r:MetadataFieldsPanel ui:field="metadataFieldsPanel"/>
+				<!-- Condition Values -->
+				<r:ChildOfPanel ui:field="childOfPanel" />
+				<r:MetadataFieldsPanel ui:field="metadataFieldsPanel" />
 
-                <g:Label styleName="wui-required-fields-note">
-                    <ui:text from="{messages.disposalConfirmationDataNote}"/>
-                </g:Label>
-            </g:FlowPanel>
-        </g:FlowPanel>
-    </g:FlowPanel>
+				<g:Label styleName="wui-required-fields-note">
+					<ui:text from="{messages.disposalConfirmationDataNote}" />
+				</g:Label>
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</g:FlowPanel>
 </ui:UiBinder>

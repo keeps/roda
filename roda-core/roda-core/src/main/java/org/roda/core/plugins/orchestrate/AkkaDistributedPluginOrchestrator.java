@@ -52,9 +52,9 @@ import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 
 /*
- * Based on 
+ * Based on
  * > http://www.typesafe.com/activator/template/akka-distributed-workers
- * > https://github.com/typesafehub/activator-akka-distributed-workers-java 
+ * > https://github.com/typesafehub/activator-akka-distributed-workers-java
  * */
 public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin implements PluginOrchestrator {
   private final IndexService index;

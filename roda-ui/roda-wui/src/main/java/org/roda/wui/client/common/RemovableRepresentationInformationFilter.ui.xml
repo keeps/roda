@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<g:FlowPanel>
-		<g:ListBox title="RODA object" addStyleNames="form-selectbox form-ri-select-boxes" ui:field="items"></g:ListBox>
-		<g:ListBox title="RODA object related fields" addStyleNames="form-selectbox form-ri-select-boxes" ui:field="fields"></g:ListBox>
-		<g:TextBox title="Specific value for field" addStyleNames="form-textbox form-ri-text-boxes" ui:field="value"></g:TextBox>
-		<g:Anchor addStyleNames="toolbarLink toolbarLinkSmall" ui:field="removeDynamicButton"><i class="fa fa-close"></i></g:Anchor>
+		<g:ListBox title="RODA object" addStyleNames="form-selectbox form-ri-select-boxes" ui:field="items">
+		</g:ListBox>
+		<g:ListBox title="RODA object related fields" addStyleNames="form-selectbox form-ri-select-boxes"
+			ui:field="fields">
+		</g:ListBox>
+		<g:TextBox title="Specific value for field" addStyleNames="form-textbox form-ri-text-boxes" ui:field="value">
+		</g:TextBox>
+		<g:Anchor addStyleNames="toolbarLink toolbarLinkSmall" ui:field="removeDynamicButton">
+			<i class="fa fa-close">
+			</i>
+		</g:Anchor>
 	</g:FlowPanel>
 </ui:UiBinder>

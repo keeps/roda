@@ -40,12 +40,15 @@ public class AccessToken implements Serializable {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
 
     AccessToken that = (AccessToken) o;
 
-    if (expiresIn != that.expiresIn) return false;
+    if (expiresIn != that.expiresIn)
+      return false;
     return token != null ? token.equals(that.token) : that.token == null;
   }
 

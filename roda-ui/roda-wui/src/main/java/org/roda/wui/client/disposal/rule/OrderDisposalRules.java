@@ -292,7 +292,7 @@ public class OrderDisposalRules extends Composite {
             @Override
             public void onSuccess(Void unused) {
               Toast.showInfo(messages.updateDisposalRulesOrderSuccessTitle(),
-                      messages.updateDisposalRulesOrderSuccessMessage());
+                messages.updateDisposalRulesOrderSuccessMessage());
               DisposalRuleActions.applyDisposalRulesAction();
             }
           });

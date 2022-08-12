@@ -125,8 +125,7 @@ public class IndexedPreservationAgent implements IsIndexed, HasId {
 
   @Override
   public List<String> toCsvHeaders() {
-    return Arrays.asList("id", "name", "type", "note", "extension", "roles", "instanceId", "instanceName",
-      "createdOn");
+    return Arrays.asList("id", "name", "type", "note", "extension", "roles", "instanceId", "instanceName", "createdOn");
   }
 
   @Override

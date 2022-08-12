@@ -104,7 +104,7 @@ public class NotificationCollection extends AbstractSolrCollection<Notification,
     doc.addField(RodaConstants.INDEX_INSTANCE_ID, notification.getInstanceId());
 
     String name = IndexUtils.giveNameFromLocalInstanceIdentifier(notification.getInstanceId());
-    
+
     doc.addField(RodaConstants.INDEX_INSTANCE_NAME, name);
 
     return doc;

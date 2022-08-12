@@ -19,14 +19,14 @@ import org.roda.core.data.v2.common.Pair;
 /**
  * A {@link HttpServletRequestWrapper} that provides a method to access username
  * and password from Basic auth information.
- * 
+ *
  * @author Rui Castro <rui.castro@gmail.com>
  */
 public class BasicAuthRequestWrapper extends HttpServletRequestWrapper {
 
   /**
    * Constructor.
-   * 
+   *
    * @param request
    *          the HTTP request.
    */
@@ -38,7 +38,7 @@ public class BasicAuthRequestWrapper extends HttpServletRequestWrapper {
    * Returns a {@link Pair} of {@link String}s with the username and password
    * contained in the HTTP header <strong>Authorization</strong> or
    * <code>null</code> if the credentials could not be extracted.
-   * 
+   *
    * @return a {@link Pair} with username and password.
    */
   public Pair<String, String> getCredentials() {

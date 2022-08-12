@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This is the RODA protocol manager. It is responsible for loading
  * {@link Protocol} s.
- * 
+ *
  * @author Gabriel Barros <g.santos.barros@gmail.com>
  */
 public class ProtocolManager {
@@ -78,7 +78,7 @@ public class ProtocolManager {
 
   /**
    * Constructs a new {@link ProtocolManager}.
-   * 
+   *
    * @throws ProtocolManagerException
    */
   private ProtocolManager() throws ProtocolManagerException {
@@ -87,9 +87,9 @@ public class ProtocolManager {
 
   /**
    * Gets the default {@link ProtocolManager}.
-   * 
+   *
    * @return the default {@link ProtocolManager}.
-   * 
+   *
    * @throws ProtocolManagerException
    */
   public static synchronized ProtocolManager instantiateProtocolManager(Path rodaConfigPath, Path rodaProtocolsPath)
@@ -121,7 +121,7 @@ public class ProtocolManager {
 
   /**
    * Returns all {@link Protocol}s present in all jars.
-   * 
+   *
    * @return a {@link List} of {@link Protocol}s.
    */
   public List<Protocol> getProtocols() {
@@ -145,10 +145,10 @@ public class ProtocolManager {
 
   /**
    * Returns an instance of the {@link Protocol} with the specified URI
-   * 
+   *
    * @param uri
    *          the Location of the resource.
-   * 
+   *
    * @return a {@link Protocol} or <code>null</code> if the specified schema has
    *         not been registered as a protocol {@link Protocol} or something went
    *         wrong during its init().

@@ -17,7 +17,7 @@ import org.roda.core.data.v2.index.sublist.Sublist;
 
 /**
  * A request to a find operation.
- * 
+ *
  * @author Rui Castro <rui.castro@gmail.com>
  */
 public class FindRequest extends CountRequest {
@@ -67,7 +67,7 @@ public class FindRequest extends CountRequest {
 
   /**
    * Constructor.
-   * 
+   *
    * @param classToReturn
    *          Class name of resources to return.
    * @param filter

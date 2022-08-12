@@ -43,17 +43,18 @@ public class EditDisposalHold extends Composite {
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
-        BrowserService.Util.getInstance().retrieveDisposalHold(historyTokens.get(0), new NoAsyncCallback<DisposalHold>() {
-          @Override
-          public void onSuccess(DisposalHold result) {
-            if (DisposalHoldState.LIFTED.equals(result.getState())) {
-              HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
-            } else {
-              EditDisposalHold panel = new EditDisposalHold(result);
-              callback.onSuccess(panel);
+        BrowserService.Util.getInstance().retrieveDisposalHold(historyTokens.get(0),
+          new NoAsyncCallback<DisposalHold>() {
+            @Override
+            public void onSuccess(DisposalHold result) {
+              if (DisposalHoldState.LIFTED.equals(result.getState())) {
+                HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+              } else {
+                EditDisposalHold panel = new EditDisposalHold(result);
+                callback.onSuccess(panel);
+              }
             }
-          }
-        });
+          });
       }
     }
 

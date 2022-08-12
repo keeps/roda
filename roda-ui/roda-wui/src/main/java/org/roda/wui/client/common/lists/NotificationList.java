@@ -57,7 +57,6 @@ public class NotificationList extends AsyncTableCell<Notification> {
     options.withFieldsToReturn(fieldsToReturn);
   }
 
-
   @Override
   protected void configureDisplay(CellTable<Notification> display) {
     fromUser = new TextColumn<Notification>() {

@@ -151,8 +151,8 @@ public class OnOffFilter implements Filter {
   }
 
   /**
-   * {@link FilterConfig} implementation that combines web.xml &lt;init-param>
-   * and RODA configuration values.
+   * {@link FilterConfig} implementation that combines web.xml &lt;init-param> and
+   * RODA configuration values.
    */
   private class OnOffFilterConfig implements FilterConfig {
     /**

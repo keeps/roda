@@ -76,7 +76,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public interface BrowserServiceAsync {
 

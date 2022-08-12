@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Rui Castro
  * @author Hélder Silva <hsilva@keep.pt>
- * 
+ *
  */
 public class FileUtility {
 
@@ -63,7 +63,7 @@ public class FileUtility {
   }
 
   /**
-   * 
+   *
    * @param is
    * @param digestAlgorithm
    * @return a {@link java.lang.String} with calculated checksum in hexadecimal.
@@ -75,7 +75,7 @@ public class FileUtility {
   }
 
   /**
-   * 
+   *
    * @param is
    * @param digestAlgorithm
    * @return a byte array with the calculated digest.
@@ -154,7 +154,7 @@ public class FileUtility {
   /**
    * Convert a byte[] array to readable string format. This makes the "hex"
    * readable!
-   * 
+   *
    * @return result String buffer in String format
    * @param in
    *          byte[] buffer to convert to string format
@@ -199,7 +199,7 @@ public class FileUtility {
 
   /**
    * Returns a list with all the files inside a given directory.
-   * 
+   *
    * @param dir
    *          the directory to list the contents.
    * @return a list with all the files and directories.
@@ -223,10 +223,10 @@ public class FileUtility {
 
   /**
    * Gets file extension from filename
-   * 
+   *
    * @param filename
-   * @return file extension if filename has at least one dot ; otherwise an
-   *         empty string
+   * @return file extension if filename has at least one dot ; otherwise an empty
+   *         string
    */
   public static String getFileNameExtension(String filename) {
     String res = "";

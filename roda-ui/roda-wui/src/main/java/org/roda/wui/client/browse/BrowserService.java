@@ -185,10 +185,11 @@ public interface BrowserService extends RemoteService {
   void stopJob(String jobId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException;
 
-  void approveJob(SelectedItems<Job> jobs) throws RequestNotValidException, GenericException, NotFoundException, JobAlreadyStartedException, AuthorizationDeniedException, JobStateNotPendingException;
+  void approveJob(SelectedItems<Job> jobs) throws RequestNotValidException, GenericException, NotFoundException,
+    JobAlreadyStartedException, AuthorizationDeniedException, JobStateNotPendingException;
 
-  void rejectJob(SelectedItems<Job> jobs, String details) throws RequestNotValidException, GenericException, NotFoundException,
-          JobAlreadyStartedException, AuthorizationDeniedException, JobStateNotPendingException;
+  void rejectJob(SelectedItems<Job> jobs, String details) throws RequestNotValidException, GenericException,
+    NotFoundException, JobAlreadyStartedException, AuthorizationDeniedException, JobStateNotPendingException;
 
   List<PluginInfo> retrievePluginsInfo(List<PluginType> type);
 

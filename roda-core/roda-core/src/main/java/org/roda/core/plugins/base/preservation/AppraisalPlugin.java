@@ -135,10 +135,11 @@ public class AppraisalPlugin extends AbstractPlugin<AIP> {
       String userAgentId;
       try {
         PreservationMetadata pm = PremisV3Utils.createOrUpdatePremisUserAgentBinary(job.getUsername(), model, index,
-          true,job);
-        linkingIdentifierAgent.setValue( pm.getId());
+          true, job);
+        linkingIdentifierAgent.setValue(pm.getId());
       } catch (AlreadyExistsException e) {
-        linkingIdentifierAgent.setValue(IdUtils.getUserAgentId(job.getUsername(), RODAInstanceUtils.getLocalInstanceIdentifier()));
+        linkingIdentifierAgent
+          .setValue(IdUtils.getUserAgentId(job.getUsername(), RODAInstanceUtils.getLocalInstanceIdentifier()));
       } catch (ValidationException e) {
         throw new GenericException(e);
       }

@@ -173,9 +173,8 @@ public class ShowRisk extends Composite {
               public void onSuccess(Boolean hasHistory) {
                 if (hasHistory) {
                   SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, actionsWithHistory.hasAnyRoles());
-                  instance.actionsSidebar
-                    .setWidget(new ActionableWidgetBuilder<>(actionsWithHistory).withBackButton()
-                      .withActionCallback(actionCallback).buildListWithObjects(new ActionableObject<>(result)));
+                  instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(actionsWithHistory).withBackButton()
+                    .withActionCallback(actionCallback).buildListWithObjects(new ActionableObject<>(result)));
                 } else {
                   SidebarUtils.toggleSidebar(contentFlowPanel, sidebarFlowPanel, riskActions.hasAnyRoles());
                   instance.actionsSidebar.setWidget(new ActionableWidgetBuilder<>(riskActions).withBackButton()

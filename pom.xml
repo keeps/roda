@@ -33,11 +33,6 @@
       <name>GitHub Packages</name>
       <url>https://maven.pkg.github.com/keeps/*</url>
     </repository>
-    <!--<repository>
-        <id>keeps_artifactory</id>
-        <name>KEEP SOLUTIONS artifactory</name>
-        <url>https://artifactory.keep.pt/artifactory/keep</url>
-    </repository>-->
     <repository>
       <id>maven-restlet</id>
       <name>Public online Restlet repository</name>
@@ -85,6 +80,14 @@
       <organizationUrl>https://www.keep.pt</organizationUrl>
       <timezone>0</timezone>
     </developer>
+    <developer>
+      <id>syusupov</id>
+      <name>Shahzod Yusupov</name>
+      <email>syusupov@keep.pt</email>
+      <organization>KEEP SOLUTIONS</organization>
+      <organizationUrl>https://www.keep.pt</organizationUrl>
+      <timezone>0</timezone>
+    </developer>
   </developers>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -106,11 +109,11 @@
     <!--<akka_management.version>0.17.0</akka_management.version> -->
     <apacheds.version>2.0.0-M24</apacheds.version>
     <httpcomponents.version>4.5.13</httpcomponents.version>
-    <commons_ip2.version>2.1.0</commons_ip2.version>
+    <commons_ip2.version>2.2.1</commons_ip2.version>
     <metrics.version>3.2.6</metrics.version>
     <roda_community_url>https://roda-community.org</roda_community_url>
     <testng.groups>all</testng.groups>
-    <springboot.version>2.7.0</springboot.version>
+    <springboot.version>2.7.2</springboot.version>
     <scope.gwt-dev>provided</scope.gwt-dev>
   </properties>
   <profiles>
@@ -188,21 +191,13 @@
         <module>roda-core/roda-core-tests</module>
       </modules>
     </profile>
-    <!-- <profile> -->
-    <!-- <id>create-installer</id> -->
-    <!-- <modules> -->
-    <!-- <module>roda-common</module> -->
-    <!-- <module>roda-ui</module> -->
-    <!-- <module>roda-installer</module> -->
-    <!-- </modules> -->
-    <!-- </profile> -->
   </profiles>
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.0.0-M2</version>
+        <version>3.1.0</version>
         <executions>
           <execution>
             <id>enforce-maven</id>
@@ -212,11 +207,11 @@
             <configuration>
               <rules>
                 <requireMavenVersion>
-                  <version>3.3.9</version>
-                  <message>Invalid Maven version. It should, at least, be 3.3.9</message>
+                  <version>3.8.5</version>
+                  <message>Invalid Maven version. It should, at least, be 3.8.5</message>
                 </requireMavenVersion>
                 <requireJavaVersion>
-                  <version>1.8</version>
+                  <version>11</version>
                 </requireJavaVersion>
               </rules>
             </configuration>
@@ -248,7 +243,7 @@
         <artifactId>formatter-maven-plugin</artifactId>
         <version>2.20.0</version>
         <configuration>
-          <configFile>${build.sourceDirectory}/code-style/eclipse_formatter.xml
+          <configFile>${maven.multiModuleProjectDirectory}/code-style/eclipse_formatter.xml
           </configFile>
         </configuration>
       </plugin>
@@ -264,7 +259,6 @@
             <keyword>copyright</keyword>
           </keywords>
           <properties>
-            <!--<project.name>RODA - Repositório de Objetos Digitais Autênticos</project.name> -->
             <project.license.url>https://github.com/keeps/roda</project.license.url>
           </properties>
           <includes>
@@ -1098,7 +1092,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>3.4.0</version>
       </plugin>
     </plugins>
   </reporting>

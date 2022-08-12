@@ -34,7 +34,7 @@ public class HttpProtocol extends AbstractProtocol {
   private static final String NAME = "Http protocol";
   private static final String VERSION = "0";
 
-  public HttpProtocol(){
+  public HttpProtocol() {
     super();
   }
 

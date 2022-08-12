@@ -29,7 +29,7 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public interface ClientMessages extends Messages {
 

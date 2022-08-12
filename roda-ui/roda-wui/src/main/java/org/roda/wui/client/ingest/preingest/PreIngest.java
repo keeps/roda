@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.ingest.preingest;
 
@@ -26,7 +26,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class PreIngest {
 
@@ -57,7 +57,7 @@ public class PreIngest {
 
   /**
    * Get instance
-   * 
+   *
    * @return {@link PreIngest} singleton
    */
   public static PreIngest getInstance() {

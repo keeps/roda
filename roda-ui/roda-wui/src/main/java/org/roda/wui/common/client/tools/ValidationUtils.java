@@ -23,7 +23,7 @@ public class ValidationUtils {
       .compile("^((ftp|http|https)://[\\w@.\\-\\_]+(:\\d{1,5})?(/[\\w#!:.?+=&%@!\\_\\-/]+)*){1}$");
     RegExp urlPlusTldValidator = RegExp
       .compile("^((ftp|http|https)://[\\w@.\\-\\_]+\\.[a-zA-Z]{2,}(:\\d{1,5})?(/[\\w#!:.?+=&%@!\\_\\-/]+)*){1}$");
-    GWT.log("isValidURL: " + url + " " + (topLevelDomainRequired ? urlPlusTldValidator : urlValidator).exec(url) );
+    GWT.log("isValidURL: " + url + " " + (topLevelDomainRequired ? urlPlusTldValidator : urlValidator).exec(url));
     return (topLevelDomainRequired ? urlPlusTldValidator : urlValidator).exec(url) != null;
   }
 }

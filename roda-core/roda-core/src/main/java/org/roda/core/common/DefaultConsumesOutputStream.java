@@ -33,7 +33,6 @@ public class DefaultConsumesOutputStream implements ConsumesOutputStream {
   public DefaultConsumesOutputStream(String fileName, String mediaType, Consumer<OutputStream> consumer) {
     this(fileName, mediaType, null, -1, consumer);
   }
-  
 
   @Override
   public void consumeOutputStream(OutputStream out) throws IOException {

@@ -376,9 +376,11 @@ public class Job implements IsModelObject, IsIndexed, HasId {
     newJob.setOutcomeObjectsClass(getOutcomeObjectsClass());
     newJob.getJobStats().setCompletionPercentage(getJobStats().getCompletionPercentage());
     newJob.getJobStats().setSourceObjectsBeingProcessed(getJobStats().getSourceObjectsBeingProcessed());
-    newJob.getJobStats().setOutcomeObjectsWithManualIntervention(getJobStats().getOutcomeObjectsWithManualIntervention());
+    newJob.getJobStats()
+      .setOutcomeObjectsWithManualIntervention(getJobStats().getOutcomeObjectsWithManualIntervention());
     newJob.getJobStats().setSourceObjectsCount(getJobStats().getSourceObjectsCount());
-    newJob.getJobStats().setSourceObjectsProcessedWithPartialSuccess(getJobStats().getSourceObjectsProcessedWithPartialSuccess());
+    newJob.getJobStats()
+      .setSourceObjectsProcessedWithPartialSuccess(getJobStats().getSourceObjectsProcessedWithPartialSuccess());
     newJob.getJobStats().setSourceObjectsProcessedWithSkipped(getJobStats().getSourceObjectsProcessedWithSkipped());
     newJob.getJobStats().setSourceObjectsProcessedWithSuccess(getJobStats().getSourceObjectsProcessedWithSuccess());
     newJob.getJobStats().setSourceObjectsProcessedWithFailure(getJobStats().getSourceObjectsProcessedWithFailure());

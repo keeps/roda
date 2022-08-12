@@ -57,7 +57,6 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
     options.withFieldsToReturn(fieldsToReturn);
   }
 
-
   @Override
   protected void configureDisplay(CellTable<LogEntry> display) {
     dateColumn = new Column<LogEntry, Date>(

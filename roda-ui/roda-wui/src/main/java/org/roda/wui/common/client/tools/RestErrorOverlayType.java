@@ -11,7 +11,8 @@ import com.google.gwt.core.client.JavaScriptObject;
 
 public class RestErrorOverlayType extends JavaScriptObject {
   // Overlay types always have protected, zero-arg ctors
- protected RestErrorOverlayType() { }
+  protected RestErrorOverlayType() {
+  }
 
   // Typically, methods on overlay types are JSNI
   public final native String getType() /*-{

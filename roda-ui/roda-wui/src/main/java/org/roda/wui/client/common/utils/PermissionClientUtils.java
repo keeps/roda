@@ -61,7 +61,7 @@ public class PermissionClientUtils {
 
               canAct = containGroup;
             }
-          } catch(IllegalArgumentException e) {
+          } catch (IllegalArgumentException e) {
             // do nothing
           }
         }

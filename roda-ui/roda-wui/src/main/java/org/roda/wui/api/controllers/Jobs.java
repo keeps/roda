@@ -70,8 +70,9 @@ public class Jobs extends RodaWuiController {
     }
   }
 
-  public static Job approveJob(User user, SelectedItems<Job> jobs, boolean async) throws AuthorizationDeniedException,
-          RequestNotValidException, NotFoundException, GenericException, JobAlreadyStartedException, JobStateNotPendingException {
+  public static Job approveJob(User user, SelectedItems<Job> jobs, boolean async)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
+    JobAlreadyStartedException, JobStateNotPendingException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     ModelService model = RodaCoreFactory.getModelService();
@@ -80,7 +81,7 @@ public class Jobs extends RodaWuiController {
       SelectedItemsList<Job> jobsList = (SelectedItemsList<Job>) jobs;
       for (String id : jobsList.getIds()) {
         Job job = model.retrieveJob(id);
-        if(job.getState().equals(Job.JOB_STATE.PENDING_APPROVAL)) {
+        if (job.getState().equals(Job.JOB_STATE.PENDING_APPROVAL)) {
           // validate input and set missing information when possible
           JobsHelper.validateJobInformation(user, job);
 
@@ -103,7 +104,7 @@ public class Jobs extends RodaWuiController {
           try {
             // delegate
             updatedJob = JobsHelper.startJob(job.getId());
-            //return updatedJob;
+            // return updatedJob;
           } catch (RODAException e) {
             state = LogEntryState.FAILURE;
             throw e;
@@ -117,8 +118,9 @@ public class Jobs extends RodaWuiController {
     return null;
   }
 
-  public static Job rejectJob(User user, SelectedItems<Job> jobs, String details) throws AuthorizationDeniedException,
-          RequestNotValidException, NotFoundException, GenericException, JobAlreadyStartedException, JobStateNotPendingException {
+  public static Job rejectJob(User user, SelectedItems<Job> jobs, String details)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
+    JobAlreadyStartedException, JobStateNotPendingException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     ModelService model = RodaCoreFactory.getModelService();
@@ -193,8 +195,6 @@ public class Jobs extends RodaWuiController {
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
     }
   }
-
-
 
   public static void deleteJob(User user, String jobId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {

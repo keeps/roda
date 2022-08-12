@@ -285,7 +285,8 @@ public class DisassociateDisposalHoldFromAIPPlugin extends AbstractPlugin<AIP> {
       try {
         AIP aipChildren = model.retrieveAIP(indexedAIP.getId());
         LOGGER.debug("Processing transitive AIP {}", aip.getId());
-        outcomeText = DisposalHoldPluginUtils.disassociateTransitiveDisposalHoldFromAIP(holdId, aipChildren, reportItem);
+        outcomeText = DisposalHoldPluginUtils.disassociateTransitiveDisposalHoldFromAIP(holdId, aipChildren,
+          reportItem);
         model.updateAIP(aipChildren, cachedJob.getUsername());
         reportItem.setPluginState(state).addPluginDetails(outcomeText);
         jobPluginInfo.incrementObjectsProcessedWithSuccess();

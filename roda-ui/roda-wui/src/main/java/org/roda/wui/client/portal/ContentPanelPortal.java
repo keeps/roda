@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.portal;
 
@@ -52,7 +52,7 @@ public class ContentPanelPortal extends SimplePanel {
 
   /**
    * Get the singleton instance
-   * 
+   *
    * @return the singleton instance
    */
   public static ContentPanelPortal getInstance() {
@@ -79,7 +79,7 @@ public class ContentPanelPortal extends SimplePanel {
 
   /**
    * Update the content panel with the new history
-   * 
+   *
    * @param historyTokens
    *          the history tokens
    */

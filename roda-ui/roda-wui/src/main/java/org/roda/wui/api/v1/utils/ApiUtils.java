@@ -148,8 +148,8 @@ public class ApiUtils {
 
   /**
    * Returns valid start (pair first element) and limit (pair second element)
-   * paging parameters defaulting to start = 0 and limit = 100 if none or
-   * invalid values are provided.
+   * paging parameters defaulting to start = 0 and limit = 100 if none or invalid
+   * values are provided.
    */
   public static Pair<Integer, Integer> processPagingParams(String start, String limit) {
     Integer startInteger;
@@ -431,8 +431,9 @@ public class ApiUtils {
   }
 
   public static StreamResponse download(Resource resource, String fileName, boolean addTopDirectory)
-      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    ConsumesOutputStream download = DownloadUtils.download(RodaCoreFactory.getStorageService(), resource, fileName, addTopDirectory);
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    ConsumesOutputStream download = DownloadUtils.download(RodaCoreFactory.getStorageService(), resource, fileName,
+      addTopDirectory);
     return new StreamResponse(download);
   }
 
@@ -446,7 +447,7 @@ public class ApiUtils {
         StoragePath storagePath = ModelUtils.getAIPStoragePath(indexedAIP.getId());
         StorageService storage = RodaCoreFactory.getStorageService();
         Directory directory = storage.getDirectory(storagePath);
-        response = download(directory, indexedAIP.getTitle(),true);
+        response = download(directory, indexedAIP.getTitle(), true);
       } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
         || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)
         || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSONP.equals(acceptFormat)) {

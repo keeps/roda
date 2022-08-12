@@ -24,33 +24,40 @@
 
 				<wcag:AccessibleFocusPanel ui:field="disseminationsButton" addStyleNames="navigationToolbarLink">
 					<g:HTML>
-						<i class="fa fa-play-circle-o"></i>
+						<i class="fa fa-play-circle-o">
+						</i>
 					</g:HTML>
 				</wcag:AccessibleFocusPanel>
-				<wcag:AccessibleFocusPanel ui:field="infoSidebarButton" addStyleNames="navigationToolbarLink" title="{messages.details}">
+				<wcag:AccessibleFocusPanel ui:field="infoSidebarButton" addStyleNames="navigationToolbarLink"
+					title="{messages.details}">
 					<g:HTML>
-						<i class="fa fa-list-alt"></i>
+						<i class="fa fa-list-alt">
+						</i>
 					</g:HTML>
 				</wcag:AccessibleFocusPanel>
 				<wcag:AccessibleFocusPanel ui:field="searchButton" addStyleNames="navigationToolbarLink">
 					<g:HTML>
-						<i class="fa fa-search"></i>
+						<i class="fa fa-search">
+						</i>
 					</g:HTML>
 				</wcag:AccessibleFocusPanel>
 				<wcag:AccessibleFocusPanel ui:field="previousButton" addStyleNames="navigationToolbarLink">
 					<g:HTML>
-						<i class="fa fa-chevron-left"></i>
+						<i class="fa fa-chevron-left">
+						</i>
 					</g:HTML>
 				</wcag:AccessibleFocusPanel>
-				<g:HTML ui:field="pageInformation" addStyleNames="navigationToolbarPagination"/>
+				<g:HTML ui:field="pageInformation" addStyleNames="navigationToolbarPagination" />
 				<wcag:AccessibleFocusPanel ui:field="nextButton" addStyleNames="navigationToolbarLink">
 					<g:HTML>
-						<i class="fa fa-chevron-right"></i>
+						<i class="fa fa-chevron-right">
+						</i>
 					</g:HTML>
 				</wcag:AccessibleFocusPanel>
 				<wcag:AccessibleFocusPanel ui:field="actionsButton" addStyleNames="navigationToolbarLink">
 					<g:HTML>
-						<i class="fa fa-ellipsis-v"></i>
+						<i class="fa fa-ellipsis-v">
+						</i>
 					</g:HTML>
 				</wcag:AccessibleFocusPanel>
 			</g:FlowPanel>

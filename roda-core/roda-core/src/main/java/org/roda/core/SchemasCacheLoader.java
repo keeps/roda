@@ -43,7 +43,8 @@ public class SchemasCacheLoader extends CacheLoader<Pair<String, String>, Option
 
     String schemaPath = RodaConstants.CORE_SCHEMAS_FOLDER + "/" + schemaFileName;
 
-    InputStream schemaStream = RodaCoreFactory.getConfigurationFileAsStream(RodaCoreFactory.getConfigPath(), schemaPath);
+    InputStream schemaStream = RodaCoreFactory.getConfigurationFileAsStream(RodaCoreFactory.getConfigPath(),
+      schemaPath);
 
     Schema xmlSchema = null;
     try {

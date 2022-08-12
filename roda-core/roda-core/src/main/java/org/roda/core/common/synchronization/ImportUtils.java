@@ -296,7 +296,7 @@ public class ImportUtils {
   /**
    * Creates and Iterates through the {@link Map} with the class and the path to
    * the entities.
-   * 
+   *
    * @param index
    *          {@link IndexService}
    * @param bundleWorkingDir

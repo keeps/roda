@@ -17,7 +17,7 @@ import org.roda.core.data.v2.ip.StoragePath;
  * <i> A binary resource which contains metadata and binary content payload.</i>
  * </p>
  * </p>
- * 
+ *
  * @author Sébastien Leroux <sleroux@keep.pt>
  * @author Luis Faria <lfaria@keep.pt>
  * @see Binary

@@ -272,7 +272,7 @@ public class IngestJobPluginInfo extends JobPluginInfo {
 
     /*
      * int countSuccess = 0; int countPartialSuccess = 0; int countFailure = 0;
-     * 
+     *
      * if (allReports != null) { for (Map<String, Report> map : allReports.values())
      * { for (Report report : map.values()) { if
      * (PluginState.FAILURE.equals(report.getPluginState())) { countFailure++; }
@@ -280,7 +280,7 @@ public class IngestJobPluginInfo extends JobPluginInfo {
      * countSuccess++; } else if
      * (PluginState.PARTIAL_SUCCESS.equals(report.getPluginState())) {
      * countPartialSuccess++; } } }
-     * 
+     *
      * setSourceObjectsProcessedWithFailure(countFailure);
      * setSourceObjectsProcessedWithPartialSuccess(countPartialSuccess);
      * setSourceObjectsProcessedWithSuccess(countSuccess); }

@@ -36,8 +36,8 @@ public class MultipleStepBundle {
 
   public MultipleStepBundle(final Plugin<?> plugin, final IndexService index, final ModelService model,
     final StorageService storage, final MultipleJobPluginInfo mutipleJobPluginInfo,
-    final PluginParameter pluginParameter, final Map<String, String> parameterValues, final List<? extends IsRODAObject> objects,
-    final Job cachedJob) {
+    final PluginParameter pluginParameter, final Map<String, String> parameterValues,
+    final List<? extends IsRODAObject> objects, final Job cachedJob) {
 
     this.plugin = plugin;
     this.index = index;

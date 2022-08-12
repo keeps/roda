@@ -1,38 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui">
-	
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
+
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<g:FlowPanel>
 		<g:FlowPanel addStyleNames="loginPanel" ui:field="loginPanel">
 			<g:HTML>
-				<h1><ui:text from='{messages.loginTitle}' /></h1>
+				<h1>
+					<ui:text from='{messages.loginTitle}' />
+				</h1>
 			</g:HTML>
 			<g:FlowPanel>
-				<g:Label addStyleNames="form-label"><ui:text from='{messages.loginUsername}' /></g:Label>
-				<g:TextBox title="{messages.loginUsername}" ui:field="username" addStyleNames="fieldTextBox"></g:TextBox>
-				<g:Label addStyleNames="form-label"><ui:text from='{messages.loginPassword}' /></g:Label>
-				<g:PasswordTextBox title="{messages.loginPassword}" ui:field="password"
-					addStyleNames="fieldTextBox"></g:PasswordTextBox>
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{messages.loginUsername}' />
+				</g:Label>
+				<g:TextBox title="{messages.loginUsername}" ui:field="username" addStyleNames="fieldTextBox">
+				</g:TextBox>
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{messages.loginPassword}' />
+				</g:Label>
+				<g:PasswordTextBox title="{messages.loginPassword}" ui:field="password" addStyleNames="fieldTextBox">
+				</g:PasswordTextBox>
 			</g:FlowPanel>
-			<g:Label ui:field="error" addStyleNames="login-error"></g:Label>
+			<g:Label ui:field="error" addStyleNames="login-error">
+			</g:Label>
 			<g:FlowPanel addStyleNames="login-buttons">
-				<g:Button ui:field="recover" addStyleNames="btn btn-link login-link"><ui:text from='{messages.loginRecoverPassword}' /></g:Button>
-				<g:Button ui:field="register" addStyleNames="btn btn-link login-link"><ui:text from='{messages.loginRegister}' /></g:Button>
-				<g:Button ui:field="login" addStyleNames="btn btn-play login-button"><ui:text from='{messages.loginLogin}' /></g:Button>
-				<g:Button ui:field="resendEmail" addStyleNames="btn btn-link login-link" visible="false"><ui:text from='{messages.loginResendEmail}' /></g:Button>
+				<g:Button ui:field="recover" addStyleNames="btn btn-link login-link">
+					<ui:text from='{messages.loginRecoverPassword}' />
+				</g:Button>
+				<g:Button ui:field="register" addStyleNames="btn btn-link login-link">
+					<ui:text from='{messages.loginRegister}' />
+				</g:Button>
+				<g:Button ui:field="login" addStyleNames="btn btn-play login-button">
+					<ui:text from='{messages.loginLogin}' />
+				</g:Button>
+				<g:Button ui:field="resendEmail" addStyleNames="btn btn-link login-link" visible="false">
+					<ui:text from='{messages.loginResendEmail}' />
+				</g:Button>
 			</g:FlowPanel>
 		</g:FlowPanel>
 		<g:FlowPanel addStyleNames="loginPanel" ui:field="loggedInPanel" visible="false">
 			<g:HTML>
-				<h1><ui:text from='{messages.loginTitle}' /></h1>
+				<h1>
+					<ui:text from='{messages.loginTitle}' />
+				</h1>
 			</g:HTML>
 			<g:InlineHTML ui:field="loggedInMessage" />
 			<g:FlowPanel addStyleNames="login-buttons">
-				<g:Button ui:field="homepage" addStyleNames="btn btn-play login-button"><ui:text from='{messages.welcomePage}' /></g:Button>
-				<g:Button ui:field="logout" addStyleNames="btn btn-link login-link"><ui:text from='{messages.loginLogout}' /></g:Button>
+				<g:Button ui:field="homepage" addStyleNames="btn btn-play login-button">
+					<ui:text from='{messages.welcomePage}' />
+				</g:Button>
+				<g:Button ui:field="logout" addStyleNames="btn btn-link login-link">
+					<ui:text from='{messages.loginLogout}' />
+				</g:Button>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

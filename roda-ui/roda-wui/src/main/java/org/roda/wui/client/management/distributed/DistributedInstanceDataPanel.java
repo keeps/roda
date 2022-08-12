@@ -43,7 +43,8 @@ public class DistributedInstanceDataPanel extends Composite implements HasValueC
   interface MyUiBinder extends UiBinder<Widget, DistributedInstanceDataPanel> {
   }
 
-  private static DistributedInstanceDataPanel.MyUiBinder uiBinder = GWT.create(DistributedInstanceDataPanel.MyUiBinder.class);
+  private static DistributedInstanceDataPanel.MyUiBinder uiBinder = GWT
+    .create(DistributedInstanceDataPanel.MyUiBinder.class);
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -53,11 +54,11 @@ public class DistributedInstanceDataPanel extends Composite implements HasValueC
   @UiField
   Label nameError;
 
-//  @UiField
-//  TextBox identifier;
-//
-//  @UiField
-//  Label identifierError;
+  // @UiField
+  // TextBox identifier;
+  //
+  // @UiField
+  // Label identifierError;
 
   @UiField
   TextArea description;
@@ -101,8 +102,8 @@ public class DistributedInstanceDataPanel extends Composite implements HasValueC
     name.addChangeHandler(changeHandler);
     name.addKeyUpHandler(keyUpHandler);
 
-//    identifier.addChangeHandler(changeHandler);
-//    identifier.addKeyUpHandler(keyUpHandler);
+    // identifier.addChangeHandler(changeHandler);
+    // identifier.addKeyUpHandler(keyUpHandler);
 
     description.addChangeHandler(changeHandler);
     description.addKeyUpHandler(keyUpHandler);
@@ -114,14 +115,14 @@ public class DistributedInstanceDataPanel extends Composite implements HasValueC
 
   public void setDistributedInstance(DistributedInstance distributedInstance) {
     this.name.setText(distributedInstance.getName());
-    //this.identifier.setText(distributedInstance.getNameIdentifier());
+    // this.identifier.setText(distributedInstance.getNameIdentifier());
     this.description.setText(distributedInstance.getDescription());
   }
 
   public DistributedInstance getDistributedInstance() {
     DistributedInstance distributedInstance = new DistributedInstance();
     distributedInstance.setName(name.getText());
-    //distributedInstance.setNameIdentifier(identifier.getText());
+    // distributedInstance.setNameIdentifier(identifier.getText());
     distributedInstance.setDescription(description.getText());
 
     return distributedInstance;
@@ -129,7 +130,7 @@ public class DistributedInstanceDataPanel extends Composite implements HasValueC
 
   public boolean isValid() {
     List<String> errorList = new ArrayList<>();
-    //name
+    // name
     if (StringUtils.isBlank(name.getText())) {
       name.addStyleName(IS_WRONG);
       nameError.setText(messages.mandatoryField());
@@ -141,23 +142,23 @@ public class DistributedInstanceDataPanel extends Composite implements HasValueC
       nameError.setVisible(false);
     }
 
-    //Identifier
-//    if (StringUtils.isBlank(identifier.getText())) {
-//      identifier.addStyleName(IS_WRONG);
-//      identifierError.setText(messages.mandatoryField());
-//      identifierError.setVisible(true);
-//      Window.scrollTo(identifier.getAbsoluteLeft(), identifier.getAbsoluteTop());
-//      errorList.add(messages.isAMandatoryField(messages.distributedInstanceIDLabel()));
-//    } else if (identifier.getText().length() != 3) {
-//      identifier.addStyleName(IS_WRONG);
-//      identifierError.setText(messages.mandatoryField());
-//      identifierError.setVisible(true);
-//      Window.scrollTo(identifier.getAbsoluteLeft(), identifier.getAbsoluteTop());
-//      errorList.add(messages.isAMandatoryField(messages.distributedInstanceIDLabel()));
-//    } else {
-//      identifier.removeStyleName(IS_WRONG);
-//      identifierError.setVisible(false);
-//    }
+    // Identifier
+    // if (StringUtils.isBlank(identifier.getText())) {
+    // identifier.addStyleName(IS_WRONG);
+    // identifierError.setText(messages.mandatoryField());
+    // identifierError.setVisible(true);
+    // Window.scrollTo(identifier.getAbsoluteLeft(), identifier.getAbsoluteTop());
+    // errorList.add(messages.isAMandatoryField(messages.distributedInstanceIDLabel()));
+    // } else if (identifier.getText().length() != 3) {
+    // identifier.addStyleName(IS_WRONG);
+    // identifierError.setText(messages.mandatoryField());
+    // identifierError.setVisible(true);
+    // Window.scrollTo(identifier.getAbsoluteLeft(), identifier.getAbsoluteTop());
+    // errorList.add(messages.isAMandatoryField(messages.distributedInstanceIDLabel()));
+    // } else {
+    // identifier.removeStyleName(IS_WRONG);
+    // identifierError.setVisible(false);
+    // }
 
     checked = true;
 
@@ -178,7 +179,7 @@ public class DistributedInstanceDataPanel extends Composite implements HasValueC
 
   public void clear() {
     name.setText("");
-    //identifier.setText("");
+    // identifier.setText("");
     description.setText("");
   }
 

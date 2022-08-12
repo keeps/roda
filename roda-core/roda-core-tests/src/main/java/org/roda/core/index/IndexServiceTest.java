@@ -233,8 +233,8 @@ public class IndexServiceTest {
       sroIDs.add(sro.getId());
     }
 
-    MatcherAssert.assertThat(sroIDs, Matchers.contains(
-        aip.getRepresentations().stream().map(Representation::getId).toArray()));
+    MatcherAssert.assertThat(sroIDs,
+      Matchers.contains(aip.getRepresentations().stream().map(Representation::getId).toArray()));
 
     model.deleteAIP(aipId);
     try {

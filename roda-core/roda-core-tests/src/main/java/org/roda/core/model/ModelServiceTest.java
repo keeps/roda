@@ -91,10 +91,10 @@ import jersey.repackaged.com.google.common.collect.Lists;
 
 /**
  * Unit tests for ModelService
- * 
+ *
  * @author Hélder Silva <hsilva@keep.pt>
  * @author Luis Faria <lfaria@keep.pt>
- * 
+ *
  * @see ModelService
  */
 // @PrepareForTest({})
@@ -951,7 +951,7 @@ public class ModelServiceTest {
    * dummyLogFile = corporaPath.resolve("logs").resolve("dummy.log"); int response
    * = RESTClientUtility.sendPostRequestWithFile("http://localhost:8080",
    * "/api/v1/log_entries", "admin", "roda", dummyLogFile);
-   * 
+   *
    * assertEquals(response, RodaConstants.HTTP_RESPONSE_CODE_SUCCESS); }
    */
 

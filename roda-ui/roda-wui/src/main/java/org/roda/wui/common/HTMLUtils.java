@@ -24,7 +24,7 @@ import com.google.common.io.CharStreams;
 
 /**
  * HTML related utility class
- * 
+ *
  * @author Hélder Silva <hsilva@keep.pt>
  * @author Luis Faria <lfaria@keep.pt>
  * @author Sébastien Leroux <sleroux@keep.pt>

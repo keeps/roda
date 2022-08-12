@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:lists="urn:import:org.roda.wui.client.common.lists"
 	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search">
 
@@ -26,8 +25,7 @@
 					<g:Label styleName="label" ui:field="riskDescriptionKey">
 						<ui:text from='{messages.riskDescription}' />
 					</g:Label>
-					<g:Label styleName="value text-area-whitespace-wrap"
-						ui:field="riskDescriptionValue" />
+					<g:Label styleName="value text-area-whitespace-wrap" ui:field="riskDescriptionValue" />
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
 					<g:Label styleName="label">
@@ -51,8 +49,7 @@
 					<g:Label styleName="label" ui:field="riskNotesKey">
 						<ui:text from='{messages.riskNotes}' />
 					</g:Label>
-					<g:Label styleName="value text-area-whitespace-wrap"
-						ui:field="riskNotesValue" />
+					<g:Label styleName="value text-area-whitespace-wrap" ui:field="riskNotesValue" />
 				</g:FlowPanel>
 
 				<g:Label styleName="h4" ui:field="riskPreMitigationKey">
@@ -74,14 +71,14 @@
 					<g:Label styleName="label">
 						<ui:text from='{messages.riskPreMitigationSeverity}' />
 					</g:Label>
-					<g:HTML styleName="value" ui:field="riskPreMitigationSeverity"></g:HTML>
+					<g:HTML styleName="value" ui:field="riskPreMitigationSeverity">
+					</g:HTML>
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
 					<g:Label styleName="label" ui:field="riskPreMitigationNotesKey">
 						<ui:text from='{messages.riskPreMitigationNotes}' />
 					</g:Label>
-					<g:Label styleName="value text-area-whitespace-wrap"
-						ui:field="riskPreMitigationNotesValue" />
+					<g:Label styleName="value text-area-whitespace-wrap" ui:field="riskPreMitigationNotesValue" />
 				</g:FlowPanel>
 
 				<g:Label styleName="h4" ui:field="riskMitigationKey">
@@ -91,8 +88,7 @@
 					<g:Label styleName="label" ui:field="riskMitigationStrategyKey">
 						<ui:text from='{messages.riskMitigationStrategy}' />
 					</g:Label>
-					<g:Label styleName="value text-area-whitespace-wrap"
-						ui:field="riskMitigationStrategyValue" />
+					<g:Label styleName="value text-area-whitespace-wrap" ui:field="riskMitigationStrategyValue" />
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
 					<g:Label styleName="label" ui:field="riskMitigationOwnerTypeKey">
@@ -107,20 +103,16 @@
 					<g:Label styleName="value" ui:field="riskMitigationOwnerValue" />
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
-					<g:Label styleName="label"
-						ui:field="riskMitigationRelatedEventIdentifierTypeKey">
+					<g:Label styleName="label" ui:field="riskMitigationRelatedEventIdentifierTypeKey">
 						<ui:text from='{messages.riskMitigationRelatedEventIdentifierType}' />
 					</g:Label>
-					<g:Label styleName="value"
-						ui:field="riskMitigationRelatedEventIdentifierTypeValue" />
+					<g:Label styleName="value" ui:field="riskMitigationRelatedEventIdentifierTypeValue" />
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
-					<g:Label styleName="label"
-						ui:field="riskMitigationRelatedEventIdentifierValueKey">
+					<g:Label styleName="label" ui:field="riskMitigationRelatedEventIdentifierValueKey">
 						<ui:text from='{messages.riskMitigationRelatedEventIdentifierValue}' />
 					</g:Label>
-					<g:Label styleName="value"
-						ui:field="riskMitigationRelatedEventIdentifierValueValue" />
+					<g:Label styleName="value" ui:field="riskMitigationRelatedEventIdentifierValueValue" />
 				</g:FlowPanel>
 
 				<g:Label styleName="h4" ui:field="riskPosMitigationKey">
@@ -142,14 +134,14 @@
 					<g:Label styleName="label" ui:field="riskPosMitigationSeverityKey">
 						<ui:text from='{messages.riskPostMitigationSeverity}' />
 					</g:Label>
-					<g:HTML styleName="value" ui:field="riskPosMitigationSeverity"></g:HTML>
+					<g:HTML styleName="value" ui:field="riskPosMitigationSeverity">
+					</g:HTML>
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
 					<g:Label styleName="label" ui:field="riskPosMitigationNotesKey">
 						<ui:text from='{messages.riskPostMitigationNotes}' />
 					</g:Label>
-					<g:Label styleName="value text-area-whitespace-wrap"
-						ui:field="riskPosMitigationNotesValue" />
+					<g:Label styleName="value text-area-whitespace-wrap" ui:field="riskPosMitigationNotesValue" />
 				</g:FlowPanel>
 
 				<g:SimplePanel addStyleNames="card">

@@ -13,7 +13,7 @@ import org.roda.core.plugins.Plugin;
 
 /**
  * Thrown to indicate that some went wrong inside a {@link Protocol}.
- * 
+ *
  * @author Rui Castro
  */
 public class ProtocolException extends RODAException {

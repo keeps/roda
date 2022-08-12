@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:search="urn:import:org.roda.wui.client.search"
-             xmlns:common="urn:import:org.roda.wui.client.common">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:search="urn:import:org.roda.wui.client.search" xmlns:common="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
 	<g:FlowPanel styleName="wui-job-list" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
-			<g:FlowPanel addStyleNames="col_12 content"  ui:field="contentFlowPanel">
+			<g:FlowPanel addStyleNames="col_12 content" ui:field="contentFlowPanel">
 				<common:TitlePanel text="{messages.preservationActionsTitle}" iconClass="Job" />
 				<g:FlowPanel addStyleNames="page-description" ui:field="preservationProcessDescription" />
-                <search:JobSearch ui:field="jobSearch" />
+				<search:JobSearch ui:field="jobSearch" />
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

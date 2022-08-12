@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.process;
 
@@ -60,7 +60,7 @@ import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
 

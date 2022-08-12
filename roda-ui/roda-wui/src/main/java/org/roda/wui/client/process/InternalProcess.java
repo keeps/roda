@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.process;
 
@@ -37,7 +37,7 @@ import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class InternalProcess extends Composite {
 
@@ -92,7 +92,7 @@ public class InternalProcess extends Composite {
 
   /**
    * Get the singleton instance
-   * 
+   *
    * @return the instance
    */
   public static InternalProcess getInstance() {

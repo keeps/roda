@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.management;
 
@@ -31,7 +31,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class Management {
 
@@ -64,7 +64,7 @@ public class Management {
 
   /**
    * Get the singleton instance
-   * 
+   *
    * @return the instance
    */
   public static Management getInstance() {

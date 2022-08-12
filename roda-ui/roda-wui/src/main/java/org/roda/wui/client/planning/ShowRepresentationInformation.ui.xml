@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:common="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
@@ -19,55 +18,49 @@
 								<common:TitlePanel icon="fa fa-info-circle" ui:field="title" />
 								<g:Label addStyleNames="browseItemId" ui:field="representationInformationId"
 									title="{messages.representationInformationIdentifier}" />
-								<g:Label addStyleNames="browseItemId" ui:field="dateCreated"/>
-								<g:Label addStyleNames="browseItemId" ui:field="dateUpdated"/>
+								<g:Label addStyleNames="browseItemId" ui:field="dateCreated" />
+								<g:Label addStyleNames="browseItemId" ui:field="dateUpdated" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label"
-									ui:field="representationInformationDescriptionKey">
+								<g:Label styleName="label" ui:field="representationInformationDescriptionKey">
 									<ui:text from='{messages.representationInformationDescription}' />
 								</g:Label>
 								<g:HTML styleName="value ri-description"
 									ui:field="representationInformationDescriptionValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label"
-									ui:field="representationInformationTagKey">
+								<g:Label styleName="label" ui:field="representationInformationTagKey">
 									<ui:text from='{messages.representationInformationTags}' />
 								</g:Label>
-								<g:FlowPanel styleName="value"
-									ui:field="representationInformationTagValue" />
+								<g:FlowPanel styleName="value" ui:field="representationInformationTagValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label styleName="label" ui:field="representationInformationSupportKey">
 									<ui:text from='{messages.representationInformationSupport}' />
 								</g:Label>
-								<g:Label styleName="value"
-									ui:field="representationInformationSupportValue" />
+								<g:Label styleName="value" ui:field="representationInformationSupportValue" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:Label styleName="label"
-									ui:field="representationInformationFamilyKey">
+								<g:Label styleName="label" ui:field="representationInformationFamilyKey">
 									<ui:text from='{messages.representationInformationFamily}' />
 								</g:Label>
-								<g:Label styleName="value"
-									ui:field="representationInformationFamilyValue" />
+								<g:Label styleName="value" ui:field="representationInformationFamilyValue" />
 							</g:FlowPanel>
-							
-							<g:FlowPanel ui:field="extras"></g:FlowPanel>
+
+							<g:FlowPanel ui:field="extras">
+							</g:FlowPanel>
 
 							<g:FlowPanel styleName="ri-form-separator" ui:field="additionalSeparator">
 								<g:Label>
-									<ui:text
-										from='{messages.representationInformationAdditionalInformation}' />
+									<ui:text from='{messages.representationInformationAdditionalInformation}' />
 								</g:Label>
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
-								<g:FlowPanel styleName="value"
-									ui:field="representationInformationRelationsValue" />
+								<g:FlowPanel styleName="value" ui:field="representationInformationRelationsValue" />
 							</g:FlowPanel>
 
-							<g:FlowPanel ui:field="objectPanel"></g:FlowPanel>
+							<g:FlowPanel ui:field="objectPanel">
+							</g:FlowPanel>
 						</g:FlowPanel>
 					</g:FlowPanel>
 				</g:FlowPanel>

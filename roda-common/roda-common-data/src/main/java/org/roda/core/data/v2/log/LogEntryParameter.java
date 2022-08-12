@@ -11,7 +11,7 @@ import java.io.Serializable;
 
 /**
  * This is a parameter in a {@link LogEntry}.
- * 
+ *
  * @author Rui Castro
  */
 public class LogEntryParameter implements Serializable {
@@ -30,7 +30,7 @@ public class LogEntryParameter implements Serializable {
   /**
    * Constructs an empty {@link LogEntryParameter} cloning an existing
    * {@link LogEntryParameter}.
-   * 
+   *
    * @param logEntryParameter
    *          the {@link LogEntryParameter} to clone.
    */
@@ -40,7 +40,7 @@ public class LogEntryParameter implements Serializable {
 
   /**
    * Constructs a new {@link LogEntryParameter} with the given arguments.
-   * 
+   *
    * @param name
    *          the name of the parameter.
    * @param value

@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This is the AVG anti-virus.
- * 
+ *
  * @author Rui Castro
  */
 @SuppressWarnings("unused")
@@ -80,12 +80,12 @@ public class AVGAntiVirus implements AntiVirus {
 
   /**
    * Performs a virus check on the specified path.
-   * 
+   *
    * @param file
    *          a file or directory to scan.
-   * 
+   *
    * @return the results of the virus check as a {@link VirusCheckResult}.
-   * 
+   *
    * @throws RuntimeException
    *           if some problem prevented the virus check from run a normal test.
    * @see AntiVirus

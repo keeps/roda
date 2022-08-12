@@ -22,7 +22,7 @@ import org.roda.core.data.v2.ip.StoragePath;
 
 /**
  * Storage Service related and independent utility class
- * 
+ *
  * @author Hélder Silva <hsilva@keep.pt>
  * @author Luis Faria <lfaria@keep.pt>
  */
@@ -38,7 +38,7 @@ public final class StorageServiceUtils {
   /**
    * Move resources from a given storage service/storage path to another storage
    * service/storage path
-   * 
+   *
    * @param fromService
    *          source storage service
    * @param fromStoragePath
@@ -64,7 +64,7 @@ public final class StorageServiceUtils {
   /**
    * Copy resources from a given "storage service/storage path" to another
    * "storage service/storage path"
-   * 
+   *
    * @param fromService
    *          source storage service
    * @param fromStoragePath

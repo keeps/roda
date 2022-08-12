@@ -107,8 +107,7 @@ public class AbstractConvertPluginDummy<T extends IsRODAObject> extends CommandC
     return new Report();
   }
 
-  public static String executeCommand(Path input)
-          throws CommandException {
+  public static String executeCommand(Path input) throws CommandException {
 
     String command = "stat " + input;
 

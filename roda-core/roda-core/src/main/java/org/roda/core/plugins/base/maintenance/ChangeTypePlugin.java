@@ -108,13 +108,13 @@ public class ChangeTypePlugin<T extends IsRODAObject> extends AbstractPlugin<T> 
     List<LiteOptionalWithCause> liteList) throws PluginException {
 
     return PluginHelper.processObjects(this,
-        (RODAObjectsProcessingLogic<T>) (index1, model1, storage1, report, cachedJob, jobPluginInfo, plugin, objects) -> {
-          if (objects.get(0) instanceof AIP) {
-            processAIP(model1, report, jobPluginInfo, cachedJob, (List<AIP>) objects);
-          } else if (objects.get(0) instanceof Representation) {
-            processRepresentation(model1, report, jobPluginInfo, cachedJob, (List<Representation>) objects);
-          }
-        }, index, model, storage, liteList);
+      (RODAObjectsProcessingLogic<T>) (index1, model1, storage1, report, cachedJob, jobPluginInfo, plugin, objects) -> {
+        if (objects.get(0) instanceof AIP) {
+          processAIP(model1, report, jobPluginInfo, cachedJob, (List<AIP>) objects);
+        } else if (objects.get(0) instanceof Representation) {
+          processRepresentation(model1, report, jobPluginInfo, cachedJob, (List<Representation>) objects);
+        }
+      }, index, model, storage, liteList);
   }
 
   private void processAIP(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job, List<AIP> aips) {

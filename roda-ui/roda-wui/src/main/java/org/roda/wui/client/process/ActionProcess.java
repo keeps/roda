@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.process;
 
@@ -37,7 +37,7 @@ import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class ActionProcess extends Composite {
 
@@ -82,7 +82,8 @@ public class ActionProcess extends Composite {
     Filter actionFilter = new Filter(
       new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INTERNAL.name()),
       new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INGEST.name()));
-    jobSearch = new JobSearch("ActionProcess_jobs", "ActionProcess_reports", actionFilter, actionFilter, false, CreateDefaultJob.RESOLVER);
+    jobSearch = new JobSearch("ActionProcess_jobs", "ActionProcess_reports", actionFilter, actionFilter, false,
+      CreateDefaultJob.RESOLVER);
 
     initWidget(uiBinder.createAndBindUi(this));
     preservationProcessDescription.add(new HTMLWidgetWrapper("PreservationProcessDescription.html"));
@@ -90,7 +91,7 @@ public class ActionProcess extends Composite {
 
   /**
    * Get the singleton instance
-   * 
+   *
    * @return the instance
    */
   public static ActionProcess getInstance() {

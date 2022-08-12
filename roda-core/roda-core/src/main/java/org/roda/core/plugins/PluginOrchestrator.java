@@ -25,7 +25,7 @@ import org.roda.core.plugins.orchestrate.JobPluginInfo;
 
 /**
  * Plugin Orchestrator interface
- * 
+ *
  * <p>
  * <b>NOTE:</b> methods are synchronous unless stated otherwise by method name
  * or specific parameter
@@ -55,7 +55,8 @@ public interface PluginOrchestrator {
   /** 201603 hsilva: only tests should invoke this method synchronously */
   public void executeJob(Job job, boolean async) throws JobAlreadyStartedException;
 
-  public void createAndExecuteJobs(Job job, boolean async) throws JobAlreadyStartedException, AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+  public void createAndExecuteJobs(Job job, boolean async) throws JobAlreadyStartedException,
+    AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
   /** 201712 hsilva: this method was known as stopJob */
   public void stopJobAsync(Job job);

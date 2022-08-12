@@ -76,7 +76,8 @@ public class AkkaJobActor extends AkkaBaseActor {
         jobsManager, jobId, JobsHelper.getNumberOfJobsWorkers(), JobsHelper.getNumberOfLimitedJobsWorkers()), jobId);
       super.getPluginOrchestrator().setJobContextInformation(jobId, jobStateInfoActor);
 
-      jobStateInfoActor.tell(Messages.newJobStateUpdated(plugin, JOB_STATE.STARTED).withParallelism(jobParallelism).withJobPriority(jobPriority), getSelf());
+      jobStateInfoActor.tell(Messages.newJobStateUpdated(plugin, JOB_STATE.STARTED).withParallelism(jobParallelism)
+        .withJobPriority(jobPriority), getSelf());
 
       try {
         if (job.getSourceObjects() instanceof SelectedItemsAll<?>) {
@@ -90,7 +91,8 @@ public class AkkaJobActor extends AkkaBaseActor {
         }
       } catch (Exception e) {
         LOGGER.error("Error while invoking orchestration method", e);
-        jobStateInfoActor.tell(Messages.newJobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE, e).withParallelism(jobParallelism).withJobPriority(jobPriority), getSelf());
+        jobStateInfoActor.tell(Messages.newJobStateUpdated(plugin, JOB_STATE.FAILED_TO_COMPLETE, e)
+          .withParallelism(jobParallelism).withJobPriority(jobPriority), getSelf());
         getSender().tell("Failed to complete", getSelf());
       }
 
@@ -131,7 +133,8 @@ public class AkkaJobActor extends AkkaBaseActor {
     JobsHelper.updateJobObjectsCount(plugin, super.getModel(), objectsCount);
 
     // execute
-    getPluginOrchestrator().runPluginFromIndex(getSelf(), job, sourceObjectsClass, selectedItems.getFilter(), selectedItems.justActive(), plugin);
+    getPluginOrchestrator().runPluginFromIndex(getSelf(), job, sourceObjectsClass, selectedItems.getFilter(),
+      selectedItems.justActive(), plugin);
   }
 
   @Override

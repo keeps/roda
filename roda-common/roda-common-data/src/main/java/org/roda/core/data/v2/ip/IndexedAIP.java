@@ -26,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * This class contains the indexed information about an AIP.
- * 
+ *
  * @author Hélder Silva <hsilva@keep.pt>
  * @author Luis Faria <lfaria@keep.pt>
  */
@@ -105,7 +105,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
 
   /**
    * Constructs a new {@link IndexedAIP} cloning the one given by argument.
-   * 
+   *
    * @param other
    *          the {@link IndexedAIP} to be cloned.
    */
@@ -123,7 +123,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
 
   /**
    * Constructs a new SimpleDescriptionObject with the given arguments.
-   * 
+   *
    * @param id
    * @param state
    * @param level
@@ -214,7 +214,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
 
   /**
    * Gets the description level of this DO.
-   * 
+   *
    * @return a {@link DescriptionLevel} with the level of this DO.
    */
   public String getLevel() {
@@ -223,7 +223,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
 
   /**
    * Sets the level of this DO.
-   * 
+   *
    * @param level
    *          the level to set.
    */
@@ -246,7 +246,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
 
   /**
    * Gets the title of this Description Object.
-   * 
+   *
    * @return a String containing the title of this Descriptive Object.
    */
   public String getTitle() {
@@ -262,7 +262,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
 
   /**
    * Return the initial date of this Descriptive Object.
-   * 
+   *
    * @return a {@link String} with the initial date or <code>null</code> if it
    *         doesn't exist.
    */
@@ -279,7 +279,7 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
 
   /**
    * Return the final date of this Descriptive Object.
-   * 
+   *
    * @return a {@link String} with the final date or <code>null</code> if it
    *         doesn't exist.
    */
@@ -683,29 +683,29 @@ public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, H
   @Override
   public String toString() {
     return "IndexedAIP{" + "id='" + id + '\'' + ", state=" + state + ", type='" + type + '\'' + ", instanceId='"
-      + instanceId + '\'' + instanceName + '\'' + ", level='" + level + '\'' + ", title='" + title + '\'' + ", dateInitial=" + dateInitial
-      + ", dateFinal=" + dateFinal + ", createdOn=" + createdOn + ", createdBy='" + createdBy + '\'' + ", updatedOn="
-      + updatedOn + ", updatedBy='" + updatedBy + '\'' + ", description='" + description + '\'' + ", parentID='"
-      + parentID + '\'' + ", ancestors=" + ancestors + ", permissions=" + permissions + ", numberOfSubmissionFiles="
-      + numberOfSubmissionFiles + ", numberOfDocumentationFiles=" + numberOfDocumentationFiles
-      + ", numberOfSchemaFiles=" + numberOfSchemaFiles + ", hasRepresentations=" + hasRepresentations + ", ghost="
-      + ghost + ", ingestSIPIds=" + ingestSIPIds + ", ingestJobId='" + ingestJobId + '\'' + ", ingestUpdateJobIds="
-      + ingestUpdateJobIds + ", allIngestJobIds=" + allIngestJobIds + ", fields=" + fields + ", disposalScheduleId='"
-      + disposalScheduleId + '\'' + ", disposalScheduleName='" + disposalScheduleName + '\''
-      + ", retentionPeriodDuration='" + retentionPeriodDuration + '\'' + ", retentionPeriodInterval='"
-      + retentionPeriodInterval + '\'' + '\'' + ", retentionPeriodStartDate='" + retentionPeriodStartDate
-      + ", disposalHoldsId=" + disposalHoldsId + ", destroyedOn=" + destroyedOn + ", destroyedBy='" + destroyedBy + '\''
-      + ", disposalAction='" + disposalAction + '\'' + ", overdueDate=" + overdueDate + ", disposalHoldStatus=" + onHold
-      + ", disposalConfirmationId='" + disposalConfirmationId + '\'' + ", scheduleAssociationType="
-      + scheduleAssociationType + '}';
+      + instanceId + '\'' + instanceName + '\'' + ", level='" + level + '\'' + ", title='" + title + '\''
+      + ", dateInitial=" + dateInitial + ", dateFinal=" + dateFinal + ", createdOn=" + createdOn + ", createdBy='"
+      + createdBy + '\'' + ", updatedOn=" + updatedOn + ", updatedBy='" + updatedBy + '\'' + ", description='"
+      + description + '\'' + ", parentID='" + parentID + '\'' + ", ancestors=" + ancestors + ", permissions="
+      + permissions + ", numberOfSubmissionFiles=" + numberOfSubmissionFiles + ", numberOfDocumentationFiles="
+      + numberOfDocumentationFiles + ", numberOfSchemaFiles=" + numberOfSchemaFiles + ", hasRepresentations="
+      + hasRepresentations + ", ghost=" + ghost + ", ingestSIPIds=" + ingestSIPIds + ", ingestJobId='" + ingestJobId
+      + '\'' + ", ingestUpdateJobIds=" + ingestUpdateJobIds + ", allIngestJobIds=" + allIngestJobIds + ", fields="
+      + fields + ", disposalScheduleId='" + disposalScheduleId + '\'' + ", disposalScheduleName='"
+      + disposalScheduleName + '\'' + ", retentionPeriodDuration='" + retentionPeriodDuration + '\''
+      + ", retentionPeriodInterval='" + retentionPeriodInterval + '\'' + '\'' + ", retentionPeriodStartDate='"
+      + retentionPeriodStartDate + ", disposalHoldsId=" + disposalHoldsId + ", destroyedOn=" + destroyedOn
+      + ", destroyedBy='" + destroyedBy + '\'' + ", disposalAction='" + disposalAction + '\'' + ", overdueDate="
+      + overdueDate + ", disposalHoldStatus=" + onHold + ", disposalConfirmationId='" + disposalConfirmationId + '\''
+      + ", scheduleAssociationType=" + scheduleAssociationType + '}';
   }
 
   @Override
   public List<String> toCsvHeaders() {
-    return Arrays.asList("id", "state", "type", "instanceId", "instanceName" ,"level", "title", "dateInitial", "dateFinal",
-      "description", "parentID", "ancestors", "permissions", "numberOfSubmissionFiles", "numberOfDocumentationFiles",
-      "numberOfSchemaFiles", "hasRepresentations", "ghost", "ingestSIPId", "ingestJobId", "ingestUpdateJobIds",
-      "allIngestJobIds", "createdOn", "createdBy", "updatedOn", "updatedBy", "disposalScheduleId",
+    return Arrays.asList("id", "state", "type", "instanceId", "instanceName", "level", "title", "dateInitial",
+      "dateFinal", "description", "parentID", "ancestors", "permissions", "numberOfSubmissionFiles",
+      "numberOfDocumentationFiles", "numberOfSchemaFiles", "hasRepresentations", "ghost", "ingestSIPId", "ingestJobId",
+      "ingestUpdateJobIds", "allIngestJobIds", "createdOn", "createdBy", "updatedOn", "updatedBy", "disposalScheduleId",
       "disposalScheduleName", "disposalHoldsId", "destroyedOn", "destroyedBy", "scheduleAssociationType");
   }
 

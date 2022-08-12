@@ -318,7 +318,7 @@ public class ApplyDisposalHoldToAIPPlugin extends AbstractPlugin<AIP> {
           }
           model.updateAIP(transitiveAIP, cachedJob.getUsername());
           outcomeText = PluginHelper.createOutcomeTextForDisposalHold("Transitive applied with success",
-              disposalHold.getId(), disposalHold.getTitle());
+            disposalHold.getId(), disposalHold.getTitle());
           reportItem.setPluginState(state).addPluginDetails(outcomeText);
           jobPluginInfo.incrementObjectsProcessedWithSuccess();
         } catch (NotFoundException | AuthorizationDeniedException e) {

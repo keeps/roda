@@ -32,7 +32,8 @@ public class DisposalSchedulePluginUtils {
     return disposalScheduleAIPMetadata;
   }
 
-  public static DisposalTransitiveScheduleAIPMetadata createTransitiveDisposalScheduleAIPMetadata(DisposalSchedule disposalSchedule, AIP aip, IndexedAIP aipParentIndexed) {
+  public static DisposalTransitiveScheduleAIPMetadata createTransitiveDisposalScheduleAIPMetadata(
+    DisposalSchedule disposalSchedule, AIP aip, IndexedAIP aipParentIndexed) {
     DisposalTransitiveScheduleAIPMetadata disposalTransitiveSchedule = new DisposalTransitiveScheduleAIPMetadata();
     disposalTransitiveSchedule.setAipId(aip.getId());
     disposalTransitiveSchedule.setActionCode(disposalSchedule.getActionCode());

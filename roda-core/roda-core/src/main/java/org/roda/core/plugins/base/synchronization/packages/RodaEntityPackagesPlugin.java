@@ -161,12 +161,11 @@ public abstract class RodaEntityPackagesPlugin<T extends IsRODAObject> extends A
         createPackage(index, model, indexResult);
       }
 
-
       state = PluginState.SUCCESS;
       outcomeText = "Package created with " + totalCount + " item(s) of entity " + getEntity();
       jobPluginInfo.incrementObjectsProcessedWithSuccess();
-    } catch (GenericException | AuthorizationDeniedException | RequestNotValidException
-      | NotFoundException | AlreadyExistsException e) {
+    } catch (GenericException | AuthorizationDeniedException | RequestNotValidException | NotFoundException
+      | AlreadyExistsException e) {
       LOGGER.error("Error on create package for entity " + getEntity(), e);
       state = PluginState.FAILURE;
       jobPluginInfo.incrementObjectsProcessedWithFailure();
@@ -178,7 +177,8 @@ public abstract class RodaEntityPackagesPlugin<T extends IsRODAObject> extends A
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
   }
 
-  // AipPackagePlugin needs to override this method to avoid counting preservation events.
+  // AipPackagePlugin needs to override this method to avoid counting preservation
+  // events.
   public void addTotalCount(long totalCount) {
     this.totalCount += totalCount;
   }

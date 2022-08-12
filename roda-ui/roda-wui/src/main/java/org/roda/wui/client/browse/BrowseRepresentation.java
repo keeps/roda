@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.browse;
 
@@ -94,7 +94,7 @@ import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class BrowseRepresentation extends Composite {
   private static final MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -414,13 +414,14 @@ public class BrowseRepresentation extends Composite {
 
     if (incidenceCount >= 0) {
       Anchor risksLink = new Anchor(messages.aipRiskIncidences(bundle.getRiskIncidenceCount()), HistoryUtils
-              .createHistoryHashLink(RiskIncidenceRegister.RESOLVER, representation.getAipId(), representation.getId()));
+        .createHistoryHashLink(RiskIncidenceRegister.RESOLVER, representation.getAipId(), representation.getId()));
       risksEventsLogs.add(risksLink);
     }
 
     if (eventCount >= 0) {
-      Anchor eventsLink = new Anchor(messages.aipEvents(bundle.getPreservationEventCount()), HistoryUtils
-              .createHistoryHashLink(PreservationEvents.BROWSE_RESOLVER, representation.getAipId(), representation.getUUID()));
+      Anchor eventsLink = new Anchor(messages.aipEvents(bundle.getPreservationEventCount()),
+        HistoryUtils.createHistoryHashLink(PreservationEvents.BROWSE_RESOLVER, representation.getAipId(),
+          representation.getUUID()));
 
       if (incidenceCount >= 0) {
         risksEventsLogs.add(new Label(" " + messages.and() + " "));

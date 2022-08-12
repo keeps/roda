@@ -10,7 +10,7 @@ package org.roda.core.data.exceptions;
 /**
  * Thrown to indicate that a role with the same name already exists when a new
  * one is trying to be created.
- * 
+ *
  * @author Rui Castro <rui.castro@gmail.com>
  */
 public class RoleAlreadyExistsException extends AlreadyExistsException {

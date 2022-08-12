@@ -71,7 +71,7 @@ public class DisposalPolicyRulesPanel extends Composite {
 
   }
 
-  private void createDisposalRulesPanel(ScrollPanel disposalRulesTablePanel,DisposalRules disposalRules) {
+  private void createDisposalRulesPanel(ScrollPanel disposalRulesTablePanel, DisposalRules disposalRules) {
     disposalRulesTablePanel.addStyleName("basicTable");
     disposalRulesTablePanel.addStyleName("basicTable-border");
     if (disposalRules.getObjects().isEmpty()) {
@@ -109,7 +109,8 @@ public class DisposalPolicyRulesPanel extends Composite {
     }
   }
 
-  private void init(FlowPanel disposalRulesDescription, ScrollPanel disposalRulesTablePanel, DisposalRules disposalRules) {
+  private void init(FlowPanel disposalRulesDescription, ScrollPanel disposalRulesTablePanel,
+    DisposalRules disposalRules) {
     // Create disposal rules description
     createDisposalRulesDescription(disposalRulesDescription);
 

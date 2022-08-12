@@ -9,7 +9,7 @@ package org.roda.core.data.exceptions;
 
 /**
  * Thrown to indicate that the specified email was is already used.
- * 
+ *
  * @author Rui Castro
  */
 public class EmailAlreadyExistsException extends AlreadyExistsException {
@@ -24,7 +24,7 @@ public class EmailAlreadyExistsException extends AlreadyExistsException {
 
   /**
    * Construct a new {@link EmailAlreadyExistsException} with the error message.
-   * 
+   *
    * @param message
    *          the error message.
    */
@@ -35,7 +35,7 @@ public class EmailAlreadyExistsException extends AlreadyExistsException {
   /**
    * Constructs a new {@link EmailAlreadyExistsException} with the given cause
    * exception.
-   * 
+   *
    * @param cause
    *          the cause exception.
    */
@@ -46,7 +46,7 @@ public class EmailAlreadyExistsException extends AlreadyExistsException {
   /**
    * Constructs a new {@link EmailAlreadyExistsException} with the given error
    * message and cause exception.
-   * 
+   *
    * @param message
    *          the error message.
    * @param cause

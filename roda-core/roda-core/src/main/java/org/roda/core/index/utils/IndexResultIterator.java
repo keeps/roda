@@ -191,7 +191,7 @@ public class IndexResultIterator<T extends IsIndexed> implements Iterator<T> {
 
   /**
    * Gets the total count of objects as reported by underlying Solr requests.
-   * 
+   *
    * @return
    */
   public long getTotalCount() {

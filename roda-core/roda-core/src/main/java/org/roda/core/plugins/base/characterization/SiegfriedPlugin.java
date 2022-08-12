@@ -122,20 +122,19 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
             if (getSipInformation().isUpdate()) {
               // SIP UPDATE
               if (AIPState.INGEST_PROCESSING.equals(aip.getState())) {
-                if( aip.getRepresentations() != null && !aip.getRepresentations().isEmpty()) {
+                if (aip.getRepresentations() != null && !aip.getRepresentations().isEmpty()) {
                   for (Representation representation : aip.getRepresentations()) {
-                    LOGGER.debug("Processing representation {} of AIP {}", representation.getId(),
-                        aip.getId());
+                    LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
                     sources.addAll(
-                        SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation, cachedJob.getId()));
+                      SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation, cachedJob.getId()));
                     model.notifyRepresentationUpdated(representation).failOnError();
                   }
 
                   jobPluginInfo.incrementObjectsProcessedWithSuccess();
                   reportItem.setPluginState(PluginState.SUCCESS);
-                }
-                else {
-                  reportItem.setPluginState(PluginState.SKIPPED).setPluginDetails("Skipped because no representation was found for this AIP.");
+                } else {
+                  reportItem.setPluginState(PluginState.SKIPPED)
+                    .setPluginDetails("Skipped because no representation was found for this AIP.");
                   jobPluginInfo.incrementObjectsProcessed(PluginState.SKIPPED);
                 }
               } else {
@@ -147,7 +146,8 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
               if (aip.getRepresentations() != null && !aip.getRepresentations().isEmpty()) {
                 for (Representation representation : aip.getRepresentations()) {
                   LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-                  sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation, cachedJob.getId()));
+                  sources.addAll(
+                    SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation, cachedJob.getId()));
                   model.notifyRepresentationUpdated(representation).failOnError();
                 }
 
@@ -156,7 +156,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
               } else {
                 jobPluginInfo.incrementObjectsProcessedWithSkipped();
                 reportItem.setPluginState(PluginState.SKIPPED)
-                    .setPluginDetails("Skipped because no representation was found for this AIP");
+                  .setPluginDetails("Skipped because no representation was found for this AIP");
               }
             }
           } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
@@ -175,17 +175,15 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
             if (aip.getRepresentations() != null && !aip.getRepresentations().isEmpty()) {
 
               List<Representation> filteredList = aip.getRepresentations().stream()
-                  .filter(
-                      r -> aipData.get(RodaConstants.RODA_OBJECT_REPRESENTATION)
-                          .contains(IdUtils.getRepresentationId(r)))
-                  .collect(Collectors.toList());
+                .filter(
+                  r -> aipData.get(RodaConstants.RODA_OBJECT_REPRESENTATION).contains(IdUtils.getRepresentationId(r)))
+                .collect(Collectors.toList());
 
               for (Representation representation : filteredList) {
                 try {
-                  LOGGER.debug("Processing representation {} of AIP {}", representation.getId(),
-                      aip.getId());
+                  LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
                   sources.addAll(
-                      SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation, cachedJob.getId()));
+                    SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation, cachedJob.getId()));
                   model.notifyRepresentationUpdated(representation).failOnError();
                   state = PluginState.SUCCESS;
                 } catch (RODAException e) {
@@ -194,7 +192,8 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
                 }
               }
             } else {
-              reportItem.setPluginState(state).setPluginDetails("Skipped because no representation was found for this AIP");
+              reportItem.setPluginState(state)
+                .setPluginDetails("Skipped because no representation was found for this AIP");
               jobPluginInfo.incrementObjectsProcessed(state);
             }
             reportItem.setPluginState(state).setPluginDetails("Executed on a SIP update context.");

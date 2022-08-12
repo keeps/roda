@@ -37,7 +37,7 @@ public class RodaWuiServlet extends HttpServlet {
       LOGGER.info("Injecting RODA WUI configurations...");
       RodaCoreFactory.addConfiguration("roda-wui.properties");
       final boolean debug = Boolean
-              .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("ui.sharedProperties.debug"));
+        .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("ui.sharedProperties.debug"));
       if (debug) {
         LOGGER.warn("Has the debug settings enabled.");
       }

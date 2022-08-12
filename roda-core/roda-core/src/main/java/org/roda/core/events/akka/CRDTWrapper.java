@@ -84,7 +84,7 @@ public class CRDTWrapper extends AbstractReplicatedData<CRDTWrapper>
     Map<String, Object> clone = new HashMap<>(rodaObjectOtherInfo);
     clone.put("password", "********");
 
-    return "CRDTWrapper [rodaObject=" + rodaObject + ", rodaObjectOtherInfo=" + clone + ", isUpdate="
-      + isUpdate + ", instanceId=" + instanceId + ", timeinmillis=" + timeinmillis + "]";
+    return "CRDTWrapper [rodaObject=" + rodaObject + ", rodaObjectOtherInfo=" + clone + ", isUpdate=" + isUpdate
+      + ", instanceId=" + instanceId + ", timeinmillis=" + timeinmillis + "]";
   }
 }

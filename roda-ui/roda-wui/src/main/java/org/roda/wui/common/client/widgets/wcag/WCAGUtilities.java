@@ -79,7 +79,7 @@ public class WCAGUtilities {
   /**
    * Sets the title of the first input element found in the children of this
    * element. Depth-first traversal.
-   * 
+   *
    * @param element
    *          element and children to search
    * @param title

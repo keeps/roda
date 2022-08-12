@@ -36,14 +36,14 @@ public interface Plugin<T extends IsRODAObject> {
 
   /**
    * Returns the name of this {@link Plugin}.
-   * 
+   *
    * @return a {@link String} with the name of this {@link Plugin}.
    */
   String getName();
 
   /**
    * Returns the version of this {@link Plugin}.
-   * 
+   *
    * @return a <code>String</code> with the version number for this
    *         {@link Plugin}.
    */
@@ -51,14 +51,14 @@ public interface Plugin<T extends IsRODAObject> {
 
   /**
    * Returns description of this {@link Plugin}.
-   * 
+   *
    * @return a {@link String} with the description of this {@link Plugin}.
    */
   String getDescription();
 
   /**
    * Returns the type of the agent linked to this {@link Plugin}.
-   * 
+   *
    * @return a {@link PreservationAgentType} with the type of the agent of this
    *         {@link Plugin}.
    */
@@ -67,7 +67,7 @@ public interface Plugin<T extends IsRODAObject> {
   /**
    * Returns the type of the execution preservation event linked to this
    * {@link Plugin}.
-   * 
+   *
    * @return a {@link PreservationEventType} with the type of the execution event
    *         of this {@link Plugin}.
    */
@@ -76,7 +76,7 @@ public interface Plugin<T extends IsRODAObject> {
   /**
    * Returns the description of the execution preservation event linked to this
    * {@link Plugin}.
-   * 
+   *
    * @return a {@link String} with the description of the execution event of this
    *         {@link Plugin}.
    */
@@ -85,7 +85,7 @@ public interface Plugin<T extends IsRODAObject> {
   /**
    * Returns the success message of the execution preservation event linked to
    * this {@link Plugin}.
-   * 
+   *
    * @return a {@link String} with the success message of the execution event of
    *         this {@link Plugin}.
    */
@@ -94,7 +94,7 @@ public interface Plugin<T extends IsRODAObject> {
   /**
    * Returns the failure message of the execution preservation event linked to
    * this {@link Plugin}.
-   * 
+   *
    * @return a {@link String} with the failure message of the execution event of
    *         this {@link Plugin}.
    */
@@ -107,7 +107,7 @@ public interface Plugin<T extends IsRODAObject> {
   /**
    * Returns the {@link List} of {@link PluginParameter}s necessary to run this
    * {@link Plugin}.
-   * 
+   *
    * @return a {@link List} of {@link PluginParameter} with the parameters.
    */
   List<PluginParameter> getParameters();
@@ -115,7 +115,7 @@ public interface Plugin<T extends IsRODAObject> {
   /**
    * Gets the parameter values inside a {@link Map} with attribute names and
    * values.
-   * 
+   *
    * @return a {@link Map} with the parameters name and value.
    */
   Map<String, String> getParameterValues();
@@ -123,10 +123,10 @@ public interface Plugin<T extends IsRODAObject> {
   /**
    * Sets the parameters returned by a previous call to
    * {@link Plugin#getParameters()}.
-   * 
+   *
    * @param parameters
    *          a {@link List} of parameters.
-   * 
+   *
    * @throws InvalidParameterException
    */
   void setParameterValues(Map<String, String> parameters) throws InvalidParameterException;
@@ -149,7 +149,7 @@ public interface Plugin<T extends IsRODAObject> {
 
   /**
    * Method that validates the parameters provided to the Plugin
-   * 
+   *
    * FIXME this should be changed to return a report
    */
   boolean areParameterValuesValid();
@@ -162,7 +162,7 @@ public interface Plugin<T extends IsRODAObject> {
   /**
    * Initializes this {@link Plugin}. This method is called by the
    * {@link PluginManager} before any other methods in the plugin.
-   * 
+   *
    * @throws PluginException
    */
   void init() throws PluginException;
@@ -183,16 +183,16 @@ public interface Plugin<T extends IsRODAObject> {
   /**
    * Method executed by {@link PluginOrchestrator} before splitting the workload
    * (if it makes sense) by N workers
-   * 
+   *
    * @throws PluginException
    */
   Report beforeAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;
 
   /**
    * Executes the {@link Plugin}.
-   * 
+   *
    * @return a {@link Report} of the actions performed.
-   * 
+   *
    * @throws PluginException
    */
   Report execute(IndexService index, ModelService model, StorageService storage, List<LiteOptionalWithCause> list)
@@ -201,7 +201,7 @@ public interface Plugin<T extends IsRODAObject> {
   /**
    * Method executed by {@link PluginOrchestrator} after all workers have finished
    * their work
-   * 
+   *
    * @throws PluginException
    */
   Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;

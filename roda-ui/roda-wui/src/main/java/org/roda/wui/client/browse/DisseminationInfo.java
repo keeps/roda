@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.browse;
 
@@ -16,7 +16,7 @@ import org.roda.core.RodaCoreFactory;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class DisseminationInfo implements Serializable {
 
@@ -41,14 +41,13 @@ public class DisseminationInfo implements Serializable {
 
   /**
    * Create a new dissemination info
-   * 
+   *
    * @param id
    *          the dissemination id
    * @param url
    *          the dissemination URL
    * @param windowName
-   *          the name where to open the window (e.g. "_self", "_top" or
-   *          "_blank")
+   *          the name where to open the window (e.g. "_self", "_top" or "_blank")
    * @param windowFeatures
    *          the window features (e.g. "fullscreen=yes, menubar=no,
    *          scrollbars=yes")
@@ -65,7 +64,7 @@ public class DisseminationInfo implements Serializable {
 
   /**
    * Get dissemination id
-   * 
+   *
    * @return the id
    */
   public String getId() {
@@ -74,7 +73,7 @@ public class DisseminationInfo implements Serializable {
 
   /**
    * Set dissemination id
-   * 
+   *
    * @param id
    */
   public void setId(String id) {
@@ -83,7 +82,7 @@ public class DisseminationInfo implements Serializable {
 
   /**
    * Get dissemination URL
-   * 
+   *
    * @return the URL
    */
   public String getUrl() {
@@ -92,7 +91,7 @@ public class DisseminationInfo implements Serializable {
 
   /**
    * Set dissemination URL
-   * 
+   *
    * @param url
    */
   public void setUrl(String url) {
@@ -101,7 +100,7 @@ public class DisseminationInfo implements Serializable {
 
   /**
    * Get target window features
-   * 
+   *
    * @return the window features
    */
   public String getWindowFeatures() {
@@ -110,7 +109,7 @@ public class DisseminationInfo implements Serializable {
 
   /**
    * Set target window features
-   * 
+   *
    * @param windowFeatures
    */
   public void setWindowFeatures(String windowFeatures) {
@@ -119,7 +118,7 @@ public class DisseminationInfo implements Serializable {
 
   /**
    * Get target window name
-   * 
+   *
    * @return "_blank", "_self", "_top", etc.
    */
   public String getWindowName() {
@@ -128,7 +127,7 @@ public class DisseminationInfo implements Serializable {
 
   /**
    * Set target window name
-   * 
+   *
    * @param windowName
    *          "_blank", "_self", "_top", etc.
    */
@@ -138,7 +137,7 @@ public class DisseminationInfo implements Serializable {
 
   /**
    * Get dissemination icon URL
-   * 
+   *
    * @return an URL pointing to the icon image
    */
   public String getIconURL() {
@@ -147,7 +146,7 @@ public class DisseminationInfo implements Serializable {
 
   /**
    * Set dissemination icon URL
-   * 
+   *
    * @param iconURL
    *          URL pointing to the icon image
    */
@@ -157,7 +156,7 @@ public class DisseminationInfo implements Serializable {
 
   /**
    * Does this disseminator return the download of the AIP
-   * 
+   *
    * @return true if this disseminator returns the download of the AIP
    */
   public boolean isDownloadDisseminator() {

@@ -50,8 +50,11 @@ public class FileNotificationProcessor implements NotificationProcessor {
         Path trimmedDropPath = Paths.get(dropPath.substring(7));
 
         if (FSUtils.isDirectory(trimmedDropPath)) {
-          try (DirectResourceAccess jobAccess = model.getStorage().getDirectAccess(ModelUtils.getJobStoragePath(job.getId()));
-               DirectResourceAccess jobReportAccess = model.getStorage().getDirectAccess(ModelUtils.getJobReportsStoragePath(job.getId()))) {
+          try (
+            DirectResourceAccess jobAccess = model.getStorage()
+              .getDirectAccess(ModelUtils.getJobStoragePath(job.getId()));
+            DirectResourceAccess jobReportAccess = model.getStorage()
+              .getDirectAccess(ModelUtils.getJobReportsStoragePath(job.getId()))) {
 
             Path jobPath = FSUtils.createDirectory(trimmedDropPath, job.getId());
 

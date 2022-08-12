@@ -25,10 +25,8 @@ public final class LinkingObjectUtils {
     return URNUtils.createRodaURN(type, uuid, instanceId);
   }
 
-  public static String getLinkingIdentifierId(TransferredResource transferredResource,
-    String instanceId) {
-    return getLinkingIdentifierId(RODA_TYPE.TRANSFERRED_RESOURCE, transferredResource.getRelativePath(),
-      instanceId);
+  public static String getLinkingIdentifierId(TransferredResource transferredResource, String instanceId) {
+    return getLinkingIdentifierId(RODA_TYPE.TRANSFERRED_RESOURCE, transferredResource.getRelativePath(), instanceId);
   }
 
   /**

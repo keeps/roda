@@ -26,9 +26,8 @@ public class SortParameter implements Serializable {
   }
 
   /**
-   * Constructs a {@link SortParameter} cloning an existing
-   * {@link SortParameter}.
-   * 
+   * Constructs a {@link SortParameter} cloning an existing {@link SortParameter}.
+   *
    * @param sortParameter
    *          the {@link SortParameter} to clone.
    */
@@ -38,7 +37,7 @@ public class SortParameter implements Serializable {
 
   /**
    * Constructs a {@link SortParameter} with the given parameters.
-   * 
+   *
    * @param name
    *          the name of the attribute to sort
    * @param descending

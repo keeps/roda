@@ -24,7 +24,7 @@ import java.util.Set;
  * @author Luis Faria <lfaria@keep.pt>
  */
 public class CompoundClassLoader extends ClassLoader {
-    
+
   private Set<ClassLoader> loaders = new HashSet<>();
 
   public void addLoader(ClassLoader loader) {

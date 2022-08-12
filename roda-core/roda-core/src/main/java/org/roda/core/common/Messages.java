@@ -47,7 +47,7 @@ public class Messages {
 
   /**
    * Get translation
-   * 
+   *
    * @param key
    * @return
    */
@@ -74,7 +74,7 @@ public class Messages {
   }
 
   /**
-   * 
+   *
    * prefix will be replaced by "i18n." for simplicity purposes
    */
   @SuppressWarnings("unchecked")
@@ -114,7 +114,7 @@ public class Messages {
       // ask not to cache
       return TTL_DONT_CACHE;
     }
-    
+
     @Override
     public Locale getFallbackLocale(String baseName, Locale locale) {
       if (baseName == null) {

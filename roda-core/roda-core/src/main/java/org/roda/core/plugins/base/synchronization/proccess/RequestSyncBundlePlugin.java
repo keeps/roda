@@ -217,7 +217,7 @@ public class RequestSyncBundlePlugin extends AbstractPlugin<Void> {
 
   /**
    * Creates the Jobs from RODA Central in RODA local and executes.
-   * 
+   *
    * @return number of jobs created and executed.
    */
   private int createJobs(final Path workingDir, IndexService index) throws GenericException, NotFoundException,

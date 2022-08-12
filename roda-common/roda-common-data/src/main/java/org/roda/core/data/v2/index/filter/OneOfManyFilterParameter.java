@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * This filter match one the of the values.
- * 
+ *
  * @author Rui Castro
  */
 public class OneOfManyFilterParameter extends FilterParameter {
@@ -29,7 +29,7 @@ public class OneOfManyFilterParameter extends FilterParameter {
   /**
    * Constructs a {@link OneOfManyFilterParameter} cloning an existing
    * {@link OneOfManyFilterParameter}.
-   * 
+   *
    * @param oneOfManyFilterParameter
    *          the {@link OneOfManyFilterParameter} to clone.
    */
@@ -39,7 +39,7 @@ public class OneOfManyFilterParameter extends FilterParameter {
 
   /**
    * Constructs a {@link OneOfManyFilterParameter} from a list of values.
-   * 
+   *
    * @param name
    *          the name of the attribute.
    * @param values

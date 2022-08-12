@@ -176,7 +176,7 @@ public class Humanize {
 
   /**
    * Format a value in milliseconds as a string
-   * 
+   *
    * @param value
    * @param showMillis
    * @return a formatted string for time duration

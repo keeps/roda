@@ -66,7 +66,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This is the RODA plugin manager. It is responsible for loading {@link Plugin}
  * s.
- * 
+ *
  * @author Rui Castro
  * @author Hélder Silva <hsilva@keep.pt>
  * @author Luis Faria <lfaria@keep.pt>
@@ -100,7 +100,7 @@ public class PluginManager {
 
   /**
    * Constructs a new {@link PluginManager}.
-   * 
+   *
    * @throws PluginManagerException
    */
   private PluginManager() throws PluginManagerException {
@@ -109,9 +109,9 @@ public class PluginManager {
 
   /**
    * Gets the default {@link PluginManager}.
-   * 
+   *
    * @return the default {@link PluginManager}.
-   * 
+   *
    * @throws PluginManagerException
    */
   public static synchronized PluginManager instantiatePluginManager(Path rodaConfigPath, Path rodaPluginsPath)
@@ -146,7 +146,7 @@ public class PluginManager {
 
   /**
    * Returns all {@link Plugin}s present in all jars.
-   * 
+   *
    * @return a {@link List} of {@link Plugin}s.
    */
   public List<Plugin<? extends IsRODAObject>> getPlugins() {
@@ -158,7 +158,7 @@ public class PluginManager {
 
   /**
    * Returns the {@link PluginInfo}s for all {@link Plugin}s.
-   * 
+   *
    * @return a {@link List} of {@link PluginInfo}s.
    */
   public List<PluginInfo> getPluginsInfo() {
@@ -208,12 +208,11 @@ public class PluginManager {
   }
 
   /**
-   * Returns an instance of the {@link Plugin} with the specified ID
-   * (classname).
-   * 
+   * Returns an instance of the {@link Plugin} with the specified ID (classname).
+   *
    * @param pluginID
    *          the ID (classname) of the {@link Plugin}.
-   * 
+   *
    * @return a {@link Plugin} or <code>null</code> if the specified classname is
    *         not a {@link Plugin} or something went wrong during its init().
    */
@@ -241,7 +240,7 @@ public class PluginManager {
 
   /**
    * @param pluginID
-   * 
+   *
    * @return {@link PluginInfo} or <code>null</code>.
    */
   public PluginInfo getPluginInfo(String pluginID) {
@@ -747,13 +746,13 @@ public class PluginManager {
     }
   }
 
-  public static String getPluginsInformationAsMarkdown(List<Pair<String,String>> plugins) {
+  public static String getPluginsInformationAsMarkdown(List<Pair<String, String>> plugins) {
     StringBuilder sb = new StringBuilder();
     int numberOfPlugins = plugins.size();
     if (numberOfPlugins > 1) {
       sb.append(String.format("# Plugins%n%n"));
     }
-    for (Pair<String,String> pluginNameAndState : plugins) {
+    for (Pair<String, String> pluginNameAndState : plugins) {
       String plugin = pluginNameAndState.getFirst();
       String state = pluginNameAndState.getSecond();
       try {
@@ -773,7 +772,8 @@ public class PluginManager {
     return getPluginInformationAsMarkdown(plugin, "", false);
   }
 
-  private static String getPluginInformationAsMarkdown(Plugin<? extends IsRODAObject> plugin, String pluginState, boolean severalPlugins) {
+  private static String getPluginInformationAsMarkdown(Plugin<? extends IsRODAObject> plugin, String pluginState,
+    boolean severalPlugins) {
     StringBuilder sb = new StringBuilder();
     sb.append(String.format("#%s %s %s %n%n", severalPlugins ? "#" : "", plugin.getName(), pluginState));
     // 2018-01-24 hsilva: having the version usually depends on having the tool

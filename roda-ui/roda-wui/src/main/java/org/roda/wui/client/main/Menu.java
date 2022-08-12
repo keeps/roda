@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.main;
 
@@ -72,7 +72,7 @@ import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class Menu extends Composite {
 
@@ -134,7 +134,7 @@ public class Menu extends Composite {
 
   /**
    * Main menu constructor
-   * 
+   *
    */
   public Menu() {
     initWidget(uiBinder.createAndBindUi(this));

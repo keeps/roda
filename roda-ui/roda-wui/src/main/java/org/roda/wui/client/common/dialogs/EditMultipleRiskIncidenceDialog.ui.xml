@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
@@ -9,27 +8,43 @@
 	<g:FlowPanel addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="wui-dialog-layout">
 			<g:FlowPanel>
-				<g:FlowPanel addStyleNames="page-description" ui:field="titlePanel"></g:FlowPanel>
-				<g:FlowPanel>
-					<g:Label addStyleNames="form-label"><ui:text from='{messages.riskIncidenceStatus}' /></g:Label>
-					<g:ListBox title="{messages.riskIncidenceStatus}" ui:field="status" addStyleNames="form-selectbox form-textbox-small form-risk-mitigation-margin" />
+				<g:FlowPanel addStyleNames="page-description" ui:field="titlePanel">
 				</g:FlowPanel>
 				<g:FlowPanel>
-					<g:Label addStyleNames="form-label"><ui:text from='{messages.riskIncidenceSeverity}' /></g:Label>
-					<g:ListBox title="{messages.riskIncidenceSeverity}" ui:field="severity" addStyleNames="form-selectbox form-textbox-small form-risk-mitigation-margin" />
+					<g:Label addStyleNames="form-label">
+						<ui:text from='{messages.riskIncidenceStatus}' />
+					</g:Label>
+					<g:ListBox title="{messages.riskIncidenceStatus}" ui:field="status"
+						addStyleNames="form-selectbox form-textbox-small form-risk-mitigation-margin" />
 				</g:FlowPanel>
 				<g:FlowPanel>
-					<g:Label addStyleNames="form-label"><ui:text from='{messages.riskIncidenceMitigatedOn}' /></g:Label>
-					<d:DateBox title="{messages.riskIncidenceMitigatedOn}" ui:field="mitigatedOn" addStyleNames="form-textbox form-textbox-small" />
-				</g:FlowPanel>		
+					<g:Label addStyleNames="form-label">
+						<ui:text from='{messages.riskIncidenceSeverity}' />
+					</g:Label>
+					<g:ListBox title="{messages.riskIncidenceSeverity}" ui:field="severity"
+						addStyleNames="form-selectbox form-textbox-small form-risk-mitigation-margin" />
+				</g:FlowPanel>
 				<g:FlowPanel>
-					<g:Label addStyleNames="form-label"><ui:text from='{messages.riskIncidenceMitigatedBy}' /></g:Label>
-					<g:TextBox title="{messages.riskIncidenceMitigatedBy}" ui:field="mitigatedBy" addStyleNames="form-textbox" />
-				</g:FlowPanel>		
+					<g:Label addStyleNames="form-label">
+						<ui:text from='{messages.riskIncidenceMitigatedOn}' />
+					</g:Label>
+					<d:DateBox title="{messages.riskIncidenceMitigatedOn}" ui:field="mitigatedOn"
+						addStyleNames="form-textbox form-textbox-small" />
+				</g:FlowPanel>
 				<g:FlowPanel>
-					<g:Label addStyleNames="form-label"><ui:text from='{messages.riskIncidenceMitigatedDescription}' /></g:Label>
-					<g:TextArea title="{messages.riskIncidenceMitigatedDescription}" ui:field="mitigatedDescription" addStyleNames="form-textbox" />
-				</g:FlowPanel>	
+					<g:Label addStyleNames="form-label">
+						<ui:text from='{messages.riskIncidenceMitigatedBy}' />
+					</g:Label>
+					<g:TextBox title="{messages.riskIncidenceMitigatedBy}" ui:field="mitigatedBy"
+						addStyleNames="form-textbox" />
+				</g:FlowPanel>
+				<g:FlowPanel>
+					<g:Label addStyleNames="form-label">
+						<ui:text from='{messages.riskIncidenceMitigatedDescription}' />
+					</g:Label>
+					<g:TextArea title="{messages.riskIncidenceMitigatedDescription}" ui:field="mitigatedDescription"
+						addStyleNames="form-textbox" />
+				</g:FlowPanel>
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="wui-dialog-layout-footer">
 				<g:Button addStyleNames="btn btn-link" ui:field="cancelButton">

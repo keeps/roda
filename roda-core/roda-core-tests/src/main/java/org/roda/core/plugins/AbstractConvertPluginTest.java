@@ -113,7 +113,7 @@ public class AbstractConvertPluginTest {
 
   /**
    * Test the abstract convert plugin from files in shallow AIP.
-   * 
+   *
    * @throws RODAException
    *           if some error occurs.
    */
@@ -138,8 +138,8 @@ public class AbstractConvertPluginTest {
 
     final Filter filterParentTheAIP = new Filter();
     filterParentTheAIP.add(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId));
-    final IndexResult<IndexedRepresentation> indexResult = index.find(IndexedRepresentation.class, filterParentTheAIP, null,
-      new Sublist(0, 10), Collections.emptyList());
+    final IndexResult<IndexedRepresentation> indexResult = index.find(IndexedRepresentation.class, filterParentTheAIP,
+      null, new Sublist(0, 10), Collections.emptyList());
 
     Assert.assertEquals(indexResult.getResults().size(), 2);
 
@@ -157,8 +157,8 @@ public class AbstractConvertPluginTest {
 
     // create the AIP in Resources
     model.createAIP(aipId, corporaService,
-            DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID_EARK2S),
-            RodaConstants.ADMIN);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID_EARK2S),
+      RodaConstants.ADMIN);
 
     index.commitAIPs();
     final Map<String, String> parameters = new HashMap<>();
@@ -166,14 +166,14 @@ public class AbstractConvertPluginTest {
     parameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT, "txt");
 
     final Job job = TestsHelper.executeJob(AbstractConvertPluginDummy.class, parameters, PluginType.AIP_TO_AIP,
-            SelectedItemsAll.create(Representation.class));
+      SelectedItemsAll.create(Representation.class));
 
     index.commitAIPs();
 
     final Filter filterParentTheAIP = new Filter();
     filterParentTheAIP.add(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId));
-    final IndexResult<IndexedRepresentation> indexResult = index.find(IndexedRepresentation.class, filterParentTheAIP, null,
-            new Sublist(0, 10), Collections.emptyList());
+    final IndexResult<IndexedRepresentation> indexResult = index.find(IndexedRepresentation.class, filterParentTheAIP,
+      null, new Sublist(0, 10), Collections.emptyList());
 
     Assert.assertEquals(indexResult.getResults().size(), 2);
 
@@ -191,8 +191,8 @@ public class AbstractConvertPluginTest {
 
     // create the AIP in Resources
     model.createAIP(aipId, corporaService,
-            DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID_EARK2S),
-            RodaConstants.ADMIN);
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID_EARK2S),
+      RodaConstants.ADMIN);
 
     index.commitAIPs();
     final Map<String, String> parameters = new HashMap<>();
@@ -200,14 +200,14 @@ public class AbstractConvertPluginTest {
     parameters.put(RodaConstants.PLUGIN_PARAMS_OUTPUT_FORMAT, "txt");
 
     final Job job = TestsHelper.executeJob(AbstractConvertPluginDummy.class, parameters, PluginType.AIP_TO_AIP,
-            SelectedItemsAll.create(AIP.class));
+      SelectedItemsAll.create(AIP.class));
 
     index.commitAIPs();
 
     final Filter filterParentTheAIP = new Filter();
     filterParentTheAIP.add(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId));
-    final IndexResult<IndexedRepresentation> indexResult = index.find(IndexedRepresentation.class, filterParentTheAIP, null,
-            new Sublist(0, 10), Collections.emptyList());
+    final IndexResult<IndexedRepresentation> indexResult = index.find(IndexedRepresentation.class, filterParentTheAIP,
+      null, new Sublist(0, 10), Collections.emptyList());
 
     Assert.assertEquals(indexResult.getResults().size(), 2);
 

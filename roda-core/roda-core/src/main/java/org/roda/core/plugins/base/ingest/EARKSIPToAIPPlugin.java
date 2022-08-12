@@ -142,7 +142,8 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
 
   private void transformTransferredResourceIntoAnAIP(IndexService index, ModelService model, StorageService storage,
     TransferredResource transferredResource, Path earkSIPPath, boolean createSubmission, Report reportItem,
-    String jobId, Optional<String> computedSearchScope, boolean forceSearchScope, Path jobWorkingDirectory, Job cachedJob) {
+    String jobId, Optional<String> computedSearchScope, boolean forceSearchScope, Path jobWorkingDirectory,
+    Job cachedJob) {
     SIP sip = null;
     AIP aip = null;
 

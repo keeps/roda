@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.common;
 
@@ -17,13 +17,13 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public interface UserLoginServiceAsync {
 
   /**
    * Get the authenticated user
-   * 
+   *
    * @return
    * @throws RODAException
    */
@@ -31,7 +31,7 @@ public interface UserLoginServiceAsync {
 
   /**
    * Login into RODA Core
-   * 
+   *
    * @param username
    * @param password
    * @return

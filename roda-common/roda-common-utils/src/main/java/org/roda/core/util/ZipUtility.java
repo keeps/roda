@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Rui Castro
  * @author Vladislav Korecký <vladislav_korecky@gordic.cz>
- * 
+ *
  * @since 20160909 hsilva: RODA is not using any of these methods, but external
  *        plugins are
  */
@@ -52,17 +52,17 @@ public final class ZipUtility {
 
   /**
    * Extract files in zipFilename to outputDir.
-   * 
+   *
    * @param zipFilename
    *          the zip file to extract files from.
    * @param outputDir
    *          the output directory to extract files to.
    * @param filesWithAbsolutePath
-   *          determines if the output list of files will contain the absolute
-   *          or relative path to the files
-   * 
+   *          determines if the output list of files will contain the absolute or
+   *          relative path to the files
+   *
    * @return a {@link List} of with all the extracted {@link File}s.
-   * 
+   *
    * @throws IOException
    *           if a input/output operation fails, like opening a file or
    *           reading/writing from/to a stream.
@@ -133,7 +133,7 @@ public final class ZipUtility {
 
   /**
    * Creates ZIP file with the files inside directory <code>contentsDir</code> .
-   * 
+   *
    * @param newZipFile
    *          the ZIP file to create
    * @param contentsDir
@@ -198,7 +198,7 @@ public final class ZipUtility {
 
   /**
    * Adds file / folder to zip output stream. Method works recursively.
-   * 
+   *
    * @param zos
    * @param srcFile
    */

@@ -71,8 +71,7 @@ public class BasicTablePanel<C> extends Composite {
   }
 
   @SafeVarargs
-  public BasicTablePanel(CellTable.Resources resources, Iterator<C> rowItems,
-                         ColumnInfo<C>... columns) {
+  public BasicTablePanel(CellTable.Resources resources, Iterator<C> rowItems, ColumnInfo<C>... columns) {
     initWidget(uiBinder.createAndBindUi(this));
 
     display = createTable(resources, rowItems, columns);
@@ -87,8 +86,6 @@ public class BasicTablePanel<C> extends Composite {
     displayScroll.addScrollHandler(event -> handleScrollChanges());
     handleScrollChanges();
   }
-
-
 
   @SafeVarargs
   public BasicTablePanel(Widget headerContent, Widget infoContent, CellTable.Resources resources, Iterator<C> rowItems,
@@ -144,7 +141,6 @@ public class BasicTablePanel<C> extends Composite {
     table.setVisible(false);
     selectionModel = null;
   }
-
 
   @Override
   public void setVisible(boolean visible) {

@@ -1,41 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:common="urn:import:org.roda.wui.client.common">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:common="urn:import:org.roda.wui.client.common">
 
-    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
-    <g:FlowPanel styleName="wui-create-disposal-confirmation-data wui-user-data" addStyleNames="wrapper skip_padding">
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+	<g:FlowPanel styleName="wui-create-disposal-confirmation-data wui-user-data" addStyleNames="wrapper skip_padding">
 
-        <g:FlowPanel addStyleNames="row full_width skip_padding">
-            <g:FlowPanel addStyleNames="col_10 content" ui:field="content">
-                <common:TitlePanel text="{messages.createDisposalConfirmationExtraInformationTitle}" iconClass="DisposalConfirmations"/>
-                <g:FlowPanel addStyleNames="page-description" ui:field="createDisposalConfirmationFormDescription"/>
-                <g:FlowPanel addStyleNames="wui-error-panel">
-                    <g:HTML ui:field="errors"/>
-                </g:FlowPanel>
-                <g:Label addStyleNames="form-label">
-                    <ui:text from='{messages.disposalConfirmationDataPanelTitle}'/>
+		<g:FlowPanel addStyleNames="row full_width skip_padding">
+			<g:FlowPanel addStyleNames="col_10 content" ui:field="content">
+				<common:TitlePanel text="{messages.createDisposalConfirmationExtraInformationTitle}"
+					iconClass="DisposalConfirmations" />
+				<g:FlowPanel addStyleNames="page-description" ui:field="createDisposalConfirmationFormDescription" />
+				<g:FlowPanel addStyleNames="wui-error-panel">
+					<g:HTML ui:field="errors" />
+				</g:FlowPanel>
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{messages.disposalConfirmationDataPanelTitle}' />
                     *
                 </g:Label>
-                <g:TextBox title="{messages.disposalConfirmationDataPanelTitle}" ui:field="title" addStyleNames="form-textbox"/>
-                <g:Label ui:field="titleError" addStyleNames="form-label-error"/>
-                <g:FlowPanel ui:field="extra"/>
-                <g:Label styleName="wui-disposal-confirmation-data-note">
-                    <ui:text from="{messages.disposalConfirmationDataNote}" />
-                </g:Label>
-            </g:FlowPanel>
+				<g:TextBox title="{messages.disposalConfirmationDataPanelTitle}" ui:field="title"
+					addStyleNames="form-textbox" />
+				<g:Label ui:field="titleError" addStyleNames="form-label-error" />
+				<g:FlowPanel ui:field="extra" />
+				<g:Label styleName="wui-disposal-confirmation-data-note">
+					<ui:text from="{messages.disposalConfirmationDataNote}" />
+				</g:Label>
+			</g:FlowPanel>
 
-            <g:FlowPanel addStyleNames="col_2 last sidebar" ui:field="sidebarFlowPanel">
-                <g:FlowPanel addStyleNames="sticky-flow">
-                    <g:FlowPanel addStyleNames="sticky-padding">
-                        <g:Label addStyleNames="h4">
-                            <ui:text from="{messages.actions}"/>
-                        </g:Label>
-                        <g:FlowPanel ui:field="buttonsPanel"/>
-                    </g:FlowPanel>
-                </g:FlowPanel>
-            </g:FlowPanel>
-        </g:FlowPanel>
-    </g:FlowPanel>
+			<g:FlowPanel addStyleNames="col_2 last sidebar" ui:field="sidebarFlowPanel">
+				<g:FlowPanel addStyleNames="sticky-flow">
+					<g:FlowPanel addStyleNames="sticky-padding">
+						<g:Label addStyleNames="h4">
+							<ui:text from="{messages.actions}" />
+						</g:Label>
+						<g:FlowPanel ui:field="buttonsPanel" />
+					</g:FlowPanel>
+				</g:FlowPanel>
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</g:FlowPanel>
 </ui:UiBinder>

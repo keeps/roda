@@ -24,7 +24,7 @@ public abstract class FiltersParameters extends FilterParameter {
   /**
    * Constructs a {@link FiltersParameters} cloning an existing
    * {@link FiltersParameters}.
-   * 
+   *
    * @param filtersParameters
    *          the {@link FiltersParameters} to clone.
    */
@@ -34,7 +34,7 @@ public abstract class FiltersParameters extends FilterParameter {
 
   /**
    * Constructs a {@link FiltersParameters} from a list of values.
-   * 
+   *
    * @param name
    *          the name of the attribute.
    * @param values

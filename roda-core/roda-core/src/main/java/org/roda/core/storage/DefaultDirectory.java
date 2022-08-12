@@ -11,9 +11,9 @@ import org.roda.core.data.v2.ip.StoragePath;
 
 /**
  * Default implementation of the Directory inteface.
- * 
+ *
  * @see Directory
- * 
+ *
  * @author Luis Faria <lfaria@keep.pt>
  *
  */

@@ -421,7 +421,7 @@ public class Report implements IsModelObject, HasId {
    * (!currentPluginState.equals(PluginState.FAILURE)) { if
    * (newPluginState.equals(PluginState.FAILURE)) { return
    * PluginState.PARTIAL_SUCCESS; } } }
-   * 
+   *
    * return newPluginState; }
    */
 

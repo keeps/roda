@@ -19,7 +19,7 @@ public class RecaptchaException extends Exception {
 
   /**
    * Construct a new {@link RecaptchaException} with the error message.
-   * 
+   *
    * @param message
    *          the error message.
    */
@@ -29,7 +29,7 @@ public class RecaptchaException extends Exception {
 
   /**
    * Constructs a new {@link RecaptchaException} with the given cause exception.
-   * 
+   *
    * @param cause
    *          the cause exception.
    */
@@ -38,9 +38,9 @@ public class RecaptchaException extends Exception {
   }
 
   /**
-   * Constructs a new {@link RecaptchaException} with the given error message
-   * and cause exception.
-   * 
+   * Constructs a new {@link RecaptchaException} with the given error message and
+   * cause exception.
+   *
    * @param message
    *          the error message.
    * @param cause

@@ -23,10 +23,10 @@ public interface MigrationAction<T extends IsModelObject> {
    * migration action to migrate to version X & some other person might setup it
    * incorrectly in {@link MigrationManager#setupModelMigrations()}to migrate to
    * version Y
-   * 
+   *
    * @param toVersion
-   *          injected by {@link MigrationManager} because, even if this class
-   *          is specific to migrate a certain model class to a certain version,
+   *          injected by {@link MigrationManager} because, even if this class is
+   *          specific to migrate a certain model class to a certain version,
    *          someone might change the version when doing the setup in the
    *          {@link MigrationManager}
    */

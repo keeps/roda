@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.common.client;
 
@@ -14,13 +14,13 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public interface ClientLoggerServiceAsync {
 
   /**
    * Log at trace level
-   * 
+   *
    * @param classname
    * @param object
    */
@@ -28,7 +28,7 @@ public interface ClientLoggerServiceAsync {
 
   /**
    * Log at trace level
-   * 
+   *
    * @param classname
    * @param object
    * @param error
@@ -37,7 +37,7 @@ public interface ClientLoggerServiceAsync {
 
   /**
    * Log at debug level
-   * 
+   *
    * @param classname
    * @param object
    */
@@ -45,7 +45,7 @@ public interface ClientLoggerServiceAsync {
 
   /**
    * Log at debug level
-   * 
+   *
    * @param classname
    * @param object
    * @param error
@@ -54,7 +54,7 @@ public interface ClientLoggerServiceAsync {
 
   /**
    * Log at info level
-   * 
+   *
    * @param classname
    * @param object
    */
@@ -62,7 +62,7 @@ public interface ClientLoggerServiceAsync {
 
   /**
    * Log at info level
-   * 
+   *
    * @param classname
    * @param object
    * @param error
@@ -71,7 +71,7 @@ public interface ClientLoggerServiceAsync {
 
   /**
    * Log at warn level
-   * 
+   *
    * @param classname
    * @param object
    */
@@ -79,7 +79,7 @@ public interface ClientLoggerServiceAsync {
 
   /**
    * Log at warn level
-   * 
+   *
    * @param classname
    * @param object
    * @param error
@@ -88,7 +88,7 @@ public interface ClientLoggerServiceAsync {
 
   /**
    * Log at error level
-   * 
+   *
    * @param classname
    * @param object
    */
@@ -96,7 +96,7 @@ public interface ClientLoggerServiceAsync {
 
   /**
    * Log at error level
-   * 
+   *
    * @param classname
    * @param object
    * @param error
@@ -105,7 +105,7 @@ public interface ClientLoggerServiceAsync {
 
   /**
    * Log at fatal level
-   * 
+   *
    * @param classname
    * @param object
    */
@@ -113,7 +113,7 @@ public interface ClientLoggerServiceAsync {
 
   /**
    * Log at fatal level
-   * 
+   *
    * @param classname
    * @param object
    * @param error
@@ -122,7 +122,7 @@ public interface ClientLoggerServiceAsync {
 
   /**
    * Log a page hit
-   * 
+   *
    * @param pagename
    * @throws LoginException
    * @throws LoggerException

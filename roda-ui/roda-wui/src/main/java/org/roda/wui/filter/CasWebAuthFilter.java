@@ -140,7 +140,7 @@ public class CasWebAuthFilter implements Filter {
       } catch (URISyntaxException e) {
         LOGGER.error("Could not generate service URL, redirecting to base path " + path, e);
         httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-            "Unexpected error, see server logs for details");
+          "Unexpected error, see server logs for details");
       }
 
     } else if (url.endsWith("/logout")) {

@@ -48,7 +48,7 @@ public class BinaryConsumesOutputStream implements ConsumesSkipableOutputStream 
   public Date getLastModified() {
     return null;
   }
-  
+
   @Override
   public long getSize() {
     return binary.getSizeInBytes();
@@ -63,7 +63,5 @@ public class BinaryConsumesOutputStream implements ConsumesSkipableOutputStream 
   public String getMediaType() {
     return mediaType;
   }
-
-
 
 }

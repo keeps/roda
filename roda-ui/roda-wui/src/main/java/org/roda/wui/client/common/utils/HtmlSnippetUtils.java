@@ -93,7 +93,7 @@ public class HtmlSnippetUtils {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   public static final SafeHtml LOADING = SafeHtmlUtils.fromSafeConstant(
-      "<div class='spinner'><div class='double-bounce1'></div><div class='double-bounce2'></div></div>");
+    "<div class='spinner'><div class='double-bounce1'></div><div class='double-bounce2'></div></div>");
 
   private HtmlSnippetUtils() {
     // do nothing
@@ -122,12 +122,12 @@ public class HtmlSnippetUtils {
     SafeHtmlBuilder b = new SafeHtmlBuilder();
 
     b.append(SafeHtmlUtils.fromSafeConstant("<span class='badge-card "))
-        .append(SafeHtmlUtils.fromSafeConstant(extraCSS)).append(SafeHtmlUtils.fromSafeConstant("'>"));
+      .append(SafeHtmlUtils.fromSafeConstant(extraCSS)).append(SafeHtmlUtils.fromSafeConstant("'>"));
 
     b.append(SafeHtmlUtils.fromSafeConstant("<i class=\"fas fa-stopwatch\" style=\"color: white\"></i>"));
 
     b.append(SafeHtmlUtils.fromSafeConstant("<span> ")).append(SafeHtmlUtils.fromSafeConstant(label))
-        .append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+      .append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
 
     return b.toSafeHtml();
   }
@@ -261,50 +261,49 @@ public class HtmlSnippetUtils {
       if (JOB_STATE.COMPLETED.equals(state)) {
         if (job.getJobStats().getSourceObjectsCount() == job.getJobStats().getSourceObjectsProcessedWithSuccess()) {
           ret = SafeHtmlUtils
-              .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + messages.showJobStatusCompleted() + CLOSE_SPAN);
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + messages.showJobStatusCompleted() + CLOSE_SPAN);
         } else if (job.getJobStats().getSourceObjectsProcessedWithPartialSuccess() > 0) {
           ret = SafeHtmlUtils
-              .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
         } else if (job.getJobStats().getSourceObjectsProcessedWithSuccess() > 0) {
           ret = SafeHtmlUtils
-              .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
         } else if (job.getJobStats().getSourceObjectsProcessedWithSuccess() == 0
-            && job.getJobStats().getSourceObjectsProcessedWithSkipped() > 0) {
+          && job.getJobStats().getSourceObjectsProcessedWithSkipped() > 0) {
           ret = SafeHtmlUtils
-              .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusCompleted() + CLOSE_SPAN);
         } else {
           ret = SafeHtmlUtils
-              .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.showJobStatusCompleted() + CLOSE_SPAN);
+            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.showJobStatusCompleted() + CLOSE_SPAN);
         }
       } else if (JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
         ret = SafeHtmlUtils
-            .fromSafeConstant(
-                OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusFailedDuringCreation() + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusFailedDuringCreation() + CLOSE_SPAN);
       } else if (JOB_STATE.FAILED_TO_COMPLETE.equals(state)) {
         ret = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusFailedToComplete() + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusFailedToComplete() + CLOSE_SPAN);
       } else if (JOB_STATE.STOPPING.equals(state)) {
         ret = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusStopping() + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusStopping() + CLOSE_SPAN);
       } else if (JOB_STATE.STOPPED.equals(state)) {
         ret = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusStopped() + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.showJobStatusStopped() + CLOSE_SPAN);
       } else if (JOB_STATE.CREATED.equals(state)) {
         ret = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + messages.showJobStatusCreated() + CLOSE_SPAN);
       } else if (JOB_STATE.STARTED.equals(state)) {
         ret = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + messages.showJobStatusStarted() + CLOSE_SPAN);
       } else if (JOB_STATE.PENDING_APPROVAL.equals(state)) {
         ret = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusPendingApproval() + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusPendingApproval() + CLOSE_SPAN);
       } else if (JOB_STATE.SCHEDULED.equals(state)) {
         ret = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusScheduled() + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusScheduled() + CLOSE_SPAN);
       } else if (JOB_STATE.REJECTED.equals(state)) {
         ret = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.showJobStatusApprovalRejected() + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.showJobStatusApprovalRejected() + CLOSE_SPAN);
       } else if (JOB_STATE.TO_BE_CLEANED.equals(state)) {
         ret = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusToBeCleaned() + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.showJobStatusToBeCleaned() + CLOSE_SPAN);
       } else {
         ret = SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + state + CLOSE_SPAN);
       }
@@ -335,7 +334,7 @@ public class HtmlSnippetUtils {
 
   public static void getRepresentationTypeHTML(FlowPanel panel, String title, List<String> representationStates) {
     RepresentationInformationHelper.addFieldWithRepresentationInformationIcon(
-        SafeHtmlUtils.fromSafeConstant(OPEN_H2_CLASS_LABEL_SUCCESS + title + CLOSE_SPAN), null, panel, false);
+      SafeHtmlUtils.fromSafeConstant(OPEN_H2_CLASS_LABEL_SUCCESS + title + CLOSE_SPAN), null, panel, false);
 
     for (String state : representationStates) {
       SafeHtmlBuilder b = new SafeHtmlBuilder();
@@ -348,9 +347,9 @@ public class HtmlSnippetUtils {
       icon.addStyleName("h6 representation-information-badge");
 
       final String filter = RepresentationInformationUtils.createRepresentationInformationFilter(
-          RodaConstants.INDEX_REPRESENTATION, RodaConstants.REPRESENTATION_STATES, state);
+        RodaConstants.INDEX_REPRESENTATION, RodaConstants.REPRESENTATION_STATES, state);
       icon.setHref(HistoryUtils.createHistoryHashLink(RepresentationInformationAssociations.RESOLVER,
-          RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter));
+        RodaConstants.REPRESENTATION_INFORMATION_FILTERS, filter));
 
       panel.add(icon);
     }
@@ -361,21 +360,21 @@ public class HtmlSnippetUtils {
     switch (pluginState) {
       case SUCCESS:
         pluginStateHTML = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
         break;
       case RUNNING:
         pluginStateHTML = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
         break;
       case PARTIAL_SUCCESS:
       case SKIPPED:
         pluginStateHTML = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
         break;
       case FAILURE:
       default:
         pluginStateHTML = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.pluginStateMessage(pluginState) + CLOSE_SPAN);
         break;
     }
     return pluginStateHTML;
@@ -390,10 +389,10 @@ public class HtmlSnippetUtils {
 
     if (value) {
       pluginMandatoryHTML = SafeHtmlUtils
-          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + messages.mandatoryPlugin() + CLOSE_SPAN);
+        .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + messages.mandatoryPlugin() + CLOSE_SPAN);
     } else {
       pluginMandatoryHTML = SafeHtmlUtils
-          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + messages.optionalPlugin() + CLOSE_SPAN);
+        .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_INFO + messages.optionalPlugin() + CLOSE_SPAN);
     }
 
     return pluginMandatoryHTML;
@@ -440,11 +439,11 @@ public class HtmlSnippetUtils {
     switch (level) {
       case LOW:
         ret = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + messages.severityLevel(level) + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + messages.severityLevel(level) + CLOSE_SPAN);
         break;
       case MODERATE:
         ret = SafeHtmlUtils
-            .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.severityLevel(level) + CLOSE_SPAN);
+          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING + messages.severityLevel(level) + CLOSE_SPAN);
         break;
       case HIGH:
       default:
@@ -457,10 +456,10 @@ public class HtmlSnippetUtils {
   public static SafeHtml getStatusDefinition(IncidenceStatus status) {
     if (status.equals(IncidenceStatus.UNMITIGATED)) {
       return SafeHtmlUtils
-          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.riskIncidenceStatusValue(status) + CLOSE_SPAN);
+        .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER + messages.riskIncidenceStatusValue(status) + CLOSE_SPAN);
     } else {
       return SafeHtmlUtils
-          .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + messages.riskIncidenceStatusValue(status) + CLOSE_SPAN);
+        .fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS + messages.riskIncidenceStatusValue(status) + CLOSE_SPAN);
     }
   }
 
@@ -483,11 +482,11 @@ public class HtmlSnippetUtils {
     }
 
     return SafeHtmlUtils
-        .fromSafeConstant("<span class='" + labelClass + "'>" + messages.logEntryStateValue(state) + CLOSE_SPAN);
+      .fromSafeConstant("<span class='" + labelClass + "'>" + messages.logEntryStateValue(state) + CLOSE_SPAN);
   }
 
   public static void addRiskIncidenceObjectLinks(RiskIncidence incidence, final Label objectLabel,
-      final Anchor objectLink) {
+    final Anchor objectLink) {
     if (AIP.class.getSimpleName().equals(incidence.getObjectClass())) {
       objectLabel.setText(messages.showAIPExtended());
       objectLink.setHref(HistoryUtils.createHistoryHashLink(BrowseTop.RESOLVER, incidence.getAipId()));
@@ -495,12 +494,12 @@ public class HtmlSnippetUtils {
     } else if (Representation.class.getSimpleName().equals(incidence.getObjectClass())) {
       objectLabel.setText(messages.showRepresentationExtended());
       objectLink.setHref(HistoryUtils.createHistoryHashLink(BrowseRepresentation.RESOLVER, incidence.getAipId(),
-          incidence.getRepresentationId()));
+        incidence.getRepresentationId()));
       objectLink.setText(incidence.getRepresentationId());
     } else if (File.class.getSimpleName().equals(incidence.getObjectClass())) {
       objectLabel.setText(messages.showFileExtended());
       objectLink.setHref(HistoryUtils.createHistoryHashLink(HistoryUtils.getHistoryBrowse(incidence.getAipId(),
-          incidence.getRepresentationId(), incidence.getFilePath(), incidence.getFileId())));
+        incidence.getRepresentationId(), incidence.getFilePath(), incidence.getFileId())));
       objectLink.setText(incidence.getFileId());
     }
   }
@@ -613,7 +612,7 @@ public class HtmlSnippetUtils {
   }
 
   private static boolean addField(FlowPanel panel, final FlowPanel layout, final MetadataValue mv,
-      final boolean mandatory) {
+    final boolean mandatory) {
     layout.addStyleName("field");
 
     if (StringUtils.isNotBlank(mv.get("value"))) {
@@ -637,7 +636,7 @@ public class HtmlSnippetUtils {
   }
 
   private static boolean addHTML(FlowPanel panel, final FlowPanel layout, final MetadataValue mv,
-      final boolean mandatory) {
+    final boolean mandatory) {
     layout.addStyleName("field");
 
     if (StringUtils.isNotBlank(mv.get("value"))) {
@@ -708,7 +707,7 @@ public class HtmlSnippetUtils {
     }
 
     return SafeHtmlUtils
-        .fromSafeConstant("<span class='" + labelClass + "'>" + messages.disposalConfirmationState(state) + CLOSE_SPAN);
+      .fromSafeConstant("<span class='" + labelClass + "'>" + messages.disposalConfirmationState(state) + CLOSE_SPAN);
   }
 
   public static SimplePanel getNoItemsToDisplay(String object) {
@@ -741,22 +740,21 @@ public class HtmlSnippetUtils {
     }
 
     return SafeHtmlUtils.fromSafeConstant(
-        "<span class='" + labelClass + "'>" + messages.disposalScheduleActionCode(disposalAction.name()) + CLOSE_SPAN);
+      "<span class='" + labelClass + "'>" + messages.disposalScheduleActionCode(disposalAction.name()) + CLOSE_SPAN);
   }
 
   /**
    * Create a {@link SafeHtml} with the status and the issues in synchronization.
-   * 
+   *
    * @param distributedInstance
-   *                            {@link DistributedInstance}.
+   *          {@link DistributedInstance}.
    * @param togetherWithStatus
-   *                            if this flag is true put the issues together with
-   *                            the status
+   *          if this flag is true put the issues together with the status
    *
    * @return {@link SafeHtml}.
    */
   public static SafeHtml getDistributedInstanceStateHtml(final DistributedInstance distributedInstance,
-      final boolean togetherWithStatus) {
+    final boolean togetherWithStatus) {
     SafeHtml ret = null;
     if (distributedInstance != null && distributedInstance.getStatus() != null) {
       SafeHtmlBuilder b = new SafeHtmlBuilder();
@@ -800,7 +798,7 @@ public class HtmlSnippetUtils {
     lastSyncBuilder.append(SafeHtmlUtils.fromSafeConstant("<div>"));
     if (rodaInstance.getLastSynchronizationDate() != null) {
       lastSyncBuilder
-          .append(SafeHtmlUtils.fromString(Humanize.formatDateTime(rodaInstance.getLastSynchronizationDate())));
+        .append(SafeHtmlUtils.fromString(Humanize.formatDateTime(rodaInstance.getLastSynchronizationDate())));
     } else {
       lastSyncBuilder.append(SafeHtmlUtils.fromString(messages.permanentlyRetained()));
     }
@@ -814,9 +812,9 @@ public class HtmlSnippetUtils {
         String entityClassUiName = getNameByEntityClassName(entitySummary.getEntityClass());
         String entityClass = getEntityClassNameSplit(entitySummary.getEntityClass());
         SafeUri downloadUriRemoved = RestUtils.createLastSynchronizationDownloadUri(rodaInstance.getId(), entityClass,
-            RodaConstants.SYNCHRONIZATION_REPORT_KEY_REMOVED);
+          RodaConstants.SYNCHRONIZATION_REPORT_KEY_REMOVED);
         SafeUri downloadUriIssue = RestUtils.createLastSynchronizationDownloadUri(rodaInstance.getId(), entityClass,
-            RodaConstants.SYNCHRONIZATION_REPORT_KEY_ISSUES);
+          RodaConstants.SYNCHRONIZATION_REPORT_KEY_ISSUES);
 
         lastSyncBuilder.append(SafeHtmlUtils.fromSafeConstant(OPEN_DIV_FONT_STYLE_1_REM));
         lastSyncBuilder.append(SafeHtmlUtils.fromString(entityClassUiName + ": "));
@@ -824,11 +822,11 @@ public class HtmlSnippetUtils {
         createAddedUpdatedSpan(lastSyncBuilder, entitySummary, entitySummary.getCountAddedUpdated());
         // Removed
         createRemovedAndIssuesLink(lastSyncBuilder, entitySummary.getCountRemoved(),
-            messages.distributedInstanceRemovedEntitiesLabel(), downloadUriRemoved, "label-warning");
+          messages.distributedInstanceRemovedEntitiesLabel(), downloadUriRemoved, "label-warning");
         // Issues
         if (showIssues) {
           createRemovedAndIssuesLink(lastSyncBuilder, entitySummary.getCountIssues(),
-              messages.distributedInstanceSyncErrorsLabel(), downloadUriIssue, "label-danger");
+            messages.distributedInstanceSyncErrorsLabel(), downloadUriIssue, "label-danger");
         }
         lastSyncBuilder.append(SafeHtmlUtils.fromSafeConstant(ClOSE_DIV));
       }
@@ -842,13 +840,13 @@ public class HtmlSnippetUtils {
     if (count > 0) {
       safeHtmlBuilder.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
       safeHtmlBuilder.append(SafeHtmlUtils.fromString(String.valueOf(entitySummary.getCountAddedUpdated()) + " "
-          + messages.distributedInstanceUpdatedEntitiesLabel()));
+        + messages.distributedInstanceUpdatedEntitiesLabel()));
       safeHtmlBuilder.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
     }
   }
 
   private static void createRemovedAndIssuesLink(SafeHtmlBuilder safeHtmlBuilder, int count, String message,
-      SafeUri safeUri, String labelStyle) {
+    SafeUri safeUri, String labelStyle) {
     if (count > 0) {
       safeHtmlBuilder.append(SafeHtmlUtils.fromSafeConstant(" <a href='"));
       safeHtmlBuilder.append(SafeHtmlUtils.fromString(safeUri.asString()));

@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.planning;
 
@@ -35,7 +35,7 @@ import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class PreservationAgents extends Composite {
 
@@ -74,7 +74,8 @@ public class PreservationAgents extends Composite {
   SearchWrapper searchWrapper;
 
   public PreservationAgents() {
-    ListBuilder<IndexedPreservationAgent> preservationAgentListBuilder = new ListBuilder<>(() -> new PreservationAgentList(),
+    ListBuilder<IndexedPreservationAgent> preservationAgentListBuilder = new ListBuilder<>(
+      () -> new PreservationAgentList(),
       new AsyncTableCellOptions<>(IndexedPreservationAgent.class, "PreservationAgents_agents").bindOpener()
         .withActionable(PreservationAgentActions.get()));
 

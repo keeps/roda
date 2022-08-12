@@ -21,7 +21,7 @@ import config.i18n.client.ClientMessages;
 
 /**
  * A simple pager that controls the page size.
- * 
+ *
  * NOTE: GWT 2.7 PageSizePager doesn't have the ShowMore and ShowLess button
  * localized.
  */
@@ -43,7 +43,7 @@ public class RodaPageSizePager extends AbstractPager {
 
   /**
    * Construct a PageSizePager with a given increment.
-   * 
+   *
    * @param increment
    *          the amount by which to increase the page size
    */

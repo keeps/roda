@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-			 xmlns:g="urn:import:com.google.gwt.user.client.ui"
-			 xmlns:common="urn:import:org.roda.wui.client.common">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:common="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
@@ -22,22 +21,22 @@
 					</common:TitlePanel>
 
 					<!-- DESCRIPTIVE METADATA -->
-					<g:Button addStyleNames="btn btn-block btn-plus browseNewDescriptiveMetadataButton" ui:field="newDescriptiveMetadata">
+					<g:Button addStyleNames="btn btn-block btn-plus browseNewDescriptiveMetadataButton"
+						ui:field="newDescriptiveMetadata">
 						<ui:text from='{messages.newDescriptiveMetadataTitle}' />
 					</g:Button>
 					<g:FlowPanel addStyleNames="card descriptiveMetadataCard">
-						<g:TabPanel ui:field="descriptiveMetadata"
-							addStyleNames="browseItemMetadata" />
+						<g:TabPanel ui:field="descriptiveMetadata" addStyleNames="browseItemMetadata" />
 					</g:FlowPanel>
 
 					<!-- REPRESENTATIONS -->
-					<g:SimplePanel ui:field="representationsCard" addStyleNames="card representationsCard"/>
+					<g:SimplePanel ui:field="representationsCard" addStyleNames="card representationsCard" />
 
 					<!-- DIPs -->
-					<g:SimplePanel ui:field="disseminationsCard" addStyleNames="card disseminationsCard"/>
+					<g:SimplePanel ui:field="disseminationsCard" addStyleNames="card disseminationsCard" />
 
 					<!-- AIP CHILDREN -->
-					<g:SimplePanel ui:field="aipChildrenCard" addStyleNames="card aipChildrenCard"/>
+					<g:SimplePanel ui:field="aipChildrenCard" addStyleNames="card aipChildrenCard" />
 
 					<!-- ADD NEW -->
 					<g:SimplePanel ui:field="addRepresentation" addStyleNames="ActionableStyleButtons" />

@@ -22,7 +22,7 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class ClientLogger implements IsSerializable {
   // log levels
@@ -73,7 +73,7 @@ public class ClientLogger implements IsSerializable {
 
   /**
    * Create a new client logger
-   * 
+   *
    * @param classname
    */
   public ClientLogger(String classname) {
@@ -99,7 +99,7 @@ public class ClientLogger implements IsSerializable {
 
   /**
    * Log a trace message
-   * 
+   *
    * @param message
    */
   public void trace(final String message) {
@@ -122,7 +122,7 @@ public class ClientLogger implements IsSerializable {
 
   /**
    * Log a trace message and error
-   * 
+   *
    * @param message
    * @param error
    */
@@ -147,7 +147,7 @@ public class ClientLogger implements IsSerializable {
 
   /**
    * Log a debug message
-   * 
+   *
    * @param message
    */
   public void debug(final String message) {
@@ -171,7 +171,7 @@ public class ClientLogger implements IsSerializable {
 
   /**
    * Log a debug message and error
-   * 
+   *
    * @param object
    * @param error
    */
@@ -196,7 +196,7 @@ public class ClientLogger implements IsSerializable {
 
   /**
    * Log a information message
-   * 
+   *
    * @param message
    */
   public void info(final String message) {
@@ -219,7 +219,7 @@ public class ClientLogger implements IsSerializable {
 
   /**
    * Log an information message and error
-   * 
+   *
    * @param message
    * @param error
    */
@@ -244,7 +244,7 @@ public class ClientLogger implements IsSerializable {
 
   /**
    * Log a warning message
-   * 
+   *
    * @param message
    */
   public void warn(final String message) {
@@ -267,7 +267,7 @@ public class ClientLogger implements IsSerializable {
 
   /**
    * Log a warning message and error
-   * 
+   *
    * @param message
    * @param error
    */
@@ -291,7 +291,7 @@ public class ClientLogger implements IsSerializable {
 
   /**
    * Log an error message
-   * 
+   *
    * @param message
    */
   public void error(final String message) {
@@ -319,7 +319,7 @@ public class ClientLogger implements IsSerializable {
 
   /**
    * Log an error message and error
-   * 
+   *
    * @param message
    * @param error
    */
@@ -373,7 +373,7 @@ public class ClientLogger implements IsSerializable {
 
   /**
    * Log a fatal message
-   * 
+   *
    * @param message
    */
   public void fatal(final String message) {
@@ -401,7 +401,7 @@ public class ClientLogger implements IsSerializable {
 
   /**
    * Log a fatal message and error
-   * 
+   *
    * @param message
    * @param error
    */
@@ -434,7 +434,7 @@ public class ClientLogger implements IsSerializable {
 
   /**
    * Get logging class name
-   * 
+   *
    * @return the name of the class being logged
    */
   public String getClassname() {
@@ -443,7 +443,7 @@ public class ClientLogger implements IsSerializable {
 
   /**
    * Set class name
-   * 
+   *
    * @param classname
    *          the name of class being logged
    */

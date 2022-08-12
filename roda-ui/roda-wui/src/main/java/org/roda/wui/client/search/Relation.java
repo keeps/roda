@@ -30,9 +30,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * 
+ *
  * @author Luis Faria
- * 
+ *
  */
 public class Relation {
 
@@ -63,7 +63,7 @@ public class Relation {
 
   /**
    * Get the singleton instance
-   * 
+   *
    * @return the instance
    */
   public static Relation getInstance() {

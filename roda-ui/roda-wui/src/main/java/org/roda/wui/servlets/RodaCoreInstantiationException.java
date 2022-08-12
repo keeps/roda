@@ -12,7 +12,7 @@ import javax.servlet.ServletException;
 public class RodaCoreInstantiationException extends ServletException {
 
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = -271098088066975713L;
 

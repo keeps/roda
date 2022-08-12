@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -36,7 +34,7 @@ public class DIPFile implements IsModelObject, IsIndexed, HasId, SetsUUID, HasPe
   private long size = 0;
   private boolean isDirectory;
   private String storagePath;
-  
+
   private Map<String, Object> fields = new HashMap<>();
 
   public DIPFile() {
@@ -249,7 +247,8 @@ public class DIPFile implements IsModelObject, IsIndexed, HasId, SetsUUID, HasPe
   }
 
   /**
-   * @param fields the fields to set
+   * @param fields
+   *          the fields to set
    */
   public void setFields(Map<String, Object> fields) {
     this.fields = fields;

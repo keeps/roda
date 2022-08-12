@@ -262,7 +262,7 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
    * preFilters in the UI if they should be shown according to the constructor
    * parameters, and triggers a new search in the list with the new default filter
    * and the existing search fields
-   * 
+   *
    * @param defaultFilter
    *          the new default filters
    * @param incremental

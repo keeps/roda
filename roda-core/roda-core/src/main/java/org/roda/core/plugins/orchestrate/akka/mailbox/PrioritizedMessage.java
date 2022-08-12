@@ -16,18 +16,26 @@ public interface PrioritizedMessage {
   int getPriority();
 
   interface Urgent extends PrioritizedMessage {
-    default int getPriority() { return URGENT; }
+    default int getPriority() {
+      return URGENT;
+    }
   }
 
   interface High extends PrioritizedMessage {
-    default int getPriority() { return HIGH; }
+    default int getPriority() {
+      return HIGH;
+    }
   }
 
   interface Medium extends PrioritizedMessage {
-    default int getPriority() { return MEDIUM; }
+    default int getPriority() {
+      return MEDIUM;
+    }
   }
 
   interface Low extends PrioritizedMessage {
-    default int getPriority() { return LOW; }
+    default int getPriority() {
+      return LOW;
+    }
   }
 }

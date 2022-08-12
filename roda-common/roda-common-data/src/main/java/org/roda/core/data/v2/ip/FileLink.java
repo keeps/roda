@@ -46,7 +46,7 @@ public class FileLink extends RepresentationLink implements Serializable {
   public String toString() {
     StringBuilder builder = new StringBuilder();
     builder.append("FileLink [");
-    
+
     if (getAipId() != null) {
       builder.append("getAipId()=");
       builder.append(getAipId());
@@ -69,7 +69,5 @@ public class FileLink extends RepresentationLink implements Serializable {
     builder.append("]");
     return builder.toString();
   }
-
- 
 
 }

@@ -222,7 +222,9 @@ public class LocalInstanceConfigurationDataPanel extends Composite implements Ha
           @Override
           public void onSuccess(List<String> result) {
             if (result.isEmpty()) {
-              Dialogs.showInformationDialog(messages.testLocalInstanceConfigurationDialogTitle(), messages.testLocalInstanceConfigurationDialogMessage(centralInstanceURLValue.getText()) , messages.closeButton(), false);
+              Dialogs.showInformationDialog(messages.testLocalInstanceConfigurationDialogTitle(),
+                messages.testLocalInstanceConfigurationDialogMessage(centralInstanceURLValue.getText()),
+                messages.closeButton(), false);
             } else {
               StringBuilder errorMessage = new StringBuilder();
               result.forEach(i -> {

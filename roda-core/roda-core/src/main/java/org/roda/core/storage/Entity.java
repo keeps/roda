@@ -14,14 +14,14 @@ import org.roda.core.data.v2.ip.StoragePath;
 /**
  * Interface with the minimal/common set of methods that should be implemented
  * by all roda storage model "entities"
- * 
+ *
  * @author Hélder Silva <hsilva@keep.pt>
  */
 @FunctionalInterface
 public interface Entity extends Serializable {
   /**
    * The path of the entity in storage
-   * 
+   *
    * @return
    */
   public StoragePath getStoragePath();

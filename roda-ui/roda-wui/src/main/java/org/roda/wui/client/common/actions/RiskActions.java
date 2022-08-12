@@ -155,7 +155,7 @@ public class RiskActions extends AbstractActionable<IndexedRisk> {
 
       @Override
       public void onFailure(Throwable caught) {
-        if(caught != null) {
+        if (caught != null) {
           AsyncCallbackUtils.defaultFailureTreatment(caught);
         }
         doActionCallbackUpdated();

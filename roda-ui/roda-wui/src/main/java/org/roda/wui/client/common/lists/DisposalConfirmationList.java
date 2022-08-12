@@ -36,7 +36,7 @@ import com.google.gwt.view.client.ProvidesKey;
 import config.i18n.client.ClientMessages;
 
 /**
- * 
+ *
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  *
  */

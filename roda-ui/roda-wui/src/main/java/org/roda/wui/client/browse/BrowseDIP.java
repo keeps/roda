@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.browse;
 
@@ -73,7 +73,7 @@ import config.i18n.client.ClientMessages;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class BrowseDIP extends Composite {
 
@@ -136,7 +136,7 @@ public class BrowseDIP extends Composite {
                   IndexedDIP dip = browseDipBundle.getDip();
                   if (StringUtils.isNotBlank(dip.getOpenExternalURL()) && !showEmbedded) {
                     String url = IndexedDIPUtils.interpolateOpenExternalURL(dip,
-                            LocaleInfo.getCurrentLocale().getLocaleName());
+                      LocaleInfo.getCurrentLocale().getLocaleName());
                     Window.open(url, "_blank", "");
                     Toast.showInfo(messages.browseFileDipOpenedExternalURL(), url);
                     History.back();

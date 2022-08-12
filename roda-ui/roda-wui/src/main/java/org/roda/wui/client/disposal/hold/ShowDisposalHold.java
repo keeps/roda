@@ -293,8 +293,7 @@ public class ShowDisposalHold extends Composite {
                   BrowserService.Util.getInstance().liftDisposalHold(disposalHold, new NoAsyncCallback<DisposalHold>() {
                     @Override
                     public void onSuccess(DisposalHold result) {
-                      Toast.showInfo(messages.runningInBackgroundTitle(),
-                          messages.updateDisposalHoldMessage());
+                      Toast.showInfo(messages.runningInBackgroundTitle(), messages.updateDisposalHoldMessage());
                       Timer timer = new Timer() {
                         @Override
                         public void run() {

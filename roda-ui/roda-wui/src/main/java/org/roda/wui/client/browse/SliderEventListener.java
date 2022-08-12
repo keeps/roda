@@ -6,20 +6,20 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.client.browse;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 @FunctionalInterface
 public interface SliderEventListener {
 
   /**
    * Slider moved
-   * 
+   *
    * @param value
    *          the new value
    * @param size

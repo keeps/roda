@@ -52,7 +52,7 @@ public class ServerTools {
 
   /**
    * Parse a locale string into a Locale
-   * 
+   *
    * @param localeString
    *          the locale string, e.g. en_US
    * @return
@@ -78,7 +78,7 @@ public class ServerTools {
 
   /**
    * Encode XML entities and unicode control chars
-   * 
+   *
    * @param s
    *          the string to encode
    * @return the encoded string
@@ -114,7 +114,7 @@ public class ServerTools {
   /**
    * Encode a CSV value, always adding quotes to the value and duplicating
    * existing quotes
-   * 
+   *
    * @param s
    * @return the encoded CSV value
    */
@@ -124,7 +124,7 @@ public class ServerTools {
 
   /**
    * Check if a string matches an URL
-   * 
+   *
    * @param s
    * @return true if it matches
    */

@@ -43,14 +43,14 @@ import org.testng.annotations.Test;
 import jersey.repackaged.com.google.common.collect.Iterables;
 
 /**
- * 
+ *
  * @author Luis Faria <lfaria@keep.pt>
  * @author Helder Silva <hsilva@keep.pt>
  * @author Sebastien Leroux <sleroux@keep.pt>
  *
  * @param <T>
  *          the storage service implementation
- * 
+ *
  */
 
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
@@ -58,7 +58,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
   /**
    * Get current instance of storage.
-   * 
+   *
    * @return
    */
   protected abstract T getStorage();

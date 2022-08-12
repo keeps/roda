@@ -1,31 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:u="urn:import:org.roda.wui.client.disposal.policy"
-             xmlns:common="urn:import:org.roda.wui.client.common">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:u="urn:import:org.roda.wui.client.disposal.policy" xmlns:common="urn:import:org.roda.wui.client.common">
 
-    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
-    <g:FlowPanel styleName="wui-disposal-policy" addStyleNames="wrapper skip_padding">
-        <g:FlowPanel addStyleNames="row full_width skip_padding">
-            <g:FlowPanel ui:field="contentFlowPanel" addStyleNames="col_10 content">
-                <common:TitlePanel text="{messages.disposalPolicyTitle}" iconClass="DisposalPolicy"/>
-                <g:FlowPanel addStyleNames="page-description" ui:field="disposalPolicyDescription"/>
-                <g:FlowPanel ui:field="disposalSchedulesDescription"/>
-                <u:DisposalPolicySchedulesPanel ui:field="disposalPolicySchedulesPanel"/>
-                <u:DisposalPolicyRulesPanel ui:field="disposalPolicyRulesPanel"/>
-                <u:DisposalPolicyHoldsPanel ui:field="disposalPolicyHoldsPanel"/>
-            </g:FlowPanel>
-            <g:FlowPanel ui:field="sidebarFlowPanel" addStyleNames="col_2 last sidebar contentPanel">
-                <g:FlowPanel addStyleNames="sticky-flow">
-                    <g:FlowPanel addStyleNames="sticky-padding">
-                        <g:Label addStyleNames="h4">
-                            <ui:text from="{messages.actions}"/>
-                        </g:Label>
-                        <g:FlowPanel ui:field="sidebarButtonsPanel"/>
-                    </g:FlowPanel>
-                </g:FlowPanel>
-            </g:FlowPanel>
-        </g:FlowPanel>
-    </g:FlowPanel>
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+	<g:FlowPanel styleName="wui-disposal-policy" addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="row full_width skip_padding">
+			<g:FlowPanel ui:field="contentFlowPanel" addStyleNames="col_10 content">
+				<common:TitlePanel text="{messages.disposalPolicyTitle}" iconClass="DisposalPolicy" />
+				<g:FlowPanel addStyleNames="page-description" ui:field="disposalPolicyDescription" />
+				<g:FlowPanel ui:field="disposalSchedulesDescription" />
+				<u:DisposalPolicySchedulesPanel ui:field="disposalPolicySchedulesPanel" />
+				<u:DisposalPolicyRulesPanel ui:field="disposalPolicyRulesPanel" />
+				<u:DisposalPolicyHoldsPanel ui:field="disposalPolicyHoldsPanel" />
+			</g:FlowPanel>
+			<g:FlowPanel ui:field="sidebarFlowPanel" addStyleNames="col_2 last sidebar contentPanel">
+				<g:FlowPanel addStyleNames="sticky-flow">
+					<g:FlowPanel addStyleNames="sticky-padding">
+						<g:Label addStyleNames="h4">
+							<ui:text from="{messages.actions}" />
+						</g:Label>
+						<g:FlowPanel ui:field="sidebarButtonsPanel" />
+					</g:FlowPanel>
+				</g:FlowPanel>
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</g:FlowPanel>
 </ui:UiBinder>

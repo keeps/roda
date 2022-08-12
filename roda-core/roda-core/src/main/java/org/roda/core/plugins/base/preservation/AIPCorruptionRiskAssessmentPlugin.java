@@ -273,7 +273,8 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
       } else {
         reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails("Fixity checking ran successfully");
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
-        PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, PluginState.SUCCESS, "", true, job);
+        PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, null, PluginState.SUCCESS, "", true,
+          job);
       }
 
       report.addReport(reportItem);

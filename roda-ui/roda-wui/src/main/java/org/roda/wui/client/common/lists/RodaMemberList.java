@@ -53,7 +53,6 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
     options.withFieldsToReturn(fieldsToReturn);
   }
 
-
   @Override
   protected void configureDisplay(CellTable<RODAMember> display) {
     typeColumn = new Column<RODAMember, SafeHtml>(new SafeHtmlCell()) {

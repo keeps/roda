@@ -7,5 +7,5 @@
  */
 package org.roda.core.plugins.base.notifications;
 
-public interface GenericJobNotification extends JobNotification{
+public interface GenericJobNotification extends JobNotification {
 }

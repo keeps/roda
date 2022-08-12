@@ -9,7 +9,7 @@ package org.roda.core.data.exceptions;
 
 /**
  * @author Luis Faria <lfaria@keep.pt>
- * 
+ *
  */
 public class GenericException extends RODAException {
   private static final long serialVersionUID = -2093798996190248576L;

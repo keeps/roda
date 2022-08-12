@@ -114,8 +114,8 @@ public class DisposalScheduleActions extends AbstractActionable<IndexedAIP> {
       @Override
       public void onSuccess(final Long size) {
         Dialogs.showConfirmDialog(messages.disassociateDisposalScheduleDialogTitle(),
-          messages.disassociateDisposalScheduleDialogMessage(size.intValue()), messages.dialogNo(), messages.dialogYes(),
-          new ActionNoAsyncCallback<Boolean>(callback) {
+          messages.disassociateDisposalScheduleDialogMessage(size.intValue()), messages.dialogNo(),
+          messages.dialogYes(), new ActionNoAsyncCallback<Boolean>(callback) {
             @Override
             public void onSuccess(Boolean result) {
               if (result) {

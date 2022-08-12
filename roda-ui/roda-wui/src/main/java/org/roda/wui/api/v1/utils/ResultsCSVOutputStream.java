@@ -19,7 +19,7 @@ import org.roda.core.index.utils.IterableIndexResult;
 
 /**
  * CSV output stream for {@link IterableIndexResult}.
- * 
+ *
  * @param <T>
  *          the type of results.
  * @author Rui Castro <rui.castro@gmail.com>

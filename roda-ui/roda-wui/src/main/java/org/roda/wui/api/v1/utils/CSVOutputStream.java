@@ -12,7 +12,7 @@ import org.roda.core.common.ConsumesOutputStream;
 
 /**
  * Abstract CSV output stream.
- * 
+ *
  * @author Rui Castro <rui.castro@gmail.com>
  */
 public abstract class CSVOutputStream implements ConsumesOutputStream {

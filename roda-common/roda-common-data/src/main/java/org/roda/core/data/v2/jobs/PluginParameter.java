@@ -40,8 +40,8 @@ public class PluginParameter implements Serializable {
     INTEGER,
 
     /**
-     * String which will be translated into the canonical class name of sip to
-     * aip plugin
+     * String which will be translated into the canonical class name of sip to aip
+     * plugin
      */
     PLUGIN_SIP_TO_AIP,
 
@@ -108,7 +108,7 @@ public class PluginParameter implements Serializable {
 
   /**
    * Constructs a new {@link PluginParameter} with the given parameters.
-   * 
+   *
    * @param id
    * @param name
    * @param type
@@ -131,7 +131,7 @@ public class PluginParameter implements Serializable {
 
   /**
    * Constructs a new {@link PluginParameter} with the given parameters.
-   * 
+   *
    * @param id
    * @param name
    * @param type
@@ -156,7 +156,7 @@ public class PluginParameter implements Serializable {
   /**
    * Constructs a new {@link PluginParameter} cloning an existing
    * {@link PluginParameter}.
-   * 
+   *
    * @param parameter
    *          the {@link PluginParameter} to clone.
    */

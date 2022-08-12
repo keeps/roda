@@ -31,7 +31,7 @@ public abstract class RodaPrincipal implements Serializable, RODAMember, IsModel
 
   private Set<String> allRoles = new HashSet<>();
   private Set<String> directRoles = new HashSet<>();
-  
+
   private Map<String, Object> fields;
 
   public RodaPrincipal() {
@@ -256,7 +256,8 @@ public abstract class RodaPrincipal implements Serializable, RODAMember, IsModel
   }
 
   /**
-   * @param fields the fields to set
+   * @param fields
+   *          the fields to set
    */
   public void setFields(Map<String, Object> fields) {
     this.fields = fields;

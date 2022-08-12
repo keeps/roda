@@ -25,7 +25,7 @@ public class LikeFilterParameter extends FilterParameter {
   /**
    * Constructs a {@link LikeFilterParameter} cloning an existing
    * {@link LikeFilterParameter}.
-   * 
+   *
    * @param likeFilterParameter
    *          the {@link LikeFilterParameter} to clone.
    */
@@ -35,7 +35,7 @@ public class LikeFilterParameter extends FilterParameter {
 
   /**
    * Constructs a {@link LikeFilterParameter} with the given parameters.
-   * 
+   *
    * @param name
    * @param expression
    */

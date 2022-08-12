@@ -625,12 +625,16 @@ public class PluginParameterPanel extends Composite {
     return value;
   }
 
-  public String getAipTitle() { return aipTitle; }
+  public String getAipTitle() {
+    return aipTitle;
+  }
 
   public PluginParameter getParameter() {
     return parameter;
   }
 
-  public FlowPanel getLayout() { return layout;}
+  public FlowPanel getLayout() {
+    return layout;
+  }
 
 }

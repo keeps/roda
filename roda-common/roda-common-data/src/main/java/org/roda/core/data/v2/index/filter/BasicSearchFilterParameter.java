@@ -9,7 +9,7 @@ package org.roda.core.data.v2.index.filter;
 
 /**
  * @author Hélder Silva <hsilva@keep.pt>
- * 
+ *
  */
 public class BasicSearchFilterParameter extends FilterParameter {
   private static final long serialVersionUID = -2122986808484304112L;
@@ -26,7 +26,7 @@ public class BasicSearchFilterParameter extends FilterParameter {
   /**
    * Constructs a {@link BasicSearchFilterParameter} cloning an existing
    * {@link BasicSearchFilterParameter}.
-   * 
+   *
    * @param basicSearchFilterParameter
    *          the {@link BasicSearchFilterParameter} to clone.
    */
@@ -36,7 +36,7 @@ public class BasicSearchFilterParameter extends FilterParameter {
 
   /**
    * Constructs a {@link BasicSearchFilterParameter} with the given parameters.
-   * 
+   *
    * @param name
    * @param value
    */

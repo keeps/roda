@@ -6,7 +6,7 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
 package org.roda.wui.common.client.tools;
 
@@ -66,7 +66,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Useful methods
- * 
+ *
  * @author Luis Faria
  */
 public class HistoryUtils {
@@ -96,7 +96,7 @@ public class HistoryUtils {
 
   /**
    * Split history string to history path using HISTORY_SEP as the separator
-   * 
+   *
    * @param history
    * @return the history path
    */

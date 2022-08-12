@@ -20,17 +20,18 @@ public class AipIdPluginParameterRenderingHints implements RenderingHints {
    */
   private Filter filter;
   /**
-   * Determines if just active aips is to be shown in result list
-   * determines if export csv button is visible
+   * Determines if just active aips is to be shown in result list determines if
+   * export csv button is visible
    */
   private boolean justActive, exportCsvVisible;
   /**
-   * Returns customized button label if plugin sets one, otherwise
-   * returns null and in that case the gwt dialog will show default label.
+   * Returns customized button label if plugin sets one, otherwise returns null
+   * and in that case the gwt dialog will show default label.
    */
   private String customizedButtonLabel = null;
   /**
-   * If set to true gwt dialog will work as a preview and doesn't have the possibility to select items in result list.
+   * If set to true gwt dialog will work as a preview and doesn't have the
+   * possibility to select items in result list.
    */
   private boolean disableSelection = false;
 

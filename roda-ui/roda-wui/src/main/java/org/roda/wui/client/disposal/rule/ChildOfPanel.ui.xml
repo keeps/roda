@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-             xmlns:g="urn:import:com.google.gwt.user.client.ui"
-             xmlns:p="urn:import:org.roda.wui.client.ingest.process"
->
-    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:p="urn:import:org.roda.wui.client.ingest.process">
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
-    <g:FlowPanel>
-        <g:FlowPanel addStyleNames="wui-error-panel">
-            <g:HTML ui:field="errors"/>
-        </g:FlowPanel>
-        <g:Label ui:field="editPanelLabel" addStyleNames="form-label">
-            <ui:text from='{messages.conditionActualParent}'/>
+	<g:FlowPanel>
+		<g:FlowPanel addStyleNames="wui-error-panel">
+			<g:HTML ui:field="errors" />
+		</g:FlowPanel>
+		<g:Label ui:field="editPanelLabel" addStyleNames="form-label">
+			<ui:text from='{messages.conditionActualParent}' />
             *
         </g:Label>
-        <g:HorizontalPanel ui:field="editPanel"/>
-        <p:PluginParameterPanel ui:field="pluginParameterPanel"/>
-        <g:Label ui:field="pluginParameterPanelError" addStyleNames="form-label-error"/>
-    </g:FlowPanel>
+		<g:HorizontalPanel ui:field="editPanel" />
+		<p:PluginParameterPanel ui:field="pluginParameterPanel" />
+		<g:Label ui:field="pluginParameterPanelError" addStyleNames="form-label-error" />
+	</g:FlowPanel>
 </ui:UiBinder>

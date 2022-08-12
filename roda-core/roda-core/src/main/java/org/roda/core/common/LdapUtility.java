@@ -399,7 +399,7 @@ public class LdapUtility {
 
   /**
    * Return all users
-   * 
+   *
    * @return a list of {@link User}'s.
    *
    * @throws GenericException
@@ -639,7 +639,7 @@ public class LdapUtility {
 
   /**
    * Return all groups
-   * 
+   *
    * @return an array of {@link Group}'s.
    *
    * @throws GenericException
@@ -1660,7 +1660,7 @@ public class LdapUtility {
 
   /**
    * Get all roles.
-   * 
+   *
    * @param session
    *          the session.
    * @return a {@link Set} with all role names.

@@ -62,20 +62,23 @@ public class IndexedDIP extends DIP implements IsIndexed {
 
   @Override
   public String toString() {
-    return "IndexedDIP [super=" + super.toString() + ", openExternalURL=" + openExternalURL + ", instanceName=" + instanceName + "]";
+    return "IndexedDIP [super=" + super.toString() + ", openExternalURL=" + openExternalURL + ", instanceName="
+      + instanceName + "]";
   }
 
   @Override
   public List<String> toCsvHeaders() {
     return Arrays.asList("id", "title", "description", "type", "dateCreated", "lastModified", "isPermanent",
-      "properties", "aipIds", "representationIds", "fileIds", "permissions", "openExternalURL", "instanceId", "instanceName");
+      "properties", "aipIds", "representationIds", "fileIds", "permissions", "openExternalURL", "instanceId",
+      "instanceName");
   }
 
   @Override
   public List<Object> toCsvValues() {
     return Arrays.asList(super.getId(), super.getTitle(), super.getDescription(), super.getType(),
       super.getDateCreated(), super.getLastModified(), super.getIsPermanent(), super.getProperties(), super.getAipIds(),
-      super.getRepresentationIds(), super.getFileIds(), super.getPermissions(), openExternalURL, super.getInstanceId(), instanceName);
+      super.getRepresentationIds(), super.getFileIds(), super.getPermissions(), openExternalURL, super.getInstanceId(),
+      instanceName);
   }
 
   @Override

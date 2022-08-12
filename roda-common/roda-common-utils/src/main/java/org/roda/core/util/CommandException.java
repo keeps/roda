@@ -11,7 +11,7 @@ import org.roda.core.data.exceptions.RODAException;
 
 /**
  * Thrown to indicate that a system command finished with an error code.
- * 
+ *
  * @author Rui Castro
  */
 public class CommandException extends RODAException {
@@ -22,7 +22,7 @@ public class CommandException extends RODAException {
 
   /**
    * Constructs a {@link CommandException} with the given error message.
-   * 
+   *
    * @param message
    *          the error message.
    */
@@ -31,9 +31,9 @@ public class CommandException extends RODAException {
   }
 
   /**
-   * Constructs a {@link CommandException} with the given error message, exit
-   * code and output.
-   * 
+   * Constructs a {@link CommandException} with the given error message, exit code
+   * and output.
+   *
    * @param message
    *          the error message.
    * @param exitCode
@@ -48,9 +48,9 @@ public class CommandException extends RODAException {
   }
 
   /**
-   * Constructs a {@link CommandException} with the given error message and
-   * cause exception.
-   * 
+   * Constructs a {@link CommandException} with the given error message and cause
+   * exception.
+   *
    * @param message
    *          the error message.
    * @param cause

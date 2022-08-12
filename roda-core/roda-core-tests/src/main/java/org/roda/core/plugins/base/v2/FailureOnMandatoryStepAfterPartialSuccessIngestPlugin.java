@@ -69,9 +69,9 @@ public class FailureOnMandatoryStepAfterPartialSuccessIngestPlugin extends Defau
         VerifyUserAuthorizationPlugin.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN, "true", true, true,
         VerifyUserAuthorizationPlugin.getStaticDescription()));
     pluginParameters.put(PLUGIN_PARAMS_PLUGIN_THAT_FAILS,
-        new PluginParameter(PLUGIN_PARAMS_PLUGIN_THAT_FAILS,
-            PluginThatAlwaysFailsDuringExecuteMethod.getStaticName(), PluginParameter.PluginParameterType.BOOLEAN, "true", true, true,
-            PluginThatAlwaysFailsDuringExecuteMethod.getStaticDescription()));
+      new PluginParameter(PLUGIN_PARAMS_PLUGIN_THAT_FAILS, PluginThatAlwaysFailsDuringExecuteMethod.getStaticName(),
+        PluginParameter.PluginParameterType.BOOLEAN, "true", true, true,
+        PluginThatAlwaysFailsDuringExecuteMethod.getStaticDescription()));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT, AutoAcceptSIPPlugin.getStaticName(),
         PluginParameter.PluginParameterType.BOOLEAN, "true", true, true, AutoAcceptSIPPlugin.getStaticDescription()));
@@ -81,8 +81,8 @@ public class FailureOnMandatoryStepAfterPartialSuccessIngestPlugin extends Defau
         RodaCoreFactory.getRodaConfigurationAsString("ingest.configurable.http_endpoint"), false, false,
         "Send a notification after finishing the ingest process to a specific HTTP endpoint"));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_FILE_FORMAT_IDENTIFICATION,
-        new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FILE_FORMAT_IDENTIFICATION, SiegfriedPlugin.getStaticName(),
-            PluginParameter.PluginParameterType.BOOLEAN, "true", true, false, SiegfriedPlugin.getStaticDescription()));
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FILE_FORMAT_IDENTIFICATION, SiegfriedPlugin.getStaticName(),
+        PluginParameter.PluginParameterType.BOOLEAN, "true", true, false, SiegfriedPlugin.getStaticDescription()));
 
     // 2) descriptive metadata validation
     steps.add(new IngestStep(DescriptiveMetadataValidationPlugin.class.getName(),
@@ -92,10 +92,10 @@ public class FailureOnMandatoryStepAfterPartialSuccessIngestPlugin extends Defau
       true, true, true, true));
     // 4) format identification (using Siegfried)
     steps.add(new IngestStep(PluginThatAlwaysFailsDuringExecuteMethod.class.getName(), PLUGIN_PARAMS_PLUGIN_THAT_FAILS,
-        true, false, true, false));
+      true, false, true, false));
     // 5) PluginThatAlwaysFailsDuringExecuteMethod
     steps.add(new IngestStep(PluginThatAlwaysFailsDuringExecuteMethod.class.getName(), PLUGIN_PARAMS_PLUGIN_THAT_FAILS,
-        true, true, true, true));
+      true, true, true, true));
     // 6) verify producer authorization
     steps.add(new IngestStep(VerifyUserAuthorizationPlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK, true, true, true, true));

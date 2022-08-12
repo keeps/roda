@@ -136,7 +136,8 @@ public interface ModelObserver {
 
   public ReturnWithExceptions<Void, ModelObserver> dipFileDeleted(String dipId, List<String> path, String fileId);
 
-  public ReturnWithExceptions<Void, ModelObserver> disposalConfirmationCreateOrUpdate(DisposalConfirmation confirmation);
+  public ReturnWithExceptions<Void, ModelObserver> disposalConfirmationCreateOrUpdate(
+    DisposalConfirmation confirmation);
 
   public ReturnWithExceptions<Void, ModelObserver> disposalConfirmationDeleted(String confirmationId, boolean commit);
 }

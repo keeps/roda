@@ -27,6 +27,6 @@ public interface EventsHandler extends Serializable {
   public void handleGroupUpdated(ModelService model, Group group);
 
   public void handleGroupDeleted(ModelService model, String id);
-  
+
   public void shutdown();
 }

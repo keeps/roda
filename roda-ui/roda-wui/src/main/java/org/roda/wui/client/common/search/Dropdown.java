@@ -126,8 +126,7 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
     } else {
       // popup.showRelativeTo(panel);
       popup.setWidth(panel.getOffsetWidth() + "px");
-      popup.setPopupPosition(panel.getAbsoluteLeft(),
-        panel.getAbsoluteTop() + panel.getOffsetHeight());
+      popup.setPopupPosition(panel.getAbsoluteLeft(), panel.getAbsoluteTop() + panel.getOffsetHeight());
       popup.show();
       popupShowing = popup.isShowing();
       panel.addStyleName("open");

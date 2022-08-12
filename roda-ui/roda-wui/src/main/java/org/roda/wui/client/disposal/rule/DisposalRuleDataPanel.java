@@ -263,7 +263,8 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
       conditionTypeList.removeStyleName("isWrong");
       conditionTypeListError.setVisible(false);
 
-      if (conditionTypeList.getSelectedValue().equals(ConditionType.METADATA_FIELD.name()) && !metadataFieldsPanel.isValid()) {
+      if (conditionTypeList.getSelectedValue().equals(ConditionType.METADATA_FIELD.name())
+        && !metadataFieldsPanel.isValid()) {
         errorList.add(messages.isAMandatoryField(messages.disposalRuleCondition()));
       }
 

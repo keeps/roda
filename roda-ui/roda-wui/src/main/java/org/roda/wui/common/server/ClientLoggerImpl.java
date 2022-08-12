@@ -15,9 +15,9 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 /**
  * Client logging servlet implementation
- * 
+ *
  * @author Luis Faria
- * 
+ *
  */
 public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLoggerService {
 
@@ -142,7 +142,7 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
 
   /**
    * Send error to logging services
-   * 
+   *
    * @param classname
    *          the name of the class that generated the error
    * @param message

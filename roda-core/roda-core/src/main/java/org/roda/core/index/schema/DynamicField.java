@@ -64,12 +64,12 @@ public class DynamicField {
   }
 
   /**
-   * 
+   *
    * If true, the value of the field can be used in queries to retrieve matching
    * documents.
-   * 
+   *
    * Implicit default: true
-   * 
+   *
    * @param indexed
    * @return
    */
@@ -79,12 +79,12 @@ public class DynamicField {
   }
 
   /**
-   * 
+   *
    * If true, the value of the field can be used in queries to retrieve matching
    * documents.
-   * 
+   *
    * Implicit default: true
-   * 
+   *
    * @param indexed
    * @return
    */
@@ -97,11 +97,11 @@ public class DynamicField {
   }
 
   /**
-   * 
+   *
    * If true, the actual value of the field can be retrieved by queries.
-   * 
+   *
    * Implicit default: true
-   * 
+   *
    * @param stored
    * @return
    */
@@ -111,11 +111,11 @@ public class DynamicField {
   }
 
   /**
-   * 
+   *
    * If true, the actual value of the field can be retrieved by queries.
-   * 
+   *
    * Implicit default: true
-   * 
+   *
    * @param stored
    * @return
    */
@@ -135,9 +135,9 @@ public class DynamicField {
   /**
    * If true, the value of the field will be put in a column-oriented DocValues
    * structure.
-   * 
+   *
    * Implicit default: false
-   * 
+   *
    * @param docValues
    * @return
    */
@@ -157,9 +157,9 @@ public class DynamicField {
   /**
    * If true, indicates that a single document might contain multiple values for
    * this field type.
-   * 
+   *
    * Implicit default: false
-   * 
+   *
    * @param multivalued
    * @return
    */
@@ -177,11 +177,11 @@ public class DynamicField {
   }
 
   /**
-   * Instructs Solr to reject any attempts to add a document which does not have
-   * a value for this field. This property defaults to false.
-   * 
+   * Instructs Solr to reject any attempts to add a document which does not have a
+   * value for this field. This property defaults to false.
+   *
    * Implicit default: false
-   * 
+   *
    * @param required
    * @return
    */
@@ -240,7 +240,7 @@ public class DynamicField {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see java.lang.Object#hashCode()
    */
   @Override
@@ -260,7 +260,7 @@ public class DynamicField {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
@@ -336,7 +336,7 @@ public class DynamicField {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see java.lang.Object#toString()
    */
   @Override

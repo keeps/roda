@@ -22,7 +22,7 @@ public class AndFiltersParameters extends FiltersParameters {
   /**
    * Constructs a {@link AndFiltersParameters} cloning an existing
    * {@link AndFiltersParameters}.
-   * 
+   *
    * @param andFiltersParameters
    *          the {@link AndFiltersParameters} to clone.
    */
@@ -32,7 +32,7 @@ public class AndFiltersParameters extends FiltersParameters {
 
   /**
    * Constructs a {@link AndFiltersParameters} from a list of values.
-   * 
+   *
    * @param name
    *          the name of the attribute.
    * @param values

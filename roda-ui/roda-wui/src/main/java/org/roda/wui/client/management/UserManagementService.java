@@ -59,7 +59,7 @@ public interface UserManagementService extends RemoteService {
 
       UserManagementServiceAsync instance = (UserManagementServiceAsync) GWT.create(UserManagementService.class);
       ServiceDefTarget target = (ServiceDefTarget) instance;
-      target.setServiceEntryPoint(GWT.getHostPageBaseURL()  + RodaConstants.GWT_RPC_BASE_URL + SERVICE_URI);
+      target.setServiceEntryPoint(GWT.getHostPageBaseURL() + RodaConstants.GWT_RPC_BASE_URL + SERVICE_URI);
       return instance;
     }
   }
@@ -121,8 +121,8 @@ public interface UserManagementService extends RemoteService {
    * @throws GenericException
    */
   public User createUser(User user, String password, UserExtraBundle extra)
-          throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException,
-          GenericException, IllegalOperationException, RequestNotValidException, ValidationException;
+    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException,
+    IllegalOperationException, RequestNotValidException, ValidationException;
 
   /**
    * Modify a user
@@ -136,8 +136,8 @@ public interface UserManagementService extends RemoteService {
    * @throws AlreadyExistsException
    * @throws GenericException
    */
-  public void updateUser(User user, String password, UserExtraBundle extra)
-          throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException, ValidationException, RequestNotValidException;
+  public void updateUser(User user, String password, UserExtraBundle extra) throws AuthorizationDeniedException,
+    NotFoundException, AlreadyExistsException, GenericException, ValidationException, RequestNotValidException;
 
   /**
    * Modify the authenticated user
@@ -152,8 +152,9 @@ public interface UserManagementService extends RemoteService {
    * @throws GenericException
    * @throws IllegalOperationException
    */
-  public User updateMyUser(User user, String password, UserExtraBundle extra) throws AuthorizationDeniedException,
-          NotFoundException, AlreadyExistsException, GenericException, IllegalOperationException, ValidationException, RequestNotValidException;
+  public User updateMyUser(User user, String password, UserExtraBundle extra)
+    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException,
+    IllegalOperationException, ValidationException, RequestNotValidException;
 
   /**
    * Try to remove a user, if user cannot be removed it will be deactivated
