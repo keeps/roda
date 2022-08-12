@@ -49,6 +49,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.IndexTestUtils;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.plugins.ingest.v2.MinimalIngestPlugin;
@@ -104,6 +105,7 @@ public class MinimalIngestPluginTest {
 
   @AfterClass
   public void tearDown() throws Exception {
+    IndexTestUtils.resetIndex();
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }
@@ -271,9 +273,8 @@ public class MinimalIngestPluginTest {
     CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
       aip.getRepresentations().get(0).getId(), true);
     List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles,
-      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
-
+    Iterables.addAll(reusableAllFiles, Lists.newArrayList(allFiles).stream().filter(OptionalWithCause::isPresent)
+      .map(OptionalWithCause::get).collect(Collectors.toList()));
     // All folders and files
     Assert.assertEquals(reusableAllFiles.size(), CORPORA_FOLDERS_COUNT + CORPORA_FILES_COUNT);
   }

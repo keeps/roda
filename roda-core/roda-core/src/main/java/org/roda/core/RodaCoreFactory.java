@@ -17,7 +17,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -58,9 +57,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.impl.CloudSolrClient;
-import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest;
 import org.apache.solr.client.solrj.request.CollectionAdminRequest.Create;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
@@ -1124,79 +1121,40 @@ public class RodaCoreFactory {
 
     Field.initialize();
 
-    if (solrType == RodaConstants.SolrType.HTTP) {
-      String solrBaseUrl = getConfigurationString(RodaConstants.CORE_SOLR_HTTP_URL, "http://localhost:8983/solr/");
-      LOGGER.info("Instantiating SOLR HTTP at {}", solrBaseUrl);
+    String solrCloudZooKeeperUrls = getConfigurationString(RodaConstants.CORE_SOLR_CLOUD_URLS,
+      "localhost:2181,localhost:2182,localhost:2183");
+    LOGGER.info("Instantiating SOLR Cloud at {}", solrCloudZooKeeperUrls);
 
-      return new HttpSolrClient.Builder(solrBaseUrl).build();
-    } else if (solrType == RodaConstants.SolrType.CLOUD) {
-      String solrCloudZooKeeperUrls = getConfigurationString(RodaConstants.CORE_SOLR_CLOUD_URLS,
-        "localhost:2181,localhost:2182,localhost:2183");
-      LOGGER.info("Instantiating SOLR Cloud at {}", solrCloudZooKeeperUrls);
-
-      try {
-        ZkController.checkChrootPath(solrCloudZooKeeperUrls, true);
-      } catch (KeeperException | InterruptedException e) {
-        LOGGER.error("Could not check zookeeper chroot path", e);
-      }
-
-      List<String> zkHosts;
-      Optional<String> zkChroot;
-
-      // parse config
-      int indexOfSlash = solrCloudZooKeeperUrls.indexOf('/');
-
-      if (indexOfSlash > 0) {
-        // has chroot
-        zkHosts = Arrays.asList(solrCloudZooKeeperUrls.substring(0, indexOfSlash).split(","));
-        zkChroot = Optional.of(solrCloudZooKeeperUrls.substring(indexOfSlash));
-      } else {
-        // does not have chroot
-        zkHosts = Arrays.asList(solrCloudZooKeeperUrls.split(","));
-        zkChroot = Optional.empty();
-      }
-
-      CloudSolrClient cloudSolrClient = new CloudSolrClient.Builder(zkHosts, zkChroot).build();
-
-      waitForSolrCluster(cloudSolrClient);
-
-      if (writeIsAllowed) {
-        bootstrap(cloudSolrClient, solrHome);
-      }
-      return cloudSolrClient;
-    } else {
-      // default to Embedded
-      System.setProperty("solr.data.dir", indexDataPath.toString());
-
-      try {
-
-        // Create base config for each collection
-        Path commonConf = Files.createTempDirectory("solr-base-config");
-
-        copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/"
-          + SolrUtils.COMMON + "/" + SolrUtils.CONF + "/", commonConf, true);
-
-        for (String collection : SolrCollectionRegistry.registryIndexNames()) {
-          Path collectionPath = solrHome.resolve(collection);
-          FSUtils.copy(commonConf, collectionPath.resolve(SolrUtils.CONF), true);
-
-          // create core.properties
-          Files.write(collectionPath.resolve("core.properties"),
-            ("name=" + collection).getBytes(StandardCharsets.UTF_8));
-        }
-
-        FSUtils.deletePathQuietly(commonConf);
-
-        // create empty solr.xml
-        Files.write(solrHome.resolve("solr.xml"), "<solr></solr>".getBytes(StandardCharsets.UTF_8));
-
-      } catch (IOException | AlreadyExistsException e) {
-        LOGGER.info("Error instantiating SOLR Embedded", e);
-      }
-
-      LOGGER.info("Instantiating SOLR Embedded");
-      return new EmbeddedSolrServer(solrHome, "schema");
+    try {
+      ZkController.checkChrootPath(solrCloudZooKeeperUrls, true);
+    } catch (KeeperException | InterruptedException e) {
+      LOGGER.error("Could not check zookeeper chroot path", e);
     }
+
+    List<String> zkHosts;
+    Optional<String> zkChroot;
+
+    // parse config
+    int indexOfSlash = solrCloudZooKeeperUrls.indexOf('/');
+
+    if (indexOfSlash > 0) {
+      // has chroot
+      zkHosts = Arrays.asList(solrCloudZooKeeperUrls.substring(0, indexOfSlash).split(","));
+      zkChroot = Optional.of(solrCloudZooKeeperUrls.substring(indexOfSlash));
+    } else {
+      // does not have chroot
+      zkHosts = Arrays.asList(solrCloudZooKeeperUrls.split(","));
+      zkChroot = Optional.empty();
+    }
+
+    CloudSolrClient cloudSolrClient = new CloudSolrClient.Builder(zkHosts, zkChroot).build();
+
+    waitForSolrCluster(cloudSolrClient);
+
+    if (writeIsAllowed) {
+      bootstrap(cloudSolrClient, solrHome);
+    }
+    return cloudSolrClient;
   }
 
   private static void waitForSolrCluster(CloudSolrClient cloudSolrClient) throws GenericException {
@@ -2367,7 +2325,7 @@ public class RodaCoreFactory {
           Files.write(Paths.get(args.get(3), "README.md"), pluginsMarkdown.getBytes());
         } catch (IOException e) {
           System.err
-              .println("Error while writing plugin/plugins information in markdown format! Reason: " + e.getMessage());
+            .println("Error while writing plugin/plugins information in markdown format! Reason: " + e.getMessage());
         }
       } else {
         printConfigsUsage();

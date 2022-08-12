@@ -49,6 +49,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceTest;
+import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.plugins.internal.disposal.schedule.AssociateDisposalScheduleToAIPPlugin;
@@ -102,6 +103,7 @@ public class DisposalScheduleTest {
 
   @AfterClass
   public void tearDown() throws Exception {
+    IndexTestUtils.resetIndex();
     RodaCoreFactory.shutdown();
     // FSUtils.deletePath(basePath);
   }

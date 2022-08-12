@@ -8,6 +8,8 @@
 package org.roda.core.common;
 
 import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertFalse;
+import static org.testng.AssertJUnit.assertTrue;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -41,6 +43,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexServiceTest;
+import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
 import org.roda.core.storage.DefaultStoragePath;
@@ -87,6 +90,7 @@ public class ValidationUtilsTest {
 
   @AfterClass
   public static void tearDown() throws Exception {
+    IndexTestUtils.resetIndex();
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }
@@ -100,7 +104,7 @@ public class ValidationUtilsTest {
       RodaConstants.ADMIN);
     final DescriptiveMetadata descMetadata = model.retrieveDescriptiveMetadata(aipId,
       CorporaConstants.DESCRIPTIVE_METADATA_ID);
-    assertEquals(ValidationUtils.isDescriptiveMetadataValid(model, descMetadata, true).isValid(), true);
+    assertTrue(ValidationUtils.isDescriptiveMetadataValid(model, descMetadata, true).isValid());
   }
 
   @Test(enabled = false)
@@ -113,7 +117,7 @@ public class ValidationUtilsTest {
         RodaConstants.ADMIN);
       final DescriptiveMetadata descMetadata = model.retrieveDescriptiveMetadata(aipId,
         CorporaConstants.DESCRIPTIVE_METADATA_ID);
-      assertEquals(ValidationUtils.isDescriptiveMetadataValid(model, descMetadata, true), false);
+      assertFalse(ValidationUtils.isDescriptiveMetadataValid(model, descMetadata, true).isValid());
     } catch (NotFoundException e) {
       // expected exception (for now)
     }
@@ -126,7 +130,7 @@ public class ValidationUtilsTest {
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);
-    assertEquals(ValidationUtils.isAIPDescriptiveMetadataValid(model, aip.getId(), true).isValid(), true);
+    assertTrue(ValidationUtils.isAIPDescriptiveMetadataValid(model, aip.getId(), true).isValid());
   }
 
   @Test(enabled = false)
@@ -138,7 +142,7 @@ public class ValidationUtilsTest {
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_BUGGY_ID),
       RodaConstants.ADMIN);
-    assertEquals(ValidationUtils.isAIPDescriptiveMetadataValid(model, aip.getId(), true), false);
+    assertFalse(ValidationUtils.isAIPDescriptiveMetadataValid(model, aip.getId(), true).isValid());
   }
 
   @Test
@@ -153,7 +157,7 @@ public class ValidationUtilsTest {
     model.createDescriptiveMetadata(aip.getId(), "ead", corporaService.getBinary(path).getContent(), "ead", "2002");
 
     Optional<Schema> xmlSchema = RodaCoreFactory.getRodaSchema("ead", "2002");
-    assertEquals(xmlSchema.isPresent(), true);
+    assertTrue(xmlSchema.isPresent());
 
     // AIP 2 (correct one)
     final AIP aip2 = model.createAIP(IdUtils.createUUID(), corporaService,

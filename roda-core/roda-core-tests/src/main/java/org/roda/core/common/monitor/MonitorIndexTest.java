@@ -32,6 +32,7 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.IndexTestUtils;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -75,6 +76,7 @@ public class MonitorIndexTest {
 
   @AfterClass
   public static void tearDown() throws Exception {
+    IndexTestUtils.resetIndex();
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }

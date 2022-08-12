@@ -70,6 +70,7 @@ public class PermissionsRecursiveTest {
 
   @AfterClass
   public static void tearDown() throws Exception {
+    IndexTestUtils.resetIndex();
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }

@@ -68,6 +68,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetada
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -143,6 +144,7 @@ public class InternalPluginsTest {
 
   @AfterClass
   public void tearDown() throws Exception {
+    IndexTestUtils.resetIndex();
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }

@@ -101,6 +101,7 @@ public class FilterTest {
 
   @AfterClass
   public void cleanup() throws NotFoundException, GenericException, IOException {
+    IndexTestUtils.resetIndex();
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }

@@ -33,6 +33,7 @@ import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.DummyPlugin;
@@ -73,6 +74,7 @@ public class JobsTest {
 
   @AfterClass
   public void tearDown() throws Exception {
+    IndexTestUtils.resetIndex();
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }

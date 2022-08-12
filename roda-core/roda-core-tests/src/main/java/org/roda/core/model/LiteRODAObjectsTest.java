@@ -54,6 +54,7 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.EARKSIPPluginsTest;
 import org.roda.core.plugins.plugins.characterization.PremisSkeletonPlugin;
@@ -106,6 +107,7 @@ public class LiteRODAObjectsTest {
 
   @AfterClass
   public void tearDown() throws Exception {
+    IndexTestUtils.resetIndex();
     RodaCoreFactory.shutdown();
     FSUtils.deletePath(basePath);
   }
