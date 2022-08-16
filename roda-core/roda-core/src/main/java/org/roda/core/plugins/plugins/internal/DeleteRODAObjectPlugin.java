@@ -59,6 +59,7 @@ import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
+import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -317,7 +318,7 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     // removing PREMIS file
     if (!file.isDirectory()) {
       try {
-        String pmId = URNUtils.getPremisPrefix(PreservationMetadataType.FILE) + file.getId();
+        String pmId = IdUtils.getPreservationFileId(file.getId());
         model.deletePreservationMetadata(PreservationMetadataType.FILE, file.getAipId(), file.getRepresentationId(),
           pmId, file.getPath(), false);
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
@@ -386,18 +387,9 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
           reportItem.addPluginDetails("Could not delete representation related incidences: " + e.getMessage());
         }
 
-    // removing PREMIS file
-    try {
-      String pmId = URNUtils.getPremisPrefix(PreservationMetadataType.REPRESENTATION) + representation.getId();
-      model.deletePreservationMetadata(PreservationMetadataType.REPRESENTATION, representation.getAipId(),
-        representation.getId(), pmId, Collections.EMPTY_LIST, false);
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      reportItem.addPluginDetails("Could not delete associated PREMIS file: " + e.getMessage());
-    }
-
-        report.addReport(reportItem.setPluginState(state));
-        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
-        jobPluginInfo.incrementObjectsProcessed(state);
+    report.addReport(reportItem.setPluginState(state));
+    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+    jobPluginInfo.incrementObjectsProcessed(state);
 
         String outcomeText;
         if (state.equals(PluginState.SUCCESS)) {
