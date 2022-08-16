@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DIP)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class IndexedDIP extends DIP implements IsIndexed {
+public class IndexedDIP extends DIP implements IsIndexed, HasInstanceName {
   private static final long serialVersionUID = 4188689893034771594L;
   private String openExternalURL = "";
   private String instanceName = null;

@@ -20,10 +20,12 @@ import org.roda.core.data.v2.ip.HasId;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.roda.core.data.v2.ip.HasInstanceID;
+import org.roda.core.data.v2.ip.HasInstanceName;
 
 @javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_INCIDENCE)
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class RiskIncidence implements IsModelObject, IsIndexed, HasId {
+public class RiskIncidence implements IsModelObject, IsIndexed, HasId, HasInstanceID, HasInstanceName {
   private static final long serialVersionUID = -1089167070045254627L;
 
   private String id = null;

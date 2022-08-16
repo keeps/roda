@@ -15,10 +15,13 @@ import java.util.Map;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.HasId;
+import org.roda.core.data.v2.ip.HasInstanceID;
+import org.roda.core.data.v2.ip.HasInstanceName;
 import org.roda.core.data.v2.ip.HasPermissionFilters;
 import org.roda.core.data.v2.ip.HasStateFilter;
 
-public class IndexedPreservationEvent implements IsIndexed, HasId, HasPermissionFilters, HasStateFilter {
+public class IndexedPreservationEvent
+  implements IsIndexed, HasId, HasPermissionFilters, HasStateFilter, HasInstanceID, HasInstanceName {
   private static final long serialVersionUID = 7328069950706217131L;
 
   public enum PreservationMetadataEventClass {

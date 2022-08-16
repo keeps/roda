@@ -15,6 +15,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.HasId;
+import org.roda.core.data.v2.ip.HasInstanceID;
 import org.roda.core.data.v2.ip.SIPInformation;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -24,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_REPORT)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Report implements IsModelObject, HasId {
+public class Report implements IsModelObject, HasId, HasInstanceID {
   private static final long serialVersionUID = 4316398565678538090L;
 
   public static final String NO_SOURCE_OBJECT_ID = "NO_SOURCE_ID";

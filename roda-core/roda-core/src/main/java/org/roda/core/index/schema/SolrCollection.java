@@ -21,6 +21,8 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.HasId;
+import org.roda.core.data.v2.ip.HasInstanceID;
+import org.roda.core.data.v2.ip.HasInstanceName;
 import org.roda.core.data.v2.ip.HasPermissionFilters;
 import org.roda.core.data.v2.ip.HasPermissions;
 import org.roda.core.data.v2.ip.HasState;
@@ -80,6 +82,14 @@ public interface SolrCollection<I extends IsIndexed, M extends IsModelObject> {
 
   static <T> boolean hasState(Class<T> resultClass) {
     return HasState.class.isAssignableFrom(resultClass);
+  }
+
+  static <T> boolean hasInstanceId(Class<T> resultClass) {
+    return HasInstanceID.class.isAssignableFrom(resultClass);
+  }
+
+  static <T> boolean hasInstanceName(Class<T> resultClass) {
+    return HasInstanceName.class.isAssignableFrom(resultClass);
   }
 
   Class<I> getIndexClass();

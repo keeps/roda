@@ -17,10 +17,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.NamedIndexedModel;
+import org.roda.core.data.v2.ip.HasInstanceID;
 
 @javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_RISK)
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class Risk extends NamedIndexedModel implements IsModelObject {
+public class Risk extends NamedIndexedModel implements IsModelObject, HasInstanceID {
 
   private static final long serialVersionUID = -585753367605901060L;
 

@@ -106,8 +106,6 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     fields.add(new Field(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS, Field.TYPE_STRING).setMultiValued(true)
       .setStored(false));
     fields.add(new Field(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS_COUNTER, Field.TYPE_INT).setStored(false));
-    fields.add(new Field(RodaConstants.INDEX_INSTANCE_ID, Field.TYPE_STRING));
-    fields.add(new Field(RodaConstants.INDEX_INSTANCE_NAME, Field.TYPE_STRING));
 
     return fields;
   }
@@ -145,11 +143,6 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     doc.addField(RodaConstants.JOB_REPORT_REPORTS, JsonUtils.getJsonFromObject(jobReport.getReports()));
     doc.addField(RodaConstants.JOB_REPORT_SOURCE_OBJECT_CLASS, jobReport.getSourceObjectClass());
     doc.addField(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_CLASS, jobReport.getOutcomeObjectClass());
-    doc.addField(RodaConstants.INDEX_INSTANCE_ID, jobReport.getInstanceId());
-
-    String name = IndexUtils.giveNameFromLocalInstanceIdentifier(jobReport.getInstanceId());
-
-    doc.addField(RodaConstants.INDEX_INSTANCE_NAME, name);
 
     return doc;
   }
@@ -257,8 +250,6 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     jobReport.setSuccessfulPlugins(SolrUtils.objectToListString(doc.get(RodaConstants.JOB_REPORT_SUCCESSFUL_PLUGINS)));
     jobReport
       .setUnsuccessfulPlugins(SolrUtils.objectToListString(doc.get(RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS)));
-    jobReport.setInstanceId(SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_ID), null));
-    jobReport.setInstanceName(SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_NAME), null));
 
     return jobReport;
   }

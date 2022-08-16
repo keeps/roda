@@ -74,8 +74,6 @@ public class PreservationAgentCollection
     fields.add(new Field(RodaConstants.PRESERVATION_AGENT_EXTENSION, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.PRESERVATION_AGENT_NOTE, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.PRESERVATION_AGENT_VERSION, Field.TYPE_STRING));
-    fields.add(new Field(RodaConstants.INDEX_INSTANCE_ID, Field.TYPE_STRING));
-    fields.add(new Field(RodaConstants.INDEX_INSTANCE_NAME, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.PRESERVATION_AGENT_CREATED_ON, Field.TYPE_DATE));
 
     return fields;
@@ -115,11 +113,6 @@ public class PreservationAgentCollection
       doc.addField(RodaConstants.PRESERVATION_AGENT_EXTENSION, extensions.toString());
       doc.addField(RodaConstants.PRESERVATION_AGENT_NOTE, Collections.singletonList(agent.getAgentNote()));
       doc.addField(RodaConstants.PRESERVATION_AGENT_VERSION, agent.getAgentVersion());
-
-      doc.addField(RodaConstants.INDEX_INSTANCE_ID, pm.getInstanceId());
-
-      String name = IndexUtils.giveNameFromLocalInstanceIdentifier(pm.getInstanceId());
-      doc.addField(RodaConstants.INDEX_INSTANCE_NAME, name);
       doc.addField(RodaConstants.PRESERVATION_AGENT_CREATED_ON, SolrUtils.formatDate(pm.getCreatedOn()));
 
     } catch (ValidationException e) {
@@ -142,8 +135,6 @@ public class PreservationAgentCollection
     final String version = SolrUtils.objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_VERSION), null);
     final String note = SolrUtils.objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_NOTE), null);
     final List<String> roles = SolrUtils.objectToListString(doc.get(RodaConstants.PRESERVATION_AGENT_ROLES));
-    final String instanceId = SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_ID), null);
-    final String instanceName = SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_NAME), null);
     final Date createdOn = SolrUtils.objectToDate(doc.get(RodaConstants.PRESERVATION_AGENT_CREATED_ON));
 
     ipa.setId(id);
@@ -153,8 +144,6 @@ public class PreservationAgentCollection
     ipa.setVersion(version);
     ipa.setNote(note);
     ipa.setRoles(roles);
-    ipa.setInstanceId(instanceId);
-    ipa.setInstanceName(instanceName);
     ipa.setCreatedOn(createdOn);
 
     return ipa;

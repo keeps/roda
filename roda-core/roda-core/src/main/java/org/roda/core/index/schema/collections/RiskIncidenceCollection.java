@@ -81,9 +81,7 @@ public class RiskIncidenceCollection extends AbstractSolrCollection<RiskIncidenc
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_MITIGATED_BY, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION, Field.TYPE_TEXT).setMultiValued(false));
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED, Field.TYPE_STRING).setStored(false));
-    fields.add(new Field(RodaConstants.INDEX_INSTANCE_ID, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.RISK_INCIDENCE_UPDATED_ON, Field.TYPE_DATE));
-    fields.add(new Field(RodaConstants.INDEX_INSTANCE_NAME, Field.TYPE_STRING));
 
     return fields;
   }
@@ -115,12 +113,7 @@ public class RiskIncidenceCollection extends AbstractSolrCollection<RiskIncidenc
     doc.addField(RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION, incidence.getMitigatedDescription());
     doc.addField(RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED,
       StringUtils.join(incidence.getFilePath(), RodaConstants.RISK_INCIDENCE_FILE_PATH_COMPUTED_SEPARATOR));
-    doc.addField(RodaConstants.INDEX_INSTANCE_ID, incidence.getInstanceId());
     doc.addField(RodaConstants.RISK_INCIDENCE_UPDATED_ON, SolrUtils.formatDate(incidence.getUpdatedOn()));
-
-    String name = IndexUtils.giveNameFromLocalInstanceIdentifier(incidence.getInstanceId());
-
-    doc.addField(RodaConstants.INDEX_INSTANCE_NAME, name);
 
     return doc;
   }
@@ -151,8 +144,6 @@ public class RiskIncidenceCollection extends AbstractSolrCollection<RiskIncidenc
     incidence.setMitigatedBy(SolrUtils.objectToString(doc.get(RodaConstants.RISK_INCIDENCE_MITIGATED_BY), null));
     incidence.setMitigatedDescription(
       SolrUtils.objectToString(doc.get(RodaConstants.RISK_INCIDENCE_MITIGATED_DESCRIPTION), null));
-    incidence.setInstanceId(SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_ID), null));
-    incidence.setInstanceName(SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_NAME), null));
     incidence.setUpdatedOn(SolrUtils.objectToDate(doc.get(RodaConstants.RISK_INCIDENCE_UPDATED_ON)));
 
     return incidence;

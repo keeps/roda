@@ -16,10 +16,11 @@ import org.roda.core.data.v2.ip.HasId;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.roda.core.data.v2.ip.HasInstanceID;
 
 @javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_PRESERVATION_METADATA)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class PreservationMetadata implements IsModelObject, HasId {
+public class PreservationMetadata implements IsModelObject, HasId, HasInstanceID {
   private static final long serialVersionUID = -4312941542769679721L;
 
   public enum PreservationMetadataType {

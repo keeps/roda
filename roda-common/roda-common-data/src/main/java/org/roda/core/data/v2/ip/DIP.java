@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DIP)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class DIP implements IsModelObject, HasId, HasPermissions {
+public class DIP implements IsModelObject, HasId, HasPermissions, HasInstanceID {
 
   private static final long serialVersionUID = -7335470043357396783L;
   private static final int VERSION = 1;

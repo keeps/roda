@@ -20,7 +20,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_FILE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class IndexedFile implements IsIndexed, HasId, SetsUUID, HasPermissionFilters, HasStateFilter {
+public class IndexedFile
+  implements IsIndexed, HasId, SetsUUID, HasPermissionFilters, HasStateFilter, HasInstanceID, HasInstanceName {
   private static final long serialVersionUID = 3303019735787641534L;
 
   private String uuid;

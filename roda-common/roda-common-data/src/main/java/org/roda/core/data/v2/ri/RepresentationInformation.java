@@ -13,18 +13,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.NamedIndexedModel;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.ip.HasInstanceID;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 @javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION_INFORMATION)
 @javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.PUBLIC_MEMBER)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class RepresentationInformation extends NamedIndexedModel implements IsModelObject, IsIndexed {
+public class RepresentationInformation extends NamedIndexedModel implements IsModelObject, IsIndexed, HasInstanceID {
   private static final long serialVersionUID = 8766448064705416130L;
 
   private String description = null;

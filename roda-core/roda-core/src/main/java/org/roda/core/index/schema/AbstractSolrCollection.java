@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.StringUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -23,12 +24,16 @@ import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.HasId;
+import org.roda.core.data.v2.ip.HasInstanceID;
+import org.roda.core.data.v2.ip.HasInstanceName;
 import org.roda.core.data.v2.ip.HasPermissions;
 import org.roda.core.data.v2.ip.HasState;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.SetsUUID;
 import org.roda.core.index.IndexingAdditionalInfo;
+import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.index.utils.SolrUtils;
+import org.roda.core.storage.utils.RODAInstanceUtils;
 
 public abstract class AbstractSolrCollection<I extends IsIndexed, M extends IsModelObject>
   implements SolrCollection<I, M> {
@@ -45,6 +50,14 @@ public abstract class AbstractSolrCollection<I extends IsIndexed, M extends IsMo
       boolean stored = SolrCollection.hasState(getIndexClass());
       ret.add(new Field(RodaConstants.INDEX_STATE, Field.TYPE_STRING).setStored(stored)
         .setDefaultValue(AIPState.getDefault().toString()));
+    }
+
+    if (SolrCollection.hasInstanceId(getIndexClass())) {
+      ret.add(new Field(RodaConstants.INDEX_INSTANCE_ID, Field.TYPE_STRING));
+    }
+
+    if (SolrCollection.hasInstanceName(getIndexClass())){
+      ret.add(new Field(RodaConstants.INDEX_INSTANCE_NAME, Field.TYPE_STRING));
     }
 
     ret.add(SolrCollection.getSearchField());
@@ -88,6 +101,15 @@ public abstract class AbstractSolrCollection<I extends IsIndexed, M extends IsMo
       if (SolrCollection.hasPermissions(object.getClass())) {
         SolrUtils.setPermissions(((HasPermissions) object).getPermissions(), doc);
       }
+
+      if (SolrCollection.hasInstanceId(object.getClass()) && RODAInstanceUtils.isConfiguredAsDistributedMode()) {
+        String instanceId = ((HasInstanceID) object).getInstanceId();
+        if (StringUtils.isEmpty(instanceId)) {
+          instanceId = RODAInstanceUtils.getLocalInstanceIdentifier();
+        }
+        doc.addField(RodaConstants.INDEX_INSTANCE_ID, instanceId);
+        doc.addField(RodaConstants.INDEX_INSTANCE_NAME, IndexUtils.giveNameFromLocalInstanceIdentifier(instanceId));
+      }
     }
 
     if (info.getPreCalculatedFields() != null) {
@@ -126,6 +148,16 @@ public abstract class AbstractSolrCollection<I extends IsIndexed, M extends IsMo
       if (ret instanceof HasPermissions) {
         Permissions permissions = SolrUtils.getPermissions(doc);
         ((HasPermissions) ret).setPermissions(permissions);
+      }
+
+      if (ret instanceof HasInstanceID) {
+        String instanceID = SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_ID), null);
+        ((HasInstanceID) ret).setInstanceId(instanceID);
+      }
+
+      if (ret instanceof HasInstanceName) {
+        String instanceName = SolrUtils.objectToString(doc.get(RodaConstants.INDEX_INSTANCE_NAME), null);
+        ((HasInstanceName) ret).setInstanceName(instanceName);
       }
 
       Map<String, Object> indexedFields = new HashMap<>();

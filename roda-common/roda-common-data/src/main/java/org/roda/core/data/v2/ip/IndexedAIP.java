@@ -32,7 +32,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_AIP)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, HasDisposal {
+public class IndexedAIP implements IsIndexed, HasId, HasPermissions, HasState, HasDisposal, HasInstanceID, HasInstanceName {
   private static final long serialVersionUID = 38813680938917204L;
 
   private String id;

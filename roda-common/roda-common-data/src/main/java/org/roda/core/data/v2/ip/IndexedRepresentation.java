@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 @javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class IndexedRepresentation extends Representation
-  implements IsIndexed, SetsUUID, HasPermissionFilters, HasStateFilter {
+  implements IsIndexed, SetsUUID, HasPermissionFilters, HasStateFilter, HasInstanceID, HasInstanceName {
   private static final long serialVersionUID = -950545608880793468L;
 
   private String uuid;

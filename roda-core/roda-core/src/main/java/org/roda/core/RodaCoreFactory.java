@@ -515,6 +515,9 @@ public class RodaCoreFactory {
         // initialize synchronization directory
         initializeJobAttachmentsDir();
 
+        instantiateDistributedMode();
+        LOGGER.debug("Finished instantiating distributed mode");
+
         // instantiate solr and index service
         instantiateSolrAndIndexService(nodeType);
         LOGGER.debug("Finished instantiating solr & index");
@@ -536,9 +539,6 @@ public class RodaCoreFactory {
 
         instantiateProtocolManager();
         LOGGER.debug("Finished instantiating protocol manager");
-
-        instantiateDistributedMode();
-        LOGGER.debug("Finished instantiating distributed mode");
 
         // instantiate plugin manager
         // 20160920 hsilva: this must be the last thing to be instantiated as
