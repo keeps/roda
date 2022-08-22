@@ -57,7 +57,6 @@ jobs:
           asset_name: roda-wui-${{ steps.release_version.outputs.result }}.war
           tag: ${{ github.ref }}
           release_name: v${{ steps.release_version.outputs.result }}
-          prerelease: true
       - name: Login to DockerHub
         uses: docker/login-action@v2 
         with:
