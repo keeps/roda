@@ -18,7 +18,7 @@ jobs:
         ports:
           - 2181:2181
       solr:
-        image: solr:9
+        image: solr:8
         ports:
           - 8983:8983
         env:

@@ -10,6 +10,18 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
+    services:
+      zookeeper:
+        image: zookeeper:3.8
+        ports:
+          - 2181:2181
+      solr:
+        image: solr:8
+        ports:
+          - 8983:8983
+        env:
+          ZK_HOST: zookeeper:2181
+        options: -e cloud
     steps:
       - uses: actions/checkout@v3
         with:
