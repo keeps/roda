@@ -59,6 +59,7 @@ import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
+import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -268,7 +269,7 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     // removing PREMIS file
     if (!file.isDirectory()) {
       try {
-        String pmId = URNUtils.getPremisPrefix(PreservationMetadataType.FILE) + file.getId();
+        String pmId = IdUtils.getPreservationFileId(file.getId());
         model.deletePreservationMetadata(PreservationMetadataType.FILE, file.getAipId(), file.getRepresentationId(),
           pmId, file.getPath(), false);
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
@@ -302,7 +303,7 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), Representation.class);
 
     try {
-      model.deleteRepresentation(representation.getAipId(), representation.getId());
+          model.deleteRepresentation(representation.getAipId(), representation.getId());
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       state = PluginState.FAILURE;
       reportItem.addPluginDetails("Could not delete representation: " + e.getMessage());
@@ -317,15 +318,6 @@ public class DeleteRODAObjectPlugin<T extends IsRODAObject> extends AbstractPlug
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       state = PluginState.FAILURE;
       reportItem.addPluginDetails("Could not delete representation related incidences: " + e.getMessage());
-    }
-
-    // removing PREMIS file
-    try {
-      String pmId = URNUtils.getPremisPrefix(PreservationMetadataType.REPRESENTATION) + representation.getId();
-      model.deletePreservationMetadata(PreservationMetadataType.REPRESENTATION, representation.getAipId(),
-        representation.getId(), pmId, Collections.EMPTY_LIST, false);
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      reportItem.addPluginDetails("Could not delete associated PREMIS file: " + e.getMessage());
     }
 
     report.addReport(reportItem.setPluginState(state));
