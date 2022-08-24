@@ -77,6 +77,7 @@ public class SolrRetryTest {
 
   @AfterClass
   public static void tearDown() throws Exception {
+    IndexTestUtils.resetIndex();
     RodaCoreFactory.shutdown();
   }
 
@@ -145,7 +146,11 @@ public class SolrRetryTest {
     SolrClient solrClient = index.getSolrClient();
     SolrClient spy = Mockito.spy(solrClient);
 
-    Mockito.doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doThrow(new SolrServerException("test")).doCallRealMethod().when(spy).deleteById(anyString(), anyList());
+    Mockito
+      .doThrow(new SolrServerException("test"), new SolrServerException("test"), new SolrServerException("test"),
+        new SolrServerException("test"), new SolrServerException("test"), new SolrServerException("test"),
+        new SolrServerException("test"), new SolrServerException("test"), new SolrServerException("test"))
+      .doCallRealMethod().when(spy).deleteById(anyString(), anyList());
 
     String aipId = IdUtils.createUUID();
 
@@ -153,9 +158,9 @@ public class SolrRetryTest {
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);
 
-    ReturnWithExceptions<Void, SolrRetryTest> delete = SolrUtils.delete(spy, IndexedAIP.class, Collections.singletonList(aipId), this, false);
+    SolrUtils.delete(spy, IndexedAIP.class, Collections.singletonList(aipId), this, false);
 
-    Mockito.verify(spy, times(2)).deleteById(anyString(), anyList());
+    Mockito.verify(spy, times(10)).deleteById(anyString(), anyList());
 
     Assert.assertThrows(NotFoundException.class, () -> index.retrieve(IndexedAIP.class, aipId, new ArrayList<>()));
   }

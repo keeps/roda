@@ -24,12 +24,12 @@ public final class RetryPolicyUtils {
 
   private RetryPolicyUtils() {
     int delay = RodaCoreFactory.getRodaConfiguration().getInt(RodaConstants.SOLR_RETRY_DELAY, 1);
-    int maxDeplay = RodaCoreFactory.getRodaConfiguration().getInt(RodaConstants.SOLR_RETRY_MAX_DELAY, 30);
+    int maxDelay = RodaCoreFactory.getRodaConfiguration().getInt(RodaConstants.SOLR_RETRY_MAX_DELAY, 180);
     double delayFactor = RodaCoreFactory.getRodaConfiguration().getDouble(RodaConstants.SOLR_RETRY_DELAY_FACTOR, 2.0);
-    int maxRetries = RodaCoreFactory.getRodaConfiguration().getInt(RodaConstants.SOLR_RETRY_MAX_RETRIES, 5);
+    int maxRetries = RodaCoreFactory.getRodaConfiguration().getInt(RodaConstants.SOLR_RETRY_MAX_RETRIES, 10);
 
     retryPolicy = RetryPolicy.builder().handle(Arrays.asList(SolrServerException.class, IOException.class))
-      .withBackoff(delay, maxDeplay, ChronoUnit.SECONDS, delayFactor).withMaxRetries(maxRetries).onRetry(event -> {
+      .withBackoff(delay, maxDelay, ChronoUnit.SECONDS, delayFactor).withMaxRetries(maxRetries).onRetry(event -> {
         LOGGER.debug("Attempt #{}", event.getAttemptCount());
       }).onRetriesExceeded(event -> {
         LOGGER.debug("Number of max retries exceeded");
