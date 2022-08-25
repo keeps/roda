@@ -1183,8 +1183,10 @@ public class SolrUtils {
     boolean waitSearcher = true;
     boolean softCommit = true;
 
+    Fallback<Object> fallback = Fallback.of(() -> new SolrRetryException(ALL_RETRY_ATTEMPTS_FAILED));
+
     for (String collection : collections) {
-      Failsafe.with(RetryPolicyUtils.getInstance().getRetryPolicy()).onFailure(e -> {
+      Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy()).onFailure(e -> {
         LOGGER.error("Error committing into collection: {}", collection, e.getException());
       }).run(() -> index.commit(collection, waitFlush, waitSearcher, softCommit));
     }
@@ -1215,7 +1217,7 @@ public class SolrUtils {
     Fallback<Object> fallback = Fallback.of(() -> new SolrRetryException(ALL_RETRY_ATTEMPTS_FAILED));
 
     if (instance != null) {
-      Failsafe.with(fallback, RetryPolicyUtils.getInstance().getRetryPolicy()).onFailure(e -> {
+      Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy()).onFailure(e -> {
         LOGGER.error("Error adding document to index", e.getException());
         ret.add((SolrRetryException) e.getResult());
       }).run(() -> index.add(classToCreate, instance));
@@ -1234,7 +1236,7 @@ public class SolrUtils {
       try {
         SolrInputDocument solrDocument = SolrCollectionRegistry.toSolrDocument(indexClass, object, utils);
         if (solrDocument != null) {
-          Failsafe.with(fallback, RetryPolicyUtils.getInstance().getRetryPolicy()).onFailure(e -> {
+          Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy()).onFailure(e -> {
             LOGGER.error("Error adding document to index", e.getException());
             ret.add((SolrRetryException) e.getResult());
           }).run(() -> {
@@ -1390,7 +1392,7 @@ public class SolrUtils {
         }
         String field = SolrCollectionRegistry.getIndexName(objectClass);
 
-        SolrDocument doc = Failsafe.with(fallback, RetryPolicyUtils.getInstance().getRetryPolicy()).onFailure(e -> {
+        SolrDocument doc = Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy()).onFailure(e -> {
           LOGGER.error(ALL_RETRY_ATTEMPTS_FAILED);
           e.getResult();
         }).get(() -> index.getById(field, id));
@@ -1584,7 +1586,7 @@ public class SolrUtils {
 
     Fallback<Object> fallback = Fallback.of(() -> new SolrRetryException(ALL_RETRY_ATTEMPTS_FAILED));
 
-    Failsafe.with(fallback, RetryPolicyUtils.getInstance().getRetryPolicy()).onFailure(e -> {
+    Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy()).onFailure(e -> {
       LOGGER.error("Error deleting document from index");
       ret.add((SolrRetryException) e.getResult());
     }).run(() -> {

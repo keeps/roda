@@ -83,15 +83,26 @@ public class SolrRetryTest {
 
   @Test
   public void testSolrRetryCommit() throws SolrServerException, IOException, GenericException {
-    SolrClient solrClient = index.getSolrClient();
-    SolrClient spy = Mockito.spy(solrClient);
+    SolrClient mock = Mockito.mock(SolrClient.class);
 
-    Mockito.doThrow(new SolrServerException("test")).doCallRealMethod().when(spy).commit(anyString(), anyBoolean(),
+    Mockito.doThrow(new SolrServerException("test")).when(mock).commit(anyString(), anyBoolean(),
       anyBoolean(), anyBoolean());
 
-    SolrUtils.commit(spy, IndexedAIP.class);
+    SolrUtils.commit(mock, IndexedAIP.class);
 
-    Mockito.verify(spy, times(2)).commit(anyString(), anyBoolean(), anyBoolean(), anyBoolean());
+    Mockito.verify(mock, times(11)).commit(anyString(), anyBoolean(), anyBoolean(), anyBoolean());
+  }
+
+  @Test
+  public void testSolrCommit() throws SolrServerException, IOException, GenericException {
+    SolrClient mock = Mockito.mock(SolrClient.class);
+
+    Mockito.doCallRealMethod().when(mock).commit(anyString(), anyBoolean(),
+            anyBoolean(), anyBoolean());
+
+    SolrUtils.commit(mock, IndexedAIP.class);
+
+    Mockito.verify(mock, times(1)).commit(anyString(), anyBoolean(), anyBoolean(), anyBoolean());
   }
 
   @Test
