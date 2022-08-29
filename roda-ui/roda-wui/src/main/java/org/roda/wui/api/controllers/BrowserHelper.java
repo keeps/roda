@@ -379,7 +379,10 @@ public class BrowserHelper {
       bundle.setRepresentationInformationFields(Collections.emptyList());
     }
 
-    if (RODAInstanceUtils.isConfiguredAsDistributedMode()) {
+    RodaConstants.DistributedModeType distributedModeType = RodaCoreFactory.getDistributedModeType();
+
+    if (RODAInstanceUtils.isConfiguredAsDistributedMode()
+      && RodaConstants.DistributedModeType.CENTRAL.equals(distributedModeType)) {
       bundle.setLocalToInstance(aip.getInstanceId().equals(RODAInstanceUtils.getLocalInstanceIdentifier()));
       retrieveDistributedInstanceName(aip.getInstanceId(), bundle.isLocalToInstance())
         .ifPresent(bundle::setInstanceName);
@@ -464,7 +467,10 @@ public class BrowserHelper {
       bundle.setAvailable(true);
     }
 
-    if (RODAInstanceUtils.isConfiguredAsDistributedMode()) {
+    RodaConstants.DistributedModeType distributedModeType = RodaCoreFactory.getDistributedModeType();
+
+    if (RODAInstanceUtils.isConfiguredAsDistributedMode()
+      && RodaConstants.DistributedModeType.CENTRAL.equals(distributedModeType)) {
       bundle.setLocalToInstance(aip.getInstanceId().equals(RODAInstanceUtils.getLocalInstanceIdentifier()));
       retrieveDistributedInstanceName(aip.getInstanceId(), bundle.isLocalToInstance())
         .ifPresent(bundle::setInstanceName);
