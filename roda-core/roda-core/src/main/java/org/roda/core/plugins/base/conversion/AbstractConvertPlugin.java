@@ -268,10 +268,6 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                 if (!file.isDirectory()) {
                   if (FSUtils.isManifestOfExternalFiles(file.getId())) {
                     for (OptionalWithCause<File> fileShallows : model.listExternalFilesUnder(file)) {
-                      /*
-                       * executeOnFile(index, model, storage, report, jobPluginInfo,
-                       * Arrays.asList(fileShallows.get()), job);
-                       */
                       for (File file1 : Arrays.asList(fileShallows.get())) {
                         StorageService tmpStorageService = null;
 
@@ -655,10 +651,6 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
             if (!file.isDirectory()) {
               if (FSUtils.isManifestOfExternalFiles(file.getId())) {
                 for (OptionalWithCause<File> fileShallows : model.listExternalFilesUnder(file)) {
-                  /*
-                   * executeOnFile(index, model, storage, report, jobPluginInfo,
-                   * Arrays.asList(fileShallows.get()), job);
-                   */
                   for (File file1 : Arrays.asList(fileShallows.get())) {
                     StorageService tmpStorageService = null;
 
