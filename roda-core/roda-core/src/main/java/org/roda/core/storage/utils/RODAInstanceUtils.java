@@ -19,7 +19,9 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.utils.YamlUtils;
+import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.synchronization.SynchronizingStatus;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
@@ -101,8 +103,7 @@ public class RODAInstanceUtils {
 
   public static void addLocalInstanceFilter(final Filter filter) throws GenericException {
     if (RodaConstants.DistributedModeType.CENTRAL.equals(RodaCoreFactory.getDistributedModeType())) {
-      final LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
-      filter.add(new SimpleFilterParameter(RodaConstants.INDEX_INSTANCE_ID, localInstance.getId()));
+      filter.add(new EmptyKeyFilterParameter(RodaConstants.INDEX_INSTANCE_ID));
     }
   }
 }
