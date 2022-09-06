@@ -141,6 +141,8 @@ public class AbstractConvertPluginTest {
     final IndexResult<IndexedRepresentation> indexResult = index.find(IndexedRepresentation.class, filterParentTheAIP,
       null, new Sublist(0, 10), Collections.emptyList());
 
+    Assert.assertEquals(job.getJobStats().getCompletionPercentage(), 100);
+    Assert.assertEquals(job.getJobStats().getSourceObjectsProcessedWithSuccess(), 1);
     Assert.assertEquals(indexResult.getResults().size(), 2);
 
   }
@@ -175,6 +177,8 @@ public class AbstractConvertPluginTest {
     final IndexResult<IndexedRepresentation> indexResult = index.find(IndexedRepresentation.class, filterParentTheAIP,
       null, new Sublist(0, 10), Collections.emptyList());
 
+    Assert.assertEquals(job.getJobStats().getCompletionPercentage(), 100);
+    Assert.assertEquals(job.getJobStats().getSourceObjectsProcessedWithSuccess(), 1);
     Assert.assertEquals(indexResult.getResults().size(), 2);
 
   }
@@ -209,6 +213,8 @@ public class AbstractConvertPluginTest {
     final IndexResult<IndexedRepresentation> indexResult = index.find(IndexedRepresentation.class, filterParentTheAIP,
       null, new Sublist(0, 10), Collections.emptyList());
 
+    Assert.assertEquals(job.getJobStats().getCompletionPercentage(), 100);
+    Assert.assertEquals(job.getJobStats().getSourceObjectsProcessedWithSuccess(), 1);
     Assert.assertEquals(indexResult.getResults().size(), 2);
 
   }
