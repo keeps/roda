@@ -29,6 +29,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.base.multiple.DefaultMultipleStepPlugin;
 import org.roda.core.plugins.base.multiple.Step;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +84,11 @@ public class LocalInstanceRegisterPlugin extends DefaultMultipleStepPlugin<Void>
         true, true, InstanceIdentifierPreservationAgentPlugin.getStaticDescription()));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_REGISTER_PLUGIN,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REGISTER_PLUGIN, RegisterPlugin.getStaticName(),
-        PluginParameter.PluginParameterType.BOOLEAN, "false", true, true, RegisterPlugin.getStaticDescription()));
+        PluginParameter.PluginParameterType.BOOLEAN, "false", true, false, RegisterPlugin.getStaticDescription()));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, "Instance Identifier",
+        PluginParameter.PluginParameterType.STRING, RODAInstanceUtils.retrieveLocalInstanceIdentifierToPlugin(), true,
+        true, "Identifier from the RODA local instance"));
 
     steps.add(new Step(InstanceIdentifierAIPPlugin.class.getName(),
       RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_AIP_PLUGIN, true, true));
@@ -123,6 +128,7 @@ public class LocalInstanceRegisterPlugin extends DefaultMultipleStepPlugin<Void>
     parameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_REPOSITORY_EVENT_PLUGIN));
     parameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_INSTANCE_IDENTIFIER_PRESERVATION_AGENT_PLUGIN));
     parameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_REGISTER_PLUGIN));
+    parameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER));
     return parameters;
   }
 

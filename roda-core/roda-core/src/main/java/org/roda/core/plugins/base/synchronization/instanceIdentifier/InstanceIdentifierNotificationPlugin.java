@@ -230,7 +230,6 @@ public class InstanceIdentifierNotificationPlugin extends AbstractPlugin<Void> {
     throws RequestNotValidException, GenericException {
     final Filter filter = new Filter();
     RODAInstanceUtils.addLocalInstanceFilter(filter);
-
     return index.findAll(Notification.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
   }
 }

@@ -200,32 +200,36 @@ public class InstanceIdentifierAIPEventPlugin extends AbstractPlugin<Void> {
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
 
-    IterableIndexResult<IndexedAIP> indexedAIPS = retrieveList(index);
-    for (IndexedAIP indexedAIP : indexedAIPS) {
-      try (CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model
-        .listPreservationMetadata(indexedAIP.getId(), true)) {
-        for (OptionalWithCause<PreservationMetadata> opm : iterable) {
-          if (opm.isPresent()) {
-            try {
-              PremisV3Utils.updatePremisEventInstanceId(opm.get(), model, index, instanceId);
-            } catch (InstanceIdNotUpdated e) {
+    try (IterableIndexResult<IndexedAIP> indexedAIPS = retrieveList(index)) {
+      for (IndexedAIP indexedAIP : indexedAIPS) {
+        try (CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model
+          .listPreservationMetadata(indexedAIP.getId(), true)) {
+          for (OptionalWithCause<PreservationMetadata> opm : iterable) {
+            if (opm.isPresent()) {
+              try {
+                PremisV3Utils.updatePremisEventInstanceId(opm.get(), model, index, instanceId);
+              } catch (InstanceIdNotUpdated e) {
+                countFail++;
+              }
+              countSuccess++;
+            } else {
               countFail++;
             }
-            countSuccess++;
-          } else {
-            countFail++;
           }
+        } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
+          | ValidationException | AlreadyExistsException | IOException e) {
+          LOGGER.error("Error updating instance id on AIP preservation events", e);
+          countFail++;
+          detailsList.add(e.getMessage());
+        } catch (AlreadyHasInstanceIdentifier alreadyHasInstanceIdentifier) {
+          countSkipped++;
+          detailsList.add("" + alreadyHasInstanceIdentifier);
         }
-      } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
-        | ValidationException | AlreadyExistsException | IOException e) {
-        LOGGER.error("Error updating instance id on AIP preservation events", e);
-        countFail++;
-        detailsList.add(e.getMessage());
-      } catch (AlreadyHasInstanceIdentifier alreadyHasInstanceIdentifier) {
-        pluginState = PluginState.SKIPPED;
-        countSkipped++;
-        detailsList.add("" + alreadyHasInstanceIdentifier);
       }
+    } catch (IOException e) {
+      LOGGER.error("Error updating instance id on AIP preservation events", e);
+      countFail++;
+      detailsList.add(e.getMessage());
     }
 
     StringBuilder details = new StringBuilder();
@@ -238,7 +242,7 @@ public class InstanceIdentifierAIPEventPlugin extends AbstractPlugin<Void> {
     }
     details.append("Updated the instance identifier on ").append(countSuccess)
       .append(" AIP preservation events and failed to update ").append(countFail).append(". Skipped ")
-      .append(countSkipped).append(" AIP preservation events ")
+      .append(countSkipped).append(" AIP preservation events.\n")
       .append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
 
     reportItem.setPluginDetails(details.toString());

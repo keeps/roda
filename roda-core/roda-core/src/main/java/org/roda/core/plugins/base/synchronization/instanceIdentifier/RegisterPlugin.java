@@ -16,6 +16,7 @@ import java.util.Map;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.TokenManager;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.DistributedModeType;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -47,17 +48,6 @@ import org.slf4j.LoggerFactory;
  * {@author João Gomes <jgomes@keep.pt>}.
  */
 public class RegisterPlugin extends AbstractPlugin<Void> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierRiskPlugin.class);
-  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
-
-  static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, "Instance Identifier",
-        PluginParameter.PluginParameterType.STRING, RODAInstanceUtils.retrieveLocalInstanceIdentifierToPlugin(), true,
-        true, "Identifier from the RODA local instance"));
-  }
-
-  private String instanceId;
 
   @Override
   public String getVersionImpl() {
@@ -80,21 +70,6 @@ public class RegisterPlugin extends AbstractPlugin<Void> {
   @Override
   public String getDescription() {
     return getStaticDescription();
-  }
-
-  @Override
-  public List<PluginParameter> getParameters() {
-    ArrayList<PluginParameter> parameters = new ArrayList<>();
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER));
-    return parameters;
-  }
-
-  @Override
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    super.setParameterValues(parameters);
-    if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER)) {
-      instanceId = parameters.get(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER);
-    }
   }
 
   @Override
@@ -176,27 +151,33 @@ public class RegisterPlugin extends AbstractPlugin<Void> {
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
 
-    try {
-      LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
-      AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
-      String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE
-        + RodaConstants.API_PATH_PARAM_DISTRIBUTED_INSTANCE_REGISTER;
-      RESTClientUtility.sendPostRequest(localInstance, null, localInstance.getCentralInstanceURL(), resource,
-        accessToken);
-      localInstance.setIsSubscribed(true);
-      localInstance.setStatus(SynchronizingStatus.ACTIVE);
-      RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
-      jobPluginInfo.incrementObjectsProcessedWithSuccess();
-      reportItem.setPluginState(PluginState.SUCCESS);
-    } catch (GenericException | AuthenticationDeniedException e) {
-      String details = e.getMessage() + "\n";
-      jobPluginInfo.incrementObjectsProcessedWithFailure();
-      reportItem.setPluginState(PluginState.FAILURE);
-      reportItem.addPluginDetails(details);
-    }
+    if (DistributedModeType.LOCAL.equals(RodaCoreFactory.getDistributedModeType())) {
+      try {
+        LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
+        AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
+        String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE
+          + RodaConstants.API_PATH_PARAM_DISTRIBUTED_INSTANCE_REGISTER;
+        RESTClientUtility.sendPostRequest(localInstance, null, localInstance.getCentralInstanceURL(), resource,
+          accessToken);
+        localInstance.setIsSubscribed(true);
+        localInstance.setStatus(SynchronizingStatus.ACTIVE);
+        RodaCoreFactory.createOrUpdateLocalInstance(localInstance);
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        reportItem.setPluginState(PluginState.SUCCESS);
+      } catch (GenericException | AuthenticationDeniedException e) {
+        String details = e.getMessage() + "\n";
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+        reportItem.setPluginState(PluginState.FAILURE);
+        reportItem.addPluginDetails(details);
+      }
 
-    PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
-    pluginReport.addReport(reportItem);
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
+      pluginReport.addReport(reportItem);
+    } else {
+      reportItem.setPluginState(PluginState.SKIPPED);
+      reportItem.setPluginDetails("Skipped because RODA is not configured as a local instance");
+      PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
+    }
   }
 
   @Override

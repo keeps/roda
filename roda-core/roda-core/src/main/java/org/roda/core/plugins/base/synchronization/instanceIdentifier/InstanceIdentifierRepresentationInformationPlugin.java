@@ -51,16 +51,6 @@ public class InstanceIdentifierRepresentationInformationPlugin extends AbstractP
 
   private static final Logger LOGGER = LoggerFactory.getLogger(InstanceIdentifierRepresentationInformationPlugin.class);
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
-
-  static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER, "Instance Identifier",
-        PluginParameter.PluginParameterType.STRING, RODAInstanceUtils.retrieveLocalInstanceIdentifierToPlugin(), true,
-        true, "Identifier from the RODA local instance"));
-  }
-
-  private String instanceId;
-
   @Override
   public String getVersionImpl() {
     return "1.0";
@@ -98,9 +88,6 @@ public class InstanceIdentifierRepresentationInformationPlugin extends AbstractP
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-    if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER)) {
-      instanceId = parameters.get(RodaConstants.PLUGIN_PARAMS_INSTANCE_IDENTIFIER);
-    }
   }
 
   @Override

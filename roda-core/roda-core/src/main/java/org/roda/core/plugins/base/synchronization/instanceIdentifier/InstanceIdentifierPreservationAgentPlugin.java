@@ -179,7 +179,7 @@ public class InstanceIdentifierPreservationAgentPlugin extends AbstractPlugin<Vo
         .append(" Preservation agents and failed to update. Skipped").append(countSkipped)
         .append(" preservation agents.\n ").append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
     } else {
-      details.append("Skipped").append(countSkipped).append(" preservation agents.\n ")
+      details.append("Skipped ").append(countSkipped).append(" preservation agents.\n")
         .append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
     }
 

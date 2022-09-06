@@ -210,7 +210,7 @@ public class InstanceIdentifierRiskIncidencePlugin extends AbstractPlugin<Void> 
         .append(LocalInstanceRegisterUtils.getDetailsFromList(detailsList));
     } else if (countSuccess > 0) {
       pluginState = PluginState.SUCCESS;
-      details.append("Updated the instance identifier on ").append(countSuccess).append(" Risk incidences event");
+      details.append("Updated the instance identifier on ").append(countSuccess).append(" risk incidences event");
     }
 
     reportItem.setPluginDetails(details.toString());

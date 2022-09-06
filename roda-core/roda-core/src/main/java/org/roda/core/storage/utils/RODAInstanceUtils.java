@@ -103,7 +103,8 @@ public class RODAInstanceUtils {
 
   public static void addLocalInstanceFilter(final Filter filter) throws GenericException {
     if (RodaConstants.DistributedModeType.CENTRAL.equals(RodaCoreFactory.getDistributedModeType())) {
-      filter.add(new EmptyKeyFilterParameter(RodaConstants.INDEX_INSTANCE_ID));
+      final LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
+      filter.add(new SimpleFilterParameter(RodaConstants.INDEX_INSTANCE_ID, localInstance.getId()));
     }
   }
 }
