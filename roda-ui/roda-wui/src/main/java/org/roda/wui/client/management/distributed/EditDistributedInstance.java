@@ -9,12 +9,12 @@ package org.roda.wui.client.management.distributed;
 
 import java.util.List;
 
-import com.google.gwt.event.dom.client.ClickHandler;
-import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.SynchronizingStatus;
+import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -23,6 +23,7 @@ import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -170,11 +171,19 @@ public class EditDistributedInstance extends Composite {
 
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
-    BrowserServiceImpl.Util.getInstance().deleteDistributedInstance(distributedInstance.getId(),
-      new NoAsyncCallback<Void>() {
+    Dialogs.showConfirmDialog(messages.removeDistributedInstanceTitle(), messages.removeDistributedInstanceLabel(),
+      messages.cancelButton(), messages.confirmButton(), new NoAsyncCallback<Boolean>() {
         @Override
-        public void onSuccess(Void result) {
-          HistoryUtils.newHistory(DistributedInstancesManagement.RESOLVER);
+        public void onSuccess(Boolean confirm) {
+          if (confirm) {
+            BrowserServiceImpl.Util.getInstance().deleteDistributedInstance(distributedInstance.getId(),
+              new NoAsyncCallback<Void>() {
+                @Override
+                public void onSuccess(Void result) {
+                  HistoryUtils.newHistory(DistributedInstancesManagement.RESOLVER);
+                }
+              });
+          }
         }
       });
   }
