@@ -15,6 +15,7 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.client.management.access.AccessKeyTablePanel;
@@ -196,12 +197,21 @@ public class ShowDistributedInstance extends Composite {
 
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
-    BrowserServiceImpl.Util.getInstance().deleteDistributedInstance(distributedInstance.getId(),
-      new NoAsyncCallback<Void>() {
+    Dialogs.showConfirmDialog(messages.removeDistributedInstanceTitle(), messages.removeDistributedInstanceLabel(),
+      messages.cancelButton(), messages.confirmButton(), new NoAsyncCallback<Boolean>() {
         @Override
-        public void onSuccess(Void result) {
-          HistoryUtils.newHistory(DistributedInstancesManagement.RESOLVER);
+        public void onSuccess(Boolean confirm) {
+          if (confirm) {
+            BrowserServiceImpl.Util.getInstance().deleteDistributedInstance(distributedInstance.getId(),
+              new NoAsyncCallback<Void>() {
+                @Override
+                public void onSuccess(Void result) {
+                  HistoryUtils.newHistory(DistributedInstancesManagement.RESOLVER);
+                }
+              });
+          }
         }
       });
   }
+
 }

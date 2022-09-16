@@ -2161,6 +2161,10 @@ public interface ClientMessages extends Messages {
 
   String editDistributedInstanceTitle();
 
+  String removeDistributedInstanceTitle();
+
+  String removeDistributedInstanceLabel();
+
   String distributedInstanceLabel();
 
   String distributedInstancesLabel();
