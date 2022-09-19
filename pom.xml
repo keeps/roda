@@ -570,11 +570,6 @@
                 <version>1.2.3</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.velocity</groupId>
-                <artifactId>velocity</artifactId>
-                <version>1.7</version>
-            </dependency>
-            <dependency>
                 <groupId>org.bluestemsoftware.open.maven.plugin</groupId>
                 <artifactId>launch4j-plugin</artifactId>
                 <version>1.5.0.0</version>
@@ -944,11 +939,6 @@
                         <artifactId>log4j</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>xalan</groupId>
-                <artifactId>xalan</artifactId>
-                <version>2.7.2</version>
             </dependency>
 
             <!-- Actions related dependencies - end -->
