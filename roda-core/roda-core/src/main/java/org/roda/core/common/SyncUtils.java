@@ -75,10 +75,7 @@ public class SyncUtils {
     boolean riskPackage = createCentralRiskPackage(workingDir);
     boolean riPackage = createCentralRepresentationInformationPackage(workingDir);
 
-    if (jobsPackage || riskPackage || riPackage) {
-      return true;
-    }
-    return false;
+    return jobsPackage || riskPackage || riPackage;
   }
 
   private static boolean createCentralJobsPackage(Path workingDir, String instanceIdentifier)
@@ -148,8 +145,7 @@ public class SyncUtils {
 
   public static String getInstanceBundleName(String instanceId) {
     final String date = new SimpleDateFormat("yyyyMMdd'T'HHmmss'.zip'").format(new Date());
-    final String fileName = instanceId + "_" + date;
-    return fileName;
+    return instanceId + "_" + date;
   }
 
   public static Path getSyncOutcomeBundlePath(String bundleName) {
@@ -270,7 +266,6 @@ public class SyncUtils {
   }
 
   public static Path requestRemoteActions(LocalInstance localInstance) throws GenericException {
-    Path remoteActionsPath = null;
     try {
       AccessToken accessToken = TokenManager.getInstance().getAccessToken(localInstance);
       String resource = RodaConstants.API_SEP + RodaConstants.API_REST_V1_DISTRIBUTED_INSTANCE + "remote_actions"
@@ -290,7 +285,7 @@ public class SyncUtils {
     } catch (AuthenticationDeniedException | IOException e) {
       throw new GenericException("unable to communicate with the central instance");
     }
-    return remoteActionsPath;
+    return null;
   }
 
   private static Path downloadRemoteActions(HttpResponse response, String instanceId) {

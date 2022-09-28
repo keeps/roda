@@ -198,7 +198,7 @@ public class SendSyncBundlePlugin extends AbstractPlugin<Void> {
         + RodaConstants.API_PATH_PARAM_DISTRIBUTED_INSTANCE_SYNC + RodaConstants.API_SEP + localInstance.getId();
       return RESTClientUtility.sendPostRequestWithCompressedFile(localInstance.getCentralInstanceURL(), resource,
         zipPath, accessToken);
-    } catch (RODAException | FileNotFoundException e) {
+    } catch (RODAException | IOException e) {
       LOGGER.error("Unable to send bundle to central instance", e);
       throw new GenericException("Unable to send bundle to central instance", e);
     }

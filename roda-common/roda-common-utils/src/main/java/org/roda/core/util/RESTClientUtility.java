@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.apache.http.HttpEntity;
@@ -105,13 +106,13 @@ public final class RESTClientUtility {
   }
 
   public static int sendPostRequestWithCompressedFile(String url, String resource, Path path, AccessToken accessToken)
-    throws RODAException, FileNotFoundException {
+      throws RODAException, IOException {
     CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 
     HttpPost httpPost = new HttpPost(url + resource);
     httpPost.addHeader("Authorization", "Bearer " + accessToken.getToken());
 
-    InputStream inputStream = new FileInputStream(path.toFile());
+    InputStream inputStream = Files.newInputStream(path.toFile().toPath());
     MultipartEntityBuilder builder = MultipartEntityBuilder.create();
     builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
     builder.addBinaryBody(RodaConstants.API_QUERY_KEY_FILE, inputStream, ContentType.create("application/zip"),
