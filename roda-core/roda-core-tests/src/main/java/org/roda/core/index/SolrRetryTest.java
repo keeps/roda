@@ -22,7 +22,10 @@ import java.util.Collections;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.client.solrj.impl.CloudSolrClient;
+import org.apache.solr.cloud.ZkController;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.cloud.ClusterState;
 import org.mockito.Mockito;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
@@ -181,5 +184,14 @@ public class SolrRetryTest {
     Mockito.verify(spy, times(10)).deleteById(anyString(), anyList());
 
     Assert.assertThrows(NotFoundException.class, () -> index.retrieve(IndexedAIP.class, aipId, new ArrayList<>()));
+  }
+
+  @Test
+  public void testZookeeperConnectionTimeout() {
+    try (CloudSolrClient solrClient = (CloudSolrClient) RodaCoreFactory.getIndexService().getSolrClient()) {
+      ClusterState clusterState = solrClient.getClusterStateProvider().getClusterState();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

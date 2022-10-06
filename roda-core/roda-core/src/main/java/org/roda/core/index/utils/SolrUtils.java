@@ -1607,17 +1607,18 @@ public class SolrUtils {
   public static <T extends IsIndexed, S extends Object> ReturnWithExceptions<Void, S> delete(SolrClient index,
     Class<T> classToDelete, Filter filter, S source, boolean commit) {
     ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>();
-    try {
-      index.deleteByQuery(SolrCollectionRegistry.getIndexName(classToDelete), parseFilter(filter));
 
+    Fallback<Object> fallback = Fallback.of(() -> new SolrRetryException(ALL_RETRY_ATTEMPTS_FAILED));
+
+    Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy()).onFailure(e -> {
+      LOGGER.error("Error deleting documents from index");
+      ret.add((SolrRetryException) e.getResult());
+    }).run(() -> {
+      index.deleteByQuery(SolrCollectionRegistry.getIndexName(classToDelete), parseFilter(filter));
       if (commit) {
         commit(index, classToDelete);
       }
-    } catch (SolrServerException | IOException | SolrException | GenericException | RequestNotValidException
-      | NotSupportedException e) {
-      LOGGER.error("Error deleting documents from index");
-      ret.add(e);
-    }
+    });
 
     return ret;
   }
