@@ -130,7 +130,8 @@ public class AkkaBackgroundJobActor extends AkkaBaseActor {
     JobsHelper.updateJobObjectsCount(plugin, super.getModel(), objectsCount);
 
     // execute
-    getPluginOrchestrator().runPluginFromIndex(getSelf(), job, sourceObjectsClass, selectedItems.getFilter(), plugin);
+    getPluginOrchestrator().runPluginFromIndex(getSelf(), job, sourceObjectsClass, selectedItems.getFilter(),
+      selectedItems.justActive(), plugin);
   }
 
   @Override

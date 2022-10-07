@@ -100,10 +100,10 @@
 		<appender-ref ref="AKKA" />
 	</logger>
 
-	<logger name="org.roda.core.common.akka">
+	<!--logger name="org.roda.core.common.akka">
 		<level value="TRACE" />
 		<appender-ref ref="AKKA" />
-	</logger>
+	</logger-->
 
 	<logger name="gov.loc.repository.bagit" additivity="false">
 		<level value="DEBUG" />
