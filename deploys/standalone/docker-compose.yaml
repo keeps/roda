@@ -8,7 +8,7 @@ services:
       - zookeeper_data:/data
       - zookeeper_datalog:/datalog
   solr:
-    image: solr:9
+    image: solr:8
     restart: unless-stopped
     ports:
       - 8983:8983
@@ -32,6 +32,7 @@ services:
       - RODA_CORE_SOLR_CLOUD_URLS=zoo:2181
       - SOLR_NUM_SHARDS=4
       - SOLR_REPLICATION_FACTOR=1
+      - SOLR_MAX_SHARDS_PER_NODE=4
 
       # Remote debug
       - JPDA_ADDRESS=5005
