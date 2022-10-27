@@ -182,7 +182,7 @@ public class InstanceIdentifierAIPEventPlugin extends AbstractPlugin<Void> {
         JobPluginInfo jobPluginInfo, Plugin<Void> plugin) throws PluginException {
         try {
           modifyInstanceId(model, index, cachedJob, report, jobPluginInfo);
-        } catch (RequestNotValidException | GenericException e) {
+        } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
           LOGGER.error("Could not modify Instance ID's in objects");
         }
       }
@@ -190,7 +190,7 @@ public class InstanceIdentifierAIPEventPlugin extends AbstractPlugin<Void> {
   }
 
   private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
-    JobPluginInfo jobPluginInfo) throws RequestNotValidException, GenericException {
+    JobPluginInfo jobPluginInfo) throws RequestNotValidException, GenericException, AuthorizationDeniedException {
     int countFail = 0;
     int countSuccess = 0;
     int countSkipped = 0;
@@ -258,7 +258,7 @@ public class InstanceIdentifierAIPEventPlugin extends AbstractPlugin<Void> {
   }
 
   private IterableIndexResult<IndexedAIP> retrieveList(final IndexService index)
-    throws RequestNotValidException, GenericException {
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
     final Filter filter = new Filter();
     RODAInstanceUtils.addLocalInstanceFilter(filter);
     return index.findAll(IndexedAIP.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));

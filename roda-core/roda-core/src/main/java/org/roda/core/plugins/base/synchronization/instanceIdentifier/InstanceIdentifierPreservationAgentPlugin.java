@@ -13,7 +13,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
@@ -23,6 +25,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.common.OptionalWithCause;
@@ -32,6 +35,7 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.synchronization.central.DistributedInstances;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -136,14 +140,27 @@ public class InstanceIdentifierPreservationAgentPlugin extends AbstractPlugin<Vo
 
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
+    DistributedInstances distributedInstances = null;
+    try {
+      distributedInstances = RodaCoreFactory.getModelService().listDistributedInstances();
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | IOException e) {
+      LOGGER.error("Could not list distributed instances");
+    }
+    List<String> distributedInstanceIds = distributedInstances.getObjects().stream()
+      .map(distributedInstance -> distributedInstance.getId()).collect(Collectors.toList());
 
     try (CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationAgents()) {
       for (OptionalWithCause<PreservationMetadata> opm : iterable) {
         try {
           if (opm.isPresent()) {
             PreservationMetadata pm = opm.get();
-            PremisV3Utils.updatePremisUserAgentId(pm, model, index, instanceId);
-            countSuccess++;
+            if (URNUtils.hasInstanceId(pm.getId())) {
+              String instanceId = URNUtils.extractInstanceIdentifierFromId(pm.getId());
+              if (!distributedInstanceIds.contains(instanceId)) {
+                PremisV3Utils.updatePremisUserAgentId(pm, model, index, RODAInstanceUtils.getLocalInstanceIdentifier());
+                countSuccess++;
+              }
+            }
           } else {
             jobPluginInfo.incrementObjectsProcessedWithFailure();
             pluginState = PluginState.FAILURE;

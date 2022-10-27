@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.base.synchronization.instanceIdentifier;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -14,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -24,14 +24,12 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.index.filter.Filter;
-import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.notifications.Notification;
-import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
@@ -176,7 +174,8 @@ public class InstanceIdentifierNotificationPlugin extends AbstractPlugin<Void> {
         JobPluginInfo jobPluginInfo, Plugin<Void> plugin) throws PluginException {
         try {
           modifyInstanceId(model, index, cachedJob, report, jobPluginInfo);
-        } catch (RequestNotValidException | GenericException | NotFoundException e) {
+        } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
+          | IOException e) {
           LOGGER.error("Could not modify Instance ID's in objects");
         }
       }
@@ -184,7 +183,8 @@ public class InstanceIdentifierNotificationPlugin extends AbstractPlugin<Void> {
   }
 
   private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
-    JobPluginInfo jobPluginInfo) throws RequestNotValidException, GenericException, NotFoundException {
+    JobPluginInfo jobPluginInfo)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
     PluginState pluginState = PluginState.SKIPPED;
     List<String> detailsList = new ArrayList<>();
     int countFail = 0;
@@ -227,7 +227,7 @@ public class InstanceIdentifierNotificationPlugin extends AbstractPlugin<Void> {
   }
 
   private IterableIndexResult<Notification> retrieveList(final IndexService index)
-    throws RequestNotValidException, GenericException {
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
     final Filter filter = new Filter();
     RODAInstanceUtils.addLocalInstanceFilter(filter);
     return index.findAll(Notification.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
