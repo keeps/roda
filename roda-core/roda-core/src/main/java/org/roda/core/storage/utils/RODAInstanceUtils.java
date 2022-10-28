@@ -7,10 +7,14 @@
  */
 package org.roda.core.storage.utils;
 
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -18,12 +22,14 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.YamlUtils;
-import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
+import org.roda.core.data.v2.index.filter.AndFiltersParameters;
 import org.roda.core.data.v2.index.filter.Filter;
+import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.NotSimpleFilterParameter;
-import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.synchronization.SynchronizingStatus;
+import org.roda.core.data.v2.synchronization.central.DistributedInstances;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
@@ -101,10 +107,22 @@ public class RODAInstanceUtils {
     }
   }
 
-  public static void addLocalInstanceFilter(final Filter filter) throws GenericException {
+  public static void addLocalInstanceFilter(final Filter filter)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, IOException {
+
     if (RodaConstants.DistributedModeType.CENTRAL.equals(RodaCoreFactory.getDistributedModeType())) {
-      final LocalInstance localInstance = RodaCoreFactory.getLocalInstance();
-      filter.add(new SimpleFilterParameter(RodaConstants.INDEX_INSTANCE_ID, localInstance.getId()));
+
+      DistributedInstances distributedInstances = RodaCoreFactory.getModelService().listDistributedInstances();
+      List<String> distributedInstanceIds = distributedInstances.getObjects().stream()
+        .map(distributedInstance -> distributedInstance.getId()).collect(Collectors.toList());
+
+      List<FilterParameter> instanceParams = new ArrayList<>();
+
+      for (String instanceId : distributedInstanceIds) {
+        instanceParams.add(new NotSimpleFilterParameter(RodaConstants.INDEX_INSTANCE_ID, instanceId));
+      }
+
+      filter.add(new AndFiltersParameters(instanceParams));
     }
   }
 }

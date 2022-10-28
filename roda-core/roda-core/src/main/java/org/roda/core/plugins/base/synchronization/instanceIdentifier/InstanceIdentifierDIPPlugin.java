@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.base.synchronization.instanceIdentifier;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -173,7 +174,8 @@ public class InstanceIdentifierDIPPlugin extends AbstractPlugin<Void> {
         JobPluginInfo jobPluginInfo, Plugin<Void> plugin) throws PluginException {
         try {
           modifyInstanceId(model, index, cachedJob, report, jobPluginInfo);
-        } catch (RequestNotValidException | GenericException | NotFoundException e) {
+        } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
+          | IOException e) {
           LOGGER.error("Could not modify Instance ID's in objects");
         }
       }
@@ -181,7 +183,8 @@ public class InstanceIdentifierDIPPlugin extends AbstractPlugin<Void> {
   }
 
   private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
-    JobPluginInfo jobPluginInfo) throws RequestNotValidException, GenericException, NotFoundException {
+    JobPluginInfo jobPluginInfo)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
     List<String> detaislList = new ArrayList<>();
     PluginState pluginState = PluginState.SKIPPED;
     int countFail = 0;
@@ -224,7 +227,7 @@ public class InstanceIdentifierDIPPlugin extends AbstractPlugin<Void> {
   }
 
   private IterableIndexResult<IndexedDIP> retrieveList(final IndexService index)
-    throws RequestNotValidException, GenericException {
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
     final Filter filter = new Filter();
     RODAInstanceUtils.addLocalInstanceFilter(filter);
     return index.findAll(IndexedDIP.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));

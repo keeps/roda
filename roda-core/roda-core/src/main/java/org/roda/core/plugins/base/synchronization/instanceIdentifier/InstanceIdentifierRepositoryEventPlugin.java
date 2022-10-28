@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.base.synchronization.instanceIdentifier;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -179,7 +180,7 @@ public class InstanceIdentifierRepositoryEventPlugin extends AbstractPlugin<Void
         JobPluginInfo jobPluginInfo, Plugin<Void> plugin) throws PluginException {
         try {
           modifyInstanceId(model, index, cachedJob, report, jobPluginInfo);
-        } catch (RequestNotValidException | GenericException e) {
+        } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | IOException e) {
           LOGGER.error("Could not modify Instance ID's in objects");
         }
       }
@@ -187,7 +188,8 @@ public class InstanceIdentifierRepositoryEventPlugin extends AbstractPlugin<Void
   }
 
   private void modifyInstanceId(ModelService model, IndexService index, Job cachedJob, Report pluginReport,
-    JobPluginInfo jobPluginInfo) throws RequestNotValidException, GenericException {
+    JobPluginInfo jobPluginInfo)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
     PluginState pluginState = PluginState.SKIPPED;
     List<String> detailsList = new ArrayList<>();
 
@@ -246,7 +248,7 @@ public class InstanceIdentifierRepositoryEventPlugin extends AbstractPlugin<Void
   }
 
   private IterableIndexResult<IndexedPreservationEvent> retrieveList(final IndexService index)
-    throws RequestNotValidException, GenericException {
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, IOException {
     final Filter filter = new Filter(new EmptyKeyFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID));
     RODAInstanceUtils.addLocalInstanceFilter(filter);
     return index.findAll(IndexedPreservationEvent.class, filter, Collections.singletonList(RodaConstants.INDEX_UUID));
