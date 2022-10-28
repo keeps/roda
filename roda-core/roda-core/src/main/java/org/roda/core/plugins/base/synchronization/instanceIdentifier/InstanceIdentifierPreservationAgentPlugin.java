@@ -141,13 +141,18 @@ public class InstanceIdentifierPreservationAgentPlugin extends AbstractPlugin<Vo
     Report reportItem = PluginHelper.initPluginReportItem(this, cachedJob.getId(), Job.class);
     PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
     DistributedInstances distributedInstances = null;
+    List<String> distributedInstanceIds = new ArrayList<>();
+
     try {
       distributedInstances = RodaCoreFactory.getModelService().listDistributedInstances();
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | IOException e) {
       LOGGER.error("Could not list distributed instances");
     }
-    List<String> distributedInstanceIds = distributedInstances.getObjects().stream()
-      .map(distributedInstance -> distributedInstance.getId()).collect(Collectors.toList());
+
+    if (distributedInstances != null) {
+      distributedInstanceIds = distributedInstances.getObjects().stream()
+        .map(distributedInstance -> distributedInstance.getId()).collect(Collectors.toList());
+    }
 
     try (CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationAgents()) {
       for (OptionalWithCause<PreservationMetadata> opm : iterable) {
