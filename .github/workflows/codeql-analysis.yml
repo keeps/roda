@@ -60,3 +60,20 @@ jobs:
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
+      with:
+        upload: False
+        output: sarif-results
+
+    - name: Filter SARIF results
+      uses: advanced-security/filter-sarif@main
+      if: matrix.language == 'java'
+      with:
+        patterns: |
+          -roda-core/roda-core/src/main/java/org/roda/core/storage/fs/FSUtils.java:java/path-injection
+        input: sarif-results/java.sarif
+        output: sarif-results/java.sarif
+
+    - name: Upload SARIF results
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: sarif-results/${{ matrix.language }}.sarif
