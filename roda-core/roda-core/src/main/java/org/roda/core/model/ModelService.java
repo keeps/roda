@@ -3392,8 +3392,7 @@ public class ModelService extends ModelObservable {
     StoragePath disposalHoldContainerPath = ModelUtils.getDisposalHoldContainerPath();
     DisposalHolds disposalHolds = new DisposalHolds();
 
-    try {
-      CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(disposalHoldContainerPath, false);
+    try (CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(disposalHoldContainerPath, false)) {
       for (Resource resource : iterable) {
         DisposalHold hold = ResourceParseUtils.convertResourceToObject(resource, DisposalHold.class);
         disposalHolds.addObject(hold);
@@ -3599,13 +3598,12 @@ public class ModelService extends ModelObservable {
     StoragePath disposalScheduleContainerPath = ModelUtils.getDisposalScheduleContainerPath();
     DisposalSchedules disposalSchedules = new DisposalSchedules();
 
-    try {
-      CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(disposalScheduleContainerPath, false);
+    try (CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(disposalScheduleContainerPath,
+      false)) {
       for (Resource resource : iterable) {
         DisposalSchedule schedule = ResourceParseUtils.convertResourceToObject(resource, DisposalSchedule.class);
         disposalSchedules.addObject(schedule);
       }
-
     } catch (NotFoundException e) {
       LOGGER.error("Could not find any disposal schedules to list: {}", e.getMessage(), e);
       return disposalSchedules;
@@ -3828,8 +3826,7 @@ public class ModelService extends ModelObservable {
     StoragePath disposalRuleContainerPath = ModelUtils.getDisposalRuleContainerPath();
     DisposalRules disposalRules = new DisposalRules();
 
-    try {
-      CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(disposalRuleContainerPath, false);
+    try (CloseableIterable<Resource> iterable = storage.listResourcesUnderDirectory(disposalRuleContainerPath, false)) {
       for (Resource resource : iterable) {
         DisposalRule rule = ResourceParseUtils.convertResourceToObject(resource, DisposalRule.class);
         disposalRules.addObject(rule);
