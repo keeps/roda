@@ -22,6 +22,7 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
@@ -45,7 +46,6 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -470,29 +470,38 @@ public class EditDescriptiveMetadata extends Composite {
     DescriptiveMetadataEditBundle updatedBundle = new DescriptiveMetadataEditBundle(bundle.getId(), typeText, version,
       content, bundle.getPermissions());
 
-    BrowserService.Util.getInstance().updateDescriptiveMetadataFile(aipId, representationId, updatedBundle,
-      new AsyncCallback<Void>() {
+    Dialogs.showConfirmDialog(messages.updateMetadataFileTitle(), messages.updateMetadataFileLabel(),
+      messages.cancelButton(), messages.confirmButton(), new NoAsyncCallback<Boolean>() {
 
-        @Override
-        public void onFailure(Throwable caught) {
-          if (caught instanceof ValidationException) {
-            ValidationException e = (ValidationException) caught;
-            updateErrors(e);
-          } else {
-            AsyncCallbackUtils.defaultFailureTreatment(caught);
+        public void onSuccess(Boolean confirm) {
+          if (confirm) {
+            BrowserService.Util.getInstance().updateDescriptiveMetadataFile(aipId, representationId, updatedBundle,
+              new AsyncCallback<Void>() {
+
+                @Override
+                public void onFailure(Throwable caught) {
+                  if (caught instanceof ValidationException) {
+                    ValidationException e = (ValidationException) caught;
+                    updateErrors(e);
+                  } else {
+                    AsyncCallbackUtils.defaultFailureTreatment(caught);
+                  }
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                  errors.setText("");
+                  errors.setVisible(false);
+                  Toast.showInfo(messages.dialogSuccess(), messages.metadataFileSaved());
+                  back();
+                }
+              });
           }
-        }
-
-        @Override
-        public void onSuccess(Void result) {
-          errors.setText("");
-          errors.setVisible(false);
-          Toast.showInfo(messages.dialogSuccess(), messages.metadataFileSaved());
-          back();
         }
       });
 
   }
+
 
   protected void updateErrors(ValidationException e) {
     SafeHtmlBuilder b = new SafeHtmlBuilder();
@@ -508,19 +517,28 @@ public class EditDescriptiveMetadata extends Composite {
 
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
-    BrowserService.Util.getInstance().deleteDescriptiveMetadataFile(aipId, representationId, bundle.getId(),
-      new AsyncCallback<Void>() {
+    Dialogs.showConfirmDialog(messages.removeMetadataFileTitle(), messages.removeMetadataFileLabel(),
+      messages.cancelButton(), messages.confirmButton(), new NoAsyncCallback<Boolean>() {
 
-        @Override
-        public void onFailure(Throwable caught) {
-          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        public void onSuccess(Boolean confirm) {
+          if (confirm) {
+            BrowserService.Util.getInstance().deleteDescriptiveMetadataFile(aipId, representationId, bundle.getId(),
+              new AsyncCallback<Void>() {
+
+                @Override
+                public void onFailure(Throwable caught) {
+                  AsyncCallbackUtils.defaultFailureTreatment(caught);
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                  Toast.showInfo(messages.dialogSuccess(), messages.metadataFileRemoved());
+                  back();
+                }
+              });
+          }
         }
 
-        @Override
-        public void onSuccess(Void result) {
-          Toast.showInfo(messages.dialogSuccess(), messages.metadataFileRemoved());
-          back();
-        }
       });
   }
 
