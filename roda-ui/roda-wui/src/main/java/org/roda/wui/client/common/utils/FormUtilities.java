@@ -258,7 +258,7 @@ public class FormUtilities {
     mvText.addStyleName("form-textbox ri-richtextarea");
 
     if (mv.get("value") != null) {
-      mvText.setHTML(SafeHtmlUtils.fromTrustedString(mv.get("value")));
+      mvText.setHTML(SafeHtmlUtils.fromString(mv.get("value")));
     }
 
     mvText.addBlurHandler(new BlurHandler() {

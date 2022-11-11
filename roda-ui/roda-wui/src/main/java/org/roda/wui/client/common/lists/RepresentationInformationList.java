@@ -61,7 +61,7 @@ public class RepresentationInformationList extends AsyncTableCell<Representation
           nameWithTags.append("<span class='label label-info btn-separator-left ri-category'>")
             .append(messages.representationInformationListItems(tag)).append("</span>");
         }
-        return SafeHtmlUtils.fromTrustedString(nameWithTags.toString());
+        return SafeHtmlUtils.fromString(nameWithTags.toString());
       }
     };
 
