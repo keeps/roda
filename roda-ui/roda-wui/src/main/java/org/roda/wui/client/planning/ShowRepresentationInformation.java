@@ -223,7 +223,7 @@ public class ShowRepresentationInformation extends Composite {
       for (final String category : tagsList) {
         InlineHTML parPanel = new InlineHTML();
         parPanel.setHTML("<span class='label label-info btn-separator-right ri-category'>"
-          + messages.representationInformationListItems(category) + "</span>");
+          + messages.representationInformationListItems(SafeHtmlUtils.htmlEscape(category)) + "</span>");
         parPanel.addClickHandler(new ClickHandler() {
           @Override
           public void onClick(ClickEvent event) {
