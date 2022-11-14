@@ -56,12 +56,12 @@ public class RepresentationInformationList extends AsyncTableCell<Representation
       @Override
       public SafeHtml getValue(RepresentationInformation ri) {
         StringBuilder nameWithTags = new StringBuilder();
-        nameWithTags.append(ri.getName());
+        nameWithTags.append(SafeHtmlUtils.fromString(ri.getName()));
         for (String tag : ri.getTags()) {
           nameWithTags.append("<span class='label label-info btn-separator-left ri-category'>")
-            .append(messages.representationInformationListItems(tag)).append("</span>");
+            .append(messages.representationInformationListItems(SafeHtmlUtils.htmlEscape(tag))).append("</span>");
         }
-        return SafeHtmlUtils.fromString(nameWithTags.toString());
+        return SafeHtmlUtils.fromTrustedString(nameWithTags.toString());
       }
     };
 
