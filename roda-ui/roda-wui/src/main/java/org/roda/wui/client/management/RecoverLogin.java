@@ -222,10 +222,21 @@ public class RecoverLogin extends Composite {
 
     if (caught instanceof RecaptchaException) {
       Toast.showError(messages.recoverLoginCaptchaFailed());
-    } else if (caught instanceof NotFoundException) {
-      Toast.showError(messages.recoverLoginNoSuchUser());
     } else {
-      Toast.showError(messages.recoverLoginFailure());
+      Dialogs.showInformationDialog(messages.recoverLoginSuccessDialogTitle(),
+              messages.recoverLoginSuccessDialogMessage(), messages.recoverLoginSuccessDialogButton(), false,
+              new AsyncCallback<Void>() {
+
+                @Override
+                public void onFailure(Throwable caught) {
+                  HistoryUtils.newHistory(Login.RESOLVER);
+                }
+
+                @Override
+                public void onSuccess(Void result) {
+                  HistoryUtils.newHistory(Login.RESOLVER);
+                }
+              });
     }
   }
 }

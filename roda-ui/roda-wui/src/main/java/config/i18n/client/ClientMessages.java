@@ -1840,10 +1840,6 @@ public interface ClientMessages extends Messages {
 
   String recoverLoginCaptchaFailed();
 
-  String recoverLoginNoSuchUser();
-
-  String recoverLoginFailure();
-
   String recoverLoginSuccessDialogTitle();
 
   String recoverLoginSuccessDialogMessage();
