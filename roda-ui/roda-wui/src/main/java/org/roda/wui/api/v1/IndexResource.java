@@ -376,11 +376,15 @@ public class IndexResource {
    */
   @SuppressWarnings("unchecked")
   private <T> Class<T> getClass(final String className) throws RequestNotValidException {
-    try {
-      return (Class<T>) Class.forName(className);
-    } catch (final ClassNotFoundException e) {
-      throw new RequestNotValidException(String.format("Invalid value for classToReturn '%s'", className), e);
+    if (RodaConstants.INDEXED_CLASSES.contains(className)) {
+      try {
+        return (Class<T>) Class.forName(className);
+      } catch (final ClassNotFoundException e) {
+        throw new RequestNotValidException(String.format("Invalid value for classToReturn '%s'", className), e);
+      }
+    } else {
+      throw new RequestNotValidException(String.format("Invalid value for classToReturn '%s'", className));
     }
-  }
 
+  }
 }
