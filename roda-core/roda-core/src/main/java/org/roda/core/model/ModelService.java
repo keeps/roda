@@ -2205,6 +2205,7 @@ public class ModelService extends ModelObservable {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     User user = null;
+
     if (useModel) {
       user = UserUtility.getLdapUtility().requestPasswordReset(username, email);
     }

@@ -453,7 +453,7 @@ public class LdapUtility {
     try {
       return getUser(service.getAdminSession(), name);
     } catch (final LdapException e) {
-      throw new GenericException("If this username or email belongs to an existing user, an email will be sent to recover the password", e);
+      throw new GenericException("Error getting user " + name, e);
     }
   }
 
@@ -475,7 +475,7 @@ public class LdapUtility {
     try {
       return getUserWithEmail(service.getAdminSession(), email);
     } catch (final LdapException e) {
-      throw new GenericException("If this username or email belongs to an existing user, an email will be sent to recover the password " + email, e);
+      throw new GenericException("Error getting user with email " + email, e);
     }
   }
 
@@ -969,9 +969,16 @@ public class LdapUtility {
    */
   public User requestPasswordReset(final String username, final String email)
     throws NotFoundException, IllegalOperationException, GenericException {
-    final User user = getUserByNameOrEmail(username, email);
+    User user = null;
+    try {
+      user = getUserByNameOrEmail(username, email);
+    } catch (GenericException e) {
+      LOGGER.debug("Error getting user with given credentials");
+    }
+
     if (user == null) {
-      throw new NotFoundException("If this username or email belongs to an existing user, an email will be sent to recover the password.");
+      LOGGER.debug("Could not find any user with given credentials");
+      return null;
     } else {
       // Generate a password reset token with 1 day expiration date.
       user.setResetPasswordToken(IdUtils.createUUID());
