@@ -195,7 +195,7 @@ public class UserUtility {
   public static <T extends IsIndexed> void checkObjectPermissions(final User user, SelectedItems<T> objs,
     final Class<?> invokingMethodInnerClass, final Class<?> classToReturn)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    if (RodaConstants.INDEXED_CLASSES.contains(objs.getSelectedClass())) {
+    if (RodaConstants.WHITELIST_CLASS_NAMES.contains(objs.getSelectedClass())) {
       try {
         if (SolrCollection.hasPermissionFilters(Class.forName(objs.getSelectedClass()))) {
           final Method method = invokingMethodInnerClass.getEnclosingMethod();

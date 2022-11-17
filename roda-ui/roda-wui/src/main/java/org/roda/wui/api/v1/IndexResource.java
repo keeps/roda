@@ -376,7 +376,7 @@ public class IndexResource {
    */
   @SuppressWarnings("unchecked")
   private <T> Class<T> getClass(final String className) throws RequestNotValidException {
-    if (RodaConstants.INDEXED_CLASSES.contains(className)) {
+    if (RodaConstants.WHITELIST_CLASS_NAMES.contains(className)) {
       try {
         return (Class<T>) Class.forName(className);
       } catch (final ClassNotFoundException e) {

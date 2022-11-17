@@ -20,7 +20,7 @@ public class SelectedItemsUtils {
   @SuppressWarnings("unchecked")
   public static <T extends IsRODAObject> Class<T> parseClass(String classNameToReturn) throws GenericException {
     Class<T> classToReturn;
-    if (RodaConstants.INDEXED_CLASSES.contains(classNameToReturn)) {
+    if (RodaConstants.WHITELIST_CLASS_NAMES.contains(classNameToReturn)) {
       try {
         classToReturn = (Class<T>) Class.forName(classNameToReturn);
       } catch (ClassNotFoundException e) {

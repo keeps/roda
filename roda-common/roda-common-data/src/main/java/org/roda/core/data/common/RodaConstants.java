@@ -602,7 +602,7 @@ public final class RodaConstants {
   /*
    * INDEXED CLASSES
    */
-  public static final List<String> INDEXED_CLASSES = Collections.unmodifiableList(
+  public static final List<String> WHITELIST_CLASS_NAMES = Collections.unmodifiableList(
     Arrays.asList("org.roda.core.data.v2.ip.IndexedAIP", "org.roda.core.data.v2.ip.IndexedRepresentation",
       "org.roda.core.data.v2.ip.IndexedFile", "org.roda.core.data.v2.ip.IndexedDIP", "org.roda.core.data.v2.ip.DIPFile",
       "org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent",
@@ -612,7 +612,7 @@ public final class RodaConstants {
       "org.roda.core.data.v2.risks.RiskIncidence", "org.roda.core.data.v2.ri.RepresentationInformation",
       "org.roda.core.data.v2.ip.TransferredResource", "org.roda.core.data.v2.user.User",
       "org.roda.core.data.v2.user.Group", "org.roda.core.data.v2.user.RODAMember",
-      "org.roda.core.data.v2.ip.disposal.DisposalConfirmation"));
+      "org.roda.core.data.v2.ip.disposal.DisposalConfirmation", "org.roda.core.data.v2.user.RodaPrincipal"));
 
   /*
    * STORAGE CONTAINERS
