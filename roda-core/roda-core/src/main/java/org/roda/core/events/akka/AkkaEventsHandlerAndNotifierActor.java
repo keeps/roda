@@ -142,14 +142,15 @@ public class AkkaEventsHandlerAndNotifierActor extends AbstractActor {
       CRDTWrapper wrapper = (CRDTWrapper) option.get();
       if (!wrapper.getInstanceId().equals(instanceSenderId)) {
         if (objectId.startsWith(USER_KEY_PREFIX)) {
-          String password = getUserPasswordFromRodaUserOtherInfoMap(wrapper);
+          char[] password = getUserPasswordFromRodaUserOtherInfoMap(wrapper).toCharArray();
           if (!wrapper.isUpdate()) {
             eventsHandler.handleUserCreated(RodaCoreFactory.getModelService(), (User) wrapper.getRodaObject(),
-              password);
+              String.valueOf(password));
           } else {
             eventsHandler.handleUserUpdated(RodaCoreFactory.getModelService(), (User) wrapper.getRodaObject(),
-              password);
+              String.valueOf(password));
           }
+          password = null;
         } else if (objectId.startsWith(GROUP_KEY_PREFIX)) {
           if (!wrapper.isUpdate()) {
             eventsHandler.handleGroupCreated(RodaCoreFactory.getModelService(), (Group) wrapper.getRodaObject());
