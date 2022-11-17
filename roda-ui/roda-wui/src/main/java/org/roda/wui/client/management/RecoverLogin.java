@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
@@ -196,20 +195,7 @@ public class RecoverLogin extends Composite {
 
           @Override
           public void onSuccess(Void result) {
-            Dialogs.showInformationDialog(messages.recoverLoginSuccessDialogTitle(),
-              messages.recoverLoginSuccessDialogMessage(), messages.recoverLoginSuccessDialogButton(), false,
-              new AsyncCallback<Void>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  HistoryUtils.newHistory(Login.RESOLVER);
-                }
-
-                @Override
-                public void onSuccess(Void result) {
-                  HistoryUtils.newHistory(Login.RESOLVER);
-                }
-              });
+            showRecoverLoginMessage();
           }
         });
     }
@@ -222,10 +208,25 @@ public class RecoverLogin extends Composite {
 
     if (caught instanceof RecaptchaException) {
       Toast.showError(messages.recoverLoginCaptchaFailed());
-    } else if (caught instanceof NotFoundException) {
-      Toast.showError(messages.recoverLoginNoSuchUser());
     } else {
-      Toast.showError(messages.recoverLoginFailure());
+      showRecoverLoginMessage();
     }
+  }
+
+  private void showRecoverLoginMessage() {
+    Dialogs.showInformationDialog(messages.recoverLoginSuccessDialogTitle(),
+      messages.recoverLoginSuccessDialogMessage(), messages.recoverLoginSuccessDialogButton(), false,
+      new AsyncCallback<Void>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          HistoryUtils.newHistory(Login.RESOLVER);
+        }
+
+        @Override
+        public void onSuccess(Void result) {
+          HistoryUtils.newHistory(Login.RESOLVER);
+        }
+      });
   }
 }
