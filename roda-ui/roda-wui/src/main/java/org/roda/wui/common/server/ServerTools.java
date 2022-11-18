@@ -22,15 +22,17 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.xml.transform.stream.StreamSource;
+import javax.xml.transform.sax.SAXSource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.roda.core.data.utils.XMLUtils;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.MetadataValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
 
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
@@ -232,8 +234,8 @@ public class ServerTools {
       DocumentBuilder builder = proc.newDocumentBuilder();
 
       // Load the XML document.
-      StringReader reader = new StringReader(xml);
-      XdmNode doc = builder.build(new StreamSource(reader));
+      SAXSource xmlSource = XMLUtils.getSafeSAXSource(new InputSource(new StringReader(xml)));
+      XdmNode doc = builder.build(xmlSource);
 
       // Compile the xpath
       XPathSelector selector = xpath.compile(xpathString).load();

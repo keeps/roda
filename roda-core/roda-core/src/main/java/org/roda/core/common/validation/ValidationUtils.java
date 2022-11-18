@@ -201,8 +201,8 @@ public class ValidationUtils {
   }
 
   /**
-   * Validates descriptive medatada (e.g. against its schema, but other
-   * strategies may be used)
+   * Validates descriptive medatada (e.g. against its schema, but other strategies
+   * may be used)
    * 
    * @param failIfNoSchema
    * @throws AuthorizationDeniedException
@@ -257,8 +257,8 @@ public class ValidationUtils {
   }
 
   /**
-   * Validates descriptive medatada (e.g. against its schema, but other
-   * strategies may be used)
+   * Validates descriptive medatada (e.g. against its schema, but other strategies
+   * may be used)
    * 
    * @param descriptiveMetadataType
    * @param failIfNoSchema
