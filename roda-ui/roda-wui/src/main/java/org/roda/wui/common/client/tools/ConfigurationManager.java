@@ -64,6 +64,10 @@ public class ConfigurationManager {
     }
   }
 
+  public static boolean isInitialized() {
+    return instance != null;
+  }
+
   /**
    * @return The property value for the provided keyParts. Or {@code null} if the
    *         property value was null or the key is not present.
