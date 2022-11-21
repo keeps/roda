@@ -37,6 +37,12 @@ RUN set -ex; \
     apt-get remove -y curl zip && apt-get clean && apt-get autoremove ; \
     rm -rf /var/lib/apt/lists/*
 
+# Add tomcat error handler
+RUN set -ex; \
+    PATTERN='<Valve className="org.apache.catalina.valves.ErrorReportValve" showReport="false" showServerInfo="false" \/>'; \
+    TARGET='<\/Host>'; \
+    sed  -i "/${TARGET}.*/i ${PATTERN}" /usr/local/tomcat/conf/server.xml
+
 ENV RODA_HOME=/roda
 
 COPY /docker-entrypoint.sh /
