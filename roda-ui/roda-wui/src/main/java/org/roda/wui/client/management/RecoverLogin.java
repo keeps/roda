@@ -187,31 +187,18 @@ public class RecoverLogin extends Composite {
         recaptchaResponse = recaptchaWidget.getResponse();
       }
       UserManagementService.Util.getInstance().requestPasswordReset(usernameOrEmail.getValue(), recaptchaResponse,
-        LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<Void>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            errorMessage(caught);
-          }
-
-          @Override
-          public void onSuccess(Void result) {
-            Dialogs.showInformationDialog(messages.recoverLoginSuccessDialogTitle(),
-              messages.recoverLoginSuccessDialogMessage(), messages.recoverLoginSuccessDialogButton(), false,
-              new AsyncCallback<Void>() {
+              LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<Void>() {
 
                 @Override
                 public void onFailure(Throwable caught) {
-                  HistoryUtils.newHistory(Login.RESOLVER);
+                  errorMessage(caught);
                 }
 
                 @Override
                 public void onSuccess(Void result) {
-                  HistoryUtils.newHistory(Login.RESOLVER);
+                  showRecoverLoginMessage();
                 }
               });
-          }
-        });
     }
   }
 
@@ -222,10 +209,25 @@ public class RecoverLogin extends Composite {
 
     if (caught instanceof RecaptchaException) {
       Toast.showError(messages.recoverLoginCaptchaFailed());
-    } else if (caught instanceof NotFoundException) {
-      Toast.showError(messages.recoverLoginNoSuchUser());
     } else {
-      Toast.showError(messages.recoverLoginFailure());
+      showRecoverLoginMessage();
     }
+  }
+
+  private void showRecoverLoginMessage() {
+    Dialogs.showInformationDialog(messages.recoverLoginSuccessDialogTitle(),
+            messages.recoverLoginSuccessDialogMessage(), messages.recoverLoginSuccessDialogButton(), false,
+            new AsyncCallback<Void>() {
+
+              @Override
+              public void onFailure(Throwable caught) {
+                HistoryUtils.newHistory(Login.RESOLVER);
+              }
+
+              @Override
+              public void onSuccess(Void result) {
+                HistoryUtils.newHistory(Login.RESOLVER);
+              }
+            });
   }
 }
