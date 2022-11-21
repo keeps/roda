@@ -9,6 +9,7 @@ package org.roda.core.data.common;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
@@ -730,6 +731,37 @@ public final class RodaConstants {
   public static final String INDEX_DIP_FILE = "DIPFile";
   public static final String INDEX_REPRESENTATION_INFORMATION = "RepresentationInformation";
   public static final String INDEX_DISPOSAL_CONFIRMATION = "DisposalConfirmation";
+
+  /*
+   * INDEXED CLASSES
+   */
+  public static final List<String> WHITELIST_CLASS_NAMES = Collections.unmodifiableList(
+    Arrays.asList("org.roda.core.data.v2.ip.IndexedAIP", "org.roda.core.data.v2.ip.IndexedRepresentation",
+      "org.roda.core.data.v2.ip.IndexedFile", "org.roda.core.data.v2.ip.IndexedDIP", "org.roda.core.data.v2.ip.DIPFile",
+      "org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent",
+      "org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent", "org.roda.core.data.v2.jobs.Job",
+      "org.roda.core.data.v2.jobs.IndexedReport", "org.roda.core.data.v2.log.LogEntry",
+      "org.roda.core.data.v2.notifications.Notification", "org.roda.core.data.v2.risks.IndexedRisk",
+      "org.roda.core.data.v2.risks.RiskIncidence", "org.roda.core.data.v2.ri.RepresentationInformation",
+      "org.roda.core.data.v2.ip.TransferredResource", "org.roda.core.data.v2.user.User",
+      "org.roda.core.data.v2.user.Group", "org.roda.core.data.v2.user.RODAMember",
+      "org.roda.core.data.v2.ip.disposal.DisposalConfirmation", "org.roda.core.data.v2.user.RodaPrincipal",
+      "org.roda.core.data.v2.ip.AIP", "org.roda.core.data.v2.risks.Risk", "org.roda.core.events.akka.CRDTWrapper",
+      "org.roda.core.data.v2.ip.DIP", "org.roda.core.data.v2.ip.metadata.DescriptiveMetadata",
+      "org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry",
+      "org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalConfirmationAIPMetadata",
+      "org.roda.core.data.v2.ip.disposal.DisposalHold", "org.roda.core.data.v2.ip.disposal.DisposalRule",
+      "org.roda.core.data.v2.ip.disposal.DisposalSchedule",
+      "org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalScheduleAIPMetadata", "org.roda.core.data.v2.ip.File",
+      "org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata",
+      "org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation", "org.roda.core.data.v2.jobs.Job",
+      "org.roda.core.data.v2.ip.metadata.OtherMetadata", "org.roda.core.data.v2.ip.metadata.PreservationMetadata",
+      "org.roda.core.data.v2.jobs.Report", "org.roda.core.data.v2.ip.Representation",
+      "org.roda.core.protocols.AbstractProtocol", "org.roda.core.protocols.RODAProtocol",
+      "org.roda.core.protocols.protocols.FileProtocol", "org.roda.core.protocols.protocols.HttpProtocol",
+      "org.roda.core.protocols.protocols.HttpsProtocol", "org.roda.core.data.v2.accessKey.AccessKey",
+      "org.roda.core.data.v2.synchronization.central.DistributedInstance",
+      "org.roda.core.data.v2.synchronization.local.LocalInstance", "org.roda.core.data.v2.ip.ShallowFile"));
 
   /*
    * STORAGE CONTAINERS
