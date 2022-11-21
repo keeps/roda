@@ -38,6 +38,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -152,10 +153,10 @@ public class ShowDisposalRule extends Composite {
         messages.dateUpdated(Humanize.formatDateTime(disposalRule.getUpdatedOn()), disposalRule.getUpdatedBy()));
     }
 
-    disposalRuleDescription.setHTML(disposalRule.getDescription());
+    disposalRuleDescription.setHTML(SafeHtmlUtils.fromString(disposalRule.getDescription()));
     disposalRuleDescriptionLabel.setVisible(StringUtils.isNotBlank(disposalRule.getDescription()));
 
-    disposalRuleScheduleName.setHTML(disposalRule.getDisposalScheduleName());
+    disposalRuleScheduleName.setHTML(SafeHtmlUtils.fromString(disposalRule.getDisposalScheduleName()));
     disposalRuleScheduleLabel.setVisible(StringUtils.isNotBlank(disposalRule.getDisposalScheduleName()));
     disposalRuleScheduleName.addStyleName("btn-link addCursorPointer");
     disposalRuleScheduleName.addClickHandler(new ClickHandler() {
@@ -165,7 +166,7 @@ public class ShowDisposalRule extends Composite {
       }
     });
 
-    disposalRuleType.setHTML(messages.disposalRuleTypeValue(disposalRule.getType().toString()));
+    disposalRuleType.setHTML(SafeHtmlUtils.fromString(messages.disposalRuleTypeValue(disposalRule.getType().toString())));
     disposalRuleTypeLabel.setVisible(StringUtils.isNotBlank(disposalRule.getType().toString()));
 
     conditionsLabel.setVisible(true);
@@ -173,7 +174,7 @@ public class ShowDisposalRule extends Composite {
     if (disposalRule.getType().equals(ConditionType.IS_CHILD_OF)) {
       String conditionTxt = messages.disposalRuleTypeValue(disposalRule.getType().toString()) + " "
         + disposalRule.getConditionValue() + " (" + disposalRule.getConditionKey() + ")";
-      condition.setHTML(conditionTxt);
+      condition.setHTML(SafeHtmlUtils.fromString(conditionTxt));
       condition.addStyleName("btn-link addCursorPointer");
       condition.addClickHandler(new ClickHandler() {
         @Override
@@ -185,7 +186,7 @@ public class ShowDisposalRule extends Composite {
     } else if (disposalRule.getType().equals(ConditionType.METADATA_FIELD)) {
       String conditionTxt = disposalRule.getConditionKey() + " " + messages.disposalRuleConditionOperator() + " "
         + disposalRule.getConditionValue();
-      condition.setHTML(conditionTxt);
+      condition.setHTML(SafeHtmlUtils.fromString(conditionTxt));
       conditionsPanel.add(condition);
     }
   }

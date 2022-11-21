@@ -19,6 +19,7 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.RichTextArea;
@@ -124,7 +125,7 @@ public class RichTextToolbar extends Composite {
             @Override
             public void onSuccess(String codeHtml) {
               if (codeHtml != null) {
-                richText.setHTML(codeHtml);
+                richText.setHTML(SafeHtmlUtils.fromString(codeHtml));
               }
             }
           });

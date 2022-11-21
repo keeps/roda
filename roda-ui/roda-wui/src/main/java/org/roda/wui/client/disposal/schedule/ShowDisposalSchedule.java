@@ -47,6 +47,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -205,13 +206,13 @@ public class ShowDisposalSchedule extends Composite {
         disposalSchedule.getUpdatedBy()));
     }
 
-    descriptionValue.setHTML(disposalSchedule.getDescription());
+    descriptionValue.setHTML(SafeHtmlUtils.fromString(disposalSchedule.getDescription()));
     descriptionLabel.setVisible(StringUtils.isNotBlank(disposalSchedule.getDescription()));
 
-    mandateValue.setHTML(disposalSchedule.getMandate());
+    mandateValue.setHTML(SafeHtmlUtils.fromString(disposalSchedule.getMandate()));
     mandateLabel.setVisible(StringUtils.isNotBlank(disposalSchedule.getMandate()));
 
-    notesValue.setHTML(disposalSchedule.getScopeNotes());
+    notesValue.setHTML(SafeHtmlUtils.fromString(disposalSchedule.getScopeNotes()));
     notesLabel.setVisible(StringUtils.isNotBlank(disposalSchedule.getScopeNotes()));
 
     disposalActionsValue.setHTML(messages.disposalScheduleAction(disposalSchedule.getActionCode().toString()));
