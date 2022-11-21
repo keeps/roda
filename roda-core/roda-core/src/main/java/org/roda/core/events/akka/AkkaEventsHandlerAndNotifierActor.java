@@ -7,6 +7,7 @@
  */
 package org.roda.core.events.akka;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -145,10 +146,10 @@ public class AkkaEventsHandlerAndNotifierActor extends AbstractActor {
           char[] password = getUserPasswordFromRodaUserOtherInfoMap(wrapper).toCharArray();
           if (!wrapper.isUpdate()) {
             eventsHandler.handleUserCreated(RodaCoreFactory.getModelService(), (User) wrapper.getRodaObject(),
-              String.valueOf(password));
+              Arrays.toString(password));
           } else {
             eventsHandler.handleUserUpdated(RodaCoreFactory.getModelService(), (User) wrapper.getRodaObject(),
-              String.valueOf(password));
+              Arrays.toString(password));
           }
           password = null;
         } else if (objectId.startsWith(GROUP_KEY_PREFIX)) {

@@ -15,8 +15,20 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.CharBuffer;
 import java.nio.file.Path;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.Arrays;
+import java.nio.CharBuffer;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -159,10 +171,11 @@ public final class RESTClientUtility {
     throws RODAException, FileNotFoundException {
     CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     HttpPost httpPost = new HttpPost(url + resource);
+    char[] basicAuth = ArrayUtils.addAll((username + ":").toCharArray(), password);
+    char[] basicAuthToken = Base64.encode(StandardCharsets.UTF_8.encode(CharBuffer.wrap(basicAuth)).array());
 
-    String basicAuthToken = new String(Base64.encode((username + ":" + password).getBytes()));
-    httpPost.setHeader("Authorization", "Basic " + basicAuthToken);
-
+    httpPost.setHeader("Authorization", "Basic " + Arrays.toString(basicAuthToken));
+    basicAuthToken = null;
     File fileToUpload = new File(file.toString());
     InputStream inputStream = new FileInputStream(fileToUpload);
     MultipartEntityBuilder builder = MultipartEntityBuilder.create();
