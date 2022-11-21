@@ -195,38 +195,42 @@ public class UserUtility {
   public static <T extends IsIndexed> void checkObjectPermissions(final User user, SelectedItems<T> objs,
     final Class<?> invokingMethodInnerClass, final Class<?> classToReturn)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    try {
-      if (SolrCollection.hasPermissionFilters(Class.forName(objs.getSelectedClass()))) {
-        final Method method = invokingMethodInnerClass.getEnclosingMethod();
-        final String classParam = (classToReturn == null) ? "" : "(" + classToReturn.getSimpleName() + ")";
-        final String configKey = String.format("core.permissions.%s.%s%s", method.getDeclaringClass().getName(),
-          method.getName(), classParam);
-        if (RodaCoreFactory.getRodaConfiguration().containsKey(configKey)) {
-          LOGGER.trace("Testing if user '{}' has permissions to '{}'", user.getName(), configKey);
-          String configValue = RodaCoreFactory.getRodaConfigurationAsString(configKey);
+    if (RodaConstants.WHITELIST_CLASS_NAMES.contains(objs.getSelectedClass())) {
+      try {
+        if (SolrCollection.hasPermissionFilters(Class.forName(objs.getSelectedClass()))) {
+          final Method method = invokingMethodInnerClass.getEnclosingMethod();
+          final String classParam = (classToReturn == null) ? "" : "(" + classToReturn.getSimpleName() + ")";
+          final String configKey = String.format("core.permissions.%s.%s%s", method.getDeclaringClass().getName(),
+            method.getName(), classParam);
+          if (RodaCoreFactory.getRodaConfiguration().containsKey(configKey)) {
+            LOGGER.trace("Testing if user '{}' has permissions to '{}'", user.getName(), configKey);
+            String configValue = RodaCoreFactory.getRodaConfigurationAsString(configKey);
 
-          try {
-            PermissionType permissionType = PermissionType.valueOf(configValue);
-            checkObjectPermissions(user, objs, permissionType);
-          } catch (IllegalArgumentException e) {
+            try {
+              PermissionType permissionType = PermissionType.valueOf(configValue);
+              checkObjectPermissions(user, objs, permissionType);
+            } catch (IllegalArgumentException e) {
+              LOGGER.error(
+                "Unable to determine which permissions the user '{}' needs because the config value '{}' is not a permission type",
+                user.getName(), configValue);
+              throw new AuthorizationDeniedException(
+                "Unable to determine which permissions the user needs because the config value '" + configValue
+                  + "' is not a permission type");
+            }
+          } else {
             LOGGER.error(
-              "Unable to determine which permissions the user '{}' needs because the config value '{}' is not a permission type",
-              user.getName(), configValue);
+              "Unable to determine which permissions the user '{}' needs because the config. key '{}' is not defined",
+              user.getName(), configKey);
             throw new AuthorizationDeniedException(
-              "Unable to determine which permissions the user needs because the config value '" + configValue
-                + "' is not a permission type");
+              "Unable to determine which permissions the user needs because the config. key '" + configKey
+                + "' is not defined");
           }
-        } else {
-          LOGGER.error(
-            "Unable to determine which permissions the user '{}' needs because the config. key '{}' is not defined",
-            user.getName(), configKey);
-          throw new AuthorizationDeniedException(
-            "Unable to determine which permissions the user needs because the config. key '" + configKey
-              + "' is not defined");
         }
+      } catch (ClassNotFoundException e) {
+        throw new GenericException(e);
       }
-    } catch (ClassNotFoundException e) {
-      throw new GenericException(e);
+    } else {
+      throw new GenericException("Invalid value for class name " + objs.getSelectedClass());
     }
   }
 
