@@ -8,8 +8,12 @@
 package org.roda.core.util;
 
 import java.io.*;
+import java.nio.CharBuffer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Arrays;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -61,14 +65,15 @@ public final class RESTClientUtility {
     }
   }
 
-  public static int sendPostRequestWithFile(String url, String resource, String username, String password, Path file)
+  public static int sendPostRequestWithFile(String url, String resource, String username, char[] password, Path file)
     throws RODAException, FileNotFoundException {
     CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     HttpPost httpPost = new HttpPost(url + resource);
+    char[] basicAuth = ArrayUtils.addAll((username + ":").toCharArray(), password);
+    char[] basicAuthToken = Base64.encode(StandardCharsets.UTF_8.encode(CharBuffer.wrap(basicAuth)).array());
 
-    String basicAuthToken = new String(Base64.encode((username + ":" + password).getBytes()));
-    httpPost.setHeader("Authorization", "Basic " + basicAuthToken);
-
+    httpPost.setHeader("Authorization", "Basic " + Arrays.toString(basicAuthToken));
+    basicAuthToken = null;
     File fileToUpload = new File(file.toString());
     InputStream inputStream = new FileInputStream(fileToUpload);
     MultipartEntityBuilder builder = MultipartEntityBuilder.create();

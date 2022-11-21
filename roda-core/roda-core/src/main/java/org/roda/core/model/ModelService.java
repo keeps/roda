@@ -22,6 +22,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -1873,7 +1874,7 @@ public class ModelService extends ModelObservable {
     try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(logDirectory)) {
       for (Path path : directoryStream) {
         if (!path.equals(currentLogFile)) {
-          int httpExitCode = RESTClientUtility.sendPostRequestWithFile(url, resource, username, String.valueOf(password), path);
+          int httpExitCode = RESTClientUtility.sendPostRequestWithFile(url, resource, username, password, path);
           if (httpExitCode == RodaConstants.HTTP_RESPONSE_CODE_SUCCESS) {
             LOGGER.info("The action log file ({}) was moved to Master successfully!", path);
             Files.delete(path);
