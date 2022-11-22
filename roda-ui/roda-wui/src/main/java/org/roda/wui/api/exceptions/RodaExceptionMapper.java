@@ -14,6 +14,8 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import java.util.UUID;
+
 import org.glassfish.jersey.server.ContainerRequest;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -45,11 +47,14 @@ public class RodaExceptionMapper implements ExceptionMapper<RODAException> {
     String mediaType = ApiUtils.getMediaType(parameter, header);
 
     ResponseBuilder responseBuilder;
-    String message = e.getClass().getSimpleName() + ": " + e.getMessage();
+    UUID errorID = UUID.randomUUID();
+    String message = "An error has occurred, to get more details use the error identifier: " + errorID;
+    String warn = "ERROR_ID: " + errorID + " - " + e.getClass().getSimpleName() + ": " + e.getMessage();
     if (e.getCause() != null) {
-      message += ", caused by " + e.getCause().getClass().getName() + ": " + e.getCause().getMessage();
+      warn += ", caused by " + e.getCause().getClass().getName() + ": " + e.getCause().getMessage();
     }
     LOGGER.debug("Creating error response. MediaType: {}; Message: {}", mediaType, message, e);
+    LOGGER.warn(warn);
     if (e instanceof AuthorizationDeniedException) {
       responseBuilder = Response.status(Status.UNAUTHORIZED)
         .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, message));
