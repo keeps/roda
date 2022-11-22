@@ -14,6 +14,8 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import java.util.UUID;
+
 import org.glassfish.jersey.server.ContainerRequest;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -23,14 +25,11 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.NotImplementedException;
 import org.roda.core.data.exceptions.RODAException;
-import java.util.UUID;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.UUID;
 
 @Provider
 public class RodaExceptionMapper implements ExceptionMapper<RODAException> {
