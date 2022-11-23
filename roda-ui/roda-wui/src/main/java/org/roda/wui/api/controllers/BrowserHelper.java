@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -34,8 +35,6 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.custommonkey.xmlunit.Diff;
-import org.custommonkey.xmlunit.XMLUnit;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ClassificationPlanUtils;
 import org.roda.core.common.ConsumesOutputStream;
@@ -194,13 +193,15 @@ import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.common.HTMLUtils;
 import org.roda.wui.common.server.ServerTools;
-import org.roda.wui.server.common.XMLSimilarityIgnoreElements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
+import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.DefaultNodeMatcher;
+import org.xmlunit.diff.Diff;
+import org.xmlunit.diff.ElementSelectors;
 
 /**
  * @author Luis Faria <lfaria@keep.pt>
@@ -572,7 +573,7 @@ public class BrowserHelper {
       Binary binary = RodaCoreFactory.getModelService().retrieveDescriptiveMetadataBinary(aip.getId(), representationId,
         descriptiveMetadataId);
       inputStream = binary.getContent().createInputStream();
-      String xml = IOUtils.toString(inputStream, "UTF-8");
+      String xml = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
 
       // Get the supported metadata type with the same type and version
       // We need this to try to get the values for the form
@@ -627,18 +628,12 @@ public class BrowserHelper {
           String templateWithValues = retrieveDescriptiveMetadataPreview(metadataTypeBundle);
 
           if (StringUtils.isNotBlank(templateWithValues)) {
-            try {
-              XMLUnit.setIgnoreComments(true);
-              XMLUnit.setIgnoreWhitespace(true);
-              XMLUnit.setIgnoreAttributeOrder(true);
-              XMLUnit.setCompareUnmatched(false);
+            Diff diff = DiffBuilder.compare(xml).withTest(templateWithValues).ignoreComments().ignoreWhitespace()
+              .checkForIdentical().checkForSimilar()
+              .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText))
+              .withNodeFilter(node -> !node.getNodeName().equals("schemaLocation")).build();
 
-              Diff xmlDiff = new Diff(xml, templateWithValues);
-              xmlDiff.overrideDifferenceListener(new XMLSimilarityIgnoreElements("schemaLocation"));
-              similar = xmlDiff.identical() || xmlDiff.similar();
-            } catch (SAXException e) {
-              LOGGER.warn("Could not check if template can loose info", e);
-            }
+            similar = !diff.hasDifferences();
           }
         }
       }

@@ -111,6 +111,8 @@ public class PluginParameterPanel extends Composite {
       createPluginObjectFieldsLayout(File.class.getSimpleName());
     } else if (PluginParameterType.PERMISSION_TYPES.equals(parameter.getType())) {
       createPermissionTypesLayout();
+    } else if (PluginParameterType.DROPDOWN.equals(parameter.getType())) {
+      createDropdownLayout();
     } else {
       LOGGER
         .warn("Unsupported plugin parameter type: " + parameter.getType() + ". Reverting to default parameter editor.");
@@ -373,6 +375,39 @@ public class PluginParameterPanel extends Composite {
     addHelp();
   }
 
+  private void createDropdownLayout() {
+    Label parameterName = new Label(parameter.getName());
+    final ListBox dropdown = new ListBox();
+    dropdown.addStyleName("form-selectbox");
+    dropdown.addStyleName("form-textbox-small");
+
+    BrowserService.Util.getInstance().retrieveDropdownPluginItems(parameter.getId(),
+      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<Set<Pair<String, String>>>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          // do nothing
+        }
+
+        @Override
+        public void onSuccess(Set<Pair<String, String>> result) {
+          for (Pair<String, String> item : result) {
+            dropdown.addItem(item.getFirst(), item.getSecond());
+          }
+
+          dropdown.setSelectedIndex(dropdown.getItemCount() - 1);
+          value = dropdown.getSelectedValue();
+        }
+      });
+
+    dropdown.addChangeHandler(event -> value = dropdown.getSelectedValue());
+
+    dropdown.setTitle("object box");
+    layout.add(parameterName);
+    layout.add(dropdown);
+    addHelp();
+  }
+
   private void createPluginObjectFieldsLayout(final String className) {
     List<String> defaultValues = Arrays.asList(parameter.getDefaultValue().split(","));
 
@@ -625,12 +660,16 @@ public class PluginParameterPanel extends Composite {
     return value;
   }
 
-  public String getAipTitle() { return aipTitle; }
+  public String getAipTitle() {
+    return aipTitle;
+  }
 
   public PluginParameter getParameter() {
     return parameter;
   }
 
-  public FlowPanel getLayout() { return layout;}
+  public FlowPanel getLayout() {
+    return layout;
+  }
 
 }

@@ -184,6 +184,8 @@ public interface BrowserService extends RemoteService {
 
   Set<Pair<String, String>> retrieveReindexPluginObjectClasses();
 
+  Set<Pair<String, String>> retrieveDropdownPluginItems(String parameterId, String localeString);
+
   CreateIngestJobBundle retrieveCreateIngestProcessBundle();
 
   JobBundle retrieveJobBundle(String jobId, List<String> fieldsToReturn) throws RODAException;

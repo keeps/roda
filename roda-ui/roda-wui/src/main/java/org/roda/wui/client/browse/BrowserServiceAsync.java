@@ -124,6 +124,8 @@ public interface BrowserServiceAsync {
 
   void retrieveReindexPluginObjectClasses(AsyncCallback<Set<Pair<String, String>>> asyncCallback);
 
+  void retrieveDropdownPluginItems(String parameterId, String localeString, AsyncCallback<Set<Pair<String, String>>> asyncCallback);
+
   void retrieveCreateIngestProcessBundle(AsyncCallback<CreateIngestJobBundle> callback);
 
   void retrieveJobBundle(String jobId, List<String> fieldsToReturn, AsyncCallback<JobBundle> callback);
