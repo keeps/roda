@@ -56,3 +56,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RODA_CORE_SOLR_TYPE: CLOUD
           RODA_CORE_SOLR_CLOUD_URLS: localhost:2181
+          SIEGFRIED_MODE: standalone

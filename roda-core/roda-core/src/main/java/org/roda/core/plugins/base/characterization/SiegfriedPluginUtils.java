@@ -49,7 +49,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.util.JSONPObject;
 
 public class SiegfriedPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPluginUtils.class);
@@ -60,21 +59,22 @@ public class SiegfriedPluginUtils {
 
   private static List<String> getBatchCommand(Path sourceDirectory) {
     List<String> command;
-    String siegfriedPath = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "siegfried", "binary");
+    String siegfriedPath = RodaCoreFactory.getRodaConfiguration().getString("core.tools.siegfried.binary", "sf");
     command = new ArrayList<>(
       Arrays.asList(siegfriedPath, "-json=true", "-z=false", sourceDirectory.toFile().getAbsolutePath()));
     return command;
   }
 
   private static String getSiegfriedServerEndpoint(Path sourceDirectory) {
-    String siegfriedServer = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "siegfried", "server");
+    String siegfriedServer = RodaCoreFactory.getRodaConfiguration().getString("core.tools.siegfried.server", "http://localhost:5138");
+
     return String.format("%s/identify/%s?base64=true&format=json", siegfriedServer,
       new String(Base64.encode(sourceDirectory.toString().getBytes())));
   }
 
   public static String runSiegfriedOnPath(Path sourceDirectory) throws PluginException {
     try {
-      String siegfriedMode = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "siegfried", "mode");
+      String siegfriedMode = RodaCoreFactory.getRodaConfiguration().getString("core.tools.siegfried.mode", "server");
       if ("server".equalsIgnoreCase(siegfriedMode)) {
         LOGGER.debug("Running Siegfried on server mode");
         String endpoint = getSiegfriedServerEndpoint(sourceDirectory);

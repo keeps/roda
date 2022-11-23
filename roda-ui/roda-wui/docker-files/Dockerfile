@@ -32,7 +32,7 @@ RUN set -ex; \
     apt-get remove -y curl zip && apt-get clean && apt-get autoremove ; \
     rm -rf /var/lib/apt/lists/*
 
-ENV RODA_HOME=/roda
+ENV RODA_HOME=/roda SIEGFRIED_MODE=server SIEGFRIED_SERVER_URL=http://siegfried:5138
 
 COPY /docker-entrypoint.sh /
 COPY /docker-entrypoint.d/* /docker-entrypoint.d/
