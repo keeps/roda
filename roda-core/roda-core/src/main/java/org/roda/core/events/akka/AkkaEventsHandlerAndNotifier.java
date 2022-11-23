@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.solr.cloud.ZkController;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.ZooDefs;
@@ -28,6 +27,7 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.events.AbstractEventsHandler;
 import org.roda.core.events.EventsHandler;
 import org.roda.core.events.EventsNotifier;
+import org.roda.core.index.utils.ZkController;
 import org.roda.core.model.ModelService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

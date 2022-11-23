@@ -46,9 +46,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
-import org.apache.solr.client.solrj.SolrRequest.METHOD;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
@@ -59,7 +57,6 @@ import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.SolrInputField;
 import org.apache.solr.common.params.CursorMarkParams;
 import org.apache.solr.common.params.FacetParams;
-import org.apache.solr.handler.loader.XMLLoader;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.common.RodaUtils;
@@ -226,11 +223,8 @@ public class SolrUtils {
   private static <T extends IsIndexed> QueryResponse query(SolrClient index, Class<T> classToRetrieve, SolrQuery query)
     throws GenericException, RequestNotValidException {
 
-    // NOTE: work-around https://issues.apache.org/jira/browse/SOLR-12858
-    METHOD method = index instanceof EmbeddedSolrServer ? METHOD.GET : METHOD.POST;
-
     try {
-      return index.query(SolrCollectionRegistry.getIndexName(classToRetrieve), query, method);
+      return index.query(SolrCollectionRegistry.getIndexName(classToRetrieve), query);
     } catch (SolrServerException | IOException | NotSupportedException e) {
       throw new GenericException("Could not query index", e);
     } catch (SolrException e) {
@@ -724,7 +718,8 @@ public class SolrUtils {
 
     try (Reader transformationResult = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CORE_CROSSWALKS_INGEST,
       metadataType, metadataVersion, parameters)) {
-      XMLLoader loader = new XMLLoader();
+        
+      SolrXMLLoader loader = new SolrXMLLoader();
       XMLStreamReader parser = XMLInputFactory.newInstance().createXMLStreamReader(transformationResult);
 
       boolean parsing = true;

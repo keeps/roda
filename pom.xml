@@ -107,7 +107,7 @@
     <solr.version>9.0.0</solr.version>
     <akka.version>2.5.26</akka.version>
     <!--<akka_management.version>0.17.0</akka_management.version> -->
-    <apacheds.version>2.0.0-M24</apacheds.version>
+    <apacheds.version>2.0.0.AM26</apacheds.version>
     <httpcomponents.version>4.5.13</httpcomponents.version>
     <commons_ip2.version>2.2.1</commons_ip2.version>
     <metrics.version>3.2.6</metrics.version>
@@ -688,11 +688,6 @@
       </dependency>
       <!-- CAS related dependencies - end -->
       <!-- ApacheDS related dependencies - start -->
-      <!-- <dependency> -->
-      <!-- <groupId>org.apache.directory.server</groupId> -->
-      <!-- <artifactId>apacheds-all</artifactId> -->
-      <!-- <version>${apacheds.version}</version> -->
-      <!-- </dependency> -->
       <dependency>
         <groupId>org.apache.directory.server</groupId>
         <artifactId>apacheds-core</artifactId>
@@ -838,18 +833,6 @@
         <groupId>org.apache.solr</groupId>
         <artifactId>solr-solrj</artifactId>
         <version>${solr.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.solr</groupId>
-        <artifactId>solr-core</artifactId>
-        <version>${solr.version}</version>
-        <!-- Removing log4j dependency -->
-        <exclusions>
-          <exclusion>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>*</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>net.sf.saxon</groupId>

@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.solr.api.ApiBag.ExceptionWithErrObject;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest.MultiUpdate;
@@ -72,7 +71,6 @@ public class SchemaBuilder {
     return fields.isEmpty() && dynamicFields.isEmpty() && copyFields.isEmpty();
   }
 
-  @SuppressWarnings("unchecked")
   public void build(SolrClient client, String collection) throws GenericException {
     List<Update> updates = new ArrayList<>();
 
@@ -91,16 +89,7 @@ public class SchemaBuilder {
     } catch (SolrServerException | IOException e) {
       LOGGER.error("Error bootstraping schemas", e);
       throw new GenericException("Error bootstraping schemas", e);
-    } catch (ExceptionWithErrObject e) {
-      LOGGER.error("Error bootstraping schemas for collection {}", collection);
-      e.getErrs().forEach(m -> m.forEach((k, v) -> LOGGER.error("Error: {} -> {}", k, v)));
-      LOGGER.info("Collection {} details:", collection);
-      fields.forEach(f -> LOGGER.info("> {}", f));
-      dynamicFields.forEach(f -> LOGGER.info("> {}", f));
-      copyFields.forEach(f -> LOGGER.info("> {}", f));
-
-      throw new GenericException("Error bootstraping schemas", e);
-    }
+    } 
   }
 
 }

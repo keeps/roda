@@ -36,7 +36,7 @@ services:
         - siegfried_data:/root/siegfried/
         - roda_data_storage:/roda/data/storage
     roda:
-      image: docker.io/keeps/roda:development
+      image: keeps/roda:latest
       restart: unless-stopped
       ports:
         - 8080:8080

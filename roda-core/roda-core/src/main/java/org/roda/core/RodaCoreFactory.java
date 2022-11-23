@@ -65,8 +65,6 @@ import org.apache.solr.client.solrj.request.CollectionAdminRequest.Create;
 import org.apache.solr.client.solrj.response.CollectionAdminResponse;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.SolrPingResponse;
-import org.apache.solr.cloud.ZkConfigSetService;
-import org.apache.solr.cloud.ZkController;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrException;
@@ -75,7 +73,6 @@ import org.apache.solr.common.cloud.DocCollection;
 import org.apache.solr.common.cloud.Replica;
 import org.apache.solr.common.cloud.Slice;
 import org.apache.solr.common.cloud.SolrZkClient;
-import org.apache.solr.core.ConfigSetService;
 import org.apache.zookeeper.KeeperException;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
@@ -135,6 +132,7 @@ import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrBootstrapUtils;
 import org.roda.core.index.schema.SolrCollectionRegistry;
 import org.roda.core.index.utils.SolrUtils;
+import org.roda.core.index.utils.ZkController;
 import org.roda.core.migration.MigrationManager;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
@@ -1417,10 +1415,8 @@ public class RodaCoreFactory {
       int numShards = getEnvInt("SOLR_NUM_SHARDS", 1);
       int numReplicas = getEnvInt("SOLR_REPLICATION_FACTOR", 1);
 
-      String zkHost = ZkClientClusterStateProvider.from(cloudSolrClient).getZkHost();
-      SolrZkClient zkClient = new SolrZkClient(zkHost, 10000);
-      ConfigSetService configSetService = new ZkConfigSetService(zkClient);
-      configSetService.uploadConfig(collection, configPath);
+      SolrZkClient zkClient = ZkClientClusterStateProvider.from(cloudSolrClient).getZkStateReader().getZkClient();
+      ZkController.uploadConfig(zkClient, collection, configPath);
 
       Create createCollection = CollectionAdminRequest.createCollection(collection, collection, numShards, numReplicas);
 

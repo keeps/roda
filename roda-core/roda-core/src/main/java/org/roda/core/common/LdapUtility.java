@@ -54,7 +54,6 @@ import org.apache.directory.api.ldap.schema.loader.LdifSchemaLoader;
 import org.apache.directory.api.ldap.schema.manager.impl.DefaultSchemaManager;
 import org.apache.directory.server.constants.ServerDNConstants;
 import org.apache.directory.server.core.DefaultDirectoryService;
-import org.apache.directory.server.core.api.CacheService;
 import org.apache.directory.server.core.api.CoreSession;
 import org.apache.directory.server.core.api.DirectoryService;
 import org.apache.directory.server.core.api.DnFactory;
@@ -1097,11 +1096,6 @@ public class LdapUtility {
     this.service.setInstanceId(INSTANCE_NAME);
     this.service.setInstanceLayout(new InstanceLayout(this.dataDirectory.toFile()));
 
-    final CacheService cacheService = new CacheService();
-    cacheService.initialize(this.service.getInstanceLayout());
-
-    this.service.setCacheService(cacheService);
-
     // first load the schema
     initSchemaPartition();
 
@@ -1306,7 +1300,7 @@ public class LdapUtility {
 
     if (attributeUniqueMember != null) {
 
-      for (Value<?> value : attributeUniqueMember) {
+      for (Value value : attributeUniqueMember) {
         final String memberDN = value.toString();
 
         if (memberDN.endsWith(getPeopleDN())) {

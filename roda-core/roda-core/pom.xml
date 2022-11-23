@@ -181,40 +181,6 @@
 			<artifactId>solr-solrj</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.solr</groupId>
-			<artifactId>solr-core</artifactId>
-			<exclusions>
-				<!-- 20160218 hsilva: this is needed for apache tika parsers, so commenting 
-					out -->
-				<!-- <exclusion> <artifactId>asm</artifactId> <groupId>org.ow2.asm</groupId> 
-					</exclusion> <exclusion> <artifactId>asm-commons</artifactId> <groupId>org.ow2.asm</groupId> 
-					</exclusion> -->
-				<!--exclusion>
-					<artifactId>*</artifactId>
-					<groupId>org.eclipse.jetty</groupId>
-				</exclusion-->
-				<exclusion>
-					<groupId>org.apache.hadoop</groupId>
-					<artifactId>hadoop-hdfs</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.hadoop</groupId>
-					<artifactId>hadoop-common</artifactId>
-				</exclusion>
-				<!-- 20180820 hsilva: when updating solr to 7.4, this dependency is introduced 
-					&, depending on the class loading order of things, might lead slf4j to try 
-					to use the log4j binding (instead of logback binding) -->
-				<exclusion>
-					<groupId>org.apache.logging.log4j</groupId>
-					<artifactId>log4j-slf4j-impl</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.logging.log4j</groupId>
-					<artifactId>log4j-api</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
 			<groupId>org.roda-project</groupId>
 			<artifactId>roda-common-data</artifactId>
 		</dependency>
