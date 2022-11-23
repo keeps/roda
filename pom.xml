@@ -88,7 +88,7 @@
         <solr.version>8.11.1</solr.version>
         <akka.version>2.5.26</akka.version>
         <!--<akka_management.version>0.17.0</akka_management.version> -->
-        <apacheds.version>2.0.0-M24</apacheds.version>
+        <apacheds.version>2.0.0.AM26</apacheds.version>
         <httpcomponents.version>4.5.13</httpcomponents.version>
         <poi.version>3.17</poi.version>
         <commons_ip2.version>2.2.1</commons_ip2.version>

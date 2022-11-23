@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.common;
+package org.roda.core.model.utils;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -19,6 +19,8 @@ import java.util.function.Function;
 import javax.servlet.http.HttpServletRequest;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.RodaUtils;
+import org.roda.core.common.SelectedItemsUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;

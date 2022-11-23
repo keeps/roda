@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.jasig.cas.client.authentication.AttributePrincipal;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.UserUtility;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.EmailUnverifiedException;
 import org.roda.core.data.exceptions.GenericException;
