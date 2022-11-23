@@ -30,7 +30,11 @@ services:
       - 3310:3310
     volumes:
       - clam_data:/var/lib/clamav
+      # Mapping $HOME/.roda to enable usage with spring-boot mode
       - $HOME/.roda/data/storage:$HOME/.roda/data/storage
+      # Mapping /tmp to enable usage with local testing via mvn test
+      - /tmp:/tmp
+
   siegfried:
     image: keeps/siegfried:v1.9.3
     restart: unless-stopped
@@ -41,7 +45,10 @@ services:
       SIEGFRIED_PORT: 5138
     volumes:
       - siegfried_data:/root/siegfried/
+      # Mapping $HOME/.roda to enable usage with spring-boot mode
       - $HOME/.roda/data/storage:$HOME/.roda/data/storage
+      # Mapping /tmp to enable usage with local testing via mvn test
+      - /tmp:/tmp
 volumes:
   zookeeper_data:
   zookeeper_datalog:

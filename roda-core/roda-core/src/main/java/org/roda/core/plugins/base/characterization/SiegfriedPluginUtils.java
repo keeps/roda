@@ -92,7 +92,7 @@ public class SiegfriedPluginUtils {
   public static String getVersion() {
     String version = null;
 
-    String siegfriedMode = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "siegfried", "mode");
+    String siegfriedMode = RodaCoreFactory.getRodaConfiguration().getString("core.tools.siegfried.mode", "server");
     if ("server".equalsIgnoreCase(siegfriedMode)) {
       LOGGER.debug("Running Siegfried on server mode");
       String endpoint = getSiegfriedServerEndpoint(Paths.get("/dev/null"));
@@ -110,7 +110,7 @@ public class SiegfriedPluginUtils {
     } else {
       LOGGER.debug("Running Siegfried on standalone mode");
       try {
-        String siegfriedPath = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "siegfried", "binary");
+        String siegfriedPath = RodaCoreFactory.getRodaConfiguration().getString("core.tools.siegfried.binary", "sf");
         List<String> command = new ArrayList<>(Arrays.asList(siegfriedPath, "--version"));
 
         String siegfriedOutput = CommandUtility.execute(command);
