@@ -1,4 +1,4 @@
-FROM tomcat:9-jre11
+FROM tomcat:9-jre17
 LABEL maintainer="admin@keep.pt" vendor="KEEP SOLUTIONS"
 
 # Install dependencies
