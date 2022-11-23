@@ -85,7 +85,12 @@ public class PluginParameter implements Serializable {
     /**
      * Interface to select permission types
      */
-    PERMISSION_TYPES;
+    PERMISSION_TYPES,
+
+    /**
+     * Interface to generic dropdown items
+     */
+    DROPDOWN;
   }
 
   private String id = null;
