@@ -6,6 +6,22 @@
 [![Staging](https://github.com/keeps/roda/actions/workflows/staging.yml/badge.svg)](https://github.com/keeps/roda/actions/workflows/staging.yml)
 [![Release](https://github.com/keeps/roda/actions/workflows/release.yml/badge.svg)](https://github.com/keeps/roda/actions/workflows/release.yml)
 
+## Setup
+
+Install pre-requisites:
+- Java 17
+- Maven 3.8.6 or greater
+- [Configure Maven to use your GitHub account for GitHub Packages](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry#authenticating-with-a-personal-access-token)
+
+Additional support for internal plugins:
+ -  ClamAV using docker image
+
+ ```sh
+ sudo apt install clamdscan
+ echo "TCPSocket 3310
+TCPAddr localhost" | sudo tee /etc/clamav/clamd.conf
+ ```
+
 ## Debug WUI
 
 ```bash
@@ -14,6 +30,11 @@ mvn -pl roda-ui/roda-wui -am gwt:compile -Pdebug-main -Dscope.gwt-dev=compile
 cd roda-ui/roda-wui
 ./copy_gwt_rpc.sh
 cd -
+
+# Start up dependencies (Solr, Zookeeper, Siegfried, ClamAV)
+mkdir -p $HOME/.roda/data/storage
+docker compose -f deploys/standalone/docker-compose-dev.yaml up -d
+
 
 # Open WUI in Spring boot
 mvn -pl roda-ui/roda-wui -am spring-boot:run -Pdebug-main
