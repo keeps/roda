@@ -16,11 +16,11 @@
 		<g:FlowPanel addStyleNames="row full_width no_padding">
 			<g:FlowPanel addStyleNames="wui-data-panel">
 				<g:Label addStyleNames="form-label">
-					<ui:text from='{messages.groupName}' />
+					<ui:text from='{messages.groupName}' /> *
 				</g:Label>
 				<g:TextBox title="{messages.groupName}" ui:field="groupname" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label">
-					<ui:text from='{messages.groupFullname}' />
+					<ui:text from='{messages.groupFullname}' /> *
 				</g:Label>
 				<g:TextBox title="{messages.groupFullname}" ui:field="fullname" addStyleNames="form-textbox" />
 				<g:Label ui:field="usersLabel" addStyleNames="form-label">

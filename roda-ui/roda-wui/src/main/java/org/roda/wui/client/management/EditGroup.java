@@ -166,7 +166,7 @@ public class EditGroup extends Composite {
   }
 
   private void cancel() {
-    HistoryUtils.newHistory(MemberManagement.RESOLVER);
+    HistoryUtils.newHistory(ShowGroup.RESOLVER, group.getId());
   }
 
   private void errorMessage(Throwable caught) {

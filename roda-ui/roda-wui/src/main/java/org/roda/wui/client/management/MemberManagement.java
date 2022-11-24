@@ -87,7 +87,6 @@ public class MemberManagement extends Composite {
 
   public MemberManagement() {
 
-
     ListBuilder<RODAMember> rodaMemberListBuilder = new ListBuilder<>(() -> new RodaMemberList(),
       new AsyncTableCellOptions<>(RODAMember.class, "MemberManagement_rodaMembers")
         .withSummary(messages.usersAndGroupsTitle()).bindOpener()
@@ -123,8 +122,12 @@ public class MemberManagement extends Composite {
         callback.onSuccess(null);
       }
     } else if (historyTokens.size() == 2) {
-      if (historyTokens.get(0).equals(EditUser.RESOLVER.getHistoryToken())) {
+      if (historyTokens.get(0).equals(ShowUser.RESOLVER.getHistoryToken())) {
+        ShowUser.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+      } else if (historyTokens.get(0).equals(EditUser.RESOLVER.getHistoryToken())) {
         EditUser.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
+      } else if (historyTokens.get(0).equals(ShowGroup.RESOLVER.getHistoryToken())) {
+        ShowGroup.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(EditGroup.RESOLVER.getHistoryToken())) {
         EditGroup.RESOLVER.resolve(HistoryUtils.tail(historyTokens), callback);
       } else {

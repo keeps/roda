@@ -21,6 +21,9 @@ import org.roda.wui.client.common.actions.model.ActionableGroup;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.management.CreateGroup;
 import org.roda.wui.client.management.CreateUser;
+import org.roda.wui.client.management.EditGroup;
+import org.roda.wui.client.management.EditUser;
+import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.common.client.tools.HistoryUtils;
 
@@ -43,7 +46,7 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
     Arrays.asList(RODAMemberAction.ACTIVATE, RODAMemberAction.DEACTIVATE, RODAMemberAction.REMOVE));
 
   private static final Set<RODAMemberAction> POSSIBLE_ACTIONS_ON_GROUP = new HashSet<>(
-    Arrays.asList(RODAMemberAction.REMOVE));
+    Arrays.asList(RODAMemberAction.EDIT, RODAMemberAction.REMOVE));
 
   private static final Set<RODAMemberAction> POSSIBLE_ACTIONS_ON_MEMBERS = new HashSet<>(
     Arrays.asList(RODAMemberAction.ACTIVATE, RODAMemberAction.DEACTIVATE, RODAMemberAction.REMOVE));
@@ -55,7 +58,7 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
   public enum RODAMemberAction implements Action<RODAMember> {
     NEW_USER(RodaConstants.PERMISSION_METHOD_CREATE_USER), NEW_GROUP(RodaConstants.PERMISSION_METHOD_CREATE_GROUP),
     ACTIVATE(RodaConstants.PERMISSION_METHOD_UPDATE_USER), DEACTIVATE(RodaConstants.PERMISSION_METHOD_UPDATE_USER),
-    REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_USER);
+    EDIT(RodaConstants.PERMISSION_METHOD_UPDATE_USER), REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_USER);
 
     private List<String> methods;
 
@@ -94,7 +97,7 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
       if (object.isUser()) {
         return (action.equals(RODAMemberAction.DEACTIVATE) && object.isActive())
           || (action.equals(RODAMemberAction.ACTIVATE) && !object.isActive())
-          || (action.equals(RODAMemberAction.REMOVE));
+          || (action.equals(RODAMemberAction.REMOVE) || (action.equals(RODAMemberAction.EDIT)));
       } else {
         return POSSIBLE_ACTIONS_ON_GROUP.contains(action);
       }
@@ -125,6 +128,8 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
       activate(objectToSelectedItems(object, RODAMember.class), callback);
     } else if (action.equals(RODAMemberAction.DEACTIVATE)) {
       deactivate(objectToSelectedItems(object, RODAMember.class), callback);
+    } else if (action.equals(RODAMemberAction.EDIT)) {
+      edit(object, callback);
     } else if (action.equals(RODAMemberAction.REMOVE)) {
       remove(objectToSelectedItems(object, RODAMember.class), callback);
     } else {
@@ -151,8 +156,18 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
         @Override
         public void onSuccess(Void result) {
           doActionCallbackUpdated();
+          HistoryUtils.newHistory(MemberManagement.RESOLVER.getHistoryPath());
         }
       });
+  }
+
+  private void edit(RODAMember object, AsyncCallback<ActionImpact> callback) {
+    callback.onSuccess(ActionImpact.NONE);
+    if (object.isUser()) {
+      HistoryUtils.newHistory(EditUser.RESOLVER, object.getId());
+    } else {
+      HistoryUtils.newHistory(EditGroup.RESOLVER, object.getId());
+    }
   }
 
   private void deactivate(SelectedItems<RODAMember> objects, AsyncCallback<ActionImpact> callback) {
@@ -161,6 +176,7 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
         @Override
         public void onSuccess(Void result) {
           doActionCallbackUpdated();
+          HistoryUtils.newHistory(MemberManagement.RESOLVER.getHistoryPath());
         }
       });
   }
@@ -208,6 +224,7 @@ public class RODAMemberActions extends AbstractActionable<RODAMember> {
       "btn-plus-circle");
     actionableGroup.addButton(messages.addGroupButton(), RODAMemberAction.NEW_GROUP, ActionImpact.UPDATED,
       "btn-plus-circle");
+    actionableGroup.addButton(messages.editUserAction(), RODAMemberAction.EDIT, ActionImpact.UPDATED, "btn-edit");
 
     actionableGroup.addButton(messages.editUserActivate(), RODAMemberAction.ACTIVATE, ActionImpact.UPDATED,
       "fas fa-user-check");

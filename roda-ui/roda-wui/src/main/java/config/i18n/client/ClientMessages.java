@@ -1703,6 +1703,19 @@ public interface ClientMessages extends Messages {
 
   String createUserCreate();
 
+  // Show user
+  String showUserTitle();
+
+  String showUserStatusLabel();
+
+  String showUserActivated();
+
+  String showUserDeactivated();
+
+  String showUserEmptyGroupList();
+
+  String showUserEmptyPermissions();
+
   // Edit User
   String editUserTitle();
 
@@ -1715,6 +1728,8 @@ public interface ClientMessages extends Messages {
   String editUserDeactivate();
 
   String editUserApply();
+
+  String editUserAction();
 
   // User Data Panel
   String username();
@@ -1751,6 +1766,13 @@ public interface ClientMessages extends Messages {
   String createGroupCreate();
 
   String createGroupCancel();
+
+  // Show Group
+  String showGroupTitle();
+
+  String showGroupEmptyUserList();
+
+  String showGroupEmptyPermissions();
 
   // Edit Group
   String editGroupTitle();

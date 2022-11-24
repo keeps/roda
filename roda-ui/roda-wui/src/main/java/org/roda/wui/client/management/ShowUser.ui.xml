@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
+	xmlns:u="urn:import:org.roda.wui.client.management"
+	xmlns:common="urn:import:org.roda.wui.client.common">
+
+	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+
+	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="row full_width skip_padding">
+			<g:FlowPanel ui:field="contentFlowPanel" addStyleNames="col_10 content">
+				<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
+					<g:FlowPanel styleName="browseItemPanelWithMargin">
+						<common:TitlePanel ui:field="titlePanel" text="{messages.showUserTitle}" iconClass="User" />
+					</g:FlowPanel>
+                    <!--Username-->
+					<g:FlowPanel styleName="field">
+						<g:Label styleName="label" >
+							<ui:text from='{messages.username}' />
+						</g:Label>
+						<g:Label styleName="value"	ui:field="userNameValue" />
+					</g:FlowPanel>
+
+					<!--Full Name-->
+					<g:FlowPanel styleName="field">
+						<g:Label styleName="label" >
+							<ui:text from='{messages.fullname}' />
+						</g:Label>
+						<g:Label styleName="value"	ui:field="fullnameValue" />
+					</g:FlowPanel>
+
+					<!--Email-->
+					<g:FlowPanel styleName="field">
+						<g:Label styleName="label" >
+							<ui:text from='{messages.email}' />
+						</g:Label>
+						<g:Label styleName="value"	ui:field="emailValue" />
+					</g:FlowPanel>
+
+					<!--Status-->
+					<g:FlowPanel styleName="field">
+						<g:Label styleName="label" >
+							<ui:text from='{messages.showUserStatusLabel}' />
+						</g:Label>
+						<g:HTML styleName="value"	ui:field="stateValue" />
+					</g:FlowPanel>
+
+					<!--Extra-->
+					<g:FlowPanel ui:field="extraValue" />
+
+					<!--Groups-->
+					<g:FlowPanel styleName="field">
+						<g:Label styleName="label" >
+							<ui:text from='{messages.userGroups}' />
+						</g:Label>
+						<g:FlowPanel styleName="value" ui:field="groupList" />
+					</g:FlowPanel>
+
+					<!--Permissions-->
+					<g:FlowPanel styleName="field">
+						<g:Label styleName="label" >
+							<ui:text from='{messages.userPermissions}' />
+						</g:Label>
+						<g:FlowPanel styleName="value" ui:field="permissionList" />
+					</g:FlowPanel>
+
+				</g:FlowPanel>
+			</g:FlowPanel>
+
+			<g:FlowPanel addStyleNames="col_2 last sidebar" ui:field="sidebarFlowPanel">
+				<g:FlowPanel addStyleNames="sticky-flow">
+					<g:FlowPanel addStyleNames="sticky-padding">
+						<g:SimplePanel addStyleNames="sidebar-group" ui:field="actionsSidebar" />
+					</g:FlowPanel>
+				</g:FlowPanel>
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</g:FlowPanel>
+</ui:UiBinder>

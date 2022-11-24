@@ -35,6 +35,7 @@ import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.risks.IncidenceStatus;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.risks.SeverityLevel;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.MetadataValue;
@@ -716,5 +717,22 @@ public class HtmlSnippetUtils {
 
     return SafeHtmlUtils.fromSafeConstant(
       "<span class='" + labelClass + "'>" + messages.disposalScheduleActionCode(disposalAction.name()) + CLOSE_SPAN);
+  }
+
+  public static SafeHtml getUserStateHtml(User user) {
+    SafeHtml ret = null;
+    if (user != null) {
+      SafeHtmlBuilder b = new SafeHtmlBuilder();
+      if (user.isActive()) {
+        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
+        b.append(SafeHtmlUtils.fromString(messages.showUserActivated()));
+      } else {
+        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT));
+        b.append(SafeHtmlUtils.fromString(messages.showUserDeactivated()));
+      }
+      b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+      ret = b.toSafeHtml();
+    }
+    return ret;
   }
 }
