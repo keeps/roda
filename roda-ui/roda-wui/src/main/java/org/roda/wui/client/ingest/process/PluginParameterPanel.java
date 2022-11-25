@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
@@ -391,11 +392,14 @@ public class PluginParameterPanel extends Composite {
 
         @Override
         public void onSuccess(Set<Pair<String, String>> result) {
-          for (Pair<String, String> item : result) {
+          Set<Pair<String, String>> treeSet = new TreeSet<>(
+            (p1, p2) -> p1.getFirst().compareToIgnoreCase(p2.getFirst()));
+
+          treeSet.addAll(result);
+          for (Pair<String, String> item : treeSet) {
             dropdown.addItem(item.getFirst(), item.getSecond());
           }
 
-          dropdown.setSelectedIndex(dropdown.getItemCount() - 1);
           value = dropdown.getSelectedValue();
         }
       });

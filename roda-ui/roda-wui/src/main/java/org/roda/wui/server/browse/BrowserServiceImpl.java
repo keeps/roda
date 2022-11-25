@@ -594,13 +594,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public Set<Pair<String, String>> retrieveDropdownPluginItems(String parameterId, String localeString) {
     Set<Pair<String, String>> items = new HashSet<>();
-    List<String> dropdownItems = RodaUtils.copyList(RodaCoreFactory.getRodaConfiguration().getList("core.plugins.dropdown." + parameterId + "[]"));
+    List<String> dropdownItems = RodaUtils
+      .copyList(RodaCoreFactory.getRodaConfiguration().getList("core.plugins.dropdown." + parameterId + "[]"));
     Locale locale = ServerTools.parseLocale(localeString);
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
 
-    for(String item : dropdownItems) {
+    for (String item : dropdownItems) {
       String i18nProperty = RodaCoreFactory.getRodaConfiguration()
-          .getString("core.plugins.dropdown." + parameterId + "[]." + item + ".i18n");
+        .getString("core.plugins.dropdown." + parameterId + "[]." + item + ".i18n");
       items.add(Pair.of(messages.getTranslation(i18nProperty, item), item));
     }
 
