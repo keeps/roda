@@ -10,10 +10,15 @@ package org.roda.core.common;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -514,7 +519,7 @@ public class LdapUtility {
 
       if (!user.isActive()) {
         try {
-          setUserPasswordUnchecked(user.getName(), RandomStringUtils.random(RANDOM_PASSWORD_LENGTH));
+          setUserPasswordUnchecked(user.getName(), RandomStringUtils.random(RANDOM_PASSWORD_LENGTH).toCharArray());
         } catch (final NotFoundException e) {
           LOGGER.error("Created user doesn't exist! Notify developers!!!", e);
         }
@@ -574,7 +579,7 @@ public class LdapUtility {
    * @throws GenericException
    *           if some error occurs.
    */
-  public void setUserPassword(final String username, final String password)
+  public void setUserPassword(final String username, char[] password)
     throws IllegalOperationException, NotFoundException, GenericException {
 
     final String userDN = getUserDN(username);
@@ -606,7 +611,7 @@ public class LdapUtility {
    * @throws GenericException
    *           if some error occurred.
    */
-  public User modifySelfUser(final User modifiedUser, final String newPassword)
+  public User modifySelfUser(final User modifiedUser, char[] newPassword)
     throws NotFoundException, EmailAlreadyExistsException, IllegalOperationException, GenericException {
     modifyUser(service.getAdminSession(), modifiedUser, newPassword, false, false);
     return getUser(modifiedUser.getName());
@@ -850,7 +855,7 @@ public class LdapUtility {
    * @throws GenericException
    *           if something goes wrong with the register process.
    */
-  public User registerUser(final User user, final String password)
+  public User registerUser(final User user, char[] password)
     throws UserAlreadyExistsException, EmailAlreadyExistsException, GenericException {
 
     // Generate an email verification token with 1 day expiration date.
@@ -1011,7 +1016,7 @@ public class LdapUtility {
    * @throws GenericException
    *           if something goes wrong with the operation.
    */
-  public User resetUserPassword(final String username, final String password, final String resetPasswordToken)
+  public User resetUserPassword(final String username, char[] password, final String resetPasswordToken)
     throws NotFoundException, InvalidTokenException, IllegalOperationException, GenericException {
 
     final User user = getUser(username);
@@ -1475,7 +1480,7 @@ public class LdapUtility {
    * @throws GenericException
    *           if some error occurred.
    */
-  private void modifyUser(final CoreSession session, final User modifiedUser, final String newPassword,
+  private void modifyUser(final CoreSession session, final User modifiedUser, char[] newPassword,
     final boolean modifyRolesAndGroups, final boolean force)
     throws NotFoundException, IllegalOperationException, EmailAlreadyExistsException, GenericException {
 
@@ -1537,7 +1542,7 @@ public class LdapUtility {
    * @throws NoSuchAlgorithmException
    *           the the algorithm doesn't exist.
    */
-  private void modifyUserPassword(final CoreSession session, final String username, final String password)
+  private void modifyUserPassword(final CoreSession session, final String username, char[] password)
     throws LdapException, NoSuchAlgorithmException {
 
     LdapSecurityConstants algorithm = LdapSecurityConstants.getAlgorithm(ldapDigestAlgorithm);
@@ -1546,9 +1551,13 @@ public class LdapUtility {
       // default to PBKDF2-based encryption method
       algorithm = LdapSecurityConstants.HASH_METHOD_PKCS5S2;
     }
+    ByteBuffer passwordByteBuffer = StandardCharsets.UTF_8.encode(CharBuffer.wrap(password));
+    byte[] passwordBytes = Arrays.copyOf(passwordByteBuffer.array(), passwordByteBuffer.limit());
 
-    final String passwordDigest = new String(PasswordUtil.createStoragePassword(password, algorithm));
-
+    String s = String.valueOf(password);
+    final String passwordDigest = new String(PasswordUtil.createStoragePassword(passwordBytes, algorithm));
+    passwordBytes = null;
+    passwordByteBuffer = null;
     session.modify(new Dn(getUserDN(username)),
       new DefaultModification(ModificationOperation.REPLACE_ATTRIBUTE, USER_PASSWORD, passwordDigest));
   }
@@ -1850,7 +1859,7 @@ public class LdapUtility {
    * @throws GenericException
    *           if some error occurs.
    */
-  private void setUserPasswordUnchecked(final String username, final String password)
+  private void setUserPasswordUnchecked(final String username, char[] password)
     throws NotFoundException, GenericException {
     try {
       modifyUserPassword(service.getAdminSession(), username, password);
@@ -2054,7 +2063,7 @@ public class LdapUtility {
     return value;
   }
 
-  public void resetAdminAccess(final String password) throws GenericException {
+  public void resetAdminAccess(char[] password) throws GenericException {
     try {
 
       final CoreSession session = this.service.getAdminSession();

@@ -2105,7 +2105,7 @@ public class ModelService extends ModelObservable {
     return UserUtility.getLdapUtility().getUserWithEmail(email);
   }
 
-  public User registerUser(User user, String password, boolean notify)
+  public User registerUser(User user, char[] password, boolean notify)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
@@ -2122,7 +2122,7 @@ public class ModelService extends ModelObservable {
     return createUser(user, null, notify);
   }
 
-  public User createUser(User user, String password, boolean notify)
+  public User createUser(User user, char[] password, boolean notify)
     throws EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException, GenericException,
     NotFoundException, AuthorizationDeniedException {
     return createUser(user, password, notify, false);
@@ -2133,7 +2133,7 @@ public class ModelService extends ModelObservable {
    *          this should only be set to true if invoked from EventsManager
    *          related methods
    */
-  public User createUser(User user, String password, boolean notify, boolean isHandlingEvent)
+  public User createUser(User user, char[] password, boolean notify, boolean isHandlingEvent)
     throws GenericException, EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException,
     NotFoundException, AuthorizationDeniedException {
     boolean writeIsAllowed = RodaCoreFactory.checkIfWriteIsAllowed(nodeType);
@@ -2141,6 +2141,7 @@ public class ModelService extends ModelObservable {
     User createdUser = UserUtility.getLdapUtility().addUser(user);
     if (password != null) {
       UserUtility.getLdapUtility().setUserPassword(createdUser.getId(), password);
+      password = null;
     }
 
     if (notify && writeIsAllowed) {
@@ -2148,13 +2149,13 @@ public class ModelService extends ModelObservable {
     }
 
     if (!isHandlingEvent) {
-      eventsManager.notifyUserCreated(this, createdUser, password);
+      eventsManager.notifyUserCreated(this, createdUser);
     }
 
     return createdUser;
   }
 
-  public User updateUser(User user, String password, boolean notify)
+  public User updateUser(User user, char[] password, boolean notify)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     return updateUser(user, password, notify, false);
   }
@@ -2164,7 +2165,7 @@ public class ModelService extends ModelObservable {
    *          this should only be set to true if invoked from EventsManager
    *          related methods
    */
-  public User updateUser(User user, String password, boolean notify, boolean isHandlingEvent)
+  public User updateUser(User user, char[] password, boolean notify, boolean isHandlingEvent)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     boolean writeIsAllowed = RodaCoreFactory.checkIfWriteIsAllowed(nodeType);
 
@@ -2180,7 +2181,7 @@ public class ModelService extends ModelObservable {
 
       if (!isHandlingEvent) {
         // FIXME 20180813 hsilva: user is not the previous state of the user
-        eventsManager.notifyUserUpdated(this, user, updatedUser, password);
+        eventsManager.notifyUserUpdated(this, user, updatedUser);
       }
 
       return updatedUser;
@@ -2209,7 +2210,7 @@ public class ModelService extends ModelObservable {
 
         if (!isHandlingEvent) {
           // FIXME 20180813 hsilva: user is not the previous state of the user
-          eventsManager.notifyUserUpdated(this, user, updatedUser, null);
+          eventsManager.notifyUserUpdated(this, user, updatedUser);
         }
 
         return updatedUser;
@@ -2221,12 +2222,12 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public User updateMyUser(User user, String password, boolean notify)
+  public User updateMyUser(User user, char[] password, boolean notify)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     return updateMyUser(user, password, notify, false);
   }
 
-  public User updateMyUser(User user, String password, boolean notify, boolean isHandlingEvent)
+  public User updateMyUser(User user, char[] password, boolean notify, boolean isHandlingEvent)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     boolean writeIsAllowed = RodaCoreFactory.checkIfWriteIsAllowed(nodeType);
 
@@ -2238,7 +2239,7 @@ public class ModelService extends ModelObservable {
 
       if (!isHandlingEvent) {
         // FIXME 20180813 hsilva: user is not the previous state of the user
-        eventsManager.notifyUserUpdated(this, user, updatedUser, password);
+        eventsManager.notifyUserUpdated(this, user, updatedUser);
       }
 
       return updatedUser;
@@ -2398,7 +2399,7 @@ public class ModelService extends ModelObservable {
     return user;
   }
 
-  public User resetUserPassword(String username, String password, String resetPasswordToken, boolean useModel,
+  public User resetUserPassword(String username, char[] password, String resetPasswordToken, boolean useModel,
     boolean notify) throws NotFoundException, InvalidTokenException, IllegalOperationException, GenericException,
     AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);

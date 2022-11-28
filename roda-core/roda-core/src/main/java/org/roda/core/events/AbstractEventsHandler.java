@@ -25,7 +25,7 @@ public abstract class AbstractEventsHandler implements EventsHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEventsHandler.class);
 
   @Override
-  public void handleUserCreated(ModelService model, User user, String password) {
+  public void handleUserCreated(ModelService model, User user, char[] password) {
     LOGGER.debug("handleUserCreated '{}' with password '{}'", user, password != null ? "******" : "NULL");
     try {
       model.createUser(user, password, true, true);
@@ -43,7 +43,7 @@ public abstract class AbstractEventsHandler implements EventsHandler {
   }
 
   @Override
-  public void handleUserUpdated(ModelService model, User user, String password) {
+  public void handleUserUpdated(ModelService model, User user, char[] password) {
     LOGGER.debug("handleUserUpdated '{}' with password '{}'", user, password != null ? "******" : "NULL");
     try {
       model.updateUser(user, password, true, true);
@@ -62,7 +62,7 @@ public abstract class AbstractEventsHandler implements EventsHandler {
   }
 
   @Override
-  public void handleMyUserUpdated(ModelService model, User user, String password) {
+  public void handleMyUserUpdated(ModelService model, User user, char[] password) {
     LOGGER.debug("handleMyUserUpdated '{}' with password '{}'", user, password != null ? "******" : "NULL");
     try {
       model.updateMyUser(user, password, true, true);

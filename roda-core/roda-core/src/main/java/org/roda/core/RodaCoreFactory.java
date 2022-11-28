@@ -2437,10 +2437,12 @@ public class RodaCoreFactory {
 
   private static void resetAdminAccess() throws GenericException {
     try {
-      final String password = readPassword("New admin password");
-      final String passwordConfirmation = readPassword("Repeat admin password");
-      if (password.equals(passwordConfirmation)) {
+      char[] password = readPassword("New admin password").toCharArray();
+      char[] passwordConfirmation = readPassword("Repeat admin password").toCharArray();
+      if (Arrays.equals(password, passwordConfirmation)) {
         RodaCoreFactory.ldapUtility.resetAdminAccess(password);
+        password = null;
+        passwordConfirmation = null;
         try {
           indexUsersAndGroupsFromLDAP();
         } catch (final Exception e) {

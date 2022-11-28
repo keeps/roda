@@ -107,7 +107,7 @@ public class CreateUser extends Composite {
   void buttonApplyHandler(ClickEvent e) {
     if (userDataPanel.isValid()) {
       user = userDataPanel.getUser();
-      final String password = userDataPanel.getPassword();
+      char[] password = userDataPanel.getPassword().toCharArray();
 
       UserManagementService.Util.getInstance().createUser(user, password, userDataPanel.getExtra(),
         new AsyncCallback<User>() {

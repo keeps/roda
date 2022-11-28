@@ -151,7 +151,7 @@ public class EditUser extends Composite {
     if (userDataPanel.isChanged()) {
       if (userDataPanel.isValid()) {
         final User user = userDataPanel.getUser();
-        final String password = userDataPanel.getPassword();
+        char[] password = userDataPanel.getPassword().toCharArray();
 
         UserManagementService.Util.getInstance().updateUser(user, password, userDataPanel.getExtra(),
           new AsyncCallback<Void>() {

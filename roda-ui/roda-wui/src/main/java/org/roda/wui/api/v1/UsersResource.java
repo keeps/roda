@@ -106,11 +106,12 @@ public class UsersResource {
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
+
     // get user
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    User createdUser = UserManagement.createUser(user, newUser, password, null);
+    User createdUser = UserManagement.createUser(user, newUser, password.toCharArray(), null);
     return Response.ok(createdUser, mediaType).build();
   }
 
@@ -136,7 +137,7 @@ public class UsersResource {
     modifiedUser = JsonUtils.getObjectFromJson(sanitize, User.class);
 
     // delegate action to controller
-    UserManagement.updateUser(user, modifiedUser, password, null);
+    UserManagement.updateUser(user, modifiedUser, password.toCharArray(), null);
     return Response.ok(modifiedUser, mediaType).build();
   }
 

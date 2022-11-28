@@ -93,7 +93,7 @@ public class PermissionsRecursiveTest {
     user.setName("rodauser");
     user.setFullName("Roda User");
     user.setEmail("rodauser@example.com");
-    model.registerUser(user, "rodapassword", false);
+    model.registerUser(user, "rodapassword".toCharArray(), false);
 
     // change parent permissions
     Set<PermissionType> userPermissions = new HashSet<>();
