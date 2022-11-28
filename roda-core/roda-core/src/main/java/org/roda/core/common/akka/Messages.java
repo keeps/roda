@@ -733,8 +733,8 @@ public class Messages {
     }
   }
 
-  public static EventUserCreated newEventUserCreated(User user, String password, String senderId) {
-    return INSTANCE.new EventUserCreated(user, password, senderId);
+  public static EventUserCreated newEventUserCreated(User user, String senderId) {
+    return INSTANCE.new EventUserCreated(user, senderId);
   }
 
   public final class EventUserCreated extends AbstractEventMessage {
@@ -743,10 +743,9 @@ public class Messages {
     private User user;
     private String password;
 
-    public EventUserCreated(User user, String password, String senderId) {
+    public EventUserCreated(User user, String senderId) {
       super(senderId);
       this.user = user;
-      this.password = password;
     }
 
     public User getUser() {
@@ -763,9 +762,9 @@ public class Messages {
     }
   }
 
-  public final static EventUserUpdated newEventUserUpdated(User user, String password, boolean myUser,
+  public final static EventUserUpdated newEventUserUpdated(User user, boolean myUser,
     String senderId) {
-    return INSTANCE.new EventUserUpdated(user, password, myUser, senderId);
+    return INSTANCE.new EventUserUpdated(user, myUser, senderId);
   }
 
   public final class EventUserUpdated extends AbstractEventMessage {
@@ -775,10 +774,9 @@ public class Messages {
     private String password;
     private boolean myUser;
 
-    public EventUserUpdated(User user, String password, boolean myUser, String senderId) {
+    public EventUserUpdated(User user, boolean myUser, String senderId) {
       super(senderId);
       this.user = user;
-      this.password = password;
       this.myUser = myUser;
     }
 

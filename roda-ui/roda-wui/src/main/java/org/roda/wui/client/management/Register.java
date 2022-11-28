@@ -166,7 +166,7 @@ public class Register extends Composite {
       User user = userDataPanel.getUser();
       user.setActive(false);
 
-      final String password = userDataPanel.getPassword();
+      char[] password = userDataPanel.getPassword().toCharArray();
       final String recaptcha = recaptchaResponse;
 
       UserManagementService.Util.getInstance().registerUser(user, password, recaptcha, userDataPanel.getExtra(),
@@ -212,6 +212,7 @@ public class Register extends Composite {
             }
           }
         });
+      password = null;
     }
   }
 

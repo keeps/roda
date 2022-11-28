@@ -80,23 +80,23 @@ public class AkkaEventsHandlerAndNotifier extends AbstractEventsHandler implemen
   }
 
   @Override
-  public void notifyUserCreated(ModelService model, User user, String password) {
-    LOGGER.debug("notifyUserCreated '{}' with password '{}'", user, password != null ? "******" : "NULL");
-    eventsNotifierAndHandlerActor.tell(Messages.newEventUserCreated(user, password, instanceSenderId),
+  public void notifyUserCreated(ModelService model, User user) {
+    LOGGER.debug("notifyUserCreated '{}'", user);
+    eventsNotifierAndHandlerActor.tell(Messages.newEventUserCreated(user, instanceSenderId),
       ActorRef.noSender());
   }
 
   @Override
-  public void notifyUserUpdated(ModelService model, User user, User updatedUser, String password) {
-    LOGGER.debug("notifyUserUpdated '{}' with password '{}'", user, password != null ? "******" : "NULL");
-    eventsNotifierAndHandlerActor.tell(Messages.newEventUserUpdated(user, password, false, instanceSenderId),
+  public void notifyUserUpdated(ModelService model, User user, User updatedUser) {
+    LOGGER.debug("notifyUserUpdated '{}'", user);
+    eventsNotifierAndHandlerActor.tell(Messages.newEventUserUpdated(user, false, instanceSenderId),
       ActorRef.noSender());
   }
 
   @Override
-  public void notifyMyUserUpdated(ModelService model, User user, User updatedUser, String password) {
-    LOGGER.debug("notifyMyUserUpdated '{}' with password '{}'", user, password != null ? "******" : "NULL");
-    eventsNotifierAndHandlerActor.tell(Messages.newEventUserUpdated(user, password, true, instanceSenderId),
+  public void notifyMyUserUpdated(ModelService model, User user, User updatedUser) {
+    LOGGER.debug("notifyMyUserUpdated '{}'", user);
+    eventsNotifierAndHandlerActor.tell(Messages.newEventUserUpdated(user, true, instanceSenderId),
       ActorRef.noSender());
   }
 

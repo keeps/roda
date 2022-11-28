@@ -134,7 +134,7 @@ public class Profile extends Composite {
     if (userDataPanel.isChanged()) {
       if (userDataPanel.isValid()) {
         final User user = userDataPanel.getUser();
-        final String password = userDataPanel.getPassword();
+        char[] password = userDataPanel.getPassword().toCharArray();
 
         UserManagementService.Util.getInstance().updateMyUser(user, password, userDataPanel.getExtra(),
           new AsyncCallback<User>() {

@@ -28,23 +28,23 @@ public class EventsManager implements EventsNotifier {
   }
 
   @Override
-  public void notifyUserCreated(ModelService model, User user, String password) {
+  public void notifyUserCreated(ModelService model, User user) {
     if (enabled) {
-      eventsNotifier.notifyUserCreated(model, user, password);
+      eventsNotifier.notifyUserCreated(model, user);
     }
   }
 
   @Override
-  public void notifyUserUpdated(ModelService model, User user, User updatedUser, String password) {
+  public void notifyUserUpdated(ModelService model, User user, User updatedUser) {
     if (enabled) {
-      eventsNotifier.notifyUserUpdated(model, user, updatedUser, password);
+      eventsNotifier.notifyUserUpdated(model, user, updatedUser);
     }
   }
 
   @Override
-  public void notifyMyUserUpdated(ModelService model, User user, User updatedUser, String password) {
+  public void notifyMyUserUpdated(ModelService model, User user, User updatedUser) {
     if (enabled) {
-      eventsNotifier.notifyMyUserUpdated(model, user, updatedUser, password);
+      eventsNotifier.notifyMyUserUpdated(model, user, updatedUser);
     }
   }
 

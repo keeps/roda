@@ -102,7 +102,7 @@ public interface UserManagementService extends RemoteService {
    * @throws EmailAlreadyExistsException
    * @throws RecaptchaException
    */
-  public User registerUser(User user, String password, String captcha, UserExtraBundle extra, String localeString)
+  public User registerUser(User user, char[] password, String captcha, UserExtraBundle extra, String localeString)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, RecaptchaException,
     AuthorizationDeniedException;
 
@@ -120,7 +120,7 @@ public interface UserManagementService extends RemoteService {
    * @throws UserAlreadyExistsException
    * @throws GenericException
    */
-  public User createUser(User user, String password, UserExtraBundle extra)
+  public User createUser(User user, char[] password, UserExtraBundle extra)
           throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException,
           GenericException, IllegalOperationException, RequestNotValidException, ValidationException;
 
@@ -136,7 +136,7 @@ public interface UserManagementService extends RemoteService {
    * @throws AlreadyExistsException
    * @throws GenericException
    */
-  public void updateUser(User user, String password, UserExtraBundle extra)
+  public void updateUser(User user, char[] password, UserExtraBundle extra)
           throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException, ValidationException, RequestNotValidException;
 
   /**
@@ -152,7 +152,7 @@ public interface UserManagementService extends RemoteService {
    * @throws GenericException
    * @throws IllegalOperationException
    */
-  public User updateMyUser(User user, String password, UserExtraBundle extra) throws AuthorizationDeniedException,
+  public User updateMyUser(User user, char[] password, UserExtraBundle extra) throws AuthorizationDeniedException,
           NotFoundException, AlreadyExistsException, GenericException, IllegalOperationException, ValidationException, RequestNotValidException;
 
   /**
@@ -260,7 +260,7 @@ public interface UserManagementService extends RemoteService {
    * @throws NotFoundException
    * @throws GenericException
    */
-  public void resetUserPassword(String username, String password, String resetPasswordToken)
+  public void resetUserPassword(String username, char[] password, String resetPasswordToken)
     throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException,
     AuthorizationDeniedException;
 

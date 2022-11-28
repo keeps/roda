@@ -265,7 +265,7 @@ public class ResetPassword extends Composite {
 
   private void doReset() {
     if (isValid()) {
-      UserManagementService.Util.getInstance().resetUserPassword(username.getValue(), password.getValue(),
+      UserManagementService.Util.getInstance().resetUserPassword(username.getValue(), password.getValue().toCharArray(),
         token.getValue(), new AsyncCallback<Void>() {
 
           @Override

@@ -77,10 +77,10 @@ public interface UserManagementServiceAsync {
    * @throws EmailAlreadyExistsException
    * @throws RecaptchaException
    */
-  public void registerUser(User user, String password, String captcha, UserExtraBundle extra, String localeString,
+  public void registerUser(User user, char[] password, String captcha, UserExtraBundle extra, String localeString,
     AsyncCallback<User> callback);
 
-  void createUser(User user, String password, UserExtraBundle extra, AsyncCallback<User> callback);
+  void createUser(User user, char[] password, UserExtraBundle extra, AsyncCallback<User> callback);
 
   /**
    * Modify a user
@@ -94,7 +94,7 @@ public interface UserManagementServiceAsync {
    * @throws AlreadyExistsException
    * @throws GenericException
    */
-  public void updateUser(User user, String password, UserExtraBundle extra, AsyncCallback<Void> callback);
+  public void updateUser(User user, char[] password, UserExtraBundle extra, AsyncCallback<Void> callback);
 
   /**
    * Modify the authenticated user
@@ -109,7 +109,7 @@ public interface UserManagementServiceAsync {
    * @throws GenericException
    * @throws IllegalOperationException
    */
-  public void updateMyUser(User user, String password, UserExtraBundle extra, AsyncCallback<User> callback);
+  public void updateMyUser(User user, char[] password, UserExtraBundle extra, AsyncCallback<User> callback);
 
   /**
    * Try to remove a user, if user cannot be removed it will be deactivated
@@ -213,7 +213,7 @@ public interface UserManagementServiceAsync {
    * @throws IllegalOperationException
    * @throws NotFoundException
    */
-  public void resetUserPassword(String username, String password, String resetPasswordToken,
+  public void resetUserPassword(String username, char[] password, String resetPasswordToken,
     AsyncCallback<Void> callback);
 
   void retrieveDefaultExtraBundle(AsyncCallback<UserExtraBundle> asyncCallback);

@@ -146,10 +146,10 @@ public class AkkaEventsHandlerAndNotifierActor extends AbstractActor {
           char[] password = getUserPasswordFromRodaUserOtherInfoMap(wrapper).toCharArray();
           if (!wrapper.isUpdate()) {
             eventsHandler.handleUserCreated(RodaCoreFactory.getModelService(), (User) wrapper.getRodaObject(),
-              Arrays.toString(password));
+              password);
           } else {
             eventsHandler.handleUserUpdated(RodaCoreFactory.getModelService(), (User) wrapper.getRodaObject(),
-              Arrays.toString(password));
+              password);
           }
           password = null;
         } else if (objectId.startsWith(GROUP_KEY_PREFIX)) {
@@ -173,7 +173,8 @@ public class AkkaEventsHandlerAndNotifierActor extends AbstractActor {
 
   private void handleUserCreated(EventUserCreated e) {
     String key = USER_KEY_PREFIX + e.getUser().getId();
-    putObjectInCache(key, new CRDTWrapper(e.getUser(), createRodaUserOtherInfoMapWithUserPassword(e.getPassword()),
+    Map<String, Object> rodaObjectOtherInfo = new HashMap<>();
+    putObjectInCache(key, new CRDTWrapper(e.getUser(), rodaObjectOtherInfo,
       false, instanceSenderId, new Date().getTime()));
   }
 
@@ -189,8 +190,9 @@ public class AkkaEventsHandlerAndNotifierActor extends AbstractActor {
 
   private void handleUserUpdated(EventUserUpdated e) {
     String key = USER_KEY_PREFIX + e.getUser().getId();
-    putObjectInCache(key, new CRDTWrapper(e.getUser(), createRodaUserOtherInfoMapWithUserPassword(e.getPassword()),
-      true, instanceSenderId, new Date().getTime()));
+    Map<String, Object> rodaObjectOtherInfo = new HashMap<>();
+    putObjectInCache(key, new CRDTWrapper(e.getUser(), rodaObjectOtherInfo,
+            true, instanceSenderId, new Date().getTime()));
   }
 
   private void handleUserDeleted(EventUserDeleted e) {
