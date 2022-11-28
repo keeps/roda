@@ -8,6 +8,9 @@
 package org.roda.wui.server.common;
 
 import org.roda.core.model.utils.UserUtility;
+import java.util.List;
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.user.User;
@@ -44,6 +47,14 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements UserLo
 
   @Override
   public User login(String username, String password) throws AuthenticationDeniedException, GenericException {
+    if (RodaCoreFactory.getRodaConfiguration().getBoolean(RodaConstants.CORE_WEB_BASIC_AUTH_DISABLE, false)) {
+      List<String> allowedUsers = RodaCoreFactory
+        .getRodaConfigurationAsList(RodaConstants.CORE_WEB_BASIC_AUTH_WHITELIST);
+      if (allowedUsers.isEmpty() || !allowedUsers.contains(username)) {
+        throw new AuthenticationDeniedException("User is not authorized to login via basic authentication");
+      }
+    }
+
     User user = UserLogin.login(username, password, this.getThreadLocalRequest());
     logger.debug("Logged user {}", user);
     return user;
