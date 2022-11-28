@@ -53,6 +53,11 @@ public final class RodaConstants {
   public static final String CORE_ACTION_LOGS_MASTER_RESOURCE = "core.action_logs.master.resource";
   public static final String CORE_ACTION_LOGS_SLAVE_WRITE_IN_SOLR = "core.action_logs.slave.write.solr";
 
+  public static final String CORE_WEB_BASIC_AUTH_DISABLE = "core.web.basicAuth.disable";
+  public static final String CORE_WEB_BASIC_AUTH_WHITELIST = "core.web.basicAuth.whitelist[]";
+  public static final String CORE_API_BASIC_AUTH_DISABLE = "core.api.basicAuth.disable";
+  public static final String CORE_API_BASIC_AUTH_WHITELIST = "core.api.basicAuth.whitelist[]";
+
   public static final String TRASH_CONTAINER = "trash";
 
   public static final String TRANSFERRED_RESOURCES_PROCESSED_FOLDER = "PROCESSED";
