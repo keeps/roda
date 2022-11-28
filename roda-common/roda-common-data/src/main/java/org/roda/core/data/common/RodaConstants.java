@@ -612,7 +612,18 @@ public final class RodaConstants {
       "org.roda.core.data.v2.risks.RiskIncidence", "org.roda.core.data.v2.ri.RepresentationInformation",
       "org.roda.core.data.v2.ip.TransferredResource", "org.roda.core.data.v2.user.User",
       "org.roda.core.data.v2.user.Group", "org.roda.core.data.v2.user.RODAMember",
-      "org.roda.core.data.v2.ip.disposal.DisposalConfirmation", "org.roda.core.data.v2.user.RodaPrincipal"));
+      "org.roda.core.data.v2.ip.disposal.DisposalConfirmation", "org.roda.core.data.v2.user.RodaPrincipal",
+      "org.roda.core.data.v2.ip.AIP", "org.roda.core.data.v2.risks.Risk", "org.roda.core.events.akka.CRDTWrapper",
+      "org.roda.core.data.v2.ip.DIP", "org.roda.core.data.v2.ip.metadata.DescriptiveMetadata",
+      "org.roda.core.data.v2.ip.disposal.DisposalConfirmationAIPEntry",
+      "org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalConfirmationAIPMetadata",
+      "org.roda.core.data.v2.ip.disposal.DisposalHold", "org.roda.core.data.v2.ip.disposal.DisposalRule",
+      "org.roda.core.data.v2.ip.disposal.DisposalSchedule",
+      "org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalScheduleAIPMetadata", "org.roda.core.data.v2.ip.File",
+      "org.roda.core.data.v2.ip.disposal.aipMetadata.DisposalHoldAIPMetadata",
+      "org.roda.core.data.v2.ip.disposal.DisposalHoldAssociation", "org.roda.core.data.v2.jobs.Job",
+      "org.roda.core.data.v2.ip.metadata.OtherMetadata", "org.roda.core.data.v2.ip.metadata.PreservationMetadata",
+      "org.roda.core.data.v2.jobs.Report", "org.roda.core.data.v2.ip.Representation"));
 
   /*
    * STORAGE CONTAINERS
