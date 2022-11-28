@@ -109,7 +109,7 @@ public class UserPermissionsPluginTest {
 
     User user = new User("random_user", "random_user", "random@test.com", false);
     user.addGroup(RodaConstants.ADMINISTRATORS);
-    user = model.createUser(user, "teste123", true);
+    user = model.createUser(user, "teste123".toCharArray(), true);
 
     Job job = TestsHelper.executeJob(MinimalIngestPlugin.class, new HashMap<>(), PluginType.SIP_TO_AIP,
       SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()), user.getName());
