@@ -27,6 +27,7 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.data.common.SecureString;
 import org.roda.wui.api.controllers.UserManagement;
 import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.client.management.UserManagementService;
@@ -73,7 +74,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public User registerUser(User user, char[] password, String captcha, UserExtraBundle extra, String localeString)
+  public User registerUser(User user, SecureString password, String captcha, UserExtraBundle extra, String localeString)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, RecaptchaException,
     AuthorizationDeniedException {
     if (captcha != null) {
@@ -90,7 +91,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public User createUser(User newUser, char[] password, UserExtraBundle extra)
+  public User createUser(User newUser, SecureString password, UserExtraBundle extra)
     throws AuthorizationDeniedException, NotFoundException, GenericException, AlreadyExistsException,
     IllegalOperationException, RequestNotValidException, ValidationException {
     User user = UserUtility.getUser(getThreadLocalRequest());
@@ -98,7 +99,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public User updateMyUser(User modifiedUser, char[] password, UserExtraBundle extra)
+  public User updateMyUser(User modifiedUser, SecureString password, UserExtraBundle extra)
     throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException,
     IllegalOperationException, ValidationException, RequestNotValidException {
     HttpServletRequest request = getThreadLocalRequest();
@@ -109,7 +110,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public void updateUser(User modifiedUser, char[] password, UserExtraBundle extra) throws AuthorizationDeniedException,
+  public void updateUser(User modifiedUser, SecureString password, UserExtraBundle extra) throws AuthorizationDeniedException,
     NotFoundException, AlreadyExistsException, GenericException, ValidationException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     UserManagement.updateUser(user, modifiedUser, password, extra);
@@ -167,7 +168,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public void resetUserPassword(String username, char[] password, String resetPasswordToken)
+  public void resetUserPassword(String username, SecureString password, String resetPasswordToken)
     throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException,
     AuthorizationDeniedException {
     UserManagement.resetUserPassword(username, password, resetPasswordToken, getThreadLocalRequest().getRemoteAddr());
