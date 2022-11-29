@@ -8,7 +8,6 @@
 package org.roda.core.plugins.plugins.ingest.v2;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +28,7 @@ import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
 import org.roda.core.plugins.plugins.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.plugins.ingest.AutoAcceptSIPPlugin;
-import org.roda.core.plugins.plugins.ingest.EARKSIPToAIPPlugin;
+import org.roda.core.plugins.plugins.ingest.EARKSIP2ToAIPPlugin;
 import org.roda.core.plugins.plugins.ingest.VerifyUserAuthorizationPlugin;
 import org.roda.core.plugins.plugins.ingest.v2.steps.AutoAcceptIngestStep;
 import org.roda.core.plugins.plugins.ingest.v2.steps.IngestStep;
@@ -137,7 +136,7 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS,
         new PluginParameter(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS,
           "Format of the Submission Information Packages", PluginParameterType.PLUGIN_SIP_TO_AIP,
-          EARKSIPToAIPPlugin.class.getName(), true, false,
+          EARKSIP2ToAIPPlugin.class.getName(), true, false,
           "Select the format of the Submission Information Packages to be ingested in this ingest process."));
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID,
