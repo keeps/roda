@@ -18,14 +18,13 @@ import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
-import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.data.common.SecureString;
 import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 
@@ -77,10 +76,10 @@ public interface UserManagementServiceAsync {
    * @throws EmailAlreadyExistsException
    * @throws RecaptchaException
    */
-  public void registerUser(User user, char[] password, String captcha, UserExtraBundle extra, String localeString,
-    AsyncCallback<User> callback);
+  public void registerUser(User user, SecureString password, String captcha, UserExtraBundle extra, String localeString,
+                           AsyncCallback<User> callback);
 
-  void createUser(User user, char[] password, UserExtraBundle extra, AsyncCallback<User> callback);
+  void createUser(User user, SecureString password, UserExtraBundle extra, AsyncCallback<User> callback);
 
   /**
    * Modify a user
@@ -94,7 +93,7 @@ public interface UserManagementServiceAsync {
    * @throws AlreadyExistsException
    * @throws GenericException
    */
-  public void updateUser(User user, char[] password, UserExtraBundle extra, AsyncCallback<Void> callback);
+  public void updateUser(User user, SecureString password, UserExtraBundle extra, AsyncCallback<Void> callback);
 
   /**
    * Modify the authenticated user
@@ -109,7 +108,7 @@ public interface UserManagementServiceAsync {
    * @throws GenericException
    * @throws IllegalOperationException
    */
-  public void updateMyUser(User user, char[] password, UserExtraBundle extra, AsyncCallback<User> callback);
+  public void updateMyUser(User user, SecureString password, UserExtraBundle extra, AsyncCallback<User> callback);
 
   /**
    * Try to remove a user, if user cannot be removed it will be deactivated
@@ -213,7 +212,7 @@ public interface UserManagementServiceAsync {
    * @throws IllegalOperationException
    * @throws NotFoundException
    */
-  public void resetUserPassword(String username, char[] password, String resetPasswordToken,
+  public void resetUserPassword(String username, SecureString password, String resetPasswordToken,
     AsyncCallback<Void> callback);
 
   void retrieveDefaultExtraBundle(AsyncCallback<UserExtraBundle> asyncCallback);

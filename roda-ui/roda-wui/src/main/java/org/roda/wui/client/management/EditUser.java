@@ -12,6 +12,7 @@ package org.roda.wui.client.management;
 
 import java.util.List;
 
+import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.user.User;
@@ -139,24 +140,25 @@ public class EditUser extends Composite {
     if (userDataPanel.isChanged()) {
       if (userDataPanel.isValid()) {
         final User user = userDataPanel.getUser();
-        char[] password = userDataPanel.getPassword().toCharArray();
+        try (SecureString password = new SecureString(userDataPanel.getPassword().toCharArray())) {
 
-        UserManagementService.Util.getInstance().updateUser(user, password, userDataPanel.getExtra(),
-          new AsyncCallback<Void>() {
+          UserManagementService.Util.getInstance().updateUser(user, password, userDataPanel.getExtra(),
+            new AsyncCallback<Void>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              errorMessage(caught, user);
-            }
+              @Override
+              public void onFailure(Throwable caught) {
+                errorMessage(caught, user);
+              }
 
-            @Override
-            public void onSuccess(Void result) {
-              HistoryUtils.newHistory(MemberManagement.RESOLVER);
-            }
-          });
+              @Override
+              public void onSuccess(Void result) {
+                HistoryUtils.newHistory(MemberManagement.RESOLVER);
+              }
+            });
+        }
+      } else {
+        HistoryUtils.newHistory(MemberManagement.RESOLVER);
       }
-    } else {
-      HistoryUtils.newHistory(MemberManagement.RESOLVER);
     }
   }
 

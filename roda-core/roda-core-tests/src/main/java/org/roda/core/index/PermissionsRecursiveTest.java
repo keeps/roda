@@ -18,6 +18,7 @@ import java.util.Set;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -86,8 +87,9 @@ public class PermissionsRecursiveTest {
     user.setName("rodauser");
     user.setFullName("Roda User");
     user.setEmail("rodauser@example.com");
-    model.registerUser(user, "rodapassword".toCharArray(), false);
-
+    SecureString password = new SecureString("rodapassword".toCharArray());
+    model.registerUser(user, password, false);
+    password.close();
     // change parent permissions
     Set<PermissionType> userPermissions = new HashSet<>();
     userPermissions.add(PermissionType.READ);

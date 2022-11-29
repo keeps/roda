@@ -7,7 +7,6 @@
  */
 package org.roda.core.events.akka;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,6 +25,7 @@ import org.roda.core.common.akka.Messages.EventUserUpdated;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.events.EventsHandler;
+import org.roda.core.data.common.SecureString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,15 +143,15 @@ public class AkkaEventsHandlerAndNotifierActor extends AbstractActor {
       CRDTWrapper wrapper = (CRDTWrapper) option.get();
       if (!wrapper.getInstanceId().equals(instanceSenderId)) {
         if (objectId.startsWith(USER_KEY_PREFIX)) {
-          char[] password = getUserPasswordFromRodaUserOtherInfoMap(wrapper).toCharArray();
-          if (!wrapper.isUpdate()) {
-            eventsHandler.handleUserCreated(RodaCoreFactory.getModelService(), (User) wrapper.getRodaObject(),
-              password);
-          } else {
-            eventsHandler.handleUserUpdated(RodaCoreFactory.getModelService(), (User) wrapper.getRodaObject(),
-              password);
+          try(SecureString password = new SecureString(getUserPasswordFromRodaUserOtherInfoMap(wrapper).toCharArray())) {
+            if (!wrapper.isUpdate()) {
+              eventsHandler.handleUserCreated(RodaCoreFactory.getModelService(), (User) wrapper.getRodaObject(),
+                      password);
+            } else {
+              eventsHandler.handleUserUpdated(RodaCoreFactory.getModelService(), (User) wrapper.getRodaObject(),
+                      password);
+            }
           }
-          password = null;
         } else if (objectId.startsWith(GROUP_KEY_PREFIX)) {
           if (!wrapper.isUpdate()) {
             eventsHandler.handleGroupCreated(RodaCoreFactory.getModelService(), (Group) wrapper.getRodaObject());

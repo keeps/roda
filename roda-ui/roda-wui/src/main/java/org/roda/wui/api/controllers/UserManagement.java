@@ -37,6 +37,7 @@ import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.util.IdUtils;
+import org.roda.core.data.common.SecureString;
 import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
@@ -109,7 +110,7 @@ public class UserManagement extends RodaWuiController {
     }
   }
 
-  public static User registerUser(User user, char[] password, UserExtraBundle extra, String localeString,
+  public static User registerUser(User user, SecureString password, UserExtraBundle extra, String localeString,
     String servletPath)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -128,7 +129,7 @@ public class UserManagement extends RodaWuiController {
     }
   }
 
-  public static User createUser(User user, User newUser, char[] password, UserExtraBundle extra)
+  public static User createUser(User user, User newUser, SecureString password, UserExtraBundle extra)
     throws AuthorizationDeniedException, NotFoundException, GenericException, AlreadyExistsException,
     IllegalOperationException, RequestNotValidException, ValidationException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -150,7 +151,7 @@ public class UserManagement extends RodaWuiController {
     }
   }
 
-  public static User updateMyUser(User user, User modifiedUser, char[] password, UserExtraBundle extra)
+  public static User updateMyUser(User user, User modifiedUser, SecureString password, UserExtraBundle extra)
     throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException,
     IllegalOperationException, ValidationException, RequestNotValidException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -176,7 +177,7 @@ public class UserManagement extends RodaWuiController {
     }
   }
 
-  public static void updateUser(User user, User modifiedUser, char[] password, UserExtraBundle extra)
+  public static void updateUser(User user, User modifiedUser, SecureString password, UserExtraBundle extra)
     throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException,
     ValidationException, RequestNotValidException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -361,7 +362,7 @@ public class UserManagement extends RodaWuiController {
     controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_USER_PARAM, user);
   }
 
-  public static void resetUserPassword(String username, char[] password, String resetPasswordToken, String ipAddress)
+  public static void resetUserPassword(String username, SecureString password, String resetPasswordToken, String ipAddress)
     throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException,
     AuthorizationDeniedException {
     ControllerAssistant controllerAssistant = new ControllerAssistant() {};

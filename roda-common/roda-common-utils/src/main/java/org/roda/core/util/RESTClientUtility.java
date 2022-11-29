@@ -7,11 +7,15 @@
  */
 package org.roda.core.util;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.Arrays;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.http.HttpEntity;
@@ -23,6 +27,7 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
 
@@ -65,15 +70,17 @@ public final class RESTClientUtility {
     }
   }
 
-  public static int sendPostRequestWithFile(String url, String resource, String username, char[] password, Path file)
+  public static int sendPostRequestWithFile(String url, String resource, String username, SecureString password,
+    Path file)
     throws RODAException, FileNotFoundException {
     CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     HttpPost httpPost = new HttpPost(url + resource);
-    char[] basicAuth = ArrayUtils.addAll((username + ":").toCharArray(), password);
-    char[] basicAuthToken = Base64.encode(StandardCharsets.UTF_8.encode(CharBuffer.wrap(basicAuth)).array());
+    SecureString basicAuth = new SecureString(ArrayUtils.addAll((username + ":").toCharArray(), password.getChars()));
+    SecureString basicAuthToken = new SecureString(
+      Base64.encode(StandardCharsets.UTF_8.encode(CharBuffer.wrap(basicAuth)).array()));
 
-    httpPost.setHeader("Authorization", "Basic " + Arrays.toString(basicAuthToken));
-    basicAuthToken = null;
+    httpPost.setHeader("Authorization", "Basic " + basicAuthToken.toString());
+
     File fileToUpload = new File(file.toString());
     InputStream inputStream = new FileInputStream(fileToUpload);
     MultipartEntityBuilder builder = MultipartEntityBuilder.create();
@@ -90,6 +97,9 @@ public final class RESTClientUtility {
 
     } catch (IOException e) {
       throw new RODAException("Error sending POST request", e);
+    } finally {
+      basicAuth.close();
+      basicAuthToken.close();
     }
   }
 

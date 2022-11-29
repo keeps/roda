@@ -22,7 +22,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -46,6 +45,7 @@ import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -1867,11 +1867,12 @@ public class ModelService extends ModelObservable {
   public synchronized void findOldLogsAndSendThemToMaster(Path logDirectory, Path currentLogFile) {
 
     String username = RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_MASTER_USER, "");
-    char[] password = RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_MASTER_PASS, "").toCharArray();
     String url = RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_MASTER_URL, "");
     String resource = RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_MASTER_RESOURCE, "");
 
-    try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(logDirectory)) {
+    try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(logDirectory);
+      SecureString password = new SecureString(
+        RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_MASTER_PASS, "").toCharArray())) {
       for (Path path : directoryStream) {
         if (!path.equals(currentLogFile)) {
           int httpExitCode = RESTClientUtility.sendPostRequestWithFile(url, resource, username, password, path);
@@ -1884,7 +1885,7 @@ public class ModelService extends ModelObservable {
           }
         }
       }
-      password = null;
+      password.close();
     } catch (IOException e) {
       LOGGER.error("Error listing directory for log files", e);
     } catch (RODAException e) {
@@ -1925,7 +1926,7 @@ public class ModelService extends ModelObservable {
     return UserUtility.getLdapUtility().getUserWithEmail(email);
   }
 
-  public User registerUser(User user, char[] password, boolean notify)
+  public User registerUser(User user, SecureString password, boolean notify)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
@@ -1942,7 +1943,7 @@ public class ModelService extends ModelObservable {
     return createUser(user, null, notify);
   }
 
-  public User createUser(User user, char[] password, boolean notify)
+  public User createUser(User user, SecureString password, boolean notify)
     throws EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException, GenericException,
     NotFoundException, AuthorizationDeniedException {
     return createUser(user, password, notify, false);
@@ -1953,7 +1954,7 @@ public class ModelService extends ModelObservable {
    *          this should only be set to true if invoked from EventsManager
    *          related methods
    */
-  public User createUser(User user, char[] password, boolean notify, boolean isHandlingEvent)
+  public User createUser(User user, SecureString password, boolean notify, boolean isHandlingEvent)
     throws GenericException, EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException,
     NotFoundException, AuthorizationDeniedException {
     boolean writeIsAllowed = RodaCoreFactory.checkIfWriteIsAllowed(nodeType);
@@ -1975,7 +1976,7 @@ public class ModelService extends ModelObservable {
     return createdUser;
   }
 
-  public User updateUser(User user, char[] password, boolean notify)
+  public User updateUser(User user, SecureString password, boolean notify)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     return updateUser(user, password, notify, false);
   }
@@ -1985,7 +1986,7 @@ public class ModelService extends ModelObservable {
    *          this should only be set to true if invoked from EventsManager
    *          related methods
    */
-  public User updateUser(User user, char[] password, boolean notify, boolean isHandlingEvent)
+  public User updateUser(User user, SecureString password, boolean notify, boolean isHandlingEvent)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     boolean writeIsAllowed = RodaCoreFactory.checkIfWriteIsAllowed(nodeType);
 
@@ -2042,12 +2043,12 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public User updateMyUser(User user, char[] password, boolean notify)
+  public User updateMyUser(User user, SecureString password, boolean notify)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     return updateMyUser(user, password, notify, false);
   }
 
-  public User updateMyUser(User user, char[] password, boolean notify, boolean isHandlingEvent)
+  public User updateMyUser(User user, SecureString password, boolean notify, boolean isHandlingEvent)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     boolean writeIsAllowed = RodaCoreFactory.checkIfWriteIsAllowed(nodeType);
 
@@ -2219,7 +2220,7 @@ public class ModelService extends ModelObservable {
     return user;
   }
 
-  public User resetUserPassword(String username, char[] password, String resetPasswordToken, boolean useModel,
+  public User resetUserPassword(String username, SecureString password, String resetPasswordToken, boolean useModel,
     boolean notify) throws NotFoundException, InvalidTokenException, IllegalOperationException, GenericException,
     AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
