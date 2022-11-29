@@ -87,7 +87,7 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS,
         new PluginParameter(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS,
           "Format of the Submission Information Packages", PluginParameterType.PLUGIN_SIP_TO_AIP,
-          EARKSIPToAIPPlugin.class.getName(), true, false,
+          EARKSIP2ToAIPPlugin.class.getName(), true, false,
           "Select the format of the Submission Information Packages to be ingested in this ingest process."));
 
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID,
