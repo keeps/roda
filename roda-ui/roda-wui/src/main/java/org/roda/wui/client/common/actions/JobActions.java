@@ -160,7 +160,7 @@ public class JobActions extends AbstractActionable<Job> {
 
   private void ingestAppraisal(Job object, AsyncCallback<ActionImpact> callback) {
     callback.onSuccess(ActionImpact.NONE);
-    HistoryUtils.newHistory(IngestAppraisal.RESOLVER, IndexedAIP.class.getSimpleName(), RodaConstants.INGEST_JOB_ID,
+    HistoryUtils.newHistory(IngestAppraisal.RESOLVER, RodaConstants.INGEST_JOB_ID,
       object.getId());
   }
 
