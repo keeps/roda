@@ -138,27 +138,27 @@ public class IngestAppraisal extends Composite {
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    setFilters(historyTokens);
+    if (!historyTokens.isEmpty()) {
+      setFilters(historyTokens);
+    } else {
+      searchWrapper.setFilter(IndexedAIP.class, BASE_FILTER);
+      searchWrapper.setFilter(IndexedRepresentation.class, BASE_FILTER);
+      searchWrapper.setFilter(IndexedFile.class, BASE_FILTER);
+      searchWrapper.changeDropdownSelectedValue(IndexedAIP.class.getSimpleName());
+    }
     callback.onSuccess(this);
   }
 
   private void setFilters(List<String> historyTokens) {
     if (!historyTokens.isEmpty()) {
-      Filter filter = SearchFilters.createFilterFromHistoryTokens(ListUtils.tail(historyTokens));
+      Filter filter = SearchFilters.createIncrementalFilterFromTokens(historyTokens, BASE_FILTER);
 
-      String classSimpleName = historyTokens.get(0);
-      if (IndexedRepresentation.class.getSimpleName().equals(classSimpleName)) {
-        searchWrapper.setFilter(IndexedRepresentation.class, filter);
-        searchWrapper.changeDropdownSelectedValue(classSimpleName);
-      } else if (IndexedFile.class.getSimpleName().equals(classSimpleName)) {
-        searchWrapper.setFilter(IndexedFile.class, filter);
-        searchWrapper.changeDropdownSelectedValue(classSimpleName);
-      } else if (IndexedAIP.class.getSimpleName().equals(classSimpleName)) {
-        searchWrapper.setFilter(IndexedAIP.class, filter);
-        searchWrapper.changeDropdownSelectedValue(classSimpleName);
-      } else {
-        GWT.log("setFilter can not handle tokens: " + historyTokens);
-      }
+      searchWrapper.setFilter(IndexedRepresentation.class, filter);
+      searchWrapper.setFilter(IndexedFile.class, filter);
+      searchWrapper.setFilter(IndexedAIP.class, filter);
+      searchWrapper.changeDropdownSelectedValue(IndexedAIP.class.getSimpleName());
+    } else {
+      GWT.log("setFilter can not handle tokens: " + historyTokens);
     }
   }
 }
