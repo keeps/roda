@@ -292,8 +292,10 @@ public class CreateDisposalConfirmationPlugin extends AbstractPlugin<AIP> {
       // Make disposal schedules as a jsonl
       try {
         for (String disposalScheduleId : disposalSchedules) {
-          DisposalSchedule disposalSchedule = model.retrieveDisposalSchedule(disposalScheduleId);
-          model.addDisposalScheduleEntry(confirmationId, disposalSchedule);
+          if (disposalScheduleId != null) {
+            DisposalSchedule disposalSchedule = model.retrieveDisposalSchedule(disposalScheduleId);
+            model.addDisposalScheduleEntry(confirmationId, disposalSchedule);
+          }
         }
       } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | NotFoundException e) {
         LOGGER.error("Failed to create disposal schedules jsonl file", e);
