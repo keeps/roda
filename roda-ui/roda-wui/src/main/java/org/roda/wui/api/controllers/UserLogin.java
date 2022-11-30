@@ -12,7 +12,6 @@ import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
-import com.google.gwt.core.client.GWT;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
