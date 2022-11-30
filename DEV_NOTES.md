@@ -11,9 +11,7 @@
 ```bash
 # If never GWT compiled before, compile once and copy gwt.rpc files
 mvn -pl roda-ui/roda-wui -am gwt:compile -Pdebug-main -Dscope.gwt-dev=compile
-cd roda-ui/roda-wui
-./copy_gwt_rpc.sh
-cd -
+./roda-ui/roda-wui/copy_gwt_rpc.sh
 
 # Open WUI in Spring boot
 mvn -pl roda-ui/roda-wui -am spring-boot:run -Pdebug-main

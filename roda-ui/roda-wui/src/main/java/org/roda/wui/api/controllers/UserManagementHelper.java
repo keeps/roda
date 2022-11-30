@@ -43,6 +43,7 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.data.common.SecureString;
 import org.roda.wui.client.browse.MetadataValue;
 import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.common.server.ServerTools;
@@ -71,7 +72,7 @@ public class UserManagementHelper {
     return RodaCoreFactory.getModelService().listGroups();
   }
 
-  public static User registerUser(User user, String password, UserExtraBundle extra, String localeString,
+  public static User registerUser(User user, SecureString password, UserExtraBundle extra, String localeString,
     String servletPath)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, AuthorizationDeniedException {
     user.setExtra(getUserExtra(extra));
@@ -100,7 +101,7 @@ public class UserManagementHelper {
     return registeredUser;
   }
 
-  public static User createUser(User user, String password, UserExtraBundle extra)
+  public static User createUser(User user, SecureString password, UserExtraBundle extra)
     throws GenericException, AlreadyExistsException, IllegalOperationException, NotFoundException,
     AuthorizationDeniedException, RequestNotValidException, ValidationException {
     user.setExtra(getUserExtra(extra));
@@ -140,7 +141,7 @@ public class UserManagementHelper {
     RodaCoreFactory.getIndexService().commit(true, RODAMember.class);
   }
 
-  public static User updateUser(User user, String password, UserExtraBundle extra)
+  public static User updateUser(User user, SecureString password, UserExtraBundle extra)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException,
     ValidationException, RequestNotValidException {
     ModelService model = RodaCoreFactory.getModelService();
@@ -152,7 +153,7 @@ public class UserManagementHelper {
     return modifiedUser;
   }
 
-  public static User updateMyUser(User modifiedUser, String password, UserExtraBundle extra)
+  public static User updateMyUser(User modifiedUser, SecureString password, UserExtraBundle extra)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException,
     ValidationException, RequestNotValidException {
     ModelService model = RodaCoreFactory.getModelService();
@@ -257,7 +258,7 @@ public class UserManagementHelper {
     return RodaCoreFactory.getModelService().requestPasswordReset(username, email, true, true);
   }
 
-  public static User resetUserPassword(String username, String password, String resetPasswordToken)
+  public static User resetUserPassword(String username, SecureString password, String resetPasswordToken)
     throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException,
     AuthorizationDeniedException {
     return RodaCoreFactory.getModelService().resetUserPassword(username, password, resetPasswordToken, true, true);

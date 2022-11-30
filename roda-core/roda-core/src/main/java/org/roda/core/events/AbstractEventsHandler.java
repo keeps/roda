@@ -17,6 +17,7 @@ import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;
+import org.roda.core.data.common.SecureString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +26,7 @@ public abstract class AbstractEventsHandler implements EventsHandler {
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractEventsHandler.class);
 
   @Override
-  public void handleUserCreated(ModelService model, User user, String password) {
+  public void handleUserCreated(ModelService model, User user, SecureString password) {
     LOGGER.debug("handleUserCreated '{}' with password '{}'", user, password != null ? "******" : "NULL");
     try {
       model.createUser(user, password, true, true);
@@ -43,7 +44,7 @@ public abstract class AbstractEventsHandler implements EventsHandler {
   }
 
   @Override
-  public void handleUserUpdated(ModelService model, User user, String password) {
+  public void handleUserUpdated(ModelService model, User user, SecureString password) {
     LOGGER.debug("handleUserUpdated '{}' with password '{}'", user, password != null ? "******" : "NULL");
     try {
       model.updateUser(user, password, true, true);
@@ -62,7 +63,7 @@ public abstract class AbstractEventsHandler implements EventsHandler {
   }
 
   @Override
-  public void handleMyUserUpdated(ModelService model, User user, String password) {
+  public void handleMyUserUpdated(ModelService model, User user, SecureString password) {
     LOGGER.debug("handleMyUserUpdated '{}' with password '{}'", user, password != null ? "******" : "NULL");
     try {
       model.updateMyUser(user, password, true, true);

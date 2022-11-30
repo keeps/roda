@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.user.User;
@@ -165,53 +166,54 @@ public class Register extends Composite {
 
       User user = userDataPanel.getUser();
       user.setActive(false);
+      String pwd = userDataPanel.getPassword();
+      try (SecureString password = new SecureString(userDataPanel.getPassword().toCharArray())) {
+        final String recaptcha = recaptchaResponse;
 
-      final String password = userDataPanel.getPassword();
-      final String recaptcha = recaptchaResponse;
+        UserManagementService.Util.getInstance().registerUser(user, password, recaptcha, userDataPanel.getExtra(),
+          LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<User>() {
 
-      UserManagementService.Util.getInstance().registerUser(user, password, recaptcha, userDataPanel.getExtra(),
-        LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<User>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            errorMessage(caught);
-          }
-
-          @Override
-          public void onSuccess(final User registeredUser) {
-            if (registeredUser.isActive()) {
-              Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
-                messages.registerSuccessDialogMessageActive(), messages.registerSuccessDialogButton(), false,
-                new AsyncCallback<Void>() {
-
-                  @Override
-                  public void onSuccess(Void result) {
-                    HistoryUtils.newHistory(Login.RESOLVER);
-                  }
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    HistoryUtils.newHistory(Login.RESOLVER);
-                  }
-                });
-            } else {
-              Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
-                messages.registerSuccessDialogMessage(), messages.registerSuccessDialogButton(), false,
-                new AsyncCallback<Void>() {
-
-                  @Override
-                  public void onSuccess(Void result) {
-                    HistoryUtils.newHistory(Login.RESOLVER);
-                  }
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    HistoryUtils.newHistory(Login.RESOLVER);
-                  }
-                });
+            @Override
+            public void onFailure(Throwable caught) {
+              errorMessage(caught);
             }
-          }
-        });
+
+            @Override
+            public void onSuccess(final User registeredUser) {
+              if (registeredUser.isActive()) {
+                Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
+                  messages.registerSuccessDialogMessageActive(), messages.registerSuccessDialogButton(), false,
+                  new AsyncCallback<Void>() {
+
+                    @Override
+                    public void onSuccess(Void result) {
+                      HistoryUtils.newHistory(Login.RESOLVER);
+                    }
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      HistoryUtils.newHistory(Login.RESOLVER);
+                    }
+                  });
+              } else {
+                Dialogs.showInformationDialog(messages.registerSuccessDialogTitle(),
+                  messages.registerSuccessDialogMessage(), messages.registerSuccessDialogButton(), false,
+                  new AsyncCallback<Void>() {
+
+                    @Override
+                    public void onSuccess(Void result) {
+                      HistoryUtils.newHistory(Login.RESOLVER);
+                    }
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      HistoryUtils.newHistory(Login.RESOLVER);
+                    }
+                  });
+              }
+            }
+          });
+      }
     }
   }
 

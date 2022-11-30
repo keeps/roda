@@ -252,12 +252,12 @@ public class Login extends Composite {
   private void doLogin() {
     String usernameText = username.getText();
     String passwordText = password.getText();
+
     error.setText("");
 
     if (usernameText.trim().length() == 0 || passwordText.trim().length() == 0) {
       error.setText(messages.fillUsernameAndPasswordMessage());
     } else {
-
       UserLogin.getInstance().login(usernameText, passwordText, new AsyncCallback<User>() {
 
         @Override
