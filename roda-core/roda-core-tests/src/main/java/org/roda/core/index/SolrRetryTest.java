@@ -22,10 +22,7 @@ import java.util.Collections;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CloudSolrClient;
-import org.apache.solr.cloud.ZkController;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.cloud.ClusterState;
 import org.mockito.Mockito;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
@@ -36,7 +33,6 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
@@ -95,8 +91,8 @@ public class SolrRetryTest {
   public void testSolrRetryCommit() throws SolrServerException, IOException, GenericException {
     SolrClient mock = Mockito.mock(SolrClient.class);
 
-    Mockito.doThrow(new SolrServerException("test")).when(mock).commit(anyString(), anyBoolean(),
-      anyBoolean(), anyBoolean());
+    Mockito.doThrow(new SolrServerException("test")).when(mock).commit(anyString(), anyBoolean(), anyBoolean(),
+      anyBoolean());
 
     SolrUtils.commit(mock, IndexedAIP.class);
 
@@ -107,8 +103,7 @@ public class SolrRetryTest {
   public void testSolrCommit() throws SolrServerException, IOException, GenericException {
     SolrClient mock = Mockito.mock(SolrClient.class);
 
-    Mockito.doCallRealMethod().when(mock).commit(anyString(), anyBoolean(),
-            anyBoolean(), anyBoolean());
+    Mockito.doCallRealMethod().when(mock).commit(anyString(), anyBoolean(), anyBoolean(), anyBoolean());
 
     SolrUtils.commit(mock, IndexedAIP.class);
 
@@ -184,14 +179,5 @@ public class SolrRetryTest {
     Mockito.verify(spy, times(10)).deleteById(anyString(), anyList());
 
     Assert.assertThrows(NotFoundException.class, () -> index.retrieve(IndexedAIP.class, aipId, new ArrayList<>()));
-  }
-
-  @Test
-  public void testZookeeperConnectionTimeout() {
-    try (CloudSolrClient solrClient = (CloudSolrClient) RodaCoreFactory.getIndexService().getSolrClient()) {
-      ClusterState clusterState = solrClient.getClusterStateProvider().getClusterState();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
   }
 }
