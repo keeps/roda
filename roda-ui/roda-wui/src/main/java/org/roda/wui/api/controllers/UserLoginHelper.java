@@ -12,7 +12,6 @@ import java.util.function.BiConsumer;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.google.gwt.core.client.GWT;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.jasig.cas.client.authentication.AttributePrincipal;
 import org.roda.core.RodaCoreFactory;

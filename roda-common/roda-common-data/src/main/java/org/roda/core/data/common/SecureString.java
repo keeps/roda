@@ -71,8 +71,8 @@ public class SecureString implements CharSequence, Closeable, Serializable {
   }
 
   /**
-   * Convert to a {@link String}. This should only be used with APIs that do not
-   * take {@link CharSequence}.
+   * Converts chars to a {@link String}. Avoid using this method as it creates a string with
+   * the secure string content.
    */
   @Override
   public synchronized String toString() {

@@ -10,6 +10,7 @@
  */
 package org.roda.wui.client.management;
 
+import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
@@ -24,7 +25,6 @@ import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
-import org.roda.core.data.common.SecureString;
 import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 
@@ -76,8 +76,9 @@ public interface UserManagementServiceAsync {
    * @throws EmailAlreadyExistsException
    * @throws RecaptchaException
    */
+
   public void registerUser(User user, SecureString password, String captcha, UserExtraBundle extra, String localeString,
-                           AsyncCallback<User> callback);
+    AsyncCallback<User> callback);
 
   void createUser(User user, SecureString password, UserExtraBundle extra, AsyncCallback<User> callback);
 

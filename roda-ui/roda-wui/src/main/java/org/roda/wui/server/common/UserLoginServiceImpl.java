@@ -7,16 +7,9 @@
  */
 package org.roda.wui.server.common;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import com.google.gwt.core.client.GWT;
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.UserLogin;
 import org.roda.wui.client.common.UserLoginService;
