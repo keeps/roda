@@ -7,7 +7,6 @@
  */
 package org.roda.wui.api.v1;
 
-import com.google.json.JsonSanitizer;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,12 +29,13 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalRules;
-import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.controllers.Disposals;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
+
+import com.google.json.JsonSanitizer;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -51,7 +51,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = DisposalRuleResource.SWAGGER_ENDPOINT)
 public class DisposalRuleResource {
   public static final String ENDPOINT = "/v1/disposal/rule";
-  public static final String SWAGGER_ENDPOINT = "v1 rule";
+  public static final String SWAGGER_ENDPOINT = "v1 disposal";
 
   @Context
   private HttpServletRequest request;

@@ -81,9 +81,9 @@
         <gwt.version>2.10.0</gwt.version>
         <cas.client.version>3.6.1</cas.client.version>
         <jersey.version>2.31</jersey.version>
-        <swagger.version>2.2.0</swagger.version>
-        <jackson.version>2.11.2</jackson.version>
-        <spring.version>4.3.19.RELEASE</spring.version>
+        <swagger.version>2.2.7</swagger.version>
+        <jackson.version>2.14.1</jackson.version>
+        <spring.version>5.3.24</spring.version>
         <grizzly.version>2.4.3</grizzly.version>
         <solr.version>8.11.1</solr.version>
         <akka.version>2.5.26</akka.version>
@@ -95,7 +95,7 @@
         <metrics.version>3.2.6</metrics.version>
         <roda_community_url>https://roda-community.org</roda_community_url>
         <testng.groups>all</testng.groups>
-        <springboot.version>2.7.0</springboot.version>
+        <springboot.version>2.7.6</springboot.version>
         <scope.gwt-dev>provided</scope.gwt-dev>
     </properties>
     <profiles>
@@ -444,7 +444,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.13.2.2</version>
+                <version>${jackson.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>

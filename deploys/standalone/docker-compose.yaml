@@ -19,7 +19,7 @@ services:
     volumes:
       - solr_data:/var/solr
   roda:
-    image: keeps/roda:v4.5.0-RC
+    image: keeps/roda:latest
     restart: unless-stopped
     ports:
       - 8080:8080
@@ -33,13 +33,24 @@ services:
       - SOLR_NUM_SHARDS=4
       - SOLR_MAX_SHARDS_PER_NODE=4
       - SOLR_REPLICATION_FACTOR=1
-      - SOLR_MAX_SHARDS_PER_NODE=4
 
       # Remote debug
       - JPDA_ADDRESS=5005
       - JPDA_TRANSPORT=dt_socket
+    volumes:
+      - roda_data:/roda/data
     command: catalina.sh jpda run
+  swagger:
+    image: swaggerapi/swagger-ui
+    restart: on-failure
+    ports:
+      - 8081:8080
+    environment:
+      - URL=http://localhost:8080/api/openapi.json
+      - DOC_EXPANSION=none
+      - VALIDATOR_URL=none
 volumes:
   zookeeper_data:
   zookeeper_datalog:
   solr_data:
+  roda_data:
