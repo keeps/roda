@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.roda.core.RodaCoreFactory;
@@ -288,11 +289,11 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                       StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
                       DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
 
-                      LOGGER.debug("Running a ConvertPlugin ({} to {}) on {}", fileFormat, outputFormat, file.getId());
-                      try {
-                        Path pluginResult = Files.createTempFile(getWorkingDirectory(), "converted",
-                          "." + getOutputFormat());
-                        String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
+                    LOGGER.debug("Running a ConvertPlugin ({} to {}) on {}", fileFormat, outputFormat, file.getId());
+                    try {
+                      Path pluginResult = Files.createTempFile(getWorkingDirectory(), "converted",
+                        "." + FilenameUtils.normalize(getOutputFormat()));
+                      String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
 
                         newFileId = file.getId().replaceFirst("[.][^.]+$", "." + outputFormat);
                         ContentPayload payload = new FSPathContentPayload(pluginResult);
@@ -502,12 +503,11 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                   StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
                   DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
 
-                  LOGGER.debug("Running a ConvertPlugin ({} to {}) on {}", fileFormat, outputFormat, file.getId());
-                  try {
-                    Path pluginResult = Files.createTempFile(getWorkingDirectory(), "converted",
-                      "." + getOutputFormat());
-                    String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
-                    ContentPayload payload = new FSPathContentPayload(pluginResult);
+                LOGGER.debug("Running a ConvertPlugin ({} to {}) on {}", fileFormat, outputFormat, file.getId());
+                try {
+                  Path pluginResult = Files.createTempFile(getWorkingDirectory(), "converted", "." + FilenameUtils.normalize(getOutputFormat()));
+                  String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
+                  ContentPayload payload = new FSPathContentPayload(pluginResult);
 
                     if (!newRepresentations.contains(newRepresentationID)) {
                       LOGGER.debug("Creating a new representation {} on AIP {}", newRepresentationID, aipId);
@@ -705,10 +705,10 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                   directAccess = tmpStorageService.getDirectAccess(fileStoragePath);
                 }
 
-                LOGGER.debug("Running a ConvertPlugin ({} to {}) on {}", fileFormat, outputFormat, file.getId());
-                try {
-                  Path pluginResult = Files.createTempFile(getWorkingDirectory(), "converted", "." + getOutputFormat());
-                  String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
+            LOGGER.debug("Running a ConvertPlugin ({} to {}) on {}", fileFormat, outputFormat, file.getId());
+            try {
+              Path pluginResult = Files.createTempFile(getWorkingDirectory(), "converted", "." + FilenameUtils.normalize(getOutputFormat()));
+              String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
 
                   ContentPayload payload = new FSPathContentPayload(pluginResult);
                   StoragePath storagePath = ModelUtils.getRepresentationStoragePath(file.getAipId(),

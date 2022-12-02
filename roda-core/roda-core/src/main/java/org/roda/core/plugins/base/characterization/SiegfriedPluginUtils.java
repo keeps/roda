@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisV3Utils;
@@ -204,7 +205,7 @@ public class SiegfriedPluginUtils {
       final JsonNode files = jsonObject.get("files");
 
       for (JsonNode file : files) {
-        Path fullFsPath = Paths.get(file.get("filename").asText());
+        Path fullFsPath = Paths.get(FilenameUtils.normalize(file.get("filename").asText()));
         Path relativeFsPath = path.relativize(fullFsPath);
         String jsonFileId = fullFsPath.getFileName().toString();
 

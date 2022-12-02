@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -67,7 +68,7 @@ public class SeleniumUtils {
     url = args[0];
     driverPath = args[1];
 
-    ChromeDriverService service = new ChromeDriverService.Builder().usingDriverExecutable(new File(driverPath))
+    ChromeDriverService service = new ChromeDriverService.Builder().usingDriverExecutable(new File(FilenameUtils.normalize(driverPath)))
       .usingAnyFreePort().build();
     service.start();
 

@@ -17,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Date;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConsumesOutputStream;
@@ -34,15 +35,17 @@ public class Theme extends RodaWuiController {
   }
 
   public static Pair<String, ProvidesInputStream> getThemeResource(String id, String fallbackResourceId) {
+    String normalizedID = FilenameUtils.normalize(id);
+    String normalizedFallBackResource = FilenameUtils.normalize(fallbackResourceId);
     Pair<String, ProvidesInputStream> ret;
-    URL url = RodaCoreFactory.getConfigurationFile(RodaConstants.CORE_THEME_FOLDER + "/" + id);
+    URL url = RodaCoreFactory.getConfigurationFile(RodaConstants.CORE_THEME_FOLDER + "/" + normalizedID);
 
     if (url != null) {
-      ret = Pair.of(id, () -> RodaCoreFactory
-        .getConfigurationFileAsStream(RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER), id));
+      ret = Pair.of(id, () -> RodaCoreFactory.getConfigurationFileAsStream(
+        RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER), normalizedID));
     } else {
-      ret = Pair.of(fallbackResourceId, () -> RodaCoreFactory.getConfigurationFileAsStream(
-        RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER), fallbackResourceId));
+      ret = Pair.of(normalizedFallBackResource, () -> RodaCoreFactory.getConfigurationFileAsStream(
+        RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER), normalizedFallBackResource));
     }
 
     return ret;

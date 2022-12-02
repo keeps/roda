@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -38,7 +39,7 @@ public class RodaEntityResolver implements EntityResolver {
     public byte[] load(Pair<String, String> pair) throws Exception {
       String systemId = pair.getSecond();
 
-      String filename = Paths.get(URI.create(systemId)).getFileName().toString();
+      String filename = FilenameUtils.normalize(Paths.get(URI.create(systemId)).getFileName().toString());
       String configurationFile = RodaConstants.CORE_SCHEMAS_FOLDER + "/" + filename;
 
       try (InputStream in = RodaCoreFactory.getConfigurationFileAsStream(configurationFile);

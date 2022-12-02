@@ -16,22 +16,12 @@ import java.io.Serializable;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.CharBuffer;
 import java.nio.file.Path;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.CharBuffer;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -39,7 +29,6 @@ import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.SecureString;
@@ -178,7 +167,7 @@ public final class RESTClientUtility {
 
     httpPost.setHeader("Authorization", "Basic " + basicAuthToken.toString());
 
-    File fileToUpload = new File(file.toString());
+    File fileToUpload = new File(FilenameUtils.normalize(file.toString()));
     InputStream inputStream = new FileInputStream(fileToUpload);
     MultipartEntityBuilder builder = MultipartEntityBuilder.create();
     builder.addBinaryBody(RodaConstants.API_QUERY_KEY_FILE, inputStream, ContentType.DEFAULT_BINARY,

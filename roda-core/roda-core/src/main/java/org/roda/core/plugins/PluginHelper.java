@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.reflections.Reflections;
 import org.roda.core.RodaCoreFactory;
@@ -1284,8 +1285,8 @@ public final class PluginHelper {
       .getString("core.ingest.processed.successfully_ingested", "SUCCESSFULLY_INGESTED");
     String unsuccessfulFolder = RodaCoreFactory.getRodaConfiguration()
       .getString("core.ingest.processed.unsuccessfully_ingested", "UNSUCCESSFULLY_INGESTED");
-    String successPath = Paths.get(baseFolder, successFolder).toString();
-    String unsuccessfulPath = Paths.get(baseFolder, unsuccessfulFolder).toString();
+    String successPath = FilenameUtils.normalize(Paths.get(baseFolder, successFolder).toString());
+    String unsuccessfulPath = FilenameUtils.normalize(Paths.get(baseFolder, unsuccessfulFolder).toString());
 
     // determine which SIPs will be moved based on 1) if at least one AIP was
     // created from each SIP; 2) if it was created, in which state it is
