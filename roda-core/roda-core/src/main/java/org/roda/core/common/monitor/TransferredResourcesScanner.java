@@ -15,6 +15,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -25,6 +26,7 @@ import org.roda.core.data.v2.LiteRODAObject;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.LiteRODAObjectFactory;
@@ -200,7 +202,7 @@ public class TransferredResourcesScanner {
 
     for (String uuid : ids) {
       TransferredResource tr = index.retrieve(TransferredResource.class, uuid, fieldsToReturn);
-      Path relative = Paths.get(tr.getRelativePath());
+      Path relative = Paths.get(FilenameUtils.normalize(tr.getRelativePath()));
       Path fullPath = basePath.resolve(relative);
       if (FSUtils.exists(fullPath)) {
         FSUtils.deletePath(fullPath);
@@ -224,7 +226,7 @@ public class TransferredResourcesScanner {
     Path resolvedBasePath;
     Optional<String> normalizedRelativePath;
     if(folderRelativePath.isPresent() && !folderRelativePath.get().isEmpty()) {
-      resolvedBasePath = basePath.resolve(Paths.get(folderRelativePath.get())).normalize();
+      resolvedBasePath = basePath.resolve(Paths.get(FilenameUtils.normalize(folderRelativePath.get()))).normalize();
       isWithin = RodaCoreFactory.checkPathIsWithin(resolvedBasePath, basePath);
       if(resolvedBasePath.equals(basePath)){
         normalizedRelativePath = Optional.empty();
@@ -267,7 +269,7 @@ public class TransferredResourcesScanner {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     if (folderRelativePath.isPresent()) {
-      Path resolvedBasePath = basePath.resolve(Paths.get(folderRelativePath.get()));
+      Path resolvedBasePath = basePath.resolve(Paths.get(FilenameUtils.normalize(folderRelativePath.get())));
       boolean isWithin = RodaCoreFactory.checkPathIsWithin(resolvedBasePath,basePath);
 
       if (isWithin) {
@@ -288,9 +290,9 @@ public class TransferredResourcesScanner {
     NotFoundException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    if (FSUtils.exists(Paths.get(resource.getFullPath()))) {
-      Path resourcePath = Paths.get(resource.getFullPath());
-      Path newPath = resourcePath.getParent().resolve(newName);
+    if (FSUtils.exists(Paths.get(FilenameUtils.normalize(resource.getFullPath())))) {
+      Path resourcePath = Paths.get(FilenameUtils.normalize(resource.getFullPath()));
+      Path newPath = resourcePath.getParent().resolve(FilenameUtils.normalize(newName));
       FSUtils.move(resourcePath, newPath, replaceExisting);
 
       if (reindexResources) {
@@ -311,7 +313,7 @@ public class TransferredResourcesScanner {
         }
       }
 
-      Path relativeToBase = basePath.relativize(resourcePath.getParent().resolve(newName));
+      Path relativeToBase = basePath.relativize(resourcePath.getParent().resolve(FilenameUtils.normalize(newName)));
       return IdUtils.createUUID(relativeToBase.toString());
     } else {
       throw new NotFoundException("Transferred resource was moved or does not exist");
@@ -361,7 +363,7 @@ public class TransferredResourcesScanner {
 
     for (TransferredResource resource : resources) {
       try {
-        if (FSUtils.exists(Paths.get(resource.getFullPath()))) {
+        if (FSUtils.exists(Paths.get(FilenameUtils.normalize(resource.getFullPath())))) {
           Path newResourcePath = basePath.resolve(newRelativePath);
           if (addOldRelativePathToNewRelativePath) {
             newResourcePath = newResourcePath
@@ -371,7 +373,7 @@ public class TransferredResourcesScanner {
             newResourcePath = newResourcePath.resolve(resource.getName());
           }
 
-          FSUtils.move(Paths.get(resource.getFullPath()), newResourcePath, replaceExisting);
+          FSUtils.move(Paths.get(FilenameUtils.normalize(resource.getFullPath())), newResourcePath, replaceExisting);
 
           // create & index transferred resource in the new location
           TransferredResource newResource = instantiateTransferredResource(newResourcePath, basePath);

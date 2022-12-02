@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.roda.core.RodaCoreFactory;
@@ -285,7 +286,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                     LOGGER.debug("Running a ConvertPlugin ({} to {}) on {}", fileFormat, outputFormat, file.getId());
                     try {
                       Path pluginResult = Files.createTempFile(getWorkingDirectory(), "converted",
-                        "." + getOutputFormat());
+                        "." + FilenameUtils.normalize(getOutputFormat()));
                       String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
 
                       String newFileId = file.getId().replaceFirst("[.][^.]+$", "." + outputFormat);
@@ -490,7 +491,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
                 LOGGER.debug("Running a ConvertPlugin ({} to {}) on {}", fileFormat, outputFormat, file.getId());
                 try {
-                  Path pluginResult = Files.createTempFile(getWorkingDirectory(), "converted", "." + getOutputFormat());
+                  Path pluginResult = Files.createTempFile(getWorkingDirectory(), "converted", "." + FilenameUtils.normalize(getOutputFormat()));
                   String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
                   ContentPayload payload = new FSPathContentPayload(pluginResult);
 
@@ -677,7 +678,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
             LOGGER.debug("Running a ConvertPlugin ({} to {}) on {}", fileFormat, outputFormat, file.getId());
             try {
-              Path pluginResult = Files.createTempFile(getWorkingDirectory(), "converted", "." + getOutputFormat());
+              Path pluginResult = Files.createTempFile(getWorkingDirectory(), "converted", "." + FilenameUtils.normalize(getOutputFormat()));
               String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
 
               ContentPayload payload = new FSPathContentPayload(pluginResult);

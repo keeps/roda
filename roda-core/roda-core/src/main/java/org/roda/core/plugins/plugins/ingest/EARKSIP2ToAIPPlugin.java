@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.io.FilenameUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -130,7 +131,7 @@ public class EARKSIP2ToAIPPlugin extends SIPToAIPPlugin {
     Job cachedJob, TransferredResource transferredResource) {
     Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
 
-    Path earkSIPPath = Paths.get(transferredResource.getFullPath());
+    Path earkSIPPath = Paths.get(FilenameUtils.normalize(transferredResource.getFullPath()));
     LOGGER.debug("Converting {} to AIP", earkSIPPath);
 
     transformTransferredResourceIntoAnAIP(index, model, storage, transferredResource, earkSIPPath, createSubmission,

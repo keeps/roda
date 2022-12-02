@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.DownloadUtils;
@@ -154,7 +155,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
       @Override
       public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
         JobPluginInfo jobPluginInfo, Plugin<AIP> plugin, List<AIP> aips) {
-        Path outputPath = Paths.get(outputFolder);
+        Path outputPath = Paths.get(FilenameUtils.normalize(outputFolder));
         String error = null;
         try {
           if (!FSUtils.exists(outputPath)) {
@@ -186,7 +187,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
   private Report exportFolders(List<AIP> aips, StorageService storage, ModelService model, IndexService index,
     Report report, JobPluginInfo jobPluginInfo, Job job) {
     try {
-      FileStorageService localStorage = new FileStorageService(Paths.get(outputFolder), false, null, false);
+      FileStorageService localStorage = new FileStorageService(Paths.get(FilenameUtils.normalize(outputFolder)), false, null, false);
       for (AIP aip : aips) {
         LOGGER.debug("Exporting AIP {} to folder", aip.getId());
         String error = null;

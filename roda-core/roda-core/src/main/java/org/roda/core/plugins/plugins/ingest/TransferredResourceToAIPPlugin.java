@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.io.FilenameUtils;
 import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -118,7 +119,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
     Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
 
     try {
-      Path transferredResourcePath = Paths.get(transferredResource.getFullPath());
+      Path transferredResourcePath = Paths.get(FilenameUtils.normalize(transferredResource.getFullPath()));
       LOGGER.debug("Converting {} to AIP", transferredResourcePath);
       AIPState state = AIPState.INGEST_PROCESSING;
       String aipType = RodaConstants.AIP_TYPE_MIXED;

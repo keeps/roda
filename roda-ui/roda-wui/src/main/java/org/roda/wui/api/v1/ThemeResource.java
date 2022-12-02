@@ -18,7 +18,6 @@ import javax.ws.rs.core.Response;
 import org.roda.core.common.ProvidesInputStream;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.wui.api.controllers.Theme;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -37,19 +36,14 @@ public class ThemeResource {
     @Parameter(description = "The resource id", required = true) @QueryParam(RodaConstants.API_QUERY_PARAM_RESOURCE_ID) String resourceId,
     @Parameter(description = "The default resource id", required = false) @QueryParam(RodaConstants.API_QUERY_PARAM_DEFAULT_RESOURCE_ID) String fallbackResourceId,
     @Parameter(description = "If the resource is served inline", required = false) @QueryParam(RodaConstants.API_QUERY_PARAM_INLINE) boolean inline,
-    @HeaderParam("Range") String range, @Context Request req) throws NotFoundException, AuthorizationDeniedException {
+    @HeaderParam("Range") String range, @Context Request req) throws NotFoundException {
 
     Pair<String, ProvidesInputStream> themeResource = Theme.getThemeResource(resourceId, fallbackResourceId);
 
-    if(resourceId.matches("(\\.\\./*.*|^\\./*/*.*|^\\\\\\\\.*)")){
-      throw new AuthorizationDeniedException("Unauthorized acess to file");
-    }
-    else {
-      if (themeResource.getSecond() != null) {
-        return ApiUtils.okResponse(Theme.getThemeResourceStreamResponse(themeResource), inline, range, req);
-      } else {
-        throw new NotFoundException("File not found: " + resourceId);
-      }
+    if (themeResource.getSecond() != null) {
+      return ApiUtils.okResponse(Theme.getThemeResourceStreamResponse(themeResource), inline, range, req);
+    } else {
+      throw new NotFoundException("File not found: " + resourceId);
     }
   }
 }

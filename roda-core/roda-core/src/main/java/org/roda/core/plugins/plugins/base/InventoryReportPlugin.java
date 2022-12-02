@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -177,7 +178,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
     }
     if (parameters.containsKey(CSV_FILE_OUTPUT)) {
       try {
-        output = Paths.get(parameters.get(CSV_FILE_OUTPUT));
+        output = Paths.get(FilenameUtils.normalize(parameters.get(CSV_FILE_OUTPUT)));
         Path parent = output.getParent();
         Files.createDirectories(parent);
       } catch (IOException e) {
