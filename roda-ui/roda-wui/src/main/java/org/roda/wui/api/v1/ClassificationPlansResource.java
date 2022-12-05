@@ -8,6 +8,7 @@
 package org.roda.wui.api.v1;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -44,7 +45,7 @@ public class ClassificationPlansResource {
   @GET
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   public Response getClassificationPlan(
-    @Parameter(description = "Choose file name", schema = @Schema(defaultValue = "plan.json")) @QueryParam(RodaConstants.API_QUERY_KEY_FILENAME) String filename)
+    @DefaultValue("plan.json") @Parameter(description = "Choose file name", schema = @Schema(defaultValue = "plan.json")) @QueryParam(RodaConstants.API_QUERY_KEY_FILENAME) String filename)
     throws RODAException {
 
     // get user
