@@ -64,7 +64,7 @@ public class AcknowledgeNotification extends Composite {
   }
 
   private static void init() {
-    acknowledgeBody = new HTMLWidgetWrapper("Acknowledgements.html");
+    acknowledgeBody = new HTMLWidgetWrapper("Acknowledge.html");
     acknowledgeBody.addStyleName("wui-home");
   }
 
