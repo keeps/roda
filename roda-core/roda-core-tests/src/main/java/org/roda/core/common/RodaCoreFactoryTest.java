@@ -21,14 +21,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.index.IndexTestUtils;
 import org.roda.core.storage.fs.FSUtils;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
