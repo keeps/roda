@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Matchers;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -537,7 +538,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     final Binary binaryCreated = getStorage().getBinary(binaryStoragePath);
     assertNotNull(binaryCreated);
 
-    final Path original = Files.createTempFile(binaryCreated.getStoragePath().getName(), ".tmp");
+    final Path original = Files.createTempFile(FilenameUtils.normalize(binaryCreated.getStoragePath().getName()), ".tmp");
     binaryCreated.getContent().writeToPath(original);
 
     // 1) update binary content

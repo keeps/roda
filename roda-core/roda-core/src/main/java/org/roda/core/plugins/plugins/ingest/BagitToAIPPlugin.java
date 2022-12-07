@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.commons.io.FilenameUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
@@ -106,7 +107,7 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
   private void processTransferredResource(IndexService index, ModelService model, Report report, Job job,
     TransferredResource transferredResource) {
     Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
-    Path bagitPath = Paths.get(transferredResource.getFullPath());
+    Path bagitPath = Paths.get(FilenameUtils.normalize(transferredResource.getFullPath()));
 
     try {
       LOGGER.debug("Converting {} to AIP", bagitPath);

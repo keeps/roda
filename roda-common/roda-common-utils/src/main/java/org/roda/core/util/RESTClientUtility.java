@@ -17,6 +17,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -81,7 +82,7 @@ public final class RESTClientUtility {
 
     httpPost.setHeader("Authorization", "Basic " + basicAuthToken.toString());
 
-    File fileToUpload = new File(file.toString());
+    File fileToUpload = new File(FilenameUtils.normalize(file.toString()));
     InputStream inputStream = new FileInputStream(fileToUpload);
     MultipartEntityBuilder builder = MultipartEntityBuilder.create();
     builder.addBinaryBody(RodaConstants.API_QUERY_KEY_FILE, inputStream, ContentType.DEFAULT_BINARY,

@@ -30,6 +30,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,7 +126,7 @@ public final class ZipUtility {
 
       while (zipEntry != null) {
         // for each entry to be extracted
-        String entryName = zipEntry.getName();
+        String entryName = FilenameUtils.getName(zipEntry.getName());
         LOGGER.debug("Extracting {}", entryName);
 
         File newFile = new File(outputDir, entryName);
@@ -133,7 +134,7 @@ public final class ZipUtility {
         if (!canonicalDestinationFile.startsWith(canonicalDestinationDirPath + File.separator)) {
           LOGGER.debug("Removing already extracted files due to suspicious zip file");
           for (File f : extractedFiles) {
-            Files.delete(Paths.get(f.getCanonicalPath()));
+            Files.delete(Paths.get(FilenameUtils.normalize(f.getCanonicalPath())));
           }
           throw new IOException("Detected a ZIP entry outside of the target dir: " + entryName);
         }

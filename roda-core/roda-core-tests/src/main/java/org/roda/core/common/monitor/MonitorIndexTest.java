@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.Random;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.roda.core.RodaCoreFactory;
@@ -156,11 +157,11 @@ public class MonitorIndexTest {
     }
 
     TransferredResource resource = transferredResources.getResults().get(toRemove1);
-    File firstFileRemoved = new File(resource.getFullPath());
+    File firstFileRemoved = new File(FilenameUtils.normalize(resource.getFullPath()));
     firstFileRemoved.delete();
 
     TransferredResource resource2 = transferredResources.getResults().get(toRemove2);
-    File secondFileRemoved = new File(resource2.getFullPath());
+    File secondFileRemoved = new File(FilenameUtils.normalize(resource2.getFullPath()));
     secondFileRemoved.delete();
 
     monitor.updateTransferredResources(Optional.empty(), true);
@@ -193,7 +194,7 @@ public class MonitorIndexTest {
     }
 
     TransferredResource resource = transferredResources.getResults().get(toRemove);
-    FileUtils.deleteDirectory(new File(resource.getFullPath()));
+    FileUtils.deleteDirectory(new File(FilenameUtils.normalize(resource.getFullPath())));
 
     monitor.updateTransferredResources(Optional.empty(), true);
 
@@ -239,7 +240,7 @@ public class MonitorIndexTest {
     }
 
     TransferredResource resource = transferredResources.getResults().get(toRemove);
-    File fileRemoved = new File(resource.getFullPath());
+    File fileRemoved = new File(FilenameUtils.normalize(resource.getFullPath()));
     fileRemoved.delete();
 
     TransferredResource transferredResourceFolder = transferredResources.getResults().get(folderIndex);

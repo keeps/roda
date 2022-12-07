@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
@@ -2396,7 +2397,7 @@ public class ModelService extends ModelObservable {
     throws GenericException, AuthorizationDeniedException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
-    FSUtils.deletePathQuietly(Paths.get(transferredResource.getFullPath()));
+    FSUtils.deletePathQuietly(Paths.get(FilenameUtils.normalize(transferredResource.getFullPath())));
     notifyTransferredResourceDeleted(transferredResource.getUUID()).failOnError();
   }
 
@@ -3021,7 +3022,7 @@ public class ModelService extends ModelObservable {
 
   public TransferredResource retrieveTransferredResource(String fullPath) {
     TransferredResourcesScanner transferredResourcesScanner = RodaCoreFactory.getTransferredResourcesScanner();
-    return transferredResourcesScanner.instantiateTransferredResource(Paths.get(fullPath),
+    return transferredResourcesScanner.instantiateTransferredResource(Paths.get(FilenameUtils.normalize(fullPath)),
       transferredResourcesScanner.getBasePath());
   }
 
