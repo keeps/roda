@@ -353,10 +353,6 @@
 			<artifactId>akka-discovery-dns_2.11</artifactId> </dependency> -->
 		<!-- Akka related dependencies - end -->
 		<dependency>
-			<groupId>gov.loc</groupId>
-			<artifactId>bagit</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>com.github.jknack</groupId>
 			<artifactId>handlebars</artifactId>
 		</dependency>

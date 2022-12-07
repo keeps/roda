@@ -91,7 +91,7 @@
         <apacheds.version>2.0.0.AM26</apacheds.version>
         <httpcomponents.version>4.5.13</httpcomponents.version>
         <poi.version>3.17</poi.version>
-        <commons_ip2.version>2.2.1</commons_ip2.version>
+        <commons_ip2.version>2.3.0</commons_ip2.version>
         <metrics.version>3.2.6</metrics.version>
         <roda_community_url>https://roda-community.org</roda_community_url>
         <testng.groups>all</testng.groups>
@@ -927,20 +927,7 @@
                 <version>${swagger.version}</version>
             </dependency>
             <!-- REST API related dependencies - end -->
-            <!-- Actions related dependencies - start -->
-            <dependency>
-                <groupId>gov.loc</groupId>
-                <artifactId>bagit</artifactId>
-                <version>4.12.0</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>log4j</groupId>
-                        <artifactId>log4j</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
 
-            <!-- Actions related dependencies - end -->
             <!-- Akka related dependencies - start -->
             <dependency>
                 <groupId>com.typesafe.akka</groupId>
