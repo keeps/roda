@@ -41,7 +41,7 @@ public class ResourceResolver implements LSResourceResolver {
       try {
         String filename = href;
         try {
-          filename = FilenameUtils.normalize(Paths.get(URI.create(href)).getFileName().toString());
+          filename = FilenameUtils.getName(Paths.get(URI.create(href)).getFileName().toString());
         } catch (IllegalArgumentException e) {
           try {
             filename = FilenameUtils.normalize(Paths.get(href).getFileName().toString());

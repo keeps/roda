@@ -657,7 +657,7 @@ public class RodaCoreFactory {
       String systemTmpDir = getSystemProperty("java.io.tmpdir", "tmp");
       Path defaultRodaWorkingDirectory = Files.createTempDirectory(Paths.get(systemTmpDir), "rodaWorkingDirectory");
       workingDirectoryPath = Paths
-        .get(getRodaConfiguration().getString("core.workingdirectory", FilenameUtils.normalize(defaultRodaWorkingDirectory.toString())));
+        .get(getRodaConfiguration().getString("core.workingdirectory", defaultRodaWorkingDirectory.toString())).normalize();
       Files.createDirectories(workingDirectoryPath);
     } catch (IOException e) {
       throw new RuntimeException("Unable to create RODA WORKING DIRECTORY " + workingDirectoryPath + ". Aborting...",
