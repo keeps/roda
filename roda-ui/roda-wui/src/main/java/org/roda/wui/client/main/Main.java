@@ -56,6 +56,8 @@ public class Main extends Composite implements EntryPoint {
     // Set uncaught exception handler
     ClientLogger.setUncaughtExceptionHandler();
 
+    JavascriptUtils.exportStaticMethod();
+
     // load shared properties before init
     BrowserService.Util.getInstance().retrieveSharedProperties(LocaleInfo.getCurrentLocale().getLocaleName(),
       new AsyncCallback<Map<String, List<String>>>() {

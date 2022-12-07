@@ -965,10 +965,10 @@ public interface ClientMessages extends Messages {
   SafeHtml searchPreFilterEmptyKeyFilterParameter(String searchPreFilterName);
 
   SafeHtml searchPreFilterLongRangeFilterParameter(String searchPreFilterName, long searchPreFilterFromValue,
-    long searchPreFilterToValue);
+      long searchPreFilterToValue);
 
   SafeHtml searchPreFilterLongRangeFilterParameterGreaterThan(String searchPreFilterName,
-    long searchPreFilterFromValue);
+      long searchPreFilterFromValue);
 
   SafeHtml searchPreFilterLongRangeFilterParameterSmallerThan(String searchPreFilterName, long searchPreFilterToValue);
 
@@ -977,6 +977,12 @@ public interface ClientMessages extends Messages {
   SafeHtml searchPreFilterOneOfManyFilterParameterWithSize(String searchPreFilterName, int listSize);
 
   SafeHtml searchPreFilterOneOfManyFilterParameterWithList(String searchPreFilterName, List<String> list);
+
+  SafeHtml searchPreFilterDateIntervalFilterParameter(String searchPreFilterName, String fromDate, String toDate);
+
+  SafeHtml searchPreFilterDateIntervalFilterParameterFrom(String searchPreFilterName, String fromDate);
+
+  SafeHtml searchPreFilterDateIntervalFilterParameterTo(String searchPreFilterName, String toDate);
 
   String searchPreFilterName(@Select String name);
 
@@ -2019,7 +2025,7 @@ public interface ClientMessages extends Messages {
   SafeHtml representationInformationAssociateWith(String field, String value, @Select String indexObjectName);
 
   SafeHtml representationInformationAssociatedWithDescription(String field, String value,
-    @Select String indexObjectName);
+      @Select String indexObjectName);
 
   String representationInformationNameFromAssociation(String field, String value, @Select String indexObjectName);
 
@@ -2444,4 +2450,17 @@ public interface ClientMessages extends Messages {
 
   String updateDisposalHoldMessage();
 
+  String searchPrefilterDescendantsOf(String title);
+
+  String searchPreFilterInThisPackage(String title);
+
+  String searchPrefilterTransitiveHolds();
+
+  String saveSearchTitle();
+
+  String saveSearchDescription();
+
+  String promptDialogErrorMessageForSavedSearchTitle();
+
+  SafeHtml promptDialogEmptyInputError();
 }

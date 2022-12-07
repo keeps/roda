@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.common.search;
 
+import java.util.Date;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
@@ -15,6 +16,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
+import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
@@ -25,6 +27,7 @@ import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 
 import config.i18n.client.ClientMessages;
+import org.roda.wui.common.client.tools.Humanize;
 
 public class SearchPreFilterUtils {
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
@@ -81,7 +84,6 @@ public class SearchPreFilterUtils {
       } else {
         return null;
       }
-
     } else if (parameter instanceof OneOfManyFilterParameter) {
       OneOfManyFilterParameter p = (OneOfManyFilterParameter) parameter;
       int listSize = p.getValues().size();
@@ -109,6 +111,19 @@ public class SearchPreFilterUtils {
       }
 
       return preFilterTranslations.toSafeHtml();
+    } else if (parameter instanceof DateIntervalFilterParameter) {
+      DateIntervalFilterParameter p = (DateIntervalFilterParameter) parameter;
+      if (p.getFromValue() != null && p.getToValue() != null) {
+        String fromDateHumanized = Humanize.formatDate(p.getFromValue());
+        String toDateHumanized = Humanize.formatDate(p.getToValue());
+        return messages.searchPreFilterDateIntervalFilterParameter(messages.searchPreFilterName(p.getFromName()), fromDateHumanized, toDateHumanized);
+      } else if (p.getToValue() == null) {
+        String fromDateHumanized = Humanize.formatDate(p.getFromValue());
+        return messages.searchPreFilterDateIntervalFilterParameterFrom(messages.searchPreFilterName(p.getFromName()), fromDateHumanized);
+      } else {
+        String toDateHumanized = Humanize.formatDate(p.getToValue());
+        return messages.searchPreFilterDateIntervalFilterParameterTo(messages.searchPreFilterName(p.getFromName()), toDateHumanized);
+      }
     } else {
       return SafeHtmlUtils.fromString(parameter.getClass().getSimpleName());
     }

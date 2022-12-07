@@ -7,9 +7,13 @@
  */
 package org.roda.wui.client.common.dialogs;
 
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.search.SearchSuggestBox;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -191,6 +195,13 @@ public class Dialogs {
   public static void showPromptDialog(String title, String message, String value, String placeHolder,
     final RegExp validator, String cancelButtonText, String confirmButtonText, boolean mandatory, boolean isBigText,
     final AsyncCallback<String> callback) {
+    showPromptDialog(title, message, value, placeHolder, validator, "", cancelButtonText, confirmButtonText, mandatory,
+      isBigText, callback);
+  }
+
+  public static void showPromptDialog(String title, String message, String value, String placeHolder,
+    final RegExp validator, String validatorErrorMessage, String cancelButtonText, String confirmButtonText,
+    boolean mandatory, boolean isBigText, final AsyncCallback<String> callback) {
     final DialogBox dialogBox = new DialogBox(false, true);
     dialogBox.setText(title);
 
@@ -221,6 +232,9 @@ public class Dialogs {
     inputBox.setTitle("input box");
     layout.add(inputBox);
 
+    SimplePanel errorPanel = new SimplePanel();
+    layout.add(errorPanel);
+
     final Button cancelButton = new Button(cancelButtonText);
     final Button confirmButton = new Button(confirmButtonText);
     confirmButton.setEnabled(!mandatory);
@@ -231,65 +245,49 @@ public class Dialogs {
     dialogBox.setGlassEnabled(true);
     dialogBox.setAnimationEnabled(false);
 
-    cancelButton.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
+    cancelButton.addClickHandler(event -> {
+      dialogBox.hide();
+      callback.onFailure(null);
+    });
+
+    confirmButton.addClickHandler(event -> {
+      if (validator.test(inputBox.getText())) {
         dialogBox.hide();
-        callback.onFailure(null);
+        callback.onSuccess(inputBox.getText());
       }
     });
 
-    confirmButton.addClickHandler(new ClickHandler() {
-      @Override
-      public void onClick(ClickEvent event) {
+    inputBox.addValueChangeHandler(event -> {
+      boolean isValid = validator.test(event.getValue());
+      confirmButton.setEnabled(isValid);
+      validatePromptInput(errorPanel, isValid, event.getValue(), validatorErrorMessage);
+    });
+
+    //inputBox.addKeyPressHandler(event -> {
+    //  TextBox box = (TextBox) event.getSource();
+    //  boolean isValid = validator.test(box.getText());
+    //  confirmButton.setEnabled(isValid);
+    //  validatePromptInput(errorPanel, isValid, box.getText(), validatorErrorMessage);
+    //});
+
+    /*inputBox.addKeyDownHandler(event -> {
+      TextBox box = (TextBox) event.getSource();
+      boolean isValid = validator.test(box.getText());
+      confirmButton.setEnabled(isValid);
+      validatePromptInput(errorPanel, isValid, box.getText(), validatorErrorMessage);
+    });*/
+
+    inputBox.addKeyUpHandler(event -> {
+      if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
         if (validator.test(inputBox.getText())) {
           dialogBox.hide();
           callback.onSuccess(inputBox.getText());
         }
-      }
-    });
-
-    inputBox.addValueChangeHandler(new ValueChangeHandler<String>() {
-      @Override
-      public void onValueChange(ValueChangeEvent<String> event) {
-        boolean isValid = validator.test(event.getValue());
+      } else {
+        TextBox box = (TextBox) event.getSource();
+        boolean isValid = validator.test(box.getText());
         confirmButton.setEnabled(isValid);
-        if (isValid) {
-          inputBox.removeStyleName("error");
-        } else {
-          inputBox.addStyleName("error");
-        }
-      }
-    });
-
-    inputBox.addKeyPressHandler(new KeyPressHandler() {
-      @Override
-      public void onKeyPress(KeyPressEvent event) {
-        TextBox box = (TextBox) event.getSource();
-        confirmButton.setEnabled(validator.test(box.getText()));
-      }
-    });
-
-    inputBox.addKeyDownHandler(new KeyDownHandler() {
-      @Override
-      public void onKeyDown(KeyDownEvent event) {
-        TextBox box = (TextBox) event.getSource();
-        confirmButton.setEnabled(validator.test(box.getText()));
-      }
-    });
-
-    inputBox.addKeyUpHandler(new KeyUpHandler() {
-      @Override
-      public void onKeyUp(KeyUpEvent event) {
-        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-          if (validator.test(inputBox.getText())) {
-            dialogBox.hide();
-            callback.onSuccess(inputBox.getText());
-          }
-        } else {
-          TextBox box = (TextBox) event.getSource();
-          confirmButton.setEnabled(validator.test(box.getText()));
-        }
+        validatePromptInput(errorPanel, isValid, box.getText(), validatorErrorMessage);
       }
     });
 
@@ -302,6 +300,24 @@ public class Dialogs {
     dialogBox.center();
     dialogBox.show();
     inputBox.setFocus(true);
+  }
+
+  private static void validatePromptInput(SimplePanel errorPanel, boolean isValid, String text, String errorMessage) {
+    if (isValid) {
+      errorPanel.clear();
+    } else {
+      HTML htmlMessage;
+      GWT.log(text);
+      errorPanel.clear();
+      if (StringUtils.isNotBlank(text)) {
+        htmlMessage = new HTML(SafeHtmlUtils.fromSafeConstant(errorMessage));
+      } else {
+        htmlMessage = new HTML(messages.promptDialogEmptyInputError());
+      }
+      htmlMessage.addStyleName("form-help");
+      htmlMessage.addStyleName("error");
+      errorPanel.add(htmlMessage);
+    }
   }
 
   public static void showPromptDialogSuggest(String title, String message, String placeHolder, String cancelButtonText,

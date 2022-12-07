@@ -58,6 +58,9 @@
 				<g:Button styleName="btn btn-refresh advancedSearchCleanButton" ui:field="searchAdvancedClean">
 					<ui:text from='{messages.clearButton}' />
 				</g:Button>
+				<g:Button styleName="btn btn-bookmark advancedSearchCleanButton" ui:field="searchAdvancedSave">
+					<ui:text from='{messages.saveButton}' />
+				</g:Button>
 			</g:FlowPanel>
 		</g:FlowPanel>
 		<g:FlowPanel addStyleNames="searchPreFilters" ui:field="searchPreFilters" />

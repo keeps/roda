@@ -515,6 +515,11 @@
             <version>${springboot.version}</version>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.fusesource.restygwt</groupId>
+            <artifactId>restygwt</artifactId>
+            <version>2.2.7</version>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>

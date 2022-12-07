@@ -726,6 +726,10 @@ pre code {
     top: -5px;
 }
 
+.form-help.error {
+  color: #D20707;
+}
+
 .form-radiobutton + .form-help {
     margin-left: 20px;
 }
@@ -996,6 +1000,10 @@ pre code {
 
 .btn-refresh:after {
     content: "\f021";
+}
+
+.btn-bookmark:after {
+  content: "\f02e";
 }
 
 .btn-times-circle:after {

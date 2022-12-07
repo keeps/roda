@@ -464,6 +464,10 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
       if (action.equals(SearchAipAction.SEARCH_DESCENDANTS)) {
         List<String> searchFilters = new ArrayList<>();
 
+        searchFilters.add(RodaConstants.SEARCH_WITH_PREFILTER_HANDLER);
+        searchFilters.add("title");
+        searchFilters.add(messages.searchPrefilterDescendantsOf(object.getTitle()));
+
         searchFilters.add(SearchFilters.classesToHistoryTokens(IndexedAIP.class));
         searchFilters.add(RodaConstants.AIP_ANCESTORS);
         searchFilters.add(object.getId());
@@ -479,6 +483,10 @@ public class NavigationToolbar<T extends IsIndexed> extends Composite implements
         HistoryUtils.newHistory(Search.RESOLVER, searchFilters);
       } else if (action.equals(SearchAipAction.SEARCH_PACKAGE)) {
         List<String> searchFilters = new ArrayList<>();
+
+        searchFilters.add(RodaConstants.SEARCH_WITH_PREFILTER_HANDLER);
+        searchFilters.add("title");
+        searchFilters.add(messages.searchPreFilterInThisPackage(object.getTitle()));
 
         searchFilters.add(SearchFilters.classesToHistoryTokens(IndexedRepresentation.class));
         searchFilters.add(RodaConstants.REPRESENTATION_AIP_ID);

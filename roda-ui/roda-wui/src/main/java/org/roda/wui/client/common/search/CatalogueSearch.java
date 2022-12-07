@@ -14,8 +14,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.common.SavedSearch;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.AIPState;
@@ -29,6 +32,7 @@ import org.roda.wui.client.common.actions.RepresentationActions;
 import org.roda.wui.client.common.lists.utils.AsyncTableCellOptions;
 import org.roda.wui.client.common.lists.utils.ConfigurableAsyncTableCell;
 import org.roda.wui.client.common.lists.utils.ListBuilder;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.StringUtils;
@@ -46,22 +50,32 @@ public class CatalogueSearch extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  private static final SavedSearchCodec codec = GWT.create(SavedSearchCodec.class);
 
   private static final List<Class<? extends IsIndexed>> searchableClasses = Arrays.asList(IndexedAIP.class,
-    IndexedRepresentation.class, IndexedFile.class);
+      IndexedRepresentation.class, IndexedFile.class);
 
   @UiField(provided = true)
   SearchWrapper searchWrapper;
 
+  private Supplier<Map<String, Filter>> createClassFilters() {
+    Map<String, Filter> classFilters = new HashMap<>();
+    for (Class<? extends IsIndexed> searchableClass : searchableClasses) {
+      classFilters.put(searchableClass.getSimpleName(), Filter.ALL);
+    }
+    return () -> classFilters;
+  }
+
   public CatalogueSearch(List<String> filterHistoryTokens, boolean justActive, String itemsListId,
-    String representationsListId, String filesListId, Permissions permissions, boolean startHidden,
-    boolean redirectOnSingleResult) {
+      String representationsListId, String filesListId, Permissions permissions, boolean startHidden,
+      boolean redirectOnSingleResult) {
 
     // get classes to show and preFilters to use
     Map<String, Filter> classFilters;
     if (!filterHistoryTokens.isEmpty()) {
-      classFilters = parseFilters(filterHistoryTokens);
-      redirectOnSingleResult = redirectOnSingleResult && classFilters.keySet().size() <= 1;
+      classFilters = parseFilters(filterHistoryTokens).orElseGet(() -> createClassFilters().get());
+      redirectOnSingleResult = calculateRedirectOnSingleResult(filterHistoryTokens, classFilters,
+          redirectOnSingleResult);
     } else {
       classFilters = new HashMap<>();
       for (Class<? extends IsIndexed> searchableClass : searchableClasses) {
@@ -78,36 +92,36 @@ public class CatalogueSearch extends Composite {
         Filter filter = classFilters.get(searchableClass.getSimpleName());
         ListBuilder<?> listBuilder = null;
         if (searchableClass.equals(IndexedAIP.class)
-          && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
+            && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_AIP)) {
 
           listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
-            new AsyncTableCellOptions<>(IndexedAIP.class, itemsListId)
-              .withActionable(AipActions.getWithoutNoAipActions(null, AIPState.ACTIVE, permissions))
-              .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
-              .withFilter(filter).withStartHidden(startHidden));
+              new AsyncTableCellOptions<>(IndexedAIP.class, itemsListId)
+                  .withActionable(AipActions.getWithoutNoAipActions(null, AIPState.ACTIVE, permissions))
+                  .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
+                  .withFilter(filter).withStartHidden(startHidden));
         } else if (searchableClass.equals(IndexedRepresentation.class)
-          && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)) {
+            && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_REPRESENTATION)) {
 
           listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
-            new AsyncTableCellOptions<>(IndexedRepresentation.class, representationsListId)
-              .withActionable(RepresentationActions.getWithoutNoRepresentationActions(null, null))
-              .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
-              .withFilter(filter).withStartHidden(startHidden));
+              new AsyncTableCellOptions<>(IndexedRepresentation.class, representationsListId)
+                  .withActionable(RepresentationActions.getWithoutNoRepresentationActions(null, null))
+                  .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
+                  .withFilter(filter).withStartHidden(startHidden));
         } else if (searchableClass.equals(IndexedFile.class)
-          && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_FILE)) {
+            && PermissionClientUtils.hasPermissions(RodaConstants.PERMISSION_METHOD_FIND_FILE)) {
 
           listBuilder = new ListBuilder<>(() -> new ConfigurableAsyncTableCell<>(),
-            new AsyncTableCellOptions<>(IndexedFile.class, filesListId)
-              .withActionable(FileActions.getWithoutNoFileActions(null, null, null, null))
-              .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
-              .withFilter(filter).withStartHidden(startHidden));
+              new AsyncTableCellOptions<>(IndexedFile.class, filesListId)
+                  .withActionable(FileActions.getWithoutNoFileActions(null, null, null, null))
+                  .withRedirectOnSingleResult(redirectOnSingleResult).withJustActive(justActive).bindOpener()
+                  .withFilter(filter).withStartHidden(startHidden));
         }
 
         if (listBuilder != null) {
           if (preselectedDropdownValue == null) {
             preselectedDropdownValue = searchableClass.getSimpleName();
           }
-          searchWrapper.createListAndSearchPanel(listBuilder);
+          searchWrapper.createListAndSearchPanel(listBuilder, true);
         }
       }
     }
@@ -120,17 +134,49 @@ public class CatalogueSearch extends Composite {
   }
 
   public CatalogueSearch(boolean justActive, String itemsListId, String representationsListId, String filesListId,
-    Permissions permissions, boolean startHidden, boolean redirectOnSingleResult) {
+      Permissions permissions, boolean startHidden, boolean redirectOnSingleResult) {
     this(Collections.emptyList(), justActive, itemsListId, representationsListId, filesListId, permissions, startHidden,
-      redirectOnSingleResult);
+        redirectOnSingleResult);
   }
 
   public void refresh() {
     searchWrapper.refreshCurrentList();
   }
 
-  private Map<String, Filter> parseFilters(List<String> historyTokens) {
+  private boolean calculateRedirectOnSingleResult(List<String> historyTokens, Map<String, Filter> classFilters,
+      boolean redirectOnSingleResult) {
+    if (historyTokens.get(0).startsWith("$")) {
+      return false;
+    }
 
+    return redirectOnSingleResult && classFilters.keySet().size() <= 1;
+  }
+
+  private Optional<Map<String, Filter>> parseFilters(List<String> historyTokens) {
+    if (historyTokens.get(0).startsWith("$")) {
+      return handleSavedSearch(historyTokens);
+    } else if (historyTokens.get(0).startsWith("@")) {
+      return handlePreFilterSearch(historyTokens);
+    } else {
+      logger.error("setFilter can not handle tokens: " + historyTokens);
+    }
+
+    return Optional.empty();
+  }
+
+  private Optional<Map<String, Filter>> handleSavedSearch(List<String> historyTokens) {
+    Map<String, Filter> classFilters = new HashMap<>();
+    if (historyTokens.size() == 2) {
+      String jsonValue = JavascriptUtils.decodeBase64(historyTokens.get(1));
+      SavedSearch decode = codec.decode(jsonValue);
+      classFilters.put(decode.getSearchClassName(), decode.getFilter());
+      return Optional.of(classFilters);
+    } else {
+      return Optional.empty();
+    }
+  }
+
+  private Optional<Map<String, Filter>> handlePreFilterSearch(List<String> historyTokens) {
     // classSimpleName -> filter
     Map<String, Filter> classFilters = new HashMap<>();
     ListIterator<String> tokens = historyTokens.listIterator();
@@ -174,7 +220,7 @@ public class CatalogueSearch extends Composite {
             }
           } else {
             logger.error("Could not parse filter (" + StringUtils.join(filterTokens, "/") + ") for classes "
-              + StringUtils.join(classes, ", ") + ". List of tokens: " + StringUtils.join(historyTokens, "/"));
+                + StringUtils.join(classes, ", ") + ". List of tokens: " + StringUtils.join(historyTokens, "/"));
           }
         }
       } else {
@@ -183,6 +229,6 @@ public class CatalogueSearch extends Composite {
       }
     }
 
-    return classFilters;
+    return Optional.of(classFilters);
   }
 }

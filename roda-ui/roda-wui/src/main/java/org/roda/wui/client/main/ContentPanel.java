@@ -251,5 +251,4 @@ public class ContentPanel extends SimplePanel {
     // title.setText(tokenI18N);
     Window.setTitle(messages.windowTitle(tokenI18N));
   }
-
 }
