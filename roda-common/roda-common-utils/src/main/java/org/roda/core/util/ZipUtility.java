@@ -88,7 +88,7 @@ public final class ZipUtility {
 
       while (zipEntry != null) {
         // for each entry to be extracted
-        String entryName = FilenameUtils.normalize(zipEntry.getName());
+        String entryName = FilenameUtils.getName(zipEntry.getName());
         LOGGER.debug("Extracting {}", entryName);
 
         File newFile = new File(outputDir, entryName);
