@@ -873,6 +873,12 @@
                 <groupId>org.glassfish.jersey.ext</groupId>
                 <artifactId>jersey-spring3</artifactId>
                 <version>2.25.1</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-context</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>javax.ws.rs</groupId>
