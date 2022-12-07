@@ -10,7 +10,7 @@
 		<relativePath>../..</relativePath>
 	</parent>
 	<properties>
-		<io.prometheus.version>0.9.0</io.prometheus.version>
+		<io.prometheus.version>0.16.0</io.prometheus.version>
 	</properties>
 	<profiles>
 		<profile>
