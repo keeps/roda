@@ -283,7 +283,7 @@ public class ShowJobReport extends Composite {
         attributeLabel.setStyleName("label");
         panelBody.add(attributeLabel);
         if (reportItem.isHtmlPluginDetails()) {
-          attributeValue = new HTML(SafeHtmlUtils.fromString(reportItem.getPluginDetails()));
+          attributeValue = new HTML(SafeHtmlUtils.fromTrustedString(reportItem.getPluginDetails()));
         } else {
           attributeValue = new Label(reportItem.getPluginDetails());
         }
