@@ -2052,7 +2052,7 @@ public class ModelService extends ModelObservable {
 
     try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(logDirectory);
       SecureString password = new SecureString(
-        RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_MASTER_PASS, "").toCharArray())) {
+        RodaCoreFactory.getProperty(RodaConstants.CORE_ACTION_LOGS_PRIMARY_PASS, "").toCharArray())) {
       for (Path path : directoryStream) {
         if (!path.equals(currentLogFile)) {
           int httpExitCode = RESTClientUtility.sendPostRequestWithFile(url, resource, username, password, path);

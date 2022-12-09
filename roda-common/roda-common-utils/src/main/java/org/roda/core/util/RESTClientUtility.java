@@ -43,6 +43,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.SecureString;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.accessToken.AccessToken;
@@ -63,7 +64,7 @@ public final class RESTClientUtility {
   }
 
   public static <T extends Serializable> T sendPostRequest(T element, Class<T> elementClass, String url,
-    String resource, String username, String password) throws RODAException {
+                                                           String resource, String username, String password) throws RODAException {
     CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     String basicAuthToken = new String(Base64.encode((username + ":" + password).getBytes()));
     HttpPost httpPost = new HttpPost(url + resource);
@@ -88,6 +89,84 @@ public final class RESTClientUtility {
     }
   }
 
+  public static <T extends Serializable> T sendPostRequest(Object element, Class<T> elementClass, String url,
+                                                           String resource, AccessToken accessToken) throws GenericException {
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+    HttpPost httpPost = new HttpPost(url + resource);
+    httpPost.addHeader("Authorization", "Bearer " + accessToken.getToken());
+    httpPost.addHeader("content-type", "application/json");
+    httpPost.addHeader("Accept", "application/json");
+
+    try {
+      httpPost.setEntity(new StringEntity(JsonUtils.getJsonFromObject(element)));
+      HttpResponse response;
+      response = httpClient.execute(httpPost);
+      HttpEntity responseEntity = response.getEntity();
+
+      int responseStatusCode = response.getStatusLine().getStatusCode();
+      if (responseStatusCode == 200) {
+        if (elementClass != null) {
+          return JsonUtils.getObjectFromJson(responseEntity.getContent(), elementClass);
+        } else {
+          return null;
+        }
+      } else {
+        throw new GenericException("POST request response status code: " + responseStatusCode);
+      }
+    } catch (IOException e) {
+      throw new GenericException("Error sending POST request", e);
+    }
+  }
+
+  public static int sendPostRequestWithCompressedFile(String url, String resource, Path path, AccessToken accessToken)
+          throws RODAException, IOException {
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+
+    HttpPost httpPost = new HttpPost(url + resource);
+    httpPost.addHeader("Authorization", "Bearer " + accessToken.getToken());
+
+    InputStream inputStream = Files.newInputStream(path.toFile().toPath());
+    MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+    builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+    builder.addBinaryBody(RodaConstants.API_QUERY_KEY_FILE, inputStream, ContentType.create("application/zip"),
+            path.getFileName().toString());
+
+    HttpEntity entity = builder.build();
+
+    try {
+      httpPost.setEntity(entity);
+      HttpResponse response = httpClient.execute(httpPost);
+
+      return response.getStatusLine().getStatusCode();
+
+    } catch (IOException e) {
+      throw new RODAException("Error sending POST request", e);
+    }
+  }
+
+  public static JsonNode sendPostRequest(String url, String resource, Object object) throws GenericException {
+    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+    HttpPost httpPost = new HttpPost(url + resource);
+    httpPost.addHeader("content-type", "application/json");
+    httpPost.addHeader("Accept", "application/json");
+
+    try {
+      httpPost.setEntity(new StringEntity(JsonUtils.getJsonFromObject(object)));
+      HttpResponse response;
+      response = httpClient.execute(httpPost);
+      HttpEntity responseEntity = response.getEntity();
+
+      int responseStatusCode = response.getStatusLine().getStatusCode();
+      if (responseStatusCode == 200) {
+        String json = EntityUtils.toString(responseEntity, StandardCharsets.UTF_8);
+        return JsonUtils.parseJson(json);
+      } else {
+        throw new GenericException("POST request response status code: " + responseStatusCode);
+      }
+    } catch (IOException e) {
+      throw new GenericException("Error sending POST request", e);
+    }
+  }
   public static int sendPostRequestWithFile(String url, String resource, String username, SecureString password,
     Path file)
     throws RODAException, FileNotFoundException {
