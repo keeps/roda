@@ -76,6 +76,7 @@ import org.apache.solr.common.cloud.ZkStateReader;
 import org.apache.zookeeper.KeeperException;
 import org.reflections.Reflections;
 import org.reflections.scanners.ResourcesScanner;
+import org.reflections.scanners.Scanners;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.roda.core.common.Messages;
@@ -657,7 +658,8 @@ public class RodaCoreFactory {
       String systemTmpDir = getSystemProperty("java.io.tmpdir", "tmp");
       Path defaultRodaWorkingDirectory = Files.createTempDirectory(Paths.get(systemTmpDir), "rodaWorkingDirectory");
       workingDirectoryPath = Paths
-        .get(getRodaConfiguration().getString("core.workingdirectory", defaultRodaWorkingDirectory.toString())).normalize();
+        .get(getRodaConfiguration().getString("core.workingdirectory", defaultRodaWorkingDirectory.toString()))
+        .normalize();
       Files.createDirectories(workingDirectoryPath);
     } catch (IOException e) {
       throw new RuntimeException("Unable to create RODA WORKING DIRECTORY " + workingDirectoryPath + ". Aborting...",
@@ -881,16 +883,16 @@ public class RodaCoreFactory {
     List<ClassLoader> classLoadersList = new LinkedList<>();
     classLoadersList.add(ClasspathHelper.contextClassLoader());
 
-    Reflections reflections = new Reflections(
-      new ConfigurationBuilder().setScanners(new ResourcesScanner()).setUrls(ClasspathHelper.forPackage(classpathPrefix,
-        ClasspathHelper.contextClassLoader(), ClasspathHelper.staticClassLoader())));
+    Reflections reflections = new Reflections(new ConfigurationBuilder()
+      .forPackage(classpathPrefix, ClasspathHelper.contextClassLoader(), ClasspathHelper.staticClassLoader())
+      .setScanners(Scanners.Resources));
 
     Set<String> resources = reflections.getResources(Pattern.compile(".*"));
     resources = resources.stream().filter(r -> !shouldExclude(r, classpathPrefix, excludePaths))
       .collect(Collectors.toSet());
 
     LOGGER.info("Copying files from classpath prefix={}, destination={}, removePrefix={}, excludePaths={}",
-      classpathPrefix, destinationDirectory, removeClasspathPrefixFromFinalPath, excludePaths, resources.size());
+      classpathPrefix, destinationDirectory, removeClasspathPrefixFromFinalPath, excludePaths);
 
     for (String resource : resources) {
 
