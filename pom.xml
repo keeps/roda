@@ -93,18 +93,17 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <build.date>${maven.build.timestamp}</build.date>
     <maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
-    <maven.compiler.target>11</maven.compiler.target>
-    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.release>17</maven.compiler.release>
     <roda.temporary.repository>${user.dir}</roda.temporary.repository>
-    <java_version>11</java_version>
+    <java_version>17</java_version>
     <gwt.version>2.10.0</gwt.version>
-    <cas.client.version>3.6.1</cas.client.version>
+    <cas.client.version>3.6.4</cas.client.version>
     <jersey.version>2.37</jersey.version>
-    <swagger.version>2.2.0</swagger.version>
-    <jackson.version>2.13.3</jackson.version>
-    <spring.version>5.3.20</spring.version>
+    <swagger.version>2.2.7</swagger.version>
+    <jackson.version>2.14.1</jackson.version>
+    <spring.version>6.0.2</spring.version>
     <grizzly.version>2.4.3</grizzly.version>
-    <solr.version>9.0.0</solr.version>
+    <solr.version>9.1.0</solr.version>
     <akka.version>2.5.26</akka.version>
     <!--<akka_management.version>0.17.0</akka_management.version> -->
     <apacheds.version>2.0.0.AM26</apacheds.version>
@@ -113,7 +112,7 @@
     <metrics.version>3.2.6</metrics.version>
     <roda_community_url>https://roda-community.org</roda_community_url>
     <testng.groups>all</testng.groups>
-    <springboot.version>2.7.2</springboot.version>
+    <springboot.version>2.7.6</springboot.version>
     <scope.gwt-dev>provided</scope.gwt-dev>
   </properties>
   <profiles>
@@ -822,12 +821,12 @@
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-text</artifactId>
-        <version>1.9</version>
+        <version>1.10.0</version>
       </dependency>
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>26.0-jre</version>
+        <version>31.1-jre</version>
       </dependency>
       <dependency>
         <groupId>org.apache.solr</groupId>
@@ -837,7 +836,7 @@
       <dependency>
         <groupId>net.sf.saxon</groupId>
         <artifactId>Saxon-HE</artifactId>
-        <version>9.9.0-1</version>
+        <version>11.4</version>
       </dependency>
       <dependency>
         <groupId>org.hamcrest</groupId>
@@ -1004,7 +1003,7 @@
       <dependency>
         <groupId>org.reflections</groupId>
         <artifactId>reflections</artifactId>
-        <version>0.9.11</version>
+        <version>0.10.2</version>
       </dependency>
       <!-- RODA Commons IP -->
       <dependency>
