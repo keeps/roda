@@ -833,6 +833,12 @@
         <artifactId>solr-solrj</artifactId>
         <version>${solr.version}</version>
       </dependency>
+      <!-- https://mvnrepository.com/artifact/org.apache.solr/solr-solrj-zookeeper -->
+      <dependency>
+        <groupId>org.apache.solr</groupId>
+        <artifactId>solr-solrj-zookeeper</artifactId>
+        <version>${solr.version}</version>
+      </dependency>
       <dependency>
         <groupId>net.sf.saxon</groupId>
         <artifactId>Saxon-HE</artifactId>

@@ -44,7 +44,7 @@ public class ZkController {
             return true;
         }
         LOGGER.trace("zkHost includes chroot");
-        String chrootPath = zkHost.substring(zkHost.indexOf("/"), zkHost.length());
+        String chrootPath = zkHost.substring(zkHost.indexOf("/"));
 
         try (SolrZkClient tmpClient = new SolrZkClient(zkHost.substring(0, zkHost.indexOf("/")), 60000, 30000);) {
             boolean exists = tmpClient.exists(chrootPath, true);
@@ -57,13 +57,13 @@ public class ZkController {
         }
     }
 
-    /**
-     * Validates if zkHost contains a chroot. See
-     * http://zookeeper.apache.org/doc/r3.2.2/zookeeperProgrammers.html#ch_zkSessions
-     */
-    public static boolean containsChroot(String zkHost) {
-        return zkHost.contains("/");
-    }
+  /**
+   * Validates if zkHost contains a chroot. See
+   * http://zookeeper.apache.org/doc/r3.2.2/zookeeperProgrammers.html#ch_zkSessions
+   */
+  public static boolean containsChroot(String zkHost) {
+    return zkHost.contains("/");
+  }
 
     public static void uploadConfig(SolrZkClient zkClient, String configName, Path dir) throws IOException {
         zkClient.uploadToZK(dir, CONFIGS_ZKNODE + "/" + configName, UPLOAD_FILENAME_EXCLUDE_PATTERN);
