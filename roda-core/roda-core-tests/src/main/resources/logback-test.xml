@@ -14,25 +14,19 @@
 	<!-- <appender-ref ref="STDOUT" /> -->
 	<!-- </logger> -->
 
-	<logger name="org.roda.core.plugins.orchestrate.akka.AkkaWorkerActor" additivity="false">
-		<level value="OFF" />
-	</logger>
+	<logger name="org.roda.core.plugins.orchestrate.akka.AkkaWorkerActor" level="off" additivity="false" />
 
-	<logger name="org.roda.core.plugins.orchestrate.akka.DeadLetterActor" additivity="false">
-		<level value="OFF" />
-	</logger>
+	<logger name="org.roda.core.plugins.orchestrate.akka.DeadLetterActor" level="off" additivity="false" />
 
-	<logger name="org.roda" additivity="false">
-		<level value="INFO" />
+	<logger name="org.roda" level="info" additivity="false">
 		<appender-ref ref="STDOUT" />
 	</logger>
 
-	<logger name="org.apache.solr" additivity="false">
-		<level value="WARN" />
+	<logger name="org.apache.solr" level="warn" additivity="false">
 		<appender-ref ref="STDOUT" />
 	</logger>
 
-	<root level="WARN">
+	<root level="warn">
 		<appender-ref ref="STDOUT" />
 	</root>
 </configuration>
