@@ -47,6 +47,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -188,13 +189,13 @@ public class ShowDisposalHold extends Composite {
         messages.dateUpdated(Humanize.formatDateTime(disposalHold.getUpdatedOn()), disposalHold.getUpdatedBy()));
     }
 
-    disposalHoldDescriptionValue.setHTML(disposalHold.getDescription());
+    disposalHoldDescriptionValue.setHTML(SafeHtmlUtils.fromString(disposalHold.getDescription()));
     disposalHoldDescriptionKey.setVisible(StringUtils.isNotBlank(disposalHold.getDescription()));
 
-    disposalHoldMandateValue.setHTML(disposalHold.getMandate());
+    disposalHoldMandateValue.setHTML(SafeHtmlUtils.fromString(disposalHold.getMandate()));
     disposalHoldMandateKey.setVisible(StringUtils.isNotBlank(disposalHold.getMandate()));
 
-    disposalHoldNotesValue.setHTML(disposalHold.getScopeNotes());
+    disposalHoldNotesValue.setHTML(SafeHtmlUtils.fromString(disposalHold.getScopeNotes()));
     disposalHoldNotesKey.setVisible(StringUtils.isNotBlank(disposalHold.getScopeNotes()));
 
     disposalHoldStateValue.setHTML(HtmlSnippetUtils.getDisposalHoldStateHtml(disposalHold));
