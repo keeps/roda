@@ -188,5 +188,4 @@ public final class RESTClientUtility {
       basicAuthToken.close();
     }
   }
-
 }
