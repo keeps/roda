@@ -33,7 +33,7 @@ services:
       # Mapping $HOME/.roda to enable usage with spring-boot mode
       - $HOME/.roda/data/storage:$HOME/.roda/data/storage:ro
       # Mapping /tmp to enable usage with local testing via mvn test
-      - /tmp:/tmp:ro
+      - /tmp:/tmp
 
   siegfried:
     image: docker.io/keeps/siegfried:v1.9.6
