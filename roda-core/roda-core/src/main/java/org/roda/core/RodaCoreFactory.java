@@ -150,6 +150,7 @@ import org.roda.core.storage.StorageServiceWrapper;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.util.IdUtils;
+import org.roda.core.data.common.SecureString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -2424,21 +2425,20 @@ public class RodaCoreFactory {
     }
   }
 
-  private static String readPassword(final String message) throws IOException {
+  private static SecureString readPassword(final String message) throws IOException {
     final Console console = System.console();
     if (console == null) {
       final BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
       System.out.print(String.format("%s (INSECURE - password will be shown): ", message));
-      return reader.readLine();
+      return new SecureString(reader.readLine().toCharArray());
     } else {
-      return new String(console.readPassword("%s: ", message));
+      return new SecureString(new String(console.readPassword("%s: ", message)).toCharArray());
     }
   }
 
   private static void resetAdminAccess() throws GenericException {
-    try {
-      final String password = readPassword("New admin password");
-      final String passwordConfirmation = readPassword("Repeat admin password");
+    try (SecureString password = readPassword("New admin password");
+      SecureString passwordConfirmation = readPassword("Repeat admin password")) {
       if (password.equals(passwordConfirmation)) {
         RodaCoreFactory.ldapUtility.resetAdminAccess(password);
         try {

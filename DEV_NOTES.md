@@ -27,9 +27,7 @@ TCPAddr localhost" | sudo tee /etc/clamav/clamd.conf
 ```bash
 # If never GWT compiled before, compile once and copy gwt.rpc files
 mvn -pl roda-ui/roda-wui -am gwt:compile -Pdebug-main -Dscope.gwt-dev=compile
-cd roda-ui/roda-wui
-./copy_gwt_rpc.sh
-cd -
+./roda-ui/roda-wui/copy_gwt_rpc.sh
 
 # Start up dependencies (Solr, Zookeeper, Siegfried, ClamAV)
 mkdir -p $HOME/.roda/data/storage

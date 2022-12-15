@@ -12,6 +12,7 @@ package org.roda.wui.client.management;
 
 import java.util.List;
 
+import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.user.User;
@@ -107,22 +108,23 @@ public class CreateUser extends Composite {
   void buttonApplyHandler(ClickEvent e) {
     if (userDataPanel.isValid()) {
       user = userDataPanel.getUser();
-      final String password = userDataPanel.getPassword();
+      try (SecureString password = new SecureString(userDataPanel.getPassword().toCharArray())) {
 
-      UserManagementService.Util.getInstance().createUser(user, password, userDataPanel.getExtra(),
-        new AsyncCallback<User>() {
+        UserManagementService.Util.getInstance().createUser(user, password, userDataPanel.getExtra(),
+          new AsyncCallback<User>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            errorMessage(caught);
-          }
+            @Override
+            public void onFailure(Throwable caught) {
+              errorMessage(caught);
+            }
 
-          @Override
-          public void onSuccess(User createdUser) {
-            HistoryUtils.newHistory(MemberManagement.RESOLVER);
-          }
+            @Override
+            public void onSuccess(User createdUser) {
+              HistoryUtils.newHistory(MemberManagement.RESOLVER);
+            }
 
-        });
+          });
+      }
     }
   }
 

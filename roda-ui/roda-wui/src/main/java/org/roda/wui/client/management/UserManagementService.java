@@ -27,6 +27,7 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.data.common.SecureString;
 import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
 
@@ -102,7 +103,7 @@ public interface UserManagementService extends RemoteService {
    * @throws EmailAlreadyExistsException
    * @throws RecaptchaException
    */
-  public User registerUser(User user, String password, String captcha, UserExtraBundle extra, String localeString)
+  public User registerUser(User user, SecureString password, String captcha, UserExtraBundle extra, String localeString)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, RecaptchaException,
     AuthorizationDeniedException;
 
@@ -120,9 +121,9 @@ public interface UserManagementService extends RemoteService {
    * @throws UserAlreadyExistsException
    * @throws GenericException
    */
-  public User createUser(User user, String password, UserExtraBundle extra)
-    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException,
-    IllegalOperationException, RequestNotValidException, ValidationException;
+  public User createUser(User user, SecureString password, UserExtraBundle extra)
+          throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException,
+          GenericException, IllegalOperationException, RequestNotValidException, ValidationException;
 
   /**
    * Modify a user
@@ -136,8 +137,8 @@ public interface UserManagementService extends RemoteService {
    * @throws AlreadyExistsException
    * @throws GenericException
    */
-  public void updateUser(User user, String password, UserExtraBundle extra) throws AuthorizationDeniedException,
-    NotFoundException, AlreadyExistsException, GenericException, ValidationException, RequestNotValidException;
+  public void updateUser(User user, SecureString password, UserExtraBundle extra)
+          throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException, ValidationException, RequestNotValidException;
 
   /**
    * Modify the authenticated user
@@ -152,9 +153,8 @@ public interface UserManagementService extends RemoteService {
    * @throws GenericException
    * @throws IllegalOperationException
    */
-  public User updateMyUser(User user, String password, UserExtraBundle extra)
-    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException,
-    IllegalOperationException, ValidationException, RequestNotValidException;
+  public User updateMyUser(User user, SecureString password, UserExtraBundle extra) throws AuthorizationDeniedException,
+          NotFoundException, AlreadyExistsException, GenericException, IllegalOperationException, ValidationException, RequestNotValidException;
 
   /**
    * Try to remove a user, if user cannot be removed it will be deactivated
@@ -261,7 +261,7 @@ public interface UserManagementService extends RemoteService {
    * @throws NotFoundException
    * @throws GenericException
    */
-  public void resetUserPassword(String username, String password, String resetPasswordToken)
+  public void resetUserPassword(String username, SecureString password, String resetPasswordToken)
     throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException,
     AuthorizationDeniedException;
 

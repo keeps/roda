@@ -42,6 +42,7 @@ import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.base.ingest.v2.MinimalIngestPlugin;
 import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.data.common.SecureString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Assert;
@@ -109,7 +110,9 @@ public class UserPermissionsPluginTest {
 
     User user = new User("random_user", "random_user", "random@test.com", false);
     user.addGroup(RodaConstants.ADMINISTRATORS);
-    user = model.createUser(user, "teste123", true);
+    SecureString password = new SecureString("teste123".toCharArray());
+    user = model.createUser(user, password, true);
+    password.close();
 
     Job job = TestsHelper.executeJob(MinimalIngestPlugin.class, new HashMap<>(), PluginType.SIP_TO_AIP,
       SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()), user.getName());

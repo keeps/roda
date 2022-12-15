@@ -13,6 +13,7 @@ package org.roda.wui.client.management;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.user.User;
@@ -265,32 +266,34 @@ public class ResetPassword extends Composite {
 
   private void doReset() {
     if (isValid()) {
-      UserManagementService.Util.getInstance().resetUserPassword(username.getValue(), password.getValue(),
-        token.getValue(), new AsyncCallback<Void>() {
+      try (SecureString securePassword = new SecureString(password.getValue().toCharArray())) {
+        UserManagementService.Util.getInstance().resetUserPassword(username.getValue(), securePassword,
+          token.getValue(), new AsyncCallback<Void>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            errorMessage(caught);
-          }
+            @Override
+            public void onFailure(Throwable caught) {
+              errorMessage(caught);
+            }
 
-          @Override
-          public void onSuccess(Void result) {
-            Dialogs.showInformationDialog(messages.resetPasswordSuccessDialogTitle(),
-              messages.resetPasswordSuccessDialogMessage(), messages.resetPasswordSuccessDialogButton(), false,
-              new AsyncCallback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+              Dialogs.showInformationDialog(messages.resetPasswordSuccessDialogTitle(),
+                messages.resetPasswordSuccessDialogMessage(), messages.resetPasswordSuccessDialogButton(), false,
+                new AsyncCallback<Void>() {
 
-                @Override
-                public void onSuccess(Void result) {
-                  HistoryUtils.newHistory(Login.RESOLVER);
-                }
+                  @Override
+                  public void onSuccess(Void result) {
+                    HistoryUtils.newHistory(Login.RESOLVER);
+                  }
 
-                @Override
-                public void onFailure(Throwable caught) {
-                  HistoryUtils.newHistory(Login.RESOLVER);
-                }
-              });
-          }
-        });
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    HistoryUtils.newHistory(Login.RESOLVER);
+                  }
+                });
+            }
+          });
+      }
     }
   }
 

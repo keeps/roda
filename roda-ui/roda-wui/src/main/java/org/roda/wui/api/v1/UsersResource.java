@@ -39,6 +39,7 @@ import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RODAUsers;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.data.common.SecureString;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.controllers.UserManagement;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
@@ -106,12 +107,15 @@ public class UsersResource {
     throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
+
     // get user
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    User createdUser = UserManagement.createUser(user, newUser, password, null);
-    return Response.ok(createdUser, mediaType).build();
+    try(SecureString safePassword = new SecureString(password.toCharArray())){
+      User createdUser = UserManagement.createUser(user, newUser, safePassword, null);
+      return Response.ok(createdUser, mediaType).build();
+    }
   }
 
   @PUT
@@ -136,8 +140,11 @@ public class UsersResource {
     modifiedUser = JsonUtils.getObjectFromJson(sanitize, User.class);
 
     // delegate action to controller
-    UserManagement.updateUser(user, modifiedUser, password, null);
-    return Response.ok(modifiedUser, mediaType).build();
+
+    try(SecureString safePassword = new SecureString(password.toCharArray())){
+      UserManagement.updateUser(user, modifiedUser, safePassword, null);
+      return Response.ok(modifiedUser, mediaType).build();
+    }
   }
 
   @GET
