@@ -8,8 +8,7 @@
 package org.roda.wui.client.common.utils;
 
 import com.google.gwt.core.client.JavaScriptObject;
-
-import java.util.Date;
+import com.google.gwt.json.client.JSONValue;
 
 public class JavascriptUtils {
 
@@ -370,6 +369,21 @@ public class JavascriptUtils {
     $wnd.jQuery('.searchAdvancedPanel input').val('');
   }-*/;
 
+  public static native void copyURLToClipboard() /*-{
+    var textArea = document.createElement("textarea");
+    textArea.value = $wnd.location.href;
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+  }-*/;
+
+  public static native void exportStaticMethod() /*-{
+  $wnd.share =
+          $entry(@org.roda.wui.client.common.utils.SavedSearchUtils::share());
+  }-*/;
+
   public static native void copyToClipboard(String elementId) /*-{
     var selection = $wnd.getSelection();
     var text = $doc.getElementById(elementId);
@@ -406,10 +420,68 @@ public class JavascriptUtils {
     }
   }-*/;
 
-  public static final native void print(String html) /*-{
+  public static native void print(String html) /*-{
     top.consoleRef=$wnd.open('','_blank', "");
     top.consoleRef.document.write(html);
     top.consoleRef.print();
     top.consoleRef.document.close()
 }-*/;
+
+  public static native String encodeBase64(JSONValue jsonValue) /*-{
+  if (!jsonValue) return jsonValue;
+    var b64="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+    var d=new Map();
+    var s=unescape(encodeURIComponent(jsonValue)).split("");
+    var word=s[0];
+    var num=256;
+    var key;
+    var o=[];
+    function out(word,num) {
+        key=word.length>1 ? d.get(word) : word.charCodeAt(0);
+        o.push(b64[key&0x3f]);
+        o.push(b64[(key>>6)&0x3f]);
+        o.push(b64[(key>>12)&0x3f]);
+    }
+    for (var i=1; i<s.length; i++) {
+        var c=s[i];
+        if (d.has(word+c)) {
+            word+=c;
+        } else {
+            d.set(word+c,num++);
+            out(word,num);
+            word=c;
+            if(num==(1<<18)-1) {
+                d.clear();
+               num=256;
+            }
+        }
+    }
+    out(word);
+    return o.join("");
+  }-*/;
+
+  public static native String decodeBase64(String s) /*-{
+    var b64="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+    var b64d={};
+    for(var i=0; i<64; i++){
+        b64d[b64.charAt(i)]=i;
+    }
+    var d=new Map();
+    var num=256;
+    var word=String.fromCharCode(b64d[s[0]]+(b64d[s[1]]<<6)+(b64d[s[2]]<<12));
+    var prev=word;
+    var o=[word];
+    for(var i=3; i<s.length; i+=3) {
+        var key=b64d[s[i]]+(b64d[s[i+1]]<<6)+(b64d[s[i+2]]<<12);
+        word=key<256 ? String.fromCharCode(key) : d.has(key) ? d.get(key) : word+word.charAt(0);
+        o.push(word);
+        d.set(num++, prev+word.charAt(0));
+        prev=word;
+        if(num==(1<<18)-1) {
+            d.clear();
+            num=256;
+       }
+   }
+   return decodeURIComponent(escape(o.join("")));
+  }-*/;
 }

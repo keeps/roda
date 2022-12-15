@@ -1,27 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<name>roda-wui</name>
-	<artifactId>roda-wui</artifactId>
-	<parent>
-		<groupId>org.roda-project</groupId>
-		<artifactId>roda-ui</artifactId>
-		<version>5.0.0-SNAPSHOT</version>
-		<relativePath>..</relativePath>
-	</parent>
-	<properties>
-		<gwt.module.main>org.roda.wui.RodaWUI</gwt.module.main>
-		<gwt.module.portal>org.roda.wui.RodaWUIPortal</gwt.module.portal>
-	</properties>
-	<packaging>war</packaging>
-	<profiles>
-		<profile>
-			<id>default</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <name>roda-wui</name>
+    <artifactId>roda-wui</artifactId>
+    <parent>
+        <groupId>org.roda-project</groupId>
+        <artifactId>roda-ui</artifactId>
+        <version>5.0.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
+    </parent>
+    <properties>
+        <gwt.module.main>org.roda.wui.RodaWUI</gwt.module.main>
+        <gwt.module.portal>org.roda.wui.RodaWUIPortal</gwt.module.portal>
+    </properties>
+    <packaging>war</packaging>
+    <profiles>
+        <profile>
+            <id>default</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
 
                     <!-- GWT Maven Plugin -->
                     <plugin>
@@ -410,10 +411,10 @@
             <groupId>org.roda-project</groupId>
             <artifactId>roda-core</artifactId>
             <exclusions>
-<!--                <exclusion>-->
-<!--                    <artifactId>*</artifactId>-->
-<!--                    <groupId>org.eclipse.jetty</groupId>-->
-<!--                </exclusion>-->
+                <!--                <exclusion>-->
+                <!--                    <artifactId>*</artifactId>-->
+                <!--                    <groupId>org.eclipse.jetty</groupId>-->
+                <!--                </exclusion>-->
                 <exclusion>
                     <artifactId>saxon</artifactId>
                     <groupId>net.sf.saxon</groupId>
@@ -626,6 +627,11 @@
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
             <version>0.9.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.fusesource.restygwt</groupId>
+            <artifactId>restygwt</artifactId>
+            <version>2.2.7</version>
         </dependency>
     </dependencies>
     <dependencyManagement>

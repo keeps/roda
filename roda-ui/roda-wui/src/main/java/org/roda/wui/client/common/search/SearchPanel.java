@@ -13,21 +13,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gwt.regexp.shared.RegExp;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.common.SavedSearch;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
 import org.roda.core.data.v2.index.filter.OrFiltersParameters;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.model.ActionableObject;
 import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.popup.CalloutPopup;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.tools.ConfigurationManager;
+import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 import com.google.gwt.core.client.GWT;
@@ -61,6 +67,8 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static final Binder binder = GWT.create(Binder.class);
+
+  private static final SavedSearchCodec codec = GWT.create(SavedSearchCodec.class);
 
   interface Binder extends UiBinder<Widget, SearchPanel> {
   }
@@ -96,6 +104,9 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
   Button searchAdvancedClean;
 
   @UiField
+  Button searchAdvancedSave;
+
+  @UiField
   FlowPanel searchPreFilters;
 
   @UiField
@@ -127,8 +138,8 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
   }
 
   SearchPanel(AsyncTableCell<T> list, Filter defaultFilter, String allFilter, boolean incremental, String placeholder,
-    boolean showSearchInputListBox, Actionable<T> actionable,
-    AsyncCallback<Actionable.ActionImpact> actionableCallback) {
+    boolean showSearchInputListBox, Actionable<T> actionable, AsyncCallback<Actionable.ActionImpact> actionableCallback,
+    boolean showSaveButton) {
     this.defaultFilter = defaultFilter;
     this.allFilter = allFilter;
     this.defaultFilterIncremental = incremental;
@@ -255,6 +266,10 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
     drawSearchPreFilters();
 
     updateRightButtonsCss();
+
+    if (!showSaveButton) {
+      searchAdvancedSave.setVisible(false);
+    }
   }
 
   /**
@@ -287,6 +302,29 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
   @UiHandler("searchAdvancedClean")
   void handleSearchAdvancedClean(ClickEvent e) {
     JavascriptUtils.cleanAdvancedSearch();
+  }
+
+  @UiHandler("searchAdvancedSave")
+  void handleSearchAdvancedSave(ClickEvent e) {
+    SavedSearch savedSearch = new SavedSearch();
+    savedSearch.setFilter(buildSearchFilter());
+    if (searchPanelSelectionDropdownWrapper.getWidget() instanceof Dropdown) {
+      String selectedValue = ((Dropdown) searchPanelSelectionDropdownWrapper.getWidget()).getSelectedValue();
+      savedSearch.setSearchClassName(selectedValue);
+    } else {
+      savedSearch.setSearchClassName(IndexedAIP.class.getSimpleName());
+    }
+
+    Dialogs.showPromptDialog(messages.saveSearchTitle(), messages.saveSearchDescription(), "", "",
+      RegExp.compile("^[^/]+$"), messages.promptDialogErrorMessageForSavedSearchTitle(), messages.cancelButton(),
+      messages.saveButton(), true, false, new NoAsyncCallback<String>() {
+        @Override
+        public void onSuccess(String title) {
+          savedSearch.setTitle(title);
+          String base64String = JavascriptUtils.encodeBase64(codec.encode(savedSearch));
+          HistoryUtils.newHistory(Search.RESOLVER, RodaConstants.SEARCH_WITH_SAVED_HANDLER, base64String);
+        }
+      });
   }
 
   @UiHandler("searchAdvancedGo")

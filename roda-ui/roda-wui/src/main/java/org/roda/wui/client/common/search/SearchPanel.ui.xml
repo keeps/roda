@@ -1,67 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
-	xmlns:commonsearch="urn:import:org.roda.wui.client.common.search">
+             xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
+             xmlns:commonsearch="urn:import:org.roda.wui.client.common.search">
 
-	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
+    <ui:with field='messages' type='config.i18n.client.ClientMessages'/>
 
-	<g:FlowPanel styleName="searchPanelContainer">
-		<g:FlowPanel styleName="searchPanel" ui:field="searchPanel">
-			<g:FlowPanel styleName="searchPanelLeft">
-				<g:SimplePanel ui:field="searchPanelSelectionDropdownWrapper" />
-				<commonsearch:SelectedPanel ui:field="searchSelectedPanel" />
-				<g:FlowPanel styleName="searchPanelLeftInput">
-					<g:TextBox title="{messages.searchButton}" ui:field="searchInputBox" addStyleNames="searchBox" />
-				</g:FlowPanel>
-			</g:FlowPanel>
-			<g:FlowPanel styleName="searchPanelRight" ui:field="searchPanelRight">
-				<wcag:AccessibleFocusPanel styleName="searchAdvancedDisclosureButton"
-					ui:field="searchAdvancedDisclosureButton">
-					<g:HTML addStyleNames="searchButton-html" ui:field="searchButton">
-						<span class="searchButton-html-label">
-							<ui:text from='{messages.searchButtonAdvancedSearch}' />
-						</span>
-						<span class="fa-stack fa-lg">
-							<i class="fa fa-angle-down fa-stack-1x">
-							</i>
-							<i class="fa fa-angle-up fa-stack-1x">
-							</i>
-						</span>
-					</g:HTML>
-				</wcag:AccessibleFocusPanel>
-				<wcag:AccessibleFocusPanel styleName="searchButton" ui:field="searchInputButton">
-					<g:HTML addStyleNames="searchButton-html">
-						<span class="fa-stack fa-lg">
-							<i class="fa fa-search fa-stack-1x">
-							</i>
-						</span>
-					</g:HTML>
-				</wcag:AccessibleFocusPanel>
-				<wcag:AccessibleFocusPanel styleName="actions-button searchPanelButtonsSeparator"
-					ui:field="actionsButton">
-					<g:HTML>
-						<span class="fa-stack fa-lg">
-							<i class="fa fa-ellipsis-v fa-stack-1x">
-							</i>
-						</span>
-					</g:HTML>
-				</wcag:AccessibleFocusPanel>
-			</g:FlowPanel>
-		</g:FlowPanel>
-		<g:FlowPanel addStyleNames="searchAdvancedPanel" ui:field="searchAdvancedPanel">
-			<g:FlowPanel styleName="searchAdvancedPanelButtons" ui:field="searchAdvancedPanelButtons">
-				<g:Button styleName="btn btn-plus advancedAddButton" ui:field="searchAdvancedFieldOptionsAdd">
-					<ui:text from='{messages.addSearchField}' />
-				</g:Button>
-				<g:Button styleName="btn btn-search advancedSearchButton" ui:field="searchAdvancedGo">
-					<ui:text from='{messages.searchButton}' />
-				</g:Button>
-				<g:Button styleName="btn btn-refresh advancedSearchCleanButton" ui:field="searchAdvancedClean">
-					<ui:text from='{messages.clearButton}' />
-				</g:Button>
-			</g:FlowPanel>
-		</g:FlowPanel>
-		<g:FlowPanel addStyleNames="searchPreFilters" ui:field="searchPreFilters" />
-	</g:FlowPanel>
+    <g:FlowPanel styleName="searchPanelContainer">
+        <g:FlowPanel styleName="searchPanel" ui:field="searchPanel">
+            <g:FlowPanel styleName="searchPanelLeft">
+                <g:SimplePanel ui:field="searchPanelSelectionDropdownWrapper"/>
+                <commonsearch:SelectedPanel ui:field="searchSelectedPanel"/>
+                <g:FlowPanel styleName="searchPanelLeftInput">
+                    <g:TextBox title="{messages.searchButton}" ui:field="searchInputBox" addStyleNames="searchBox"/>
+                </g:FlowPanel>
+            </g:FlowPanel>
+            <g:FlowPanel styleName="searchPanelRight" ui:field="searchPanelRight">
+                <wcag:AccessibleFocusPanel styleName="searchAdvancedDisclosureButton"
+                                           ui:field="searchAdvancedDisclosureButton">
+                    <g:HTML addStyleNames="searchButton-html" ui:field="searchButton">
+                        <span class="searchButton-html-label">
+                            <ui:text from='{messages.searchButtonAdvancedSearch}'/>
+                        </span>
+                        <span class="fa-stack fa-lg">
+                            <i class="fa fa-angle-down fa-stack-1x">
+                            </i>
+                            <i class="fa fa-angle-up fa-stack-1x">
+                            </i>
+                        </span>
+                    </g:HTML>
+                </wcag:AccessibleFocusPanel>
+                <wcag:AccessibleFocusPanel styleName="searchButton" ui:field="searchInputButton">
+                    <g:HTML addStyleNames="searchButton-html">
+                        <span class="fa-stack fa-lg">
+                            <i class="fa fa-search fa-stack-1x">
+                            </i>
+                        </span>
+                    </g:HTML>
+                </wcag:AccessibleFocusPanel>
+                <wcag:AccessibleFocusPanel styleName="actions-button searchPanelButtonsSeparator"
+                                           ui:field="actionsButton">
+                    <g:HTML>
+                        <span class="fa-stack fa-lg">
+                            <i class="fa fa-ellipsis-v fa-stack-1x">
+                            </i>
+                        </span>
+                    </g:HTML>
+                </wcag:AccessibleFocusPanel>
+            </g:FlowPanel>
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="searchAdvancedPanel" ui:field="searchAdvancedPanel">
+            <g:FlowPanel styleName="searchAdvancedPanelButtons" ui:field="searchAdvancedPanelButtons">
+                <g:Button styleName="btn btn-plus advancedAddButton" ui:field="searchAdvancedFieldOptionsAdd">
+                    <ui:text from='{messages.addSearchField}'/>
+                </g:Button>
+                <g:Button styleName="btn btn-search advancedSearchButton" ui:field="searchAdvancedGo">
+                    <ui:text from='{messages.searchButton}'/>
+                </g:Button>
+                <g:Button styleName="btn btn-refresh advancedSearchCleanButton" ui:field="searchAdvancedClean">
+                    <ui:text from='{messages.clearButton}'/>
+                </g:Button>
+                <g:Button styleName="btn btn-bookmark advancedSearchCleanButton" ui:field="searchAdvancedSave">
+                    <ui:text from='{messages.saveButton}'/>
+                </g:Button>
+            </g:FlowPanel>
+        </g:FlowPanel>
+        <g:FlowPanel addStyleNames="searchPreFilters" ui:field="searchPreFilters"/>
+    </g:FlowPanel>
 </ui:UiBinder>

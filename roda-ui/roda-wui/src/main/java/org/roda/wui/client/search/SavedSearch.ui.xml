@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+             xmlns:g="urn:import:com.google.gwt.user.client.ui"
+             xmlns:commonsearch="urn:import:org.roda.wui.client.common.search"
+             xmlns:common="urn:import:org.roda.wui.client.common">
+
+    <ui:with field='messages' type='config.i18n.client.ClientMessages' />
+
+    <g:FlowPanel styleName="search" addStyleNames="wrapper skip_padding">
+        <g:FlowPanel addStyleNames="row full_width skip_padding">
+            <g:FlowPanel addStyleNames="col_12 content">
+                <common:TitlePanel text="{messages.searchTitle}" icon="fas fa-search" />
+                <g:FlowPanel addStyleNames="page-description" ui:field="searchDescription" />
+                <common:SubTitlePanel icon="fas fa-search-plus" ui:field="subTitlePanel" />
+                <g:FlowPanel addStyleNames="page-description" ui:field="savedSearchStaticDescription" />
+                <commonsearch:CatalogueSearch ui:field="catalogueSearch" />
+            </g:FlowPanel>
+        </g:FlowPanel>
+    </g:FlowPanel>
+</ui:UiBinder>

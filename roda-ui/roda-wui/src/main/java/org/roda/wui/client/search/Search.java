@@ -13,6 +13,7 @@ package org.roda.wui.client.search;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.search.CatalogueSearch;
 import org.roda.wui.common.client.HistoryResolver;
@@ -37,7 +38,14 @@ public class Search extends Composite {
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
       if (historyTokens.size() > 1) {
-        SearchWithPreFilters.resolveToNewInstance(historyTokens, callback);
+        String searchType = historyTokens.get(0);
+        if (RodaConstants.SEARCH_WITH_SAVED_HANDLER.equals(searchType)) {
+          SavedSearch.resolveToNewInstance(historyTokens, callback);
+        } else if (RodaConstants.SEARCH_WITH_PREFILTER_HANDLER.equals(searchType)) {
+          SearchWithPreFilters.resolveToNewInstance(historyTokens, callback);
+        } else {
+          getInstance().resolve(callback);
+        }
       } else {
         getInstance().resolve(callback);
       }

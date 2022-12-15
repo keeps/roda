@@ -873,6 +873,12 @@ public interface ClientMessages extends Messages {
 
   SafeHtml searchPreFilterOneOfManyFilterParameterWithList(String searchPreFilterName, List<String> list);
 
+  SafeHtml searchPreFilterDateIntervalFilterParameter(String searchPreFilterName, String fromDate, String toDate);
+
+  SafeHtml searchPreFilterDateIntervalFilterParameterFrom(String searchPreFilterName, String fromDate);
+
+  SafeHtml searchPreFilterDateIntervalFilterParameterTo(String searchPreFilterName, String toDate);
+
   String searchPreFilterName(@Select String name);
 
   String searchPreFilterValue(@Select String name);
@@ -2150,6 +2156,21 @@ public interface ClientMessages extends Messages {
   String disposalConfirmationShowRecordsRetentionPeriodCalculationError();
 
   String updateDisposalHoldMessage();
+
+  String searchPrefilterDescendantsOf(String title);
+
+  String searchPreFilterInThisPackage(String title);
+
+  String searchPrefilterTransitiveHolds();
+
+  String genericSearchWithPrefilterTitle();
+  String saveSearchTitle();
+
+  String saveSearchDescription();
+
+  String promptDialogErrorMessageForSavedSearchTitle();
+
+  SafeHtml promptDialogEmptyInputError();
 
   /** Institution **/
 

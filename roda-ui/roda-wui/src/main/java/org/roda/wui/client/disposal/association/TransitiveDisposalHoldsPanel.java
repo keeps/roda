@@ -38,6 +38,8 @@ import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
 
+import static org.roda.core.data.common.RodaConstants.SEARCH_WITH_PREFILTER_HANDLER;
+
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
@@ -103,6 +105,9 @@ public class TransitiveDisposalHoldsPanel extends Composite {
       DisposalTransitiveHoldAIPMetadata selectedObject = tableTransitiveHolds.getSelectionModel().getSelectedObject();
       if (selectedObject != null) {
         List<String> history = new ArrayList<>();
+        history.add(SEARCH_WITH_PREFILTER_HANDLER);
+        history.add("title");
+        history.add(messages.searchPrefilterTransitiveHolds());
         history.add("@" + IndexedAIP.class.getSimpleName());
         history.add(RodaConstants.OPERATOR_OR);
 
