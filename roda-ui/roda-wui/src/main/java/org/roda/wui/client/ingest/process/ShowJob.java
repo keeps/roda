@@ -310,28 +310,29 @@ public class ShowJob extends Composite {
       String distributedMode = ConfigurationManager.getStringWithDefault(
         RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
       if (distributedMode.equals(RodaConstants.DistributedModeType.CENTRAL.name())) {
-        BrowserService.Util.getInstance().retrieveDistributedInstance(job.getInstanceId(), new NoAsyncCallback<>() {
-          @Override
-          public void onFailure(Throwable caught) {
-            BrowserService.Util.getInstance().retrieveLocalInstance(new NoAsyncCallback<LocalInstance>() {
-              @Override
-              public void onSuccess(LocalInstance localInstance) {
-                Label instanceNameLabel = new Label(localInstance.getName());
-                instanceNameLabel.addStyleName("value");
-                instancePanel.add(instanceNameLabel);
-              }
-            });
-          }
+        BrowserService.Util.getInstance().retrieveDistributedInstance(job.getInstanceId(),
+          new AsyncCallback<DistributedInstance>() {
+            @Override
+            public void onFailure(Throwable caught) {
+              BrowserService.Util.getInstance().retrieveLocalInstance(new NoAsyncCallback<LocalInstance>() {
+                @Override
+                public void onSuccess(LocalInstance localInstance) {
+                  Label instanceNameLabel = new Label(localInstance.getName());
+                  instanceNameLabel.addStyleName("value");
+                  instancePanel.add(instanceNameLabel);
+                }
+              });
+            }
 
-          @Override
-          public void onSuccess(DistributedInstance distributedInstance) {
-            Anchor anchor = new Anchor();
-            anchor.setHref(HistoryUtils.createHistoryHashLink(ShowDistributedInstance.RESOLVER, job.getInstanceId()));
-            anchor.setText(distributedInstance.getName());
-            anchor.addStyleName("btn-link");
-            instancePanel.add(anchor);
-          }
-        });
+            @Override
+            public void onSuccess(DistributedInstance distributedInstance) {
+              Anchor anchor = new Anchor();
+              anchor.setHref(HistoryUtils.createHistoryHashLink(ShowDistributedInstance.RESOLVER, job.getInstanceId()));
+              anchor.setText(distributedInstance.getName());
+              anchor.addStyleName("btn-link");
+              instancePanel.add(anchor);
+            }
+          });
       } else {
         instancePanel.setVisible(false);
       }
