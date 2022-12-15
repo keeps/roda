@@ -389,7 +389,7 @@ public class RodaCoreFactory {
       LOGGER.error("Unknown node type '{}'", nodeType);
     }
 
-    Runtime.getRuntime().addShutdownHook(new Thread(() -> shutdown()));
+    Runtime.getRuntime().addShutdownHook(new Thread(RodaCoreFactory::shutdown));
   }
 
   public static void instantiateTest(boolean deploySolr, boolean deployLdap, boolean deployTransferredResourcesScanner,

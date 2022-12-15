@@ -118,7 +118,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.typesafe.akka</groupId>
-			<artifactId>akka-testkit_2.11</artifactId>
+			<artifactId>akka-testkit_3</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
