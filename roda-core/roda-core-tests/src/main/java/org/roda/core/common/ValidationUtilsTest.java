@@ -64,7 +64,7 @@ public class ValidationUtilsTest {
   private static IndexService index;
   private static StorageService corporaService;
 
-  private static final Logger logger = LoggerFactory.getLogger(ValidationUtilsTest.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ValidationUtilsTest.class);
 
   @BeforeClass
   public static void setUp() throws IOException, URISyntaxException, GenericException {
@@ -85,7 +85,7 @@ public class ValidationUtilsTest {
     URL corporaURL = IndexServiceTest.class.getResource("/corpora");
     corporaService = new FileStorageService(Paths.get(corporaURL.toURI()));
 
-    logger.debug("Running model test under storage: {}", basePath);
+    LOGGER.debug("Running model test under storage: {}", basePath);
   }
 
   @AfterClass
