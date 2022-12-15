@@ -7,6 +7,7 @@
  */
 package org.roda.core.common;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.IsRODAObject;
 
@@ -19,10 +20,14 @@ public class SelectedItemsUtils {
   @SuppressWarnings("unchecked")
   public static <T extends IsRODAObject> Class<T> parseClass(String classNameToReturn) throws GenericException {
     Class<T> classToReturn;
-    try {
-      classToReturn = (Class<T>) Class.forName(classNameToReturn);
-    } catch (ClassNotFoundException e) {
-      throw new GenericException("Could not find class " + classNameToReturn);
+    if (RodaConstants.WHITELIST_CLASS_NAMES.contains(classNameToReturn)) {
+      try {
+        classToReturn = (Class<T>) Class.forName(classNameToReturn);
+      } catch (ClassNotFoundException e) {
+        throw new GenericException("Could not find class " + classNameToReturn);
+      }
+    } else {
+      throw new GenericException("Invalid value for classNameToReturn " + classNameToReturn);
     }
     return classToReturn;
   }
