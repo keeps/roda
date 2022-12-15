@@ -7,23 +7,26 @@
  */
 package org.roda.core.common;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-
+import jakarta.activation.DataHandler;
+import jakarta.mail.util.ByteArrayDataSource;
 import org.roda.core.RodaCoreFactory;
 
-import com.sun.mail.smtp.SMTPTransport;
+import jakarta.mail.Authenticator;
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.PasswordAuthentication;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeBodyPart;
+import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.MimeMultipart;
 
 public class ConfigurableEmailUtility {
 
@@ -34,7 +37,7 @@ public class ConfigurableEmailUtility {
   private String from;
   private String fromActor;
   private String subject;
-  private javax.mail.Authenticator authenticator = null;
+  private Authenticator authenticator = null;
   private Properties props = new Properties();
 
   public ConfigurableEmailUtility(String fromActor, String subject) {
@@ -48,7 +51,7 @@ public class ConfigurableEmailUtility {
     createSessionParameters();
   }
 
-  public void sendMail(String recipient, String message) throws MessagingException {
+  public void sendMail(String recipient, String message) throws MessagingException, IOException {
 
     if ("".equals(from)) {
       throw new MessagingException();
@@ -74,8 +77,10 @@ public class ConfigurableEmailUtility {
     mimeMultipart.addBodyPart(mimeBodyPart);
     msg.setContent(mimeMultipart);
 
+    msg.setDataHandler(new DataHandler(new ByteArrayDataSource(htmlMessage, "text/html")));
+
     // sending the message
-    SMTPTransport transport = (SMTPTransport) session.getTransport(this.protocol);
+    Transport transport = session.getTransport(this.protocol);
     transport.connect();
     transport.sendMessage(msg, msg.getAllRecipients());
     transport.close();
@@ -101,7 +106,7 @@ public class ConfigurableEmailUtility {
     }
 
     if (hasAuth) {
-      authenticator = new javax.mail.Authenticator() {
+      authenticator = new Authenticator() {
         @Override
         protected PasswordAuthentication getPasswordAuthentication() {
           return new PasswordAuthentication(user, password);
