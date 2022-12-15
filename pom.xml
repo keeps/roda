@@ -105,7 +105,6 @@
     <grizzly.version>2.4.3</grizzly.version>
     <solr.version>9.1.0</solr.version>
     <akka.version>2.5.26</akka.version>
-    <!--<akka_management.version>0.17.0</akka_management.version> -->
     <apacheds.version>2.0.0.AM26</apacheds.version>
     <httpcomponents.version>4.5.13</httpcomponents.version>
     <commons_ip2.version>2.2.1</commons_ip2.version>

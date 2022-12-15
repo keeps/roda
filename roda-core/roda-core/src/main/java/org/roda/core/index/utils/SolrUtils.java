@@ -60,7 +60,7 @@ import org.apache.solr.common.params.FacetParams;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.common.RodaUtils;
-import org.roda.core.common.UserUtility;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.DateGranularity;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;

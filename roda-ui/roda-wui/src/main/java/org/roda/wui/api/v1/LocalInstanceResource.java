@@ -22,7 +22,7 @@ import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.server.JSONP;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.UserUtility;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;

@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.common;
+package org.roda.core.model.utils;
 
 import java.io.File;
 import java.io.IOException;

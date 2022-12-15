@@ -9,9 +9,7 @@ package org.roda.core.disposal;
 
 import static org.testng.AssertJUnit.assertEquals;
 
-import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.TestsHelper;
@@ -27,13 +25,9 @@ import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
 import org.roda.core.data.v2.validation.ValidationException;
-import org.roda.core.index.IndexService;
-import org.roda.core.index.IndexServiceTest;
 import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.annotations.AfterClass;

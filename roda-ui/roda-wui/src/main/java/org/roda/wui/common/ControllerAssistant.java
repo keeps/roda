@@ -10,7 +10,7 @@ package org.roda.wui.common;
 import java.lang.reflect.Method;
 import java.util.Date;
 
-import org.roda.core.common.UserUtility;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;

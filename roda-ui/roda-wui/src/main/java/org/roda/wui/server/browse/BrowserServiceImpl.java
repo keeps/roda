@@ -24,7 +24,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.SelectedItemsUtils;
-import org.roda.core.common.UserUtility;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;

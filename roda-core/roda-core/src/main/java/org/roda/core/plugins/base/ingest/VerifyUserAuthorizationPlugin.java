@@ -10,7 +10,7 @@ package org.roda.core.plugins.base.ingest;
 import java.util.Arrays;
 import java.util.List;
 
-import org.roda.core.common.UserUtility;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;

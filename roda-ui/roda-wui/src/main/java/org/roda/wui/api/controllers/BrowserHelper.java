@@ -48,7 +48,7 @@ import org.roda.core.common.Messages;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.StreamResponse;
-import org.roda.core.common.UserUtility;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.common.monitor.TransferredResourcesScanner;

@@ -24,11 +24,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.server.JSONP;
-import org.roda.core.common.UserUtility;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
-import org.roda.core.data.v2.ip.disposal.DisposalHold;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.core.data.v2.user.User;

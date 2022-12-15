@@ -10,7 +10,7 @@ package org.roda.wui.server.management;
 import javax.servlet.http.HttpServletRequest;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.UserUtility;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;

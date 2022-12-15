@@ -26,7 +26,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.server.JSONP;
-import org.roda.core.common.UserUtility;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
@@ -36,7 +36,6 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
-import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAGroups;
 import org.roda.core.data.v2.user.RODAMember;

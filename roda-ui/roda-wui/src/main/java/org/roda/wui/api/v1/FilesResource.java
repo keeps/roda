@@ -34,7 +34,7 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.server.JSONP;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.StreamResponse;
-import org.roda.core.common.UserUtility;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;

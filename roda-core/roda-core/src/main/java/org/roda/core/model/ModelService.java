@@ -39,7 +39,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.JwtUtils;
 import org.roda.core.common.PremisV3Utils;
-import org.roda.core.common.UserUtility;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.core.common.dips.DIPUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
