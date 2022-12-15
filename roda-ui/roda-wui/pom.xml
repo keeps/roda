@@ -345,10 +345,6 @@
             <artifactId>roda-common-data</artifactId>
             <classifier>sources</classifier>
         </dependency>
-        <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-        </dependency>
 
         <!-- gwt -->
         <dependency>

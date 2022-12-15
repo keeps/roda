@@ -53,7 +53,7 @@ public final class RESTClientUtility {
   }
 
   public static <T extends Serializable> T sendPostRequest(T element, Class<T> elementClass, String url,
-                                                           String resource, String username, String password) throws RODAException {
+    String resource, String username, String password) throws RODAException {
     CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     String basicAuthToken = new String(Base64.encode((username + ":" + password).getBytes()));
     HttpPost httpPost = new HttpPost(url + resource);
@@ -79,7 +79,7 @@ public final class RESTClientUtility {
   }
 
   public static <T extends Serializable> T sendPostRequest(Object element, Class<T> elementClass, String url,
-                                                           String resource, AccessToken accessToken) throws GenericException {
+    String resource, AccessToken accessToken) throws GenericException {
     CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     HttpPost httpPost = new HttpPost(url + resource);
     httpPost.addHeader("Authorization", "Bearer " + accessToken.getToken());
@@ -108,7 +108,7 @@ public final class RESTClientUtility {
   }
 
   public static int sendPostRequestWithCompressedFile(String url, String resource, Path path, AccessToken accessToken)
-          throws RODAException, IOException {
+    throws RODAException, IOException {
     CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 
     HttpPost httpPost = new HttpPost(url + resource);
@@ -118,7 +118,7 @@ public final class RESTClientUtility {
     MultipartEntityBuilder builder = MultipartEntityBuilder.create();
     builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
     builder.addBinaryBody(RodaConstants.API_QUERY_KEY_FILE, inputStream, ContentType.create("application/zip"),
-            path.getFileName().toString());
+      path.getFileName().toString());
 
     HttpEntity entity = builder.build();
 
@@ -156,9 +156,9 @@ public final class RESTClientUtility {
       throw new GenericException("Error sending POST request", e);
     }
   }
+
   public static int sendPostRequestWithFile(String url, String resource, String username, SecureString password,
-    Path file)
-    throws RODAException, FileNotFoundException {
+    Path file) throws RODAException, FileNotFoundException {
     CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     HttpPost httpPost = new HttpPost(url + resource);
     SecureString basicAuth = new SecureString(ArrayUtils.addAll((username + ":").toCharArray(), password.getChars()));

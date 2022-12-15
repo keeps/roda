@@ -106,7 +106,7 @@
         <solr.version>9.1.0</solr.version>
         <akka.version>2.7.0</akka.version>
         <apacheds.version>2.0.0.AM26</apacheds.version>
-        <httpcomponents.version>4.5.13</httpcomponents.version>
+        <httpcomponents.version>4.5.14</httpcomponents.version>
         <commons_ip2.version>2.3.0</commons_ip2.version>
         <metrics.version>3.2.6</metrics.version>
         <roda_community_url>https://roda-community.org</roda_community_url>
@@ -488,11 +488,6 @@
                 <groupId>commons-fileupload</groupId>
                 <artifactId>commons-fileupload</artifactId>
                 <version>1.4</version>
-            </dependency>
-            <dependency>
-                <groupId>commons-httpclient</groupId>
-                <artifactId>commons-httpclient</artifactId>
-                <version>3.1</version>
             </dependency>
             <dependency>
                 <groupId>commons-io</groupId>
