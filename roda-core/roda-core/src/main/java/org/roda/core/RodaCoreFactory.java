@@ -54,6 +54,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.tree.MergeCombiner;
 import org.apache.commons.configuration.tree.NodeCombiner;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
@@ -754,7 +755,7 @@ public class RodaCoreFactory {
       String systemTmpDir = getSystemProperty("java.io.tmpdir", "tmp");
       Path defaultRodaWorkingDirectory = Files.createTempDirectory(Paths.get(systemTmpDir), "rodaWorkingDirectory");
       workingDirectoryPath = Paths
-        .get(getRodaConfiguration().getString("core.workingdirectory", defaultRodaWorkingDirectory.toString()));
+        .get(getRodaConfiguration().getString("core.workingdirectory", defaultRodaWorkingDirectory.toString())).normalize();
       Files.createDirectories(workingDirectoryPath);
     } catch (IOException e) {
       throw new RuntimeException("Unable to create RODA WORKING DIRECTORY " + workingDirectoryPath + ". Aborting...",
@@ -838,7 +839,7 @@ public class RodaCoreFactory {
     Path ret;
 
     if (StringUtils.isNotBlank(configuredPath)) {
-      ret = Paths.get(configuredPath);
+      ret = Paths.get(FilenameUtils.normalize(configuredPath));
     } else {
       ret = basePath.resolve(directoryName);
     }
@@ -2553,7 +2554,7 @@ public class RodaCoreFactory {
   private static void mainConfigsTasks(final List<String> args) {
     if ("generatePluginsMarkdown".equals(args.get(0)) && args.size() == 4 && StringUtils.isNotBlank(args.get(1))
       && StringUtils.isNotBlank(args.get(2)) && StringUtils.isNotBlank(args.get(3))
-      && Files.exists(Paths.get(args.get(3)))) {
+      && Files.exists(Paths.get(FilenameUtils.normalize(args.get(3))))) {
 
       List<Pair<String, String>> pluginsNameAndState = new ArrayList<>();
 
@@ -2567,7 +2568,7 @@ public class RodaCoreFactory {
 
         String pluginsMarkdown = PluginManager.getPluginsInformationAsMarkdown(pluginsNameAndState);
         try {
-          Files.write(Paths.get(args.get(3), "README.md"), pluginsMarkdown.getBytes());
+          Files.write(Paths.get(FilenameUtils.normalize(args.get(3)), "README.md"), pluginsMarkdown.getBytes());
         } catch (IOException e) {
           System.err
             .println("Error while writing plugin/plugins information in markdown format! Reason: " + e.getMessage());

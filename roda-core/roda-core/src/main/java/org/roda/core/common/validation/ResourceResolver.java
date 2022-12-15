@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -40,10 +41,10 @@ public class ResourceResolver implements LSResourceResolver {
       try {
         String filename = href;
         try {
-          filename = Paths.get(URI.create(href)).getFileName().toString();
+          filename = FilenameUtils.getName(Paths.get(URI.create(href)).getFileName().toString());
         } catch (IllegalArgumentException e) {
           try {
-            filename = Paths.get(href).getFileName().toString();
+            filename = FilenameUtils.normalize(Paths.get(href).getFileName().toString());
           } catch (InvalidPathException e2) {
             // nothing to do
           }

@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.Optional;
 
+import org.apache.commons.io.FilenameUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -58,8 +59,8 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
       EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
       Path path;
       if (folderRelativePath.isPresent()) {
-        Path resolvedBasePath = basePath.resolve(Paths.get(folderRelativePath.get()));
-        boolean isWithin = RodaCoreFactory.checkPathIsWithin(resolvedBasePath, basePath);
+        Path resolvedBasePath = basePath.resolve(Paths.get(FilenameUtils.normalize(folderRelativePath.get())));
+        boolean isWithin = RodaCoreFactory.checkPathIsWithin(resolvedBasePath,basePath);
         if (isWithin) {
           path = resolvedBasePath.normalize();
         } else {

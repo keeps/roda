@@ -13,6 +13,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,7 @@ public class ClassLoaderUtility {
    *           IOException
    */
   public static void addFile(String s) throws IOException {
-    File f = new File(s);
+    File f = new File(FilenameUtils.normalize(s));
     addFile(f);
   }
 
@@ -161,7 +162,7 @@ public class ClassLoaderUtility {
     }
 
     ClassLoaderUtility.addFile(filePath);
-    String path = "jar:file://" + filePath + "!/";
+    String path = "jar:file://" + FilenameUtils.normalize(filePath) + "!/";
     URL url = new File(path).toURL();
 
     URLClassLoader clazzLoader = new URLClassLoader(new URL[] {url}, CLASS_LOADER);

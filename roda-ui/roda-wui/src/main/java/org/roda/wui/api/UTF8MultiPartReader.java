@@ -29,6 +29,7 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 import javax.ws.rs.ext.Providers;
 
+import org.apache.commons.io.FilenameUtils;
 import org.glassfish.jersey.media.multipart.BodyPart;
 import org.glassfish.jersey.media.multipart.BodyPartEntity;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
@@ -75,7 +76,7 @@ public class UTF8MultiPartReader implements MessageBodyReader<MultiPart> {
     // Set values defined by user.
     mimeConfig.setMemoryThreshold(properties.getBufferThreshold());
 
-    final String tempDir = properties.getTempDir();
+    final String tempDir = FilenameUtils.normalize(properties.getTempDir());
     if (tempDir != null) {
       mimeConfig.setDir(tempDir);
     }

@@ -7,6 +7,7 @@
  */
 package org.roda.core.common.notifications;
 
+import org.apache.commons.io.FilenameUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
@@ -47,7 +48,7 @@ public class FileNotificationProcessor implements NotificationProcessor {
 
       if (dropPath != null) {
         LOGGER.debug("Sending notification via drop folder ...");
-        Path trimmedDropPath = Paths.get(dropPath.substring(7));
+        Path trimmedDropPath = Paths.get(FilenameUtils.normalize(dropPath.substring(7)));
 
         if (FSUtils.isDirectory(trimmedDropPath)) {
           try (
