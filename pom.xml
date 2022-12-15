@@ -643,11 +643,6 @@
         <version>1.0</version>
       </dependency>
       <dependency>
-        <groupId>org.opensaml</groupId>
-        <artifactId>opensaml1</artifactId>
-        <version>1.1</version>
-      </dependency>
-      <dependency>
         <groupId>edu.harvard.hul.ois</groupId>
         <artifactId>ots-schemas</artifactId>
         <version>0.11</version>
