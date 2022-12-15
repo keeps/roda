@@ -1,16 +1,16 @@
 services:
   zoo:
-    image: zookeeper:3.8
+    image: docker.io/zookeeper:3.8
     restart: unless-stopped
     ports:
-      - 2181:2181
+      - "2181:2181"
     environment:
       - ZOO_4LW_COMMANDS_WHITELIST=mntr,conf,ruok
     volumes:
       - zookeeper_data:/data
       - zookeeper_datalog:/datalog
   solr:
-    image: solr:9
+    image: docker.io/solr:9
     restart: unless-stopped
     ports:
       - "8983:8983"
@@ -24,10 +24,10 @@ services:
     volumes:
       - solr_data:/var/solr
   clamd:
-    image: clamav/clamav:stable
+    image: docker.io/clamav/clamav:stable
     restart: unless-stopped
     ports:
-      - 3310:3310
+      - "3310:3310"
     volumes:
       - clam_data:/var/lib/clamav
       # Mapping $HOME/.roda to enable usage with spring-boot mode
@@ -36,10 +36,10 @@ services:
       - /tmp:/tmp:ro
 
   siegfried:
-    image: keeps/siegfried:v1.9.3
+    image: docker.io/keeps/siegfried:v1.9.6
     restart: unless-stopped
     ports:
-      - 5138:5138
+      - "5138:5138"
     environment:
       SIEGFRIED_HOST: siegfried
       SIEGFRIED_PORT: 5138
@@ -49,6 +49,15 @@ services:
       - $HOME/.roda/data/storage:$HOME/.roda/data/storage:ro
       # Mapping /tmp to enable usage with local testing via mvn test
       - /tmp:/tmp:ro
+  swagger:
+    image: docker.io/swaggerapi/swagger-ui:latest
+    restart: on-failure
+    ports:
+      - "8081:8080"
+    environment:
+      - URL=http://localhost:8080/api/openapi.json
+      - DOC_EXPANSION=none
+      - VALIDATOR_URL=none
 volumes:
   zookeeper_data:
   zookeeper_datalog:

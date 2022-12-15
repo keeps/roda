@@ -1,67 +1,76 @@
 version: '3.3'
 services:
-    zoo:
-      image: docker.io/zookeeper:3.8
-      restart: unless-stopped
-      environment:
-        - ZOO_4LW_COMMANDS_WHITELIST=mntr,conf,ruok
-      volumes:
-        - zookeeper_data:/data
-        - zookeeper_datalog:/datalog
-    solr:
-      image: docker.io/solr:9
-      restart: unless-stopped
-      ports:
-        - 8983:8983
-      environment:
-          SOLR_HEAP: 2g
-          ZK_HOST: zoo:2181
-      command: -c
-      volumes:
-        - solr_data:/var/solr
+  zoo:
+    image: docker.io/zookeeper:3.8
+    restart: unless-stopped
+    environment:
+      - ZOO_4LW_COMMANDS_WHITELIST=mntr,conf,ruok
+    volumes:
+      - zookeeper_data:/data
+      - zookeeper_datalog:/datalog
+  solr:
+    image: docker.io/solr:9
+    restart: unless-stopped
+    ports:
+      - "8983:8983"
+    environment:
+      SOLR_HEAP: 2g
+      ZK_HOST: zoo:2181
+    command: -c
+    volumes:
+      - solr_data:/var/solr
 
-    clamd:
-      image: docker.io/clamav/clamav:stable
-      restart: unless-stopped
-      volumes:
-        - clam_data:/var/lib/clamav
-        - roda_data_storage:/roda/data/storage
-    siegfried:
-      image: docker.io/keeps/siegfried:v1.9.4
-      restart: unless-stopped
-      environment:
-        SIEGFRIED_HOST: siegfried
-        SIEGFRIED_PORT: 5138
-      volumes:
-        - siegfried_data:/root/siegfried/
-        - roda_data_storage:/roda/data/storage
-    roda:
-      image: keeps/roda:latest
-      restart: unless-stopped
-      ports:
-        - 8080:8080
-        - 5005:5005 # remote debug
-      depends_on:
-        - solr
-        - clamd
-        - siegfried
-      volumes:
-        - roda_data_storage:/roda/data/storage
-      environment:
-        # Solr Cloud configuration
-        - RODA_CORE_SOLR_TYPE=CLOUD
-        - RODA_CORE_SOLR_CLOUD_URLS=zoo:2181
-        - SOLR_NUM_SHARDS=4
-        - SOLR_REPLICATION_FACTOR=1
-        # Base plugin services configuration
-        - SIEGFRIED_SERVER_URL=http://siegfried:5138
-        - CLAMD_TCPADDR=clamd
-        - CLAMD_TCPSOCKET=3310
+  clamd:
+    image: docker.io/clamav/clamav:stable
+    restart: unless-stopped
+    volumes:
+      - clam_data:/var/lib/clamav
+      - roda_data_storage:/roda/data/storage
+  siegfried:
+    image: docker.io/keeps/siegfried:v1.9.6
+    restart: unless-stopped
+    environment:
+      SIEGFRIED_HOST: siegfried
+      SIEGFRIED_PORT: 5138
+    volumes:
+      - siegfried_data:/root/siegfried/
+      - roda_data_storage:/roda/data/storage
+  swagger:
+    image: docker.io/swaggerapi/swagger-ui:latest
+    restart: on-failure
+    ports:
+      - "8081:8080"
+    environment:
+      - URL=http://localhost:8080/api/openapi.json
+      - DOC_EXPANSION=none
+      - VALIDATOR_URL=none
+  roda:
+    image: docker.io/keeps/roda:latest
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+      - "5005:5005" # remote debug
+    depends_on:
+      - solr
+      - clamd
+      - siegfried
+    volumes:
+      - roda_data_storage:/roda/data/storage
+    environment:
+      # Solr Cloud configuration
+      - RODA_CORE_SOLR_TYPE=CLOUD
+      - RODA_CORE_SOLR_CLOUD_URLS=zoo:2181
+      - SOLR_NUM_SHARDS=4
+      - SOLR_REPLICATION_FACTOR=1
+      # Base plugin services configuration
+      - SIEGFRIED_SERVER_URL=http://siegfried:5138
+      - CLAMD_TCPADDR=clamd
+      - CLAMD_TCPSOCKET=3310
 
-        # Remote debug
-        - JPDA_ADDRESS=*:5005
-        - JPDA_TRANSPORT=dt_socket
-      command: catalina.sh jpda run
+      # Remote debug
+      - JPDA_ADDRESS=*:5005
+      - JPDA_TRANSPORT=dt_socket
+    command: catalina.sh jpda run
 volumes:
   zookeeper_data:
   zookeeper_datalog:
