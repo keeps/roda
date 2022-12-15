@@ -222,6 +222,14 @@ public interface ClientMessages extends Messages {
 
   String metadataFileRemoved();
 
+  String removeMetadataFileTitle();
+
+  String removeMetadataFileLabel();
+
+  String updateMetadataFileTitle();
+
+  String updateMetadataFileLabel();
+
   String versionReverted();
 
   String versionDeleted();
