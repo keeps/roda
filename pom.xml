@@ -1038,6 +1038,14 @@
                 <artifactId>metrics-jvm</artifactId>
                 <version>${metrics.version}</version>
             </dependency>
+            <!-- lfaria: 2022-12-07 -->
+            <!-- Forcing transitive dependencies upgrade due to vulnerabilities -->
+            <!-- Forcing apacheds 2.0.0.AM26 dependency upgrade -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk15on</artifactId>
+                <version>1.70</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <reporting>
