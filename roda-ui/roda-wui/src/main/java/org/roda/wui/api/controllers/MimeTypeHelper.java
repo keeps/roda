@@ -7,7 +7,7 @@
  */
 package org.roda.wui.api.controllers;
 
-import javax.activation.MimetypesFileTypeMap;
+import jakarta.activation.MimetypesFileTypeMap;
 
 public class MimeTypeHelper {
 
