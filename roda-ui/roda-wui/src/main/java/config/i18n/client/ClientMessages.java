@@ -2456,6 +2456,8 @@ public interface ClientMessages extends Messages {
 
   String searchPrefilterTransitiveHolds();
 
+  String genericSearchWithPrefilterTitle();
+
   String saveSearchTitle();
 
   String saveSearchDescription();
