@@ -103,7 +103,7 @@ public interface UserManagementService extends RemoteService {
    * @throws EmailAlreadyExistsException
    * @throws RecaptchaException
    */
-  public User registerUser(User user, SecureString password, String captcha, UserExtraBundle extra, String localeString)
+  public User registerUser(User user, SecureString password, String captcha, UserExtraBundle extra, boolean recaptchaActive, String localeString)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, RecaptchaException,
     AuthorizationDeniedException;
 

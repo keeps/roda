@@ -1040,7 +1040,7 @@ public class LdapUtility {
         throw new InvalidTokenException("Password reset token is invalid.");
 
       } else {
-        if (DateTime.now().isAfter(DateTime.parse(user.getEmailConfirmationTokenExpirationDate()))) {
+        if (DateTime.now().isAfter(DateTime.parse(user.getResetPasswordTokenExpirationDate()))) {
           throw new InvalidTokenException(
             "Password reset token expired in " + user.getResetPasswordTokenExpirationDate());
         }

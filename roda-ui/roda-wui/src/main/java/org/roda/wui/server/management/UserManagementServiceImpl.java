@@ -74,12 +74,15 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public User registerUser(User user, SecureString password, String captcha, UserExtraBundle extra, String localeString)
+  public User registerUser(User user, SecureString password, String captcha, UserExtraBundle extra, boolean recaptchaActive, String localeString)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, RecaptchaException,
     AuthorizationDeniedException {
     if (captcha != null) {
       RecaptchaUtils
         .recaptchaVerify(RodaCoreFactory.getRodaConfiguration().getString(RECAPTCHA_CODE_SECRET_PROPERTY, ""), captcha);
+    }
+    else if (recaptchaActive){
+      throw new RecaptchaException("The Captcha can not be null.");
     }
 
     HttpServletRequest request = getThreadLocalRequest();
