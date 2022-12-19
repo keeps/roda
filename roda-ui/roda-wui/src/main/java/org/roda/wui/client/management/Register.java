@@ -170,7 +170,7 @@ public class Register extends Composite {
       try (SecureString password = new SecureString(userDataPanel.getPassword().toCharArray())) {
         final String recaptcha = recaptchaResponse;
 
-        UserManagementService.Util.getInstance().registerUser(user, password, recaptcha, userDataPanel.getExtra(),
+        UserManagementService.Util.getInstance().registerUser(user, password, recaptcha, userDataPanel.getExtra(), recaptchaActive,
           LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<User>() {
 
             @Override
