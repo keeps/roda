@@ -10,6 +10,7 @@ package org.roda.wui.server.management;
 import javax.servlet.http.HttpServletRequest;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -32,6 +33,7 @@ import org.roda.wui.api.controllers.UserManagement;
 import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.client.management.recaptcha.RecaptchaException;
+import org.roda.wui.common.client.tools.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,14 +76,16 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public User registerUser(User user, SecureString password, String captcha, UserExtraBundle extra, boolean recaptchaActive, String localeString)
+  public User registerUser(User user, SecureString password, String captcha, UserExtraBundle extra, String localeString)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, RecaptchaException,
     AuthorizationDeniedException {
+    String recaptchakey = RodaCoreFactory.getRodaConfiguration().getString(RodaConstants.UI_GOOGLE_RECAPTCHA_CODE_PROPERTY);
+
     if (captcha != null) {
       RecaptchaUtils
         .recaptchaVerify(RodaCoreFactory.getRodaConfiguration().getString(RECAPTCHA_CODE_SECRET_PROPERTY, ""), captcha);
     }
-    else if (recaptchaActive){
+    else if (StringUtils.isNotBlank(recaptchakey)){
       throw new RecaptchaException("The Captcha can not be null.");
     }
 
