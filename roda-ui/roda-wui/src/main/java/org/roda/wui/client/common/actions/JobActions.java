@@ -120,7 +120,7 @@ public class JobActions extends AbstractActionable<Job> {
 
   private void ingestProcess(Job object, AsyncCallback<ActionImpact> callback) {
     callback.onSuccess(ActionImpact.NONE);
-    HistoryUtils.newHistory(Search.RESOLVER, SearchFilters.classesToHistoryTokens(IndexedAIP.class),
+    HistoryUtils.newHistory(Search.RESOLVER, RodaConstants.SEARCH_WITH_PREFILTER_HANDLER, SearchFilters.classesToHistoryTokens(IndexedAIP.class),
       RodaConstants.ALL_INGEST_JOB_IDS, object.getId());
   }
 
