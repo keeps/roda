@@ -135,19 +135,27 @@ public class EditUser extends Composite {
     JavascriptUtils.stickSidebar();
   }
 
+  private SecureString getPassword() {
+    if(userDataPanel.getPassword() != null) {
+      return new SecureString(userDataPanel.getPassword().toCharArray());
+    } else {
+      return null;
+    }
+  }
+
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
     if (userDataPanel.isChanged()) {
       if (userDataPanel.isValid()) {
-        final User user = userDataPanel.getUser();
-        try (SecureString password = new SecureString(userDataPanel.getPassword().toCharArray())) {
+        final User updatedUser = userDataPanel.getUser();
+        try (SecureString password = getPassword()) {
 
-          UserManagementService.Util.getInstance().updateUser(user, password, userDataPanel.getExtra(),
+          UserManagementService.Util.getInstance().updateUser(updatedUser, password, userDataPanel.getExtra(),
             new AsyncCallback<Void>() {
 
               @Override
               public void onFailure(Throwable caught) {
-                errorMessage(caught, user);
+                errorMessage(caught, updatedUser);
               }
 
               @Override

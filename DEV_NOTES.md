@@ -13,6 +13,9 @@
 mvn -pl roda-ui/roda-wui -am gwt:compile -Pdebug-main -Dscope.gwt-dev=compile
 ./roda-ui/roda-wui/copy_gwt_rpc.sh
 
+# Startup dependencies
+docker compose -f deploys/standalone/docker-compose-dev.yaml up
+
 # Open WUI in Spring boot
 mvn -pl roda-ui/roda-wui -am spring-boot:run -Pdebug-main
 
