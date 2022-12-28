@@ -154,14 +154,14 @@ public class JobActions extends AbstractActionable<Job> {
 
   private void ingestProcess(Job object, AsyncCallback<ActionImpact> callback) {
     callback.onSuccess(ActionImpact.NONE);
-    HistoryUtils.newHistory(Search.RESOLVER, SearchFilters.classesToHistoryTokens(IndexedAIP.class),
+    HistoryUtils.newHistory(Search.RESOLVER, RodaConstants.SEARCH_WITH_PREFILTER_HANDLER, "title",
+      messages.searchPrefilterCreatedByJob(object.getName()), SearchFilters.classesToHistoryTokens(IndexedAIP.class),
       RodaConstants.ALL_INGEST_JOB_IDS, object.getId());
   }
 
   private void ingestAppraisal(Job object, AsyncCallback<ActionImpact> callback) {
     callback.onSuccess(ActionImpact.NONE);
-    HistoryUtils.newHistory(IngestAppraisal.RESOLVER, RodaConstants.INGEST_JOB_ID,
-      object.getId());
+    HistoryUtils.newHistory(IngestAppraisal.RESOLVER, RodaConstants.INGEST_JOB_ID, object.getId());
   }
 
   private void stop(Job object, AsyncCallback<ActionImpact> callback) {
@@ -356,7 +356,8 @@ public class JobActions extends AbstractActionable<Job> {
     managementGroup.addButton(messages.approveButton(), JobAction.APPROVE, ActionImpact.UPDATED, "btn-check");
     managementGroup.addButton(messages.rejectButton(), JobAction.REJECT, ActionImpact.DESTROYED, "btn-times");
 
-    // FIXME 20180731 bferreira: JobAction.INGEST_APPRAISAL button text should be
+    // FIXME 20180731 bferreira: JobAction.INGEST_APPRAISAL button text should
+    // be
     // dynamic and equal to messages.appraisalTitle() + " (" +
     // job.getJobStats().getOutcomeObjectsWithManualIntervention() + ")"
 

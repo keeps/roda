@@ -2171,6 +2171,8 @@ public interface ClientMessages extends Messages {
 
   String searchPrefilterTransitiveHolds();
 
+  String searchPrefilterCreatedByJob(String jobName);
+
   String genericSearchWithPrefilterTitle();
   String saveSearchTitle();
 
