@@ -1,5 +1,64 @@
 # Changelog
 
+## v4.5.0 (06/01/2023)
+#### New features:
+
+- Solr retry #1216
+- Add saved search functionality #2283
+
+#### Enhancements:
+
+- Dialogs.prompt() lack of feedback when input is invalid #908
+
+#### Bug Fixes:
+
+- Fixity information computation does not create an event when skipped #2291
+- File leak when listing disposal resources #2250
+- Ingest Assessment search filter does not clear up #2263
+
+#### Security:
+
+- Several dependency upgrades to fix security vulnerabilities
+
+Install for demonstration:
+```
+docker pull keeps/roda:v4.5.0
+```
+
+---
+
+## v4.5.0-RC5 (28/12/2022)
+
+---
+
+## v4.5.0-RC4 (27/12/2022)
+
+---
+
+## v4.5.0-RC3 (13/12/2022)
+
+---
+
+## v4.5.0-RC2 (09/12/2022)
+
+---
+
+## v4.5.0-RC (19/09/2022)
+
+---
+
+## v3.7.1 (01/08/2022)
+#### Bug Fixes:
+
+- Processes with different types of parallelism are sharing the same pool of workers #2211
+- Deleting a Representation is also deleting PREMIS file #2033
+
+Install for demonstration:
+```
+docker pull keeps/roda:v3.7.1
+```
+---
+
 ## v4.4.0 (17/06/2022)
 ### :warning: Breaking Changes
 Solr 7.7 reached EOL meaning that is no longer supported and will not receive any security patches. As such RODA from version 4.4 onward will use Solr 8 as index system. If you have any implementation with Solr 7 you need to upgrade the Solr to version 8 and then rebuild all indexes on RODA.
@@ -348,184 +407,3 @@ Install for demonstration:
 ```
 docker pull keeps/roda:v3.5.2
 ```
----
-
-## v3.5.1 (02/12/2020)
-#### Security fixes
--  Bump xstream from 1.4.10-java7 to 1.4.14-java7 [#1710](https://github.com/keeps/roda/issues/1710) to fix CVE-2019-10173
-
-#### Dependency upgrades
--  Bump Solr from 7.7.2 to 7.7.3 [#1706](https://github.com/keeps/roda/issues/1706)
--  Bump several dependencies [#1707](https://github.com/keeps/roda/issues/1707)
-   - CAS from 3.5.0 to 3.6.1
-   - Jersey from 2.27 to 2.31
-   - Swagger from 1.5.24 to 1.6.2
-   - Jackson from 2.10.1 to 2.11.2
-   - Springboot from 2.1.9 to 2.3.3
-   - Commons-code from 1.12 to 1.15
-   - Commons-io from 2.6 to 2.8.0
-   - Commons-lang from 3.9 to 3.11
-   - Commons-csv from 1.6 to 1.8
-   - Commons-text from 1.6 to 1.9
-   - handlebars from 4.1.0 to 4.2.0
-   - prometheus from 0.8.0 to 0.9.0
- 
-#### Enhancements
--  Skip Siegfried and Premis plugin when SIP update has no representations [#1709](https://github.com/keeps/roda/issues/1709)
-
-Install for demonstration:
-```
-docker pull keeps/roda:v3.5.1
-```
----
-
-## v3.5.0 (16/09/2020)
-#### New features:
-
--  Hide actions which user does not have permissions to execute [#1022](https://github.com/keeps/roda/issues/1022)
-
-#### Enhancements:
-
--  Bump GWT from 2.8.3 to 2.9.0 [#1549](https://github.com/keeps/roda/issues/1549)
--  REST API: Tranferred resource reindex better error mapping [#1547](https://github.com/keeps/roda/issues/1547)
--  Default ingest plugin generalization [#1484](https://github.com/keeps/roda/issues/1484)
--  Job report list consistency [#1328](https://github.com/keeps/roda/issues/1328)
--  Improve default ingest plugin final states [#1300](https://github.com/keeps/roda/issues/1300)
-
-#### Security Fixes:
-
-- Blocking URL redirection from remote source ([CWE-601](https://cwe.mitre.org/data/definitions/601.html))
-- Guarding against ["Zip Slip"](https://snyk.io/research/zip-slip-vulnerability)
-- Fixed [information exposure through stack trace](https://wiki.sei.cmu.edu/confluence/display/java/ERR01-J.+Do+not+allow+exceptions+to+expose+sensitive+information)
-- Guarding against cross-site scripting ([CWE-79](https://cwe.mitre.org/data/definitions/79.html))
-
-#### Bug Fixes:
-
--  AntivirusPlugin version command polluted by warning [#1548](https://github.com/keeps/roda/issues/1548)
--  Siegfried task on SIP update optimization not working [#1536](https://github.com/keeps/roda/issues/1536)
--  API create/update descriptive metadata is failing [#1516](https://github.com/keeps/roda/issues/1516)
--  Greater than 100% progress on deletion of a list of AIPs in some cases [#1506](https://github.com/keeps/roda/issues/1506)
-
----
-
-## v3.4.0 (09/07/2020)
-### Security fix:
--  HTTP GET Request to reindex transferred resources folder can access data outside the folder [#1540](https://github.com/keeps/roda/issues/1540)
-
-#### New features:
-
--  Option to force timezone on all presented dates to UTC [#1539](https://github.com/keeps/roda/issues/1539)
-
-#### Enhancements:
-
--  Support show embedded / open new page option in DIPs on AIP or Representation levels [#1541](https://github.com/keeps/roda/issues/1541)
-
-#### Bug Fixes:
-
--  Fixing plugin readme generator [#1542](https://github.com/keeps/roda/issues/1542)
-
-Install for demonstration:
-```
-docker pull keeps/roda:v3.4.0
-```
-
----
-
-## v3.3.1 (24/02/2020)
-Install for demonstration:
-```
-docker pull keeps/roda:v3.3.1
-```
-
-
-### Enhancements
-* Improve file notification processor #1519
-
-### Bug fixes
-* Opening job reports directly via URL (new page) creates a javascript error
-
-### Security
-* Setting all Maven reports to HTTPS to secure against man-in-the-middle attacks to the compilation process
----
-
-## v3.3.0 (15/01/2020)
-Install for demonstration:
-```
-docker pull keeps/roda:v3.3.0
-```
-
-#### Features:
-- Monitoring: Adding support for Prometheus metrics export
-- Development: Adding Super devmode via mvn using springboot and codeserver
-
-#### Enhancements:
-
--  Support very large queries to Solr [#1500](https://github.com/keeps/roda/issues/1500)
-- Upgrading PDFJS to 2.3.200
-
-#### Bug Fixes:
-
--  Authorization denied when accessing repository-level preservation event [#1503](https://github.com/keeps/roda/issues/1503)
--  Fixity PREMIS event not being created in case of a SIP update with new representations [#1502](https://github.com/keeps/roda/issues/1502)
--  Search advanced list multiplied everytime is selected [#1498](https://github.com/keeps/roda/issues/1498)
--  API index does not allow inverse search (regression) [#1497](https://github.com/keeps/roda/issues/1497)
--  Error showing Job with LongRangeFilterParameter without lower or upper limit  [#1496](https://github.com/keeps/roda/issues/1496)
--  Recovering login with e-mail makes user loose groups and roles [#1489](https://github.com/keeps/roda/issues/1489)
-- Fixing descriptive metadata history panel when descriptive metadata is edited by the system
-
-#### Security Fixes:
-- Updating Jackson from 2.9.10 to 2.10.1
-
-
----
-
-## v3.2.0 (31/10/2019)
-Install for demonstration:
-```
-docker pull keeps/roda:v3.2.0
-```
-
-#### New features:
-
-- E-ARK SIP version 2 support (Common Specification version 2.0.1)
-
-#### Enhancements:
-
--  Add parentId as a default field when generating inventory report [#1488](https://github.com/keeps/roda/issues/1488)
--  Default ingest plugin generalization [#1484](https://github.com/keeps/roda/issues/1484)
--  Add a submission download button [#1479](https://github.com/keeps/roda/issues/1479)
--  Make post-job (ingest or not) notifications generic [#1477](https://github.com/keeps/roda/issues/1477)
--  Removing a user doesn't have a confirm dialog [#1458](https://github.com/keeps/roda/issues/1458)
-
-#### Bug Fixes:
-
--  "Has failures" facet of job list not considering running jobs [#1493](https://github.com/keeps/roda/issues/1493)
--  Title sort not working with default configuration [#1492](https://github.com/keeps/roda/issues/1492)
--  Ingest reports issue after moving SIPs [#1491](https://github.com/keeps/roda/issues/1491)
-
-#### Security:
-
-- Upgrading jackson to fix CVE-2019-14540 and CVE-2019-16335 fixes #1495
-
----
-
-## v3.1.1 (30/05/2019)
-Install for demonstration:
-```
-docker pull keeps/roda:v3.1.1
-```
-
-#### Enhancements:
-
--  Create a way to define orchestrator block size per plugin [#1476](https://github.com/keeps/roda/issues/1476)
--  Introduce cache strategies to improve ingest performance [#1475](https://github.com/keeps/roda/issues/1475)
--  Add HTTP notification support on MinimalIngestPlugin [#1473](https://github.com/keeps/roda/issues/1473)
--  Reindex plugins must deal with org.apache.solr.client.solrj.impl.CloudSolrClient$RouteException [#1469](https://github.com/keeps/roda/issues/1469)
--  Add descriptive metadata config to open specific tab by default [#1464](https://github.com/keeps/roda/issues/1464)
-
-#### Bug Fixes:
-
--  Fix translation disparities between english and portuguese languages [#1474](https://github.com/keeps/roda/issues/1474)
--  Stop job button missing [#1470](https://github.com/keeps/roda/issues/1470)
--  Cannot create an AIP using web user interface [#1468](https://github.com/keeps/roda/issues/1468)
--  Page information on navigation bar is not generic to files or other possible RODA objects [#1463](https://github.com/keeps/roda/issues/1463)
