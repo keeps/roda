@@ -33,76 +33,81 @@ import com.google.gwt.user.client.ui.Widget;
  *
  */
 public class SearchWithPreFilters extends Composite {
-    // Used by Search.RESOLVER
-    public static void resolveToNewInstance(List<String> historyTokens, AsyncCallback<Widget> callback) {
-        callback.onSuccess(getInstance(historyTokens));
-        Window.setTitle(messages.windowTitle(historyTokens.get(2).toUpperCase()));
+  // Used by Search.RESOLVER
+  public static void resolveToNewInstance(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    callback.onSuccess(getInstance(historyTokens));
+    Optional<String> titleFromHistoryTokens = getTitleFromHistoryTokens(historyTokens);
+    if (titleFromHistoryTokens.isPresent()) {
+      Window.setTitle(messages.windowTitle(titleFromHistoryTokens.get()).toUpperCase());
+    } else {
+      Window.setTitle(messages.windowTitle(messages.genericSearchWithPrefilterTitle().toUpperCase()));
+    }
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, SearchWithPreFilters> {
+  }
+
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static SearchWithPreFilters instance = null;
+
+  private static SearchWithPreFilters getInstance(List<String> historyTokens) {
+    // also create a new instance if the historyTokens have changed
+    if (instance == null || !historyTokens.equals(instance.historyTokens)) {
+      instance = new SearchWithPreFilters(historyTokens);
+    }
+    return instance;
+  }
+
+  private final List<String> historyTokens;
+
+  @UiField
+  FlowPanel searchDescription;
+
+  @UiField
+  FlowPanel savedSearchStaticDescription;
+
+  @UiField
+  SubTitlePanel subTitlePanel;
+
+  @UiField(provided = true)
+  CatalogueSearch catalogueSearch;
+
+  private SearchWithPreFilters(List<String> historyTokens) {
+    this.historyTokens = historyTokens;
+
+    Optional<String> title = getTitleFromHistoryTokens(historyTokens);
+
+    // prepare historyToken for the SearchWrapper
+    List<String> preparedHistoryToken;
+    if (title.isPresent()) {
+      preparedHistoryToken = historyTokens.subList(3, historyTokens.size());
+    } else {
+      preparedHistoryToken = historyTokens.subList(1, historyTokens.size());
     }
 
-    interface MyUiBinder extends UiBinder<Widget, SearchWithPreFilters> {
+    // Create main search
+    catalogueSearch = new CatalogueSearch(preparedHistoryToken, true, "Search_AIPs", "Search_representations",
+      "Search_files", null, false, true);
+
+    initWidget(uiBinder.createAndBindUi(this));
+
+    subTitlePanel.setText(title.orElse(messages.genericSearchWithPrefilterTitle()));
+    searchDescription.add(new HTMLWidgetWrapper("SearchDescription.html"));
+    savedSearchStaticDescription.add(new HTMLWidgetWrapper("SavedSearchDescription.html"));
+  }
+
+  private static Optional<String> getTitleFromHistoryTokens(List<String> historyTokens) {
+    // #search/$prefilter/(title/<title>)?/<filter>
+    // OR
+    // #search/$prefilter/<filter>
+    if ("title".equals(historyTokens.get(1))) {
+      if (StringUtils.isNotBlank(historyTokens.get(2))) {
+        return Optional.of(historyTokens.get(2));
+      }
+
     }
-
-    private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-    private static final ClientMessages messages = GWT.create(ClientMessages.class);
-    private static SearchWithPreFilters instance = null;
-
-    private static SearchWithPreFilters getInstance(List<String> historyTokens) {
-        // also create a new instance if the historyTokens have changed
-        if (instance == null || !historyTokens.equals(instance.historyTokens)) {
-            instance = new SearchWithPreFilters(historyTokens);
-        }
-        return instance;
-    }
-
-    private final List<String> historyTokens;
-
-    @UiField
-    FlowPanel searchDescription;
-
-    @UiField
-    FlowPanel savedSearchStaticDescription;
-
-    @UiField
-    SubTitlePanel subTitlePanel;
-
-    @UiField(provided = true)
-    CatalogueSearch catalogueSearch;
-
-    private SearchWithPreFilters(List<String> historyTokens) {
-        this.historyTokens = historyTokens;
-
-        Optional<String> title = getTitleFromHistoryTokens(historyTokens);
-
-        // prepare historyToken for the SearchWrapper
-        List<String> preparedHistoryToken;
-        if (title.isPresent()) {
-            preparedHistoryToken = historyTokens.subList(3, historyTokens.size());
-        } else {
-            preparedHistoryToken = historyTokens.subList(1, historyTokens.size());
-        }
-
-        // Create main search
-        catalogueSearch = new CatalogueSearch(preparedHistoryToken, true, "Search_AIPs", "Search_representations", "Search_files",
-                null, false, true);
-
-        initWidget(uiBinder.createAndBindUi(this));
-
-        subTitlePanel.setText(title.orElse(messages.genericSearchWithPrefilterTitle()));
-        searchDescription.add(new HTMLWidgetWrapper("SearchDescription.html"));
-        savedSearchStaticDescription.add(new HTMLWidgetWrapper("SavedSearchDescription.html"));
-    }
-
-    private Optional<String> getTitleFromHistoryTokens(List<String> historyTokens) {
-        // #search/$prefilter/(title/<title>)?/<filter>
-        // OR
-        // #search/$prefilter/<filter>
-        if ("title".equals(historyTokens.get(1))) {
-            if (StringUtils.isNotBlank(historyTokens.get(2))) {
-                return Optional.of(historyTokens.get(2));
-            }
-
-        }
-        return Optional.empty();
-    }
+    return Optional.empty();
+  }
 }
