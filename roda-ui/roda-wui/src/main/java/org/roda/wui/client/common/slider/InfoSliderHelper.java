@@ -23,12 +23,14 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
+import org.roda.core.plugins.plugins.ingest.PermissionUtils;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.browse.RepresentationInformationHelper;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.common.actions.AipActions;
+import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -211,11 +213,12 @@ public class InfoSliderHelper {
       values.put(messages.updateProcessIdTitle(), jobIdsList);
     }
 
-    if (!bundle.getAip().getPermissions().getUsers().isEmpty()
-      || !bundle.getAip().getPermissions().getGroups().isEmpty()) {
-      values.put(messages.aipPermissionDetails(), createAipPermissionDetailsHTML(bundle));
+    if (PermissionClientUtils.hasPermissions("org.roda.wui.api.controllers.Browser.findAll(RODAMember)")) {
+      if (!bundle.getAip().getPermissions().getUsers().isEmpty()
+              || !bundle.getAip().getPermissions().getGroups().isEmpty()) {
+        values.put(messages.aipPermissionDetails(), createAipPermissionDetailsHTML(bundle));
+      }
     }
-
     populate(infoSliderPanel, values);
   }
 
