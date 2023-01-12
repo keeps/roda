@@ -88,7 +88,7 @@ public class UserManagementHelper {
           generateNewToken, user.getIpAddress(), localeString);
 
         if (notification.getState() == NotificationState.FAILED) {
-          registeredUser.setActive(true);
+          registeredUser.setActive(false);
           boolean notify = true;
           RodaCoreFactory.getModelService().updateUser(registeredUser, password, notify);
         }

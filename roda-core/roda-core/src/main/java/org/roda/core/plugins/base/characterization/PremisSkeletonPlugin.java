@@ -7,13 +7,6 @@
  */
 package org.roda.core.plugins.base.characterization;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -47,6 +40,13 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPComponentsPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(PremisSkeletonPlugin.class);
@@ -198,25 +198,24 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
                 }
               }
             }
-
             reportItem.setPluginState(state).setPluginDetails("Executed on a SIP update context.");
             jobPluginInfo.incrementObjectsProcessed(state);
           }
-          try {
-            PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", true,
-              cachedJob);
-          } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
-            | AuthorizationDeniedException | AlreadyExistsException e) {
-            LOGGER.error("Error creating event: {}", e.getMessage(), e);
-          }
         } else {
           reportItem.setPluginState(PluginState.SKIPPED)
-            .setPluginDetails("Skipped because aip does not have representations.");
+                  .setPluginDetails("Skipped because aip does not have representations.");
           jobPluginInfo.incrementObjectsProcessed(PluginState.SKIPPED);
         }
 
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
+        try {
+          PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", true,
+                  cachedJob);
+        } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+                 | AuthorizationDeniedException | AlreadyExistsException e) {
+          LOGGER.error("Error creating event: {}", e.getMessage(), e);
+        }
       }
     } catch (ClassCastException e) {
       LOGGER.error("Trying to execute an AIP-only plugin with other objects", e);
