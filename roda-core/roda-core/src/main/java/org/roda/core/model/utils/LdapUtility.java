@@ -972,16 +972,17 @@ public class LdapUtility {
    *           if something goes wrong with the operation.
    */
   public User requestPasswordReset(final String username, final String email)
-    throws NotFoundException, IllegalOperationException, GenericException {
-    final User user = getUserByNameOrEmail(username, email);
+          throws NotFoundException, IllegalOperationException, GenericException {
+    User user = null;
+    try {
+      user = getUserByNameOrEmail(username, email);
+    } catch (GenericException e) {
+      LOGGER.debug("Error getting user with given credentials");
+    }
+
     if (user == null) {
-      final String message;
-      if (username != null) {
-        message = userMessage(username, " doesn't exist");
-      } else {
-        message = "Email " + email + " is not registered by any user";
-      }
-      throw new NotFoundException(message);
+      LOGGER.debug("Could not find any user with given credentials");
+      return null;
     } else {
       // Generate a password reset token with 1 day expiration date.
       user.setResetPasswordToken(IdUtils.createUUID());
@@ -993,6 +994,7 @@ public class LdapUtility {
       }
     }
   }
+
 
   /**
    * Reset {@link User}'s password given a previously generated token.

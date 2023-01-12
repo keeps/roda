@@ -354,9 +354,14 @@ public class UserManagement extends RodaWuiController {
     }
 
     User user = UserManagementHelper.requestPasswordReset(username, email);
+    if (user != null) {
+      sendRecoverLoginEmail(servletPath, user, localeString);
+    } else {
+      user = new User(usernameOrEmail);
+    }
+
     // 20180112 hsilva: need to set ip address for registering the action
     user.setIpAddress(ipAddress);
-    sendRecoverLoginEmail(servletPath, user, localeString);
 
     // register action
     controllerAssistant.registerAction(user, LogEntryState.SUCCESS, RodaConstants.CONTROLLER_USER_PARAM, user);
