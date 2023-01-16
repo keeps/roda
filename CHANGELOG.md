@@ -1,5 +1,19 @@
 # Changelog
 
+## v4.5.1 (16/01/2023)
+#### Enhancements:
+
+- Refactor RetryPolicyBuilder #2296
+- Improve log information during initialization process #2297
+- Add metrics about retries (related to RetryPolicyBuilder) #2298
+
+Install for demonstration:
+```
+docker pull keeps/roda:v4.5.1
+```
+
+---
+
 ## v4.5.0 (06/01/2023)
 #### New features:
 
@@ -390,20 +404,4 @@ docker pull keeps/roda:v3.5.3
 Install for demonstration:
 ```
 docker pull keeps/roda:v4.0.0
-```
----
-
-## v3.5.2 (10/03/2021)
-
-#### New features:
-
--  Add option to remove SIP from transfer resource folder after a successfully ingest workflow [#1917](https://github.com/keeps/roda/issues/1917)
-
-#### Bug Fixes:
-
--  Siegfried and fixity skipped during ingest workflow [#1916](https://github.com/keeps/roda/issues/1916)
-
-Install for demonstration:
-```
-docker pull keeps/roda:v3.5.2
 ```
