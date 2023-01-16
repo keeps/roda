@@ -10,10 +10,13 @@ package org.roda.core.index.utils;
 import dev.failsafe.RetryPolicy;
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.RodaUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,22 +27,29 @@ import org.slf4j.LoggerFactory;
 public final class RetryPolicyBuilder {
 
   private static RetryPolicyBuilder instance;
-  private dev.failsafe.RetryPolicyBuilder<Object> builder;
+  private final RetryPolicy<Object> policy;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RetryPolicyBuilder.class);
 
   private RetryPolicyBuilder() {
     int delay = RodaCoreFactory.getRodaConfiguration().getInt(RodaConstants.SOLR_RETRY_DELAY, 1);
-    int maxDelay = RodaCoreFactory.getRodaConfiguration().getInt(RodaConstants.SOLR_RETRY_MAX_DELAY, 180);
+    int maxDelay = RodaCoreFactory.getRodaConfiguration().getInt(RodaConstants.SOLR_RETRY_MAX_DELAY,
+      RodaConstants.NodeType.TEST.equals(RodaCoreFactory.getNodeType()) ? 2 : 180);
     double delayFactor = RodaCoreFactory.getRodaConfiguration().getDouble(RodaConstants.SOLR_RETRY_DELAY_FACTOR, 2.0);
     int maxRetries = RodaCoreFactory.getRodaConfiguration().getInt(RodaConstants.SOLR_RETRY_MAX_RETRIES, 10);
 
-    builder = RetryPolicy.builder().handle(Arrays.asList(SolrServerException.class, IOException.class))
-            .withBackoff(delay, maxDelay, ChronoUnit.SECONDS, delayFactor).withMaxRetries(maxRetries).onRetry(event -> {
-              LOGGER.debug("Attempt #{}", event.getAttemptCount());
-            }).onRetriesExceeded(event -> {
-              LOGGER.debug("Number of max retries exceeded");
-            });
+    policy = RetryPolicy.builder().handle(getHandleExceptionsFromConfiguration())
+      .withBackoff(delay, maxDelay, ChronoUnit.SECONDS, delayFactor).withMaxRetries(maxRetries).onRetry(event -> {
+        LOGGER.warn("Attempt #{}", event.getAttemptCount());
+      }).onRetriesExceeded(event -> {
+        LOGGER.warn("Number of max retries exceeded", event.getException());
+      }).onFailure(e -> {
+        LOGGER.error("Failed due to: {}", e.getException().getMessage(), e.getException());
+      }).onSuccess(event -> {
+        if (event.getAttemptCount() > 1) {
+          LOGGER.debug("Success retry after {} attempts", event.getAttemptCount());
+        }
+      }).build();
   }
 
   public static RetryPolicyBuilder getInstance() {
@@ -51,6 +61,27 @@ public final class RetryPolicyBuilder {
   }
 
   public RetryPolicy<Object> getRetryPolicy() {
-    return builder.build();
+    return policy;
+  }
+
+  private List<Class<? extends Throwable>> getHandleExceptionsFromConfiguration() {
+    List<Class<? extends Throwable>> classes = new ArrayList<>();
+    List<String> exceptions = RodaUtils
+      .copyList(RodaCoreFactory.getRodaConfiguration().getList(RodaConstants.SOLR_RETRY_HANDLE_EXCEPTIONS));
+
+    if (exceptions.isEmpty()) {
+      return Arrays.asList(SolrServerException.class, IOException.class);
+    } else {
+      for (String exception : exceptions) {
+        try {
+          Class<?> aClass = Class.forName(exception);
+          classes.add(aClass.asSubclass(Throwable.class));
+        } catch (ClassNotFoundException e) {
+          LOGGER.debug("Class not found: {}", exception, e);
+        }
+      }
+
+      return classes;
+    }
   }
 }

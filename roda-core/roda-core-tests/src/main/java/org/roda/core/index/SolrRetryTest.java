@@ -49,21 +49,21 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import dev.failsafe.FailsafeException;
+
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 
-// @PrepareForTest(SolrUtils.class)
+@Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
 public class SolrRetryTest {
 
-  private static Path basePath;
   private static IndexService index;
   private static ModelService model;
   private static StorageService corporaService;
 
   @BeforeClass
   public static void setUp() throws Exception {
-    basePath = TestsHelper.createBaseTempDir(IndexServiceTest.class, true);
 
     boolean deploySolr = true;
     boolean deployLdap = false;
@@ -88,15 +88,16 @@ public class SolrRetryTest {
   }
 
   @Test
-  public void testSolrRetryCommit() throws SolrServerException, IOException, GenericException {
-    SolrClient mock = Mockito.mock(SolrClient.class);
+  public void testSolrRetryCommit() throws SolrServerException, IOException {
+    SolrClient solrClient = index.getSolrClient();
+    SolrClient spy = Mockito.spy(solrClient);
 
-    Mockito.doThrow(new SolrServerException("test")).when(mock).commit(anyString(), anyBoolean(), anyBoolean(),
+    Mockito.doThrow(new SolrServerException("test")).when(spy).commit(anyString(), anyBoolean(), anyBoolean(),
       anyBoolean());
 
-    SolrUtils.commit(mock, IndexedAIP.class);
+    Assert.assertThrows(FailsafeException.class, () -> SolrUtils.commit(spy, IndexedAIP.class));
 
-    Mockito.verify(mock, times(11)).commit(anyString(), anyBoolean(), anyBoolean(), anyBoolean());
+    Mockito.verify(spy, times(11)).commit(anyString(), anyBoolean(), anyBoolean(), anyBoolean());
   }
 
   @Test

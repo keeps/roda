@@ -147,7 +147,6 @@ public class SolrUtils {
   private static final String DEFAULT_QUERY_PARSER_OPERATOR = "AND";
   private static final Set<String> NON_REPEATABLE_FIELDS = new HashSet<>(Arrays.asList(RodaConstants.AIP_TITLE,
     RodaConstants.AIP_LEVEL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL));
-  public static final String ALL_RETRY_ATTEMPTS_FAILED = "All retry attempts failed";
 
   private static Map<String, List<String>> liteFieldsForEachClass = new HashMap<>();
 
@@ -723,7 +722,7 @@ public class SolrUtils {
 
     try (Reader transformationResult = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CORE_CROSSWALKS_INGEST,
       metadataType, metadataVersion, parameters)) {
-        
+
       SolrXMLLoader loader = new SolrXMLLoader();
       XMLStreamReader parser = XMLInputFactory.newInstance().createXMLStreamReader(transformationResult);
 
@@ -1178,7 +1177,7 @@ public class SolrUtils {
     boolean waitSearcher = true;
     boolean softCommit = true;
 
-    Fallback<Object> fallback = Fallback.of(() -> new SolrRetryException(ALL_RETRY_ATTEMPTS_FAILED));
+    Fallback<Object> fallback = Fallback.ofException(e -> new SolrRetryException(e.getLastException()));
 
     for (String collection : collections) {
       Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy()).onFailure(e -> {
@@ -1209,7 +1208,7 @@ public class SolrUtils {
     String classToCreate, SolrInputDocument instance, S source) {
     ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>(source);
 
-    Fallback<Object> fallback = Fallback.of(() -> new SolrRetryException(ALL_RETRY_ATTEMPTS_FAILED));
+    Fallback<Object> fallback = Fallback.ofException(e -> new SolrRetryException(e.getLastException()));
 
     if (instance != null) {
       Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy()).onFailure(e -> {
@@ -1225,7 +1224,7 @@ public class SolrUtils {
     SolrClient index, S source, Class<I> indexClass, M object, IndexingAdditionalInfo utils) {
     ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>(source);
 
-    Fallback<Object> fallback = Fallback.of(() -> new SolrRetryException(ALL_RETRY_ATTEMPTS_FAILED));
+    Fallback<Object> fallback = Fallback.ofException(e -> new SolrRetryException(e.getLastException()));
 
     if (object != null) {
       try {
@@ -1388,7 +1387,7 @@ public class SolrUtils {
         String field = SolrCollectionRegistry.getIndexName(objectClass);
 
         SolrDocument doc = Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy()).onFailure(e -> {
-          LOGGER.error(ALL_RETRY_ATTEMPTS_FAILED);
+          LOGGER.error("Using the fallback strategy");
           e.getResult();
         }).get(() -> index.getById(field, id));
 
@@ -1579,11 +1578,11 @@ public class SolrUtils {
     Class<T> classToDelete, List<String> ids, S source, boolean commit) {
     ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>();
 
-    Fallback<Object> fallback = Fallback.of(() -> new SolrRetryException(ALL_RETRY_ATTEMPTS_FAILED));
+    Fallback<Object> fallback = Fallback.ofException(e -> new SolrRetryException(e.getLastException()));
 
     Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy()).onFailure(e -> {
       LOGGER.error("Error deleting document from index");
-      ret.add((SolrRetryException) e.getResult());
+      ret.add((SolrRetryException) e.getException());
     }).run(() -> {
       index.deleteById(SolrCollectionRegistry.getIndexName(classToDelete), ids);
       if (commit) {
@@ -1603,7 +1602,7 @@ public class SolrUtils {
     Class<T> classToDelete, Filter filter, S source, boolean commit) {
     ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>();
 
-    Fallback<Object> fallback = Fallback.of(() -> new SolrRetryException(ALL_RETRY_ATTEMPTS_FAILED));
+    Fallback<Object> fallback = Fallback.ofException(e -> new SolrRetryException(e.getLastException()));
 
     Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy()).onFailure(e -> {
       LOGGER.error("Error deleting documents from index");

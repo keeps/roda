@@ -21,6 +21,10 @@ public class SolrRetryException extends RODAException {
     super(message);
   }
 
+  public SolrRetryException(Throwable cause) {
+    super(cause);
+  }
+
   public SolrRetryException(String message, Throwable cause) {
     super(message, cause);
   }

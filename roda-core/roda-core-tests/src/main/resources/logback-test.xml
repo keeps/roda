@@ -27,6 +27,11 @@
 		<appender-ref ref="STDOUT" />
 	</logger>
 
+	<logger name="org.roda.core.index.utils.RetryPolicyBuilder" additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="STDOUT" />
+	</logger>
+
 	<logger name="org.apache.solr" additivity="false">
 		<level value="WARN" />
 		<appender-ref ref="STDOUT" />
