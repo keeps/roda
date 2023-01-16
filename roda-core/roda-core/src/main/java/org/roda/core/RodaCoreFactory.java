@@ -454,18 +454,23 @@ public class RodaCoreFactory {
           addConfiguration(configuration);
           LOGGER.debug("Loaded {}", configuration);
         }
+        LOGGER.debug("Finished loading configurations");
 
         // initialize working directory
         initializeWorkingDirectory();
+        LOGGER.debug("Finished instantiating working directory");
 
         // initialize reports directory
         initializeReportsDirectory();
+        LOGGER.debug("Finished instantiating reports directory");
 
         // initialize metrics stuff
         initializeMetrics();
+        LOGGER.debug("Finished instantiating metrics");
 
         // instantiate events manager
         instantiateEventsManager();
+        LOGGER.debug("Finished instantiating events manager");
 
         // instantiate storage and model service
         instantiateStorageAndModel();
@@ -473,6 +478,7 @@ public class RodaCoreFactory {
 
         // initialize disposal bin directory
         initializeDisposalBinDirectory();
+        LOGGER.debug("Finished instantiating disposal bin directory");
 
         // instantiate solr and index service
         instantiateSolrAndIndexService(nodeType);
@@ -489,6 +495,7 @@ public class RodaCoreFactory {
           // migrationManager.performModelMigrations();
           throw new GenericException("It's necessary to do a model/index migration");
         }
+        LOGGER.debug("Finished migration verification");
 
         instantiateDefaultObjects();
         LOGGER.debug("Finished instantiating default objects");
@@ -1153,7 +1160,11 @@ public class RodaCoreFactory {
       zkChroot = Optional.empty();
     }
 
-    CloudSolrClient cloudSolrClient = new CloudSolrClient.Builder(zkHosts, zkChroot).build();
+    int connectionTimeout = RodaCoreFactory.getRodaConfiguration().getInt("core.solr.cloud.connection.timeout", 10000);
+    int socketTimeout = RodaCoreFactory.getRodaConfiguration().getInt("core.solr.cloud.socket.timeout", 60000);
+
+    CloudSolrClient cloudSolrClient = new CloudSolrClient.Builder(zkHosts, zkChroot)
+      .withConnectionTimeout(connectionTimeout).withSocketTimeout(socketTimeout).build();
 
     waitForSolrCluster(cloudSolrClient);
 

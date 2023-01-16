@@ -7,7 +7,6 @@
  */
 package org.roda.core.index.utils;
 
-import dev.failsafe.RetryPolicy;
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -21,6 +20,12 @@ import org.roda.core.data.common.RodaConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.codahale.metrics.Counter;
+import com.codahale.metrics.Histogram;
+import com.codahale.metrics.MetricRegistry;
+
+import dev.failsafe.RetryPolicy;
+
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
@@ -28,6 +33,8 @@ public final class RetryPolicyBuilder {
 
   private static RetryPolicyBuilder instance;
   private final RetryPolicy<Object> policy;
+  private final Histogram retriesHisto;
+  private final Counter retriesCount;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RetryPolicyBuilder.class);
 
@@ -38,9 +45,17 @@ public final class RetryPolicyBuilder {
     double delayFactor = RodaCoreFactory.getRodaConfiguration().getDouble(RodaConstants.SOLR_RETRY_DELAY_FACTOR, 2.0);
     int maxRetries = RodaCoreFactory.getRodaConfiguration().getInt(RodaConstants.SOLR_RETRY_MAX_RETRIES, 10);
 
+    this.retriesHisto = RodaCoreFactory.getMetrics()
+      .histogram(MetricRegistry.name(RetryPolicyBuilder.class.getSimpleName(), "retriesHisto"));
+    this.retriesCount = RodaCoreFactory.getMetrics()
+      .counter(MetricRegistry.name(RetryPolicyBuilder.class.getSimpleName(), "retriesCounter"));
+
     policy = RetryPolicy.builder().handle(getHandleExceptionsFromConfiguration())
       .withBackoff(delay, maxDelay, ChronoUnit.SECONDS, delayFactor).withMaxRetries(maxRetries).onRetry(event -> {
-        LOGGER.warn("Attempt #{}", event.getAttemptCount());
+        LOGGER.warn("Attempt #{}: {} [{}]", event.getAttemptCount(), event.getLastException().getMessage(),
+          event.getLastException().getClass().getSimpleName());
+        retriesCount.inc();
+        retriesHisto.update(retriesCount.getCount());
       }).onRetriesExceeded(event -> {
         LOGGER.warn("Number of max retries exceeded", event.getException());
       }).onFailure(e -> {
