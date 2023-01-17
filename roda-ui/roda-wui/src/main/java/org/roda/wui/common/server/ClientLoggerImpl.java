@@ -7,6 +7,7 @@
  */
 package org.roda.wui.common.server;
 
+import com.google.gwt.core.client.GWT;
 import org.roda.wui.common.client.ClientLoggerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,79 +29,103 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
   }
 
   @Override
-  public void debug(String classname, String object) {
-    Logger logger = LoggerFactory.getLogger(classname);
-    logger.debug(String.format("%s%s", getUserInfo(), object));
+  public void debug(String classname, String object, boolean isDisabled) {
+    if (!isDisabled) {
+      Logger logger = LoggerFactory.getLogger(classname);
+      logger.debug(String.format("%s%s", getUserInfo(), object));
+    }
   }
 
   @Override
-  public void debug(String classname, String object, Throwable error) {
-    Logger logger = LoggerFactory.getLogger(classname);
-    logger.debug(String.format("%s%s", getUserInfo(), object), error);
+  public void debug(String classname, String object, boolean isDisabled, Throwable error) {
+    if (!isDisabled) {
+      Logger logger = LoggerFactory.getLogger(classname);
+      logger.debug(String.format("%s%s", getUserInfo(), object), error);
+    }
   }
 
   @Override
-  public void error(String classname, String object) {
-    Logger logger = LoggerFactory.getLogger(classname);
-    logger.error(String.format("%s%s", getUserInfo(), object));
-    sendError(classname, object, null);
+  public void error(String classname, String object, boolean isDisabled) {
+    if (!isDisabled) {
+      Logger logger = LoggerFactory.getLogger(classname);
+      logger.error(String.format("%s%s", getUserInfo(), object));
+      sendError(classname, object, null);
+    }
   }
 
   @Override
-  public void error(String classname, String object, Throwable error) {
-    Logger logger = LoggerFactory.getLogger(classname);
-    logger.error(String.format("%s%s", getUserInfo(), object), error);
-    sendError(classname, object, error);
+  public void error(String classname, String object, boolean isDisabled, Throwable error) {
+    if (!isDisabled) {
+      Logger logger = LoggerFactory.getLogger(classname);
+      logger.error(String.format("%s%s", getUserInfo(), object), error);
+      sendError(classname, object, error);
+    }
   }
 
   @Override
-  public void fatal(String classname, String object) {
-    Logger logger = LoggerFactory.getLogger(classname);
-    logger.error(String.format("%s%s", getUserInfo(), object));
-    sendError(classname, object, null);
+  public void fatal(String classname, String object, boolean isDisabled) {
+    if (!isDisabled) {
+      Logger logger = LoggerFactory.getLogger(classname);
+      logger.error(String.format("%s%s", getUserInfo(), object));
+      sendError(classname, object, null);
+    }
   }
 
   @Override
-  public void fatal(String classname, String object, Throwable error) {
-    Logger logger = LoggerFactory.getLogger(classname);
-    logger.error(String.format("%s%s", getUserInfo(), object), error);
-    sendError(classname, object, error);
+  public void fatal(String classname, String object, boolean isDisabled, Throwable error) {
+    if (!isDisabled) {
+      Logger logger = LoggerFactory.getLogger(classname);
+      logger.error(String.format("%s%s", getUserInfo(), object), error);
+      sendError(classname, object, error);
+    }
   }
 
   @Override
-  public void info(String classname, String object) {
-    Logger logger = LoggerFactory.getLogger(classname);
-    logger.info(String.format("%s%s", getUserInfo(), object));
+  public void info(String classname, String object, boolean isDisabled) {
+    if (!isDisabled) {
+      Logger logger = LoggerFactory.getLogger(classname);
+      logger.info(String.format("%s%s", getUserInfo(), object));
+    }
   }
 
   @Override
-  public void info(String classname, String object, Throwable error) {
-    Logger logger = LoggerFactory.getLogger(classname);
-    logger.info(String.format("%s%s", getUserInfo(), object), error);
+  public void info(String classname, String object, boolean isDisabled, Throwable error) {
+    if (!isDisabled) {
+      Logger logger = LoggerFactory.getLogger(classname);
+      logger.info(String.format("%s%s", getUserInfo(), object), error);
+    }
   }
 
   @Override
-  public void trace(String classname, String object) {
-    Logger logger = LoggerFactory.getLogger(classname);
-    logger.trace(String.format("%s%s", getUserInfo(), object));
+  public void trace(String classname, String object, boolean isDisabled) {
+    if (!isDisabled) {
+      Logger logger = LoggerFactory.getLogger(classname);
+      logger.trace(String.format("%s%s", getUserInfo(), object));
+    }
   }
 
   @Override
-  public void trace(String classname, String object, Throwable error) {
-    Logger logger = LoggerFactory.getLogger(classname);
-    logger.trace(String.format("%s%s", getUserInfo(), object), error);
+  public void trace(String classname, String object, boolean isDisabled, Throwable error) {
+    if (!isDisabled) {
+      Logger logger = LoggerFactory.getLogger(classname);
+      logger.trace(String.format("%s%s", getUserInfo(), object), error);
+    }
   }
 
   @Override
-  public void warn(String classname, String object) {
-    Logger logger = LoggerFactory.getLogger(classname);
-    logger.warn(String.format("%s%s", getUserInfo(), object));
+  public void warn(String classname, String object, boolean isDisabled) {
+    if (!isDisabled) {
+      Logger logger = LoggerFactory.getLogger(classname);
+      logger.warn(String.format("%s%s", getUserInfo(), object));
+    }
   }
 
   @Override
-  public void warn(String classname, String object, Throwable error) {
-    Logger logger = LoggerFactory.getLogger(classname);
-    logger.warn(String.format("%s%s", getUserInfo(), object), error);
+  public void warn(String classname, String object, boolean isDisabled, Throwable error) {
+    if (!isDisabled) {
+      Logger logger = LoggerFactory.getLogger(classname);
+      logger.warn(String.format("%s%s", getUserInfo(), object), error);
+    }
   }
 
   @Override

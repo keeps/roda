@@ -23,51 +23,57 @@ public interface ClientLoggerServiceAsync {
    *
    * @param classname
    * @param object
+   * @param isDisabled
    */
-  public void trace(String classname, String object, AsyncCallback<Void> callback);
+  public void trace(String classname, String object, boolean isDisabled, AsyncCallback<Void> callback);
 
   /**
    * Log at trace level
    *
    * @param classname
    * @param object
+   * @param isDisabled
    * @param error
    */
-  public void trace(String classname, String object, Throwable error, AsyncCallback<Void> callback);
+  public void trace(String classname, String object, boolean isDisabled, Throwable error, AsyncCallback<Void> callback);
 
   /**
    * Log at debug level
    *
    * @param classname
    * @param object
+   * @param isDisabled
    */
-  public void debug(String classname, String object, AsyncCallback<Void> callback);
+  public void debug(String classname, String object, boolean isDisabled, AsyncCallback<Void> callback);
 
   /**
    * Log at debug level
    *
    * @param classname
    * @param object
+   * @param isDisabled
    * @param error
    */
-  public void debug(String classname, String object, Throwable error, AsyncCallback<Void> callback);
+  public void debug(String classname, String object, boolean isDisabled, Throwable error, AsyncCallback<Void> callback);
 
   /**
    * Log at info level
    *
    * @param classname
    * @param object
+   * @param isDisabled
    */
-  public void info(String classname, String object, AsyncCallback<Void> callback);
+  public void info(String classname, String object, boolean isDisabled, AsyncCallback<Void> callback);
 
   /**
    * Log at info level
    *
    * @param classname
    * @param object
+   * @param isDisabled
    * @param error
    */
-  public void info(String classname, String object, Throwable error, AsyncCallback<Void> callback);
+  public void info(String classname, String object, boolean isDisabled, Throwable error, AsyncCallback<Void> callback);
 
   /**
    * Log at warn level
@@ -75,50 +81,55 @@ public interface ClientLoggerServiceAsync {
    * @param classname
    * @param object
    */
-  public void warn(String classname, String object, AsyncCallback<Void> callback);
+  public void warn(String classname, String object, boolean isDisabled, AsyncCallback<Void> callback);
 
   /**
    * Log at warn level
    *
    * @param classname
    * @param object
+   * @param isDisabled
    * @param error
    */
-  public void warn(String classname, String object, Throwable error, AsyncCallback<Void> callback);
+  public void warn(String classname, String object, boolean isDisabled, Throwable error, AsyncCallback<Void> callback);
 
   /**
    * Log at error level
    *
    * @param classname
    * @param object
+   * @param isDisabled
    */
-  public void error(String classname, String object, AsyncCallback<Void> callback);
+  public void error(String classname, String object, boolean isDisabled, AsyncCallback<Void> callback);
 
   /**
    * Log at error level
    *
    * @param classname
    * @param object
+   * @param isDisabled
    * @param error
    */
-  public void error(String classname, String object, Throwable error, AsyncCallback<Void> callback);
+  public void error(String classname, String object, boolean isDisabled, Throwable error, AsyncCallback<Void> callback);
 
   /**
    * Log at fatal level
    *
    * @param classname
    * @param object
+   * @param isDisabled
    */
-  public void fatal(String classname, String object, AsyncCallback<Void> callback);
+  public void fatal(String classname, String object, boolean isDisabled, AsyncCallback<Void> callback);
 
   /**
    * Log at fatal level
    *
    * @param classname
    * @param object
+   * @param isDisabled
    * @param error
    */
-  public void fatal(String classname, String object, Throwable error, AsyncCallback<Void> callback);
+  public void fatal(String classname, String object, boolean isDisabled, Throwable error, AsyncCallback<Void> callback);
 
   /**
    * Log a page hit
