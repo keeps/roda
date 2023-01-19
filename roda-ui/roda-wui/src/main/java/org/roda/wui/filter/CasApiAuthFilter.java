@@ -92,7 +92,11 @@ public class CasApiAuthFilter implements Filter {
       try {
         doFilterWithCredentials(request, response, filterChain, credentials.getFirst(), credentials.getSecond());
       } catch (final AuthenticationDeniedException | NotFoundException e) {
-        LOGGER.error("Error authenticating user '" + request.getUserPrincipal().getName() + "': " + e.getMessage());
+        if (request.getUserPrincipal() != null) {
+          LOGGER.error("Error authenticating user '" + request.getUserPrincipal().getName() + "': " + e.getMessage());
+        } else {
+          LOGGER.error("Error authenticating user " + e.getMessage());
+        }
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error authenticating user");
       } catch (final GenericException e) {
         throw new ServletException(e.getMessage(), e);
