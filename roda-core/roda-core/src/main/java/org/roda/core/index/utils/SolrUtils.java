@@ -1177,7 +1177,7 @@ public class SolrUtils {
     boolean waitSearcher = true;
     boolean softCommit = true;
 
-    Fallback<Object> fallback = Fallback.ofException(e -> new SolrRetryException(e.getLastException()));
+    Fallback<Object> fallback = Fallback.of(e -> {});
 
     for (String collection : collections) {
       Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy()).onFailure(e -> {
@@ -1208,12 +1208,13 @@ public class SolrUtils {
     String classToCreate, SolrInputDocument instance, S source) {
     ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>(source);
 
-    Fallback<Object> fallback = Fallback.ofException(e -> new SolrRetryException(e.getLastException()));
+    Fallback<Object> fallback = Fallback.of(e -> {
+      ret.add(new SolrRetryException(e.getLastException()));
+    });
 
     if (instance != null) {
       Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy()).onFailure(e -> {
         LOGGER.error("Error adding document to index", e.getException());
-        ret.add((SolrRetryException) e.getResult());
       }).run(() -> index.add(classToCreate, instance));
     }
 
@@ -1224,7 +1225,9 @@ public class SolrUtils {
     SolrClient index, S source, Class<I> indexClass, M object, IndexingAdditionalInfo utils) {
     ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>(source);
 
-    Fallback<Object> fallback = Fallback.ofException(e -> new SolrRetryException(e.getLastException()));
+    Fallback<Object> fallback = Fallback.of(e -> {
+      ret.add(new SolrRetryException(e.getLastException()));
+    });
 
     if (object != null) {
       try {
@@ -1232,7 +1235,6 @@ public class SolrUtils {
         if (solrDocument != null) {
           Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy()).onFailure(e -> {
             LOGGER.error("Error adding document to index", e.getException());
-            ret.add((SolrRetryException) e.getResult());
           }).run(() -> {
             index.add(SolrCollectionRegistry.getIndexName(indexClass), solrDocument);
           });
@@ -1578,11 +1580,12 @@ public class SolrUtils {
     Class<T> classToDelete, List<String> ids, S source, boolean commit) {
     ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>();
 
-    Fallback<Object> fallback = Fallback.ofException(e -> new SolrRetryException(e.getLastException()));
+    Fallback<Object> fallback = Fallback.of(e -> {
+      ret.add(new SolrRetryException(e.getLastException()));
+    });
 
     Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy()).onFailure(e -> {
       LOGGER.error("Error deleting document from index");
-      ret.add((SolrRetryException) e.getException());
     }).run(() -> {
       index.deleteById(SolrCollectionRegistry.getIndexName(classToDelete), ids);
       if (commit) {
@@ -1602,11 +1605,12 @@ public class SolrUtils {
     Class<T> classToDelete, Filter filter, S source, boolean commit) {
     ReturnWithExceptions<Void, S> ret = new ReturnWithExceptions<>();
 
-    Fallback<Object> fallback = Fallback.ofException(e -> new SolrRetryException(e.getLastException()));
+    Fallback<Object> fallback = Fallback.of(e -> {
+      ret.add(new SolrRetryException(e.getLastException()));
+    });
 
     Failsafe.with(fallback, RetryPolicyBuilder.getInstance().getRetryPolicy()).onFailure(e -> {
       LOGGER.error("Error deleting documents from index");
-      ret.add((SolrRetryException) e.getResult());
     }).run(() -> {
       index.deleteByQuery(SolrCollectionRegistry.getIndexName(classToDelete), parseFilter(filter));
       if (commit) {

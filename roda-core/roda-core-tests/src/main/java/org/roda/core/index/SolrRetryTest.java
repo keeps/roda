@@ -15,7 +15,6 @@ import static org.mockito.Mockito.times;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,13 +25,13 @@ import org.apache.solr.common.SolrInputDocument;
 import org.mockito.Mockito;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.TestsHelper;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
@@ -48,8 +47,6 @@ import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import dev.failsafe.FailsafeException;
 
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
@@ -88,14 +85,14 @@ public class SolrRetryTest {
   }
 
   @Test
-  public void testSolrRetryCommit() throws SolrServerException, IOException {
+  public void testSolrRetryCommit() throws SolrServerException, IOException, GenericException {
     SolrClient solrClient = index.getSolrClient();
     SolrClient spy = Mockito.spy(solrClient);
 
     Mockito.doThrow(new SolrServerException("test")).when(spy).commit(anyString(), anyBoolean(), anyBoolean(),
       anyBoolean());
 
-    Assert.assertThrows(FailsafeException.class, () -> SolrUtils.commit(spy, IndexedAIP.class));
+    SolrUtils.commit(spy, IndexedAIP.class);
 
     Mockito.verify(spy, times(11)).commit(anyString(), anyBoolean(), anyBoolean(), anyBoolean());
   }
@@ -180,5 +177,54 @@ public class SolrRetryTest {
     Mockito.verify(spy, times(10)).deleteById(anyString(), anyList());
 
     Assert.assertThrows(NotFoundException.class, () -> index.retrieve(IndexedAIP.class, aipId, new ArrayList<>()));
+  }
+
+  @Test
+  public void testEnsureReturnWithExceptionHaveExceptionsForDelete()
+    throws SolrServerException, IOException, RequestNotValidException, AuthorizationDeniedException,
+    ValidationException, AlreadyExistsException, NotFoundException, GenericException {
+    SolrClient solrClient = index.getSolrClient();
+    SolrClient spy = Mockito.spy(solrClient);
+
+    Mockito.doThrow(new SolrServerException("test")).when(spy).deleteById(anyString(), anyList());
+
+    String aipId = IdUtils.createUUID();
+
+    model.createAIP(aipId, corporaService,
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
+      RodaConstants.ADMIN);
+
+    ReturnWithExceptions<Void, SolrRetryTest> returnWithExceptions = SolrUtils.delete(spy, IndexedAIP.class,
+      Collections.singletonList(aipId), this, false);
+
+    Assert.assertFalse(returnWithExceptions.getExceptions().isEmpty());
+
+    Mockito.verify(spy, times(11)).deleteById(anyString(), anyList());
+  }
+
+  @Test
+  public void testEnsureReturnWithExceptionHaveExceptionsForCreate2()
+    throws IOException, SolrServerException, GenericException, AuthorizationDeniedException, RequestNotValidException,
+    AlreadyExistsException, NotFoundException {
+    SolrClient solrClient = index.getSolrClient();
+    SolrClient spy = Mockito.spy(solrClient);
+
+    Mockito.doThrow(new SolrServerException("test")).when(spy).add(anyString(), any(SolrInputDocument.class));
+
+    DisposalConfirmation confirmation = new DisposalConfirmation();
+    confirmation.setTitle("Confirmation");
+    confirmation.setNumberOfAIPs(100L);
+    confirmation.setState(DisposalConfirmationState.PENDING);
+    confirmation.setSize(12346234L);
+
+    DisposalConfirmation disposalConfirmation = model.createDisposalConfirmation(confirmation, "admin");
+
+    ReturnWithExceptions<Void, SolrRetryTest> returnWithExceptions = SolrUtils.create2(spy, this,
+      DisposalConfirmation.class, disposalConfirmation);
+
+    Assert.assertFalse(returnWithExceptions.getExceptions().isEmpty());
+
+    Mockito.verify(spy, times(11)).add(anyString(), any(SolrInputDocument.class));
+
   }
 }
