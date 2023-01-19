@@ -1,5 +1,16 @@
 # Changelog
 
+## v4.5.2 (19/01/2023)
+#### Bug fixes:
+
+-  Failsafe fallback policy misconfigured #2303
+
+Install for demonstration:
+```
+docker pull keeps/roda:v4.5.2
+```
+---
+
 ## v4.5.1 (16/01/2023)
 #### Enhancements:
 
@@ -15,6 +26,14 @@ docker pull keeps/roda:v4.5.1
 ---
 
 ## v4.5.0 (06/01/2023)
+### :warning: Breaking Changes
+Due to a dependency upgrade from Apache DS a migration procedure should be executed:
+
+1. Perform a LDAP backup
+2. Remove the ldap folder inside config directory
+3. Start RODA
+4. Restore the LDAP backup.
+
 #### New features:
 
 - Solr retry #1216
@@ -390,18 +409,4 @@ docker pull keeps/roda:v3.5.4
 Install for demonstration:
 ```
 docker pull keeps/roda:v3.5.3
-```
-
----
-
-## v4.0.0 (11/03/2021)
-
-#### New features:
-
--  Adding Croatian language [#1711](https://github.com/keeps/roda/issues/1711)
--  Retention and disposal features [#1708](https://github.com/keeps/roda/issues/1708)
-
-Install for demonstration:
-```
-docker pull keeps/roda:v4.0.0
 ```
