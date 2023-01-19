@@ -123,6 +123,7 @@ public class CasApiAuthFilter implements Filter {
     final FilterChain filterChain, final String username, final String password)
     throws GenericException, IOException, ServletException, AuthenticationDeniedException, NotFoundException {
 
+    UserUtility.checkUserApiBasicAuth(username);
     // check if user is internal
     if (UserUtility.getLdapUtility().isInternal(username)) {
       final User user = UserUtility.getLdapUtility().getAuthenticatedUser(username, password);
