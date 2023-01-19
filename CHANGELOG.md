@@ -3,7 +3,7 @@
 ## v4.5.2 (19/01/2023)
 #### Bug fixes:
 
--  Failsafe fallback policy misconfigured #2303
+- Failsafe fallback policy misconfigured #2303
 
 Install for demonstration:
 ```
