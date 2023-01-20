@@ -213,11 +213,9 @@ public class InfoSliderHelper {
       values.put(messages.updateProcessIdTitle(), jobIdsList);
     }
 
-    if (PermissionClientUtils.hasPermissions("org.roda.wui.api.controllers.Browser.findAll(RODAMember)")) {
-      if (!bundle.getAip().getPermissions().getUsers().isEmpty()
-              || !bundle.getAip().getPermissions().getGroups().isEmpty()) {
-        values.put(messages.aipPermissionDetails(), createAipPermissionDetailsHTML(bundle));
-      }
+    if (!bundle.getAip().getPermissions().getUsers().equals(new Permissions().getUsers())
+            || !bundle.getAip().getPermissions().getGroups().equals(new Permissions().getGroups())) {
+      values.put(messages.aipPermissionDetails(), createAipPermissionDetailsHTML(bundle));
     }
     populate(infoSliderPanel, values);
   }
