@@ -229,6 +229,11 @@ public class BrowserHelper {
     List<IndexedAIP> ancestors = retrieveAncestors(aip, user, aipAncestorsFieldsToReturn);
     bundle.setAIPAncestors(ancestors);
 
+    if (!UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_LIST_USERS)) {
+      Permissions p = new Permissions();
+      bundle.getAip().setPermissions(p);
+    }
+
     // set descriptive metadata
     if (UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_LIST_AIP_DESCRIPTIVE_METADATA)) {
       try {
