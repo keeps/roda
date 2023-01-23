@@ -710,6 +710,15 @@ public final class RodaConstants {
   public static final String CORE_LDAP_BACKEND_MAVIBOT = "MAVIBOT";
 
   /*
+   * Solr Retry
+   */
+  public static final String SOLR_RETRY_DELAY = "core.solr.retry.delay";
+  public static final String SOLR_RETRY_MAX_DELAY = "core.solr.retry.maxDelay";
+  public static final String SOLR_RETRY_DELAY_FACTOR = "core.solr.retry.delayFactor";
+  public static final String SOLR_RETRY_MAX_RETRIES = "core.solr.retry.maxRetries";
+  public static final String SOLR_RETRY_HANDLE_EXCEPTIONS = "core.solr.retry.handleExceptions[]";
+
+  /*
    * INDEX NAMES
    */
   public static final String INDEX_AIP = "AIP";
