@@ -244,7 +244,7 @@ public class EditUser extends Composite {
   }
 
   private void cancel() {
-    HistoryUtils.newHistory(MemberManagement.RESOLVER);
+    HistoryUtils.newHistory(ShowUser.RESOLVER, user.getId());
   }
 
   private void errorMessage(Throwable caught, User modifiedUser) {

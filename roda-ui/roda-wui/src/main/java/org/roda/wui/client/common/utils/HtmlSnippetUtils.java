@@ -44,6 +44,7 @@ import org.roda.core.data.v2.synchronization.RODAInstance;
 import org.roda.core.data.v2.synchronization.SynchronizingStatus;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowseRepresentation;
 import org.roda.wui.client.browse.BrowseTop;
 import org.roda.wui.client.browse.MetadataValue;
@@ -923,6 +924,23 @@ public class HtmlSnippetUtils {
         b.append(SafeHtmlUtils.fromString(messages.synchronizingStatus(localInstance.getStatus())));
       }
 
+      b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+      ret = b.toSafeHtml();
+    }
+    return ret;
+  }
+
+  public static SafeHtml getUserStateHtml(User user) {
+    SafeHtml ret = null;
+    if (user != null) {
+      SafeHtmlBuilder b = new SafeHtmlBuilder();
+      if (user.isActive()) {
+        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
+        b.append(SafeHtmlUtils.fromString(messages.showUserActivated()));
+      } else {
+        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT));
+        b.append(SafeHtmlUtils.fromString(messages.showUserDeactivated()));
+      }
       b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
       ret = b.toSafeHtml();
     }
