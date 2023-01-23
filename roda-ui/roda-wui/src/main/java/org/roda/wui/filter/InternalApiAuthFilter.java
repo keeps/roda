@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.common.JwtUtils;
 import org.roda.core.model.utils.UserUtility;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -129,6 +130,7 @@ public class InternalApiAuthFilter implements Filter {
     if (credentials == null) {
       return UserUtility.getGuest(request.getRemoteAddr());
     } else {
+      UserUtility.checkUserApiBasicAuth(credentials.getFirst());
       return UserUtility.getLdapUtility().getAuthenticatedUser(credentials.getFirst(), credentials.getSecond());
     }
   }

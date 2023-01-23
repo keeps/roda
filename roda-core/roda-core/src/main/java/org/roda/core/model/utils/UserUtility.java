@@ -22,6 +22,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.SelectedItemsUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -233,6 +234,16 @@ public class UserUtility {
       }
     } else {
       throw new GenericException("Invalid value for class name " + objs.getSelectedClass());
+    }
+  }
+
+  public static void checkUserApiBasicAuth(String username) throws AuthenticationDeniedException {
+    if (RodaCoreFactory.getRodaConfiguration().getBoolean(RodaConstants.CORE_API_BASIC_AUTH_DISABLE, false)) {
+      List<String> allowedUsers = RodaCoreFactory
+              .getRodaConfigurationAsList(RodaConstants.CORE_API_BASIC_AUTH_WHITELIST);
+      if (allowedUsers.isEmpty() || !allowedUsers.contains(username)) {
+        throw new AuthenticationDeniedException("User is not authorized to use API");
+      }
     }
   }
 

@@ -22,7 +22,9 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.JwtUtils;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -104,7 +106,11 @@ public class CasApiAuthFilter implements Filter {
       try {
         doFilterWithCredentials(request, response, filterChain, credentials.getFirst(), credentials.getSecond());
       } catch (final AuthenticationDeniedException | NotFoundException e) {
-        LOGGER.error("Error authenticating user '" + request.getUserPrincipal().getName() + "': " + e.getMessage());
+        if (request.getUserPrincipal() != null) {
+          LOGGER.error("Error authenticating user '" + request.getUserPrincipal().getName() + "': " + e.getMessage());
+        } else {
+          LOGGER.error("Error authenticating user " + e.getMessage());
+        }
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error authenticating user");
       } catch (final GenericException e) {
         throw new ServletException(e.getMessage(), e);
@@ -131,12 +137,12 @@ public class CasApiAuthFilter implements Filter {
     final FilterChain filterChain, final String username, final String password)
     throws GenericException, IOException, ServletException, AuthenticationDeniedException, NotFoundException {
 
+    UserUtility.checkUserApiBasicAuth(username);
     // check if user is internal
     if (UserUtility.getLdapUtility().isInternal(username)) {
       final User user = UserUtility.getLdapUtility().getAuthenticatedUser(username, password);
       UserUtility.setUser(request, user);
     }
-
     filterChain.doFilter(request, response);
   }
 

@@ -55,6 +55,11 @@ public final class RodaConstants {
 
   public static final String CORE_SYNCHRONIZATION_BUNDLE_PATH = "core.synchronization.bundle.path";
 
+  public static final String CORE_WEB_BASIC_AUTH_DISABLE = "core.web.basicAuth.disable";
+  public static final String CORE_WEB_BASIC_AUTH_WHITELIST = "core.web.basicAuth.whitelist[]";
+  public static final String CORE_API_BASIC_AUTH_DISABLE = "core.api.basicAuth.disable";
+  public static final String CORE_API_BASIC_AUTH_WHITELIST = "core.api.basicAuth.whitelist[]";
+
   public static final String TRASH_CONTAINER = "trash";
 
   public static final String TRANSFERRED_RESOURCES_PROCESSED_FOLDER = "PROCESSED";
