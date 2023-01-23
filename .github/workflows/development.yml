@@ -39,14 +39,17 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-
-      - name: Install dependencies
+      - name: Set up GO
+        uses: actions/setup-go@v3
+        with:
+          go-version: '^1.19.5'
+          check-latest: true
+      - name: Install siegfried
         run: |
-          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 20F802FE798E6857
-          sudo add-apt-repository "deb https://www.itforarchivists.com/ buster main"
-          sudo apt-get -qq update
-          sudo apt-get -qq install siegfried -y
-          sudo rm -f /usr/bin/clamscan /usr/bin/clamdscan
-          sudo mkdir -p /usr/bin
+          go install github.com/richardlehane/siegfried/cmd/sf@latest
+          sf -update
+      - name: Install clamdscan mock
+        run: |
           sudo cp .github/workflows/bin/clamscan /usr/bin/clamscan
           sudo cp .github/workflows/bin/clamscan /usr/bin/clamdscan
           sudo chmod a+rx /usr/bin/clamscan /usr/bin/clamdscan

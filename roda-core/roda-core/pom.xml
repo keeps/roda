@@ -409,11 +409,15 @@
 			<artifactId>simpleclient_logback</artifactId>
 			<version>${io.prometheus.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt</artifactId>
 			<version>0.9.1</version>
+		</dependency>
+		<dependency>
+			<groupId>dev.failsafe</groupId>
+			<artifactId>failsafe</artifactId>
+			<version>3.3.0</version>
 		</dependency>
 	</dependencies>
 </project>
