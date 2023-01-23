@@ -9,6 +9,7 @@ package org.roda.core.common;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +25,9 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.util.ValidationEventCollector;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Source;
+import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -45,6 +48,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.URNUtils;
+import org.roda.core.data.utils.XMLUtils;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.Fixity;
@@ -70,6 +74,7 @@ import org.roda.core.util.FileUtility;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -1051,9 +1056,10 @@ public final class PremisV3Utils {
         jaxbUnmarshaller.setEventHandler(validationCollector);
       }
 
-      Object unmarshal = jaxbUnmarshaller.unmarshal(binaryInputStream);
+      SAXSource xmlSource = XMLUtils.getSafeSAXSource(new InputSource(new InputStreamReader(binaryInputStream)));
+      Object unmarshal = jaxbUnmarshaller.unmarshal(xmlSource);
       return ((Representation) ((JAXBElement<?>) unmarshal).getValue());
-    } catch (SAXException | JAXBException e) {
+    } catch (SAXException | JAXBException | ParserConfigurationException e) {
       if (validate && validationCollector.hasEvents()) {
         throw new ValidationException(MetadataUtils.xmlValidationErrorsToValidationReport(validationCollector));
       } else {
@@ -1080,9 +1086,10 @@ public final class PremisV3Utils {
         jaxbUnmarshaller.setEventHandler(validationCollector);
       }
 
-      Object unmarshal = jaxbUnmarshaller.unmarshal(binaryInputStream);
+      SAXSource xmlSource = XMLUtils.getSafeSAXSource(new InputSource(new InputStreamReader(binaryInputStream)));
+      Object unmarshal = jaxbUnmarshaller.unmarshal(xmlSource);
       return ((AgentComplexType) ((JAXBElement<?>) unmarshal).getValue());
-    } catch (JAXBException | SAXException e) {
+    } catch (JAXBException | SAXException | ParserConfigurationException e) {
       if (validate && validationCollector.hasEvents()) {
         throw new ValidationException(MetadataUtils.xmlValidationErrorsToValidationReport(validationCollector));
       } else {
@@ -1109,10 +1116,11 @@ public final class PremisV3Utils {
         jaxbUnmarshaller.setEventHandler(validationCollector);
       }
 
-      Object unmarshal = jaxbUnmarshaller.unmarshal(binaryInputStream);
+      SAXSource xmlSource = XMLUtils.getSafeSAXSource(new InputSource(new InputStreamReader(binaryInputStream)));
+      Object unmarshal = jaxbUnmarshaller.unmarshal(xmlSource);
       return ((gov.loc.premis.v3.File) ((JAXBElement<?>) unmarshal).getValue());
 
-    } catch (SAXException | JAXBException e) {
+    } catch (SAXException | JAXBException | ParserConfigurationException e) {
       if (validate && validationCollector.hasEvents()) {
         throw new ValidationException(MetadataUtils.xmlValidationErrorsToValidationReport(validationCollector));
       } else {
@@ -1139,9 +1147,10 @@ public final class PremisV3Utils {
         jaxbUnmarshaller.setEventHandler(validationCollector);
       }
 
-      Object unmarshal = jaxbUnmarshaller.unmarshal(binaryInputStream);
+      SAXSource xmlSource = XMLUtils.getSafeSAXSource(new InputSource(new InputStreamReader(binaryInputStream)));
+      Object unmarshal = jaxbUnmarshaller.unmarshal(xmlSource);
       return ((EventComplexType) ((JAXBElement<?>) unmarshal).getValue());
-    } catch (JAXBException | SAXException e) {
+    } catch (JAXBException | SAXException | ParserConfigurationException e) {
       if (validate && validationCollector.hasEvents()) {
         throw new ValidationException(MetadataUtils.xmlValidationErrorsToValidationReport(validationCollector));
       } else {

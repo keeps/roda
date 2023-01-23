@@ -16,12 +16,18 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.sax.SAXSource;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 public class XMLUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(XMLUtils.class);
@@ -60,14 +66,27 @@ public class XMLUtils {
   }
 
   public static <T> T getObjectFromXML(String xml, Class<T> objectClass) throws GenericException {
-    JAXBContext jaxbContext;
     try {
-      jaxbContext = JAXBContext.newInstance(objectClass);
+      SAXSource xmlSource = getSafeSAXSource(new InputSource(new StringReader(xml)));
+      JAXBContext jaxbContext = JAXBContext.newInstance(objectClass);
       Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      StringReader reader = new StringReader(xml);
-      return (T) unmarshaller.unmarshal(reader);
-    } catch (JAXBException e) {
+      return (T) unmarshaller.unmarshal(xmlSource);
+    } catch (JAXBException | ParserConfigurationException | SAXException e) {
       throw new GenericException(e);
     }
+  }
+
+  public static SAXSource getSafeSAXSource(InputSource inputSource) throws ParserConfigurationException, SAXException {
+    return new SAXSource(getSafeXMLReader(), inputSource);
+  }
+
+  public static XMLReader getSafeXMLReader() throws SAXException, ParserConfigurationException {
+    // Disable XXE
+    XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+    xmlReader.setFeature("http://xml.org/sax/features/external-general-entities", false);
+    xmlReader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+    xmlReader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+
+    return xmlReader;
   }
 }
