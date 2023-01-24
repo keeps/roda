@@ -100,13 +100,7 @@ public class InternalApiAuthFilter implements Filter {
     if (credentials == null) {
       return UserUtility.getGuest(request.getRemoteAddr());
     } else {
-      if (RodaCoreFactory.getRodaConfiguration().getBoolean(RodaConstants.CORE_API_BASIC_AUTH_DISABLE, false)) {
-        List<String> allowedUsers = RodaCoreFactory
-          .getRodaConfigurationAsList(RodaConstants.CORE_API_BASIC_AUTH_WHITELIST);
-        if (allowedUsers.isEmpty() || !allowedUsers.contains(credentials.getFirst())) {
-          throw new AuthenticationDeniedException("User is not authorized to use API");
-        }
-      }
+      UserUtility.checkUserApiBasicAuth(credentials.getFirst());
       return UserUtility.getLdapUtility().getAuthenticatedUser(credentials.getFirst(), credentials.getSecond());
     }
   }
