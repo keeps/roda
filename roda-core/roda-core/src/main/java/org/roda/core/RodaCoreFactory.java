@@ -486,18 +486,23 @@ public class RodaCoreFactory {
           addConfiguration(configuration);
           LOGGER.debug("Loaded {}", configuration);
         }
+        LOGGER.debug("Finished loading configurations");
 
         // initialize working directory
         initializeWorkingDirectory();
+        LOGGER.debug("Finished instantiating working directory");
 
         // initialize reports directory
         initializeReportsDirectory();
+        LOGGER.debug("Finished instantiating reports directory");
 
         // initialize metrics stuff
         initializeMetrics();
+        LOGGER.debug("Finished instantiating metrics");
 
         // instantiate events manager
         instantiateEventsManager();
+        LOGGER.debug("Finished instantiating events manager");
 
         // instantiate storage and model service
         instantiateStorageAndModel();
@@ -505,15 +510,19 @@ public class RodaCoreFactory {
 
         // initialize disposal bin directory
         initializeDisposalBinDirectory();
+        LOGGER.debug("Finished instantiating disposal bin directory");
 
         // initialize file shallow temporary directory
         initializeFileShallowTmpDirectoryPath();
+        LOGGER.debug("Finished instantiating Shallow temporary directory");
 
         // initialize synchronization directory
         initializeSynchronizationStateDir();
+        LOGGER.debug("Finished instantiating synchronization state directory");
 
         // initialize synchronization directory
         initializeJobAttachmentsDir();
+        LOGGER.debug("Finished instantiating Job attachments directory");
 
         instantiateDistributedMode();
         LOGGER.debug("Finished instantiating distributed mode");
@@ -755,7 +764,8 @@ public class RodaCoreFactory {
       String systemTmpDir = getSystemProperty("java.io.tmpdir", "tmp");
       Path defaultRodaWorkingDirectory = Files.createTempDirectory(Paths.get(systemTmpDir), "rodaWorkingDirectory");
       workingDirectoryPath = Paths
-        .get(getRodaConfiguration().getString("core.workingdirectory", defaultRodaWorkingDirectory.toString())).normalize();
+        .get(getRodaConfiguration().getString("core.workingdirectory", defaultRodaWorkingDirectory.toString()))
+        .normalize();
       Files.createDirectories(workingDirectoryPath);
     } catch (IOException e) {
       throw new RuntimeException("Unable to create RODA WORKING DIRECTORY " + workingDirectoryPath + ". Aborting...",
