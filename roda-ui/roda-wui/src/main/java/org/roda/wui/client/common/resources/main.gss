@@ -6209,6 +6209,9 @@ td.datePickerMonth, td.datePickerYear {
     color: #222;
 }
 
+.plugin-list-item-icon-experimental:before {
+	content: "\f0c3";
+}
 
 .plugin-list-item-icon-risk_management:before {
 	content: "\f071";
