@@ -1,0 +1,13 @@
+# Erkännanden
+
+Utvecklingen av RODA startade 2006\. I ett tidigt skede sponsrades projektet av generaldirektoratet för portugisiska arkiv (DGARQ) och fick ekonomiskt stöd av samhällets gemenskapsstödram - POAP (bidragsavtal nr 000613/2006/111). Det initiala syftet med projektet var att bygga en fungerande prototyp av ett digitalt förvar som skulle leda till mer konkreta idéer och kunskap om hur man bygger ett fungerande digitalt förvar för DGARQ.
+
+En andra fas finansiellt supporterad av DGARQ bestod av utvecklingen av ett produktionsfärdigt förvar enligt de krav som identifierades under prototypfasen. Förvaret gick live 2008 hos DGARQ själv. Mellan 2011 och 2014 fortsatte mjukvaran att utvecklas inom ramen för SCAPE-projektet som samfinansierades av KEEP SOLUTIONS och Europeiska kommissionen under det sjunde ramprogrammet (bidragsavtal nr 270137). Under denna period förbättrades mjukvaran med nya och förbättrade API:er, samt ny funktionalitet för att göra den mer kapabel att hantera storskaliga miljöer.
+
+Mellan 2014 och 2016 har RODA-projektet fått ekonomiskt och tekniskt stöd från E-ARK-projektet (samfinansierat av KEEP SOLUTIONS och Europeiska kommissionens ramprogram för konkurrenskraft och innovation, bidragsavtal nr 620998). I detta projekt har RODA förbättrats för att stödja E-ARK-informationspaketens specifikationer och de arbetsflöden för arkivering som drivits framåt av projektet.
+
+Under 2015 fick programvaran ytterligare finansiering från generaldirektoratet för boken, arkiven och biblioteken (DGLAB, formellt känd som DGARQ), även stödd av det nationella finansieringssystemet Compete 2020, för att utveckla en andra version av programvaran med förbättrade funktioner runt om (t.ex. förbättrade ingestsarbetsflöden, stöd för riskhantering, anpassade beskrivande metadatascheman, snabbare upptäcktsfunktioner, representationsinformation, samt andra funktioner).
+
+## Särskilt tack
+
+Genom åren har RODA fått bidrag från olika individer som har förbättrat produkten på många olika sätt (idéer, buggfixar, funktioner, översättningar, etc.). Ett särskilt tack går till José Carlos Ramalho från University of Minho för hans bidrag till den kunskap som initierade utvecklingen av RODA, Vladislav Korecký från Gordic för att översätta RODA 1.0 till tjeckiska och finansiera stödet för det tjeckiska SIP-formatet, Miguel Coutada, Masterstudent, för utvecklingen av Digital Preservation Toolkit, David Giaretta och Neil Beagrie för sina insikter om ISO 14721 och ISO 16363, Fulgencio Sanmartin från European Publications Office för sina innovativa idéer om riskhantering, Daniel Cáceres, masterstudent, för översättning RODA till spanska och alla andra som direkt eller indirekt har stöttat projektet under åren.
