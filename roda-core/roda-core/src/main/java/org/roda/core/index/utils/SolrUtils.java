@@ -43,6 +43,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrRequest.METHOD;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrQuery.SortClause;
@@ -228,7 +229,7 @@ public class SolrUtils {
     throws GenericException, RequestNotValidException {
 
     try {
-      return index.query(SolrCollectionRegistry.getIndexName(classToRetrieve), query);
+      return index.query(SolrCollectionRegistry.getIndexName(classToRetrieve), query, METHOD.POST);
     } catch (SolrServerException | IOException | NotSupportedException e) {
       throw new GenericException("Could not query index", e);
     } catch (SolrException e) {
