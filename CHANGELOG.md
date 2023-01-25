@@ -1,5 +1,20 @@
 # Changelog
 
+## v4.5.3 (25/01/2023)
+#### Bug fixes:
+
+- Support very large queries to Solr (fix regression) #2311
+
+#### Enhancements:
+
+- Add icon to experimental plugin categories #2306
+
+Install for demonstration:
+```
+docker pull keeps/roda:v4.5.3
+```
+---
+
 ## v4.5.2 (19/01/2023)
 #### Bug fixes:
 
@@ -396,17 +411,4 @@ docker pull keeps/roda:v3.5.5
 Install for demonstration:
 ```
 docker pull keeps/roda:v3.5.4
-```
-
----
-
-## v3.5.3 (18/03/2021)
-
-#### Enhancements:
-
--  Skipped reports are showing as failure [#1918](https://github.com/keeps/roda/issues/1918)
-
-Install for demonstration:
-```
-docker pull keeps/roda:v3.5.3
 ```
