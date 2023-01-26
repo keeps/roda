@@ -171,7 +171,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
       jobPluginInfo.finalizeInfo();
       PluginHelper.updateJobInformationAsync(this, jobPluginInfo);
     } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
-      | RequestNotValidException | LockingException e) {
+      | RequestNotValidException  e) {
       throw new PluginException("A job exception has occurred", e);
     }
 

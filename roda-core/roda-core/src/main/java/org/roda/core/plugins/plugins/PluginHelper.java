@@ -173,8 +173,6 @@ public final class PluginHelper {
     } catch (JobException | AuthorizationDeniedException | RequestNotValidException | GenericException
       | NotFoundException e) {
       throw new PluginException("A job exception has occurred", e);
-    } catch (LockingException e) {
-      throw new PluginException("Unable to acquire locks for the objects being processed", e);
     } finally {
       if (autoLocking) {
         releaseObjectLocks(plugin, liteList);
@@ -261,8 +259,6 @@ public final class PluginHelper {
     } catch (JobException | AuthorizationDeniedException | RequestNotValidException | GenericException
       | NotFoundException e) {
       throw new PluginException("A job exception has occurred", e);
-    } catch (LockingException e) {
-      throw new PluginException("Unable to acquire locks for the objects being processed", e);
     } finally {
       if (autoLocking) {
         releaseObjectLocks(plugin, liteList);
@@ -1686,7 +1682,7 @@ public final class PluginHelper {
    */
   public static <T extends IsRODAObject> List<T> transformLitesIntoObjects(ModelService model, Plugin<T> plugin,
     Report report, JobPluginInfo pluginInfo, List<LiteOptionalWithCause> lites, Job job, boolean autoLocking)
-    throws LockingException {
+  {
     List<T> finalObjects = new ArrayList<>();
     List<LiteRODAObject> objectsToLock = new ArrayList<>();
 
@@ -1739,8 +1735,20 @@ public final class PluginHelper {
       String requestUuid = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
         IdUtils.createUUID());
       plugin.getParameterValues().put(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID, requestUuid);
-      PluginHelper.acquireObjectLock(objectsToLock.stream().map(obj -> obj.getInfo()).collect(Collectors.toList()),
-        requestUuid);
+
+      try {
+        PluginHelper.acquireObjectLock(objectsToLock.stream().map(obj -> obj.getInfo()).collect(Collectors.toList()),
+          requestUuid);
+      } catch (LockingException e) {
+
+        for (LiteRODAObject object : objectsToLock) {
+          String failureMessage = "Unable to acquire locks: " + e;
+          reportFailureTransformingLiteInObject(model, plugin, report, pluginInfo, job,
+            LiteOptionalWithCause.of(object), failureMessage, Optional.of(object));
+
+        }
+        return finalObjects;
+      }
 
       for (LiteRODAObject object : objectsToLock) {
         OptionalWithCause<T> retrievedObject = (OptionalWithCause<T>) model.retrieveObjectFromLite(object);
