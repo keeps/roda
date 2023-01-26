@@ -1339,14 +1339,17 @@ public class RodaCoreFactory {
   private static void instantiateNodeSpecificObjects(NodeType nodeType) {
     if (INSTANTIATE_LDAP) {
       startApacheDS();
+      LOGGER.debug("ApacheDS started");
     }
 
     if (INSTANTIATE_SCANNER) {
       instantiateTransferredResourcesScanner();
+      LOGGER.debug("Finished instantiating transferred resource scanner");
     }
 
     if (INSTANTIATE_PLUGIN_ORCHESTRATOR) {
       instantiateOrchestrator();
+      LOGGER.debug("Finished instantiating orchestrator");
     }
 
     if (nodeType == NodeType.MASTER) {

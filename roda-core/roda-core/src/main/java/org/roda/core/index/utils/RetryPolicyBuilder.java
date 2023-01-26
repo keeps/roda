@@ -33,9 +33,16 @@ public final class RetryPolicyBuilder {
 
   private static RetryPolicyBuilder instance;
   private final RetryPolicy<Object> policy;
-  private final Histogram retriesHisto;
-  private final Counter retriesCount;
-
+  private Histogram retries90Histo;
+  private Histogram retries80Histo;
+  private Histogram retries50Histo;
+  private Histogram retriesHisto;
+  private Counter retries90Count;
+  private Counter retries80Count;
+  private Counter retries50Count;
+  private Counter retriesCount;
+  private Counter successfulRetriesCounter;
+  private Histogram successfulRetriesHistogram;
   private static final Logger LOGGER = LoggerFactory.getLogger(RetryPolicyBuilder.class);
 
   private RetryPolicyBuilder() {
@@ -45,24 +52,19 @@ public final class RetryPolicyBuilder {
     double delayFactor = RodaCoreFactory.getRodaConfiguration().getDouble(RodaConstants.SOLR_RETRY_DELAY_FACTOR, 2.0);
     int maxRetries = RodaCoreFactory.getRodaConfiguration().getInt(RodaConstants.SOLR_RETRY_MAX_RETRIES, 10);
 
-    this.retriesHisto = RodaCoreFactory.getMetrics()
-      .histogram(MetricRegistry.name(RetryPolicyBuilder.class.getSimpleName(), "retriesHisto"));
-    this.retriesCount = RodaCoreFactory.getMetrics()
-      .counter(MetricRegistry.name(RetryPolicyBuilder.class.getSimpleName(), "retriesCounter"));
+    initMetrics();
 
     policy = RetryPolicy.builder().handle(getHandleExceptionsFromConfiguration())
       .withBackoff(delay, maxDelay, ChronoUnit.SECONDS, delayFactor).withMaxRetries(maxRetries).onRetry(event -> {
         LOGGER.warn("Attempt #{}: {} [{}]", event.getAttemptCount(), event.getLastException().getMessage(),
           event.getLastException().getClass().getSimpleName());
-        retriesCount.inc();
-        retriesHisto.update(retriesCount.getCount());
-      }).onRetriesExceeded(event -> {
-        LOGGER.warn("Number of max retries exceeded", event.getException());
-      }).onFailure(e -> {
-        LOGGER.error("Failed due to: {}", e.getException().getMessage(), e.getException());
-      }).onSuccess(event -> {
+        computeMetrics(event.getAttemptCount(), maxRetries);
+      }).onRetriesExceeded(event -> LOGGER.warn("Number of max retries exceeded", event.getException()))
+      .onFailure(event -> LOGGER.error("Failed due to: {}", event.getException().getMessage(), event.getException()))
+      .onSuccess(event -> {
         if (event.getAttemptCount() > 1) {
-          LOGGER.debug("Success retry after {} attempts", event.getAttemptCount());
+          LOGGER.debug("Successful retry after {} attempts", event.getAttemptCount());
+          computeSuccessfulRetriesMetrics();
         }
       }).build();
   }
@@ -77,6 +79,55 @@ public final class RetryPolicyBuilder {
 
   public RetryPolicy<Object> getRetryPolicy() {
     return policy;
+  }
+
+  private void initMetrics() {
+    retriesHisto = RodaCoreFactory.getMetrics()
+      .histogram(MetricRegistry.name(RetryPolicyBuilder.class.getSimpleName(), "allRetriesHisto"));
+    retriesCount = RodaCoreFactory.getMetrics()
+      .counter(MetricRegistry.name(RetryPolicyBuilder.class.getSimpleName(), "allRetriesCounter"));
+    retries90Histo = RodaCoreFactory.getMetrics()
+      .histogram(MetricRegistry.name(RetryPolicyBuilder.class.getSimpleName(), "retries90Histo"));
+    retries80Histo = RodaCoreFactory.getMetrics()
+      .histogram(MetricRegistry.name(RetryPolicyBuilder.class.getSimpleName(), "retries80Histo"));
+    retries50Histo = RodaCoreFactory.getMetrics()
+      .histogram(MetricRegistry.name(RetryPolicyBuilder.class.getSimpleName(), "retries50Histo"));
+    retries90Count = RodaCoreFactory.getMetrics()
+      .counter(MetricRegistry.name(RetryPolicyBuilder.class.getSimpleName(), "retries90Counter"));
+    retries80Count = RodaCoreFactory.getMetrics()
+      .counter(MetricRegistry.name(RetryPolicyBuilder.class.getSimpleName(), "retries80Counter"));
+    retries50Count = RodaCoreFactory.getMetrics()
+      .counter(MetricRegistry.name(RetryPolicyBuilder.class.getSimpleName(), "retries50Counter"));
+    successfulRetriesCounter = RodaCoreFactory.getMetrics()
+      .counter(MetricRegistry.name(RetryPolicyBuilder.class.getSimpleName(), "successfulRetriesCounter"));
+    successfulRetriesHistogram = RodaCoreFactory.getMetrics()
+      .histogram(MetricRegistry.name(RetryPolicyBuilder.class.getSimpleName(), "successfulRetriesHisto"));
+
+  }
+
+  private void computeSuccessfulRetriesMetrics() {
+    successfulRetriesCounter.inc();
+    successfulRetriesHistogram.update(successfulRetriesCounter.getCount());
+  }
+
+  private void computeMetrics(int numberOfAttempts, int maxRetries) {
+    retriesCount.inc();
+    retriesHisto.update(retriesCount.getCount());
+
+    if (numberOfAttempts == Math.round(maxRetries * 0.5)) {
+      retries50Count.inc();
+      retries50Histo.update(retries50Count.getCount());
+    }
+
+    if (numberOfAttempts == Math.round(maxRetries * 0.8)) {
+      retries80Count.inc();
+      retries80Histo.update(retries80Count.getCount());
+    }
+
+    if (numberOfAttempts == Math.round(maxRetries * 0.9)) {
+      retries90Count.inc();
+      retries90Histo.update(retries90Count.getCount());
+    }
   }
 
   private List<Class<? extends Throwable>> getHandleExceptionsFromConfiguration() {
