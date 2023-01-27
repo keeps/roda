@@ -25,7 +25,7 @@ services:
     restart: unless-stopped
     volumes:
       - clam_data:/var/lib/clamav
-      - roda_data_storage:/roda/data/storage
+      - roda_data:/roda/data/
   siegfried:
     image: docker.io/keeps/siegfried:v1.9.6
     restart: unless-stopped
@@ -34,7 +34,7 @@ services:
       SIEGFRIED_PORT: 5138
     volumes:
       - siegfried_data:/root/siegfried/
-      - roda_data_storage:/roda/data/storage
+      - roda_data:/roda/data/
   swagger:
     image: docker.io/swaggerapi/swagger-ui:latest
     restart: on-failure
@@ -55,7 +55,7 @@ services:
       - clamd
       - siegfried
     volumes:
-      - roda_data_storage:/roda/data/storage
+      - roda_data:/roda/data/
     environment:
       # Solr Cloud configuration
       - RODA_CORE_SOLR_TYPE=CLOUD
@@ -77,4 +77,4 @@ volumes:
   solr_data:
   clam_data:
   siegfried_data:
-  roda_data_storage:
+  roda_data:
