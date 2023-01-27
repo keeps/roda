@@ -5,10 +5,8 @@ LABEL maintainer="admin@keep.pt" vendor="KEEP SOLUTIONS"
 RUN set -ex; \
     apt-get -qq update && \
     apt-get -qq -y install software-properties-common; \
-    apt-get -qq -y --no-install-recommends install clamdscan cron supervisor zip rsync jq && \
+    apt-get -qq -y --no-install-recommends install clamdscan zip rsync jq && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
-
-COPY supervisor-conf.d/* /etc/supervisor/conf.d/
 
 COPY clamd.conf /etc/clamav/clamd.conf
 
@@ -32,7 +30,13 @@ RUN set -ex; \
     apt-get remove -y curl zip && apt-get clean && apt-get autoremove ; \
     rm -rf /var/lib/apt/lists/*
 
-ENV RODA_HOME=/roda SIEGFRIED_MODE=server SIEGFRIED_SERVER_URL=http://siegfried:5138
+ENV RODA_HOME=/roda \
+    SIEGFRIED_MODE=server \
+    SIEGFRIED_SERVER_URL=http://siegfried:5138 \
+    RODA_USER="roda" \
+    RODA_UID="1000" \
+    RODA_GROUP="roda" \
+    RODA_GID="1000"
 
 COPY /docker-entrypoint.sh /
 COPY /docker-entrypoint.d/* /docker-entrypoint.d/
@@ -40,5 +44,15 @@ COPY /docker-entrypoint.d/* /docker-entrypoint.d/
 # Work-around to achieve optional copy
 ONBUILD COPY /docker-entrypoint.d/* Dockerfile /docker-entrypoint.d/
 ONBUILD RUN rm /docker-entrypoint.d/Dockerfile
+
+RUN set -ex; \
+  groupadd -r --gid "$RODA_GID" "$RODA_GROUP"; \
+  useradd -r --uid "$RODA_UID" --gid "$RODA_GID" "$RODA_USER"; \
+  mkdir -p -m0770 "$RODA_HOME/data"; \
+  chown -R "$RODA_USER:0" "$RODA_HOME"
+
+VOLUME "$RODA_HOME/data"
+
+USER "$RODA_UID"
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
