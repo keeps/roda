@@ -122,7 +122,7 @@ public class RiskIncidenceRemoverPlugin<T extends IsRODAObject> extends Abstract
         jobPluginInfo.incrementObjectsProcessedWithFailure(list.size());
       }
     } catch (JobException | AuthorizationDeniedException | NotFoundException | GenericException
-      | RequestNotValidException | LockingException e) {
+      | RequestNotValidException  e) {
       throw new PluginException("A job exception has occurred", e);
     }
 
