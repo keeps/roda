@@ -1,5 +1,16 @@
 # Changelog
 
+## v4.5.4 (27/01/2023)
+#### Enhancements:
+
+- Add metric per percentage of retries #2299
+
+Install for demonstration:
+```
+docker pull keeps/roda:v4.5.4
+```
+---
+
 ## v4.5.3 (25/01/2023)
 #### Bug fixes:
 
@@ -391,24 +402,4 @@ docker pull keeps/roda:v4.0.1
 Install for demonstration:
 ```
 docker pull keeps/roda:v3.5.5
-```
----
-
-## v3.5.4 (22/04/2021)
-
-#### Enhancements:
-
--  Modify Tomcat on Dockerfile [#1923](https://github.com/keeps/roda/issues/1923)
-
-#### Bug Fixes:
-
--  master/slave action logs management [#1928](https://github.com/keeps/roda/issues/1928)
--  CAS login repeatedly register an action even though the user is already logged in [#1926](https://github.com/keeps/roda/issues/1926)
--  PluginHelper is faulty reporting a failure when transforming lite in object [#1925](https://github.com/keeps/roda/issues/1925)
--  Failed to open job-report via job page [#1922](https://github.com/keeps/roda/issues/1922)
--  Improve ErrorHandler to filter false positive errors [#1921](https://github.com/keeps/roda/issues/1921)
-
-Install for demonstration:
-```
-docker pull keeps/roda:v3.5.4
 ```
