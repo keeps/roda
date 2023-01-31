@@ -41,10 +41,6 @@ ENV RODA_HOME=/roda \
 COPY /docker-entrypoint.sh /
 COPY /docker-entrypoint.d/* /docker-entrypoint.d/
 
-# Work-around to achieve optional copy
-ONBUILD COPY /docker-entrypoint.d/* Dockerfile /docker-entrypoint.d/
-ONBUILD RUN rm /docker-entrypoint.d/Dockerfile
-
 RUN set -ex; \
   groupadd -r --gid "$RODA_GID" "$RODA_GROUP"; \
   useradd -r --uid "$RODA_UID" --gid "$RODA_GID" "$RODA_USER"; \
