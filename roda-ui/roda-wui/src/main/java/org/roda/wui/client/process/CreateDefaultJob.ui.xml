@@ -27,6 +27,9 @@
 					</g:FlowPanel>
 					<g:FlowPanel addStyleNames="pull-right plugin-details">
 						<g:Label addStyleNames="form-label h5" ui:field="workflowListTitle" />
+						<g:FlowPanel ui:field="workflowListCertificate" />
+						<g:FlowPanel ui:field="workflowListLicenseAndDocumentation" />
+						<g:FlowPanel ui:field="workflowVendorInformation" />
 						<g:FlowPanel ui:field="workflowListDescription">
 						</g:FlowPanel>
 						<g:HTML addStyleNames="p plugin-description plugin-category-padding"

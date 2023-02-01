@@ -274,6 +274,7 @@ public final class RodaConstants {
   public static final String CORE_LDAP_FOLDER = "ldap";
   public static final String CORE_THEME_FOLDER = "theme";
   public static final String CORE_MARKDOWN_FOLDER = "documentation";
+  public static final String CORE_LICENSE_MARKDOWN_FILE = "LICENSE.md";
   public static final String CORE_RISK_FOLDER = "risk";
   public static final String CORE_AGENT_FOLDER = "agent";
   public static final String CORE_NOTIFICATION_FOLDER = "notification";
@@ -291,6 +292,10 @@ public final class RodaConstants {
   public static final String CORE_SYNCHRONIZATION_INCOMING_FOLDER = "incoming";
   public static final String CORE_LOCAL_INSTANCE_FOLDER = "local-instance";
   public static final String CORE_JOB_ATTACHMENTS_FOLDER = "job-attachments";
+  public static final String CORE_PLUGIN_MARKET_FOLDER = "market";
+
+  public static final String CORE_PLUGIN_MARKET_FILE = "plugins.json";
+  public static final String CORE_PLUGINS_DOCUMENTATION_FILE = "documentation.md";
 
   public static final String CORE_I18N_CLIENT_FOLDER = "client";
   public static final String CORE_I18_GWT_XML_FILE = "I18N.gwt.xml";

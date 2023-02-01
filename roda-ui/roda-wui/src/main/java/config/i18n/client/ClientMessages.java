@@ -14,6 +14,7 @@ import org.roda.core.data.v2.accessKey.AccessKeyStatus;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmationState;
+import org.roda.core.data.v2.jobs.CertificateInfo;
 import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.PluginState;
@@ -1733,6 +1734,14 @@ public interface ClientMessages extends Messages {
   SafeHtml defaultColumnHeader(@Select String field);
 
   String pluginStateMessage(@Select PluginState state);
+
+  String pluginLicenseLabel();
+
+  String pluginLicenseStatus(@Select CertificateInfo.CertificateStatus status);
+
+  String pluginVendorLabel();
+
+  String pluginDocumentationLabel();
 
   String notificationStateValue(@Select NotificationState state);
 

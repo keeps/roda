@@ -28,6 +28,7 @@ import org.roda.core.data.v2.ip.disposal.DisposalHoldState;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.jobs.CertificateInfo;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobParallelism;
@@ -945,5 +946,42 @@ public class HtmlSnippetUtils {
       ret = b.toSafeHtml();
     }
     return ret;
+  }
+
+  public static SafeHtml getCertificateStatusHtml(CertificateInfo.CertificateStatus status) {
+    SafeHtmlBuilder b = new SafeHtmlBuilder();
+    switch (status) {
+      case INTERNAL:
+        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT));
+        b.append(SafeHtmlUtils.fromSafeConstant("<i class=\"fas fa-plug\" style=\"color: white\"></i>"));
+        break;
+      case UNSIGNED:
+        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING));
+        b.append(SafeHtmlUtils.fromSafeConstant("<i class=\"fas fa-exclamation-triangle\" style=\"color: white\"></i>"));
+        break;
+      case TRUSTED:
+        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
+        b.append(SafeHtmlUtils.fromSafeConstant("<i class=\"fas fa-shield-alt\" style=\"color: white\"></i>"));
+        break;
+      default:
+        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER));
+        b.append(SafeHtmlUtils.fromSafeConstant("<i class=\"fas fa-exclamation-circle\" style=\"color: white\"></i>"));
+    }
+    b.append(SafeHtmlUtils.fromSafeConstant("<span class=\"icon-left-padding\">"));
+    b.append(SafeHtmlUtils.fromString(messages.pluginLicenseStatus(status)));
+    b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+    b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+    return b.toSafeHtml();
+  }
+
+  public static SafeHtml getCertificateInfoHTML(String information) {
+    SafeHtmlBuilder b = new SafeHtmlBuilder();
+    b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING));
+    b.append(SafeHtmlUtils.fromSafeConstant("<i class=\"fas fa-award\" style=\"color: white\"></i>"));
+    b.append(SafeHtmlUtils.fromSafeConstant("<span class=\"icon-left-padding\">"));
+    b.append(SafeHtmlUtils.fromString(information));
+    b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+    b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
+    return b.toSafeHtml();
   }
 }

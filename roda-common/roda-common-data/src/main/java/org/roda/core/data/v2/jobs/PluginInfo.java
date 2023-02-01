@@ -32,6 +32,15 @@ public class PluginInfo implements Serializable {
   private List<String> categories = null;
   private List<PluginParameter> parameters = new ArrayList<>();
   private Set<String> objectClasses = new HashSet<>();
+  private boolean isSigned = false;
+  private CertificateInfo certificateInfo = new CertificateInfo();
+  private String licenseResourceID = null;
+  private String documentationEntrypointID = null;
+  private Set<String> extraResources = new HashSet<>();
+  private String vendor = null;
+  private String installation = null;
+  private String support = null;
+  private boolean isInstalled = false;
 
   /**
    * Constructs a new {@link PluginInfo}.
@@ -213,4 +222,67 @@ public class PluginInfo implements Serializable {
     return this.objectClasses.contains(objectClass);
   }
 
+  public boolean isSigned() {
+    return isSigned;
+  }
+
+  public void setSigned(boolean signed) {
+    isSigned = signed;
+  }
+
+  public CertificateInfo getCertificateInfo() {
+    return certificateInfo;
+  }
+
+  public void setCertificateInfo(CertificateInfo certificateInfo) {
+    this.certificateInfo = certificateInfo;
+  }
+
+  public String getLicenseResourceID() {
+    return licenseResourceID;
+  }
+
+  public void setLicenseResourceID(String licenseResourceID) {
+    this.licenseResourceID = licenseResourceID;
+  }
+
+  public String getDocumentationEntrypointID() {
+    return documentationEntrypointID;
+  }
+
+  public void setDocumentationEntrypointID(String documentationEntrypointID) {
+    this.documentationEntrypointID = documentationEntrypointID;
+  }
+
+  public String getVendor() {
+    return vendor;
+  }
+
+  public void setVendor(String vendor) {
+    this.vendor = vendor;
+  }
+
+  public String getInstallation() {
+    return installation;
+  }
+
+  public void setInstallation(String installation) {
+    this.installation = installation;
+  }
+
+  public String getSupport() {
+    return support;
+  }
+
+  public void setSupport(String support) {
+    this.support = support;
+  }
+
+  public boolean isInstalled() {
+    return isInstalled;
+  }
+
+  public void setInstalled(boolean installed) {
+    isInstalled = installed;
+  }
 }

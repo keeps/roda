@@ -1093,8 +1093,16 @@ pre code {
     /*padding: 3px 10px;*/
 }
 
-.btn-file-signature {
+.btn-file-signature:after {
     content: "\f573";
+}
+
+.btn-stamp:after {
+    content: "\f5bf";
+}
+
+.btn-book:after {
+    content: "\f02d";
 }
 
 .lightbtn {
@@ -6286,6 +6294,13 @@ td.datePickerMonth, td.datePickerYear {
     display: inherit;
 }
 
+.plugin-list-item-label-disable {
+    color: #777;
+}
+
+.plugin-list-item-label-untrusted {
+    color: COLOR_LABEL_DANGER;
+}
 
 .plugin-list-item-selected {
 	background-color: #eee;
@@ -7457,4 +7472,14 @@ span.code {
 .fa-solid fa-triangle-exclamation {
       content: '\f071';
         @mixin fontawesome();
+}
+
+.licenseLabel {
+    float: left;
+    margin-right: 2px;
+    font-weight: bold;
+}
+
+.certificatesHTML {
+    margin: 5px 0;
 }

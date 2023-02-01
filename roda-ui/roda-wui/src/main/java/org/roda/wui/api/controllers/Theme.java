@@ -38,14 +38,26 @@ public class Theme extends RodaWuiController {
     String normalizedID = FilenameUtils.normalize(id);
     String normalizedFallBackResource = FilenameUtils.normalize(fallbackResourceId);
     Pair<String, ProvidesInputStream> ret;
-    URL url = RodaCoreFactory.getConfigurationFile(RodaConstants.CORE_THEME_FOLDER + "/" + normalizedID);
 
-    if (url != null) {
-      ret = Pair.of(id, () -> RodaCoreFactory.getConfigurationFileAsStream(
-        RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER), normalizedID));
+    if (id.startsWith(RodaConstants.CORE_PLUGINS_FOLDER)) {
+      URL url = RodaCoreFactory.getConfigurationFile(normalizedID);
+      if (url != null) {
+        ret = Pair.of(id,
+          () -> RodaCoreFactory.getConfigurationFileAsStream(RodaCoreFactory.getConfigPath(), normalizedID));
+      } else {
+        ret = Pair.of(normalizedFallBackResource, () -> RodaCoreFactory
+          .getConfigurationFileAsStream(RodaCoreFactory.getConfigPath(), normalizedFallBackResource));
+      }
     } else {
-      ret = Pair.of(normalizedFallBackResource, () -> RodaCoreFactory.getConfigurationFileAsStream(
-        RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER), normalizedFallBackResource));
+      URL url = RodaCoreFactory.getConfigurationFile(RodaConstants.CORE_THEME_FOLDER + "/" + normalizedID);
+
+      if (url != null) {
+        ret = Pair.of(id, () -> RodaCoreFactory.getConfigurationFileAsStream(
+          RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER), normalizedID));
+      } else {
+        ret = Pair.of(normalizedFallBackResource, () -> RodaCoreFactory.getConfigurationFileAsStream(
+          RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER), normalizedFallBackResource));
+      }
     }
 
     return ret;
@@ -97,7 +109,12 @@ public class Theme extends RodaWuiController {
 
   public static Date getLastModifiedDate(String resourceId) throws IOException {
     Date modifiedDate;
-    URL file = RodaCoreFactory.getConfigurationFile(RodaConstants.CORE_THEME_FOLDER + "/" + resourceId);
+    URL file;
+    if(resourceId.startsWith(RodaConstants.CORE_PLUGINS_FOLDER)){
+      file = RodaCoreFactory.getConfigurationFile(resourceId);
+    } else {
+      file = RodaCoreFactory.getConfigurationFile(RodaConstants.CORE_THEME_FOLDER + "/" + resourceId);
+    }
 
     if ("file".equalsIgnoreCase(file.getProtocol())) {
       try {

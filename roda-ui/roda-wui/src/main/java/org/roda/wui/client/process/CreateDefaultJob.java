@@ -29,6 +29,7 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.jobs.CertificateInfo;
 import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobParallelism;
@@ -39,7 +40,9 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.CertificateDialogs;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
@@ -50,6 +53,7 @@ import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.ingest.process.PluginOptionsPanel;
+import org.roda.wui.client.main.Theme;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
@@ -63,6 +67,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -147,6 +152,15 @@ public class CreateDefaultJob extends Composite {
   FlowPanel workflowList;
 
   @UiField
+  FlowPanel workflowListCertificate;
+
+  @UiField
+  FlowPanel workflowVendorInformation;
+
+  @UiField
+  FlowPanel workflowListLicenseAndDocumentation;
+
+  @UiField
   FlowPanel workflowListDescription;
 
   @UiField
@@ -213,6 +227,7 @@ public class CreateDefaultJob extends Composite {
 
       @Override
       public void onFailure(Throwable caught) {
+        GWT.log(caught.getMessage());
         // do nothing
       }
 
@@ -259,7 +274,10 @@ public class CreateDefaultJob extends Composite {
         PluginInfo pluginInfo = plugins.get(p);
 
         if (pluginInfo != null) {
-          List<String> pluginCategories = pluginInfo.getCategories();
+          List<String> pluginCategories = new ArrayList<>(pluginInfo.getCategories());
+          if (pluginInfo.isInstalled()) {
+            pluginCategories.add("Installed");
+          }
 
           if (pluginCategories != null && !pluginCategories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
             for (String category : pluginCategories) {
@@ -284,7 +302,10 @@ public class CreateDefaultJob extends Composite {
                       for (int p = 0; p < plugins.size(); p++) {
                         PluginInfo pluginInfo = plugins.get(p);
                         if (pluginInfo != null) {
-                          List<String> categories = pluginInfo.getCategories();
+                          List<String> categories = new ArrayList<>(pluginInfo.getCategories());
+                          if (pluginInfo.isInstalled()) {
+                            categories.add("Installed");
+                          }
 
                           if (categories != null) {
                             for (int i = 0; i < workflowCategoryList.getWidgetCount(); i++) {
@@ -386,13 +407,25 @@ public class CreateDefaultJob extends Composite {
     String labelContent = messages.pluginLabelWithVersion(pluginInfo.getName(), pluginInfo.getVersion());
     label.setText(labelContent);
     label.setTitle(labelContent);
-    label.addStyleName("plugin-list-item-label");
+    label.addStyleName(getWorkFlowListItemLabel(pluginInfo));
 
     panel.add(itemImage);
     panel.add(label);
 
     workflowList.add(panel);
     return panel;
+  }
+
+  private String getWorkFlowListItemLabel(PluginInfo pluginInfo) {
+    if (pluginInfo.isSigned()) {
+      if (pluginInfo.getCertificateInfo().isUntrusted()) {
+        return "plugin-list-item-label-untrusted";
+      }
+    }
+    if (!pluginInfo.isInstalled()) {
+      return "plugin-list-item-label-disable";
+    }
+    return "plugin-list-item-label";
   }
 
   protected void updateWorkflowOptions() {
@@ -407,6 +440,11 @@ public class CreateDefaultJob extends Composite {
       String pluginName = messages.pluginLabelWithVersion(selectedPlugin.getName(), selectedPlugin.getVersion());
       name.setText(pluginName);
       workflowListTitle.setText(pluginName);
+      buildCertificatePanel();
+      buildPluginLicenseAndDocumentation();
+      buildVendorInformation();
+
+      buttonCreate.setEnabled(shouldEnableCreateButton());
 
       String description = selectedPlugin.getDescription();
       if (description != null && description.length() > 0) {
@@ -459,6 +497,88 @@ public class CreateDefaultJob extends Composite {
       targetListPanel.clear();
       defineTargetInformation(targetList.getSelectedValue());
     }
+  }
+
+  private boolean shouldEnableCreateButton() {
+    // Enable it only for unsigned plugins or trusted plugins
+    if (selectedPlugin.isInstalled()) {
+      if (!selectedPlugin.isSigned()) {
+        return true;
+      } else if (!selectedPlugin.getCertificateInfo().isUntrusted()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private void buildCertificatePanel() {
+    workflowListCertificate.clear();
+    if (selectedPlugin.isInstalled()) {
+      if (selectedPlugin.getCertificateInfo() != null) {
+        CertificateInfo certificateInfo = selectedPlugin.getCertificateInfo();
+        workflowListCertificate
+          .add(new HTML(HtmlSnippetUtils.getCertificateStatusHtml(certificateInfo.getCertificateStatus())));
+        if (!certificateInfo.getCertificates().isEmpty()) {
+          Button certificateInfoButton = new Button("Certificates");
+          certificateInfoButton.addStyleName("btn btn-file-signature");
+          certificateInfoButton.addClickHandler(
+            clickEvent -> CertificateDialogs.showCertificateDialog(certificateInfo, new NoAsyncCallback<>()));
+          workflowListCertificate.add(certificateInfoButton);
+        }
+      }
+    }
+  }
+
+  private void buildVendorInformation() {
+    workflowVendorInformation.clear();
+    if (selectedPlugin.getVendor() != null && !selectedPlugin.getVendor().isEmpty()) {
+      FlowPanel vendorFlowPanel = new FlowPanel();
+      Label vendorLabel = new Label(messages.pluginVendorLabel());
+      vendorLabel.addStyleName("licenseLabel");
+      Label vendor = new Label(selectedPlugin.getVendor());
+      vendorFlowPanel.add(vendorLabel);
+      vendorFlowPanel.add(vendor);
+      workflowVendorInformation.add(vendorFlowPanel);
+    }
+
+    if (!selectedPlugin.isInstalled()) {
+      if (selectedPlugin.getInstallation() != null && !selectedPlugin.getInstallation().isEmpty()) {
+        FlowPanel installationPanel = new FlowPanel();
+        SafeHtml safeHtml = SafeHtmlUtils.fromTrustedString(selectedPlugin.getInstallation());
+        installationPanel.add(new HTML(safeHtml));
+        workflowVendorInformation.add(installationPanel);
+      }
+    } else {
+      if (selectedPlugin.getSupport() != null && !selectedPlugin.getSupport().isEmpty()) {
+        FlowPanel supportPanel = new FlowPanel();
+        SafeHtml safeHtml = SafeHtmlUtils.fromString(selectedPlugin.getSupport());
+        supportPanel.add(new HTML(safeHtml));
+        workflowVendorInformation.add(supportPanel);
+      }
+    }
+  }
+
+  private void buildPluginLicenseAndDocumentation() {
+    workflowListLicenseAndDocumentation.clear();
+    if (selectedPlugin.getLicenseResourceID() != null) {
+      Button licenseButton = new Button(messages.pluginLicenseLabel());
+      licenseButton.addStyleName("btn btn-stamp");
+      licenseButton
+        .addClickHandler(clickEvent -> HistoryUtils.newHistory(Theme.RESOLVER, selectedPlugin.getLicenseResourceID()));
+      workflowListLicenseAndDocumentation.add(licenseButton);
+    }
+
+    if (selectedPlugin.getDocumentationEntrypointID() != null) {
+      Button licenseButton = new Button(messages.pluginDocumentationLabel());
+      licenseButton.addStyleName("btn btn-book");
+      licenseButton.addClickHandler(
+        clickEvent -> HistoryUtils.newHistory(Theme.RESOLVER, selectedPlugin.getDocumentationEntrypointID()));
+      workflowListLicenseAndDocumentation.add(licenseButton);
+    }
+  }
+
+  private String getResourceName(String resourceId) {
+    return resourceId.substring(resourceId.lastIndexOf("/") + 1);
   }
 
   private List<String> getPluginNames(Set<String> objectClasses) {

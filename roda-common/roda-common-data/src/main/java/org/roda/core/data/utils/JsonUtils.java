@@ -157,6 +157,15 @@ public final class JsonUtils {
     }
   }
 
+  public static <T> List<T> getListFromJson(InputStream json, Class<T> objectClass) throws GenericException {
+    try {
+      String jsonString = IOUtils.toString(json, RodaConstants.DEFAULT_ENCODING);
+      return getListFromJson(jsonString, objectClass);
+    } catch (IOException e) {
+      throw new GenericException(JSON_ERROR_MESSAGE, e);
+    }
+  }
+
   public static <T> List<T> getListFromJson(String json, Class<T> objectClass) throws GenericException {
     try {
       ObjectMapper mapper = new ObjectMapper(new JsonFactory());

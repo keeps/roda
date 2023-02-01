@@ -10,7 +10,6 @@
  */
 package org.roda.wui.common.client.widgets;
 
-import com.google.gwt.core.client.GWT;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.wui.client.main.Theme;
@@ -69,14 +68,19 @@ public class HTMLWidgetWrapper extends HTML {
   public HTMLWidgetWrapper(String resourceId, String instanceId, final AsyncCallback<Void> callback) {
     String id = resourceId;
     boolean isMarkdown = false;
+
     if (id.endsWith(".html")) {
       id = id.substring(0, id.length() - 5);
     }
     if (id.endsWith(".md")) {
       isMarkdown = true;
-      String markdownPathPrefix = RodaConstants.CORE_MARKDOWN_FOLDER + "/";
-      if (!id.startsWith(markdownPathPrefix)) {
-        id = markdownPathPrefix + id.substring(0, id.length() - 3);
+      if (id.startsWith(RodaConstants.CORE_PLUGINS_FOLDER)) {
+        id = id.substring(0, id.length() - 3);
+      } else {
+        String markdownPathPrefix = RodaConstants.CORE_MARKDOWN_FOLDER + "/";
+        if (!id.startsWith(markdownPathPrefix)) {
+          id = markdownPathPrefix + id.substring(0, id.length() - 3);
+        }
       }
     }
 
@@ -122,8 +126,8 @@ public class HTMLWidgetWrapper extends HTML {
               RegExp imgDocRegExp = RegExp
                 .compile("<img src=\"(" + RodaConstants.CORE_MARKDOWN_FOLDER + "/images/.*?)\"", "g");
               String imgDocReplacement = ("<img src=\""
-                + RestUtils.createThemeResourceUri(filenameToken, null, false).asString() + "\"")
-                .replace(filenameToken, "$1");
+                + RestUtils.createThemeResourceUri(filenameToken, null, false).asString() + "\"").replace(filenameToken,
+                  "$1");
 
               html = imgDocRegExp.replace(html, imgDocReplacement);
 
@@ -131,8 +135,8 @@ public class HTMLWidgetWrapper extends HTML {
               // them with proper "#theme/images/..." links
               RegExp imgRegExp = RegExp.compile("<img src=\"(images/.*?)\"", "g");
               String imgReplacement = ("<img src=\""
-                + RestUtils.createThemeResourceUri(filenameToken, null, false).asString() + "\"")
-                .replace(filenameToken, RodaConstants.CORE_MARKDOWN_FOLDER + "/$1");
+                + RestUtils.createThemeResourceUri(filenameToken, null, false).asString() + "\"").replace(filenameToken,
+                  RodaConstants.CORE_MARKDOWN_FOLDER + "/$1");
 
               html = imgRegExp.replace(html, imgReplacement);
             } else {

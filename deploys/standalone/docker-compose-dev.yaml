@@ -23,32 +23,32 @@ services:
       - -c
     volumes:
       - solr_data:/var/solr
-  clamd:
-    image: docker.io/clamav/clamav:stable
-    restart: unless-stopped
-    ports:
-      - "3310:3310"
-    volumes:
-      - clam_data:/var/lib/clamav
-      # Mapping $HOME/.roda to enable usage with spring-boot mode
-      - $HOME/.roda/data/storage:$HOME/.roda/data/storage:ro
-      # Mapping /tmp to enable usage with local testing via mvn test
-      - /tmp:/tmp
-
-  siegfried:
-    image: docker.io/keeps/siegfried:v1.9.6
-    restart: unless-stopped
-    ports:
-      - "5138:5138"
-    environment:
-      SIEGFRIED_HOST: siegfried
-      SIEGFRIED_PORT: 5138
-    volumes:
-      - siegfried_data:/root/siegfried/
-      # Mapping $HOME/.roda to enable usage with spring-boot mode
-      - $HOME/.roda/data/storage:$HOME/.roda/data/storage:ro
-      # Mapping /tmp to enable usage with local testing via mvn test
-      - /tmp:/tmp:ro
+#  clamd:
+#    image: docker.io/clamav/clamav:stable
+#    restart: unless-stopped
+#    ports:
+#      - "3310:3310"
+#    volumes:
+#      - clam_data:/var/lib/clamav
+#      # Mapping $HOME/.roda to enable usage with spring-boot mode
+#      - $HOME/.roda/data/storage:$HOME/.roda/data/storage:ro
+#      # Mapping /tmp to enable usage with local testing via mvn test
+#      - /tmp:/tmp
+#
+#  siegfried:
+#    image: docker.io/keeps/siegfried:v1.9.6
+#    restart: unless-stopped
+#    ports:
+#      - "5138:5138"
+#    environment:
+#      SIEGFRIED_HOST: siegfried
+#      SIEGFRIED_PORT: 5138
+#    volumes:
+#      - siegfried_data:/root/siegfried/
+#      # Mapping $HOME/.roda to enable usage with spring-boot mode
+#      - $HOME/.roda/data/storage:$HOME/.roda/data/storage:ro
+#      # Mapping /tmp to enable usage with local testing via mvn test
+#      - /tmp:/tmp:ro
   swagger:
     image: docker.io/swaggerapi/swagger-ui:latest
     restart: on-failure
