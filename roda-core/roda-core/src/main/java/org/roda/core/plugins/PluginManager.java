@@ -405,22 +405,20 @@ public class PluginManager {
   private void loadMarketPlugins() {
     String marketPluginFile = Paths.get(RodaConstants.CORE_PLUGIN_MARKET_FOLDER)
       .resolve(RodaConstants.CORE_PLUGIN_MARKET_FILE).toString();
-    if (Files.exists(Paths.get(RodaCoreFactory.getConfigurationFile(marketPluginFile).getPath()))) {
-      try {
-        List<PluginInfo> pluginInfoList = JsonUtils
-          .getListFromJson(RodaCoreFactory.getConfigurationFileAsStream(marketPluginFile), PluginInfo.class);
-        LOGGER.info("Loading information from plugins available on the market");
-        for (PluginInfo pluginInfo : pluginInfoList) {
-          // Add only if is not already loaded
-          if (!internalPluginChache.containsKey(pluginInfo.getId())
-            && !externalPluginChache.containsKey(pluginInfo.getId())
-            && !blacklistedPlugins.contains(pluginInfo.getId())) {
-            processAndCachePluginInfoPerType(pluginInfo.getType(), pluginInfo);
-          }
+    try {
+      List<PluginInfo> pluginInfoList = JsonUtils
+        .getListFromJson(RodaCoreFactory.getConfigurationFileAsStream(marketPluginFile), PluginInfo.class);
+      LOGGER.info("Loading information from plugins available on the market");
+      for (PluginInfo pluginInfo : pluginInfoList) {
+        // Add only if is not already loaded
+        if (!internalPluginChache.containsKey(pluginInfo.getId())
+          && !externalPluginChache.containsKey(pluginInfo.getId())
+          && !blacklistedPlugins.contains(pluginInfo.getId())) {
+          processAndCachePluginInfoPerType(pluginInfo.getType(), pluginInfo);
         }
-      } catch (GenericException e) {
-        LOGGER.error("Unable to read plugin market file", e);
       }
+    } catch (GenericException e) {
+      LOGGER.error("Unable to read plugin market file", e);
     }
     marketPluginStarted = true;
   }
