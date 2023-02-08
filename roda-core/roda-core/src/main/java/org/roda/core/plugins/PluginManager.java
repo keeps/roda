@@ -410,10 +410,8 @@ public class PluginManager {
         .getListFromJson(RodaCoreFactory.getConfigurationFileAsStream(marketPluginFile), PluginInfo.class);
       LOGGER.info("Loading information from plugins available on the market");
       for (PluginInfo pluginInfo : pluginInfoList) {
-        // Add only if is not already loaded
-        if (!internalPluginChache.containsKey(pluginInfo.getId())
-          && !externalPluginChache.containsKey(pluginInfo.getId())
-          && !blacklistedPlugins.contains(pluginInfo.getId())) {
+
+        if (!blacklistedPlugins.contains(pluginInfo.getId())) {
           processAndCachePluginInfoPerType(pluginInfo.getType(), pluginInfo);
         }
       }
@@ -656,6 +654,15 @@ public class PluginManager {
           classloader = c;
         }
 
+        // Let's load Plugin properties
+        for (Path propertiesFile : p.pluginProperties) {
+          try {
+            RodaCoreFactory.addExternalConfiguration(propertiesFile);
+          } catch (ConfigurationException e) {
+            LOGGER.warn("Could not load plugin configuration: " + propertiesFile, e);
+          }
+        }
+
         // load certificates
         CertificateInfo certificateInfo = loadAndCheckCertificates(p.jarPath);
         if (certificateInfo.isUntrusted()) {
@@ -684,15 +691,6 @@ public class PluginManager {
 
   private void loadTrustedOrUnsignedPlugins(PluginLoadInfo p, ClassLoader classloader, BasicFileAttributes attrs,
     CertificateInfo certificateInfo) throws IOException {
-    // Let's load Plugin properties
-    for (Path propertiesFile : p.pluginProperties) {
-      try {
-        RodaCoreFactory.addExternalConfiguration(propertiesFile);
-      } catch (ConfigurationException e) {
-        LOGGER.warn("Could not load plugin configuration: " + propertiesFile, e);
-      }
-    }
-
     // Let's load the Plugin
     List<Plugin<? extends IsRODAObject>> plugins = loadPlugin(p.jarPath, p.pluginClassNames, classloader);
     if (!plugins.isEmpty()) {
@@ -843,9 +841,14 @@ public class PluginManager {
       // checks if the cached plugin is installed or comes from market information
       int i = pluginInfoPerType.get(pluginType).indexOf(pluginInfo);
       PluginInfo cachedPluginInfo = pluginInfoPerType.get(pluginType).get(i);
+
       if (!cachedPluginInfo.isInstalled()) {
+        // Replace market plugin information for installed plugin
         pluginInfoPerType.get(pluginType).remove(cachedPluginInfo);
         pluginInfoPerType.get(pluginType).add(pluginInfo);
+      } else {
+        // Set market version to already installed plugins
+        cachedPluginInfo.setMarketVersion(pluginInfo.getVersion());
       }
     }
   }

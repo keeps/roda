@@ -27,6 +27,7 @@ public class PluginInfo implements Serializable {
   private String id = null;
   private String name = null;
   private String version = null;
+  private String marketVersion = null;
   private String description = null;
   private PluginType type = PluginType.MISC;
   private List<String> categories = null;
@@ -36,7 +37,6 @@ public class PluginInfo implements Serializable {
   private CertificateInfo certificateInfo = new CertificateInfo();
   private String licenseResourceID = null;
   private String documentationEntrypointID = null;
-  private Set<String> extraResources = new HashSet<>();
   private String vendor = null;
   private String installation = null;
   private String support = null;
@@ -155,6 +155,14 @@ public class PluginInfo implements Serializable {
    */
   public void setVersion(String version) {
     this.version = version;
+  }
+
+  public String getMarketVersion() {
+    return marketVersion;
+  }
+
+  public void setMarketVersion(String marketVersion) {
+    this.marketVersion = marketVersion;
   }
 
   /**
