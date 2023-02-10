@@ -294,7 +294,7 @@ public final class RodaConstants {
   public static final String CORE_JOB_ATTACHMENTS_FOLDER = "job-attachments";
   public static final String CORE_PLUGIN_MARKET_FOLDER = "market";
 
-  public static final String CORE_PLUGIN_MARKET_FILE = "plugins.json";
+  public static final String CORE_PLUGIN_MARKET_FILE = "pluginsInfo.jsonl";
   public static final String CORE_PLUGINS_DOCUMENTATION_FILE = "documentation.md";
 
   public static final String CORE_I18N_CLIENT_FOLDER = "client";

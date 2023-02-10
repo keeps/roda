@@ -8,12 +8,11 @@
 package org.roda.core.data.utils;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -31,6 +30,7 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadataMixIn;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -101,6 +101,24 @@ public final class JsonUtils {
     return ret;
   }
 
+  public static <T> String getJsonLinesFromObjectList(List<T> objectList) {
+    StringBuilder ret = new StringBuilder();
+    for (Object object : objectList) {
+      try {
+        if (!ret.isEmpty()) {
+          ret.append("\n");
+        }
+        ObjectMapper mapper = new ObjectMapper(new JsonFactory());
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+        ret.append(mapper.writer().writeValueAsString(object));
+      } catch (IOException e) {
+        LOGGER.error("Error transforming object '{}' to json string", object, e);
+      }
+    }
+    return ret.toString();
+  }
+
   private static ObjectMapper addMixinsToMapper(ObjectMapper mapper, Object object, Class<?> mixin) {
     if (!(object instanceof DescriptiveMetadata)) {
       if (object instanceof List<?>) {
@@ -157,13 +175,19 @@ public final class JsonUtils {
     }
   }
 
-  public static <T> List<T> getListFromJson(InputStream json, Class<T> objectClass) throws GenericException {
+  public static <T> List<T> getListFromJsonLines(InputStream jsonLines, Class<T> objectClass) throws GenericException {
+    ArrayList<T> list = new ArrayList<>();
     try {
-      String jsonString = IOUtils.toString(json, RodaConstants.DEFAULT_ENCODING);
-      return getListFromJson(jsonString, objectClass);
+      InputStreamReader inputStreamReader = new InputStreamReader(jsonLines, StandardCharsets.UTF_8);
+      BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+      String json;
+      while ((json = bufferedReader.readLine()) != null) {
+        list.add(getObjectFromJson(json, objectClass));
+      }
     } catch (IOException e) {
       throw new GenericException(JSON_ERROR_MESSAGE, e);
     }
+    return list;
   }
 
   public static <T> List<T> getListFromJson(String json, Class<T> objectClass) throws GenericException {

@@ -551,7 +551,7 @@ public class CreateDefaultJob extends Composite {
     } else {
       if (selectedPlugin.getSupport() != null && !selectedPlugin.getSupport().isEmpty()) {
         FlowPanel supportPanel = new FlowPanel();
-        SafeHtml safeHtml = SafeHtmlUtils.fromString(selectedPlugin.getSupport());
+        SafeHtml safeHtml = SafeHtmlUtils.fromTrustedString(selectedPlugin.getSupport());
         supportPanel.add(new HTML(safeHtml));
         workflowVendorInformation.add(supportPanel);
       }

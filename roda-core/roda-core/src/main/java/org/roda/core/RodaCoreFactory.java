@@ -82,7 +82,6 @@ import org.reflections.util.ConfigurationBuilder;
 import org.roda.core.common.Messages;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
-import org.roda.core.model.utils.UserUtility;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.monitor.TransferUpdateStatus;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
@@ -94,6 +93,7 @@ import org.roda.core.data.common.RodaConstants.PreservationAgentType;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.common.RodaConstants.SolrType;
 import org.roda.core.data.common.RodaConstants.StorageType;
+import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -137,6 +137,7 @@ import org.roda.core.migration.MigrationManager;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.LdapUtility;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.PluginManager;
 import org.roda.core.plugins.PluginManagerException;
 import org.roda.core.plugins.PluginOrchestrator;
@@ -151,7 +152,6 @@ import org.roda.core.storage.StorageServiceWrapper;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.util.IdUtils;
-import org.roda.core.data.common.SecureString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -2577,8 +2577,12 @@ public class RodaCoreFactory {
         }
 
         String pluginsMarkdown = PluginManager.getPluginsInformationAsMarkdown(pluginsNameAndState);
+        String pluginsJson = PluginManager.getPluginsInformationAsJsonLines(pluginsNameAndState);
         try {
           Files.write(Paths.get(FilenameUtils.normalize(args.get(3)), "README.md"), pluginsMarkdown.getBytes());
+          if (pluginsJson != null) {
+            Files.write(Paths.get(FilenameUtils.normalize(args.get(3)), "pluginInfo.jsonl"), pluginsJson.getBytes());
+          }
         } catch (IOException e) {
           System.err
             .println("Error while writing plugin/plugins information in markdown format! Reason: " + e.getMessage());

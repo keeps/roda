@@ -33,14 +33,14 @@ public class PluginInfo implements Serializable {
   private List<String> categories = null;
   private List<PluginParameter> parameters = new ArrayList<>();
   private Set<String> objectClasses = new HashSet<>();
-  private boolean isSigned = false;
+  private Boolean isSigned = false;
   private CertificateInfo certificateInfo = new CertificateInfo();
   private String licenseResourceID = null;
   private String documentationEntrypointID = null;
   private String vendor = null;
   private String installation = null;
   private String support = null;
-  private boolean isInstalled = false;
+  private Boolean isInstalled = false;
 
   /**
    * Constructs a new {@link PluginInfo}.
@@ -230,11 +230,11 @@ public class PluginInfo implements Serializable {
     return this.objectClasses.contains(objectClass);
   }
 
-  public boolean isSigned() {
+  public Boolean isSigned() {
     return isSigned;
   }
 
-  public void setSigned(boolean signed) {
+  public void setSigned(Boolean signed) {
     isSigned = signed;
   }
 
@@ -286,11 +286,11 @@ public class PluginInfo implements Serializable {
     this.support = support;
   }
 
-  public boolean isInstalled() {
+  public Boolean isInstalled() {
     return isInstalled;
   }
 
-  public void setInstalled(boolean installed) {
+  public void setInstalled(Boolean installed) {
     isInstalled = installed;
   }
 }

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.DirectoryStream;
@@ -47,12 +48,14 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.io.FilenameUtils;
 import org.reflections.Reflections;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -407,7 +410,7 @@ public class PluginManager {
       .resolve(RodaConstants.CORE_PLUGIN_MARKET_FILE).toString();
     try {
       List<PluginInfo> pluginInfoList = JsonUtils
-        .getListFromJson(RodaCoreFactory.getConfigurationFileAsStream(marketPluginFile), PluginInfo.class);
+        .getListFromJsonLines(RodaCoreFactory.getConfigurationFileAsStream(marketPluginFile), PluginInfo.class);
       LOGGER.info("Loading information from plugins available on the market");
       for (PluginInfo pluginInfo : pluginInfoList) {
 
@@ -845,10 +848,15 @@ public class PluginManager {
       if (!cachedPluginInfo.isInstalled()) {
         // Replace market plugin information for installed plugin
         pluginInfoPerType.get(pluginType).remove(cachedPluginInfo);
+        pluginInfo.setMarketVersion(cachedPluginInfo.getVersion());
+        pluginInfo.setVendor(cachedPluginInfo.getVendor());
+        pluginInfo.setSupport(cachedPluginInfo.getSupport());
         pluginInfoPerType.get(pluginType).add(pluginInfo);
       } else {
         // Set market version to already installed plugins
         cachedPluginInfo.setMarketVersion(pluginInfo.getVersion());
+        cachedPluginInfo.setVendor(pluginInfo.getVendor());
+        cachedPluginInfo.setSupport(pluginInfo.getSupport());
       }
     }
   }
@@ -967,4 +975,51 @@ public class PluginManager {
     return sb.toString();
   }
 
+  public static String getPluginsInformationAsJsonLines(List<Pair<String, String>> plugins) {
+    ArrayList<PluginInfo> pluginInfoList = new ArrayList<>();
+    for (Pair<String, String> pluginNameAndState : plugins) {
+      String plugin = pluginNameAndState.getFirst();
+      try {
+        Class<?> pluginClass = Class.forName(plugin);
+
+        // Load and add all plugin configuration files
+        List<Path> propertiesFiles;
+        Path configurationFolder = Paths.get(pluginClass.getClassLoader().getResource(RodaConstants.CORE_CONFIG_FOLDER).getPath());
+        if(Files.exists(configurationFolder)) {
+          try (Stream<Path> walk = Files.walk(configurationFolder)) {
+            propertiesFiles = walk.filter(Files::isRegularFile).collect(Collectors.toList());
+          }
+          for (Path propertiesFile : propertiesFiles) {
+            String extension = FilenameUtils.getExtension(FilenameUtils.getName(propertiesFile.toString()));
+            if ("properties".equals(extension)) {
+              RodaCoreFactory.addExternalConfiguration(propertiesFile);
+            }
+          }
+        }
+
+        // create a plugin instance
+        Plugin<? extends IsRODAObject> pluginInstance = (Plugin<? extends IsRODAObject>) pluginClass.newInstance();
+        PluginInfo pluginInfo = new PluginInfo();
+
+        // Create the plugin info with only the necessary information
+        pluginInfo.setId(pluginInstance.getClass().getName());
+        pluginInfo.setName(pluginInstance.getName());
+        pluginInfo.setVersion(pluginInstance.getVersion());
+        pluginInfo.setCategories(pluginInstance.getCategories());
+        pluginInfo.setDescription(pluginInstance.getDescription());
+        pluginInfo.setCertificateInfo(null);
+        pluginInfo.setInstalled(null);
+        pluginInfo.setSigned(null);
+
+        pluginInfoList.add(pluginInfo);
+      } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+        LOGGER.error("Error getting plugin information", e);
+        return null;
+      } catch ( IOException | ConfigurationException e) {
+        LOGGER.error("Unable to load plugin properties", e);
+        return null;
+      }
+    }
+    return JsonUtils.getJsonLinesFromObjectList(pluginInfoList);
+  }
 }
