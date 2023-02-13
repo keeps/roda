@@ -42,6 +42,8 @@ $ sudo apt-get install oracle-java8-installer oracle-java8-set-default git maven
 
 ### Compilation
 
+Before compile, be sure to [authenticate to GitHub packages](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry#authenticating-with-a-personal-access-token).
+
 To compile, go to the RODA sources folder and execute the command:
 
 ```bash
