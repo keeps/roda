@@ -28,6 +28,7 @@ import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -90,9 +91,12 @@ public class Login extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private boolean register_disabled = ConfigurationManager.getBoolean(false,
+    "ui.sharedProperties.userRegister.disabled");
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
+
 
   @UiField
   TextBox username;
@@ -105,6 +109,12 @@ public class Login extends Composite {
 
   @UiField
   Button resendEmail;
+
+  @UiField
+  Button recover;
+
+  @UiField
+  Button register;
 
   @UiField
   FlowPanel loginPanel;
@@ -144,6 +154,10 @@ public class Login extends Composite {
     resendEmail.setVisible(false);
     serviceTokens = historyTokens;
 
+    if (this.register_disabled) {
+      recover.setVisible(false);
+      register.setVisible(false);
+    }
     UserLogin.getInstance().getAuthenticatedUser(new NoAsyncCallback<User>() {
       @Override
       public void onSuccess(User user) {
