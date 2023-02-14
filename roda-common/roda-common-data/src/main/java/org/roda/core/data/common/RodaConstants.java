@@ -292,9 +292,8 @@ public final class RodaConstants {
   public static final String CORE_SYNCHRONIZATION_INCOMING_FOLDER = "incoming";
   public static final String CORE_LOCAL_INSTANCE_FOLDER = "local-instance";
   public static final String CORE_JOB_ATTACHMENTS_FOLDER = "job-attachments";
-  public static final String CORE_PLUGIN_MARKET_FOLDER = "market";
-
-  public static final String CORE_PLUGIN_MARKET_FILE = "pluginsInfo.jsonl";
+  public static final String CORE_MARKET_FOLDER = "market";
+  public static final String CORE_MARKET_FILE = "marketInfo.jsonl";
   public static final String CORE_PLUGINS_DOCUMENTATION_FILE = "documentation.md";
 
   public static final String CORE_I18N_CLIENT_FOLDER = "client";
@@ -696,13 +695,18 @@ public final class RodaConstants {
   public static final String API_SECRET_KEY_PROPERTY = "roda.distributed.api.secret";
 
   public static final String CENTRAL_INSTANCE_NAME_PROPERTY = "roda.distributed.localinstance.name";
-
   public static final String DEFAULT_CENTRAL_INSTANCE_NAME = "Central";
 
   public static final long DEFAULT_ACCESS_KEY_VALIDITY = 31536000000L; // 1 year in ms
   public static final String ACCESS_KEY_VALIDITY = "roda.distributed.api.access.key.validity";
   public static final long DEFAULT_ACCESS_TOKEN_VALIDITY = 7200000L; // 2 hours in ms
   public static final String ACCESS_TOKEN_VALIDITY = "roda.distributed.api.access.token.validity";
+
+  // MARKET
+  public static final String MARKET_INFO_URL_PROPERTY = "core.market.info.url";
+  public static final String DEFAULT_MARKET_INFO_URL = "https://market.roda-community.org";
+  public static final String DEFAULT_MARKET_SUPPORT_URL = "https://www.keep.pt/en/contacts-proposals-information-telephone-address/";
+
 
   public enum OrchestratorType {
     AKKA, AKKA_DISTRIBUTED

@@ -80,6 +80,7 @@ import org.reflections.scanners.Scanners;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.roda.core.common.Messages;
+import org.roda.core.common.MarketUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -205,6 +206,8 @@ public class RodaCoreFactory {
   private static Path synchronizationDirectoryPath;
   private static Path localInstanceConfigPath;
   private static Path jobAttachmentsDirectoryPath;
+
+  private static Path marketDirectoryPath;
 
   private static StorageService storage;
   private static ModelService model;
@@ -648,6 +651,18 @@ public class RodaCoreFactory {
     }
   }
 
+  private static void initializeMarketDir() {
+    try {
+      String marketFolder = getConfigurationString("market.folder",
+        RodaConstants.CORE_MARKET_FOLDER);
+      marketDirectoryPath = getConfigPath().resolve(marketFolder);
+      Files.createDirectories(marketDirectoryPath);
+    } catch (IOException e) {
+      throw new RuntimeException(
+        "Unable to create market DIRECTORY " + marketDirectoryPath + ", Aborting...", e);
+    }
+  }
+
   /**
    * Try to get property from 1) system property (passed in command-line via -D;
    * if property does not start by "roda.", it will be prepended); 2) environment
@@ -1055,6 +1070,17 @@ public class RodaCoreFactory {
 
   private static void instantiatePluginManager() {
     if (INSTANTIATE_PLUGIN_MANAGER) {
+      try {
+        initializeMarketDir();
+        // Retrieve plugin info list from market
+        MarketUtils.retrievePluginsListFromAPI(getLocalInstance());
+      } catch (GenericException e) {
+        LOGGER.error("Unable to retrieve instance config file", e);
+        instantiatedWithoutErrors = false;
+      } catch (IOException e) {
+        LOGGER.warn("Unable to retrieve plugin list info from API", e);
+      }
+
       try {
         pluginManager = PluginManager.instantiatePluginManager(getConfigPath(), getPluginsPath());
       } catch (PluginManagerException e) {
@@ -1486,16 +1512,16 @@ public class RodaCoreFactory {
   }
 
   private static void instantiateDistributedMode() {
+    initializeLocalInstanceConfigDirectory();
     distributedModeType = DistributedModeType.valueOf(
       getProperty(RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY, RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name()));
-    if (DistributedModeType.CENTRAL.equals(distributedModeType)) {
-      apiSecretKey = getProperty(RodaConstants.API_SECRET_KEY_PROPERTY, RodaConstants.DEFAULT_API_SECRET_KEY);
-      accessKeyValidity = RodaCoreFactory.getRodaConfiguration().getLong(RodaConstants.ACCESS_KEY_VALIDITY,
-        RodaConstants.DEFAULT_ACCESS_KEY_VALIDITY);
-      accessTokenValidity = RodaCoreFactory.getRodaConfiguration().getLong(RodaConstants.ACCESS_TOKEN_VALIDITY,
-        RodaConstants.DEFAULT_ACCESS_TOKEN_VALIDITY);
-      try {
-        initializeLocalInstanceConfigDirectory();
+    try {
+      if (DistributedModeType.CENTRAL.equals(distributedModeType)) {
+        apiSecretKey = getProperty(RodaConstants.API_SECRET_KEY_PROPERTY, RodaConstants.DEFAULT_API_SECRET_KEY);
+        accessKeyValidity = RodaCoreFactory.getRodaConfiguration().getLong(RodaConstants.ACCESS_KEY_VALIDITY,
+          RodaConstants.DEFAULT_ACCESS_KEY_VALIDITY);
+        accessTokenValidity = RodaCoreFactory.getRodaConfiguration().getLong(RodaConstants.ACCESS_TOKEN_VALIDITY,
+          RodaConstants.DEFAULT_ACCESS_TOKEN_VALIDITY);
         if (getLocalInstance() == null) {
           final LocalInstance rodaCentralInstance = new LocalInstance();
           rodaCentralInstance.setId(IdUtils.createUUID());
@@ -1505,12 +1531,16 @@ public class RodaCoreFactory {
           rodaCentralInstance.setIsSubscribed(true);
           createOrUpdateLocalInstance(rodaCentralInstance);
         }
-      } catch (final GenericException e) {
-        LOGGER.error("Can't initialize ", e);
-        instantiatedWithoutErrors = false;
+      } else if (DistributedModeType.BASE.equals(distributedModeType)) {
+        if (getLocalInstance() == null) {
+          final LocalInstance rodaBaseInstance = new LocalInstance();
+          rodaBaseInstance.setId(IdUtils.createUUID());
+          createOrUpdateLocalInstance(rodaBaseInstance);
+        }
       }
-    } else if (DistributedModeType.LOCAL.equals(distributedModeType)) {
-      initializeLocalInstanceConfigDirectory();
+    } catch (final GenericException e) {
+      LOGGER.error("Can't initialize distributed mode", e);
+      instantiatedWithoutErrors = false;
     }
   }
 
@@ -1852,6 +1882,10 @@ public class RodaCoreFactory {
 
   public static Path getJobAttachmentsDirectoryPath() {
     return jobAttachmentsDirectoryPath;
+  }
+
+  public static Path getMarketDirectoryPath() {
+    return marketDirectoryPath;
   }
 
   public static Path getDataPath() {
@@ -2577,7 +2611,7 @@ public class RodaCoreFactory {
         }
 
         String pluginsMarkdown = PluginManager.getPluginsInformationAsMarkdown(pluginsNameAndState);
-        String pluginsJson = PluginManager.getPluginsInformationAsJsonLines(pluginsNameAndState);
+        String pluginsJson = PluginManager.getPluginsMarketInformationAsJsonLines(pluginsNameAndState);
         try {
           Files.write(Paths.get(FilenameUtils.normalize(args.get(3)), "README.md"), pluginsMarkdown.getBytes());
           if (pluginsJson != null) {

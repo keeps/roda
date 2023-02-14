@@ -33,6 +33,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
+import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryState;
@@ -86,6 +87,7 @@ public class HtmlSnippetUtils {
 
   private static final String OPEN_SPAN_ORIGINAL_LABEL_SUCCESS = "<span class='label-success browseRepresentationOriginalIcon'>";
   private static final String OPEN_H2_CLASS_LABEL_SUCCESS = "<span class='h2'>";
+  private static final String OPEN_SPAN = "<span>";
   private static final String CLOSE_SPAN = "</span>";
 
   private static final String OPEN_DIV_FONT_STYLE_1_REM = "<div style='font-size: 1rem; padding-top:0.5rem;'>";
@@ -685,6 +687,15 @@ public class HtmlSnippetUtils {
     return SafeHtmlUtils.fromSafeConstant(beginSpan + innerIcon + outerIcon + endSpan);
   }
 
+  public static SafeHtml getStackIcon(String innerIcon, String outerIcon) {
+    String beginSpan = "<span class=\"fa-stack\">";
+    String innerIconTag = "<i class=\"" + innerIcon + " fa-stack-1x\"></i>";
+    String outerIconTag = "<i class=\"" + outerIcon + " fa-stack-1x\"></i>";
+    String endSpan = "</span>";
+
+    return SafeHtmlUtils.fromSafeConstant(beginSpan + innerIconTag + outerIconTag + endSpan);
+  }
+
   public static SafeHtml getDisposalConfirmationStateHTML(DisposalConfirmationState state) {
     String labelClass;
 
@@ -946,42 +957,5 @@ public class HtmlSnippetUtils {
       ret = b.toSafeHtml();
     }
     return ret;
-  }
-
-  public static SafeHtml getCertificateStatusHtml(CertificateInfo.CertificateStatus status) {
-    SafeHtmlBuilder b = new SafeHtmlBuilder();
-    switch (status) {
-      case INTERNAL:
-        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DEFAULT));
-        b.append(SafeHtmlUtils.fromSafeConstant("<i class=\"fas fa-plug\" style=\"color: white\"></i>"));
-        break;
-      case UNSIGNED:
-        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING));
-        b.append(SafeHtmlUtils.fromSafeConstant("<i class=\"fas fa-exclamation-triangle\" style=\"color: white\"></i>"));
-        break;
-      case TRUSTED:
-        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_SUCCESS));
-        b.append(SafeHtmlUtils.fromSafeConstant("<i class=\"fas fa-shield-alt\" style=\"color: white\"></i>"));
-        break;
-      default:
-        b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_DANGER));
-        b.append(SafeHtmlUtils.fromSafeConstant("<i class=\"fas fa-exclamation-circle\" style=\"color: white\"></i>"));
-    }
-    b.append(SafeHtmlUtils.fromSafeConstant("<span class=\"icon-left-padding\">"));
-    b.append(SafeHtmlUtils.fromString(messages.pluginLicenseStatus(status)));
-    b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
-    b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
-    return b.toSafeHtml();
-  }
-
-  public static SafeHtml getCertificateInfoHTML(String information) {
-    SafeHtmlBuilder b = new SafeHtmlBuilder();
-    b.append(SafeHtmlUtils.fromSafeConstant(OPEN_SPAN_CLASS_LABEL_WARNING));
-    b.append(SafeHtmlUtils.fromSafeConstant("<i class=\"fas fa-award\" style=\"color: white\"></i>"));
-    b.append(SafeHtmlUtils.fromSafeConstant("<span class=\"icon-left-padding\">"));
-    b.append(SafeHtmlUtils.fromString(information));
-    b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
-    b.append(SafeHtmlUtils.fromSafeConstant(CLOSE_SPAN));
-    return b.toSafeHtml();
   }
 }

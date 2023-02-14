@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.DirectoryStream;
@@ -73,6 +72,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.CertificateInfo;
 import org.roda.core.data.v2.jobs.IndexedReport;
+import org.roda.core.data.v2.jobs.MarketInfo;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -113,7 +113,7 @@ public class PluginManager {
   private Map<String, Set<Class>> pluginObjectClasses = new HashMap<>();
   private Map<Class, List<PluginInfo>> pluginInfoPerObjectClass = new HashMap<>();
   private boolean internalPluginStarted = false;
-  private boolean marketPluginStarted = false;
+  private boolean marketInformationLoaded = false;
   private List<String> blacklistedPlugins;
 
   /**
@@ -328,8 +328,8 @@ public class PluginManager {
     }
 
     // load plugins from market file
-    if (!marketPluginStarted) {
-      loadMarketPlugins();
+    if (!marketInformationLoaded) {
+      loadMarketInformation();
     }
   }
 
@@ -405,14 +405,44 @@ public class PluginManager {
     }
   }
 
-  private void loadMarketPlugins() {
-    String marketPluginFile = Paths.get(RodaConstants.CORE_PLUGIN_MARKET_FOLDER)
-      .resolve(RodaConstants.CORE_PLUGIN_MARKET_FILE).toString();
+  private void loadInternalPlugins() {
+    Reflections reflections = new Reflections(
+      RodaCoreFactory.getRodaConfigurationAsString("core", "plugins", "internal", "package"));
+    Set<Class<? extends AbstractPlugin>> plugins = reflections.getSubTypesOf(AbstractPlugin.class);
+    plugins.addAll(reflections.getSubTypesOf(AbstractAIPComponentsPlugin.class));
+
+    for (Class<? extends AbstractPlugin> plugin : plugins) {
+      String name = plugin.getName();
+      if (!Modifier.isAbstract(plugin.getModifiers()) && !blacklistedPlugins.contains(name)) {
+        LOGGER.debug("Loading internal plugin '{}'", name);
+        try {
+          Plugin<? extends IsRODAObject> p = (Plugin<?>) ClassLoaderUtility.createObject(plugin.getName());
+          p.init();
+          internalPluginChache.put(plugin.getName(), p);
+          processAndCachePluginInformation(p);
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | PluginException
+          | RuntimeException e) {
+          LOGGER.error("Unable to instantiate plugin '{}'", plugin.getName(), e);
+        }
+      }
+    }
+    internalPluginStarted = true;
+  }
+
+  private void loadMarketInformation() {
+    String marketPluginFile = Paths.get(RodaConstants.CORE_MARKET_FOLDER).resolve(RodaConstants.CORE_MARKET_FILE)
+      .toString();
     try {
-      List<PluginInfo> pluginInfoList = JsonUtils
-        .getListFromJsonLines(RodaCoreFactory.getConfigurationFileAsStream(marketPluginFile), PluginInfo.class);
+      List<MarketInfo> marketInfoList = JsonUtils
+        .getListFromJsonLines(RodaCoreFactory.getConfigurationFileAsStream(marketPluginFile), MarketInfo.class);
+
       LOGGER.info("Loading information from plugins available on the market");
-      for (PluginInfo pluginInfo : pluginInfoList) {
+      for (MarketInfo marketInfo : marketInfoList) {
+
+        // Convert market info into plugin info
+        PluginInfo pluginInfo = new PluginInfo(marketInfo.getId(), marketInfo.getName(), marketInfo.getVersion(),
+          marketInfo.getDescription(), marketInfo.getType(), marketInfo.getCategories(), null);
+        pluginInfo.setMarketInfo(marketInfo);
 
         if (!blacklistedPlugins.contains(pluginInfo.getId())) {
           processAndCachePluginInfoPerType(pluginInfo.getType(), pluginInfo);
@@ -421,7 +451,7 @@ public class PluginManager {
     } catch (GenericException e) {
       LOGGER.error("Unable to read plugin market file", e);
     }
-    marketPluginStarted = true;
+    marketInformationLoaded = true;
   }
 
   private class PluginLoadInfo {
@@ -572,67 +602,6 @@ public class PluginManager {
     return sharedJarURLs;
   }
 
-  private CertificateInfo loadAndCheckCertificates(Path jarPath) throws IOException {
-    JarFile jar = new JarFile(jarPath.toFile());
-    Enumeration<JarEntry> entries = jar.entries();
-    CertificateInfo certificateInfo = new CertificateInfo();
-
-    while (entries.hasMoreElements()) {
-      JarEntry entry = entries.nextElement();
-      byte buffer[] = new byte[8192];
-      try (InputStream is = jar.getInputStream(entry)) {
-        // need to read the entry's data to see the certs.
-        while (is.read(buffer) != -1)
-          ;
-        Certificate[] certificates = entry.getCertificates();
-        CodeSigner[] signers = entry.getCodeSigners();
-
-        if (signers != null && certificates != null) {
-          X509Certificate[] x509Certificates = Arrays.copyOf(certificates, certificates.length,
-            X509Certificate[].class);
-
-          X509Certificate pluginCertificate = x509Certificates[0];
-          String issuerDN = pluginCertificate.getIssuerDN().getName();
-          String subjectDN = pluginCertificate.getSubjectDN().getName();
-          Date notBefore = pluginCertificate.getNotBefore();
-          Date notAfter = pluginCertificate.getNotAfter();
-
-          certificateInfo.addCertificates(issuerDN, subjectDN, notBefore, notAfter);
-          try {
-            validateCertificate(x509Certificates);
-            certificateInfo.setCertificateStatus(CertificateInfo.CertificateStatus.TRUSTED);
-          } catch (NoSuchAlgorithmException | CertificateException | KeyStoreException e) {
-            LOGGER.error("Plugin not signed by RODA");
-            certificateInfo.setCertificateStatus(CertificateInfo.CertificateStatus.UNTRUSTED);
-            break;
-          }
-        } else {
-          certificateInfo.setCertificateStatus(CertificateInfo.CertificateStatus.UNSIGNED);
-        }
-      }
-    }
-    return certificateInfo;
-  }
-
-  private static void validateCertificate(X509Certificate[] certificates)
-    throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
-    TrustManagerFactory trustManagerFactory = TrustManagerFactory
-      .getInstance(TrustManagerFactory.getDefaultAlgorithm());
-    KeyStore keyStore = KeyStore.getInstance("PKCS12");
-
-    // default truststore
-    keyStore.load(PluginManager.class.getResourceAsStream("/config/market/roda-truststore.p12"),
-      "changeit".toCharArray());
-    trustManagerFactory.init(keyStore);
-
-    for (TrustManager trustManager : trustManagerFactory.getTrustManagers()) {
-      if (trustManager instanceof X509TrustManager) {
-        X509TrustManager x509TrustManager = (X509TrustManager) trustManager;
-        x509TrustManager.checkServerTrusted(certificates, "RSA");
-      }
-    }
-  }
-
   private void loadPlugin(PluginLoadInfo p) {
     try {
       BasicFileAttributes attrs = Files.readAttributes(p.jarPath, BasicFileAttributes.class);
@@ -668,74 +637,129 @@ public class PluginManager {
 
         // load certificates
         CertificateInfo certificateInfo = loadAndCheckCertificates(p.jarPath);
-        if (certificateInfo.isUntrusted()) {
-          loadUntrustedPlugins(p, classloader, attrs, certificateInfo);
-        } else {
-          loadTrustedOrUnsignedPlugins(p, classloader, attrs, certificateInfo);
+
+        // Let's load the Plugin
+        List<Plugin<? extends IsRODAObject>> plugins = loadPlugin(p.jarPath, p.pluginClassNames, classloader);
+        if (!plugins.isEmpty()) {
+          LOGGER.info("'{}' (is new? {}) is not loaded or modification dates differ. Inspecting Jar...",
+            p.jarPath.getFileName(), jarPluginCache.containsKey(p.jarPath));
         }
+
+        for (Plugin<? extends IsRODAObject> plugin : plugins) {
+          try {
+            if (plugin != null && !blacklistedPlugins.contains(plugin.getClass().getName())) {
+              PluginInfo pluginInfo = getPluginInfo(plugin);
+              loadPluginResources(p.jarPath, pluginInfo);
+              pluginInfo.setCertificateInfo(certificateInfo);
+              pluginInfo.setInstalled(true);
+              if (certificateInfo.isNotVerified()) {
+                // load Not Verified Plugins;
+                pluginInfo.setParameters(new ArrayList<>());
+                pluginInfo.setVerified(false);
+              } else {
+                // load Verified Plugins
+                pluginInfo.setVerified(true);
+                plugin.init();
+                externalPluginChache.put(plugin.getClass().getName(), plugin);
+              }
+
+              processAndCachePluginInfoPerType(pluginInfo.getType(), pluginInfo);
+              LOGGER.info("Plugin started '{}' (version {})", plugin.getName(), plugin.getVersion());
+            } else {
+              LOGGER.trace("'{}' is not a Plugin", p.jarPath.getFileName());
+            }
+
+            synchronized (jarPluginCache) {
+              if (jarPluginCache.get(p.jarPath) != null) {
+                JarPlugins jarPlugins = jarPluginCache.get(p.jarPath);
+                jarPlugins.plugins = new ArrayList<>();
+                jarPlugins.plugins.add(plugin);
+                jarPlugins.lastModified = attrs.lastModifiedTime().toMillis();
+              } else {
+                jarPluginCache.put(p.jarPath, new JarPlugins(plugin, attrs.lastModifiedTime().toMillis()));
+              }
+            }
+          } catch (Exception | LinkageError e) {
+            LOGGER.error("Plugin failed to initialize: {}", p.jarPath, e);
+          }
+        }
+        if (!certificateInfo.isNotVerified()) {
+          // Let's cache Plugin classloader
+          jarPluginClassloaderCache.put(getPluginClassLoaderCacheKey(p.jarPath), classloader);
+        }
+
       }
     } catch (IOException e1) {
       LOGGER.error("Plugin failed to initialize: {}", p.jarPath, e1);
     }
   }
 
-  private void loadUntrustedPlugins(PluginLoadInfo p, ClassLoader classloader, BasicFileAttributes attrs,
-    CertificateInfo certificateInfo) {
-    // Need to load to get plugin info
-    for (Plugin<? extends IsRODAObject> plugin : loadPlugin(p.jarPath, p.pluginClassNames, classloader)) {
-      PluginInfo pluginInfo = getPluginInfo(plugin);
-      pluginInfo.setInstalled(true);
-      pluginInfo.setCertificateInfo(certificateInfo);
-      pluginInfo.setSigned(true);
-      pluginInfo.setParameters(new ArrayList<>());
-      processAndCachePluginInfoPerType(pluginInfo.getType(), pluginInfo);
-    }
-  }
+  private CertificateInfo loadAndCheckCertificates(Path jarPath) throws IOException {
+    JarFile jar = new JarFile(jarPath.toFile());
+    Enumeration<JarEntry> entries = jar.entries();
+    CertificateInfo certificateInfo = new CertificateInfo();
 
-  private void loadTrustedOrUnsignedPlugins(PluginLoadInfo p, ClassLoader classloader, BasicFileAttributes attrs,
-    CertificateInfo certificateInfo) throws IOException {
-    // Let's load the Plugin
-    List<Plugin<? extends IsRODAObject>> plugins = loadPlugin(p.jarPath, p.pluginClassNames, classloader);
-    if (!plugins.isEmpty()) {
-      LOGGER.info("'{}' (is new? {}) is not loaded or modification dates differ. Inspecting Jar...",
-        p.jarPath.getFileName(), jarPluginCache.containsKey(p.jarPath));
-    }
+    while (entries.hasMoreElements()) {
+      JarEntry entry = entries.nextElement();
+      // Ignore signature related files
+      if (entry.getName().equals("META-INF/LICENSE.SF") || entry.getName().equals("META-INF/LICENSE.RSA")
+        || entry.isDirectory()) {
+        continue;
+      }
+      byte buffer[] = new byte[8192];
+      try (InputStream is = jar.getInputStream(entry)) {
+        // need to read the entry's data to see the certs.
+        while (is.read(buffer) != -1)
+          ;
+        Certificate[] certificates = entry.getCertificates();
+        CodeSigner[] signers = entry.getCodeSigners();
 
-    for (Plugin<? extends IsRODAObject> plugin : plugins) {
-      try {
-        if (plugin != null && !blacklistedPlugins.contains(plugin.getClass().getName())) {
-          plugin.init();
-          PluginInfo pluginInfo = getPluginInfo(plugin);
-          if (!certificateInfo.getCertificates().isEmpty()) {
-            pluginInfo.setSigned(true);
+        if (signers != null && certificates != null) {
+          X509Certificate[] x509Certificates = Arrays.copyOf(certificates, certificates.length,
+            X509Certificate[].class);
+
+          X509Certificate pluginCertificate = x509Certificates[0];
+          String issuerDN = pluginCertificate.getIssuerDN().getName();
+          String subjectDN = pluginCertificate.getSubjectDN().getName();
+          Date notBefore = pluginCertificate.getNotBefore();
+          Date notAfter = pluginCertificate.getNotAfter();
+
+          certificateInfo.addCertificates(issuerDN, subjectDN, notBefore, notAfter);
+          try {
+            validateCertificate(x509Certificates);
+            certificateInfo.setCertificateStatus(CertificateInfo.CertificateStatus.VERIFIED);
+          } catch (NoSuchAlgorithmException | CertificateException | KeyStoreException e) {
+            LOGGER.error("Plugin not signed by RODA");
+            certificateInfo.setCertificateStatus(CertificateInfo.CertificateStatus.NOT_VERIFIED);
+            break;
           }
-          pluginInfo.setCertificateInfo(certificateInfo);
-          // load plugin resources
-          loadPluginResources(p.jarPath, pluginInfo);
-
-          externalPluginChache.put(plugin.getClass().getName(), plugin);
-          processAndCachePluginInformation(plugin, pluginInfo);
-          LOGGER.info("Plugin started '{}' (version {})", plugin.getName(), plugin.getVersion());
         } else {
-          LOGGER.trace("'{}' is not a Plugin", p.jarPath.getFileName());
+          LOGGER.error("Plugin not signed by RODA");
+          certificateInfo.setCertificateStatus(CertificateInfo.CertificateStatus.NOT_VERIFIED);
+          break;
         }
-
-        synchronized (jarPluginCache) {
-          if (jarPluginCache.get(p.jarPath) != null) {
-            JarPlugins jarPlugins = jarPluginCache.get(p.jarPath);
-            jarPlugins.plugins = new ArrayList<>();
-            jarPlugins.plugins.add(plugin);
-            jarPlugins.lastModified = attrs.lastModifiedTime().toMillis();
-          } else {
-            jarPluginCache.put(p.jarPath, new JarPlugins(plugin, attrs.lastModifiedTime().toMillis()));
-          }
-        }
-      } catch (Exception | LinkageError e) {
-        LOGGER.error("Plugin failed to initialize: {}", p.jarPath, e);
       }
     }
-    // Let's cache Plugin classloader
-    jarPluginClassloaderCache.put(getPluginClassLoaderCacheKey(p.jarPath), classloader);
+    return certificateInfo;
+  }
+
+  private static void validateCertificate(X509Certificate[] certificates)
+    throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
+    TrustManagerFactory trustManagerFactory = TrustManagerFactory
+      .getInstance(TrustManagerFactory.getDefaultAlgorithm());
+    KeyStore keyStore = KeyStore.getInstance("PKCS12");
+
+    // default truststore
+    keyStore.load(PluginManager.class.getResourceAsStream("/config/market/roda-truststore.p12"),
+      "changeit".toCharArray());
+    trustManagerFactory.init(keyStore);
+
+    for (TrustManager trustManager : trustManagerFactory.getTrustManagers()) {
+      if (trustManager instanceof X509TrustManager) {
+        X509TrustManager x509TrustManager = (X509TrustManager) trustManager;
+        x509TrustManager.checkServerTrusted(certificates, "RSA");
+      }
+    }
   }
 
   private void loadPluginResources(Path jarPath, PluginInfo pluginInfo) throws IOException {
@@ -743,46 +767,28 @@ public class PluginManager {
     Path pluginResourceDir = Paths.get(RodaConstants.CORE_PLUGINS_FOLDER).resolve(pluginDir.getFileName());
 
     if (Files.exists(pluginDir.resolve(RodaConstants.CORE_LICENSE_MARKDOWN_FILE))) {
-      pluginInfo.setLicenseResourceID(pluginResourceDir.resolve(RodaConstants.CORE_LICENSE_MARKDOWN_FILE).toString());
+      pluginInfo.setHasLicenseFile(true);
+      pluginInfo.setLicenseFilePath(pluginResourceDir.resolve(RodaConstants.CORE_LICENSE_MARKDOWN_FILE).toString());
     }
 
     if (Files.exists(
       pluginDir.resolve(RodaConstants.CORE_MARKDOWN_FOLDER).resolve(RodaConstants.CORE_PLUGINS_DOCUMENTATION_FILE))) {
-      pluginInfo.setDocumentationEntrypointID(pluginResourceDir.resolve(RodaConstants.CORE_MARKDOWN_FOLDER)
+      pluginInfo.setHasDocumentationFile(true);
+      pluginInfo.setDocumentationFilePath(pluginResourceDir.resolve(RodaConstants.CORE_MARKDOWN_FOLDER)
         .resolve(RodaConstants.CORE_PLUGINS_DOCUMENTATION_FILE).toString());
     }
   }
 
-  private void loadInternalPlugins() {
-    Reflections reflections = new Reflections(
-      RodaCoreFactory.getRodaConfigurationAsString("core", "plugins", "internal", "package"));
-    Set<Class<? extends AbstractPlugin>> plugins = reflections.getSubTypesOf(AbstractPlugin.class);
-    plugins.addAll(reflections.getSubTypesOf(AbstractAIPComponentsPlugin.class));
-
-    for (Class<? extends AbstractPlugin> plugin : plugins) {
-      String name = plugin.getName();
-      if (!Modifier.isAbstract(plugin.getModifiers()) && !blacklistedPlugins.contains(name)) {
-        LOGGER.debug("Loading internal plugin '{}'", name);
-        try {
-          Plugin<? extends IsRODAObject> p = (Plugin<?>) ClassLoaderUtility.createObject(plugin.getName());
-          p.init();
-          internalPluginChache.put(plugin.getName(), p);
-          processAndCachePluginInformation(p);
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | PluginException
-          | RuntimeException e) {
-          LOGGER.error("Unable to instantiate plugin '{}'", plugin.getName(), e);
-        }
-      }
-    }
-    internalPluginStarted = true;
-  }
-
   private <T extends IsRODAObject> void processAndCachePluginInformation(Plugin<T> plugin) {
-    processAndCachePluginInformation(plugin, getPluginInfo(plugin.getClass().getName()));
+    PluginInfo pluginInfo = getPluginInfo(plugin.getClass().getName());
+    pluginInfo.setInstalled(true);
+    pluginInfo.setVerified(true);
+    pluginInfo.setHasLicenseFile(true);
+    pluginInfo.setLicenseFilePath("License.md");
+    processAndCachePluginInformation(plugin, pluginInfo);
   }
 
   private <T extends IsRODAObject> void processAndCachePluginInformation(Plugin<T> plugin, PluginInfo pluginInfo) {
-    pluginInfo.setInstalled(true);
     // cache plugin > objectClasses
     Set<Class> objectClasses = new HashSet<>(plugin.getObjectClasses());
     if (objectClasses.contains(AIP.class)) {
@@ -846,17 +852,12 @@ public class PluginManager {
       PluginInfo cachedPluginInfo = pluginInfoPerType.get(pluginType).get(i);
 
       if (!cachedPluginInfo.isInstalled()) {
-        // Replace market plugin information for installed plugin
+        // Replace market information
         pluginInfoPerType.get(pluginType).remove(cachedPluginInfo);
-        pluginInfo.setMarketVersion(cachedPluginInfo.getVersion());
-        pluginInfo.setVendor(cachedPluginInfo.getVendor());
-        pluginInfo.setSupport(cachedPluginInfo.getSupport());
         pluginInfoPerType.get(pluginType).add(pluginInfo);
       } else {
-        // Set market version to already installed plugins
-        cachedPluginInfo.setMarketVersion(pluginInfo.getVersion());
-        cachedPluginInfo.setVendor(pluginInfo.getVendor());
-        cachedPluginInfo.setSupport(pluginInfo.getSupport());
+        // Set market info to already installed plugins
+        cachedPluginInfo.setMarketInfo(pluginInfo.getMarketInfo());
       }
     }
   }
@@ -975,8 +976,8 @@ public class PluginManager {
     return sb.toString();
   }
 
-  public static String getPluginsInformationAsJsonLines(List<Pair<String, String>> plugins) {
-    ArrayList<PluginInfo> pluginInfoList = new ArrayList<>();
+  public static String getPluginsMarketInformationAsJsonLines(List<Pair<String, String>> plugins) {
+    ArrayList<MarketInfo> marketInfoList = new ArrayList<>();
     for (Pair<String, String> pluginNameAndState : plugins) {
       String plugin = pluginNameAndState.getFirst();
       try {
@@ -984,8 +985,9 @@ public class PluginManager {
 
         // Load and add all plugin configuration files
         List<Path> propertiesFiles;
-        Path configurationFolder = Paths.get(pluginClass.getClassLoader().getResource(RodaConstants.CORE_CONFIG_FOLDER).getPath());
-        if(Files.exists(configurationFolder)) {
+        Path configurationFolder = Paths
+          .get(pluginClass.getClassLoader().getResource(RodaConstants.CORE_CONFIG_FOLDER).getPath());
+        if (Files.exists(configurationFolder)) {
           try (Stream<Path> walk = Files.walk(configurationFolder)) {
             propertiesFiles = walk.filter(Files::isRegularFile).collect(Collectors.toList());
           }
@@ -999,27 +1001,25 @@ public class PluginManager {
 
         // create a plugin instance
         Plugin<? extends IsRODAObject> pluginInstance = (Plugin<? extends IsRODAObject>) pluginClass.newInstance();
-        PluginInfo pluginInfo = new PluginInfo();
+        MarketInfo marketInfo = new MarketInfo();
 
         // Create the plugin info with only the necessary information
-        pluginInfo.setId(pluginInstance.getClass().getName());
-        pluginInfo.setName(pluginInstance.getName());
-        pluginInfo.setVersion(pluginInstance.getVersion());
-        pluginInfo.setCategories(pluginInstance.getCategories());
-        pluginInfo.setDescription(pluginInstance.getDescription());
-        pluginInfo.setCertificateInfo(null);
-        pluginInfo.setInstalled(null);
-        pluginInfo.setSigned(null);
+        marketInfo.setId(pluginInstance.getClass().getName());
+        marketInfo.setType(pluginInstance.getType());
+        marketInfo.setName(pluginInstance.getName());
+        marketInfo.setVersion(pluginInstance.getVersion());
+        marketInfo.setCategories(pluginInstance.getCategories());
+        marketInfo.setDescription(pluginInstance.getDescription());
 
-        pluginInfoList.add(pluginInfo);
+        marketInfoList.add(marketInfo);
       } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
         LOGGER.error("Error getting plugin information", e);
         return null;
-      } catch ( IOException | ConfigurationException e) {
+      } catch (IOException | ConfigurationException e) {
         LOGGER.error("Unable to load plugin properties", e);
         return null;
       }
     }
-    return JsonUtils.getJsonLinesFromObjectList(pluginInfoList);
+    return JsonUtils.getJsonLinesFromObjectList(marketInfoList);
   }
 }

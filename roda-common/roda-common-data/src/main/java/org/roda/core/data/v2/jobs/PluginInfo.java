@@ -27,20 +27,19 @@ public class PluginInfo implements Serializable {
   private String id = null;
   private String name = null;
   private String version = null;
-  private String marketVersion = null;
   private String description = null;
   private PluginType type = PluginType.MISC;
   private List<String> categories = null;
   private List<PluginParameter> parameters = new ArrayList<>();
   private Set<String> objectClasses = new HashSet<>();
-  private Boolean isSigned = false;
+  private Boolean isVerified = false;
   private CertificateInfo certificateInfo = new CertificateInfo();
-  private String licenseResourceID = null;
-  private String documentationEntrypointID = null;
-  private String vendor = null;
-  private String installation = null;
-  private String support = null;
   private Boolean isInstalled = false;
+  private Boolean hasLicenseFile = false;
+  private String licenseFilePath = null;
+  private Boolean hasDocumentationFile = false;
+  private String documentationFilePath = null;
+  private MarketInfo marketInfo = null;
 
   /**
    * Constructs a new {@link PluginInfo}.
@@ -157,14 +156,6 @@ public class PluginInfo implements Serializable {
     this.version = version;
   }
 
-  public String getMarketVersion() {
-    return marketVersion;
-  }
-
-  public void setMarketVersion(String marketVersion) {
-    this.marketVersion = marketVersion;
-  }
-
   /**
    * @return the description
    */
@@ -230,12 +221,12 @@ public class PluginInfo implements Serializable {
     return this.objectClasses.contains(objectClass);
   }
 
-  public Boolean isSigned() {
-    return isSigned;
+  public Boolean isVerified() {
+    return isVerified;
   }
 
-  public void setSigned(Boolean signed) {
-    isSigned = signed;
+  public void setVerified(Boolean verified) {
+    isVerified = verified;
   }
 
   public CertificateInfo getCertificateInfo() {
@@ -246,51 +237,51 @@ public class PluginInfo implements Serializable {
     this.certificateInfo = certificateInfo;
   }
 
-  public String getLicenseResourceID() {
-    return licenseResourceID;
-  }
-
-  public void setLicenseResourceID(String licenseResourceID) {
-    this.licenseResourceID = licenseResourceID;
-  }
-
-  public String getDocumentationEntrypointID() {
-    return documentationEntrypointID;
-  }
-
-  public void setDocumentationEntrypointID(String documentationEntrypointID) {
-    this.documentationEntrypointID = documentationEntrypointID;
-  }
-
-  public String getVendor() {
-    return vendor;
-  }
-
-  public void setVendor(String vendor) {
-    this.vendor = vendor;
-  }
-
-  public String getInstallation() {
-    return installation;
-  }
-
-  public void setInstallation(String installation) {
-    this.installation = installation;
-  }
-
-  public String getSupport() {
-    return support;
-  }
-
-  public void setSupport(String support) {
-    this.support = support;
-  }
-
   public Boolean isInstalled() {
     return isInstalled;
   }
 
   public void setInstalled(Boolean installed) {
     isInstalled = installed;
+  }
+
+  public Boolean hasLicenseFile() {
+    return hasLicenseFile;
+  }
+
+  public void setHasLicenseFile(Boolean hasLicenseFile) {
+    this.hasLicenseFile = hasLicenseFile;
+  }
+
+  public String getLicenseFilePath() {
+    return licenseFilePath;
+  }
+
+  public void setLicenseFilePath(String licenseFilePath) {
+    this.licenseFilePath = licenseFilePath;
+  }
+
+  public Boolean hasDocumentationFile() {
+    return hasDocumentationFile;
+  }
+
+  public void setHasDocumentationFile(Boolean hasDocumentationFile) {
+    this.hasDocumentationFile = hasDocumentationFile;
+  }
+
+  public String getDocumentationFilePath() {
+    return documentationFilePath;
+  }
+
+  public void setDocumentationFilePath(String documentationFilePath) {
+    this.documentationFilePath = documentationFilePath;
+  }
+
+  public MarketInfo getMarketInfo() {
+    return marketInfo;
+  }
+
+  public void setMarketInfo(MarketInfo marketInfo) {
+    this.marketInfo = marketInfo;
   }
 }

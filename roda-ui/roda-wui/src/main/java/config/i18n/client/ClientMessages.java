@@ -1737,11 +1737,23 @@ public interface ClientMessages extends Messages {
 
   String pluginLicenseLabel();
 
+  String pluginDocumentationLabel();
+
+  String pluginHomepageLabel();
+
+  String pluginNotInstalledLabel();
+
   String pluginLicenseStatus(@Select CertificateInfo.CertificateStatus status);
 
-  String pluginVendorLabel();
+  String pluginInternalMessage();
 
-  String pluginDocumentationLabel();
+  String pluginNotInstalledMessage();
+
+  SafeHtml pluginTrustedMessage(String publisher, String to);
+
+  SafeHtml pluginUntrustedMessage();
+
+  String pluginVendorLabel();
 
   String notificationStateValue(@Select NotificationState state);
 
@@ -2360,4 +2372,13 @@ public interface ClientMessages extends Messages {
   String accessKeyRevokeConfirmationMessage();
 
   String accessKeyRegenerateConfirmationMessage();
+
+  /** Market **/
+  String marketPluginsActionsTabLabel();
+
+  String marketVersionLabel(String version);
+
+  String marketStoreTabLabel();
+
+  String marketStoreInstallLabel();
 }

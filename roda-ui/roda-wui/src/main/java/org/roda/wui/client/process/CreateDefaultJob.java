@@ -34,15 +34,16 @@ import org.roda.core.data.v2.jobs.IndexedReport;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
+import org.roda.core.data.v2.jobs.LicenseInfo;
+import org.roda.core.data.v2.jobs.MarketInfo;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.BadgePanel;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.dialogs.CertificateDialogs;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.utils.ClientSelectedItemsUtils;
@@ -66,11 +67,10 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -80,6 +80,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RadioButton;
+import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -133,14 +134,13 @@ public class CreateDefaultJob extends Composite {
   private boolean isListEmpty = true;
   private JobPriority priority = JobPriority.MEDIUM;
   private JobParallelism parallelism = JobParallelism.NORMAL;
-
   private static List<PluginType> pluginTypes = PluginUtils.getPluginTypesWithoutIngest();
 
   @UiField
   TextBox name;
 
   @UiField
-  Label workflowListTitle;
+  FlowPanel workflowListTitle;
 
   @UiField
   Label workflowCategoryLabel;
@@ -149,22 +149,22 @@ public class CreateDefaultJob extends Composite {
   FlowPanel workflowCategoryList;
 
   @UiField
-  FlowPanel workflowList;
+  TabPanel workflowTabPanel;
 
   @UiField
-  FlowPanel workflowListCertificate;
+  FlowPanel workflowList, workflowStoreList;
+
+  @UiField
+  FlowPanel workflowListPluginStatus;
 
   @UiField
   FlowPanel workflowVendorInformation;
 
   @UiField
-  FlowPanel workflowListLicenseAndDocumentation;
-
-  @UiField
   FlowPanel workflowListDescription;
 
   @UiField
-  HTML workflowListDescriptionCategories;
+  FlowPanel workflowListDescriptionCategories;
 
   @UiField
   FlowPanel workflowPanel;
@@ -266,6 +266,7 @@ public class CreateDefaultJob extends Composite {
 
   public void configurePlugins() {
     List<String> categoriesOnListBox = new ArrayList<>();
+    workflowTabPanel.selectTab(0);
 
     if (plugins != null) {
       PluginUtils.sortByName(plugins);
@@ -275,9 +276,6 @@ public class CreateDefaultJob extends Composite {
 
         if (pluginInfo != null) {
           List<String> pluginCategories = new ArrayList<>(pluginInfo.getCategories());
-          if (pluginInfo.isInstalled()) {
-            pluginCategories.add("Installed");
-          }
 
           if (pluginCategories != null && !pluginCategories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
             for (String category : pluginCategories) {
@@ -293,6 +291,7 @@ public class CreateDefaultJob extends Composite {
                   @Override
                   public void onValueChange(ValueChangeEvent<Boolean> event) {
                     workflowList.clear();
+                    workflowStoreList.clear();
                     boolean noChecks = true;
 
                     if (plugins != null) {
@@ -303,9 +302,6 @@ public class CreateDefaultJob extends Composite {
                         PluginInfo pluginInfo = plugins.get(p);
                         if (pluginInfo != null) {
                           List<String> categories = new ArrayList<>(pluginInfo.getCategories());
-                          if (pluginInfo.isInstalled()) {
-                            categories.add("Installed");
-                          }
 
                           if (categories != null) {
                             for (int i = 0; i < workflowCategoryList.getWidgetCount(); i++) {
@@ -383,6 +379,11 @@ public class CreateDefaultJob extends Composite {
           panelWidget.removeStyleName("plugin-list-item-selected");
         }
 
+        for (int i = 0; i < workflowStoreList.getWidgetCount(); i++) {
+          Widget panelWidget = workflowStoreList.getWidget(i);
+          panelWidget.removeStyleName("plugin-list-item-selected");
+        }
+
         if (selectedPluginId != null) {
           CreateDefaultJob.this.selectedPlugin = lookupPlugin(selectedPluginId);
           panel.addStyleName("plugin-list-item-selected");
@@ -412,18 +413,20 @@ public class CreateDefaultJob extends Composite {
     panel.add(itemImage);
     panel.add(label);
 
-    workflowList.add(panel);
+    if (pluginInfo.isInstalled()) {
+      workflowList.add(panel);
+    } else {
+      workflowStoreList.add(panel);
+    }
     return panel;
   }
 
   private String getWorkFlowListItemLabel(PluginInfo pluginInfo) {
-    if (pluginInfo.isSigned()) {
-      if (pluginInfo.getCertificateInfo().isUntrusted()) {
-        return "plugin-list-item-label-untrusted";
-      }
-    }
     if (!pluginInfo.isInstalled()) {
       return "plugin-list-item-label-disable";
+    }
+    if (!pluginInfo.isVerified()) {
+      return "plugin-list-item-label-untrusted";
     }
     return "plugin-list-item-label";
   }
@@ -432,19 +435,14 @@ public class CreateDefaultJob extends Composite {
     isListEmpty = true;
     if (selectedPlugin == null) {
       workflowListDescription.clear();
-      workflowListDescriptionCategories.setText("");
+      workflowListDescriptionCategories.clear();
       workflowListDescription.setVisible(false);
       workflowListDescriptionCategories.setVisible(false);
       workflowOptions.setPluginInfo(null);
     } else {
-      String pluginName = messages.pluginLabelWithVersion(selectedPlugin.getName(), selectedPlugin.getVersion());
-      name.setText(pluginName);
-      workflowListTitle.setText(pluginName);
-      buildCertificatePanel();
-      buildPluginLicenseAndDocumentation();
-      buildVendorInformation();
-
       buttonCreate.setEnabled(shouldEnableCreateButton());
+      buildPluginHeader();
+      buildPluginStatusPanel();
 
       String description = selectedPlugin.getDescription();
       if (description != null && description.length() > 0) {
@@ -463,9 +461,13 @@ public class CreateDefaultJob extends Composite {
           categoryTranslations.add(messages.showPluginCategories(category));
         }
 
-        SafeHtml categories = messages.createJobCategoryWorkflow(categoryTranslations);
+        workflowListDescriptionCategories.clear();
+        for (String categoryTranslation : categoryTranslations) {
+          BadgePanel categoryBadge = new BadgePanel();
+          categoryBadge.setText(categoryTranslation);
+          workflowListDescriptionCategories.add(categoryBadge);
+        }
 
-        workflowListDescriptionCategories.setHTML(categories);
         workflowListDescription.setVisible(true);
         workflowListDescriptionCategories.setVisible(true);
       } else {
@@ -499,86 +501,130 @@ public class CreateDefaultJob extends Composite {
     }
   }
 
-  private boolean shouldEnableCreateButton() {
-    // Enable it only for unsigned plugins or trusted plugins
-    if (selectedPlugin.isInstalled()) {
-      if (!selectedPlugin.isSigned()) {
-        return true;
-      } else if (!selectedPlugin.getCertificateInfo().isUntrusted()) {
-        return true;
-      }
-    }
-    return false;
-  }
+  private void buildPluginHeader() {
+    workflowListTitle.clear();
+    FlowPanel leftPanel = new FlowPanel();
+    FlowPanel rightPanel = new FlowPanel();
 
-  private void buildCertificatePanel() {
-    workflowListCertificate.clear();
-    if (selectedPlugin.isInstalled()) {
-      if (selectedPlugin.getCertificateInfo() != null) {
-        CertificateInfo certificateInfo = selectedPlugin.getCertificateInfo();
-        workflowListCertificate
-          .add(new HTML(HtmlSnippetUtils.getCertificateStatusHtml(certificateInfo.getCertificateStatus())));
-        if (!certificateInfo.getCertificates().isEmpty()) {
-          Button certificateInfoButton = new Button("Certificates");
-          certificateInfoButton.addStyleName("btn btn-file-signature");
-          certificateInfoButton.addClickHandler(
-            clickEvent -> CertificateDialogs.showCertificateDialog(certificateInfo, new NoAsyncCallback<>()));
-          workflowListCertificate.add(certificateInfoButton);
-        }
-      }
-    }
-  }
+    // PLUGIN NAME
+    String pluginName = messages.pluginLabel(selectedPlugin.getName());
+    name.setText(pluginName);
+    Label pluginNameLabel = new Label(pluginName);
+    pluginNameLabel.addStyleName("form-label h5");
+    leftPanel.add(pluginNameLabel);
 
-  private void buildVendorInformation() {
-    workflowVendorInformation.clear();
-    if (selectedPlugin.getVendor() != null && !selectedPlugin.getVendor().isEmpty()) {
-      FlowPanel vendorFlowPanel = new FlowPanel();
-      Label vendorLabel = new Label(messages.pluginVendorLabel());
-      vendorLabel.addStyleName("licenseLabel");
-      Label vendor = new Label(selectedPlugin.getVendor());
-      vendorFlowPanel.add(vendorLabel);
-      vendorFlowPanel.add(vendor);
-      workflowVendorInformation.add(vendorFlowPanel);
+    MarketInfo marketInfo = selectedPlugin.getMarketInfo();
+    GWT.log(selectedPlugin.getId() + " -> " + marketInfo);
+    // HOMEPAGE
+    if (marketInfo != null && marketInfo.getHomepage() != null) {
+      Button homepageButton = new Button(messages.pluginHomepageLabel());
+      homepageButton.addStyleName("btn pluginWorkFlowListTitleButtons btn-home");
+      homepageButton.addClickHandler(clickEvent -> Window.open(marketInfo.getHomepage(), "_blank", ""));
+      rightPanel.add(homepageButton);
     }
 
-    if (!selectedPlugin.isInstalled()) {
-      if (selectedPlugin.getInstallation() != null && !selectedPlugin.getInstallation().isEmpty()) {
-        FlowPanel installationPanel = new FlowPanel();
-        SafeHtml safeHtml = SafeHtmlUtils.fromTrustedString(selectedPlugin.getInstallation());
-        installationPanel.add(new HTML(safeHtml));
-        workflowVendorInformation.add(installationPanel);
-      }
-    } else {
-      if (selectedPlugin.getSupport() != null && !selectedPlugin.getSupport().isEmpty()) {
-        FlowPanel supportPanel = new FlowPanel();
-        SafeHtml safeHtml = SafeHtmlUtils.fromTrustedString(selectedPlugin.getSupport());
-        supportPanel.add(new HTML(safeHtml));
-        workflowVendorInformation.add(supportPanel);
-      }
-    }
-  }
-
-  private void buildPluginLicenseAndDocumentation() {
-    workflowListLicenseAndDocumentation.clear();
-    if (selectedPlugin.getLicenseResourceID() != null) {
-      Button licenseButton = new Button(messages.pluginLicenseLabel());
-      licenseButton.addStyleName("btn btn-stamp");
+    // LICENSE
+    Button licenseButton = new Button(messages.pluginLicenseLabel());
+    licenseButton.addStyleName("btn pluginWorkFlowListTitleButtons btn-stamp");
+    if (selectedPlugin.hasLicenseFile()) {
       licenseButton
-        .addClickHandler(clickEvent -> HistoryUtils.newHistory(Theme.RESOLVER, selectedPlugin.getLicenseResourceID()));
-      workflowListLicenseAndDocumentation.add(licenseButton);
+        .addClickHandler(clickEvent -> HistoryUtils.newHistory(Theme.RESOLVER, selectedPlugin.getLicenseFilePath()));
+      rightPanel.add(licenseButton);
+    } else if (marketInfo != null && marketInfo.getLicense() != null) {
+      LicenseInfo license = marketInfo.getLicense();
+      licenseButton.setText(license.getName());
+      licenseButton.addClickHandler(clickEvent -> Window.open(license.getUrl(), "_blank", ""));
+      rightPanel.add(licenseButton);
     }
 
-    if (selectedPlugin.getDocumentationEntrypointID() != null) {
-      Button licenseButton = new Button(messages.pluginDocumentationLabel());
-      licenseButton.addStyleName("btn btn-book");
-      licenseButton.addClickHandler(
-        clickEvent -> HistoryUtils.newHistory(Theme.RESOLVER, selectedPlugin.getDocumentationEntrypointID()));
-      workflowListLicenseAndDocumentation.add(licenseButton);
+    // DOCUMENTATION
+    Button documentationButton = new Button(messages.pluginDocumentationLabel());
+    documentationButton.addStyleName("btn pluginWorkFlowListTitleButtons btn-book");
+    if (selectedPlugin.hasDocumentationFile()) {
+      documentationButton.addClickHandler(
+        clickEvent -> HistoryUtils.newHistory(Theme.RESOLVER, selectedPlugin.getDocumentationFilePath()));
+      rightPanel.add(documentationButton);
+    } else if (marketInfo != null && marketInfo.getDocumentation() != null) {
+      documentationButton.addClickHandler(clickEvent -> Window.open(marketInfo.getDocumentation(), "_blank", ""));
+      rightPanel.add(documentationButton);
     }
+
+    // VERSION
+    BadgePanel version = new BadgePanel();
+    version.setText(selectedPlugin.getVersion());
+    if (selectedPlugin.getMarketInfo() != null
+      && !selectedPlugin.getMarketInfo().getVersion().equals(selectedPlugin.getVersion())) {
+      version.enableNotification(true);
+      version.setTitle(messages.marketVersionLabel(selectedPlugin.getMarketInfo().getVersion()));
+    }
+    version.addStyleName("badge-for-version");
+    rightPanel.add(version);
+    rightPanel.addStyleName("pluginWorkflowListTitle");
+
+    workflowListTitle.addStyleName("pluginWorkflowListTitle");
+    workflowListTitle.add(leftPanel);
+    workflowListTitle.add(rightPanel);
   }
 
-  private String getResourceName(String resourceId) {
-    return resourceId.substring(resourceId.lastIndexOf("/") + 1);
+  private void buildPluginStatusPanel() {
+    workflowListPluginStatus.clear();
+    FlowPanel statusPanel = new FlowPanel();
+    statusPanel.addStyleName("plugin-status-panel");
+    BadgePanel badgePanel = new BadgePanel();
+    HTML statusMessage = new HTML();
+    statusMessage.addStyleName("plugin-status-message");
+
+    if (selectedPlugin.isInstalled()) {
+      CertificateInfo certificateInfo = selectedPlugin.getCertificateInfo();
+      CertificateInfo.CertificateStatus certificateStatus = certificateInfo.getCertificateStatus();
+      badgePanel.setText(messages.pluginLicenseStatus(certificateStatus));
+      if (CertificateInfo.CertificateStatus.INTERNAL.equals(certificateStatus)) {
+        badgePanel.setIcon("fas fa-cog");
+        badgePanel.addStyleName("badge-panel-success");
+        statusMessage.setText(messages.pluginInternalMessage());
+      } else if (CertificateInfo.CertificateStatus.VERIFIED.equals(certificateStatus)) {
+        badgePanel.setIcon("fas fa-shield-alt");
+        badgePanel.addStyleName("badge-panel-success");
+        CertificateInfo.Certificate certificate = certificateInfo.getCertificates().iterator().next();
+        String issuer = certificate.getOrganizationName(certificate.getIssuerDN());
+        String subject = certificate.getOrganizationName(certificate.getSubjectDN());
+        statusMessage.setHTML(messages.pluginTrustedMessage(issuer, subject));
+      } else {
+        badgePanel.setIcon(HtmlSnippetUtils.getStackIcon("fas fa-shield-alt", "fas fa-slash"));
+        badgePanel.addStyleName("badge-panel-danger");
+        statusMessage.setHTML(messages.pluginUntrustedMessage());
+      }
+      statusPanel.add(badgePanel);
+      statusPanel.add(statusMessage);
+    } else {
+      badgePanel.setIcon(HtmlSnippetUtils.getStackIcon("far fa-circle", "fas fa-slash"));
+      badgePanel.addStyleName("badge-panel-dark");
+      badgePanel.setText(messages.pluginNotInstalledLabel());
+      statusMessage.setText(messages.pluginNotInstalledMessage());
+
+      MarketInfo marketInfo = selectedPlugin.getMarketInfo();
+      Button installBtn = new Button(messages.marketStoreInstallLabel());
+      installBtn.addStyleName("btn btn-download");
+      if (marketInfo != null && marketInfo.getInstallation() != null) {
+        installBtn.addClickHandler(clickEvent -> Window.open(marketInfo.getInstallation(), "_blank", ""));
+      } else {
+        installBtn.addClickHandler(clickEvent -> Window.open(RodaConstants.DEFAULT_MARKET_SUPPORT_URL, "_blank", ""));
+      }
+      installBtn.addStyleName("btn plugin-status-btn");
+
+      statusPanel.add(badgePanel);
+      statusPanel.add(statusMessage);
+      statusPanel.add(installBtn);
+    }
+    workflowListPluginStatus.add(statusPanel);
+  }
+
+  private boolean shouldEnableCreateButton() {
+    // Enable it only for verified plugins
+    if (!selectedPlugin.isVerified() || !selectedPlugin.isInstalled()) {
+      return false;
+    }
+    return true;
   }
 
   private List<String> getPluginNames(Set<String> objectClasses) {
