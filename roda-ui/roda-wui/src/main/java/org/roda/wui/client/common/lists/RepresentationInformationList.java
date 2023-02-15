@@ -7,12 +7,14 @@
  */
 package org.roda.wui.client.common.lists;
 
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.NamedIndexedModel;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
@@ -36,8 +38,6 @@ public class RepresentationInformationList extends AsyncTableCell<Representation
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   private Column<RepresentationInformation, SafeHtml> nameColumn;
-  private TextColumn<RepresentationInformation> supportColumn;
-  private TextColumn<RepresentationInformation> familyColumn;
 
   private static final List<String> fieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID,
     RodaConstants.REPRESENTATION_INFORMATION_ID, RodaConstants.REPRESENTATION_INFORMATION_NAME,
@@ -55,24 +55,28 @@ public class RepresentationInformationList extends AsyncTableCell<Representation
     nameColumn = new Column<RepresentationInformation, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(RepresentationInformation ri) {
-        StringBuilder nameWithTags = new StringBuilder();
-        nameWithTags.append(SafeHtmlUtils.fromString(ri.getName()));
+        SafeHtmlBuilder safeHtmlBuilder = new SafeHtmlBuilder();
+        safeHtmlBuilder.append(SafeHtmlUtils.fromString(ri.getName()));
         for (String tag : ri.getTags()) {
-          nameWithTags.append("<span class='label label-info btn-separator-left ri-category'>")
-            .append(messages.representationInformationListItems(SafeHtmlUtils.htmlEscape(tag))).append("</span>");
+          safeHtmlBuilder
+            .append(SafeHtmlUtils.fromTrustedString("<span class='label label-info btn-separator-left ri-category'>"))
+            .append(
+              SafeHtmlUtils.fromString(messages.representationInformationListItems(SafeHtmlUtils.htmlEscape(tag))))
+            .append(SafeHtmlUtils.fromTrustedString("</span>"));
         }
-        return SafeHtmlUtils.fromTrustedString(nameWithTags.toString());
+
+        return safeHtmlBuilder.toSafeHtml();
       }
     };
 
-    supportColumn = new TextColumn<RepresentationInformation>() {
+    TextColumn<RepresentationInformation> supportColumn = new TextColumn<RepresentationInformation>() {
       @Override
       public String getValue(RepresentationInformation ri) {
         return messages.representationInformationSupportValue(ri.getSupport().toString());
       }
     };
 
-    familyColumn = new TextColumn<RepresentationInformation>() {
+    TextColumn<RepresentationInformation> familyColumn = new TextColumn<RepresentationInformation>() {
       @Override
       public String getValue(RepresentationInformation ri) {
         return ri != null ? ri.getFamily() : null;
@@ -98,13 +102,6 @@ public class RepresentationInformationList extends AsyncTableCell<Representation
 
   @Override
   protected ProvidesKey<RepresentationInformation> getKeyProvider() {
-    return new ProvidesKey<RepresentationInformation>() {
-
-      @Override
-      public Object getKey(RepresentationInformation item) {
-        return item.getId();
-      }
-    };
+    return NamedIndexedModel::getId;
   }
-
 }
