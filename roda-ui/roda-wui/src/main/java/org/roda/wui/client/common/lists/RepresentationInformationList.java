@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.common.lists;
 
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -55,13 +56,17 @@ public class RepresentationInformationList extends AsyncTableCell<Representation
     nameColumn = new Column<RepresentationInformation, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(RepresentationInformation ri) {
-        StringBuilder nameWithTags = new StringBuilder();
-        nameWithTags.append(SafeHtmlUtils.fromString(ri.getName()));
+        SafeHtmlBuilder safeHtmlBuilder = new SafeHtmlBuilder();
+        safeHtmlBuilder.append(SafeHtmlUtils.fromString(ri.getName()));
         for (String tag : ri.getTags()) {
-          nameWithTags.append("<span class='label label-info btn-separator-left ri-category'>")
-            .append(messages.representationInformationListItems(SafeHtmlUtils.htmlEscape(tag))).append("</span>");
+          safeHtmlBuilder
+            .append(SafeHtmlUtils.fromTrustedString("<span class='label label-info btn-separator-left ri-category'>"))
+            .append(
+              SafeHtmlUtils.fromString(messages.representationInformationListItems(SafeHtmlUtils.htmlEscape(tag))))
+            .append(SafeHtmlUtils.fromTrustedString("</span>"));
         }
-        return SafeHtmlUtils.fromTrustedString(nameWithTags.toString());
+        // return SafeHtmlUtils.fromTrustedString(nameWithTags.toString());
+        return safeHtmlBuilder.toSafeHtml();
       }
     };
 
