@@ -91,7 +91,7 @@ public class Login extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private boolean register_disabled = ConfigurationManager.getBoolean(false,
+  private boolean registerDisabled = ConfigurationManager.getBoolean(false,
     "ui.sharedProperties.userRegister.disabled");
 
   @SuppressWarnings("unused")
@@ -154,7 +154,7 @@ public class Login extends Composite {
     resendEmail.setVisible(false);
     serviceTokens = historyTokens;
 
-    if (this.register_disabled) {
+    if (this.registerDisabled) {
       recover.setVisible(false);
       register.setVisible(false);
     }
