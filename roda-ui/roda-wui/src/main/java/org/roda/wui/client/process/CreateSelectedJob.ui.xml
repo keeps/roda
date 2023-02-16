@@ -24,17 +24,20 @@
 
 				<g:FlowPanel addStyleNames="clearfix">
 					<g:FlowPanel addStyleNames="pull-left plugin-list">
-						<g:Label addStyleNames="form-label h4">
-							<ui:text from='{messages.createJobWorkflow}' />
-						</g:Label>
-						<g:FlowPanel ui:field="workflowList" />
+						<g:TabPanel ui:field="workflowTabPanel" addStyleNames="tabs">
+							<g:Tab text="{messages.marketPluginsActionsTabLabel}">
+								<g:FlowPanel ui:field="workflowList" />
+							</g:Tab>
+							<g:Tab text="{messages.marketStoreTabLabel}">
+								<g:FlowPanel ui:field="workflowStoreList" />
+							</g:Tab>
+						</g:TabPanel>
 					</g:FlowPanel>
 					<g:FlowPanel addStyleNames="pull-right plugin-details">
-						<g:Label addStyleNames="form-label h5" ui:field="workflowListTitle" />
-						<g:FlowPanel ui:field="workflowListDescription">
-						</g:FlowPanel>
-						<g:HTML addStyleNames="p plugin-description plugin-category-padding"
-							ui:field="workflowListDescriptionCategories" />
+						<g:FlowPanel ui:field="workflowListTitle" />
+						<g:FlowPanel ui:field="workflowListPluginStatus" />
+						<g:FlowPanel ui:field="workflowListDescription" />
+						<g:FlowPanel ui:field="workflowListDescriptionCategories" styleName="plugin-categories-panel" />
 
 						<g:FlowPanel styleName="panel" ui:field="workflowPanel">
 							<p:PluginOptionsPanel styleName="panel-body" ui:field="workflowOptions" />

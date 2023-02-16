@@ -442,6 +442,7 @@ public class PluginManager {
         // Convert market info into plugin info
         PluginInfo pluginInfo = new PluginInfo(marketInfo.getId(), marketInfo.getName(), marketInfo.getVersion(),
           marketInfo.getDescription(), marketInfo.getType(), marketInfo.getCategories(), null);
+        pluginInfo.setObjectClasses(marketInfo.getObjectClasses());
         pluginInfo.setMarketInfo(marketInfo);
 
         if (!blacklistedPlugins.contains(pluginInfo.getId())) {
@@ -663,7 +664,7 @@ public class PluginManager {
                 externalPluginChache.put(plugin.getClass().getName(), plugin);
               }
 
-              processAndCachePluginInfoPerType(pluginInfo.getType(), pluginInfo);
+              processAndCachePluginInformation(plugin, pluginInfo);
               LOGGER.info("Plugin started '{}' (version {})", plugin.getName(), plugin.getVersion());
             } else {
               LOGGER.trace("'{}' is not a Plugin", p.jarPath.getFileName());
@@ -784,12 +785,32 @@ public class PluginManager {
     pluginInfo.setInstalled(true);
     pluginInfo.setVerified(true);
     pluginInfo.setHasLicenseFile(true);
-    pluginInfo.setLicenseFilePath("License.md");
+    pluginInfo.setLicenseFilePath(RodaConstants.CORE_LICENSE_MARKDOWN_FILE);
     processAndCachePluginInformation(plugin, pluginInfo);
   }
 
   private <T extends IsRODAObject> void processAndCachePluginInformation(Plugin<T> plugin, PluginInfo pluginInfo) {
     // cache plugin > objectClasses
+    Set<Class> objectClasses = getObjectClasses(plugin);
+    pluginObjectClasses.put(plugin.getClass().getName(), objectClasses);
+    // cache plugintype > plugininfos
+    objectClasses.stream().forEach(objectClass -> pluginInfo.addObjectClass(objectClass.getName()));
+
+    // cache objectClass > plugininfos
+    for (Class class1 : getPluginObjectClasses(plugin)) {
+      if (pluginInfoPerObjectClass.get(class1) == null) {
+        List<PluginInfo> list = new ArrayList<>();
+        list.add(pluginInfo);
+        pluginInfoPerObjectClass.put(class1, list);
+      } else {
+        pluginInfoPerObjectClass.get(class1).add(pluginInfo);
+      }
+    }
+
+    processAndCachePluginInfoPerType(plugin.getType(), pluginInfo);
+  }
+
+  private static <T extends IsRODAObject> Set<Class> getObjectClasses(Plugin<T> plugin) {
     Set<Class> objectClasses = new HashSet<>(plugin.getObjectClasses());
     if (objectClasses.contains(AIP.class)) {
       objectClasses.add(IndexedAIP.class);
@@ -821,22 +842,7 @@ public class PluginManager {
     } else if (objectClasses.contains(IndexedReport.class)) {
       objectClasses.add(Report.class);
     }
-    pluginObjectClasses.put(plugin.getClass().getName(), objectClasses);
-
-    // cache plugintype > plugininfos
-    objectClasses.stream().forEach(objectClass -> pluginInfo.addObjectClass(objectClass.getName()));
-    processAndCachePluginInfoPerType(plugin.getType(), pluginInfo);
-
-    // cache objectClass > plugininfos
-    for (Class class1 : getPluginObjectClasses(plugin)) {
-      if (pluginInfoPerObjectClass.get(class1) == null) {
-        List<PluginInfo> list = new ArrayList<>();
-        list.add(pluginInfo);
-        pluginInfoPerObjectClass.put(class1, list);
-      } else {
-        pluginInfoPerObjectClass.get(class1).add(pluginInfo);
-      }
-    }
+    return objectClasses;
   }
 
   private void processAndCachePluginInfoPerType(PluginType pluginType, PluginInfo pluginInfo) {
@@ -1010,6 +1016,10 @@ public class PluginManager {
         marketInfo.setVersion(pluginInstance.getVersion());
         marketInfo.setCategories(pluginInstance.getCategories());
         marketInfo.setDescription(pluginInstance.getDescription());
+
+        // set object class for create selected job
+        Set<Class> objectClasses = getObjectClasses(pluginInstance);
+        objectClasses.stream().forEach(objectClass -> marketInfo.addObjectClass(objectClass.getName()));
 
         marketInfoList.add(marketInfo);
       } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {

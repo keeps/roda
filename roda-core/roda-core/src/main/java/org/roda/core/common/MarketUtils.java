@@ -28,6 +28,7 @@ public class MarketUtils {
 
     CloseableHttpClient httpClient = HttpClientBuilder.create().build();
     HttpGet httpGet = new HttpGet(pluginUrl);
+    httpGet.addHeader("Accept", "application/json");
     HttpResponse response = httpClient.execute(httpGet);
     int responseStatusCode = response.getStatusLine().getStatusCode();
 

@@ -158,9 +158,6 @@ public class CreateDefaultJob extends Composite {
   FlowPanel workflowListPluginStatus;
 
   @UiField
-  FlowPanel workflowVendorInformation;
-
-  @UiField
   FlowPanel workflowListDescription;
 
   @UiField
@@ -227,7 +224,6 @@ public class CreateDefaultJob extends Composite {
 
       @Override
       public void onFailure(Throwable caught) {
-        GWT.log(caught.getMessage());
         // do nothing
       }
 
@@ -275,7 +271,7 @@ public class CreateDefaultJob extends Composite {
         PluginInfo pluginInfo = plugins.get(p);
 
         if (pluginInfo != null) {
-          List<String> pluginCategories = new ArrayList<>(pluginInfo.getCategories());
+          List<String> pluginCategories = pluginInfo.getCategories();
 
           if (pluginCategories != null && !pluginCategories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
             for (String category : pluginCategories) {
@@ -301,7 +297,7 @@ public class CreateDefaultJob extends Composite {
                       for (int p = 0; p < plugins.size(); p++) {
                         PluginInfo pluginInfo = plugins.get(p);
                         if (pluginInfo != null) {
-                          List<String> categories = new ArrayList<>(pluginInfo.getCategories());
+                          List<String> categories = pluginInfo.getCategories();
 
                           if (categories != null) {
                             for (int i = 0; i < workflowCategoryList.getWidgetCount(); i++) {
@@ -514,7 +510,6 @@ public class CreateDefaultJob extends Composite {
     leftPanel.add(pluginNameLabel);
 
     MarketInfo marketInfo = selectedPlugin.getMarketInfo();
-    GWT.log(selectedPlugin.getId() + " -> " + marketInfo);
     // HOMEPAGE
     if (marketInfo != null && marketInfo.getHomepage() != null) {
       Button homepageButton = new Button(messages.pluginHomepageLabel());

@@ -722,6 +722,7 @@ pre code {
 
 .form-checkbox-job {
 	margin-right: 1em;
+	display: inline-block;
 }
 
 .form-checkbox {
@@ -1099,17 +1100,14 @@ pre code {
 
 .btn-stamp:after {
     content: "\f5bf";
-    display: contents;
 }
 
 .btn-book:after {
     content: "\f02d";
-    display: contents;
 }
 
 .btn-home:after {
     content: "\f015";
-    display: contents;
 }
 
 .lightbtn {
@@ -1843,6 +1841,20 @@ td.datePickerMonth, td.datePickerYear {
         margin-top: 2rem;
         margin-bottom: 1rem;
         font-weight: 400;
+    }
+
+    div.pluginWorkflowListTitle {
+        position: relative;
+        flex-wrap: wrap;
+        padding-bottom: 0.5rem;
+    }
+
+    div.pluginWorkflowListTitle > div:nth-child(1) {
+        width: 100%;
+    }
+
+    div.pluginWorkflowListTitle button:nth-child(1) {
+        margin-left: 0px;
     }
 }
 
@@ -7496,6 +7508,7 @@ span.code {
     padding: 8px;
     display: flex;
     align-items: center;
+    margin-bottom: 1rem;
 }
 
 .plugin-status-message {
@@ -7601,6 +7614,7 @@ span.code {
     white-space: nowrap;
     vertical-align: baseline;
     border-radius: .25em;
+    align-items: baseline;
 }
 
 .badge-label {

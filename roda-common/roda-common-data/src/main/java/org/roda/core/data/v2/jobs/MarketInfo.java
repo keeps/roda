@@ -1,8 +1,10 @@
 package org.roda.core.data.v2.jobs;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -18,6 +20,7 @@ public class MarketInfo implements Serializable {
   private String description = null;
   private List<String> categories = null;
 
+  private Set<String> objectClasses = new HashSet<>();
   private LicenseInfo license = null;
   private String documentation = null;
   private String installation = null;
@@ -74,6 +77,18 @@ public class MarketInfo implements Serializable {
     this.categories = categories;
   }
 
+  public Set<String> getObjectClasses() {
+    return objectClasses;
+  }
+
+  public void setObjectClasses(Set<String> objectClasses) {
+    this.objectClasses = objectClasses;
+  }
+
+  public void addObjectClass(String objectClass) {
+    this.objectClasses.add(objectClass);
+  }
+
   public LicenseInfo getLicense() {
     return license;
   }
@@ -106,17 +121,23 @@ public class MarketInfo implements Serializable {
     this.homepage = homepage;
   }
 
-
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
     MarketInfo that = (MarketInfo) o;
-    return Objects.equals(id, that.id) && Objects.equals(name, that.name) && type == that.type && Objects.equals(version, that.version) && Objects.equals(description, that.description) && Objects.equals(categories, that.categories) && Objects.equals(license, that.license) && Objects.equals(documentation, that.documentation) && Objects.equals(installation, that.installation) && Objects.equals(homepage, that.homepage);
+    return Objects.equals(id, that.id) && Objects.equals(name, that.name) && type == that.type
+      && Objects.equals(version, that.version) && Objects.equals(description, that.description)
+      && Objects.equals(categories, that.categories) && Objects.equals(objectClasses, that.objectClasses)
+      && Objects.equals(license, that.license) && Objects.equals(documentation, that.documentation)
+      && Objects.equals(installation, that.installation) && Objects.equals(homepage, that.homepage);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, type, version, description, categories, license, documentation, installation, homepage);
+    return Objects.hash(id, name, type, version, description, categories, objectClasses, license, documentation,
+      installation, homepage);
   }
 }
