@@ -7,8 +7,6 @@
  */
 package org.roda.wui.client.common.dialogs;
 
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.SimplePanel;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.search.SearchSuggestBox;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -19,22 +17,17 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.TextBoxBase;
@@ -94,6 +87,22 @@ public class Dialogs {
     cancelButton.addStyleName("btn btn-link");
     confirmButton.addStyleName("btn btn-play");
 
+    dialogBox.center();
+    dialogBox.show();
+  }
+
+  public static void showLicenseModal(String title, HTML license) {
+    final DialogBox dialogBox = new ClosableDialog(true, true);
+    ScrollPanel layout = new ScrollPanel();
+    layout.setSize("70vw",  "80vh");
+    layout.addStyleName("wui-dialog-layout");
+    layout.setWidget(license);
+
+    dialogBox.setWidget(layout);
+    dialogBox.setText(title);
+    dialogBox.addStyleName("wui-dialog-information");
+    dialogBox.setGlassEnabled(true);
+    dialogBox.setAnimationEnabled(false);
     dialogBox.center();
     dialogBox.show();
   }
@@ -431,6 +440,5 @@ public class Dialogs {
     dialogBox.show();
     return dialogBox;
   }
-
 
 }

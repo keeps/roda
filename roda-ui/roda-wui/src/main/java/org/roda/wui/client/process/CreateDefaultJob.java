@@ -58,6 +58,7 @@ import org.roda.wui.client.main.Theme;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -522,8 +523,8 @@ public class CreateDefaultJob extends Composite {
     Button licenseButton = new Button(messages.pluginLicenseLabel());
     licenseButton.addStyleName("btn pluginWorkFlowListTitleButtons btn-stamp");
     if (selectedPlugin.hasLicenseFile()) {
-      licenseButton
-        .addClickHandler(clickEvent -> HistoryUtils.newHistory(Theme.RESOLVER, selectedPlugin.getLicenseFilePath()));
+      licenseButton.addClickHandler(
+        e -> Dialogs.showLicenseModal(messages.pluginLicenseLabel(), new HTMLWidgetWrapper(selectedPlugin.getLicenseFilePath())));
       rightPanel.add(licenseButton);
     } else if (marketInfo != null && marketInfo.getLicense() != null) {
       LicenseInfo license = marketInfo.getLicense();
