@@ -7509,6 +7509,7 @@ span.code {
     display: flex;
     align-items: center;
     margin-bottom: 1rem;
+    border-radius: 2px;
 }
 
 .plugin-status-message {
@@ -7607,14 +7608,14 @@ span.code {
     position: relative;
     background-color: #e0e0e0;
     display: inline-flex;
-    padding: 1.1rem;
+    padding: 0.7rem;
     line-height: 1;
     color: #7f7f7f;
     text-align: center;
     white-space: nowrap;
     vertical-align: baseline;
     border-radius: .25em;
-    align-items: baseline;
+    align-items: center;
 }
 
 .badge-label {
@@ -7660,6 +7661,7 @@ span.code {
     margin-left: 5px;
     background-color: #c5eafc;
     align-self: center;
+    cursor: pointer;
 }
 
 .badge-for-version .badge-label {
@@ -7671,11 +7673,11 @@ span.code {
 
 .badge-notification {
     color: #286b93;
-    font-size: 1rem;
-    height: 1rem;
-    line-height: 1rem;
+    font-size: 0.8rem;
+    height: 0.8rem;
+    line-height: 0.8rem;
+    padding-left: 2px;
     width: 1.5rem;
-    margin-top: -1px;
 }
 
 .badge-for-version .badge-notification .fa-stack {
@@ -7690,11 +7692,11 @@ span.code {
 }
 
 .badge-for-version .badge-notification i:first-child {
-    font-size: 1.6rem;
+    font-size: 1.6em;
 }
 
 .badge-for-version .badge-notification i:last-child {
-    font-size: 0.8rem;
+    font-size: 0.8em;
 }
 
 
