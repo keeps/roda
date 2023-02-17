@@ -545,6 +545,7 @@ public class RodaCoreFactory {
           // migrationManager.performModelMigrations();
           throw new GenericException("It's necessary to do a model/index migration");
         }
+        LOGGER.debug("Finished migration verification");
 
         instantiateDefaultObjects();
         LOGGER.debug("Finished instantiating default objects");
@@ -1488,15 +1489,19 @@ public class RodaCoreFactory {
 
   private static void instantiateNodeSpecificObjects(NodeType nodeType) {
     if (INSTANTIATE_LDAP) {
+      LOGGER.debug("Starting up ApacheDS");
       startApacheDS();
+      LOGGER.debug("Finishing starting up ApacheDS");
     }
 
     if (INSTANTIATE_SCANNER) {
       instantiateTransferredResourcesScanner();
+      LOGGER.debug("Finished instantiating transferred resource scanner");
     }
 
     if (INSTANTIATE_PLUGIN_ORCHESTRATOR) {
       instantiateOrchestrator();
+      LOGGER.debug("Finished instantiating orchestrator");
     }
 
     if (nodeType == NodeType.PRIMARY) {
