@@ -184,7 +184,6 @@ public class Menu extends Composite {
     administrationStatistics.addStyleName("administration_statistics_item");
     String distributedMode = ConfigurationManager.getStringWithDefault(
       RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
-    GWT.log("distributedMode: " + distributedMode);
     if (distributedMode.equals(RodaConstants.DistributedModeType.CENTRAL.name())) {
       administrationDistributedInstances = administrationMenu.addItem(
         messages.title("administration_distributed_instances"),

@@ -523,8 +523,14 @@ public class CreateDefaultJob extends Composite {
     Button licenseButton = new Button(messages.pluginLicenseLabel());
     licenseButton.addStyleName("btn pluginWorkFlowListTitleButtons btn-stamp");
     if (selectedPlugin.hasLicenseFile()) {
-      licenseButton.addClickHandler(
-        e -> Dialogs.showLicenseModal(messages.pluginLicenseLabel(), new HTMLWidgetWrapper(selectedPlugin.getLicenseFilePath())));
+      if (selectedPlugin.getCertificateInfo().getCertificateStatus()
+        .equals(CertificateInfo.CertificateStatus.INTERNAL)) {
+        licenseButton.addClickHandler(e -> Dialogs.showLicenseModal(messages.pluginLicenseLabel(),
+          new HTMLWidgetWrapper(selectedPlugin.getLicenseFilePath(), RodaConstants.ResourcesTypes.INTERNAL)));
+      } else {
+        licenseButton.addClickHandler(e -> Dialogs.showLicenseModal(messages.pluginLicenseLabel(),
+          new HTMLWidgetWrapper(selectedPlugin.getLicenseFilePath(), RodaConstants.ResourcesTypes.PLUGINS)));
+      }
       rightPanel.add(licenseButton);
     } else if (marketInfo != null && marketInfo.getLicense() != null) {
       LicenseInfo license = marketInfo.getLicense();
@@ -537,11 +543,8 @@ public class CreateDefaultJob extends Composite {
     Button documentationButton = new Button(messages.pluginDocumentationLabel());
     documentationButton.addStyleName("btn pluginWorkFlowListTitleButtons btn-book");
     if (selectedPlugin.hasDocumentationFile()) {
-      documentationButton.addClickHandler(
-        clickEvent -> HistoryUtils.newHistory(Theme.RESOLVER, selectedPlugin.getDocumentationFilePath()));
-      rightPanel.add(documentationButton);
-    } else if (marketInfo != null && marketInfo.getDocumentation() != null) {
-      documentationButton.addClickHandler(clickEvent -> Window.open(marketInfo.getDocumentation(), "_blank", ""));
+      documentationButton.addClickHandler(clickEvent -> HistoryUtils.newHistory(Theme.RESOLVER,
+        RodaConstants.ResourcesTypes.PLUGINS.toString(), selectedPlugin.getDocumentationFilePath()));
       rightPanel.add(documentationButton);
     }
 

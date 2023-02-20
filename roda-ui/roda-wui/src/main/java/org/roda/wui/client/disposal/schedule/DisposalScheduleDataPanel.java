@@ -447,7 +447,6 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
   }
 
   protected void onChange() {
-    GWT.log("HERE!!!");
     changed = true;
     if (checked) {
       isValid();

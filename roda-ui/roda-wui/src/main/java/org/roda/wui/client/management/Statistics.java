@@ -12,6 +12,7 @@ package org.roda.wui.client.management;
 
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
@@ -79,18 +80,19 @@ public class Statistics {
     if (!initialized) {
       initialized = true;
       JavascriptUtils.expose("locale", LocaleInfo.getCurrentLocale().getLocaleName());
-      layout = new HTMLWidgetWrapper("Statistics.html", null, new AsyncCallback<Void>() {
+      layout = new HTMLWidgetWrapper("Statistics.html", null, RodaConstants.ResourcesTypes.INTERNAL,
+        new AsyncCallback<Void>() {
 
-        @Override
-        public void onFailure(Throwable caught) {
-          Toast.showError(caught);
-        }
+          @Override
+          public void onFailure(Throwable caught) {
+            Toast.showError(caught);
+          }
 
-        @Override
-        public void onSuccess(Void result) {
-          JavascriptUtils.runHighlighter();
-        }
-      });
+          @Override
+          public void onSuccess(Void result) {
+            JavascriptUtils.runHighlighter();
+          }
+        });
       layout.addStyleName("wui-home");
     }
   }

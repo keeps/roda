@@ -1079,7 +1079,7 @@ public class RodaCoreFactory {
         LOGGER.error("Unable to retrieve instance config file", e);
         instantiatedWithoutErrors = false;
       } catch (IOException e) {
-        LOGGER.warn("Unable to retrieve plugin list info from API", e);
+        LOGGER.warn("Unable to retrieve plugin list info from API");
       }
 
       try {

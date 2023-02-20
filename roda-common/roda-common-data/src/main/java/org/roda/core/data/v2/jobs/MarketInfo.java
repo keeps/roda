@@ -22,7 +22,6 @@ public class MarketInfo implements Serializable {
 
   private Set<String> objectClasses = new HashSet<>();
   private LicenseInfo license = null;
-  private String documentation = null;
   private String installation = null;
   private String homepage = null;
 
@@ -97,14 +96,6 @@ public class MarketInfo implements Serializable {
     this.license = license;
   }
 
-  public String getDocumentation() {
-    return documentation;
-  }
-
-  public void setDocumentation(String documentation) {
-    this.documentation = documentation;
-  }
-
   public String getInstallation() {
     return installation;
   }
@@ -123,21 +114,14 @@ public class MarketInfo implements Serializable {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o)
-      return true;
-    if (o == null || getClass() != o.getClass())
-      return false;
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
     MarketInfo that = (MarketInfo) o;
-    return Objects.equals(id, that.id) && Objects.equals(name, that.name) && type == that.type
-      && Objects.equals(version, that.version) && Objects.equals(description, that.description)
-      && Objects.equals(categories, that.categories) && Objects.equals(objectClasses, that.objectClasses)
-      && Objects.equals(license, that.license) && Objects.equals(documentation, that.documentation)
-      && Objects.equals(installation, that.installation) && Objects.equals(homepage, that.homepage);
+    return Objects.equals(id, that.id) && Objects.equals(name, that.name) && type == that.type && Objects.equals(version, that.version) && Objects.equals(description, that.description) && Objects.equals(categories, that.categories) && Objects.equals(objectClasses, that.objectClasses) && Objects.equals(license, that.license) && Objects.equals(installation, that.installation) && Objects.equals(homepage, that.homepage);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, type, version, description, categories, objectClasses, license, documentation,
-      installation, homepage);
+    return Objects.hash(id, name, type, version, description, categories, objectClasses, license, installation, homepage);
   }
 }

@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import com.google.gwt.user.client.ui.TabBar;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -32,6 +31,7 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.BadgePanel;
 import org.roda.wui.client.common.LastSelectedItemsSingleton;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.PluginUtils;
@@ -40,6 +40,7 @@ import org.roda.wui.client.main.Theme;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -58,6 +59,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
+import com.google.gwt.user.client.ui.TabBar;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -484,9 +486,9 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
     }
 
     // Remove store tab if there is no item on store
-    if(workflowStoreList.getWidgetCount() == 0){
+    if (workflowStoreList.getWidgetCount() == 0) {
       TabBar tabBar = workflowTabPanel.getTabBar();
-      if(tabBar.getTabCount() > 1){
+      if (tabBar.getTabCount() > 1) {
         workflowTabPanel.remove(1);
       }
     }
@@ -517,9 +519,14 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
     Button licenseButton = new Button(messages.pluginLicenseLabel());
     licenseButton.addStyleName("btn pluginWorkFlowListTitleButtons btn-stamp");
     if (selectedPlugin.hasLicenseFile()) {
-      licenseButton
-        .addClickHandler(clickEvent -> HistoryUtils.newHistory(Theme.RESOLVER, selectedPlugin.getLicenseFilePath()));
-      rightPanel.add(licenseButton);
+     if (selectedPlugin.getCertificateInfo().getCertificateStatus()
+        .equals(CertificateInfo.CertificateStatus.INTERNAL)) {
+        licenseButton.addClickHandler(e -> Dialogs.showLicenseModal(messages.pluginLicenseLabel(),
+          new HTMLWidgetWrapper(selectedPlugin.getLicenseFilePath(), RodaConstants.ResourcesTypes.INTERNAL)));
+      } else {
+        licenseButton.addClickHandler(e -> Dialogs.showLicenseModal(messages.pluginLicenseLabel(),
+          new HTMLWidgetWrapper(selectedPlugin.getLicenseFilePath(), RodaConstants.ResourcesTypes.PLUGINS)));
+      }
     } else if (marketInfo != null && marketInfo.getLicense() != null) {
       LicenseInfo license = marketInfo.getLicense();
       licenseButton.setText(license.getName());
@@ -531,11 +538,8 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
     Button documentationButton = new Button(messages.pluginDocumentationLabel());
     documentationButton.addStyleName("btn pluginWorkFlowListTitleButtons btn-book");
     if (selectedPlugin.hasDocumentationFile()) {
-      documentationButton.addClickHandler(
-        clickEvent -> HistoryUtils.newHistory(Theme.RESOLVER, selectedPlugin.getDocumentationFilePath()));
-      rightPanel.add(documentationButton);
-    } else if (marketInfo != null && marketInfo.getDocumentation() != null) {
-      documentationButton.addClickHandler(clickEvent -> Window.open(marketInfo.getDocumentation(), "_blank", ""));
+      documentationButton.addClickHandler(clickEvent -> HistoryUtils.newHistory(Theme.RESOLVER,
+        RodaConstants.ResourcesTypes.PLUGINS.toString(), selectedPlugin.getDocumentationFilePath()));
       rightPanel.add(documentationButton);
     }
 

@@ -34,37 +34,34 @@ public class Theme extends RodaWuiController {
     super();
   }
 
-  public static Pair<String, ProvidesInputStream> getThemeResource(String id, String fallbackResourceId) {
+  public static Pair<String, ProvidesInputStream> getThemeResource(String id, String fallbackResourceId, String type) {
     String normalizedID = FilenameUtils.normalize(id);
     String normalizedFallBackResource = FilenameUtils.normalize(fallbackResourceId);
     Pair<String, ProvidesInputStream> ret;
+    Path resourcePath;
+    String resourceId;
 
-    if (id.startsWith(RodaConstants.CORE_PLUGINS_FOLDER)) {
-      URL url = RodaCoreFactory.getConfigurationFile(normalizedID);
-      if (url != null) {
-        ret = Pair.of(id,
-          () -> RodaCoreFactory.getConfigurationFileAsStream(RodaCoreFactory.getConfigPath(), normalizedID));
-      } else {
-        ret = Pair.of(normalizedFallBackResource, () -> RodaCoreFactory
-          .getConfigurationFileAsStream(RodaCoreFactory.getConfigPath(), normalizedFallBackResource));
-      }
+    if (RodaConstants.ResourcesTypes.PLUGINS.toString().equals(type)) {
+      resourcePath = RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_PLUGINS_FOLDER);
+      resourceId = RodaConstants.CORE_PLUGINS_FOLDER + "/" + normalizedID;
     } else {
-      URL url = RodaCoreFactory.getConfigurationFile(RodaConstants.CORE_THEME_FOLDER + "/" + normalizedID);
+      resourcePath = RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER);
+      resourceId = RodaConstants.CORE_THEME_FOLDER + "/" + normalizedID;
+    }
 
-      if (url != null) {
-        ret = Pair.of(id, () -> RodaCoreFactory.getConfigurationFileAsStream(
-          RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER), normalizedID));
-      } else {
-        ret = Pair.of(normalizedFallBackResource, () -> RodaCoreFactory.getConfigurationFileAsStream(
-          RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_THEME_FOLDER), normalizedFallBackResource));
-      }
+    URL url = RodaCoreFactory.getConfigurationFile(resourceId);
+    if (url != null) {
+      ret = Pair.of(id, () -> RodaCoreFactory.getConfigurationFileAsStream(resourcePath, normalizedID));
+    } else {
+      ret = Pair.of(normalizedFallBackResource,
+        () -> RodaCoreFactory.getConfigurationFileAsStream(resourcePath, normalizedFallBackResource));
     }
 
     return ret;
   }
 
   public static StreamResponse getThemeResourceStreamResponse(
-    final Pair<String, ProvidesInputStream> themeResourceInputstream) {
+    final Pair<String, ProvidesInputStream> themeResourceInputstream, String type) {
     final String resourceId = themeResourceInputstream.getFirst();
     final String mimeType = MimeTypeHelper.getContentType(resourceId);
 
@@ -91,7 +88,7 @@ public class Theme extends RodaWuiController {
       public Date getLastModified() {
         Date lastModified = null;
         try {
-          lastModified = Theme.getLastModifiedDate(resourceId);
+          lastModified = Theme.getLastModifiedDate(resourceId, type);
         } catch (IOException e) {
           // do nothing
         }
@@ -107,11 +104,11 @@ public class Theme extends RodaWuiController {
     return new StreamResponse(stream);
   }
 
-  public static Date getLastModifiedDate(String resourceId) throws IOException {
+  public static Date getLastModifiedDate(String resourceId, String type) throws IOException {
     Date modifiedDate;
     URL file;
-    if(resourceId.startsWith(RodaConstants.CORE_PLUGINS_FOLDER)){
-      file = RodaCoreFactory.getConfigurationFile(resourceId);
+    if (RodaConstants.ResourcesTypes.PLUGINS.toString().equals(type)) {
+      file = RodaCoreFactory.getConfigurationFile(RodaConstants.CORE_PLUGINS_FOLDER + "/" + resourceId);
     } else {
       file = RodaCoreFactory.getConfigurationFile(RodaConstants.CORE_THEME_FOLDER + "/" + resourceId);
     }

@@ -36,7 +36,22 @@ public class HTMLWidgetWrapper extends HTML {
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   public HTMLWidgetWrapper(String resourceId) {
-    this(resourceId, null, new AsyncCallback<Void>() {
+    this(resourceId, null, RodaConstants.ResourcesTypes.INTERNAL, new AsyncCallback<Void>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        // do nothing
+      }
+
+      @Override
+      public void onSuccess(Void result) {
+        // do nothing
+      }
+    });
+  }
+
+  public HTMLWidgetWrapper(String resourceId, RodaConstants.ResourcesTypes resourceType) {
+    this(resourceId, null, resourceType, new AsyncCallback<Void>() {
 
       @Override
       public void onFailure(Throwable caught) {
@@ -51,7 +66,7 @@ public class HTMLWidgetWrapper extends HTML {
   }
 
   public HTMLWidgetWrapper(String resourceId, String instanceId) {
-    this(resourceId, instanceId, new AsyncCallback<Void>() {
+    this(resourceId, instanceId, RodaConstants.ResourcesTypes.INTERNAL, new AsyncCallback<Void>() {
 
       @Override
       public void onFailure(Throwable caught) {
@@ -65,7 +80,8 @@ public class HTMLWidgetWrapper extends HTML {
     });
   }
 
-  public HTMLWidgetWrapper(String resourceId, String instanceId, final AsyncCallback<Void> callback) {
+  public HTMLWidgetWrapper(String resourceId, String instanceId, RodaConstants.ResourcesTypes resourceType,
+    final AsyncCallback<Void> callback) {
     String id = resourceId;
     boolean isMarkdown = false;
 
@@ -74,7 +90,7 @@ public class HTMLWidgetWrapper extends HTML {
     }
     if (id.endsWith(".md")) {
       isMarkdown = true;
-      if (id.startsWith(RodaConstants.CORE_PLUGINS_FOLDER)) {
+      if (resourceType.equals(RodaConstants.ResourcesTypes.PLUGINS)) {
         id = id.substring(0, id.length() - 3);
       } else {
         String markdownPathPrefix = RodaConstants.CORE_MARKDOWN_FOLDER + "/";
@@ -97,7 +113,7 @@ public class HTMLWidgetWrapper extends HTML {
     }
 
     RequestBuilder request = new RequestBuilder(RequestBuilder.GET,
-      RestUtils.createThemeResourceUri(localizedResourceId, defaultResourceId, false).asString());
+      RestUtils.createThemeResourceUri(localizedResourceId, defaultResourceId, resourceType.toString(), false).asString());
 
     final boolean transformMarkdownIntoHTML = isMarkdown;
     try {

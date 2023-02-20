@@ -13,7 +13,7 @@ package org.roda.wui.client.main;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.gwt.user.client.Window;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
@@ -34,10 +34,15 @@ public class Theme extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+      RodaConstants.ResourcesTypes resourceType = RodaConstants.ResourcesTypes.INTERNAL;
       if (!historyTokens.isEmpty()) {
         StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (String token : historyTokens) {
+          if (token.equals(RodaConstants.ResourcesTypes.PLUGINS.toString())) {
+             resourceType = RodaConstants.ResourcesTypes.PLUGINS;
+             continue;
+          }
           if (first) {
             first = false;
           } else {
@@ -45,7 +50,7 @@ public class Theme extends Composite {
           }
           sb.append(token);
         }
-        Theme theme = new Theme(sb.toString());
+        Theme theme = new Theme(sb.toString(), resourceType);
         callback.onSuccess(theme);
       } else {
         HistoryUtils.newHistory(Theme.RESOLVER);
@@ -71,8 +76,8 @@ public class Theme extends Composite {
 
   private HTMLWidgetWrapper layout;
 
-  private Theme(String htmlPage) {
-    layout = new HTMLWidgetWrapper(htmlPage, null, new AsyncCallback<Void>() {
+  private Theme(String htmlPage, RodaConstants.ResourcesTypes resourceType) {
+    layout = new HTMLWidgetWrapper(htmlPage, null, resourceType, new AsyncCallback<Void>() {
 
       @Override
       public void onFailure(Throwable caught) {

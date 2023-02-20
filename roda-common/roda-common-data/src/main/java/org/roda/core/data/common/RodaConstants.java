@@ -294,7 +294,7 @@ public final class RodaConstants {
   public static final String CORE_JOB_ATTACHMENTS_FOLDER = "job-attachments";
   public static final String CORE_MARKET_FOLDER = "market";
   public static final String CORE_MARKET_FILE = "marketInfo.jsonl";
-  public static final String CORE_PLUGINS_DOCUMENTATION_FILE = "documentation.md";
+  public static final String CORE_PLUGINS_DOCUMENTATION_FILE = "README.md";
 
   public static final String CORE_I18N_CLIENT_FOLDER = "client";
   public static final String CORE_I18_GWT_XML_FILE = "I18N.gwt.xml";
@@ -420,6 +420,10 @@ public final class RodaConstants {
   public static final String API_QUERY_PARAM_NOTIFICATION_TOKEN = "token";
   public static final String API_QUERY_PARAM_RESOURCE_ID = "resource_id";
   public static final String API_QUERY_PARAM_DEFAULT_RESOURCE_ID = "default_resource_id";
+
+  public static final String API_QUERY_PARAM_RESOURCE_TYPE = "resource_type";
+
+  public static final String API_QUERY_PARAM_DEFAULT_RESOURCE_TYPE = "internal";
   public static final String API_QUERY_PARAM_INLINE = "inline";
   public static final String API_QUERY_PARAM_FILEPATH = "filepath";
   public static final String API_QUERY_PARAM_PARENT_ID = "parent_id";
@@ -533,6 +537,25 @@ public final class RodaConstants {
     private String value;
 
     MetadataMediaTypes(String value) {
+      this.value = value;
+    }
+
+    public void setValue(final String value) {
+      this.value = value;
+    }
+
+    @Override
+    public String toString() {
+      return value;
+    }
+  }
+
+  public enum ResourcesTypes {
+    INTERNAL("internal"), PLUGINS("plugins");
+
+    private String value;
+
+    ResourcesTypes(String value) {
       this.value = value;
     }
 

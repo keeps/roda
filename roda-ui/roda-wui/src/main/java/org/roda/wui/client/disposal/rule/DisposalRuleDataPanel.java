@@ -220,7 +220,6 @@ public class DisposalRuleDataPanel extends Composite implements HasValueChangeHa
       disposalRule.setConditionValue(metadataFieldsPanel.getValue().getSecond());
     } else {
       disposalRule.setType(ConditionType.IS_CHILD_OF);
-      GWT.log("AQUI: " + childOfPanel.getValue());
       if (childOfPanel.getValue() != null) {
         disposalRule.setConditionKey(childOfPanel.getValue().getFirst());
         disposalRule.setConditionValue(childOfPanel.getValue().getSecond());

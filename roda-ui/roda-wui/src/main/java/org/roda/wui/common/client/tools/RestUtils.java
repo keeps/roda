@@ -458,16 +458,26 @@ public class RestUtils {
   }
 
   public static SafeUri createThemeResourceUri(String resourceId, String defaultResourceId, boolean inline) {
-    // api/v1/theme/?resource_id={resourceId}&default_resource_od={defaultResourceId}
+    return createThemeResourceUri(resourceId, defaultResourceId, RodaConstants.ResourcesTypes.INTERNAL.toString(), inline);
+  }
+
+  public static SafeUri createThemeResourceUri(String resourceId, String defaultResourceId, String resourceType,
+    boolean inline) {
+    // api/v1/theme/?resource_id={resourceId}&default_resource_od={defaultResourceId}&resource_type={resourceType}
     StringBuilder b = new StringBuilder();
 
     b.append(RodaConstants.API_REST_V1_THEME).append(RodaConstants.API_QUERY_START)
       .append(RodaConstants.API_QUERY_PARAM_RESOURCE_ID).append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
-      .append(resourceId);
+      .append(URL.encode(resourceId));
 
     if (defaultResourceId != null) {
       b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_PARAM_DEFAULT_RESOURCE_ID)
         .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(defaultResourceId);
+    }
+
+    if (resourceType != null) {
+      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_PARAM_RESOURCE_TYPE)
+        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(resourceType);
     }
 
     if (inline) {

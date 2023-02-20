@@ -92,7 +92,7 @@ public class RepresentationInformationDialogs {
     layout.addStyleName("wui-dialog-layout");
 
     HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIAssociationsDescription.html", null,
-      new AsyncCallback<Void>() {
+      RodaConstants.ResourcesTypes.INTERNAL, new AsyncCallback<Void>() {
         @Override
         public void onFailure(Throwable caught) {
           AsyncCallbackUtils.defaultFailureTreatment(caught);
@@ -483,7 +483,7 @@ public class RepresentationInformationDialogs {
               rightSide.clear();
 
               HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionHelp.html", null,
-                centerDialogBox);
+                RodaConstants.ResourcesTypes.INTERNAL, centerDialogBox);
               description.addStyleName("page-description");
               rightSide.add(description);
 
@@ -510,7 +510,7 @@ public class RepresentationInformationDialogs {
               rightSide.clear();
 
               HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithRI.html", null,
-                centerDialogBox);
+                RodaConstants.ResourcesTypes.INTERNAL, centerDialogBox);
               description.addStyleName("page-description");
               rightSide.add(description);
 
@@ -606,7 +606,7 @@ public class RepresentationInformationDialogs {
               rightSide.clear();
 
               HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithText.html", null,
-                centerDialogBox);
+                RodaConstants.ResourcesTypes.INTERNAL, centerDialogBox);
               description.addStyleName("page-description");
               rightSide.add(description);
 
@@ -663,7 +663,7 @@ public class RepresentationInformationDialogs {
               rightSide.clear();
 
               HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsDescriptionWithWeb.html", null,
-                centerDialogBox);
+                RodaConstants.ResourcesTypes.INTERNAL, centerDialogBox);
               description.addStyleName("page-description");
               rightSide.add(description);
 
@@ -732,7 +732,7 @@ public class RepresentationInformationDialogs {
     rightSide.clear();
 
     HTMLWidgetWrapper description = new HTMLWidgetWrapper("RIRelationsWithIntellectualEntity.html", null,
-      centerDialogBox);
+      RodaConstants.ResourcesTypes.INTERNAL, centerDialogBox);
     description.addStyleName("page-description");
     rightSide.add(description);
 

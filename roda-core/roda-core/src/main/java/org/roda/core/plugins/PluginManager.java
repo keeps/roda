@@ -765,17 +765,17 @@ public class PluginManager {
 
   private void loadPluginResources(Path jarPath, PluginInfo pluginInfo) throws IOException {
     Path pluginDir = jarPath.getParent();
-    Path pluginResourceDir = Paths.get(RodaConstants.CORE_PLUGINS_FOLDER).resolve(pluginDir.getFileName());
 
     if (Files.exists(pluginDir.resolve(RodaConstants.CORE_LICENSE_MARKDOWN_FILE))) {
       pluginInfo.setHasLicenseFile(true);
-      pluginInfo.setLicenseFilePath(pluginResourceDir.resolve(RodaConstants.CORE_LICENSE_MARKDOWN_FILE).toString());
+      pluginInfo
+        .setLicenseFilePath(pluginDir.getFileName().resolve(RodaConstants.CORE_LICENSE_MARKDOWN_FILE).toString());
     }
 
     if (Files.exists(
       pluginDir.resolve(RodaConstants.CORE_MARKDOWN_FOLDER).resolve(RodaConstants.CORE_PLUGINS_DOCUMENTATION_FILE))) {
       pluginInfo.setHasDocumentationFile(true);
-      pluginInfo.setDocumentationFilePath(pluginResourceDir.resolve(RodaConstants.CORE_MARKDOWN_FOLDER)
+      pluginInfo.setDocumentationFilePath(pluginDir.getFileName().resolve(RodaConstants.CORE_MARKDOWN_FOLDER)
         .resolve(RodaConstants.CORE_PLUGINS_DOCUMENTATION_FILE).toString());
     }
   }

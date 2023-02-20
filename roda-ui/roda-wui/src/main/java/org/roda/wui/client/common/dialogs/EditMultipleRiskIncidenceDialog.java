@@ -9,6 +9,7 @@ package org.roda.wui.client.common.dialogs;
 
 import java.util.Date;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.risks.IncidenceStatus;
 import org.roda.core.data.v2.risks.SeverityLevel;
@@ -83,18 +84,19 @@ public class EditMultipleRiskIncidenceDialog<T extends IsIndexed> extends Dialog
       severity.addItem(messages.severityLevel(iseverity), iseverity.toString());
     }
 
-    titlePanel.add(new HTMLWidgetWrapper("EditRiskIncidenceDescription.html", null, new AsyncCallback<Void>() {
+    titlePanel.add(new HTMLWidgetWrapper("EditRiskIncidenceDescription.html", null,
+      RodaConstants.ResourcesTypes.INTERNAL, new AsyncCallback<Void>() {
 
-      @Override
-      public void onFailure(Throwable caught) {
-        // do nothing
-      }
+        @Override
+        public void onFailure(Throwable caught) {
+          // do nothing
+        }
 
-      @Override
-      public void onSuccess(Void result) {
-        center();
-      }
-    }));
+        @Override
+        public void onSuccess(Void result) {
+          center();
+        }
+      }));
 
     setAutoHideEnabled(false);
     setModal(true);
