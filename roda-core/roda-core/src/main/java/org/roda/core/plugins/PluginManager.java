@@ -47,14 +47,12 @@ import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.io.FilenameUtils;
 import org.reflections.Reflections;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -982,28 +980,16 @@ public class PluginManager {
     return sb.toString();
   }
 
-  public static String getPluginsMarketInformationAsJsonLines(List<Pair<String, String>> plugins) {
+  public static String getPluginsMarketInformationAsJsonLines(String pluginFolder) {
     ArrayList<MarketInfo> marketInfoList = new ArrayList<>();
-    for (Pair<String, String> pluginNameAndState : plugins) {
-      String plugin = pluginNameAndState.getFirst();
-      try {
-        Class<?> pluginClass = Class.forName(plugin);
 
-        // Load and add all plugin configuration files
-        List<Path> propertiesFiles;
-        Path configurationFolder = Paths
-          .get(pluginClass.getClassLoader().getResource(RodaConstants.CORE_CONFIG_FOLDER).getPath());
-        if (Files.exists(configurationFolder)) {
-          try (Stream<Path> walk = Files.walk(configurationFolder)) {
-            propertiesFiles = walk.filter(Files::isRegularFile).collect(Collectors.toList());
-          }
-          for (Path propertiesFile : propertiesFiles) {
-            String extension = FilenameUtils.getExtension(FilenameUtils.getName(propertiesFile.toString()));
-            if ("properties".equals(extension)) {
-              RodaCoreFactory.addExternalConfiguration(propertiesFile);
-            }
-          }
-        }
+    try {
+      Path pluginPath = RodaCoreFactory.getConfigPath().resolve(RodaCoreFactory.getPluginsPath()).resolve(pluginFolder);
+      List<String> plugins = loadPluginFromPath(pluginPath);
+
+      for (String plugin : plugins) {
+
+        Class<?> pluginClass = Class.forName(plugin);
 
         // create a plugin instance
         Plugin<? extends IsRODAObject> pluginInstance = (Plugin<? extends IsRODAObject>) pluginClass.newInstance();
@@ -1016,20 +1002,49 @@ public class PluginManager {
         marketInfo.setVersion(pluginInstance.getVersion());
         marketInfo.setCategories(pluginInstance.getCategories());
         marketInfo.setDescription(pluginInstance.getDescription());
+        marketInfo.setHomepage(RodaConstants.DEFAULT_MARKET_PLUGIN_HOMEPAGE_URL + plugin);
 
         // set object class for create selected job
         Set<Class> objectClasses = getObjectClasses(pluginInstance);
         objectClasses.stream().forEach(objectClass -> marketInfo.addObjectClass(objectClass.getName()));
 
         marketInfoList.add(marketInfo);
-      } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-        LOGGER.error("Error getting plugin information", e);
-        return null;
-      } catch (IOException | ConfigurationException e) {
-        LOGGER.error("Unable to load plugin properties", e);
-        return null;
       }
+    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+      LOGGER.error("Error getting plugin information", e);
+      return null;
+    } catch (IOException | ConfigurationException e) {
+      LOGGER.error("Unable to load plugin properties", e);
+      return null;
     }
     return JsonUtils.getJsonLinesFromObjectList(marketInfoList);
+  }
+
+  private static List<String> loadPluginFromPath(Path pluginPath) throws IOException, ConfigurationException {
+    if (Files.exists(pluginPath)) {
+      try (DirectoryStream<Path> jarsStream = Files.newDirectoryStream(pluginPath, "*.jar")) {
+        List<String> pluginClassNames = new ArrayList<>();
+        for (Path jarPath : jarsStream) {
+          JarFile jarFile = new JarFile(jarPath.toFile());
+          Manifest manifest = jarFile.getManifest();
+          if (manifest != null) {
+            Attributes mainAttributes = manifest.getMainAttributes();
+            // Get plugin class names from manifest
+            String pluginClassNamesString = mainAttributes.getValue(RODA_PLUGIN_MANIFEST_KEY);
+            if (pluginClassNamesString != null) {
+              pluginClassNames.addAll(Arrays.asList(pluginClassNamesString.split("\\s+")));
+            }
+          }
+        }
+        // gather and load plugin configuration
+        try (DirectoryStream<Path> propertiesStream = Files.newDirectoryStream(pluginPath, "*.properties")) {
+          for (Path path : propertiesStream) {
+            RodaCoreFactory.addExternalConfiguration(path);
+          }
+        }
+        return pluginClassNames;
+      }
+    }
+    return null;
   }
 }

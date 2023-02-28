@@ -79,8 +79,8 @@ import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
-import org.roda.core.common.Messages;
 import org.roda.core.common.MarketUtils;
+import org.roda.core.common.Messages;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -655,13 +655,11 @@ public class RodaCoreFactory {
 
   private static void initializeMarketDir() {
     try {
-      String marketFolder = getConfigurationString("market.folder",
-        RodaConstants.CORE_MARKET_FOLDER);
+      String marketFolder = getConfigurationString("market.folder", RodaConstants.CORE_MARKET_FOLDER);
       marketDirectoryPath = getConfigPath().resolve(marketFolder);
       Files.createDirectories(marketDirectoryPath);
     } catch (IOException e) {
-      throw new RuntimeException(
-        "Unable to create market DIRECTORY " + marketDirectoryPath + ", Aborting...", e);
+      throw new RuntimeException("Unable to create market DIRECTORY " + marketDirectoryPath + ", Aborting...", e);
     }
   }
 
@@ -2602,9 +2600,18 @@ public class RodaCoreFactory {
   }
 
   private static void mainConfigsTasks(final List<String> args) {
-    if ("generatePluginsMarkdown".equals(args.get(0)) && args.size() == 4 && StringUtils.isNotBlank(args.get(1))
-      && StringUtils.isNotBlank(args.get(2)) && StringUtils.isNotBlank(args.get(3))
-      && Files.exists(Paths.get(FilenameUtils.normalize(args.get(3))))) {
+    if ("generatePluginsMarkdown".equals(args.get(0))) {
+      generatePluginsMarkdownTask(args);
+    } else if ("generatePluginsMarketInformation".equals(args.get(0))) {
+      generatePluginsMarketInformationTask(args);
+    } else {
+      printConfigsUsage();
+    }
+  }
+
+  private static void generatePluginsMarkdownTask(final List<String> args) {
+    if (args.size() == 4 && StringUtils.isNotBlank(args.get(1)) && StringUtils.isNotBlank(args.get(2))
+      && StringUtils.isNotBlank(args.get(3)) && Files.exists(Paths.get(FilenameUtils.normalize(args.get(3))))) {
 
       List<Pair<String, String>> pluginsNameAndState = new ArrayList<>();
 
@@ -2617,18 +2624,33 @@ public class RodaCoreFactory {
         }
 
         String pluginsMarkdown = PluginManager.getPluginsInformationAsMarkdown(pluginsNameAndState);
-        String pluginsJson = PluginManager.getPluginsMarketInformationAsJsonLines(pluginsNameAndState);
+
         try {
           Files.write(Paths.get(FilenameUtils.normalize(args.get(3)), "README.md"), pluginsMarkdown.getBytes());
-          if (pluginsJson != null) {
-            Files.write(Paths.get(FilenameUtils.normalize(args.get(3)), "pluginInfo.jsonl"), pluginsJson.getBytes());
-          }
         } catch (IOException e) {
           System.err
             .println("Error while writing plugin/plugins information in markdown format! Reason: " + e.getMessage());
         }
       } else {
         printConfigsUsage();
+      }
+    } else {
+      printConfigsUsage();
+    }
+  }
+
+  private static void generatePluginsMarketInformationTask(final List<String> args) {
+    if (args.size() == 3 && StringUtils.isNotBlank(args.get(1))
+      && StringUtils.isNotBlank(args.get(2)) && Files.exists(Paths.get(FilenameUtils.normalize(args.get(2))))) {
+      String pluginFolder = args.get(1);
+      try {
+        String pluginsJson = PluginManager.getPluginsMarketInformationAsJsonLines(pluginFolder);
+        if (pluginsJson != null) {
+          Files.write(Paths.get(FilenameUtils.normalize(args.get(2)), "pluginInfo.jsonl"), pluginsJson.getBytes());
+        }
+      } catch (IOException e) {
+        System.err
+          .println("Error while writing plugin/plugins information in markdown format! Reason: " + e.getMessage());
       }
     } else {
       printConfigsUsage();

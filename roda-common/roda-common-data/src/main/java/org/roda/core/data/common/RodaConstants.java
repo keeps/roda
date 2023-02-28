@@ -728,6 +728,7 @@ public final class RodaConstants {
   // MARKET
   public static final String MARKET_INFO_URL_PROPERTY = "core.market.info.url";
   public static final String DEFAULT_MARKET_INFO_URL = "https://market.roda-community.org";
+  public static final String DEFAULT_MARKET_PLUGIN_HOMEPAGE_URL = "https://market.roda.keep.pt/";
   public static final String DEFAULT_MARKET_SUPPORT_URL = "https://www.keep.pt/en/contacts-proposals-information-telephone-address/";
 
 
