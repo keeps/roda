@@ -98,6 +98,7 @@ import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.MarketException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.ReturnWithExceptions;
@@ -1078,8 +1079,8 @@ public class RodaCoreFactory {
       } catch (GenericException e) {
         LOGGER.error("Unable to retrieve instance config file", e);
         instantiatedWithoutErrors = false;
-      } catch (IOException e) {
-        LOGGER.warn("Unable to retrieve plugin list info from API");
+      } catch (MarketException e) {
+        LOGGER.warn(e.getMessage());
       }
 
       try {
