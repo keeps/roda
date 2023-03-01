@@ -28,7 +28,7 @@
 							<g:Tab text="{messages.marketPluginsActionsTabLabel}">
 								<g:FlowPanel ui:field="workflowList" />
 							</g:Tab>
-							<g:Tab text="{messages.marketStoreTabLabel}">
+							<g:Tab text="{messages.marketTabLabel}">
 								<g:FlowPanel ui:field="workflowStoreList" />
 							</g:Tab>
 						</g:TabPanel>

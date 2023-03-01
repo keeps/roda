@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import com.google.gwt.user.client.ui.TabBar;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -495,6 +496,14 @@ public class CreateDefaultJob extends Composite {
 
       targetListPanel.clear();
       defineTargetInformation(targetList.getSelectedValue());
+    }
+
+    // Remove store tab if there is no item on store
+    if (workflowStoreList.getWidgetCount() == 0) {
+      TabBar tabBar = workflowTabPanel.getTabBar();
+      if (tabBar.getTabCount() > 1) {
+        workflowTabPanel.remove(1);
+      }
     }
   }
 
