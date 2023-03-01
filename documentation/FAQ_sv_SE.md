@@ -78,7 +78,7 @@ När SIP:ar bearbetas under ingest, om de inte accepteras, flyttas de till en sp
 
 Detta är en komplex fråga som inte kan besvaras med bara några rader text. Med det sagt kan vi säga att systemet hanterar bevarande på flera sätt:
 
-- Det finns åtgärder som utför regelbundna korrigeringskontroller av de inlevererade filerna och varnar förvaltarna om något problem upptäcks
+- Det finns åtgärder som utför regelbundna beständighetskontroller av de inlevererade filerna och varnar förvaltarna om något problem upptäcks
 - Systemet levereras med ett inbyggt riskhanteringsgränssnitt (dvs riskregister)
 - Det finns åtgärder som upptäcker risker på filer och lägger till nya hot till riskregistret som måste hanteras manuellt (t.ex. en post som inte innehåller tillräckligt med beskrivande metadata, en fil följer inte formatpolicyn för förvaret, ett filformat är okänt eller det finns ingen representationsinformation etc.).
 - Åtgärder finns tillgängliga som gör att förvaltarna kan minska risker, t.ex. utföra filformatkonverteringar (tiotals format stöds).
