@@ -2650,7 +2650,7 @@ public class RodaCoreFactory {
         }
       } catch (IOException e) {
         System.err
-          .println("Error while writing plugin/plugins information in markdown format! Reason: " + e.getMessage());
+          .println("Error while writing plugin/plugins information in jsonlines format! Reason: " + e.getMessage());
       }
     } else {
       printConfigsUsage();

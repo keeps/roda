@@ -13,4 +13,4 @@ if [[ $# -eq 0 ]] ; then
     exec catalina.sh run
 fi
 
-exec $@
+exec "$@"
