@@ -62,7 +62,7 @@ Nej. Det skulle behöva integreras med ett externt system som kan hantera dessa 
 
 ### Återspeglar sökresultatlistan de behörigheter som tillämpas på posterna som presenteras?
 
-Ja. Du kan bara se de poster som du har tillgång till.
+Ja. Du kan bara se de bevarandeobjekt som du har tillgång till.
 
 ### Är verifieringskedjan sökbar och tillgänglig på ett användarvänligt sätt?
 
