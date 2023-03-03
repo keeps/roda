@@ -25,6 +25,12 @@ public class MarketInfo implements Serializable {
   private String installation = null;
   private String homepage = null;
 
+  private String vendor = null;
+
+  private String minSupportedVersion = null;
+
+  private String maxSupportedVersion = null;
+
   public MarketInfo() {
   }
 
@@ -112,16 +118,49 @@ public class MarketInfo implements Serializable {
     this.homepage = homepage;
   }
 
+  public String getVendor() {
+    return vendor;
+  }
+
+  public void setVendor(String vendor) {
+    this.vendor = vendor;
+  }
+
+  public String getMinSupportedVersion() {
+    return minSupportedVersion;
+  }
+
+  public void setMinSupportedVersion(String minSupportedVersion) {
+    this.minSupportedVersion = minSupportedVersion;
+  }
+
+  public String getMaxSupportedVersion() {
+    return maxSupportedVersion;
+  }
+
+  public void setMaxSupportedVersion(String maxSupportedVersion) {
+    this.maxSupportedVersion = maxSupportedVersion;
+  }
+
   @Override
   public boolean equals(Object o) {
-    if (this == o) return true;
-    if (o == null || getClass() != o.getClass()) return false;
+    if (this == o)
+      return true;
+    if (o == null || getClass() != o.getClass())
+      return false;
     MarketInfo that = (MarketInfo) o;
-    return Objects.equals(id, that.id) && Objects.equals(name, that.name) && type == that.type && Objects.equals(version, that.version) && Objects.equals(description, that.description) && Objects.equals(categories, that.categories) && Objects.equals(objectClasses, that.objectClasses) && Objects.equals(license, that.license) && Objects.equals(installation, that.installation) && Objects.equals(homepage, that.homepage);
+    return Objects.equals(id, that.id) && Objects.equals(name, that.name) && type == that.type
+      && Objects.equals(version, that.version) && Objects.equals(description, that.description)
+      && Objects.equals(categories, that.categories) && Objects.equals(objectClasses, that.objectClasses)
+      && Objects.equals(license, that.license) && Objects.equals(installation, that.installation)
+      && Objects.equals(homepage, that.homepage) && Objects.equals(vendor, that.vendor)
+      && Objects.equals(minSupportedVersion, that.minSupportedVersion)
+      && Objects.equals(maxSupportedVersion, that.maxSupportedVersion);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, type, version, description, categories, objectClasses, license, installation, homepage);
+    return Objects.hash(id, name, type, version, description, categories, objectClasses, license, installation,
+      homepage, vendor, minSupportedVersion, maxSupportedVersion);
   }
 }

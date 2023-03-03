@@ -927,7 +927,7 @@ public class PluginManager {
     }
   }
 
-  public static String getPluginsInformationAsMarkdown(List<Pair<String, String>> plugins) {
+  public static String getPluginsInformationAsMarkdown(List<Pair<String, String>> plugins, String rodaVersion) {
     StringBuilder sb = new StringBuilder();
     int numberOfPlugins = plugins.size();
     if (numberOfPlugins > 1) {
@@ -939,7 +939,7 @@ public class PluginManager {
       try {
         Class<?> pluginClass = Class.forName(plugin);
         Plugin<? extends IsRODAObject> pluginInstance = (Plugin<? extends IsRODAObject>) pluginClass.newInstance();
-        sb.append(getPluginInformationAsMarkdown(pluginInstance, state, numberOfPlugins > 1));
+        sb.append(getPluginInformationAsMarkdown(pluginInstance, state, numberOfPlugins > 1, rodaVersion));
       } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
         sb.append(String.format("#%s %s %n%n", numberOfPlugins > 1 ? "#" : "", plugin));
         sb.append(String.format("##%s Description %n%n%s%n%n", numberOfPlugins > 1 ? "#" : "",
@@ -950,13 +950,15 @@ public class PluginManager {
   }
 
   public static String getPluginInformationAsMarkdown(Plugin<? extends IsRODAObject> plugin) {
-    return getPluginInformationAsMarkdown(plugin, "", false);
+    return getPluginInformationAsMarkdown(plugin, "", false, "");
   }
 
   private static String getPluginInformationAsMarkdown(Plugin<? extends IsRODAObject> plugin, String pluginState,
-    boolean severalPlugins) {
+    boolean severalPlugins, String rodaVersion) {
     StringBuilder sb = new StringBuilder();
     sb.append(String.format("#%s %s %s %n%n", severalPlugins ? "#" : "", plugin.getName(), pluginState));
+    sb.append("<span class=\"theme-badge\">KEEP SOLUTIONS</span>");
+    sb.append(String.format("<span class=\"theme-badge\">RODA %s</span>%n%n", rodaVersion));
     // 2018-01-24 hsilva: having the version usually depends on having the tool
     // installed, so lets not show that information
     sb.append(String.format("##%s Description %n%n%s%n%n", severalPlugins ? "#" : "", plugin.getDescription()));
@@ -965,15 +967,14 @@ public class PluginManager {
     if (plugin.getParameters().isEmpty()) {
       sbParameters.append("No parameters.");
     } else {
-      sbParameters.append(String.format("| **%s** | **%s** | **%s** | **%s** | **%s** | **%s** | **%s** | %n", "Name",
-        "Description", "Type", "Default value", "Possible values", "Mandatory", "Read only"));
-      sbParameters.append(String.format("| --- | --- | --- | --- | --- | --- | --- | %n"));
+      sbParameters.append(String.format("| **%s** | **%s** | **%s** | %n", "Name", "Description", "Description"));
+      sbParameters.append(String.format("| --- | --- | --- | %n"));
       for (PluginParameter pluginParameter : plugin.getParameters()) {
-        sbParameters.append(String.format("| **%s** | %s | %s | %s | %s | %s | %s | %n", pluginParameter.getName(),
-          pluginParameter.getDescription().replaceAll("\n", ""), pluginParameter.getType(),
-          pluginParameter.getDefaultValue(),
-          pluginParameter.getPossibleValues().isEmpty() ? "" : pluginParameter.getPossibleValues(),
-          pluginParameter.isMandatory(), pluginParameter.isReadonly()));
+        sbParameters.append(String.format(
+          "| **%s** | %s | <span title=\"Type\" class=\"theme-badge\">%s</span> <span class=\"theme-badge\">%s</span> %s | %n",
+          pluginParameter.getName(), pluginParameter.getDescription().replaceAll("\n", ""), pluginParameter.getType(),
+          pluginParameter.isMandatory() ? "Optional" : "Mandatory",
+          pluginParameter.isReadonly() ? "<span title=\"Mode\" class=\"theme-badge\">Read only</span>" : ""));
       }
     }
     sb.append(String.format("##%s Parameters %n%n%s%n%n", severalPlugins ? "#" : "", sbParameters.toString()));

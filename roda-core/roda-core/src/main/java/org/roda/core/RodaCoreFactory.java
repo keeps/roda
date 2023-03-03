@@ -2610,23 +2610,24 @@ public class RodaCoreFactory {
   }
 
   private static void generatePluginsMarkdownTask(final List<String> args) {
-    if (args.size() == 4 && StringUtils.isNotBlank(args.get(1)) && StringUtils.isNotBlank(args.get(2))
-      && StringUtils.isNotBlank(args.get(3)) && Files.exists(Paths.get(FilenameUtils.normalize(args.get(3))))) {
+    if (args.size() == 5 && StringUtils.isNotBlank(args.get(1)) && StringUtils.isNotBlank(args.get(2)) && StringUtils.isNotBlank(args.get(3))
+      && StringUtils.isNotBlank(args.get(4)) && Files.exists(Paths.get(FilenameUtils.normalize(args.get(4))))) {
 
       List<Pair<String, String>> pluginsNameAndState = new ArrayList<>();
 
       String[] pluginsName = args.get(1).split(" ");
       String[] pluginsState = args.get(2).split(";");
+      String rodaVersion = args.get(3);
 
       if (pluginsName.length == pluginsState.length) {
         for (int i = 0, pluginsNameLength = pluginsName.length; i < pluginsNameLength; i++) {
           pluginsNameAndState.add(Pair.of(pluginsName[i], pluginsState[i]));
         }
 
-        String pluginsMarkdown = PluginManager.getPluginsInformationAsMarkdown(pluginsNameAndState);
+        String pluginsMarkdown = PluginManager.getPluginsInformationAsMarkdown(pluginsNameAndState, rodaVersion);
 
         try {
-          Files.write(Paths.get(FilenameUtils.normalize(args.get(3)), "README.md"), pluginsMarkdown.getBytes());
+          Files.write(Paths.get(FilenameUtils.normalize(args.get(4)), "README.md"), pluginsMarkdown.getBytes());
         } catch (IOException e) {
           System.err
             .println("Error while writing plugin/plugins information in markdown format! Reason: " + e.getMessage());
@@ -2660,7 +2661,8 @@ public class RodaCoreFactory {
   private static void printConfigsUsage() {
     System.err.println("Configs command parameters:");
     System.err.println(
-      "\tgeneratePluginsMarkdown PLUGIN_OR_PLUGINS DEVELOPMENT_STATUS_PER_PLUGIN OUTPUT_FOLDER - generates plugin representation in markdown format. Development status if many please separate with ;");
+      "\tgeneratePluginsMarkdown PLUGIN_OR_PLUGINS DEVELOPMENT_STATUS_PER_PLUGIN OUTPUT_FOLDER - generates plugin representation in markdown format. Development status if many please separate with ;\n" +
+      "\tgeneratePluginsMarketInformation PLUGIN_DIR OUTPUT_FOLDER - generates plugin market information in jsonlines format.");
   }
 
   public static void main(final String[] argsArray)
