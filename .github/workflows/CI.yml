@@ -34,6 +34,10 @@ jobs:
         with:
           java-version: 17
           distribution: 'temurin'
+      - name: Set up Maven
+        uses: s4u/setup-maven-action@v1
+        with:
+          maven-version: 3.8.7
       - name: Cache
         uses: actions/cache@v3
         with:
