@@ -99,14 +99,15 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "AIP batch export";
+    return "AIP Batch Exporter";
   }
 
   @Override
   public String getDescription() {
-    return "Exports selected AIP(s) to a ZIP file or folder on the server file system. To retrieve the results of the export action you must "
-      + "have access to the server file system.\nNOTE: This action can potentially generate a large amount of data. Make sure you select a destination "
-      + "folder that has enough storage space to accommodate the results of the export action.";
+    return "The AIP Batch Exporter is a powerful plugin that allows you to select a group of AIPs and export them as a single ZIP file or folder. "
+      + "The outcome is saved on the server file system, which can be accessed by users with the necessary permissions.\nThis plugin is particularly "
+      + "useful when you need to export a large number of AIPs based on specific search criteria. With just a few clicks, you can create a batch"
+      + "export of AIPs and download them in a compressed format.\nThis saves time and effort and ensures that your AIPs are stored and transferred efficiently.";
   }
 
   @Override

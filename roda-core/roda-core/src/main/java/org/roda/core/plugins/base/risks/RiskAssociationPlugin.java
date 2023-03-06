@@ -82,13 +82,13 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
 
   @Override
   public String getName() {
-    return "Risk association";
+    return "Risk Incidence Creator";
   }
 
   @Override
   public String getDescription() {
-    return "Associates selected items to existing risks in the Risk registry (as risk incidences).\nThis task is convenient when the preservation "
-      + "expert wants to associate a set of items (e.g. AIPs, representations or files) to a risk to be mitigated in the near future.\nAs an example, "
+    return "The Risk Associator plugin associates selected items (AIPs, Representations or Files) to existing risks in the Risk registry (as risk incidences)."
+      + "\nThis action is convenient when the preservation expert wants to associate a set of items to a risk to be mitigated in the near future.\nAs an example, "
       + "if the designated community of the repository provides feedback that a given format under a certain collection is not being displayed properly "
       + "on the graphical user interface of the repository, then the preservation expert may want to mark these files to be targeted by a preservation"
       + " action (e.g. generate new representations for access purposes).";

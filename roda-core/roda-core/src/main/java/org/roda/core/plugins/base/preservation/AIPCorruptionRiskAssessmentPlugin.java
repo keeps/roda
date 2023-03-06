@@ -92,19 +92,18 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "AIP corruption risk assessment";
+    return "File Integrity Verifier";
   }
 
   @Override
   public String getDescription() {
-    return "Computes the fixity/checksum information of files inside an Archival Information Package (AIP) and verifies if this "
-      + "information differs from the information stored in the preservation metadata (i.e. PREMIS objects). If so, it creates a "
-      + "new risk called “File(s) corrupted due to hardware malfunction or human intervention“ and assigns the corrupted file to "
-      + "that risk in the Risk register.\n It also creates an incidence linked to the representation if a PREMIS file exists but "
-      + "the associated file does not. Within the repository, fixity checking is used to ensure that digital files have not been "
-      + "affected by data rot or other digital preservation dangers. By itself, fixity checking does not ensure the preservation "
-      + "of a digital file. Instead, it allows a repository to identify which corrupted files to replace with a clean copy from "
-      + "the producer or from a backup.";
+    return "The File Integrity Verifier plugin Computes the fixity/checksum information of files inside an Archival Information "
+      + "Package (AIP) and verifies if this information differs from the information stored in the preservation metadata. If so, "
+      + "it creates a new risk and assigns the corrupted file to that risk in the Risk register.\nThe plugin also creates an "
+      + "incidence linked to the representation if a PREMIS file exists, but the associated file does not. Within the repository, "
+      + "fixity checking is used to ensure that digital files have not been affected by data rot or other digital preservation dangers. "
+      + "By itself, fixity checking does not ensure the preservation of a digital file. Instead, it allows a repository to identify "
+      + "which corrupted files to replace with a clean copy from the producer or from a backup.";
   }
 
   @Override

@@ -139,15 +139,17 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "Inventory report";
+    return "Inventory Report Creator";
   }
 
   @Override
   public String getDescription() {
-    return "Creates a report in CSV format that includes a listing of all AIP and its inner files (data and metadata) which also includes some of "
-      + "their technical properties (e.g. sipId, aipId, representationId, filePath, SHA-256, MD5, SHA-1). The report will be stored in a folder on "
-      + "the server side as defined by the user. To obtain the report, one needs access to the storage layer of the repository server.\nThis report"
-      + " may be used to validate the completeness and correctness of an ingest process.";
+    return "The Inventory Report Creator plugin automates the generation of a detailed inventory report in CSV format for all AIPs and their corresponding "
+      + "files (both data and metadata) within a repository. The report includes technical information such as SIP ID, AIP ID, representation ID, "
+      + "file path, and cryptographic hash values such as SHA-256, MD5, and SHA-1. This information can be used to validate the completeness and correctness "
+      + "of the repository content by comparing it to previous inventory reports generated during pre-ingest.\nThe Inventory Report Comparator App is "
+      + "an optional tool that can be used to compare inventory reports from different time periods. This allows for easy identification of any changes "
+      + "or discrepancies in the repository's content over time. To learn more about the Inventory Report Comparator App or to request a demo, please contact sales@keep.pt.";
   }
 
   @Override
