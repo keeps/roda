@@ -77,7 +77,7 @@ Du kan också ladda ner dessa verktyg:
 1. Starta Eclipse
 2. Välj "File > Import". Välj sedan "Maven > Existing Maven Projects" och klicka på "Next"
 3. I "Root Directory", gå dit källkoden för RODA finns i ditt filsystem och välj "Open"
-4. Om du vill, kan du lägga till det i "Workning set"
+4. Om du vill, kan du lägga till det i "Working set"
 5. Klicka på "Finish"
 
 
@@ -144,6 +144,6 @@ För att skapa nya plugins och använda dem med RODA krävs det följande:
 
 RODA styrs helt av ett REST API. Detta möjliggör utveckling av externa tjänster eller att integrera andra applikationer med systemet. Dokumentation för API:et finns på [https://demo.roda-community.org/api-docs/](https://demo.roda-community.org/api-docs/).
 
-### Utveckla 3dje parts integrationer
+### Utveckla 3:e parts integrationer
 
 Om du är intresserat av att utveckla en integration mot RODA via REST API, kontakta gärna utvecklarteamet för mer information, eller skicka in en fråga via https://github.com/keeps/roda/issues.
