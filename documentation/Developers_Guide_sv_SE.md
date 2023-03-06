@@ -77,7 +77,7 @@ Du kan också ladda ner dessa verktyg:
 1. Starta Eclipse
 2. Välj "File > Import". Välj sedan "Maven > Existing Maven Projects" och klicka på "Next"
 3. I "Root Directory", gå dit källkoden för RODA finns i ditt filsystem och välj "Open"
-4. Om du vill, kan du lägga till det i "Workning set"
+4. Om du vill, kan du lägga till det i "Working set"
 5. Klicka på "Finish"
 
 
