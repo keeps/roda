@@ -328,7 +328,7 @@ För att köra CAS-tjänsten på en annan applikationsserver, installera bara fi
 Öppna URL:n [https://localhost:8443/cas](https://localhost:8443/cas) och ange dina användaruppgifter för LDAP.
 Om användaruppgifterna är giltiga kommer du att se meddelandet "**Inloggning lyckad**".
 
-**OBS**: Certifikatet vi genererade ovan är självsignerat och webbläsaren kommer att klaga på det.
+**OBS**: Certifikatet vi genererade ovan är självsignerat och webbläsaren kommer att reagera på det.
 För teständamål kan du ignorera den varningen och acceptera certifikatet.
 
 
