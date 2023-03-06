@@ -30,14 +30,14 @@ Valfritt:
 
 
 ### 1. Generera SIP:ar med din ny beskrivande metadatatyp och version
-På SIP:en måste du definiera den beskrivande metadatatypen och versionen. Eftersom du använder din egen bör du definiera metadatatyp OTHER, annan metadatatyp t.ex. "GolikSwe" och metadatatyp version t.ex. "1". Detta kan göras direkt i METS eller med hjälp av [RODA-in application](http://rodain.roda-community.org/) eller [commons-ip library](https://github.com/keeps/commons-ip).
+På SIP:en måste du definiera den beskrivande metadatatypen och versionen. Eftersom du använder din egen bör du definiera metadatatyp OTHER, annan metadatatyp t.ex. "GolikSwe" och metadatatypversion t.ex. "1". Detta kan göras direkt i METS eller med hjälp av [RODA-in application](http://rodain.roda-community.org/) eller [commons-ip library](https://github.com/keeps/commons-ip).
 
 ### 2. Konfigurera RODA för att indexera ditt nya beskrivande metadataformat
 I RODA måste du konfigurera hur den kan indexera den här filen. För att göra det måste du definiera XSLT under `$RODA_HOME/config/crosswalks/ingest/` med ett namn baserat på din metadatatyp och version.
 
 I exemplet med metadata type=OTHER, other metadata type="GolikSwe" och metadata version 1, måste du skapa filen `$RODA_HOME/config/crosswalks/ingest/golikswe_1.xslt`.
 
-Du kan titta på exempel i `$RODA_HOME/example-config/crosswalks/dissemination/ingest/` eller [online version](https://github.com/keeps/roda/tree/master/roda-core/roda-core/src/main/resources/config/crosswalks/ingest).
+Se exempel i `$RODA_HOME/example-config/crosswalks/dissemination/ingest/` eller [online version](https://github.com/keeps/roda/tree/master/roda-core/roda-core/src/main/resources/config/crosswalks/ingest).
 
 Den resulterande XML-filen måste vara något i stil med:
 ```xml
