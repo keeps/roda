@@ -2618,16 +2618,15 @@ public class RodaCoreFactory {
       String[] pluginsName = args.get(1).split(" ");
       String[] pluginsState = args.get(2).split(";");
       String rodaVersion = args.get(3);
+      String outputDir = args.get(4);
 
       if (pluginsName.length == pluginsState.length) {
         for (int i = 0, pluginsNameLength = pluginsName.length; i < pluginsNameLength; i++) {
           pluginsNameAndState.add(Pair.of(pluginsName[i], pluginsState[i]));
         }
 
-        String pluginsMarkdown = PluginManager.getPluginsInformationAsMarkdown(pluginsNameAndState, rodaVersion);
-
         try {
-          Files.write(Paths.get(FilenameUtils.normalize(args.get(4)), "README.md"), pluginsMarkdown.getBytes());
+          PluginManager.writePluginInformationAsMarkdown(pluginsNameAndState, rodaVersion, outputDir);
         } catch (IOException e) {
           System.err
             .println("Error while writing plugin/plugins information in markdown format! Reason: " + e.getMessage());

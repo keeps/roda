@@ -53,6 +53,7 @@ import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.io.FilenameUtils;
 import org.reflections.Reflections;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -927,41 +928,63 @@ public class PluginManager {
     }
   }
 
-  public static String getPluginsInformationAsMarkdown(List<Pair<String, String>> plugins, String rodaVersion) {
-    StringBuilder sb = new StringBuilder();
-    int numberOfPlugins = plugins.size();
-    if (numberOfPlugins > 1) {
+  public static void writePluginInformationAsMarkdown(List<Pair<String, String>> plugins, String rodaVersion,
+    String outputDir) throws IOException {
+    Map<String, String> pluginsInfoMap = getPluginsInformationAsMarkdown(plugins, rodaVersion);
+
+    if (pluginsInfoMap.size() > 1) {
+      // Plugin bundle
+      StringBuilder sb = new StringBuilder();
       sb.append(String.format("# Plugins%n%n"));
+      for (Entry<String, String> entry : pluginsInfoMap.entrySet()) {
+        String pluginName = entry.getKey();
+        String pluginInfo = entry.getValue();
+        Files.write(Paths.get(FilenameUtils.normalize(outputDir), pluginName + ".md"), pluginInfo.getBytes());
+
+        sb.append(String.format("- [%s](%s.md)%n", pluginName, pluginName));
+      }
+      Files.write(Paths.get(FilenameUtils.normalize(outputDir), "README.md"), sb.toString().getBytes());
+    } else {
+      // Create README for plugins in bundle
+      for (String pluginInfo : pluginsInfoMap.values()) {
+        Files.write(Paths.get(FilenameUtils.normalize(outputDir), "README.md"), pluginInfo.getBytes());
+      }
     }
+  }
+
+  private static Map<String, String> getPluginsInformationAsMarkdown(List<Pair<String, String>> plugins,
+    String rodaVersion) {
+    Map<String, String> pluginsInfo = new HashMap<>();
     for (Pair<String, String> pluginNameAndState : plugins) {
+      StringBuilder sb = new StringBuilder();
       String plugin = pluginNameAndState.getFirst();
       String state = pluginNameAndState.getSecond();
       try {
         Class<?> pluginClass = Class.forName(plugin);
         Plugin<? extends IsRODAObject> pluginInstance = (Plugin<? extends IsRODAObject>) pluginClass.newInstance();
-        sb.append(getPluginInformationAsMarkdown(pluginInstance, state, numberOfPlugins > 1, rodaVersion));
+        sb.append(getPluginInformationAsMarkdown(pluginInstance, state, rodaVersion));
+        pluginsInfo.put(pluginClass.getSimpleName(), sb.toString());
       } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-        sb.append(String.format("#%s %s %n%n", numberOfPlugins > 1 ? "#" : "", plugin));
-        sb.append(String.format("##%s Description %n%n%s%n%n", numberOfPlugins > 1 ? "#" : "",
+        sb.append(String.format("# %s %n%n", plugin));
+        sb.append(String.format("## Description %n%n%s%n%n",
           "Couldn't generate plugin info! Exception thrown: " + e.getClass().getSimpleName()));
+        pluginsInfo.put(plugin, sb.toString());
       }
     }
-    return sb.toString();
-  }
-
-  public static String getPluginInformationAsMarkdown(Plugin<? extends IsRODAObject> plugin) {
-    return getPluginInformationAsMarkdown(plugin, "", false, "");
+    return pluginsInfo;
   }
 
   private static String getPluginInformationAsMarkdown(Plugin<? extends IsRODAObject> plugin, String pluginState,
-    boolean severalPlugins, String rodaVersion) {
+    String rodaVersion) {
     StringBuilder sb = new StringBuilder();
-    sb.append(String.format("#%s %s %s %n%n", severalPlugins ? "#" : "", plugin.getName(), pluginState));
-    sb.append("<span class=\"theme-badge\">KEEP SOLUTIONS</span>");
-    sb.append(String.format("<span class=\"theme-badge\">RODA %s</span>%n%n", rodaVersion));
+    sb.append(String.format("# %s %s %n%n", plugin.getName(), pluginState));
+    sb.append("<span class=\"theme-badge\">KEEP SOLUTIONS</span>\s");
+    sb.append(String.format("<span class=\"theme-badge\">RODA %s</span>\s", rodaVersion));
+    sb.append("<span class=\"theme-badge theme-badge-primary\">[License](./LICENSE.md)</span>\s");
+    sb.append(String.format("<span class=\"theme-badge theme-badge-primary\">[Documentation](./documentation/README.md)</span>%n%n"));
     // 2018-01-24 hsilva: having the version usually depends on having the tool
     // installed, so lets not show that information
-    sb.append(String.format("##%s Description %n%n%s%n%n", severalPlugins ? "#" : "", plugin.getDescription()));
+    sb.append(String.format("## Description %n%n%s%n%n", plugin.getDescription()));
 
     StringBuilder sbParameters = new StringBuilder();
     if (plugin.getParameters().isEmpty()) {
@@ -977,7 +1000,7 @@ public class PluginManager {
           pluginParameter.isReadonly() ? "<span title=\"Mode\" class=\"theme-badge\">Read only</span>" : ""));
       }
     }
-    sb.append(String.format("##%s Parameters %n%n%s%n%n", severalPlugins ? "#" : "", sbParameters.toString()));
+    sb.append(String.format("## Parameters %n%n%s%n%n", sbParameters.toString()));
     return sb.toString();
   }
 
