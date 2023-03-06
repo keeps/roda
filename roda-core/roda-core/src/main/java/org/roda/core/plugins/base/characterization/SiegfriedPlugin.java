@@ -57,13 +57,13 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
    */
 
   public static String getStaticName() {
-    return "File format identification (Siegfried)";
+    return "File Format Detector";
   }
 
   public static String getStaticDescription() {
-    return "Identifies the file format and version of data files included in Information Packages using the Siegfried tool (a signature-based file format "
-      + "identification tool that supports PRONOM identifiers and Mimetypes).\nThe task updates PREMIS objects metadata in the Information Package to store "
-      + "the results of format identification. A PREMIS event is also recorded after the task is run.";
+    return "The File Format Detector plugin is an essential tool for identifying and analyzing various file formats.\nIt provides comprehensive information "
+      + "about each file, including its name, designation, version, MIME type, and PRONOM identifier.\nThis information can be used to determine the appropriate "
+      + "software to open and manipulate the file, as well as to ensure compatibility with different systems and applications.";
   }
 
   @Override
