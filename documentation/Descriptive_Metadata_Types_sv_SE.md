@@ -5,16 +5,16 @@ När du skapar en ny intellektuell enhet är ett av stegen att välja "typ" av b
 Detta hänvisar till det beskrivande metadataschemat som kommer att användas, och som standard stöder RODA följande alternativ:
 
 * **[EAD 2002](https://www.loc.gov/ead/)**: Encoded Archival Description (EAD) version 2002 är en XML-standard för kodning av arkivinformation, som underhålls av Technical Subcommittee on Encoded Archival Standards (TS-EAS), i samarbete med Library of Congress. Det används främst av arkiv för att beskriva både digitalt födda och analoga dokument.
-* **[Dublin Core](https://www.dublincore.org/schemas/xmls/)**: Dublin Core (DC) Metadata Initiative stödjer innovation inom metadatadesign och bästa praxis. För närvarande rekommenderade scheman inkluderar *Simple DC XML-schemat, version 2002-12-12*, som definierar termer för Simple Dublin Core, dvs. de 15 elementen från http://purl.org/dc/elements/1.1/ namnrymden, utan behov av användning av kodningsscheman eller elementförfinningar.
+* **[Dublin Core](https://www.dublincore.org/schemas/xmls/)**: Dublin Core (DC) Metadata Initiative stödjer innovation inom metadatadesign och bästa praxis. För närvarande rekommenderade scheman inkluderar *Simple DC XML-schemat, version 2002-12-12*, som definierar termer för Simple Dublin Core, dvs. de 15 elementen från http://purl.org/dc/elements/1.1/ namnrymden, utan behov av användning av kodningsscheman eller elementförfiningar.
 * **[Key-value](https://github.com/keeps/roda/blob/master/roda-core/roda-core/src/main/resources/config/schemas/key-value.xsd)** : Ett internt enkelt beskrivningsschema för RODA för definition av nyckel-värde metadata, där metadatanyckeln identifierar elementet (t.ex. "titel") och värdet innehållet i metadataelementet.
 *  **Övrigt**: Generisk XML-typ där inget schema är definierat.
 
 Nya metadatatyper kan läggas till i RODA enligt dokumentationen [Metadata formats](Metadata_Formats.md).
 
-| Beskrivande metadata typ | Validering           | Indexering         | Visualisering         | Version      |
+| Beskrivande metadatatyp | Validering           | Indexering         | Visualisering         | Version      |
 |---------------------------|----------------------|------------------|-----------------------|--------------|
-| EAD 2002                  | Schema validering    | Indexeringsregler   | Visualiseringsregler   | Redigeringsformulär |
-| Dublin Core               | Schema validering    | Indexeringsregler   | Visualiseringsregler   | Redigeringsformulär |
+| EAD 2002                  | Schemavalidering    | Indexeringsregler   | Visualiseringsregler   | Redigeringsformulär |
+| Dublin Core               | Schemavalidering    | Indexeringsregler   | Visualiseringsregler   | Redigeringsformulär |
 | Nyckel-värde                 | Schema validering    | Indexeringsregler   | Visualiseringsregler   | Redigeringsformulär |
 | Annan                     | Grammatikalitetsbedömning | Generell indexering | Generell visualisering | XML editering     |
 
