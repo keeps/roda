@@ -8,7 +8,7 @@ Om du upplever ett problem är det stor sannolikhet att andra har varit med om l
 
 ## Online forum
 
-Använd [GitHub issues](https://github.com/keeps/roda/issues/new?labels=question&title=I+have+a+question+about+RODA) för att ställa dina supportfrågor. Någon från open-source communityt kommer att svara på dina frågor. Var aktiv i forumet till du har fått svar. Det går också att söka på tidigare frågor och svar i forumet. 
+Använd [GitHub issues](https://github.com/keeps/roda/issues/new?labels=question&title=I+have+a+question+about+RODA) för att ställa dina supportfrågor. Någon från open-source communityt kommer att svara på dina frågor. Var aktiv i forumet tills du har fått svar. Det går också att söka på tidigare frågor och svar i forumet. 
 
 ## Professionell support
 
