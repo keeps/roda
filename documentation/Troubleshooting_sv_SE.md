@@ -13,7 +13,7 @@ RODA_HOME/logs/roda-wui.log:pt.gov.dgarq.roda.core.common.RODAClientException: E
 RODA_HOME/logs/roda-wui.log:Caused by: java.net.SocketException: Too many open file
 ```
 
-Detta fel kan uppstå om det är för många filer öppna på servern. För att kontrollera antalet öppna filer, ta reda på PID på processen, kör Isof | grep | <PID>| wc. På många datorer finns ett defaultvärde på max antal öppna filer satt lågt (1024). 
+Detta fel kan uppstå om det är för många filer öppna på servern. För att kontrollera antalet öppna filer, ta reda på PID på processen, kör Isof | grep | <PID>| wc. På många datorer är maxvärdet på hur många filer som kan vara öppna samtidigt lågt. (1024). 
 
 För att ändra defaultvärdet, editera `/etc/security/limits.conf` genom att lägga till: 
 
