@@ -38,6 +38,7 @@ import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.ingest.process.PluginOptionsPanel;
 import org.roda.wui.client.main.Theme;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -519,7 +520,7 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
     Button licenseButton = new Button(messages.pluginLicenseLabel());
     licenseButton.addStyleName("btn pluginWorkFlowListTitleButtons btn-stamp");
     if (selectedPlugin.hasLicenseFile()) {
-     if (selectedPlugin.getCertificateInfo().getCertificateStatus()
+      if (selectedPlugin.getCertificateInfo().getCertificateStatus()
         .equals(CertificateInfo.CertificateStatus.INTERNAL)) {
         licenseButton.addClickHandler(e -> Dialogs.showLicenseModal(messages.pluginLicenseLabel(),
           new HTMLWidgetWrapper(selectedPlugin.getLicenseFilePath(), RodaConstants.ResourcesTypes.INTERNAL)));
@@ -614,11 +615,9 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
   }
 
   private boolean shouldEnableCreateButton() {
-    // Enable it only for verified plugins
-    if (!selectedPlugin.isVerified() || !selectedPlugin.isInstalled()) {
-      return false;
-    }
-    return true;
+    // Enable it for development or for verified plugins
+    boolean optIn = ConfigurationManager.getBoolean(false, RodaConstants.PLUGINS_CERTIFICATE_OPT_IN_PROPERTY);
+    return (optIn && selectedPlugin.isInstalled()) || selectedPlugin.isVerified() && selectedPlugin.isInstalled();
   }
 
   private PluginInfo lookupPlugin(String selectedPluginId) {

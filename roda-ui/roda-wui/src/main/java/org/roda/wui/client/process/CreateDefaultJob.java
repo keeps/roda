@@ -15,7 +15,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import com.google.gwt.user.client.ui.TabBar;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -57,6 +56,7 @@ import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.ingest.process.PluginOptionsPanel;
 import org.roda.wui.client.main.Theme;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -82,6 +82,7 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.RadioButton;
+import com.google.gwt.user.client.ui.TabBar;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
@@ -628,11 +629,9 @@ public class CreateDefaultJob extends Composite {
   }
 
   private boolean shouldEnableCreateButton() {
-    // Enable it only for verified plugins
-    if (!selectedPlugin.isVerified() || !selectedPlugin.isInstalled()) {
-      return false;
-    }
-    return true;
+    // Enable it for development or for verified plugins
+    boolean optIn = ConfigurationManager.getBoolean(false, RodaConstants.PLUGINS_CERTIFICATE_OPT_IN_PROPERTY);
+    return (optIn && selectedPlugin.isInstalled()) || selectedPlugin.isVerified() && selectedPlugin.isInstalled();
   }
 
   private List<String> getPluginNames(Set<String> objectClasses) {

@@ -638,6 +638,10 @@ public class PluginManager {
         // load certificates
         CertificateInfo certificateInfo = loadAndCheckCertificates(p.jarPath);
 
+        // for development purpose
+        boolean optIn = RodaCoreFactory.getRodaConfiguration()
+          .getBoolean(RodaConstants.PLUGINS_CERTIFICATE_OPT_IN_PROPERTY, false);
+
         // Let's load the Plugin
         List<Plugin<? extends IsRODAObject>> plugins = loadPlugin(p.jarPath, p.pluginClassNames, classloader);
         if (!plugins.isEmpty()) {
@@ -654,8 +658,13 @@ public class PluginManager {
               pluginInfo.setInstalled(true);
               if (certificateInfo.isNotVerified()) {
                 // load Not Verified Plugins;
-                pluginInfo.setParameters(new ArrayList<>());
                 pluginInfo.setVerified(false);
+                if (optIn) {
+                  plugin.init();
+                  externalPluginChache.put(plugin.getClass().getName(), plugin);
+                } else {
+                  pluginInfo.setParameters(new ArrayList<>());
+                }
               } else {
                 // load Verified Plugins
                 pluginInfo.setVerified(true);
@@ -1026,7 +1035,7 @@ public class PluginManager {
         marketInfo.setVersion(pluginInstance.getVersion());
         marketInfo.setCategories(pluginInstance.getCategories());
         marketInfo.setDescription(pluginInstance.getDescription());
-        marketInfo.setHomepage(RodaConstants.DEFAULT_MARKET_PLUGIN_HOMEPAGE_URL + plugin);
+        marketInfo.setHomepage(RodaConstants.DEFAULT_KEEP_MARKET_PLUGIN_HOMEPAGE_URL + plugin);
 
         // set object class for create selected job
         Set<Class> objectClasses = getObjectClasses(pluginInstance);

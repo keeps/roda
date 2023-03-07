@@ -725,12 +725,14 @@ public final class RodaConstants {
   public static final long DEFAULT_ACCESS_TOKEN_VALIDITY = 7200000L; // 2 hours in ms
   public static final String ACCESS_TOKEN_VALIDITY = "roda.distributed.api.access.token.validity";
 
+  // Plugins certificates
+  public static final String PLUGINS_CERTIFICATE_OPT_IN_PROPERTY = "core.plugins.external.certificates.opt-in";
+
   // MARKET
   public static final String MARKET_INFO_URL_PROPERTY = "core.market.info.url";
   public static final String DEFAULT_MARKET_INFO_URL = "https://market.roda-community.org/api/v1";
-  public static final String DEFAULT_MARKET_PLUGIN_HOMEPAGE_URL = "https://market.roda.keep.pt/";
+  public static final String DEFAULT_KEEP_MARKET_PLUGIN_HOMEPAGE_URL = "https://roda-enterprise.keep.pt/plugin/";
   public static final String DEFAULT_MARKET_SUPPORT_URL = "https://www.keep.pt/en/contacts-proposals-information-telephone-address/";
-
 
   public enum OrchestratorType {
     AKKA, AKKA_DISTRIBUTED
@@ -1939,7 +1941,7 @@ public final class RodaConstants {
   public static final String PERMISSION_METHOD_UPDATE_DESCRIPTIVE_METADATA_FILE = "org.roda.wui.api.controllers.Browser.updateDescriptiveMetadataFile";
   public static final String PERMISSION_METHOD_DELETE_DESCRIPTIVE_METADATA_FILE = "org.roda.wui.api.controllers.Browser.deleteDescriptiveMetadataFile";
   public static final String PERMISSION_METHOD_RETRIEVE_DESCRIPTIVE_METADATA_VERSIONS_BUNDLE = "org.roda.wui.api.controllers.Browser.retrieveDescriptiveMetadataVersionsBundle";
-  public  static final String PERMISSION_METHOD_LIST_USERS =  "org.roda.wui.api.controllers.Browser.findAll(RODAMember)";
+  public static final String PERMISSION_METHOD_LIST_USERS = "org.roda.wui.api.controllers.Browser.findAll(RODAMember)";
 
   public static final String PERMISSION_METHOD_CREATE_USER = "org.roda.wui.api.controllers.UserManagement.createUser";
   public static final String PERMISSION_METHOD_CREATE_GROUP = "org.roda.wui.api.controllers.UserManagement.createGroup";
