@@ -731,7 +731,9 @@ public final class RodaConstants {
   // MARKET
   public static final String MARKET_INFO_URL_PROPERTY = "core.market.info.url";
   public static final String DEFAULT_MARKET_INFO_URL = "https://market.roda-community.org/api/v1";
-  public static final String DEFAULT_KEEP_MARKET_PLUGIN_HOMEPAGE_URL = "https://roda-enterprise.keep.pt/plugin/";
+
+  public static final String KEEP_MARKET_PLUGIN_HOMEPAGE_URL_PROPERTY = "core.market.plugin.homepage.url";
+  public static final String DEFAULT_KEEP_MARKET_PLUGIN_HOMEPAGE_URL = "https://roda-enterprise.keep.pt/plugins/";
   public static final String DEFAULT_MARKET_SUPPORT_URL = "https://www.keep.pt/en/contacts-proposals-information-telephone-address/";
 
   public enum OrchestratorType {
@@ -1292,14 +1294,17 @@ public final class RodaConstants {
   public static final String PLUGIN_CATEGORY_REPLICATION = "replication";
   public static final String PLUGIN_CATEGORY_MANAGEMENT = "management";
   public static final String PLUGIN_CATEGORY_REINDEX = "reindex";
-
   public static final String PLUGIN_CATEGORY_VALIDATION = "validation";
   public static final String PLUGIN_CATEGORY_FORMAT_IDENTIFICATION = "format_identification";
   public static final String PLUGIN_CATEGORY_FEATURE_EXTRACTION = "feature_extraction";
-
   public static final String PLUGIN_CATEGORY_MISC = "misc";
   public static final String PLUGIN_CATEGORY_EXPERIMENTAL = "experimental";
   public static final String PLUGIN_CATEGORY_NOT_LISTABLE = "not_listable";
+  public static final String PLUGIN_CATEGORY_DIGITAL_SIGNATURE = "digital_signature";
+  public static final String PLUGIN_CATEGORY_RISK_ASSESSMENT = "risk_assessment";
+  public static final String PLUGIN_CATEGORY_MAINTENANCE = "maintenance";
+  public static final String PLUGIN_CATEGORY_E_ARCHIVING = "eArchiving";
+  public static final String PLUGIN_CATEGORY_DATABASE_PRESERVATION = "database_preservation";
 
   public static final String PLUGIN_SELECT_ALL_RODA_OBJECTS = "All";
 

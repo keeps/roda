@@ -937,6 +937,12 @@ public class PluginManager {
     }
   }
 
+  public static void main(String[] args) throws IOException {
+    ArrayList<Pair<String, String>> pairs = new ArrayList<>();
+    pairs.add(Pair.of("org.roda.core.plugins.base.risks.RiskAssociationPlugin", "STABLE"));
+    writePluginInformationAsMarkdown(pairs, "5.0.0-SNAPSHOT", "/tmp");
+  }
+
   public static void writePluginInformationAsMarkdown(List<Pair<String, String>> plugins, String rodaVersion,
     String outputDir) throws IOException {
     Map<String, String> pluginsInfoMap = getPluginsInformationAsMarkdown(plugins, rodaVersion);
@@ -986,27 +992,73 @@ public class PluginManager {
   private static String getPluginInformationAsMarkdown(Plugin<? extends IsRODAObject> plugin, String pluginState,
     String rodaVersion) {
     StringBuilder sb = new StringBuilder();
-    sb.append(String.format("# %s %s %n%n", plugin.getName(), pluginState));
-    sb.append("<span class=\"theme-badge\">KEEP SOLUTIONS</span>\s");
-    sb.append(String.format("<span class=\"theme-badge\">RODA %s</span>\s", rodaVersion));
-    sb.append("<span class=\"theme-badge theme-badge-primary\">[License](./LICENSE.md)</span>\s");
-    sb.append(String.format("<span class=\"theme-badge theme-badge-primary\">[Documentation](./documentation/README.md)</span>%n%n"));
-    // 2018-01-24 hsilva: having the version usually depends on having the tool
-    // installed, so lets not show that information
-    sb.append(String.format("## Description %n%n%s%n%n", plugin.getDescription()));
+    // TITLE
+    sb.append(String.format("# %s %n%n", plugin.getName()));
 
+    // METADATA
+    sb.append(String.format("## Metadata %n%n"));
+    sb.append("<dl class=\"plugin-metadata\">");
+    sb.append(String.format("%n"));
+    // METADATA - VENDOR
+    sb.append("<dt class=\"vendor\">Vendor</dt>");
+    sb.append("<dd title=\"Vendor\" class=\"vendor\"><a href=\"https://www.keep.pt/\">KEEP SOLUTIONS</a></dd>");
+    sb.append(String.format("%n"));
+    // METADATA - RODA VERSION
+    sb.append("<dt class=\"supported-version\">Supported version</dt>");
+    sb.append(String.format("<dd title=\"Supported versions\" class=\"supported-version\">RODA %s</dd>", rodaVersion));
+    sb.append(String.format("%n"));
+    // METADATA - Lifecycle
+    sb.append("<dt class=\"maturity\">Maturity</dt>");
+    sb.append(String.format("<dd title=\"Maturity\" class=\"maturity\">%s</dd>",
+      pluginState.replace("[", "").replace("]", "")));
+    sb.append(String.format("%n"));
+    // METADATA - License
+    sb.append("<dt class=\"license\">License</dt>");
+    sb.append("<dd title=\"License\" class=\"license\"><a href=\"./LICENSE.md\">EULA</a></dd>");
+    sb.append(String.format("%n"));
+    // METADATA - Documentation
+    sb.append("<dt class=\"documentation\">Documentation</dt>");
+    sb.append("<dd title=\"Documentation\" class=\"documentation\"><a href=\"./LICENSE.md\">Documentation</a></dd>");
+    sb.append(String.format("%n"));
+    sb.append("</dl>");
+
+    // DESCRIPTION
+    if (plugin.getDescription() != null && !plugin.getDescription().isEmpty()) {
+      sb.append(String.format("%n%n## Description %n%n"));
+      sb.append(String.format("%s%n%n", plugin.getDescription()));
+    }
+
+    // CATEGORIES
+    if (!plugin.getCategories().isEmpty()) {
+      sb.append(String.format("%n%n## Categories %n%n"));
+      for (String category : plugin.getCategories()) {
+        sb.append(String.format("- %s%n", category));
+      }
+      sb.append(String.format("%n%n"));
+    }
+
+    // PARAMETERS
     StringBuilder sbParameters = new StringBuilder();
     if (plugin.getParameters().isEmpty()) {
       sbParameters.append("No parameters.");
     } else {
-      sbParameters.append(String.format("| **%s** | **%s** | **%s** | %n", "Name", "Description", "Description"));
+      sbParameters.append(String.format("| **%s** | **%s** | **%s** | %n", "Name", "Description", "Details"));
       sbParameters.append(String.format("| --- | --- | --- | %n"));
       for (PluginParameter pluginParameter : plugin.getParameters()) {
-        sbParameters.append(String.format(
-          "| **%s** | %s | <span title=\"Type\" class=\"theme-badge\">%s</span> <span class=\"theme-badge\">%s</span> %s | %n",
-          pluginParameter.getName(), pluginParameter.getDescription().replaceAll("\n", ""), pluginParameter.getType(),
-          pluginParameter.isMandatory() ? "Optional" : "Mandatory",
-          pluginParameter.isReadonly() ? "<span title=\"Mode\" class=\"theme-badge\">Read only</span>" : ""));
+        // DESCRIPTION
+        String description = pluginParameter.getDescription().replaceAll("\n", "");
+        // DETAILS - Parameter type
+        String type = String.format("<span title=\"Type\" class=\"parameter-type\">%s</span>",
+          pluginParameter.getType());
+        // DETAILS - Is Mandatory or optional
+        String isMandatory = String.format("<span title=\"Mandatory\" class=\"parameter-mandatory\">%s</span>",
+          pluginParameter.isMandatory() ? "Optional" : "Mandatory");
+        // DETAILS - Parameter mode
+        String mode = pluginParameter.isReadonly() ? "<span title=\"Mode\" class=\"parameter-mode\">%s</span>" : "";
+
+        // ROW
+        sbParameters.append(
+          String.format("| **%s** | %s | %s %s %s | %n", pluginParameter.getName(), description, type, isMandatory, mode));
       }
     }
     sb.append(String.format("## Parameters %n%n%s%n%n", sbParameters.toString()));
@@ -1035,7 +1087,9 @@ public class PluginManager {
         marketInfo.setVersion(pluginInstance.getVersion());
         marketInfo.setCategories(pluginInstance.getCategories());
         marketInfo.setDescription(pluginInstance.getDescription());
-        marketInfo.setHomepage(RodaConstants.DEFAULT_KEEP_MARKET_PLUGIN_HOMEPAGE_URL + plugin);
+        String homepage = RodaCoreFactory.getProperty(RodaConstants.KEEP_MARKET_PLUGIN_HOMEPAGE_URL_PROPERTY,
+          RodaConstants.DEFAULT_KEEP_MARKET_PLUGIN_HOMEPAGE_URL);
+        marketInfo.setHomepage(homepage + plugin);
 
         // set object class for create selected job
         Set<Class> objectClasses = getObjectClasses(pluginInstance);

@@ -45,6 +45,7 @@ RUN set -ex; \
   groupadd -r --gid "$RODA_GID" "$RODA_GROUP"; \
   useradd -r --uid "$RODA_UID" --gid "$RODA_GID" "$RODA_USER"; \
   mkdir -p -m0770 "$RODA_HOME/data"; \
+  mkdir -p -m0770 "$RODA_HOME/config"; \
   chown -R "$RODA_USER:0" "$RODA_HOME"
 
 VOLUME "$RODA_HOME/data"
