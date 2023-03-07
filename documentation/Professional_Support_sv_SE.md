@@ -1,6 +1,6 @@
 # Professionell support
 
-Professionell support på RODA erbjuds av **KEEP SOLUTIONS**, ett europeiskt företag som tillhandahåller tjänster för hantering av och lagring av digital information. 
+Professionell support på RODA erbjuds av **KEEP SOLUTIONS**, ett europeiskt företag som tillhandahåller tjänster för hantering och lagring av digital information. 
 
 KEEPS SOLUTIONS tillhandahåller ett stort antal produkter och tjänster för att stödja skapandet av digitala arkiv/system, muséer och bibliotek. Kärnverksamheten består av design och utveckling av informationshanteringssystem, konsulttjänster, forskning och utbildning. Deras kunder finns främst inom offentlig verksamhet och utbildningssektorn, t.ex. departement, arkivinstitutioner, militären, kommuner och regioner, akademiska institutioner och stiftelser.
 
