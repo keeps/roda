@@ -16,9 +16,9 @@ På den här sidan kan du se mappning mellan format och objektklasser och en tab
 | Text | Open Office Text | application/vnd.oasis.opendocument.text<br>x-fmt/3, fmt/136, fmt/290, fmt/291 <br>.odt |
 | Text | Rich Text Format | application/rtf<br>fmt/355, fmt/45, fmt/50, fmt/52 ,fmt/53 <br>.rtf |
 | Text | Plain Text | text/plain<br>x-fmt/111 <br>.txt |
-| Presenation | Microsoft Powerpoint | application/vnd.ms-powerpoint<br>x-fmt/88, fmt/125, fmt/126, fmt/181 <br>.ppt |
+| Presentation | Microsoft Powerpoint | application/vnd.ms-powerpoint<br>x-fmt/88, fmt/125, fmt/126, fmt/181 <br>.ppt |
 | Presentation | Microsoft Powerpoint Open XML dokument | application/vnd.openxmlformats-officedocument.presentationml.presentation<br/>fmt/215 <br>.pptx |
-| Presentation | Open Office Presenation | application/vnd.oasis.opendocument.presentation<br> fmt/138, fmt/292, fmt/293 <br>.odp |
+| Presentation | Open Office Presentation | application/vnd.oasis.opendocument.presentation<br> fmt/138, fmt/292, fmt/293 <br>.odp |
 | Kalkylblad | Microsoft Excel | application/vnd.ms-excel<br>fmt/55, fmt/56, fmt/57, fmt/59, fmt/61, fmt/62 <br>.xls |
 | Kalkylblad | Microsoft Excel Open XML dokument | application/vnd.openxmlformats-officedocument.spreadsheetml<br>fmt/214 <br>.xlsx |
 | Kalkylblad | Open Office Kalkylblad | application/ vnd.oasis.opendocument.spreadsheet<br>fmt/137, fmt/294, fmt/295 <br>.ods |
