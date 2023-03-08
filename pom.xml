@@ -383,22 +383,32 @@
                     <version>4.0.0</version>
                     <executions>
                         <execution>
+                            <id>servlet-resource</id>
                             <goals>
                                 <goal>revision</goal>
                             </goals>
+                            <configuration>
+                                <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                                <generateGitPropertiesFilename>
+                                    ${project.build.directory}/${project.build.finalName}/version.json
+                                </generateGitPropertiesFilename>
+                                <format>json</format>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>internal-resource</id>
+                            <goals>
+                                <goal>revision</goal>
+                            </goals>
+                            <configuration>
+                                <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                                <generateGitPropertiesFilename>
+                                    ${project.build.directory}/classes/version.json
+                                </generateGitPropertiesFilename>
+                                <format>json</format>
+                            </configuration>
                         </execution>
                     </executions>
-                    <configuration>
-                        <!-- this is false by default, forces the plugin to generate the file -->
-                        <generateGitPropertiesFile>true</generateGitPropertiesFile>
-
-                        <!-- The path for the properties file to be generated. See Super Pom
-                          for default variable reference https://maven.apache.org/guides/introduction/introduction-to-the-pom.html -->
-                        <generateGitPropertiesFilename>
-                            ${project.build.directory}/${project.build.finalName}/version.json
-                        </generateGitPropertiesFilename>
-                        <format>json</format>
-                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>

@@ -3,11 +3,12 @@ package org.roda.core.common;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -18,6 +19,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.MarketException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.jobs.MarketInfo;
@@ -30,12 +32,8 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class MarketUtils {
   private static String retrieveRodaVersion() throws MarketException {
-    Path versionFile = Paths.get(MarketUtils.class.getClassLoader().getResource("version.json").getPath());
-    if (!Files.exists(versionFile)) {
-      throw new MarketException("Unable to retrieve RODA version");
-    }
-
-    try (BufferedReader bufferedReader = new BufferedReader(new FileReader(versionFile.toFile()))) {
+    try (InputStream inputStream = MarketUtils.class.getClassLoader().getResourceAsStream("version.json");
+      BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
       StringBuilder builder = new StringBuilder();
       for (String line = null; (line = bufferedReader.readLine()) != null;) {
         builder.append(line).append("\n");
@@ -47,7 +45,7 @@ public class MarketUtils {
         throw new MarketException("Unable to retrieve RODA version");
       }
       return version;
-    } catch (Exception e) {
+    } catch (GenericException | IOException e) {
       throw new MarketException("Unable to retrieve RODA version", e);
     }
   }
@@ -87,7 +85,7 @@ public class MarketUtils {
           }
         }
       }
-    } catch (Exception e) {
+    } catch (IOException | GenericException e) {
       throw new MarketException("Unable to retrieve plugin list info from API", e);
     }
   }
