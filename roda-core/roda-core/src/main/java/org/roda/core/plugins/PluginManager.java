@@ -1018,7 +1018,7 @@ public class PluginManager {
     sb.append(String.format("%n"));
     // METADATA - Documentation
     sb.append("<dt class=\"documentation\">Documentation</dt>");
-    sb.append("<dd title=\"Documentation\" class=\"documentation\"><a href=\"./LICENSE.md\">Documentation</a></dd>");
+    sb.append("<dd title=\"Documentation\" class=\"documentation\"><a href=\"./documentation/README.md\">Documentation</a></dd>");
     sb.append(String.format("%n"));
     sb.append("</dl>");
 
