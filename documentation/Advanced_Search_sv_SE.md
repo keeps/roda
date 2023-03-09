@@ -4,9 +4,9 @@ På söksidan kan du söka efter Intellektuella enheter, Representationer eller 
 
 Sökmotorn hittar bara hela ord. Om du vill söka efter deltermer bör du använda asterisk '*'.
 
-## Sökoperatorer
+## Sökparametrar
 
-Följande sökoperatorer står till ditt förfogande:
+Följande sökparametrar är möjliga:
 
 - Exakt mening (t.ex. "Miguel Ferreira")
 - Termer börjar med (t.ex. Miguel F*)
