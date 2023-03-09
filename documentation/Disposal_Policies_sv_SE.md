@@ -2,19 +2,19 @@
 
 ## Gallringsschema
 
-Gallringsscheman anger minimikraven för underhålls-, bevaring- eller destruktionsåtgärder som ska vidtas i befintliga eller framtida intellektuella enheter i detta förvar. En intellektuell enhet får endast förstöras som en del av en gallringsprocess som styrs av det gallringsschema som tilldelats den enheten. Det är den intellektuella enhetens gallringsschema som bestämmer hur länge en post bevaras och hur den därefter gallras i slutet av dess bevarandeperiod.
+Gallringsscheman anger minimikraven för underhålls-, bevarande- eller destruktionsåtgärder som ska vidtas i befintliga eller framtida intellektuella enheter i detta e-arkiv. En intellektuell enhet får endast raderas som en del av en gallringsprocess som styrs av det gallringsschema som tilldelats den enheten. Det är den intellektuella enhetens gallringsschema som bestämmer hur länge en post bevaras och hur den därefter gallras i slutet av dess bevarandeperiod.
 
 ### 1. Vad är ett gallringsschema?
 
-[MoReq2010®](https://moreq.info/) säger "Gallringsscheman är avgörande för att hantera bevarandeobjekt eftersom MoReq2010® specificerar att ett bevarandeobjekt i ett MCRS endast får förstöras som en del av en gallringsprocess som styrs av gallringsschemat som tilldelats till det bevarandeobjektet . Det är bevarandeobjektets gallringsschema som avgör hur länge ett bevarandeobjekt bevaras och hur den därefter gallras vid slutet av dess bevarandeperiod."
+Enligt [MoReq2010®](https://moreq.info/) är "Gallringsscheman avgörande för att hantera bevarandeobjekt eftersom MoReq2010® specificerar att ett bevarandeobjekt i ett MCRS endast får raderas som en del av en gallringsprocess som styrs av gallringsschemat som tilldelats det bevarandeobjektet . Det är bevarandeobjektets gallringsschema som avgör hur länge ett bevarandeobjekt bevaras och hur den därefter gallras vid slutet av dess bevarandeperiod."
 
-RODA stöder tre typer av gallringsåtgärder:
+RODA stödjer tre typer av gallringsåtgärder:
 
 1. Behåll permanent;
 2. Granska i slutet av bevarandeperioden;
 3. Förstör i slutet av bevarandeperioden.
 
-Beräkningen av bevarandeperiod använder sig av identifierare av element för bevaring och lägger till dess värde med bevarandeperioden. De möjliga värdena för bevarandeperiod är:
+Beräkningen av bevarandeperiod använder sig av identifierare av element för bevarande och lägger till dess värde med bevarandeperioden. De möjliga värdena för bevarandeperiod är:
 
 1. Ingen bevarandetid;
 2. Dagar;
@@ -30,8 +30,8 @@ Följande attribut kategoriserar ett gallringsschema:
 | --------- |---------- | ------------- |
 | Titel | Det identifierande namnet eller titeln på gallringsschemat | Sant |
 | Beskrivning | Beskrivning av gallringsschemat | Falskt |
-| Mandat | Texthänvisning till ett rättsligt eller annat instrument som ger befogenhet för ett gallringsschema | Falskt |
-| Omfattningsanteckningar | Vägledning till auktoriserade användare som anger hur man bäst tillämpar en viss enhet och anger eventuella organisatoriska policyer eller begränsningar för dess användning | Falskt |
+| Mandat | Hänvisning till gallringsbeslut eller liknande  | Falskt |
+| Omfattningsbeskrivning | Vägledning till auktoriserade användare som anger hur man bäst tillämpar en viss enhet och anger eventuella organisatoriska policyer eller begränsningar för dess användning | Falskt |
 | Gallringsåtgärd | Kod som beskriver den åtgärd som ska vidtas vid kassering av posten (möjliga värden: Behåll permanent, granska, förstör) | Sant |
 | Identifierare av element för bevaring | Det beskrivande metadatafältet som används för att beräkna bevarandeperioden | Sant (om åtgärdskoden för gallring skiljer sig från Behåll permanent) |
 | Bevarandeperiod | Antal dagar, veckor, månader eller år som specificerats för att bevara ett bevarandeobjekt efter att bevarandeperioden har triggats | Sant (om åtgärdskoden för gallring skiljer sig från Behåll permanent) |
