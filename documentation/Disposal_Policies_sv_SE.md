@@ -1,4 +1,4 @@
-# Gallringspolicies
+# Gallringspolicyer
 
 ## Gallringsschema
 
