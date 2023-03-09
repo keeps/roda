@@ -2,15 +2,15 @@
 
 Du kan redigera beskrivande metadata direkt på arkivobjektets visningssida genom att klicka på knappen ![Edit](images/md_edit.png "Redigera metadata")
 
-Om det beskrivande metadataschemat stöds (som standard eller i din konfiguration), kan du ha ett webbformulär för att redigera metadata. Information som exempelvis titeln kommer vanligtvis att finnas i rubrikfältet.
+Om det beskrivande metadataschemat stöds (som standard eller i konfigurationen), kan man ha ett webbformulär för att redigera metadata. Information, exempelvis titeln, kommer vanligtvis att finnas i titelfältet.
 
 Du kan också redigera direkt i XML:en genom att klicka på ![Edit code](images/md_edit_code.png "Redigera XML metadata") och ändra den råa XML:en.
 
 Klicka på SPARA när du är klar.
 
-## Beskrivande metadata typ
+## Beskrivande metadatatyp
 
-Du måste definiera den beskrivande metadatatypen, som definierade reglerna för hur metadata valideras, indexeras, visas och redigeras. Beskrivande metadatatyper har ett namn och en version, till exempel Encoded Archival Description (EAD) version 2002, Dublin Core version 2002-12-12.
+Man måste definiera den beskrivande metadatatypen, som definierade reglerna för hur metadata valideras, indexeras, visas och redigeras. Beskrivande metadatatyper har ett namn och en version, till exempel Encoded Archival Description (EAD) version 2002, Dublin Core version 2002-12-12.
 
 Du kan lägga till dina egna beskrivande metadatatyper och deras konfiguration för att validera, indexera, visa en redigering med hjälp av ett formulär. För mer information se [Metadataformats](Metadata_Formats.md).
 
