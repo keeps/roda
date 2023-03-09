@@ -6,6 +6,6 @@ KEEPS SOLUTIONS tillhandahåller ett stort antal produkter och tjänster för at
 
 KEEP SOLUTIONS arbetar för att erbjuda högsta standard av tjänster som ger deras kunder möjlighet att lyckas med att bevara sina digitala tillgångar; i egna lokaler, i molnet eller som en hybridlösning. 
 
-Professionell support är tillgänglig antingen som "pay-per-incident" (PPI) eller support som tjänst. Supporten fokuserar på felsökning av ett specifikt problem, felmeddelanden, eller funktionalitet som inte fungerar som tänkt. En incident definieras som ett enstaka ärende med en rimlig insats för att lösa den. Incidenter bör registreras online. Förväntad svarstid är 1 till 10 dagar, beroende på allvarligt problemet är. 
+Professionell support är tillgänglig antingen som "pay-per-incident" (PPI) eller årlig support. Supporten fokuserar på felsökning av ett specifikt problem, felmeddelanden, eller funktionalitet som inte fungerar som tänkt. En incident definieras som ett enstaka ärende med en rimlig insats för att lösa den. Incidenter bör registreras online. Förväntad svarstid är 1 till 10 dagar, beroende på hur allvarligt problemet är. 
 
 För mer information och komersiell support, vänligen kontakta [KEEP SOLUTIONS] (https://www.keeps.pt).
