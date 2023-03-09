@@ -11,7 +11,7 @@ Nu kan du börja använda RODA:
 
 1. Till till Katalogen och klicka på **NY**, välj Dublin Core och namnge din nya samling.
 2. Gå till **Ingest > Överför** och ladda upp filer (t.ex. PDF) eller SIP:ar från [Roda-In](https://rodain.roda-community.org/). SIP:ar kommer att ha metadata kopplat till sig men det kommer inte PDF:erna. För mer information om RODA-in [se här]/https://rodain.roda-community.org/#tutorials).
-3. Efter uppladdning är genomförd, välj SIP:ar eller filer som ska levereras in genom att klicka i check-boxen och sedan **PROCESSA** i menyn på sidan under sektionen Ingest.
+3. Efter att uppladdningen är genomförd, välj SIP:ar eller filer som ska levereras in genom att klicka i check-boxen och sedan **PROCESSA** i menyn på sidan under sektionen Ingest.
 4. Nu behöver ett Ingest-flöde konfigureras. Välj vilket SIP-format du har laddat upp, antingen E-ARK eller Bagit för SIP-filer, eller **Uppladdade filer/mappar** för lösa filer. 
 5. Under **toppnoden** kan du välja den nya samlingen som du skapade enligt ovan.
 6. Efter konfiguration av ingest, klicka på **Skapa**.
