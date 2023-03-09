@@ -4,9 +4,9 @@ På söksidan kan du söka efter Intellektuella enheter, Representationer eller 
 
 Sökmotorn hittar bara hela ord. Om du vill söka efter deltermer bör du använda asterisk '*'.
 
-## Sökoperatorer
+## Sökparametrar
 
-Följande sökoperatorer står till ditt förfogande:
+Följande sökparametrar är möjliga:
 
 - Exakt mening (t.ex. "Miguel Ferreira")
 - Termer börjar med (t.ex. Miguel F*)
@@ -49,12 +49,12 @@ Den resulterande XML-filen måste vara något i stil med:
 </doc>
 ```
 Regler:
-- Det finns några reserverade fältnamn, särskilt `titel`, `dateInitial` och `dateFinal`, som definierar vad som visas på listorna
+- Det finns några reserverade fältnamn; `titel`, `dateInitial` och `dateFinal`, som definierar vad som visas på listorna
 - Du kan lägga till nya specifika fält, men du måste alltid lägga till ett suffix för datatypen. De mest använda suffixen är "\_txt" (valfri sträng tokeniserad), "\_ss" (icke-tokeniserade strängar för identifierare), "\_dd" för ISO1601-datum.
 - Definitionen av de reserverade fältnamnen görs [here](https://github.com/keeps/roda/blob/master/roda-core/roda-core/src/main/java/org/roda/core/index/schema/collections/AIPCollection.java#L61) men du kan behöva komma åt [here](https://github.com/keeps/roda/blob/master/roda-common/roda-common-data/src/main/java/org/roda/core/data/common/RodaConstants.java#L604) för att ta reda på det slutliga namnet.
 - En komplett lista över suffix och fälttyper finns på [SOLR base schema](https://github.com/keeps/roda/blob/master/roda-core/roda-core/src/main/resources/config/index/common/conf/managed-schema).
 
-För att tillämpa ändringarna på visningsmallen måste du ingestera nytt innehåll eller indexera om befintligt innehåll.
+För att tillämpa ändringarna på visningsmallen måste du leverera in nytt innehåll eller indexera om befintligt innehåll.
 
 ### 3. Konfigurera RODA för att visa fält i den avancerade sökmenyn
 
