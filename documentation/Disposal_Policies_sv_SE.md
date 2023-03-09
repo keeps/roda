@@ -2,13 +2,13 @@
 
 ## Gallringsschema
 
-Gallringsscheman anger minimikraven för underhålls-, bevaring- eller destruktionsåtgärder som ska vidtas i befintliga eller framtida intellektuella enheter i detta förvar. En intellektuell enhet får endast förstöras som en del av en gallringsprocess som styrs av det gallringsschema som tilldelats den enheten. Det är den intellektuella enhetens gallringsschema som bestämmer hur länge en post bevaras och hur den därefter gallras i slutet av dess bevarandeperiod.
+Gallringsscheman anger minimikraven för underhålls-, bevarande- eller destruktionsåtgärder som ska vidtas i befintliga eller framtida intellektuella enheter i detta e-arkiv. En intellektuell enhet får endast raderas som en del av en gallringsprocess som styrs av det gallringsschema som tilldelats den enheten. Det är den intellektuella enhetens gallringsschema som bestämmer hur länge en post bevaras och hur den därefter gallras i slutet av dess bevarandeperiod.
 
 ### 1. Vad är ett gallringsschema?
 
-[MoReq2010®](https://moreq.info/) säger "Gallringsscheman är avgörande för att hantera bevarandeobjekt eftersom MoReq2010® specificerar att ett bevarandeobjekt i ett MCRS endast får förstöras som en del av en gallringsprocess som styrs av gallringsschemat som tilldelats till det bevarandeobjektet . Det är bevarandeobjektets gallringsschema som avgör hur länge ett bevarandeobjekt bevaras och hur den därefter gallras vid slutet av dess bevarandeperiod."
+Enligt [MoReq2010®](https://moreq.info/) är "Gallringsscheman avgörande för att hantera bevarandeobjekt eftersom MoReq2010® specificerar att ett bevarandeobjekt i ett MCRS endast får raderas som en del av en gallringsprocess som styrs av gallringsschemat som tilldelats det bevarandeobjektet . Det är bevarandeobjektets gallringsschema som avgör hur länge ett bevarandeobjekt bevaras och hur den därefter gallras vid slutet av dess bevarandeperiod."
 
-RODA stöder tre typer av gallringsåtgärder:
+RODA stödjer tre typer av gallringsåtgärder:
 
 1. Behåll permanent;
 2. Granska i slutet av bevarandeperioden;
