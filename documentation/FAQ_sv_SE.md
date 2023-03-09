@@ -2,7 +2,7 @@
 
 Vanliga frågor från RODA-användare och deras svar.
 
-Har du en brinnande fråga du inte hittar svaret på? Skapa en fråga [create an issue](https://github.com/keeps/roda/issues/new) på GitHub och markera det som "question".
+Har du en viktig fråga du inte hittar svaret på? Skapa en fråga [create an issue](https://github.com/keeps/roda/issues/new) på GitHub och markera det som "question".
 
 ## Visare
 
@@ -72,7 +72,7 @@ Ja. Du kan navigera i åtgärdsloggen (hela uppsättningen av åtgärder som utf
 
 ### Beskriv hur karantänmiljön fungerar.
 
-När SIP:ar bearbetas under ingest, om de inte accepteras, flyttas de till en speciell mapp i filsystemet. Ingestsprocessen genererar en detaljerad rapport som beskriver orsakerna till avslaget. Vidare steg behöver ske via manuell hantering.
+När SIP:ar under bearbetningen av inleveransen inte accepteras, flyttas de till en speciell mapp i filsystemet. Inleveransprocessen genererar en detaljerad rapport som beskriver orsakerna till avslaget. Vidare steg behöver ske via manuell hantering.
 
 ### Hur stöder systemet bevarande?
 
