@@ -61,7 +61,10 @@ public class MarketUtils {
       CloseableHttpClient httpClient = HttpClientBuilder.create().build();
       HttpGet httpGet = new HttpGet(pluginUrl);
       httpGet.addHeader("Accept", "application/jsonlines");
-      httpGet.addHeader("X-RODA-INSTANCE-ID", instance.getId());
+      // TODO: RODA-LOCAL must have an instanceId at startup
+      if(instance != null){
+        httpGet.addHeader("X-RODA-INSTANCE-ID", instance.getId());
+      }
       httpGet.addHeader("X-RODA-VERSION", rodaVersion);
       HttpResponse response = httpClient.execute(httpGet);
       int responseStatusCode = response.getStatusLine().getStatusCode();
