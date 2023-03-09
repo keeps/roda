@@ -2,7 +2,7 @@
 
 Vanliga frågor från RODA-användare och deras svar.
 
-Har du en brinnande fråga du inte hittar svaret på? Skapa en fråga [create an issue](https://github.com/keeps/roda/issues/new) på GitHub och markera det som "question".
+Har du en viktig fråga du inte hittar svaret på? Skapa en fråga [create an issue](https://github.com/keeps/roda/issues/new) på GitHub och markera det som "question".
 
 ## Visare
 
