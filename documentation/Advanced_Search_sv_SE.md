@@ -6,7 +6,7 @@ Sökmotorn hittar bara hela ord. Om du vill söka efter deltermer bör du använ
 
 ## Sökoperatorer
 
-Följande sökoperatorer står till ditt förfogande:
+Följande sökparametrar är möjliga:
 
 - Exakt mening (t.ex. "Miguel Ferreira")
 - Termer börjar med (t.ex. Miguel F*)
