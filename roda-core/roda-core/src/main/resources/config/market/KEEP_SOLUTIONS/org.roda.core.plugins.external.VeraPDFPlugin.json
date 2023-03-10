@@ -1,0 +1,24 @@
+{
+  "id": "org.roda.core.plugins.external.VeraPDFPlugin",
+  "name": "Format Validator for PDF/A",
+  "type": "AIP_TO_AIP",
+  "version": "1.0",
+  "description": "The Format Validator for PDF/A is a specialized tool designed to ensurecompliance with the ISO-standardized Portable Document Format (PDF)specification for archival and long-term preservation of electronic documents.\nThis plugin validates PDF files against the PDF/A specification, which imposesrestrictions and requirements on the 'base' PDF standards, including PDF 1.4 for\nPDF/A-1 and ISO 32000 for PDF/A-2 and PDF/A-3, as well as a set of additionalthird-party standards. \nThe PDF/A specification prohibits features that are notconducive to long-term archiving, such as font linking, and encryption.",
+  "categories": [
+    "validation",
+    "characterization"
+  ],
+  "objectClasses": [
+    "org.roda.core.data.v2.ip.IndexedAIP",
+    "org.roda.core.data.v2.ip.Representation",
+    "org.roda.core.data.v2.ip.File",
+    "org.roda.core.data.v2.ip.AIP",
+    "org.roda.core.data.v2.ip.IndexedFile",
+    "org.roda.core.data.v2.ip.IndexedRepresentation"
+  ],
+  "homepage": "https://roda-enterprise.keep.pt/plugins/org.roda.core.plugins.external.VeraPDFPlugin",
+  "pluginType": "Validation",
+  "vendor": "KEEP SOLUTIONS",
+  "minSupportedVersion": "4.3.0",
+  "maxSupportedVersion": "5.0.0"
+}

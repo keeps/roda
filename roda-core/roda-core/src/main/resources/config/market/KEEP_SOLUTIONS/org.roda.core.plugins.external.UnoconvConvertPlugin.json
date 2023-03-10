@@ -1,0 +1,24 @@
+{
+  "id": "org.roda.core.plugins.external.UnoconvConvertPlugin",
+  "name": "Office Documents Converter",
+  "type": "AIP_TO_AIP",
+  "version": "7.3.7.2",
+  "description": "The Office Documents Converter is a versatile plugin that utilizes the 'unoconv' (Universal Office Converter) technology to convert a wide range of office file formats. \nThe supported formats include Open Document Format (odt), Microsoft Word (doc), Microsoft Office Open/Microsoft OOXML (ooxml), Portable Document Format (pdf), HTML (html), XHTML (xhtml), Rich Text Format (rtf), Docbook (docbook), and many others. \nThis tool provides a convenient and efficient solution for converting office documents to a desired format. ",
+  "categories": [
+    "conversion",
+    "dissemination"
+  ],
+  "objectClasses": [
+    "org.roda.core.data.v2.ip.IndexedAIP",
+    "org.roda.core.data.v2.ip.Representation",
+    "org.roda.core.data.v2.ip.File",
+    "org.roda.core.data.v2.ip.AIP",
+    "org.roda.core.data.v2.ip.IndexedFile",
+    "org.roda.core.data.v2.ip.IndexedRepresentation"
+  ],
+  "homepage": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.UnoconvConvertPlugin",
+  "pluginType": "Conversion",
+  "vendor": "KEEP SOLUTIONS",
+  "minSupportedVersion": "4.3.0",
+  "maxSupportedVersion": "5.0.0"
+}

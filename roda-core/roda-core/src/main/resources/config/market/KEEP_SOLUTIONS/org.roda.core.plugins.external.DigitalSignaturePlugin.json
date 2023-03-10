@@ -1,0 +1,24 @@
+{
+  "id": "org.roda.core.plugins.external.DigitalSignaturePlugin",
+  "name": "Digital Signature Validator",
+  "type": "AIP_TO_AIP",
+  "version": "1.0",
+  "description": "The Digital Signature Validator performs a comprehensive evaluation of embedded digital signatures within files to ascertain their validity. This task supports verification of digital signatures in the following file formats: PDF, Microsoft Office Formats (such as .docx, xslx, and .pptx), and OpenDocument formats (such as .odt, .ods, and .odp). Upon completion of this process, three significant outcomes are achieved: Firstly, the outcome of the verification is recorded and documented in a PREMIS event. Secondly, the extracted digital signatures are securely stored within the Archival Information Package (AIP) in the designated 'metadata/other' folder. Finally, the original files with the digital signatures removed are securely stored in a new representation within the AIP.",
+  "categories": [
+    "validation",
+    "characterization"
+  ],
+  "objectClasses": [
+    "org.roda.core.data.v2.ip.IndexedAIP",
+    "org.roda.core.data.v2.ip.Representation",
+    "org.roda.core.data.v2.ip.File",
+    "org.roda.core.data.v2.ip.AIP",
+    "org.roda.core.data.v2.ip.IndexedFile",
+    "org.roda.core.data.v2.ip.IndexedRepresentation"
+  ],
+  "homepage": "https://roda-enterprise.keep.pt/plugins/org.roda.core.plugins.external.DigitalSignaturePlugin",
+  "pluginType": "Digital signature",
+  "vendor": "KEEP SOLUTIONS",
+  "minSupportedVersion": "4.3.0",
+  "maxSupportedVersion": "5.0.0"
+}

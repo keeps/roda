@@ -1,0 +1,19 @@
+{
+  "id": "org.roda.core.plugins.external.CreateMetsDIPPlugin",
+  "name": "E-ARK DIP Manifest Updater",
+  "type": "MISC",
+  "version": "1.0",
+  "description": "For performance reasons, RODA does not keep updated versions of the METS manifest prescribed by the E-ARK DIP specification. The E-ARK DIP Manifest Updater plugin creates, or updates METS manifest files based on DIP information found in the storage layer.",
+  "categories": [
+    "dissemination"
+  ],
+  "objectClasses": [
+    "org.roda.core.data.v2.ip.IndexedAIP",
+    "org.roda.core.data.v2.ip.AIP"
+  ],
+  "homepage": "https://roda-enterprise.keep.pt/plugins/org.roda.core.plugins.external.CreateMetsDIPPlugin",
+  "pluginType": "eArchiving",
+  "vendor": "KEEP SOLUTIONS",
+  "minSupportedVersion": "4.1.0",
+  "maxSupportedVersion": "5.0.0"
+}

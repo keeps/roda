@@ -1,0 +1,19 @@
+{
+  "id": "org.roda.core.plugins.external.ManageAIPPermissionsPlugin",
+  "name": "Permissions Manager",
+  "type": "AIP_TO_AIP",
+  "version": "1.0",
+  "description": "The Permissions Manager plugin enables users to update permissions of selected AIPs by adding or removing groups, users or setting specific permissions such CREATE, READ, UPDATE, DELETE, GRANT.",
+  "categories": [
+    "management"
+  ],
+  "objectClasses": [
+    "org.roda.core.data.v2.ip.IndexedAIP",
+    "org.roda.core.data.v2.ip.AIP"
+  ],
+  "homepage": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.ManageAIPPermissionsPlugin",
+  "pluginType": "Maintenance",
+  "vendor": "KEEP SOLUTIONS",
+  "minSupportedVersion": "4.3.0",
+  "maxSupportedVersion": "5.0.0"
+}

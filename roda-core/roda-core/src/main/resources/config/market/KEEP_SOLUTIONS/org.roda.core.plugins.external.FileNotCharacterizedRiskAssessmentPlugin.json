@@ -1,0 +1,19 @@
+{
+  "id": "org.roda.core.plugins.external.FileNotCharacterizedRiskAssessmentPlugin",
+  "name": "Incomplete File Format Detector",
+  "type": "MISC",
+  "version": "1.0",
+  "description": "The Incomplete File Format Detector plugin verifies if a file has a format name attribute adequately filled with a MIME type, PRONOM ID, or a Format designation. \nIf this information is missing, it creates a new risk entry titled 'File(s) not comprehensively characterized' in the Risk Register and assigns the file in question to that risk.\nFurthermore, by creating a new risk entry for files with missing format information, the plugin helps organizations track and manage the risks associated with incomplete file format information. \nThis can help organizations prioritize their efforts and resources for addressing these risks and improving the completeness and accuracy of their digital assets representation information.",
+  "categories": [
+    "risk_management"
+  ],
+  "objectClasses": [
+    "org.roda.core.data.v2.ip.File",
+    "org.roda.core.data.v2.ip.IndexedFile"
+  ],
+  "homepage": "https://roda-enterprise.keep.pt/plugins/org.roda.core.plugins.external.FileNotCharacterizedRiskAssessmentPlugin",
+  "pluginType": "Risk assessment",
+  "vendor": "KEEP SOLUTIONS",
+  "minSupportedVersion": "4.3.0",
+  "maxSupportedVersion": "5.0.0"
+}

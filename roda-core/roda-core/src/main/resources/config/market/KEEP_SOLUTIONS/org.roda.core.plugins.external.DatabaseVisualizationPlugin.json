@@ -1,0 +1,23 @@
+{
+  "id": "org.roda.core.plugins.external.DatabaseVisualizationPlugin",
+  "name": "Database Visualization",
+  "type": "MISC",
+  "version": "1.0",
+  "description": "The Database Visualization plugin creates a special purpose DIP and loads SIARD 2 files into an instance of DBPTK for visualisation purposes.\nDBPTK (Database Preservation Toolkit) is an open-source tool for archiving and browsing the contents of relational databases. It is designed to preserve and provide access to databases that are part of a digital archive. \nThe viewing tool also provides a range of features such as database export, saved searches, records concentration diagrams, etc.",
+  "categories": [
+    "dissemination"
+  ],
+  "objectClasses": [
+    "org.roda.core.data.v2.ip.IndexedAIP",
+    "org.roda.core.data.v2.ip.Representation",
+    "org.roda.core.data.v2.ip.File",
+    "org.roda.core.data.v2.ip.IndexedFile",
+    "org.roda.core.data.v2.ip.AIP",
+    "org.roda.core.data.v2.ip.IndexedRepresentation"
+  ],
+  "homepage": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.DatabaseVisualizationPlugin",
+  "pluginType": "Database preservation",
+  "vendor": "KEEP SOLUTIONS",
+  "minSupportedVersion": "4.4.0",
+  "maxSupportedVersion": "5.0.0"
+}

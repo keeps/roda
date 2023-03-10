@@ -1,0 +1,19 @@
+{
+  "id": "org.roda.core.plugins.external.AIPValidatorPlugin",
+  "name": "E-ARK AIP Validator",
+  "type": "MISC",
+  "version": "1.0",
+  "description": "The E-ARK AIP Validator plugin provides a comprehensive evaluation to ensure that AIPs meet the requirements outlined in the E-ARK specification, version 2.0.4.",
+  "categories": [
+    "validation"
+  ],
+  "objectClasses": [
+    "org.roda.core.data.v2.ip.IndexedAIP",
+    "org.roda.core.data.v2.ip.AIP"
+  ],
+  "homepage": "https://roda-enterprise.keep.pt/plugins/org.roda.core.plugins.external.AIPValidatorPlugin",
+  "pluginType": "eArchiving",
+  "vendor": "KEEP SOLUTIONS",
+  "minSupportedVersion": "4.1.0",
+  "maxSupportedVersion": "5.0.0"
+}

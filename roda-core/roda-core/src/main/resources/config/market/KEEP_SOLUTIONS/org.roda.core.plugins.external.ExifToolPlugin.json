@@ -1,0 +1,21 @@
+{
+  "id": "org.roda.core.plugins.external.ExifToolPlugin",
+  "name": "Optical Character Recognition Extractor",
+  "type": "AIP_TO_AIP",
+  "version": "1.0",
+  "description": "The Optical Character Recognition Extractor is a powerful plugin designed to extract typed or printed text from digitalized images, making it an essential tool for professionals in various fields, including data analysis, document management, and research. \nThe plugin supports a wide range of image formats and can extract text from images with a minimum resolution of 300 DPIs, low noise, and minimal dilation, erosion, rotation, and skew.\nWhile the plugin does not support handwritten text, it offers a range of advanced features for enhancing the quality of the extracted text. \nThese include image pre- processing, specialized dictionaries, word lists, patterns, and trained data. \nBy leveraging these features, users can greatly improve the accuracy and reliability of the text extraction process, ensuring that the extracted text is of the highest quality. \nOnce extracted, the text can be used in a variety of applications, including full- text search, data analysis, and document management. \nThe ability to extract text from digitalized images enables users to unlock valuable information that may otherwise have remained inaccessible, providing new insights and opportunities for analysis.",
+  "categories": [
+    "feature_extraction",
+    "characterization",
+    "experimental"
+  ],
+  "objectClasses": [
+    "org.roda.core.data.v2.ip.IndexedAIP",
+    "org.roda.core.data.v2.ip.AIP"
+  ],
+  "homepage": "https://roda-enterprise.keep.pt/plugins/org.roda.core.plugins.external.ExifToolPlugin",
+  "pluginType": "Characterization",
+  "vendor": "KEEP SOLUTIONS",
+  "minSupportedVersion": "4.3.0",
+  "maxSupportedVersion": "5.0.0"
+}

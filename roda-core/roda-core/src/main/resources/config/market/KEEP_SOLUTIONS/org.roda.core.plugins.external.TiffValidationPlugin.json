@@ -1,0 +1,23 @@
+{
+  "id": "org.roda.core.plugins.external.TiffValidationPlugin",
+  "name": "Digitization profile validator for TIFF images",
+  "type": "AIP_TO_AIP",
+  "version": "1.0",
+  "description": "This plugin checks if the images produced through digitization processes meet the expectations defined in a digitization profile. \nThe digitization profile typically outlines rules and guidelines for minimum DPI resolution, compression type, photometric interpretation, and other technical aspects of the image file format. \nThe goal of a digitization profile validator is to ensure that digital images are of sufficient quality and have the necessary technical attributes for preservation and accessibility over time.",
+  "categories": [
+    "validation"
+  ],
+  "objectClasses": [
+    "org.roda.core.data.v2.ip.IndexedAIP",
+    "org.roda.core.data.v2.ip.Representation",
+    "org.roda.core.data.v2.ip.File",
+    "org.roda.core.data.v2.ip.IndexedFile",
+    "org.roda.core.data.v2.ip.AIP",
+    "org.roda.core.data.v2.ip.IndexedRepresentation"
+  ],
+  "homepage": "https://roda-enterprise.keep.pt/plugins/org.roda.core.plugins.external.TiffValidationPlugin",
+  "pluginType": "Validation",
+  "vendor": "KEEP SOLUTIONS",
+  "minSupportedVersion": "4.3.0",
+  "maxSupportedVersion": "5.0.0"
+}

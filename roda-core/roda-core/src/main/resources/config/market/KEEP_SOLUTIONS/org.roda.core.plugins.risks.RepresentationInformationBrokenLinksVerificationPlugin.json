@@ -1,0 +1,18 @@
+{
+  "id": "org.roda.core.plugins.risks.RepresentationInformationBrokenLinksVerificationPlugin",
+  "name": "Representation Information Broken Links Verifier",
+  "type": "MISC",
+  "version": "1.0",
+  "description": "The Representation Information Broken Links Verifier plugin is a valuable tool for verifying the accuracy and accessibility of external links referenced in Representation Information Records. \nRepresentation Information can point to external links for additional information, but these web pages can cease to exist, leading to broken links and potentially lost or inaccessible information. \nThe plugin checks if the links being pointed by the Representation Information Records are still accessible and optionally removes them in case they are broken. \nBy identifying broken links and removing them, the plugin helps ensure that the Representation Information is accurate and accessible for future use and preservation. \nEnsuring the accuracy and accessibility of Representation Information is critical for the long-term preservation and usability of digital assets. \nBroken links can cause confusion, errors, and lost information, making it difficult or impossible to interpret or use digital assets correctly.",
+  "categories": [
+    "management"
+  ],
+  "objectClasses": [
+    "org.roda.core.data.v2.ri.RepresentationInformation"
+  ],
+  "homepage": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.risks.RepresentationInformationBrokenLinksVerificationPlugin",
+  "pluginType": "Risk assessment",
+  "vendor": "KEEP SOLUTIONS",
+  "minSupportedVersion": "4.3.0",
+  "maxSupportedVersion": "5.0.0"
+}
