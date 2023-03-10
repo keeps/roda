@@ -37,7 +37,7 @@ Esta documentação cobre os seguintes tópicos:
 - [Resolução de problemas](Troubleshooting.md)
 - [FAQ](FAQ_pt_PT.md)
 - [agradecimentos](Acknowledgements.md)
-- [Licença](License.md)
+- [Licença](LICENSE.md)
 
 ## Normas e especificações
 

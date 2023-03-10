@@ -107,9 +107,9 @@ git:
       translation_files_expression: documentation/Risk_Assessment_<lang>.md
     - filter_type: file
       file_format: GITHUBMARKDOWN
-      source_file: documentation/License.md
+      source_file: documentation/LICENSE.md
       source_language: en
-      translation_files_expression: documentation/License_<lang>.md
+      translation_files_expression: documentation/LICENSE_<lang>.md
     - filter_type: file
       file_format: GITHUBMARKDOWN
       source_file: documentation/Professional_Support.md

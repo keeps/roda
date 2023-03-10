@@ -37,7 +37,7 @@ Among others articles, in this series of documentation you will find information
 - [Troubleshooting](Troubleshooting.md)
 - [FAQ](FAQ.md)
 - [Acknowledgements](Acknowledgements.md)
-- [License](License.md)
+- [License](LICENSE.md)
 
 ## Standards and specifications
 
