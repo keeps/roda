@@ -38,153 +38,153 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ActionLogCleanerPlugin.class);
-    private int deleteOlderThanXDays = 90;
+  private static final Logger LOGGER = LoggerFactory.getLogger(ActionLogCleanerPlugin.class);
+  private int deleteOlderThanXDays = 90;
 
-    private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
-    static {
-        pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS,
-                new PluginParameter(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS, "Delete older than X days",
-                        PluginParameterType.INTEGER, "90", false, false,
-                        "The plugin will delete all logs older than the specified number of days."));
-    }
+  static {
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS, "Delete older than X days",
+        PluginParameterType.INTEGER, "90", false, false,
+        "The plugin will delete all logs older than the specified number of days."));
+  }
 
-    @Override
-    public void init() throws PluginException {
-        // do nothing
-    }
+  @Override
+  public void init() throws PluginException {
+    // do nothing
+  }
 
-    @Override
-    public void shutdown() {
-        // do nothing
-    }
+  @Override
+  public void shutdown() {
+    // do nothing
+  }
 
-    @Override
-    public String getName() {
-        return "Activity Log Truncator";
-    }
+  @Override
+  public String getName() {
+    return "Activity Log Truncator";
+  }
 
-    @Override
-    public String getVersionImpl() {
-        return "1.0";
-    }
+  @Override
+  public String getVersionImpl() {
+    return "1.0";
+  }
 
-    @Override
-    public String getDescription() {
-        return "The Activity Log Truncator removes all entries in the activity log that are older than the specified number of"
-                + " days. The log is preserved as external physical files, however older entries will not be displayed in the graphical user interface. "
-                + "To access older log entries, one needs access to the storage layer of the repository server.\nActivity log truncation "
-                + "automatically frees index space and improves performance of the repository as a whole.";
-    }
+  @Override
+  public String getDescription() {
+    return "The Activity Log Truncator removes all entries in the activity log that are older than the specified number of"
+      + " days. The log is preserved as external physical files, however older entries will not be displayed in the graphical user interface. "
+      + "To access older log entries, one needs access to the storage layer of the repository server.\nActivity log truncation "
+      + "automatically frees index space and improves performance of the repository as a whole.";
+  }
 
-    @Override
-    public List<PluginParameter> getParameters() {
-        ArrayList<PluginParameter> parameters = new ArrayList<>();
-        parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS));
-        return parameters;
-    }
+  @Override
+  public List<PluginParameter> getParameters() {
+    ArrayList<PluginParameter> parameters = new ArrayList<>();
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS));
+    return parameters;
+  }
 
-    @Override
-    public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-        super.setParameterValues(parameters);
-        if (parameters != null && parameters.get(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS) != null) {
-            try {
-                int deleteDays = Integer.parseInt(parameters.get(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS));
+  @Override
+  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
+    if (parameters != null && parameters.get(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS) != null) {
+      try {
+        int deleteDays = Integer.parseInt(parameters.get(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS));
 
-                if (deleteDays >= 0) {
-                    this.deleteOlderThanXDays = deleteDays;
-                } else {
-                    this.deleteOlderThanXDays = 0;
-                }
-            } catch (NumberFormatException e) {
-                // do nothing
-            }
-        }
-    }
-
-    @Override
-    public Report execute(IndexService index, ModelService model, StorageService storage,
-                          List<LiteOptionalWithCause> entries) throws PluginException {
-
-        if (deleteOlderThanXDays > 0) {
-            Calendar cal = Calendar.getInstance();
-
-            cal.add(Calendar.DAY_OF_YEAR, -1 * deleteOlderThanXDays);
-            Date until = cal.getTime();
-            try {
-                index.deleteActionLog(until);
-            } catch (SolrServerException | IOException | AuthorizationDeniedException e) {
-                LOGGER.error("Error deleting actionlog until {}", until);
-            }
+        if (deleteDays >= 0) {
+          this.deleteOlderThanXDays = deleteDays;
         } else {
-            // do nothing
+          this.deleteOlderThanXDays = 0;
         }
-
-        return null;
-    }
-
-    @Override
-    public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-            throws PluginException {
+      } catch (NumberFormatException e) {
         // do nothing
-        return null;
+      }
+    }
+  }
+
+  @Override
+  public Report execute(IndexService index, ModelService model, StorageService storage,
+    List<LiteOptionalWithCause> entries) throws PluginException {
+
+    if (deleteOlderThanXDays > 0) {
+      Calendar cal = Calendar.getInstance();
+
+      cal.add(Calendar.DAY_OF_YEAR, -1 * deleteOlderThanXDays);
+      Date until = cal.getTime();
+      try {
+        index.deleteActionLog(until);
+      } catch (SolrServerException | IOException | AuthorizationDeniedException e) {
+        LOGGER.error("Error deleting actionlog until {}", until);
+      }
+    } else {
+      // do nothing
     }
 
-    @Override
-    public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-        LOGGER.debug("Optimizing indexes");
-        try {
-            index.optimizeIndex(RodaConstants.INDEX_ACTION_LOG);
-        } catch (GenericException | AuthorizationDeniedException e) {
-            throw new PluginException("Error optimizing index", e);
-        }
-        return null;
-    }
+    return null;
+  }
 
-    @Override
-    public Plugin<Void> cloneMe() {
-        return new ActionLogCleanerPlugin();
-    }
+  @Override
+  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
+    // do nothing
+    return null;
+  }
 
-    @Override
-    public PluginType getType() {
-        return PluginType.MISC;
+  @Override
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+    LOGGER.debug("Optimizing indexes");
+    try {
+      index.optimizeIndex(RodaConstants.INDEX_ACTION_LOG);
+    } catch (GenericException | AuthorizationDeniedException e) {
+      throw new PluginException("Error optimizing index", e);
     }
+    return null;
+  }
 
-    @Override
-    public boolean areParameterValuesValid() {
-        return true;
-    }
+  @Override
+  public Plugin<Void> cloneMe() {
+    return new ActionLogCleanerPlugin();
+  }
 
-    @Override
-    public PreservationEventType getPreservationEventType() {
-        return PreservationEventType.DELETION;
-    }
+  @Override
+  public PluginType getType() {
+    return PluginType.MISC;
+  }
 
-    @Override
-    public String getPreservationEventDescription() {
-        return "Log entries were cleaned";
-    }
+  @Override
+  public boolean areParameterValuesValid() {
+    return true;
+  }
 
-    @Override
-    public String getPreservationEventSuccessMessage() {
-        return "Log entries were cleaned successfully";
-    }
+  @Override
+  public PreservationEventType getPreservationEventType() {
+    return PreservationEventType.DELETION;
+  }
 
-    @Override
-    public String getPreservationEventFailureMessage() {
-        return "Log entries cleaning failed";
-    }
+  @Override
+  public String getPreservationEventDescription() {
+    return "Log entries were cleaned";
+  }
 
-    @Override
-    public List<String> getCategories() {
-        return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_MANAGEMENT);
-    }
+  @Override
+  public String getPreservationEventSuccessMessage() {
+    return "Log entries were cleaned successfully";
+  }
 
-    @Override
-    public List<Class<Void>> getObjectClasses() {
-        return Arrays.asList(Void.class);
-    }
+  @Override
+  public String getPreservationEventFailureMessage() {
+    return "Log entries cleaning failed";
+  }
+
+  @Override
+  public List<String> getCategories() {
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_MANAGEMENT);
+  }
+
+  @Override
+  public List<Class<Void>> getObjectClasses() {
+    return Arrays.asList(Void.class);
+  }
 
 }
