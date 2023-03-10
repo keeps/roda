@@ -26,7 +26,8 @@ docker compose down
 
 ## Development
 
-In order to successfuly the instructions ahead, these pre-requisites are necessary:
+
+In order to successfuly run the instructions ahead, these pre-requisites are necessary:
 
 - Java 17
 - Maven 3.8.6 or greater
