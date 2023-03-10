@@ -44,9 +44,9 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -252,7 +252,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_REINDEX);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_REINDEX, RodaConstants.PLUGIN_CATEGORY_MAINTENANCE);
   }
 
   @Override

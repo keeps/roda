@@ -61,9 +61,9 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -469,7 +469,7 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_RISK_MANAGEMENT);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_RISK_MANAGEMENT, RodaConstants.PLUGIN_CATEGORY_RISK_ASSESSMENT);
   }
 
   @Override

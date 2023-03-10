@@ -7548,6 +7548,10 @@ span.code {
     margin-right: 1rem;
 }
 
+.plugin-install-btn {
+    min-width: 95px;
+}
+
 /******************************
   Common Tabs
  ******************************/

@@ -46,10 +46,10 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobsHelper;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
@@ -361,7 +361,7 @@ public class InventoryReportPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_MANAGEMENT);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_MANAGEMENT, RodaConstants.PLUGIN_CATEGORY_MAINTENANCE);
   }
 
   @Override

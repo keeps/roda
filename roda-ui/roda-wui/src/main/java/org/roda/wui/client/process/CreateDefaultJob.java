@@ -613,7 +613,7 @@ public class CreateDefaultJob extends Composite {
 
       MarketInfo marketInfo = selectedPlugin.getMarketInfo();
       Button installBtn = new Button(messages.marketStoreInstallLabel());
-      installBtn.addStyleName("btn btn-download");
+      installBtn.addStyleName("btn btn-download plugin-install-btn");
       if (marketInfo != null && marketInfo.getInstallation() != null) {
         installBtn.addClickHandler(clickEvent -> Window.open(marketInfo.getInstallation(), "_blank", ""));
       } else {

@@ -734,7 +734,7 @@ public final class RodaConstants {
 
   public static final String KEEP_MARKET_PLUGIN_HOMEPAGE_URL_PROPERTY = "core.market.plugin.homepage.url";
   public static final String DEFAULT_KEEP_MARKET_PLUGIN_HOMEPAGE_URL = "http://docs.roda-enterprise.com/plugins/";
-  public static final String DEFAULT_MARKET_SUPPORT_URL = "https://www.keep.pt/en/contacts-proposals-information-telephone-address/";
+  public static final String DEFAULT_MARKET_SUPPORT_URL = "https://www.roda-enterprise.com";
 
   public enum OrchestratorType {
     AKKA, AKKA_DISTRIBUTED

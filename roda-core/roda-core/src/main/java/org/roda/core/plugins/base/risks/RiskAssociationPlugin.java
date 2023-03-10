@@ -21,7 +21,6 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobException;
-import org.roda.core.data.exceptions.LockingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IsRODAObject;
@@ -45,8 +44,8 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.PluginHelper;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -357,7 +356,7 @@ public class RiskAssociationPlugin<T extends IsRODAObject> extends AbstractPlugi
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_RISK_MANAGEMENT);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_RISK_MANAGEMENT, RodaConstants.PLUGIN_CATEGORY_RISK_ASSESSMENT);
   }
 
   @SuppressWarnings({"unchecked", "rawtypes"})

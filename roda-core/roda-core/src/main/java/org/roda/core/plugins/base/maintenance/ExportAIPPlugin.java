@@ -49,9 +49,9 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Directory;
 import org.roda.core.storage.StorageService;
@@ -326,7 +326,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_MANAGEMENT);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_MANAGEMENT, RodaConstants.PLUGIN_CATEGORY_MAINTENANCE);
   }
 
   @Override
