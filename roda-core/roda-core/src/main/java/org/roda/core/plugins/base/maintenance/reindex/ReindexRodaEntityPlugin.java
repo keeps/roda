@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
- *
+ * <p>
  * https://github.com/keeps/roda
  */
 package org.roda.core.plugins.base.maintenance.reindex;
@@ -57,6 +57,7 @@ public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends Ab
   private boolean optimizeIndexes = false;
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN,

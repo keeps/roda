@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
- *
+ * <p>
  * https://github.com/keeps/roda
  */
 package org.roda.core.plugins.base.maintenance;
@@ -42,6 +42,7 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
   private int deleteOlderThanXDays = 90;
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS, "Delete older than X days",

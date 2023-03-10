@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
- *
+ * <p>
  * https://github.com/keeps/roda
  */
 package org.roda.core.plugins.base.characterization;
@@ -203,7 +203,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
           }
         } else {
           reportItem.setPluginState(PluginState.SKIPPED)
-                  .setPluginDetails("Skipped because aip does not have representations.");
+            .setPluginDetails("Skipped because aip does not have representations.");
           jobPluginInfo.incrementObjectsProcessed(PluginState.SKIPPED);
         }
 
@@ -211,9 +211,9 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
         PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
         try {
           PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", true,
-                  cachedJob);
+            cachedJob);
         } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
-                 | AuthorizationDeniedException | AlreadyExistsException e) {
+          | AuthorizationDeniedException | AlreadyExistsException e) {
           LOGGER.error("Error creating event: {}", e.getMessage(), e);
         }
       }

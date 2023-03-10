@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
- *
+ * <p>
  * https://github.com/keeps/roda
  */
 package org.roda.core.plugins.base.maintenance;
@@ -72,6 +72,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
   private boolean removeIfAlreadyExists;
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+
   static {
     pluginParameters.put(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER,
       new PluginParameter(PLUGIN_PARAM_EXPORT_FOLDER_PARAMETER, "Destination folder", PluginParameterType.STRING,
@@ -186,7 +187,8 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
   private Report exportFolders(List<AIP> aips, StorageService storage, ModelService model, IndexService index,
     Report report, JobPluginInfo jobPluginInfo, Job job) {
     try {
-      FileStorageService localStorage = new FileStorageService(Paths.get(FilenameUtils.normalize(outputFolder)), false, null, false);
+      FileStorageService localStorage = new FileStorageService(Paths.get(FilenameUtils.normalize(outputFolder)), false,
+        null, false);
       for (AIP aip : aips) {
         LOGGER.debug("Exporting AIP {} to folder", aip.getId());
         String error = null;

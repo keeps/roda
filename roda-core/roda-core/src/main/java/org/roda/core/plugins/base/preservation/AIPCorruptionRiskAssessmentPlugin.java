@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
- *
+ * <p>
  * https://github.com/keeps/roda
  */
 package org.roda.core.plugins.base.preservation;
@@ -75,6 +75,7 @@ public class AIPCorruptionRiskAssessmentPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(AIPCorruptionRiskAssessmentPlugin.class);
 
   private static List<String> risks;
+
   static {
     risks = new ArrayList<>();
     risks.add("urn:fixityplugin:r1");
