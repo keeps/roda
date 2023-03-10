@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
- *
+ * <p>
  * https://github.com/keeps/roda
  */
 package org.roda.core.plugins.base.maintenance.reindex;
@@ -52,209 +52,210 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class ReindexRodaEntityPlugin<T extends IsRODAObject> extends AbstractPlugin<T> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(ReindexRodaEntityPlugin.class);
-  private boolean clearIndexes = false;
-  private boolean optimizeIndexes = false;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReindexRodaEntityPlugin.class);
+    private boolean clearIndexes = false;
+    private boolean optimizeIndexes = false;
 
-  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
-  static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN,
-        "false", false, false, "Clear all indexes before reindexing them."));
+    private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES, "Optimize indexes", PluginParameterType.BOOLEAN,
-        "true", false, false, "Optimize indexes after reindexing them."));
-  }
+    static {
+        pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES,
+                new PluginParameter(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN,
+                        "false", false, false, "Clear all indexes before reindexing them."));
 
-  @Override
-  public void init() throws PluginException {
-    // do nothing
-  }
-
-  @Override
-  public void shutdown() {
-    // do nothing
-  }
-
-  @Override
-  public abstract String getName();
-
-  @Override
-  public String getDescription() {
-    return "Rebuild indexed information from data kept in storage. All indexes can be rebuilt or refreshed from information persisted in storage. This may also be "
-      + "necessary when updating the indexing system. Additional options include clearing index before re-index (full re-index) and to optimize indexes.";
-  }
-
-  @Override
-  public abstract String getVersionImpl();
-
-  @Override
-  public List<PluginParameter> getParameters() {
-    ArrayList<PluginParameter> parameters = new ArrayList<>();
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES));
-    return parameters;
-  }
-
-  @Override
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    super.setParameterValues(parameters);
-    if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES)) {
-      clearIndexes = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
+        pluginParameters.put(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES,
+                new PluginParameter(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES, "Optimize indexes", PluginParameterType.BOOLEAN,
+                        "true", false, false, "Optimize indexes after reindexing them."));
     }
 
-    if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES)) {
-      optimizeIndexes = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES));
-    }
-  }
-
-  @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage,
-    List<LiteOptionalWithCause> liteList) throws PluginException {
-    return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<T>() {
-      @Override
-      public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
-        JobPluginInfo jobPluginInfo, Plugin<T> plugin, List<T> objects) {
-        reindex(index, model, report, jobPluginInfo, cachedJob, objects);
-      }
-    }, index, model, storage, liteList);
-  }
-
-  private void reindex(IndexService index, ModelService model, Report pluginReport, JobPluginInfo jobPluginInfo,
-    Job job, List<T> list) {
-    pluginReport.setPluginState(PluginState.SUCCESS);
-
-    // clearing specific indexes from a id list
-    try {
-      SelectedItems<?> selectedItems = job.getSourceObjects();
-      if (!(selectedItems instanceof SelectedItemsAll) && clearIndexes) {
-        List<String> ids = list.stream().map(obj -> obj.getId()).collect(Collectors.toList());
-        clearSpecificIndexes(index, ids);
-      }
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | RouteException e) {
-      LOGGER.error("Error clearing specific indexes of a RODA entity", e);
+    @Override
+    public void init() throws PluginException {
+        // do nothing
     }
 
-    // executing reindex
-    for (T object : list) {
-      if (LOGGER.isTraceEnabled()) {
-        LOGGER.trace("Reindexing {} {}", object.getClass().getSimpleName(), object.getId());
-      }
+    @Override
+    public void shutdown() {
+        // do nothing
+    }
 
-      Report reportItem = PluginHelper.initPluginReportItem(this, object.getId(), object.getClass());
-      try {
-        ReturnWithExceptions<Void, ModelObserver> exceptions = index.reindex(object);
-        List<Exception> exceptionList = exceptions.getExceptions();
-        if (exceptionList.isEmpty()) {
-          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+    @Override
+    public abstract String getName();
+
+    @Override
+    public String getDescription() {
+        return "Rebuild indexed information from data kept in storage. All indexes can be rebuilt or refreshed from information persisted in storage. This may also be "
+                + "necessary when updating the indexing system. Additional options include clearing index before re-index (full re-index) and to optimize indexes.";
+    }
+
+    @Override
+    public abstract String getVersionImpl();
+
+    @Override
+    public List<PluginParameter> getParameters() {
+        ArrayList<PluginParameter> parameters = new ArrayList<>();
+        parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
+        parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES));
+        return parameters;
+    }
+
+    @Override
+    public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+        super.setParameterValues(parameters);
+        if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES)) {
+            clearIndexes = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
+        }
+
+        if (parameters != null && parameters.containsKey(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES)) {
+            optimizeIndexes = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_OPTIMIZE_INDEXES));
+        }
+    }
+
+    @Override
+    public Report execute(IndexService index, ModelService model, StorageService storage,
+                          List<LiteOptionalWithCause> liteList) throws PluginException {
+        return PluginHelper.processObjects(this, new RODAObjectsProcessingLogic<T>() {
+            @Override
+            public void process(IndexService index, ModelService model, StorageService storage, Report report, Job cachedJob,
+                                JobPluginInfo jobPluginInfo, Plugin<T> plugin, List<T> objects) {
+                reindex(index, model, report, jobPluginInfo, cachedJob, objects);
+            }
+        }, index, model, storage, liteList);
+    }
+
+    private void reindex(IndexService index, ModelService model, Report pluginReport, JobPluginInfo jobPluginInfo,
+                         Job job, List<T> list) {
+        pluginReport.setPluginState(PluginState.SUCCESS);
+
+        // clearing specific indexes from a id list
+        try {
+            SelectedItems<?> selectedItems = job.getSourceObjects();
+            if (!(selectedItems instanceof SelectedItemsAll) && clearIndexes) {
+                List<String> ids = list.stream().map(obj -> obj.getId()).collect(Collectors.toList());
+                clearSpecificIndexes(index, ids);
+            }
+        } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | RouteException e) {
+            LOGGER.error("Error clearing specific indexes of a RODA entity", e);
+        }
+
+        // executing reindex
+        for (T object : list) {
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("Reindexing {} {}", object.getClass().getSimpleName(), object.getId());
+            }
+
+            Report reportItem = PluginHelper.initPluginReportItem(this, object.getId(), object.getClass());
+            try {
+                ReturnWithExceptions<Void, ModelObserver> exceptions = index.reindex(object);
+                List<Exception> exceptionList = exceptions.getExceptions();
+                if (exceptionList.isEmpty()) {
+                    jobPluginInfo.incrementObjectsProcessedWithSuccess();
+                } else {
+                    jobPluginInfo.incrementObjectsProcessedWithFailure();
+
+                    for (Exception e : exceptionList) {
+                        reportItem.addPluginDetails(e.getMessage() + "\n");
+                    }
+
+                    pluginReport.addReport(reportItem.setPluginState(PluginState.FAILURE));
+                    PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+                }
+            } catch (Exception e) {
+                LOGGER.error("Error while reindexing {} {}", object.getClass(), object.getId(), e);
+                jobPluginInfo.incrementObjectsProcessedWithFailure();
+                reportItem.addPluginDetails("Failed to reindex " + object.getClass() + " " + object.getId());
+                pluginReport.addReport(reportItem.setPluginState(PluginState.FAILURE));
+                PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+            }
+        }
+    }
+
+    @Override
+    public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+            throws PluginException {
+        if (clearIndexes) {
+            LOGGER.debug("Clearing indexes");
+            try {
+                Job job = PluginHelper.getJob(this, index);
+                if (job.getSourceObjects() instanceof SelectedItemsAll) {
+                    Class<? extends IsIndexed> selectedClass = (Class<? extends IsIndexed>) Class
+                            .forName(job.getSourceObjects().getSelectedClass());
+                    index.clearIndexes(SolrCollectionRegistry.getCommitIndexNames(selectedClass));
+                    if (selectedClass.equals(AIP.class) || selectedClass.equals(IndexedAIP.class)) {
+                        index.clearAIPEventIndex();
+                    }
+                }
+            } catch (GenericException | NotFoundException | ClassNotFoundException | RequestNotValidException
+                     | NotSupportedException | AuthorizationDeniedException e) {
+                throw new PluginException("Error clearing index", e);
+            }
+
         } else {
-          jobPluginInfo.incrementObjectsProcessedWithFailure();
-
-          for (Exception e : exceptionList) {
-            reportItem.addPluginDetails(e.getMessage() + "\n");
-          }
-
-          pluginReport.addReport(reportItem.setPluginState(PluginState.FAILURE));
-          PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
+            LOGGER.debug("Skipping clear indexes");
         }
-      } catch (Exception e) {
-        LOGGER.error("Error while reindexing {} {}", object.getClass(), object.getId(), e);
-        jobPluginInfo.incrementObjectsProcessedWithFailure();
-        reportItem.addPluginDetails("Failed to reindex " + object.getClass() + " " + object.getId());
-        pluginReport.addReport(reportItem.setPluginState(PluginState.FAILURE));
-        PluginHelper.updatePartialJobReport(this, model, reportItem, true, job);
-      }
-    }
-  }
 
-  @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    if (clearIndexes) {
-      LOGGER.debug("Clearing indexes");
-      try {
-        Job job = PluginHelper.getJob(this, index);
-        if (job.getSourceObjects() instanceof SelectedItemsAll) {
-          Class<? extends IsIndexed> selectedClass = (Class<? extends IsIndexed>) Class
-            .forName(job.getSourceObjects().getSelectedClass());
-          index.clearIndexes(SolrCollectionRegistry.getCommitIndexNames(selectedClass));
-          if (selectedClass.equals(AIP.class) || selectedClass.equals(IndexedAIP.class)) {
-            index.clearAIPEventIndex();
-          }
+        return new Report();
+    }
+
+    @Override
+    public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+        LOGGER.debug("Optimizing indexes");
+        if (optimizeIndexes) {
+            try {
+                Job job = PluginHelper.getJob(this, index);
+                Class<? extends IsIndexed> selectedClass = (Class<? extends IsIndexed>) Class
+                        .forName(job.getSourceObjects().getSelectedClass());
+                index.optimizeIndexes(SolrCollectionRegistry.getCommitIndexNames(selectedClass));
+            } catch (GenericException | NotFoundException | ClassNotFoundException | RequestNotValidException
+                     | NotSupportedException | AuthorizationDeniedException e) {
+                throw new PluginException("Error optimizing index", e);
+            }
         }
-      } catch (GenericException | NotFoundException | ClassNotFoundException | RequestNotValidException
-        | NotSupportedException | AuthorizationDeniedException e) {
-        throw new PluginException("Error clearing index", e);
-      }
 
-    } else {
-      LOGGER.debug("Skipping clear indexes");
+        return new Report();
     }
 
-    return new Report();
-  }
+    public abstract void clearSpecificIndexes(IndexService index, List<String> ids)
+            throws GenericException, RequestNotValidException, AuthorizationDeniedException;
 
-  @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    LOGGER.debug("Optimizing indexes");
-    if (optimizeIndexes) {
-      try {
-        Job job = PluginHelper.getJob(this, index);
-        Class<? extends IsIndexed> selectedClass = (Class<? extends IsIndexed>) Class
-          .forName(job.getSourceObjects().getSelectedClass());
-        index.optimizeIndexes(SolrCollectionRegistry.getCommitIndexNames(selectedClass));
-      } catch (GenericException | NotFoundException | ClassNotFoundException | RequestNotValidException
-        | NotSupportedException | AuthorizationDeniedException e) {
-        throw new PluginException("Error optimizing index", e);
-      }
+    @Override
+    public abstract Plugin<T> cloneMe();
+
+    @Override
+    public PluginType getType() {
+        return PluginType.MISC;
     }
 
-    return new Report();
-  }
+    @Override
+    public boolean areParameterValuesValid() {
+        return true;
+    }
 
-  public abstract void clearSpecificIndexes(IndexService index, List<String> ids)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException;
+    @Override
+    public PreservationEventType getPreservationEventType() {
+        return PreservationEventType.NONE;
+    }
 
-  @Override
-  public abstract Plugin<T> cloneMe();
+    @Override
+    public String getPreservationEventDescription() {
+        return "Reindex Roda entity";
+    }
 
-  @Override
-  public PluginType getType() {
-    return PluginType.MISC;
-  }
+    @Override
+    public String getPreservationEventSuccessMessage() {
+        return "All entities were reindexed with success";
+    }
 
-  @Override
-  public boolean areParameterValuesValid() {
-    return true;
-  }
+    @Override
+    public String getPreservationEventFailureMessage() {
+        return "An error occured while reindexing all entities";
+    }
 
-  @Override
-  public PreservationEventType getPreservationEventType() {
-    return PreservationEventType.NONE;
-  }
+    @Override
+    public List<String> getCategories() {
+        return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_REINDEX);
+    }
 
-  @Override
-  public String getPreservationEventDescription() {
-    return "Reindex Roda entity";
-  }
-
-  @Override
-  public String getPreservationEventSuccessMessage() {
-    return "All entities were reindexed with success";
-  }
-
-  @Override
-  public String getPreservationEventFailureMessage() {
-    return "An error occured while reindexing all entities";
-  }
-
-  @Override
-  public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_REINDEX);
-  }
-
-  @Override
-  public abstract List<Class<T>> getObjectClasses();
+    @Override
+    public abstract List<Class<T>> getObjectClasses();
 
 }
