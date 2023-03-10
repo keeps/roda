@@ -164,7 +164,10 @@
                                 -Droda.distributed.mode.type=LOCAL
                                 -Droda.home=${env.HOME}/.roda_local
                                 -Dgwt.codeServerPort=9876 -Xdebug
+                                <!-- Remove after upgrade to spring-boot 3-->
+                                -Dorg.springframework.boot.logging.LoggingSystem=none
                                 -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5007
+                                --add-opens java.base/java.util=ALL-UNNAMED
                             </jvmArguments>
                         </configuration>
                     </plugin>
@@ -213,7 +216,10 @@
                                 -Droda.distributed.mode.type=CENTRAL
                                 -Droda.home=${env.HOME}/.roda_central
                                 -Dgwt.codeServerPort=9876 -Xdebug
+                                <!-- Remove after upgrade to spring-boot 3-->
+                                -Dorg.springframework.boot.logging.LoggingSystem=none
                                 -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5006
+                                --add-opens java.base/java.util=ALL-UNNAMED
                             </jvmArguments>
                         </configuration>
                     </plugin>
