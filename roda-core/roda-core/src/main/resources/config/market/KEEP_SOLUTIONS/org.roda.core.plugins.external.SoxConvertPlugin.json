@@ -17,7 +17,6 @@
     "org.roda.core.data.v2.ip.IndexedRepresentation"
   ],
   "homepage": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.SoxConvertPlugin",
-  "pluginType": "Conversion",
   "vendor": "KEEP SOLUTIONS",
   "minSupportedVersion": "4.3.0",
   "maxSupportedVersion": "5.0.0"

@@ -34,6 +34,7 @@ Esta documentação cobre os seguintes tópicos:
     - [Guia para desenvolvimento](Developers_Guide.md)
     - [Guia de tradução](Translation_Guide.md)
     - [Guia de documentação](Documentation_Guide_pt_PT.md)
+    - [Publicação de plugins](Publishing_plugins_pt_PT.md)
 - [Resolução de problemas](Troubleshooting.md)
 - [FAQ](FAQ_pt_PT.md)
 - [agradecimentos](Acknowledgements.md)

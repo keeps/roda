@@ -139,6 +139,7 @@ Para criar novos plugins e usá-los no RODA, é necessário:
 2. A classe do plugin deve estender a classe **AbstractPlugin** e implementar os métodos necessários
 3. Depois de criar o plugin, é necessário gerar um ficheiro jar
 4. Esse ficheiro jar deve, então, ser incluído na pasta de instalação base do RODA, mais especificamente em **config/plugins/PLUGIN_NAME/**
+5. Publicar plugin no market ([ver instruções](./Publishing_plugins.md))
 
 ## API REST
 

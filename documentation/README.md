@@ -34,6 +34,7 @@ Among others articles, in this series of documentation you will find information
     - [Developers guide](Developers_Guide.md)
     - [Translation guide](Translation_Guide.md)
     - [Documentation guide](Documentation_Guide.md)
+    - [Publishing plugins](Publishing_plugins.md)
 - [Troubleshooting](Troubleshooting.md)
 - [FAQ](FAQ.md)
 - [Acknowledgements](Acknowledgements.md)

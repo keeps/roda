@@ -16,7 +16,6 @@
     "org.roda.core.data.v2.ip.IndexedRepresentation"
   ],
   "homepage": "https://roda-enterprise.keep.pt/plugins/org.roda.core.plugins.external.DigitalSignatureDIPPlugin",
-  "pluginType": "Digital signature",
   "vendor": "KEEP SOLUTIONS",
   "minSupportedVersion": "4.3.0",
   "maxSupportedVersion": "5.0.0"

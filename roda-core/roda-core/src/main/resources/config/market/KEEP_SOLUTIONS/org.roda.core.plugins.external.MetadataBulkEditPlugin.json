@@ -12,7 +12,6 @@
     "org.roda.core.data.v2.ip.AIP"
   ],
   "homepage": "https://roda-enterprise.keep.pt/plugins/org.roda.core.plugins.external.MetadataBulkEditPlugin",
-  "pluginType": "Maintenance",
   "vendor": "KEEP SOLUTIONS",
   "minSupportedVersion": "4.5.0",
   "maxSupportedVersion": "5.0.0"

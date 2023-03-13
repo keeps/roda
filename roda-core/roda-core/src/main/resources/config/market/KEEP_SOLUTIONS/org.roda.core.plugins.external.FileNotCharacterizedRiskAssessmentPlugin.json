@@ -12,7 +12,6 @@
     "org.roda.core.data.v2.ip.IndexedFile"
   ],
   "homepage": "https://roda-enterprise.keep.pt/plugins/org.roda.core.plugins.external.FileNotCharacterizedRiskAssessmentPlugin",
-  "pluginType": "Risk assessment",
   "vendor": "KEEP SOLUTIONS",
   "minSupportedVersion": "4.3.0",
   "maxSupportedVersion": "5.0.0"
