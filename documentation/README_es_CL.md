@@ -17,9 +17,7 @@ Among others articles, in this series of documentation you will find information
 - Support
   - [Community support](Community_Support.md)
   - [Professional support](Professional_Support.md)
-- Installation
-  - [Demo](Installation_Testing_Environments.md)
-  - [Production](Installation_Production_Environments.md)
+- [Installation](https://github.com/keeps/roda/blob/master/deploys/README.md)
 - Configuration
   - [Statistics](Statistics.md)
   - [Metadata formats](Metadata_Formats.md)

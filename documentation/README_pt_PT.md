@@ -22,6 +22,7 @@ Esta documentação cobre os seguintes tópicos:
 - Suporte
     - [Suporte pela comunidade](Community_Support.md)
     - [Suporte profissional](Professional_Support.md)
+- [Instalação](https://github.com/keeps/roda/blob/master/deploys/README.md)
 - Instalação
     - [Demonstração](Installation_Testing_Environments.md)
     - [Produção](Installation_Production_Environments.md)
