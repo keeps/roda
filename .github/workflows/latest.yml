@@ -10,26 +10,49 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
+
+    services:
+      zookeeper:
+        image: zookeeper:3.8
+        ports:
+          - 2181:2181
+      solr:
+        image: solr:9
+        ports:
+          - 8983:8983
+        env:
+          ZK_HOST: zookeeper:2181
+        options: -e cloud
+
     steps:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Set up JDK 8
+      - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: 8
-          distribution: 'adopt'
+          java-version: 17
+          distribution: "temurin"
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v4.5
+        with:
+          maven-version: 3.8.7
       - name: Cache
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-      - name: Install dependencies
+      - name: Set up GO
+        uses: actions/setup-go@v3
+        with:
+          go-version: '^1.19.5'
+          check-latest: true
+      - name: Install siegfried
         run: |
-          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 20F802FE798E6857
-          sudo add-apt-repository "deb https://www.itforarchivists.com/ buster main"
-          sudo apt-get -qq update
-          sudo apt-get -qq install siegfried -y
+          go install github.com/richardlehane/siegfried/cmd/sf@latest
+          sf -update
+      - name: Install clamdscan mock
+        run: |
           sudo cp .github/workflows/bin/clamscan /usr/bin/clamscan
           sudo cp .github/workflows/bin/clamscan /usr/bin/clamdscan
           sudo chmod a+rx /usr/bin/clamscan /usr/bin/clamdscan
@@ -38,6 +61,8 @@ jobs:
           mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" -Proda-wui-docker -Denforcer.skip=true clean org.jacoco:jacoco-maven-plugin:prepare-agent install
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RODA_CORE_SOLR_TYPE: CLOUD
+          RODA_CORE_SOLR_CLOUD_URLS: localhost:2181
       - name: Deploy to GitHub packages
         run: mvn $MAVEN_CLI_OPTS clean deploy -Dmaven.test.skip=true -Pcore
         env:
