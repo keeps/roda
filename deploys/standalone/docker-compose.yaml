@@ -49,7 +49,6 @@ services:
     restart: unless-stopped
     ports:
       - "8080:8080"
-      - "5005:5005" # remote debug
     depends_on:
       - solr
       - clamd
@@ -66,11 +65,6 @@ services:
       - SIEGFRIED_SERVER_URL=http://siegfried:5138
       - CLAMD_TCPADDR=clamd
       - CLAMD_TCPSOCKET=3310
-
-      # Remote debug
-      - JPDA_ADDRESS=0.0.0.0:5005
-      - JPDA_TRANSPORT=dt_socket
-    command: catalina.sh jpda run
 volumes:
   zookeeper_data:
   zookeeper_datalog:

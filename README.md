@@ -36,7 +36,7 @@ All documentation articles are written in markdown, which means that you can eas
 
 ## Installation
 
-We provide installation methods for testing and production environments for several different operating systems. For more information on the installation process, please visit our [documentation page](https://github.com/keeps/roda/tree/master/documentation/README.md).
+To try RODA or start a production implementation, check [these instructions](https://github.com/keeps/roda/tree/master/deploys/README.md).
 
 ## Usage
 
