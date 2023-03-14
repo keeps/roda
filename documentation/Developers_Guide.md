@@ -1,6 +1,6 @@
 # Developers guide
 
-This is a quick and durty guide on how to start coding on RODA.
+This is a quick and dirty guide on how to start coding on RODA.
 
 ## Get the source code
 
@@ -29,16 +29,9 @@ RODA uses [Apache Maven](http://maven.apache.org/) build system. Being a multi-m
 The pre-requisites to build RODA are:
 
 * Git client
-* Apache Maven
-* Oracle Java 8
+* Apache Maven 3.8+
+* Oracle Java 17
 
-To install all dependencies in Debian based systems execute:
-
-```bash
-$ sudo add-apt-repository ppa:webupd8team/java
-$ sudo apt-get update
-$ sudo apt-get install oracle-java8-installer oracle-java8-set-default git maven ant
-```
 
 ### Compilation
 
@@ -54,31 +47,28 @@ Use the following command to skip the Unit Tests (faster).
 $ mvn clean package -Dmaven.test.skip=true
 ```
 
-
 After a successful compile, RODA web application will be available at `roda-ui/roda-wui/target/roda-wui-VERSION.war`. To deploy it, just put it inside your favourite servlet container (e.g. Apache Tomcat) and that is it.
+
+More advanced instruction available on the [Developer notes](https://github.com/keeps/roda/blob/master/DEV_NOTES.md) page.
 
 ## How to set up the development environment
 
 ### Required software
 
-Besides the software needed to build RODA, you need:
+Besides the software needed to build RODA, we recommend the following:
 
-* Eclipse for Java ([Download page](http://www.eclipse.org/downloads/))
-* Eclipse Maven Plugin ([Download & install instructions](http://www.eclipse.org/m2e/))
-
-Optionally you may install the following tools:
-
-* Google Plugin for Eclipse ([Download & install instructions](https://developers.google.com/eclipse/docs/getting_started)) is usefull to develop and test graphical user interface developments.
+* IntelliJ IDEA ([Download page](https://www.jetbrains.com/idea/download/))
 
 **NOTE:** This is not a restrictive list of software to be used for developing RODA (as other software, like IDEs, can be used instead of the one suggested.)
 
-### How to import the code in Eclipse
+### How to import the code in IntelliJ IDEA
 
-1. Start Eclipse
-2. Select "File > Import". Then, select "Maven > Existing Maven Projects" and click "Next"
-3. In the "Root Directory", browse to RODA source code directory on your filesystem and select "Open"
-4. Optionally, you can add it to a "Working set"
-5. Click "Finish"
+1. Start IntelliJ IDEA
+2. Select "File > Open". Then, browse to RODA source code directory on your filesystem and select "Open"
+3. Install "Adapter for Eclipse Code Formatter" plugin in "File > Settings > Plugins"
+4. Set the "Eclipse Code Formatter" configuration to use `code-style/eclipse-formatter.xml` configuration. Also, set the import order to be `java;javax;org;com;`.
+5. Select any Java file and do the following actions (these settings will be remembered, there is no need to select these options every time). On the menu: `Code > Reformat File...`, set Scope: Only VCS changed text; Optimize imports (checked); Code cleanup (checked); Rearrange code (unchecked).
+6. Go to "File > Settings...", "Editor > Code Style > Java", select tab "Imports", set "Class count to use import with '*':" 9999, set "Names count to use static import with '*': 9999
 
 
 ## Code structure
