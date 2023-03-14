@@ -71,35 +71,30 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Get release version
-        id: release_version
-        run: echo ::set-output name=result::${GITHUB_REF/refs\/tags\/v/} 
+        run: echo "release_version=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
       - name: Upload artifact to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: roda-ui/roda-wui/target/roda-wui-${{ steps.release_version.outputs.result }}.war
-          asset_name: roda-wui-${{ steps.release_version.outputs.result }}.war
+          file: roda-ui/roda-wui/target/roda-wui-${{ env.release_version }}.war
+          asset_name: roda-wui-$${{ env.release_version }}.war
           tag: ${{ github.ref }}
-          release_name: v${{ steps.release_version.outputs.result }}
-          prerelease: true
+          release_name: ${{ github.ref_name }}
       - name: Login to DockerHub
         uses: docker/login-action@v2 
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Get release version
-        id: tag
-        run: echo ::set-output name=result::${GITHUB_REF/refs\/tags\//} 
       - name: Deploy to DockerHub
         run: |
-          docker tag keeps/roda:latest keeps/roda:${{ steps.tag.outputs.result }}
-          docker push keeps/roda:${{ steps.tag.outputs.result }}
+          docker tag keeps/roda:latest keeps/roda:${{ github.ref_name }}
+          docker push keeps/roda:${{ github.ref_name }}
       - name: Trigger KEEPS GitLab CI/CD
         run: |
           curl --progress-bar -o /dev/null -L --request POST \
                --form ref=master \
                --form token=${{ secrets.GITLAB_RODA_DEV_TRIGGER_TOKEN }} \
-               --form "variables[DOCKER_TAG]=${{ steps.tag.outputs.result }}" \
+               --form "variables[DOCKER_TAG]=${{ github.ref_name }}" \
                ${{ secrets.GITLAB_RODA_DEV_TRIGGER }}
 
 #  update-release-notes:
