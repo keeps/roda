@@ -47,11 +47,6 @@ git:
       translation_files_expression: documentation/Troubleshooting_<lang>.md
     - filter_type: file
       file_format: GITHUBMARKDOWN
-      source_file: documentation/Developers_Guide.md
-      source_language: en
-      translation_files_expression: documentation/Developers_Guide_<lang>.md
-    - filter_type: file
-      file_format: GITHUBMARKDOWN
       source_file: documentation/Community_Support.md
       source_language: en
       translation_files_expression: documentation/Community_Support_<lang>.md
