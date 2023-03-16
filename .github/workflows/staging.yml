@@ -64,15 +64,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RODA_CORE_SOLR_TYPE: CLOUD
           RODA_CORE_SOLR_CLOUD_URLS: localhost:2181
-      - name: Login to DockerHub
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v2 
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Deploy to DockerHub
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Deploy to GitHub Container Registry
         run: |
-          docker tag keeps/roda:latest keeps/roda:staging
-          docker push keeps/roda:staging
+          docker tag keeps/roda:latest ghcr.io/keeps/roda:staging
+          docker push ghcr.io/keeps/roda:staging
       - name: Trigger KEEPS GitLab CI/CD
         run: |
           curl --progress-bar -o /dev/null -L --request POST \
