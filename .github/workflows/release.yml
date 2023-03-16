@@ -58,10 +58,10 @@ jobs:
           mvn $MAVEN_CLI_OPTS -Dtestng.groups="travis" -Proda-wui-docker -Denforcer.skip=true clean org.jacoco:jacoco-maven-plugin:prepare-agent install
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #- name: Deploy to GitHub packages
-      #  run: mvn $MAVEN_CLI_OPTS clean deploy -Dmaven.test.skip=true -Pcore
-      #  env:
-      #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Deploy to GitHub packages
+        run: mvn $MAVEN_CLI_OPTS clean deploy -Dmaven.test.skip=true -Pcore
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Get release version
         run: echo "release_version=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
       - name: Release to GitHub
@@ -86,5 +86,5 @@ jobs:
           curl --progress-bar -o /dev/null -L --request POST \
                --form ref=roda-4 \
                --form token=${{ secrets.GITLAB_RODA_DEV_TRIGGER_TOKEN }} \
-               --form "variables[DOCKER_TAG]=${{ steps.tag.outputs.result }}" \
+               --form "variables[DOCKER_TAG]=${{ github.ref_name }}" \
                ${{ secrets.GITLAB_RODA_DEV_TRIGGER }}
