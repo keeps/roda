@@ -1044,6 +1044,10 @@ pre code {
     content: "\f05e";
 }
 
+.btn-preview:after {
+  content: "\f06e";
+}
+
 .btn-th-list:after {
     content: "\f00b";
 }
@@ -7353,6 +7357,22 @@ span.code {
     border-left: 5px solid COLOR_PRIMARY;
     margin-top: 15px;
     padding: 5px 10px;
+}
+
+.wui-disposal-rules-aip-preview {
+  margin-top: 1rem;
+}
+
+.wui-disposal-rules-aip-preview .h5 {
+  margin-top: 1rem;
+}
+
+.wui-disposal-rules-aip-preview .no-preview-label {
+    font-size: 1.4rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    color: #9a9a9a;
 }
 
 .wui-create-disposal-confirmation-data .wui-disposal-confirmation-data-note {

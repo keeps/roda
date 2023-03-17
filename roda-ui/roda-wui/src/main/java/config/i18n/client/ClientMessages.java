@@ -1901,6 +1901,12 @@ public interface ClientMessages extends Messages {
 
   String disposalRuleTypeValue(@Select String action);
 
+  String disposalRulePreviewAIPListTitle();
+
+  String disposalRulePreviewHelpText();
+
+  String disposalRulePreviewButtonText();
+
   String disposalRuleOrder();
 
   String disposalRuleCondition();
