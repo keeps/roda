@@ -9,6 +9,7 @@ package org.roda.wui.server.browse;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,6 +25,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.SelectedItemsUtils;
+import org.roda.core.data.exceptions.LockingException;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -1469,4 +1471,28 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return description;
   }
 
+  public boolean requestAIPLock(String aipId) {
+    boolean lockEnabled = RodaCoreFactory.getRodaConfiguration().getBoolean("core.aip.lockToEdit", false);
+
+    if (!lockEnabled) {
+      return true;
+    }
+
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    try {
+      PluginHelper.tryLock(Collections.singletonList(aipId), user.getUUID());
+    } catch (LockingException e) {
+      return false;
+    }
+    return true;
+  }
+
+  public void releaseAIPLock(String aipId) {
+    boolean lockEnabled = RodaCoreFactory.getRodaConfiguration().getBoolean("core.aip.lockToEdit", false);
+
+    if (lockEnabled) {
+      User user = UserUtility.getUser(getThreadLocalRequest());
+      PluginHelper.releaseObjectLock(aipId, user.getUUID());
+    }
+  }
 }

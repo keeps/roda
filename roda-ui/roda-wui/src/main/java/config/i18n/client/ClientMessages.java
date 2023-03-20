@@ -2387,4 +2387,8 @@ public interface ClientMessages extends Messages {
   String marketTabLabel();
 
   String marketStoreInstallLabel();
+
+  String editDescMetadataLockedTitle();
+
+  String editDescMetadataLockedText();
 }
