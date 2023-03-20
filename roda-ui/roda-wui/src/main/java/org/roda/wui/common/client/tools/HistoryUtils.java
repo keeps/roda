@@ -301,8 +301,8 @@ public class HistoryUtils {
   }
 
   public static String getSearchHistoryByRepresentationInformationFilter(List<String> filters, String searchType) {
-    List<String> history = new ArrayList<>();
-    history.addAll(Search.RESOLVER.getHistoryPath());
+    List<String> history = new ArrayList<>(Search.RESOLVER.getHistoryPath());
+    history.add(RodaConstants.SEARCH_WITH_PREFILTER_HANDLER);
     history.add("@" + searchType);
     history.add(RodaConstants.OPERATOR_OR);
 
