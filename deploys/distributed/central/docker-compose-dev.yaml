@@ -4,7 +4,7 @@ services:
     image: docker.io/zookeeper:3.8
     restart: unless-stopped
     ports:
-      - 2182:2181
+      - "2182:2181"
     environment:
       - ZOO_4LW_COMMANDS_WHITELIST=mntr,conf,ruok
     volumes:
@@ -29,15 +29,15 @@ services:
     image: docker.io/clamav/clamav:stable
     restart: unless-stopped
     ports:
-      - 3311:3310
+      - "3311:3310"
     volumes:
       - clam_data:/var/lib/clamav
       - $HOME/.roda_central/data/storage:$HOME/.roda_central/data/storage
   siegfried:
-    image: ghcr.io/keeps/siegfried:v1.9.3
+    image: ghcr.io/keeps/siegfried:v1.9.6
     restart: unless-stopped
     ports:
-      - 5139:5138
+      - "5139:5138"
     environment:
       SIEGFRIED_HOST: siegfried
       SIEGFRIED_PORT: 5138
