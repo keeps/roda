@@ -18,8 +18,11 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.notifications.Notifications;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.bundle.SupportedMetadataTypeBundle;
 import org.roda.wui.client.common.NoAsyncCallback;
@@ -28,6 +31,7 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.FormUtilities;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.PermissionClientUtils;
 import org.roda.wui.common.client.HistoryResolver;
@@ -59,6 +63,7 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
+import org.roda.wui.server.browse.BrowserServiceImpl;
 
 /**
  * @author Luis Faria
@@ -75,20 +80,30 @@ public class EditDescriptiveMetadata extends Composite {
         final String representationId = historyTokens.size() == 3 ? historyTokens.get(1) : null;
         final String descriptiveMetadataId = new HTML(historyTokens.get(historyTokens.size() - 1)).getText();
 
-        BrowserService.Util.getInstance().retrieveDescriptiveMetadataEditBundle(aipId, representationId,
-          descriptiveMetadataId, LocaleInfo.getCurrentLocale().getLocaleName(),
-          new AsyncCallback<DescriptiveMetadataEditBundle>() {
+        BrowserService.Util.getInstance().requestAIPLock(aipId, new NoAsyncCallback<Boolean>() {
+          @Override
+          public void onSuccess(Boolean result) {
+            if (Boolean.TRUE.equals(result)) {
+              BrowserService.Util.getInstance().retrieveDescriptiveMetadataEditBundle(aipId, representationId,
+                descriptiveMetadataId, LocaleInfo.getCurrentLocale().getLocaleName(),
+                new AsyncCallback<DescriptiveMetadataEditBundle>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              callback.onFailure(caught);
-            }
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    callback.onFailure(caught);
+                  }
 
-            @Override
-            public void onSuccess(DescriptiveMetadataEditBundle bundle) {
-              callback.onSuccess(new EditDescriptiveMetadata(aipId, representationId, bundle));
+                  @Override
+                  public void onSuccess(DescriptiveMetadataEditBundle bundle) {
+                    callback.onSuccess(new EditDescriptiveMetadata(aipId, representationId, bundle));
+                  }
+                });
+            } else {
+              HistoryUtils.newHistory(BrowseTop.RESOLVER, aipId);
+              Toast.showInfo(messages.editDescMetadataLockedTitle(), messages.editDescMetadataLockedText());
             }
-          });
+          }
+        });
       } else {
         HistoryUtils.newHistory(BrowseTop.RESOLVER);
         callback.onSuccess(null);
@@ -124,6 +139,8 @@ public class EditDescriptiveMetadata extends Composite {
   private boolean inXML = false;
   private TextArea metadataXML;
   private String metadataTextFromForm = null;
+
+  private boolean aipLocked;
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
@@ -164,9 +181,10 @@ public class EditDescriptiveMetadata extends Composite {
   TitlePanel title;
 
   /**
-   * Create a new panel to edit a user
+   * Create a new panel to edit a descriptive metadata
    *
-   * @param user
+   * @param aipId
+   * @param representationId
    *          the user to edit
    */
   public EditDescriptiveMetadata(final String aipId, final String representationId,
@@ -174,6 +192,7 @@ public class EditDescriptiveMetadata extends Composite {
     this.aipId = aipId;
     this.representationId = representationId;
     this.bundle = bundleParam;
+    aipLocked = true;
 
     // Create new Set of MetadataValues so we can keep the original
     Set<MetadataValue> newValues = null;
@@ -308,6 +327,19 @@ public class EditDescriptiveMetadata extends Composite {
     if ("input".equalsIgnoreCase(firstElement.getTagName())) {
       firstElement.setAttribute("title", "browse input");
     }
+  }
+
+  @Override
+  protected void onDetach() {
+    if (aipLocked) {
+      BrowserService.Util.getInstance().releaseAIPLock(this.aipId, new NoAsyncCallback<Void>() {
+        @Override
+        public void onSuccess(Void result) {
+          aipLocked = false;
+        }
+      });
+    }
+    super.onDetach();
   }
 
   @Override
