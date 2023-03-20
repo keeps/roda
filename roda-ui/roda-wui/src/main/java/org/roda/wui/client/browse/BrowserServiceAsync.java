@@ -434,4 +434,7 @@ public interface BrowserServiceAsync {
 
   void getCrontabValue(String localeName, AsyncCallback<String> async);
 
+  void requestAIPLock(String aipId, AsyncCallback<Boolean> async);
+
+  void releaseAIPLock(String aipId, AsyncCallback<Void> async);
 }

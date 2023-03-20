@@ -19,6 +19,7 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.wui.client.browse.bundle.BinaryVersionBundle;
 import org.roda.wui.client.browse.bundle.DescriptiveMetadataVersionsBundle;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -76,23 +77,32 @@ public class DescriptiveMetadataHistory extends Composite {
         final String representationId = historyTokens.size() == 3 ? historyTokens.get(1) : null;
         final String descriptiveMetadataId = new HTML(historyTokens.get(historyTokens.size() - 1)).getText();
 
-        BrowserService.Util.getInstance().retrieveDescriptiveMetadataVersionsBundle(aipId, representationId,
-          descriptiveMetadataId, LocaleInfo.getCurrentLocale().getLocaleName(),
-          new AsyncCallback<DescriptiveMetadataVersionsBundle>() {
+        BrowserService.Util.getInstance().requestAIPLock(aipId, new NoAsyncCallback<Boolean>() {
+          @Override
+          public void onSuccess(Boolean result) {
+            if (Boolean.TRUE.equals(result)) {
+              BrowserService.Util.getInstance().retrieveDescriptiveMetadataVersionsBundle(aipId, representationId,
+                descriptiveMetadataId, LocaleInfo.getCurrentLocale().getLocaleName(),
+                new AsyncCallback<DescriptiveMetadataVersionsBundle>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    AsyncCallbackUtils.defaultFailureTreatment(caught);
+                  }
+
+                  @Override
+                  public void onSuccess(DescriptiveMetadataVersionsBundle bundle) {
+                    DescriptiveMetadataHistory widget = new DescriptiveMetadataHistory(aipId, representationId,
+                      descriptiveMetadataId, bundle);
+                    callback.onSuccess(widget);
+                  }
+                });
+            } else {
+              HistoryUtils.newHistory(BrowseTop.RESOLVER, aipId);
+              Toast.showInfo(messages.editDescMetadataLockedTitle(), messages.editDescMetadataLockedText());
             }
-
-            @Override
-            public void onSuccess(DescriptiveMetadataVersionsBundle bundle) {
-              DescriptiveMetadataHistory widget = new DescriptiveMetadataHistory(aipId, representationId,
-                descriptiveMetadataId, bundle);
-              callback.onSuccess(widget);
-            }
-          });
-
+          }
+        });
       } else {
         HistoryUtils.newHistory(BrowseTop.RESOLVER);
         callback.onSuccess(null);
@@ -130,6 +140,7 @@ public class DescriptiveMetadataHistory extends Composite {
 
   private boolean inHTML = true;
   private String selectedVersion = null;
+  private boolean aipLocked;
 
   @UiField
   ListBox list;
@@ -156,10 +167,18 @@ public class DescriptiveMetadataHistory extends Composite {
   TitlePanel title;
 
   /**
-   * Create a new panel to edit a user
+   * Create a new panel to select descriptive metadata history
    *
-   * @param user
-   *          the user to edit
+   * @param aipId
+   *          the AIP identifier.
+   * @param representationId
+   *          the representation identifier.
+   * @param descriptiveMetadataId
+   *          the descriptive metadata identifier.
+   * @param bundle
+   *          the descriptive metadata versions
+   *          bundle @{DescriptiveMetadataVersionsBundle}
+   *
    */
   public DescriptiveMetadataHistory(final String aipId, final String representationId,
     final String descriptiveMetadataId, final DescriptiveMetadataVersionsBundle bundle) {
@@ -167,6 +186,7 @@ public class DescriptiveMetadataHistory extends Composite {
     this.representationId = representationId;
     this.descriptiveMetadataId = descriptiveMetadataId;
     this.bundle = bundle;
+    aipLocked = true;
 
     initWidget(uiBinder.createAndBindUi(this));
     CreateDescriptiveMetadata.initTitle(aipId, title);
@@ -425,4 +445,16 @@ public class DescriptiveMetadataHistory extends Composite {
     HistoryUtils.newHistory(BrowseTop.RESOLVER, aipId);
   }
 
+  @Override
+  protected void onDetach() {
+    if (aipLocked) {
+      BrowserService.Util.getInstance().releaseAIPLock(this.aipId, new NoAsyncCallback<Void>() {
+        @Override
+        public void onSuccess(Void result) {
+          aipLocked = false;
+        }
+      });
+    }
+    super.onDetach();
+  }
 }

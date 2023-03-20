@@ -573,4 +573,8 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
   String getCrontabValue(String locale);
+
+  boolean requestAIPLock(String aipId);
+
+  void releaseAIPLock(String aipId);
 }

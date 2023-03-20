@@ -914,6 +914,15 @@ public final class PluginHelper {
       requestUuid);
   }
 
+  public static void tryLock(List<String> lites, String requestUuid) throws LockingException {
+    if (lites.isEmpty()) {
+      return;
+    }
+    LOGGER.debug("Acquiring lock for: {} request: {}", lites, requestUuid);
+    RodaCoreFactory.getPluginOrchestrator().acquireObjectLock(lites, PluginHelper.getLockRequestTimeout(), false,
+        requestUuid);
+  }
+
   private static int getLockRequestTimeout() {
     return RodaCoreFactory.getRodaConfiguration().getInt(LOCK_REQUEST_TIMEOUT, DEFAULT_LOCK_REQUEST_TIMEOUT);
   }
