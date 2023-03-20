@@ -27,7 +27,7 @@ services:
       - clam_data:/var/lib/clamav
       - roda_data:/roda/data/
   siegfried:
-    image: docker.io/keeps/siegfried:v1.9.6
+    image: ghcr.io/keeps/siegfried:v1.9.6
     restart: unless-stopped
     environment:
       SIEGFRIED_HOST: siegfried
@@ -45,7 +45,7 @@ services:
       - DOC_EXPANSION=none
       - VALIDATOR_URL=none
   roda:
-    image: docker.io/keeps/roda:latest
+    image: ghcr.io/keeps/roda:latest
     restart: unless-stopped
     ports:
       - "8080:8080"
