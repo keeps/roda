@@ -158,7 +158,7 @@ For more information about Enterprise Editions, please visit the [RODA Enterpris
 
 RODA 5 introduced the [RODA Marketplace](https://market.roda-community.org), a digital platform where users can browse and purchase RODA plugins, components and services. It is a centralized location where developers can showcase their products, and users can easily discover and acquire the software or services they need.
 
-In the Marketplace, developers can publish their plugins, components and services, providing information such as descriptions, pricing, and links to more documentation. Users can then search for these products based on criteria such as functionality, category, and price range. Once they find a product they are interested in, they can purchase it from its original developer.
+In the Marketplace, developers can [publish their plugins](./documentation/Publishing_plugins.md), components and services, providing information such as descriptions, pricing, and links to more documentation. Users can then search for these products based on criteria such as functionality, category, and price range. Once they find a product they are interested in, they can purchase it from its original developer.
 
 The marketplace is beneficial for both developers and users. For developers, they offer a centralized location to reach a wide audience, which can help increase their visibility and sales. For users, the marketplace provides a convenient way to discover and purchase useful extensions for their RODA environments.
 
