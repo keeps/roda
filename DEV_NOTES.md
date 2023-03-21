@@ -94,6 +94,12 @@ docker images -q -f dangling=true | xargs --no-run-if-empty docker rmi
 docker exec -i -t CONTAINER_ID /bin/bash
 ```
 
+## Browser compatibility
+
+Testing RODA on different browsers is done in an easy way thanks to BrowserStack!
+
+[![BrowserStack website](https://user-images.githubusercontent.com/98429/40908885-f1559ca4-67df-11e8-8a98-8b0b57d3febb.png)](http://browserstack.com/)
+
 ## Known problems
 
 * Problems may arise when using GWT Dev Mode and having in the classpath a different jetty version
