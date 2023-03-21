@@ -1,12 +1,12 @@
 # Pre-ingest
 
-Förkontroll inleverans-processen åskådliggör möjligheten för en Producent att skapa Submission Information Packages (SIP:ar) som innehåller data och metadata (i en tydligt definierad struktur) för att kunna överlämna dem till systemet för ingest. SIP:arna som skapas förväntas följa policys som är fastställda av eller överenskommna med systemet. 
+Förkontroll inleverans-processen åskådliggör möjligheten för en arkivbildare att skapa Submission Information Packages (SIP:ar) som innehåller data och metadata (i en tydligt definierad struktur) för att kunna överlämna dem till systemet för ingest. SIP:arna som skapas förväntas följa policys som är fastställda av eller överenskommna med systemet. 
 
 Förkontroll inleverans-processen omfattar vanligtvis följande aktiviteter:
 
 ## Inlämningskontrakt
 
-Denna aktivitet består av att definiera villkoren, förutsättningar och krav för innehållet och för åtföljande information (t.ex. metadata, dokument, kontrakt etc.), som kommer att levereras till systemet av producenten. Det skapas en skriftlig överenskommelse mellan producent och systemet som specificerar typ av innehåll, juridiska samt tekniska krav som båda parter förväntas följa. 
+Denna aktivitet består av att definiera villkoren, förutsättningar och krav för innehållet och för åtföljande information (t.ex. metadata, dokument, kontrakt etc.), som kommer att levereras till systemet av arkivbildaren. Det skapas en skriftlig överenskommelse mellan arkivbildare och systemet som specificerar typ av innehåll, juridiska samt tekniska krav som båda parter förväntas följa. 
 
 ## Klassificering
 
