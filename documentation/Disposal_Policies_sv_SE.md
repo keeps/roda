@@ -16,7 +16,7 @@ RODA stödjer tre typer av gallringsåtgärder:
 
 Beräkningen av bevarandeperiod använder sig av identifierare av element för bevarande och lägger till dess värde med bevarandeperioden. De möjliga värdena för bevarandeperiod är:
 
-1. Ingen bevarandetid;
+1. Ingen gallringsfrist;
 2. Dagar;
 3. Veckor;
 4. Månader;
@@ -97,7 +97,7 @@ Gallringsstopp är en order som stoppar den normala processen för gallring och 
 
 ### 2. Vad kategoriserar ett gallringsstopp?
 
-Ett gallringsstopp har följande kategoriattribut:
+Följande attribut kategoriserar ett gallringsstopp:
 
 | *Fält* | *Beskrivning* | *Obligatorisk* |
 | --------- |---------- | ------------- |
