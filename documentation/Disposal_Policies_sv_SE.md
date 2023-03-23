@@ -16,7 +16,7 @@ RODA stödjer tre typer av gallringsåtgärder:
 
 Beräkningen av bevarandeperiod använder sig av identifierare av element för bevarande och lägger till dess värde med bevarandeperioden. De möjliga värdena för bevarandeperiod är:
 
-1. Ingen bevarandetid;
+1. Ingen gallringsfrist;
 2. Dagar;
 3. Veckor;
 4. Månader;
