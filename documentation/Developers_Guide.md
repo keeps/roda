@@ -125,11 +125,9 @@ If you would like to translate RODA to a new language please read the [Translati
 
 To create new plugins and use them to RODA it is necessary to:
 
-1. Create a new Maven project that depends on roda-core and declare the plugin class qualified name in _pom.xml_
-2. The plugin class must extend **AbstractPlugin** class and implement the necessary methods
-3. After creating the plugin, it is necessary to generate a jar file
-4. That jar file should then be included under RODA base installation folder specifically in **config/plugins/PLUGIN_NAME/**
-5. Publish plugin in market ([see instructions](./Publishing_plugins.md))
+1. Create a new plugin project, see https://github.com/keeps/roda-plugin-template/
+2. Build the plugin and deploy the resulting zip (expanded) on **config/plugins/PLUGIN_NAME/**
+3. Publish plugin in market ([see instructions](./Publishing_plugins.md))
 
 ## REST API
 
