@@ -67,14 +67,16 @@ jobs:
         run: mvn $MAVEN_CLI_OPTS clean deploy -Dmaven.test.skip=true -Pcore
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Login to DockerHub
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v2 
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Deploy to DockerHub
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Deploy to GitHub Container Registry
         run: |
-          docker push keeps/roda:latest
+          docker tag keeps/roda:latest ghcr.io/keeps/roda:latest
+          docker push ghcr.io/keeps/roda:latest
       - name: Trigger KEEPS GitLab CI/CD
         run: |
           curl --progress-bar -o /dev/null -L --request POST \
