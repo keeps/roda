@@ -17,7 +17,7 @@ Note: After *End of Standard Support* a release will only get security patches.
 
 | RODA    | Java          | Apache Tomcat     | Apache Solr             | E-ARK IP           |
 | ------- | ------------- | ----------------- | ----------------------- | ------------------ |
-| 5.X     | Java 11 (LTS) | Apache Tomcat 9   | Apache Solr 9.X         | E-ARK IP 2.X-S[^3] | 
+| 5.X     | Java 17 (LTS) | Apache Tomcat 9   | Apache Solr 9.X         | E-ARK IP 2.X-S[^3] | 
 | 4.X     | Java 8 (LTS)  | Apache Tomcat 8.5 | Apache Solr 8.X[^1]     | E-ARK IP 2.X[^2]   |  
 | 3.7.X   | Java 8 (LTS)  | Apache Tomcat 8.5 | Apache Solr 7.7.3 (EOL) | E-ARK IP 1.X       |
 
