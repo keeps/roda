@@ -1,8 +1,35 @@
+<div align="center" name="top">
+
+<img src="https://user-images.githubusercontent.com/1252710/228822517-7a3ef92a-df80-4b40-9b62-24447c782b21.svg#gh-dark-mode-only" height="150">
+
+<img src="https://user-images.githubusercontent.com/1252710/228822529-469ba04d-6749-4da8-928a-2d8d914f60dd.svg#gh-light-mode-only" height="150">
+
+----
+  
 [![CI](https://github.com/keeps/roda/actions/workflows/CI.yml/badge.svg)](https://github.com/keeps/roda/actions/workflows/CI.yml)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/keeps/roda?sort=semver&color=informational)](https://github.com/keeps/roda/releases/latest)
+[![](https://img.shields.io/badge/java-17%20LTS-red)](https://docs.oracle.com/en/java/javase/17/)
+[![Docker](https://img.shields.io/badge/Docker-available-blue.svg?style=flat&logo=docker)](https://github.com/keeps/roda/pkgs/container/roda)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-blue.svg)](https://makeapullrequest.com)
+[![GitHub contributors](https://img.shields.io/github/contributors/keeps/roda)](https://github.com/keeps/roda/graphs/contributors)
+[![License](https://img.shields.io/github/license/keeps/roda?color=9cf)](./LICENSE)
 
-# RODA
+</div>
 
-RODA (Repository of Authentic Digital Records) is a **long-term digital repository** solution that delivers functionalities for all the main functional units of the OAIS reference model. RODA is capable of ingesting, managing, and providing access to various types of digital content produced by large corporations and public bodies.
+<p align="justify">RODA (Repository of Authentic Digital Records) is a <strong>long-term digital repository</strong> solution that delivers functionalities for all the main functional units of the OAIS reference model. RODA is capable of ingesting, managing, and providing access to various types of digital content produced by large corporations and public bodies.</p>
+
+<div align="center">
+
+[Features](#rocket-features) &nbsp;&bull;&nbsp;
+[Documentation](#books-documentation) &nbsp;&bull;&nbsp;
+[Installation](deploys/README.md) &nbsp;&bull;&nbsp;
+[Demo](https://demo.roda-community.org) &nbsp;&bull;&nbsp;
+[Support](#bellhop_bell-support) &nbsp;&bull;&nbsp;
+[Contributing](#writing_hand-contributing)
+
+</div>
+
+## :nerd_face: Overview
 
 RODA was developed using **open-source technologies** and it is supported by standards such as the Open Archival Information System (OAIS), Metadata Encoding and Transmission Standard (METS), Encoded Archival Description (EAD), Dublin Core (DC), [E-ARK Information Package specifications](https://dilcis.eu/) and PREMIS (Preservation Metadata).
 
@@ -14,9 +41,9 @@ Administration interfaces allow repository managers to maintain **representation
 
 RODA ensures that **ingested data remains authentic** by recording PREMIS metadata for every action performed on a digital object. It records provenance information in archival metadata standards such as EAD or Dublin Core and **ensures integrity and availability** by frequently monitoring data and making sure that it has not been tampered with. All interactions between users and the repository (human and software) are logged for **security and accountability** reasons.
 
-To experience RODA firsthand, please visit the **RODA demo site** at https://www.roda-community.org.
+To experience RODA firsthand, please visit the **RODA demo site** at :link: https://www.roda-community.org.
 
-## Features
+## :rocket: Features
 
 ### Conforms to open standards
 
@@ -92,11 +119,13 @@ RODA exposes all its functionality via well-documented REST API. Convenient Java
 
 In fact, RODA’s ability to integrate data from other records management systems include: 1) packaging data available on a filesystem via RODA-in tool, 2) extract data from relational databases using DBPTK, and 3) custom integrations with original systems via APIs or using drop folders.
 
-## Trying out RODA
+[(Back to top)](#top)
+
+## :desktop_computer: Trying out RODA
 
 ### Online demo
 
-To experience RODA without having to install it on your local machine, please visit the RODA online demo available at https://www.roda-community.org.
+To experience RODA without having to install it on your local machine, please visit the RODA online demo available at :link: https://www.roda-community.org.
 
 ### Testing environment
 
@@ -116,13 +145,17 @@ Should you require assistance in preparing RODA for production environments, we 
 
 To obtain more information on how to get professional assistance in your region, please contact [KEEP SOLUTIONS](https://www.keep.pt/en/contacts-proposals-information-telephone-address).
 
-## Documentation
+[(Back to top)](#top)
+
+## :books: Documentation
 
 RODA is accompanied by a comprehensive collection of articles that are constantly being updated. You may find the most recent version of the documentation [here](documentation/README.md).
 
 All articles included in the documentation are written in [Markdown](https://www.markdownguide.org/), providing you with the convenience of easy conversion to a wide range of formats including PDF, ePub, HTML, and more.
 
-## Editions
+[(Back to top)](#top)
+
+## :art: Editions
 
 RODA is an open-source solution, which means that anyone can download its source code, compile it and have it running on their own institution in a matter of hours. While this flexibility is a major advantage, organizations may also benefit from enlisting the expertise of IT, software, and digital preservation specialists to tailor the solution to their unique needs by adding specialized features and integrations.
 
@@ -154,7 +187,9 @@ This offering includes unlimited scalability and the ability to upgrade the syst
 
 For more information about Enterprise Editions, please visit the [RODA Enterprise](https://www.keep.pt/en/produts/roda-long-term-digital-preservation-repository-solution/) web page.
 
-## Marketplace
+[(Back to top)](#top)
+
+## :shopping: Marketplace
 
 RODA 5 introduced the [RODA Marketplace](https://market.roda-community.org), a digital platform where users can browse and purchase RODA plugins, components and services. It is a centralized location where developers can showcase their products, and users can easily discover and acquire the software or services they need.
 
@@ -164,7 +199,9 @@ The marketplace is beneficial for both developers and users. For developers, the
 
 For more information on available RODA extensions, please visit [RODA Marketplace](https://market.roda-community.org/).
 
-## Support
+[(Back to top)](#top)
+
+## :bellhop_bell: Support
 
 ### Community support
 
@@ -184,7 +221,9 @@ These services ensure organizations have access to the resources and support the
 
 To obtain more information on how to get professional support in your region, please contact [KEEP SOLUTIONS](https://www.keep.pt/en/contacts-proposals-information-telephone-address).
 
-## Contributing
+[(Back to top)](#top)
+
+## :writing_hand: Contributing
 
 Community contributions play a vital role in the success of open source projects. They bring diverse perspectives, knowledge, and skills to the table, which can lead to innovative solutions and better outcomes.
 
@@ -205,8 +244,10 @@ To start developing new features in RODA, please check the [Developer guide](doc
 
 ### Translations
 
-RODA is translated in several languages such as English, Portuguese, Swedish, Hungarian, Spanish, Croatian, etc. Translations are maintained in [Transifex](https://www.transifex.com/roda-1/roda2) and updated using the [Transifex Client](http://docs.transifex.com/client/).
+RODA is translated in several languages such as English :uk:, Portuguese :portugal:, Swedish :sweden:, Hungarian :hungary:, Spanish :es:, Croatian :croatia:, etc. Translations are maintained in [Transifex](https://www.transifex.com/roda-1/roda2) and updated using the [Transifex Client](http://docs.transifex.com/client/).
 
 Transifex is a cloud-based localization management platform that facilitates the translation and localization of software applications, websites, and digital content. It allows for the coordination of multilingual content creation and translation by providing a collaborative workspace for translators, project managers, and developers.
 
 For more information, check our [Translation guide](documentation/Translation_Guide.md).
+
+[(Back to top)](#top)
