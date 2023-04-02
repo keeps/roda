@@ -25,8 +25,6 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.SelectedItemsUtils;
-import org.roda.core.data.exceptions.LockingException;
-import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
@@ -37,6 +35,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.JobStateNotPendingException;
+import org.roda.core.data.exceptions.LockingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -83,6 +82,7 @@ import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
@@ -94,6 +94,7 @@ import org.roda.core.data.v2.synchronization.local.LocalInstance;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.schema.SolrCollectionRegistry;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StringContentPayload;
@@ -1494,5 +1495,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
       User user = UserUtility.getUser(getThreadLocalRequest());
       PluginHelper.releaseObjectLock(aipId, user.getUUID());
     }
+  }
+
+  public List<Report> retrieveJobReportItems(String jobId, String jobReportId)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Jobs.retrieveJobReportItems(user, jobId, jobReportId);
   }
 }

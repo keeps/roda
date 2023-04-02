@@ -1340,7 +1340,6 @@ public final class RodaConstants {
   public static final String JOB_REPORT_PLUGIN_DETAILS = "pluginDetails";
   public static final String JOB_REPORT_PLUGIN_IS_MANDATORY = "pluginIsMandatory";
   public static final String JOB_REPORT_HTML_PLUGIN_DETAILS = "htmlPluginDetails";
-  public static final String JOB_REPORT_REPORTS = "reports";
   public static final String JOB_REPORT_JOB_NAME = "jobName";
   public static final String JOB_REPORT_SOURCE_OBJECT_LABEL = "sourceObjectLabel";
   public static final String JOB_REPORT_OUTCOME_OBJECT_LABEL = "outcomeObjectLabel";

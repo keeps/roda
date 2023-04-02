@@ -59,20 +59,7 @@ public class ShowJobReport extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         String jobReportId = historyTokens.get(0);
-        BrowserService.Util.getInstance().retrieve(IndexedReport.class.getName(), jobReportId, fieldsToReturn,
-          new AsyncCallback<IndexedReport>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-              callback.onFailure(caught);
-            }
-
-            @Override
-            public void onSuccess(IndexedReport jobReport) {
-              ShowJobReport showJob = new ShowJobReport(jobReport);
-              callback.onSuccess(showJob);
-            }
-          });
+        retrieveJobReport(jobReportId, callback);
       } else {
         HistoryUtils.newHistory(IngestProcess.RESOLVER);
         callback.onSuccess(null);
@@ -145,6 +132,38 @@ public class ShowJobReport extends Composite {
   Button searchPrevious, searchNext, buttonBack;
   @UiField
   FocusPanel keyboardFocus;
+
+  private static void retrieveJobReport(String jobReportId, AsyncCallback<Widget> callback) {
+    BrowserService.Util.getInstance().retrieve(IndexedReport.class.getName(), jobReportId, fieldsToReturn,
+      new AsyncCallback<IndexedReport>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          callback.onFailure(caught);
+        }
+
+        @Override
+        public void onSuccess(IndexedReport jobReport) {
+          retrieveJobReportItems(jobReport, callback);
+        }
+      });
+  }
+
+  private static void retrieveJobReportItems(IndexedReport jobReport, AsyncCallback<Widget> callback) {
+    BrowserService.Util.getInstance().retrieveJobReportItems(jobReport.getJobId(), jobReport.getId(),
+      new AsyncCallback<List<Report>>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          callback.onFailure(caught);
+        }
+
+        @Override
+        public void onSuccess(List<Report> reports) {
+          jobReport.setReports(reports);
+          ShowJobReport showJob = new ShowJobReport(jobReport);
+          callback.onSuccess(showJob);
+        }
+      });
+  }
 
   public ShowJobReport(IndexedReport jobReport) {
     this.jobReport = jobReport;

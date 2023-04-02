@@ -7,10 +7,7 @@
  */
 package org.roda.wui.api.controllers;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.EntityResponse;
@@ -22,11 +19,11 @@ import org.roda.core.data.exceptions.JobStateNotPendingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobUserDetails;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;
@@ -225,6 +222,26 @@ public class Jobs extends RodaWuiController {
     LogEntryState state = LogEntryState.SUCCESS;
     try {
       return JobsHelper.retrieveJobAttachment(jobId, attachmentId);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_JOB_ID_PARAM, jobId);
+    }
+  }
+
+  public static List<Report> retrieveJobReportItems(User user, String jobId, String jobReportId)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+    // check permissions
+    controllerAssistant.checkRoles(user);
+    LogEntryState state = LogEntryState.SUCCESS;
+    ModelService model = RodaCoreFactory.getModelService();
+
+    try {
+      Report report = model.retrieveJobReport(jobId, jobReportId);
+      return report.getReports();
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
