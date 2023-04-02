@@ -96,7 +96,6 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
       new Field(RodaConstants.JOB_REPORT_PLUGIN_IS_MANDATORY, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
     fields.add(new Field(RodaConstants.JOB_REPORT_HTML_PLUGIN_DETAILS, Field.TYPE_BOOLEAN).setIndexed(false)
       .setDocValues(false));
-    fields.add(new Field(RodaConstants.JOB_REPORT_REPORTS, Field.TYPE_STRING).setIndexed(false).setDocValues(false));
     fields.add(new Field(RodaConstants.JOB_REPORT_JOB_NAME, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_REPORT_SOURCE_OBJECT_LABEL, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_LABEL, Field.TYPE_STRING));
@@ -140,7 +139,6 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     doc.addField(RodaConstants.JOB_REPORT_PLUGIN_DETAILS, jobReport.getPluginDetails());
     doc.addField(RodaConstants.JOB_REPORT_PLUGIN_IS_MANDATORY, jobReport.getPluginIsMandatory());
     doc.addField(RodaConstants.JOB_REPORT_HTML_PLUGIN_DETAILS, jobReport.isHtmlPluginDetails());
-    doc.addField(RodaConstants.JOB_REPORT_REPORTS, JsonUtils.getJsonFromObject(jobReport.getReports()));
     doc.addField(RodaConstants.JOB_REPORT_SOURCE_OBJECT_CLASS, jobReport.getSourceObjectClass());
     doc.addField(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_CLASS, jobReport.getOutcomeObjectClass());
 
@@ -232,15 +230,6 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     jobReport.setPluginDetails(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_DETAILS), null));
     jobReport
       .setHtmlPluginDetails(SolrUtils.objectToBoolean(doc.get(RodaConstants.JOB_REPORT_HTML_PLUGIN_DETAILS), false));
-    try {
-      if (fieldsToReturn.isEmpty() || fieldsToReturn.contains(RodaConstants.JOB_REPORT_REPORTS)) {
-        jobReport.setReports(JsonUtils
-          .getListFromJson(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_REPORTS), ""), Report.class));
-      }
-    } catch (GenericException e) {
-      LOGGER.error("Error parsing report in job report", e);
-    }
-
     jobReport.setJobName(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_JOB_NAME), null));
     jobReport
       .setSourceObjectLabel(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_LABEL), null));

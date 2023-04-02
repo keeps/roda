@@ -46,6 +46,7 @@ import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
@@ -133,7 +134,8 @@ public interface BrowserServiceAsync {
 
   void retrieveReindexPluginObjectClasses(AsyncCallback<Set<Pair<String, String>>> asyncCallback);
 
-  void retrieveDropdownPluginItems(String parameterId, String localeString, AsyncCallback<Set<Pair<String, String>>> asyncCallback);
+  void retrieveDropdownPluginItems(String parameterId, String localeString,
+    AsyncCallback<Set<Pair<String, String>>> asyncCallback);
 
   void retrieveCreateIngestProcessBundle(AsyncCallback<CreateIngestJobBundle> callback);
 
@@ -437,4 +439,6 @@ public interface BrowserServiceAsync {
   void requestAIPLock(String aipId, AsyncCallback<Boolean> async);
 
   void releaseAIPLock(String aipId, AsyncCallback<Void> async);
+
+  void retrieveJobReportItems(String jobId, String jobReportId, AsyncCallback<List<Report>> async);
 }

@@ -65,7 +65,7 @@ public class IngestJobReportList extends AsyncTableCell<IndexedReport> {
     RodaConstants.JOB_REPORT_PLUGIN_NAME, RodaConstants.JOB_REPORT_PLUGIN_VERSION,
     RodaConstants.JOB_REPORT_PLUGIN_STATE, RodaConstants.JOB_REPORT_STEPS_COMPLETED,
     RodaConstants.JOB_REPORT_TOTAL_STEPS, RodaConstants.JOB_REPORT_COMPLETION_PERCENTAGE,
-    RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS, RodaConstants.JOB_REPORT_REPORTS);
+    RodaConstants.JOB_REPORT_UNSUCCESSFUL_PLUGINS);
 
   private boolean insideJob = false;
   private boolean jobRunning = false;

@@ -57,6 +57,7 @@ import org.roda.core.data.v2.jobs.JobParallelism;
 import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.IndexedRisk;
@@ -577,4 +578,7 @@ public interface BrowserService extends RemoteService {
   boolean requestAIPLock(String aipId);
 
   void releaseAIPLock(String aipId);
+
+  List<Report> retrieveJobReportItems(String jobId, String jobReportId)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 }
