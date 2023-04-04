@@ -100,96 +100,16 @@ Testing RODA on different browsers is done in an easy way thanks to BrowserStack
 
 [![BrowserStack website](https://user-images.githubusercontent.com/98429/40908885-f1559ca4-67df-11e8-8a98-8b0b57d3febb.png)](http://browserstack.com/)
 
-## Known problems
+## Common problems
 
+* Lack of permissions to download dependencies when building RODA: to compile you need to set your GitHub access token in your settings.xml as described on https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry#authenticating-with-a-personal-access-token
 * Problems may arise when using GWT Dev Mode and having in the classpath a different jetty version
-* Problems with maven dependencies that are fat-jars can be solved, even if this is hard to maintain, through repackaging and package name relocation. For example, if ApacheDS dependency contains bouncycastle and it colides with a certain but needed version of bouncycastle, one might use maven-shade plugin to solve the problem. Steps:
-  * Download source code
-
-  ```bash
-  wget http://mirrors.fe.up.pt/pub/apache//directory/apacheds/dist/2.0.0-M21/apacheds-parent-2.0.0-M21-source-release.zip
-  ```
-  
-  * Edit file apacheds-parent-2.0.0-M21/all/pom.xml as follows
-
-  ```xml
-  <plugin>
-    <groupId>org.apache.maven.plugins</groupId>
-    <artifactId>maven-shade-plugin</artifactId>
-    <executions>
-        <execution>
-            <phase>package</phase>
-            <goals>
-                <goal>shade</goal>
-            </goals>
-            <configuration>
-                <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
-                <filters>
-                    <filter>
-                        <artifact>org.bouncycastle:bcprov-jdk15on</artifact>
-                        <excludes>
-                            <exclude>META-INF/BCKEY.SF</exclude>
-                            <exclude>META-INF/BCKEY.DSA</exclude>
-                        </excludes>
-                    </filter>
-                </filters>
-                <relocations>
-                    <relocation>
-                        <pattern>org.bouncycastle</pattern>
-                        <shadedPattern>org.bouncycastle.shaded</shadedPattern>
-                    </relocation>
-                </relocations>
-            </configuration>
-        </execution>
-    </executions>
-    </plugin>
-    ```
-
-  * Recompile and grab the artifact
-
-  ```bash
-  mvn clean package -Dmaven.test.skip
-  cp all/target/apacheds-all-2.0.0-M21.jar ...
-  ```
-
-* Tomcat7 behaves oddly when using the following code, throwing an exception (closed stream exception), whereas tomcat8 performs well/correctly
-
-```java
-StreamingOutput streamingOutput = new StreamingOutput() {
-    @Override
-    public void write(OutputStream os) throws IOException, WebApplicationException {
-        InputStream retrieveFile = null;
-        try {
-            retrieveFile =  RodaCoreFactory.getFolderMonitor().retrieveFile(transferredResource.getFullPath());
-            IOUtils.copy(retrieveFile, os);
-        } catch (NotFoundException | RequestNotValidException | GenericException e) {
-            // do nothing
-        } finally {
-            IOUtils.closeQuietly(retrieveFile);
-        }
-    }
-};
-```
 
 ## Misc
 
 * Executing worker (compiled with -Proda-core-jar):
   * `java -Droda.node.type=worker -jar roda-core/roda-core/target/roda-core-2.0.0-SNAPSHOT-jar-with-dependencies.jar`
   * `java -cp roda-core/roda-core/target/roda-core-2.0.0-SNAPSHOT-jar-with-dependencies.jar -Droda.node.type=worker org.roda.core.RodaCoreFactory`
-
-* Solr HTTP (create cores from RODA install dir in ~/.roda/)
-
-```bash
-cd SOLR_INSTALL_DIR
-bin/solr start
-for i in $(ls ~/.roda/config/index/);do if [ -d ~/.roda/config/index/$i ]; then bin/solr create -c $i -d ~/.roda/config/index/$i/conf/ ; fi; done
-```
-
-OR
-
-```bash
-INDEXES_PATH=~/roda/roda-core/roda-core/src/main/resources/config/index/; SOLR_BIN=/apps/KEEPS/solr-single-node-tests/solr-5.5.0/bin/solr ; for i in $(find $INDEXES_PATH -mindepth 1 -maxdepth 1 -type d); do COLLECTION="$(basename $i)"; $SOLR_BIN create -c "$COLLECTION" -d "$INDEXES_PATH/$COLLECTION/conf/" -p 8984 ; done
-```
 
 * Analyze RODA dependencies for version update
 
