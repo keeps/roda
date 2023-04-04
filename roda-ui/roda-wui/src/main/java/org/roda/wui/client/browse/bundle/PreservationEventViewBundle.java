@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.browse.bundle;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 
 public class PreservationEventViewBundle implements Bundle {
 
@@ -27,6 +29,8 @@ public class PreservationEventViewBundle implements Bundle {
   private Map<String, IndexedFile> files;
   private Map<String, TransferredResource> transferredResources;
   private List<String> uris;
+  private List<LinkingIdentifier> outcomeObjectIds = new ArrayList<>();
+  private List<LinkingIdentifier> sourcesObjectIds = new ArrayList<>();
 
   public PreservationEventViewBundle() {
     super();
@@ -34,7 +38,8 @@ public class PreservationEventViewBundle implements Bundle {
 
   public PreservationEventViewBundle(IndexedPreservationEvent event, Map<String, IndexedPreservationAgent> agents,
     Map<String, IndexedAIP> aips, Map<String, IndexedRepresentation> representations, Map<String, IndexedFile> files,
-    Map<String, TransferredResource> transferredResources, List<String> uris) {
+    Map<String, TransferredResource> transferredResources, List<String> uris, List<LinkingIdentifier> outcomeObjectIds,
+    List<LinkingIdentifier> sourcesObjectIds) {
     super();
     this.event = event;
     this.agents = agents;
@@ -43,6 +48,8 @@ public class PreservationEventViewBundle implements Bundle {
     this.files = files;
     this.transferredResources = transferredResources;
     this.uris = uris;
+    this.outcomeObjectIds = outcomeObjectIds;
+    this.sourcesObjectIds = sourcesObjectIds;
   }
 
   public IndexedPreservationEvent getEvent() {
@@ -101,11 +108,34 @@ public class PreservationEventViewBundle implements Bundle {
     this.uris = uris;
   }
 
-  @Override
-  public String toString() {
-    return "PreservationEventViewBundle [event=" + event + ", agents=" + agents + ", aips=" + aips
-      + ", representations=" + representations + ", files=" + files + ", transferredResources=" + transferredResources
-      + ", uris=" + uris + "]";
+  public List<LinkingIdentifier> getOutcomeObjectIds() {
+    return outcomeObjectIds;
   }
 
+  public void setOutcomeObjectIds(List<LinkingIdentifier> outcomeObjectIds) {
+    this.outcomeObjectIds = outcomeObjectIds;
+  }
+
+  public void addOutcomeObjectIds(LinkingIdentifier outcomeObjectIds) {
+    this.outcomeObjectIds.add(outcomeObjectIds);
+  }
+
+  public List<LinkingIdentifier> getSourcesObjectIds() {
+    return sourcesObjectIds;
+  }
+
+  public void setSourcesObjectIds(List<LinkingIdentifier> sourcesObjectIds) {
+    this.sourcesObjectIds = sourcesObjectIds;
+  }
+
+  public void addSourcesObjectIds(LinkingIdentifier outcomeObjectIds) {
+    this.sourcesObjectIds.add(outcomeObjectIds);
+  }
+
+  @Override
+  public String toString() {
+    return "PreservationEventViewBundle{" + "event=" + event + ", agents=" + agents + ", aips=" + aips
+      + ", representations=" + representations + ", files=" + files + ", transferredResources=" + transferredResources
+      + ", uris=" + uris + ", outcomeObjectIds=" + outcomeObjectIds + ", sourcesObjectIds=" + sourcesObjectIds + '}';
+  }
 }

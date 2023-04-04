@@ -793,14 +793,11 @@ public final class PremisV3Utils {
     if (pm.getType().equals(PreservationMetadata.PreservationMetadataType.EVENT)) {
       IndexedPreservationEvent event = null;
       try {
-        event = index.retrieve(IndexedPreservationEvent.class, pm.getId(), new ArrayList<>());
-
-        ContentPayload payload = PremisV3Utils.retrievePremisEventBinary(updatedId, event.getEventDateTime(),
-          event.getEventType(), event.getEventDetail(), event.getSourcesObjectIds(), event.getOutcomeObjectIds(),
-          event.getEventOutcome(), event.getEventDetail(), null, event.getLinkingAgentIds());
+        Binary binary = model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(),
+          pm.getFileDirectoryPath(), pm.getFileId(), pm.getId());
 
         model.createPreservationMetadata(pm.getType(), updatedId, pm.getAipId(), pm.getRepresentationId(),
-          pm.getFileDirectoryPath(), pm.getFileId(), payload, true);
+          pm.getFileDirectoryPath(), pm.getFileId(), binary.getContent(), true);
 
         model.deletePreservationMetadata(pm.getType(), pm.getAipId(), pm.getRepresentationId(), pm.getId(),
           pm.getFileDirectoryPath(), true);

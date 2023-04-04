@@ -24,14 +24,12 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent.PreservationMetadataEventClass;
-import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexingAdditionalInfo;
@@ -39,7 +37,6 @@ import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
 import org.roda.core.index.schema.SolrCollection;
-import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.util.IdUtils;
@@ -49,8 +46,6 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.Sets;
 
 import gov.loc.premis.v3.EventComplexType;
-import gov.loc.premis.v3.LinkingAgentIdentifierComplexType;
-import gov.loc.premis.v3.LinkingObjectIdentifierComplexType;
 
 public class PreservationEventCollection
   extends AbstractSolrCollection<IndexedPreservationEvent, PreservationMetadata> {
@@ -94,12 +89,6 @@ public class PreservationEventCollection
     fields.add(new Field(RodaConstants.PRESERVATION_EVENT_DETAIL, Field.TYPE_TEXT).setMultiValued(false));
     fields.add(new Field(RodaConstants.PRESERVATION_EVENT_TYPE, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.PRESERVATION_EVENT_OUTCOME, Field.TYPE_STRING));
-    fields.add(
-      new Field(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER, Field.TYPE_STRING).setMultiValued(true));
-    fields.add(new Field(RodaConstants.PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER, Field.TYPE_STRING)
-      .setMultiValued(true));
-    fields.add(new Field(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER, Field.TYPE_STRING)
-      .setMultiValued(true));
 
     return fields;
   }
@@ -173,39 +162,6 @@ public class PreservationEventCollection
         doc.addField(RodaConstants.PRESERVATION_EVENT_OUTCOME,
           event.getEventOutcomeInformation().get(0).getEventOutcome().get(0).getValue());
       }
-
-      if (event.getLinkingAgentIdentifier() != null && !event.getLinkingAgentIdentifier().isEmpty()) {
-        for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifier()) {
-          LinkingIdentifier li = new LinkingIdentifier();
-          li.setType(laict.getLinkingAgentIdentifierType().getValue());
-          li.setValue(laict.getLinkingAgentIdentifierValue());
-          li.setRoles(PremisV3Utils.toStringList(laict.getLinkingAgentRole()));
-          doc.addField(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER, JsonUtils.getJsonFromObject(li));
-        }
-      }
-
-      if (event.getLinkingObjectIdentifier() != null && !event.getLinkingObjectIdentifier().isEmpty()) {
-        for (LinkingObjectIdentifierComplexType loict : event.getLinkingObjectIdentifier()) {
-          LinkingIdentifier li = new LinkingIdentifier();
-          li.setType(loict.getLinkingObjectIdentifierType().getValue());
-          li.setValue(loict.getLinkingObjectIdentifierValue());
-          li.setRoles(PremisV3Utils.toStringList(loict.getLinkingObjectRole()));
-          doc.addField(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER,
-            JsonUtils.getJsonFromObject(li));
-        }
-      }
-
-      if (event.getLinkingObjectIdentifier() != null && !event.getLinkingObjectIdentifier().isEmpty()) {
-        for (LinkingObjectIdentifierComplexType loict : event.getLinkingObjectIdentifier()) {
-          LinkingIdentifier li = new LinkingIdentifier();
-          li.setType(loict.getLinkingObjectIdentifierType().getValue());
-          li.setValue(loict.getLinkingObjectIdentifierValue());
-          li.setRoles(PremisV3Utils.toStringList(loict.getLinkingObjectRole()));
-          doc.addField(RodaConstants.PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER,
-            JsonUtils.getJsonFromObject(li));
-        }
-      }
-
     } catch (ValidationException e) {
       throw new GenericException(e);
     }
@@ -262,45 +218,45 @@ public class PreservationEventCollection
     final String eventType = SolrUtils.objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_TYPE), "");
     final String eventOutcome = SolrUtils.objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME), "");
 
-    final List<String> agents = SolrUtils
-      .objectToListString(doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER));
-    final List<String> outcomes = SolrUtils
-      .objectToListString(doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER));
-    final List<String> sources = SolrUtils
-      .objectToListString(doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER));
+    // final List<String> agents = SolrUtils
+    // .objectToListString(doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER));
+    // final List<String> outcomes = SolrUtils
+    // .objectToListString(doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER));
+    // final List<String> sources = SolrUtils
+    // .objectToListString(doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER));
 
     ipe.setEventDateTime(eventDateTime);
     ipe.setEventDetail(eventDetail);
     ipe.setEventType(eventType);
     ipe.setEventOutcome(eventOutcome);
 
-    try {
-      List<LinkingIdentifier> ids = new ArrayList<>();
-      for (String source : sources) {
-        ids.add(JsonUtils.getObjectFromJson(source, LinkingIdentifier.class));
-      }
-      ipe.setSourcesObjectIds(ids);
-    } catch (GenericException | RuntimeException e) {
-      LOGGER.error("Error setting event linking source", e);
-    }
-    try {
-      List<LinkingIdentifier> ids = new ArrayList<>();
-      for (String outcome : outcomes) {
-        ids.add(JsonUtils.getObjectFromJson(outcome, LinkingIdentifier.class));
-      }
-      ipe.setOutcomeObjectIds(ids);
-    } catch (GenericException | RuntimeException e) {
-      LOGGER.error("Error setting event linking outcome", e);
-    }
-    try {
-      List<LinkingIdentifier> ids = new ArrayList<>();
-      for (String agent : agents) {
-        ids.add(JsonUtils.getObjectFromJson(agent, LinkingIdentifier.class));
-      }
-      ipe.setLinkingAgentIds(ids);
-    } catch (GenericException | RuntimeException e) {
-      LOGGER.error("Error setting event linking agents", e);
-    }
+    // try {
+    // List<LinkingIdentifier> ids = new ArrayList<>();
+    // for (String source : sources) {
+    // ids.add(JsonUtils.getObjectFromJson(source, LinkingIdentifier.class));
+    // }
+    // ipe.setSourcesObjectIds(ids);
+    // } catch (GenericException | RuntimeException e) {
+    // LOGGER.error("Error setting event linking source", e);
+    // }
+    // try {
+    // List<LinkingIdentifier> ids = new ArrayList<>();
+    // for (String outcome : outcomes) {
+    // ids.add(JsonUtils.getObjectFromJson(outcome, LinkingIdentifier.class));
+    // }
+    // ipe.setOutcomeObjectIds(ids);
+    // } catch (GenericException | RuntimeException e) {
+    // LOGGER.error("Error setting event linking outcome", e);
+    // }
+    // try {
+    // List<LinkingIdentifier> ids = new ArrayList<>();
+    // for (String agent : agents) {
+    // ids.add(JsonUtils.getObjectFromJson(agent, LinkingIdentifier.class));
+    // }
+    // ipe.setLinkingAgentIds(ids);
+    // } catch (GenericException | RuntimeException e) {
+    // LOGGER.error("Error setting event linking agents", e);
+    // }
     return ipe;
 
   }
