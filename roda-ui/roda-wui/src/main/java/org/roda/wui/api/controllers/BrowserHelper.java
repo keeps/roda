@@ -48,8 +48,6 @@ import org.roda.core.common.Messages;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.StreamResponse;
-import org.roda.core.data.v2.index.filter.AndFiltersParameters;
-import org.roda.core.model.utils.UserUtility;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
@@ -81,6 +79,7 @@ import org.roda.core.data.v2.index.facet.FacetFieldResult;
 import org.roda.core.data.v2.index.facet.FacetValue;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
+import org.roda.core.data.v2.index.filter.AndFiltersParameters;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -143,6 +142,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.base.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.base.disposal.confirmation.CreateDisposalConfirmationPlugin;
@@ -200,13 +200,18 @@ import org.roda.wui.common.HTMLUtils;
 import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.github.jknack.handlebars.Handlebars;
-import com.github.jknack.handlebars.Template;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.Diff;
 import org.xmlunit.diff.ElementSelectors;
+
+import com.github.jknack.handlebars.Handlebars;
+import com.github.jknack.handlebars.Template;
+
+import gov.loc.premis.v3.EventComplexType;
+import gov.loc.premis.v3.LinkingAgentIdentifierComplexType;
+import gov.loc.premis.v3.LinkingObjectIdentifierComplexType;
+import gov.loc.premis.v3.StringPlusAuthority;
 
 /**
  * @author Luis Faria <lfaria@keep.pt>
@@ -2203,76 +2208,115 @@ public class BrowserHelper {
 
     List<String> eventFields = new ArrayList<>();
     IndexedPreservationEvent ipe = retrieve(IndexedPreservationEvent.class, eventId, eventFields);
-    eventBundle.setEvent(ipe);
-    if (ipe.getLinkingAgentIds() != null && !ipe.getLinkingAgentIds().isEmpty()) {
-      Map<String, IndexedPreservationAgent> agents = new HashMap<>();
-      for (LinkingIdentifier agentID : ipe.getLinkingAgentIds()) {
+
+    // TODO retrieve linked items
+    ModelService model = RodaCoreFactory.getModelService();
+    Binary binaryEvent = null;
+    try {
+      if (ipe.getObjectClass().equals(IndexedPreservationEvent.PreservationMetadataEventClass.REPOSITORY)) {
+        binaryEvent = model.retrieveRepositoryPreservationEvent(ipe.getId());
+      } else {
+        String representationId = null;
+        String fileId = null;
+        List<String> directoryFilePath = null;
+
+        if (ipe.getRepresentationUUID() != null) {
+          IndexedRepresentation representation = retrieve(IndexedRepresentation.class, ipe.getRepresentationUUID(),
+            new ArrayList<>());
+          representationId = representation.getId();
+        }
+
+        if (ipe.getFileUUID() != null) {
+          IndexedFile file = retrieve(IndexedFile.class, ipe.getFileUUID(), new ArrayList<>());
+          fileId = file.getId();
+          directoryFilePath = file.getPath();
+        }
+        binaryEvent = model.retrievePreservationEvent(ipe.getAipID(), representationId, directoryFilePath, fileId,
+          eventId);
+      }
+    } catch (AuthorizationDeniedException | RequestNotValidException e) {
+      LOGGER.error("Error listing AIP preservation metadata {}: {}", ipe.getAipID(), e);
+    }
+
+    Map<String, IndexedPreservationAgent> agents = new HashMap<>();
+    try {
+      EventComplexType eventComplexType = PremisV3Utils.binaryToEvent(binaryEvent.getContent(), false);
+      for (LinkingAgentIdentifierComplexType linkingAgentIdentifierComplexType : eventComplexType
+        .getLinkingAgentIdentifier()) {
         try {
           List<String> agentFields = Arrays.asList(RodaConstants.PRESERVATION_AGENT_ID,
             RodaConstants.PRESERVATION_AGENT_NAME, RodaConstants.PRESERVATION_AGENT_TYPE,
             RodaConstants.PRESERVATION_AGENT_ROLES, RodaConstants.PRESERVATION_AGENT_VERSION,
             RodaConstants.PRESERVATION_AGENT_NOTE, RodaConstants.PRESERVATION_AGENT_EXTENSION);
-          IndexedPreservationAgent agent = retrieve(IndexedPreservationAgent.class, agentID.getValue(), agentFields);
-          agents.put(agentID.getValue(), agent);
+          IndexedPreservationAgent agent = retrieve(IndexedPreservationAgent.class,
+            linkingAgentIdentifierComplexType.getLinkingAgentIdentifierValue(), agentFields);
+          agents.put(linkingAgentIdentifierComplexType.getLinkingAgentIdentifierValue(), agent);
         } catch (NotFoundException | GenericException e) {
-          LOGGER.error("Error getting agent {}: {}", agentID, e.getMessage());
+          LOGGER.error("Error getting agent {}: {}", linkingAgentIdentifierComplexType.getLinkingAgentIdentifierValue(),
+            e.getMessage());
         }
       }
       eventBundle.setAgents(agents);
-    }
 
-    List<LinkingIdentifier> allLinkingIdentifiers = new ArrayList<>();
-
-    if (ipe.getSourcesObjectIds() != null) {
-      allLinkingIdentifiers.addAll(ipe.getSourcesObjectIds());
-    }
-
-    if (ipe.getOutcomeObjectIds() != null) {
-      allLinkingIdentifiers.addAll(ipe.getOutcomeObjectIds());
-    }
-
-    for (LinkingIdentifier identifier : allLinkingIdentifiers) {
-      String idValue = identifier.getValue();
-      RODA_TYPE linkingType = LinkingObjectUtils.getLinkingIdentifierType(idValue);
-
-      try {
-        if (RODA_TYPE.AIP.equals(linkingType)) {
-          String uuid = LinkingObjectUtils.getAipIdFromLinkingId(idValue);
-          List<String> aipFields = Arrays.asList(RodaConstants.AIP_TITLE, RodaConstants.INDEX_UUID);
-          IndexedAIP aip = retrieve(IndexedAIP.class, uuid, aipFields);
-          aips.put(idValue, aip);
-        } else if (RODA_TYPE.REPRESENTATION.equals(linkingType)) {
-          String uuid = LinkingObjectUtils.getRepresentationIdFromLinkingId(idValue);
-          List<String> representationFields = Arrays.asList(RodaConstants.REPRESENTATION_ID,
-            RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ORIGINAL);
-          IndexedRepresentation rep = retrieve(IndexedRepresentation.class, uuid, representationFields);
-          representations.put(idValue, rep);
-        } else if (RODA_TYPE.FILE.equals(linkingType)) {
-          List<String> fileFields = new ArrayList<>(RodaConstants.FILE_FIELDS_TO_RETURN);
-          fileFields.addAll(RodaConstants.FILE_FORMAT_FIELDS_TO_RETURN);
-          fileFields.addAll(Arrays.asList(RodaConstants.FILE_ORIGINALNAME, RodaConstants.FILE_SIZE,
-            RodaConstants.FILE_FILEFORMAT, RodaConstants.FILE_FORMAT_VERSION, RodaConstants.FILE_FORMAT_DESIGNATION));
-          IndexedFile file = retrieve(IndexedFile.class, LinkingObjectUtils.getFileIdFromLinkingId(idValue),
-            fileFields);
-          files.put(idValue, file);
-        } else if (RODA_TYPE.TRANSFERRED_RESOURCE.equals(linkingType)) {
-          String id = LinkingObjectUtils.getTransferredResourceIdFromLinkingId(idValue);
-          if (id != null) {
-            List<String> resourceFields = Arrays.asList(RodaConstants.INDEX_UUID,
-              RodaConstants.TRANSFERRED_RESOURCE_NAME, RodaConstants.TRANSFERRED_RESOURCE_FULLPATH);
-            TransferredResource tr = retrieve(TransferredResource.class, IdUtils.createUUID(id), resourceFields);
-            transferredResources.put(idValue, tr);
-          }
-        } else if (RodaConstants.URI_TYPE.equals(identifier.getType())) {
-          uris.add(idValue);
-        } else {
-          LOGGER.warn("No support for linking object type: {}", idValue);
+      for (LinkingObjectIdentifierComplexType linkingObjectIdentifierComplexType : eventComplexType
+        .getLinkingObjectIdentifier()) {
+        LinkingIdentifier identifier = new LinkingIdentifier();
+        identifier.setValue(linkingObjectIdentifierComplexType.getLinkingObjectIdentifierValue());
+        identifier.setType(linkingObjectIdentifierComplexType.getLinkingObjectIdentifierType().getValue());
+        List<String> roles = new ArrayList<>();
+        for (StringPlusAuthority stringPlusAuthority : linkingObjectIdentifierComplexType.getLinkingObjectRole()) {
+          roles.add(stringPlusAuthority.getValue());
         }
-      } catch (NotFoundException e) {
-        // nothing to do
+        identifier.setRoles(roles);
+
+        eventBundle.addOutcomeObjectIds(identifier);
+        eventBundle.addSourcesObjectIds(identifier);
+
+        String idValue = identifier.getValue();
+        RODA_TYPE linkingType = LinkingObjectUtils.getLinkingIdentifierType(idValue);
+
+        try {
+          if (RODA_TYPE.AIP.equals(linkingType)) {
+            String uuid = LinkingObjectUtils.getAipIdFromLinkingId(idValue);
+            List<String> aipFields = Arrays.asList(RodaConstants.AIP_TITLE, RodaConstants.INDEX_UUID);
+            IndexedAIP aip = retrieve(IndexedAIP.class, uuid, aipFields);
+            aips.put(idValue, aip);
+          } else if (RODA_TYPE.REPRESENTATION.equals(linkingType)) {
+            String uuid = LinkingObjectUtils.getRepresentationIdFromLinkingId(idValue);
+            List<String> representationFields = Arrays.asList(RodaConstants.REPRESENTATION_ID,
+              RodaConstants.REPRESENTATION_AIP_ID, RodaConstants.REPRESENTATION_ORIGINAL);
+            IndexedRepresentation rep = retrieve(IndexedRepresentation.class, uuid, representationFields);
+            representations.put(idValue, rep);
+          } else if (RODA_TYPE.FILE.equals(linkingType)) {
+            List<String> fileFields = new ArrayList<>(RodaConstants.FILE_FIELDS_TO_RETURN);
+            fileFields.addAll(RodaConstants.FILE_FORMAT_FIELDS_TO_RETURN);
+            fileFields.addAll(Arrays.asList(RodaConstants.FILE_ORIGINALNAME, RodaConstants.FILE_SIZE,
+              RodaConstants.FILE_FILEFORMAT, RodaConstants.FILE_FORMAT_VERSION, RodaConstants.FILE_FORMAT_DESIGNATION));
+            IndexedFile file = retrieve(IndexedFile.class, LinkingObjectUtils.getFileIdFromLinkingId(idValue),
+              fileFields);
+            files.put(idValue, file);
+          } else if (RODA_TYPE.TRANSFERRED_RESOURCE.equals(linkingType)) {
+            String id = LinkingObjectUtils.getTransferredResourceIdFromLinkingId(idValue);
+            if (id != null) {
+              List<String> resourceFields = Arrays.asList(RodaConstants.INDEX_UUID,
+                RodaConstants.TRANSFERRED_RESOURCE_NAME, RodaConstants.TRANSFERRED_RESOURCE_FULLPATH);
+              TransferredResource tr = retrieve(TransferredResource.class, IdUtils.createUUID(id), resourceFields);
+              transferredResources.put(idValue, tr);
+            }
+          } else if (RodaConstants.URI_TYPE.equals(identifier.getType())) {
+            uris.add(idValue);
+          } else {
+            LOGGER.warn("No support for linking object type: {}", idValue);
+          }
+        } catch (NotFoundException e) {
+          // nothing to do
+        }
       }
+    } catch (ValidationException e) {
+      LOGGER.error("error converting binary into event {}: {}", eventId, e);
     }
 
+    eventBundle.setEvent(ipe);
     eventBundle.setAips(aips);
     eventBundle.setRepresentations(representations);
     eventBundle.setFiles(files);

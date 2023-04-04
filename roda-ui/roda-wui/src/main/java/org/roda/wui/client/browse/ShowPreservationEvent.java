@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import gov.loc.premis.v3.LinkingAgentIdentifierComplexType;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.RODA_TYPE;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -254,20 +255,17 @@ public class ShowPreservationEvent extends Composite {
     Map<String, IndexedPreservationAgent> agents = bundle.getAgents();
     boolean hasAgents = false;
 
-    for (LinkingIdentifier agentId : event.getLinkingAgentIds()) {
-      IndexedPreservationAgent agent = agents.get(agentId.getValue());
-      if (agent != null) {
-        FlowPanel layout = createAgentPanel(agentId, agent);
-        agentsPanel.add(layout);
-        hasAgents = true;
-      }
+    for (IndexedPreservationAgent agent : agents.values()) {
+      FlowPanel layout = createAgentPanel(agent);
+      agentsPanel.add(layout);
+      hasAgents = true;
     }
 
     agentsHeader.setVisible(hasAgents);
 
     // Source objects
     boolean showSourceObjects = false;
-    for (LinkingIdentifier sourceObjectId : event.getSourcesObjectIds()) {
+    for (LinkingIdentifier sourceObjectId : bundle.getSourcesObjectIds()) {
       if (sourceObjectId.getRoles() != null
         && sourceObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)
         && (RodaConstants.URN_TYPE.equalsIgnoreCase(sourceObjectId.getType())
@@ -281,7 +279,7 @@ public class ShowPreservationEvent extends Composite {
 
     // Outcome objects
     boolean showOutcomeObjects = false;
-    for (LinkingIdentifier outcomeObjectId : event.getOutcomeObjectIds()) {
+    for (LinkingIdentifier outcomeObjectId : bundle.getOutcomeObjectIds()) {
       if (outcomeObjectId.getRoles() != null
         && outcomeObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME)
         && (RodaConstants.URN_TYPE.equalsIgnoreCase(outcomeObjectId.getType())
@@ -370,6 +368,94 @@ public class ShowPreservationEvent extends Composite {
 
     body.add(titleLabel);
     body.add(link);
+  }
+
+  private FlowPanel createAgentPanel(IndexedPreservationAgent agent) {
+    FlowPanel layout = new FlowPanel();
+    layout.addStyleName("panel");
+
+    FlowPanel heading = new FlowPanel();
+    heading.addStyleName("panel-heading");
+    layout.add(heading);
+    FlowPanel body = new FlowPanel();
+    body.addStyleName("panel-body");
+    layout.add(body);
+
+    if (StringUtils.isNotBlank(agent.getName())) {
+      Label nameValue = new Label(agent.getName());
+      nameValue.addStyleName("panel-title");
+      heading.add(nameValue);
+    } else {
+      Label idValue = new Label(agent.getId());
+      idValue.addStyleName("panel-title");
+      heading.add(idValue);
+    }
+
+    if (StringUtils.isNotBlank(agent.getId())) {
+      Label idLabel = new Label(messages.preservationEventAgentIdentifier());
+      idLabel.addStyleName("label");
+      Label idValue = new Label(agent.getId());
+      idValue.addStyleName("value");
+      body.add(idLabel);
+      body.add(idValue);
+    }
+
+    if (!agent.getRoles().isEmpty()) {
+      Label rolesLabel = new Label(messages.preservationEventAgentRoles());
+      rolesLabel.addStyleName("label");
+      // TODO humanize list
+      Label rolesValue = new Label(StringUtils.join(agent.getRoles(), ", "));
+      rolesValue.addStyleName("value");
+      body.add(rolesLabel);
+      body.add(rolesValue);
+    }
+
+    if (StringUtils.isNotBlank(agent.getType())) {
+      Label typeLabel = new Label(messages.preservationEventAgentType());
+      typeLabel.addStyleName("label");
+      Label typeValue = new Label(agent.getType());
+      typeValue.addStyleName("value");
+      body.add(typeLabel);
+      body.add(typeValue);
+    }
+
+    if (StringUtils.isNotBlank(agent.getVersion())) {
+      Label versionLabel = new Label(messages.preservationEventAgentVersion());
+      versionLabel.addStyleName("label");
+      Label versionValue = new Label(agent.getVersion());
+      versionValue.addStyleName("value");
+      body.add(versionLabel);
+      body.add(versionValue);
+    }
+
+    if (StringUtils.isNotBlank(agent.getNote())) {
+      Label noteLabel = new Label(messages.preservationEventAgentNote());
+      noteLabel.addStyleName("label");
+      Label noteValue = new Label(agent.getNote());
+      noteValue.addStyleName("value");
+      body.add(noteLabel);
+      body.add(noteValue);
+    }
+
+    if (StringUtils.isNotBlank(agent.getExtension())) {
+      Label extensionLabel = new Label(messages.preservationEventAgentExtension());
+      extensionLabel.addStyleName("label");
+      Label extensionValue = new Label(agent.getExtension());
+      extensionValue.addStyleName("value");
+      body.add(extensionLabel);
+      body.add(extensionValue);
+    }
+
+    FlowPanel footer = new FlowPanel();
+    footer.addStyleName("panel-footer");
+    layout.add(footer);
+
+    Anchor link = new Anchor(messages.inspectPreservationAgent(),
+      HistoryUtils.createHistoryHashLink(ShowPreservationAgent.RESOLVER, eventId, agent.getId()));
+
+    link.addStyleName("btn");
+    footer.add(link);
+    return layout;
   }
 
   private FlowPanel createAgentPanel(LinkingIdentifier agentId, IndexedPreservationAgent agent) {
