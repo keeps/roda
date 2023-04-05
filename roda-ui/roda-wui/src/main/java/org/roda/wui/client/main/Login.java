@@ -13,6 +13,7 @@ package org.roda.wui.client.main;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.EmailUnverifiedException;
 import org.roda.core.data.exceptions.InactiveUserException;
@@ -28,6 +29,7 @@ import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -116,6 +118,9 @@ public class Login extends Composite {
   InlineHTML loggedInMessage;
 
   @UiField
+  InlineHTML casMessage;
+
+  @UiField
   Button logout;
 
   @UiField
@@ -141,6 +146,7 @@ public class Login extends Composite {
     username.setText("");
     password.setText("");
     error.setText("");
+    casMessage.setHTML(messages.casInformationText(ConfigurationManager.getString(RodaConstants.CAS_URL)));
     resendEmail.setVisible(false);
     serviceTokens = historyTokens;
 

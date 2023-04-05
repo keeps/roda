@@ -10,6 +10,9 @@
 			<g:FlowPanel addStyleNames="col_12 content" ui:field="contentFlowPanel">
 				<common:TitlePanel text="{messages.ingestProcessTitle}" iconClass="Job" />
 				<g:FlowPanel addStyleNames="page-description" ui:field="ingestProcessDescription" />
+				<g:FlowPanel addStyleNames="page-description" >
+					<g:InlineHTML ui:field="dropFolderMessage" />
+				</g:FlowPanel>
 				<search:JobSearch ui:field="jobSearch" />
 			</g:FlowPanel>
 		</g:FlowPanel>
