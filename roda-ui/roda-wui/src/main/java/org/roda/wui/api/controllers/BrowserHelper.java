@@ -48,6 +48,7 @@ import org.roda.core.common.Messages;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.StreamResponse;
+import org.roda.core.data.v2.index.filter.AndFiltersParameters;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
@@ -356,9 +357,13 @@ public class BrowserHelper {
 
     // Count risk incidences
     if (UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_FIND_RISK_INCIDENCE)) {
-      Filter riskIncidenceFilter = new Filter(
-        new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representation.getId()));
-      Long riskIncidenceCount = RodaCoreFactory.getIndexService().count(RiskIncidence.class, riskIncidenceFilter);
+
+      AndFiltersParameters andFiltersParameters = new AndFiltersParameters(
+        Arrays.asList(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representation.getId()),
+          new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, representation.getAipId())));
+
+      Long riskIncidenceCount = RodaCoreFactory.getIndexService().count(RiskIncidence.class,
+        new Filter(andFiltersParameters));
       bundle.setRiskIncidenceCount(riskIncidenceCount);
     } else {
       bundle.setRiskIncidenceCount(-1L);
