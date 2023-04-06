@@ -230,12 +230,12 @@ public class MinimalIngestPluginTest {
     Assert.assertEquals(report.getOutcomeObjectId(), Report.NO_OUTCOME_OBJECT_ID);
     String baseFolder = RodaCoreFactory.getRodaConfiguration().getString("core.ingest.processed.base_folder",
       "PROCESSED");
-    String unsuccessFolder = RodaCoreFactory.getRodaConfiguration()
+    String unsuccessfulFolder = RodaCoreFactory.getRodaConfiguration()
       .getString("core.ingest.processed.unsuccessfully_ingested", "UNSUCCESSFULLY_INGESTED");
     TransferredResource transferredResourceAfterMove = index.retrieve(TransferredResource.class,
       report.getSourceObjectId(), Collections.emptyList());
     Assert.assertTrue(transferredResourceAfterMove.getFullPath().contains(baseFolder));
-    Assert.assertTrue(transferredResourceAfterMove.getFullPath().contains(unsuccessFolder));
+    Assert.assertTrue(transferredResourceAfterMove.getFullPath().contains(unsuccessfulFolder));
   }
 
   private void assessAIP(AIP aip)
@@ -343,7 +343,7 @@ public class MinimalIngestPluginTest {
     parameters.put(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "true");
     parameters.put(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT, "false");
     // ingest corpora
-    Job job = TestsHelper.executeJob(MinimalIngestPlugin.class, parameters, PluginType.SIP_TO_AIP,
+    TestsHelper.executeJob(MinimalIngestPlugin.class, parameters, PluginType.SIP_TO_AIP,
       SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
 
     index.commitAIPs();
@@ -371,9 +371,9 @@ public class MinimalIngestPluginTest {
 
     Assert.assertEquals(indexedPreservationEventIndexResult.getTotalCount(), 1);
 
-    Binary event_bin = model.retrievePreservationEvent(null, null, null, null,
+    Binary eventBin = model.retrievePreservationEvent(null, null, null, null,
       indexedPreservationEventIndexResult.getResults().get(0).getId());
-    EventComplexType event = PremisV3Utils.binaryToEvent(event_bin.getContent(), true);
+    EventComplexType event = PremisV3Utils.binaryToEvent(eventBin.getContent(), true);
     String outcomeDetail = event.getEventOutcomeInformation().get(0).getEventOutcomeDetail().get(0)
       .getEventOutcomeDetailNote().get(0);
 
