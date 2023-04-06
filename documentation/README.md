@@ -19,14 +19,12 @@ Among others articles, in this series of documentation you will find information
     - [Representation Information](Representation_Information.md)
     - [Format normalization policy](Format_Normalization_Policy.md)
     - [Disposal Policies](Disposal_Policies.md)
-- Support
-    - [Community support](Community_Support.md)
-    - [Professional support](Professional_Support.md)
+- [Support](https://github.com/keeps/roda#support)
 - [Installation](https://github.com/keeps/roda/blob/master/deploys/README.md)
 - Configuration
     - [Statistics](Statistics.md)
     - [Metadata formats](Metadata_Formats.md)
-    - [Central Authentication Service (CAS)](Central_Authentication_Service.md)
+    - [External Authentication with CAS protocol](Central_Authentication_Service.md)
     - [Disposal feature](Disposal.md)
 - Contributing
     - [Developers guide](Developers_Guide.md)
