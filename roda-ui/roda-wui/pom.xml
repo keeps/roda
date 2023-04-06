@@ -256,6 +256,10 @@
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <version>${springboot.version}</version>
                         <configuration>
+                            <environmentVariables>
+                                <SIEGFRIED_MODE>server</SIEGFRIED_MODE>
+                                <SIEGFRIED_SERVER_URL>http://localhost:5138</SIEGFRIED_SERVER_URL>
+                            </environmentVariables>
                             <skip>false</skip>
                             <directories>
                                 <directory>${project.build.directory}/${project.build.finalName}</directory>

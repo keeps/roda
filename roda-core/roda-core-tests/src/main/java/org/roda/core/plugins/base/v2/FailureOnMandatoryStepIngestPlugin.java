@@ -22,11 +22,11 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.base.PluginThatAlwaysFailsDuringExecuteMethod;
+import org.roda.core.plugins.base.ingest.EARKSIP2ToAIPPlugin;
 import org.roda.core.plugins.base.preservation.DescriptiveMetadataValidationPlugin;
 import org.roda.core.plugins.base.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.base.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.base.ingest.AutoAcceptSIPPlugin;
-import org.roda.core.plugins.base.ingest.EARKSIPToAIPPlugin;
 import org.roda.core.plugins.base.ingest.VerifyUserAuthorizationPlugin;
 import org.roda.core.plugins.base.ingest.v2.DefaultIngestPlugin;
 import org.roda.core.plugins.base.ingest.v2.steps.AutoAcceptIngestStep;
@@ -47,7 +47,7 @@ public class FailureOnMandatoryStepIngestPlugin extends DefaultIngestPlugin {
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_SIP_TO_AIP_CLASS, "Format of the Submission Information Packages",
-        PluginParameter.PluginParameterType.PLUGIN_SIP_TO_AIP, EARKSIPToAIPPlugin.class.getName(), true, false,
+        PluginParameter.PluginParameterType.PLUGIN_SIP_TO_AIP, EARKSIP2ToAIPPlugin.class.getName(), true, false,
         "Select the format of the Submission Information Packages to be ingested in this ingest process."));
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_PARENT_ID, "Parent node",

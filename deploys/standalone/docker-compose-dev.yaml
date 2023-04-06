@@ -36,12 +36,12 @@ services:
       - /tmp:/tmp
 
   siegfried:
-    image: ghcr.io/keeps/siegfried:v1.9.6
+    image: ghcr.io/keeps/siegfried:v1.10.0
     restart: unless-stopped
     ports:
       - "5138:5138"
     environment:
-      SIEGFRIED_HOST: siegfried
+      SIEGFRIED_HOST: 0.0.0.0
       SIEGFRIED_PORT: 5138
     volumes:
       - siegfried_data:/root/siegfried/
