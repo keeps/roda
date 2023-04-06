@@ -63,8 +63,8 @@ jobs:
         patterns: |
           -roda-core/roda-core/src/main/java/org/roda/core/storage/ExternalFileManifestContentPayload.java:java/path-injection
           -roda-core/roda-core/src/main/java/org/roda/core/storage/fs/FSUtils.java:java/path-injection
-      input: sarif-results/java.sarif
-      output: sarif-results/java.sarif
+        input: sarif-results/java.sarif
+        output: sarif-results/java.sarif
     
     - name: Upload SARIF results
       uses: github/codeql-action/upload-sarif@v2
