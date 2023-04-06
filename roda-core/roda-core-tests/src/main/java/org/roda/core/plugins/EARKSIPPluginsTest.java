@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.roda.core.CorporaConstants;
@@ -52,6 +51,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.base.ingest.EARKSIP2ToAIPPlugin;
 import org.roda.core.plugins.base.ingest.EARKSIPToAIPPlugin;
 import org.roda.core.plugins.base.maintenance.FixAncestorsPlugin;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexAIPPlugin;
@@ -140,13 +140,13 @@ public class EARKSIPPluginsTest {
   public static TransferredResource createIngestCorpora(Path corporaPath, IndexService index)
     throws IOException, NotFoundException, GenericException, IsStillUpdatingException, AlreadyExistsException,
     AuthorizationDeniedException {
-    return createIngestCorpora(corporaPath, index, CorporaConstants.EARK_SIP, null);
+    return createIngestCorpora(corporaPath, index, CorporaConstants.EARK_SIP_204, null);
   }
 
   public static TransferredResource createIngestUpdateCorpora(Path corporaPath, IndexService index,
     String renameSipFileTo) throws IOException, NotFoundException, GenericException, IsStillUpdatingException,
     AlreadyExistsException, AuthorizationDeniedException {
-    return createIngestCorpora(corporaPath, index, CorporaConstants.EARK_SIP_UPDATE, renameSipFileTo);
+    return createIngestCorpora(corporaPath, index, CorporaConstants.EARK_SIP_204_UPDATE, renameSipFileTo);
   }
 
   public static TransferredResource createIngestCorpora(Path corporaPath, IndexService index, String sipName)
@@ -197,7 +197,7 @@ public class EARKSIPPluginsTest {
     TransferredResource transferredResource = createIngestUpdateCorpora(corporaPath, index, null);
     Assert.assertNotNull(transferredResource);
 
-    Job job = TestsHelper.executeJob(EARKSIPToAIPPlugin.class, new HashMap<>(), PluginType.SIP_TO_AIP,
+    Job job = TestsHelper.executeJob(EARKSIP2ToAIPPlugin.class, new HashMap<>(), PluginType.SIP_TO_AIP,
       SelectedItemsList.create(TransferredResource.class, transferredResource.getUUID()));
 
     TestsHelper.getJobReports(index, job, true);
@@ -215,14 +215,14 @@ public class EARKSIPPluginsTest {
 
   @Test
   public void testIngestEARKSIP() throws IOException, RODAException {
-    AIP aip = ingestCorpora(EARKSIPToAIPPlugin.class, model, index, corporaPath);
+    AIP aip = ingestCorpora(EARKSIP2ToAIPPlugin.class, model, index, corporaPath);
     Assert.assertEquals(aip.getRepresentations().size(), 1);
 
     CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
       aip.getRepresentations().get(0).getId(), true);
     List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles, Lists.newArrayList(allFiles).stream().filter(OptionalWithCause::isPresent)
-      .map(OptionalWithCause::get).collect(Collectors.toList()));
+    Iterables.addAll(reusableAllFiles,
+      Lists.newArrayList(allFiles).stream().filter(OptionalWithCause::isPresent).map(OptionalWithCause::get).toList());
 
     // All folders and files
     Assert.assertEquals(reusableAllFiles.size(), CORPORA_FOLDERS_COUNT + CORPORA_FILES_COUNT);
@@ -230,7 +230,7 @@ public class EARKSIPPluginsTest {
 
   @Test
   public void testIngestAndUpdateEARKSIP() throws IOException, RODAException {
-    AIP aip = ingestCorpora(EARKSIPToAIPPlugin.class, model, index, corporaPath);
+    AIP aip = ingestCorpora(EARKSIP2ToAIPPlugin.class, model, index, corporaPath);
     Assert.assertEquals(aip.getRepresentations().size(), 1);
     aip.setState(AIPState.ACTIVE);
     model.updateAIP(aip, CorporaConstants.EARK_SIP_UPDATE_USER);
