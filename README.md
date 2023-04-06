@@ -171,6 +171,7 @@ However, it should be noted that the RODA Community Edition does not include com
 
 For more information about how to acquire commercial services from KEEP SOLUTIONS, please visit [KEEP SOLUTIONS](https://www.keep.pt) website.
 
+
 ### Enterprise Edition
 
 The Enterprise Edition is designed for large-scale production environments and provides a comprehensive suite of tools and services for organizations seeking a secure and high-performance preservation solution.
@@ -212,6 +213,8 @@ The way to get community-driven support is by posting your questions on the [ROD
 GitHub is a popular web-based platform used for version control and collaboration on software development projects. The RODA GitHub repository is where the project is hosted, and it's also where you can find helpful resources and get support from other users and developers. To get started, simply create a GitHub account and navigate to the [RODA repository](https://github.com/keeps/roda). From there, you can browse the issues section or create a new issue to post your question on the Discussion board.
 
 Posting your question on GitHub allows other community members to see it, and they may offer solutions, insights, or workarounds to help you resolve your issue. Additionally, the RODA developers and maintainers actively monitor the GitHub repository, and they may also chime in with advice or solutions.
+
+For information about the maintenance and security policy, view security advisories, or report vulnerabilities, check out the [RODA Community Security page](https://github.com/keeps/roda/security).
 
 ### Professional support
 
