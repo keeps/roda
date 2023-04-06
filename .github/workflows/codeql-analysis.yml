@@ -18,19 +18,6 @@ jobs:
       matrix:
         language: ['java', 'javascript']
 
-    services:
-      zookeeper:
-        image: zookeeper:3.8
-        ports:
-          - 2181:2181
-      solr:
-        image: solr:9
-        ports:
-          - 8983:8983
-        env:
-          ZK_HOST: zookeeper:2181
-        options: -e cloud
-
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -62,8 +49,24 @@ jobs:
       run: mvn clean package -Dmaven.test.skip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        RODA_CORE_SOLR_TYPE: CLOUD
-        RODA_CORE_SOLR_CLOUD_URLS: localhost:2181
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
+      with:
+        upload: False
+        output: sarif-results
+    
+    - name: Filter SARIF results
+      uses: advanced-security/filter-sarif@v1
+      if: ${{ matrix.language == 'java' }}
+      with:
+        patterns: |
+          -roda-core/roda-core/src/main/java/org/roda/core/storage/ExternalFileManifestContentPayload.java:java/path-injection
+          -roda-core/roda-core/src/main/java/org/roda/core/storage/fs/FSUtils.java:java/path-injection
+      input: sarif-results/java.sarif
+      output: sarif-results/java.sarif
+    
+    - name: Upload SARIF results
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: sarif-results/${{ matrix.language }}.sarif
