@@ -209,7 +209,7 @@
                                     <message>Invalid Maven version. It should, at least, be 3.8.6</message>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>11</version>
+                                    <version>17</version>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
@@ -272,7 +272,7 @@
                     <skip>true</skip>
                     <excludes>
                         <exclude>
-                            <groupId>org.gwtproject</groupId>
+                            <groupId>org.project</groupId>
                             <artifactId>gwt-dev</artifactId>
                         </exclude>
                     </excludes>
@@ -1045,7 +1045,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.4.0</version>
+                <version>3.5.0</version>
             </plugin>
         </plugins>
     </reporting>
