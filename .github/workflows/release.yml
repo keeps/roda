@@ -70,25 +70,36 @@ jobs:
         run: mvn $MAVEN_CLI_OPTS clean deploy -Dmaven.test.skip=true -Pcore
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Get release version
-        run: echo "release_version=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
+      - name: Manipulate tag
+        run: |
+          echo "release_version=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
+          echo "major_version=$(cut -d '.' -f 1 <<< $GITHUB_REF_NAME)" >> $GITHUB_ENV
+          echo "major_minor_version=$(cut -d '.' -f 1,2 <<< $GITHUB_REF_NAME)" >> $GITHUB_ENV
       - name: Upload artifact to release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: roda-ui/roda-wui/target/roda-wui-${{ env.release_version }}.war
-          asset_name: roda-wui-$${{ env.release_version }}.war
+          asset_name: roda-wui-${{ env.release_version }}.war
           tag: ${{ github.ref }}
           release_name: ${{ github.ref_name }}
-      - name: Login to DockerHub
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v2 
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-      - name: Deploy to DockerHub
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Deploy to GitHub Container Registry
         run: |
-          docker tag keeps/roda:latest keeps/roda:${{ github.ref_name }}
-          docker push keeps/roda:${{ github.ref_name }}
+          docker tag keeps/roda:latest ghcr.io/keeps/roda:${{ github.ref_name }}
+          docker push ghcr.io/keeps/roda:${{ github.ref_name }}
+      - name: Deploy to GitHub Container Registry (alias)
+        if: ${{ !contains(github.ref_name, 'alpha') && !contains(github.ref_name, 'beta') }}
+        run: |
+          docker tag keeps/roda:latest ghcr.io/keeps/roda:${{ env.major_version }}
+          docker push ghcr.io/keeps/roda:${{ env.major_version }}
+          docker tag keeps/roda:latest ghcr.io/keeps/roda:${{ env.major_minor_version }}
+          docker push ghcr.io/keeps/roda:${{ env.major_minor_version }}
       - name: Trigger KEEPS GitLab CI/CD
         run: |
           curl --progress-bar -o /dev/null -L --request POST \
