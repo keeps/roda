@@ -185,7 +185,7 @@ public class Menu extends Composite {
       createCommand(Statistics.RESOLVER.getHistoryPath()));
     administrationStatistics.addStyleName("administration_statistics_item");
     administrationMarketplace = administrationMenu.addItem(messages.title("administration_market_place"),
-      createURLCommand(ConfigurationManager.getString(RodaConstants.MARKETPLACE_URL)));
+      createURLCommand(ConfigurationManager.getString(RodaConstants.UI_MARKETPLACE_URL)));
     administrationStatistics.addStyleName("administration_statistics_item");
     String distributedMode = ConfigurationManager.getStringWithDefault(
       RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
@@ -201,10 +201,10 @@ public class Menu extends Composite {
       administrationDistributedInstances.addStyleName("administration_statistics_item");
     }
 
-    String monitoringLink = ConfigurationManager.getString(RodaConstants.MONITORING_URL);
-    String reportingLink = ConfigurationManager.getString(RodaConstants.REPORTING_URL);
-    Boolean monitoringActive = ConfigurationManager.getBoolean(false, RodaConstants.MONITORING_ACTIVE);
-    Boolean reportingActive = ConfigurationManager.getBoolean(false, RodaConstants.REPORTING_ACTIVE);
+    String monitoringLink = ConfigurationManager.getString(RodaConstants.UI_MONITORING_URL);
+    String reportingLink = ConfigurationManager.getString(RodaConstants.UI_REPORTING_URL);
+    Boolean monitoringActive = ConfigurationManager.getBoolean(false, RodaConstants.UI_MONITORING_ACTIVE);
+    Boolean reportingActive = ConfigurationManager.getBoolean(false, RodaConstants.UI_REPORTING_ACTIVE);
 
     if (reportingActive) {
       //reporting page

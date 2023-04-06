@@ -146,7 +146,7 @@ public class Login extends Composite {
     username.setText("");
     password.setText("");
     error.setText("");
-    casMessage.setHTML(messages.casInformationText(ConfigurationManager.getString(RodaConstants.CAS_URL)));
+    casMessage.setHTML(messages.casInformationText(ConfigurationManager.getString(RodaConstants.UI_CAS_URL)));
     resendEmail.setVisible(false);
     serviceTokens = historyTokens;
 

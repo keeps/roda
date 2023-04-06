@@ -234,7 +234,7 @@ public class IngestTransfer extends Composite {
 
     navigationToolbar.setHeader(messages.oneOfAObject(TransferredResource.class.getName()));
 
-    dropFolderMessage.setHTML(messages.dropFolderInformationText(ConfigurationManager.getString(RodaConstants.DROPFOLDER_URL)));
+    dropFolderMessage.setHTML(messages.dropFolderInformationText(ConfigurationManager.getString(RodaConstants.UI_DROPFOLDER_URL)));
     ingestTransferDescription.add(new HTMLWidgetWrapper("IngestTransferDescription.html"));
 
     draw();

@@ -116,7 +116,7 @@ public class IngestProcess extends Composite {
     jobSearch = new JobSearch("IngestProcess_jobs", "IngestProcess_reports", jobIngestFilter, jobReportIngestFilter,
       true, IngestTransfer.RESOLVER);
     initWidget(uiBinder.createAndBindUi(this));
-    dropFolderMessage.setHTML(messages.dropFolderInformationText(ConfigurationManager.getString(RodaConstants.DROPFOLDER_URL)));
+    dropFolderMessage.setHTML(messages.dropFolderInformationText(ConfigurationManager.getString(RodaConstants.UI_DROPFOLDER_URL)));
     ingestProcessDescription.add(new HTMLWidgetWrapper("IngestProcessDescription.html"));
   }
 
