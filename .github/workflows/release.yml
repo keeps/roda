@@ -94,7 +94,7 @@ jobs:
           docker tag keeps/roda:latest ghcr.io/keeps/roda:${{ github.ref_name }}
           docker push ghcr.io/keeps/roda:${{ github.ref_name }}
       - name: Deploy to GitHub Container Registry (alias)
-        if: ${{ !contains(github.ref_name, 'alpha') && !contains(github.ref_name, 'beta') }}
+        if: ${{ !contains(github.ref_name, 'alpha') && !contains(github.ref_name, 'beta') && !contains(github.ref_name, 'RC') }}
         run: |
           docker tag keeps/roda:latest ghcr.io/keeps/roda:${{ env.major_version }}
           docker push ghcr.io/keeps/roda:${{ env.major_version }}
