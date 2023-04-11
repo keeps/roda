@@ -12,6 +12,7 @@ package org.roda.wui.client.process;
 
 import java.util.List;
 
+import com.google.gwt.user.client.ui.InlineHTML;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
@@ -28,6 +29,7 @@ import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.search.JobSearch;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
@@ -102,6 +104,9 @@ public class IngestProcess extends Composite {
   @UiField
   FlowPanel contentFlowPanel;
 
+  @UiField
+  InlineHTML dropFolderMessage;
+
   private IngestProcess() {
     Filter jobIngestFilter = new Filter(
       new SimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INGEST.name()));
@@ -111,6 +116,7 @@ public class IngestProcess extends Composite {
     jobSearch = new JobSearch("IngestProcess_jobs", "IngestProcess_reports", jobIngestFilter, jobReportIngestFilter,
       true, IngestTransfer.RESOLVER);
     initWidget(uiBinder.createAndBindUi(this));
+    dropFolderMessage.setHTML(messages.dropFolderInformationText(ConfigurationManager.getString(RodaConstants.UI_DROPFOLDER_URL)));
     ingestProcessDescription.add(new HTMLWidgetWrapper("IngestProcessDescription.html"));
   }
 

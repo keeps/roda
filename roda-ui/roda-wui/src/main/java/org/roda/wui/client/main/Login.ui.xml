@@ -56,6 +56,9 @@
 				</g:Button>
 			</g:FlowPanel>
 		</g:FlowPanel>
+		<g:FlowPanel addStyleNames="casMessagePanel">
+			<g:InlineHTML ui:field="casMessage" />
+		</g:FlowPanel>
 	</g:FlowPanel>
 
 </ui:UiBinder>

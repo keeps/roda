@@ -1457,6 +1457,8 @@ public interface ClientMessages extends Messages {
 
   String welcomePage();
 
+  SafeHtml casInformationText(String url);
+
   // Login Dialog
 
   String loginDialogTitle();
@@ -1538,7 +1540,8 @@ public interface ClientMessages extends Messages {
   String editUserApply();
 
   String editUserAction();
-
+  // Pre ingest panel
+  SafeHtml dropFolderInformationText(String url);
   // User Data Panel
   String username();
 

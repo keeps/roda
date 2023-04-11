@@ -4333,6 +4333,14 @@ td.datePickerMonth, td.datePickerYear {
     padding: 40px;
 }
 
+.casMessagePanel {
+    margin: 40px auto 0;
+    max-width: 400px;
+    min-width: 300px;
+    background-color: #f9f9f9;
+    padding: 40px;
+}
+
 .loginPanel h1 {
     margin-top: 0px;
 }
