@@ -10,11 +10,20 @@
  */
 package org.roda.wui.client.main;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.MenuBar;
+import com.google.gwt.user.client.ui.MenuItem;
+import com.google.gwt.user.client.ui.Widget;
+import config.i18n.client.ClientMessages;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowseTop;
@@ -55,20 +64,10 @@ import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.wcag.AcessibleMenuBar;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.Scheduler.ScheduledCommand;
-import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.MenuBar;
-import com.google.gwt.user.client.ui.MenuItem;
-import com.google.gwt.user.client.ui.Widget;
-
-import config.i18n.client.ClientMessages;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * @author Luis Faria
@@ -108,9 +107,12 @@ public class Menu extends Composite {
   private MenuItem administrationNotifications;
   private MenuItem administrationStatistics;
   private MenuItem administrationDistributedInstances;
+  private MenuItem administrationReporting;
+  private MenuItem administrationMonitoring;
+  private MenuItem administrationMarketplace;
   // private MenuItem administrationPreferences;
 
-  private AcessibleMenuBar disposalMenu;;
+  private AcessibleMenuBar disposalMenu;
   private MenuItem disposalPolicy;
   private MenuItem disposalConfirmation;
   private MenuItem overdueActions;
@@ -182,6 +184,9 @@ public class Menu extends Composite {
     administrationStatistics = administrationMenu.addItem(messages.title("administration_statistics"),
       createCommand(Statistics.RESOLVER.getHistoryPath()));
     administrationStatistics.addStyleName("administration_statistics_item");
+    administrationMarketplace = administrationMenu.addItem(messages.title("administration_market_place"),
+      createURLCommand(ConfigurationManager.getString(RodaConstants.UI_MARKETPLACE_URL)));
+    administrationStatistics.addStyleName("administration_statistics_item");
     String distributedMode = ConfigurationManager.getStringWithDefault(
       RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
     if (distributedMode.equals(RodaConstants.DistributedModeType.CENTRAL.name())) {
@@ -194,6 +199,29 @@ public class Menu extends Composite {
         messages.title("administration_local_instance_configuration"),
         createCommand(LocalInstanceManagement.RESOLVER.getHistoryPath()));
       administrationDistributedInstances.addStyleName("administration_statistics_item");
+    }
+
+    String monitoringLink = ConfigurationManager.getString(RodaConstants.UI_MONITORING_URL);
+    String reportingLink = ConfigurationManager.getString(RodaConstants.UI_REPORTING_URL);
+    Boolean monitoringActive = ConfigurationManager.getBoolean(false, RodaConstants.UI_MONITORING_ACTIVE);
+    Boolean reportingActive = ConfigurationManager.getBoolean(false, RodaConstants.UI_REPORTING_ACTIVE);
+
+    if (reportingActive) {
+      //reporting page
+    } else {
+      administrationReporting = administrationMenu.addItem(
+        messages.title("administration_reporting"),
+        createURLCommand(reportingLink));
+      administrationReporting.addStyleName("administration_reporting_item");
+    }
+
+    if (monitoringActive) {
+      //monitoring page
+    } else {
+      administrationMonitoring = administrationMenu.addItem(
+        messages.title("administration_monitoring"),
+        createURLCommand(monitoringLink));
+      administrationReporting.addStyleName("administration_monitoring_item");
     }
     // administration_preferences =
     // administrationMenu.addItem(messages.title("administrationPreferences"),
@@ -266,6 +294,10 @@ public class Menu extends Composite {
 
   private ScheduledCommand createLoginCommand() {
     return () -> UserLogin.getInstance().login();
+  }
+
+  private ScheduledCommand createURLCommand(String url) {
+    return () -> Window.open(url, "_blank", "");
   }
 
   private void updateVisibles(User user) {
