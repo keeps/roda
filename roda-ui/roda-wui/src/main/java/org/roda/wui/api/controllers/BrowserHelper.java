@@ -2209,7 +2209,6 @@ public class BrowserHelper {
     List<String> eventFields = new ArrayList<>();
     IndexedPreservationEvent ipe = retrieve(IndexedPreservationEvent.class, eventId, eventFields);
 
-    // TODO retrieve linked items
     ModelService model = RodaCoreFactory.getModelService();
     Binary binaryEvent = null;
     try {
