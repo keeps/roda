@@ -639,8 +639,7 @@ public class PluginManager {
         CertificateInfo certificateInfo = loadAndCheckCertificates(p.jarPath);
 
         // for development purpose
-        boolean optIn = RodaCoreFactory.getRodaConfiguration()
-          .getBoolean(RodaConstants.PLUGINS_CERTIFICATE_OPT_IN_PROPERTY, false);
+        boolean optIn = RodaCoreFactory.getProperty(RodaConstants.PLUGINS_CERTIFICATE_OPT_IN_PROPERTY, false);
 
         // Let's load the Plugin
         List<Plugin<? extends IsRODAObject>> plugins = loadPlugin(p.jarPath, p.pluginClassNames, classloader);
@@ -937,12 +936,6 @@ public class PluginManager {
     }
   }
 
-  public static void main(String[] args) throws IOException {
-    ArrayList<Pair<String, String>> pairs = new ArrayList<>();
-    pairs.add(Pair.of("org.roda.core.plugins.base.risks.RiskAssociationPlugin", "STABLE"));
-    writePluginInformationAsMarkdown(pairs, "5.0.0-SNAPSHOT", "/tmp");
-  }
-
   public static void writePluginInformationAsMarkdown(List<Pair<String, String>> plugins, String rodaVersion,
     String outputDir) throws IOException {
     Map<String, String> pluginsInfoMap = getPluginsInformationAsMarkdown(plugins, rodaVersion);
@@ -1018,7 +1011,8 @@ public class PluginManager {
     sb.append(String.format("%n"));
     // METADATA - Documentation
     sb.append("<dt class=\"documentation\">Documentation</dt>");
-    sb.append("<dd title=\"Documentation\" class=\"documentation\"><a href=\"./documentation/README.md\">Documentation</a></dd>");
+    sb.append(
+      "<dd title=\"Documentation\" class=\"documentation\"><a href=\"./documentation/README.md\">Documentation</a></dd>");
     sb.append(String.format("%n"));
     sb.append("</dl>");
 
@@ -1057,8 +1051,8 @@ public class PluginManager {
         String mode = pluginParameter.isReadonly() ? "<span title=\"Mode\" class=\"parameter-mode\">%s</span>" : "";
 
         // ROW
-        sbParameters.append(
-          String.format("| **%s** | %s | %s %s %s | %n", pluginParameter.getName(), description, type, isMandatory, mode));
+        sbParameters.append(String.format("| **%s** | %s | %s %s %s | %n", pluginParameter.getName(), description, type,
+          isMandatory, mode));
       }
     }
     sb.append(String.format("## Parameters %n%n%s%n%n", sbParameters.toString()));
