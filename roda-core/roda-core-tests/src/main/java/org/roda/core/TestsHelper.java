@@ -11,11 +11,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.hamcrest.MatcherAssert;
 import org.hamcrest.core.Is;
@@ -40,6 +40,7 @@ import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
+import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.util.IdUtils;
 import org.testng.AssertJUnit;
@@ -170,14 +171,20 @@ public final class TestsHelper {
     IndexResult<IndexedReport> indexReports = index.find(IndexedReport.class, filter, Sorter.NONE,
       new Sublist(0, counter.intValue()), Collections.emptyList());
 
-    List<Report> reports = indexReports.getResults().stream().map(ireport -> (Report) ireport)
-      .collect(Collectors.toList());
+    try {
+      ModelService model = RodaCoreFactory.getModelService();
+      List<Report> reports = new ArrayList<>();
+      for (IndexedReport ireport : indexReports.getResults()) {
+        reports.add(model.retrieveJobReport(ireport.getJobId(), ireport.getId()));
+      }
+      if (failIfReportNotSucceeded) {
+        ReportAssertUtils.assertReports(reports);
+      }
 
-    if (failIfReportNotSucceeded) {
-      ReportAssertUtils.assertReports(reports);
+      return reports;
+    } catch (NotFoundException e) {
+      throw new GenericException("Unable to retrieve report from model", e);
     }
-
-    return reports;
   }
 
   public static <T extends IsRODAObject> void releaseAllLocks() {
