@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.index.filter;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -30,8 +31,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
   @Type(value = LongRangeFilterParameter.class, name = "LongRangeFilterParameter"),
   @Type(value = StringRangeFilterParameter.class, name = "StringRangeFilterParameter"),
   @Type(value = SimpleFilterParameter.class, name = "SimpleFilterParameter"),
-  @Type(value = OrFiltersParameters.class, name = "OrFiltersParameters")})
+  @Type(value = OrFiltersParameters.class, name = "OrFiltersParameters"),
+  @Type(value = AndFiltersParameters.class, name = "AndFiltersParameters")})
 public abstract class FilterParameter implements Serializable {
+  @Serial
   private static final long serialVersionUID = 3744111668897879761L;
 
   private String name;
