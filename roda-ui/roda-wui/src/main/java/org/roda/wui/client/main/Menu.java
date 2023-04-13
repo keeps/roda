@@ -107,7 +107,6 @@ public class Menu extends Composite {
   private MenuItem administrationNotifications;
   private MenuItem administrationStatistics;
   private MenuItem administrationDistributedInstances;
-  private MenuItem administrationReporting;
   private MenuItem administrationMonitoring;
   private MenuItem administrationMarketplace;
   // private MenuItem administrationPreferences;
@@ -186,7 +185,7 @@ public class Menu extends Composite {
     administrationStatistics.addStyleName("administration_statistics_item");
     administrationMarketplace = administrationMenu.addItem(messages.title("administration_market_place"),
       createURLCommand(ConfigurationManager.getString(RodaConstants.UI_MARKETPLACE_URL)));
-    administrationStatistics.addStyleName("administration_statistics_item");
+    administrationMarketplace.addStyleName("administration_marketplace_item");
     String distributedMode = ConfigurationManager.getStringWithDefault(
       RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
     if (distributedMode.equals(RodaConstants.DistributedModeType.CENTRAL.name())) {
@@ -202,18 +201,7 @@ public class Menu extends Composite {
     }
 
     String monitoringLink = ConfigurationManager.getString(RodaConstants.UI_MONITORING_URL);
-    String reportingLink = ConfigurationManager.getString(RodaConstants.UI_REPORTING_URL);
     Boolean monitoringActive = ConfigurationManager.getBoolean(false, RodaConstants.UI_MONITORING_ACTIVE);
-    Boolean reportingActive = ConfigurationManager.getBoolean(false, RodaConstants.UI_REPORTING_ACTIVE);
-
-    if (reportingActive) {
-      //reporting page
-    } else {
-      administrationReporting = administrationMenu.addItem(
-        messages.title("administration_reporting"),
-        createURLCommand(reportingLink));
-      administrationReporting.addStyleName("administration_reporting_item");
-    }
 
     if (monitoringActive) {
       //monitoring page
@@ -221,7 +209,7 @@ public class Menu extends Composite {
       administrationMonitoring = administrationMenu.addItem(
         messages.title("administration_monitoring"),
         createURLCommand(monitoringLink));
-      administrationReporting.addStyleName("administration_monitoring_item");
+      administrationMonitoring.addStyleName("administration_monitoring_item");
     }
     // administration_preferences =
     // administrationMenu.addItem(messages.title("administrationPreferences"),
