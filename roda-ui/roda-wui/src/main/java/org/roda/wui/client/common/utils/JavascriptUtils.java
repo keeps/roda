@@ -2,13 +2,14 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
- *
+ * <p>
  * https://github.com/keeps/roda
  */
 package org.roda.wui.client.common.utils;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.json.client.JSONValue;
+import com.google.gwt.user.client.Element;
 
 public class JavascriptUtils {
 
@@ -483,5 +484,36 @@ public class JavascriptUtils {
        }
    }
    return decodeURIComponent(escape(o.join("")));
+  }-*/;
+
+
+  public static native Boolean accessLocalStorage(String key) /*-{
+    var result=localStorage.getItem(key);
+    if (result==null) {
+      localStorage.setItem(key,true);
+      return true;
+    }
+    else {
+      if(result=="true") return true;
+      if(result=="false") return false;
+    }
+  }-*/;
+
+  public static native void setLocalStorage(String key, boolean b) /*-{
+    localStorage.setItem(key, b);
+  }-*/;
+
+  public static native void handleClickClose(Element panelCloseButton, Element panelStatistic, String key) /*-{
+    panelCloseButton.addEventListener("click", function() {
+      panelStatistic.style.display = "none";
+      localStorage.setItem(key, false);
+    })
+  }-*/;
+
+
+  public static native void handleClickLeanMore(Element panelStatisticsButton, String url) /*-{
+    panelStatisticsButton.addEventListener("click", function() {
+      window.open(url);
+    })
   }-*/;
 }

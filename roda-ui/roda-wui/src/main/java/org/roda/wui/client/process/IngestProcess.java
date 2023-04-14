@@ -12,18 +12,13 @@ package org.roda.wui.client.process;
 
 import java.util.List;
 
-import com.google.gwt.user.client.ui.InlineHTML;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.wui.client.common.UpSalePanel;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.actions.JobActions;
-import org.roda.wui.client.common.actions.model.ActionableObject;
-import org.roda.wui.client.common.actions.widgets.ActionableWidgetBuilder;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.common.utils.SidebarUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
@@ -40,7 +35,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -95,6 +89,8 @@ public class IngestProcess extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
+  public static final String cardIdentifier="collapsable-ingest-process-card";
+
   @UiField
   FlowPanel ingestProcessDescription;
 
@@ -104,8 +100,9 @@ public class IngestProcess extends Composite {
   @UiField
   FlowPanel contentFlowPanel;
 
-  @UiField
-  InlineHTML dropFolderMessage;
+  @UiField(provided = true)
+  UpSalePanel ingestPanel;
+
 
   private IngestProcess() {
     Filter jobIngestFilter = new Filter(
@@ -115,8 +112,9 @@ public class IngestProcess extends Composite {
 
     jobSearch = new JobSearch("IngestProcess_jobs", "IngestProcess_reports", jobIngestFilter, jobReportIngestFilter,
       true, IngestTransfer.RESOLVER);
+    ingestPanel = new UpSalePanel(messages.dropFolderInformationText(), messages.views() ,ConfigurationManager.getString(RodaConstants.UI_DROPFOLDER_URL), cardIdentifier);
     initWidget(uiBinder.createAndBindUi(this));
-    dropFolderMessage.setHTML(messages.dropFolderInformationText(ConfigurationManager.getString(RodaConstants.UI_DROPFOLDER_URL)));
+    ingestPanel.setVisible(JavascriptUtils.accessLocalStorage(cardIdentifier));
     ingestProcessDescription.add(new HTMLWidgetWrapper("IngestProcessDescription.html"));
   }
 

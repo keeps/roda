@@ -463,6 +463,8 @@ public interface ClientMessages extends Messages {
 
   String closeButton();
 
+  String close();
+
   String copyAndCloseButton();
 
   String selectButton();
@@ -1455,9 +1457,14 @@ public interface ClientMessages extends Messages {
 
   SafeHtml loggedIn(String username);
 
+  String views();
+
   String welcomePage();
 
-  SafeHtml casInformationText(String url);
+  String casInformationText();
+
+  String casTitleText();
+
 
   // Login Dialog
 
@@ -1541,7 +1548,7 @@ public interface ClientMessages extends Messages {
 
   String editUserAction();
   // Pre ingest panel
-  SafeHtml dropFolderInformationText(String url);
+  String dropFolderInformationText();
   // User Data Panel
   String username();
 
@@ -2394,4 +2401,5 @@ public interface ClientMessages extends Messages {
   String editDescMetadataLockedTitle();
 
   String editDescMetadataLockedText();
+
 }

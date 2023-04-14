@@ -21,8 +21,10 @@ import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.NoAsyncCallback;
+import org.roda.wui.client.common.UpSalePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.Dialogs;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.management.RecoverLogin;
 import org.roda.wui.client.management.Register;
 import org.roda.wui.client.management.UserManagementService;
@@ -87,6 +89,8 @@ public class Login extends Composite {
     return RESOLVER.getHistoryPath() + "." + id;
   }
 
+  public static final String cardIdentifier="collapsable-login-card";
+
   interface MyUiBinder extends UiBinder<Widget, Login> {
   }
 
@@ -114,12 +118,11 @@ public class Login extends Composite {
   @UiField
   FlowPanel loggedInPanel;
 
+  @UiField(provided = true)
+  UpSalePanel casMessagePanel;
+
   @UiField
   InlineHTML loggedInMessage;
-
-  @UiField
-  InlineHTML casMessage;
-
   @UiField
   Button logout;
 
@@ -129,6 +132,7 @@ public class Login extends Composite {
   private List<String> serviceTokens = null;
 
   private Login() {
+    casMessagePanel = new UpSalePanel(messages.casTitleText(), messages.casInformationText(),messages.views(), ConfigurationManager.getString(RodaConstants.UI_DROPFOLDER_URL), cardIdentifier);
     initWidget(uiBinder.createAndBindUi(this));
 
     addAttachHandler(new AttachEvent.Handler() {
@@ -142,11 +146,13 @@ public class Login extends Composite {
 
   }
 
+
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     username.setText("");
     password.setText("");
     error.setText("");
-    casMessage.setHTML(messages.casInformationText(ConfigurationManager.getString(RodaConstants.UI_CAS_URL)));
+
+    casMessagePanel.setVisible(JavascriptUtils.accessLocalStorage(cardIdentifier));
     resendEmail.setVisible(false);
     serviceTokens = historyTokens;
 
