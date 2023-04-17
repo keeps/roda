@@ -12,9 +12,6 @@ package org.roda.wui.client.management;
 
 import java.util.List;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Element;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -26,6 +23,8 @@ import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -43,7 +42,7 @@ public class Statistics {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[]{Statistics.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {Statistics.RESOLVER}, false, callback);
     }
 
     @Override
@@ -60,7 +59,6 @@ public class Statistics {
   private static Statistics instance = null;
 
   public static final String cardIdentifier = "collapsable-statistics-card";
-
 
   /**
    * Get the singleton instance
@@ -86,32 +84,32 @@ public class Statistics {
     if (!initialized) {
       initialized = true;
       JavascriptUtils.expose("locale", LocaleInfo.getCurrentLocale().getLocaleName());
-      layout = new HTMLWidgetWrapper("Statistics.html", null, RodaConstants.ResourcesTypes.INTERNAL, new AsyncCallback<Void>() {
+      layout = new HTMLWidgetWrapper("Statistics.html", null, RodaConstants.ResourcesTypes.INTERNAL,
+        new AsyncCallback<Void>() {
 
-        @Override
-        public void onFailure(Throwable caught) {
-          Toast.showError(caught);
-        }
-
-        @Override
-        public void onSuccess(Void result) {
-
-          JavascriptUtils.runHighlighter();
-
-          Element panelStatistic = DOM.getElementById("panelStatistic");
-          if (!JavascriptUtils.accessLocalStorage(cardIdentifier)) {
-            panelStatistic.setAttribute("hidden", "");
-          } else {
-            Element panelStatisticsButton = DOM.getElementById("reporting-action-button");
-            JavascriptUtils.handleClickLeanMore(panelStatisticsButton, ConfigurationManager.getString(RodaConstants.UI_DROPFOLDER_URL));
+          @Override
+          public void onFailure(Throwable caught) {
+            Toast.showError(caught);
           }
 
-          Element panelCloseButton = DOM.getElementById("closeButton");
-          JavascriptUtils.handleClickClose(panelCloseButton, panelStatistic, cardIdentifier);
+          @Override
+          public void onSuccess(Void result) {
 
-          //JavascriptUtils.accessLocalStorage();
-        }
-      });
+            JavascriptUtils.runHighlighter();
+
+            Element panelStatistic = DOM.getElementById("panelStatistic");
+            if (!JavascriptUtils.accessLocalStorage(cardIdentifier)) {
+              panelStatistic.setAttribute("hidden", "");
+            } else {
+              Element panelStatisticsButton = DOM.getElementById("reporting-action-button");
+              JavascriptUtils.handleClickLeanMore(panelStatisticsButton,
+                ConfigurationManager.getString(RodaConstants.UI_DROPFOLDER_URL));
+            }
+
+            Element panelCloseButton = DOM.getElementById("closeButton");
+            JavascriptUtils.handleClickClose(panelCloseButton, panelStatistic, cardIdentifier);
+          }
+        });
       layout.addStyleName("wui-home");
     }
   }

@@ -132,7 +132,8 @@ public class Login extends Composite {
   private List<String> serviceTokens = null;
 
   private Login() {
-    casMessagePanel = new UpSalePanel(messages.casTitleText(), messages.casInformationText(),messages.views(), ConfigurationManager.getString(RodaConstants.UI_DROPFOLDER_URL), cardIdentifier);
+    casMessagePanel = new UpSalePanel(messages.casTitleText(), messages.casInformationText(), messages.views(),
+      ConfigurationManager.getString(RodaConstants.UI_DROPFOLDER_URL), cardIdentifier);
     initWidget(uiBinder.createAndBindUi(this));
 
     addAttachHandler(new AttachEvent.Handler() {
@@ -145,7 +146,6 @@ public class Login extends Composite {
     });
 
   }
-
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     username.setText("");
