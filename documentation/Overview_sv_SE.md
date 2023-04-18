@@ -56,7 +56,7 @@ Processen för förkontroll av inleverans åskådliggör möjligheten för en Pr
 
 Inleveransprocessen innehåller tjänster och funktioner för att acceptera inlämningspaket (SIP) från producenter, förbereda arkivpaket (AIP) för lagring och säkerställa att arkivpaket och deras stödjande beskrivande information etableras i e-arkivet. Den här sidan listar alla inleveranser som för närvarande körs och alla leveranser som har körts tidigare. I den högra sidopanelen är det möjligt att filtrera jobb baserat på deras tillstånd, användare som initierade jobbet och startdatum. Genom att klicka på ett objekt i tabellen är det möjligt att se hur arbetet fortskrider samt ytterligare detaljer.
 
-### Bedömning
+### Ankomstkontroll
 
 Inleveransbedömning är processen för att avgöra om informationen och annat material har bevarandevärde. Bedömning kan göras på samling-, skapar-, serie-, fil- eller objektsnivå. Bedömningen kan ske före eller efter överföringen. Grunden för bedömningsbeslut kan omfatta ett antal faktorer inklusive informationens härkomst, innehåll, autenticitet, tillförlitlighet, ordning, fullständighet, skick, kostnader för bevarandet samt informationens egenvärde.
 
