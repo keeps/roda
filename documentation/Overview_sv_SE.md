@@ -60,7 +60,7 @@ Inleveransprocessen innehåller tjänster och funktioner för att acceptera inl�
 
 Inleveransbedömning är processen för att avgöra om informationen och annat material har bevarandevärde. Bedömning kan göras på samling-, skapar-, serie-, fil- eller objektsnivå. Bedömningen kan ske före eller efter överföringen. Grunden för bedömningsbeslut kan omfatta ett antal faktorer inklusive informationens härkomst, innehåll, autenticitet, tillförlitlighet, ordning, fullständighet, skick, kostnader för bevarandet samt informationens egenvärde.
 
-### Bevarandeåtgärder
+### Arkivvårdsjobb
 
 Arkivvårdsjobb är uppgifter som utförs på innehållet i arkivet och som syftar till att förbättra tillgängligheten till arkiverade filer eller att minska riskerna vid digital bevarande.Inom RODA hanteras arkivvårdsjobb av en jobbexekveringsmodul. Jobbexekveringsmodulen tillåter arkivarien att köra arkivvårdsjobb för en given uppsättning data (AIP, representationer eller filer). Arkivvårdsjobben inkluderar formatkonverteringar, verifieringar av kontrollsummor, rapportering (t.ex. för att automatiskt skickade SIP-acceptans/avvisninge-postmeddelanden), viruskontroller osv. Preservation actions are tasks performed on the contents of the repository that aim to enhance the accessibility of archived files or to mitigate digital preservation risks.Within RODA, preservation actions are handled by a job execution module. The job execution module allows the repository manager to run actions over a given set of data (AIPs, representations or files). Preservation actions include format conversions, checksum verifications, reporting (e.g. to automatically send SIP acceptance/rejection emails), virus checks, etc.
 
