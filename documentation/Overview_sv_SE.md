@@ -48,9 +48,9 @@ På söksidan kan du söka efter intellektuella enheter, Representationer eller 
 
 Processen för förkontroll av inleverans åskådliggör möjligheten för en Producent att skapa Submission Information Packages (SIP) som innehåller data och metadata (i en definierad struktur) för att kunna överlämna dem till systemet för inleverans. SIP:arna som skapas förväntas följa policyer som är fastställda med (eller genom) systemet. 
 
-### Överföring
+### Inleverans
 
-Överföringsområdet tillhandahåller lämplig tillfällig lagring för att ta emot inlämningsinformationspaket (SIP) från producenter. SIP:er kan levereras via elektronisk överföring (t.ex. FTP) eller laddas från media som är anslutna till förvaret. Den här sidan gör det också möjligt för användaren att söka efter filer i det temporära överföringsområdet, skapa/ta bort mappar och ladda upp flera SIP:er till förvaret samtidigt för vidare bearbetning och intag. Intagsprocessen kan initieras genom att välja de SIP:er som du vill inkludera i bearbetningsbatchen. Klicka på knappen "Bearbeta" för att initiera intagningsprocessen.
+Inleveransytan tillhandahåller tillfällig lagring för att ta emot inlämningsinformationspaket (SIP) från producenter. SIP:er kan levereras via elektronisk överföring (t.ex. FTP) eller laddas in från media som är anslutna till systemet. Den här sidan gör det också möjligt för användaren att söka efter filer i den tillfälliga lagringsytan, skapa/ta bort mappar och ladda upp flera SIP:er samtidigt till systemet för vidare bearbetning och inleverans. Inleveransprocessen kan initieras genom att välja de SIP:er som du vill inkludera i bearbetningsbatchen. Klicka på knappen "Bearbeta" för att initiera intagningsprocessen.
 
 ### Leverans
 
