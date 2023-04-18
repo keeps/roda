@@ -58,7 +58,7 @@ Inleveransprocessen innehåller tjänster och funktioner för att acceptera inl�
 
 ### Ankomstkontroll
 
-Inleveransbedömning är processen för att avgöra om informationen och annat material har bevarandevärde. Bedömning kan göras på samling-, skapar-, serie-, fil- eller objektsnivå. Bedömningen kan ske före eller efter överföringen. Grunden för bedömningsbeslut kan omfatta ett antal faktorer inklusive informationens härkomst, innehåll, autenticitet, tillförlitlighet, ordning, fullständighet, skick, kostnader för bevarandet samt informationens egenvärde.
+Ankomstkontroll är en process för att avgöra om informationen och annat material har bevarandevärde. Bedömning kan göras på samling-, skapar-, serie-, fil- eller objektsnivå. Ankomstkontrollen kan ske före eller efter överföringen. Grunden för beslut kan omfatta ett antal faktorer inklusive informationens härkomst, innehåll, autenticitet, tillförlitlighet, ordning, fullständighet, skick, kostnader för bevarandet samt informationens egenvärde.
 
 ### Arkivvårdsjobb
 
