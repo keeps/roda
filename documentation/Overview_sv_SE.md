@@ -52,7 +52,7 @@ Processen för förkontroll av inleverans åskådliggör möjligheten för en Pr
 
 Överföringsområdet tillhandahåller lämplig tillfällig lagring för att ta emot inlämningsinformationspaket (SIP) från producenter. SIP:er kan levereras via elektronisk överföring (t.ex. FTP) eller laddas från media som är anslutna till förvaret. Den här sidan gör det också möjligt för användaren att söka efter filer i det temporära överföringsområdet, skapa/ta bort mappar och ladda upp flera SIP:er till förvaret samtidigt för vidare bearbetning och intag. Intagsprocessen kan initieras genom att välja de SIP:er som du vill inkludera i bearbetningsbatchen. Klicka på knappen "Bearbeta" för att initiera intagningsprocessen.
 
-### Inleverans
+### Leverans
 
 Inleveransprocessen innehåller tjänster och funktioner för att acceptera inlämningspaket (SIP) från producenter, förbereda arkivpaket (AIP) för lagring och säkerställa att arkivpaket och deras stödjande beskrivande information etableras i e-arkivet. Den här sidan listar alla inleveranser som för närvarande körs och alla leveranser som har körts tidigare. I den högra sidopanelen är det möjligt att filtrera jobb baserat på deras tillstånd, användare som initierade jobbet och startdatum. Genom att klicka på ett objekt i tabellen är det möjligt att se hur arbetet fortskrider samt ytterligare detaljer.
 
