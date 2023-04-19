@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
-<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder" xmlns:g="urn:import:com.google.gwt.user.client.ui"
+			 xmlns:common="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='messages' type='config.i18n.client.ClientMessages' />
 
@@ -56,9 +57,7 @@
 				</g:Button>
 			</g:FlowPanel>
 		</g:FlowPanel>
-		<g:FlowPanel addStyleNames="casMessagePanel">
-			<g:InlineHTML ui:field="casMessage" />
-		</g:FlowPanel>
+		<common:UpSalePanel ui:field="casMessagePanel" />
 	</g:FlowPanel>
 
 </ui:UiBinder>

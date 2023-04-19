@@ -14,9 +14,7 @@
 					ui:field="ingestTransferTitle" />
 				<g:FlowPanel addStyleNames="page-description" ui:field="ingestTransferDescription">
 				</g:FlowPanel>
-				<g:FlowPanel addStyleNames="page-description" >
-					<g:InlineHTML ui:field="dropFolderMessage" />
-				</g:FlowPanel>
+				<g:SimplePanel ui:field="ingestTransferPanel"/>
 				<common:TitlePanel ui:field="itemTitle">
 					<g:Label addStyleNames="browseItemDates" ui:field="itemDates" />
 				</common:TitlePanel>
