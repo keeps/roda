@@ -13,7 +13,6 @@ package org.roda.wui.client.ingest.transfer;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.gwt.user.client.ui.InlineHTML;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.filter.EmptyKeyFilterParameter;
@@ -24,11 +23,13 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NavigationToolbar;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
+import org.roda.wui.client.common.UpSalePanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.Actionable;
 import org.roda.wui.client.common.actions.TransferredResourceActions;
 import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.search.TransferredResourceSearch;
 import org.roda.wui.common.client.HistoryResolver;
@@ -52,6 +53,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
@@ -64,6 +66,8 @@ public class IngestTransfer extends Composite {
 
   @SuppressWarnings("unused")
   private static final String TRANSFERRED_RESOURCE_ID_SEPARATOR = "/";
+
+  public static final String cardIdentifier = "collapsable-ingest-transfer-card";
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -153,6 +157,9 @@ public class IngestTransfer extends Composite {
   @UiField
   FlowPanel ingestTransferDescription;
 
+  @UiField
+  SimplePanel ingestTransferPanel;
+
   @UiField(provided = true)
   TransferredResourceSearch resourceSearch;
 
@@ -167,9 +174,6 @@ public class IngestTransfer extends Composite {
 
   @UiField
   TitlePanel ingestTransferTitle;
-
-  @UiField
-  InlineHTML dropFolderMessage;
 
   @UiField
   Label itemDates;
@@ -231,10 +235,12 @@ public class IngestTransfer extends Composite {
       TransferredResourceActions.get(null), actionCallback);
 
     initWidget(uiBinder.createAndBindUi(this));
+    UpSalePanel widgets = new UpSalePanel(messages.dropFolderInformationText(), messages.learnMore(),
+      ConfigurationManager.getString(RodaConstants.UI_DROPFOLDER_URL), cardIdentifier);
+    ingestTransferPanel.setWidget(widgets);
 
     navigationToolbar.setHeader(messages.oneOfAObject(TransferredResource.class.getName()));
 
-    dropFolderMessage.setHTML(messages.dropFolderInformationText(ConfigurationManager.getString(RodaConstants.UI_DROPFOLDER_URL)));
     ingestTransferDescription.add(new HTMLWidgetWrapper("IngestTransferDescription.html"));
 
     draw();
@@ -248,13 +254,13 @@ public class IngestTransfer extends Composite {
       itemDates.setText("");
       download.setVisible(false);
       navigationToolbar.setVisible(false);
-
+      ingestTransferPanel.setVisible(JavascriptUtils.accessLocalStorage(cardIdentifier));
       lastScanned.setText("");
     } else {
       navigationToolbar.updateBreadcrumb(resource);
       navigationToolbar.withObject(resource).build();
       navigationToolbar.setVisible(true);
-
+      ingestTransferPanel.setVisible(false);
       ingestTransferTitle.setVisible(false);
       ingestTransferDescription.setVisible(false);
 
