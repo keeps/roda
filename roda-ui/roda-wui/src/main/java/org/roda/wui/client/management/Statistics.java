@@ -2,7 +2,7 @@
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE file at the root of the source
  * tree and available online at
- *
+ * <p>
  * https://github.com/keeps/roda
  */
 /**
@@ -16,18 +16,20 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
  * @author Luis Faria
- *
  */
 public class Statistics {
 
@@ -55,6 +57,8 @@ public class Statistics {
   };
 
   private static Statistics instance = null;
+
+  public static final String cardIdentifier = "collapsable-statistics-card";
 
   /**
    * Get the singleton instance
@@ -90,7 +94,20 @@ public class Statistics {
 
           @Override
           public void onSuccess(Void result) {
+
             JavascriptUtils.runHighlighter();
+
+            Element panelStatistic = DOM.getElementById("panelStatistic");
+            if (!JavascriptUtils.accessLocalStorage(cardIdentifier)) {
+              panelStatistic.setAttribute("hidden", "");
+            } else {
+              Element panelStatisticsButton = DOM.getElementById("reporting-action-button");
+              JavascriptUtils.handleClickLeanMore(panelStatisticsButton,
+                ConfigurationManager.getString(RodaConstants.UI_DROPFOLDER_URL));
+            }
+
+            Element panelCloseButton = DOM.getElementById("closeButton");
+            JavascriptUtils.handleClickClose(panelCloseButton, panelStatistic, cardIdentifier);
           }
         });
       layout.addStyleName("wui-home");
