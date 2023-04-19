@@ -534,6 +534,18 @@ div.inline {
     line-height: 1.5em;
 }
 
+.page-description span {
+    margin-bottom: 1em;
+    font-size: 1.3rem;
+    line-height: 1.5em;
+}
+.page-description btn {
+    margin-bottom: 1em;
+    font-size: 1.3rem;
+    line-height: 1.5em;
+}
+
+
 .roda-logo {
     font-family: 'RODALogo' !important;
     speak: none;
@@ -4333,12 +4345,52 @@ td.datePickerMonth, td.datePickerYear {
     padding: 40px;
 }
 
-.casMessagePanel {
+.collapsable-card-panel {
     margin: 40px auto 0;
     max-width: 400px;
     min-width: 300px;
     background-color: #f9f9f9;
-    padding: 40px;
+    padding: 30px 40px;
+    position: relative;
+    border-radius: 2px;
+}
+
+
+.collapsable-card-panel#panelStatistic {
+    max-width: fit-content;
+}
+
+.collapsable-card-panel h5 {
+  margin-top: 0;
+}
+
+.collapsable-card-panel p {
+  font-weight: 200;
+  font-size: 1.4rem;
+}
+
+.collapsable-card-panel .collapsable-card-panel-close:hover {
+  color: black;
+}
+
+.collapsable-card-panel-action {
+    padding-right:10px;
+    margin-top: 15px;
+    background: none;
+    color: #089de3;
+    border: 1px solid #089de3;
+    min-width: 80px;
+    text-align: center;
+}
+
+.collapsable-card-panel a:hover {
+    text-decoration: none;
+}
+
+
+.collapsable-card-panel-action:hover {
+  color: white;
+  border: 1px solid #2988c0;
 }
 
 .loginPanel h1 {
@@ -7516,6 +7568,15 @@ span.code {
     margin-right: 10px;
 }
 
+.close {
+    left: 100%;
+    position: relative;
+    background-color:transparent;
+    border: none;
+    outline: none;
+}
+
+
 .fa-solid fa-triangle-exclamation {
       content: '\f071';
         @mixin fontawesome();
@@ -7732,3 +7793,47 @@ span.code {
 }
 
 
+
+.collapsable-card-panel-close {
+  background-color:transparent;
+  border: none;
+  right: 20px;
+  position: absolute;
+  color: #555;
+  cursor: pointer;
+  top: 20px;
+}
+
+.ingest-tab-panel {
+    border: 1px solid #e0e0e0;
+    padding: 7px 10px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    border-radius: 2px;
+    font-weight: 200;
+    font-size: 1.3rem;
+}
+
+.ingest-tab-panel-label {
+    padding: 3px 5px;
+}
+
+.ingestTabPanelclose{
+    background-color: transparent;
+    border: none;
+    right: 20px;
+    color: #555;
+    cursor: pointer;
+    top: 20px;
+    float:right;
+    margin-left:auto;
+}
+
+.ingest-tab-panel .ingestTabPanelclose:hover {
+  color: black;
+}
+
+.ingest-tab-panel a {
+  font-weight: bold;
+}
