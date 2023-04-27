@@ -159,8 +159,10 @@ public final class RodaConstants {
   public static final String UI_MARKETPLACE_URL = "ui.url.marketplace";
   public static final String UI_MONITORING_URL = "ui.url.monitoring";
   public static final String UI_REPORTING_URL = "ui.url.reporting";
-  public static final String UI_MONITORING_ACTIVE = "ui.menu.administration.reporting";
-  public static final String UI_REPORTING_ACTIVE = "ui.menu.administration.reporting";
+  public static final String UI_MONITORING_STATUS = "ui.service.monitoring";
+  public static final String UI_REPORTING_STATUS = "ui.service.reporting";
+  public static final String UI_CAS_STATUS = "ui.service.cas";
+  public static final String UI_DROPFOLDER_STATUS = "ui.service.dropfolder";
 
   /*
    * RODA objects
