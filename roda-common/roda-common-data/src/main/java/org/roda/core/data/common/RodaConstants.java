@@ -665,6 +665,11 @@ public final class RodaConstants {
   public static final String SOLR_RETRY_HANDLE_EXCEPTIONS = "core.solr.retry.handleExceptions[]";
 
   /*
+   * USER REGISTRATION SETTINGS
+   */
+  public static final String USER_REGISTRATION_DISABLED = "core.user_registration.disabled";
+
+  /*
    * INDEX NAMES
    */
   public static final String INDEX_AIP = "AIP";

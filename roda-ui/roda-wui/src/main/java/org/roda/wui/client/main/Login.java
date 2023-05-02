@@ -13,11 +13,12 @@ package org.roda.wui.client.main;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.EmailUnverifiedException;
 import org.roda.core.data.exceptions.InactiveUserException;
-import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
@@ -91,12 +92,10 @@ public class Login extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private boolean registerDisabled = ConfigurationManager.getBoolean(false,
-    "ui.sharedProperties.userRegister.disabled");
+  private boolean registerDisabled = ConfigurationManager.getBoolean(false, RodaConstants.USER_REGISTRATION_DISABLED);
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
-
 
   @UiField
   TextBox username;
@@ -175,7 +174,7 @@ public class Login extends Composite {
   }
 
   @UiHandler("homepage")
-  void handleHomepage(ClickEvent e){
+  void handleHomepage(ClickEvent e) {
     HistoryUtils.newHistory(Welcome.RESOLVER);
   }
 
