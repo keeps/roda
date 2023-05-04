@@ -112,9 +112,18 @@ public class IngestProcess extends Composite {
 
     jobSearch = new JobSearch("IngestProcess_jobs", "IngestProcess_reports", jobIngestFilter, jobReportIngestFilter,
       true, IngestTransfer.RESOLVER);
+
+    Boolean dropfolderActive = ConfigurationManager.getBoolean(false, RodaConstants.UI_DROPFOLDER_STATUS);
+
     ingestPanel = new UpSalePanel(messages.dropFolderInformationText(), messages.learnMore() ,ConfigurationManager.getString(RodaConstants.UI_DROPFOLDER_URL), cardIdentifier);
     initWidget(uiBinder.createAndBindUi(this));
-    ingestPanel.setVisible(JavascriptUtils.accessLocalStorage(cardIdentifier));
+
+    if(dropfolderActive){
+      ingestPanel.setVisible(false);
+    } else {
+      ingestPanel.setVisible(JavascriptUtils.accessLocalStorage(cardIdentifier));
+    }
+
     ingestProcessDescription.add(new HTMLWidgetWrapper("IngestProcessDescription.html"));
   }
 
