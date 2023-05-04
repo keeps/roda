@@ -96,7 +96,7 @@ public class Login extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  private Boolean casActive = ConfigurationManager.getBoolean(false, RodaConstants.UI_CAS_STATUS);
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -136,6 +136,10 @@ public class Login extends Composite {
       ConfigurationManager.getString(RodaConstants.UI_DROPFOLDER_URL), cardIdentifier);
     initWidget(uiBinder.createAndBindUi(this));
 
+    if(casActive){
+      casMessagePanel.setVisible(false);
+    }
+
     addAttachHandler(new AttachEvent.Handler() {
       @Override
       public void onAttachOrDetach(AttachEvent event) {
@@ -152,7 +156,10 @@ public class Login extends Composite {
     password.setText("");
     error.setText("");
 
-    casMessagePanel.setVisible(JavascriptUtils.accessLocalStorage(cardIdentifier));
+    if(!casActive){
+      casMessagePanel.setVisible(JavascriptUtils.accessLocalStorage(cardIdentifier));
+    }
+
     resendEmail.setVisible(false);
     serviceTokens = historyTokens;
 
