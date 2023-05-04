@@ -151,7 +151,7 @@ public class IngestTransfer extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  private Boolean dropfolderActive = ConfigurationManager.getBoolean(false, RodaConstants.UI_DROPFOLDER_STATUS);
   private final TransferredResource resource;
 
   @UiField
@@ -239,6 +239,10 @@ public class IngestTransfer extends Composite {
       ConfigurationManager.getString(RodaConstants.UI_DROPFOLDER_URL), cardIdentifier);
     ingestTransferPanel.setWidget(widgets);
 
+    if (dropfolderActive){
+      ingestTransferPanel.setVisible(false);
+    }
+
     navigationToolbar.setHeader(messages.oneOfAObject(TransferredResource.class.getName()));
 
     ingestTransferDescription.add(new HTMLWidgetWrapper("IngestTransferDescription.html"));
@@ -254,7 +258,9 @@ public class IngestTransfer extends Composite {
       itemDates.setText("");
       download.setVisible(false);
       navigationToolbar.setVisible(false);
-      ingestTransferPanel.setVisible(JavascriptUtils.accessLocalStorage(cardIdentifier));
+      if (!dropfolderActive){
+        ingestTransferPanel.setVisible(JavascriptUtils.accessLocalStorage(cardIdentifier));
+      }
       lastScanned.setText("");
     } else {
       navigationToolbar.updateBreadcrumb(resource);
