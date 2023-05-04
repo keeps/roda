@@ -2006,9 +2006,14 @@ td.datePickerMonth, td.datePickerYear {
 .homeText {
     color: white;
     font-weight: 400;
-    font-size: 58px;
+    font-size: 6rem;
     line-height: 110px;
     text-align: left;
+}
+
+.homeSubText {
+    font-size: 3.5rem;
+    font-weight: 200;
 }
 
 .languageSwitcher {
