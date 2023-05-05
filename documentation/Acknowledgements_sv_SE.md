@@ -8,6 +8,12 @@ Mellan 2014 och 2016 har RODA-projektet fått ekonomiskt och tekniskt stöd frå
 
 Under 2015 fick programvaran ytterligare finansiering från generaldirektoratet för boken, arkiven och biblioteken (DGLAB, formellt känd som DGARQ), även stödd av det nationella finansieringssystemet Compete 2020, för att utveckla en andra version av programvaran med förbättrade funktioner överlag (t.ex. förbättrade flöden för inleverans, stöd för riskhantering, anpassade beskrivande metadatascheman, snabbare upptäcktsfunktioner, representationsinformation, samt andra funktioner).
 
+Under 2020 sponsrade Tullverket utvecklingen av lagrings- och kgallringsfunktioner i RODA, anpassat till MoReq2010 standardkrav, samt deras egna krav. Dessa funktioner släpptes som en del av RODA 4 i mars 2021.
+
+Mellan 2021-2022 sponsrade DGLAB återigen utvecklingen av flera nya funktioner i RODA, som en del i deras Distributed Digital Preservation-projekt. Dessa funktioner inkluderade stöd för binärer som referens (grund SIP och AIP), autentisering med JWT-åtkomsttokens och sinkronisering mellan RODA-instanser som fungerar som agenter och en RODA-instans som fungerar som central som kan styra bevarandeplaneringsfunktionerna för RODA-agenterna. Dessa funktioner släpptes som en del av RODA 5 i mars 2023.
+
+
+
 ## Särskilt tack
 
 Genom åren har RODA fått bidrag från olika håll som har förbättrat produkten på många olika sätt (idéer, buggfixar, funktioner, översättningar, etc.). Ett särskilt tack går till José Carlos Ramalho från University of Minho för hans bidrag till den kunskap som initierade utvecklingen av RODA, Vladislav Korecký från Gordic för att översätta RODA 1.0 till tjeckiska och finansiera stödet för det tjeckiska SIP-formatet, Miguel Coutada, Masterstudent, för utvecklingen av Digital Preservation Toolkit, David Giaretta och Neil Beagrie för sina insikter om ISO 14721 och ISO 16363, Fulgencio Sanmartin från European Publications Office för sina innovativa idéer om riskhantering, Daniel Cáceres, masterstudent, för översättning av RODA till spanska och alla andra som direkt eller indirekt har stöttat projektet under åren.
