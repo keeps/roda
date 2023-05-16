@@ -7,21 +7,11 @@
  */
 package org.roda.core.common.synchronization;
 
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
+import com.fasterxml.jackson.core.JsonEncoding;
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.SyncUtils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -74,11 +64,20 @@ import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonEncoding;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * {@author João Gomes <jgomes@keep.pt>}.
@@ -104,8 +103,9 @@ public class ImportUtils {
       if (!RodaConstants.STORAGE_CONTAINER_JOB.equals(container.getStoragePath().getName()) || importJobs) {
         for (Resource resource : tmpStorage.listResourcesUnderContainer(container.getStoragePath(), false)) {
           StoragePath storagePath = resource.getStoragePath();
-          if (RodaConstants.STORAGE_CONTAINER_PRESERVATION.equals(container.getStoragePath().getName())) {
-            CloseableIterable<Resource> resources = tmpStorage.listResourcesUnderDirectory(container.getStoragePath(),
+          if (RodaConstants.STORAGE_CONTAINER_PRESERVATION.equals(container.getStoragePath().getName())
+            || RodaConstants.STORAGE_CONTAINER_JOB_REPORT.equals(container.getStoragePath().getName())) {
+            CloseableIterable<Resource> resources = tmpStorage.listResourcesUnderDirectory(resource.getStoragePath(),
               true);
             for (Resource pmResource : resources) {
               StoragePath pmStoragePath = pmResource.getStoragePath();
@@ -134,7 +134,7 @@ public class ImportUtils {
   }
 
   private static void reindexResource(ModelService model, IndexService index, Resource resource)
-    throws AuthorizationDeniedException, GenericException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
     String containerName = resource.getStoragePath().getContainerName();
     Class<IsRODAObject> objectClass = ModelUtils.giveRespectiveModelClassFromContainerName(containerName);
 
@@ -150,6 +150,10 @@ public class ImportUtils {
       if (rodaObject.isPresent()) {
         if (PreservationMetadata.class.equals(objectClass)) {
           model.notifyPreservationMetadataCreated((PreservationMetadata) rodaObject.get()).failOnError();
+        } else if (Report.class.equals(objectClass)) {
+          String jobId = ModelUtils.getJobAndReportIds(resource.getStoragePath()).get(0);
+          Job job = index.retrieve(Job.class, jobId, Arrays.asList());
+          model.notifyJobReportCreatedOrUpdated((Report) rodaObject.get(), job);
         } else {
           clearSpecificIndexes(index, objectClass, rodaObject.get());
           index.reindex(rodaObject.get());
