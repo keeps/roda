@@ -7,12 +7,16 @@
  */
 package org.roda.core.plugins.base.maintenance;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.dips.DIPUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -20,6 +24,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.URNUtils;
 import org.roda.core.data.v2.IsRODAObject;
+import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -27,12 +32,16 @@ import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPLink;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.FileLink;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.RepresentationLink;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
@@ -42,11 +51,16 @@ import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.IterableIndexResult;
+import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.roda.core.storage.utils.RODAInstanceUtils;
+import org.roda.core.util.IdUtils;
 
 /**
  * {@author João Gomes <jgomes@keep.pt>}.
@@ -152,6 +166,7 @@ public class DeleteRodaObjectPluginUtils {
                 PluginState state = PluginState.SUCCESS;
                 try {
                   model.deleteAIP(item.getId());
+                  processLinkedDIP(aip, index, model, report, reportItem, jobPluginInfo, job, plugin);
                 } catch (NotFoundException e) {
                   state = PluginState.FAILURE;
                   reportItem.addPluginDetails("Could not delete AIP: " + e.getMessage());
@@ -199,7 +214,7 @@ public class DeleteRodaObjectPluginUtils {
 
       try {
         model.deleteAIP(aip.getId());
-
+        processLinkedDIP(aip, index, model, report, reportItem, jobPluginInfo, job, plugin);
         if (item != null) {
           outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has been manually deleted");
         } else {
@@ -242,6 +257,7 @@ public class DeleteRodaObjectPluginUtils {
           // model.deleteFile(file, true);
           model.deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), job.getUsername(),
             true);
+          processLinkedDIP(file, index, model, report, reportItem, jobPluginInfo, job, plugin);
         } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
           state = PluginState.FAILURE;
           reportItem.addPluginDetails("Could not delete File: " + e.getMessage());
@@ -320,6 +336,7 @@ public class DeleteRodaObjectPluginUtils {
       } else {
         try {
           model.deleteRepresentation(representation.getAipId(), representation.getId(), job.getUsername());
+          processLinkedDIP(representation, index, model, report, reportItem, jobPluginInfo, job, plugin);
         } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
           state = PluginState.FAILURE;
           reportItem.addPluginDetails("Could not delete representation: " + e.getMessage());
@@ -454,23 +471,95 @@ public class DeleteRodaObjectPluginUtils {
     jobPluginInfo.incrementObjectsProcessed(state);
   }
 
+  private static void processLinkedDIP(IsRODAObject object, IndexService index, ModelService model, Report report,
+    Report reportItem, JobPluginInfo jobPluginInfo, Job job, Plugin<? extends IsRODAObject> plugin)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    Filter dipFilter = new Filter();
+    if (object instanceof AIP aip) {
+      dipFilter.add(new SimpleFilterParameter(RodaConstants.DIP_ALL_AIP_UUIDS, aip.getId()));
+    } else if (object instanceof Representation representation) {
+      dipFilter.add(
+        new SimpleFilterParameter(RodaConstants.DIP_ALL_REPRESENTATION_UUIDS, IdUtils.getRepresentationId(representation)));
+    } else if (object instanceof File file) {
+      dipFilter.add(new SimpleFilterParameter(RodaConstants.DIP_FILE_UUIDS, IdUtils.getFileId(file)));
+    } else {
+      return;
+    }
+
+    try (IterableIndexResult<IndexedDIP> allDips = index.findAll(IndexedDIP.class, dipFilter, new ArrayList<>())) {
+      for (IndexedDIP indexedDIP : allDips) {
+        DIP dip = model.retrieveDIP(indexedDIP.getId());
+        List<AIPLink> aipIds = dip.getAipIds();
+        List<RepresentationLink> representationIds = dip.getRepresentationIds();
+        List<FileLink> fileIds = dip.getFileIds();
+        if (object instanceof AIP aip) {
+          aipIds.removeIf(aipId -> aipId.getAipId().equals(aip.getId()));
+          representationIds.removeIf(repId -> repId.getAipId().equals(aip.getId()));
+          fileIds.removeIf(fileId -> fileId.getAipId().equals(aip.getId()));
+        } else if (object instanceof Representation representation) {
+          representationIds.removeIf(repId -> repId.getAipId().equals(representation.getAipId())
+            && repId.getRepresentationId().equals(representation.getId()));
+          fileIds.removeIf(fileId -> fileId.getRepresentationId().equals(representation.getId()));
+        } else if (object instanceof File file) {
+          fileIds.removeIf(fileId -> fileId.getAipId().equals(file.getAipId())
+            && fileId.getRepresentationId().equals(file.getRepresentationId())
+            && fileId.getPath().equals(file.getPath()) && fileId.getFileId().equals(file.getId()));
+        }
+
+        if (aipIds.isEmpty() && representationIds.isEmpty() && fileIds.isEmpty()) {
+          processDIP(model, report, jobPluginInfo, job, plugin, dip, false);
+        } else {
+          model.updateDIP(dip);
+        }
+      }
+    } catch (IOException e) {
+      reportItem.addPluginDetails("Error removing object link in dip");
+    }
+  }
+
   private static void processDIP(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
     final Plugin<? extends IsRODAObject> plugin, DIP dip, final boolean doReport) {
-    PluginState state = PluginState.SUCCESS;
-    Report reportItem = PluginHelper.initPluginReportItem(plugin, dip.getId(), DIP.class);
+    Optional<String> deletePlugin = DIPUtils.getDeletePlugin(dip);
 
+    if (deletePlugin.isPresent()) {
+      processDIPDelegated(model, report, jobPluginInfo, job, plugin, dip, doReport, deletePlugin.get());
+    } else {
+      PluginState state = PluginState.SUCCESS;
+      Report reportItem = PluginHelper.initPluginReportItem(plugin, dip.getId(), DIP.class);
+
+      try {
+        model.deleteDIP(dip.getId());
+      } catch (NotFoundException | GenericException | AuthorizationDeniedException e) {
+        state = PluginState.FAILURE;
+        reportItem.addPluginDetails("Could not delete DIP: " + e.getMessage());
+      }
+      if (doReport) {
+        report.addReport(reportItem.setPluginState(state));
+        PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, job);
+      }
+      jobPluginInfo.incrementObjectsProcessed(state);
+    }
+  }
+
+  private static void processDIPDelegated(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
+    Plugin<? extends IsRODAObject> plugin, DIP dip, boolean doReport, String deletePlugin) {
     try {
-      model.deleteDIP(dip.getId());
-    } catch (NotFoundException | GenericException | AuthorizationDeniedException e) {
-      state = PluginState.FAILURE;
-      reportItem.addPluginDetails("Could not delete DIP: " + e.getMessage());
+      Plugin<? extends IsRODAObject> externalDeletePlugin = RodaCoreFactory.getPluginManager().getPlugin(deletePlugin);
+      JobsHelper.setPluginParameters(externalDeletePlugin, job);
+      List<LiteOptionalWithCause> lites = LiteRODAObjectFactory.transformIntoLiteWithCause(model,
+        Collections.singletonList(dip));
+      externalDeletePlugin.execute(RodaCoreFactory.getIndexService(), model, RodaCoreFactory.getStorageService(),
+        lites);
+    } catch (PluginException e) {
+      Report reportItem = PluginHelper.initPluginReportItem(plugin, dip.getId(), DIP.class);
+      PluginState state = PluginState.FAILURE;
+      reportItem.addPluginDetails("Could not delete DIP using plugin " + deletePlugin + " reason: " + e.getMessage());
+      if (doReport) {
+        report.addReport(reportItem.setPluginState(state));
+        PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, job);
+      }
+      jobPluginInfo.incrementObjectsProcessed(state);
     }
-
-    if (doReport) {
-      report.addReport(reportItem.setPluginState(state));
-      PluginHelper.updatePartialJobReport(plugin, model, reportItem, true, job);
-    }
-    jobPluginInfo.incrementObjectsProcessed(state);
   }
 
   private static void processDIPFile(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,

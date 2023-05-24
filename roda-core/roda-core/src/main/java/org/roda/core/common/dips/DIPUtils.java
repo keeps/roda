@@ -78,6 +78,10 @@ public class DIPUtils {
     }
   }
 
+  public static Optional<String> getDeletePlugin(DIP dip) {
+    return getDIPProperty(dip, RodaConstants.RODA_OBJECT_DIP, dip.getType(), "deleteExternalURL", "plugin");
+  }
+
   private static Optional<String> getDIPProperty(DIP dip, String... property) {
     Optional<String> ret = Optional.empty();
     if (StringUtils.isNotBlank(dip.getType())) {
