@@ -108,6 +108,7 @@ import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
@@ -130,6 +131,8 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.model.utils.ResourceListUtils;
 import org.roda.core.model.utils.ResourceParseUtils;
 import org.roda.core.model.utils.UserUtility;
+import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
@@ -1919,12 +1922,18 @@ public class ModelService extends ModelObservable {
     String id = IdUtils.getOtherMetadataId(aipId, representationId, fileDirectoryPath, fileId);
     OtherMetadata om = new OtherMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, fileSuffix);
 
-    AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
-    AIP updatedAIP = updateAIPMetadata(aip, username);
-
     if (notify) {
       notifyOtherMetadataCreated(om).failOnError();
-      notifyAipUpdatedOnChanged(updatedAIP);
+    }
+
+    if (representationId != null) {
+      changeRepresentationUpdateOn(aipId, representationId, username, notify);
+    } else {
+      AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
+      AIP updatedAIP = updateAIPMetadata(aip, username);
+      if (notify) {
+        notifyAipUpdatedOnChanged(updatedAIP);
+      }
     }
 
     return om;
