@@ -183,9 +183,6 @@ public class Menu extends Composite {
     administrationStatistics = administrationMenu.addItem(messages.title("administration_statistics"),
       createCommand(Statistics.RESOLVER.getHistoryPath()));
     administrationStatistics.addStyleName("administration_statistics_item");
-    administrationMarketplace = administrationMenu.addItem(messages.title("administration_market_place"),
-      createURLCommand(ConfigurationManager.getString(RodaConstants.UI_MARKETPLACE_URL)));
-    administrationMarketplace.addStyleName("administration_marketplace_item");
     String distributedMode = ConfigurationManager.getStringWithDefault(
       RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
     if (distributedMode.equals(RodaConstants.DistributedModeType.CENTRAL.name())) {
@@ -211,6 +208,10 @@ public class Menu extends Composite {
         createURLCommand(monitoringLink));
       administrationMonitoring.addStyleName("administration_monitoring_item");
     }
+    administrationMarketplace = administrationMenu.addItem(messages.title("administration_market_place"),
+        createURLCommand(ConfigurationManager.getString(RodaConstants.UI_MARKETPLACE_URL)));
+    administrationMarketplace.addStyleName("administration_marketplace_item");
+
     // administration_preferences =
     // administrationMenu.addItem(messages.title("administrationPreferences"),
     // createCommand(Management.RESOLVER.getHistoryPath()));

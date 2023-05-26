@@ -62,7 +62,7 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getName() {
-    return "Activity Log Truncator";
+    return "Audit Log Truncator";
   }
 
   @Override
@@ -72,9 +72,9 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
 
   @Override
   public String getDescription() {
-    return "The Activity Log Truncator removes all entries in the activity log that are older than the specified number of"
+    return "The Audit Log Truncator removes all entries in the audit log that are older than the specified number of"
       + " days. The log is preserved as external physical files, however older entries will not be displayed in the graphical user interface. "
-      + "To access older log entries, one needs access to the storage layer of the repository server.\nActivity log truncation "
+      + "To access older log entries, one needs access to the storage layer of the repository server.\nAudit log truncation "
       + "automatically frees index space and improves performance of the repository as a whole.";
   }
 
