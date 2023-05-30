@@ -89,14 +89,14 @@ public class Login extends Composite {
     return RESOLVER.getHistoryPath() + "." + id;
   }
 
-  public static final String cardIdentifier="collapsable-login-card";
+  public static final String cardIdentifier = "collapsable-login-card";
 
   interface MyUiBinder extends UiBinder<Widget, Login> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private Boolean casActive = ConfigurationManager.getBoolean(false, RodaConstants.UI_CAS_STATUS);
+  private Boolean casActive = ConfigurationManager.getBoolean(false, RodaConstants.UI_SERVICE_CAS_ACTIVE);
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -133,10 +133,10 @@ public class Login extends Composite {
 
   private Login() {
     casMessagePanel = new UpSalePanel(messages.casTitleText(), messages.casInformationText(), messages.learnMore(),
-      ConfigurationManager.getString(RodaConstants.UI_DROPFOLDER_URL), cardIdentifier);
+      ConfigurationManager.getString(RodaConstants.UI_SERVICE_CAS_URL), cardIdentifier);
     initWidget(uiBinder.createAndBindUi(this));
 
-    if(casActive){
+    if (casActive) {
       casMessagePanel.setVisible(false);
     }
 
@@ -156,7 +156,7 @@ public class Login extends Composite {
     password.setText("");
     error.setText("");
 
-    if(!casActive){
+    if (!casActive) {
       casMessagePanel.setVisible(JavascriptUtils.accessLocalStorage(cardIdentifier));
     }
 
