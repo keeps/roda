@@ -10,12 +10,8 @@
  */
 package org.roda.wui.client.management;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
+import java.util.List;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -26,7 +22,11 @@ import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
-import java.util.List;
+import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.Element;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  * @author Luis Faria
@@ -47,7 +47,7 @@ public class Statistics {
 
     @Override
     public String getHistoryToken() {
-      return "statistics";
+      return "reporting";
     }
 
     @Override
@@ -97,23 +97,18 @@ public class Statistics {
 
             JavascriptUtils.runHighlighter();
 
-            Boolean reportingActive = ConfigurationManager.getBoolean(false, RodaConstants.UI_REPORTING_STATUS);
             Element panelStatistic = DOM.getElementById("panelStatistic");
 
-            if (reportingActive) {
+            if (!JavascriptUtils.accessLocalStorage(cardIdentifier)) {
               panelStatistic.setAttribute("hidden", "");
             } else {
-              if (!JavascriptUtils.accessLocalStorage(cardIdentifier)) {
-                panelStatistic.setAttribute("hidden", "");
-              } else {
-                Element panelStatisticsButton = DOM.getElementById("reporting-action-button");
-                JavascriptUtils.handleClickLeanMore(panelStatisticsButton,
-                  ConfigurationManager.getString(RodaConstants.UI_DROPFOLDER_URL));
-              }
-
-              Element panelCloseButton = DOM.getElementById("closeButton");
-              JavascriptUtils.handleClickClose(panelCloseButton, panelStatistic, cardIdentifier);
+              Element panelStatisticsButton = DOM.getElementById("reporting-action-button");
+              JavascriptUtils.handleClickLeanMore(panelStatisticsButton,
+                  ConfigurationManager.getString(RodaConstants.UI_SERVICE_REPORTING_URL));
             }
+
+            Element panelCloseButton = DOM.getElementById("closeButton");
+            JavascriptUtils.handleClickClose(panelCloseButton, panelStatistic, cardIdentifier);
           }
         });
       layout.addStyleName("wui-home");

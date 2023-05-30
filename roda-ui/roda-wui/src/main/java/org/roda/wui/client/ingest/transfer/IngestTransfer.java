@@ -151,7 +151,7 @@ public class IngestTransfer extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-  private Boolean dropfolderActive = ConfigurationManager.getBoolean(false, RodaConstants.UI_DROPFOLDER_STATUS);
+  private Boolean dropfolderActive = ConfigurationManager.getBoolean(false, RodaConstants.UI_SERVICE_DROPFOLDER_ACTIVE);
   private final TransferredResource resource;
 
   @UiField
@@ -236,7 +236,7 @@ public class IngestTransfer extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
     UpSalePanel widgets = new UpSalePanel(messages.dropFolderInformationText(), messages.learnMore(),
-      ConfigurationManager.getString(RodaConstants.UI_DROPFOLDER_URL), cardIdentifier);
+      ConfigurationManager.getString(RodaConstants.UI_SERVICE_DROPFOLDER_URL), cardIdentifier);
     ingestTransferPanel.setWidget(widgets);
 
     if (dropfolderActive){

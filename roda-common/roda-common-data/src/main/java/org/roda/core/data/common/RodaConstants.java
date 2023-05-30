@@ -154,16 +154,18 @@ public final class RodaConstants {
   public static final String UI_LISTS_COLUMNS_DEFAULTSORTLIST_ASCENDING = "defaultSortList.ascending";
 
   public static final String UI_ICONS_CLASS = "ui.icons.class";
-  public static final String UI_DROPFOLDER_URL = "ui.url.dropfolder";
-  public static final String UI_CAS_URL = "ui.url.cas";
-  public static final String UI_MARKETPLACE_URL = "ui.url.marketplace";
-  public static final String UI_MONITORING_URL = "ui.url.monitoring";
-  public static final String UI_REPORTING_URL = "ui.url.reporting";
-  public static final String UI_MONITORING_STATUS = "ui.service.monitoring";
-  public static final String UI_REPORTING_STATUS = "ui.service.reporting";
-  public static final String UI_CAS_STATUS = "ui.service.cas";
-  public static final String UI_DROPFOLDER_STATUS = "ui.service.dropfolder";
+  public static final String UI_SERVICE_DROPFOLDER_URL = "ui.service.dropfolder.url";
+  public static final String UI_SERVICE_CAS_URL = "ui.service.cas.url";
+  public static final String UI_SERVICE_MARKETPLACE_URL = "ui.service.marketplace.url";
+  public static final String UI_SERVICE_MONITORING_URL = "ui.service.monitoring.url";
+  public static final String UI_SERVICE_REPORTING_URL = "ui.service.reporting.url";
+  public static final String UI_SERVICE_REPORTING_ACTIVE = "ui.service.reporting.active";
+  public static final String UI_SERVICE_CAS_ACTIVE = "ui.service.cas.active";
+  public static final String UI_SERVICE_DROPFOLDER_ACTIVE = "ui.service.dropfolder.active";
 
+  public static final String UI_SERVICE_MONITORING_DEFAULT_URL = "https://www.roda-enterprise.com";
+  public static final String UI_SERVICE_CAS_DEFAULT_URL = "https://www.roda-enterprise.com";
+  public static final String UI_SERVICE_MARKETPLACE_DEFAULT_URL = "https://marketplace.roda-community.org";
   /*
    * RODA objects
    */

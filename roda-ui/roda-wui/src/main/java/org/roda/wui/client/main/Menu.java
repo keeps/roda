@@ -171,17 +171,24 @@ public class Menu extends Composite {
     administrationInternalActions = administrationMenu.addItem(messages.title("administration_internal_actions"),
       createCommand(InternalProcess.RESOLVER.getHistoryPath()));
     administrationInternalActions.addStyleName("administration_internal_actions_item");
-    administrationUser = administrationMenu.addItem(messages.title("administration_user"),
-      createCommand(MemberManagement.RESOLVER.getHistoryPath()));
-    administrationUser.addStyleName("administration_user_item");
     administrationLog = administrationMenu.addItem(messages.title("administration_log"),
       createCommand(UserLog.RESOLVER.getHistoryPath()));
     administrationLog.addStyleName("administration_log_item");
     administrationNotifications = administrationMenu.addItem(messages.title("administration_notifications"),
       createCommand(NotificationRegister.RESOLVER.getHistoryPath()));
     administrationNotifications.addStyleName("administration_notifications_item");
-    administrationStatistics = administrationMenu.addItem(messages.title("administration_statistics"),
-      createCommand(Statistics.RESOLVER.getHistoryPath()));
+
+    boolean reportingActive = ConfigurationManager.getBoolean(false,
+        RodaConstants.UI_SERVICE_REPORTING_ACTIVE);
+
+    if (reportingActive) {
+      administrationStatistics = administrationMenu.addItem(messages.title("administration_statistics"),
+          createURLCommand(ConfigurationManager.getString(RodaConstants.UI_SERVICE_REPORTING_URL)));
+    } else {
+      administrationStatistics = administrationMenu.addItem(messages.title("administration_statistics"),
+          createCommand(Statistics.RESOLVER.getHistoryPath()));
+    }
+
     administrationStatistics.addStyleName("administration_statistics_item");
     String distributedMode = ConfigurationManager.getStringWithDefault(
       RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name(), RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY);
@@ -197,24 +204,18 @@ public class Menu extends Composite {
       administrationDistributedInstances.addStyleName("administration_statistics_item");
     }
 
-    String monitoringLink = ConfigurationManager.getString(RodaConstants.UI_MONITORING_URL);
-    Boolean monitoringActive = ConfigurationManager.getBoolean(false, RodaConstants.UI_MONITORING_STATUS);
-
-    if (monitoringActive) {
-      //monitoring page
-    } else {
-      administrationMonitoring = administrationMenu.addItem(
-        messages.title("administration_monitoring"),
-        createURLCommand(monitoringLink));
-      administrationMonitoring.addStyleName("administration_monitoring_item");
-    }
+    String monitoringLink = ConfigurationManager.getStringWithDefault(RodaConstants.UI_SERVICE_MONITORING_DEFAULT_URL,
+      RodaConstants.UI_SERVICE_MONITORING_URL);
+    administrationMonitoring = administrationMenu.addItem(messages.title("administration_monitoring"),
+      createURLCommand(monitoringLink));
+    administrationMonitoring.addStyleName("administration_monitoring_item");
+    administrationUser = administrationMenu.addItem(messages.title("administration_user"),
+      createCommand(MemberManagement.RESOLVER.getHistoryPath()));
+    administrationUser.addStyleName("administration_user_item");
     administrationMarketplace = administrationMenu.addItem(messages.title("administration_market_place"),
-        createURLCommand(ConfigurationManager.getString(RodaConstants.UI_MARKETPLACE_URL)));
+      createURLCommand(ConfigurationManager.getStringWithDefault(RodaConstants.UI_SERVICE_MARKETPLACE_DEFAULT_URL,
+        RodaConstants.UI_SERVICE_MARKETPLACE_URL)));
     administrationMarketplace.addStyleName("administration_marketplace_item");
-
-    // administration_preferences =
-    // administrationMenu.addItem(messages.title("administrationPreferences"),
-    // createCommand(Management.RESOLVER.getHistoryPath()));
 
     disposalMenu = new AcessibleMenuBar(true);
     disposalPolicy = disposalMenu.addItem(messages.title("disposal_policies"),
@@ -231,9 +232,6 @@ public class Menu extends Composite {
     disposalDestroyedRecords.addStyleName("disposal_destroyed_records_item");
 
     planningMenu = new AcessibleMenuBar(true);
-    // planningMonitoring =
-    // planningMenu.addItem(messages.title("planning_monitoring"),
-    // createCommand(Planning.RESOLVER.getHistoryPath()));
     planningRepresentationInformation = planningMenu.addItem(messages.title("planning_representation_information"),
       createCommand(RepresentationInformationNetwork.RESOLVER.getHistoryPath()));
     planningRepresentationInformation.addStyleName("planning_representation_information_item");

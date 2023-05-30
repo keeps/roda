@@ -7810,7 +7810,7 @@ span.code {
 }
 
 .ingest-tab-panel {
-    border: 1px solid #e0e0e0;
+    border: 1px solid #ffe69c;
     padding: 7px 10px;
     display: flex;
     align-items: center;
@@ -7818,6 +7818,8 @@ span.code {
     border-radius: 2px;
     font-weight: 200;
     font-size: 1.3rem;
+    background-color: #FFF3CD;
+    color: #664d03;
 }
 
 .ingest-tab-panel-label {
