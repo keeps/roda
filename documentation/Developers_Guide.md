@@ -30,6 +30,7 @@ The pre-requisites to build RODA are:
 
 * Git client
 * Apache Maven 3.8+
+* GitHub account, [configure Maven to use your Github account](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry#authenticating-with-a-personal-access-token).
 * Oracle Java 17
 
 
