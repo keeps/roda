@@ -67,7 +67,8 @@ public class SiegfriedPluginUtils {
   }
 
   private static String getSiegfriedServerEndpoint(Path sourceDirectory) {
-    String siegfriedServer = RodaCoreFactory.getRodaConfiguration().getString("core.tools.siegfried.server", "http://localhost:5138");
+    String siegfriedServer = RodaCoreFactory.getRodaConfiguration().getString("core.tools.siegfried.server",
+      "http://localhost:5138");
 
     return String.format("%s/identify/%s?base64=true&format=json", siegfriedServer,
       new String(Base64.encode(sourceDirectory.toString().getBytes())));
@@ -141,8 +142,8 @@ public class SiegfriedPluginUtils {
   }
 
   public static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnRepresentation(ModelService model,
-    Representation representation, String jobId) throws GenericException, RequestNotValidException, NotFoundException,
-    AuthorizationDeniedException, PluginException {
+    Representation representation, String jobId, String username) throws GenericException, RequestNotValidException,
+    NotFoundException, AuthorizationDeniedException, PluginException {
     StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(representation.getAipId(),
       representation.getId());
     StorageService storageService;
@@ -153,7 +154,7 @@ public class SiegfriedPluginUtils {
       try (DirectResourceAccess directAccess = tmpStorageService.getDirectAccess(representationDataPath)) {
         Path representationFsPath = directAccess.getPath();
         return runSiegfriedOnRepresentationOrFile(model, representation.getAipId(), representation.getId(),
-          new ArrayList<>(), null, representationFsPath);
+          new ArrayList<>(), null, representationFsPath, username);
       } catch (IOException e) {
         throw new GenericException(e);
       } finally {
@@ -170,22 +171,22 @@ public class SiegfriedPluginUtils {
       try (DirectResourceAccess directAccess = model.getStorage().getDirectAccess(representationDataPath)) {
         Path representationFsPath = directAccess.getPath();
         return runSiegfriedOnRepresentationOrFile(model, representation.getAipId(), representation.getId(),
-          new ArrayList<>(), null, representationFsPath);
+          new ArrayList<>(), null, representationFsPath, username);
       } catch (IOException e) {
         throw new GenericException(e);
       }
     }
   }
 
-  public static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnFile(ModelService model, File file)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
+  public static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnFile(ModelService model, File file,
+    String username) throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
     PluginException {
     StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
 
     try (DirectResourceAccess directAccess = model.getStorage().getDirectAccess(fileStoragePath)) {
       Path filePath = directAccess.getPath();
       List<LinkingIdentifier> sources = runSiegfriedOnRepresentationOrFile(model, file.getAipId(),
-        file.getRepresentationId(), file.getPath(), file.getId(), filePath);
+        file.getRepresentationId(), file.getPath(), file.getId(), filePath, username);
       model.notifyFileUpdated(file).failOnError();
       return sources;
     } catch (IOException e) {
@@ -194,7 +195,7 @@ public class SiegfriedPluginUtils {
   }
 
   private static <T extends IsRODAObject> List<LinkingIdentifier> runSiegfriedOnRepresentationOrFile(ModelService model,
-    String aipId, String representationId, List<String> fileDirectoryPath, String fileId, Path path)
+    String aipId, String representationId, List<String> fileDirectoryPath, String fileId, Path path, String username)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
     PluginException {
     List<LinkingIdentifier> sources = new ArrayList<>();
@@ -223,7 +224,7 @@ public class SiegfriedPluginUtils {
 
         ContentPayload payload = new StringContentPayload(file.toString());
         model.createOrUpdateOtherMetadata(aipId, representationId, jsonFilePath, jsonFileId,
-          SiegfriedPlugin.FILE_SUFFIX, RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, payload, false);
+          SiegfriedPlugin.FILE_SUFFIX, RodaConstants.OTHER_METADATA_TYPE_SIEGFRIED, payload, username, false);
 
         sources.add(PluginHelper.getLinkingIdentifier(aipId, representationId, jsonFilePath, jsonFileId,
           RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
@@ -244,7 +245,7 @@ public class SiegfriedPluginUtils {
           }
 
           PremisV3Utils.updateFormatPreservationMetadata(model, aipId, representationId, jsonFilePath, jsonFileId,
-            format, version, pronom, mime, true);
+            format, version, pronom, mime, username, true);
         }
       }
     }

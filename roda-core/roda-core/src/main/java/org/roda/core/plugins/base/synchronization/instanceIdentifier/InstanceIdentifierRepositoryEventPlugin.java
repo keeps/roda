@@ -204,7 +204,7 @@ public class InstanceIdentifierRepositoryEventPlugin extends AbstractPlugin<Void
     for (IndexedPreservationEvent indexedPreservationEvent : indexedPreservationEvents) {
       try {
         PremisV3Utils.updatePremisEventInstanceId(model.retrievePreservationMetadata(indexedPreservationEvent.getId(),
-          PreservationMetadata.PreservationMetadataType.EVENT), model, index, instanceId);
+          PreservationMetadata.PreservationMetadataType.EVENT), model, index, instanceId, cachedJob.getUsername());
 
         countSuccess++;
       } catch (AuthorizationDeniedException | RequestNotValidException | GenericException | ValidationException

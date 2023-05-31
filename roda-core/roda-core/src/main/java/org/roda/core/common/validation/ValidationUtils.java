@@ -78,7 +78,7 @@ public class ValidationUtils {
 
   public static Pair<ValidationReport, List<Pair<String, String>>> isAIPMetadataValid(
     boolean forceDescriptiveMetadataType, boolean validateDescriptiveMetadata, String fallbackMetadataType,
-    String fallbackMetadataVersion, ModelService model, AIP aip)
+    String fallbackMetadataVersion, ModelService model, AIP aip, String username)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     ValidationReport report = new ValidationReport();
     report.setValid(true);
@@ -103,7 +103,7 @@ public class ValidationUtils {
         properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.METADATA_TYPE_FORCED.toString());
 
         model.updateDescriptiveMetadata(aip.getId(), dm.getId(), binary.getContent(), fallbackMetadataType,
-          fallbackMetadataVersion, properties);
+          fallbackMetadataVersion, properties, username);
         report.setValid(true);
 
         LOGGER.debug("{} valid for metadata type {}", storagePath, fallbackMetadataType);

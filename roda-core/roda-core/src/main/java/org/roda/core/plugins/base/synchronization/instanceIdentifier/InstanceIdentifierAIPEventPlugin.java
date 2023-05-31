@@ -207,7 +207,7 @@ public class InstanceIdentifierAIPEventPlugin extends AbstractPlugin<Void> {
           for (OptionalWithCause<PreservationMetadata> opm : iterable) {
             if (opm.isPresent()) {
               try {
-                PremisV3Utils.updatePremisEventInstanceId(opm.get(), model, index, instanceId);
+                PremisV3Utils.updatePremisEventInstanceId(opm.get(), model, index, instanceId, cachedJob.getUsername());
               } catch (InstanceIdNotUpdated e) {
                 countFail++;
               }

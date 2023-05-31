@@ -44,10 +44,10 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.RODAObjectsProcessingLogic;
-import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.PluginHelper;
+import org.roda.core.plugins.RODAObjectsProcessingLogic;
 import org.roda.core.plugins.base.ingest.AutoAcceptSIPPlugin;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.utils.RODAInstanceUtils;
@@ -175,7 +175,7 @@ public class AppraisalPlugin extends AbstractPlugin<AIP> {
                 Arrays.asList(linkingIdentifierAgent));
 
               model.createPreservationMetadata(PreservationMetadata.PreservationMetadataType.EVENT, id, aipId, null,
-                null, null, premisEvent, true);
+                null, null, premisEvent, job.getUsername(), true);
             } catch (AlreadyExistsException /* | ValidationException */ e) {
               throw new GenericException(e);
             }

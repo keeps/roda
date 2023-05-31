@@ -780,7 +780,7 @@ public final class PremisV3Utils {
   }
 
   public static void updatePremisEventInstanceId(PreservationMetadata pm, ModelService model, IndexService index,
-    String instanceId) throws AuthorizationDeniedException, RequestNotValidException, GenericException,
+    String instanceId, String username) throws AuthorizationDeniedException, RequestNotValidException, GenericException,
     ValidationException, AlreadyExistsException, AlreadyHasInstanceIdentifier, InstanceIdNotUpdated {
 
     if (URNUtils.verifyInstanceIdentifier(pm.getId(), instanceId)) {
@@ -797,7 +797,7 @@ public final class PremisV3Utils {
           pm.getFileDirectoryPath(), pm.getFileId(), pm.getId());
 
         model.createPreservationMetadata(pm.getType(), updatedId, pm.getAipId(), pm.getRepresentationId(),
-          pm.getFileDirectoryPath(), pm.getFileId(), binary.getContent(), true);
+          pm.getFileDirectoryPath(), pm.getFileId(), binary.getContent(), username, true);
 
         model.deletePreservationMetadata(pm.getType(), pm.getAipId(), pm.getRepresentationId(), pm.getId(),
           pm.getFileDirectoryPath(), true);
@@ -811,7 +811,7 @@ public final class PremisV3Utils {
         ContentPayload payload = model.getStorage().getBinary(path).getContent();
 
         model.createPreservationMetadata(pm.getType(), updatedId, pm.getAipId(), pm.getRepresentationId(),
-          pm.getFileDirectoryPath(), pm.getFileId(), payload, false);
+          pm.getFileDirectoryPath(), pm.getFileId(), payload, username, false);
 
         model.deletePreservationMetadata(pm, false);
       } catch (NotFoundException e) {
@@ -917,7 +917,7 @@ public final class PremisV3Utils {
 
   public static void updateFormatPreservationMetadata(ModelService model, String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId, String format, String version, String pronom, String mime,
-    boolean notify) {
+    String username, boolean notify) {
     Binary premisBin;
 
     try {
@@ -928,7 +928,8 @@ public final class PremisV3Utils {
         List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
 
         if (fileId == null) {
-          PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representationId, algorithms);
+          PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representationId, algorithms,
+            username);
         } else {
           // File file;
           // if (shallow) {
@@ -939,7 +940,7 @@ public final class PremisV3Utils {
           // fileId);
           // }
           File file = model.retrieveFile(aipId, representationId, fileDirectoryPath, fileId);
-          PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, algorithms);
+          PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, algorithms, username);
         }
 
         premisBin = model.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
@@ -954,7 +955,7 @@ public final class PremisV3Utils {
 
       ContentPayload premisFilePayload = fileToBinary(premisFile);
       model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, premisFilePayload,
-        notify);
+        username, notify);
     } catch (RODAException | IOException e) {
       LOGGER.error("PREMIS will not be updated due to an error", e);
     }
@@ -1006,7 +1007,7 @@ public final class PremisV3Utils {
 
   public static void updateCreatingApplicationPreservationMetadata(ModelService model, String aipId,
     String representationId, List<String> fileDirectoryPath, String fileId, String creatingApplicationName,
-    String creatingApplicationVersion, String dateCreatedByApplication, boolean notify) {
+    String creatingApplicationVersion, String dateCreatedByApplication, String username, boolean notify) {
     Binary premisBin;
 
     try {
@@ -1015,7 +1016,8 @@ public final class PremisV3Utils {
       } catch (NotFoundException e) {
         LOGGER.debug("PREMIS object skeleton does not exist yet. Creating PREMIS object!");
         List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
-        PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representationId, algorithms);
+        PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representationId, algorithms,
+          username);
         premisBin = model.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
         LOGGER.debug("PREMIS object skeleton created");
       }
@@ -1029,7 +1031,7 @@ public final class PremisV3Utils {
 
       ContentPayload premisFilePayload = fileToBinary(premisFile);
       model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, premisFilePayload,
-        notify);
+        username, notify);
     } catch (RODAException | IOException e) {
       LOGGER.error("PREMIS will not be updated due to an error", e);
     }

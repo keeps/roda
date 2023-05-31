@@ -196,7 +196,7 @@ public class InstanceIdentifierAIPPlugin extends AbstractPlugin<Void> {
 
     for (IndexedAIP indexedAIP : indexedAIPS) {
       try {
-        model.updateAIPInstanceId(model.retrieveAIP(indexedAIP.getId()));
+        model.updateAIPInstanceId(model.retrieveAIP(indexedAIP.getId()), cachedJob.getUsername());
 
         countSuccess++;
       } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {

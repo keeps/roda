@@ -29,7 +29,6 @@ import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.Messages;
 import org.roda.core.common.StreamResponse;
-import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -81,6 +80,7 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.utils.IterableIndexResult;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
@@ -911,7 +911,7 @@ public class Browser extends RodaWuiController {
 
       // delegate
       BrowserHelper.createOrUpdateAIPRepresentationPreservationMetadataFile(aipId, null, new ArrayList<>(), id, is,
-        create);
+        create, user.getId());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -943,7 +943,7 @@ public class Browser extends RodaWuiController {
 
       // delegate
       BrowserHelper.createOrUpdateAIPRepresentationPreservationMetadataFile(rep.getAipId(), rep.getId(),
-        new ArrayList<>(), id, is, create);
+        new ArrayList<>(), id, is, create, user.getId());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -973,7 +973,7 @@ public class Browser extends RodaWuiController {
 
       // delegate
       BrowserHelper.createOrUpdateAIPRepresentationPreservationMetadataFile(file.getAipId(), file.getRepresentationId(),
-        file.getPath(), file.getId(), is, create);
+        file.getPath(), file.getId(), is, create, user.getId());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -1129,7 +1129,7 @@ public class Browser extends RodaWuiController {
       }
 
       // delegate
-      BrowserHelper.createOrUpdateOtherMetadataFile(aipId, representationId, null, null, type, name, is);
+      BrowserHelper.createOrUpdateOtherMetadataFile(aipId, representationId, null, null, type, name, is, user.getId());
 
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
@@ -1167,7 +1167,7 @@ public class Browser extends RodaWuiController {
 
       // delegate
       BrowserHelper.createOrUpdateOtherMetadataFile(file.getAipId(), file.getRepresentationId(), file.getPath(),
-        file.getId(), type, name, is);
+        file.getId(), type, name, is, user.getId());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -1200,7 +1200,7 @@ public class Browser extends RodaWuiController {
       controllerAssistant.checkIfAIPInConfirmation(aip);
 
       // delegate
-      BrowserHelper.deleteOtherMetadataFile(aipId, representationId, null, null, suffix, type);
+      BrowserHelper.deleteOtherMetadataFile(aipId, representationId, null, null, suffix, type, user.getId());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -1230,7 +1230,7 @@ public class Browser extends RodaWuiController {
 
       // delegate
       BrowserHelper.deleteOtherMetadataFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-        suffix, type);
+        suffix, type, user.getId());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -1486,7 +1486,7 @@ public class Browser extends RodaWuiController {
 
       // delegate
       return BrowserHelper.createDescriptiveMetadataFile(aipId, representationId, metadataId, metadataType,
-        metadataVersion, metadataPayload);
+        metadataVersion, metadataPayload, user.getId());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -1526,7 +1526,7 @@ public class Browser extends RodaWuiController {
       properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
 
       return BrowserHelper.updateDescriptiveMetadataFile(aipId, representationId, metadataId, metadataType,
-        metadataVersion, metadataPayload, properties);
+        metadataVersion, metadataPayload, properties, user.getId());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -1558,7 +1558,7 @@ public class Browser extends RodaWuiController {
       controllerAssistant.checkIfAIPInConfirmation(aip);
 
       // delegate
-      BrowserHelper.deleteDescriptiveMetadataFile(aipId, representationId, metadataId);
+      BrowserHelper.deleteDescriptiveMetadataFile(aipId, representationId, metadataId, user.getId());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -1585,7 +1585,7 @@ public class Browser extends RodaWuiController {
       controllerAssistant.checkObjectPermissions(user, aip);
 
       // delegate
-      BrowserHelper.deleteDescriptiveMetadataFile(aipId, representationId, metadataId);
+      BrowserHelper.deleteDescriptiveMetadataFile(aipId, representationId, metadataId, user.getId());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -1710,7 +1710,7 @@ public class Browser extends RodaWuiController {
       properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
 
       return BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(aipId, null, metadataId, metadataType,
-        metadataVersion, properties, is, false);
+        metadataVersion, properties, is, false, user.getId());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -1752,7 +1752,7 @@ public class Browser extends RodaWuiController {
       properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
 
       return BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(representation.getAipId(), representation.getId(),
-        metadataId, metadataType, metadataVersion, properties, is, false);
+        metadataId, metadataType, metadataVersion, properties, is, false, user.getId());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -1791,7 +1791,7 @@ public class Browser extends RodaWuiController {
       properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.CREATED.toString());
 
       return BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(aipId, null, metadataId, metadataType,
-        metadataVersion, properties, is, true);
+        metadataVersion, properties, is, true, user.getId());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -1834,7 +1834,7 @@ public class Browser extends RodaWuiController {
       properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.CREATED.toString());
 
       return BrowserHelper.createOrUpdateAIPDescriptiveMetadataFile(representation.getAipId(), representation.getId(),
-        metadataId, metadataType, metadataVersion, properties, is, true);
+        metadataId, metadataType, metadataVersion, properties, is, true, user.getId());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -2727,7 +2727,7 @@ public class Browser extends RodaWuiController {
       Path temp = Files.createTempFile("descriptive", ".tmp");
       Files.copy(is, temp, StandardCopyOption.REPLACE_EXISTING);
       ContentPayload payload = new FSPathContentPayload(temp);
-      return BrowserHelper.updateFile(file, payload, createIfNotExists, notify);
+      return BrowserHelper.updateFile(file, payload, createIfNotExists, user.getId(), notify);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;

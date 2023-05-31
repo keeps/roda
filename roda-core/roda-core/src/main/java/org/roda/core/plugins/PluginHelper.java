@@ -91,12 +91,6 @@ import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
-import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
-import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.orchestrate.MultipleJobPluginInfo;
-import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
-import org.roda.core.plugins.base.notifications.GenericJobNotification;
-import org.roda.core.plugins.base.notifications.JobNotification;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexAIPPlugin;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexActionLogPlugin;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexDIPPlugin;
@@ -110,6 +104,12 @@ import org.roda.core.plugins.base.maintenance.reindex.ReindexRepresentationInfor
 import org.roda.core.plugins.base.maintenance.reindex.ReindexRiskPlugin;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexRodaMemberPlugin;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexTransferredResourcePlugin;
+import org.roda.core.plugins.base.notifications.GenericJobNotification;
+import org.roda.core.plugins.base.notifications.JobNotification;
+import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.plugins.orchestrate.MultipleJobPluginInfo;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
@@ -920,7 +920,7 @@ public final class PluginHelper {
     }
     LOGGER.debug("Acquiring lock for: {} request: {}", lites, requestUuid);
     RodaCoreFactory.getPluginOrchestrator().acquireObjectLock(lites, PluginHelper.getLockRequestTimeout(), false,
-        requestUuid);
+      requestUuid);
   }
 
   private static int getLockRequestTimeout() {
@@ -1183,7 +1183,7 @@ public final class PluginHelper {
       plugin.getPreservationEventType().toString(), plugin.getPreservationEventDescription(), sources, outcomes,
       outcome.name(), outcomeDetailNote, outcomeDetailExtension, agentIds);
     model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, representationId, filePath, fileId,
-      premisEvent, notify);
+      premisEvent, job.getUsername(), notify);
 
     PreservationMetadata pm = new PreservationMetadata();
     pm.setId(id);
@@ -1552,8 +1552,7 @@ public final class PluginHelper {
    *             is why this method will become private in a near future
    */
   public static <T extends IsRODAObject> List<T> transformLitesIntoObjects(ModelService model, Plugin<T> plugin,
-    Report report, JobPluginInfo pluginInfo, List<LiteOptionalWithCause> lites, Job job, boolean autoLocking)
-  {
+    Report report, JobPluginInfo pluginInfo, List<LiteOptionalWithCause> lites, Job job, boolean autoLocking) {
     List<T> finalObjects = new ArrayList<>();
     List<LiteRODAObject> objectsToLock = new ArrayList<>();
 

@@ -83,9 +83,10 @@ public class MovePluginTest {
       RodaConstants.ADMIN);
 
     // create 'folderA' and 'folderA/fileAA'
-    File folderA = model.createFile(aip.getId(), representation.getId(), Collections.emptyList(), "", "folderA", true);
+    File folderA = model.createFile(aip.getId(), representation.getId(), Collections.emptyList(), "", "folderA",
+      RodaConstants.ADMIN, true);
     File fileAA = model.createFile(aip.getId(), representation.getId(), Collections.singletonList("folderA"), "fileAA",
-      new StringContentPayload("fileAA"), true);
+      new StringContentPayload("fileAA"), RodaConstants.ADMIN, true);
     index.commit(IndexedFile.class);
 
     // move fileAA to root

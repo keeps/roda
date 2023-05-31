@@ -38,9 +38,9 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
@@ -139,15 +139,15 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
         String fileId = transferredResource.getName();
         List<String> directoryPath = new ArrayList<>();
         ContentPayload payload = new FSPathContentPayload(transferredResourcePath);
-        model.createFile(aip.getId(), representationId, directoryPath, fileId, payload, false);
+        model.createFile(aip.getId(), representationId, directoryPath, fileId, payload, job.getUsername(), false);
       } else {
-        processTransferredResourceDirectory(model, transferredResourcePath, aip, representationId);
+        processTransferredResourceDirectory(model, transferredResourcePath, aip, representationId, job.getUsername());
       }
 
       createUnpackingEventSuccess(model, index, transferredResource, aip, UNPACK_DESCRIPTION, job);
       ContentPayload metadataPayload = MetadataFileUtils.getMetadataPayload(transferredResource);
       model.createDescriptiveMetadata(aip.getId(), METADATA_FILE, metadataPayload, METADATA_TYPE, METADATA_VERSION,
-        false);
+        job.getUsername(), false);
 
       // FIXME 20160516 hsilva: put "SIP" inside the AIP???
 
@@ -172,7 +172,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
   }
 
   private void processTransferredResourceDirectory(ModelService model, Path transferredResourcePath, final AIP aip,
-    final String representationId) throws IOException {
+    final String representationId, String username) throws IOException {
     EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
     Files.walkFileTree(transferredResourcePath, opts, Integer.MAX_VALUE, new FileVisitor<Path>() {
       @Override
@@ -187,7 +187,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
         try {
           ContentPayload payload = new FSPathContentPayload(file);
           boolean notifyFileCreated = false;
-          model.createFile(aip.getId(), representationId, directoryPath, fileId, payload, notifyFileCreated);
+          model.createFile(aip.getId(), representationId, directoryPath, fileId, payload, username, notifyFileCreated);
         } catch (RODAException e) {
           LOGGER.error("Could not create file on {}", file.toString(), e);
         }

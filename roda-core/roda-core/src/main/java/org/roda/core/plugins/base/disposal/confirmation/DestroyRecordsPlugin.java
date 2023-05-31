@@ -239,9 +239,9 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
 
         executeSetAIPMetadataInformation(aip, cachedJob.getUsername());
 
-        executeApplyStylesheet(aip, model);
+        executeApplyStylesheet(aip, model, cachedJob.getUsername());
 
-        executeRemoveAllRepresentations(aip, model);
+        executeRemoveAllRepresentations(aip, model, cachedJob.getUsername());
 
         // destroy the AIP
         model.destroyAIP(aip, cachedJob.getUsername());
@@ -282,11 +282,11 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
     PluginHelper.updatePartialJobReport(this, model, reportItem, true, cachedJob);
   }
 
-  private void executeRemoveAllRepresentations(AIP aip, ModelService model)
+  private void executeRemoveAllRepresentations(AIP aip, ModelService model, String username)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     // remove all representations
     for (Representation representation : aip.getRepresentations()) {
-      model.deleteRepresentation(aip.getId(), representation.getId());
+      model.deleteRepresentation(aip.getId(), representation.getId(), username);
     }
     aip.getRepresentations().clear();
   }
@@ -312,7 +312,7 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
     aip.getDisposal().getConfirmation().setDestruction(destruction);
   }
 
-  private void executeApplyStylesheet(AIP aip, ModelService model) throws NotFoundException,
+  private void executeApplyStylesheet(AIP aip, ModelService model, String username) throws NotFoundException,
     AuthorizationDeniedException, GenericException, RequestNotValidException, IOException, AlreadyExistsException {
     // Apply stylesheet to descriptive metadata
     for (DescriptiveMetadata metadata : aip.getDescriptiveMetadata()) {
@@ -322,10 +322,10 @@ public class DestroyRecordsPlugin extends AbstractPlugin<DisposalConfirmation> {
       ReaderInputStream readerInputStream = new ReaderInputStream(reader, StandardCharsets.UTF_8);
       String content = IOUtils.toString(readerInputStream, StandardCharsets.UTF_8);
 
-      model.deleteDescriptiveMetadata(aip.getId(), metadata.getId());
+      model.deleteDescriptiveMetadata(aip.getId(), metadata.getId(), username);
 
       model.createDescriptiveMetadata(aip.getId(), metadata.getId(), new StringContentPayload(content),
-        metadata.getType(), metadata.getVersion());
+        metadata.getType(), metadata.getVersion(), username);
     }
   }
 
