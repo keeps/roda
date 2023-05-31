@@ -31,6 +31,8 @@ public interface ModelObserver {
 
   public ReturnWithExceptions<Void, ModelObserver> aipUpdated(AIP aip);
 
+  public ReturnWithExceptions<Void, ModelObserver> aipUpdatedOn(AIP aip);
+
   public ReturnWithExceptions<Void, ModelObserver> aipDestroyed(AIP aip);
 
   public ReturnWithExceptions<Void, ModelObserver> aipStateUpdated(AIP aip);
@@ -56,6 +58,8 @@ public interface ModelObserver {
 
   public ReturnWithExceptions<Void, ModelObserver> representationDeleted(String aipId, String representationId,
     boolean deleteIncidences);
+
+  public ReturnWithExceptions<Void, ModelObserver> representationUpdatedOn(Representation representation);
 
   public ReturnWithExceptions<Void, ModelObserver> fileCreated(File file);
 

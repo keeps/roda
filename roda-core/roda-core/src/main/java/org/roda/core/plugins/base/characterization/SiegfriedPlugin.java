@@ -40,8 +40,8 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractAIPComponentsPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.PluginHelper;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
@@ -125,8 +125,8 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
                 if (aip.getRepresentations() != null && !aip.getRepresentations().isEmpty()) {
                   for (Representation representation : aip.getRepresentations()) {
                     LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-                    sources.addAll(
-                      SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation, cachedJob.getId()));
+                    sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation,
+                      cachedJob.getId(), cachedJob.getUsername()));
                     model.notifyRepresentationUpdated(representation).failOnError();
                   }
 
@@ -146,8 +146,8 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
               if (aip.getRepresentations() != null && !aip.getRepresentations().isEmpty()) {
                 for (Representation representation : aip.getRepresentations()) {
                   LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-                  sources.addAll(
-                    SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation, cachedJob.getId()));
+                  sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation,
+                    cachedJob.getId(), cachedJob.getUsername()));
                   model.notifyRepresentationUpdated(representation).failOnError();
                 }
 
@@ -182,8 +182,8 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
               for (Representation representation : filteredList) {
                 try {
                   LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-                  sources.addAll(
-                    SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation, cachedJob.getId()));
+                  sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation,
+                    cachedJob.getId(), cachedJob.getUsername()));
                   model.notifyRepresentationUpdated(representation).failOnError();
                   state = PluginState.SUCCESS;
                 } catch (RODAException e) {
@@ -232,7 +232,8 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
       PluginHelper.updatePartialJobReport(this, model, reportItem, false, cachedJob);
       LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), representation.getAipId());
       try {
-        sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation, cachedJob.getId()));
+        sources.addAll(SiegfriedPluginUtils.runSiegfriedOnRepresentation(model, representation, cachedJob.getId(),
+          cachedJob.getUsername()));
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
         reportItem.setPluginState(PluginState.SUCCESS);
         model.notifyRepresentationUpdated(representation).failOnError();
@@ -273,7 +274,7 @@ public class SiegfriedPlugin<T extends IsRODAObject> extends AbstractAIPComponen
         file.getAipId());
 
       try {
-        sources.addAll(SiegfriedPluginUtils.runSiegfriedOnFile(model, file));
+        sources.addAll(SiegfriedPluginUtils.runSiegfriedOnFile(model, file, cachedJob.getUsername()));
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
         reportItem.setPluginState(PluginState.SUCCESS);
       } catch (PluginException | NotFoundException | GenericException | RequestNotValidException

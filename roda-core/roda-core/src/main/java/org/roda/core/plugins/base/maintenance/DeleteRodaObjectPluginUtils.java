@@ -44,8 +44,8 @@ import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.PluginHelper;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.storage.utils.RODAInstanceUtils;
 
 /**
@@ -240,7 +240,8 @@ public class DeleteRodaObjectPluginUtils {
       } else {
         try {
           // model.deleteFile(file, true);
-          model.deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), true);
+          model.deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), job.getUsername(),
+            true);
         } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
           state = PluginState.FAILURE;
           reportItem.addPluginDetails("Could not delete File: " + e.getMessage());
@@ -318,7 +319,7 @@ public class DeleteRodaObjectPluginUtils {
           representation.getId(), "hold", retrievedAIP.getId(), details, doReport);
       } else {
         try {
-          model.deleteRepresentation(representation.getAipId(), representation.getId());
+          model.deleteRepresentation(representation.getAipId(), representation.getId(), job.getUsername());
         } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
           state = PluginState.FAILURE;
           reportItem.addPluginDetails("Could not delete representation: " + e.getMessage());

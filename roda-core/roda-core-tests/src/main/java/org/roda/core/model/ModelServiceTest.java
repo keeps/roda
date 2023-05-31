@@ -65,8 +65,6 @@ import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
-import org.roda.core.index.IndexServiceTest;
-import org.roda.core.index.IndexTestUtils;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultStoragePath;
@@ -587,7 +585,7 @@ public class ModelServiceTest {
 
     final DescriptiveMetadata newDescriptiveMetadata = model.createDescriptiveMetadata(aipId, newDescriptiveMetadataId,
       binary.getContent(), CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE,
-      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION);
+      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION, RodaConstants.ADMIN);
 
     // check if it is connected
     DescriptiveMetadata retrievedDescriptiveMetadata = model.retrieveDescriptiveMetadata(aipId,
@@ -621,7 +619,7 @@ public class ModelServiceTest {
 
     final DescriptiveMetadata updatedDescriptiveMetadata = model.updateDescriptiveMetadata(aipId,
       CorporaConstants.DESCRIPTIVE_METADATA_ID, binary.getContent(), CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE,
-      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION, properties);
+      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION, properties, RodaConstants.ADMIN);
 
     // check if it is connected
     DescriptiveMetadata retrievedDescriptiveMetadata = model.retrieveDescriptiveMetadata(aipId,
@@ -639,14 +637,14 @@ public class ModelServiceTest {
 
     // check if binary version message collisions are well treated
     model.updateDescriptiveMetadata(aipId, CorporaConstants.DESCRIPTIVE_METADATA_ID, binary.getContent(),
-      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE, CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION,
-      properties);
+      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE, CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION, properties,
+      RodaConstants.ADMIN);
     model.updateDescriptiveMetadata(aipId, CorporaConstants.DESCRIPTIVE_METADATA_ID, binary.getContent(),
-      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE, CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION,
-      properties);
+      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE, CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION, properties,
+      RodaConstants.ADMIN);
     model.updateDescriptiveMetadata(aipId, CorporaConstants.DESCRIPTIVE_METADATA_ID, binary.getContent(),
-      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE, CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION,
-      properties);
+      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE, CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION, properties,
+      RodaConstants.ADMIN);
 
     assertEquals(4, Iterables.size(storage.listBinaryVersions(storagePath)));
 
@@ -662,7 +660,7 @@ public class ModelServiceTest {
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);
 
-    model.deleteDescriptiveMetadata(aipId, CorporaConstants.DESCRIPTIVE_METADATA_ID);
+    model.deleteDescriptiveMetadata(aipId, CorporaConstants.DESCRIPTIVE_METADATA_ID, RodaConstants.ADMIN);
 
     // check if it deleted
     try {
@@ -761,7 +759,7 @@ public class ModelServiceTest {
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID),
       RodaConstants.ADMIN);
 
-    model.deleteRepresentation(aipId, CorporaConstants.REPRESENTATION_1_ID);
+    model.deleteRepresentation(aipId, CorporaConstants.REPRESENTATION_1_ID, RodaConstants.ADMIN);
 
     // check if it deleted
     try {
@@ -798,7 +796,7 @@ public class ModelServiceTest {
     final Binary binary = corporaService.getBinary(corporaFilePath);
 
     File createdFile = model.createFile(aipId, CorporaConstants.REPRESENTATION_1_ID, newFileDirectoryPath, newFileId,
-      binary.getContent(), true);
+      binary.getContent(), RodaConstants.ADMIN, true);
 
     // check if it is connected
     File retrievedFile = model.retrieveFile(aipId, CorporaConstants.REPRESENTATION_1_ID, newFileDirectoryPath,
@@ -829,7 +827,7 @@ public class ModelServiceTest {
     final boolean notify = false;
     File createdFile = model.updateFile(aipId, CorporaConstants.REPRESENTATION_1_ID,
       CorporaConstants.REPRESENTATION_1_FILE_1_PATH, CorporaConstants.REPRESENTATION_1_FILE_1_ID, binary.getContent(),
-      createIfNotExists, notify);
+      createIfNotExists, RodaConstants.ADMIN, notify);
 
     // check if it is connected
     File retrievedFile = model.retrieveFile(aipId, CorporaConstants.REPRESENTATION_1_ID,
@@ -854,7 +852,7 @@ public class ModelServiceTest {
       RodaConstants.ADMIN);
 
     model.deleteFile(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_1_FILE_1_PATH,
-      CorporaConstants.REPRESENTATION_1_FILE_1_ID, true);
+      CorporaConstants.REPRESENTATION_1_FILE_1_ID, RodaConstants.ADMIN, true);
 
     // check if it deleted
     try {

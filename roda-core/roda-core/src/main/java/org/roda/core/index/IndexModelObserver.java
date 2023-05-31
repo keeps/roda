@@ -35,7 +35,6 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.exceptions.RetentionPeriodCalculationException;
 import org.roda.core.data.exceptions.ReturnWithExceptions;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsModelObject;
@@ -405,6 +404,18 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
+  public ReturnWithExceptions<Void, ModelObserver> aipUpdatedOn(AIP aip) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+
+    // change AIP
+    Map<String, Object> updatedFields = new HashMap<>();
+    updatedFields.put(RodaConstants.AIP_UPDATED_BY, aip.getUpdatedBy());
+    updatedFields.put(RodaConstants.AIP_UPDATED_ON, aip.getUpdatedOn());
+    SolrUtils.update(index, IndexedAIP.class, aip.getId(), updatedFields, (ModelObserver) this).addTo(ret);
+    return ret;
+  }
+
+  @Override
   public ReturnWithExceptions<Void, ModelObserver> aipDestroyed(AIP aip) {
     ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
 
@@ -555,6 +566,19 @@ public class IndexModelObserver implements ModelObserver {
       ret.add(e);
     }
 
+    return ret;
+  }
+
+  @Override
+  public ReturnWithExceptions<Void, ModelObserver> representationUpdatedOn(Representation representation) {
+    ReturnWithExceptions<Void, ModelObserver> ret = new ReturnWithExceptions<>(this);
+
+    // change AIP
+    Map<String, Object> updatedFields = new HashMap<>();
+    updatedFields.put(RodaConstants.REPRESENTATION_UPDATED_BY, representation.getUpdatedBy());
+    updatedFields.put(RodaConstants.REPRESENTATION_UPDATED_ON, representation.getUpdatedOn());
+    String representationUUID = IdUtils.getRepresentationId(representation.getAipId(), representation.getId());
+    SolrUtils.update(index, IndexedRepresentation.class, representationUUID, updatedFields, (ModelObserver) this).addTo(ret);
     return ret;
   }
 

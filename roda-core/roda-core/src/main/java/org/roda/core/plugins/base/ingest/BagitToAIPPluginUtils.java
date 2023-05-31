@@ -58,7 +58,7 @@ public class BagitToAIPPluginUtils {
       ingestJobId, notify, createdBy);
 
     model.createDescriptiveMetadata(aip.getId(), metadataFilename, metadataAsPayload, METADATA_TYPE, METADATA_VERSION,
-      notify);
+      createdBy, notify);
 
     boolean original = true;
     String representationType = RodaConstants.REPRESENTATION_TYPE_MIXED;
@@ -70,7 +70,7 @@ public class BagitToAIPPluginUtils {
       for (IPFile bagFile : irep.getData()) {
         ContentPayload payload = new FSPathContentPayload(bagFile.getPath());
         model.createFile(aip.getId(), rep.getId(), bagFile.getRelativeFolders(), bagFile.getFileName(), payload,
-          notify);
+          createdBy, notify);
       }
     }
 

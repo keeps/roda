@@ -141,7 +141,8 @@ public class FilterTest {
 
     LOGGER.info("Generating testing corpora");
     for (int i = 0; i < PREMIS_CORPORA_SIZE; i++) {
-      model.createFile(aip.getId(), REPRESENTATION_ID, filePath, "file_" + i, new StringContentPayload(""), true);
+      model.createFile(aip.getId(), REPRESENTATION_ID, filePath, "file_" + i, new StringContentPayload(""),
+        RodaConstants.ADMIN, true);
     }
     LOGGER.info("Done generating testing corpora");
 
@@ -172,7 +173,8 @@ public class FilterTest {
     LOGGER.info("Generating testing corpora");
     for (int i = 0; i < PREMIS_CORPORA_SIZE; i++) {
       String id = "file_" + i;
-      model.createFile(aip.getId(), REPRESENTATION_ID, filePath, id, new StringContentPayload(""), true);
+      model.createFile(aip.getId(), REPRESENTATION_ID, filePath, id, new StringContentPayload(""), RodaConstants.ADMIN,
+        true);
     }
     LOGGER.info("Done generating testing corpora");
 
@@ -234,7 +236,8 @@ public class FilterTest {
     LOGGER.info("Generating testing corpora");
     for (int i = 0; i < PREMIS_CORPORA_SIZE; i++) {
       String id = "file_" + i;
-      model.createFile(aip.getId(), REPRESENTATION_ID, filePath, id, new StringContentPayload(""), true);
+      model.createFile(aip.getId(), REPRESENTATION_ID, filePath, id, new StringContentPayload(""), RodaConstants.ADMIN,
+        true);
     }
     LOGGER.info("Done generating testing corpora");
 
@@ -248,7 +251,8 @@ public class FilterTest {
         for (int i = PREMIS_CORPORA_SIZE; i < 10000; i++) {
           try {
             String id = "file_" + i;
-            model.createFile(aip.getId(), REPRESENTATION_ID, filePath, id, new StringContentPayload(""), true);
+            model.createFile(aip.getId(), REPRESENTATION_ID, filePath, id, new StringContentPayload(""),
+              RodaConstants.ADMIN, true);
 
             if (i % 20 == 0) {
               index.commit(IndexedFile.class);

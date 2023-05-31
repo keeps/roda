@@ -72,6 +72,10 @@ public abstract class ModelObservable {
     return notifyObserversSafely(observer -> observer.aipUpdated(aip));
   }
 
+  public ReturnWithExceptionsWrapper notifyAipUpdatedOnChanged(AIP aip) {
+    return notifyObserversSafely(observer -> observer.aipUpdatedOn(aip));
+  }
+
   public ReturnWithExceptionsWrapper notifyAipDestroyed(AIP aip) {
     return notifyObserversSafely(observer -> observer.aipDestroyed(aip));
   }
@@ -116,6 +120,10 @@ public abstract class ModelObservable {
 
   public ReturnWithExceptionsWrapper notifyRepresentationDeleted(String aipId, String representationId) {
     return notifyObserversSafely(observer -> observer.representationDeleted(aipId, representationId, true));
+  }
+
+  public ReturnWithExceptionsWrapper notifyRepresentationUpdatedOnChanged(Representation representation) {
+    return notifyObserversSafely(observer -> observer.representationUpdatedOn(representation));
   }
 
   public ReturnWithExceptionsWrapper notifyFileCreated(File file) {

@@ -1488,8 +1488,9 @@ public class BrowserHelper {
   }
 
   public static void createOrUpdateAIPRepresentationPreservationMetadataFile(String aipId, String representationId,
-    List<String> fileDirectoryPath, String fileId, InputStream is, boolean create) throws GenericException,
-    RequestNotValidException, NotFoundException, AuthorizationDeniedException, AlreadyExistsException {
+    List<String> fileDirectoryPath, String fileId, InputStream is, boolean create, String username)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
+    AlreadyExistsException {
     Path file = null;
     try {
       ModelService model = RodaCoreFactory.getModelService();
@@ -1499,11 +1500,12 @@ public class BrowserHelper {
       boolean notify = true;
       if (create) {
         model.createPreservationMetadata(PreservationMetadataType.FILE, aipId, representationId, fileDirectoryPath,
-          fileId, payload, notify);
+          fileId, payload, username, notify);
       } else {
         PreservationMetadataType type = PreservationMetadataType.FILE;
         String id = IdUtils.getPreservationFileId(fileId, RODAInstanceUtils.getLocalInstanceIdentifier());
-        model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, payload, notify);
+        model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, payload,
+          username, notify);
       }
     } catch (IOException e) {
       throw new GenericException("Error creating or updating AIP representation preservation metadata file", e);
@@ -1663,7 +1665,7 @@ public class BrowserHelper {
   }
 
   public static OtherMetadata createOrUpdateOtherMetadataFile(String aipId, String representationId,
-    List<String> fileDirectoryPath, String fileId, String type, String fileSuffix, InputStream is)
+    List<String> fileDirectoryPath, String fileId, String type, String fileSuffix, InputStream is, String username)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     try {
       Path tempFile = Files.createTempFile("descriptive", ".tmp");
@@ -1671,17 +1673,17 @@ public class BrowserHelper {
       ContentPayload payload = new FSPathContentPayload(tempFile);
 
       return RodaCoreFactory.getModelService().createOrUpdateOtherMetadata(aipId, representationId, fileDirectoryPath,
-        fileId, fileSuffix, type, payload, false);
+        fileId, fileSuffix, type, payload, username, false);
     } catch (IOException e) {
       throw new GenericException("Error creating or updating other metadata");
     }
   }
 
   public static void deleteOtherMetadataFile(String aipId, String representationId, List<String> fileDirectoryPath,
-    String fileId, String fileSuffix, String type)
+    String fileId, String fileSuffix, String type, String username)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     RodaCoreFactory.getModelService().deleteOtherMetadata(aipId, representationId, fileDirectoryPath, fileId,
-      fileSuffix, type);
+      fileSuffix, type, username);
   }
 
   public static Job moveAIPInHierarchy(User user, SelectedItems<IndexedAIP> selected, String parentId, String details)
@@ -1794,7 +1796,7 @@ public class BrowserHelper {
 
   public static DescriptiveMetadata createDescriptiveMetadataFile(String aipId, String representationId,
     String descriptiveMetadataId, String descriptiveMetadataType, String descriptiveMetadataVersion,
-    ContentPayload descriptiveMetadataPayload) throws GenericException, ValidationException,
+    ContentPayload descriptiveMetadataPayload, String createdBy) throws GenericException, ValidationException,
     AuthorizationDeniedException, RequestNotValidException, AlreadyExistsException, NotFoundException {
 
     ValidationReport report = ValidationUtils.validateDescriptiveBinary(descriptiveMetadataPayload,
@@ -1805,13 +1807,14 @@ public class BrowserHelper {
     }
 
     return RodaCoreFactory.getModelService().createDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
-      descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion);
+      descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion, createdBy);
   }
 
   public static DescriptiveMetadata updateDescriptiveMetadataFile(String aipId, String representationId,
     String descriptiveMetadataId, String descriptiveMetadataType, String descriptiveMetadataVersion,
-    ContentPayload descriptiveMetadataPayload, Map<String, String> properties) throws GenericException,
-    AuthorizationDeniedException, ValidationException, RequestNotValidException, NotFoundException {
+    ContentPayload descriptiveMetadataPayload, Map<String, String> properties, String updatedBy)
+    throws GenericException, AuthorizationDeniedException, ValidationException, RequestNotValidException,
+    NotFoundException {
 
     ValidationReport report = ValidationUtils.validateDescriptiveBinary(descriptiveMetadataPayload,
       descriptiveMetadataType, descriptiveMetadataVersion, false);
@@ -1821,13 +1824,15 @@ public class BrowserHelper {
     }
 
     return RodaCoreFactory.getModelService().updateDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
-      descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion, properties);
+      descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion, properties, updatedBy);
 
   }
 
-  public static void deleteDescriptiveMetadataFile(String aipId, String representationId, String descriptiveMetadataId)
+  public static void deleteDescriptiveMetadataFile(String aipId, String representationId, String descriptiveMetadataId,
+    String deletedBy)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    RodaCoreFactory.getModelService().deleteDescriptiveMetadata(aipId, representationId, descriptiveMetadataId);
+    RodaCoreFactory.getModelService().deleteDescriptiveMetadata(aipId, representationId, descriptiveMetadataId,
+      deletedBy);
   }
 
   public static Representation createRepresentation(User user, String aipId, String representationId, String type,
@@ -1873,7 +1878,7 @@ public class BrowserHelper {
     ModelService model = RodaCoreFactory.getModelService();
 
     try {
-      File file = model.createFile(aipId, representationId, directoryPath, fileId, content);
+      File file = model.createFile(aipId, representationId, directoryPath, fileId, content, user.getId());
 
       List<LinkingIdentifier> targets = new ArrayList<>();
       targets.add(PluginHelper.getLinkingIdentifier(aipId, file.getRepresentationId(), file.getPath(), file.getId(),
@@ -1894,9 +1899,9 @@ public class BrowserHelper {
     }
   }
 
-  public static File updateFile(File file, ContentPayload contentPayload, boolean createIfNotExists, boolean notify)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
-    return RodaCoreFactory.getModelService().updateFile(file, contentPayload, createIfNotExists, notify);
+  public static File updateFile(File file, ContentPayload contentPayload, boolean createIfNotExists, String updatedBy,
+    boolean notify) throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    return RodaCoreFactory.getModelService().updateFile(file, contentPayload, createIfNotExists, updatedBy, notify);
   }
 
   public static EntityResponse retrieveAIPRepresentationFile(IndexedFile iFile, String acceptFormat)
@@ -1932,8 +1937,8 @@ public class BrowserHelper {
 
   public static DescriptiveMetadata createOrUpdateAIPDescriptiveMetadataFile(String aipId, String representationId,
     String metadataId, String metadataType, String metadataVersion, Map<String, String> properties, InputStream is,
-    boolean create) throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
-    AlreadyExistsException {
+    boolean create, String username) throws GenericException, RequestNotValidException, NotFoundException,
+    AuthorizationDeniedException, AlreadyExistsException {
     Path file = null;
     DescriptiveMetadata dm = null;
     try {
@@ -1944,10 +1949,10 @@ public class BrowserHelper {
 
       if (create) {
         dm = model.createDescriptiveMetadata(aipId, representationId, metadataId, payload, metadataType,
-          metadataVersion);
+          metadataVersion, username);
       } else {
         dm = model.updateDescriptiveMetadata(aipId, representationId, metadataId, payload, metadataType,
-          metadataVersion, properties);
+          metadataVersion, properties, username);
       }
 
     } catch (IOException e) {
@@ -2780,9 +2785,9 @@ public class BrowserHelper {
       if (folderUUID != null) {
         IndexedFile ifolder = index.retrieve(IndexedFile.class, folderUUID, RodaConstants.FILE_FIELDS_TO_RETURN);
         newFolder = model.createFile(ifolder.getAipId(), ifolder.getRepresentationId(), ifolder.getPath(),
-          ifolder.getId(), newName, true);
+          ifolder.getId(), newName, user.getId(), true);
       } else {
-        newFolder = model.createFile(irep.getAipId(), irep.getId(), null, null, newName, true);
+        newFolder = model.createFile(irep.getAipId(), irep.getId(), null, null, newName, user.getId(), true);
       }
 
       String outcomeText = "The folder '" + newName + "' has been manually created.";

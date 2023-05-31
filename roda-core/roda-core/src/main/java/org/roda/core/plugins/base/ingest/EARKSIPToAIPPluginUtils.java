@@ -42,9 +42,9 @@ import org.roda_project.commons_ip.model.IPFile;
 import org.roda_project.commons_ip.model.IPMetadata;
 import org.roda_project.commons_ip.model.IPRepresentation;
 import org.roda_project.commons_ip.model.MetadataType;
+import org.roda_project.commons_ip.model.MetadataType.MetadataTypeEnum;
 import org.roda_project.commons_ip.model.RepresentationStatus;
 import org.roda_project.commons_ip.model.SIP;
-import org.roda_project.commons_ip.model.MetadataType.MetadataTypeEnum;
 
 public class EARKSIPToAIPPluginUtils {
 
@@ -69,7 +69,7 @@ public class EARKSIPToAIPPluginUtils {
     PluginHelper.acquireObjectLock(aip, plugin);
 
     // process IP information
-    processIPInformation(model, sip, aip.getId(), notify, false);
+    processIPInformation(model, sip, aip.getId(), notify, false, username);
 
     // process IPRepresentation information
     for (IPRepresentation representation : sip.getRepresentations()) {
@@ -111,7 +111,7 @@ public class EARKSIPToAIPPluginUtils {
     }
 
     // process IP information
-    processIPInformation(model, sip, indexedAIP.getId(), notify, true);
+    processIPInformation(model, sip, indexedAIP.getId(), notify, true, username);
 
     // process IPRepresentation information
     for (IPRepresentation representation : sip.getRepresentations()) {
@@ -134,17 +134,17 @@ public class EARKSIPToAIPPluginUtils {
     return model.updateAIP(aip, username);
   }
 
-  private static void processIPInformation(ModelService model, SIP sip, String aipId, boolean notify, boolean update)
-    throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
-    NotFoundException, ValidationException {
+  private static void processIPInformation(ModelService model, SIP sip, String aipId, boolean notify, boolean update,
+    String username) throws RequestNotValidException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException, NotFoundException, ValidationException {
     // process descriptive metadata
-    processDescriptiveMetadata(model, aipId, null, sip.getDescriptiveMetadata(), notify, update);
+    processDescriptiveMetadata(model, aipId, null, sip.getDescriptiveMetadata(), notify, update, username);
 
     // process other metadata
-    processOtherMetadata(model, sip.getOtherMetadata(), aipId, Optional.empty(), notify);
+    processOtherMetadata(model, sip.getOtherMetadata(), aipId, Optional.empty(), username, notify);
 
     // process preservation metadata
-    processPreservationMetadata(model, sip.getPreservationMetadata(), aipId, Optional.empty(), notify);
+    processPreservationMetadata(model, sip.getPreservationMetadata(), aipId, Optional.empty(), username, notify);
 
     // process documentation
     processDocumentation(model, sip.getDocumentation(), aipId, null, update);
@@ -154,8 +154,9 @@ public class EARKSIPToAIPPluginUtils {
   }
 
   private static void processDescriptiveMetadata(ModelService model, String aipId, String representationId,
-    List<IPDescriptiveMetadata> descriptiveMetadata, boolean notify, boolean update) throws RequestNotValidException,
-    GenericException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException, ValidationException {
+    List<IPDescriptiveMetadata> descriptiveMetadata, boolean notify, boolean update, String username)
+    throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
+    NotFoundException, ValidationException {
     for (IPDescriptiveMetadata dm : descriptiveMetadata) {
       String descriptiveMetadataId = dm.getMetadata().getFileName();
       ContentPayload payload = new FSPathContentPayload(dm.getMetadata().getPath());
@@ -163,14 +164,14 @@ public class EARKSIPToAIPPluginUtils {
       String metadataVersion = dm.getMetadataVersion();
       try {
         model.createDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload, metadataType,
-          metadataVersion, notify);
+          metadataVersion, username, notify);
       } catch (AlreadyExistsException e) {
         if (update) {
           Map<String, String> properties = new HashMap<>();
           properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATE_FROM_SIP.toString());
 
           model.updateDescriptiveMetadata(aipId, descriptiveMetadataId, payload, metadataType, metadataVersion,
-            properties);
+            properties, username);
         } else {
           throw e;
         }
@@ -179,7 +180,7 @@ public class EARKSIPToAIPPluginUtils {
   }
 
   private static void processOtherMetadata(ModelService model, List<IPMetadata> otherMetadata, String aipId,
-    Optional<String> representationId, boolean notify) throws GenericException, NotFoundException,
+    Optional<String> representationId, String username, boolean notify) throws GenericException, NotFoundException,
     RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
 
     for (IPMetadata pm : otherMetadata) {
@@ -187,23 +188,23 @@ public class EARKSIPToAIPPluginUtils {
       ContentPayload fileContentPayload = new FSPathContentPayload(file.getPath());
 
       model.createOrUpdateOtherMetadata(aipId, representationId.orElse(null), file.getRelativeFolders(),
-        file.getFileName(), "", pm.getMetadataType().asString(), fileContentPayload, notify);
+        file.getFileName(), "", pm.getMetadataType().asString(), fileContentPayload, username, notify);
     }
   }
 
   private static void processPreservationMetadata(ModelService model, List<IPMetadata> preservationMetadata,
-    String aipId, Optional<String> representationId, boolean notify) throws GenericException, NotFoundException,
-    RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
+    String aipId, Optional<String> representationId, String username, boolean notify) throws GenericException,
+    NotFoundException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
     for (IPMetadata pm : preservationMetadata) {
       IPFile file = pm.getMetadata();
       ContentPayload fileContentPayload = new FSPathContentPayload(file.getPath());
 
       if (representationId.isPresent()) {
         model.createPreservationMetadata(PreservationMetadataType.OTHER, aipId, representationId.get(),
-          file.getRelativeFolders(), file.getFileName(), fileContentPayload, notify);
+          file.getRelativeFolders(), file.getFileName(), fileContentPayload, username, notify);
       } else {
         model.createPreservationMetadata(PreservationMetadataType.OTHER, aipId, file.getRelativeFolders(),
-          file.getFileName(), fileContentPayload, notify);
+          file.getFileName(), fileContentPayload, username, notify);
       }
     }
   }
@@ -267,14 +268,16 @@ public class EARKSIPToAIPPluginUtils {
     }
 
     // process representation descriptive metadata
-    processDescriptiveMetadata(model, aipId, representation.getId(), sr.getDescriptiveMetadata(), notify, update);
+    processDescriptiveMetadata(model, aipId, representation.getId(), sr.getDescriptiveMetadata(), notify, update,
+      username);
 
     // process other metadata
-    processOtherMetadata(model, sr.getOtherMetadata(), aipId, Optional.ofNullable(representation.getId()), notify);
+    processOtherMetadata(model, sr.getOtherMetadata(), aipId, Optional.ofNullable(representation.getId()), username,
+      notify);
 
     // process representation preservation metadata
     processPreservationMetadata(model, sr.getPreservationMetadata(), aipId, Optional.ofNullable(representation.getId()),
-      notify);
+      username, notify);
 
     // process representation files
     for (IPFile file : sr.getData()) {
@@ -282,14 +285,15 @@ public class EARKSIPToAIPPluginUtils {
       String fileId = file.getFileName();
       ContentPayload payload = new FSPathContentPayload(file.getPath());
       try {
-        File createdFile = model.createFile(aipId, representation.getId(), directoryPath, fileId, payload, notify);
+        File createdFile = model.createFile(aipId, representation.getId(), directoryPath, fileId, payload, username,
+          notify);
         if (reportItem != null && update) {
           reportItem.getSipInformation().addFileData(aipId, IdUtils.getRepresentationId(representation), createdFile);
         }
       } catch (AlreadyExistsException e) {
         if (update) {
           File updatedFile = model.updateFile(aipId, representation.getId(), directoryPath, fileId, payload, true,
-            notify);
+            username, notify);
           if (reportItem != null) {
             reportItem.getSipInformation().addFileData(aipId, IdUtils.getRepresentationId(representation), updatedFile);
           }

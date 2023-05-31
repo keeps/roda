@@ -32,9 +32,9 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,7 +140,8 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
     try {
       LOGGER.debug("Validating AIP {}", aip.getId());
       Pair<ValidationReport, List<Pair<String, String>>> reportAndSchemaInfo = ValidationUtils.isAIPMetadataValid(
-        forceDescriptiveMetadataType, validateDescriptiveMetadata, metadataType, metadataVersion, model, aip);
+        forceDescriptiveMetadataType, validateDescriptiveMetadata, metadataType, metadataVersion, model, aip,
+        cachedJob.getUsername());
       schemasInfo = reportAndSchemaInfo.getSecond();
 
       if (reportAndSchemaInfo.getFirst().isValid()) {

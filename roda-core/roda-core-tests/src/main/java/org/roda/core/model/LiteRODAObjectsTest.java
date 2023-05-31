@@ -128,11 +128,11 @@ public class LiteRODAObjectsTest {
       RodaConstants.ADMIN);
 
     File file = model.createFile(aip.getId(), CorporaConstants.REPRESENTATION_1_ID, Collections.emptyList(), "file1",
-      new StringContentPayload(""), true);
+      new StringContentPayload(""), RodaConstants.ADMIN, true);
     model.createFile(aip.getId(), CorporaConstants.REPRESENTATION_1_ID, Collections.emptyList(), "file2",
-      new StringContentPayload(""), true);
+      new StringContentPayload(""), RodaConstants.ADMIN, true);
     model.createFile(aip.getId(), CorporaConstants.REPRESENTATION_1_ID, Collections.emptyList(), "file3",
-      new StringContentPayload(""), true);
+      new StringContentPayload(""), RodaConstants.ADMIN, true);
     index.commit(IndexedFile.class);
 
     RodaCoreFactory.getStorageService().deleteResource(ModelUtils.getFileStoragePath(file));

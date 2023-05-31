@@ -7,6 +7,13 @@
  */
 package org.roda.core.plugins.base.characterization;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -41,13 +48,6 @@ import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPComponentsPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(PremisSkeletonPlugin.class);
 
@@ -62,9 +62,9 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
 
   public static String getStaticDescription() {
     return "Computes file fixity information (also known as checksum) for all data files within an AIP, representation or file and stores this information in PREMIS objects "
-            + "within the corresponding entity. This task uses SHA-256 as the default checksum algorithm, however, other algorithms can be configured in “roda-core.properties”."
-            + "\nFile fixity is the property of a digital file being fixed, or unchanged. “AIP corruption risk assessment” is the process of validating that a file has not changed or been "
-            + "altered from a previous state. In order to validate the fixity of an AIP or file, fixity information has to be generated beforehand.";
+      + "within the corresponding entity. This task uses SHA-256 as the default checksum algorithm, however, other algorithms can be configured in “roda-core.properties”."
+      + "\nFile fixity is the property of a digital file being fixed, or unchanged. “AIP corruption risk assessment” is the process of validating that a file has not changed or been "
+      + "altered from a previous state. In order to validate the fixity of an AIP or file, fixity information has to be generated beforehand.";
   }
 
   @Override
@@ -126,7 +126,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
                   for (Representation representation : aip.getRepresentations()) {
                     LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
                     PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aip.getId(),
-                      representation.getId(), algorithms);
+                      representation.getId(), algorithms, cachedJob.getUsername());
                     // notify is not failing because it is not crucial
                     model.notifyRepresentationUpdated(representation);
                   }
@@ -142,7 +142,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
                 for (Representation representation : aip.getRepresentations()) {
                   LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
                   PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aip.getId(),
-                    representation.getId(), algorithms);
+                    representation.getId(), algorithms, cachedJob.getUsername());
                   // notify is not failing because it is not crucial
                   model.notifyRepresentationUpdated(representation);
                 }
@@ -169,7 +169,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
                 try {
                   LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
                   PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aip.getId(),
-                    representation.getId(), algorithms);
+                    representation.getId(), algorithms, cachedJob.getUsername());
                   model.notifyRepresentationUpdated(representation);
                   state = PluginState.SUCCESS;
                 } catch (RODAException | IOException e) {
@@ -188,7 +188,8 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
 
                 try {
                   File file = model.retrieveFile(aip.getId(), representationId, filePath, fileId);
-                  PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, algorithms);
+                  PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, algorithms,
+                    cachedJob.getUsername());
                   jobPluginInfo.incrementObjectsProcessedWithSuccess();
                   state = PluginState.SUCCESS;
                 } catch (RODAException | IOException e) {
@@ -239,7 +240,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
 
       try {
         PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, representation.getAipId(),
-          representation.getId(), algorithms);
+          representation.getId(), algorithms, cachedJob.getUsername());
         model.notifyRepresentationUpdated(representation);
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
       } catch (RODAException | IOException e) {
@@ -277,7 +278,7 @@ public class PremisSkeletonPlugin<T extends IsRODAObject> extends AbstractAIPCom
       reportItem.setPluginState(PluginState.SUCCESS);
 
       try {
-        PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, algorithms);
+        PremisSkeletonPluginUtils.createPremisSkeletonOnFile(model, file, algorithms, cachedJob.getUsername());
         jobPluginInfo.incrementObjectsProcessedWithSuccess();
       } catch (RODAException | IOException e) {
         LOGGER.error("Error processing file {}", file.getId(), e);

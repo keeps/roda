@@ -289,11 +289,11 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                       StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
                       DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
 
-                    LOGGER.debug("Running a ConvertPlugin ({} to {}) on {}", fileFormat, outputFormat, file.getId());
-                    try {
-                      Path pluginResult = Files.createTempFile(getWorkingDirectory(), "converted",
-                        "." + FilenameUtils.normalize(getOutputFormat()));
-                      String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
+                      LOGGER.debug("Running a ConvertPlugin ({} to {}) on {}", fileFormat, outputFormat, file.getId());
+                      try {
+                        Path pluginResult = Files.createTempFile(getWorkingDirectory(), "converted",
+                          "." + FilenameUtils.normalize(getOutputFormat()));
+                        String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
 
                         newFileId = file.getId().replaceFirst("[.][^.]+$", "." + outputFormat);
                         ContentPayload payload = new FSPathContentPayload(pluginResult);
@@ -337,7 +337,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                           }
 
                           File f = model.createFile(aip.getId(), newRepresentationID, file.getPath(), newFileId,
-                            payload, notify);
+                            payload, job.getUsername(), notify);
                           newFiles.add(f);
                         }
 
@@ -393,7 +393,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
             // add unchanged files to the new representation if created
             if (!alteredFiles.isEmpty() && !createDIP) {
-              createNewFilesOnRepresentation(storage, model, unchangedFiles, newRepresentationID, notify);
+              createNewFilesOnRepresentation(storage, model, unchangedFiles, newRepresentationID, job.getUsername(),
+                notify);
             }
 
           } catch (RuntimeException | NotFoundException | GenericException | RequestNotValidException
@@ -409,7 +410,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
             if (!createDIP) {
               try {
                 Representation rep = model.retrieveRepresentation(aip.getId(), newRepresentationID);
-                createPremisSkeletonOnRepresentation(model, aip.getId(), rep);
+                createPremisSkeletonOnRepresentation(model, aip.getId(), rep, job.getUsername());
               } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
                 | ValidationException | IOException e) {
                 LOGGER.error("Error running premis skeleton on new representation: {}", e.getMessage());
@@ -503,11 +504,12 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                   StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
                   DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
 
-                LOGGER.debug("Running a ConvertPlugin ({} to {}) on {}", fileFormat, outputFormat, file.getId());
-                try {
-                  Path pluginResult = Files.createTempFile(getWorkingDirectory(), "converted", "." + FilenameUtils.normalize(getOutputFormat()));
-                  String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
-                  ContentPayload payload = new FSPathContentPayload(pluginResult);
+                  LOGGER.debug("Running a ConvertPlugin ({} to {}) on {}", fileFormat, outputFormat, file.getId());
+                  try {
+                    Path pluginResult = Files.createTempFile(getWorkingDirectory(), "converted",
+                      "." + FilenameUtils.normalize(getOutputFormat()));
+                    String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
+                    ContentPayload payload = new FSPathContentPayload(pluginResult);
 
                     if (!newRepresentations.contains(newRepresentationID)) {
                       LOGGER.debug("Creating a new representation {} on AIP {}", newRepresentationID, aipId);
@@ -553,7 +555,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                       newDIPFiles.add(f);
                     } else {
                       File newFile = model.createFile(aipId, newRepresentationID, file.getPath(), newFileId, payload,
-                        notify);
+                        job.getUsername(), notify);
                       newFiles.add(newFile);
                     }
 
@@ -609,7 +611,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
           if (createDIP) {
             createNewFilesOnDIP(storage, model, unchangedFiles, newRepresentationID, notify);
           } else {
-            createNewFilesOnRepresentation(storage, model, unchangedFiles, newRepresentationID, notify);
+            createNewFilesOnRepresentation(storage, model, unchangedFiles, newRepresentationID, job.getUsername(),
+              notify);
           }
         }
 
@@ -631,7 +634,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
       if (!createDIP) {
         try {
           Representation rep = model.retrieveRepresentation(representation.getAipId(), newRepresentationID);
-          createPremisSkeletonOnRepresentation(model, representation.getAipId(), rep);
+          createPremisSkeletonOnRepresentation(model, representation.getAipId(), rep, job.getUsername());
         } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
           | ValidationException | IOException e) {
           LOGGER.error("Error running premis skeleton on new representation: {}", e.getMessage());
@@ -705,10 +708,11 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                   directAccess = tmpStorageService.getDirectAccess(fileStoragePath);
                 }
 
-            LOGGER.debug("Running a ConvertPlugin ({} to {}) on {}", fileFormat, outputFormat, file.getId());
-            try {
-              Path pluginResult = Files.createTempFile(getWorkingDirectory(), "converted", "." + FilenameUtils.normalize(getOutputFormat()));
-              String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
+                LOGGER.debug("Running a ConvertPlugin ({} to {}) on {}", fileFormat, outputFormat, file.getId());
+                try {
+                  Path pluginResult = Files.createTempFile(getWorkingDirectory(), "converted",
+                    "." + FilenameUtils.normalize(getOutputFormat()));
+                  String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
 
                   ContentPayload payload = new FSPathContentPayload(pluginResult);
                   StoragePath storagePath = ModelUtils.getRepresentationStoragePath(file.getAipId(),
@@ -754,9 +758,10 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                       directAccess.getPath().toFile().length(), payload, notify);
                     newDIPFiles.add(f);
                   } else {
-                    model.deleteFile(file.getAipId(), newRepresentationID, file.getPath(), file.getId(), notify);
+                    model.deleteFile(file.getAipId(), newRepresentationID, file.getPath(), file.getId(),
+                      job.getUsername(), notify);
                     File f = model.createFile(file.getAipId(), newRepresentationID, file.getPath(), newFileId, payload,
-                      notify);
+                      job.getUsername(), notify);
                     newFiles.add(f);
                     reportItem.setSourceAndOutcomeObjectId(reportItem.getSourceObjectId(), IdUtils.getFileId(f));
                     changedRepresentationsOnAIPs.put(file.getRepresentationId(), file.getAipId());
@@ -824,7 +829,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
           if (!createDIP) {
             try {
               Representation rep = model.retrieveRepresentation(file.getAipId(), newRepresentationID);
-              createPremisSkeletonOnRepresentation(model, file.getAipId(), rep);
+              createPremisSkeletonOnRepresentation(model, file.getAipId(), rep, job.getUsername());
             } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
               | ValidationException | IOException e) {
               LOGGER.error("Error running premis skeleton on new representation: {}", e.getMessage());
@@ -844,11 +849,12 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   public abstract String executePlugin(Path inputPath, Path outputPath, String fileFormat)
     throws UnsupportedOperationException, IOException, CommandException;
 
-  private void createPremisSkeletonOnRepresentation(ModelService model, String aipId, Representation representation)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
+  private void createPremisSkeletonOnRepresentation(ModelService model, String aipId, Representation representation,
+    String username) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
     ValidationException, IOException {
     List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
-    PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representation.getId(), algorithms);
+    PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representation.getId(), algorithms,
+      username);
     model.notifyRepresentationUpdated(representation).failOnError();
   }
 
@@ -992,9 +998,10 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                     directAccess.getPath().toFile().length(), payload, notify);
                   newDIPFiles.add(f);
                 } else {
-                  model.deleteFile(file1.getAipId(), newRepresentationID, file1.getPath(), file1.getId(), notify);
+                  model.deleteFile(file1.getAipId(), newRepresentationID, file1.getPath(), file1.getId(),
+                    job.getUsername(), notify);
                   File f = model.createFile(file1.getAipId(), newRepresentationID, file1.getPath(), newFileId, payload,
-                    notify);
+                    job.getUsername(), notify);
                   newFiles.add(f);
                   reportItem.setSourceAndOutcomeObjectId(reportItem.getSourceObjectId(), IdUtils.getFileId(f));
                   changedRepresentationsOnAIPs.put(file1.getRepresentationId(), file1.getAipId());
@@ -1058,7 +1065,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
         if (!createDIP) {
           try {
             Representation rep = model.retrieveRepresentation(file1.getAipId(), newRepresentationID);
-            createPremisSkeletonOnRepresentation(model, file1.getAipId(), rep);
+            createPremisSkeletonOnRepresentation(model, file1.getAipId(), rep, job.getUsername());
           } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException
             | ValidationException | IOException e) {
             LOGGER.error("Error running premis skeleton on new representation: {}", e.getMessage());
@@ -1107,14 +1114,15 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
   }
 
   private void createNewFilesOnRepresentation(StorageService storage, ModelService model, List<File> unchangedFiles,
-    String newRepresentationID, boolean notify) throws RequestNotValidException, GenericException, NotFoundException,
-    AuthorizationDeniedException, UnsupportedOperationException, IOException, AlreadyExistsException {
+    String newRepresentationID, String username, boolean notify)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
+    UnsupportedOperationException, IOException, AlreadyExistsException {
     for (File f : unchangedFiles) {
       StoragePath fileStoragePath = ModelUtils.getFileStoragePath(f);
       Binary binary = storage.getBinary(fileStoragePath);
       Path uriPath = Paths.get(binary.getContent().getURI());
       ContentPayload payload = new FSPathContentPayload(uriPath);
-      model.createFile(f.getAipId(), newRepresentationID, f.getPath(), f.getId(), payload, notify);
+      model.createFile(f.getAipId(), newRepresentationID, f.getPath(), f.getId(), payload, username, notify);
     }
   }
 

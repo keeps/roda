@@ -155,7 +155,8 @@ public class ValidationUtilsTest {
 
     DefaultStoragePath path = DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER,
       CorporaConstants.SOURCE_INVALID_FOLDER, "ead.xml");
-    model.createDescriptiveMetadata(aip.getId(), "ead", corporaService.getBinary(path).getContent(), "ead", "2002");
+    model.createDescriptiveMetadata(aip.getId(), "ead", corporaService.getBinary(path).getContent(), "ead", "2002",
+      RodaConstants.ADMIN);
 
     Optional<Schema> xmlSchema = RodaCoreFactory.getRodaSchema("ead", "2002");
     assertTrue(xmlSchema.isPresent());
