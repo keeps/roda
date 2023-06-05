@@ -1,23 +1,34 @@
 {
   "id": "org.roda.core.plugins.external.ImageMagickConvertPlugin",
   "name": "Image Converter",
-  "type": "AIP_TO_AIP",
+  "type": "plugin",
   "version": "6.9.11-60",
   "description": "The Image Converter plugin harnesses the power of ImageMagick, a leading image manipulation tool, to effortlessly convert between over 200 different image formats including PNG, JPEG, JPEG-2000, GIF, TIFF, DPX, EXR, WebP, Postscript, PDF, and SVG. \nWith the ability to handle large scale conversions, this plugin is perfect for organisations that need to normalise the format of images quickly and efficiently.",
-  "categories": [
-    "conversion",
-    "dissemination"
-  ],
-  "objectClasses": [
-    "org.roda.core.data.v2.ip.IndexedAIP",
-    "org.roda.core.data.v2.ip.Representation",
-    "org.roda.core.data.v2.ip.File",
-    "org.roda.core.data.v2.ip.AIP",
-    "org.roda.core.data.v2.ip.IndexedFile",
-    "org.roda.core.data.v2.ip.IndexedRepresentation"
-  ],
+  "license": {
+    "name": "EULA",
+    "url": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.ImageMagickConvertPlugin/LICENSE.html"
+  },
   "homepage": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.ImageMagickConvertPlugin",
-  "vendor": "KEEP SOLUTIONS",
-  "minSupportedVersion": "4.3.0",
-  "maxSupportedVersion": "5.0.0"
+  "vendor": {
+    "name": "KEEP Solutions",
+    "homepage": "https://keep.pt"
+  },
+  "minSupportedVersion": "4",
+  "maxSupportedVersion": "5",
+  "price": "paid",
+  "plugin": {
+    "objectClasses": [
+      "org.roda.core.data.v2.ip.IndexedAIP",
+      "org.roda.core.data.v2.ip.Representation",
+      "org.roda.core.data.v2.ip.File",
+      "org.roda.core.data.v2.ip.IndexedFile",
+      "org.roda.core.data.v2.ip.AIP",
+      "org.roda.core.data.v2.ip.IndexedRepresentation"
+    ],
+    "categories": [
+      "conversion",
+      "dissemination"
+    ],
+    "type": "AIP_TO_AIP"
+  }
 }

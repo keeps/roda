@@ -1,23 +1,34 @@
 {
   "id": "org.roda.core.plugins.external.AvconvConvertPlugin",
   "name": "Video Converter",
-  "type": "AIP_TO_AIP",
+  "type": "plugin",
   "version": "4.4.2",
   "description": "The Video Converter is a powerful plugin that leverages the capabilities of 'avconv,' a high-speed video and audio conversion tool. This converter can perform arbitrary sample rate conversions and resize video in real-time with a high-quality polyphase filter. The plugin allows for the conversion of files containing a variety of different stream types, including video, audio, subtitles, attachments, and data. The number and type of streams are determined by the container format, and the plugin can enforce these limitations as necessary.s",
-  "categories": [
-    "conversion",
-    "dissemination"
-  ],
-  "objectClasses": [
-    "org.roda.core.data.v2.ip.IndexedAIP",
-    "org.roda.core.data.v2.ip.Representation",
-    "org.roda.core.data.v2.ip.File",
-    "org.roda.core.data.v2.ip.AIP",
-    "org.roda.core.data.v2.ip.IndexedFile",
-    "org.roda.core.data.v2.ip.IndexedRepresentation"
-  ],
+  "license": {
+    "name": "EULA",
+    "url": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.AvconvConvertPlugin/LICENSE.html"
+  },
   "homepage": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.AvconvConvertPlugin",
-  "vendor": "KEEP SOLUTIONS",
-  "minSupportedVersion": "4.3.0",
-  "maxSupportedVersion": "5.0.0"
+  "vendor": {
+    "name": "KEEP Solutions",
+    "homepage": "https://keep.pt"
+  },
+  "minSupportedVersion": "4",
+  "maxSupportedVersion": "5",
+  "price": "paid",
+  "plugin": {
+    "objectClasses": [
+      "org.roda.core.data.v2.ip.IndexedAIP",
+      "org.roda.core.data.v2.ip.Representation",
+      "org.roda.core.data.v2.ip.File",
+      "org.roda.core.data.v2.ip.AIP",
+      "org.roda.core.data.v2.ip.IndexedFile",
+      "org.roda.core.data.v2.ip.IndexedRepresentation"
+    ],
+    "categories": [
+      "conversion",
+      "dissemination"
+    ],
+    "type": "AIP_TO_AIP"
+  }
 }

@@ -7,6 +7,8 @@
  */
 package org.roda.core.data.v2.jobs;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 
 /**
@@ -14,7 +16,9 @@ import java.io.Serializable;
  */
 public class LicenseInfo implements Serializable {
   private static final long serialVersionUID = -6199653832479993919L;
+  @JsonProperty("name")
   private String name;
+  @JsonProperty("url")
   private String url;
 
   public LicenseInfo() {
