@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
@@ -99,6 +100,22 @@ public final class JsonUtils {
       LOGGER.error("Error transforming object '{}' to json string", object, e);
     }
     return ret;
+  }
+
+  public static <T> String getJsonFromObjectList(List<T> objectList) {
+    StringBuilder ret = new StringBuilder();
+    try {
+      ObjectMapper mapper = new ObjectMapper(new JsonFactory());
+      for (T object : objectList) {
+        if (ret.length() > 0) {
+          ret.append("\n");
+        }
+        ret.append(mapper.writeValueAsString(object));
+      }
+    } catch (IOException e) {
+      LOGGER.error("Error transforming object list to JSON string", e);
+    }
+    return ret.toString();
   }
 
   public static <T> String getJsonLinesFromObjectList(List<T> objectList) {

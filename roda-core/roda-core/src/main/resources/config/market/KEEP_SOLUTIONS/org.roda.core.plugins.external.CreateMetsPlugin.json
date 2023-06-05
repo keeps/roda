@@ -1,18 +1,30 @@
 {
   "id": "org.roda.core.plugins.external.CreateMetsPlugin",
   "name": "E-ARK AIP Manifest Updater",
-  "type": "MISC",
+  "type": "plugin",
   "version": "1.0",
   "description": "For performance reasons, RODA does not keep updated versions of the METS manifest prescribed by the E-ARK AIP specification. \nThe E-ARK AIP Manifest Updater plugin creates, or updates METS manifest files based on AIP information found in the storage layer.",
-  "categories": [
-    "misc"
-  ],
-  "objectClasses": [
-    "org.roda.core.data.v2.ip.IndexedAIP",
-    "org.roda.core.data.v2.ip.AIP"
-  ],
-  "homepage": "https://roda-enterprise.keep.pt/plugins/org.roda.core.plugins.external.CreateMetsPlugin",
-  "vendor": "KEEP SOLUTIONS",
-  "minSupportedVersion": "4.1.0",
-  "maxSupportedVersion": "5.0.0"
+  "license": {
+    "name": "EULA",
+    "url": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.CreateMetsPlugin/LICENSE.html"
+  },
+  "homepage": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.CreateMetsPlugin",
+  "vendor": {
+    "name": "KEEP Solutions",
+    "homepage": "https://keep.pt"
+  },
+  "minSupportedVersion": "4",
+  "maxSupportedVersion": "5",
+  "price": "paid",
+  "plugin": {
+    "objectClasses": [
+      "org.roda.core.data.v2.ip.IndexedAIP",
+      "org.roda.core.data.v2.ip.AIP"
+    ],
+    "categories": [
+      "misc",
+      "eArchiving"
+    ],
+    "type": "MISC"
+  }
 }

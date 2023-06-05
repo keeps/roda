@@ -440,7 +440,7 @@ public class PluginManager {
 
         // Convert market info into plugin info
         PluginInfo pluginInfo = new PluginInfo(marketInfo.getId(), marketInfo.getName(), marketInfo.getVersion(),
-          marketInfo.getDescription(), marketInfo.getType(), marketInfo.getCategories(), null);
+          marketInfo.getDescription(), marketInfo.getPluginType(), marketInfo.getCategories(), null);
         pluginInfo.setObjectClasses(marketInfo.getObjectClasses());
         pluginInfo.setMarketInfo(marketInfo);
 
@@ -1076,7 +1076,7 @@ public class PluginManager {
 
         // Create the plugin info with only the necessary information
         marketInfo.setId(pluginInstance.getClass().getName());
-        marketInfo.setType(pluginInstance.getType());
+        marketInfo.setPluginType(pluginInstance.getType());
         marketInfo.setName(pluginInstance.getName());
         marketInfo.setVersion(pluginInstance.getVersion());
         marketInfo.setCategories(pluginInstance.getCategories());

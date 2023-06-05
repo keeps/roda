@@ -1,22 +1,33 @@
 {
   "id": "org.roda.core.plugins.external.DatabaseVisualizationPlugin",
   "name": "Database Visualization",
-  "type": "MISC",
+  "type": "plugin",
   "version": "1.0",
   "description": "The Database Visualization plugin creates a special purpose DIP and loads SIARD 2 files into an instance of DBPTK for visualisation purposes.\nDBPTK (Database Preservation Toolkit) is an open-source tool for archiving and browsing the contents of relational databases. It is designed to preserve and provide access to databases that are part of a digital archive. \nThe viewing tool also provides a range of features such as database export, saved searches, records concentration diagrams, etc.",
-  "categories": [
-    "dissemination"
-  ],
-  "objectClasses": [
-    "org.roda.core.data.v2.ip.IndexedAIP",
-    "org.roda.core.data.v2.ip.Representation",
-    "org.roda.core.data.v2.ip.File",
-    "org.roda.core.data.v2.ip.IndexedFile",
-    "org.roda.core.data.v2.ip.AIP",
-    "org.roda.core.data.v2.ip.IndexedRepresentation"
-  ],
+  "license": {
+    "name": "EULA",
+    "url": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.DatabaseVisualizationPlugin/LICENSE.html"
+  },
   "homepage": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.DatabaseVisualizationPlugin",
-  "vendor": "KEEP SOLUTIONS",
-  "minSupportedVersion": "4.4.0",
-  "maxSupportedVersion": "5.0.0"
+  "vendor": {
+    "name": "KEEP Solutions",
+    "homepage": "https://keep.pt"
+  },
+  "minSupportedVersion": "4",
+  "maxSupportedVersion": "5",
+  "price": "paid",
+  "plugin": {
+    "objectClasses": [
+      "org.roda.core.data.v2.ip.IndexedAIP",
+      "org.roda.core.data.v2.ip.Representation",
+      "org.roda.core.data.v2.ip.File",
+      "org.roda.core.data.v2.ip.AIP",
+      "org.roda.core.data.v2.ip.IndexedFile",
+      "org.roda.core.data.v2.ip.IndexedRepresentation"
+    ],
+    "categories": [
+      "dissemination"
+    ],
+    "type": "MISC"
+  }
 }
