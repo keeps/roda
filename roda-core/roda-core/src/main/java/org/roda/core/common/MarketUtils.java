@@ -75,8 +75,8 @@ public class MarketUtils {
   public static void retrievePluginsListFromAPI(LocalInstance instance) throws MarketException {
     try {
       String rodaVersion = retrieveRodaVersion();
-      String pluginUrl = "http://localhost:3000/api/v2/marketplace";/*RodaCoreFactory.getProperty(RodaConstants.MARKET_INFO_URL_PROPERTY,
-        RodaConstants.DEFAULT_MARKET_INFO_URL) + "?rodaVersion=" + rodaVersion;*/
+      String pluginUrl = RodaCoreFactory.getProperty(RodaConstants.MARKET_INFO_URL_PROPERTY,
+        RodaConstants.DEFAULT_MARKET_INFO_URL) + "?rodaVersion=" + rodaVersion;
 
       Path pluginInfoPath = RodaCoreFactory.getMarketDirectoryPath().resolve(RodaConstants.CORE_MARKET_FILE);
 
