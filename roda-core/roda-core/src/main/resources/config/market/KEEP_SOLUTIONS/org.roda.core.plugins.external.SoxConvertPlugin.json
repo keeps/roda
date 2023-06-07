@@ -1,23 +1,34 @@
 {
   "id": "org.roda.core.plugins.external.SoxConvertPlugin",
   "name": "Audio Converter",
-  "type": "AIP_TO_AIP",
+  "type": "plugin",
   "version": "14.4.2",
   "description": "The Audio Converter is a highly effective plugin that leverages the capabilities of 'SoX' (Sound eXchange tool) a versatile cross-platform tool for audio file format conversion. \nWith this plugin, users can convert audio files from one format to another and apply a variety of advanced effects such as volume adjustments, equalization, reverb, delay, chorus, flanging, tempo and pitch changes.",
-  "categories": [
-    "conversion",
-    "dissemination"
-  ],
-  "objectClasses": [
-    "org.roda.core.data.v2.ip.IndexedAIP",
-    "org.roda.core.data.v2.ip.Representation",
-    "org.roda.core.data.v2.ip.File",
-    "org.roda.core.data.v2.ip.AIP",
-    "org.roda.core.data.v2.ip.IndexedFile",
-    "org.roda.core.data.v2.ip.IndexedRepresentation"
-  ],
+  "license": {
+    "name": "EULA",
+    "url": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.SoxConvertPlugin/LICENSE.html"
+  },
   "homepage": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.SoxConvertPlugin",
-  "vendor": "KEEP SOLUTIONS",
-  "minSupportedVersion": "4.3.0",
-  "maxSupportedVersion": "5.0.0"
+  "vendor": {
+    "name": "KEEP Solutions",
+    "homepage": "https://keep.pt"
+  },
+  "minSupportedVersion": "4",
+  "maxSupportedVersion": "5",
+  "price": "paid",
+  "plugin": {
+    "objectClasses": [
+      "org.roda.core.data.v2.ip.IndexedAIP",
+      "org.roda.core.data.v2.ip.Representation",
+      "org.roda.core.data.v2.ip.File",
+      "org.roda.core.data.v2.ip.IndexedFile",
+      "org.roda.core.data.v2.ip.AIP",
+      "org.roda.core.data.v2.ip.IndexedRepresentation"
+    ],
+    "categories": [
+      "conversion",
+      "dissemination"
+    ],
+    "type": "AIP_TO_AIP"
+  }
 }

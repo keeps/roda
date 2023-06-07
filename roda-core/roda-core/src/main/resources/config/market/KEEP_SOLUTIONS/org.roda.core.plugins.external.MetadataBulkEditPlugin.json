@@ -1,18 +1,30 @@
 {
   "id": "org.roda.core.plugins.external.MetadataBulkEditPlugin",
   "name": "Find and Replace",
-  "type": "AIP_TO_AIP",
+  "type": "plugin",
   "version": "1.0",
   "description": "The Find and Replace plugin is a powerful tool for quickly and efficiently updating the descriptive metadata of multiple records at once. \nWhether you need to make a global change to your metadata or simply correct a typo, this plugin can help you save time and improve the consistency and accuracy of your metadata. \nWith the Find and Replace plugin, you can select all records or a specific set of records in search and replace the content of descriptive metadata attributes. \nYou can choose to replace the entire attribute or search for specific words or phrases to replace. \nAdvanced users can also use regular expressions to match on the content of an attribute, extract groups, and use them in the replacement text. \nThe plugin is highly customizable and flexible, allowing you to fine-tune your search and replace operations to match your specific needs. \nYou can choose to replace all instances of a word or phrase or only those that meet certain criteria, such as occurring in specific fields or having a certain value.",
-  "categories": [
-    "management"
-  ],
-  "objectClasses": [
-    "org.roda.core.data.v2.ip.IndexedAIP",
-    "org.roda.core.data.v2.ip.AIP"
-  ],
-  "homepage": "https://roda-enterprise.keep.pt/plugins/org.roda.core.plugins.external.MetadataBulkEditPlugin",
-  "vendor": "KEEP SOLUTIONS",
-  "minSupportedVersion": "4.5.0",
-  "maxSupportedVersion": "5.0.0"
+  "license": {
+    "name": "EULA",
+    "url": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.MetadataBulkEditPlugin/LICENSE.html"
+  },
+  "homepage": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.MetadataBulkEditPlugin",
+  "vendor": {
+    "name": "KEEP Solutions",
+    "homepage": "https://keep.pt"
+  },
+  "minSupportedVersion": "4",
+  "maxSupportedVersion": "5",
+  "price": "paid",
+  "plugin": {
+    "objectClasses": [
+      "org.roda.core.data.v2.ip.IndexedAIP",
+      "org.roda.core.data.v2.ip.AIP"
+    ],
+    "categories": [
+      "management",
+      "maintenance"
+    ],
+    "type": "AIP_TO_AIP"
+  }
 }

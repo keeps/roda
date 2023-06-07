@@ -1,22 +1,33 @@
 {
   "id": "org.roda.core.plugins.external.PdfToPdfaPlugin",
   "name": "PDF to PDF/A Converter",
-  "type": "AIP_TO_AIP",
+  "type": "plugin",
   "version": "1.0",
   "description": "The PDF to PDF/A Converter plugin transforms standard Portable Document Format (PDF) files to PDF/A by leveraging the power of the “ghostscript” tool. \nPDF/A is an ISO-standardized version of the Portable Document Format (PDF) specialized for use in the archiving and long-term preservation of electronic documents. \nPDF/A differs from PDF by prohibiting features ill-suited to long-term archiving, such as font linking (as opposed to font embedding) and encryption. \nThe ISO requirements for PDF/A file viewers include colour management guidelines, support for embedded fonts, and a user interface for reading embedded annotations.",
-  "categories": [
-    "experimental"
-  ],
-  "objectClasses": [
-    "org.roda.core.data.v2.ip.IndexedAIP",
-    "org.roda.core.data.v2.ip.Representation",
-    "org.roda.core.data.v2.ip.File",
-    "org.roda.core.data.v2.ip.AIP",
-    "org.roda.core.data.v2.ip.IndexedFile",
-    "org.roda.core.data.v2.ip.IndexedRepresentation"
-  ],
-  "homepage": "https://roda-enterprise.keep.pt/plugins/org.roda.core.plugins.external.PdfToPdfaPlugin",
-  "vendor": "KEEP SOLUTIONS",
-  "minSupportedVersion": "4.3.0",
-  "maxSupportedVersion": "5.0.0"
+  "license": {
+    "name": "EULA",
+    "url": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.PdfToPdfaPlugin/LICENSE.html"
+  },
+  "homepage": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.PdfToPdfaPlugin",
+  "vendor": {
+    "name": "KEEP Solutions",
+    "homepage": "https://keep.pt"
+  },
+  "minSupportedVersion": "4",
+  "maxSupportedVersion": "5",
+  "price": "paid",
+  "plugin": {
+    "objectClasses": [
+      "org.roda.core.data.v2.ip.IndexedAIP",
+      "org.roda.core.data.v2.ip.Representation",
+      "org.roda.core.data.v2.ip.File",
+      "org.roda.core.data.v2.ip.AIP",
+      "org.roda.core.data.v2.ip.IndexedFile",
+      "org.roda.core.data.v2.ip.IndexedRepresentation"
+    ],
+    "categories": [
+      "experimental"
+    ],
+    "type": "AIP_TO_AIP"
+  }
 }

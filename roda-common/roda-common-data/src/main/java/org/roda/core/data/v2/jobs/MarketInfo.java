@@ -8,12 +8,13 @@
 package org.roda.core.data.v2.jobs;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -22,24 +23,29 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MarketInfo implements Serializable {
   private static final long serialVersionUID = 7826618040202731061L;
-
+  @JsonProperty("id")
   private String id = null;
-
+  @JsonProperty("name")
   private String name = null;
-  private PluginType type = PluginType.MISC;
+  //plugin, service, component
+  @JsonProperty("type")
+  private String type = null;
+  @JsonProperty("version")
   private String version = null;
+  @JsonProperty("description")
   private String description = null;
-  private List<String> categories = null;
-
-  private Set<String> objectClasses = new HashSet<>();
-  private LicenseInfo license = null;
+  @JsonProperty("plugin")
+  private PluginProperties pluginProperties = new PluginProperties();
+  @JsonProperty("license")
+  private LicenseInfo license = new LicenseInfo();
   private String installation = null;
+  @JsonProperty("homepage")
   private String homepage = null;
-
-  private String vendor = null;
-
+  @JsonProperty("vendor")
+  private Vendor vendor = new Vendor();
+  @JsonProperty("minSupportedVersion")
   private String minSupportedVersion = null;
-
+  @JsonProperty("maxSupportedVersion")
   private String maxSupportedVersion = null;
 
   public MarketInfo() {
@@ -60,13 +66,19 @@ public class MarketInfo implements Serializable {
   public void setName(String name) {
     this.name = name;
   }
-
-  public PluginType getType() {
+  public String getType(){
     return type;
   }
-
-  public void setType(PluginType type) {
+  public void setType(String type){
     this.type = type;
+  }
+  @JsonIgnore
+  public PluginType getPluginType() {
+    return pluginProperties.getType();
+  }
+  @JsonIgnore
+  public void setPluginType(PluginType type) {
+    this.pluginProperties.setType(type);
   }
 
   public String getVersion() {
@@ -84,25 +96,25 @@ public class MarketInfo implements Serializable {
   public void setDescription(String description) {
     this.description = description;
   }
-
+  @JsonIgnore
   public List<String> getCategories() {
-    return categories;
+    return pluginProperties.getCategories();
   }
-
+  @JsonIgnore
   public void setCategories(List<String> categories) {
-    this.categories = categories;
+    this.pluginProperties.setCategories(categories);
   }
-
+  @JsonIgnore
   public Set<String> getObjectClasses() {
-    return objectClasses;
+    return pluginProperties.getObjectClasses();
   }
-
+  @JsonIgnore
   public void setObjectClasses(Set<String> objectClasses) {
-    this.objectClasses = objectClasses;
+    this.pluginProperties.setObjectClasses(objectClasses);
   }
 
   public void addObjectClass(String objectClass) {
-    this.objectClasses.add(objectClass);
+    this.pluginProperties.addObjectClass(objectClass);
   }
 
   public LicenseInfo getLicense() {
@@ -129,12 +141,28 @@ public class MarketInfo implements Serializable {
     this.homepage = homepage;
   }
 
-  public String getVendor() {
+  public Vendor getVendor() {
     return vendor;
   }
 
-  public void setVendor(String vendor) {
+  public void setVendor(Vendor vendor) {
     this.vendor = vendor;
+  }
+  @JsonIgnore
+  public String getVendorName() {
+    return vendor.getName();
+  }
+  @JsonIgnore
+  public void setVendorName(String vendor) {
+    this.vendor.setName(vendor);
+  }
+
+  public PluginProperties getPluginProperties() {
+    return pluginProperties;
+  }
+
+  public void setPluginProperties(PluginProperties pluginProperties) {
+    this.pluginProperties = pluginProperties;
   }
 
   public String getMinSupportedVersion() {
@@ -160,9 +188,9 @@ public class MarketInfo implements Serializable {
     if (o == null || getClass() != o.getClass())
       return false;
     MarketInfo that = (MarketInfo) o;
-    return Objects.equals(id, that.id) && Objects.equals(name, that.name) && type == that.type
+    return Objects.equals(id, that.id) && Objects.equals(name, that.name) && pluginProperties.getType() == that.pluginProperties.getType()
       && Objects.equals(version, that.version) && Objects.equals(description, that.description)
-      && Objects.equals(categories, that.categories) && Objects.equals(objectClasses, that.objectClasses)
+      && Objects.equals(pluginProperties.getCategories(), that.pluginProperties.getCategories()) && Objects.equals(pluginProperties.getObjectClasses(), that.pluginProperties.getObjectClasses())
       && Objects.equals(license, that.license) && Objects.equals(installation, that.installation)
       && Objects.equals(homepage, that.homepage) && Objects.equals(vendor, that.vendor)
       && Objects.equals(minSupportedVersion, that.minSupportedVersion)
@@ -171,7 +199,7 @@ public class MarketInfo implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, type, version, description, categories, objectClasses, license, installation,
+    return Objects.hash(id, name, pluginProperties.getType(), version, description, pluginProperties.getCategories(), pluginProperties.getCategories(), license, installation,
       homepage, vendor, minSupportedVersion, maxSupportedVersion);
   }
 }

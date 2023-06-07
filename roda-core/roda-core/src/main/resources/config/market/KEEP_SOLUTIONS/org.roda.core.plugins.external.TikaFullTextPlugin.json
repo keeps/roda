@@ -1,22 +1,33 @@
 {
   "id": "org.roda.core.plugins.external.TikaFullTextPlugin",
   "name": "File Feature Extractor and Office Documents Text Extractor",
-  "type": "AIP_TO_AIP",
+  "type": "plugin",
   "version": "1.0",
   "description": "The File Feature Extractor is a powerful plugin that allows users to extract technical metadata from a wide range of file formats, making it an essential tool for digital curators.\nThe tool supports numerous file formats, including images, raw image formats from digital cameras from several manufacturers, DICOM metadata, Photoshop tags, metadata from audio and video formats, and metadata from office documents such as Microsoft Word, Excel, PowerPoint, or OpenDocument formats.\nWith this plugin, users can quickly and easily access critical technical metadata, providing them with valuable insights into the contents of their files.\nFor example, the tool can extract information about image resolution, color space, compression type, and other technical details that can be used to assess the quality and authenticity of digital images.\nSimilarly, the plugin can extract audio and video metadata such as codec type, bit rate, and frame rate, providing valuable information for media analysis and forensics.\nThe Office Documents Feature Extractor utilizes the Apache Tika framework to extract both technical metadata and textual content from a vast array ofdocument formats \nincluding but not limited to Microsoft Office (Word, Excel, PowerPoint, etc.), PDF, RTF, ODT, HTML, XML, etc. \nThis tool enables the extraction of information from over a thousand different file types, providing organizations with a comprehensive solution for managing and normalizing the format of their digital assets.",
-  "categories": [
-    "characterization"
-  ],
-  "objectClasses": [
-    "org.roda.core.data.v2.ip.IndexedAIP",
-    "org.roda.core.data.v2.ip.Representation",
-    "org.roda.core.data.v2.ip.File",
-    "org.roda.core.data.v2.ip.AIP",
-    "org.roda.core.data.v2.ip.IndexedFile",
-    "org.roda.core.data.v2.ip.IndexedRepresentation"
-  ],
-  "homepage": "https://roda-enterprise.keep.pt/plugins/org.roda.core.plugins.external.TikaFullTextPlugin",
-  "vendor": "KEEP SOLUTIONS",
-  "minSupportedVersion": "4.3.0",
-  "maxSupportedVersion": "5.0.0"
+  "license": {
+    "name": "EULA",
+    "url": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.TikaFullTextPlugin/LICENSE.html"
+  },
+  "homepage": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.TikaFullTextPlugin",
+  "vendor": {
+    "name": "KEEP Solutions",
+    "homepage": "https://keep.pt"
+  },
+  "minSupportedVersion": "4",
+  "maxSupportedVersion": "5",
+  "price": "paid",
+  "plugin": {
+    "objectClasses": [
+      "org.roda.core.data.v2.ip.IndexedAIP",
+      "org.roda.core.data.v2.ip.Representation",
+      "org.roda.core.data.v2.ip.File",
+      "org.roda.core.data.v2.ip.IndexedFile",
+      "org.roda.core.data.v2.ip.AIP",
+      "org.roda.core.data.v2.ip.IndexedRepresentation"
+    ],
+    "categories": [
+      "characterization"
+    ],
+    "type": "AIP_TO_AIP"
+  }
 }
