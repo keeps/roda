@@ -1,22 +1,33 @@
 {
   "id": "org.roda.core.plugins.external.DigitalSignatureDIPPlugin",
   "name": "DIP Digital Signature Creator",
-  "type": "AIP_TO_AIP",
+  "type": "plugin",
   "version": "1.0",
   "description": "The DIP Digital Signature Creator plugin is a powerful tool that enables users to generate a new Dissemination Information Package (DIP) for a specified Archival Information Package (AIP). \nThe DIP contains all the files from the AIP, digitally signed with the repository's digital certificate. \nBy digitally signing the files in the DIP with the repository's digital certificate, the plugin helps ensure that the files are authentic and trustworthy. \nDepending on regional legislation, the files in the DIP may be considered certified copies of the original digital assets, further enhancing their authenticity and reliability. \nUsing the DIP Digital Signature Creator plugin, users can create a secure and reliable package of digital assets that can be easily disseminated to others. \nThis is especially important for organizations and individuals who need to ensure that their digital assets are trustworthy and can be relied upon for legal or regulatory  purposes.",
-  "categories": [
-    "dissemination"
-  ],
-  "objectClasses": [
-    "org.roda.core.data.v2.ip.IndexedAIP",
-    "org.roda.core.data.v2.ip.Representation",
-    "org.roda.core.data.v2.ip.File",
-    "org.roda.core.data.v2.ip.AIP",
-    "org.roda.core.data.v2.ip.IndexedFile",
-    "org.roda.core.data.v2.ip.IndexedRepresentation"
-  ],
-  "homepage": "https://roda-enterprise.keep.pt/plugins/org.roda.core.plugins.external.DigitalSignatureDIPPlugin",
-  "vendor": "KEEP SOLUTIONS",
-  "minSupportedVersion": "4.3.0",
-  "maxSupportedVersion": "5.0.0"
+  "license": {
+    "name": "EULA",
+    "url": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.DigitalSignatureDIPPlugin/LICENSE.html"
+  },
+  "homepage": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.DigitalSignatureDIPPlugin",
+  "vendor": {
+    "name": "KEEP Solutions",
+    "homepage": "https://keep.pt"
+  },
+  "minSupportedVersion": "4",
+  "maxSupportedVersion": "5",
+  "price": "paid",
+  "plugin": {
+    "objectClasses": [
+      "org.roda.core.data.v2.ip.IndexedAIP",
+      "org.roda.core.data.v2.ip.Representation",
+      "org.roda.core.data.v2.ip.File",
+      "org.roda.core.data.v2.ip.IndexedFile",
+      "org.roda.core.data.v2.ip.AIP",
+      "org.roda.core.data.v2.ip.IndexedRepresentation"
+    ],
+    "categories": [
+      "dissemination"
+    ],
+    "type": "AIP_TO_AIP"
+  }
 }

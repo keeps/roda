@@ -1,20 +1,32 @@
 {
   "id": "org.roda.core.plugins.external.MltvResignPlugin",
   "name": "Digital Signature Expiry Date Extender",
-  "type": "AIP_TO_AIP",
+  "type": "plugin",
   "version": "1.0.4",
-  "description": "The Digital Signature Expiry Date Extender uses a technic called Long-Term Validation (LTV) to ensure the integrity and authenticity of digital objects over an extended period of time. \nLTV works by verifying the digital signature of a digital object at regular intervals to ensure that the object has not changed since its original creation. \nThe plugin uses the mLTV service provided by Multicert to extend the validity of document’s digital signatures by applying timestamps and integrated status information to the content of a PDF document. \nThe mLTV is an external webservice provided by Multicert. \nAs such it requires a service contract from Multicert to be used.",
-  "categories": [
-    "management"
-  ],
-  "objectClasses": [
-    "org.roda.core.data.v2.ip.IndexedAIP",
-    "org.roda.core.data.v2.ip.Representation",
-    "org.roda.core.data.v2.ip.AIP",
-    "org.roda.core.data.v2.ip.IndexedRepresentation"
-  ],
+  "description": "The Digital Signature Expiry Date Extender uses a technique called Long-Term Validation (LTV) to ensure the integrity and authenticity of digital objects over an extended period of time. \nLTV works by verifying the digital signature of a digital object at regular intervals to ensure that the object has not changed since its original creation. \nThe plugin uses the mLTV service provided by Multicert to extend the validity of document's digital signatures by applying timestamps and integrated status information to the content of a PDF document. \nThe mLTV is an external webservice provided by Multicert. \nAs such it requires a service contract from Multicert to be used.",
+  "license": {
+    "name": "EULA",
+    "url": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.MltvResignPlugin/LICENSE.html"
+  },
   "homepage": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.MltvResignPlugin",
-  "vendor": "KEEP SOLUTIONS",
-  "minSupportedVersion": "3.0.0",
-  "maxSupportedVersion": "5.0.0"
+  "vendor": {
+    "name": "KEEP Solutions",
+    "homepage": "https://keep.pt"
+  },
+  "minSupportedVersion": "3",
+  "maxSupportedVersion": "5",
+  "price": "paid",
+  "plugin": {
+    "objectClasses": [
+      "org.roda.core.data.v2.ip.IndexedAIP",
+      "org.roda.core.data.v2.ip.Representation",
+      "org.roda.core.data.v2.ip.AIP",
+      "org.roda.core.data.v2.ip.IndexedRepresentation"
+    ],
+    "categories": [
+      "management",
+      "digital_signature"
+    ],
+    "type": "AIP_TO_AIP"
+  }
 }

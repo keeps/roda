@@ -1,20 +1,32 @@
 {
   "id": "org.roda.core.plugins.external.LtvExtractSignatureDatesPlugin",
   "name": "Digital Signature Expiry Date Extractor",
-  "type": "AIP_TO_AIP",
+  "type": "plugin",
   "version": "2.0.0-beta1",
-  "description": "The Digital Signature Expiry Date Extractor plugin obtains expiration dates fromqualified digital signatures embedded in PDF files and saves them in metadata.The extracted dates provide a convenient means of sorting and selecting filesbased on signature expiration date, enabling proactive management of signaturevalidity, and ensuring the ongoing authenticity of the digital content incombination with the Digital Signature Extension Plugin.",
-  "categories": [
-    "management"
-  ],
-  "objectClasses": [
-    "org.roda.core.data.v2.ip.IndexedAIP",
-    "org.roda.core.data.v2.ip.Representation",
-    "org.roda.core.data.v2.ip.AIP",
-    "org.roda.core.data.v2.ip.IndexedRepresentation"
-  ],
+  "description": "The Digital Signature Expiry Date Extractor plugin obtains expiration dates from qualified digital signatures embedded in PDF files and saves them in metadata.\nThe extracted dates provide a convenient means of sorting and selecting files based on signature expiration date, enabling proactive management of signature validity, and ensuring the ongoing authenticity of the digital content in combination with the Digital Signature Extension Plugin.",
+  "license": {
+    "name": "EULA",
+    "url": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.LtvExtractSignatureDatesPlugin/LICENSE.html"
+  },
   "homepage": "http://docs.roda-enterprise.com/plugins/org.roda.core.plugins.external.LtvExtractSignatureDatesPlugin",
-  "vendor": "KEEP SOLUTIONS",
-  "minSupportedVersion": "3.0.0",
-  "maxSupportedVersion": "5.0.0"
+  "vendor": {
+    "name": "KEEP Solutions",
+    "homepage": "https://keep.pt"
+  },
+  "minSupportedVersion": "3",
+  "maxSupportedVersion": "5",
+  "price": "paid",
+  "plugin": {
+    "objectClasses": [
+      "org.roda.core.data.v2.ip.IndexedAIP",
+      "org.roda.core.data.v2.ip.Representation",
+      "org.roda.core.data.v2.ip.AIP",
+      "org.roda.core.data.v2.ip.IndexedRepresentation"
+    ],
+    "categories": [
+      "management",
+      "digital_signature"
+    ],
+    "type": "AIP_TO_AIP"
+  }
 }
