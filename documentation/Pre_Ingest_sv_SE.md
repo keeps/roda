@@ -1,6 +1,6 @@
 #  Leveransförberedelse
 
-Förkontroll inleverans-processen åskådliggör möjligheten för en arkivbildare att skapa Submission Information Packages (SIP:ar) som innehåller data och metadata (i en tydligt definierad struktur) för att kunna överlämna dem till systemet för ingest. SIP:arna som skapas förväntas följa policys som är fastställda av eller överenskommna med systemet. 
+Leveransförberedelser åskådliggör möjligheten för en arkivbildare att skapa Submission Information Packages (SIP:ar) som innehåller data och metadata (i en tydligt definierad struktur) för att kunna överlämna dem till systemet för inleverans. SIP:arna som skapas förväntas följa policys som är fastställda av eller överenskomna med systemet. 
 
 Förkontroll inleverans-processen omfattar vanligtvis följande aktiviteter:
 
