@@ -44,7 +44,7 @@ Sökmotorn hittar endast hela ord. Om du vill söka efter delar av ord så anvä
 
 På söksidan kan du söka efter intellektuella enheter, Representationer eller Filer (använd nedåtpilen för att välja sökdomän). För var och en av dessa domäner kan du söka i alla dess egenskaper eller i specifika egenskaper (använd nedåtpilen för att utöka den avancerade sökningen). Om du till exempel väljer Intellectual Entities kan du söka i ett specifikt fält av beskrivande metadata, eller hitta filer av ett visst format om Filer avancerad sökning är vald.
 
-### Förarbete inleverans
+### Leveransförberedelse
 
 Processen för förkontroll av inleverans åskådliggör möjligheten för en Producent att skapa Submission Information Packages (SIP) som innehåller data och metadata (i en definierad struktur) för att kunna överlämna dem till systemet för inleverans. SIP:arna som skapas förväntas följa policyer som är fastställda med (eller genom) systemet. 
 
