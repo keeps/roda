@@ -46,7 +46,7 @@ På söksidan kan du söka efter intellektuella enheter, Representationer eller 
 
 ### Leveransförberedelse
 
-Processen för förkontroll av inleverans åskådliggör möjligheten för en Producent att skapa Submission Information Packages (SIP) som innehåller data och metadata (i en definierad struktur) för att kunna överlämna dem till systemet för inleverans. SIP:arna som skapas förväntas följa policyer som är fastställda med (eller genom) systemet. 
+Processen för leveransförberedelse åskådliggör möjligheten för en arkivbildare att skapa Submission Information Packages (SIP) som innehåller data och metadata (i en definierad struktur) för att kunna överlämna dem till systemet för inleverans. SIP:arna som skapas förväntas följa policys som är fastställda med (eller genom) systemet. 
 
 ### Inleverans
 
