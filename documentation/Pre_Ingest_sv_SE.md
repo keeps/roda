@@ -14,7 +14,7 @@ Vid undertecknande av inlämningskontraktet måste producenten ha godkänt en kl
 
 Grundklassificeringsschemat skapas vanligtvis av arkivarien och kan laddas ner på den här sidan i ett maskinläsbart format. Den nedladdade filen kan läsas in i RODA-in för att på ett bättre sätt kunna förbereda SIP:arna inför inläsning i systemet. 
 
-[Ladda ner klassificeringsstruktur] (/api/v1/classification_plans) (Notera: för att ladda ner klassificeringsstrukturen krävs en RODA instans)
+[Ladda ner klassificeringsstruktur](/api/v1/classification_plans) (notera: för att ladda ner klassificeringsstrukturen krävs en RODA instans)
 
 ## Submission Information Packages (SIP)
 
