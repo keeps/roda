@@ -321,7 +321,6 @@
                     <plugin>
                         <groupId>net.ltgt.gwt.maven</groupId>
                         <artifactId>gwt-maven-plugin</artifactId>
-                        <version>1.0.0</version>
                         <extensions>true</extensions>
                         <configuration>
                             <moduleName>${gwt.module.portal}</moduleName>
