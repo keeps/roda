@@ -268,7 +268,6 @@ public class IndexServiceTest {
 
     Instant dateInitial = indexedAip.getDateInitial().toInstant();
     LocalDateTime ldt = LocalDateTime.ofInstant(dateInitial, ZoneOffset.UTC);
-    int year = ldt.getYear();
 
     Calendar calInitial = Calendar.getInstance();
     calInitial.setTime(indexedAip.getDateInitial());
