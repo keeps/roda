@@ -23,7 +23,7 @@ Denna aktivitet består av att förbereda ett eller flera Submission Information
 Verktyget och dokumentation är tillgänglig på [https://rodain.roda-community.org](https://rodain.roda-community.org).
 
 
-## Överföring
+## Överföring av material
 
 Aktiviteten består av överföring av Submission Information Package (SIP) från arkivbildare till systemet. SIP:arna lagras tillfälligt i karantän i väntan på att bli hanterade av systemet.
 
