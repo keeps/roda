@@ -528,6 +528,9 @@ public class RodaCoreFactory {
         initializeJobAttachmentsDir();
         LOGGER.debug("Finished instantiating Job attachments directory");
 
+        instantiateAccessTokens();
+        LOGGER.debug("Finished instantiating Access tokens");
+
         instantiateDistributedMode();
         LOGGER.debug("Finished instantiating distributed mode");
 
@@ -1515,17 +1518,20 @@ public class RodaCoreFactory {
     }
   }
 
+  private static void instantiateAccessTokens(){
+    apiSecretKey = getProperty(RodaConstants.API_SECRET_KEY_PROPERTY, RodaConstants.DEFAULT_API_SECRET_KEY);
+    accessKeyValidity = RodaCoreFactory.getRodaConfiguration().getLong(RodaConstants.ACCESS_KEY_VALIDITY,
+      RodaConstants.DEFAULT_ACCESS_KEY_VALIDITY);
+    accessTokenValidity = RodaCoreFactory.getRodaConfiguration().getLong(RodaConstants.ACCESS_TOKEN_VALIDITY,
+      RodaConstants.DEFAULT_ACCESS_TOKEN_VALIDITY);
+  }
+
   private static void instantiateDistributedMode() {
     initializeLocalInstanceConfigDirectory();
     distributedModeType = DistributedModeType.valueOf(
       getProperty(RodaConstants.DISTRIBUTED_MODE_TYPE_PROPERTY, RodaConstants.DEFAULT_DISTRIBUTED_MODE_TYPE.name()));
     try {
       if (DistributedModeType.CENTRAL.equals(distributedModeType)) {
-        apiSecretKey = getProperty(RodaConstants.API_SECRET_KEY_PROPERTY, RodaConstants.DEFAULT_API_SECRET_KEY);
-        accessKeyValidity = RodaCoreFactory.getRodaConfiguration().getLong(RodaConstants.ACCESS_KEY_VALIDITY,
-          RodaConstants.DEFAULT_ACCESS_KEY_VALIDITY);
-        accessTokenValidity = RodaCoreFactory.getRodaConfiguration().getLong(RodaConstants.ACCESS_TOKEN_VALIDITY,
-          RodaConstants.DEFAULT_ACCESS_TOKEN_VALIDITY);
         if (getLocalInstance() == null) {
           final LocalInstance rodaCentralInstance = new LocalInstance();
           rodaCentralInstance.setId(IdUtils.createUUID());
