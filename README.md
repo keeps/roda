@@ -1,4 +1,5 @@
-<div align="center" name="top">
+<!--{% comment %}-->
+<div align="center" name="top" id="roda-hero">
 
 <img src="https://user-images.githubusercontent.com/1252710/228822517-7a3ef92a-df80-4b40-9b62-24447c782b21.svg#gh-dark-mode-only" height="150">
 
@@ -7,7 +8,7 @@
 </div>
 
 ----
-  
+
 [![CI](https://github.com/keeps/roda/actions/workflows/CI.yml/badge.svg)](https://github.com/keeps/roda/actions/workflows/CI.yml)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/keeps/roda?sort=semver&color=informational)](https://github.com/keeps/roda/releases/latest)
 [![](https://img.shields.io/badge/java-17%20LTS-red)](https://docs.oracle.com/en/java/javase/17/)
@@ -16,7 +17,7 @@
 [![GitHub contributors](https://img.shields.io/github/contributors/keeps/roda)](https://github.com/keeps/roda/graphs/contributors)
 [![License](https://img.shields.io/github/license/keeps/roda?color=9cf)](./LICENSE)
 
-
+<!--{% endcomment %}-->
 
 <p align="justify">RODA (Repository of Authentic Digital Records) is a <strong>long-term digital repository</strong> solution that delivers functionalities for all the main functional units of the OAIS reference model. RODA is capable of ingesting, managing, and providing access to various types of digital content produced by large corporations and public bodies.</p>
 
