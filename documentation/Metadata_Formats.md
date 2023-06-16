@@ -584,9 +584,9 @@ Form templates should be added to the configuration under the folder `[RODA_HOME
   <language>{{language}}</language>
 </simpledc>
 ```
-<!--- {% endraw %} --->
-The Form template files are based on the the powerful [Handlebars engine](http://handlebarsjs.com). Each field that is expected to be shown in the metadata editor should be identified in the beginning of the file by a _field_ handle (e.g. `{{~field name="title"~}}`). There are several options that can be used to modify the way each field is displayed. These options are a key-value pairs, e.g. `label="Title of work"`, where the key is the name of the option and the value is the value that will be given to that option.
 
+The Form template files are based on the the powerful [Handlebars engine](http://handlebarsjs.com). Each field that is expected to be shown in the metadata editor should be identified in the beginning of the file by a _field_ handle (e.g. `{{~field name="title"~}}`). There are several options that can be used to modify the way each field is displayed. These options are a key-value pairs, e.g. `label="Title of work"`, where the key is the name of the option and the value is the value that will be given to that option.
+<!--- {% endraw %} --->
 The available options that alter the fields' behavior are:
 
 *   **order** - the order by which the field should be displayed in the metadata editor
