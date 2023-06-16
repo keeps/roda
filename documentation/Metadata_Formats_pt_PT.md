@@ -646,7 +646,7 @@ As opções disponíveis que alteram o comportamento dos campos são:
         </select>
 
 #### Exemplo completo do campo "list"
-
+<!--- {% raw %} --->
     {{~field
       name="statusDescription"
       order="470"
@@ -662,7 +662,7 @@ As opções disponíveis que alteram o comportamento dos campos são:
 O seguinte é um exemplo de como as tags podem ser usadas:
 
     {{~file name="title" order="1" type="text" label="Template title" mandatory="true" auto-generate="title"~}}
-
+<!--- {% endraw %} --->
 ## Ativar o novo formato
 
 Depois de adicionar todos os arquivos descritos na seção anterior, é preciso habilitá-los no repositório. Para realizar isso, as atividades a seguir precisam ser feitas.

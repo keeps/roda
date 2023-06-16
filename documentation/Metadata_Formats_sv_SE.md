@@ -643,7 +643,7 @@ De tillgängliga alternativen som ändrar fältens beteende är:
         </select>
 
 #### Fullständigt exempel på ett "list"-fält
-
+<!--- {% raw %} --->
     {{~field
       name="statusDescription"
       order="470"
@@ -659,7 +659,7 @@ De tillgängliga alternativen som ändrar fältens beteende är:
 Följande är ett exempel på hur taggarna kan användas:
 
     {{~file name="title" order="1" type="text" label="Template title" mandatory="true" auto-generate="title"~}}
-
+<!--- {% endraw %} --->
 ## Aktivera det nya formatet
 
 Efter att ha lagt till alla filer som beskrivs i föregående avsnitt måste man aktivera dem i systemet. För att göra det måste följande aktiviteter att göras.
