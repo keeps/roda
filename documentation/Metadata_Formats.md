@@ -558,7 +558,7 @@ The following example shows how a Simple Dublin Core file can be transformed to 
 The _Editing_ activity is supported by a configuration file that will instruct the repository on how to display a form to edit existing metadata. The configuration file also serves the purpose of providing a template for creating a new metadata item with some predefined attributes already filled in.
 
 Form templates should be added to the configuration under the folder `[RODA_HOME]/config/templates/`. The following example shows how a template file can be combined with annotations that will be used to render the metadata editor.
-
+<!--- {% raw %} --->
 ```
 {{~field name="title"   order='2' auto-generate='title' label="{'en': 'Title'}" xpath="//*:title/string()"}}
 {{~field name="id"      order='1' auto-generate='id' label="{'en': 'ID'}" xpath="//*:identifier/string()"}}
@@ -584,7 +584,7 @@ Form templates should be added to the configuration under the folder `[RODA_HOME
   <language>{{language}}</language>
 </simpledc>
 ```
-
+<!--- {% endraw %} --->
 The Form template files are based on the the powerful [Handlebars engine](http://handlebarsjs.com). Each field that is expected to be shown in the metadata editor should be identified in the beginning of the file by a _field_ handle (e.g. `{{~field name="title"~}}`). There are several options that can be used to modify the way each field is displayed. These options are a key-value pairs, e.g. `label="Title of work"`, where the key is the name of the option and the value is the value that will be given to that option.
 
 The available options that alter the fields' behavior are:

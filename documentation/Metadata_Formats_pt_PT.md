@@ -559,6 +559,8 @@ A atividade de _edição_ é suportada por um ficheiro de configuração que ins
 
 O modelo de formulário deverá ser adicionado à pasta de configuração `[RODA_HOME]/config/templates/`. O exemplo seguinte mostra como o ficheiro modelo pode ser combinado com anotações que será usadas para apresentação no editor de metainformação.
 
+<!--- {% raw %} --->
+
 ```
 {{~field name="title"   order='2' auto-generate='title' label="{'en': 'Title'}" xpath="//*:title/string()"}}
 {{~field name="id"      order='1' auto-generate='id' label="{'en': 'ID'}" xpath="//*:identifier/string()"}}
@@ -584,6 +586,7 @@ O modelo de formulário deverá ser adicionado à pasta de configuração `[RODA
   <language>{{language}}</language>
 </simpledc>
 ```
+<!--- {% endraw %} --->
 
 O modelo de formulário é baseado no [Handlebars](http://handlebarsjs.com). Cada campo que é esperado ser mostrado no editor de metainformação deve ser identificado no início do ficheiro por _campo_ (p.e. `{{~field name="title"~}}`). Existem diferentes opções que podem ser usadas para modificar a forma como cada campo é mostrado. Estas opções são pares de chave-valor, p.e. `label="Title of work"`, onde a chave é o nome da opção e o valor é o valor para aquela opção.
 

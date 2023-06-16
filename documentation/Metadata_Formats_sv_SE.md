@@ -558,7 +558,7 @@ Följande exempel visar hur en Simple Dublin Core-fil kan omvandlas till HTML f�
 Aktiviteten _Redigering_ stöds av en konfigurationsfil som kommer att instruera systemet om hur man visar ett formulär för att redigera befintlig metadata. Konfigurationsfilen syftar också till att tillhandahålla en mall för att skapa ett nytt metadataobjekt innehållande några redan ifyllda fördefinierade attribut.
 
 Formulärmallar bör läggas till i konfigurationen under mappen `[RODA_HOME]/config/templates/`. Följande exempel visar hur en mallfil kan kombineras med kommentarer som kommer att användas för att rendera metadataredigeraren.
-
+<!--- {% raw %} --->
 ```
 {{~field name="title"   order='2' auto-generate='title' label="{'en': 'Title'}" xpath="//*:title/string()"}}
 {{~field name="id"      order='1' auto-generate='id' label="{'en': 'ID'}" xpath="//*:identifier/string()"}}
@@ -584,7 +584,7 @@ Formulärmallar bör läggas till i konfigurationen under mappen `[RODA_HOME]/co
   <language>{{language}}</language>
 </simpledc>
 ```
-
+<!--- {% endraw %} --->
 Formulärmallsfilerna är baserade på den kraftfulla [Handlebars engine](http://handlebarsjs.com). Varje fält som förväntas visas i metadataredigeraren bör identifieras i början av filen med ett _field_-handle (t.ex. `{{~field name="title"~}}`). Det finns flera alternativ som kan användas för att ändra hur varje fält visas. Dessa alternativ är ett nyckelvärdepar, t.ex. `label="Title of work"`, där nyckeln är namnet på alternativet och värdet är det värde som kommer att ges till det alternativet.
 
 De tillgängliga alternativen som ändrar fältens beteende är:
