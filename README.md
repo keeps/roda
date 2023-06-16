@@ -1,4 +1,4 @@
-<div align="center" name="top" id="roda-hero">
+<div align="center" name="top">
 
 <!--{% comment %}-->
 <img src="https://user-images.githubusercontent.com/1252710/228822517-7a3ef92a-df80-4b40-9b62-24447c782b21.svg#gh-dark-mode-only" height="150">
