@@ -5,3 +5,5 @@ header_pages:
   - LICENCE
   - SECURITY.md
   - CHANGELOG.md
+plugins:
+  - jemoji
