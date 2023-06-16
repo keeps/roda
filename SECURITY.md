@@ -1,3 +1,6 @@
+---
+title: Support Policy
+---
 # Maintenance and Security Policy
 
 ## Supported Versions

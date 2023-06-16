@@ -2,9 +2,7 @@ theme: minima
 header_pages:
   - documentation/README.md
   - deploys/README.md
-  - LICENCE
   - SECURITY.md
-  - CHANGELOG.md
 plugins:
   - jemoji
 github_username:  keeps
