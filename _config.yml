@@ -1,2 +1,1 @@
-defaults:
-  - render_with_liquid: false
+theme: minima
