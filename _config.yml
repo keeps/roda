@@ -8,3 +8,8 @@ header_pages:
 plugins:
   - jemoji
 github_username:  keeps
+title: RODA Community Edition
+tagline: Long-term digital preservation repository
+description: RODA (Repository of Authentic Digital Records) is a long-term digital repository solution that delivers functionalities for all the main functional units of the OAIS reference model. RODA is capable of ingesting, managing, and providing access to various types of digital content produced by large corporations and public bodies.
+author: KEEP SOLUTIONS
+logo: https://keeps.github.io/roda/roda-ui/roda-wui/src/main/resources/config/theme/favicon/favicon-black-196.png
