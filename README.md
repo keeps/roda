@@ -1,10 +1,12 @@
 <div align="center" name="top" id="roda-hero">
 
+<!--{% comment %}-->
 <img src="https://user-images.githubusercontent.com/1252710/228822517-7a3ef92a-df80-4b40-9b62-24447c782b21.svg#gh-dark-mode-only" height="150">
+<!--{% endcomment %}-->
 
 <img src="https://user-images.githubusercontent.com/1252710/228822529-469ba04d-6749-4da8-928a-2d8d914f60dd.svg#gh-light-mode-only" height="150">
 
-<hr/>
+<hr style="margin: 24px 0; height: 0.25em"/>
 
 </div>
 
