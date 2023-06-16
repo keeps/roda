@@ -6,8 +6,8 @@ This is an example deployment and SHOULD NOT BE USED FOR PRODUCTION, due to secu
 
 Requirements:
 - Linux or macOS (Windows is not supported)
-- Docker: https://docs.docker.com/get-docker/
-- Docker Compose: https://docs.docker.com/compose/install/
+- Docker: [https://docs.docker.com/get-docker/](https://docs.docker.com/get-docker/)
+- Docker Compose: [https://docs.docker.com/compose/install/](https://docs.docker.com/compose/install/)
 
 ```sh
 # Download the docker compose
@@ -23,9 +23,9 @@ docker compose logs -f --tail=100
 ```
 
 When the services load, they should be available on the Web browser:
-* RODA will be at http://localhost:8080 (user: admin, password: roda)
-* REST-API documentation will be at http://localhost:8081 (same passwords as in RODA)
-* Indexing backend (Solr) will be at http://localhost:8983 (not protected, must be protected in production)
+* RODA will be at [http://localhost:8080](http://localhost:8080) (user: admin, password: roda)
+* REST-API documentation will be at [http://localhost:8081](http://localhost:8081) (same passwords as in RODA)
+* Indexing backend (Solr) will be at [http://localhost:8983](http://localhost:8983) (not protected, must be protected in production)
 
 When finished, stop the services:
 ```sh
