@@ -43,7 +43,7 @@ Administration interfaces allow repository managers to maintain **representation
 
 RODA ensures that **ingested data remains authentic** by recording PREMIS metadata for every action performed on a digital object. It records provenance information in archival metadata standards such as EAD or Dublin Core and **ensures integrity and availability** by frequently monitoring data and making sure that it has not been tampered with. All interactions between users and the repository (human and software) are logged for **security and accountability** reasons.
 
-To experience RODA firsthand, please visit the **RODA demo site** at :link: [https://www.roda-community.org](https://demo.roda-community.org).
+To experience RODA firsthand, please visit the **RODA demo site** at :link: [https://demo.roda-community.org](https://demo.roda-community.org).
 
 # :rocket: Features
 
@@ -127,7 +127,7 @@ In fact, RODA’s ability to integrate data from other records management system
 
 ## Online demo
 
-To experience RODA without having to install it on your local machine, please visit the RODA online demo available at :link: https://www.roda-community.org.
+To experience RODA without having to install it on your local machine, please visit the RODA online demo available at :link: [https://demo.roda-community.org](https://demo.roda-community.org).
 
 ## Testing environment
 

@@ -1,6 +1,6 @@
 # Demonstration standalone deployment
 
-RODA standalone deployment with a single-node Solr and Zookeeper services. It also includes additional support services for file format identification (Siegfried) and virus check (ClamAV). RODA is configured with a default index configuration of four (4) shards and one (1) replica per shard. This deployment is set to be run on http://localhost:8080, to change some alterations to the configuration will be required.
+RODA standalone deployment with a single-node Solr and Zookeeper services. It also includes additional support services for file format identification (Siegfried) and virus check (ClamAV). RODA is configured with a default index configuration of four (4) shards and one (1) replica per shard. This deployment is set to be run on [http://localhost:8080](http://localhost:8080), to change some alterations to the configuration will be required.
 
 This is an example deployment and SHOULD NOT BE USED FOR PRODUCTION, due to security, performance and stability reasons. Please check [RODA Enterprise](https://www.roda-enterprise.com) for advice on how to go into production.
 
