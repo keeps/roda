@@ -1,16 +1,79 @@
 # Changelog
 
+## v5.1.0 (20/06/2023)
+#### New features:
+
+- Added property to differentiate environments #2676 
+- Added link to RODA Marketplace in Menu #2722
+- Added links to additional features #2723
+- Added marketplace text to welcome page #2724
+- Option to enable AIP locking when editing descriptive metadata #2672
+- Preview functionality in disposal rules with AIPs affected by #2664 
+
+#### Enhancements:
+- Reduce indexed information of the entities that spend much of the index #2058
+- Partial updates are not affecting the updatedOn field #2851
+- Updated the banner #2725
+
+#### Bug fixes:
+- Minimal ingest plugin is using E-ARK SIP 1.0 as SIP format instead of E-ARK SIP 2.0.4 #2736 
+- Could not resolve type id 'AndFiltersParameters' #2809
+- Access token can only be created if RODA is instantiated as CENTRAL #2881
+- Saved search for files associated to a representation information not working properly #2671 
+
+#### Security:
+- Remove xml-beans dependency #2726 
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+
+
+---
+
+## v4.5.6 (04/05/2023)
+#### Bug fixes:
+
+- Option to disable user registration on server-side #2840 
+
+Install for demonstration:
+```
+docker pull ghcr.io/keeps/roda:v4.5.6
+```
+---
+
+## v5.1.0-RC (17/04/2023)
+
+---
+
+## v4.5.5 (16/03/2023)
+#### Dependencies upgrade:
+- Bump commons-ip version from 2.3.0 to 2.3.2 
+
+
+Install for demonstration:
+```
+docker pull ghcr.io/keeps/roda:v4.5.5
+```
+---
+
 ## v5.0.0 (13/03/2023)
 ### :warning: Breaking Changes
-RODA from version 5 onward will use Solr 9 as index system. If you have any implementation with Solr 8 you need to upgrade the Solr to version 9 and then rebuild all indexes on RODA.
+RODA  5.X will use Apache Solr 9 as indexing system. If you have an existing RODA implementation with Solr 8 you will need to [upgrade the Solr to version 9](https://solr.apache.org/guide/solr/latest/upgrade-notes/major-changes-in-solr-9.html) and then rebuild all indexes on RODA.
+
+RODA 5.X docker now runs as the user roda (uid: 1000, gid: 1000) to improve security. This may affect you current implementation as it may lack enough permissions to access the storage. To fix, change the owner or permissions of the files and directories in the mapped volumes or binded folders. Alternatively, you can [change the RODA user uid](https://docs.docker.com/compose/compose-file/#user) in docker compose. 
+
+---
 
 #### New features:
 
 - Distributed Digital Preservation #1933 #1934 #1935
-- Added authentication via Access Token
-- Support binaries as a reference #786
-- Adds list of all available plugins #2323
-- Supports Trusted plugins #2323
+- Added authentication via Access Token (for REST-API)
+- Support binaries as a reference (shallow SIP/AIP) #786
+- Adds list of all available plugins (see [RODA Marketplace](https://market.roda-community.org/)) #2323
+- Supports verified plugins #2323
+- New Swedish translation of the Web interface :sweden:
+- Updates to Hungarian translation of the Web interface :hungary:
 
 #### Changes:
 
@@ -20,11 +83,23 @@ RODA from version 5 onward will use Solr 9 as index system. If you have any impl
 
 #### Security:
 
+- RODA docker now runs as roda (uid: 1000) instead of root
+- (Applicational) Users can now have JWT access tokens to access the REST-API
+- Option to restrict user web authentication to delegated (CAS) or JWT access tokens
 - Several dependency upgrades to fix security vulnerabilities
 - CVE-2016-1000027 (spring-web 5.3.24): RODA does not use the HTTPInvokerServiceExporter or RemoteInvocationSerializingExporter classes, therefore we are [NOT affected](https://github.com/spring-projects/spring-framework/issues/24434#issuecomment-744519525) by this vulnerability 
 - CVE-2022-1471 (snake-yaml 1.33): RODA does not use [empty constructor](https://snyk.io/blog/unsafe-deserialization-snakeyaml-java-cve-2022-1471/) so we are NOT affected by this vulnerability.
 
+---
+
+We would like to thank the contributions of:
+- [WhiteRed](https://www.whitered.se/) with the Swedish translation :sweden:
+- Panka Dióssy from the [National Laboratory for Digital Heritage](https://dh-lab.hu/), with updates to the Hungarian translation :hungary:
+
+---
+
 To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+
 
 ---
 
@@ -410,67 +485,4 @@ docker pull keeps/roda:v4.0.1
 Install for demonstration:
 ```
 docker pull keeps/roda:v3.5.5
-```
----
-
-## v3.5.4 (22/04/2021)
-
-#### Enhancements:
-
--  Modify Tomcat on Dockerfile [#1923](https://github.com/keeps/roda/issues/1923)
-
-#### Bug Fixes:
-
--  master/slave action logs management [#1928](https://github.com/keeps/roda/issues/1928)
--  CAS login repeatedly register an action even though the user is already logged in [#1926](https://github.com/keeps/roda/issues/1926)
--  PluginHelper is faulty reporting a failure when transforming lite in object [#1925](https://github.com/keeps/roda/issues/1925)
--  Failed to open job-report via job page [#1922](https://github.com/keeps/roda/issues/1922)
--  Improve ErrorHandler to filter false positive errors [#1921](https://github.com/keeps/roda/issues/1921)
-
-Install for demonstration:
-```
-docker pull keeps/roda:v3.5.4
-```
-
----
-
-## v3.5.3 (18/03/2021)
-
-#### Enhancements:
-
--  Skipped reports are showing as failure [#1918](https://github.com/keeps/roda/issues/1918)
-
-Install for demonstration:
-```
-docker pull keeps/roda:v3.5.3
-```
-
----
-
-## v4.0.0 (11/03/2021)
-
-#### New features:
-
--  Adding Croatian language [#1711](https://github.com/keeps/roda/issues/1711)
--  Retention and disposal features [#1708](https://github.com/keeps/roda/issues/1708)
-
-Install for demonstration:
-```
-docker pull keeps/roda:v4.0.0
-```
----
-
-## v3.5.2 (10/03/2021)
-
-#### New features:
-
--  Add option to remove SIP from transfer resource folder after a successfully ingest workflow [#1917](https://github.com/keeps/roda/issues/1917)
-
-#### Bug Fixes:
-
--  Siegfried and fixity skipped during ingest workflow [#1916](https://github.com/keeps/roda/issues/1916)
-
-Install for demonstration:
-```
-docker pull keeps/roda:v3.5.2
 ```
