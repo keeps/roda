@@ -723,7 +723,6 @@ public final class RodaConstants {
 
   public static final DistributedModeType DEFAULT_DISTRIBUTED_MODE_TYPE = DistributedModeType.BASE;
   public static final String DISTRIBUTED_MODE_TYPE_PROPERTY = "roda.distributed.mode.type";
-
   public static final String DEFAULT_API_SECRET_KEY = "changeit";
   public static final String API_SECRET_KEY_PROPERTY = "roda.distributed.api.secret";
 
@@ -741,10 +740,11 @@ public final class RodaConstants {
   // MARKET
   public static final String MARKET_INFO_URL_PROPERTY = "core.market.info.url";
   public static final String DEFAULT_MARKET_INFO_URL = "https://market.roda-community.org/api/v1";
-
   public static final String KEEP_MARKET_PLUGIN_HOMEPAGE_URL_PROPERTY = "core.market.plugin.homepage.url";
   public static final String DEFAULT_KEEP_MARKET_PLUGIN_HOMEPAGE_URL = "http://docs.roda-enterprise.com/plugins/";
   public static final String DEFAULT_MARKET_SUPPORT_URL = "https://www.roda-enterprise.com";
+  public static final String ENVIRONMENT_COLLECT_VERSION = "roda.environment.collect.version";
+  public static final String DEFAULT_ENVIRONMENT_COLLECT_VERSION = "true";
 
   public enum OrchestratorType {
     AKKA, AKKA_DISTRIBUTED

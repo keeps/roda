@@ -16,13 +16,9 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -74,7 +70,11 @@ public class MarketUtils {
   }
   public static void retrievePluginsListFromAPI(LocalInstance instance) throws MarketException {
     try {
-      String rodaVersion = retrieveRodaVersion();
+      Boolean collectVersion = Boolean.valueOf(RodaCoreFactory.getProperty(RodaConstants.ENVIRONMENT_COLLECT_VERSION,
+        RodaConstants.DEFAULT_ENVIRONMENT_COLLECT_VERSION));
+
+      String rodaVersion = collectVersion ? retrieveRodaVersion() : "development";
+
       String pluginUrl = RodaCoreFactory.getProperty(RodaConstants.MARKET_INFO_URL_PROPERTY,
         RodaConstants.DEFAULT_MARKET_INFO_URL) + "?rodaVersion=" + rodaVersion;
 
