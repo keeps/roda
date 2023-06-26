@@ -14,9 +14,9 @@
 [![GitHub contributors](https://img.shields.io/github/contributors/keeps/roda)](https://github.com/keeps/roda/graphs/contributors)
 [![License](https://img.shields.io/github/license/keeps/roda?color=9cf)](./documentation/LICENSE.md)
 
-<p align="justify">RODA (Repository of Authentic Digital Records) is a <strong>long-term digital repository</strong> solution that delivers functionalities for all the main functional units of the OAIS reference model. RODA is capable of ingesting, managing, and providing access to various types of digital content produced by large corporations and public bodies.</p>
+RODA (Repository of Authentic Digital Records) is a **long-term digital repository** solution that delivers functionalities for all the main functional units of the OAIS reference model. RODA is capable of ingesting, managing, and providing access to various types of digital content produced by large corporations and public bodies.
 
-<div align="center" style="background-color: rgba(100,100,100,.3); border-radius: 2px">
+<div align="center" style="border: 1px solid rgba(50,50,50,.1); border-radius: 2px; padding: 5px">
     <a href="#rocket-features">Features</a> &nbsp;&bull;&nbsp;
     <a href="#desktop_computer-trying-out-roda">Trying out RODA</a> &nbsp;&bull;&nbsp;
     <a href="#books-documentation">Documentation</a> &nbsp;&bull;&nbsp;
