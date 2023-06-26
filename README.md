@@ -1,13 +1,7 @@
-<div align="center" name="top">
+<div align="left" name="top">
+  <img src="https://github.com/keeps/roda/assets/631728/32c32271-b86e-4411-a2b0-afed3511e35e" height="150">
 
-<!--{% comment %}-->
-<img src="https://user-images.githubusercontent.com/1252710/228822517-7a3ef92a-df80-4b40-9b62-24447c782b21.svg#gh-dark-mode-only" height="150">
-<!--{% endcomment %}-->
-
-<img src="https://user-images.githubusercontent.com/1252710/228822529-469ba04d-6749-4da8-928a-2d8d914f60dd.svg#gh-light-mode-only" height="150">
-
-<hr style="margin: 24px 0; height: 0.25em"/>
-
+  <hr style="margin: 24px 0; height: 0.25em"/>
 </div>
 
 
