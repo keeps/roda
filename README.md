@@ -16,11 +16,12 @@
 
 <p align="justify">RODA (Repository of Authentic Digital Records) is a <strong>long-term digital repository</strong> solution that delivers functionalities for all the main functional units of the OAIS reference model. RODA is capable of ingesting, managing, and providing access to various types of digital content produced by large corporations and public bodies.</p>
 
-<div align="center">
+<div align="center" style="background-color: rgba(100,100,100,.3); border-radius: 2px">
     <a href="#rocket-features">Features</a> &nbsp;&bull;&nbsp;
+    <a href="#desktop_computer-trying-out-roda">Trying out RODA</a> &nbsp;&bull;&nbsp;
     <a href="#books-documentation">Documentation</a> &nbsp;&bull;&nbsp;
-    <a href="deploys/README.md">Installation</a> &nbsp;&bull;&nbsp;
-    <a href="https://demo.roda-community.org">Demo</a> &nbsp;&bull;&nbsp;
+    <a href="#art-editions">Editions</a> &nbsp;&bull;&nbsp;
+    <a href="#shopping-marketplace">Marketplace</a> &nbsp;&bull;&nbsp;
     <a href="#bellhop_bell-support">Support</a> &nbsp;&bull;&nbsp;
     <a href="#writing_hand-contributing">Contributing</a>
 </div>
