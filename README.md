@@ -9,14 +9,13 @@
 </div>
 
 
-
-[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/keeps/roda?sort=semver&color=informational)](https://github.com/keeps/roda/releases/latest)
-[![testing](https://github.com/keeps/roda/actions/workflows/CI.yml/badge.svg)](https://github.com/keeps/roda/actions/workflows/CI.yml?label=testing)
-![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/keeps/roda)
+[![GitHub latest release](https://img.shields.io/github/v/release/keeps/roda?sort=semver&color=informational)](https://github.com/keeps/roda/releases/latest)
 ![Docker Pulls](https://img.shields.io/docker/pulls/keeps/roda)
 [![GitHub contributors](https://img.shields.io/github/contributors/keeps/roda)](https://github.com/keeps/roda/graphs/contributors)
 ![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/m/keeps/roda)
-![GitHub last commit (branch)](https://img.shields.io/github/last-commit/keeps/roda/master)
+<!-- {% comment %} --> 
+[![testing](https://github.com/keeps/roda/actions/workflows/CI.yml/badge.svg)](https://github.com/keeps/roda/actions/workflows/CI.yml?label=testing) 
+<!-- {% endcomment %}-->
 
 RODA (Repository of Authentic Digital Records) is a **long-term digital repository** solution that delivers functionalities for all the main functional units of the OAIS reference model. RODA is capable of ingesting, managing, and providing access to various types of digital content produced by large corporations and public bodies.
 
