@@ -5,13 +5,13 @@
 
 
 
-[![CI](https://github.com/keeps/roda/actions/workflows/CI.yml/badge.svg)](https://github.com/keeps/roda/actions/workflows/CI.yml)
 [![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/keeps/roda?sort=semver&color=informational)](https://github.com/keeps/roda/releases/latest)
-[![](https://img.shields.io/badge/java-17%20LTS-red)](https://docs.oracle.com/en/java/javase/17/)
-[![Docker](https://img.shields.io/badge/Docker-available-blue.svg?style=flat&logo=docker)](https://github.com/keeps/roda/pkgs/container/roda)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-blue.svg)](https://makeapullrequest.com)
+[![testing](https://github.com/keeps/roda/actions/workflows/CI.yml/badge.svg)](https://github.com/keeps/roda/actions/workflows/CI.yml?label=testing)
+![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/keeps/roda)
+![Docker Pulls](https://img.shields.io/docker/pulls/keeps/roda)
 [![GitHub contributors](https://img.shields.io/github/contributors/keeps/roda)](https://github.com/keeps/roda/graphs/contributors)
-[![License](https://img.shields.io/github/license/keeps/roda?color=9cf)](./documentation/LICENSE.md)
+![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/m/keeps/roda)
+![GitHub last commit (branch)](https://img.shields.io/github/last-commit/keeps/roda/master)
 
 RODA (Repository of Authentic Digital Records) is a **long-term digital repository** solution that delivers functionalities for all the main functional units of the OAIS reference model. RODA is capable of ingesting, managing, and providing access to various types of digital content produced by large corporations and public bodies.
 
