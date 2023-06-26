@@ -1,5 +1,10 @@
 <div align="left" name="top">
-  <img src="https://github.com/keeps/roda/assets/631728/32c32271-b86e-4411-a2b0-afed3511e35e" height="150">
+  <!--{% comment %}-->
+<img src="https://github.com/keeps/roda/assets/631728/254df003-ff11-4f33-8d20-65b6da12126a#gh-dark-mode-only" height="150">
+<!--{% endcomment %}-->
+
+<img src="https://github.com/keeps/roda/assets/631728/9c7e7fc7-c94b-4bbe-8c9c-961b5197c411#gh-light-mode-only" height="150">
+
   <br><br>
 </div>
 
