@@ -1,9 +1,10 @@
 <div align="left" name="top">
-  <!--{% comment %}-->
-<img src="https://github-production-user-asset-6210df.s3.amazonaws.com/631728/248834537-254df003-ff11-4f33-8d20-65b6da12126a.svg#gh-dark-mode-only" height="150">
-<!--{% endcomment %}-->
-
-<img src="https://github-production-user-asset-6210df.s3.amazonaws.com/631728/248834502-9c7e7fc7-c94b-4bbe-8c9c-961b5197c411.svg#gh-light-mode-only" height="150">
+  
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://github-production-user-asset-6210df.s3.amazonaws.com/631728/248834537-254df003-ff11-4f33-8d20-65b6da12126a.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://github-production-user-asset-6210df.s3.amazonaws.com/631728/248834502-9c7e7fc7-c94b-4bbe-8c9c-961b5197c411.svg">
+  <img src="https://github-production-user-asset-6210df.s3.amazonaws.com/631728/248834537-254df003-ff11-4f33-8d20-65b6da12126a.svg" height="150">
+</picture>
 
   <br><br>
 </div>
