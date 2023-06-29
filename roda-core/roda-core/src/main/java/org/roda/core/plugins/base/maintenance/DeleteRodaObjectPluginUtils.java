@@ -11,7 +11,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +22,7 @@ import org.roda.core.common.dips.DIPUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.URNUtils;
@@ -29,6 +32,7 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.SimpleFilterParameter;
+import org.roda.core.data.v2.index.select.SelectedItemsList;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
@@ -61,6 +65,7 @@ import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.core.util.IdUtils;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@author João Gomes <jgomes@keep.pt>}.
@@ -165,8 +170,9 @@ public class DeleteRodaObjectPluginUtils {
                 throws GenericException, RequestNotValidException, AuthorizationDeniedException {
                 PluginState state = PluginState.SUCCESS;
                 try {
+                  AIP childAip = model.retrieveAIP(item.getId());
+                  processLinkedDIP(childAip, index, model, report, reportItem, jobPluginInfo, job, plugin);
                   model.deleteAIP(item.getId());
-                  processLinkedDIP(aip, index, model, report, reportItem, jobPluginInfo, job, plugin);
                 } catch (NotFoundException e) {
                   state = PluginState.FAILURE;
                   reportItem.addPluginDetails("Could not delete AIP: " + e.getMessage());
@@ -213,8 +219,8 @@ public class DeleteRodaObjectPluginUtils {
       }
 
       try {
-        model.deleteAIP(aip.getId());
         processLinkedDIP(aip, index, model, report, reportItem, jobPluginInfo, job, plugin);
+        model.deleteAIP(aip.getId());
         if (item != null) {
           outcomeText = PluginHelper.createOutcomeTextForAIP(item, "has been manually deleted");
         } else {
@@ -255,9 +261,9 @@ public class DeleteRodaObjectPluginUtils {
       } else {
         try {
           // model.deleteFile(file, true);
+          processLinkedDIP(file, index, model, report, reportItem, jobPluginInfo, job, plugin);
           model.deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), job.getUsername(),
             true);
-          processLinkedDIP(file, index, model, report, reportItem, jobPluginInfo, job, plugin);
         } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
           state = PluginState.FAILURE;
           reportItem.addPluginDetails("Could not delete File: " + e.getMessage());
@@ -335,8 +341,8 @@ public class DeleteRodaObjectPluginUtils {
           representation.getId(), "hold", retrievedAIP.getId(), details, doReport);
       } else {
         try {
-          model.deleteRepresentation(representation.getAipId(), representation.getId(), job.getUsername());
           processLinkedDIP(representation, index, model, report, reportItem, jobPluginInfo, job, plugin);
+          model.deleteRepresentation(representation.getAipId(), representation.getId(), job.getUsername());
         } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
           state = PluginState.FAILURE;
           reportItem.addPluginDetails("Could not delete representation: " + e.getMessage());
@@ -544,8 +550,18 @@ public class DeleteRodaObjectPluginUtils {
   private static void processDIPDelegated(ModelService model, Report report, JobPluginInfo jobPluginInfo, Job job,
     Plugin<? extends IsRODAObject> plugin, DIP dip, boolean doReport, String deletePlugin) {
     try {
+      String requestUuid = plugin.getParameterValues().getOrDefault(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID,
+          IdUtils.createUUID());
       Plugin<? extends IsRODAObject> externalDeletePlugin = RodaCoreFactory.getPluginManager().getPlugin(deletePlugin);
-      JobsHelper.setPluginParameters(externalDeletePlugin, job);
+      Map<String, String> parameters = new HashMap<>(job.getPluginParameters());
+      parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, job.getId());
+      parameters.put(RodaConstants.PLUGIN_PARAMS_DO_REPORT, String.valueOf(doReport));
+      parameters.put(RodaConstants.PLUGIN_PARAMS_LOCK_REQUEST_UUID, requestUuid);
+      try {
+        externalDeletePlugin.setParameterValues(parameters);
+      } catch (InvalidParameterException e) {
+        LoggerFactory.getLogger(DeleteRodaObjectPluginUtils.class).error("Error setting plugin parameters", e);
+      }
       List<LiteOptionalWithCause> lites = LiteRODAObjectFactory.transformIntoLiteWithCause(model,
         Collections.singletonList(dip));
       externalDeletePlugin.execute(RodaCoreFactory.getIndexService(), model, RodaCoreFactory.getStorageService(),
