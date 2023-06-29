@@ -136,6 +136,9 @@ public class DeleteRodaObjectPluginTest {
     return dip;
   }
 
+  /*
+   * AIP related
+   */
   @Test
   public void testDeleteAIPWithASingleLinkInDIP() throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, NotFoundException, AlreadyExistsException {
@@ -188,17 +191,17 @@ public class DeleteRodaObjectPluginTest {
 
   @Test
   public void testDeleteAIPWithALinkedRepresentationInDIP() throws AuthorizationDeniedException, GenericException,
-      RequestNotValidException, NotFoundException, AlreadyExistsException {
+    RequestNotValidException, NotFoundException, AlreadyExistsException {
     // create AIP and rep
     AIP aip = model.createAIP(null, "", new Permissions(), RodaConstants.ADMIN);
     Representation representation = model.createRepresentation(aip.getId(), IdUtils.createUUID(), true, "", true,
-        RodaConstants.ADMIN);
+      RodaConstants.ADMIN);
 
     // create DIP
     DIP dip = createRepresentationDIP(Collections.singletonList(representation));
 
     Job jobDeleteAIP = TestsHelper.executeJob(DeleteRODAObjectPlugin.class, Collections.EMPTY_MAP, PluginType.INTERNAL,
-        SelectedItemsList.create(IndexedAIP.class, aip.getId()));
+      SelectedItemsList.create(IndexedAIP.class, aip.getId()));
     TestsHelper.getJobReports(index, jobDeleteAIP, true);
 
     try {
@@ -235,6 +238,41 @@ public class DeleteRodaObjectPluginTest {
   }
 
   @Test
+  public void testDeleteAIPWithAIPChildAndALinkInDIP() throws AuthorizationDeniedException, GenericException,
+    RequestNotValidException, NotFoundException, AlreadyExistsException {
+    // create AIP
+    AIP aip = model.createAIP(null, "", new Permissions(), RodaConstants.ADMIN);
+    DIP dip = createAIPDIP(Collections.singletonList(aip));
+
+    // create AIP child
+    AIP aipChild = model.createAIP(aip.getId(), "", new Permissions(), RodaConstants.ADMIN);
+    DIP dipChild = createAIPDIP(Collections.singletonList(aipChild));
+
+    AIP aipChild2 = model.createAIP(aip.getId(), "", new Permissions(), RodaConstants.ADMIN);
+    DIP dipChild2 = createAIPDIP(Collections.singletonList(aipChild2));
+
+    Job jobDeleteAIP = TestsHelper.executeJob(DeleteRODAObjectPlugin.class, Collections.EMPTY_MAP, PluginType.INTERNAL,
+      SelectedItemsList.create(IndexedAIP.class, aip.getId()));
+    TestsHelper.getJobReports(index, jobDeleteAIP, true);
+
+    try {
+      DIP retrievedDIP = model.retrieveDIP(dip.getId());
+      AssertJUnit.assertNull("Failed to delete DIP linked to an AIP", retrievedDIP);
+
+      DIP retrievedChildDIP = model.retrieveDIP(dipChild.getId());
+      AssertJUnit.assertNull("Failed to delete DIP linked to child AIP 1", retrievedChildDIP);
+
+      DIP retrievedChildDIP2 = model.retrieveDIP(dipChild2.getId());
+      AssertJUnit.assertNull("Failed to delete DIP linked to child AIP 2", retrievedChildDIP2);
+    } catch (NotFoundException e) {
+      // pass
+    }
+  }
+
+  /*
+   * Representation related
+   */
+  @Test
   public void testDeleteRepresentationWithASingleLinkInDIP() throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, NotFoundException, AlreadyExistsException {
     // create AIP and rep
@@ -259,19 +297,19 @@ public class DeleteRodaObjectPluginTest {
 
   @Test
   public void testDeleteRepresentationWithALinkedFileInDIP() throws AuthorizationDeniedException, GenericException,
-      RequestNotValidException, NotFoundException, AlreadyExistsException {
+    RequestNotValidException, NotFoundException, AlreadyExistsException {
     // create AIP and rep
     AIP aip = model.createAIP(null, "", new Permissions(), RodaConstants.ADMIN);
     Representation representation = model.createRepresentation(aip.getId(), IdUtils.createUUID(), true, "", true,
-        RodaConstants.ADMIN);
+      RodaConstants.ADMIN);
     File file = model.createFile(aip.getId(), representation.getId(), Collections.emptyList(), "file",
-        new StringContentPayload("file"), RodaConstants.ADMIN, true);
+      new StringContentPayload("file"), RodaConstants.ADMIN, true);
 
     // create DIP
     DIP dip = createFileDIP(Collections.singletonList(file));
 
     Job jobDeleteRep = TestsHelper.executeJob(DeleteRODAObjectPlugin.class, Collections.EMPTY_MAP, PluginType.INTERNAL,
-        SelectedItemsList.create(IndexedRepresentation.class, IdUtils.getRepresentationId(representation)));
+      SelectedItemsList.create(IndexedRepresentation.class, IdUtils.getRepresentationId(representation)));
     TestsHelper.getJobReports(index, jobDeleteRep, true);
 
     try {
@@ -315,6 +353,9 @@ public class DeleteRodaObjectPluginTest {
     }
   }
 
+  /*
+   * File related
+   */
   @Test
   public void testDeleteFileWithASingleLinkInDIP() throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, NotFoundException, AlreadyExistsException {

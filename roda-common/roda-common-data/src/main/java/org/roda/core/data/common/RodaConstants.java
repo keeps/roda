@@ -1216,6 +1216,8 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_OUTPUT_FORMAT = "parameter.output_format";
   public static final String PLUGIN_PARAMS_COMMAND_ARGUMENTS = "parameter.command_arguments";
   public static final String PLUGIN_PARAMS_OUTPUT_ARGUMENTS = "parameter.output_arguments";
+
+  public static final String PLUGIN_PARAMS_DO_REPORT = "parameter.do_report";
   public static final String PLUGIN_PARAMS_REPORTING_CLASS = "parameter.reporting_class";
   public static final String PLUGIN_PARAMS_HAS_COMPRESSION = "parameter.has_compression";
   public static final String PLUGIN_PARAMS_HAS_SINGLE_REQUEST = "parameter.has_single_request";
