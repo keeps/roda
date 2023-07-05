@@ -191,6 +191,16 @@ This offering includes unlimited scalability and the ability to upgrade the syst
 
 For more information about Enterprise Editions, please visit the [RODA Enterprise](https://www.roda-enterprise.com/) web page.
 
+## Enterprise SM Edition
+
+For organizations seeking comprehensive control over their infrastructure and operations, while simultaneously harnessing the benefits of warranty, security patches, commercial plugins, components, and professional services. 
+
+Under this model, the organization's IT department assumes the critical responsibility for implementing, monitoring, and maintaining the system. [Shadowing support](https://docs.roda-enterprise.com/services/05-shadowing-support/) can be enlisted to assist with maintenance and support tasks. Moreover, for additional features, custom development services can be engaged, ensuring that the system continues to evolve to meet the ever-changing demands of the business. 
+
+By minimizing reliance on third-party providers for installation, configuration, and ongoing support, this solution effectively preserves data security and system integrity.
+
+For more information about Enterprise Editions, please visit the [RODA Enterprise](https://www.roda-enterprise.com/) web page.
+
 [(Back to top)](#top)
 
 # :shopping: Marketplace
