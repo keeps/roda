@@ -181,7 +181,7 @@ The Enterprise Edition is designed for large-scale production environments and p
 
 This edition includes a set of commercial plugins and professional support services to assist organisations with deployment and ongoing operations to ensure optimal performance, stability and security.
 
-For more information about Enterprise Editions, please visit the [RODA Enterprise](https://www.keep.pt/en/produts/roda-long-term-digital-preservation-repository-solution/) web page.
+For more information about Enterprise Editions, please visit the [RODA Enterprise](https://www.roda-enterprise.com/) web page.
 
 ## Enterprise HA Edition
 
@@ -189,7 +189,7 @@ For organizations requiring uninterrupted access to their digital assets and the
 
 This offering includes unlimited scalability and the ability to upgrade the system with minimal disruption, ensuring organizations always maintain seamless access to their critical digital assets.
 
-For more information about Enterprise Editions, please visit the [RODA Enterprise](https://www.keep.pt/en/produts/roda-long-term-digital-preservation-repository-solution/) web page.
+For more information about Enterprise Editions, please visit the [RODA Enterprise](https://www.roda-enterprise.com/) web page.
 
 [(Back to top)](#top)
 
