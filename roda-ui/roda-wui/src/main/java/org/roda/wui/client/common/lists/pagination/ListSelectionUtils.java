@@ -137,7 +137,7 @@ public class ListSelectionUtils {
   }
 
   public static int getIndex(String className) {
-    if (clipboard.containsKey(className)) {
+    if (clipboard.containsKey(className) && clipboard.get(className) != null) {
       return clipboard.get(className).getIndex();
     } else {
       return 1;
@@ -145,7 +145,7 @@ public class ListSelectionUtils {
   }
 
   public static long getTotal(String className) {
-    if (clipboard.containsKey(className)) {
+    if (clipboard.containsKey(className) && clipboard.get(className) != null) {
       return clipboard.get(className).getTotal();
     } else {
       return 1L;
