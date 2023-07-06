@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.model.utils.UserUtility;
+import org.roda.core.data.common.SecureString;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
@@ -28,7 +28,7 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
-import org.roda.core.data.common.SecureString;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.api.controllers.UserManagement;
 import org.roda.wui.client.browse.bundle.UserExtraBundle;
 import org.roda.wui.client.management.UserManagementService;
@@ -79,13 +79,19 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   public User registerUser(User user, SecureString password, String captcha, UserExtraBundle extra, String localeString)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, RecaptchaException,
     AuthorizationDeniedException {
-    String recaptchakey = RodaCoreFactory.getRodaConfiguration().getString(RodaConstants.UI_GOOGLE_RECAPTCHA_CODE_PROPERTY);
+    boolean userRegistrationDisabled = RodaCoreFactory.getRodaConfiguration()
+      .getBoolean(RodaConstants.USER_REGISTRATION_DISABLED, false);
+    if (userRegistrationDisabled) {
+      throw new GenericException("User registration is disabled");
+    }
+
+    String recaptchakey = RodaCoreFactory.getRodaConfiguration()
+      .getString(RodaConstants.UI_GOOGLE_RECAPTCHA_CODE_PROPERTY);
 
     if (captcha != null) {
       RecaptchaUtils
         .recaptchaVerify(RodaCoreFactory.getRodaConfiguration().getString(RECAPTCHA_CODE_SECRET_PROPERTY, ""), captcha);
-    }
-    else if (StringUtils.isNotBlank(recaptchakey)){
+    } else if (StringUtils.isNotBlank(recaptchakey)) {
       throw new RecaptchaException("The Captcha can not be null.");
     }
 
@@ -117,8 +123,9 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public void updateUser(User modifiedUser, SecureString password, UserExtraBundle extra) throws AuthorizationDeniedException,
-    NotFoundException, AlreadyExistsException, GenericException, ValidationException, RequestNotValidException {
+  public void updateUser(User modifiedUser, SecureString password, UserExtraBundle extra)
+    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException,
+    ValidationException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     UserManagement.updateUser(user, modifiedUser, password, extra);
   }
@@ -165,6 +172,12 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   @Override
   public void requestPasswordReset(String usernameOrEmail, String captcha, String localeString) throws GenericException,
     NotFoundException, IllegalOperationException, RecaptchaException, AuthorizationDeniedException {
+    boolean userRegistrationDisabled = RodaCoreFactory.getRodaConfiguration()
+      .getBoolean(RodaConstants.USER_REGISTRATION_DISABLED, false);
+    if (userRegistrationDisabled) {
+      throw new GenericException("User registration is disabled");
+    }
+
     if (captcha != null) {
       RecaptchaUtils
         .recaptchaVerify(RodaCoreFactory.getRodaConfiguration().getString(RECAPTCHA_CODE_SECRET_PROPERTY, ""), captcha);
