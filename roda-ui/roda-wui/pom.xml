@@ -614,7 +614,7 @@
         <dependency>
             <groupId>org.webjars</groupId>
             <artifactId>jquery-ui</artifactId>
-            <version>1.13.1</version>
+            <version>1.13.2</version>
         </dependency>
         <!-- / File upload -->
         <!-- Statistics -->
@@ -633,6 +633,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <version>${springboot.version}</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -670,6 +671,12 @@
                 <groupId>javax.validation</groupId>
                 <artifactId>validation-api</artifactId>
                 <version>2.0.1.Final</version>
+                <classifier>sources</classifier>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
                 <classifier>sources</classifier>
             </dependency>
         </dependencies>
