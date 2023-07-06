@@ -103,7 +103,7 @@
         <jackson.version>2.15.2</jackson.version>
         <spring.version>6.0.9</spring.version>
         <grizzly.version>2.4.3</grizzly.version>
-        <solr.version>9.2.1</solr.version>
+        <solr.version>9.1.1</solr.version>
         <akka.version>2.7.0</akka.version>
         <apacheds.version>2.0.0.AM26</apacheds.version>
         <httpcomponents.version>4.5.14</httpcomponents.version>
@@ -429,12 +429,6 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
                 <version>${jackson.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-annotations</artifactId>
-                <version>${jackson.version}</version>
-                <classifier>sources</classifier>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.dataformat</groupId>
