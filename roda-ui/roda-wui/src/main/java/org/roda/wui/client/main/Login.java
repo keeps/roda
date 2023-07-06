@@ -96,6 +96,7 @@ public class Login extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private boolean registerDisabled = ConfigurationManager.getBoolean(false, RodaConstants.USER_REGISTRATION_DISABLED);
   private Boolean casActive = ConfigurationManager.getBoolean(false, RodaConstants.UI_SERVICE_CAS_ACTIVE);
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
@@ -111,6 +112,12 @@ public class Login extends Composite {
 
   @UiField
   Button resendEmail;
+
+  @UiField
+  Button recover;
+
+  @UiField
+  Button register;
 
   @UiField
   FlowPanel loginPanel;
@@ -163,6 +170,10 @@ public class Login extends Composite {
     resendEmail.setVisible(false);
     serviceTokens = historyTokens;
 
+    if (this.registerDisabled) {
+      recover.setVisible(false);
+      register.setVisible(false);
+    }
     UserLogin.getInstance().getAuthenticatedUser(new NoAsyncCallback<User>() {
       @Override
       public void onSuccess(User user) {
