@@ -54,10 +54,7 @@ public class ZkController {
     LOGGER.trace("zkHost includes chroot");
     String chrootPath = zkHost.substring(zkHost.indexOf("/"));
 
-    SolrZkClient.Builder builder = new SolrZkClient.Builder().withUrl(zkHost.substring(0, zkHost.indexOf("/")))
-      .withTimeout(60000, TimeUnit.MILLISECONDS).withConnTimeOut(30000, TimeUnit.MILLISECONDS);
-
-    try (SolrZkClient tmpClient = new SolrZkClient(builder);) {
+    try (SolrZkClient tmpClient = new SolrZkClient(zkHost.substring(0, zkHost.indexOf("/")), 60000, 30000);) {
       boolean exists = tmpClient.exists(chrootPath, true);
       if (!exists && create) {
         LOGGER.info("creating chroot {}", chrootPath);
