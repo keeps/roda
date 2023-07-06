@@ -100,7 +100,7 @@
         <cas.client.version>3.6.4</cas.client.version>
         <jersey.version>2.37</jersey.version>
         <swagger.version>2.2.7</swagger.version>
-        <jackson.version>2.14.2</jackson.version>
+        <jackson.version>2.15.2</jackson.version>
         <spring.version>6.0.2</spring.version>
         <grizzly.version>2.4.3</grizzly.version>
         <solr.version>9.1.0</solr.version>
