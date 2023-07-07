@@ -19,8 +19,8 @@ Among others articles, in this series of documentation you will find information
     - [Representation Information](Representation_Information.md)
     - [Format normalization policy](Format_Normalization_Policy.md)
     - [Disposal Policies](Disposal_Policies.md)
-- [Support](https://github.com/keeps/roda#support)
-- [Installation](https://github.com/keeps/roda/blob/master/deploys/README.md)
+- [Support](https://www.roda-community.org/#bellhop_bell-support)
+- [Installation](https://www.roda-community.org/deploys/)
 - Configuration
     - [Statistics](Statistics.md)
     - [Metadata formats](Metadata_Formats.md)
