@@ -1,4 +1,4 @@
-# Reconhecimentos
+# História
 
 O desenvolvimento do RODA começou em 2006. Numa fase inicial, o projeto foi patrocinado pela Direção-Geral de Arquivos (DGARQ) e foi suportado financeiramente pelo Programa Operacional de Administração Pública - POAP (acordo de subvenção n.º 000613/2006/111). O objetivo inicial do projeto era construir um protótipo operacional de um repositório digital que pudesse originar ideias e conhecimentos mais concretos sobre como construir um repositório de preservação digital operacional para a DGARQ.
 

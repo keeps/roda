@@ -739,7 +739,7 @@ public final class RodaConstants {
 
   // MARKET
   public static final String MARKET_INFO_URL_PROPERTY = "core.market.info.url";
-  public static final String DEFAULT_MARKET_INFO_URL = "https://market.roda-community.org/api/v1";
+  public static final String DEFAULT_MARKET_INFO_URL = "https://market.roda-community.org/api/v2/marketplace/filtered?type=plugin";
   public static final String KEEP_MARKET_PLUGIN_HOMEPAGE_URL_PROPERTY = "core.market.plugin.homepage.url";
   public static final String DEFAULT_KEEP_MARKET_PLUGIN_HOMEPAGE_URL = "http://docs.roda-enterprise.com/plugins/";
   public static final String DEFAULT_MARKET_SUPPORT_URL = "https://www.roda-enterprise.com";

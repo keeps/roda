@@ -1,4 +1,4 @@
-# Zahvalnice
+# Povijesti
 
 Razvoj RODA započeo je 2006. U ranoj fazi projekt je sponzorirao Directorate-General of Portuguese Archives (DGARQ), a financijski ga je podržao Community Support Framework - POAP (sporazum o dodjeli bespovratnih sredstava br. 000613/2006/111). Početna svrha projekta bila je izgradnja funkcionalnog prototipa digitalnog spremišta koji bi doveo do konkretnijih ideja i znanja o tome kako izraditi operativno spremište digitalnih pohrana za DGARQ.
 

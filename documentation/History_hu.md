@@ -1,4 +1,4 @@
-# Köszönetnyilvánítás
+# Történelem
 
 A RODA fejlesztése 2006-ban kezdődött. A projekt korai szakaszában a Portugál Levéltári Főigazgatóság (DGARQ) szponzorálta és a Közösségi Támogatási Keret - POAP (000613/2006/111 számú támogatási megállapodás) támogatta. A projekt kezdeti célja az volt, hogy egy működő digitális adattár prototípusát hozza létre, amely a DGARQ számára egy működőképes digitális megőrzési adattár létrehozására vonatkozó konkrétabb elképzelésekhez és ismeretekhez vezet.
 

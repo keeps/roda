@@ -61,7 +61,11 @@ $(document).ready(function () {
         if (!FOOTER_ADDED && $(elem).find('.footer').length > 0) {
             var pathname = window.location.pathname;
             $.get(pathname + "version.json", function (data) {
-                $(".footer").append("<div style='color:rgba(255, 255, 255, 0.5); float:right;' class='build_time'>Version build on " + data["git.build.time"] + "</div>");
+                $("div#version").append(
+                  "<div style='color:rgba(255, 255, 255, 0.5); class='built_time'>Version " +
+                  data["git.build.version"] +
+                  "</div>"
+                 );
                 FOOTER_ADDED = true;
             });
         }

@@ -1798,6 +1798,10 @@ td.datePickerMonth, td.datePickerYear {
     font-size: 12pt;
 }
 
+.static-page .features {
+  margin-bottom: 30px;
+}
+
 .static-page .feature-img {
     float: left;
     width: 32px;
@@ -1996,11 +2000,10 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .homeLogo {
-    width: 75px;
-    height: 75px;
+    height: 100px;
     float: left;
     margin-right: 20px;
-    margin-top: 18px;
+    margin-top: 4px;
 }
 
 .homeText {
@@ -4404,6 +4407,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .login-buttons {
     margin-top: 20px;
+    overflow:hidden;
 }
 
 .login-button {
