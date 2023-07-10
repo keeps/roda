@@ -1,6 +1,6 @@
-# Erkännanden
+# Historia
 
-Utvecklingen av RODA startade 2006\. I ett tidigt skede sponsrades projektet av generaldirektoratet för portugisiska arkiv (DGARQ) och fick ekonomiskt stöd av samhällets "Community Support Framework" - POAP (bidragsavtal nr 000613/2006/111). Det initiala syftet med projektet var att bygga en fungerande prototyp av ett e-arkiv som skulle leda till mer konkreta idéer och kunskap om hur man bygger ett fungerande e-arkiv för DGARQ.
+Utvecklingen av RODA startade 2006. I ett tidigt skede sponsrades projektet av generaldirektoratet för portugisiska arkiv (DGARQ) och fick ekonomiskt stöd av samhällets "Community Support Framework" - POAP (bidragsavtal nr 000613/2006/111). Det initiala syftet med projektet var att bygga en fungerande prototyp av ett e-arkiv som skulle leda till mer konkreta idéer och kunskap om hur man bygger ett fungerande e-arkiv för DGARQ.
 
 En andra fas som bekostades av DGARQ bestod av utvecklingen av ett produktionsfärdigt e-arkiv enligt de krav som identifierades under prototypfasen. E-arkivet sattes i drift 2008 hos DGARQ själva. Mellan 2011 och 2014 fortsatte mjukvaran att utvecklas inom ramen för SCAPE-projektet som samfinansierades av KEEP SOLUTIONS och Europeiska kommissionen under det sjunde ramprogrammet (bidragsavtal nr 270137). Under denna period förbättrades mjukvaran med nya och förbättrade API:er, samt ny funktionalitet för att öka dess kapacitet att hantera storskaliga miljöer.
 

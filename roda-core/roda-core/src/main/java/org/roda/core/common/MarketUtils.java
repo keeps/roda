@@ -70,13 +70,13 @@ public class MarketUtils {
   }
   public static void retrievePluginsListFromAPI(LocalInstance instance) throws MarketException {
     try {
-      Boolean collectVersion = Boolean.valueOf(RodaCoreFactory.getProperty(RodaConstants.ENVIRONMENT_COLLECT_VERSION,
+      boolean collectVersion = Boolean.parseBoolean(RodaCoreFactory.getProperty(RodaConstants.ENVIRONMENT_COLLECT_VERSION,
         RodaConstants.DEFAULT_ENVIRONMENT_COLLECT_VERSION));
 
       String rodaVersion = collectVersion ? retrieveRodaVersion() : "development";
 
       String pluginUrl = RodaCoreFactory.getProperty(RodaConstants.MARKET_INFO_URL_PROPERTY,
-        RodaConstants.DEFAULT_MARKET_INFO_URL) + "?rodaVersion=" + rodaVersion;
+        RodaConstants.DEFAULT_MARKET_INFO_URL);
 
       Path pluginInfoPath = RodaCoreFactory.getMarketDirectoryPath().resolve(RodaConstants.CORE_MARKET_FILE);
 

@@ -33,7 +33,7 @@ Among others articles, in this series of documentation you will find information
     - [Publishing plugins](Publishing_plugins.md)
 - [Troubleshooting](Troubleshooting.md)
 - [FAQ](FAQ.md)
-- [Acknowledgements](Acknowledgements.md)
+- [History](History.md)
 - [License](LICENSE.md)
 
 ## Standards and specifications

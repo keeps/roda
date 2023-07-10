@@ -1,6 +1,6 @@
-# Acknowledgements
+# History
 
-The development of RODA started in 2006\. At an early stage the project was sponsored by the Directorate-General of Portuguese Archives (DGARQ) and financially supported by the Community Support Framework - POAP (grant agreement no 000613/2006/111). The initial purpose of the project was to build a functioning prototype of a digital repository that would lead to more concrete ideas and knowledge on how to build an operational digital preservation repository for DGARQ.
+The development of RODA started in 2006. At an early stage the project was sponsored by the Directorate-General of Portuguese Archives (DGARQ) and financially supported by the Community Support Framework - POAP (grant agreement no 000613/2006/111). The initial purpose of the project was to build a functioning prototype of a digital repository that would lead to more concrete ideas and knowledge on how to build an operational digital preservation repository for DGARQ.
 
 A second phase financially supported by DGARQ consisted of the development of a production-ready repository according to the requirements identified during the prototyping phase. The repository went live in 2008 hosted by DGARQ itself. Between 2011 and 2014, the software continued to be developed under the wing of the SCAPE project co-funded by KEEP SOLUTIONS and the European Commission under the 7th Framework Program (grant agreement no 270137). During this period the software was enhanced with new and improved APIs, as well as new functionality to make it more capable of coping with large-scale environments.
 
