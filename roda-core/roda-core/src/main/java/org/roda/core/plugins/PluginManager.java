@@ -691,7 +691,7 @@ public class PluginManager {
             LOGGER.error("Plugin failed to initialize: {}", p.jarPath, e);
           }
         }
-        if (!certificateInfo.isNotVerified()) {
+        if (!certificateInfo.isNotVerified() || optIn) {
           // Let's cache Plugin classloader
           jarPluginClassloaderCache.put(getPluginClassLoaderCacheKey(p.jarPath), classloader);
         }
