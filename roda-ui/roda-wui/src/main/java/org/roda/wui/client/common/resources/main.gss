@@ -1825,7 +1825,10 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .static-page .feature-text {
-    margin-left: 40px;
+    vertical-align: middle;
+    display: table-cell;
+    height: 35px;
+    padding-left: 10px;
 }
 
 .static-page .feature-text h3 {
@@ -1840,12 +1843,14 @@ td.datePickerMonth, td.datePickerYear {
     .static-page .feature-img {
         float: left;
         width: 64px;
-        font-size: 60px;
+        font-size: 40px;
     }
 
     .static-page .feature-text {
-        margin-left: 80px;
-        padding-right: 20px;
+        vertical-align: middle;
+        margin: auto;
+        display: table-cell;
+        height: 35px;
     }
 }
 
