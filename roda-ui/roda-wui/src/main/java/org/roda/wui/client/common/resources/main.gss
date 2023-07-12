@@ -6376,6 +6376,7 @@ td.datePickerMonth, td.datePickerYear {
     white-space: nowrap;
     text-overflow: ellipsis;
     height: 30px;
+    max-width: 500px;
     line-height: 30px;
     padding: 0;
     margin: 0;
@@ -7763,6 +7764,10 @@ span.code {
 }
 
 .badge-for-version .badge-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 300px;
     font-weight: 600;
     font-size: 1.0rem;
     text-align: left;
