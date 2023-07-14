@@ -7609,6 +7609,9 @@ span.code {
 
 .plugin-status-message {
     margin-left: .5em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .certificateStatus {
