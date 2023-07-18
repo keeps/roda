@@ -561,6 +561,7 @@ public class CreateDefaultJob extends Composite {
     // VERSION
     BadgePanel version = new BadgePanel();
     version.setText(selectedPlugin.getVersion());
+    version.setTitle(selectedPlugin.getVersion());
     if (selectedPlugin.getMarketInfo() != null
       && !selectedPlugin.getMarketInfo().getVersion().equals(selectedPlugin.getVersion())) {
       version.enableNotification(true);
