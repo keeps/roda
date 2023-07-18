@@ -636,6 +636,7 @@ pre code {
 
 .form-label {
 	margin-top: 5px;
+	min-width: 200px;
 }
 .form-label-mandatory::after {
 	content:" *";
@@ -1870,7 +1871,6 @@ td.datePickerMonth, td.datePickerYear {
 
     div.pluginWorkflowListTitle {
         position: relative;
-        flex-wrap: wrap;
         padding-bottom: 0.5rem;
     }
 
@@ -1879,7 +1879,10 @@ td.datePickerMonth, td.datePickerYear {
     }
 
     div.pluginWorkflowListTitle button:nth-child(1) {
-        margin-left: 0px;
+        margin-left: 5px;
+    }
+    div.plugin-status-panel {
+        flex-wrap:wrap;
     }
 }
 
@@ -6385,6 +6388,7 @@ td.datePickerMonth, td.datePickerYear {
     white-space: nowrap;
     text-overflow: ellipsis;
     height: 30px;
+    max-width: 500px;
     line-height: 30px;
     padding: 0;
     margin: 0;
@@ -7613,10 +7617,14 @@ span.code {
     align-items: center;
     margin-bottom: 1rem;
     border-radius: 2px;
+    margin-top: 3px;
 }
 
 .plugin-status-message {
     margin-left: .5em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .certificateStatus {
@@ -7625,6 +7633,7 @@ span.code {
 
 .pluginWorkflowListTitle {
     display: flex;
+    flex-wrap:wrap;
     justify-content: space-between;
 }
 
@@ -7772,6 +7781,10 @@ span.code {
 }
 
 .badge-for-version .badge-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 60px;
     font-weight: 600;
     font-size: 1.0rem;
     text-align: left;

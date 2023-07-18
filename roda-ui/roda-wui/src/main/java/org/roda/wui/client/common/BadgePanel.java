@@ -66,6 +66,7 @@ public class BadgePanel extends FlowPanel {
   }
 
   public void setText(String text) {
+    textLabel.setTitle(text);
     textLabel.setText(text);
   }
 
