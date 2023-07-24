@@ -137,6 +137,10 @@ public final class JobsHelper {
     RodaCoreFactory.getRodaConfiguration().setProperty(SYNC_TIMEOUT_PROPERTY, syncTimeout);
   }
 
+  public static void setLockRequestTimeout(int timeout) {
+    RodaCoreFactory.getRodaConfiguration().setProperty("core.orchestrator.lock_request_timeout", timeout);
+  }
+
   public static <T extends IsRODAObject> void updateJobState(Plugin<T> plugin, ModelService model, JOB_STATE state,
     Optional<String> stateDetails) {
     try {

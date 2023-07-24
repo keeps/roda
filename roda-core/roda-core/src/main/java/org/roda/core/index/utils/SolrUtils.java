@@ -84,6 +84,7 @@ import org.roda.core.data.v2.index.facet.FacetParameter;
 import org.roda.core.data.v2.index.facet.FacetParameter.SORT;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.facet.SimpleFacetParameter;
+import org.roda.core.data.v2.index.filter.AllFilterParameter;
 import org.roda.core.data.v2.index.filter.AndFiltersParameters;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.DateIntervalFilterParameter;
@@ -789,14 +790,10 @@ public class SolrUtils {
     StringBuilder ret = new StringBuilder();
 
     if (filter == null || filter.getParameters().isEmpty()) {
-      ret.append("*:*");
+      return ret.toString();
     } else {
       for (FilterParameter parameter : filter.getParameters()) {
         parseFilterParameter(ret, parameter, true);
-      }
-
-      if (ret.length() == 0) {
-        ret.append("*:*");
       }
     }
 
@@ -806,42 +803,43 @@ public class SolrUtils {
 
   private static void parseFilterParameter(StringBuilder ret, FilterParameter parameter,
     boolean prefixWithANDOperatorIfBuilderNotEmpty) throws RequestNotValidException {
-    if (parameter instanceof SimpleFilterParameter) {
-      SimpleFilterParameter simplePar = (SimpleFilterParameter) parameter;
+    if (parameter instanceof SimpleFilterParameter simplePar) {
       appendExactMatch(ret, simplePar.getName(), simplePar.getValue(), true, prefixWithANDOperatorIfBuilderNotEmpty);
-    } else if (parameter instanceof OneOfManyFilterParameter) {
-      OneOfManyFilterParameter param = (OneOfManyFilterParameter) parameter;
+    } else if (parameter instanceof OneOfManyFilterParameter param) {
       appendValuesUsingOROperator(ret, param.getName(), param.getValues(), prefixWithANDOperatorIfBuilderNotEmpty);
-    } else if (parameter instanceof BasicSearchFilterParameter) {
-      BasicSearchFilterParameter param = (BasicSearchFilterParameter) parameter;
+    } else if (parameter instanceof BasicSearchFilterParameter param) {
       appendBasicSearch(ret, param.getName(), param.getValue(), "AND", prefixWithANDOperatorIfBuilderNotEmpty);
-    } else if (parameter instanceof EmptyKeyFilterParameter) {
-      EmptyKeyFilterParameter param = (EmptyKeyFilterParameter) parameter;
+    } else if (parameter instanceof EmptyKeyFilterParameter param) {
       appendANDOperator(ret, true);
-      ret.append("(*:* NOT " + param.getName() + ":*)");
-    } else if (parameter instanceof DateRangeFilterParameter) {
-      DateRangeFilterParameter param = (DateRangeFilterParameter) parameter;
+      ret.append("(*:* NOT ").append(param.getName()).append(":*)");
+    } else if (parameter instanceof DateRangeFilterParameter param) {
       appendRange(ret, param.getName(), Date.class, param.getFromValue(), String.class,
         processToDate(param.getToValue(), param.getGranularity(), false), prefixWithANDOperatorIfBuilderNotEmpty);
-    } else if (parameter instanceof DateIntervalFilterParameter) {
-      DateIntervalFilterParameter param = (DateIntervalFilterParameter) parameter;
+    } else if (parameter instanceof DateIntervalFilterParameter param) {
       appendRangeInterval(ret, param.getFromName(), param.getToName(), param.getFromValue(), param.getToValue(),
         param.getGranularity(), prefixWithANDOperatorIfBuilderNotEmpty);
-    } else if (parameter instanceof LongRangeFilterParameter) {
-      LongRangeFilterParameter param = (LongRangeFilterParameter) parameter;
+    } else if (parameter instanceof LongRangeFilterParameter param) {
       appendRange(ret, param.getName(), Long.class, param.getFromValue(), Long.class, param.getToValue(),
         prefixWithANDOperatorIfBuilderNotEmpty);
-    } else if (parameter instanceof NotSimpleFilterParameter) {
-      NotSimpleFilterParameter notSimplePar = (NotSimpleFilterParameter) parameter;
+    } else if (parameter instanceof NotSimpleFilterParameter notSimplePar) {
       appendNotExactMatch(ret, notSimplePar.getName(), notSimplePar.getValue(), true,
         prefixWithANDOperatorIfBuilderNotEmpty);
     } else if (parameter instanceof OrFiltersParameters || parameter instanceof AndFiltersParameters) {
       FiltersParameters filters = (FiltersParameters) parameter;
-      appendFiltersWithOperator(ret, parameter instanceof OrFiltersParameters ? "OR" : "AND", filters.getValues(),
-        prefixWithANDOperatorIfBuilderNotEmpty);
+      appendFiltersWithOperator(ret, parameter instanceof OrFiltersParameters ? "OR" : "AND",
+          filters.getValues(),
+          prefixWithANDOperatorIfBuilderNotEmpty);
+    } else if (parameter instanceof AllFilterParameter) {
+      appendSelectAll(ret, prefixWithANDOperatorIfBuilderNotEmpty);
     } else {
       LOGGER.error("Unsupported filter parameter class: {}", parameter.getClass().getName());
       throw new RequestNotValidException("Unsupported filter parameter class: " + parameter.getClass().getName());
+    }
+  }
+
+  private static void appendSelectAll(StringBuilder ret, boolean prefixWithANDOperatorIfBuilderNotEmpty) {
+    if (prefixWithANDOperatorIfBuilderNotEmpty) {
+      ret.append("*:*");
     }
   }
 
@@ -926,7 +924,7 @@ public class SolrUtils {
     ret.append("(");
     for (int i = 0; i < split.length; i++) {
       if (i != 0 && operator != null) {
-        ret.append(" " + operator + " ");
+        ret.append(" ").append(operator).append(" ");
       }
       if (split[i].matches("(AND|OR|NOT)")) {
         ret.append(key).append(": \"").append(split[i]).append("\"");
@@ -953,13 +951,13 @@ public class SolrUtils {
   private static <T extends Serializable> void generateRangeValue(StringBuilder ret, Class<T> valueClass, T value) {
     if (value != null) {
       if (valueClass.equals(Date.class)) {
-        String date = formatDate(Date.class.cast(value));
+        String date = formatDate((Date) value);
         LOGGER.trace("Appending date value \"{}\" to range", date);
         ret.append(date);
       } else if (valueClass.equals(Long.class)) {
-        ret.append(Long.class.cast(value));
+        ret.append(value);
       } else if (valueClass.equals(String.class)) {
-        ret.append(String.class.cast(value));
+        ret.append((String) value);
       } else {
         LOGGER.error("Cannot process range of the type {}", valueClass);
       }
@@ -1021,27 +1019,15 @@ public class SolrUtils {
       sb.append(formatDate(toValueWithoutTimeZone));
 
       switch (granularity) {
-        case YEAR:
-          sb.append("+1YEAR-1MILLISECOND");
-          break;
-        case MONTH:
-          sb.append("+1MONTH-1MILLISECOND");
-          break;
-        case DAY:
-          sb.append("+1DAY-1MILLISECOND");
-          break;
-        case HOUR:
-          sb.append("+1HOUR-1MILLISECOND");
-          break;
-        case MINUTE:
-          sb.append("+1MINUTE-1MILLISECOND");
-          break;
-        case SECOND:
-          sb.append("+1SECOND-1MILLISECOND");
-          break;
-        default:
+        case YEAR -> sb.append("+1YEAR-1MILLISECOND");
+        case MONTH -> sb.append("+1MONTH-1MILLISECOND");
+        case DAY -> sb.append("+1DAY-1MILLISECOND");
+        case HOUR -> sb.append("+1HOUR-1MILLISECOND");
+        case MINUTE -> sb.append("+1MINUTE-1MILLISECOND");
+        case SECOND -> sb.append("+1SECOND-1MILLISECOND");
+        default -> {
           // do nothing
-          break;
+        }
       }
 
       ret = sb.toString();
@@ -1088,7 +1074,7 @@ public class SolrUtils {
         if (facetParameter instanceof SimpleFacetParameter) {
           setQueryFacetParameter(query, (SimpleFacetParameter) facetParameter);
           appendValuesUsingOROperator(filterQuery, facetParameter.getName(),
-            ((SimpleFacetParameter) facetParameter).getValues(), true);
+            facetParameter.getValues(), true);
         } else {
           LOGGER.error("Unsupported facet parameter class: {}", facetParameter.getClass().getName());
         }

@@ -32,7 +32,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
   @Type(value = StringRangeFilterParameter.class, name = "StringRangeFilterParameter"),
   @Type(value = SimpleFilterParameter.class, name = "SimpleFilterParameter"),
   @Type(value = OrFiltersParameters.class, name = "OrFiltersParameters"),
-  @Type(value = AndFiltersParameters.class, name = "AndFiltersParameters")})
+  @Type(value = AndFiltersParameters.class, name = "AndFiltersParameters"),
+  @Type(value = AllFilterParameter.class, name = "AllFilterParameter")})
 public abstract class FilterParameter implements Serializable {
   @Serial
   private static final long serialVersionUID = 3744111668897879761L;

@@ -121,7 +121,7 @@ public class MonitorIndexTest {
 
     monitor.updateTransferredResources(Optional.of(resource.getRelativePath()), true);
 
-    IndexResult<TransferredResource> transferredResources2 = index.find(TransferredResource.class, null, null,
+    IndexResult<TransferredResource> transferredResources2 = index.find(TransferredResource.class, Filter.ALL, null,
       new Sublist(0, fileCounter + 1), new ArrayList<>());
     int result2 = transferredResources2.getResults().size();
 
@@ -180,7 +180,7 @@ public class MonitorIndexTest {
     monitor.updateTransferredResources(Optional.empty(), true);
 
     int toRemove = -1;
-    IndexResult<TransferredResource> transferredResources = index.find(TransferredResource.class, null, null,
+    IndexResult<TransferredResource> transferredResources = index.find(TransferredResource.class, Filter.ALL, null,
       new Sublist(0, fileCounter), new ArrayList<>());
     int resultBeforeRemoves = transferredResources.getResults().size();
 
@@ -197,7 +197,7 @@ public class MonitorIndexTest {
 
     monitor.updateTransferredResources(Optional.empty(), true);
 
-    IndexResult<TransferredResource> transferredResources2 = index.find(TransferredResource.class, null, null,
+    IndexResult<TransferredResource> transferredResources2 = index.find(TransferredResource.class, Filter.ALL, null,
       new Sublist(0, fileCounter), new ArrayList<>());
     int resultAfterRemoves = transferredResources2.getResults().size();
 

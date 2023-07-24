@@ -24,7 +24,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class Filter implements Serializable {
   private static final long serialVersionUID = -5544859696646804386L;
 
-  public static final Filter ALL = new Filter();
+  public static final Filter ALL = new Filter(new AllFilterParameter());
   public static final Filter NULL = null;
 
   private List<FilterParameter> parameters = new ArrayList<>();

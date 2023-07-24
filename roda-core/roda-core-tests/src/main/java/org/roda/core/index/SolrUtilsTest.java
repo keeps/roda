@@ -8,6 +8,7 @@
 package org.roda.core.index;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNotNull;
 
@@ -62,6 +63,8 @@ import org.testng.annotations.Test;
 @Test(groups = {RodaConstants.TEST_GROUP_ALL, RodaConstants.TEST_GROUP_DEV, RodaConstants.TEST_GROUP_TRAVIS})
 public class SolrUtilsTest {
 
+  private static final String FONDS = "fonds";
+  private static final String SERIES = "series";
   private static StorageService corporaService;
 
   @BeforeClass
@@ -106,151 +109,159 @@ public class SolrUtilsTest {
   }
 
   @Test
-  public void testParseFilter() {
-    Filter filter = null;
-    String stringFilter = null;
-    String fonds = "fonds";
-    String series = "series";
-    String fondsOrSeries = fonds + " " + series;
-    List<String> oneOfManyValues = Arrays.asList(fonds, series);
-    Long from = 1L;
-    Long to = 5L;
-
-    // 1) null filter
+  public void testParserWithNullFilter() {
     try {
-      stringFilter = SolrUtils.parseFilter(filter);
+      String stringFilter = SolrUtils.parseFilter(null);
       assertNotNull(stringFilter);
-      assertEquals("*:*", stringFilter);
+      assertTrue(stringFilter.isEmpty());
     } catch (RODAException e) {
       Assert.fail("An exception was not expected!");
     }
+  }
 
-    // 2) empty filter
+  @Test
+  public void testParserWithEmptyFilter() {
     try {
-      filter = new Filter();
-      stringFilter = SolrUtils.parseFilter(filter);
+      String stringFilter = SolrUtils.parseFilter(new Filter());
       assertNotNull(stringFilter);
-      assertEquals("*:*", stringFilter);
+      assertTrue(stringFilter.isEmpty());
     } catch (RODAException e) {
       Assert.fail("An exception was not expected!");
     }
+  }
 
-    // 3) filter with one SimpleFilterParameter (uses exact match)
+  @Test
+  public void testParserWithOneSimpleFilterParameter() {
     try {
-      filter = new Filter();
-      filter.add(new SimpleFilterParameter(RodaConstants.INDEX_SEARCH, fonds));
-      stringFilter = SolrUtils.parseFilter(filter);
+      Filter filter = new Filter();
+      filter.add(new SimpleFilterParameter(RodaConstants.INDEX_SEARCH, FONDS));
+      String stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
-      assertEquals(String.format("(%s: \"%s\")", RodaConstants.INDEX_SEARCH, fonds), stringFilter);
+      assertEquals(String.format("(%s: \"%s\")", RodaConstants.INDEX_SEARCH, FONDS), stringFilter);
     } catch (RODAException e) {
       Assert.fail("An exception was not expected!");
     }
+  }
 
-    // 4) filter with two SimpleFilterParameter (uses exact match, will be
-    // combined with AND operator)
+  @Test
+  public void testParserWithTwoSimpleFilterParameter() {
     try {
-      filter = new Filter();
-      filter.add(new SimpleFilterParameter(RodaConstants.INDEX_SEARCH, fonds));
-      filter.add(new SimpleFilterParameter(RodaConstants.INDEX_SEARCH, series));
-      stringFilter = SolrUtils.parseFilter(filter);
+      Filter filter = new Filter();
+      filter.add(new SimpleFilterParameter(RodaConstants.INDEX_SEARCH, FONDS));
+      filter.add(new SimpleFilterParameter(RodaConstants.INDEX_SEARCH, SERIES));
+      String stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
-      assertEquals(String.format("(%s: \"%s\") AND (%s: \"%s\")", RodaConstants.INDEX_SEARCH, fonds,
-        RodaConstants.INDEX_SEARCH, series), stringFilter);
+      assertEquals(String.format("(%s: \"%s\") AND (%s: \"%s\")", RodaConstants.INDEX_SEARCH, FONDS,
+        RodaConstants.INDEX_SEARCH, SERIES), stringFilter);
     } catch (RODAException e) {
       Assert.fail("An exception was not expected!");
     }
+  }
 
-    // 5) filter with one OneOfManyFilterParameter (uses exact match for
-    // each of the values, and they will be combined using OR operator)
+  @Test
+  private void testParserWithOneOneOfManyFilterParameter() {
     try {
-      filter = new Filter();
-      filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_SEARCH, oneOfManyValues));
-      stringFilter = SolrUtils.parseFilter(filter);
+      Filter filter = new Filter();
+      filter.add(new OneOfManyFilterParameter(RodaConstants.INDEX_SEARCH, Arrays.asList(FONDS, SERIES)));
+      String stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
-      assertEquals(String.format("((%s: \"%s\") OR (%s: \"%s\"))", RodaConstants.INDEX_SEARCH, fonds,
-        RodaConstants.INDEX_SEARCH, series), stringFilter);
+      assertEquals(String.format("((%s: \"%s\") OR (%s: \"%s\"))", RodaConstants.INDEX_SEARCH, FONDS,
+        RodaConstants.INDEX_SEARCH, SERIES), stringFilter);
     } catch (RODAException e) {
       Assert.fail("An exception was not expected!");
     }
+  }
 
-    // 7) filter with one LikeFilterParameter
+  @Test
+  private void testParserWithOneLikeFilterParameter() {
     try {
-      filter = new Filter();
+      Filter filter = new Filter();
       filter.add(new LikeFilterParameter());
       SolrUtils.parseFilter(filter);
       Assert.fail("An exception should have been thrown but it wasn't!");
     } catch (RequestNotValidException e) {
       // do nothing as it was expected
     }
+  }
 
-    // 9) filter with one empty DateRangeFilterParameter
+  @Test
+  private void testParserWithOneEmptyDateRangeFilterParameter() {
     try {
-      filter = new Filter();
+      Filter filter = new Filter();
       filter.add(new DateRangeFilterParameter());
-      stringFilter = SolrUtils.parseFilter(filter);
+      String stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
-      assertThat(stringFilter, Matchers.is("*:*"));
+      assertTrue(stringFilter.isEmpty());
     } catch (RequestNotValidException e) {
       // do nothing as it was expected
     }
+  }
 
-    // 10) filter with one BasicSearchFilterParameter
+  @Test
+  private void testParserWithOneBasicSearchFilterParameter() {
     try {
-      filter = new Filter();
-      filter.add(new BasicSearchFilterParameter(RodaConstants.INDEX_SEARCH, fondsOrSeries));
-      stringFilter = SolrUtils.parseFilter(filter);
+      Filter filter = new Filter();
+      filter.add(new BasicSearchFilterParameter(RodaConstants.INDEX_SEARCH, FONDS + " " + SERIES));
+      String stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
       assertEquals(
-        String.format("(%s: (%s) AND %s: (%s))", RodaConstants.INDEX_SEARCH, fonds, RodaConstants.INDEX_SEARCH, series),
+        String.format("(%s: (%s) AND %s: (%s))", RodaConstants.INDEX_SEARCH, FONDS, RodaConstants.INDEX_SEARCH, SERIES),
         stringFilter);
     } catch (RODAException e) {
       Assert.fail("An exception was not expected!");
     }
+  }
 
-    // 11) filter with one EmptyKeyFilterParameter
+  @Test
+  private void testParserWithOneEmptyKeyFilterParameter() {
     try {
-      filter = new Filter();
+      Filter filter = new Filter();
       filter.add(new EmptyKeyFilterParameter(RodaConstants.INDEX_SEARCH));
-      stringFilter = SolrUtils.parseFilter(filter);
+      String stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
       assertEquals(String.format("(*:* NOT %s:*)", RodaConstants.INDEX_SEARCH), stringFilter);
     } catch (RODAException e) {
       Assert.fail("An exception was not expected!");
     }
+  }
 
-    // 12) filter with one empty LongRangeFilterParameter
+  @Test
+  private void testParserWithOneEmptyLongRangeFilterParameter() {
     try {
-      filter = new Filter();
+      Filter filter = new Filter();
       filter.add(new LongRangeFilterParameter());
-      stringFilter = SolrUtils.parseFilter(filter);
+      String stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
-      assertThat(stringFilter, Matchers.is("*:*"));
+      assertTrue(stringFilter.isEmpty());
     } catch (RequestNotValidException e) {
       // do nothing as it was expected
     }
+  }
 
-    // 12.1) filter with one LongRangeFilterParameter
+  @Test
+  private void testParserWithOneLongRangeFilterParameter() {
     try {
-      filter = new Filter();
-      filter.add(new LongRangeFilterParameter(RodaConstants.LOG_DURATION, from, to));
-      stringFilter = SolrUtils.parseFilter(filter);
+      Filter filter = new Filter();
+      filter.add(new LongRangeFilterParameter(RodaConstants.LOG_DURATION, 1L, 5L));
+      String stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
-      assertThat(stringFilter, Matchers.is(String.format("(%s:[%s TO %s])", RodaConstants.LOG_DURATION, from, to)));
+      assertThat(stringFilter, Matchers.is(String.format("(%s:[%s TO %s])", RodaConstants.LOG_DURATION, 1L, 5L)));
     } catch (RequestNotValidException e) {
       // do nothing as it was expected
     }
+  }
 
-    // 13) filter with one DateIntervalFilterParameter
+  @Test
+  public void testParseWithOneDateIntervalFilterParameter() {
     try {
-      filter = new Filter();
+      Filter filter = new Filter();
       filter.add(new DateIntervalFilterParameter());
-      stringFilter = SolrUtils.parseFilter(filter);
+      String stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
-      assertThat(stringFilter, Matchers.is("*:*"));
+      assertTrue(stringFilter.isEmpty());
     } catch (RequestNotValidException e) {
       // do nothing as it was expected
     }
-
   }
 
   @Test

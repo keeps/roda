@@ -9,7 +9,6 @@ package org.roda.core.index;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNotNull;
-import static org.testng.AssertJUnit.assertTrue;
 import static org.testng.AssertJUnit.fail;
 
 import java.io.IOException;
@@ -62,11 +61,11 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
-import org.roda.core.data.v2.notifications.NotificationState;
+import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.notifications.NotificationState;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.ri.RepresentationInformationSupport;
 import org.roda.core.data.v2.risks.IndexedRisk;
@@ -197,7 +196,7 @@ public class IndexServiceTest {
     final IndexedAIP indexedAip = index.retrieve(IndexedAIP.class, aipId, new ArrayList<>());
     compareAIPWithIndexedAIP(aip, indexedAip);
 
-    final IndexResult<IndexedAIP> indexAips = index.find(IndexedAIP.class, null, null, new Sublist(0, 10),
+    final IndexResult<IndexedAIP> indexAips = index.find(IndexedAIP.class, Filter.ALL, null, new Sublist(0, 10),
       Collections.emptyList());
     assertEquals(1, indexAips.getTotalCount());
     assertEquals(1, indexAips.getLimit());
@@ -531,7 +530,7 @@ public class IndexServiceTest {
     }
 
     index.reindexAIPs();
-    long count = index.count(IndexedAIP.class, new Filter());
+    long count = index.count(IndexedAIP.class, Filter.ALL);
     assertEquals(10L, count);
   }
 
@@ -601,7 +600,7 @@ public class IndexServiceTest {
 
     index.commitAIPs();
 
-    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class, null, null, new Sublist(0, 10),
+    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class, Filter.ALL, null, new Sublist(0, 10),
       Collections.emptyList());
     assertEquals(1, find.getTotalCount());
 
@@ -654,7 +653,7 @@ public class IndexServiceTest {
       assertEquals(risk.getId(), risk2.getId());
       assertEquals(risk.getName(), risk2.getName());
 
-      IndexResult<IndexedRisk> find = index.find(IndexedRisk.class, null, null, new Sublist(0, 10),
+      IndexResult<IndexedRisk> find = index.find(IndexedRisk.class, Filter.ALL, null, new Sublist(0, 10),
         Collections.emptyList());
       assertEquals(1, find.getTotalCount());
 
@@ -697,7 +696,7 @@ public class IndexServiceTest {
     assertEquals(ri.getId(), ri2.getId());
     assertEquals(ri.getName(), ri2.getName());
 
-    IndexResult<RepresentationInformation> find = index.find(RepresentationInformation.class, null, null,
+    IndexResult<RepresentationInformation> find = index.find(RepresentationInformation.class, Filter.ALL, null,
       new Sublist(0, 10), Collections.emptyList());
     assertEquals(1, find.getTotalCount());
 
@@ -736,7 +735,7 @@ public class IndexServiceTest {
     assertEquals(notification.getId(), message2.getId());
     assertEquals(notification.getSubject(), message2.getSubject());
 
-    IndexResult<Notification> find = index.find(Notification.class, null, null, new Sublist(0, 10),
+    IndexResult<Notification> find = index.find(Notification.class, Filter.ALL, null, new Sublist(0, 10),
       Collections.emptyList());
     assertEquals(1, find.getTotalCount());
 

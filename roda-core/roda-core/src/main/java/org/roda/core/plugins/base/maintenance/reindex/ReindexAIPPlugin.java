@@ -48,11 +48,13 @@ public class ReindexAIPPlugin extends ReindexRodaEntityPlugin<AIP> {
   @Override
   public void clearSpecificIndexes(IndexService index, List<String> ids)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-    index.delete(IndexedRepresentation.class,
-      new Filter(new OneOfManyFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, ids)));
-    index.delete(IndexedFile.class, new Filter(new OneOfManyFilterParameter(RodaConstants.FILE_AIP_ID, ids)));
-    index.delete(IndexedPreservationEvent.class,
-      new Filter(new OneOfManyFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, ids)));
+    if (!ids.isEmpty()) {
+      index.delete(IndexedRepresentation.class,
+        new Filter(new OneOfManyFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, ids)));
+      index.delete(IndexedFile.class, new Filter(new OneOfManyFilterParameter(RodaConstants.FILE_AIP_ID, ids)));
+      index.delete(IndexedPreservationEvent.class,
+        new Filter(new OneOfManyFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, ids)));
+    }
   }
 
 }

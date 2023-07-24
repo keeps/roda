@@ -150,13 +150,16 @@ public final class PluginHelper {
       Job job = PluginHelper.getJob(plugin, model);
       list = PluginHelper.transformLitesIntoObjects(model, plugin, report, jobPluginInfo, liteList, job, autoLocking);
 
-      try {
-        objectsLogic.process(index, model, storage, report, job, jobPluginInfo, plugin, list);
-      } catch (Throwable e) {
-        LOGGER.error("Unexpected exception during 'objectsLogic' execution", e);
-        jobPluginInfo.setSourceObjectsProcessedWithFailure(
-          jobPluginInfo.getSourceObjectsCount() - jobPluginInfo.getSourceObjectsProcessedWithSuccess());
-        exceptionOccurred = e;
+      if (!list.isEmpty()) {
+        try {
+          objectsLogic.process(index, model, storage, report, job, jobPluginInfo, plugin, list);
+        } catch (Throwable e) {
+          LOGGER.error("Unexpected exception during 'objectsLogic' execution", e);
+          jobPluginInfo.setSourceObjectsProcessedWithFailure(
+              jobPluginInfo.getSourceObjectsCount()
+                  - jobPluginInfo.getSourceObjectsProcessedWithSuccess());
+          exceptionOccurred = e;
+        }
       }
 
       jobPluginInfo.finalizeInfo();

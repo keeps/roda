@@ -8,6 +8,7 @@
 package org.roda.core.plugins.base.antivirus;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -57,9 +58,10 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
 
     try {
       LOGGER.debug("Loading antivirus class {}", antiVirusClassName);
-      setAntiVirus((AntiVirus) Class.forName(antiVirusClassName).newInstance());
+      setAntiVirus((AntiVirus) Class.forName(antiVirusClassName).getDeclaredConstructor().newInstance());
       LOGGER.debug("Using antivirus {}", getAntiVirus().getClass().getName());
-    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+    } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
+             InvocationTargetException | NoSuchMethodException e) {
       LOGGER.warn("Error loading antivirus", e);
     }
 
