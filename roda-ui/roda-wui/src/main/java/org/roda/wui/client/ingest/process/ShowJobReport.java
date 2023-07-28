@@ -127,7 +127,8 @@ public class ShowJobReport extends Composite {
   FlowPanel reportAttributes;
   @UiField
   FlowPanel reportItems;
-
+  @UiField
+  FlowPanel ingestType;
   @UiField
   Button searchPrevious, searchNext, buttonBack;
   @UiField
@@ -238,6 +239,18 @@ public class ShowJobReport extends Composite {
       jobReport.getTotalSteps()));
 
     ListSelectionUtils.bindLayout(jobReport, searchPrevious, searchNext, keyboardFocus, true, false, false);
+
+    //If it is an ingestion, creates a panel to render the type of Ingestion
+    if (jobReport.getIngestType() != null) {
+      FlowPanel ingestPanel = new FlowPanel();
+      Label panelTitle = new Label(messages.reportIngestType());
+      Label panelInfo = new Label(jobReport.getIngestType().equals("NEW") ? messages.newIngestion() : messages.ingestionUpdate());
+      ingestPanel.addStyleName("label");
+      panelInfo.addStyleName("value");
+      ingestPanel.add(panelTitle);
+      ingestPanel.add(panelInfo);
+      ingestType.add(ingestPanel);
+    }
 
     for (Report reportItem : jobReport.getReports()) {
       FlowPanel panel = new FlowPanel();

@@ -1057,6 +1057,12 @@ public interface ClientMessages extends Messages {
 
   String reportJob();
 
+  String reportIngestType();
+
+  String newIngestion();
+
+  String ingestionUpdate();
+
   String reportDateCreated();
 
   String reportDateUpdated();

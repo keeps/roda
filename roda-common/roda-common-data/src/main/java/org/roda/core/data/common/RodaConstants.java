@@ -91,6 +91,7 @@ public final class RodaConstants {
 
   public static final List<String> DEFAULT_ALGORITHMS = Arrays.asList(SHA256);
 
+
   public enum DateGranularity {
     YEAR, MONTH, DAY, HOUR, MINUTE, SECOND, MILLISECOND
   }
@@ -1341,6 +1342,7 @@ public final class RodaConstants {
   public static final String JOB_REPORT_TITLE = "title";
   public static final String JOB_REPORT_DATE_CREATED = "dateCreated";
   public static final String JOB_REPORT_DATE_UPDATED = "dateUpdated";
+  public static final String JOB_REPORT_INGEST_TYPE = "ingestType";
   public static final String JOB_REPORT_COMPLETION_PERCENTAGE = "completionPercentage";
   public static final String JOB_REPORT_STEPS_COMPLETED = "stepsCompleted";
   public static final String JOB_REPORT_TOTAL_STEPS = "totalSteps";

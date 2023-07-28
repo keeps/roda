@@ -150,10 +150,10 @@ public class EARKSIP2ToAIPPlugin extends SIPToAIPPlugin {
     try {
       sip = EARKSIP.parse(earkSIPPath, FSUtils.createRandomDirectory(jobWorkingDirectory));
       reportItem.setSourceObjectOriginalIds(sip.getIds());
+      reportItem.setIngestType(sip.getStatus().toString());
 
       if (sip.getValidationReport().isValid()) {
         Optional<String> parentId = Optional.empty();
-
         if (IPEnums.IPStatus.NEW == sip.getStatus()) {
           parentId = PluginHelper.getComputedParent(model, index, sip.getAncestors(), computedSearchScope,
             forceSearchScope, cachedJob.getId());
