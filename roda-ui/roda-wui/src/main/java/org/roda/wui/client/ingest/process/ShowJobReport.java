@@ -128,7 +128,9 @@ public class ShowJobReport extends Composite {
   @UiField
   FlowPanel reportItems;
   @UiField
-  FlowPanel ingestType;
+  FlowPanel ingestTypePanel;
+  @UiField
+  Label ingestType;
   @UiField
   Button searchPrevious, searchNext, buttonBack;
   @UiField
@@ -242,14 +244,9 @@ public class ShowJobReport extends Composite {
 
     //If it is an ingestion, creates a panel to render the type of Ingestion
     if (jobReport.getIngestType() != null) {
-      FlowPanel ingestPanel = new FlowPanel();
-      Label panelTitle = new Label(messages.reportIngestType());
-      Label panelInfo = new Label(jobReport.getIngestType().equals("NEW") ? messages.newIngestion() : messages.ingestionUpdate());
-      ingestPanel.addStyleName("label");
-      panelInfo.addStyleName("value");
-      ingestPanel.add(panelTitle);
-      ingestPanel.add(panelInfo);
-      ingestType.add(ingestPanel);
+      ingestType.setText(jobReport.getIngestType().equals("NEW") ? messages.newIngestion() : messages.ingestionUpdate());
+    } else {
+      ingestTypePanel.setVisible(false);
     }
 
     for (Report reportItem : jobReport.getReports()) {
