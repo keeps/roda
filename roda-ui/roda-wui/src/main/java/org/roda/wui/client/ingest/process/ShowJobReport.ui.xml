@@ -35,6 +35,8 @@
 									<g:HTML ui:field="outcomeObjectState" addStyleNames="inline small" />
 								</g:FlowPanel>
 
+								<g:FlowPanel ui:field="ingestType" />
+
 								<g:FlowPanel styleName="field">
 									<g:Label addStyleNames="label">
 										<ui:text from='{messages.reportDateCreated}' />

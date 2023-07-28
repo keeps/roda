@@ -46,6 +46,7 @@ public class Report implements IsModelObject, HasId, HasInstanceID {
   private String title = "";
   private Date dateCreated;
   private Date dateUpdated;
+  private String ingestType = "";
   private Integer completionPercentage = 0;
   private Integer stepsCompleted = 0;
   private Integer totalSteps = 0;
@@ -89,6 +90,7 @@ public class Report implements IsModelObject, HasId, HasInstanceID {
     this.title = report.getTitle();
     this.dateCreated = report.getDateCreated();
     this.dateUpdated = report.getDateUpdated();
+    this.ingestType = report.getIngestType();
     this.completionPercentage = report.getCompletionPercentage();
     this.stepsCompleted = report.getStepsCompleted();
     this.totalSteps = report.getTotalSteps();
@@ -347,6 +349,8 @@ public class Report implements IsModelObject, HasId, HasInstanceID {
     return this;
   }
 
+  public String getIngestType() { return ingestType; }
+  public void setIngestType(String status) { this.ingestType = status; }
   public String getInstanceId() {
     return instanceId;
   }

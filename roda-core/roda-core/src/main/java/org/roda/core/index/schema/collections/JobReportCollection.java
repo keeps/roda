@@ -83,6 +83,7 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     fields.add(new Field(RodaConstants.JOB_REPORT_TITLE, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_REPORT_DATE_CREATED, Field.TYPE_DATE));
     fields.add(new Field(RodaConstants.JOB_REPORT_DATE_UPDATED, Field.TYPE_DATE));
+    fields.add(new Field(RodaConstants.JOB_REPORT_INGEST_TYPE, Field.TYPE_STRING));
     fields.add(new Field(RodaConstants.JOB_REPORT_COMPLETION_PERCENTAGE, Field.TYPE_INT));
     fields.add(new Field(RodaConstants.JOB_REPORT_STEPS_COMPLETED, Field.TYPE_INT));
     fields.add(new Field(RodaConstants.JOB_REPORT_TOTAL_STEPS, Field.TYPE_INT));
@@ -129,6 +130,7 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     doc.addField(RodaConstants.JOB_REPORT_TITLE, jobReport.getTitle());
     doc.addField(RodaConstants.JOB_REPORT_DATE_CREATED, SolrUtils.formatDateWithMillis(jobReport.getDateCreated()));
     doc.addField(RodaConstants.JOB_REPORT_DATE_UPDATED, SolrUtils.formatDateWithMillis(jobReport.getDateUpdated()));
+    doc.addField(RodaConstants.JOB_REPORT_INGEST_TYPE, jobReport.getIngestType());
     doc.addField(RodaConstants.JOB_REPORT_COMPLETION_PERCENTAGE, jobReport.getCompletionPercentage());
     doc.addField(RodaConstants.JOB_REPORT_STEPS_COMPLETED, jobReport.getStepsCompleted());
     doc.addField(RodaConstants.JOB_REPORT_TOTAL_STEPS, jobReport.getTotalSteps());
@@ -216,6 +218,7 @@ public class JobReportCollection extends AbstractSolrCollection<IndexedReport, R
     jobReport.setTitle(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_TITLE), null));
     jobReport.setDateCreated(SolrUtils.objectToDateWithMillis(doc.get(RodaConstants.JOB_REPORT_DATE_CREATED)));
     jobReport.setDateUpdated(SolrUtils.objectToDateWithMillis(doc.get(RodaConstants.JOB_REPORT_DATE_UPDATED)));
+    jobReport.setIngestType(SolrUtils.objectToString(doc.get(RodaConstants.JOB_REPORT_INGEST_TYPE), null));
     jobReport
       .setCompletionPercentage(SolrUtils.objectToInteger(doc.get(RodaConstants.JOB_REPORT_COMPLETION_PERCENTAGE), 0));
     jobReport.setStepsCompleted(SolrUtils.objectToInteger(doc.get(RodaConstants.JOB_REPORT_STEPS_COMPLETED), 0));
