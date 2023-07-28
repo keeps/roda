@@ -8,6 +8,11 @@ RUN set -ex; \
     apt-get -qq -y --no-install-recommends install clamdscan zip rsync jq && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
+# Remove python dependency
+RUN \
+	DEBIAN_FRONTEND=noninteractive \
+	apt-get autoremove -y --purge *python*
+
 COPY clamd.conf /etc/clamav/clamd.conf
 
 # setup remove old ROOT folder from tomcat
