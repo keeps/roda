@@ -16,7 +16,7 @@ people can find, install and use the plugin.
 
 ## Validation
 The RODA development team will check if the pull request complies with the community rules. 
-If it complies, the plugin will be published in [https://market.roda-community.org/](https://market.roda-community.org/)
+If it complies, the plugin will be published in [https://market.roda-community.org/](https://market.roda-community.org)
 
 ## Metadata file
 
