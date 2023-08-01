@@ -3,7 +3,7 @@
 # Publishing Plugins
 
 After developing a plugin using the [roda-plugin-template](https://github.com/keeps/roda-plugin-template), you can make 
-a pull request to publish it to the [https://market.roda-community.org/](https://market.roda-community.org/), so other 
+a pull request to publish it to the [https://market.roda-community.org/](https://market.roda-community.org), so other 
 people can find, install and use the plugin.
 
 ## Instructions
