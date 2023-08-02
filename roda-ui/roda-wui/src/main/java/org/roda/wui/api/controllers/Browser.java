@@ -3234,7 +3234,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static Reports listReports(User user, String id, String resourceOrSip, int start, int limit,
-    String acceptFormat) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+    String acceptFormat) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input

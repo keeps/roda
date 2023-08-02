@@ -2829,17 +2829,20 @@ public class BrowserHelper {
     RodaCoreFactory.getModelService().updateRiskIncidence(incidence, true);
   }
 
-  protected static Reports listReports(int start, int limit) throws RequestNotValidException, GenericException {
+  protected static Reports listReports(int start, int limit) throws RequestNotValidException, GenericException, AuthorizationDeniedException, NotFoundException {
     Sorter sorter = new Sorter(new SortParameter(RodaConstants.JOB_REPORT_DATE_UPDATED, true));
     IndexResult<IndexedReport> indexReports = RodaCoreFactory.getIndexService().find(IndexedReport.class, Filter.ALL,
       sorter, new Sublist(start, limit), new ArrayList<>());
-    List<Report> results = indexReports.getResults().stream().map(ireport -> (Report) ireport)
-      .collect(Collectors.toList());
+    List<Report> results = new ArrayList<>();
+    for (IndexedReport val: indexReports.getResults()) {
+      val.setReports(RodaCoreFactory.getModelService().retrieveJobReport(val.getJobId(), val.getId()).getReports());
+      results.add(val);
+    }
     return new Reports(results);
   }
 
   protected static Reports listTransferredResourcesReports(String resourceId, int start, int limit)
-    throws RequestNotValidException, GenericException {
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, NotFoundException {
     Filter filter = new Filter();
     filter.add(
       new SimpleFilterParameter(RodaConstants.JOB_REPORT_SOURCE_OBJECT_CLASS, TransferredResource.class.getName()));
@@ -2850,12 +2853,16 @@ public class BrowserHelper {
     Sorter sorter = new Sorter(new SortParameter(RodaConstants.JOB_REPORT_DATE_UPDATED, true));
     IndexResult<IndexedReport> reports = RodaCoreFactory.getIndexService().find(IndexedReport.class, filter, sorter,
       new Sublist(start, limit), new ArrayList<>());
-    List<Report> results = reports.getResults().stream().map(ireport -> (Report) ireport).collect(Collectors.toList());
+    List<Report> results = new ArrayList<>();
+    for (IndexedReport val: reports.getResults()) {
+      val.setReports(RodaCoreFactory.getModelService().retrieveJobReport(val.getJobId(), val.getId()).getReports());
+      results.add(val);
+    }
     return new Reports(results);
   }
 
   protected static Reports listTransferredResourcesReportsWithSIP(String sipId, int start, int limit)
-    throws RequestNotValidException, GenericException {
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, NotFoundException {
     Filter filter = new Filter();
     filter.add(new OneOfManyFilterParameter(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_CLASS,
       Arrays.asList(AIP.class.getName(), IndexedAIP.class.getName())));
@@ -2864,13 +2871,16 @@ public class BrowserHelper {
     Sorter sorter = new Sorter(new SortParameter(RodaConstants.JOB_REPORT_DATE_UPDATED, true));
     IndexResult<IndexedReport> indexReports = RodaCoreFactory.getIndexService().find(IndexedReport.class, filter,
       sorter, new Sublist(start, limit), new ArrayList<>());
-    List<Report> results = indexReports.getResults().stream().map(ireport -> (Report) ireport)
-      .collect(Collectors.toList());
+    List<Report> results = new ArrayList<>();
+    for (IndexedReport val: indexReports.getResults()) {
+      val.setReports(RodaCoreFactory.getModelService().retrieveJobReport(val.getJobId(), val.getId()).getReports());
+      results.add(val);
+    }
     return new Reports(results);
   }
 
   protected static Reports listTransferredResourcesReportsWithSourceOriginalName(String sourceName, int start,
-    int limit) throws RequestNotValidException, GenericException {
+    int limit) throws RequestNotValidException, GenericException, AuthorizationDeniedException, NotFoundException {
     Filter filter = new Filter();
     filter.add(new OneOfManyFilterParameter(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_CLASS,
       Arrays.asList(AIP.class.getName(), IndexedAIP.class.getName())));
@@ -2879,8 +2889,11 @@ public class BrowserHelper {
     Sorter sorter = new Sorter(new SortParameter(RodaConstants.JOB_REPORT_DATE_UPDATED, true));
     IndexResult<IndexedReport> indexReports = RodaCoreFactory.getIndexService().find(IndexedReport.class, filter,
       sorter, new Sublist(start, limit), new ArrayList<>());
-    List<Report> results = indexReports.getResults().stream().map(ireport -> (Report) ireport)
-      .collect(Collectors.toList());
+    List<Report> results = new ArrayList<>();
+    for (IndexedReport val: indexReports.getResults()) {
+      val.setReports(RodaCoreFactory.getModelService().retrieveJobReport(val.getJobId(), val.getId()).getReports());
+      results.add(val);
+    }
     return new Reports(results);
   }
 
