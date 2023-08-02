@@ -17,6 +17,7 @@ import com.google.gwt.regexp.shared.RegExp;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.SavedSearch;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.filter.AllFilterParameter;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
@@ -367,7 +368,8 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
       searchPreFilters.clear();
 
       boolean effectivelyVisible = false;
-      List<FilterParameter> parameters = defaultFilter.getParameters();
+      List<FilterParameter> parameters = new ArrayList<>(defaultFilter.getParameters());
+      parameters.removeIf(f -> f instanceof AllFilterParameter);
       for (int i = 0; i < parameters.size(); i++) {
         SafeHtml filterHTML = SearchPreFilterUtils.getFilterParameterHTML(parameters.get(i));
 
