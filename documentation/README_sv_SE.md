@@ -19,8 +19,8 @@ I denna serie av dokumentation hittar du bland annat artiklar med information om
     - [Representation Information](Representation_Information.md)
     - [Format normalization policy](Format_Normalization_Policy.md)
     - [Disposal Policies](Disposal_Policies.md)
-- [Support](https://github.com/keeps/roda#support)
-- [Installation](https://github.com/keeps/roda/blob/master/deploys/README.md)
+- [Support](https://www.roda-community.org/#bellhop_bell-support)
+- [Installation](https://www.roda-community.org/deploys/)
 - Konfiguration
     - [Statistics](Statistics.md)
     - [Metadata formats](Metadata_Formats.md)
@@ -33,7 +33,7 @@ I denna serie av dokumentation hittar du bland annat artiklar med information om
     - [Publishing plugins](Publishing_plugins.md)
 - [Troubleshooting](Troubleshooting.md)
 - [FAQ](FAQ.md)
-- [Acknowledgements](Acknowledgements.md)
+- [Historik](History.md)
 - [License](LICENSE.md)
 
 ## Standarder och specifikationer
