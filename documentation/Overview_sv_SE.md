@@ -24,7 +24,7 @@ RODA implementerar också en rad specifikationer och standarder. För att veta m
 * Stöd för teman
 
 För mer information, besök gärna RODAs webbplats:
- **<http://www.roda-community.org>**
+**<http://www.roda-community.org>**
 
 
 ## Funktioner
