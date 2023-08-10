@@ -54,7 +54,7 @@ När ett bevarandeobjekts gallringsåtgärd är inställd på granskning är den
 
 #### Livscykel radering
 
-Raderingen av bevarandeobjekt har vissa begränsningar. Hur objekten raderas beror på innehållet i dess komponenter. RODA kan rensa beskrivande metadata med hjälp av [XSLT (eXtensible Stylesheet Language Transformations)](http://www.w3.org/standards/xml/transformation.html). Alla filer som är associerade med objektet raderas och lämnar objektet i ett förstört tillstånd.
+Gallringen av bevarandeobjekt har vissa begränsningar. Hur objekten gallras beror på innehållet i dess komponenter. RODA kan rensa beskrivande metadata med hjälp av [XSLT (eXtensible Stylesheet Language Transformations)](http://www.w3.org/standards/xml/transformation.html). Alla filer som är associerade med objektet raderas och lämnar objektet i ett gallrat tillstånd.
 
 ![Desctuction life cycle](images/destruction_life_cycle.png "Livscykel förstöring")
 
