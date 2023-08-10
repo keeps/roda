@@ -23,7 +23,8 @@ RODA implementerar också en rad specifikationer och standarder. För att veta m
 * 100% kompatibelt med E-ARK SIP, AIP, och DIP specifikationer
 * Stöd för teman
 
-För mer information, besök gärna RODAs webbplats: **<http://www.roda-community.org>**
+För mer information, besök gärna RODAs webbplats:
+ **<http://www.roda-community.org>**
 
 
 ## Funktioner
