@@ -33,7 +33,7 @@ I denna serie av dokumentation hittar du bland annat artiklar med information om
     - [Publishing plugins](Publishing_plugins.md)
 - [Troubleshooting](Troubleshooting.md)
 - [FAQ](FAQ.md)
-- [Historia](History.md)
+- [Historik](History.md)
 - [License](LICENSE.md)
 
 ## Standarder och specifikationer
