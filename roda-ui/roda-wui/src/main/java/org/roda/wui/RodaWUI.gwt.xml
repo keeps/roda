@@ -14,6 +14,7 @@
 	<extend-property name="locale" values="hr" />
 	<extend-property name="locale" values="hu" />
 	<extend-property name="locale" values="sv_SE" />
+	<extend-property name="locale" values="de_AT" />
 	<set-property-fallback name="locale" value="en" />
 
 	<!-- Locale -->
