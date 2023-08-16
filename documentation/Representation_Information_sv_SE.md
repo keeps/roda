@@ -38,7 +38,7 @@ OAIS måste dock spåra detta noggrant, för en dag kommer det inte att finnas n
 
 ## Programvara för åtkomst och emulering
 
-På kort sikt öppnas förmodligen de flesta arkivobjekt av exakt samma programvara som de skapades i. Någon som öppnar ett arkiverat men nyligen skapat Word-dokument kommer sannolikt att använda sin egen MS Word-app. Så detta leder till möjligheten att utökade representationsnätverk kan överges, och vi använder helt enkelt originalmjukvaran, eller något liknande.
+På kort sikt öppnas förmodligen de flesta arkivobjekt av exakt samma programvara som de skapades i. Någon som öppnar ett arkiverat, men nyligen skapat, Word-dokument kommer sannolikt att använda sin egen MS Word-app. Detta leder till möjligheten att utökade representationsnätverk kan överges. Vi använder helt enkelt originalmjukvaran eller något liknande.
 
 OAIS kallar denna Access-mjukvara och varnar för den, eftersom det betyder att vi måste försöka fortsätta att fungera. Det slår mig dock att detta är hela poängen med HW-emulering. Om du har den enda frasen "MS Word-dokument" som din representationsinformation och du har en arbetskopia av Word-appen på emulerad HW och OS, behöver du inget representationsnätverk alls. Åtminstone inte förrän allt går fel!
 
