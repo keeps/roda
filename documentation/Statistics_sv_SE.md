@@ -173,7 +173,7 @@ Följande avsnitt tillhandahåller kodsnuttar som man kan använda för att visa
 
 **Beskrivningsnivådistribution**
 
-![Description level distribution](images/description_level_distribution_line.png "Beskrivningsnivådistribution")
+![Beskrivningsnivådistribution](images/description_level_distribution_line.png "Beskrivningsnivådistribution")
 
 ```html
 <canvas class="statistic"
