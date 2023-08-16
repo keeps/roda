@@ -96,7 +96,7 @@ De flesta metadataformaten publiceras tillsammans med dokumentation och ett XML-
 
 ### Indexering
 
-Aktiviteten _Indexering_ stöds av en [XSLT (eXtensible Stylesheet Language Transformations)](http://www.w3.org/standards/xml/transformation.html) som omvandlar den XML-baserade metadatan till något som indexeringsmotorn kan förstå. Den här filen ansvarar för att välja ut data som förväntas indexeras, mappa data till specifika fältnamn och instruera motorn om hur data förväntas indexeras baserat på dess datatyp (t.ex. text, nummer, datum, etc. ).
+Aktiviteten _Indexering_ stöds av en [XSLT (eXtensible Stylesheet Language Transformations)](http://www.w3.org/standards/xml/transformation.html) som omvandlar den XML-baserade metadatan till något som indexeringsmotorn kan förstå. Den här filen ansvarar för att välja ut data som förväntas indexeras, mappa data till specifika fältnamn och instruerar motorn om hur data förväntas indexeras baserat på dess datatyp (t.ex. text, nummer, datum, etc. ).
 
 Indexkartfilen bör läggas till i konfigurationsmappen under `[RODA_HOME]/config/crosswalks/ingest/`.
 
@@ -290,7 +290,7 @@ Nedan är ett exempel på en indexkarta för Simple Dublin Core-exemplet.
 </xsl:stylesheet>
 ```
 
-Utdatan som produceras av denna visningsmall är ett [Solr document](https://wiki.apache.org/solr/UpdateXmlMessages) som är redo att indexeras av RODA-sökmotorn. Se exempel nedan:
+Utdatan som produceras av denna visningsmall är ett [Solr dokument](https://wiki.apache.org/solr/UpdateXmlMessages) som är redo att indexeras av RODA-sökmotorn. Se exempel nedan:
 
 ```
 <doc>
@@ -304,7 +304,7 @@ Utdatan som produceras av denna visningsmall är ett [Solr document](https://wik
 
 ### Visualisering
 
-Aktiviteten _Visualization_ stöds av en [XSLT (eXtensible Stylesheet Language Transformations)](http://www.w3.org/standards/xml/transformation.html) som omvandlar den XML-baserade metadatafilen till HTML för presentationsändamål. Denna åtgärd ger en HTML-fil som kommer att visas för användaren när ett befintlig AIP i katalogen visas.
+Aktiviteten _visualisering_ stöds av en [XSLT (eXtensible Stylesheet Language Transformations)](http://www.w3.org/standards/xml/transformation.html) som omvandlar den XML-baserade metadatafilen till HTML för presentationsändamål. Denna åtgärd ger en HTML-fil som kommer att visas för användaren när ett befintlig AIP i katalogen visas.
 
 Visualiseringsmappningsfilen bör läggas till i konfigurationsmappen under `[RODA_HOME]/config/crosswalks/dissemination/html/`.
 
@@ -555,9 +555,9 @@ Följande exempel visar hur en Simple Dublin Core-fil kan omvandlas till HTML f�
 
 ### Redigering
 
-Aktiviteten _Redigering_ stöds av en konfigurationsfil som kommer att instruera systemet om hur man visar ett formulär för att redigera befintlig metadata. Konfigurationsfilen syftar också till att tillhandahålla en mall för att skapa ett nytt metadataobjekt innehållande några redan ifyllda fördefinierade attribut.
+Aktiviteten _redigering_ stöds av en konfigurationsfil som kommer att instruera systemet om hur man visar ett formulär för att redigera befintlig metadata. Konfigurationsfilen syftar också till att tillhandahålla en mall för att skapa ett nytt metadataobjekt innehållande några redan ifyllda fördefinierade attribut.
 
-Formulärmallar bör läggas till i konfigurationen under mappen `[RODA_HOME]/config/templates/`. Följande exempel visar hur en mallfil kan kombineras med kommentarer som kommer att användas för att rendera metadataredigeraren.
+Formulärmallar bör läggas till i konfigurationen under mappen `[RODA_HOME]/config/templates/`. Följande exempel visar hur en mallfil kan kombineras med kommentarer som kommer att användas för att för att rendera metadataredigeraren.
 
 ```
 {{~field name="title"   order='2' auto-generate='title' label="{'en': 'Title'}" xpath="//*:title/string()"}}
@@ -585,7 +585,7 @@ Formulärmallar bör läggas till i konfigurationen under mappen `[RODA_HOME]/co
 </simpledc>
 ```
 
-Formulärmallsfilerna är baserade på den kraftfulla [Handlebars engine](http://handlebarsjs.com). Varje fält som förväntas visas i metadataredigeraren bör identifieras i början av filen med ett _field_-handle (t.ex. `{{~field name="title"~}}`). Det finns flera alternativ som kan användas för att ändra hur varje fält visas. Dessa alternativ är ett nyckelvärdepar, t.ex. `label="Title of work"`, där nyckeln är namnet på alternativet och värdet är det värde som kommer att ges till det alternativet.
+Formulärmallsfilerna är baserade på den kraftfulla [Handlebars-motorn](http://handlebarsjs.com). Varje fält som förväntas visas i metadataredigeraren bör identifieras i början av filen med ett _field_-handle (t.ex. `{{~field name="title"~}}`). Det finns flera alternativ som kan användas för att ändra hur varje fält visas. Dessa alternativ är ett nyckelvärdepar, t.ex. `label="Title of work"`, där nyckeln är namnet på alternativet och värdet är det värde som kommer att ges till det alternativet.
 
 De tillgängliga alternativen som ändrar fältens beteende är:
 
@@ -596,14 +596,14 @@ De tillgängliga alternativen som ändrar fältens beteende är:
 *   **value** - Fältets fördefinierade värde
 *   **mandatory** - Om satt till sant är etiketten skriven med fet stil för att dra till sig uppmärksamhet.
 *   **hidden** - Om satt till sant så är fältet dolt
-*   **xpath** - xpath för XML-metadatadokumentet som detta fält ska bindas till
+*   **xpath** - Xpath för XML-metadatadokumentet som detta fält ska bindas till
 *   **auto-generate** - Fyller värdet med en av de tillgängliga automatiska värdegeneratorerna. Skriver över värdealternativet:
 
 *   **now** - det aktuella datumet i formatet år/månad/dag
 *   **id** - genererar en identifierare
 *   **title** - generar en titel
 *   **level** - lägger till den aktuella beskrivningsnivån
-*   **parentid** - lägger till förälderns id om det finns
+*   **parentid** - Lägger till förälderns id om det finns
 *   **language** - lägger till systemspråket, baserat på det lokala språket. Exempel: "svenska" eller "engelska"
 
 *   **type** - typen av fält. De möjliga värdena är:
@@ -614,8 +614,8 @@ De tillgängliga alternativen som ändrar fältens beteende är:
 *   **list** - lista med möjliga värden (combo box)
 
 *   **options** - lista med möjliga värden som ett fält kan ha. Den här listan är en JSonArray. Exempel: `options="['final','revised','draft']"`
-*   **optionsLabels** - karta med etiketterna för varje alternativ. Nyckeln måste matcha ett av alternativen som anges i alternativ-listan. Ingången är en annan karta som mappar ett språk (nyckel) till en etikett (värde). Exempel: `optionsLabels="{'final': {'en':'Final', 'pt_PT':'Final'},'revised': {'en':'Revised', 'pt_PT':'Verificado'} ,'draft': {'en':'Draft', 'pt_PT':'Rascunho'}}"`
-*   **optionsLabelI18nKeyPrefix** - I18n prefixnyckel. Alla nycklar som börjar med prefixet används för att bygga listan. Exempel:
+*   **optionsLabels** - Karta med etiketterna för varje alternativ. Nyckeln måste matcha ett av alternativen som anges i alternativ-listan. Ingången är en annan karta som mappar ett språk (nyckel) till en etikett (värde). Exempel: `optionsLabels="{'final': {'en':'Final', 'pt_PT':'Final'},'revised': {'en':'Revised', 'pt_PT':'Verificado'} ,'draft': {'en':'Draft', 'pt_PT':'Rascunho'}}"`
+*   **optionsLabelI18nKeyPrefix** - I18n-prefixnyckel. Alla nycklar som börjar med prefixet används för att bygga listan. Exempel:
 
     `optionsLabelI18nKeyPrefix="crosswalks.dissemination.html.ead.level"`
 
@@ -668,7 +668,7 @@ Efter att ha lagt till alla filer som beskrivs i föregående avsnitt måste man
 
 När du har lagt till de tidigare beskrivna filerna till din konfigurationsmapp måste du aktivera det nya formatet i RODA-huvudkonfigurationsfilen.
 
-Redigera filen `[RODA_HOME]/config/roda-wui.properties` och lägg till en ny post, som de som visas i följande exempel, med namnet på ditt nyligen tillagda metadataformat. Detta kommer att göra RODA medveten om det nya metadataformatet.
+Redigera filen `[RODA_HOME]/config/roda-wui.properties` och lägg till en ny post som de som visas i följande exempel, med namnet på ditt nyligen tillagda metadataformat. Detta kommer att göra RODA medveten om det nya metadataformatet.
 
 ```
 ui.browser.metadata.descriptive.types = dc
@@ -680,7 +680,7 @@ ui.browser.metadata.descriptive.types = ead_2002
 
 För att få ditt nya metadataschema integrerat på ett bra sätt måste du tillhandahålla internationaliseringsinformation (i18n) så att RODA vet hur man visar nödvändig information i användargränssnittet på bästa möjliga sätt.
 
-Redigera filen `[RODA_HOME]/config/i18n/ServerMessages.properties` och lägg till följande poster vid behov och se till att den sista delen av nyckeln matchar koden som tillhandahålls på `[RODA_HOME]/config/roda-wui.properties ` fil som beskrevs i föregående avsnitt:
+Redigera filen `[RODA_HOME]/config/i18n/ServerMessages.properties` och lägg till följande poster vid behov och se till att den sista delen av nyckeln matchar koden som tillhandahålls på `[RODA_HOME]/config/roda-wui.properties`fil som beskrevs i föregående avsnitt:
 
 ```
 ui.browse.metadata.descriptive.type.dc=Dublin Core
@@ -688,7 +688,7 @@ ui.browse.metadata.descriptive.type.ead.3=Encoded Archival Description 3
 ui.browse.metadata.descriptive.type.ead.2002=Encoded Archival Description 2002
 ```
 
-Slutligen bör man tillhandahålla översättningar för fältnamnen som ska behandlas av RODA via _vizualization_ config-filen. För att göra det måste man redigera filen `[RODA_HOME]/config/i18n/ServerMessages.properties` och lägga till följande poster vid behov och se till att den sista delen av nyckeln matchar `xsl:params` som ingår i visualiseringskartan.
+Slutligen bör man tillhandahålla översättningar för fältnamnen som ska behandlas av RODA via _visualiseirng_ config-filen. För att göra det måste man redigera filen `[RODA_HOME]/config/i18n/ServerMessages.properties` och lägga till följande poster vid behov och se till att den sista delen av nyckeln matchar `xsl:params` som ingår i visualiseringskartan.
 
 Följande exempel visar hur fältnamnen i Simple Dublin Core-exemplet ska visas i användargränssnittet.
 

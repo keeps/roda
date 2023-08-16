@@ -2,7 +2,7 @@
 
 ## Gallringsschema
 
-Gallringsscheman anger minimikraven för underhålls-, bevarande- eller destruktionsåtgärder som ska vidtas i befintliga eller framtida intellektuella enheter i detta e-arkiv. En intellektuell enhet får endast raderas som en del av en gallringsprocess som styrs av det gallringsschema som tilldelats den enheten. Det är den intellektuella enhetens gallringsschema som bestämmer hur länge en post bevaras och hur den därefter gallras i slutet av dess bevarandeperiod.
+Gallringsscheman anger minimikraven för underhålls-, bevarande- eller gallringsåtgärder som ska vidtas på befintliga eller framtida intellektuella enheter i detta e-arkiv. En intellektuell enhet får endast raderas som en del av en gallringsprocess som styrs av det gallringsschema som tilldelats den enheten. Det är den intellektuella enhetens gallringsschema som bestämmer hur länge en post bevaras och hur den därefter gallras i slutet av dess bevarandeperiod.
 
 ### 1. Vad är ett gallringsschema?
 
@@ -33,26 +33,24 @@ Följande attribut kategoriserar ett gallringsschema:
 | Mandat | Hänvisning till gallringsbeslut eller liknande  | Falskt |
 | Omfattningsbeskrivning | Vägledning till auktoriserade användare som anger hur man bäst tillämpar en viss enhet och anger eventuella organisatoriska policyer eller begränsningar för dess användning | Falskt |
 | Gallringsåtgärd | Kod som beskriver den åtgärd som ska vidtas vid gallring av posten (möjliga värden: Behåll permanent, granska, radera) | Sant |
-| Identifierare av element för bevaring
-
-Identifierare av bevarandetrigger? | Det beskrivande metadatafältet som används för att beräkna bevarandeperioden | Sant (om åtgärdskoden för gallring skiljer sig från Behåll permanent) |
+| Trigger för att identifiera element för bevarande | Det beskrivande metadatafältet som används för att beräkna bevarandeperioden | Sant (om åtgärdskoden för gallring skiljer sig från Behåll permanent) |
 | Bevarandeperiod | Antal dagar, veckor, månader eller år som specificerats för att bevara ett bevarandeobjekt efter att bevarandeperioden har triggats | Sant (om åtgärdskoden för gallring skiljer sig från Behåll permanent) |
 
 ### 3. Bevarandeobjektets livscykel
 
 #### Livscykel för permanent bevarande
 
-Denna typ av gallringsschema, utan trigger för bevaringsperiod, har effekten att förhindra beräkningen av ett startdatum för bevaring och en efterföljande bevarandeperiod.
+Denna typ av gallringsschema, utan trigger för bevaringsperiod, förhindrar beräkningen av ett startdatum för bevaring och en efterföljande bevarandeperiod.
 
 ![Permanent retention life cycle](images/permanent_retention_life_cycle.png "Permanent bevaringslivscykel")
 
 #### Granska livscykel
 
-När ett bevarandeobjekts gallringsåtgärd är inställd på granskning är den inte omedelbart föremål för förstörelse. Istället måste resultatet av granskningen innefatta tillämpning av ett gallringsschema på objektet baserat på granskningsbeslutet. Det nya gallringsschemat kommer att ersätta det tidigare gallringsschemat som är associerat med objektet och kommer då att ange det slutliga ödet för objektet, eller så kan det användas för att schemalägga ytterligare en senare granskning eller för att behålla objektet permanent.
+När ett bevarandeobjekts gallringsåtgärd är inställd på granskning är den inte omedelbart föremål för gallring. Istället måste resultatet av granskningen innefatta tillämpning av ett gallringsschema på objektet baserat på granskningsbeslutet. Det nya gallringsschemat kommer att ersätta det tidigare gallringsschemat som är associerat med objektet och kommer då att ange vad som slutligen kommer att ske med objektet, eller så kan det användas för att schemalägga ytterligare en senare granskning eller för att behålla objektet permanent.
 
 ![Review life cycle](images/review_life_cycle.png "Granska livscykel")
 
-#### Livscykel radering
+#### Gallringslivscykeln
 
 Gallringen av bevarandeobjekt har vissa begränsningar. Hur objekten gallras beror på innehållet i dess komponenter. RODA kan rensa beskrivande metadata med hjälp av [XSLT (eXtensible Stylesheet Language Transformations)](http://www.w3.org/standards/xml/transformation.html). Alla filer som är associerade med objektet raderas och lämnar objektet i ett gallrat tillstånd.
 
@@ -87,7 +85,7 @@ Det finns två typer av utvalsmetoder i RODA:
 
 ### 4. Hur fungerar det?
 
-Gallringsregler kan tillämpas vid inleveransprocessen via en plugin men kan också tillämpas i systemet när som helst. AIP som har ett gallringsschema som är manuellt kopplat till sig kan antingen åsidosättas eller sparas som det är. 
+Gallringsregler kan tillämpas vid inleveransprocessen via ett plugin, men kan också tillämpas i systemet när som helst. AIP som har ett gallringsschema, som är manuellt kopplat till sig, kan antingen åsidosättas eller sparas som det är. 
 
 ## Gallringsstopp
 
