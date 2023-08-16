@@ -29,7 +29,7 @@ I denna serie av dokumentation hittar du bland annat artiklar med information om
 - Bidra
     - [Utvecklarguide](Developers_Guide.md)
     - [Översättningsguide](Translation_Guide.md)
-    - [Documentation guide](Documentation_Guide.md)
+    - [Dokumentationsguide](Documentation_Guide.md)
     - [Publishing plugins](Publishing_plugins.md)
 - [Troubleshooting](Troubleshooting.md)
 - [FAQ](FAQ.md)
