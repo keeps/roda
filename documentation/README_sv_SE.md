@@ -51,6 +51,6 @@ I denna serie av dokumentation hittar du bland annat artiklar med information om
 * [ISO 16363:2012 - Space data and information transfer systems - Audit and certification of trustworthy digital repositories](http://www.iso.org/iso/catalogue_detail.htm?csnumber=56510) ([TRAC version](https://www.crl.edu/sites/default/files/d6/attachments/pages/trac_0.pdf))
 * [eCH-0165 SIARD Format Specification 2.0](https://www.ech.ch/vechweb/page?p=dossier&documentNumber=eCH-0165&documentVersion=2.0)
 
-### Annan
+### Andra
 
 * [Digital Repository Audit Method Based on Risk Assessment (DRAMBORA)](http://www.repositoryaudit.eu/download/)
