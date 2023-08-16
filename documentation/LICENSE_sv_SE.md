@@ -11,7 +11,7 @@ Alla har rätt att kopiera och distribuera ordagrant distribuera kopior av detta
 
 GNU General Public License är en gratis copyleft-licens för programvara och andra typer av verk.
 
-Licenserna för de flesta mjukvaror och andra praktiska arbeten är utformade för att ta bort din frihet att dela och ändra verken. Däremot är GNU General Public License avsedd att garantera din frihet att dela och ändra alla versioner av ett program - för att se till att det förblir en fri programvara för alla dess användare. Vi, Free Software Foundation, använder GNU General Public License för det mesta av vår programvara; det gäller även för alla andra verk som släppts på detta sätt av dess upphovsmän. Du kan också tillämpa det på dina program.
+Licenserna för de flesta mjukvaror och andra praktiska arbeten är utformade för att ta bort din frihet att dela och ändra verken. Däremot är GNU General Public License avsedd att garantera din frihet att dela och ändra alla versioner av ett program för att se till att det förblir en fri programvara för alla dess användare. Vi, Free Software Foundation, använder GNU General Public License för det mesta av vår programvara; det gäller även för alla andra verk som släppts på detta sätt av dess upphovsmän. Du kan också tillämpa det på dina program.
 
 När vi talar om fri programvara syftar vi på frihet, inte pris. Våra allmänna offentliga licenser är utformade för att säkerställa att du har friheten att distribuera kopior av fri programvara (och ta betalt för dem om du vill), att du får källkod eller kan få den om du vill, att du kan ändra programvaran eller använda delar av det i nya fria program, och att du vet att du kan göra detta.
 
