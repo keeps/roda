@@ -22,7 +22,7 @@ I denna serie av dokumentation hittar du bland annat artiklar med information om
 - [Support](https://www.roda-community.org/#bellhop_bell-support)
 - [Installation](https://www.roda-community.org/deploys/)
 - Konfiguration
-    - [Statistics](Statistics.md)
+    - [Statistik](Statistics.md)
     - [Metadata formats](Metadata_Formats.md)
     - [Extern autentisering med CAS-protokoll](Central_Authentication_Service.md)
     - [Disposal feature](Disposal.md)
