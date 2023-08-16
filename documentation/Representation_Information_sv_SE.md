@@ -7,7 +7,7 @@
 
 Representationsinformation är ett avgörande koncept, eftersom det endast är genom vår förståelse av representationsinformationen som ett dataobjekt kan öppnas och tittas på. Själva representationsinformationen kan endast tolkas på den kunskapsbas som avses.
 
-Representationsinformationskonceptet är också oupplösligt kopplat till begreppet Designated Community, eftersom hur vi definierar Designated Community (och dess associerade kunskapsbas) avgör hur mycket representationsinformation vi behöver. "OAIS måste förstå kunskapsbasen för dess utsedda gemenskap för att förstå den minsta representationsinformation som måste underhållas... Med tiden kan utvecklingen av den designerade gemenskapens kunskapsbas kräva uppdateringar av representationsinformationen för att säkerställa fortsatt förståelse" (2.2. 1).
+Representationsinformationskonceptet är också oupplösligt kopplat till begreppet Designated Community, eftersom hur vi definierar Designated Community (och dess associerade kunskapsbas) avgör hur mycket representationsinformation vi behöver. "OAIS måste förstå kunskapsbasen för dess utsedda gemenskap för att förstå den minsta representationsinformation som måste underhållas... Med tiden kan utvecklingen av Designated Commynity's kunskapsbas kräva uppdateringar av representationsinformationen för att säkerställa fortsatt förståelse" (2.2.1).
 
 
 Själva dataobjektet, i ett digitalt arkiv, är helt enkelt en sträng av bitar. Vad representationsinformationen gör är att konvertera (eller berätta för oss hur man konverterar) dessa bitar till något mer meningsfullt. Den beskriver format- eller datastrukturkoncepten som bör tillämpas på bitsekvenserna som i sin tur resulterar i mer meningsfulla värden, såsom tecken, pixlar, tabeller etc.
