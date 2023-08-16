@@ -40,7 +40,7 @@ Följande attribut kategoriserar ett gallringsschema:
 
 #### Livscykel för permanent bevarande
 
-Denna typ av gallringsschema, utan trigger för bevaringsperiod, har effekten att förhindra beräkningen av ett startdatum för bevaring och en efterföljande bevarandeperiod.
+Denna typ av gallringsschema, utan trigger för bevaringsperiod, förhindrar beräkningen av ett startdatum för bevaring och en efterföljande bevarandeperiod.
 
 ![Permanent retention life cycle](images/permanent_retention_life_cycle.png "Permanent bevaringslivscykel")
 
