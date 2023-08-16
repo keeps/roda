@@ -20,7 +20,7 @@ Föreställ dig att jag, som har rätt berighet i RODA, vet att Word 95 är ett 
 
 (En annan möjlighet skulle vara att använda ett plugin som skulle göra denna typ av analys automatiskt, men det finns inget sådant plugin för tillfället. Det skulle behöva utvecklas.)
 
-Du kan sedan använda sökfunktionen för att hitta alla Word 95-filer i e-arkivet. Alla filformat har identifierats under inmatningsprocessen så den uppgiften är ganska enkel. Jag skulle sedan använda den tillgängliga riskassociation-pluginet för att ställa in dessa filer som instanser av den nyligen skapade risken. Detta fungerar som dokumentation av bevarandebesluten som fattats av arkivarien och som motivering till vad vi ska göra härnäst - det här är bevarandeplanering.
+Du kan sedan använda sökfunktionen för att hitta alla Word 95-filer i e-arkivet. Alla filformat har identifierats under inmatningsprocessen så den uppgiften är ganska enkel. Jag skulle sedan använda den tillgängliga riskassociation-pluginet för att ställa in dessa filer som instanser av den nyligen skapade risken. Detta fungerar som dokumentation av bevarandebesluten som har fattats och som motivering till vad vi ska göra härnäst - det här är bevarandeplanering.
 
 Nästa steg skulle vara att migrera filerna. Du kan göra ungefär samma sak som tidigare, d.v.s. välja alla word 95-filer i sökmenyn och sedan köra en bevarandeåtgär för att migrera dem till, exempelvis, PDF.
 
