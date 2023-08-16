@@ -1,6 +1,6 @@
 # Riskbedömning
 
-RODA levereras med ett riskregister förinstallerat med 80+ bevaranderisker som erhållits från verktygssatsen [Digital Repository Audit Method Based on Risk Assessment (DRAMBORA)](http://www.repositoryaudit.eu) utvecklad av [Digital Curation Center ( DCC)](http://www.dcc.ac.uk) och DigitalPreservationEurope (DPE).
+RODA levereras med ett riskregister förinstallerat med över 80 stycken bevaranderisker som erhållits från verktygssatsen [Digital Repository Audit Method Based on Risk Assessment (DRAMBORA)](http://www.repositoryaudit.eu) utvecklad av [Digital Curation Center ( DCC)](http://www.dcc.ac.uk) och DigitalPreservationEurope (DPE).
 
 Den innehåller också ett riskregister som kan hanteras från användargränssnittet och flera insticksprogram för riskbedömning som uppdaterar information om riskregistret.
 
