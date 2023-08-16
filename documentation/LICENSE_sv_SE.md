@@ -39,7 +39,7 @@ NOTERA: Dessa vilkor är direktöversatta ifrån engelska. Se engelska språket 
 
 "Upphovsrätt" avser också upphovsrättsliknande lagar som gäller andra typer av verk, såsom halvledarmasker.
 
-"Programmet" hänvisar till alla upphovsrättsskyddade verk som licensieras under denna Licens. Varje licenstagare tilltalas som "ni". "Licenstagare" och "mottagare" kan vara individer eller organisationer.
+"Programmet" hänvisar till alla upphovsrättsskyddade verk som licensieras under denna licens. Varje licenstagare tilltalas som "ni". "Licenstagare" och "mottagare" kan vara individer eller organisationer.
 
 Att "modifiera" ett verk innebär att kopiera från eller anpassa hela eller delar av verket på ett sätt som kräver upphovsrättsligt tillstånd, annat än att göra en exakt kopia. Det resulterande verket kallas en "modifierad version" av det tidigare verket eller ett arbete "baserat på" det tidigare verket.
 
