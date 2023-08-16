@@ -16,7 +16,7 @@ Detta kallas **strukturinformation**. Helst bör representationsinformation ocks
 
 Bevarande av RI görs enklast när representationsinformationen uttrycks i en lättförståelig form, "såsom ASCII" (4.2.1.3.2). Vad modellen säger här är att det skulle vara dumt att spara representationsinformationen i ett proprietärt eller svagt stödd filformat, även om själva dataobjektet är i ett sådant format. Representationsinformationen kan skrivas ut på papper om det hjälper.
 
-## Vad är det minsta som någon representationsinformation behöver uppnå?
+## Vad är det minsta som en representationsinformation behöver uppnå?
 
 Representationsinformationen måste möjliggöra eller tillåta återskapandet av det ursprungliga dataobjektets betydande egenskaper. I huvudsak betyder det att representationsinformation ska kunna återskapa en kopia av originalet.
 
