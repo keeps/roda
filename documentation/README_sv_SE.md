@@ -28,7 +28,7 @@ I denna serie av dokumentation hittar du bland annat artiklar med information om
     - [Gallringsfunktioner](Disposal.md)
 - Bidra
     - [Utvecklarguide](Developers_Guide.md)
-    - [Translation guide](Translation_Guide.md)
+    - [Översättningsguide](Translation_Guide.md)
     - [Documentation guide](Documentation_Guide.md)
     - [Publishing plugins](Publishing_plugins.md)
 - [Troubleshooting](Troubleshooting.md)
