@@ -614,7 +614,7 @@ De tillgängliga alternativen som ändrar fältens beteende är:
 *   **list** - lista med möjliga värden (combo box)
 
 *   **options** - lista med möjliga värden som ett fält kan ha. Den här listan är en JSonArray. Exempel: `options="['final','revised','draft']"`
-*   **optionsLabels** - karta med etiketterna för varje alternativ. Nyckeln måste matcha ett av alternativen som anges i alternativ-listan. Ingången är en annan karta som mappar ett språk (nyckel) till en etikett (värde). Exempel: `optionsLabels="{'final': {'en':'Final', 'pt_PT':'Final'},'revised': {'en':'Revised', 'pt_PT':'Verificado'} ,'draft': {'en':'Draft', 'pt_PT':'Rascunho'}}"`
+*   **optionsLabels** - Karta med etiketterna för varje alternativ. Nyckeln måste matcha ett av alternativen som anges i alternativ-listan. Ingången är en annan karta som mappar ett språk (nyckel) till en etikett (värde). Exempel: `optionsLabels="{'final': {'en':'Final', 'pt_PT':'Final'},'revised': {'en':'Revised', 'pt_PT':'Verificado'} ,'draft': {'en':'Draft', 'pt_PT':'Rascunho'}}"`
 *   **optionsLabelI18nKeyPrefix** - I18n prefixnyckel. Alla nycklar som börjar med prefixet används för att bygga listan. Exempel:
 
     `optionsLabelI18nKeyPrefix="crosswalks.dissemination.html.ead.level"`
