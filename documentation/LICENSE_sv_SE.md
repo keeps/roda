@@ -45,7 +45,7 @@ Att "modifiera" ett verk innebär att kopiera från eller att anpassa hela eller
 
 Ett "inräknat verk" betyder antingen det oförändrade programmet eller ett verk baserat på programmet.
 
-Att "propagera" ett verk innebär att göra vad som helst med det som, utan tillstånd, skulle göra dig direkt eller sekundärt ansvarig för intrång enligt tillämplig upphovsrättslagstiftning, förutom att utföra det på en dator eller modifiera en privat kopia. Spridning inkluderar kopiering, distribution (med eller utan modifiering), tillgängliggörande för allmänheten och i vissa länder även andra aktiviteter.
+Att "propagera" ett verk innebär att göra vad som helst med det som, utan tillstånd, skulle göra dig direkt eller sekundärt ansvarig för intrång enligt tillämplig upphovsrättslagstiftning, förutom att utföra det på en dator eller modifiera en privat kopia. Spridning inkluderar kopiering, distribution (med eller utan modifiering), tillgängliggörande för allmänheten och, i vissa länder, även andra aktiviteter.
 
 Att "förmedla" ett verk innebär varje form av spridning som gör det möjligt för andra parter att göra eller ta emot kopior. Enbart interaktion med en användare via ett datornätverk, utan överföring av en kopia, är inte att förmedla.
 
