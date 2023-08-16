@@ -49,7 +49,7 @@ Att "propagera" ett verk innebär att göra vad som helst med det som, utan till
 
 Att "förmedla" ett verk innebär varje form av spridning som gör det möjligt för andra parter att göra eller ta emot kopior. Enbart interaktion med en användare via ett datornätverk, utan överföring av en kopia, är inte att förmedla.
 
-Ett interaktivt användargränssnitt visar "Lämpliga juridiska meddelanden" i den mån det innehåller en bekväm och väl synlig funktion som (1) visar ett lämpligt upphovsrättsmeddelande och (2) talar om för användaren att det inte finns någon garanti för verket (förutom att omfattningen av garantier som tillhandahålls), att licenstagare kan förmedla verket under denna Licens, och hur man kan se en kopia av denna Licens. Om gränssnittet visar en lista med användarkommandon eller alternativ, till exempel en meny, uppfyller ett framträdande objekt i listan detta kriterium.
+Ett interaktivt användargränssnitt visar "Lämpliga juridiska meddelanden" i den mån det innehåller en bekväm och väl synlig funktion som (1) visar ett lämpligt upphovsrättsmeddelande och (2) talar om för användaren att det inte finns någon garanti för verket (förutom att omfattningen av garantier som tillhandahålls), att licenstagare kan förmedla verket under denna licens, och hur man kan se en kopia av denna licens. Om gränssnittet visar en lista med användarkommandon eller alternativ, till exempel en meny, uppfyller ett framträdande objekt i listan detta kriterium.
 
 #### 1. Källkod.
 
