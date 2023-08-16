@@ -5,7 +5,7 @@
 *Innehållet är en ordagrann svensk översättning av artikeln med namnet "OAIS 7: Representation Information" publicerad på [Blog Alan's Notes on Digital Preservation](https://alanake.wordpress.com/2008/01/24/oais-7-representation-information/ ).*
 
 
-Representationsinformation är ett avgörande koncept, eftersom det endast är genom vår förståelse av representationsinformationen som ett dataobjekt kan öppnas och ses. Själva representationsinformationen kan endast tolkas med avseende på en lämplig kunskapsbas.
+Representationsinformation är ett avgörande koncept, eftersom det endast är genom vår förståelse av representationsinformationen som ett dataobjekt kan öppnas och tittas på. Själva representationsinformationen kan endast tolkas på den kunskapsbas som avses.
 
 Representationsinformationskonceptet är också oupplösligt kopplat till begreppet Designated Community, eftersom hur vi definierar Designated Community (och dess associerade kunskapsbas) avgör hur mycket representationsinformation vi behöver. "OAIS måste förstå kunskapsbasen för dess utsedda gemenskap för att förstå den minsta representationsinformation som måste underhållas... Med tiden kan utvecklingen av den designerade gemenskapens kunskapsbas kräva uppdateringar av representationsinformationen för att säkerställa fortsatt förståelse" (2.2. 1).
 
