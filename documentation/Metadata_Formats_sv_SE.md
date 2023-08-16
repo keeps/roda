@@ -585,7 +585,7 @@ Formulärmallar bör läggas till i konfigurationen under mappen `[RODA_HOME]/co
 </simpledc>
 ```
 
-Formulärmallsfilerna är baserade på den kraftfulla [Handlebars engine](http://handlebarsjs.com). Varje fält som förväntas visas i metadataredigeraren bör identifieras i början av filen med ett _field_-handle (t.ex. `{{~field name="title"~}}`). Det finns flera alternativ som kan användas för att ändra hur varje fält visas. Dessa alternativ är ett nyckelvärdepar, t.ex. `label="Title of work"`, där nyckeln är namnet på alternativet och värdet är det värde som kommer att ges till det alternativet.
+Formulärmallsfilerna är baserade på den kraftfulla [Handlebars-motorn](http://handlebarsjs.com). Varje fält som förväntas visas i metadataredigeraren bör identifieras i början av filen med ett _field_-handle (t.ex. `{{~field name="title"~}}`). Det finns flera alternativ som kan användas för att ändra hur varje fält visas. Dessa alternativ är ett nyckelvärdepar, t.ex. `label="Title of work"`, där nyckeln är namnet på alternativet och värdet är det värde som kommer att ges till det alternativet.
 
 De tillgängliga alternativen som ändrar fältens beteende är:
 
