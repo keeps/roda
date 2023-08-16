@@ -167,7 +167,7 @@ En "bidragsgivare" är en upphovsrättsinnehavare som godkänner användning und
 
 En bidragsgivares "väsentliga patentkrav" är alla patentkrav som ägs eller kontrolleras av bidragsgivaren, oavsett om de redan förvärvats eller hädanefter förvärvade som skulle kränkas på något sätt, tillåtet av denna licens genom att göra, använda eller sälja dess bidragsgivares version, men inkludera inte anspråk som endast skulle göras intrång som en konsekvens av ytterligare modifiering av bidragsgivarens version. I denna definition inkluderar "kontroll" rätten att bevilja patentunderlicenser på ett sätt som överensstämmer med kraven i denna licens.
 
-Varje bidragsgivare ger dig en icke-exklusiv, världsomspännande, royaltyfri patentlicens under bidragsgivarens väsentliga patentanspråk, för att göra, använda, sälja, erbjuda till försäljning, importera och på annat sätt driva, modifiera och sprida innehållet i dess bidragsgivares version.
+Varje bidragsgivare ger dig en icke-exklusiv, världsomspännande, royaltyfri patentlicens under bidragsgivarens väsentliga patentanspråk för att göra, använda, sälja, erbjuda till försäljning, importera och på annat sätt driva, modifiera och sprida innehållet i dess bidragsgivares version.
 
 I följande tre stycken är en "patentlicens" varje uttryckligt avtal eller åtagande, oavsett hur det är, att inte genomdriva ett patent (som ett uttryckligt tillstånd att utöva ett patent eller förbund att inte stämma för patentintrång). Att "bevilja" en sådan patentlicens till en part innebär att göra ett sådant avtal eller åtagande att inte genomdriva ett patent mot parten.
 
