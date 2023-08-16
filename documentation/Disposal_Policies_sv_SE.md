@@ -85,7 +85,7 @@ Det finns två typer av utvalsmetoder i RODA:
 
 ### 4. Hur fungerar det?
 
-Gallringsregler kan tillämpas vid inleveransprocessen via en plugin men kan också tillämpas i systemet när som helst. AIP som har ett gallringsschema som är manuellt kopplat till sig kan antingen åsidosättas eller sparas som det är. 
+Gallringsregler kan tillämpas vid inleveransprocessen via ett plugin, men kan också tillämpas i systemet när som helst. AIP som har ett gallringsschema, som är manuellt kopplat till sig, kan antingen åsidosättas eller sparas som det är. 
 
 ## Gallringsstopp
 
