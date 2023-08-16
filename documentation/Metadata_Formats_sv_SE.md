@@ -603,7 +603,7 @@ De tillgängliga alternativen som ändrar fältens beteende är:
 *   **id** - genererar en identifierare
 *   **title** - generar en titel
 *   **level** - lägger till den aktuella beskrivningsnivån
-*   **parentid** - lägger till förälderns id om det finns
+*   **parentid** - Lägger till förälderns id om det finns
 *   **language** - lägger till systemspråket, baserat på det lokala språket. Exempel: "svenska" eller "engelska"
 
 *   **type** - typen av fält. De möjliga värdena är:
