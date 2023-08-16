@@ -137,7 +137,7 @@ Alla andra icke-tillåtande tilläggsvillkor betraktas som "ytterligare begräns
 
 Om du lägger till villkor till ett inräknat verk i enlighet med det här avsnittet måste du i relevanta källfiler placera en redogörelse för de ytterligare villkor som gäller för dessa filer, eller ett meddelande som anger var de tillämpliga villkoren kan hittas.
 
-Ytterligare villkor, tillåtande eller icke-tillåtande, kan anges i form av en separat skriftlig licens, eller anges som undantag; ovanstående krav gäller i båda fallen.
+Ytterligare villkor, tillåtande eller icke-tillåtande, kan anges i form av en separat skriftlig licens, eller anges som undantag. Ovanstående krav gäller i båda fallen.
 
 #### 8. Uppsägning.
 
