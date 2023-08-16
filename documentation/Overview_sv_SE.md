@@ -63,7 +63,7 @@ Ankomstkontroll är en process för att avgöra om informationen och annat mater
 
 ### Arkivvårdsjobb
 
-Arkivvårdsjobb är åtgärder som utförs på innehållet i arkivet och som syftar till att förbättra tillgängligheten till arkiverade filer eller att minska riskerna vid digital bevarande. Inom RODA hanteras arkivvårdsjobb av en exekveringsmodul. Exekveringsmodulen tillåter arkivarien att köra arkivvårdsjobb för en given uppsättning data (AIP, representationer eller filer). Arkivvårdsjobben inkluderar formatkonverteringar, verifieringar av kontrollsummor, rapportering (t.ex. för att automatiskt skickade SIP-gokännande/avvisning-meddelanden), viruskontroller etc. 
+Arkivvårdsjobb är åtgärder som utförs på innehållet i arkivet och som syftar till att förbättra tillgängligheten till arkiverade filer eller att minska riskerna vid digital bevarande. Inom RODA hanteras arkivvårdsjobb av en exekveringsmodul. Exekveringsmodulen tillåter användare med rätt behörighet att köra arkivvårdsjobb för en given uppsättning data (AIP, representationer eller filer). Arkivvårdsjobben inkluderar formatkonverteringar, verifieringar av kontrollsummor, rapportering (t.ex. för att automatiskt skickade SIP-gokännande/avvisning-meddelanden) och viruskontroller etc. 
 
 ### Interna åtgärder
 
