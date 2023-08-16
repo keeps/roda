@@ -32,7 +32,7 @@ OAIS behöver mycket mer. Men detta bör inte avskräcka en OAIS från att accep
 
 ## Representationsprogramvara
 
-Representationsinformationen kan vara **körbar programvara**, om det är till hjälp. Exemplet som ges i modellen (4.2.1.3.2) är där representationsinformationen finns som en PDF-fil. Istället för att ha ytterligare representationsinformation som definierar vad en PDF är, är det mer användbart att helt enkelt använda en PDF-visare istället.
+Representationsinformationen kan vara **körbar programvara**, om det är till hjälp. Exemplet som ges i modellen (4.2.1.3.2) är ett där representationsinformationen finns som en PDF-fil. Istället för att ha ytterligare representationsinformation som definierar vad en PDF är, är det mer användbart att helt enkelt använda en PDF-visare istället.
 
 OAIS måste dock spåra detta noggrant, för en dag kommer det inte att finnas något sådant som PDF-visare, och den ursprungliga representationsinformationen skulle då behöva migreras till en ny form.
 
