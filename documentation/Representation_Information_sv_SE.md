@@ -12,7 +12,7 @@ Representationsinformationskonceptet är också oupplösligt kopplat till begrep
 
 Själva dataobjektet, i ett digitalt arkiv, är helt enkelt en sträng av bitar. Vad representationsinformationen gör är att konvertera (eller berätta för oss hur man konverterar) dessa bitar till något mer meningsfullt. Den beskriver format- eller datastrukturkoncepten som bör tillämpas på bitsekvenserna, som i sin tur resulterar i mer meningsfulla värden, såsom tecken, pixlar och tabeller etc.
 
-Detta kallas **strukturinformation**. Helst bör representationsinformation också innehålla **semantisk information**, t.ex. vilket mänskligt språk texten är skriven på, vad någon vetenskaplig terminologi betyder, och så vidare (4.2.1.3.1). Genom att inkludera både struktur och semantisk information framtidssäkrar vi oss själva så mycket som möjligt.
+Detta kallas **strukturinformation**. Helst bör representationsinformation också innehålla **semantisk information**, t.ex. vilket mänskligt språk texten är skriven på, vad någon vetenskaplig terminologi betyder och så vidare (4.2.1.3.1). Genom att inkludera både struktur- och semantisk information framtidssäkrar vi oss själva så mycket som möjligt.
 
 Bevarande av RI görs enklast när representationsinformationen uttrycks i en lättförståelig form, "såsom ASCII" (4.2.1.3.2). Vad modellen säger här är att det skulle vara dumt att spara representationsinformationen i, säg, ett proprietärt eller svagt stödd filformat, även om själva dataobjektet är i ett sådant format. Representationsinformationen kan skrivas ut på papper om det hjälper.
 
