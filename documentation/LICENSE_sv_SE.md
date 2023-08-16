@@ -55,7 +55,7 @@ Ett interaktivt användargränssnitt visar "Lämpliga juridiska meddelanden" i d
 
 "Källkoden" för ett verk betyder den formen som bör användas av verket för att göra ändringar i det. "Objektkod" avser vilken form som helst av ett verk som inte är källkod.
 
-Ett "Standardgränssnitt" avser ett gränssnitt som antingen är en officiell standard definierad av ett erkänt standardorgan, eller, när det gäller gränssnitt specificerade för ett visst programmeringsspråk, ett som används i stor utsträckning bland utvecklare som arbetar på det språket.
+Ett "Standardgränssnitt" avser ett gränssnitt som antingen är en officiell standard, definierad av ett erkänt standardorgan, eller, när det gäller gränssnitt specificerade för ett visst programmeringsspråk, ett som används i stor utsträckning bland utvecklare som arbetar med det språket.
 
 "Systembiblioteken" för ett körbart verk inkluderar allt annat än verket som helhet som (a) ingår i den normala formen av förpackning av en huvudkomponent, men som inte är en del av den huvudkomponenten, och (b) tjänar endast till att möjliggöra användning av arbetet med den huvudkomponenten, eller för att implementera ett standardgränssnitt för vilket en implementering är tillgänglig för allmänheten i källkodsform. En "huvudkomponent" betyder i detta sammanhang en viktig viktig komponent (kärna, fönstersystem och så vidare) i det specifika operativsystemet (om något finns) som det körbara verket körs på, eller en kompilator som används för att producera verket, eller en objektkodtolkare som används för att köra den.
 
