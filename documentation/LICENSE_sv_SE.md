@@ -165,7 +165,7 @@ Du får inte införa några ytterligare begränsningar för utövandet av rätti
 
 En "bidragsgivare" är en upphovsrättsinnehavare som godkänner användning under denna licens av programmet eller ett verk som programmet är baserat på. Det sålunda licensierade verket kallas bidragsgivarens "bidragsgivarversion".
 
-En bidragsgivares "väsentliga patentkrav" är alla patentkrav som ägs eller kontrolleras av bidragsgivaren, oavsett om de redan förvärvats eller hädanefter förvärvade, som skulle kränkas på något sätt, tillåtet av denna licens, genom att göra, använda eller sälja dess bidragsgivares version, men inkludera inte anspråk som endast skulle göras intrång som en konsekvens av ytterligare modifiering av bidragsgivarens version. I denna definition inkluderar "kontroll" rätten att bevilja patentunderlicenser på ett sätt som överensstämmer med kraven i denna licens.
+En bidragsgivares "väsentliga patentkrav" är alla patentkrav som ägs eller kontrolleras av bidragsgivaren, oavsett om de redan förvärvats eller hädanefter förvärvade som skulle kränkas på något sätt, tillåtet av denna licens genom att göra, använda eller sälja dess bidragsgivares version, men inkludera inte anspråk som endast skulle göras intrång som en konsekvens av ytterligare modifiering av bidragsgivarens version. I denna definition inkluderar "kontroll" rätten att bevilja patentunderlicenser på ett sätt som överensstämmer med kraven i denna licens.
 
 Varje bidragsgivare ger dig en icke-exklusiv, världsomspännande, royaltyfri patentlicens under bidragsgivarens väsentliga patentanspråk, för att göra, använda, sälja, erbjuda till försäljning, importera och på annat sätt driva, modifiera och sprida innehållet i dess bidragsgivares version.
 
