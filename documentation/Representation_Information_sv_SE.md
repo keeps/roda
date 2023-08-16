@@ -2,7 +2,7 @@
 
 
 
-*Innehållet häri är en ordagrann svensk översättning av artikeln med namnet "OAIS 7: Representation Information" posted at the [Blog Alan's Notes on Digital Preservation](https://alanake.wordpress.com/2008/01/24/oais-7-representation-information/ ).*
+*Innehållet är en ordagrann svensk översättning av artikeln med namnet "OAIS 7: Representation Information" publicerad på [Blog Alan's Notes on Digital Preservation](https://alanake.wordpress.com/2008/01/24/oais-7-representation-information/ ).*
 
 
 Representationsinformation är ett avgörande koncept, eftersom det endast är genom vår förståelse av representationsinformationen som ett dataobjekt kan öppnas och ses. Själva representationsinformationen kan endast tolkas med avseende på en lämplig kunskapsbas.
