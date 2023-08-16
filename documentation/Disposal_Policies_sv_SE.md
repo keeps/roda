@@ -2,7 +2,7 @@
 
 ## Gallringsschema
 
-Gallringsscheman anger minimikraven för underhålls-, bevarande- eller destruktionsåtgärder som ska vidtas i befintliga eller framtida intellektuella enheter i detta e-arkiv. En intellektuell enhet får endast raderas som en del av en gallringsprocess som styrs av det gallringsschema som tilldelats den enheten. Det är den intellektuella enhetens gallringsschema som bestämmer hur länge en post bevaras och hur den därefter gallras i slutet av dess bevarandeperiod.
+Gallringsscheman anger minimikraven för underhålls-, bevarande- eller gallringsåtgärder som ska vidtas på befintliga eller framtida intellektuella enheter i detta e-arkiv. En intellektuell enhet får endast raderas som en del av en gallringsprocess som styrs av det gallringsschema som tilldelats den enheten. Det är den intellektuella enhetens gallringsschema som bestämmer hur länge en post bevaras och hur den därefter gallras i slutet av dess bevarandeperiod.
 
 ### 1. Vad är ett gallringsschema?
 
