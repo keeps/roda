@@ -61,7 +61,7 @@ Ett "Standardgränssnitt" avser ett gränssnitt som antingen är en officiell st
 
 "Motsvarande källa" för ett verk i objektkodsform betyder all källkod som behövs för att generera, installera och (för ett exekverbart arbete) köra objektkoden samt för att modifiera arbetet, inklusive skript för att kontrollera dessa aktiviteter. Det inkluderar dock inte verkets systembibliotek eller generella verktyg, eller allmänt tillgängliga gratisprogram som används oförändrat för att utföra dessa aktiviteter men som inte är en del av arbetet. Till exempel inkluderar motsvarande källa gränssnittsdefinitionsfiler associerade med källfiler för verket och källkoden för delade bibliotek samt dynamiskt länkade underprogram som verket är specifikt utformat för att kräva, till exempel, genom intim datakommunikation eller kontrollflöde mellan dessa underprogram och andra delar av arbetet.
 
-Den Motsvarande Källan behöver inte inkludera något som användare kan återskapa automatiskt från andra delar av den Motsvarande Källan.
+Den motsvarande källan behöver inte inkludera något som användare kan återskapa automatiskt från andra delar av den motsvarande källan.
 
 Den motsvarande källan för ett verk i källkodsform är samma verk.
 
