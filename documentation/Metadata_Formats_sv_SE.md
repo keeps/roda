@@ -680,7 +680,7 @@ ui.browser.metadata.descriptive.types = ead_2002
 
 För att få ditt nya metadataschema integrerat på ett bra sätt måste du tillhandahålla internationaliseringsinformation (i18n) så att RODA vet hur man visar nödvändig information i användargränssnittet på bästa möjliga sätt.
 
-Redigera filen `[RODA_HOME]/config/i18n/ServerMessages.properties` och lägg till följande poster vid behov och se till att den sista delen av nyckeln matchar koden som tillhandahålls på `[RODA_HOME]/config/roda-wui.properties `fil som beskrevs i föregående avsnitt:
+Redigera filen `[RODA_HOME]/config/i18n/ServerMessages.properties` och lägg till följande poster vid behov och se till att den sista delen av nyckeln matchar koden som tillhandahålls på `[RODA_HOME]/config/roda-wui.properties`fil som beskrevs i föregående avsnitt:
 
 ```
 ui.browse.metadata.descriptive.type.dc=Dublin Core
