@@ -87,7 +87,7 @@ Den här sidan visar en instrumentpanel med statistik som rör flera olika delar
 
 ### Riskregister
 
-Riskregistret listar alla identifierade risker som kan påverka systemet. Det bör vara så omfattande som möjligt och inkludera alla identifierade risker och en uppskattad sannolikhet att respektive risk inträffar, hur risken kan påverka om den inträffar, när den kan inträffa och hur ofta. Riskhantering används för att minimera sannolikheten att risken inträffar. 
+Riskregistret listar alla identifierade risker som kan påverka systemet. Det bör vara så omfattande som möjligt och inkludera alla identifierade risker samt en uppskattad sannolikhet att respektive risk inträffar, hur risken kan påverka om den inträffar, när den kan inträffa och hur ofta. Riskhantering används för att minimera sannolikheten att risken inträffar. 
 
 ### Representationsnätverk
 
