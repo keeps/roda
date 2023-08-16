@@ -16,11 +16,11 @@ I grund och botten skulle du vilja ha ett arbetsflöde för följande hypotetisk
 
 Det finns flera sätt att hantera nya risker och påbörja en bevarandeåtgärd för att minska dem, så vi fokuserar bara på hur vi skulle lösa just detta exempel:
 
-Föreställ dig att jag som arkivarie vet att Word 95 är ett format i riskzonen. Då skulle jag gå till riskregistret och registrera den risken, beskriva alla saker jag vet om just den risken och utse möjliga åtgärder för att minska den (t.ex. migrera den till ett nytt format).
+Föreställ dig att jag, som har rätt berighet i RODA, vet att Word 95 är ett format i riskzonen. Då skulle jag gå till riskregistret och registrera den risken, beskriva alla saker jag vet om just den risken och utse möjliga åtgärder för att minska den (t.ex. migrera den till ett nytt format).
 
 (En annan möjlighet skulle vara att använda ett plugin som skulle göra denna typ av analys automatiskt, men det finns inget sådant plugin för tillfället. Det skulle behöva utvecklas.)
 
-Du kan sedan använda sökfunktionen för att hitta alla Word 95-filer i e-arkivet. Alla filformat har identifierats under inmatningsprocessen så den uppgiften är ganska enkel. Jag skulle sedan använda den tillgängliga riskassociation-pluginet för att ställa in dessa filer som instanser av den nyligen skapade risken. Detta fungerar som dokumentation av bevarandebesluten som fattats av arkivarien och som motivering till vad vi ska göra härnäst - det här är bevarandeplanering.
+Du kan sedan använda sökfunktionen för att hitta alla Word 95-filer i e-arkivet. Alla filformat har identifierats under inmatningsprocessen så den uppgiften är ganska enkel. Jag skulle sedan använda den tillgängliga riskassociation-pluginet för att ställa in dessa filer som instanser av den nyligen skapade risken. Detta fungerar som dokumentation av bevarandebesluten som har fattats och som motivering till vad vi ska göra härnäst - det här är bevarandeplanering.
 
 Nästa steg skulle vara att migrera filerna. Du kan göra ungefär samma sak som tidigare, d.v.s. välja alla word 95-filer i sökmenyn och sedan köra en bevarandeåtgär för att migrera dem till, exempelvis, PDF.
 
