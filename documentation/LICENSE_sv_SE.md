@@ -53,7 +53,7 @@ Ett interaktivt användargränssnitt visar "Lämpliga juridiska meddelanden" i d
 
 #### 1. Källkod.
 
-"Källkoden" för ett verk betyder den föredragna formen av verket för att göra ändringar i det. "Objektkod" avser vilken form som helst av ett verk som inte är källkod.
+"Källkoden" för ett verk betyder den formen som bör användas av verket för att göra ändringar i det. "Objektkod" avser vilken form som helst av ett verk som inte är källkod.
 
 Ett "Standardgränssnitt" avser ett gränssnitt som antingen är en officiell standard definierad av ett erkänt standardorgan, eller, när det gäller gränssnitt specificerade för ett visst programmeringsspråk, ett som används i stor utsträckning bland utvecklare som arbetar på det språket.
 
