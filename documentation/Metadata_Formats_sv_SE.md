@@ -668,7 +668,7 @@ Efter att ha lagt till alla filer som beskrivs i föregående avsnitt måste man
 
 När du har lagt till de tidigare beskrivna filerna till din konfigurationsmapp måste du aktivera det nya formatet i RODA-huvudkonfigurationsfilen.
 
-Redigera filen `[RODA_HOME]/config/roda-wui.properties` och lägg till en ny post, som de som visas i följande exempel, med namnet på ditt nyligen tillagda metadataformat. Detta kommer att göra RODA medveten om det nya metadataformatet.
+Redigera filen `[RODA_HOME]/config/roda-wui.properties` och lägg till en ny post som de som visas i följande exempel, med namnet på ditt nyligen tillagda metadataformat. Detta kommer att göra RODA medveten om det nya metadataformatet.
 
 ```
 ui.browser.metadata.descriptive.types = dc
