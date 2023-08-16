@@ -51,7 +51,7 @@ Processen för leveransförberedelse åskådliggör möjligheten för en arkivbi
 
 ### Inleverans
 
-Inleveransytan är en tillfällig lagringsyta för att ta emot inlämningsinformationspaket (SIP) från producenter. SIP:er kan levereras via elektronisk överföring (t.ex. FTP) eller laddas in från media som är anslutna till systemet. Den här sidan gör det också möjligt för användaren att söka efter filer i den tillfälliga lagringsytan, skapa/ta bort mappar och ladda upp flera SIP:er samtidigt till systemet för vidare bearbetning och inleverans. Inleveransprocessen kan initieras genom att välja de SIP:er som du vill inkludera i bearbetningsbatchen. Klicka på knappen "Bearbeta" för att initiera intagningsprocessen.
+Inleveransytan är en tillfällig lagringsyta för att ta emot inlämningsinformationspaket (SIP) från producenter. SIP:ar kan levereras via elektronisk överföring (t.ex. FTP) eller laddas in från media som är anslutna till systemet. Den här sidan gör det också möjligt för användaren att söka efter filer i den tillfälliga lagringsytan, skapa/ta bort mappar och ladda upp flera SIP:er samtidigt till systemet för vidare bearbetning och inleverans. Inleveransprocessen kan initieras genom att välja de SIP:er som du vill inkludera i bearbetningsbatchen. Klicka på knappen "Bearbeta" för att initiera intagningsprocessen.
 
 ### Leverans
 
