@@ -193,7 +193,7 @@ Free Software Foundation kan publicera reviderade och/eller nya versioner av GNU
 
 Varje version får ett särskiljande versionsnummer. Om programmet anger att en viss numrerad version av GNU General Public License "eller någon senare version" gäller, har du möjlighet att följa villkoren antingen för gällande versionen eller någon senare version publicerad av  Free Software Foundation. Om programmet inte anger ett versionsnummer för GNU General Public License, kan du välja vilken version som helst som någonsin publicerats av Free Software Foundation.
 
-Om Programmet specificerar att en proxy kan bestämma vilka framtida versioner av GNU General Public License som kan användas, ger den proxyns offentliga uttalande er godkännande att välja den versionen för Programmet.
+Om Programmet specificerar att en proxy kan bestämma vilka framtida versioner av GNU General Public License som kan användas, ger den proxyns offentliga uttalande er godkännande att välja den versionen för programmet.
 
 Senare licensversioner kan ge dig ytterligare eller andra behörigheter. Inga ytterligare skyldigheter åläggs någon författare eller upphovsrättsinnehavare som ett resultat av att du väljer att följa en senare version.
 
