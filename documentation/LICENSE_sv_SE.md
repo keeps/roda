@@ -5,7 +5,7 @@ Version 3, 29 juni 2007
 Copyright (C) 2007 Free Software Foundation, Inc.
 <http://fsf.org/>
 
-Alla har rätt att kopiera och distribuera ordagrant kopior av detta licensdokument, men det är inte tillåtet att ändra det.
+Alla har rätt att kopiera och distribuera ordagrant distribuera kopior av detta licensdokument, men det är inte tillåtet att ändra det.
 
 ### Inledning
 
