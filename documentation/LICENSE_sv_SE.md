@@ -126,7 +126,7 @@ När du förmedlar en kopia av ett inräknat verk kan du, efter eget val, ta bor
 
 Oaktat någon annan bestämmelse i denna licens kan du för material som du lägger till i ett inräknat verk (om det är auktoriserat av upphovsrättsinnehavarna för det materialet) komplettera villkoren i denna licens med villkor:
 
--   a) Friskrivning av garanti eller begränsning av ansvar annorlunda än villkoren i avsnitten 15 och 16 i denna licens; eller
+-   a) Friskrivning av garanti eller begränsning av ansvar annorlunda än villkoren i avsnitten 15 och 16 i denna licens eller
 -   b) Kräva bevarande av specificerade rimliga juridiska meddelanden eller tillskrivningar av författare i det materialet eller i lämpliga juridiska meddelanden som visas av verk som innehåller det; eller
 -   c) Att förbjuda felaktig framställning av materialets ursprung, eller kräva att modifierade versioner av sådant material på rimliga sätt märks som annorlunda än originalversionen; eller
 -   d) Begränsa användningen i publicitetssyfte av namn på licensgivare eller författare till materialet; eller
