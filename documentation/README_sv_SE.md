@@ -23,7 +23,7 @@ I denna serie av dokumentation hittar du bland annat artiklar med information om
 - [Installation](https://www.roda-community.org/deploys/)
 - Konfiguration
     - [Statistik](Statistics.md)
-    - [Metadata formats](Metadata_Formats.md)
+    - [Metadataformat](Metadata_Formats.md)
     - [Extern autentisering med CAS-protokoll](Central_Authentication_Service.md)
     - [Disposal feature](Disposal.md)
 - Bidra
