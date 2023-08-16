@@ -14,7 +14,7 @@ Själva dataobjektet, i ett digitalt arkiv, är helt enkelt en sträng av bitar.
 
 Detta kallas **strukturinformation**. Helst bör representationsinformation också innehålla **semantisk information**, t.ex. vilket mänskligt språk texten är skriven på, vad någon vetenskaplig terminologi betyder och så vidare (4.2.1.3.1). Genom att inkludera både struktur- och semantisk information framtidssäkrar vi oss själva så mycket som möjligt.
 
-Bevarande av RI görs enklast när representationsinformationen uttrycks i en lättförståelig form, "såsom ASCII" (4.2.1.3.2). Vad modellen säger här är att det skulle vara dumt att spara representationsinformationen i, säg, ett proprietärt eller svagt stödd filformat, även om själva dataobjektet är i ett sådant format. Representationsinformationen kan skrivas ut på papper om det hjälper.
+Bevarande av RI görs enklast när representationsinformationen uttrycks i en lättförståelig form, "såsom ASCII" (4.2.1.3.2). Vad modellen säger här är att det skulle vara dumt att spara representationsinformationen i ett proprietärt eller svagt stödd filformat, även om själva dataobjektet är i ett sådant format. Representationsinformationen kan skrivas ut på papper om det hjälper.
 
 ## Vad är det minsta som någon representationsinformation behöver uppnå?
 
