@@ -71,7 +71,7 @@ Interna åtgärder är komplexa uppgifter som utförs av systemet som bakgrundsj
 
 ### Användare och grupper
 
-Användarhanteringstjänsten gör det möjligt för arkivarien att skapa eller ändra inloggningsuppgifter för varje användare i systemet. Den här tjänsten tillåter också arkivarien att definiera grupper och behörigheter för var och en av de registrerade användarna. Arkivarien kan också filtrera de användare och grupper som visas genom att klicka på de tillgängliga alternativen i den högra sidopanelen. För att skapa en ny användare, klicka på knappen "Lägg till användare". För att skapa en ny användargrupp, klicka på knappen "Lägg till grupp". För att redigera en befintlig användare eller grupp, klicka på ett objekt i listan.
+Användarhanteringstjänsten gör det möjligt för användare med rätt behörighet att skapa eller ändra inloggningsuppgifter för varje användare i systemet. Den här tjänsten tillåter också systemadministratören att definiera grupper och behörigheter för var och en av de registrerade användarna. Systemadministratören kan också filtrera de användare och grupper som visas genom att klicka på de tillgängliga alternativen i den högra sidopanelen. För att skapa en ny användare - klicka på knappen "Lägg till användare". För att skapa en ny användargrupp - klicka på knappen "Lägg till grupp". För att redigera en befintlig användare eller grupp - klicka på ett objekt i listan.
 
 ### Aktivitetslogg
 
