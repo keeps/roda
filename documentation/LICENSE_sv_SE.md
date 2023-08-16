@@ -41,7 +41,7 @@ NOTERA: Dessa vilkor är direktöversatta ifrån engelska. Se engelska språket 
 
 "Programmet" hänvisar till alla upphovsrättsskyddade verk som licensieras under denna licens. Varje licenstagare tilltalas som "ni". "Licenstagare" och "mottagare" kan vara individer eller organisationer.
 
-Att "modifiera" ett verk innebär att kopiera från eller anpassa hela eller delar av verket på ett sätt som kräver upphovsrättsligt tillstånd, annat än att göra en exakt kopia. Det resulterande verket kallas en "modifierad version" av det tidigare verket eller ett arbete "baserat på" det tidigare verket.
+Att "modifiera" ett verk innebär att kopiera från eller att anpassa hela eller delar av verket på ett sätt som kräver upphovsrättsligt tillstånd, annat än att göra en exakt kopia. Det resulterande verket kallas en "modifierad version" av det tidigare verket eller ett arbete "baserat på" det tidigare verket.
 
 Ett "inräknat verk" betyder antingen det oförändrade programmet eller ett verk baserat på programmet.
 
