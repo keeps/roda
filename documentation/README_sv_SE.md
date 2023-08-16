@@ -25,7 +25,7 @@ I denna serie av dokumentation hittar du bland annat artiklar med information om
     - [Statistik](Statistics.md)
     - [Metadataformat](Metadata_Formats.md)
     - [Extern autentisering med CAS-protokoll](Central_Authentication_Service.md)
-    - [Disposal feature](Disposal.md)
+    - [Gallringsfunktioner](Disposal.md)
 - Bidra
     - [Developers guide](Developers_Guide.md)
     - [Translation guide](Translation_Guide.md)
