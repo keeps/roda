@@ -30,7 +30,7 @@ För att förbättra metadataupplevelsen i RODA finns det 4 filer som måste lä
 
 RODA använder ett [XML-schema](http://www.w3.org/standards/xml/schema) för att validera strukturen och datatyperna för den tillhandahållna metadatafilen. Valideringsschemat kommer att användas under inleveransprocessen för att kontrollera om metadata som ingår i SIP är giltiga enligt de fastställda begränsningarna samt när metadata redigeras via katalogen.
 
-Du kan använda en standardschemafil för valideringsändamål eller skapa en specifik fil som verifierar alla särskilda villkor som du behöver kontrollera i din systeminstallation, t.ex. obligatoriska fält, slutna vokabulärer för vissa elements värden osv.
+Du kan använda en standardschemafil för valideringsändamål alternativt skapa en specifik fil som verifierar alla särskilda villkor som du behöver för att kontrollera i din systeminstallation, t.ex. obligatoriska fält, slutna vokabulärer för vissa elements värden osv.
 
 Valideringsschemafilerna bör placeras i konfigurationsmappen under `[RODA_HOME]/config/schemas/`.
 
