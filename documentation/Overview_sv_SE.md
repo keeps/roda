@@ -83,7 +83,7 @@ Notifieringar i RODA är ett sätt att informera användaren om specifika hände
 
 ### Statistik
 
-Den här sidan visar en instrumentpanel med statistik som rör flera olika delar av systemet. Statistiken är organiserad efter sektioner där var och en av dessa fokuserar på en viss aspekt av systemet, t.ex. frågor som har med metadata, information, statistik som rör inleverans samt arkivvårdsjobb, användarstatistik och frågor rörande autentisering, bevarandeaktiviteter, riskhantering och notiser.
+Den här sidan visar en instrumentpanel med statistik som rör flera olika delar av systemet. Statistiken är organiserad efter sektioner, där var och en av dessa fokuserar på en viss aspekt av systemet så som t.ex. frågor som har med metadata, information, statistik som rör inleverans samt arkivvårdsjobb, användarstatistik och frågor rörande autentisering, bevarandeaktiviteter, riskhantering och notiser.
 
 ### Riskregister
 
