@@ -207,7 +207,7 @@ Följande avsnitt tillhandahåller kodsnuttar som man kan använda för att visa
 
 **Pronomformatdistribution**
 
-![Pronom format distribution](images/pronom_format_distribution_polararea.png "Pronomformatdistribution")
+![Pronomformatdistribution](images/pronom_format_distribution_polararea.png "Pronomformatdistribution")
 
 ```html
 <canvas class="statistic"
