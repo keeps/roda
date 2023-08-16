@@ -71,7 +71,7 @@ Alla rättigheter som beviljas under denna licens beviljas under upphovsrättens
 
 Du får skapa, köra och sprida inräknade verk, som du inte förmedlar, utan villkor så länge som din licens i övrigt är i kraft. Du kan förmedla inräknade verk till andra i syfte att låta dem göra ändringar exklusivt för dig eller förse dig med faciliteter för att köra dessa verk, förutsatt att du följer villkoren i denna licens när du förmedlar allt material som du inte har kontroll över upphovsrätt. De som på så sätt gör eller driver de inräknade verken åt dig måste göra det uteslutande för din räkning, under din ledning och kontroll, på villkor som förbjuder dem att göra några kopior av ditt upphovsrättsskyddade material utanför deras relation med dig.
 
-Förmedling under alla andra omständigheter är tillåtet endast under de villkor som anges nedan. Underlicensiering är inte tillåten; 10 § gör det onödigt.
+Förmedling under alla andra omständigheter är endast tilllåtet under de villkor som anges nedan. Underlicensiering är inte tillåten då 10 § gör det onödigt.
 
 #### 3. Skydda användarnas lagliga rättigheter från lag mot kringgående.
 
