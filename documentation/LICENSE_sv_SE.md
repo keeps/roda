@@ -17,7 +17,7 @@ När vi talar om fri programvara syftar vi på frihet, inte pris. Våra allmänn
 
 För att skydda dina rättigheter måste vi förhindra andra från att neka dig dessa rättigheter eller be dig att avstå från rättigheterna. Därför har du vissa skyldigheter om du distribuerar kopior av programvaran, eller om du ändrar den - ansvar att respektera andras frihet.
 
-Om du till exempel distribuerar kopior av ett sådant program, oavsett om det är gratis eller mot en avgift, måste du ge mottagarna samma friheter som du fick. Du måste se till att de också tar emot eller kan få källkoden. Och du måste visa dem dessa villkor så att de vet sina rättigheter.
+Om du till exempel distribuerar kopior av ett sådant program, oavsett om det är gratis eller mot en avgift, måste du ge mottagarna samma friheter som du fick. Du måste se till att de också tar emot eller kan få källkoden och du måste visa dem dessa villkor så att de vet sina rättigheter.
 
 Utvecklare som använder GNU GPL skyddar dina rättigheter med två steg:
 (1) hävda upphovsrätten till programvaran, och (2) erbjuda dig denna licens som ger dig juridiskt tillstånd att kopiera, distribuera och/eller modifiera den.
