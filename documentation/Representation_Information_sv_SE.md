@@ -24,7 +24,7 @@ Representationsinformationen måste möjliggöra eller tillåta återskapandet a
 
 Representationsinformation kan innehålla hänvisningar till annan representationsinformation. Eftersom representationsinformationen i sig är ett informationsobjekt, med sitt eget dataobjekt och relaterad representationsinformation, kan ett helt nät av representationsinformation byggas upp. Detta kallas ett representationsnätverk (4.3.1.3.2). Till exempel kan representationsinformationen för ett objekt helt enkelt ange att en post är i ASCII. Beroende på hur vi definierar vår Designated Community kan vi behöva bidra med ytterligare representationsinformation, till exempel vad ASCII-standarden faktiskt är.
 
-## Representation Information vid inleverans
+## Representationsinformation vid inleverans
 
 En SIP kan dyka upp med mycket dålig representationsinformation – kanske bara en tryckt manual eller två, eller några PDF-filer i dokumentationsmappen (se E-ARK SIP-specifikationen).
 
