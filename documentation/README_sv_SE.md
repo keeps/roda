@@ -40,7 +40,7 @@ I denna serie av dokumentation hittar du bland annat artiklar med information om
 
 ### Paketspecifikation
 
-* [E-ARK Gemensam specifikation för informationspaket](http://www.dilcis.eu/specifications/common-specification)
+* [E-ARK Gemensam specifikation för informationspaket (SIP)](http://www.dilcis.eu/specifications/common-specification)
 * [E-ARK Submission Information Package specification](http://www.dilcis.eu/specifications/sip)
 * [E-ARK Archival Information Package specification](http://www.dilcis.eu/specifications/aip)
 * [E-ARK Dissemination Information Package specification](http://www.dilcis.eu/specifications/dip)
