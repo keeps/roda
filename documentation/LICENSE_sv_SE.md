@@ -185,7 +185,7 @@ Om villkor åläggs dig (oavsett om det är genom domstolsbeslut, avtal eller p�
 
 #### 13. Använd med GNU Affero General Public License.
 
-Oaktat någon annan bestämmelse i denna licens har du tillåtelse att länka eller kombinera alla täckta verk med ett verk som licensierats under version 3 av GNU Affero General Public License till ett enda kombinerat verk, och att förmedla det resulterande verket. Villkoren i denna licens kommer att fortsätta att gälla för den del som är det täckta verket, men de särskilda kraven i GNU Affero General Public License, avsnitt 13, angående interaktion genom ett nätverk kommer att gälla för kombinationen som sådan.
+Oaktat någon annan bestämmelse i denna licens har du tillåtelse att länka eller kombinera alla täckta verk med ett verk som licensierats under version 3 av GNU Affero General Public License till ett enda kombinerat verk,och att förmedla det resulterande verket. Villkoren i denna licens kommer att fortsätta att gälla för den del som är det täckta verket, men de särskilda kraven i GNU Affero General Public License, avsnitt 13, angående interaktion genom ett nätverk kommer att gälla för kombinationen som sådan.
 
 #### 14. Reviderade versioner av denna licens.
 
