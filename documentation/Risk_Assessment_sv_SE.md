@@ -14,7 +14,7 @@ I grund och botten skulle du vilja ha ett arbetsflöde för följande hypotetisk
 1. Du har identifierat en (hypotetisk) risk angående Word 95 .doc-fil (t.ex. för att ingen programvara kan läsa det formatet längre)
 1. Eftersom risken är identifierad skulle jag vilja starta en konvertering av alla Word 95 .doc-filer till både DOCX och PDF/A
 
-Det finns flera sätt att hantera nya risker och påbörja en bevarandeåtgärd för att minska dem, så vi fokuserar bara på hur vi skulle lösa just detta exempel:
+Det finns flera sätt att hantera nya risker och påbörja en bevarandeåtgärd för att minska dessa, så vi fokuserar bara på hur vi skulle lösa just detta exempel:
 
 Föreställ dig att jag, som har rätt berighet i RODA, vet att Word 95 är ett format i riskzonen. Då skulle jag gå till riskregistret och registrera den risken, beskriva alla saker jag vet om just den risken och utse möjliga åtgärder för att minska den (t.ex. migrera den till ett nytt format).
 
