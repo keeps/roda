@@ -1,7 +1,7 @@
 
 # Överblick
 
-RODA är ett system för digitalt bevarande, ett e-arkiv, som levererar full funktionalitet i enlighet med OAIS-modellen. RODA hanterar inleverans, vård och tillgängliggörande av digitala handlingar. RODA är baserat på open-source och stödjer förutom Open Archival Information System (OAIS) även Metadata Encoding and Transmission Standard (METS), Encoded Archival Description (EAD), Dublin Core (DC) and PREMIS (Preservation Metadata).
+RODA är ett komplett digitalt arkiv som levererar funktionalitet för alla huvudenheterna i OAIS-modellen. RODA kan ta in, hantera och ge tillgång till olika typer av digitala objekt som produceras av stora företag eller offentliga förvaltningar. RODA är baserat på öppen källkodsteknologi och stöds av befintliga standarder så som OAIS, METS, EAD och PREMIS.
 
 RODA implementerar också en rad specifikationer och standarder. För att veta mer om OAIS-informationspaketen som RODA implementerar, vänligen kolla in [Digital Information LifeCycle Interoperability Standards Board](http://www.dilcis.eu/)  på GitHub https://github.com/dilcisboard.
 
