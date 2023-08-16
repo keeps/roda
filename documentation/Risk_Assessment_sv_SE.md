@@ -28,7 +28,7 @@ Du kan sedan sänka risknivån eftersom det inte finns fler Word 95-filer i syst
 
 Det jag just förklarade är det manuella arbetsflödet, eftersom vi för närvarande inte har ett plugin för riskupptäckt av föråldrade format. Det pluginet skulle dock mycket väl kunna utvecklas. Begränsningsstegen skulle i så fall startas direkt från riskhanteringsgränssnittet.
 
-När det gäller tillgängliga konverteringsplugin stödjer RODA för närvarande de vanliga (stora bild-, video-, ord- och ljudformat). Nischformat kommer alltid att finnas i varje verksamhet och i så fall måste plugins för särskilda ändamål utvecklas.
+När det gäller tillgängliga konverteringsplugin stödjer RODA för närvarande de vanliga (stora bild-, video-, ord- och ljud) formaten. Nischformat kommer alltid att finnas i varje verksamhet och i så fall måste plugins för särskilda ändamål utvecklas.
 
 ## Har du en idé om ett plugin för riskbedömning?
 
