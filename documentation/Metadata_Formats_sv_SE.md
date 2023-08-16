@@ -96,7 +96,7 @@ De flesta metadataformaten publiceras tillsammans med dokumentation och ett XML-
 
 ### Indexering
 
-Aktiviteten _Indexering_ stöds av en [XSLT (eXtensible Stylesheet Language Transformations)](http://www.w3.org/standards/xml/transformation.html) som omvandlar den XML-baserade metadatan till något som indexeringsmotorn kan förstå. Den här filen ansvarar för att välja ut data som förväntas indexeras, mappa data till specifika fältnamn och instruera motorn om hur data förväntas indexeras baserat på dess datatyp (t.ex. text, nummer, datum, etc. ).
+Aktiviteten _Indexering_ stöds av en [XSLT (eXtensible Stylesheet Language Transformations)](http://www.w3.org/standards/xml/transformation.html) som omvandlar den XML-baserade metadatan till något som indexeringsmotorn kan förstå. Den här filen ansvarar för att välja ut data som förväntas indexeras, mappa data till specifika fältnamn och instruerar motorn om hur data förväntas indexeras baserat på dess datatyp (t.ex. text, nummer, datum, etc. ).
 
 Indexkartfilen bör läggas till i konfigurationsmappen under `[RODA_HOME]/config/crosswalks/ingest/`.
 
