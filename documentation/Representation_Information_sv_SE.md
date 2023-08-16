@@ -26,7 +26,7 @@ Representationsinformation kan innehålla hänvisningar till annan representatio
 
 ## Representationsinformation vid inleverans
 
-En SIP kan dyka upp med mycket dålig representationsinformation – kanske bara en tryckt manual eller två, eller några PDF-filer i dokumentationsmappen (se E-ARK SIP-specifikationen).
+En SIP kan dyka upp med mycket dålig representationsinformation – kanske bara en tryckt manual, eller två, eller några PDF-filer i dokumentationsmappen (se E-ARK SIP-specifikationen).
 
 OAIS behöver mycket mer. Men detta bör inte avskräcka en OAIS från att acceptera saker. Det är möjligt att bli för anoraki om representationsnätverk. Bara för att en SIP har anlänt med endast 4 metadatafält ifyllda av ett obligatoriskt 700-tal är inte riktigt ett tillräckligt bra skäl att avvisa det, om det är ett register med permanent värde.
 
