@@ -6,7 +6,7 @@ Leveransförberedelserna omfattar vanligtvis följande aktiviteter:
 
 ## Inlämningskontrakt
 
-Denna aktivitet består av att definiera villkoren, förutsättningar och krav för innehållet och för åtföljande information (t.ex. metadata, dokument, kontrakt etc.), som kommer att levereras till systemet av arkivbildaren. Det skapas en skriftlig överenskommelse mellan arkivbildare och systemet som specificerar typ av innehåll, juridiska samt tekniska krav som båda parter förväntas följa. 
+Denna aktivitet består av att definiera villkoren, förutsättningar och krav för innehållet och för åtföljande information (t.ex. metadata, dokument, kontrakt etc.), som kommer att levereras till systemet av arkivbildaren. Det skapas en skriftlig överenskommelse mellan arkivbildare och systemet som specificerar typ av innehåll och juridiska- samt tekniska krav som båda parter förväntas följa. 
 
 ## Klassificering
 
