@@ -290,7 +290,7 @@ Nedan är ett exempel på en indexkarta för Simple Dublin Core-exemplet.
 </xsl:stylesheet>
 ```
 
-Utdatan som produceras av denna visningsmall är ett [Solr document](https://wiki.apache.org/solr/UpdateXmlMessages) som är redo att indexeras av RODA-sökmotorn. Se exempel nedan:
+Utdatan som produceras av denna visningsmall är ett [Solr dokument](https://wiki.apache.org/solr/UpdateXmlMessages) som är redo att indexeras av RODA-sökmotorn. Se exempel nedan:
 
 ```
 <doc>
