@@ -18,7 +18,7 @@ Följande avsnitt tillhandahåller kodsnuttar som man kan använda för att visa
   data-view-field="totalCount"></span>
 ```
 
-**Totala antalet arkiv**
+**Totala antalet arkivbestånd**
 
 ```html
 <span class="statistic"
