@@ -8,7 +8,7 @@ Följande avsnitt tillhandahåller kodsnuttar som man kan använda för att visa
 
 ## AIP Index
 
-**Totala antal beskrivande arkivobjekt**
+**Totala antalet beskrivande arkivobjekt**
 
 ```html
 <span class="statistic"
