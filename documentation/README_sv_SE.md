@@ -34,7 +34,7 @@ I denna serie av dokumentation hittar du bland annat artiklar med information om
 - [Felsökning](Troubleshooting.md)
 - [FAQ](FAQ.md)
 - [Historik](History.md)
-- [License](LICENSE.md)
+- [Licens](LICENSE.md)
 
 ## Standarder och specifikationer
 
