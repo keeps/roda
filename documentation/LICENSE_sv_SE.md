@@ -159,7 +159,7 @@ Varje gång du förmedlar ett inräknat verk får mottagaren automatiskt en lice
 
 En "enhetstransaktion" är en transaktion som överför kontrollen över en organisation, eller i stort sett alla tillgångar i en, eller som delar upp en organisation alternativt slår samman organisationer. Om spridning av ett inräknat verk är ett resultat av en enhetstransaktion får varje part i den transaktionen som tar emot en kopia av verket, även de licenser till verket som partens föregångare i intresse hade eller kunde ge enligt föregående stycke plus en rätt till besittning av motsvarande källa till arbetet från föregångaren i intresse, om föregångaren har det eller kan få det med rimliga ansträngningar.
 
-Du får inte införa några ytterligare begränsningar för utövandet av rättigheterna som beviljas eller bekräftas under denna licens. Du får till exempel inte ta ut en licensavgift, royalty eller annan avgift för utövande av rättigheter som beviljats enligt denna licens, och du får inte inleda rättstvister (inklusive ett kors- eller motkrav i en rättegång) som påstår att något patentanspråk har kränkts genom att göra, använda, sälja, erbjuda till försäljning eller importera programmet eller någon del av det.
+Du får inte införa några ytterligare begränsningar för utövandet av rättigheterna som beviljas eller bekräftas under denna licens. Du får till exempel inte ta ut en licensavgift, royalty eller annan avgift för utövande av rättigheter som beviljats enligt denna licens och du får inte inleda rättstvister (inklusive ett kors- eller motkrav i en rättegång) som påstår att något patentanspråk har kränkts genom att göra, använda, sälja, erbjuda till försäljning eller importera programmet eller någon del av det.
 
 #### 11. Patent.
 
