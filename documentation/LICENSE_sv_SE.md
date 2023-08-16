@@ -83,7 +83,7 @@ När du förmedlar ett inräknat verk avsäger du dig all laglig befogenhet att 
 
 Du får förmedla ordagranna kopior av programmets källkod när du tar emot den, i vilket medium som helst, förutsatt att du på ett iögonfallande och lämpligt sätt publicerar ett lämpligt upphovsrättsmeddelande på varje kopia genom att behålla alla meddelanden som anger att denna licens och alla icke-tillåtande villkor som läggs till i enlighet med avsnitt 7 gäller för koden, behålla alla meddelanden om avsaknad av garanti och ge alla mottagare en kopia av denna licens tillsammans med programmet.
 
-Du kan ta ut vilket pris som helst eller inget pris för varje kopia som du förmedlar, och du kan erbjuda support eller garantiskydd mot en avgift.
+Du kan ta ut vilket pris som helst, eller inget pris, för varje kopia som du förmedlar,och du kan erbjuda support eller garantiskydd mot en avgift.
 
 #### 5. Överföra modifierade källversioner.
 
