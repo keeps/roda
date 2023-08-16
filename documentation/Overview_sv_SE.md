@@ -33,7 +33,7 @@ RODA har UI-stöd för följande funktionella enheter.
 
 ### Katalog
 
-Katalogen är en inventering av alla artiklar och poster i arkivet. En post kan representera olika information i arkivet (t ex böcker, elektroniska dokument, bild, databas export mm). Poster är vanligtvis samlat i en samling (eller arkivbestånd) och vidare indelat i undersamlingar, sektioner, serier, filer osv. Den här sidan listar alla samlingar på högsta nivå i arkivet. Du kan komma ner till undersamlingar genom natt klicka i tabellen nedan.
+Katalogen är en inventering av alla artiklar och poster i arkivet. En post kan representera olika information i arkivet (t ex böcker, elektroniska dokument, bild, databas export mm). Poster är vanligtvis samlat i en samling (eller arkivbestånd) och vidare indelat i undersamlingar, sektioner, serier, filer osv. Den här sidan listar alla samlingar på högsta nivå i arkivet. Du kan komma ner till undersamlingar genom att klicka i tabellen nedan.
 
 ### Sök
 
