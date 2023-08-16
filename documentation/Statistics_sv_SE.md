@@ -4,11 +4,11 @@ Den här sidan ger information om hur du konfigurerar ny statistik baserat på d
 
 Statistik fungerar genom att frågor skickas till RODA med hjälp av dess API (läs API-dokumentationen för mer information), samla in resultaten och presentera dem grafiskt. Hela processen görs på klientsidan av Javascript.
 
-Följande avsnitt tillhandahåller kodsnuttar (s.k. "code snippets") som man kan använda för att visa statistik om e-arkivets statistik. Man behöver bara inkludera kodsnuttarna på en ny HTML-sida och den medföljande Javascript-motorn kommer att hantera all kommunikation, arbetsbelastning och presentation. Ny grafer och statistik kan skapas genom att ändra frågeparametrarna för "data" som ingår i utdragen (t.ex. datakälla-filter).
+Följande avsnitt tillhandahåller kodsnuttar som man kan använda för att visa statistik om e-arkivets statistik. Man behöver bara inkludera kodsnuttarna på en ny HTML-sida, så kommer medföljande Javascript-motorn att hantera all kommunikation, arbetsbelastning och presentation. Ny grafer och statistik kan skapas genom att ändra frågeparametrarna för "data" som ingår i utdragen (t.ex. datakälla-filter).
 
 ## AIP Index
 
-**Totala antal beskrivande arkivobjekt**
+**Totala antalet beskrivande arkivobjekt**
 
 ```html
 <span class="statistic"
@@ -18,7 +18,7 @@ Följande avsnitt tillhandahåller kodsnuttar (s.k. "code snippets") som man kan
   data-view-field="totalCount"></span>
 ```
 
-**Totala antalet förvaringsenheter**
+**Totala antalet arkivbestånd**
 
 ```html
 <span class="statistic"
@@ -173,7 +173,7 @@ Följande avsnitt tillhandahåller kodsnuttar (s.k. "code snippets") som man kan
 
 **Beskrivningsnivådistribution**
 
-![Description level distribution](images/description_level_distribution_line.png "Beskrivningsnivådistribution")
+![Beskrivningsnivådistribution](images/description_level_distribution_line.png "Beskrivningsnivådistribution")
 
 ```html
 <canvas class="statistic"
@@ -190,7 +190,7 @@ Följande avsnitt tillhandahåller kodsnuttar (s.k. "code snippets") som man kan
 
 **Pronomformatdistribution**
 
-![Pronom format distribution](images/pronom_format_distribution_radar.png "Pronomformatdistribution")
+![Pronomformatdistribution](images/pronom_format_distribution_radar.png "Pronomformatdistribution")
 
 ```html
 <canvas class="statistic"
@@ -207,7 +207,7 @@ Följande avsnitt tillhandahåller kodsnuttar (s.k. "code snippets") som man kan
 
 **Pronomformatdistribution**
 
-![Pronom format distribution](images/pronom_format_distribution_polararea.png "Pronomformatdistribution")
+![Pronomformatdistribution](images/pronom_format_distribution_polararea.png "Pronomformatdistribution")
 
 ```html
 <canvas class="statistic"
@@ -224,7 +224,7 @@ Följande avsnitt tillhandahåller kodsnuttar (s.k. "code snippets") som man kan
 
 **Pronomformatdistribution**
 
-![Pronom format distribution](images/pronom_format_distribution_function.png "Pronomformatdistribution")
+![Pronomformatdistribution](images/pronom_format_distribution_function.png "Pronomformatdistribution")
 
 ```html
 <canvas class="statistic"
