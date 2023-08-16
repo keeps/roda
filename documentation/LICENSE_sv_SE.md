@@ -181,7 +181,7 @@ Ingenting i denna licens ska tolkas som att det utesluter eller begränsar någo
 
 #### 12. Inget överlämnande av andras frihet.
 
-Om villkor åläggs dig (oavsett om det är genom domstolsbeslut, avtal eller på annat sätt) som strider mot villkoren i denna Licens, befriar de dig inte från villkoren i denna Licens. Om du inte kan förmedla ett inräknat verk för att samtidigt uppfylla dina skyldigheter enligt denna licens och andra relevanta skyldigheter, kan du till följd av detta inte förmedla det alls. Om du till exempel godkänner villkor som förpliktar dig att ta ut en royalty för vidare förmedling från dem till vilka du förmedlar programmet, är det enda sättet du kan uppfylla båda dessa villkor och denna licens vara att helt avstå från att förmedla programmet.
+Om villkor åläggs dig (oavsett om det är genom domstolsbeslut, avtal eller på annat sätt) som strider mot villkoren i denna licens, befriar de dig inte från villkoren i denna licens. Om du inte kan förmedla ett inräknat verk för att samtidigt uppfylla dina skyldigheter enligt denna licens och andra relevanta skyldigheter, kan du till följd av detta inte förmedla det alls. Om du till exempel godkänner villkor som förpliktar dig att ta ut en royalty för vidare förmedling från dem till vilka du förmedlar programmet, är det enda sättet du kan uppfylla båda dessa villkor och denna licens vara att helt avstå från att förmedla programmet.
 
 #### 13. Använd med GNU Affero General Public License.
 
