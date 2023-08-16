@@ -120,7 +120,7 @@ Motsvarande källa som förmedlas, och installationsinformation tillhandahållen
 
 #### 7. Ytterligare villkor.
 
-Ytterligare behörigheter" är villkor som kompletterar villkoren i denna licens genom att göra undantag från ett eller flera av dess villkor. Ytterligare behörigheter som är tillämpliga på hela programmet ska behandlas som om de ingick i denna licens, i den mån de är giltig enligt tillämplig lag. Om ytterligare behörigheter endast gäller för en del av Programmet, kan den delen användas separat under dessa behörigheter, men hela Programmet förblir styrt av denna Licens utan hänsyn till de ytterligare behörigheterna.
+"Ytterligare behörigheter" är villkor som kompletterar villkoren i denna licens genom att göra undantag från ett eller flera av dess villkor. Ytterligare behörigheter som är tillämpliga på hela programmet ska behandlas som om de ingick i denna licens, i den mån de är giltig enligt tillämplig lag. Om ytterligare behörigheter endast gäller för en del av programmet, kan den delen användas separat under dessa behörigheter, men hela programmet förblir styrt av denna licens utan hänsyn till de ytterligare behörigheterna.
 
 När du förmedlar en kopia av ett inräknat verk kan du efter eget val ta bort eventuella ytterligare tillstånd från den kopian eller från någon del av den. (Ytterligare tillstånd kan skrivas för att kräva att de tas bort i vissa fall när du ändrar verket.) Du kan placera ytterligare tillstånd för material som du har lagt till i ett inräknat verk, för vilket du har eller kan ge lämplig upphovsrättstillstånd.
 
