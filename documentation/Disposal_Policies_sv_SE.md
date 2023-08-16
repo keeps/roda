@@ -46,7 +46,7 @@ Denna typ av gallringsschema, utan trigger för bevaringsperiod, förhindrar ber
 
 #### Granska livscykel
 
-När ett bevarandeobjekts gallringsåtgärd är inställd på granskning är den inte omedelbart föremål för förstörelse. Istället måste resultatet av granskningen innefatta tillämpning av ett gallringsschema på objektet baserat på granskningsbeslutet. Det nya gallringsschemat kommer att ersätta det tidigare gallringsschemat som är associerat med objektet och kommer då att ange det slutliga ödet för objektet, eller så kan det användas för att schemalägga ytterligare en senare granskning eller för att behålla objektet permanent.
+När ett bevarandeobjekts gallringsåtgärd är inställd på granskning är den inte omedelbart föremål för gallring. Istället måste resultatet av granskningen innefatta tillämpning av ett gallringsschema på objektet baserat på granskningsbeslutet. Det nya gallringsschemat kommer att ersätta det tidigare gallringsschemat som är associerat med objektet och kommer då att ange vad som slutligen kommer att ske med objektet, eller så kan det användas för att schemalägga ytterligare en senare granskning eller för att behålla objektet permanent.
 
 ![Review life cycle](images/review_life_cycle.png "Granska livscykel")
 
