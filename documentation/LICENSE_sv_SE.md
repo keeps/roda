@@ -143,7 +143,7 @@ Ytterligare villkor, tillåtande eller icke-tillåtande, kan anges i form av en 
 
 Du får inte sprida eller modifiera ett inräknat verk förutom vad som uttryckligen anges under denna licens. Varje försök att på annat sätt sprida eller modifiera det är ogiltigt och kommer automatiskt att avsluta dina rättigheter enligt denna licens (inklusive alla patentlicenser som beviljats enligt tredje stycket i avsnitt 11).
 
-Men om du upphör med all kränkning av denna licens, återställs din licens från en viss upphovsrättsinnehavare (a) provisoriskt, om inte och tills upphovsrättsinnehavaren uttryckligen och slutgiltigt säger upp din licens, och (b) permanent, om upphovsrättsinnehavaren misslyckas att meddela dig om överträdelsen på något rimligt sätt före 60 dagar efter upphörandet.
+Om du upphör med all kränkning av denna licens, återställs din licens från en viss upphovsrättsinnehavare (a) provisoriskt, om inte och tills upphovsrättsinnehavaren uttryckligen och slutgiltigt säger upp din licens, och (b) permanent, om upphovsrättsinnehavaren misslyckas att meddela dig om överträdelsen på något rimligt sätt före 60 dagar efter upphörandet.
 
 Dessutom återställs din licens från en viss upphovsrättsinnehavare permanent om upphovsrättsinnehavaren meddelar dig om kränkningen på något rimligt sätt, detta är första gången du har fått meddelande om brott mot denna licens (för något verk) från den upphovsrättsinnehavaren, och du åtgärdar överträdelsen före 30 dagar efter ditt mottagande av meddelandet.
 
