@@ -77,7 +77,7 @@ Förmedling under alla andra omständigheter är endast tilllåtet under de vill
 
 Inga inräknade verk ska anses vara en del av en effektiv teknisk åtgärd enligt någon tillämplig lag som uppfyller skyldigheterna enligt artikel 11 i WIPO:s upphovsrättsavtal, som antogs den 20 december 1996, eller liknande lagar som förbjuder eller begränsar kringgående av sådana åtgärder.
 
-När du förmedlar ett inräknat verk avsäger du dig all laglig befogenhet att förbjuda kringgående av tekniska åtgärder i den mån sådant kringgående sker genom att utöva rättigheter enligt denna licens med avseende på det inräknade verket, och du avsäger dig alla avsikter att begränsa driften eller modifieringen av arbeta som ett medel för att, mot verkets användare, genomdriva din eller tredje parts lagliga rättigheter att förbjuda kringgående av tekniska åtgärder.
+När du förmedlar ett inräknat verk avsäger du dig all laglig befogenhet att förbjuda kringgående av tekniska åtgärder i den mån sådant kringgående sker genom att utöva rättigheter enligt denna licens med avseende på det inräknade verket och du avsäger dig alla avsikter att begränsa driften eller modifieringen av arbeta som ett medel för att, mot verkets användare, genomdriva din eller tredje parts lagliga rättigheter att förbjuda kringgående av tekniska åtgärder.
 
 #### 4. Förmedla ordagranna kopior.
 
