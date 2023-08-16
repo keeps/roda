@@ -98,7 +98,7 @@ En sammanställning av ett täckt verk med andra separata och självständiga ve
 
 #### 6. Förmedla icke-källformer.
 
-Du får förmedla ett inräknat verk i objektkodsform enligt villkoren i avsnitt 4 och 5, förutsatt att du också förmedlar den maskinläsbara Motsvarande källan enligt villkoren i denna licens, på något av följande sätt:
+Du får förmedla ett inräknat verk i objektkodsform enligt villkoren i avsnitt 4 och 5, förutsatt att du också förmedlar den maskinläsbara motsvarande källan enligt villkoren i denna licens på något av följande sätt:
 
 -   a) Förmedla objektkoden i, eller inkorporerad i, en fysisk produkt (inklusive ett fysiskt distributionsmedium), åtföljd av den motsvarande källan fixerad på ett hållbart fysiskt medium som vanligtvis används för mjukvaruutbyte.
 -   b) Förmedla objektkoden i, eller inkorporerad i, en fysisk produkt (inklusive ett fysiskt distributionsmedium), åtföljt av ett skriftligt erbjudande, giltigt i minst tre år och giltigt så länge du erbjuder reservdelar eller kundsupport för det produktmodell, för att ge alla som har objektkoden antingen (1) en kopia av den motsvarande källan för all programvara i produkten som omfattas av denna licens, på ett hållbart fysiskt medium som vanligtvis används för mjukvaruutbyte, för ett pris nej mer än din rimliga kostnad för att fysiskt utföra denna överföring av källa, eller (2) tillgång till att kopiera motsvarande källa från en nätverksserver utan kostnad.
