@@ -145,7 +145,7 @@ Du får inte sprida eller modifiera ett inräknat verk förutom vad som uttryckl
 
 Om du upphör med all kränkning av denna licens, återställs din licens från en viss upphovsrättsinnehavare (a) provisoriskt, om inte och tills upphovsrättsinnehavaren uttryckligen och slutgiltigt säger upp din licens, och (b) permanent, om upphovsrättsinnehavaren misslyckas att meddela dig om överträdelsen på något rimligt sätt före 60 dagar efter upphörandet.
 
-Dessutom återställs din licens från en viss upphovsrättsinnehavare permanent om upphovsrättsinnehavaren meddelar dig om kränkningen på något rimligt sätt, detta är första gången du har fått meddelande om brott mot denna licens (för något verk) från den upphovsrättsinnehavaren, och du åtgärdar överträdelsen före 30 dagar efter ditt mottagande av meddelandet.
+Dessutom återställs din licens från en viss upphovsrättsinnehavare permanent om upphovsrättsinnehavaren meddelar dig om kränkningen på något rimligt sätt vid första gången du har fått meddelande om brott mot denna licens (för något verk) från den upphovsrättsinnehavaren,och du åtgärdar överträdelsen före 30 dagar efter ditt mottagande av meddelandet.
 
 Uppsägning av dina rättigheter enligt detta avsnitt upphäver inte licenserna för parter som har mottagit kopior eller rättigheter från dig under denna licens. Om dina rättigheter har avslutats och inte återställts permanent, kvalificerar du dig inte för att få nya licenser för samma material enligt avsnitt 10.
 
