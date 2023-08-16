@@ -16,7 +16,7 @@ I grund och botten skulle du vilja ha ett arbetsflöde för följande hypotetisk
 
 Det finns flera sätt att hantera nya risker och påbörja en bevarandeåtgärd för att minska dessa, så vi fokuserar bara på hur vi skulle lösa just detta exempel:
 
-Föreställ dig att jag, som har rätt berighet i RODA, vet att Word 95 är ett format i riskzonen. Då skulle jag gå till riskregistret och registrera den risken, beskriva alla saker jag vet om just den risken och utse möjliga åtgärder för att minska den (t.ex. migrera den till ett nytt format).
+Föreställ dig att jag, som har rätt behörigheter i RODA, vet att Word 95 är ett format i riskzonen. Då skulle jag gå till riskregistret och registrera den risken, beskriva alla saker jag vet om just den risken och utse möjliga åtgärder för att minska den (t.ex. migrera den till ett nytt format).
 
 (En annan möjlighet skulle vara att använda ett plugin som skulle göra denna typ av analys automatiskt, men det finns inget sådant plugin för tillfället. Det skulle behöva utvecklas.)
 
