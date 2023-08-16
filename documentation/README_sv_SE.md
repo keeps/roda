@@ -27,7 +27,7 @@ I denna serie av dokumentation hittar du bland annat artiklar med information om
     - [Extern autentisering med CAS-protokoll](Central_Authentication_Service.md)
     - [Gallringsfunktioner](Disposal.md)
 - Bidra
-    - [Developers guide](Developers_Guide.md)
+    - [Utvecklarguide](Developers_Guide.md)
     - [Translation guide](Translation_Guide.md)
     - [Documentation guide](Documentation_Guide.md)
     - [Publishing plugins](Publishing_plugins.md)
