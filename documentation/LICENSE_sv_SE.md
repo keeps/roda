@@ -15,7 +15,7 @@ Licenserna för de flesta mjukvaror och andra praktiska arbeten är utformade f�
 
 När vi talar om fri programvara syftar vi på frihet, inte pris. Våra allmänna offentliga licenser är utformade för att säkerställa att du har friheten att distribuera kopior av fri programvara (och ta betalt för dem om du vill), att du får källkod eller kan få den om du vill, att du kan ändra programvaran eller använda delar av det i nya fria program och att du vet att du kan göra detta.
 
-För att skydda dina rättigheter måste vi förhindra andra från att neka dig dessa rättigheter eller be dig att avstå från rättigheterna. Därför har du vissa skyldigheter om du distribuerar kopior av programvaran, eller om du ändrar den: ansvar att respektera andras frihet.
+För att skydda dina rättigheter måste vi förhindra andra från att neka dig dessa rättigheter eller be dig att avstå från rättigheterna. Därför har du vissa skyldigheter om du distribuerar kopior av programvaran, eller om du ändrar den - ansvar att respektera andras frihet.
 
 Om du till exempel distribuerar kopior av ett sådant program, oavsett om det är gratis eller mot en avgift, måste du ge mottagarna samma friheter som du fick. Du måste se till att de också tar emot eller kan få källkoden. Och du måste visa dem dessa villkor så att de vet sina rättigheter.
 
