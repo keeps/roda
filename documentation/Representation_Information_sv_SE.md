@@ -44,7 +44,7 @@ OAIS kallar denna Access-mjukvara och varnar för den eftersom det betyder att v
 
 ## Representationsinformation i praktiken
 
-Låt oss ta en JPEG-bildfil som exempel. Jag tror att vi kan ta det som läst att vår nuvarande Designated Community förstår vad en JPEG är: i OAIS-terminologi inkluderar Designated Community's Knowledge Base konceptet och termen "JPEG". Så vår representationsinformation för den filen kan i teorin helt enkelt vara ett uttalande som säger att det är en JPEG-bild. Det räcker. För JPEG-formatet, och för många andra, är den mest användbara representationsinformationen faktiskt en app som kan öppna och visa den. (Vilken nuvarande PC som helst kommer att kunna öppna JPEG ändå.)
+Låt oss ta en JPEG-bildfil som exempel. Jag tror att vi kan ta det som självklart att vår nuvarande Designated Community förstår vad en JPEG är: i OAIS-terminologi inkluderar konceptet i Designated Community's Knowledge Base termen "JPEG". Så vår representationsinformation för den filen kan i teorin helt enkelt vara ett uttalande som säger att det är en JPEG-bild. Det räcker. För JPEG-formatet, och för många andra, är den mest användbara representationsinformationen faktiskt en app som kan öppna och visa den. (Vilken nuvarande PC som helst kommer att kunna öppna JPEG ändå.)
 
 På längre sikt måste vi dock förbereda oss för en värld där den designerade gemenskapen har gått bort från JPEG. Så vi bör lägga till en länk till JPEG-standardens webbplats också för att förklara vad en JPEG är. Och vi kan inkludera information om vilka programvaror som kan öppna en JPEG-bild. Mer användbart är att det borde finnas en länk på representationsnätverket till en plats på webben där vi faktiskt kan ladda ner en JPEG-visare.
 
