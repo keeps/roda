@@ -4,7 +4,7 @@ Den här sidan ger information om hur du konfigurerar ny statistik baserat på d
 
 Statistik fungerar genom att frågor skickas till RODA med hjälp av dess API (läs API-dokumentationen för mer information), samla in resultaten och presentera dem grafiskt. Hela processen görs på klientsidan av Javascript.
 
-Följande avsnitt tillhandahåller kodsnuttar (s.k. "code snippets") som man kan använda för att visa statistik om e-arkivets statistik. Man behöver bara inkludera kodsnuttarna på en ny HTML-sida och den medföljande Javascript-motorn kommer att hantera all kommunikation, arbetsbelastning och presentation. Ny grafer och statistik kan skapas genom att ändra frågeparametrarna för "data" som ingår i utdragen (t.ex. datakälla-filter).
+Följande avsnitt tillhandahåller kodsnuttar som man kan använda för att visa statistik om e-arkivets statistik. Man behöver bara inkludera kodsnuttarna på en ny HTML-sida, så kommer medföljande Javascript-motorn att hantera all kommunikation, arbetsbelastning och presentation. Ny grafer och statistik kan skapas genom att ändra frågeparametrarna för "data" som ingår i utdragen (t.ex. datakälla-filter).
 
 ## AIP Index
 
