@@ -688,7 +688,7 @@ ui.browse.metadata.descriptive.type.ead.3=Encoded Archival Description 3
 ui.browse.metadata.descriptive.type.ead.2002=Encoded Archival Description 2002
 ```
 
-Slutligen bör man tillhandahålla översättningar för fältnamnen som ska behandlas av RODA via _vizualization_ config-filen. För att göra det måste man redigera filen `[RODA_HOME]/config/i18n/ServerMessages.properties` och lägga till följande poster vid behov och se till att den sista delen av nyckeln matchar `xsl:params` som ingår i visualiseringskartan.
+Slutligen bör man tillhandahålla översättningar för fältnamnen som ska behandlas av RODA via _visualiseirng_ config-filen. För att göra det måste man redigera filen `[RODA_HOME]/config/i18n/ServerMessages.properties` och lägga till följande poster vid behov och se till att den sista delen av nyckeln matchar `xsl:params` som ingår i visualiseringskartan.
 
 Följande exempel visar hur fältnamnen i Simple Dublin Core-exemplet ska visas i användargränssnittet.
 
