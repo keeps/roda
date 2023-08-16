@@ -215,7 +215,7 @@ SLUT PÅ VILLKOR
 
 Om du utvecklar ett nytt program, och du vill att det ska vara till största möjliga nytta för allmänheten, är det bästa sättet att uppnå detta att göra det till en fri programvara som alla kan distribuera och ändra under dessa villkor.
 
-För att göra det, bifoga följande meddelanden i programmet. Det är säkrast att bifoga dem i början av varje källfil för att på ett så effektivt sätt som möjligt ange uteslutningen av garantin; och varje fil bör ha åtminstone "copyright"-raden och en pekare till var hela meddelandet finns.
+För att göra det,bifoga följande meddelanden i programmet. Det är säkrast att bifoga dem i början av varje källfil för att på ett så effektivt sätt som möjligt ange uteslutningen av garantin och varje fil bör ha åtminstone "copyright"-raden och en pekare till var hela meddelandet finns.
 
         <one line to give the program's name and a brief idea of what it does.>
         Copyright (C) <year>  <name of author>
