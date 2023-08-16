@@ -244,6 +244,6 @@ Om programmet gör terminalinteraktion, gör det ett kort meddelande så här n�
 
 De hypotetiska kommandona \`show w' och \`show c' bör visa lämpliga delar av General Public License. Naturligtvis kan ditt programs kommandon vara annorlunda; för ett GUI-gränssnitt skulle du använda en "om-ruta".
 
-Du bör också få din arbetsgivare (om du arbetar som programmerare) eller skola, om någon, att underteckna en "copyright disclaimer" för programmet, om det behövs. För mer information om detta, och hur du ansöker och följer GNU GPL, se <http://www.gnu.org/licenses/>.
+Du bör också få din arbetsgivare (om du arbetar som programmerare) eller skola att underteckna en "copyright disclaimer" för programmet, om det behövs. För mer information om detta, och hur du ansöker och följer GNU GPL, se <http://www.gnu.org/licenses/>.
 
 GNU General Public License tillåter inte inkorporering av ditt program i proprietära program. Om ditt program är ett subrutinbibliotek kan du tycka att det är mer användbart att tillåta länkning av proprietära applikationer med biblioteket. Om detta är vad du vill göra, använd GNU Lesser General Public License istället för denna License. Men först, läs <http://www.gnu.org/philosophy/why-not-lgpl.html>.
