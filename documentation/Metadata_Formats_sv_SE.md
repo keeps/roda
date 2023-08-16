@@ -596,7 +596,7 @@ De tillgängliga alternativen som ändrar fältens beteende är:
 *   **value** - Fältets fördefinierade värde
 *   **mandatory** - Om satt till sant är etiketten skriven med fet stil för att dra till sig uppmärksamhet.
 *   **hidden** - Om satt till sant så är fältet dolt
-*   **xpath** - xpath för XML-metadatadokumentet som detta fält ska bindas till
+*   **xpath** - Xpath för XML-metadatadokumentet som detta fält ska bindas till
 *   **auto-generate** - Fyller värdet med en av de tillgängliga automatiska värdegeneratorerna. Skriver över värdealternativet:
 
 *   **now** - det aktuella datumet i formatet år/månad/dag
