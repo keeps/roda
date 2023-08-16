@@ -67,7 +67,7 @@ Arkivvårdsjobb är åtgärder som utförs på innehållet i arkivet och som syf
 
 ### Interna åtgärder
 
-Interna åtgärder är komplexa uppgifter som utförs av systemet som bakgrundsjobb vilka förbättrar användarupplevelsen genom att inte blockera användargränssnittet under arbeten som tar längre tid. Exempel på sådana arbeten är att flytta AIP:er, återindexera delar av e-arkivet eller att radera ett stort antal filer. 
+Interna åtgärder är komplexa uppgifter som utförs av systemet som bakgrundsjobb, vilka förbättrar användarupplevelsen genom att inte blockera användargränssnittet under arbeten som tar längre tid. Exempel på sådana arbeten är att flytta AIP:er, återindexera delar av e-arkivet eller att radera ett stort antal filer. 
 
 ### Användare och grupper
 
