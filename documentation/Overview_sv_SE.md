@@ -75,7 +75,7 @@ Användarhanteringstjänsten gör det möjligt för användare med rätt behöri
 
 ### Aktivitetslogg
 
-Händelseloggar är speciella filer som registrerar viktiga händelser som sker i systemet. Till exempel registrerar systemet varje gång en användare loggar in, när en nedladdning utförs eller när en ändring görs i en beskrivande metadatafil. Närhelst dessa händelser inträffar registrerar systemet den nödvändiga informationen i händelseloggen för att möjliggöra framtida granskning av systemaktiviteten. För varje händelse registreras följande information: Datum, involverad komponent, systemmetod eller	funktion, målobjekt, användare som utförde åtgärden, åtgärdens varaktighet och IP-adressen till användaren som utförde åtgärden . Användare kan filtrera händelser efter typ, datum och andra attribut genom att välja de tillgängliga alternativen i den högra sidopanelen.
+Händelseloggar är speciella filer som registrerar viktiga händelser som sker i systemet. Till exempel registrerar systemet varje gång en användare loggar in, när en nedladdning utförs eller när en ändring görs i en beskrivande metadatafil. Närhelst dessa händelser inträffar registrerar systemet den nödvändiga informationen i händelseloggen för att möjliggöra framtida granskning av systemaktiviteten. För varje händelse registreras följande information: Datum, involverad komponent, systemmetod eller funktion, målobjekt, användare som utförde åtgärden, åtgärdens varaktighet och IP-adressen till användaren som utförde åtgärden . Användare kan filtrera händelser efter typ, datum och andra attribut genom att välja de tillgängliga alternativen i den högra sidopanelen.
 
 ### Notiser
 
