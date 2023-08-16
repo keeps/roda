@@ -30,7 +30,7 @@ I denna serie av dokumentation hittar du bland annat artiklar med information om
     - [Utvecklarguide](Developers_Guide.md)
     - [Översättningsguide](Translation_Guide.md)
     - [Dokumentationsguide](Documentation_Guide.md)
-    - [Publishing plugins](Publishing_plugins.md)
+    - [Publicera plugins](Publishing_plugins.md)
 - [Troubleshooting](Troubleshooting.md)
 - [FAQ](FAQ.md)
 - [Historik](History.md)
