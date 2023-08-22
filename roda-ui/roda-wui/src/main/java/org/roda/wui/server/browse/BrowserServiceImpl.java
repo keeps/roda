@@ -1068,7 +1068,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     } else {
       try {
         Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_TYPE));
-        IndexResult<IndexedAIP> result = find(IndexedAIP.class.getName(), Filter.NULL, Sorter.NONE, Sublist.NONE,
+        IndexResult<IndexedAIP> result = find(IndexedAIP.class.getName(), Filter.ALL, Sorter.NONE, Sublist.NONE,
           facets, locale, false, new ArrayList<>());
 
         List<FacetFieldResult> facetResults = result.getFacetResults();
@@ -1094,7 +1094,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     } else {
       try {
         Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.REPRESENTATION_TYPE));
-        IndexResult<IndexedRepresentation> result = find(IndexedRepresentation.class.getName(), Filter.NULL,
+        IndexResult<IndexedRepresentation> result = find(IndexedRepresentation.class.getName(), Filter.ALL,
           Sorter.NONE, Sublist.NONE, facets, locale, false, new ArrayList<>());
 
         List<FacetFieldResult> facetResults = result.getFacetResults();

@@ -7,7 +7,6 @@
  */
 package org.roda.wui.api.v1;
 
-import com.google.json.JsonSanitizer;
 import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,7 +26,6 @@ import javax.ws.rs.core.Response;
 import org.glassfish.jersey.server.JSONP;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.StreamResponse;
-import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
@@ -39,11 +37,14 @@ import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.ri.RepresentationInformationList;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ExtraMediaType;
 import org.roda.wui.api.v1.utils.ObjectResponse;
+
+import com.google.json.JsonSanitizer;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -81,7 +82,7 @@ public class RepresentationInformationResource {
     // delegate action to controller
     boolean justActive = false;
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
-    IndexResult<RepresentationInformation> result = Browser.find(RepresentationInformation.class, Filter.NULL,
+    IndexResult<RepresentationInformation> result = Browser.find(RepresentationInformation.class, Filter.ALL,
       Sorter.NONE, new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive,
       new ArrayList<>());
     return Response.ok(ApiUtils.indexedResultToRODAObjectList(RepresentationInformation.class, result), mediaType)
