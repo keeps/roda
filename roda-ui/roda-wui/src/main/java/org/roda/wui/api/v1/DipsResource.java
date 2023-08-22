@@ -7,7 +7,6 @@
  */
 package org.roda.wui.api.v1;
 
-import com.google.json.JsonSanitizer;
 import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +25,6 @@ import javax.ws.rs.core.Response;
 import org.glassfish.jersey.server.JSONP;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.StreamResponse;
-import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.utils.JsonUtils;
@@ -40,12 +38,15 @@ import org.roda.core.data.v2.ip.DIP;
 import org.roda.core.data.v2.ip.DIPs;
 import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.controllers.Dips;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ExtraMediaType;
 import org.roda.wui.api.v1.utils.ObjectResponse;
+
+import com.google.json.JsonSanitizer;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -82,7 +83,7 @@ public class DipsResource {
 
     // delegate action to controller
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
-    IndexResult<IndexedDIP> result = Browser.find(IndexedDIP.class, Filter.NULL, Sorter.NONE,
+    IndexResult<IndexedDIP> result = Browser.find(IndexedDIP.class, Filter.ALL, Sorter.NONE,
       new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, false, new ArrayList<>());
 
     return Response.ok(ApiUtils.indexedResultToRODAObjectList(IndexedDIP.class, result), mediaType).build();

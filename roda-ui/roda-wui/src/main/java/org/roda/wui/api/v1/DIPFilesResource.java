@@ -33,7 +33,6 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.server.JSONP;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.StreamResponse;
-import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.Pair;
@@ -45,6 +44,7 @@ import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.DIPFile;
 import org.roda.core.data.v2.ip.DIPFiles;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -87,7 +87,7 @@ public class DIPFilesResource {
     // delegate action to controller
     boolean justActive = false;
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
-    IndexResult<DIPFile> result = Browser.find(DIPFile.class, Filter.NULL, Sorter.NONE,
+    IndexResult<DIPFile> result = Browser.find(DIPFile.class, Filter.ALL, Sorter.NONE,
       new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive, new ArrayList<>());
     return Response.ok(ApiUtils.indexedResultToRODAObjectList(DIPFile.class, result), mediaType).build();
   }

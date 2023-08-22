@@ -34,7 +34,6 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.server.JSONP;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.StreamResponse;
-import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;
@@ -52,6 +51,7 @@ import org.roda.core.data.v2.ip.metadata.OtherMetadataList;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadataList;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -97,7 +97,7 @@ public class FilesResource {
     boolean justActive = false;
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
 
-    Filter filter = Filter.NULL;
+    Filter filter = Filter.ALL;
     if (StringUtils.isNotBlank(aipId) && StringUtils.isNotBlank(representationId)) {
       filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_AIP_ID, aipId),
         new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_ID, representationId));
