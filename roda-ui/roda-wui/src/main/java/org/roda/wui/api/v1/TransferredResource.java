@@ -35,7 +35,6 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.glassfish.jersey.server.JSONP;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.StreamResponse;
-import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.RODAException;
@@ -47,6 +46,7 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.TransferredResources;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -92,7 +92,7 @@ public class TransferredResource {
     boolean justActive = false;
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
     IndexResult<org.roda.core.data.v2.ip.TransferredResource> result = Browser.find(
-      org.roda.core.data.v2.ip.TransferredResource.class, Filter.NULL, Sorter.NONE,
+      org.roda.core.data.v2.ip.TransferredResource.class, Filter.ALL, Sorter.NONE,
       new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive, new ArrayList<>());
     return Response
       .ok(ApiUtils.indexedResultToRODAObjectList(org.roda.core.data.v2.ip.TransferredResource.class, result), mediaType)

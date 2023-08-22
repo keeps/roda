@@ -21,7 +21,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.server.JSONP;
-import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.Pair;
@@ -32,6 +31,7 @@ import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmation;
 import org.roda.core.data.v2.ip.disposal.DisposalConfirmations;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.controllers.Disposals;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
@@ -76,7 +76,7 @@ public class DisposalConfirmationResource {
     // delegate action to controller
     boolean justActive = false;
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
-    IndexResult<DisposalConfirmation> result = Browser.find(DisposalConfirmation.class, Filter.NULL, Sorter.NONE,
+    IndexResult<DisposalConfirmation> result = Browser.find(DisposalConfirmation.class, Filter.ALL, Sorter.NONE,
       new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), null, user, justActive, new ArrayList<>());
 
     return Response.ok(ApiUtils.indexedResultToRODAObjectList(DisposalConfirmation.class, result), mediaType).build();
