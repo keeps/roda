@@ -90,7 +90,12 @@ public class PluginParameter implements Serializable {
     /**
      * Interface to generic dropdown items
      */
-    DROPDOWN;
+    DROPDOWN,
+
+    /**
+     * Interface to users profiles
+     */
+    USER_PROFILE;
   }
 
   private String id = null;

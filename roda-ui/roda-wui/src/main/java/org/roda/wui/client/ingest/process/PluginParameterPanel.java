@@ -9,6 +9,7 @@ package org.roda.wui.client.ingest.process;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -16,6 +17,7 @@ import java.util.TreeSet;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.common.UserProfile;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -28,6 +30,7 @@ import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.SeverityLevel;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.common.IncrementalAssociativeList;
@@ -114,6 +117,8 @@ public class PluginParameterPanel extends Composite {
       createPermissionTypesLayout();
     } else if (PluginParameterType.DROPDOWN.equals(parameter.getType())) {
       createDropdownLayout();
+    }  else if (PluginParameterType.USER_PROFILE.equals(parameter.getType())) {
+      createUserProfileLayout();
     } else {
       LOGGER
         .warn("Unsupported plugin parameter type: " + parameter.getType() + ". Reverting to default parameter editor.");
@@ -411,7 +416,57 @@ public class PluginParameterPanel extends Composite {
     layout.add(dropdown);
     addHelp();
   }
+  private void createUserProfileLayout() {
+    Set<UserProfile> treeSet = new HashSet<>();
+    Label parameterName = new Label(parameter.getName());
+    final Label description = new Label();
+    final ListBox dropdown = new ListBox();
+    dropdown.addStyleName("form-selectbox");
+    dropdown.addStyleName("form-textbox-small");
 
+    BrowserService.Util.getInstance().retrieveUserProfilePluginItems(parameter.getId(),
+      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<Set<UserProfile>>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+        }
+
+        @Override
+        public void onSuccess(Set<UserProfile> result) {
+          treeSet.addAll(result);
+          for (UserProfile item : treeSet) {
+            dropdown.addItem(item.getI18nProperty(), item.getProfile());
+            description.setText(item.getDescription());
+            description.addStyleName("form-help");
+          }
+
+          value = dropdown.getSelectedValue();
+          for (UserProfile userProfile : treeSet) {
+            if (userProfile.getProfile().equals(value)) {
+              description.setText(userProfile.getDescription());
+              break;
+            }
+          }
+        }
+      });
+
+    dropdown.addChangeHandler(event -> {
+      value = dropdown.getSelectedValue();
+      for (UserProfile userProfile : treeSet) {
+        if (userProfile.getProfile().equals(value)) {
+          description.setText(userProfile.getDescription());
+          break;
+        }
+      }
+    });
+
+    dropdown.setTitle("object box");
+    layout.add(parameterName);
+    layout.add(description);
+    layout.add(dropdown);
+
+    addHelp();
+  }
   private void createPluginObjectFieldsLayout(final String className) {
     List<String> defaultValues = Arrays.asList(parameter.getDefaultValue().split(","));
 

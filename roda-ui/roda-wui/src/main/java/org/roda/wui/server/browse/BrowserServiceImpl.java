@@ -45,6 +45,7 @@ import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.common.UserProfile;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
@@ -609,6 +610,44 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     }
 
     return items;
+  }
+
+  @Override
+  public Set<UserProfile> retrieveUserProfilePluginItems(String parameterId, String localeString) {
+    Set<UserProfile> items = new HashSet<>();
+
+    List<String> dropdownItems = RodaUtils
+      .copyList(RodaCoreFactory.getRodaConfiguration().getList("core.plugins.user_profile." + parameterId + "[]"));
+    Locale locale = ServerTools.parseLocale(localeString);
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+
+    String pluginName = RodaCoreFactory.getRodaConfiguration().getString("core.plugins.user_profile." + parameterId);
+
+    for (String item : dropdownItems) {
+      items.add(retrieveUserProfileItem(item, pluginName, items, messages));
+    }
+
+    return items;
+  }
+
+  private UserProfile retrieveUserProfileItem(String item, String pluginName, Set<UserProfile> items, Messages messages) {
+    UserProfile userProfile = new UserProfile();
+    Map<String, String> optionsValues = new HashMap<>();
+
+    userProfile.setI18nProperty(RodaCoreFactory.getRodaConfiguration()
+      .getString("core.plugins." + pluginName + "." + item + ".title"));
+    userProfile.setDescription(RodaCoreFactory.getRodaConfiguration()
+      .getString("core.plugins." + pluginName + "." + item + ".description"));
+    userProfile.setProfile(item);
+
+    String[] options = RodaCoreFactory.getRodaConfiguration().getStringArray("core.plugins." + pluginName + "." + item + ".options[]");
+    for(String option : options){
+      String optionValue = RodaCoreFactory.getRodaConfiguration().getString("core.plugins." + pluginName + "." + item + "." + option);
+      optionsValues.put(option, optionValue);
+    }
+    userProfile.setOptions(optionsValues);
+
+    return userProfile;
   }
 
   @Override
