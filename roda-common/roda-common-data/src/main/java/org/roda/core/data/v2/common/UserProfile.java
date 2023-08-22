@@ -1,0 +1,52 @@
+package org.roda.core.data.v2.common;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * @author António Lindo <alindo@keep.pt>
+ */
+public class UserProfile implements Serializable {
+  private static final long serialVersionUID = -117396300862413045L;
+  private String i18nProperty;
+  private String profile;
+  private String description;
+  private Map<String, String> options;
+
+  public UserProfile() {
+    options = new HashMap<>();
+  }
+
+  public void setI18nProperty(String i18nProperty) {
+    this.i18nProperty = i18nProperty;
+  }
+
+  public void setProfile(String profile) {
+    this.profile = profile;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public void setOptions(Map<String, String> options) {
+    this.options = options;
+  }
+
+  public String getI18nProperty() {
+    return i18nProperty;
+  }
+
+  public String getProfile() {
+    return profile;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public Map<String, String> getOptions() {
+    return options;
+  }
+}

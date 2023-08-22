@@ -14,11 +14,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.common.UserProfile;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
@@ -43,6 +46,7 @@ import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
@@ -373,7 +377,6 @@ public class ShowJob extends Composite {
       }
 
       for (PluginParameter parameter : pluginInfo.getParameters()) {
-
         if (PluginParameterType.BOOLEAN.equals(parameter.getType())) {
           createBooleanLayout(parameter);
         } else if (PluginParameterType.STRING.equals(parameter.getType())) {
@@ -382,6 +385,8 @@ public class ShowJob extends Composite {
           createPluginSipToAipLayout(parameter);
         } else if (PluginParameterType.AIP_ID.equals(parameter.getType())) {
           createSelectAipLayout(parameter);
+        } else if (PluginParameterType.USER_PROFILE.equals(parameter.getType())) {
+          createUserProfileLayout(parameter);
         } else {
           createStringLayout(parameter);
         }
@@ -885,7 +890,40 @@ public class ShowJob extends Composite {
       pluginValue.addStyleName("form-radiobutton");
     }
   }
+  private void createUserProfileLayout(PluginParameter parameter){
+    String value = job.getPluginParameters().get(parameter.getId());
+    if (value == null) {
+      value = parameter.getDefaultValue();
+      Label parameterLabel = new Label(parameter.getName());
+      Label parameterValue = new Label(value);
+      pluginOptions.add(parameterLabel);
+      pluginOptions.add(parameterValue);
+      parameterLabel.addStyleName("label");
 
+      addHelp(parameter.getDescription());
+    } else {
+      Label parameterLabel = new Label(parameter.getName());
+      Label parameterValue = new Label(value);
+      pluginOptions.add(parameterLabel);
+      pluginOptions.add(parameterValue);
+      parameterLabel.addStyleName("label");
+
+      addHelp(parameter.getDescription());
+
+      String profileOptions = job.getPluginParameters().get("parameter.option." + value);
+      String content = profileOptions.substring(1, profileOptions.length() - 1);
+      String[] profileOptionsArray = content.split(", ");
+
+      for (String profileOption : profileOptionsArray) {
+        String profileOptionName = profileOption.split("\\.")[1];
+        Label profileParameterLabel = new Label(profileOptionName);
+        Label profileParameterValue = new Label(job.getPluginParameters().get(profileOption));
+        pluginOptions.add(profileParameterLabel);
+        pluginOptions.add(profileParameterValue);
+        profileParameterLabel.addStyleName("label");
+      }
+    }
+  }
   private void addHelp(String description) {
     if (description != null && description.length() > 0) {
       Label pHelp = new Label(description);
