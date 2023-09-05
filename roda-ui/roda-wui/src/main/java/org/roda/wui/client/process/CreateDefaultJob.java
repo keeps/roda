@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.filter.AllFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsAll;
@@ -683,7 +684,7 @@ public class CreateDefaultJob extends Composite {
     isListEmpty = true;
 
     ListBuilder<? extends IsIndexed> listBuilder = listFactory.getListBuilder("CreateDefaultJob", objectClassName, "",
-      Filter.ALL, 10, 50);
+      new Filter(new AllFilterParameter()), 10, 50);
 
     if (listBuilder != null) {
       listBuilder.getOptions().addStyleName("searchResults").addCheckboxSelectionListener(

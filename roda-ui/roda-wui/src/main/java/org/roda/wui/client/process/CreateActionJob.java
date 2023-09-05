@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.filter.AllFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.OneOfManyFilterParameter;
 import org.roda.core.data.v2.index.select.SelectedItems;
@@ -62,7 +63,7 @@ public class CreateActionJob extends CreateSelectedJob<IsIndexed> {
 
     if (selected != null) {
       getTargetPanel().clear();
-      Filter filter = Filter.ALL;
+      Filter filter = new Filter(new AllFilterParameter());
 
       if (selected instanceof SelectedItemsList) {
         List<String> ids = ((SelectedItemsList<?>) selected).getIds();
