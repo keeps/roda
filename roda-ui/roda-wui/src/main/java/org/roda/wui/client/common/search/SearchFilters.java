@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.filter.AllFilterParameter;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
@@ -35,7 +36,7 @@ public class SearchFilters {
   public static Filter createIncrementalFilterFromTokens(final List<String> historyTokens, Filter baseFilter) {
     // historyTokens like TYPE/key/value/key/value or key/value/key/value
 
-    Filter resultingFilter = baseFilter == null ? new Filter(Filter.ALL) : new Filter(baseFilter);
+    Filter resultingFilter = baseFilter == null ? new Filter(new Filter(new AllFilterParameter())) : new Filter(baseFilter);
 
     List<String> parts = new ArrayList<>(historyTokens);
     if (!parts.isEmpty()) {
