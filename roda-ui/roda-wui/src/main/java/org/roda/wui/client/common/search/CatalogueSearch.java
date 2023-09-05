@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.SavedSearch;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.filter.AllFilterParameter;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -61,7 +62,7 @@ public class CatalogueSearch extends Composite {
   private Supplier<Map<String, Filter>> createClassFilters() {
     Map<String, Filter> classFilters = new HashMap<>();
     for (Class<? extends IsIndexed> searchableClass : searchableClasses) {
-      classFilters.put(searchableClass.getSimpleName(), Filter.ALL);
+      classFilters.put(searchableClass.getSimpleName(), new Filter(new AllFilterParameter()));
     }
     return () -> classFilters;
   }
@@ -79,7 +80,7 @@ public class CatalogueSearch extends Composite {
     } else {
       classFilters = new HashMap<>();
       for (Class<? extends IsIndexed> searchableClass : searchableClasses) {
-        classFilters.put(searchableClass.getSimpleName(), Filter.ALL);
+        classFilters.put(searchableClass.getSimpleName(), new Filter(new AllFilterParameter()));
       }
     }
 
@@ -214,7 +215,7 @@ public class CatalogueSearch extends Composite {
           }
 
           Filter filter = SearchFilters.createFilterFromHistoryTokens(filterTokens);
-          if (!filter.equals(Filter.ALL)) {
+          if (!filter.equals(new Filter(new AllFilterParameter()))) {
             for (String aClass : classes) {
               classFilters.put(aClass, filter);
             }

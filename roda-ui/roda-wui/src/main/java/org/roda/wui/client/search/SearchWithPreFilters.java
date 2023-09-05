@@ -81,7 +81,7 @@ public class SearchWithPreFilters extends Composite {
     } else {
       preparedHistoryToken = historyTokens.subList(1, historyTokens.size());
     }
-
+    
     // Create main search
     catalogueSearch = new CatalogueSearch(preparedHistoryToken, true, "Search_AIPs", "Search_representations", "Search_files",
       null, false, true);
