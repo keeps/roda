@@ -60,11 +60,11 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
@@ -197,7 +197,8 @@ public class ShowRepresentationInformation extends Composite {
       dateUpdated.setText(messages.dateUpdated(Humanize.formatDateTime(ri.getUpdatedOn()), ri.getUpdatedBy()));
     }
 
-    representationInformationDescriptionValue.setHTML(SafeHtmlUtils.fromString(ri.getDescription()));
+    String description = (ri.getDescription() == null) ? "" : ri.getDescription();
+    representationInformationDescriptionValue.setHTML(SafeHtmlUtils.fromString(description));
     representationInformationDescriptionKey.setVisible(StringUtils.isNotBlank(ri.getDescription()));
 
     representationInformationFamilyKey.setVisible(StringUtils.isNotBlank(ri.getFamily()));
