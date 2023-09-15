@@ -350,10 +350,9 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                         reportItem.addReport(fileReportItem);
 
                       } catch (CommandException e) {
-                        pluginResultState = PluginState.PARTIAL_SUCCESS;
+                        pluginResultState = PluginState.FAILURE;
                         reportState = pluginResultState;
-                        reportItem.setPluginState(pluginResultState)
-                          .addPluginDetails(e.getMessage() + "\n" + e.getOutput() + "\n");
+                        reportItem.setPluginState(pluginResultState).addPluginDetails(getOutputMessage(e));
 
                         LOGGER.debug("Conversion ({} to {}) failed on file {} of representation {} from AIP {}",
                           fileFormat, outputFormat, file.getId(), representation.getId(), aip.getId());
@@ -568,9 +567,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                     reportItem.addReport(fileReportItem);
 
                   } catch (CommandException e) {
-                    reportState = PluginState.PARTIAL_SUCCESS;
-                    reportItem.setPluginState(reportState)
-                      .addPluginDetails(e.getMessage() + "\n" + e.getOutput() + "\n");
+                    reportState = PluginState.FAILURE;
+                    reportItem.setPluginState(reportState).addPluginDetails(getOutputMessage(e));
 
                     LOGGER.debug("Conversion ({} to {}) failed on file {} of representation {} from AIP {}", fileFormat,
                       outputFormat, file.getId(), representation.getId(), representation.getAipId());
@@ -773,11 +771,10 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
                   reportItem.addReport(fileReportItem);
 
                 } catch (CommandException e) {
-                  pluginResultState = PluginState.PARTIAL_SUCCESS;
+                  pluginResultState = PluginState.FAILURE;
                   Report fileReportItem = PluginHelper.initPluginReportItem(this, file.getId(), File.class,
                     AIPState.ACTIVE);
-                  fileReportItem.setPluginState(PluginState.PARTIAL_SUCCESS)
-                    .setPluginDetails(e.getMessage() + "\n" + e.getOutput());
+                  fileReportItem.setPluginState(PluginState.FAILURE).setPluginDetails(getOutputMessage(e));
                   reportItem.addReport(fileReportItem);
 
                   LOGGER.debug("Conversion ({} to {}) failed on file {} of representation {} from AIP {}", fileFormat,
@@ -1136,6 +1133,14 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
       ContentPayload payload = new FSPathContentPayload(uriPath);
       model.createDIPFile(newRepresentationID, f.getPath(), f.getId(), uriPath.toFile().length(), payload, notify);
     }
+  }
+
+  private String getOutputMessage(CommandException exception) {
+    if (StringUtils.isNotEmpty(exception.getOutput())) {
+      return String.format("%s%n%s", exception.getMessage(), exception.getOutput());
+    }
+
+    return exception.getMessage();
   }
 
   @Override
