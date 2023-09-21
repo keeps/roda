@@ -21,6 +21,6 @@ Das Metadatenfeld wird mit den Feldern der erweiterten Suche ausgefüllt. Aus di
 ui.disposal.rule.blacklist.condition = description
 ```
 
-Weitere Informationen über das Hinzufügen vom neuen erweiterten Suchfeldelement finden Sie unter *Hilfe* > *Benutzung* > *Erweiterte Suche*.
+Weitere Informationen zu Hinzufügen vom neuen erweiterten Suchfeldelement finden Sie unter *Hilfe* > *Benutzung* > *Erweiterte Suche*.
 
 Weitere Informationen zur Konfiguration von beschreibenden Metadaten auf RODA finden Sie unter *Hilfe* > *Konfiguration* > *Metadatenformate*.
