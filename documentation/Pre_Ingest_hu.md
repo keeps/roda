@@ -1,4 +1,4 @@
-# Pre-ingest (Bevitel előtti fázis)
+# Bevitel előtti fázis
 
 Az adatbevitel előtti folyamat azt a képességet mutatja, hogy a gyártó képes olyan adatbeviteli információs csomagokat (SIP) létrehozni, amelyek (jól meghatározott struktúrában) adatokat és metaadatokat egyaránt tartalmaznak, hogy azokat az adattárba bevihessék. A létrehozott SIP-eknek meg kell felelniük az adattár által meghatározott (vagy az adattárral egyeztetett) szabályzatoknak. 
 
