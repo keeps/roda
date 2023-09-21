@@ -1,6 +1,6 @@
 # Kockázatértékelés
 
-A RODA a [Digital Curation Centre (DCC)](http://www.dcc.ac.uk) és a DigitalPreservationEurope (DPE) által kifejlesztett Digital Repository Audit Method Based on Risk Assessment (DRAMBORA)](http://www.repositoryaudit.eu) eszközkészletből származó több mint 80 megőrzési kockázattal előre feltöltött kockázati nyilvántartással rendelkezik.
+A RODA a [Digital Curation Centre (DCC)](http://www.dcc.ac.uk) és a DigitalPreservationEurope (DPE) által kifejlesztett  [Digital Repository Audit Method Based on Risk Assessment (DRAMBORA)](http://www.repositoryaudit.eu) eszközkészletből származó több mint 80 megőrzési kockázattal előre feltöltött kockázati nyilvántartással rendelkezik.
 
 Tartalmaz továbbá egy kockázati nyilvántartást, amelyet a felhasználói felületről lehet kezelni, valamint számos kockázatértékelési bővítményt, amelyek frissítik a kockázati nyilvántartás információit.
 
