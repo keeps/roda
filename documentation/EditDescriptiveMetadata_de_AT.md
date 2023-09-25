@@ -34,4 +34,4 @@ Sie können die früheren Versionen in einem Dropdown-Menü durchsuchen, das Inf
 
 ## Herunterladen
 
-Sie können die beschreibenden Metadaten im XML-Format herunterladen, indem Sie auf ![Herunterladen](images/md_download.png "Herunterladen der beschreibenden Metadaten")
+Sie können die beschreibenden Metadaten im XML-Format herunterladen, indem Sie auf ![Herunterladen](images/md_download.png "Herunterladen der beschreibenden Metadaten") klicken.
