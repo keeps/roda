@@ -192,7 +192,7 @@ public class ResourceParseUtils {
         String separator = URLEncoder.encode(RodaConstants.URN_SEPARATOR, RodaConstants.DEFAULT_ENCODING);
         if (StringUtils.countMatches(id, separator) > 0) {
           fileDirectoryPath = ModelUtils.extractFilePathFromRepresentationPreservationMetadata(resourcePath);
-          fileId = id.substring(id.lastIndexOf(separator) + 1);
+          fileId = id.substring(id.lastIndexOf(separator) + 3);
         }
       } catch (UnsupportedEncodingException e) {
         LOGGER.error("Error encoding urn separator when converting file event preservation metadata");
