@@ -29,6 +29,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.server.JSONP;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.v2.index.filter.AllFilterParameter;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -52,6 +53,7 @@ import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.Browser;
+import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.ExtraMediaType;
 import org.roda.wui.api.v1.utils.FacetsCSVOutputStream;
@@ -175,19 +177,29 @@ public class IndexResource {
     findRequest.filename = StringUtils.isBlank(filename) ? DEFAULT_CSV_FILENAME : filename;
 
     findRequest.filter = new Filter();
-    for (String filterParameter : filterParameters) {
-      final String[] parts = filterParameter.split("=");
-      if (parts.length == 2) {
-        if (parts[0].startsWith("!")) {
-          String key = parts[0].substring(1);
-          findRequest.filter.add(new NotSimpleFilterParameter(key, parts[1]));
+    if (filterParameters.isEmpty()){
+      return Response.status(Response.Status.BAD_REQUEST)
+        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Filter parameter is required. For an all-inclusive search, use filter=any.")).build();
+    } else {
+      for (String filterParameter : filterParameters) {
+        if (filterParameter.equals("any")) {
+          findRequest.filter.add(new AllFilterParameter());
         } else {
-          findRequest.filter.add(new SimpleFilterParameter(parts[0], parts[1]));
+          final String[] parts = filterParameter.split("=");
+          if (parts.length == 2) {
+            if (parts[0].startsWith("!")) {
+              String key = parts[0].substring(1);
+              findRequest.filter.add(new NotSimpleFilterParameter(key, parts[1]));
+            } else {
+              findRequest.filter.add(new SimpleFilterParameter(parts[0], parts[1]));
+            }
+          } else {
+            LOGGER.warn("Unable to parse filter parameter '{}'. Ignored", filterParameter);
+          }
         }
-      } else {
-        LOGGER.warn("Unable to parse filter parameter '{}'. Ignored", filterParameter);
       }
     }
+
 
     findRequest.sorter = new Sorter();
     for (String sortParameter : sortParameters) {
@@ -247,6 +259,12 @@ public class IndexResource {
     @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = IsIndexed.class)))})
   public <T extends IsIndexed> Response find(@Parameter(description = "Find parameters") final FindRequest findRequest)
     throws RODAException {
+
+
+    if(findRequest.filter == null || findRequest.filter.getParameters().isEmpty()){
+      return Response.status(Response.Status.BAD_REQUEST)
+        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Filter parameter is required. For an all-inclusive search, use type AllFilterParameter.")).build();
+    }
 
     final String mediaType = ApiUtils.getMediaType(null, request);
     final User user = UserUtility.getApiUser(request);
