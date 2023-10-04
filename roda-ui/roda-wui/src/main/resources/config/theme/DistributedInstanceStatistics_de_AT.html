@@ -1,0 +1,183 @@
+<div id="statistics" class="static-page-distributed-instance">
+
+    <div class="row full_width">
+        <div class="col_4 stat_col_card">
+            <h6>Anzahl von intellektueller Entitäten </h6>
+            <div class="textfill"><span class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.IndexedAIP" data-source-only-active="true" data-view="text" data-source-filters="instanceId=INSTANCEID" data-view-field="totalCount"></span></div>
+        </div>
+        <div class="col_8 chart_col_card">
+            <h6>Verteilung der Beschreibungsebenen (Top 10)</h6>
+            <canvas id="stat-desc-levels" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.IndexedAIP" data-source-facets="level" data-view="chart" data-view-field="facetResults" data-view-type="pie" data-source-filters="instanceId=INSTANCEID" data-view-limit="10"></canvas><span class="statistic toolbarLink" data-ref="stat-desc-levels" data-view="download" data-view-filename="description-levels.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+        </div>
+    </div>
+
+    <h5>Daten</h5>
+
+
+    <div class="row full_width">
+        <div class="col_4 stat_col_card">
+            <h6>Anzahl der Repräsentationen</h6>
+            <div class="textfill"><span class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.IndexedRepresentation" data-source-filters="instanceId=INSTANCEID" data-view="text" data-view-field="totalCount"></span></div>
+        </div>
+        <div class="col_8 chart_col_card">
+            <h6>Verteilung der Vertretungsarten</h6>
+            <canvas id="representation-types" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.IndexedRepresentation" data-source-filters="instanceId=INSTANCEID" data-source-facets="type" data-view="chart" data-view-field="facetResults" data-view-type="horizontalBar"></canvas><span class="statistic toolbarLink" data-ref="representation-types" data-view="download" data-view-filename="representation-types.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+        </div>
+    </div>
+
+    <div class="row full_width">
+        <div class="col_4 stat_col_card">
+            <h6>Anzahl an Dateien</h6>
+            <div class="textfill"><span class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.IndexedFile" data-source-filters="instanceId=INSTANCEID" data-view="text" data-view-field="totalCount"></span></div>
+        </div>
+        <div class="col_8 chart_col_card">
+            <h6>Verteilung der Datei PRONOMs (Top 10)</h6>
+            <canvas id="file-formats-pronom" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.IndexedFile" data-source-filters="instanceId=INSTANCEID" data-source-facets="formatPronom" data-view="chart" data-view-field="facetResults" data-view-type="horizontalBar" data-view-limit="10"></canvas><span class="statistic toolbarLink" data-ref="file-formats-pronom" data-view="download" data-view-filename="file-formats-pronom.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+        </div>
+    </div>
+    <div class="row full_width">
+        <div class="col_12 chart_col_card">
+            <h6>Verteilung der Datei Formate (Top 10)</h6>
+            <canvas id="file-formats-description" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.IndexedFile" data-source-filters="instanceId=INSTANCEID" data-source-facets="fileFormat" data-view="chart" data-view-field="facetResults" data-view-type="horizontalBar" data-view-limit="10"></canvas><span class="statistic toolbarLink" data-ref="file-formats-description" data-view="download" data-view-filename="file-formats-description.csv"><i class="fa fa-download" aria-hidden="true"></i></span>
+        </div>
+    </div>
+    <div class="row full_width">
+        <div class="col_12 chart_col_card">
+            <h6>Verteilung der Datei mimetypes (Top 10)</h6>
+            <canvas id="file-formats-mimetypes" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.IndexedFile" data-source-filters="instanceId=INSTANCEID" data-source-facets="formatMimetype" data-view="chart" data-view-field="facetResults" data-view-type="horizontalBar" data-view-limit="10"></canvas><i class="fa fa-download" aria-hidden="true"></i>
+			<span class="statistic toolbarLink" data-ref="file-formats-mimetypes" data-view="download" data-view-filename="file-formats-mimetypes.csv">
+        </span>
+</div>
+    </div>
+
+
+    <h5>Prozesse</h5>
+
+    <div class="row full_width">
+        <div class="col_4 stat_col_card">
+            <h6>Anzahl der Aktionsprozesse</h6>
+            <div class="textfill"><span class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.jobs.Job" data-view="text" data-source-filters="!pluginType=INGEST AND instanceId=INSTANCEID" data-view-field="totalCount"></span></div>
+        </div>
+        <div class="col_4 chart_col_card">
+            <h6>Verteilung des Status des Aktionsprozesses</h6>
+            <canvas id="process-action-status" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.jobs.Job" data-source-facets="state" data-view="chart" data-source-filters="!pluginType=INGEST AND instanceId=INSTANCEID" data-view-field="facetResults" data-view-type="pie"></canvas><span class="statistic toolbarLink" data-ref="process-action-status" data-view="download" data-view-filename="process-action-status.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+        </div>
+        <div class="col_4 chart_col_card">
+            <h6>Verteilung des Aktionsprozesstyp</h6>
+            <canvas id="process-action-type" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.jobs.Job" data-source-facets="pluginType" data-view="chart" data-source-filters="!pluginType=INGEST AND instanceId=INSTANCEID" data-view-field="facetResults" data-view-type="pie"></canvas><span class="statistic toolbarLink" data-ref="process-action-type" data-view="download" data-view-filename="process-action-type.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+        </div>
+    </div>
+
+    <div class="row full_width">
+        <div class="col_4 stat_col_card">
+            <h6>Anzahl der Ingest-Prozesse</h6>
+            <div class="textfill"><span class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.jobs.Job" data-view="text" data-source-filters="pluginType=INGEST AND instanceId=INSTANCEID" data-view-field="totalCount"></span></div>
+        </div>
+        <div class="col_4 chart_col_card">
+            <h6>Verteilung des Prozessstatus</h6>
+            <canvas id="process-ingest-status" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.jobs.Job" data-source-facets="state" data-view="chart" data-source-filters="pluginType=INGEST AND instanceId=INSTANCEID" data-view-field="facetResults" data-view-type="pie"></canvas><span class="statistic toolbarLink" data-ref="process-ingest-status" data-view="download" data-view-filename="process-ingest-status.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+        </div>
+        <div class="col_4 chart_col_card">
+            <h6>Anzahl der Bewertungen (Top 10)</h6>
+            <canvas id="appraisal" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.log.LogEntry" data-source-facets="username" data-view="chart" data-source-filters="actionMethod=appraisal AND instanceId=INSTANCEID" data-view-field="facetResults" data-view-type="pie" data-view-limit="10"></canvas><span class="statistic toolbarLink" data-ref="appraisal" data-view="download" data-view-filename="appraisal.csv"><i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+        </div>
+    </div>
+
+    <div class="row full_width">
+        <div class="col_4 stat_col_card">
+            <h6>Anzahl der Berichte</h6>
+            <div class="textfill"><span class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.jobs.IndexedReport" data-source-filters="instanceId=INSTANCEID" data-view="text" data-view-field="totalCount"></span></div>
+        </div>
+        <div class="col_8 chart_col_card">
+            <h6>Verteilung der Berichtsplugin (Top 5)</h6>
+            <canvas id="process-reports-plugin" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.jobs.IndexedReport" data-source-facets="pluginName" data-view="chart" data-source-filters="!plugin=org.roda.core.plugins.base.ingest.AutoAcceptSIPPlugin AND instanceId=INSTANCEID" data-view-field="facetResults" data-view-type="horizontalBar" data-view-limit="5"></canvas><span class="statistic toolbarLink" data-ref="process-reports-plugin" data-view="download" data-view-filename="process-reports-plugin.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+        </div>
+    </div>
+
+    <div class="row full_width">
+        <div class="col_4 chart_col_card">
+            <h6>Verteilung des Status der Berichtsplugin</h6>
+            <canvas id="process-reports-plugin-state" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.jobs.IndexedReport" data-source-filters="instanceId=INSTANCEID" data-source-facets="pluginState" data-view="chart" data-view-field="facetResults" data-view-type="pie"></canvas><span class="statistic toolbarLink" data-ref="process-reports-plugin-state" data-view="download" data-view-filename="process-reports-plugin-state.csv"><i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+        </div>
+
+        <div class="col_8 chart_col_card">
+            <h6>Benutzer, die mehrere Prozesse gestartet haben (Top 5)</h6>
+            <canvas id="process-users" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.log.LogEntry" data-source-facets="username" data-view="chart" data-source-filters="actionMethod=createJob AND instanceId=INSTANCEID" data-view-field="facetResults" data-view-type="horizontalBar" data-view-limit="5"></canvas><span class="statistic toolbarLink" data-ref="process-users" data-view="download" data-view-filename="process-users.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+        </div>
+    </div>
+
+    <h5>Präservierungsereignisse</h5>
+
+    <div class="row full_width">
+        <div class="col_4 stat_col_card">
+            <h6>Anzahl der Präservierungsereignisse</h6>
+            <div class="textfill"><span class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent" data-source-filters="instanceId=INSTANCEID" data-view="text" data-view-field="totalCount"></span></div>
+        </div>
+        <div class="col_8 chart_col_card">
+            <h6>Präservierungsagenten nach Typ (Top 5)</h6>
+            <canvas id="preservation-agents-type" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent" data-source-filters="instanceId=INSTANCEID" data-source-facets="eventType" data-view="chart" data-view-field="facetResults" data-view-type="pie" data-view-limit="5"></canvas><span class="statistic toolbarLink" data-ref="preservation-agents-type" data-view="download" data-view-filename="preservation-agents-type.csv"><i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+        </div>
+
+    </div>
+    <div class="row full_width">
+        <div class="col_12 chart_col_card">
+            <h6>Präservierungsereignisse nach Agent (Top 5)</h6>
+            <canvas id="preservation-event-agents" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent" data-source-filters="instanceId=INSTANCEID" data-source-facets="linkingAgentIdentifier" data-view="chart" data-view-field="facetResults" data-view-type="horizontalBar" data-label-function="agentLabel" data-view-limit="5"></canvas><script type="text/javascript">
+                function agentLabel(label) {
+                    var agent = JSON.parse(label);
+                    var valueArray = agent.value.split('@');
+                    var updatedValue = valueArray[0].substring(valueArray[0]
+                        .lastIndexOf(".") + 1);
+                    updatedValue = updatedValue.substring(updatedValue
+                        .lastIndexOf(":") + 1);
+
+                    if (valueArray.length != 1) {
+                        updatedValue += "@" + valueArray[1];
+                    }
+
+                    return updatedValue;
+                }
+            </script><span class="statistic toolbarLink" data-ref="preservation-event-agents" data-view="download" data-view-filename="preservation-event-agents.csv"><i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+        </div>
+    </div>
+
+    <h5>Risiko Vorfälle</h5>
+
+    <div class="row full_width">
+        <div class="col_4 stat_col_card">
+            <h6>Anzahl der Risikoinzidenzen</h6>
+            <div class="textfill"><span class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.risks.RiskIncidence" data-source-filters="instanceId=INSTANCEID" data-view="text" data-view-field="totalCount"></span></div>
+        </div>
+        <div class="col_4 chart_col_card">
+            <h6>Risikoinzidenzen nach Schweregrad</h6>
+            <canvas id="risk-incidence-severity" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.risks.RiskIncidence" data-source-filters="instanceId=INSTANCEID" data-source-facets="severity" data-view="chart" data-view-field="facetResults" data-view-type="pie"></canvas><span class="statistic toolbarLink" data-ref="risk-incidence-severity" data-view="download" data-view-filename="risk-incidence-severity.csv"><i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+        </div>
+        <div class="col_4 chart_col_card">
+            <h6>Risikoinzidenzen nach Status</h6>
+            <canvas id="risk-incidence-status" class="statistic" data-source="index" data-source-class="org.roda.core.data.v2.risks.RiskIncidence" data-source-filters="instanceId=INSTANCEID" data-source-facets="status" data-view="chart" data-view-field="facetResults" data-view-type="pie"></canvas><span class="statistic toolbarLink" data-ref="risk-incidence-status" data-view="download" data-view-filename="risk-incidence-status.csv">
+				<i class="fa fa-download" aria-hidden="true"></i>
+			</span>
+        </div>
+    </div>
+</div>
