@@ -116,7 +116,10 @@ To increase the changes of you code being accepted and merged into RODA source h
 
 * Has unit tests (that covers at least 80% of the code)
 * Has documentation (at least 80% of public API)
-* Agrees to contributor license agreement, certifying that any contributed code is original work and that the copyright is turned over to the project
+
+### License and Intellectual Property
+
+All contributions to RODA Community Edition are licensed on LGPL v3, which includes an explicit grant of patent rights, meaning that the developers who created or contributed to the code relinquish their patent rights with regard to any subsequent reuse of the software.
 
 ### Translations
 
