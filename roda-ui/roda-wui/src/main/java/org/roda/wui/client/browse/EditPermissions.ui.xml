@@ -33,16 +33,16 @@
 							<g:Label addStyleNames="h5">
 								<ui:text from='{messages.sidebarActionsTitle}' />
 							</g:Label>
-							<g:Button addStyleNames="btn btn-block btn-plus" ui:field="buttonAdd">
+							<g:Button addStyleNames="btn btn-block btn-plus" ui:field="buttonAdd" title="{messages.addPermission}">
 								<ui:text from='{messages.addPermission}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonApply">
+							<g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonApply" title="{messages.saveButton}">
 								<ui:text from='{messages.saveButton}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonApplyToAll">
+							<g:Button addStyleNames="btn btn-block btn-play" ui:field="buttonApplyToAll" title="{messages.applyAllButton}">
 								<ui:text from='{messages.applyAllButton}' />
 							</g:Button>
-							<g:Button addStyleNames="btn btn-block btn-default btn-times-circle" ui:field="buttonClose">
+							<g:Button addStyleNames="btn btn-block btn-default btn-times-circle" ui:field="buttonClose" title="{messages.backButton}">
 								<ui:text from='{messages.backButton}' />
 							</g:Button>
 						</g:FlowPanel>
