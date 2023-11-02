@@ -138,7 +138,6 @@
 		<entry key="class"><xsl:value-of select="$i18n.level.class"/></entry>
 		<entry key="collection"><xsl:value-of select="$i18n.level.collection"/></entry>
 		<entry key="recordgrp"><xsl:value-of select="$i18n.level.recordgrp"/></entry>
-		<entry key="recordgrp"><xsl:value-of select="$i18n.level.recordgrp"/></entry>
 		<entry key="subgrp"><xsl:value-of select="$i18n.level.subgrp"/></entry>
 		<entry key="subfonds"><xsl:value-of select="$i18n.level.subfonds"/></entry>
 		<entry key="series"><xsl:value-of select="$i18n.level.series"/></entry>
