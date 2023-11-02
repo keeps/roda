@@ -329,6 +329,7 @@ public class PluginParameterPanel extends Composite {
       removeButton.addClickHandler(removeClickHandler);
     }
     button.addClickHandler(editClickHandler);
+    editButton.addClickHandler(editClickHandler);
 
     layout.add(parameterName);
     layout.add(button);
