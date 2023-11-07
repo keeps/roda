@@ -1140,6 +1140,17 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
         for (FacetValue facetValue : facetResults.get(0).getValues()) {
           types.add(facetValue.getValue());
         }
+
+        Boolean flag = false;
+
+        for(String word : types) {
+          if(word.equals("MIXED")) {
+            flag = true;
+            break;
+          }
+        }
+
+        if(!flag) types.add("MIXED");
       } catch (GenericException | AuthorizationDeniedException | RequestNotValidException e) {
         LOGGER.error("Could not execute find request on representations", e);
       }
