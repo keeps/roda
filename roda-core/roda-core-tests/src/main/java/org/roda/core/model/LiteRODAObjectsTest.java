@@ -7,7 +7,7 @@
  */
 package org.roda.core.model;
 
-import static org.junit.Assert.fail;
+import static org.testng.AssertJUnit.fail;
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertTrue;
 

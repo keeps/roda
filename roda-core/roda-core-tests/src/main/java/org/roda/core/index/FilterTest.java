@@ -7,8 +7,9 @@
  */
 package org.roda.core.index;
 
-import static org.junit.Assert.assertTrue;
 import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.AssertJUnit.fail;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -60,18 +61,14 @@ import org.testng.annotations.Test;
 @Test(groups = {RodaConstants.TEST_GROUP_DEV})
 public class FilterTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(FilterTest.class);
-
-  private static Path basePath;
-
-  private static Path corporaPath;
-  private static StorageService corporaService;
-
-  private static ModelService model;
-  private static IndexService index;
-
   private static final int PAGE_SIZE = 5;
   private static final int PREMIS_CORPORA_SIZE = 8474;
   private static final String REPRESENTATION_ID = CorporaConstants.REPRESENTATION_1_ID;
+  private static Path basePath;
+  private static Path corporaPath;
+  private static StorageService corporaService;
+  private static ModelService model;
+  private static IndexService index;
 
   @BeforeClass
   public static void setUp() throws URISyntaxException, GenericException {
@@ -283,9 +280,9 @@ public class FilterTest {
         IndexedFile file = index.retrieve(IndexedFile.class, uuid,
           Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.FILE_HASH));
 
-        assertTrue("File " + id + " has no hash field", 0 < file.getHash().size());
+        assertTrue("File " + id + " has no hash field", file.getHash().isEmpty());
       } catch (NotFoundException e) {
-        assertTrue("File " + id + " was not found on index", false);
+        fail("File " + id + " was not found on index");
       }
     }
 
