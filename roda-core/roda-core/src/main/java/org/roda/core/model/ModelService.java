@@ -195,6 +195,7 @@ public class ModelService extends ModelObservable {
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_JOB);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_JOB_REPORT);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_RISK);
+      createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_ACCESS_KEYS);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_RISK_INCIDENCE);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_DIP);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_REPRESENTATION_INFORMATION);
