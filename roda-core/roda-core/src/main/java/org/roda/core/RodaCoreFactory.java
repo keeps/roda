@@ -263,26 +263,6 @@ public class RodaCoreFactory {
         return new Messages(locale, getConfigPath().resolve(RodaConstants.CORE_I18N_FOLDER));
       }
     });
-
-  private static LoadingCache<String, DisposalSchedule> DISPOSAL_SCHEDULE_CACHE = CacheBuilder.newBuilder()
-    .build(new CacheLoader<String, DisposalSchedule>() {
-      @Override
-      public DisposalSchedule load(String disposalScheduleId) throws Exception {
-        return model.retrieveDisposalSchedule(disposalScheduleId);
-      }
-    });
-
-  private static LoadingCache<String, DisposalHold> DISPOSAL_HOLD_CACHE = CacheBuilder.newBuilder()
-    .expireAfterWrite(10, TimeUnit.MINUTES).build(new CacheLoader<String, DisposalHold>() {
-      @Override
-      public DisposalHold load(String disposalHoldId) throws Exception {
-        return model.retrieveDisposalHold(disposalHoldId);
-      }
-    });
-
-  private static List<String> CONFIGURATIONS = new ArrayList<>(Arrays.asList("roda-core.properties",
-    "roda-roles.properties", "roda-permissions.properties", "roda-instance.properties"));
-
   /**
    * Shared configuration and message properties (cache). Includes properties from
    * {@code rodaConfiguration} and translations from ServerMessages, filtered by
@@ -322,16 +302,29 @@ public class RodaCoreFactory {
         return sharedProperties;
       }
     });
-
+  private static LoadingCache<String, DisposalSchedule> DISPOSAL_SCHEDULE_CACHE = CacheBuilder.newBuilder()
+    .build(new CacheLoader<String, DisposalSchedule>() {
+      @Override
+      public DisposalSchedule load(String disposalScheduleId) throws Exception {
+        return model.retrieveDisposalSchedule(disposalScheduleId);
+      }
+    });
+  private static LoadingCache<String, DisposalHold> DISPOSAL_HOLD_CACHE = CacheBuilder.newBuilder()
+    .expireAfterWrite(10, TimeUnit.MINUTES).build(new CacheLoader<String, DisposalHold>() {
+      @Override
+      public DisposalHold load(String disposalHoldId) throws Exception {
+        return model.retrieveDisposalHold(disposalHoldId);
+      }
+    });
+  private static List<String> CONFIGURATIONS = new ArrayList<>(Arrays.asList("roda-core.properties",
+    "roda-roles.properties", "roda-permissions.properties", "roda-instance.properties"));
   private static Map<String, Map<String, String>> rodaPropertiesCache = null;
-
   /**
    * Cache of shared configuration properties
    *
    * @see RodaCoreFactory#getRodaSharedConfigurationProperties
    */
   private static Map<String, List<String>> rodaSharedConfigurationPropertiesCache = null;
-
   private static boolean configSymbolicLinksAllowed;
 
   private static HTTPServer prometheusMetricsServer;
@@ -1518,8 +1511,14 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void instantiateAccessTokens(){
+  private static void instantiateAccessTokens() {
     apiSecretKey = getProperty(RodaConstants.API_SECRET_KEY_PROPERTY, RodaConstants.DEFAULT_API_SECRET_KEY);
+
+    if (apiSecretKey.equals(RodaConstants.DEFAULT_API_SECRET_KEY)) {
+      LOGGER.warn("It is HIGHLY recommend to change the default JWT secret key. \n"
+        + "In order to do that please set the following environment variable with your secret key: RODA_DISTRIBUTED_API_SECRET");
+    }
+
     accessKeyValidity = RodaCoreFactory.getRodaConfiguration().getLong(RodaConstants.ACCESS_KEY_VALIDITY,
       RodaConstants.DEFAULT_ACCESS_KEY_VALIDITY);
     accessTokenValidity = RodaCoreFactory.getRodaConfiguration().getLong(RodaConstants.ACCESS_TOKEN_VALIDITY,
@@ -2616,8 +2615,9 @@ public class RodaCoreFactory {
   }
 
   private static void generatePluginsMarkdownTask(final List<String> args) {
-    if (args.size() == 5 && StringUtils.isNotBlank(args.get(1)) && StringUtils.isNotBlank(args.get(2)) && StringUtils.isNotBlank(args.get(3))
-      && StringUtils.isNotBlank(args.get(4)) && Files.exists(Paths.get(FilenameUtils.normalize(args.get(4))))) {
+    if (args.size() == 5 && StringUtils.isNotBlank(args.get(1)) && StringUtils.isNotBlank(args.get(2))
+      && StringUtils.isNotBlank(args.get(3)) && StringUtils.isNotBlank(args.get(4))
+      && Files.exists(Paths.get(FilenameUtils.normalize(args.get(4))))) {
 
       List<Pair<String, String>> pluginsNameAndState = new ArrayList<>();
 
@@ -2646,8 +2646,8 @@ public class RodaCoreFactory {
   }
 
   private static void generatePluginsMarketInformationTask(final List<String> args) {
-    if (args.size() == 3 && StringUtils.isNotBlank(args.get(1))
-      && StringUtils.isNotBlank(args.get(2)) && Files.exists(Paths.get(FilenameUtils.normalize(args.get(2))))) {
+    if (args.size() == 3 && StringUtils.isNotBlank(args.get(1)) && StringUtils.isNotBlank(args.get(2))
+      && Files.exists(Paths.get(FilenameUtils.normalize(args.get(2))))) {
       String pluginFolder = args.get(1);
       try {
         String pluginsJson = PluginManager.getPluginsMarketInformationAsJsonLines(pluginFolder);
@@ -2666,8 +2666,8 @@ public class RodaCoreFactory {
   private static void printConfigsUsage() {
     System.err.println("Configs command parameters:");
     System.err.println(
-      "\tgeneratePluginsMarkdown PLUGIN_OR_PLUGINS DEVELOPMENT_STATUS_PER_PLUGIN OUTPUT_FOLDER - generates plugin representation in markdown format. Development status if many please separate with ;\n" +
-      "\tgeneratePluginsMarketInformation PLUGIN_DIR OUTPUT_FOLDER - generates plugin market information in jsonlines format.");
+      "\tgeneratePluginsMarkdown PLUGIN_OR_PLUGINS DEVELOPMENT_STATUS_PER_PLUGIN OUTPUT_FOLDER - generates plugin representation in markdown format. Development status if many please separate with ;\n"
+        + "\tgeneratePluginsMarketInformation PLUGIN_DIR OUTPUT_FOLDER - generates plugin market information in jsonlines format.");
   }
 
   public static void main(final String[] argsArray)

@@ -7,30 +7,37 @@
  */
 package org.roda.core.common;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.crypto.SecretKey;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 public class JwtUtils {
 
+  private JwtUtils() {
+    // empty constructor
+  }
+
   public static String generateToken(String subject, Date expirationDate) {
     return generateToken(subject, expirationDate, new HashMap<>());
   }
 
   public static String generateToken(String subject, Date expirationDate, Map<String, Object> claims) {
-    return Jwts.builder().signWith(SignatureAlgorithm.HS256, RodaCoreFactory.getApiSecretKey())
-      .setIssuedAt(new Date(System.currentTimeMillis())).setSubject(subject).setExpiration(expirationDate)
-      .addClaims(claims).compact();
+    SecretKey secretKey = Keys.hmacShaKeyFor(RodaCoreFactory.getApiSecretKey().getBytes(StandardCharsets.UTF_8));
+    return Jwts.builder().signWith(secretKey, Jwts.SIG.HS256).issuedAt(new Date(System.currentTimeMillis()))
+      .subject(subject).expiration(expirationDate).claims(claims).compact();
   }
 
   public static String regenerateToken(String token) throws AuthenticationDeniedException {
@@ -43,7 +50,8 @@ public class JwtUtils {
 
   private static Claims getClaimsFromToken(String token) throws AuthenticationDeniedException {
     try {
-      return Jwts.parser().setSigningKey(RodaCoreFactory.getApiSecretKey()).parseClaimsJws(token).getBody();
+      SecretKey secretKey = Keys.hmacShaKeyFor(RodaCoreFactory.getApiSecretKey().getBytes(StandardCharsets.UTF_8));
+      return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
     } catch (Exception e) {
       throw new AuthenticationDeniedException("invalid token");
     }

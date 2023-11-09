@@ -724,7 +724,7 @@ public final class RodaConstants {
 
   public static final DistributedModeType DEFAULT_DISTRIBUTED_MODE_TYPE = DistributedModeType.BASE;
   public static final String DISTRIBUTED_MODE_TYPE_PROPERTY = "roda.distributed.mode.type";
-  public static final String DEFAULT_API_SECRET_KEY = "changeit";
+  public static final String DEFAULT_API_SECRET_KEY = "WiJY0uxPwYwMAcjEsDKzQMEpBLiJDmPSTSfxmC06EI0=";
   public static final String API_SECRET_KEY_PROPERTY = "roda.distributed.api.secret";
 
   public static final String CENTRAL_INSTANCE_NAME_PROPERTY = "roda.distributed.localinstance.name";

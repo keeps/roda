@@ -7,8 +7,10 @@
  */
 package org.roda.wui.api.controllers;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
+import io.jsonwebtoken.security.Keys;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.JwtUtils;
 import org.roda.core.data.common.RodaConstants;
@@ -31,6 +33,8 @@ import org.roda.wui.common.RodaWuiController;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+
+import javax.crypto.SecretKey;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
@@ -230,8 +234,8 @@ public class ApplicationAuth extends RodaWuiController {
 
     Claims claims;
     try {
-      claims = Jwts.parser().setSigningKey(RodaCoreFactory.getApiSecretKey()).parseClaimsJws(accessKey.getKey())
-        .getBody();
+      SecretKey secretKey = Keys.hmacShaKeyFor(RodaCoreFactory.getApiSecretKey().getBytes(StandardCharsets.UTF_8));
+      claims = Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(accessKey.getKey()).getPayload();
     } catch (JwtException e) {
       throw new AuthorizationDeniedException("Expired token");
     }
