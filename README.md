@@ -260,7 +260,7 @@ To start developing new features in RODA, please check the [Developer guide](doc
 
 ## Translations
 
-RODA is translated in several languages such as English :uk:, Portuguese :portugal:, Swedish :sweden:, Hungarian :hungary:, Spanish :es:, Croatian :croatia:, etc. Translations are maintained in [Transifex](https://explore.transifex.com/roda-1/roda2/) and updated using the [Transifex Client](http://docs.transifex.com/client/).
+RODA is translated in several languages such as English :uk:, Portuguese :portugal:, Swedish :sweden:, Hungarian :hungary:, Spanish :es:, Croatian :croatia:, German (Austria) :austria:, etc. Translations are maintained in [Transifex](https://explore.transifex.com/roda-1/roda2/) and updated using the [Transifex Client](http://docs.transifex.com/client/).
 
 Transifex is a cloud-based localization management platform that facilitates the translation and localization of software applications, websites, and digital content. It allows for the coordination of multilingual content creation and translation by providing a collaborative workspace for translators, project managers, and developers.
 
