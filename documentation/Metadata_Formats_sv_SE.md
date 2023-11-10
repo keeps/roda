@@ -6,7 +6,7 @@ När metadatan finns i en XML är den redo att paketeras i ett Submission Inform
 
 #### Validering
 
-Om inget schema tillhandahålls för ditt metadataformat kommer e-arkivet att kontrollera om metadata-XML-filen är välformaterad. Eftersom e-arkivet inte vet om det är rätt grammatik kommer ingen verifiering göras angående om filen är giltig.
+Om inget schema tillhandahålls för ditt metadataformat kommer arkivet att kontrollera om metadata-XML-filen är välformaterad. Eftersom arkivet inte vet om det är rätt grammatik kommer ingen verifiering göras angående om filen är giltig.
 
 #### Indexering
 
@@ -18,7 +18,7 @@ När inga visuella mappningar är konfigurerade kommer en generisk metadatavisar
 
 #### Version
 
-RODA behöver ha en konfigurationsfil för att veta hur metadatafiler ska visas för redigeringsändamål. Om det inte finns någon sådan konfiguration kommer e-arkivet att visa ett textområde där användaren kan redigera direkt i XML:en.
+RODA behöver ha en konfigurationsfil för att veta hur metadatafiler ska visas för redigeringsändamål. Om det inte finns någon sådan konfiguration kommer arkivet att visa ett textområde där användaren kan redigera direkt i XML:en.
 
 För att stödja nya metadataformat måste e-arkivet konfigureras därefter. Följande avsnitt beskriver i detalj de åtgärder som måste utföras för att ett nytt metadataschema ska stödjas fullt ut i RODA.
 
