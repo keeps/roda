@@ -46,7 +46,7 @@ Det finns flera sätt att överföra SIP:ar till systemet. Dessa inkluderar men 
 ### Överföring från extern media
 
 1. Spara SIP:arna på externt lagringsmedia (t.ex CD, USB, etc.)
-2. Leverera till följande adress: [e-arkivets address]
+2. Leverera till följande adress: [Repository address]
 
 ## Inleveransprocess
 
