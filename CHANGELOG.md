@@ -1,6 +1,22 @@
 # Changelog
 
+## v5.2.4 (10/11/2023)
+#### Enhancements:
+
+- Update Swedish translation language
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+
+
+---
+
 ## v5.2.3 (10/11/2023)
+#### What's new:
+
+- New German (Austrian) translation of the Web interface :austria: 
+
 #### Bug fixes:
 
 - Create folder access-keys when initializing RODA for the first time #2992
@@ -485,16 +501,4 @@ docker pull keeps/roda:v3.5.7
 Install for demonstration:
 ```
 docker pull keeps/roda:v4.1.0
-```
----
-
-## v4.0.3 (04/10/2021)
-
-#### Bug Fixes:
-
--  Missing dependencies from RODA 4 Dockerfile [#1949](https://github.com/keeps/roda/issues/1949)
-
-Install for demonstration:
-```
-docker pull keeps/roda:v4.0.3
 ```
