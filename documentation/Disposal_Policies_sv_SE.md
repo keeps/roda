@@ -60,7 +60,7 @@ Gallringen av bevarandeobjekt har vissa begränsningar. Hur objekten gallras ber
 
 ### 1. Vad är en gallringsregel
 
-Gallringsregler är ett antal regler och krav som sätter gallringsschema för varje objekt i systemet. Gallringsreglerna kan sättas när som helst för att säkerställa upprätthållandet av systemet. Gallringsregler kan också sättas under inläsningsprocessen. Gallringsreglerna har egenskaper och regler som triggar om själva gallringen genomförs eller inte. Om ett arkivobjekt inte uppfyller någon av dessa regler, kommer den inte att följa gallringsregeln. 
+Gallringsregler är ett antal regler och krav som sätter gallringsschema för varje logisk enhet i systemet. Gallringsreglerna kan sättas när som helst för att säkerställa upprätthållandet av systemet. Gallringsregler kan också sättas under inläsningsprocessen. Gallringsreglerna har egenskaper och regler som triggar om själva gallringen genomförs eller inte. Om ett arkivobjekt inte uppfyller någon av dessa regler, kommer den inte att följa gallringsregeln. 
 
 ### 2. Vad är en gallringsregel?
 
