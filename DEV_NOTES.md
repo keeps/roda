@@ -68,9 +68,10 @@ Example release 2.2.0 and prepare for next version 2.3.0.
 Snippet for docker run instructions:
 
 ````text
-Install for demonstration:
-```
-docker pull keeps/roda:v2.2.11
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+
 ```
 ````
 
