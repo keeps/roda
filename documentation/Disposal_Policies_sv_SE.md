@@ -2,17 +2,17 @@
 
 ## Gallringsschema
 
-Gallringsscheman anger minimikraven för underhålls-, bevarande- eller gallringsåtgärder som ska vidtas på befintliga eller framtida intellektuella enheter i detta e-arkiv. En intellektuell enhet får endast raderas som en del av en gallringsprocess som styrs av det gallringsschema som tilldelats den enheten. Det är den intellektuella enhetens gallringsschema som bestämmer hur länge en post bevaras och hur den därefter gallras i slutet av dess bevarandeperiod.
+Gallringsscheman anger minimikraven för underhålls-, bevarande- eller gallringsåtgärder som ska vidtas på befintliga eller framtida logiska enheter i detta arkiv. En logisk enhet får endast gallras som en del av en gallringsprocess som styrs av det gallringsschema som tilldelats den enheten. Det är den logiska enhetens gallringsschema som bestämmer hur länge en post bevaras och hur den därefter gallras i slutet av dess bevarandeperiod.
 
 ### 1. Vad är ett gallringsschema?
 
-Enligt [MoReq2010®](https://moreq.info/) är "Gallringsscheman avgörande för att hantera bevarandeobjekt eftersom MoReq2010® specificerar att ett bevarandeobjekt i ett MCRS endast får raderas som en del av en gallringsprocess som styrs av gallringsschemat som tilldelats det bevarandeobjektet . Det är bevarandeobjektets gallringsschema som avgör hur länge ett bevarandeobjekt bevaras och hur den därefter gallras vid slutet av dess bevarandeperiod."
+Enligt [MoReq2010®](https://moreq.info/) är "Gallringsscheman avgörande för att hantera bevarandeobjekt eftersom MoReq2010® specificerar att ett bevarandeobjekt i ett MCRS endast får gallras som en del av en gallringsprocess som styrs av gallringsschemat som tilldelats det bevarandeobjektet . Det är bevarandeobjektets gallringsschema som avgör hur länge ett bevarandeobjekt bevaras och hur den därefter gallras vid slutet av dess bevarandeperiod."
 
 RODA stödjer tre typer av gallringsåtgärder:
 
 1. Behåll permanent;
 2. Granska i slutet av bevarandeperioden;
-3. Radera i slutet av bevarandeperioden.
+3. Gallra i slutet av bevarandeperioden.
 
 Beräkningen av bevarandeperiod använder sig av identifierare av element för bevarande och lägger till dess värde med bevarandeperioden. De möjliga värdena för bevarandeperiod är:
 
@@ -32,7 +32,7 @@ Följande attribut kategoriserar ett gallringsschema:
 | Beskrivning | Beskrivning av gallringsschemat | Falskt |
 | Mandat | Hänvisning till gallringsbeslut eller liknande  | Falskt |
 | Omfattningsbeskrivning | Vägledning till auktoriserade användare som anger hur man bäst tillämpar en viss enhet och anger eventuella organisatoriska policyer eller begränsningar för dess användning | Falskt |
-| Gallringsåtgärd | Kod som beskriver den åtgärd som ska vidtas vid gallring av posten (möjliga värden: Behåll permanent, granska, radera) | Sant |
+| Gallringsåtgärd | Kod som beskriver den åtgärd som ska vidtas vid gallring av posten (möjliga värden: Behåll permanent, granska, gallra) | Sant |
 | Trigger för att identifiera element för bevarande | Det beskrivande metadatafältet som används för att beräkna bevarandeperioden | Sant (om åtgärdskoden för gallring skiljer sig från Behåll permanent) |
 | Bevarandeperiod | Antal dagar, veckor, månader eller år som specificerats för att bevara ett bevarandeobjekt efter att bevarandeperioden har triggats | Sant (om åtgärdskoden för gallring skiljer sig från Behåll permanent) |
 
@@ -52,7 +52,7 @@ När ett bevarandeobjekts gallringsåtgärd är inställd på granskning är den
 
 #### Gallringslivscykeln
 
-Gallringen av bevarandeobjekt har vissa begränsningar. Hur objekten gallras beror på innehållet i dess komponenter. RODA kan rensa beskrivande metadata med hjälp av [XSLT (eXtensible Stylesheet Language Transformations)](http://www.w3.org/standards/xml/transformation.html). Alla filer som är associerade med objektet raderas och lämnar objektet i ett gallrat tillstånd.
+Gallringen av bevarandeobjekt har vissa begränsningar. Hur objekten gallras beror på innehållet i dess komponenter. RODA kan rensa beskrivande metadata med hjälp av [XSLT (eXtensible Stylesheet Language Transformations)](http://www.w3.org/standards/xml/transformation.html). Alla filer som är associerade med objektet gallras och lämnar objektet i ett gallrat tillstånd.
 
 ![Desctuction life cycle](images/destruction_life_cycle.png "Livscykel förstöring")
 
@@ -60,7 +60,7 @@ Gallringen av bevarandeobjekt har vissa begränsningar. Hur objekten gallras ber
 
 ### 1. Vad är en gallringsregel
 
-Gallringsregler är ett antal regler och krav som sätter gallringsschema för varje objekt i systemet. Gallringsreglerna kan sättas när som helst för att säkerställa upprätthållandet av systemet. Gallringsregler kan också sättas under inläsningsprocessen. Gallringsreglerna har egenskaper och regler som triggar om själva gallringen genomförs eller inte. Om ett arkivobjekt inte uppfyller någon av dessa regler, kommer den inte att följa gallringsregeln. 
+Gallringsregler är ett antal regler och krav som sätter gallringsschema för varje logisk enhet i systemet. Gallringsreglerna kan sättas när som helst för att säkerställa upprätthållandet av systemet. Gallringsregler kan också sättas under inläsningsprocessen. Gallringsreglerna har egenskaper och regler som triggar om själva gallringen genomförs eller inte. Om ett arkivobjekt inte uppfyller någon av dessa regler, kommer den inte att följa gallringsregeln. 
 
 ### 2. Vad är en gallringsregel?
 
@@ -91,7 +91,7 @@ Gallringsregler kan tillämpas vid inleveransprocessen via ett plugin, men kan o
 
 ### 1. Vad är gallringsstopp?
 
-Gallringsstopp är en order som stoppar den normala processen för gallring och som innebär att arkivobjekt inte kommer att gallras. När gallringsstoppet är associerat med ett arkivobjekt kommer gallring inte att ske så länge som gallringsstoppet är aktivt i systemet. När gallringsstoppet inaktiveras, kommer gallringsprocessen att fortsätta. 
+Gallringsstopp är en order som stoppar den normala processen för gallring och som innebär att en logisk enhet inte kommer att gallras. När gallringsstoppet är associerat med en logisk enhet kommer gallring inte att ske så länge som gallringsstoppet är aktivt i systemet. När gallringsstoppet inaktiveras, kommer gallringsprocessen att fortsätta. 
 
 ### 2. Vad kategoriserar ett gallringsstopp?
 

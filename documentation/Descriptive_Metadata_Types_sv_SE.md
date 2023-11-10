@@ -1,6 +1,6 @@
 # Beskrivande metadatatyper
 
-När du skapar en ny intellektuell enhet är ett av stegen att välja "typ" av beskrivande metadata.
+När du skapar en ny logisk enhet är ett av stegen att välja "typ" av beskrivande metadata.
 
 Detta hänvisar till det beskrivande metadataschemat som kommer att användas, och som standard stöder RODA följande alternativ:
 
@@ -22,7 +22,7 @@ Förklaring:
 * **Schemavalidering**: Systemet erbjuder ett XML-schema för att validera strukturen och datatyperna för den tillhandahållna metadatafilen. Valideringsschemat kommer att användas under inleveransprocessen för att kontrollera om metadata som ingår i SIP:en är giltigt enligt de fastställda begränsningarna, samt när metadata redigeras i katalogen.
 * **Grammatikalitetsbedömning**: Systemet kontrollerar endast om XML-filen för metadata är välformaterad och eftersom inget schema är definierat kommer systemet inte att verifiera om filen är giltig.
 * **Indexeringsregler**: Systemet tillhandahåller en standard XSLT som omvandlar den XML-baserade metadatan till något som indexeringsmotorn kan förstå. Detta möjliggör avancerad sökning på beskrivande metadata.
-* **Generell indexering**: E-arkivet kommer att indexera alla textelement och attributvärden som finns i metadatafilen, men eftersom systemet inte känner till rätt mappning mellan XML-elementen och den inre datamodellen kommer endast grundläggande sökning att vara möjlig på tillhandahållen metadata.
+* **Generell indexering**: Arkivet kommer att indexera alla textelement och attributvärden som finns i metadatafilen, men eftersom systemet inte känner till rätt mappning mellan XML-elementen och den inre datamodellen kommer endast grundläggande sökning att vara möjlig på tillhandahållen metadata.
 * **Visualiseringsregler**: Systemet tillhandahåller en standard XSLT som omvandlar den XML-baserade metadatan till en HTML-fil som kommer att visas för användaren när man tittar i en befintlig AIP i katalogen.
 * **Generisk visualisering**: Systemet tillhandahåller en generisk metadatavisare för att visa den XML-baserade metadatan. Alla textelement och attribut kommer att visas upp i ingen speciell ordning och deras XPath (sökväg) kommer att användas som etikett.
 * **Redigeringsformulär**: Systemet tillhandahåller en konfigurationsfil som instruerar hur man visar ett formulär för att redigera befintlig metadata.

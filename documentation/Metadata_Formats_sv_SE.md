@@ -2,11 +2,11 @@
 
 RODA stödjer alla beskrivande metadataformat (dvs. beskrivande information enligt OAIS) så länge som det representeras av en XML-fil. Om man har ett beskrivande metadataformat som inte är baserat på XML (t.ex. CSV, JSON, MARC21, etc.), måste man konvertera det till XML innan man kan använda det i RODA. Det finns flera verktyg på webben som kan konvertera de flesta dataformat till XML.
 
-När metadatan finns i en XML är den redo att paketeras i ett Submission Information Package (SIP) och levereras in till e-arkivet. Alternativt kanske du vill skapa en metadatafil direkt i e-arkivet genom att använda funktionaliteten som tillhandahålls i katalogen. När metadataformatet är nytt för RODA kommer systemet att göra sitt bästa för att stödja utan att behöva göra någon omkonfigurering av systemet, dock gäller följande begränsningar:
+När metadatan finns i en XML är den redo att paketeras i ett Submission Information Package (SIP) och levereras in till arkivet. Alternativt kanske du vill skapa en metadatafil direkt i arkivet genom att använda funktionaliteten som tillhandahålls i katalogen. När metadataformatet är nytt för RODA kommer systemet att göra sitt bästa för att stödja utan att behöva göra någon omkonfigurering av systemet, dock gäller följande begränsningar:
 
 #### Validering
 
-Om inget schema tillhandahålls för ditt metadataformat kommer e-arkivet att kontrollera om metadata-XML-filen är välformaterad. Eftersom e-arkivet inte vet om det är rätt grammatik kommer ingen verifiering göras angående om filen är giltig.
+Om inget schema tillhandahålls för ditt metadataformat kommer arkivet att kontrollera om metadata-XML-filen är välformaterad. Eftersom arkivet inte vet om det är rätt grammatik kommer ingen verifiering göras angående om filen är giltig.
 
 #### Indexering
 
@@ -18,9 +18,9 @@ När inga visuella mappningar är konfigurerade kommer en generisk metadatavisar
 
 #### Version
 
-RODA behöver ha en konfigurationsfil för att veta hur metadatafiler ska visas för redigeringsändamål. Om det inte finns någon sådan konfiguration kommer e-arkivet att visa ett textområde där användaren kan redigera direkt i XML:en.
+RODA behöver ha en konfigurationsfil för att veta hur metadatafiler ska visas för redigeringsändamål. Om det inte finns någon sådan konfiguration kommer arkivet att visa ett textområde där användaren kan redigera direkt i XML:en.
 
-För att stödja nya metadataformat måste e-arkivet konfigureras därefter. Följande avsnitt beskriver i detalj de åtgärder som måste utföras för att ett nytt metadataschema ska stödjas fullt ut i RODA.
+För att stödja nya metadataformat måste arkivet konfigureras därefter. Följande avsnitt beskriver i detalj de åtgärder som måste utföras för att ett nytt metadataschema ska stödjas fullt ut i RODA.
 
 ## Metadataförbättringsfiler
 
