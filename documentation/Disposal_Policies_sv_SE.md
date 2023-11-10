@@ -91,7 +91,7 @@ Gallringsregler kan tillämpas vid inleveransprocessen via ett plugin, men kan o
 
 ### 1. Vad är gallringsstopp?
 
-Gallringsstopp är en order som stoppar den normala processen för gallring och som innebär att arkivobjekt inte kommer att gallras. När gallringsstoppet är associerat med ett arkivobjekt kommer gallring inte att ske så länge som gallringsstoppet är aktivt i systemet. När gallringsstoppet inaktiveras, kommer gallringsprocessen att fortsätta. 
+Gallringsstopp är en order som stoppar den normala processen för gallring och som innebär att en logisk enhet inte kommer att gallras. När gallringsstoppet är associerat med en logisk enhet kommer gallring inte att ske så länge som gallringsstoppet är aktivt i systemet. När gallringsstoppet inaktiveras, kommer gallringsprocessen att fortsätta. 
 
 ### 2. Vad kategoriserar ett gallringsstopp?
 
