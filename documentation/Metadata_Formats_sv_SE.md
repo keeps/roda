@@ -2,7 +2,7 @@
 
 RODA stödjer alla beskrivande metadataformat (dvs. beskrivande information enligt OAIS) så länge som det representeras av en XML-fil. Om man har ett beskrivande metadataformat som inte är baserat på XML (t.ex. CSV, JSON, MARC21, etc.), måste man konvertera det till XML innan man kan använda det i RODA. Det finns flera verktyg på webben som kan konvertera de flesta dataformat till XML.
 
-När metadatan finns i en XML är den redo att paketeras i ett Submission Information Package (SIP) och levereras in till e-arkivet. Alternativt kanske du vill skapa en metadatafil direkt i e-arkivet genom att använda funktionaliteten som tillhandahålls i katalogen. När metadataformatet är nytt för RODA kommer systemet att göra sitt bästa för att stödja utan att behöva göra någon omkonfigurering av systemet, dock gäller följande begränsningar:
+När metadatan finns i en XML är den redo att paketeras i ett Submission Information Package (SIP) och levereras in till arkivet. Alternativt kanske du vill skapa en metadatafil direkt i arkivet genom att använda funktionaliteten som tillhandahålls i katalogen. När metadataformatet är nytt för RODA kommer systemet att göra sitt bästa för att stödja utan att behöva göra någon omkonfigurering av systemet, dock gäller följande begränsningar:
 
 #### Validering
 
