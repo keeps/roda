@@ -12,7 +12,7 @@ RODA stödjer tre typer av gallringsåtgärder:
 
 1. Behåll permanent;
 2. Granska i slutet av bevarandeperioden;
-3. Radera i slutet av bevarandeperioden.
+3. Gallra i slutet av bevarandeperioden.
 
 Beräkningen av bevarandeperiod använder sig av identifierare av element för bevarande och lägger till dess värde med bevarandeperioden. De möjliga värdena för bevarandeperiod är:
 
