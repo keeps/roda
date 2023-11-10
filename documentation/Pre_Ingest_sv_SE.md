@@ -52,5 +52,5 @@ Det finns flera sätt att överföra SIP:ar till systemet. Dessa inkluderar men 
 
 Efter överföringen kommer arkivarien att välja ut SIP:ar för inleverans. Inleveransprocessen innehåller tjänster och funktioner för att acceptera SIP:ar från producenter och förbereda innehållet för lagring.
 
-Inleveransfunktioner inkluderar att ta emot SIP:ar, utföra kvalitetssäkring av SIP:ar, generera ett Archival Information Package (AIP) som överensstämmer med e-arkivets dataformaterings- och dokumentationsstandarder, extrahera beskrivande information från AIP:erna i arkivets katalog och koordinera uppdateringar av lagring och datahantering.
+Inleveransfunktioner inkluderar att ta emot SIP:ar, utföra kvalitetssäkring av SIP:ar, generera ett Archival Information Package (AIP) som överensstämmer med arkivets dataformaterings- och dokumentationsstandarder, extrahera beskrivande information från AIP:erna i arkivets katalog och koordinera uppdateringar av lagring och datahantering.
 
