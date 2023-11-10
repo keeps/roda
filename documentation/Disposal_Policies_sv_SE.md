@@ -6,7 +6,7 @@ Gallringsscheman anger minimikraven för underhålls-, bevarande- eller gallring
 
 ### 1. Vad är ett gallringsschema?
 
-Enligt [MoReq2010®](https://moreq.info/) är "Gallringsscheman avgörande för att hantera bevarandeobjekt eftersom MoReq2010® specificerar att ett bevarandeobjekt i ett MCRS endast får raderas som en del av en gallringsprocess som styrs av gallringsschemat som tilldelats det bevarandeobjektet . Det är bevarandeobjektets gallringsschema som avgör hur länge ett bevarandeobjekt bevaras och hur den därefter gallras vid slutet av dess bevarandeperiod."
+Enligt [MoReq2010®](https://moreq.info/) är "Gallringsscheman avgörande för att hantera bevarandeobjekt eftersom MoReq2010® specificerar att ett bevarandeobjekt i ett MCRS endast får gallras som en del av en gallringsprocess som styrs av gallringsschemat som tilldelats det bevarandeobjektet . Det är bevarandeobjektets gallringsschema som avgör hur länge ett bevarandeobjekt bevaras och hur den därefter gallras vid slutet av dess bevarandeperiod."
 
 RODA stödjer tre typer av gallringsåtgärder:
 
