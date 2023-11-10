@@ -1,5 +1,79 @@
 # Changelog
 
+## v5.2.3 (10/11/2023)
+#### Bug fixes:
+
+- Create folder access-keys when initializing RODA for the first time #2992
+- Add default representation type when creating a preservation action job #2990
+- Edit button for selecting parent does not work as expected #2988
+- EAD 2002 dissemination crosswalk duplicates record group level #2987
+
+#### Enhancements:
+
+- Add title attribute to improve accessibility #2989
+
+#### Security:
+
+- Bump several dependencies
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+
+
+---
+
+## v5.2.2 (04/10/2023)
+#### Bug fixes:
+- Fixed FileID when it is encoded #2963
+- Fixed API filter issue #2965
+
+#### Security:
+- Several dependency upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://www.roda-community.org/deploys/standalone/).
+
+
+---
+
+## v5.2.1 (08/09/2023)
+#### Bug fixes:
+- Listing RODA objects via REST-API is not showing any results #2935
+- Preservation events page is not showing no events #2928
+- REST API endpoint to retrieve the last transferred resource report does not show the reports #2929
+- Problem with pre-filter not being reset when searching preservation events #2941
+
+#### Security:
+- Several dependency upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://www.roda-community.org/deploys/standalone/).
+
+
+---
+
+## v5.2.0 (28/07/2023)
+#### Enhancements:
+- DIP must be deleted if it no longer contains any link with any entity. #2863
+- Ingest job report could expose if SIP is update #2212
+
+#### Bug fixes:
+- Unexpected behaviour can cause index to be completely deleted #2921
+
+#### Security:
+- Several dependency upgrades to fix security vulnerabilities
+- Remove python from Docker image
+
+---
+
+To try out this version, check the [install instructions](https://www.roda-community.org/deploys/standalone/).
+
+
+---
+
 ## v5.1.0 (20/06/2023)
 #### New features:
 
@@ -26,7 +100,7 @@
 
 ---
 
-To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+To try out this version, check the [install instructions](https://www.roda-community.org/deploys/standalone/).
 
 
 ---
@@ -423,66 +497,4 @@ docker pull keeps/roda:v4.1.0
 Install for demonstration:
 ```
 docker pull keeps/roda:v4.0.3
-```
----
-
-## v4.0.2 (12/08/2021)
-#### Bug Fixes:
-
--  Missing Cron in Tomcat base image. [#1940](https://github.com/keeps/roda/issues/1940)
-
-Install for demonstration:
-```
-docker pull keeps/roda:v4.0.2
-```
----
-
-## v3.5.6 (12/08/2021)
-
-#### Bug Fixes:
-
--  Missing Cron in Tomcat base image. [#1940](https://github.com/keeps/roda/issues/1940)
-
-Install for demonstration:
-```
-docker pull keeps/roda:v3.5.6
-```
-
----
-
-## v4.0.1 (29/07/2021)
-#### Enhancements:
--  Improve pruning of descriptive metadata when destroying a record #1920
--  Modify Tomcat on Dockerfile [#1923](https://github.com/keeps/roda/issues/1923)
--  Update Dockerfile siegfried repository [#1938](https://github.com/keeps/roda/issues/1938)
-
-#### Bug Fixes:
-
--  master/slave action logs management [#1928](https://github.com/keeps/roda/issues/1928)
--  CAS login repeatedly register an action even though the user is already logged in [#1926](https://github.com/keeps/roda/issues/1926)
--  PluginHelper is faulty reporting a failure when transforming lite in object [#1925](https://github.com/keeps/roda/issues/1925)
--  Failed to open job-report via job page [#1922](https://github.com/keeps/roda/issues/1922)
--  Improve ErrorHandler to filter false positive errors [#1921](https://github.com/keeps/roda/issues/1921)
--  ImageMagick plugin does not create a preservation event  [#1936](https://github.com/keeps/roda/issues/1936)
-
-Install for demonstration:
-```
-docker pull keeps/roda:v4.0.1
-```
-
----
-
-## v3.5.5 (28/07/2021)
-
-#### Enhancements:
-
--  Update Dockerfile siegfried repository [#1938](https://github.com/keeps/roda/issues/1938)
-
-#### Bug Fixes:
-
--  ImageMagick plugin does not create a preservation event  [#1936](https://github.com/keeps/roda/issues/1936)
-
-Install for demonstration:
-```
-docker pull keeps/roda:v3.5.5
 ```
