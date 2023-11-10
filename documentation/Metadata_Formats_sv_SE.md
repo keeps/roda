@@ -20,7 +20,7 @@ När inga visuella mappningar är konfigurerade kommer en generisk metadatavisar
 
 RODA behöver ha en konfigurationsfil för att veta hur metadatafiler ska visas för redigeringsändamål. Om det inte finns någon sådan konfiguration kommer arkivet att visa ett textområde där användaren kan redigera direkt i XML:en.
 
-För att stödja nya metadataformat måste e-arkivet konfigureras därefter. Följande avsnitt beskriver i detalj de åtgärder som måste utföras för att ett nytt metadataschema ska stödjas fullt ut i RODA.
+För att stödja nya metadataformat måste arkivet konfigureras därefter. Följande avsnitt beskriver i detalj de åtgärder som måste utföras för att ett nytt metadataschema ska stödjas fullt ut i RODA.
 
 ## Metadataförbättringsfiler
 
