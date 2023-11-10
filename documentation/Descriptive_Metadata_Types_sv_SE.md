@@ -1,6 +1,6 @@
 # Beskrivande metadatatyper
 
-När du skapar en ny intellektuell enhet är ett av stegen att välja "typ" av beskrivande metadata.
+När du skapar en ny logisk enhet är ett av stegen att välja "typ" av beskrivande metadata.
 
 Detta hänvisar till det beskrivande metadataschemat som kommer att användas, och som standard stöder RODA följande alternativ:
 
