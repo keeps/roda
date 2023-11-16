@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 
@@ -40,6 +41,7 @@ public class PluginOptionsPanel extends Composite {
     layout.clear();
 
     if (pluginInfo != null) {
+
       for (PluginParameter parameter : pluginInfo.getParameters()) {
         PluginParameterPanel panel = new PluginParameterPanel(parameter);
         panels.add(panel);
@@ -62,9 +64,18 @@ public class PluginOptionsPanel extends Composite {
 
     for (PluginParameterPanel panel : panels) {
       String key = panel.getParameter().getId();
-      String value = panel.getValue();
-      if (value != null) {
-        ret.put(key, value);
+      if (panel.isConversionPanel()) {
+        if (panel.getValue().equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_DISSEMINATION)) {
+          ret.put(key, panel.getDisseminationParameter().printAsParameter(panel.getValue()));
+        } else {
+          ret.put(key,
+            panel.getRepresentationParameter().printAsParameter(RodaConstants.PLUGIN_PARAMS_CONVERSION_REPRESENTATION));
+        }
+      } else {
+        String value = panel.getValue();
+        if (value != null) {
+          ret.put(key, value);
+        }
       }
     }
 

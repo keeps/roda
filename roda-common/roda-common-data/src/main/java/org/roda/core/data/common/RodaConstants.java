@@ -2075,6 +2075,10 @@ public final class RodaConstants {
   public static final String SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_UPDATED = "updated";
   public static final String SYNCHRONIZATION_ENTITY_SUMMARY_TYPE_ISSUE = "issue";
 
+  public static final String PLUGIN_PARAMS_CONVERSION_REPRESENTATION = "rep";
+
+  public static final String PLUGIN_PARAMS_CONVERSION_DISSEMINATION = "dip";
+
   /** Private empty constructor */
   private RodaConstants() {
     // do nothing

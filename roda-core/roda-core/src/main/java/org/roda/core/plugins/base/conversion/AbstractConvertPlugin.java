@@ -91,25 +91,12 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
         PluginParameterType.BOOLEAN, "true", false, false,
         "Do not process files that have a different format from the indicated."));
 
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP, new PluginParameter(
-      RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP, "Create dissemination", PluginParameterType.BOOLEAN, "true",
-      false, false,
-      "If this is selected then the plugin will convert the files and create a new dissemination. If not, a new representation will be created."));
-
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE, "Dissemination title",
-        PluginParameterType.STRING, "Dissemination title", false, false,
-        "If the 'create dissemination' option is checked, then this will be the respective dissemination title."));
-
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION, new PluginParameter(
-      RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION, "Dissemination description", PluginParameterType.STRING,
-      "Dissemination description", false, false,
-      "If the 'create dissemination' option is checked, then this will be the respective dissemination description."));
-
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_TYPE,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_TYPE, "Representation type",
-        PluginParameterType.REPRESENTATION_TYPE, "", false, false,
-        "Attribute a type when creating a new representation"));
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP,
+      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP,
+        "Outcome", PluginParameterType.CONVERSION)
+        .withDescription(
+          "A conversion can create a representation or a dissemination. Please choose which option to output")
+        .build());
   }
 
   private String inputFormat;
@@ -129,7 +116,7 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
 
   protected Map<String, PluginParameter> getDefaultParameters() {
     return pluginParameters.entrySet().stream()
-      .collect(Collectors.toMap(e -> e.getKey(), e -> new PluginParameter(e.getValue())));
+      .collect(Collectors.toMap(Map.Entry::getKey, e -> new PluginParameter(e.getValue())));
   }
 
   protected List<PluginParameter> orderParameters(Map<String, PluginParameter> params) {
@@ -210,19 +197,25 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
     }
 
     if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP)) {
-      createDIP = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP));
-    }
+      String value = parameters.get(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP);
 
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE)) {
-      dipTitle = parameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_TITLE);
-    }
+      Map<String, String> map = new HashMap<>();
+      String[] keyValuePairs = value.split(";");
+      for (String pair : keyValuePairs) {
+        String[] parts = pair.split("=");
+        if (parts.length == 2) {
+          map.put(parts[0].trim(), parts[1].trim());
+        }
+      }
 
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION)) {
-      dipDescription = parameters.get(RodaConstants.PLUGIN_PARAMS_DISSEMINATION_DESCRIPTION);
-    }
-
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_TYPE)) {
-      representationType = parameters.get(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_TYPE);
+      if (map.get("type").equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_REPRESENTATION)) {
+        createDIP = false;
+        representationType = map.get("value");
+      } else {
+        createDIP = true;
+        dipTitle = map.get("title");
+        dipDescription = map.get("description");
+      }
     }
 
     hasPartialSuccessOnOutcome = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("core", "tools",

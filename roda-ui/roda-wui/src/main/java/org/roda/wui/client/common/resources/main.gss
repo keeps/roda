@@ -7866,3 +7866,15 @@ span.code {
 .ingest-tab-panel a {
   font-weight: bold;
 }
+
+.conversion-profile {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.conversion-profile select {
+    margin-right: 10px
+}
+
+

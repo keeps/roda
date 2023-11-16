@@ -39,16 +39,17 @@ import org.slf4j.LoggerFactory;
 
 public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ActionLogCleanerPlugin.class);
-  private int deleteOlderThanXDays = 90;
-
-  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+  private static final Map<String, PluginParameter> pluginParameters = new HashMap<>();
 
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS, "Delete older than X days",
-        PluginParameterType.INTEGER, "90", false, false,
-        "The plugin will delete all logs older than the specified number of days."));
+      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS,
+        "Delete older than X days", PluginParameterType.INTEGER).withDefaultValue("90").isMandatory(false)
+        .isReadOnly(false).withDescription("The plugin will delete all logs older than the specified number of days.")
+        .build());
   }
+
+  private int deleteOlderThanXDays = 90;
 
   @Override
   public void init() throws PluginException {
@@ -92,11 +93,7 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
       try {
         int deleteDays = Integer.parseInt(parameters.get(RodaConstants.PLUGIN_PARAMS_DELETE_OLDER_THAN_X_DAYS));
 
-        if (deleteDays >= 0) {
-          this.deleteOlderThanXDays = deleteDays;
-        } else {
-          this.deleteOlderThanXDays = 0;
-        }
+        this.deleteOlderThanXDays = Math.max(deleteDays, 0);
       } catch (NumberFormatException e) {
         // do nothing
       }
@@ -115,10 +112,8 @@ public class ActionLogCleanerPlugin extends AbstractPlugin<Void> {
       try {
         index.deleteActionLog(until);
       } catch (SolrServerException | IOException | AuthorizationDeniedException e) {
-        LOGGER.error("Error deleting actionlog until {}", until);
+        LOGGER.error("Error deleting audit logs until {}", until);
       }
-    } else {
-      // do nothing
     }
 
     return null;

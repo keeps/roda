@@ -34,7 +34,7 @@ services:
       - clam_data:/var/lib/clamav
       - $HOME/.roda_central/data/storage:$HOME/.roda_central/data/storage
   siegfried:
-    image: ghcr.io/keeps/siegfried:v1.9.6
+    image: ghcr.io/keeps/siegfried:v1.10.1
     restart: unless-stopped
     ports:
       - "5139:5138"

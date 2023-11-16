@@ -14,90 +14,10 @@ import java.util.List;
 /**
  * @author Rui Castro
  * @author Luis Faria <lfaria@keep.pt>
+ * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
 public class PluginParameter implements Serializable {
   private static final long serialVersionUID = -431821437136556726L;
-
-  public enum PluginParameterType {
-    /**
-     * Normal string
-     */
-    STRING,
-
-    /**
-     * Password type parameter, should not be echoed
-     */
-    // PASSWORD,
-
-    /**
-     * Checkbox
-     */
-    BOOLEAN,
-
-    /**
-     * Integer box
-     */
-    INTEGER,
-
-    /**
-     * String which will be translated into the canonical class name of sip to aip
-     * plugin
-     */
-    PLUGIN_SIP_TO_AIP,
-
-    // 20181122 hsilva: this was being used by one plugin but not specific logic
-    // was being user for example for creating web interface
-    // /**
-    // * Metadata type select box
-    // */
-    // METADATA_TYPE,
-
-    /**
-     * Interface to select an AIP Id
-     */
-    AIP_ID,
-
-    /**
-     * Interface to select an Risk Id
-     */
-    RISK_ID,
-
-    /**
-     * Interface to select a severity level
-     */
-    SEVERITY,
-
-    /**
-     * Interface to select a representation type
-     */
-    REPRESENTATION_TYPE,
-
-    /**
-     * Interface to select a RODA object
-     */
-    RODA_OBJECT,
-
-    /**
-     * Interface to select a RODA object (AIP, representation, file) fields
-     */
-    AIP_FIELDS, REPRESENTATION_FIELDS, FILE_FIELDS,
-
-    /**
-     * Interface to select permission types
-     */
-    PERMISSION_TYPES,
-
-    /**
-     * Interface to generic dropdown items
-     */
-    DROPDOWN,
-
-    /**
-     * Interface to users profiles
-     */
-    USER_PROFILE;
-  }
-
   private String id = null;
   private String name = null;
   private PluginParameterType type = null;
@@ -106,7 +26,6 @@ public class PluginParameter implements Serializable {
   private boolean mandatory = true;
   private boolean readonly = false;
   private String description = null;
-
   private RenderingHints renderingHings = null;
 
   /**
@@ -114,6 +33,23 @@ public class PluginParameter implements Serializable {
    */
   public PluginParameter() {
     // do nothing
+  }
+
+  /**
+   * Constructs a new {@link PluginParameter} using the builder pattern.
+   *
+   * @param builder
+   *          {@link PluginParameterBuilder}
+   */
+  public PluginParameter(PluginParameterBuilder builder) {
+    this.id = builder.id;
+    this.name = builder.name;
+    this.type = builder.type;
+    this.defaultValue = builder.defaultValue;
+    this.possibleValues = builder.possibleValues;
+    this.mandatory = builder.mandatory;
+    this.readonly = builder.readOnly;
+    this.description = builder.description;
   }
 
   /**
@@ -126,6 +62,13 @@ public class PluginParameter implements Serializable {
    * @param mandatory
    * @param readonly
    * @param description
+   */
+
+  /**
+   * @deprecated It will be removed in the next major version. Due to
+   *             maintainability, a constructor shouldn't have to many arguments.
+   *             Use instead the builder
+   *             {@link #PluginParameter(PluginParameterBuilder)}
    */
   public PluginParameter(String id, String name, PluginParameterType type, String defaultValue, boolean mandatory,
     boolean readonly, String description) {
@@ -151,6 +94,12 @@ public class PluginParameter implements Serializable {
    * @param readonly
    * @param description
    */
+  /**
+   * @deprecated It will be removed in the next major version. Due to
+   *             maintainability, a constructor shouldn't have to many arguments.
+   *             Use instead the builder
+   *             {@link #PluginParameter(PluginParameterBuilder)}
+   */
   public PluginParameter(String id, String name, PluginParameterType type, String value, List<String> possibleValues,
     boolean mandatory, boolean readonly, String description) {
     setId(id);
@@ -171,9 +120,10 @@ public class PluginParameter implements Serializable {
    *          the {@link PluginParameter} to clone.
    */
   public PluginParameter(PluginParameter parameter) {
-    this(parameter.getId(), parameter.getName(), parameter.getType(), parameter.getDefaultValue(),
-      new ArrayList<>(parameter.getPossibleValues()), parameter.isMandatory(), parameter.isReadonly(),
-      parameter.getDescription());
+    this(new PluginParameterBuilder(parameter.getId(), parameter.getName(), parameter.getType())
+            .withDescription(parameter.getDescription()).withDefaultValue(parameter.getDefaultValue())
+            .withPossibleValues(parameter.getPossibleValues()).isReadOnly(parameter.isReadonly())
+            .isMandatory(parameter.isMandatory()));
   }
 
   /**
@@ -254,10 +204,7 @@ public class PluginParameter implements Serializable {
     if (readonly != other.readonly) {
       return false;
     }
-    if (type != other.type) {
-      return false;
-    }
-    return true;
+    return type == other.type;
   }
 
   public String getId() {
@@ -306,7 +253,7 @@ public class PluginParameter implements Serializable {
   }
 
   /**
-   * @param value
+   * @param defaultValue
    *          the value to set
    */
   public void setDefaultValue(String defaultValue) {
@@ -390,6 +337,141 @@ public class PluginParameter implements Serializable {
    */
   public void setRenderingHings(RenderingHints renderingHings) {
     this.renderingHings = renderingHings;
+  }
+
+  public enum PluginParameterType {
+    /**
+     * Normal string
+     */
+    STRING,
+
+    /**
+     * Password type parameter, should not be echoed
+     */
+    // PASSWORD,
+
+    /**
+     * Checkbox
+     */
+    BOOLEAN,
+
+    /**
+     * Integer box
+     */
+    INTEGER,
+
+    /**
+     * String which will be translated into the canonical class name of sip to aip
+     * plugin
+     */
+    PLUGIN_SIP_TO_AIP,
+
+    // 20181122 hsilva: this was being used by one plugin but not specific logic
+    // was being user for example for creating web interface
+    // /**
+    // * Metadata type select box
+    // */
+    // METADATA_TYPE,
+
+    /**
+     * Interface to select an AIP Id
+     */
+    AIP_ID,
+
+    /**
+     * Interface to select an Risk Id
+     */
+    RISK_ID,
+
+    /**
+     * Interface to select a severity level
+     */
+    SEVERITY,
+
+    /**
+     * Interface to select a representation type
+     */
+    REPRESENTATION_TYPE,
+
+    /**
+     * Interface to select a RODA object
+     */
+    RODA_OBJECT,
+
+    /**
+     * Interface to select a RODA object (AIP, representation, file) fields
+     */
+    AIP_FIELDS, REPRESENTATION_FIELDS, FILE_FIELDS,
+
+    /**
+     * Interface to select permission types
+     */
+    PERMISSION_TYPES,
+
+    /**
+     * Interface to generic dropdown items
+     */
+    DROPDOWN,
+
+    /**
+     * Interface to users profiles
+     */
+    CONVERSION_PROFILE,
+
+    /**
+     * Interface to conversion plugins
+     */
+    CONVERSION
+  }
+
+  public static class PluginParameterBuilder {
+
+    // required parameters
+    private final String id;
+    private final String name;
+    private final PluginParameter.PluginParameterType type;
+
+    // optional parameters
+    private String defaultValue;
+    private List<String> possibleValues = new ArrayList<>();
+    private boolean mandatory = true;
+    private boolean readOnly = false;
+    private String description = null;
+
+    public PluginParameterBuilder(String id, String name, PluginParameter.PluginParameterType type) {
+      this.id = id;
+      this.name = name;
+      this.type = type;
+    }
+
+    public PluginParameter build() {
+      return new PluginParameter(this);
+    }
+
+    public PluginParameterBuilder withDefaultValue(String defaultValue) {
+      this.defaultValue = defaultValue;
+      return this;
+    }
+
+    public PluginParameterBuilder withPossibleValues(List<String> possibleValues) {
+      this.possibleValues = possibleValues;
+      return this;
+    }
+
+    public PluginParameterBuilder isMandatory(boolean isMandatory) {
+      this.mandatory = isMandatory;
+      return this;
+    }
+
+    public PluginParameterBuilder isReadOnly(boolean isReadOnly) {
+      this.readOnly = isReadOnly;
+      return this;
+    }
+
+    public PluginParameterBuilder withDescription(String description) {
+      this.description = description;
+      return this;
+    }
   }
 
 }
