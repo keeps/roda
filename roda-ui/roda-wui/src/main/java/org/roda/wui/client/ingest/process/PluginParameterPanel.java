@@ -30,22 +30,23 @@ import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.SeverityLevel;
-import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.bundle.RepresentationInformationFilterBundle;
 import org.roda.wui.client.common.IncrementalAssociativeList;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.utils.PluginUtils;
+import org.roda.wui.client.ingest.process.model.DisseminationParameter;
+import org.roda.wui.client.ingest.process.model.RepresentationParameter;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.dom.client.DomEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -66,21 +67,31 @@ import com.google.gwt.user.client.ui.TextBox;
 import config.i18n.client.ClientMessages;
 
 public class PluginParameterPanel extends Composite {
+  public static final String FORM_SELECTBOX = "form-selectbox";
+  public static final String FORM_TEXTBOX_SMALL = "form-textbox-small";
+  public static final String FORM_RADIOBUTTON = "form-radiobutton";
+  public static final String FORM_RADIOGROUP = "form-radiogroup";
+  public static final String FORM_LABEL = "form-label";
+  public static final String FORM_TEXTBOX = "form-textbox";
+  public static final String OBJECT_BOX = "object box";
+  public static final String FORM_HELP = "form-help";
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static final ClientLogger LOGGER = new ClientLogger(PluginParameterPanel.class.getName());
   private static final String ADD_TYPE = "#__ADDNEW__#";
-
   private final PluginParameter parameter;
   private final FlowPanel layout;
-
+  private final RepresentationParameter representationParameter = new RepresentationParameter();
+  private final DisseminationParameter disseminationParameter = new DisseminationParameter();
   private String value;
   private String aipTitle;
+  private boolean conversionPanel = false;
 
   public PluginParameterPanel(PluginParameter parameter) {
     super();
     this.parameter = parameter;
 
     layout = new FlowPanel();
+
     initWidget(layout);
 
     updateLayout();
@@ -92,7 +103,7 @@ public class PluginParameterPanel extends Composite {
     if (PluginParameterType.BOOLEAN.equals(parameter.getType())) {
       createBooleanLayout();
     } else if (PluginParameterType.STRING.equals(parameter.getType())) {
-      createStringLayout();
+      createStringLayout(parameter);
     } else if (PluginParameterType.PLUGIN_SIP_TO_AIP.equals(parameter.getType())) {
       createPluginSipToAipLayout();
     } else if (PluginParameterType.AIP_ID.equals(parameter.getType())) {
@@ -102,7 +113,7 @@ public class PluginParameterPanel extends Composite {
     } else if (PluginParameterType.SEVERITY.equals(parameter.getType())) {
       createSelectSeverityLayout();
     } else if (PluginParameterType.REPRESENTATION_TYPE.equals(parameter.getType())) {
-      createRepresentationTypeLayout();
+      createRepresentationTypeLayout(parameter);
     } else if (PluginParameterType.RODA_OBJECT.equals(parameter.getType())) {
       createSelectRodaObjectLayout();
     } else if (PluginParameterType.INTEGER.equals(parameter.getType())) {
@@ -117,31 +128,86 @@ public class PluginParameterPanel extends Composite {
       createPermissionTypesLayout();
     } else if (PluginParameterType.DROPDOWN.equals(parameter.getType())) {
       createDropdownLayout();
-    }  else if (PluginParameterType.USER_PROFILE.equals(parameter.getType())) {
-      createUserProfileLayout();
+    } else if (PluginParameterType.CONVERSION_PROFILE.equals(parameter.getType())) {
+      createConversionProfileLayout();
+    } else if (PluginParameterType.CONVERSION.equals(parameter.getType())) {
+      createConversionLayout();
     } else {
       LOGGER
         .warn("Unsupported plugin parameter type: " + parameter.getType() + ". Reverting to default parameter editor.");
-      createStringLayout();
+      createStringLayout(parameter);
     }
   }
 
-  private void createRepresentationTypeLayout() {
+  private void createConversionLayout() {
+    conversionPanel = true;
     Label parameterName = new Label(parameter.getName());
+    final ListBox dropdown = new ListBox();
+    dropdown.addStyleName(FORM_SELECTBOX);
+    dropdown.addStyleName(FORM_TEXTBOX_SMALL);
+
+    dropdown.addItem("Representation", RodaConstants.PLUGIN_PARAMS_CONVERSION_REPRESENTATION);
+    dropdown.addItem("Dissemination", RodaConstants.PLUGIN_PARAMS_CONVERSION_DISSEMINATION);
+
+    value = dropdown.getSelectedValue();
+    FlowPanel innerPanel = new FlowPanel();
+    dropdown.addChangeHandler(event -> {
+      value = dropdown.getSelectedValue();
+      if (value.equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_REPRESENTATION)) {
+        // Clear the layout
+        innerPanel.clear();
+        // Add fields
+        ValueChangeHandler<String> typeChanged = typeChangedEvent -> representationParameter
+          .setValue(typeChangedEvent.getValue());
+
+        innerPanel.add(createRepresentationType("Representation type",
+          "Assign a type when creating a new representation", typeChanged));
+
+        value = RodaConstants.PLUGIN_PARAMS_CONVERSION_REPRESENTATION;
+      } else {
+        // Clear the layout
+        innerPanel.clear();
+        // Add fields
+        ValueChangeHandler<String> titleChanged = titleChangedEvent -> disseminationParameter
+          .setTitle(titleChangedEvent.getValue());
+        ValueChangeHandler<String> descriptionChanged = descriptionChangedEvent -> disseminationParameter
+          .setDescription(descriptionChangedEvent.getValue());
+
+        innerPanel.add(createTextBoxLayout("Dissemination title", disseminationParameter.getTitle(),
+          "This will be the respective dissemination title.", false, titleChanged));
+        innerPanel.add(createTextBoxLayout("Dissemination description", disseminationParameter.getDescription(),
+          "This will be the respective dissemination description.", false, descriptionChanged));
+
+        value = RodaConstants.PLUGIN_PARAMS_CONVERSION_DISSEMINATION;
+      }
+    });
+
+    setSelectedIndexAndFireEvent(dropdown, 0);
+
+    dropdown.setTitle(OBJECT_BOX);
+    layout.add(parameterName);
+    layout.add(dropdown);
+    addHelp();
+    layout.add(innerPanel);
+  }
+
+  private void setSelectedIndexAndFireEvent(final ListBox listBox, final int index) {
+    // Set the selected index
+    listBox.setSelectedIndex(index);
+
+    // Manually trigger a ValueChangeEvent
+    DomEvent.fireNativeEvent(Document.get().createChangeEvent(), listBox);
+  }
+
+  private FlowPanel createRepresentationType(String name, String description,
+    ValueChangeHandler<String> changeHandler) {
+    FlowPanel panel = new FlowPanel();
+    Label parameterName = new Label(name);
 
     final ListBox selectBox = new ListBox();
-    selectBox.addStyleName("form-selectbox");
-    selectBox.addStyleName("form-textbox-small");
-
-    final TextBox newTypeBox = new TextBox();
-    final Label newTypeLabel = new Label(messages.entityTypeNewLabel() + ": ");
-
-    newTypeBox.getElement().setPropertyString("placeholder", messages.entityTypeNewLabel());
-    newTypeBox.addStyleName("form-textbox wui-dialog-message plugin-representation-type-box");
-    newTypeLabel.addStyleName("plugin-representation-type-label");
-
-    newTypeLabel.setVisible(false);
-    newTypeBox.setVisible(false);
+    selectBox.addStyleName(FORM_SELECTBOX);
+    selectBox.addStyleName(FORM_TEXTBOX_SMALL);
+    selectBox.setTitle("representation type box");
 
     BrowserService.Util.getInstance().retrieveRepresentationTypeOptions(LocaleInfo.getCurrentLocale().getLocaleName(),
       new AsyncCallback<Pair<Boolean, List<String>>>() {
@@ -157,43 +223,52 @@ public class PluginParameterPanel extends Composite {
             selectBox.addItem(option);
           }
 
-          if (!result.getFirst()) {
+          if (Boolean.FALSE.equals(result.getFirst())) {
             selectBox.addItem(messages.entityTypeAddNew(), ADD_TYPE);
           }
-
-          selectBox.addChangeHandler(new ChangeHandler() {
-            @Override
-            public void onChange(ChangeEvent event) {
-              value = selectBox.getSelectedValue();
-              newTypeLabel.setVisible(value.equals(ADD_TYPE));
-              newTypeBox.setVisible(value.equals(ADD_TYPE));
-            }
-          });
-
-          newTypeBox.addChangeHandler(new ChangeHandler() {
-            @Override
-            public void onChange(ChangeEvent event) {
-              value = newTypeBox.getText();
-            }
-          });
+          selectBox.setSelectedIndex(0);
+          value = selectBox.getSelectedValue();
+          representationParameter.setValue(selectBox.getSelectedValue());
         }
       });
 
-    value = selectBox.getSelectedValue();
-    selectBox.setTitle("representation type box");
+    final TextBox newTypeBox = new TextBox();
+    final Label newTypeLabel = new Label(messages.entityTypeNewLabel() + ": ");
+    newTypeBox.getElement().setPropertyString("placeholder", messages.entityTypeNewLabel());
+    newTypeBox.addStyleName("form-textbox wui-dialog-message plugin-representation-type-box");
+    newTypeLabel.addStyleName("plugin-representation-type-label");
+    newTypeLabel.setVisible(false);
+    newTypeBox.setVisible(false);
+    newTypeBox.addValueChangeHandler(changeHandler);
 
-    layout.add(parameterName);
-    layout.add(selectBox);
-    layout.add(newTypeLabel);
-    layout.add(newTypeBox);
-    addHelp();
+    selectBox.addChangeHandler(event -> {
+      value = selectBox.getSelectedValue();
+      representationParameter.setValue(value);
+      newTypeLabel.setVisible(value.equals(ADD_TYPE));
+      newTypeBox.setVisible(value.equals(ADD_TYPE));
+    });
+
+    panel.add(parameterName);
+    panel.add(selectBox);
+    panel.add(newTypeLabel);
+    panel.add(newTypeBox);
+    addHelp(panel, description);
+
+    return panel;
+  }
+
+  private void createRepresentationTypeLayout(PluginParameter parameter) {
+    ValueChangeHandler<String> handler = event -> value = event.getValue();
+
+    FlowPanel panel = createRepresentationType(parameter.getName(), parameter.getDescription(), handler);
+    layout.add(panel);
   }
 
   private void createSelectSeverityLayout() {
     Label parameterName = new Label(parameter.getName());
     final ListBox severityBox = new ListBox();
-    severityBox.addStyleName("form-selectbox");
-    severityBox.addStyleName("form-textbox-small");
+    severityBox.addStyleName(FORM_SELECTBOX);
+    severityBox.addStyleName(FORM_TEXTBOX_SMALL);
 
     for (SeverityLevel severity : SeverityLevel.values()) {
       severityBox.addItem(messages.severityLevel(severity), severity.toString());
@@ -201,12 +276,7 @@ public class PluginParameterPanel extends Composite {
 
     value = severityBox.getSelectedValue();
 
-    severityBox.addChangeHandler(new ChangeHandler() {
-      @Override
-      public void onChange(ChangeEvent event) {
-        value = severityBox.getSelectedValue();
-      }
-    });
+    severityBox.addChangeHandler(event -> value = severityBox.getSelectedValue());
 
     severityBox.setTitle("severity box");
     layout.add(parameterName);
@@ -249,8 +319,7 @@ public class PluginParameterPanel extends Composite {
 
   private void createSelectAipLayout() {
     AipIdPluginParameterRenderingHints renderingHints = null;
-    if (parameter.getRenderingHings() != null
-      && parameter.getRenderingHings() instanceof AipIdPluginParameterRenderingHints) {
+    if (parameter.getRenderingHings() instanceof AipIdPluginParameterRenderingHints) {
       renderingHints = (AipIdPluginParameterRenderingHints) parameter.getRenderingHings();
     }
     Label parameterName = new Label(parameter.getName());
@@ -267,64 +336,52 @@ public class PluginParameterPanel extends Composite {
     buttonsPanel.add(removeButton);
 
     final AipIdPluginParameterRenderingHints finalRenderingHints = renderingHints;
-    ClickHandler editClickHandler = new ClickHandler() {
+    ClickHandler editClickHandler = event -> {
+      SelectAipDialog selectAipDialog;
+      if (finalRenderingHints != null) {
 
-      @Override
-      public void onClick(ClickEvent event) {
-        SelectAipDialog selectAipDialog;
-        if (finalRenderingHints != null) {
+        selectAipDialog = new SelectAipDialog(parameter.getName(), finalRenderingHints.getFilter(),
+          finalRenderingHints.isJustActive(), finalRenderingHints.isExportCsvVisible());
 
-          selectAipDialog = new SelectAipDialog(parameter.getName(), finalRenderingHints.getFilter(),
-            finalRenderingHints.isJustActive(), finalRenderingHints.isExportCsvVisible());
+      } else {
+        selectAipDialog = new SelectAipDialog(parameter.getName());
+      }
+      selectAipDialog.showAndCenter();
+      // default behaviour of selectAipDialog enabled
+      if (finalRenderingHints == null || !finalRenderingHints.isDisableSelection()) {
+        selectAipDialog.setSingleSelectionMode();
+        selectAipDialog.addValueChangeHandler(event1 -> {
+          IndexedAIP aip = event1.getValue();
 
-        } else {
-          selectAipDialog = new SelectAipDialog(parameter.getName());
-        }
-        selectAipDialog.showAndCenter();
-        // default behaviour of selectAipDialog enabled
-        if (finalRenderingHints == null || !finalRenderingHints.isDisableSelection()) {
-          selectAipDialog.setSingleSelectionMode();
-          selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
+          Label itemTitle = new Label();
+          HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
+          itemIconHtmlPanel.addStyleName("itemIcon");
+          itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
+          itemTitle.addStyleName("itemText");
 
-            @Override
-            public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
-              IndexedAIP aip = event.getValue();
+          aipPanel.clear();
+          aipPanel.add(itemIconHtmlPanel);
+          aipPanel.add(itemTitle);
 
-              Label itemTitle = new Label();
-              HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
-              itemIconHtmlPanel.addStyleName("itemIcon");
-              itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
-              itemTitle.addStyleName("itemText");
+          editPanel.add(aipPanel);
+          editPanel.add(buttonsPanel);
 
-              aipPanel.clear();
-              aipPanel.add(itemIconHtmlPanel);
-              aipPanel.add(itemTitle);
+          editPanel.setCellWidth(aipPanel, "100%");
 
-              editPanel.add(aipPanel);
-              editPanel.add(buttonsPanel);
+          editPanel.setVisible(true);
+          button.setVisible(false);
 
-              editPanel.setCellWidth(aipPanel, "100%");
-
-              editPanel.setVisible(true);
-              button.setVisible(false);
-
-              value = aip.getId();
-              aipTitle = aip.getTitle();
-            }
-          });
-        }
+          value = aip.getId();
+          aipTitle = aip.getTitle();
+        });
       }
     };
     if (finalRenderingHints == null || !finalRenderingHints.isDisableSelection()) {
-      ClickHandler removeClickHandler = new ClickHandler() {
+      ClickHandler removeClickHandler = event -> {
+        editPanel.setVisible(false);
+        button.setVisible(true);
 
-        @Override
-        public void onClick(ClickEvent event) {
-          editPanel.setVisible(false);
-          button.setVisible(true);
-
-          value = null;
-        }
+        value = null;
       };
       removeButton.addClickHandler(removeClickHandler);
     }
@@ -335,7 +392,7 @@ public class PluginParameterPanel extends Composite {
     layout.add(button);
     layout.add(editPanel);
 
-    parameterName.addStyleName("form-label");
+    parameterName.addStyleName(FORM_LABEL);
     aipPanel.addStyleName("itemPanel");
     button.addStyleName("form-button btn btn-play");
     buttonsPanel.addStyleName("itemButtonsPanel");
@@ -346,8 +403,8 @@ public class PluginParameterPanel extends Composite {
   private void createSelectRodaObjectLayout() {
     Label parameterName = new Label(parameter.getName());
     final ListBox objectBox = new ListBox();
-    objectBox.addStyleName("form-selectbox");
-    objectBox.addStyleName("form-textbox-small");
+    objectBox.addStyleName(FORM_SELECTBOX);
+    objectBox.addStyleName(FORM_TEXTBOX_SMALL);
 
     BrowserService.Util.getInstance()
       .retrieveReindexPluginObjectClasses(new AsyncCallback<Set<Pair<String, String>>>() {
@@ -369,14 +426,9 @@ public class PluginParameterPanel extends Composite {
         }
       });
 
-    objectBox.addChangeHandler(new ChangeHandler() {
-      @Override
-      public void onChange(ChangeEvent event) {
-        value = objectBox.getSelectedValue();
-      }
-    });
+    objectBox.addChangeHandler(event -> value = objectBox.getSelectedValue());
 
-    objectBox.setTitle("object box");
+    objectBox.setTitle(OBJECT_BOX);
     layout.add(parameterName);
     layout.add(objectBox);
     addHelp();
@@ -385,8 +437,8 @@ public class PluginParameterPanel extends Composite {
   private void createDropdownLayout() {
     Label parameterName = new Label(parameter.getName());
     final ListBox dropdown = new ListBox();
-    dropdown.addStyleName("form-selectbox");
-    dropdown.addStyleName("form-textbox-small");
+    dropdown.addStyleName(FORM_SELECTBOX);
+    dropdown.addStyleName(FORM_TEXTBOX_SMALL);
 
     BrowserService.Util.getInstance().retrieveDropdownPluginItems(parameter.getId(),
       LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<Set<Pair<String, String>>>() {
@@ -412,24 +464,28 @@ public class PluginParameterPanel extends Composite {
 
     dropdown.addChangeHandler(event -> value = dropdown.getSelectedValue());
 
-    dropdown.setTitle("object box");
+    dropdown.setTitle(OBJECT_BOX);
     layout.add(parameterName);
     layout.add(dropdown);
     addHelp();
   }
-  private void createUserProfileLayout() {
+
+  private void createConversionProfileLayout() {
     Set<UserProfile> treeSet = new HashSet<>();
     Label parameterName = new Label(parameter.getName());
     final Label description = new Label();
     final ListBox dropdown = new ListBox();
-    dropdown.addStyleName("form-selectbox");
-    dropdown.addStyleName("form-textbox-small");
+    dropdown.addStyleName(FORM_SELECTBOX);
+    dropdown.addStyleName(FORM_TEXTBOX_SMALL);
+
+    FlowPanel panel = new FlowPanel();
 
     BrowserService.Util.getInstance().retrieveUserProfilePluginItems(parameter.getId(),
       LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<Set<UserProfile>>() {
 
         @Override
         public void onFailure(Throwable caught) {
+          // do nothing
         }
 
         @Override
@@ -438,7 +494,7 @@ public class PluginParameterPanel extends Composite {
           for (UserProfile item : treeSet) {
             dropdown.addItem(item.getI18nProperty(), item.getProfile());
             description.setText(item.getDescription());
-            description.addStyleName("form-help");
+            description.addStyleName(FORM_HELP);
           }
 
           value = dropdown.getSelectedValue();
@@ -461,13 +517,16 @@ public class PluginParameterPanel extends Composite {
       }
     });
 
-    dropdown.setTitle("object box");
-    layout.add(parameterName);
-    layout.add(description);
-    layout.add(dropdown);
+    panel.add(dropdown);
+    panel.add(description);
+    panel.addStyleName("conversion-profile");
 
+    dropdown.setTitle(OBJECT_BOX);
+    layout.add(parameterName);
     addHelp();
+    layout.add(panel);
   }
+
   private void createPluginObjectFieldsLayout(final String className) {
     List<String> defaultValues = Arrays.asList(parameter.getDefaultValue().split(","));
 
@@ -498,48 +557,42 @@ public class PluginParameterPanel extends Composite {
             }
 
             group.add(box);
-            box.addStyleName("form-radiobutton");
+            box.addStyleName(FORM_RADIOBUTTON);
 
-            box.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-              @Override
-              public void onValueChange(ValueChangeEvent<Boolean> event) {
-                if (event.getValue()) {
-                  selectedFields.add(field);
-                } else {
-                  selectedFields.remove(field);
-                }
-                value = StringUtils.join(selectedFields, ",");
+            box.addValueChangeHandler(event -> {
+              if (Boolean.TRUE.equals(event.getValue())) {
+                selectedFields.add(field);
+              } else {
+                selectedFields.remove(field);
               }
+              value = StringUtils.join(selectedFields, ",");
             });
           }
 
           if (File.class.getSimpleName().equals(className)) {
             CheckBox box = new CheckBox(messages.atLeastOneOfAbove());
             group.add(box);
-            box.addStyleName("form-radiobutton");
+            box.addStyleName(FORM_RADIOBUTTON);
 
             if (defaultValues.contains(RodaConstants.ONE_OF_FORMAT_FIELDS)) {
               box.setValue(true);
               selectedFields.add(RodaConstants.ONE_OF_FORMAT_FIELDS);
             }
 
-            box.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-              @Override
-              public void onValueChange(ValueChangeEvent<Boolean> event) {
-                if (event.getValue()) {
-                  selectedFields.add(RodaConstants.ONE_OF_FORMAT_FIELDS);
-                } else {
-                  selectedFields.remove(RodaConstants.ONE_OF_FORMAT_FIELDS);
-                }
-                value = StringUtils.join(selectedFields, ",");
+            box.addValueChangeHandler(event -> {
+              if (Boolean.TRUE.equals(event.getValue())) {
+                selectedFields.add(RodaConstants.ONE_OF_FORMAT_FIELDS);
+              } else {
+                selectedFields.remove(RodaConstants.ONE_OF_FORMAT_FIELDS);
               }
+              value = StringUtils.join(selectedFields, ",");
             });
           }
 
           value = StringUtils.join(selectedFields, ",");
           layout.add(group);
-          group.addStyleName("form-radiogroup");
-          parameterName.addStyleName("form-label");
+          group.addStyleName(FORM_RADIOGROUP);
+          parameterName.addStyleName(FORM_LABEL);
         }
       });
   }
@@ -557,25 +610,22 @@ public class PluginParameterPanel extends Composite {
       selectedTypes.add(permissionType.toString());
 
       group.add(box);
-      box.addStyleName("form-radiobutton");
+      box.addStyleName(FORM_RADIOBUTTON);
 
-      box.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-        @Override
-        public void onValueChange(ValueChangeEvent<Boolean> event) {
-          if (event.getValue()) {
-            selectedTypes.add(permissionType.toString());
-          } else {
-            selectedTypes.remove(permissionType.toString());
-          }
-          value = StringUtils.join(selectedTypes, ",");
+      box.addValueChangeHandler(event -> {
+        if (Boolean.TRUE.equals(event.getValue())) {
+          selectedTypes.add(permissionType.toString());
+        } else {
+          selectedTypes.remove(permissionType.toString());
         }
+        value = StringUtils.join(selectedTypes, ",");
       });
     }
 
     value = StringUtils.join(selectedTypes, ",");
     layout.add(group);
-    group.addStyleName("form-radiogroup");
-    parameterName.addStyleName("form-label");
+    group.addStyleName(FORM_RADIOGROUP);
+    parameterName.addStyleName(FORM_LABEL);
   }
 
   private void createPluginSipToAipLayout() {
@@ -612,16 +662,12 @@ public class PluginParameterPanel extends Composite {
             radioGroup.add(pRadio);
             radioGroup.add(pHelp);
 
-            pRadio.addStyleName("form-radiobutton");
-            pHelp.addStyleName("form-help");
+            pRadio.addStyleName(FORM_RADIOBUTTON);
+            pHelp.addStyleName(FORM_HELP);
 
-            pRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-
-              @Override
-              public void onValueChange(ValueChangeEvent<Boolean> event) {
-                if (event.getValue()) {
-                  value = pluginInfo.getId();
-                }
+            pRadio.addValueChangeHandler(event -> {
+              if (Boolean.TRUE.equals(event.getValue())) {
+                value = pluginInfo.getId();
               }
             });
           }
@@ -629,8 +675,8 @@ public class PluginParameterPanel extends Composite {
 
         layout.add(radioGroup);
 
-        radioGroup.addStyleName("form-radiogroup");
-        parameterName.addStyleName("form-label");
+        radioGroup.addStyleName(FORM_RADIOGROUP);
+        parameterName.addStyleName(FORM_LABEL);
       }
     });
   }
@@ -648,44 +694,47 @@ public class PluginParameterPanel extends Composite {
     layout.add(parameterBox);
     addHelp();
 
-    parameterName.addStyleName("form-label");
-    parameterBox.addStyleName("form-textbox");
+    parameterName.addStyleName(FORM_LABEL);
+    parameterBox.addStyleName(FORM_TEXTBOX);
 
     // binding change
-    parameterBox.addChangeHandler(new ChangeHandler() {
-
-      @Override
-      public void onChange(ChangeEvent event) {
-        value = ((IntegerBox) event.getSource()).getValue().toString();
-      }
-    });
+    parameterBox.addChangeHandler(event -> value = ((IntegerBox) event.getSource()).getValue().toString());
   }
 
-  private void createStringLayout() {
-    Label parameterName = new Label(parameter.getName());
+  private void createStringLayout(PluginParameter parameter) {
+    ValueChangeHandler<String> changeHandler = event -> value = event.getValue();
+
+    FlowPanel textBoxLayout = createTextBoxLayout(parameter.getName(), parameter.getDefaultValue(),
+      parameter.getDescription(), parameter.isReadonly(), changeHandler);
+    layout.add(textBoxLayout);
+  }
+
+  private FlowPanel createTextBoxLayout(String name, String defaultValue, String description, boolean isReadOnly,
+    ValueChangeHandler<String> valueChangeEvent) {
+
+    FlowPanel panel = new FlowPanel();
+
+    Label parameterName = new Label(name);
     TextBox parameterBox = new TextBox();
-    if (parameter.getDefaultValue() != null) {
-      parameterBox.setText(parameter.getDefaultValue());
-      value = parameter.getDefaultValue();
+
+    if (defaultValue != null) {
+      parameterBox.setText(defaultValue);
+      value = defaultValue;
     }
 
-    parameterBox.setEnabled(!parameter.isReadonly());
+    parameterName.addStyleName(FORM_LABEL);
+    parameterBox.addStyleName(FORM_TEXTBOX);
+
+    parameterBox.setEnabled(!isReadOnly);
     parameterBox.setTitle("parameter box");
-    layout.add(parameterName);
-    layout.add(parameterBox);
-    addHelp();
 
-    parameterName.addStyleName("form-label");
-    parameterBox.addStyleName("form-textbox");
+    panel.add(parameterName);
+    panel.add(parameterBox);
+    addHelp(panel, description);
 
-    // binding change
-    parameterBox.addValueChangeHandler(new ValueChangeHandler<String>() {
+    parameterBox.addValueChangeHandler(valueChangeEvent);
 
-      @Override
-      public void onValueChange(ValueChangeEvent<String> event) {
-        value = event.getValue();
-      }
-    });
+    return panel;
   }
 
   private void createBooleanLayout() {
@@ -699,25 +748,35 @@ public class PluginParameterPanel extends Composite {
     addHelp();
 
     checkBox.addStyleName("form-checkbox");
-    checkBox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-      @Override
-      public void onValueChange(ValueChangeEvent<Boolean> event) {
-        value = event.getValue() ? "true" : "false";
-      }
-    });
+    checkBox.addValueChangeHandler(event -> value = Boolean.TRUE.equals(event.getValue()) ? "true" : "false");
   }
 
   private void addHelp() {
-    String pDescription = parameter.getDescription();
-    if (pDescription != null && pDescription.length() > 0) {
-      Label pHelp = new Label(pDescription);
-      layout.add(pHelp);
-      pHelp.addStyleName("form-help");
+    addHelp(layout, parameter.getDescription());
+  }
+
+  private void addHelp(FlowPanel panel, String description) {
+    if (StringUtils.isNotBlank(description)) {
+      Label pHelp = new Label(description);
+      panel.add(pHelp);
+      pHelp.addStyleName(FORM_HELP);
     }
   }
 
   public String getValue() {
     return value;
+  }
+
+  public boolean isConversionPanel() {
+    return conversionPanel;
+  }
+
+  public RepresentationParameter getRepresentationParameter() {
+    return representationParameter;
+  }
+
+  public DisseminationParameter getDisseminationParameter() {
+    return disseminationParameter;
   }
 
   public String getAipTitle() {

@@ -261,6 +261,7 @@
                             <environmentVariables>
                                 <SIEGFRIED_MODE>server</SIEGFRIED_MODE>
                                 <SIEGFRIED_SERVER_URL>http://localhost:5138</SIEGFRIED_SERVER_URL>
+                                <JDK_JAVA_OPTIONS>--add-opens java.base/java.util=ALL-UNNAMED</JDK_JAVA_OPTIONS>
                             </environmentVariables>
                             <skip>false</skip>
                             <directories>
@@ -273,7 +274,6 @@
                                 <!-- Remove -->
                                 -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
                                 -Droda.environment.collect.version=false
-                                --add-opens java.base/java.util=ALL-UNNAMED
                             </jvmArguments>
                         </configuration>
                     </plugin>
@@ -289,9 +289,11 @@
                             <skipCompilation>false</skipCompilation>
                             <draftCompile>true</draftCompile>
                             <style>PRETTY</style>
-                            <jvmArgs>
-                                --add-opens java.base/java.util=ALL-UNNAMED
-                            </jvmArgs>
+                            <environmentVariables>
+                                <JDK_JAVA_OPTIONS>
+                                    --add-opens java.base/java.util=ALL-UNNAMED
+                                </JDK_JAVA_OPTIONS>
+                            </environmentVariables>
                         </configuration>
                         <executions>
                             <execution>

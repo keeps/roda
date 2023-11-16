@@ -27,7 +27,7 @@ services:
       - clam_data:/var/lib/clamav
       - roda_data:/roda/data/
   siegfried:
-    image: ghcr.io/keeps/siegfried:v1.10.0
+    image: ghcr.io/keeps/siegfried:v1.10.1
     restart: unless-stopped
     environment:
       SIEGFRIED_HOST: 0.0.0.0

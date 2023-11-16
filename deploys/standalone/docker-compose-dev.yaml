@@ -1,6 +1,6 @@
 services:
   zoo:
-    image: docker.io/zookeeper:3.8
+    image: docker.io/zookeeper:3.9-jre-17
     restart: unless-stopped
     ports:
       - "2181:2181"
@@ -37,7 +37,7 @@ services:
       - /tmp:/tmp
 
   siegfried:
-    image: ghcr.io/keeps/siegfried:v1.10.0
+    image: ghcr.io/keeps/siegfried:v1.10.1
     restart: unless-stopped
     ports:
       - "5138:5138"

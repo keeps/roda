@@ -14,14 +14,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.common.UserProfile;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.filter.FilterParameter;
@@ -46,7 +43,6 @@ import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
 import org.roda.core.data.v2.synchronization.local.LocalInstance;
-import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
@@ -65,7 +61,6 @@ import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.common.utils.SidebarUtils;
-import org.roda.wui.client.management.Statistics;
 import org.roda.wui.client.management.distributed.ShowDistributedInstance;
 import org.roda.wui.client.process.Process;
 import org.roda.wui.common.client.HistoryResolver;
@@ -113,7 +108,7 @@ public class ShowJob extends Composite {
 
   private static final int PERIOD_MILLIS = 10000;
   private static final int PERIOD_MILLIS_FAST = 2000;
-
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
@@ -175,103 +170,71 @@ public class ShowJob extends Composite {
       return "job";
     }
   };
-
-  interface MyUiBinder extends UiBinder<Widget, ShowJob> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
   // empty to get all job information
   private static final List<String> fieldsToReturn = new ArrayList<>();
-
   private static final List<String> aipFieldsToReturn = Arrays.asList(RodaConstants.INDEX_UUID, RodaConstants.AIP_LEVEL,
     RodaConstants.AIP_TITLE);
-
-  private Job job;
-  private Map<String, PluginInfo> pluginsInfo;
-
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   @UiField
   FlowPanel instancePanel;
   @UiField
   Label instanceLabel;
-
   @UiField
   Label name;
-
   @UiField
   Label creator;
-
   @UiField
   HTML jobPriority;
-
   @UiField
   HTML jobParallelism;
-
   @UiField
   Label dateStarted;
-
   @UiField
   Label dateEndedLabel, dateEnded;
-
   @UiField
   Label duration;
-
   @UiField
   HTML progress;
-
   @UiField
   HTML status;
-
   @UiField
   Label scheduleInfoLabel;
-
   @UiField
   Label scheduleInfo;
-
   @UiField
   Label stateDetailsLabel, stateDetailsValue;
-
   @UiField
   FlowPanel selectedListPanel;
-
   @UiField
   FlowPanel selectedList;
-
   @UiField
   FlowPanel attachmentsPanel;
-
   @UiField
   FlowPanel attachmentsList;
-
   @UiField
   Label plugin;
-
   @UiField
   FlowPanel pluginPanel;
-
   @UiField
   FlowPanel pluginOptions;
-
   @UiField
   FlowPanel reportListPanel;
-
   @UiField
   Label reportsLabel;
-
   @UiField(provided = true)
   SearchWrapper searchWrapper;
-
-  // SIDEBAR
-
   @UiField
   SimplePanel actionsSidebar;
-
   @UiField
   FlowPanel sidebar;
-
   @UiField
   FlowPanel content;
+
+  // SIDEBAR
+  private Job job;
+  private Map<String, PluginInfo> pluginsInfo;
+  private Timer autoUpdateTimer = null;
+  private int autoUpdateTimerPeriod = 0;
 
   public ShowJob(Job job, Map<String, PluginInfo> pluginsInfo, List<FilterParameter> extraReportFilterParameters) {
     this.job = job;
@@ -385,8 +348,10 @@ public class ShowJob extends Composite {
           createPluginSipToAipLayout(parameter);
         } else if (PluginParameterType.AIP_ID.equals(parameter.getType())) {
           createSelectAipLayout(parameter);
-        } else if (PluginParameterType.USER_PROFILE.equals(parameter.getType())) {
-          createUserProfileLayout(parameter);
+        } else if (PluginParameterType.CONVERSION_PROFILE.equals(parameter.getType())) {
+          createConvertProfileLayout(parameter);
+        } else if (PluginParameterType.CONVERSION.equals(parameter.getType())) {
+          createConversionLayout(parameter);
         } else {
           createStringLayout(parameter);
         }
@@ -742,9 +707,6 @@ public class ShowJob extends Composite {
     });
   }
 
-  private Timer autoUpdateTimer = null;
-  private int autoUpdateTimerPeriod = 0;
-
   private void scheduleUpdateStatus() {
     if (isJobRunning() || isJobRecent()) {
       if (autoUpdateTimer == null) {
@@ -890,7 +852,8 @@ public class ShowJob extends Composite {
       pluginValue.addStyleName("form-radiobutton");
     }
   }
-  private void createUserProfileLayout(PluginParameter parameter){
+
+  private void createConvertProfileLayout(PluginParameter parameter) {
     String value = job.getPluginParameters().get(parameter.getId());
     if (value == null) {
       value = parameter.getDefaultValue();
@@ -924,11 +887,52 @@ public class ShowJob extends Composite {
       }
     }
   }
+
+  private void createConversionLayout(PluginParameter parameter) {
+    String value = job.getPluginParameters().get(parameter.getId());
+    Map<String, String> map = new HashMap<>();
+    String[] keyValuePairs = value.split(";");
+    for (String pair : keyValuePairs) {
+      String[] parts = pair.split("=");
+      if (parts.length == 2) {
+        map.put(parts[0].trim(), parts[1].trim());
+      }
+    }
+
+    if (map.get("type").equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_DISSEMINATION)) {
+      String title = map.get("title");
+      String description = map.get("description");
+
+      Label titleLabel = new Label("Dissemination title");
+      Label titleValue = new Label(title);
+      pluginOptions.add(titleLabel);
+      pluginOptions.add(titleValue);
+      titleLabel.addStyleName("label");
+
+      Label descriptionLabel = new Label("Dissemination description");
+      Label descriptionTitle = new Label(description);
+      pluginOptions.add(descriptionLabel);
+      pluginOptions.add(descriptionTitle);
+      descriptionLabel.addStyleName("label");
+    } else {
+      String representationType = map.get("value");
+      Label parameterLabel = new Label("Representation type");
+      Label parameterValue = new Label(representationType);
+
+      pluginOptions.add(parameterLabel);
+      pluginOptions.add(parameterValue);
+      parameterLabel.addStyleName("label");
+    }
+  }
+
   private void addHelp(String description) {
-    if (description != null && description.length() > 0) {
+    if (description != null && !description.isEmpty()) {
       Label pHelp = new Label(description);
       pluginOptions.add(pHelp);
       pHelp.addStyleName("form-help");
     }
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, ShowJob> {
   }
 }
