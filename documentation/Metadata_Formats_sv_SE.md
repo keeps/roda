@@ -635,10 +635,10 @@ De tillgängliga alternativen som ändrar fältens beteende är:
     Utdata:
 
         <select>
-        <option value="fonds">Fonds</option>
-        <option value="class">Class</option>
-        <option value="collection">Collection</option>
-        <option value="recordgrp">Records group</option>
+        <option value="fonds">Arkivbestånd</option>
+        <option value="class">Klass</option>
+        <option value="collection">Samling</option>
+        <option value="recordgrp">Volym</option>
         (...)
         </select>
 
