@@ -54,7 +54,8 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
 
   private static final Set<RepresentationAction> POSSIBLE_ACTIONS_ON_SINGLE_REPRESENTATION = new HashSet<>(
     Arrays.asList(RepresentationAction.DOWNLOAD, RepresentationAction.CHANGE_TYPE, RepresentationAction.REMOVE,
-      RepresentationAction.NEW_PROCESS, RepresentationAction.IDENTIFY_FORMATS, RepresentationAction.CHANGE_STATE));
+      RepresentationAction.NEW_PROCESS, RepresentationAction.IDENTIFY_FORMATS, RepresentationAction.CHANGE_STATE,
+      RepresentationAction.DOWNLOAD_METADATA));
 
   private static final Set<RepresentationAction> POSSIBLE_ACTIONS_ON_MULTIPLE_REPRESENTATIONS = new HashSet<>(
     Arrays.asList(RepresentationAction.CHANGE_TYPE, RepresentationAction.REMOVE, RepresentationAction.NEW_PROCESS,
@@ -74,7 +75,7 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     REMOVE(RodaConstants.PERMISSION_METHOD_DELETE_REPRESENTATION),
     NEW_PROCESS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
     IDENTIFY_FORMATS(RodaConstants.PERMISSION_METHOD_CREATE_JOB),
-    CHANGE_STATE(RodaConstants.PERMISSION_METHOD_CHANGE_REPRESENTATION_STATES);
+    CHANGE_STATE(RodaConstants.PERMISSION_METHOD_CHANGE_REPRESENTATION_STATES), DOWNLOAD_METADATA();
 
     private List<String> methods;
 
@@ -173,6 +174,8 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
       identifyFormats(representation, callback);
     } else if (RepresentationAction.CHANGE_STATE.equals(action)) {
       changeState(representation, callback);
+    } else if (RepresentationAction.DOWNLOAD_METADATA.equals(action)) {
+      downloadOtherMetadata(representation, callback);
     } else {
       unsupportedAction(action, callback);
     }
@@ -202,6 +205,17 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     SafeUri downloadUri = null;
     if (representation != null) {
       downloadUri = RestUtils.createRepresentationDownloadUri(representation.getAipId(), representation.getId());
+    }
+    if (downloadUri != null) {
+      Window.Location.assign(downloadUri.asString());
+    }
+    callback.onSuccess(ActionImpact.NONE);
+  }
+
+  private void downloadOtherMetadata(IndexedRepresentation representation, final AsyncCallback<ActionImpact> callback) {
+    SafeUri downloadUri = null;
+    if (representation != null) {
+      downloadUri = RestUtils.createRepresentationOtherMetadataDownloadUri(representation.getAipId(), representation.getId());
     }
     if (downloadUri != null) {
       Window.Location.assign(downloadUri.asString());
@@ -409,6 +423,8 @@ public class RepresentationActions extends AbstractActionable<IndexedRepresentat
     ActionableGroup<IndexedRepresentation> downloadGroup = new ActionableGroup<>(messages.downloadButton());
     downloadGroup.addButton(messages.downloadButton() + " " + messages.oneOfAObject(Representation.class.getName()),
       RepresentationAction.DOWNLOAD, ActionImpact.NONE, "btn-download");
+    downloadGroup.addButton(messages.downloadButton() + " " + messages.otherMetadata(),
+      RepresentationAction.DOWNLOAD_METADATA, ActionImpact.NONE, "btn-download");
 
     representationActionableBundle.addGroup(managementGroup).addGroup(preservationGroup).addGroup(downloadGroup);
     return representationActionableBundle;

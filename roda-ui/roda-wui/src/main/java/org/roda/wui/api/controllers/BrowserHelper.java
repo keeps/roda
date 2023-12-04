@@ -207,6 +207,7 @@ import org.xmlunit.diff.ElementSelectors;
 
 import com.github.jknack.handlebars.Handlebars;
 import com.github.jknack.handlebars.Template;
+import com.google.gwt.core.shared.GWT;
 
 import gov.loc.premis.v3.EventComplexType;
 import gov.loc.premis.v3.LinkingAgentIdentifierComplexType;
@@ -927,11 +928,52 @@ public class BrowserHelper {
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     String aipId = representation.getAipId();
     String representationId = representation.getId();
-
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)) {
       StoragePath storagePath = ModelUtils.getRepresentationStoragePath(representation.getAipId(),
         representation.getId());
+      // ModelUtils.getOtherMetadataStoragePath();
       Directory directory = RodaCoreFactory.getStorageService().getDirectory(storagePath);
+      return ApiUtils.download(directory, representationId);
+    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
+      || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)
+      || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSONP.equals(acceptFormat)) {
+      ModelService model = RodaCoreFactory.getModelService();
+      Representation rep = model.retrieveRepresentation(aipId, representationId);
+      return new ObjectResponse<>(acceptFormat, rep);
+    } else {
+      throw new GenericException("Unsupported accept format: " + acceptFormat);
+    }
+  }
+
+  protected static EntityResponse retrieveAIPRepresentationOthermetadata(IndexedRepresentation representation,
+    String acceptFormat)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    String aipId = representation.getAipId();
+    String representationId = representation.getId();
+    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP.equals(acceptFormat)) {
+      StoragePath storagePath = ModelUtils.getOtherMetadataStoragePath(aipId, representationId, "", "", "");
+      Directory directory = RodaCoreFactory.getStorageService().getDirectory(storagePath);
+      return ApiUtils.download(directory, representationId);
+    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
+      || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)
+      || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSONP.equals(acceptFormat)) {
+      ModelService model = RodaCoreFactory.getModelService();
+      Representation rep = model.retrieveRepresentation(aipId, representationId);
+      return new ObjectResponse<>(acceptFormat, rep);
+    } else {
+      throw new GenericException("Unsupported accept format: " + acceptFormat);
+    }
+  }
+
+  protected static EntityResponse retrieveAIPRepresentationOthermetadataFile(IndexedRepresentation representation,
+    String acceptFormat, String filename, String extension, String type)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    String aipId = representation.getAipId();
+    String representationId = representation.getId();
+    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+      StoragePath storagePath = ModelUtils.getOtherMetadataStoragePath(aipId, representationId, filename, type,
+        extension);
+      Binary directory = RodaCoreFactory.getStorageService().getBinary(storagePath);
       return ApiUtils.download(directory, representationId);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)
@@ -2831,12 +2873,13 @@ public class BrowserHelper {
     RodaCoreFactory.getModelService().updateRiskIncidence(incidence, true);
   }
 
-  protected static Reports listReports(int start, int limit) throws RequestNotValidException, GenericException, AuthorizationDeniedException, NotFoundException {
+  protected static Reports listReports(int start, int limit)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException, NotFoundException {
     Sorter sorter = new Sorter(new SortParameter(RodaConstants.JOB_REPORT_DATE_UPDATED, true));
     IndexResult<IndexedReport> indexReports = RodaCoreFactory.getIndexService().find(IndexedReport.class, Filter.ALL,
       sorter, new Sublist(start, limit), new ArrayList<>());
     List<Report> results = new ArrayList<>();
-    for (IndexedReport val: indexReports.getResults()) {
+    for (IndexedReport val : indexReports.getResults()) {
       val.setReports(RodaCoreFactory.getModelService().retrieveJobReport(val.getJobId(), val.getId()).getReports());
       results.add(val);
     }
@@ -2856,7 +2899,7 @@ public class BrowserHelper {
     IndexResult<IndexedReport> reports = RodaCoreFactory.getIndexService().find(IndexedReport.class, filter, sorter,
       new Sublist(start, limit), new ArrayList<>());
     List<Report> results = new ArrayList<>();
-    for (IndexedReport val: reports.getResults()) {
+    for (IndexedReport val : reports.getResults()) {
       val.setReports(RodaCoreFactory.getModelService().retrieveJobReport(val.getJobId(), val.getId()).getReports());
       results.add(val);
     }
@@ -2874,7 +2917,7 @@ public class BrowserHelper {
     IndexResult<IndexedReport> indexReports = RodaCoreFactory.getIndexService().find(IndexedReport.class, filter,
       sorter, new Sublist(start, limit), new ArrayList<>());
     List<Report> results = new ArrayList<>();
-    for (IndexedReport val: indexReports.getResults()) {
+    for (IndexedReport val : indexReports.getResults()) {
       val.setReports(RodaCoreFactory.getModelService().retrieveJobReport(val.getJobId(), val.getId()).getReports());
       results.add(val);
     }
@@ -2892,7 +2935,7 @@ public class BrowserHelper {
     IndexResult<IndexedReport> indexReports = RodaCoreFactory.getIndexService().find(IndexedReport.class, filter,
       sorter, new Sublist(start, limit), new ArrayList<>());
     List<Report> results = new ArrayList<>();
-    for (IndexedReport val: indexReports.getResults()) {
+    for (IndexedReport val : indexReports.getResults()) {
       val.setReports(RodaCoreFactory.getModelService().retrieveJobReport(val.getJobId(), val.getId()).getReports());
       results.add(val);
     }
@@ -3036,6 +3079,7 @@ public class BrowserHelper {
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSONP.equals(acceptFormat)) {
+      GWT.log("ACCEPT FORMAT: " + acceptFormat);
       RepresentationInformation ri = RodaCoreFactory.getModelService()
         .retrieveRepresentationInformation(representationInformationId);
       return new ObjectResponse<>(acceptFormat, ri);

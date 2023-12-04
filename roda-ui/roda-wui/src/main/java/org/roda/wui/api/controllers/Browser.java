@@ -533,6 +533,68 @@ public class Browser extends RodaWuiController {
     }
   }
 
+  public static EntityResponse retrieveAIPRepresentationOthermetadata(User user, String aipId, String representationId,
+    String acceptFormat)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // validate input
+    BrowserHelper.validateGetAIPRepresentationParams(acceptFormat);
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // delegate
+      IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
+        IdUtils.getRepresentationId(aipId, representationId), RodaConstants.REPRESENTATION_FIELDS_TO_RETURN);
+
+      controllerAssistant.checkObjectPermissions(user, representation);
+
+      return BrowserHelper.retrieveAIPRepresentationOthermetadata(representation, acceptFormat);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
+        RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId);
+    }
+  }
+
+  public static EntityResponse retrieveAIPRepresentationOthermetadataFile(User user, String aipId,
+    String representationId, String filename, String type, String extension, String acceptFormat)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // validate input
+    BrowserHelper.validateGetFileParams(acceptFormat);
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      // delegate
+      IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class,
+        IdUtils.getRepresentationId(aipId, representationId), RodaConstants.REPRESENTATION_FIELDS_TO_RETURN);
+
+      controllerAssistant.checkObjectPermissions(user, representation);
+
+      return BrowserHelper.retrieveAIPRepresentationOthermetadataFile(representation, acceptFormat, filename, extension, type);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
+        RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId);
+    }
+  }
+
   public static StreamResponse retrieveAIPPart(User user, String aipId, String part)
     throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};

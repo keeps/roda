@@ -7,9 +7,15 @@
  */
 package org.roda.wui.client.common.dialogs;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.search.SearchSuggestBox;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -20,6 +26,8 @@ import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.safehtml.shared.SafeUri;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
@@ -31,6 +39,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.TextBoxBase;
+import com.google.gwt.user.client.ui.VerticalPanel;
 
 import config.i18n.client.ClientMessages;
 
@@ -94,7 +103,7 @@ public class Dialogs {
   public static void showLicenseModal(String title, HTML license) {
     final DialogBox dialogBox = new ClosableDialog(true, true);
     ScrollPanel layout = new ScrollPanel();
-    layout.setSize("70vw",  "80vh");
+    layout.setSize("70vw", "80vh");
     layout.addStyleName("wui-dialog-layout");
     layout.setWidget(license);
 
@@ -110,6 +119,69 @@ public class Dialogs {
   public static void showInformationDialog(String title, final String message, String continueButtonText,
     boolean canCopyMessage) {
     showInformationDialog(title, message, continueButtonText, canCopyMessage, new NoAsyncCallback<>());
+  }
+
+  public static void showTechnicalMetadataInformation(String title, HashMap<String, String> tikaValues,
+    String downloadText, String closeText, IndexedFile file) {
+    final DialogBox dialogBox = new ClosableDialog(true, true);
+    FlowPanel main = new FlowPanel();
+    ScrollPanel layout = new ScrollPanel();
+    FlowPanel footer = new FlowPanel();
+    final Button downloadButton = new Button(downloadText);
+    final Button closeButton = new Button(closeText);
+    layout.setSize("70vw", "60vh");
+
+    VerticalPanel verticalPanel = new VerticalPanel();
+    // verticalPanel.setWidth("100%");
+
+    for (Map.Entry<String, String> entry : tikaValues.entrySet()) {
+      String key = entry.getKey();
+      String value = entry.getValue();
+
+      // Wrap key and value in <b> and <span> tags for styling, respectively
+      // String tooltipText = value;
+      String keyHtmlString = "<b>" + key + "</b>: <span title='" + value + "'>" + value + "</span><br>";
+
+      // Use setHTML instead of the HTML constructor
+      HTML keyHtml = new HTML(keyHtmlString);
+      keyHtml.setStyleName("value-overflow");
+      verticalPanel.add(keyHtml);
+    }
+
+    layout.add(verticalPanel);
+    layout.addStyleName("wui-dialog-message");
+
+    footer.add(downloadButton);
+    footer.add(closeButton);
+    footer.addStyleName("wui-dialog-layout-footer");
+
+    downloadButton.addStyleName("btn btn-download");
+    closeButton.addStyleName("btn btn-default btn-times-circle btn-separator");
+    main.addStyleName("wui-dialog-layout");
+    main.add(layout);
+    main.add(footer);
+
+    closeButton.addClickHandler(event -> {
+      dialogBox.hide();
+    });
+
+    downloadButton.addClickHandler(event -> {
+      // RepresentationActions
+      SafeUri downloadUri = RestUtils.createRepresentationOtherMetadataFileDownloadUri(file.getAipId(),
+        file.getRepresentationId(), file.getId(), RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA,
+        RodaConstants.TIKA_FILE_SUFFIX_METADATA);
+      Window.Location.assign(downloadUri.asString());
+      // Toast.showInfo(messages.copiedToClipboardTitle(),
+      // messages.copiedToClipboardMessage());
+    });
+
+    dialogBox.setWidget(main);
+    dialogBox.setText(title);
+    dialogBox.addStyleName("wui-dialog-information");
+    dialogBox.setGlassEnabled(true);
+    dialogBox.setAnimationEnabled(false);
+    dialogBox.center();
+    dialogBox.show();
   }
 
   public static void showInformationDialog(String title, final String message, String continueButtonText,

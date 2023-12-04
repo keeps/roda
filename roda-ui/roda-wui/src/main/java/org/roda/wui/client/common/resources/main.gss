@@ -7877,4 +7877,11 @@ span.code {
     margin-right: 10px
 }
 
+.value-overflow {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 69vw;
+}
+
 

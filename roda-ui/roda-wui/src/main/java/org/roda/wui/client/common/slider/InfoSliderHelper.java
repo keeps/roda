@@ -23,13 +23,13 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
-import org.roda.core.storage.utils.RODAInstanceUtils;
 import org.roda.wui.client.browse.PreservationEvents;
 import org.roda.wui.client.browse.RepresentationInformationHelper;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
 import org.roda.wui.client.browse.bundle.BrowseRepresentationBundle;
 import org.roda.wui.client.common.actions.AipActions;
+import org.roda.wui.client.common.dialogs.Dialogs;
 import org.roda.wui.client.ingest.process.ShowJob;
 import org.roda.wui.client.management.distributed.ShowDistributedInstance;
 import org.roda.wui.client.planning.RiskIncidenceRegister;
@@ -220,7 +220,7 @@ public class InfoSliderHelper {
     }
 
     if (!bundle.getAip().getPermissions().getUsers().equals(new Permissions().getUsers())
-            || !bundle.getAip().getPermissions().getGroups().equals(new Permissions().getGroups())) {
+      || !bundle.getAip().getPermissions().getGroups().equals(new Permissions().getGroups())) {
       values.put(messages.aipPermissionDetails(), createAipPermissionDetailsHTML(bundle));
     }
     populate(infoSliderPanel, values);
@@ -465,6 +465,37 @@ public class InfoSliderHelper {
         HistoryUtils.createHistoryHashLink(PreservationEvents.BROWSE_RESOLVER, file.getAipId(),
           file.getRepresentationUUID(), file.getUUID()));
       values.put(messages.preservationEvents(), eventsLink);
+    }
+
+    if (!file.getOtherProperties().isEmpty()) {
+
+      boolean hasOtherProperties = false;
+      HashMap<String, String> tikaValues = new HashMap<>();
+      List<String> defaultTikaValues = ConfigurationManager.getStringList("ui.display.properties.tika.fixed");
+      List<String> blackListedValues = ConfigurationManager.getStringList("ui.display.properties.tika.blacklist");
+      defaultTikaValues.forEach(s -> tikaValues.put(messages.tikaTitles(s), ""));
+
+      // Get Other properties data
+      for (Entry<String, List<String>> entry : file.getOtherProperties().entrySet()) {
+
+        if (entry.getKey().contains("tika")) {
+          hasOtherProperties = true;
+          tikaValues.put(messages.tikaTitles(entry.getKey()),
+            entry.getValue().toString().replace("[", "").replace("]", ""));
+        }
+      }
+
+      tikaValues.entrySet().removeIf(ent -> ent.getValue().isEmpty() || blackListedValues.contains(ent.getKey()));
+
+      if (hasOtherProperties) {
+        Anchor technicalInformationAnchor = new Anchor();
+        technicalInformationAnchor.setStyleName("clickable");
+        technicalInformationAnchor.setText(messages.showTechnicalMetadata());
+        technicalInformationAnchor
+          .addClickHandler(e -> Dialogs.showTechnicalMetadataInformation(messages.viewTechnicalMetadata(), tikaValues,
+            messages.downloadButton(), messages.closeButton(), file));
+        values.put(messages.viewTikaInformation(), technicalInformationAnchor);
+      }
     }
 
     populate(infoSliderPanel, values);
