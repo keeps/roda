@@ -1,5 +1,15 @@
 # Changelog
 
+## v5.2.5 (06/12/2023)
+#### Bug fixes:
+
+- Error sending ingestion failure notification via email #3023 
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.2.4 (10/11/2023)
 #### Enhancements:
 
@@ -485,20 +495,4 @@ docker pull keeps/roda:v4.1.1
 Install for demonstration:
 ```
 docker pull keeps/roda:v3.5.7
-```
----
-
-## v4.1.0 (23/11/2021)
-
-#### New features:
-
--  Compliance with E-ARK SIP and AIP version 2.0.4  [#1960](https://github.com/keeps/roda/issues/1960)
-
-#### Enhancements:
-
--  Embedded RODA plugins that act on files to report SKIPPED when AIPs have no files [#1961](https://github.com/keeps/roda/issues/1961)
-
-Install for demonstration:
-```
-docker pull keeps/roda:v4.1.0
 ```
