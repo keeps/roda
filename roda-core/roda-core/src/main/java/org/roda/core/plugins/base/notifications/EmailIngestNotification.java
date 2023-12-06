@@ -23,6 +23,7 @@ import org.roda.core.common.notifications.EmailNotificationProcessor;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.NotificationException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -94,13 +95,18 @@ public class EmailIngestNotification extends AbstractJobNotification {
             StringBuilder builder = new StringBuilder();
 
             for (IndexedReport report : reports) {
-              Report last = report.getReports().get(report.getReports().size() - 1);
-              builder.append(last.getPluginDetails()).append("\n\n");
+              List<Report> reportsList = model.retrieveJobReport(report.getJobId(), report.getId()).getReports();
+              if (reportsList != null && !reportsList.isEmpty()) {
+                Report last = reportsList.get(reportsList.size() - 1);
+                builder.append(last.getPluginDetails()).append("\n\n");
+              }
             }
 
             scopes.put("failures", new Handlebars.SafeString(builder.toString()));
           } catch (IOException e) {
             LOGGER.error("Error getting failed reports", e);
+          } catch (NotFoundException e) {
+            LOGGER.error("Error getting reports list", e);
           }
         }
 
