@@ -627,6 +627,7 @@ public class CreateDefaultJob extends Composite {
       statusPanel.add(statusMessage);
       statusPanel.add(installBtn);
     }
+    statusPanel.setTitle(statusMessage.getText());
     workflowListPluginStatus.add(statusPanel);
   }
 
