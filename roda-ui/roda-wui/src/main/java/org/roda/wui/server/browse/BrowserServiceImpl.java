@@ -528,7 +528,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
           }
           if (pluginId != null) {
             PluginInfo refPlugin = RodaCoreFactory.getPluginManager().getPluginInfo(pluginId);
-            pluginsInfo.add(refPlugin);
+            if (refPlugin != null) {
+              pluginsInfo.add(refPlugin);
+            } else {
+              LOGGER.warn("Could not find plugin: " + pluginId);
+            }
           }
         }
       }
