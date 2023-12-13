@@ -28,9 +28,9 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.roda_project.commons_ip.model.ParseException;
 import org.roda_project.commons_ip.model.SIP;
@@ -118,7 +118,7 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
 
       AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bagit, model, METADATA_FILE,
         Arrays.asList(transferredResource.getName()), reportItem.getJobId(), computedParentId, job.getUsername(),
-        PermissionUtils.getIngestPermissions(job.getUsername()), transferredResource.getUUID());
+        transferredResource.getUUID());
 
       PluginHelper.createSubmission(model, createSubmission, bagitPath, aipCreated.getId());
 

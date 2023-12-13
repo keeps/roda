@@ -47,9 +47,9 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginHelper;
 import org.roda.core.plugins.RODAObjectProcessingLogic;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda_project.commons_ip.model.ParseException;
@@ -203,8 +203,8 @@ public class EARKSIP2ToAIPPlugin extends SIPToAIPPlugin {
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException,
     AlreadyExistsException, ValidationException, IOException, LockingException {
     String jobUsername = PluginHelper.getJobUsername(this, index);
-    return EARKSIP2ToAIPPluginUtils.earkSIPToAIP(sip, jobUsername, PermissionUtils.getIngestPermissions(jobUsername),
-      model, sip.getIds(), reportItem.getJobId(), computedParentId, ingestSIPUUID, this);
+    return EARKSIP2ToAIPPluginUtils.earkSIPToAIP(sip, jobUsername, model, sip.getIds(), reportItem.getJobId(),
+      computedParentId, ingestSIPUUID, this);
   }
 
   private AIP processUpdateSIP(IndexService index, ModelService model, StorageService storage, SIP sip,

@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -85,12 +84,14 @@ import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RODAMember;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.LiteRODAObjectFactory;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.plugins.base.ingest.PermissionUtils;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexAIPPlugin;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexActionLogPlugin;
 import org.roda.core.plugins.base.maintenance.reindex.ReindexDIPPlugin;
@@ -156,8 +157,7 @@ public final class PluginHelper {
         } catch (Throwable e) {
           LOGGER.error("Unexpected exception during 'objectsLogic' execution", e);
           jobPluginInfo.setSourceObjectsProcessedWithFailure(
-              jobPluginInfo.getSourceObjectsCount()
-                  - jobPluginInfo.getSourceObjectsProcessedWithSuccess());
+            jobPluginInfo.getSourceObjectsCount() - jobPluginInfo.getSourceObjectsProcessedWithSuccess());
           exceptionOccurred = e;
         }
       }
@@ -793,13 +793,18 @@ public final class PluginHelper {
     String username = getJobUsername(jobId, index);
 
     Permissions permissions = new Permissions();
-    permissions.setUserPermissions(username,
-      new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
-        Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
+
+    User user = model.retrieveUser(username);
+
+    if (parent.isPresent()) {
+      permissions = model.retrieveAIP(parent.get()).getPermissions();
+    }
+
+    Permissions finalPermissions = PermissionUtils.calculatePermissions(user, Optional.of(permissions));
 
     boolean isGhost = true;
-    AIP ghostAIP = model.createAIP(parent.orElse(null), "", permissions, Arrays.asList(ancestor), jobId, true, username,
-      isGhost);
+    AIP ghostAIP = model.createAIP(parent.orElse(null), "", finalPermissions, Arrays.asList(ancestor), jobId, true,
+      username, isGhost);
 
     return Optional.ofNullable(ghostAIP.getId());
   }

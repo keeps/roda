@@ -20,6 +20,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StringContentPayload;
@@ -41,7 +42,7 @@ public class BagitToAIPPluginUtils {
   }
 
   public static AIP bagitToAip(SIP bagit, ModelService model, String metadataFilename, List<String> ingestSIPIds,
-    String ingestJobId, Optional<String> computedParentId, String createdBy, Permissions permissions,
+    String ingestJobId, Optional<String> computedParentId, String createdBy,
     String ingestSIPUUID) throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException {
 
@@ -52,9 +53,18 @@ public class BagitToAIPPluginUtils {
 
     AIPState state = AIPState.INGEST_PROCESSING;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
+    Permissions permissions = new Permissions();
     boolean notify = false;
 
-    AIP aip = model.createAIP(state, computedParentId.orElse(null), aipType, permissions, ingestSIPUUID, ingestSIPIds,
+    User user = model.retrieveUser(createdBy);
+
+    if (computedParentId.isPresent()){
+      permissions = model.retrieveAIP(computedParentId.get()).getPermissions();
+    }
+
+    Permissions finalPermissions = PermissionUtils.calculatePermissions(user, Optional.of(permissions));
+    
+    AIP aip = model.createAIP(state, computedParentId.orElse(null), aipType, finalPermissions, ingestSIPUUID, ingestSIPIds,
       ingestJobId, notify, createdBy);
 
     model.createDescriptiveMetadata(aip.getId(), metadataFilename, metadataAsPayload, METADATA_TYPE, METADATA_VERSION,

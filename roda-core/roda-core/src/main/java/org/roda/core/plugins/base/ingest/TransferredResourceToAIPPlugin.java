@@ -30,10 +30,12 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.LiteOptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -123,10 +125,19 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
       LOGGER.debug("Converting {} to AIP", transferredResourcePath);
       AIPState state = AIPState.INGEST_PROCESSING;
       String aipType = RodaConstants.AIP_TYPE_MIXED;
+      Permissions permissions = new Permissions();
 
-      final AIP aip = model.createAIP(state, computedSearchScope.orElse(null), aipType,
-        PermissionUtils.getIngestPermissions(job.getUsername()), transferredResource.getUUID(),
-        Arrays.asList(transferredResource.getName()), job.getId(), false, job.getUsername());
+      User user = model.retrieveUser(job.getUsername());
+
+      if (computedSearchScope.isPresent()) {
+        permissions = model.retrieveAIP(computedSearchScope.get()).getPermissions();
+      }
+
+      Permissions finalPermissions = PermissionUtils.calculatePermissions(user, Optional.of(permissions));
+
+      final AIP aip = model.createAIP(state, computedSearchScope.orElse(null), aipType, finalPermissions,
+        transferredResource.getUUID(), Arrays.asList(transferredResource.getName()), job.getId(), false,
+        job.getUsername());
 
       PluginHelper.createSubmission(model, createSubmission, transferredResourcePath, aip.getId());
 
