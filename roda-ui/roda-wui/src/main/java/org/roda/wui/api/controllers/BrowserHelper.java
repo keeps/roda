@@ -240,7 +240,9 @@ public class BrowserHelper {
     bundle.setAIPAncestors(ancestors);
 
     if (!UserUtility.hasPermissions(user, RodaConstants.PERMISSION_METHOD_LIST_USERS)) {
+      Permissions aipPermissions = bundle.getAip().getPermissions();
       Permissions p = new Permissions();
+      p.setUserPermissions(user.getId(), aipPermissions.getUserPermissions(user.getId()));
       bundle.getAip().setPermissions(p);
     }
 
