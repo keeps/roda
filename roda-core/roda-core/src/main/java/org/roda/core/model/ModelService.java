@@ -108,7 +108,6 @@ import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
@@ -131,8 +130,6 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.model.utils.ResourceListUtils;
 import org.roda.core.model.utils.ResourceParseUtils;
 import org.roda.core.model.utils.UserUtility;
-import org.roda.core.plugins.Plugin;
-import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
@@ -352,9 +349,8 @@ public class ModelService extends ModelObservable {
     AIPState state = AIPState.ACTIVE;
     Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
     String id = directory.getStoragePath().getName();
-    Permissions inheritedPermissions = this.addParentPermissions(permissions, parentId);
 
-    AIP aip = new AIP(id, parentId, type, state, inheritedPermissions, createdBy);
+    AIP aip = new AIP(id, parentId, type, state, permissions, createdBy);
 
     aip.setGhost(isGhost);
     aip.setIngestSIPIds(ingestSIPIds);
@@ -394,9 +390,8 @@ public class ModelService extends ModelObservable {
 
     Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
     String id = directory.getStoragePath().getName();
-    Permissions inheritedPermissions = this.addParentPermissions(permissions, parentId);
 
-    AIP aip = new AIP(id, parentId, type, state, inheritedPermissions, createdBy);
+    AIP aip = new AIP(id, parentId, type, state, permissions, createdBy);
     // Instance Id Management
     aip.setInstanceId(RODAInstanceUtils.getLocalInstanceIdentifier());
     createAIPMetadata(aip);
@@ -415,9 +410,8 @@ public class ModelService extends ModelObservable {
 
     Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
     String id = directory.getStoragePath().getName();
-    Permissions inheritedPermissions = this.addParentPermissions(permissions, parentId);
 
-    AIP aip = new AIP(id, parentId, type, state, inheritedPermissions, createdBy).setIngestSIPIds(ingestSIPIds)
+    AIP aip = new AIP(id, parentId, type, state, permissions, createdBy).setIngestSIPIds(ingestSIPIds)
       .setIngestJobId(ingestJobId).setIngestSIPUUID(ingestSIPUUID);
     // Instance Id Management
     aip.setInstanceId(RODAInstanceUtils.getLocalInstanceIdentifier());

@@ -7,28 +7,20 @@
  */
 package org.roda.core.plugins.base.ingest;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.apache.commons.lang.StringUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.XMLUtility;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
-import org.roda.core.model.ModelService;
-import org.roda.core.storage.Binary;
+import org.roda.core.data.v2.user.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Andre Pereira apereira@keep.pt
@@ -36,69 +28,130 @@ import org.roda.core.storage.Binary;
  */
 public class PermissionUtils {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(PermissionUtils.class);
+
   private PermissionUtils() {
     // do nothing
   }
 
-  public static Permissions grantReadPermissionToUserGroup(ModelService model, AIP aip, Permissions permissions)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
-    List<DescriptiveMetadata> descriptiveMetadataList = aip.getDescriptiveMetadata();
-    Set<Permissions.PermissionType> readPermissionToUserGroup = new HashSet<>();
+  public static Permissions calculatePermissions(User user, Optional<Permissions> inheritedPermissions)
+    throws GenericException {
 
-    String xpath = RodaCoreFactory.getRodaConfigurationAsString("core", "permissions", "xpath");
-    String freeAccessTerm = RodaCoreFactory.getRodaConfigurationAsString("core", "permissions", "freeaccess");
+    Permissions finalPermissions = new Permissions();
 
-    if (StringUtils.isNotBlank(xpath) && StringUtils.isNotBlank(freeAccessTerm)) {
-      for (DescriptiveMetadata descriptiveMetadata : descriptiveMetadataList) {
-        Binary descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aip.getId(),
-          descriptiveMetadata.getId());
+    Set<String> creatorGroups = user.getGroups();
 
-        try (InputStream createInputStream = descriptiveMetadataBinary.getContent().createInputStream()) {
-          String useRestrict = XMLUtility.getString(createInputStream, xpath);
-          if (useRestrict.equals(freeAccessTerm)) {
-            readPermissionToUserGroup.add(Permissions.PermissionType.READ);
-            permissions.setGroupPermissions(RodaConstants.OBJECT_PERMISSIONS_USER_GROUP, readPermissionToUserGroup);
-          }
-        }
+    String creatorUsername = user.getId();
+
+    // get inherited permissions
+    if (inheritedPermissions.isPresent()) {
+
+      for (String name : inheritedPermissions.get().getUsernames()) {
+        finalPermissions.setUserPermissions(name, inheritedPermissions.get().getUserPermissions(name));
+      }
+      for (String name : inheritedPermissions.get().getGroupnames()) {
+        finalPermissions.setGroupPermissions(name, inheritedPermissions.get().getGroupPermissions(name));
+      }
+
+    }
+
+    // SET administrators permissions
+    List<String> adminGroups = RodaCoreFactory.getRodaConfigurationAsList("core.aip.default_permissions.admin.group[]");
+
+    for (String name : adminGroups) {
+      finalPermissions.setGroupPermissions(name,
+        RodaCoreFactory
+          .getRodaConfigurationAsList("core.aip.default_permissions.admin.group[]." + name + ".permission[]").stream()
+          .map(Permissions.PermissionType::valueOf) // Convert string to PermissionType enum
+          .collect(Collectors.toSet()));
+    }
+
+    // default creator Permissions
+    Set<Permissions.PermissionType> defaultCreatorPermissions = RodaCoreFactory
+      .getRodaConfigurationAsList("core.aip.default_permissions.creator.permission[]").stream()
+      .map(Permissions.PermissionType::valueOf) // Convert string to PermissionType enum
+      .collect(Collectors.toSet());
+
+    // defaultPermissions
+    Permissions defaultPermissions = new Permissions();
+
+    // add default users
+    List<String> defaultUsers = RodaCoreFactory.getRodaConfigurationAsList("core.aip.default_permissions.users[]");
+
+    for (String name : defaultUsers) {
+      defaultPermissions.setUserPermissions(name,
+        RodaCoreFactory.getRodaConfigurationAsList("core.aip.default_permissions.users[]." + name + ".permission[]")
+          .stream().map(Permissions.PermissionType::valueOf) // Convert string to PermissionType enum
+          .collect(Collectors.toSet()));
+    }
+
+    // add default groups
+    List<String> defaultGroups = RodaCoreFactory.getRodaConfigurationAsList("core.aip.default_permissions.group[]");
+
+    for (String name : defaultGroups) {
+      defaultPermissions.setGroupPermissions(name,
+        RodaCoreFactory.getRodaConfigurationAsList("core.aip.default_permissions.group[]." + name + ".permission[]")
+          .stream().map(Permissions.PermissionType::valueOf) // Convert string to PermissionType enum
+          .collect(Collectors.toSet()));
+    }
+
+    // add default User permissions
+    for (String name : defaultPermissions.getUsernames()) {
+      Set<Permissions.PermissionType> temp = finalPermissions.getUserPermissions(name);
+      temp.addAll(defaultPermissions.getUserPermissions(name));
+      finalPermissions.setUserPermissions(name, temp);
+    }
+
+    // add default creator permissions
+    Set<Permissions.PermissionType> temp = finalPermissions.getUserPermissions(creatorUsername);
+    temp.addAll(defaultCreatorPermissions);
+    finalPermissions.setUserPermissions(creatorUsername, temp);
+
+    // intersection
+    boolean intersection = RodaCoreFactory.getProperty("core.aip.default_permissions.intersect_groups", false);
+
+    // configuration
+    if (intersection) {
+      // add default groups intercepted with creator groups
+      Set<String> interceptedGroups = new HashSet<>(defaultPermissions.getGroupnames());
+      // intercept creator groups with config groups
+      interceptedGroups.retainAll(creatorGroups);
+
+      for (String name : interceptedGroups) {
+        Set<Permissions.PermissionType> tempGroups = finalPermissions.getGroupPermissions(name);
+        tempGroups.addAll(defaultPermissions.getGroupPermissions(name));
+        finalPermissions.setGroupPermissions(name, tempGroups);
+      }
+
+    } else {
+      // add default groups without interception
+      for (String name : defaultPermissions.getGroupnames()) {
+        Set<Permissions.PermissionType> tempGroups = finalPermissions.getGroupPermissions(name);
+        tempGroups.addAll(defaultPermissions.getGroupPermissions(name));
+        finalPermissions.setGroupPermissions(name, tempGroups);
       }
     }
 
-    return permissions;
-  }
+    // check if user has must have permissions to create the aip or the sublevel aip
+    Set<Permissions.PermissionType> mustHavePermissions = RodaCoreFactory
+      .getRodaConfigurationAsList("core.aip.default_permissions.creator.minimum.permissions[]").stream()
+      .map(Permissions.PermissionType::valueOf).collect(Collectors.toSet());
 
-  public static Permissions grantAllPermissions(String username, Permissions permissions, Permissions parentPermissions)
-    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-    Permissions grantedPermissions = grantPermissionToUser(username, permissions);
+    Set<Permissions.PermissionType> creatorPermissions = creatorGroups.stream()
+      .map(g -> finalPermissions.getGroupPermissions(g)).flatMap(Set::stream).collect(Collectors.toSet());
+    creatorPermissions.addAll(finalPermissions.getUserPermissions(creatorUsername));
 
-    for (String name : parentPermissions.getUsernames()) {
-      grantedPermissions.setUserPermissions(name, parentPermissions.getUserPermissions(name));
+    if(mustHavePermissions.isEmpty()) {
+      LOGGER.error("Minimum set of permissions is empty!");
+      throw new GenericException("Configuration issue, please contact administrator");
+    } else if (!creatorPermissions.containsAll(mustHavePermissions)) {
+      mustHavePermissions.addAll(creatorPermissions);
+      finalPermissions.setUserPermissions(creatorUsername, mustHavePermissions);
     }
 
-    for (String name : parentPermissions.getGroupnames()) {
-      grantedPermissions.setGroupPermissions(name, parentPermissions.getGroupPermissions(name));
-    }
+    LOGGER.warn("Permissions have been set");
 
-    return grantedPermissions;
-  }
+    return finalPermissions;
 
-  private static Permissions grantPermissionToUser(String username, Permissions permissions)
-    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-    Set<Permissions.PermissionType> allPermissions = Stream
-      .of(Permissions.PermissionType.CREATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT,
-        Permissions.PermissionType.READ, Permissions.PermissionType.UPDATE)
-      .collect(Collectors.toSet());
-    permissions.setUserPermissions(username, allPermissions);
-    return permissions;
-  }
-
-  public static Permissions getIngestPermissions(String username) {
-    Permissions permissions = new Permissions();
-    permissions.setUserPermissions(username,
-      new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
-        Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
-    permissions.setGroupPermissions(RodaConstants.ADMINISTRATORS,
-      new HashSet<>(Arrays.asList(Permissions.PermissionType.CREATE, Permissions.PermissionType.READ,
-        Permissions.PermissionType.UPDATE, Permissions.PermissionType.DELETE, Permissions.PermissionType.GRANT)));
-    return permissions;
   }
 }

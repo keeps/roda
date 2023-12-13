@@ -7,7 +7,6 @@
  */
 package org.roda.core.plugins.base.ingest;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.HashMap;
@@ -34,6 +33,7 @@ import org.roda.core.data.v2.ip.ShallowFiles;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -62,10 +62,10 @@ public class EARKSIP2ToAIPPluginUtils {
     // do nothing
   }
 
-  public static AIP earkSIPToAIP(SIP sip, String username, Permissions fullPermissions, ModelService model,
-    List<String> ingestSIPIds, String ingestJobId, Optional<String> parentId, String ingestSIPUUID, Plugin<?> plugin)
+  public static AIP earkSIPToAIP(SIP sip, String username, ModelService model, List<String> ingestSIPIds,
+    String ingestJobId, Optional<String> parentId, String ingestSIPUUID, Plugin<?> plugin)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
-    AuthorizationDeniedException, ValidationException, IOException, LockingException {
+    AuthorizationDeniedException, ValidationException, LockingException {
 
     AIPState state = AIPState.INGEST_PROCESSING;
     Permissions permissions = new Permissions();
@@ -73,7 +73,15 @@ public class EARKSIP2ToAIPPluginUtils {
 
     String aipType = getType(sip);
 
-    AIP aip = model.createAIP(state, parentId.orElse(null), aipType, permissions, ingestSIPUUID, ingestSIPIds,
+    User user = model.retrieveUser(username);
+
+    if (parentId.isPresent()){
+      permissions = model.retrieveAIP(parentId.get()).getPermissions();
+    }
+
+    Permissions finalPermissions = PermissionUtils.calculatePermissions(user, Optional.of(permissions));
+
+    AIP aip = model.createAIP(state, parentId.orElse(null), aipType, finalPermissions, ingestSIPUUID, ingestSIPIds,
       ingestJobId, notify, username);
 
     PluginHelper.acquireObjectLock(aip, plugin);
@@ -89,12 +97,6 @@ public class EARKSIP2ToAIPPluginUtils {
     // INFO 20190509 hsilva: this is required as the previous instructions
     // update the AIP metadata
     AIP createdAIP = model.retrieveAIP(aip.getId());
-
-    // Set Permissions
-    Permissions readPermissions = PermissionUtils.grantReadPermissionToUserGroup(model, createdAIP,
-      aip.getPermissions());
-    Permissions finalPermissions = PermissionUtils.grantAllPermissions(username, readPermissions, fullPermissions);
-    createdAIP.setPermissions(finalPermissions);
 
     return model.updateAIP(createdAIP, username);
   }

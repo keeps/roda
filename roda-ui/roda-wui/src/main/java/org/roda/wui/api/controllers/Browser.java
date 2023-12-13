@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -55,7 +54,6 @@ import org.roda.core.data.v2.ip.IndexedDIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
@@ -81,6 +79,7 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.utils.UserUtility;
+import org.roda.core.plugins.base.ingest.PermissionUtils;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
@@ -1303,10 +1302,13 @@ public class Browser extends RodaWuiController {
 
     try {
       Permissions permissions = new Permissions();
-      permissions.setUserPermissions(user.getId(), new HashSet<>(Arrays.asList(PermissionType.values())));
+
+      //calculate final permissions
+      Permissions finalPermissions = PermissionUtils.calculatePermissions(user, Optional.of(permissions));
 
       // delegate
-      return BrowserHelper.createAIP(user, null, type, permissions);
+      return BrowserHelper.createAIP(user, null, type, finalPermissions);
+
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -1352,10 +1354,11 @@ public class Browser extends RodaWuiController {
         throw new RequestNotValidException("Creating AIP that should be below another with a null parentId");
       }
 
-      permissions.setUserPermissions(user.getId(), new HashSet<>(Arrays.asList(PermissionType.values())));
+      //calculate final permissions
+      Permissions finalPermissions = PermissionUtils.calculatePermissions(user, Optional.of(permissions));
 
       // delegate
-      return BrowserHelper.createAIP(user, parentId, type, permissions);
+      return BrowserHelper.createAIP(user, parentId, type, finalPermissions);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -3234,7 +3237,8 @@ public class Browser extends RodaWuiController {
   }
 
   public static Reports listReports(User user, String id, String resourceOrSip, int start, int limit,
-    String acceptFormat) throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    String acceptFormat)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // validate input

@@ -169,6 +169,7 @@
                                 -Dorg.springframework.boot.logging.LoggingSystem=none
                                 -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5007
                                 --add-opens java.base/java.util=ALL-UNNAMED
+                                --add-opens java.base/java.lang=ALL-UNNAMED
                             </jvmArguments>
                         </configuration>
                     </plugin>
@@ -222,6 +223,7 @@
                                 -Dorg.springframework.boot.logging.LoggingSystem=none
                                 -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5006
                                 --add-opens java.base/java.util=ALL-UNNAMED
+                                --add-opens java.base/java.lang=ALL-UNNAMED
                             </jvmArguments>
                         </configuration>
                     </plugin>
@@ -274,6 +276,8 @@
                                 <!-- Remove -->
                                 -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005
                                 -Droda.environment.collect.version=false
+                                --add-opens java.base/java.util=ALL-UNNAMED
+                                --add-opens java.base/java.lang=ALL-UNNAMED
                             </jvmArguments>
                         </configuration>
                     </plugin>
