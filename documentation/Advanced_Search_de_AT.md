@@ -1,6 +1,6 @@
 # Erweiterte Suche
 
-Auf der Suchseite können Sie nach intellektuellen Entitäten, Darstellungen oder Dateien suchen (verwenden Sie den Pfeil nach unten, um den Suchbereich auszuwählen). Für jeden dieser Bereiche können Sie nach allen oder bestimmten Kriterien suchen (verwenden Sie den Pfeil nach unten für erweiterte Suche). Wenn Sie beispielsweise "intellektuelle Entitäten" auswählen, können Sie in einem bestimmten Bereich der beschreibenden Metadaten suchen oder Dateien eines bestimmten Formats finden, wenn die erweiterte Dateien-Suche ausgewählt ist.
+Auf der Suchseite können Sie nach intellektuellen Entitäten, Repräsentationen oder Dateien suchen (verwenden Sie den Pfeil nach unten, um den Suchbereich auszuwählen). Für jeden dieser Bereiche können Sie nach allen oder bestimmten Kriterien suchen (verwenden Sie den Pfeil nach unten für erweiterte Suche). Wenn Sie beispielsweise "intellektuelle Entitäten" auswählen, können Sie in einem bestimmten Bereich der beschreibenden Metadaten suchen oder Dateien eines bestimmten Formats finden, wenn die erweiterte Dateien-Suche ausgewählt ist.
 
 Die Suchmaschine findet nur ganze Wörter. Wenn Sie nach Teilbegriffen suchen möchten, verwenden Sie bitte "*".
 
