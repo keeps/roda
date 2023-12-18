@@ -26,6 +26,7 @@ Among others articles, in this series of documentation you will find information
     - [Metadata formats](Metadata_Formats.md)
     - [External Authentication with CAS protocol](Central_Authentication_Service.md)
     - [Disposal feature](Disposal.md)
+    - [Default AIP Permissions](Permissions.md)
 - Contributing
     - [Developers guide](Developers_Guide.md)
     - [Translation guide](Translation_Guide.md)
