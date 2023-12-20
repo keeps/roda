@@ -340,6 +340,8 @@ public final class RodaConstants {
   public static final String API_REST_V1_DISTRIBUTED_INSTANCE = "api/v1/distributed_instances/";
   public static final String API_REST_V1_JOBS = "api/v1/jobs/";
 
+  public static final String API_REST_V1_REPRESENTATION_OTHER_METADATA = "otherMetadata";
+
   // sub-resources strings
   public static final String API_DATA = "data";
   public static final Object API_FILE = "file";
@@ -1740,6 +1742,7 @@ public final class RodaConstants {
   public static final String SEARCH_TRANSFERRED_RESOURCES = "transferred_resources";
 
   public static final String SEARCH_FIELD_PREFIX = "ui.search.fields";
+
   public static final String SEARCH_FIELD_FIELDS = "fields";
   public static final String SEARCH_FIELD_TYPE = "type";
   public static final String SEARCH_FIELD_I18N = "i18n";

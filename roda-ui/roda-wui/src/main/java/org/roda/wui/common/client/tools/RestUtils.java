@@ -76,6 +76,42 @@ public class RestUtils {
     return UriUtils.fromSafeConstant(b.toString());
   }
 
+  public static SafeUri createRepresentationOtherMetadataDownloadUri(String aipId, String representationId) {
+
+    // api/v1/representations/{aip_id}/{representation_id}/otherMetadata/?acceptFormat=zip
+    StringBuilder b = new StringBuilder();
+    // base uri
+    b.append(RodaConstants.API_REST_V1_REPRESENTATIONS).append(URL.encodeQueryString(aipId))
+      .append(RodaConstants.API_SEP).append(URL.encodeQueryString(representationId)).append(RodaConstants.API_SEP)
+      .append(RodaConstants.API_REST_V1_REPRESENTATION_OTHER_METADATA).append(RodaConstants.API_SEP);
+    // accept format attribute
+    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_ZIP);
+
+    return UriUtils.fromSafeConstant(b.toString());
+  }
+
+  public static SafeUri createRepresentationOtherMetadataFileDownloadUri(String aipId, String representationId,
+    String file, String type, String extension) {
+
+    // api/v1/representations/{aip_id}/{representation_id}/otherMetadata/{filename}/{type}/{extension}/?type={type}&extension={extension}&acceptFormat=bin
+    StringBuilder b = new StringBuilder();
+    // base uri
+    b.append(RodaConstants.API_REST_V1_REPRESENTATIONS).append(URL.encodeQueryString(aipId))
+      .append(RodaConstants.API_SEP).append(URL.encodeQueryString(representationId)).append(RodaConstants.API_SEP)
+      .append(RodaConstants.API_REST_V1_REPRESENTATION_OTHER_METADATA).append(RodaConstants.API_SEP)
+      .append(URL.encodeQueryString(file)).append(RodaConstants.API_SEP);
+    // accept format attributes
+
+    b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_TYPE)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(URL.encodeQueryString(type))
+      .append(RodaConstants.API_QUERY_SEP).append(RodaConstants.FILE_EXTENSION)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(URL.encodeQueryString(extension))
+      .append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
+      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
+    return UriUtils.fromSafeConstant(b.toString());
+  }
+
   public static SafeUri createRepresentationPartDownloadUri(String aipId, String representationId, String part) {
 
     // api/v1/representations/{aip_id}/{representation_id}/{part}
@@ -458,7 +494,8 @@ public class RestUtils {
   }
 
   public static SafeUri createThemeResourceUri(String resourceId, String defaultResourceId, boolean inline) {
-    return createThemeResourceUri(resourceId, defaultResourceId, RodaConstants.ResourcesTypes.INTERNAL.toString(), inline);
+    return createThemeResourceUri(resourceId, defaultResourceId, RodaConstants.ResourcesTypes.INTERNAL.toString(),
+      inline);
   }
 
   public static SafeUri createThemeResourceUri(String resourceId, String defaultResourceId, String resourceType,
