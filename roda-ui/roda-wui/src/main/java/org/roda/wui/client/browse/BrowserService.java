@@ -199,7 +199,7 @@ public interface BrowserService extends RemoteService {
 
   Set<Pair<String, String>> retrieveDropdownPluginItems(String parameterId, String localeString);
 
-  Set<UserProfile> retrieveUserProfilePluginItems(String parameterId, String localeString);
+  Set<UserProfile> retrieveUserProfilePluginItems(String pluginId, String repOrDip, String localeString);
 
   CreateIngestJobBundle retrieveCreateIngestProcessBundle();
 

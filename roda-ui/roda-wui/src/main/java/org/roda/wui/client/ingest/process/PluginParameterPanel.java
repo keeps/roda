@@ -14,6 +14,29 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.DomEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.IntegerBox;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.RadioButton;
+import com.google.gwt.user.client.ui.TextBox;
+import config.i18n.client.ClientMessages;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.common.Pair;
@@ -41,31 +64,6 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.DomEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.IntegerBox;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.RadioButton;
-import com.google.gwt.user.client.ui.TextBox;
-
-import config.i18n.client.ClientMessages;
-
 public class PluginParameterPanel extends Composite {
   public static final String FORM_SELECTBOX = "form-selectbox";
   public static final String FORM_TEXTBOX_SMALL = "form-textbox-small";
@@ -83,12 +81,31 @@ public class PluginParameterPanel extends Composite {
   private final RepresentationParameter representationParameter = new RepresentationParameter();
   private final DisseminationParameter disseminationParameter = new DisseminationParameter();
   private String value;
+  private String profile;
+  private final String pluginId;
   private String aipTitle;
   private boolean conversionPanel = false;
 
   public PluginParameterPanel(PluginParameter parameter) {
     super();
     this.parameter = parameter;
+
+    this.pluginId = null;
+
+    layout = new FlowPanel();
+
+    initWidget(layout);
+
+    updateLayout();
+
+    layout.addStyleName("plugin-options-parameter");
+  }
+
+  public PluginParameterPanel(PluginParameter parameter, String pluginId) {
+    super();
+    this.parameter = parameter;
+
+    this.pluginId = pluginId;
 
     layout = new FlowPanel();
 
@@ -128,8 +145,6 @@ public class PluginParameterPanel extends Composite {
       createPermissionTypesLayout();
     } else if (PluginParameterType.DROPDOWN.equals(parameter.getType())) {
       createDropdownLayout();
-    } else if (PluginParameterType.CONVERSION_PROFILE.equals(parameter.getType())) {
-      createConversionProfileLayout();
     } else if (PluginParameterType.CONVERSION.equals(parameter.getType())) {
       createConversionLayout();
     } else {
@@ -153,9 +168,11 @@ public class PluginParameterPanel extends Composite {
     FlowPanel innerPanel = new FlowPanel();
     dropdown.addChangeHandler(event -> {
       value = dropdown.getSelectedValue();
+      innerPanel.clear();
+      FlowPanel profiles = createConversionProfileLayout(value, pluginId);
+      innerPanel.add(profiles);
+
       if (value.equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_REPRESENTATION)) {
-        // Clear the layout
-        innerPanel.clear();
         // Add fields
         ValueChangeHandler<String> typeChanged = typeChangedEvent -> representationParameter
           .setValue(typeChangedEvent.getValue());
@@ -165,8 +182,6 @@ public class PluginParameterPanel extends Composite {
 
         value = RodaConstants.PLUGIN_PARAMS_CONVERSION_REPRESENTATION;
       } else {
-        // Clear the layout
-        innerPanel.clear();
         // Add fields
         ValueChangeHandler<String> titleChanged = titleChangedEvent -> disseminationParameter
           .setTitle(titleChangedEvent.getValue());
@@ -470,17 +485,18 @@ public class PluginParameterPanel extends Composite {
     addHelp();
   }
 
-  private void createConversionProfileLayout() {
+  private FlowPanel createConversionProfileLayout(String repOrDip, String pluginId) {
     Set<UserProfile> treeSet = new HashSet<>();
-    Label parameterName = new Label(parameter.getName());
+    Label parameterName = new Label("Conversion Profile");
     final Label description = new Label();
     final ListBox dropdown = new ListBox();
     dropdown.addStyleName(FORM_SELECTBOX);
     dropdown.addStyleName(FORM_TEXTBOX_SMALL);
 
+    FlowPanel result = new FlowPanel();
     FlowPanel panel = new FlowPanel();
 
-    BrowserService.Util.getInstance().retrieveUserProfilePluginItems(parameter.getId(),
+    BrowserService.Util.getInstance().retrieveUserProfilePluginItems(pluginId, repOrDip,
       LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<Set<UserProfile>>() {
 
         @Override
@@ -497,9 +513,9 @@ public class PluginParameterPanel extends Composite {
             description.addStyleName(FORM_HELP);
           }
 
-          value = dropdown.getSelectedValue();
+          profile = dropdown.getSelectedValue();
           for (UserProfile userProfile : treeSet) {
-            if (userProfile.getProfile().equals(value)) {
+            if (userProfile.getProfile().equals(profile)) {
               description.setText(userProfile.getDescription());
               break;
             }
@@ -508,9 +524,9 @@ public class PluginParameterPanel extends Composite {
       });
 
     dropdown.addChangeHandler(event -> {
-      value = dropdown.getSelectedValue();
+      profile = dropdown.getSelectedValue();
       for (UserProfile userProfile : treeSet) {
-        if (userProfile.getProfile().equals(value)) {
+        if (userProfile.getProfile().equals(profile)) {
           description.setText(userProfile.getDescription());
           break;
         }
@@ -522,9 +538,10 @@ public class PluginParameterPanel extends Composite {
     panel.addStyleName("conversion-profile");
 
     dropdown.setTitle(OBJECT_BOX);
-    layout.add(parameterName);
-    addHelp();
-    layout.add(panel);
+    result.add(parameterName);
+    addHelp(result, "User profile options");
+    result.add(panel);
+    return result;
   }
 
   private void createPluginObjectFieldsLayout(final String className) {
@@ -761,6 +778,10 @@ public class PluginParameterPanel extends Composite {
       panel.add(pHelp);
       pHelp.addStyleName(FORM_HELP);
     }
+  }
+
+  public String getProfile() {
+    return profile;
   }
 
   public String getValue() {
