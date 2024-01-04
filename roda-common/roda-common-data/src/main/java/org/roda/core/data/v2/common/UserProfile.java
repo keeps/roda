@@ -19,6 +19,8 @@ public class UserProfile implements Serializable {
   private String i18nProperty;
   private String profile;
   private String description;
+  private boolean dissemination;
+  private boolean representation;
   private Map<String, String> options;
 
   public UserProfile() {
@@ -39,6 +41,22 @@ public class UserProfile implements Serializable {
 
   public void setOptions(Map<String, String> options) {
     this.options = options;
+  }
+
+  public void setHasRepresentation(boolean representation) {
+    this.representation = representation;
+  }
+
+  public void setHasDissemination(boolean dissemination) {
+    this.dissemination = dissemination;
+  }
+
+  public boolean isDissemination() {
+    return dissemination;
+  }
+
+  public boolean isRepresentation() {
+    return representation;
   }
 
   public String getI18nProperty() {

@@ -41,9 +41,8 @@ public class PluginOptionsPanel extends Composite {
     layout.clear();
 
     if (pluginInfo != null) {
-
       for (PluginParameter parameter : pluginInfo.getParameters()) {
-        PluginParameterPanel panel = new PluginParameterPanel(parameter);
+        PluginParameterPanel panel = new PluginParameterPanel(parameter, pluginInfo.getId());
         panels.add(panel);
         layout.add(panel);
       }
@@ -71,6 +70,7 @@ public class PluginOptionsPanel extends Composite {
           ret.put(key,
             panel.getRepresentationParameter().printAsParameter(RodaConstants.PLUGIN_PARAMS_CONVERSION_REPRESENTATION));
         }
+        ret.put(RodaConstants.PLUGIN_PARAMS_CONVERSION_PROFILE, panel.getProfile());
       } else {
         String value = panel.getValue();
         if (value != null) {

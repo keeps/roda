@@ -617,18 +617,23 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public Set<UserProfile> retrieveUserProfilePluginItems(String parameterId, String localeString) {
+  public Set<UserProfile> retrieveUserProfilePluginItems(String pluginId, String repOrDip, String localeString) {
     Set<UserProfile> items = new HashSet<>();
 
     List<String> dropdownItems = RodaUtils
-      .copyList(RodaCoreFactory.getRodaConfiguration().getList("core.plugins.user_profile." + parameterId + "[]"));
+      .copyList(RodaCoreFactory.getRodaConfiguration().getList("core.plugins.user_profile." + pluginId + "[]"));
     Locale locale = ServerTools.parseLocale(localeString);
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
 
-    String pluginName = RodaCoreFactory.getRodaConfiguration().getString("core.plugins.user_profile." + parameterId);
+    String pluginName = RodaCoreFactory.getRodaConfiguration().getString("core.plugins.user_profile." + pluginId);
 
     for (String item : dropdownItems) {
-      items.add(retrieveUserProfileItem(item, pluginName, items, messages));
+      UserProfile userProfile = retrieveUserProfileItem(item, pluginName, items, messages);
+      if (repOrDip.equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_REPRESENTATION) && userProfile.isRepresentation()) {
+        items.add(userProfile);
+      } else if (repOrDip.equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_DISSEMINATION) && userProfile.isDissemination()) {
+        items.add(userProfile);
+      }
     }
 
     return items;
@@ -642,6 +647,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
       .getString("core.plugins." + pluginName + "." + item + ".title"));
     userProfile.setDescription(RodaCoreFactory.getRodaConfiguration()
       .getString("core.plugins." + pluginName + "." + item + ".description"));
+    userProfile.setHasRepresentation(RodaCoreFactory.getRodaConfiguration()
+      .getBoolean("core.plugins." + pluginName + "." + item + ".representation"));
+    userProfile.setHasDissemination(RodaCoreFactory.getRodaConfiguration()
+      .getBoolean("core.plugins." + pluginName + "." + item + ".dissemination"));
     userProfile.setProfile(item);
 
     String[] options = RodaCoreFactory.getRodaConfiguration().getStringArray("core.plugins." + pluginName + "." + item + ".options[]");

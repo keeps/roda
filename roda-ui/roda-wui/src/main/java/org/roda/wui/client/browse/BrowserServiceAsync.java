@@ -138,7 +138,7 @@ public interface BrowserServiceAsync {
   void retrieveDropdownPluginItems(String parameterId, String localeString,
     AsyncCallback<Set<Pair<String, String>>> asyncCallback);
 
-  void retrieveUserProfilePluginItems(String parameterId, String localeString,
+  void retrieveUserProfilePluginItems(String pluginId, String repOrDip, String localeString,
                                    AsyncCallback<Set<UserProfile>> asyncCallback);
 
   void retrieveCreateIngestProcessBundle(AsyncCallback<CreateIngestJobBundle> callback);
