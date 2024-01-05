@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.gwt.user.client.History;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.v2.index.filter.Filter;
@@ -369,6 +370,7 @@ public class TransferredResourceActions extends AbstractActionable<TransferredRe
       public void onSuccess(Void result) {
         Toast.showInfo(messages.dialogRefresh(), messages.updatedFilesUnderFolder());
         doActionCallbackUpdated();
+        History.fireCurrentHistoryState();
       }
     });
   }
