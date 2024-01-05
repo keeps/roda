@@ -182,7 +182,7 @@ public class EARKSIP2ToAIPPluginUtils {
           Map<String, String> properties = new HashMap<>();
           properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATE_FROM_SIP.toString());
 
-          model.updateDescriptiveMetadata(aipId, descriptiveMetadataId, payload, metadataType, metadataVersion,
+          model.updateDescriptiveMetadata(aipId, representationId, descriptiveMetadataId, payload, metadataType, metadataVersion,
             properties, username);
         } else {
           throw e;
