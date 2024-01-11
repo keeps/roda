@@ -1,5 +1,31 @@
 # Changelog
 
+## v5.3.1 (11/01/2024)
+#### Bug fixes:
+- Changed default permissions to old behaviour #3043
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
+## v5.3.0 (14/12/2023)
+#### Enhancement:
+- Added tool tip to plugin license verification panel #2974
+#### New features:
+- Added permissions configuration for newly created AIPs #3032
+#### Bug fixes:
+- Unable to perform actions even having right permissions #2986
+- Ingest jobs created in RODA 4 cannot be accessed on the interface of RODA 5 #3037
+- Problem using index REST API without filter #2962
+#### Security:
+- Several dependency upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.2.5 (06/12/2023)
 #### Bug fixes:
 
@@ -468,31 +494,4 @@ New features:
 Install for demonstration:
 ```
 docker pull keeps/roda:v3.6
-```
----
-
-## v4.1.1 (09/12/2021)
-
-#### Enhancements:
-
--  Add an option to always display the last descriptive metadata [#1965](https://github.com/keeps/roda/issues/1965)
-
-#### Bug Fixes:
-
--  Ingest assessment not working with filter [#1964](https://github.com/keeps/roda/issues/1964)
-
-Install for demonstration:
-```
-docker pull keeps/roda:v4.1.1
-```
----
-
-## v3.5.7 (17/01/2022)
-#### Enhancements:
-- Expand Portal to allow customization via AIP level #1969
-
-
-Install for demonstration:
-```
-docker pull keeps/roda:v3.5.7
 ```
