@@ -290,7 +290,7 @@ public class RodaCoreFactory {
           }
 
           List<String> properties = RodaCoreFactory
-            .getRodaConfigurationAsList("ui.sharedProperties.whitelist.messages.property");
+            .getRodaConfigurationAsList("ui.display.properties.tika.fixed");
           for (String propertyKey : properties) {
             if (messages.containsTranslation(propertyKey)) {
               sharedProperties.put("i18n." + propertyKey,

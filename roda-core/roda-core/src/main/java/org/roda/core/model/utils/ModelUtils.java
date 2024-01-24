@@ -30,7 +30,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
-import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
 import org.roda.core.data.v2.index.select.SelectedItemsFilter;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
@@ -812,6 +811,22 @@ public final class ModelUtils {
     } else if (aipId != null) {
       path = getRepresentationOtherMetadataPath(aipId, representationId, type);
       path.add(aipId + fileSuffix);
+    } else {
+      throw new RequestNotValidException("AIP id cannot be null");
+    }
+    return DefaultStoragePath.parse(path);
+  }
+
+  public static StoragePath getOtherMetadataStoragePath(String aipId, String representationId, String fileName, String type, String fileSuffix) throws RequestNotValidException {
+
+    List<String> path;
+    if (aipId != null && representationId != null && fileName != null && fileSuffix != null && type != null) {
+      // other metadata pertaining to a file
+      path = getRepresentationOtherMetadataPath(aipId, representationId, type);
+      path.add(fileName + fileSuffix);
+    }
+    else if (aipId != null && representationId != null) {
+      path = getRepresentationOtherMetadataPath(aipId, representationId, "");
     } else {
       throw new RequestNotValidException("AIP id cannot be null");
     }

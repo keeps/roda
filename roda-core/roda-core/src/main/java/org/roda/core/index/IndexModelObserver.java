@@ -259,6 +259,7 @@ public class IndexModelObserver implements ModelObserver {
             aip.setHasShallowFiles(true);
             indexAIP(aip, ancestors).addTo(ret);
           }
+
           sizeInBytes += indexFile(aip, file.get(), ancestors, false).addTo(ret).getReturnedObject();
 
           if (file.get().isDirectory()) {
@@ -273,6 +274,27 @@ public class IndexModelObserver implements ModelObserver {
           LOGGER.error("Cannot index representation file", file.getCause());
           ret.add(file.getCause());
         }
+      }
+
+      // treat other metadata
+      CloseableIterable<OptionalWithCause<OtherMetadata>> allOtherMetadata = model
+        .listOtherMetadata(representation.getAipId(), representation.getId());
+
+      for (OptionalWithCause<OtherMetadata> otherMetadata : allOtherMetadata) {
+
+        String suffix = otherMetadata.get().getFileSuffix();
+        String type = otherMetadata.get().getType();
+        List<String> path = new ArrayList<>();
+
+        // suppose that all suffixes in othermetadata are like this
+        // ".metadata.<real_suffix>
+        String fileId = otherMetadata.get().getFileId();
+        suffix = fileId.substring(fileId.lastIndexOf(".")) + suffix;
+        fileId = fileId.substring(0, fileId.lastIndexOf("."));
+
+        OtherMetadata om = model.retrieveOtherMetadata(aip.getId(), representation.getId(), path, fileId, suffix, type);
+
+        otherMetadataCreated(om);
       }
 
       // TODO support safemode
@@ -578,7 +600,8 @@ public class IndexModelObserver implements ModelObserver {
     updatedFields.put(RodaConstants.REPRESENTATION_UPDATED_BY, representation.getUpdatedBy());
     updatedFields.put(RodaConstants.REPRESENTATION_UPDATED_ON, representation.getUpdatedOn());
     String representationUUID = IdUtils.getRepresentationId(representation.getAipId(), representation.getId());
-    SolrUtils.update(index, IndexedRepresentation.class, representationUUID, updatedFields, (ModelObserver) this).addTo(ret);
+    SolrUtils.update(index, IndexedRepresentation.class, representationUUID, updatedFields, (ModelObserver) this)
+      .addTo(ret);
     return ret;
   }
 

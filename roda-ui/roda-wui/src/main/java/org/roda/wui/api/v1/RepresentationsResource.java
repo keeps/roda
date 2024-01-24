@@ -9,6 +9,8 @@ package org.roda.wui.api.v1;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
@@ -122,7 +124,73 @@ public class RepresentationsResource {
 
     // delegate action to controller
     EntityResponse aipRepresentation = Browser.retrieveAIPRepresentation(user, aipId, representationId, acceptFormat);
+    if (aipRepresentation instanceof ObjectResponse) {
+      ObjectResponse<Representation> rep = (ObjectResponse<Representation>) aipRepresentation;
+      return Response.ok(rep.getObject(), mediaType).build();
+    } else {
+      return ApiUtils.okResponse((StreamResponse) aipRepresentation);
+    }
+  }
 
+  @GET
+  @Path("/{" + RodaConstants.API_PATH_PARAM_AIP_ID + "}/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_ID + "}/"
+    + RodaConstants.API_REST_V1_REPRESENTATION_OTHER_METADATA + "}/")
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_ZIP,
+    ExtraMediaType.APPLICATION_JAVASCRIPT})
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
+  @Operation(summary = "Get representation", description = "Gets a representation", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Representation.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
+  public Response retrieveRepresentationOthermetadata(
+    @Parameter(description = "The ID of the existing aip", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @Parameter(description = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
+    @Parameter(description = "Choose format in which to get the representation", schema = @Schema(implementation = RodaConstants.APIMediaTypes.class)) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @Parameter(description = "JSONP callback name", required = false, schema = @Schema(defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK)) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    throws RODAException {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+
+    // get user
+    User user = UserUtility.getApiUser(request);
+
+    // delegate action to controller
+    EntityResponse aipRepresentation = Browser.retrieveAIPRepresentationOthermetadata(user, aipId, representationId,
+      acceptFormat);
+    if (aipRepresentation instanceof ObjectResponse) {
+      ObjectResponse<Representation> rep = (ObjectResponse<Representation>) aipRepresentation;
+      return Response.ok(rep.getObject(), mediaType).build();
+    } else {
+      return ApiUtils.okResponse((StreamResponse) aipRepresentation);
+    }
+  }
+
+  // SPECIFIC FILE UNDER OTHER METADATA
+  // api/v1/representations/{aip_id}/{representation_id}/otherMetadata/{filename}?type={type}&extension={extension}&acceptFormat=bin
+  @GET
+  @Path("/{" + RodaConstants.API_PATH_PARAM_AIP_ID + "}/{" + RodaConstants.API_PATH_PARAM_REPRESENTATION_ID + "}/{"
+    + RodaConstants.API_REST_V1_REPRESENTATION_OTHER_METADATA + "}/{" + RodaConstants.API_FORM_PARAM_FILENAME + "}/")
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_ZIP,
+    ExtraMediaType.APPLICATION_JAVASCRIPT})
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
+  @Operation(summary = "Get representation", description = "Gets a representation", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = Representation.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
+  public Response retrieveRepresentationOthermetadataFile(
+    @Parameter(description = "The ID of the existing aip", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @Parameter(description = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
+    @Parameter(description = "The name of the file", required = true) @PathParam(RodaConstants.API_FORM_PARAM_FILENAME) String filename,
+    @Parameter(description = "The metadata type") @QueryParam(RodaConstants.API_QUERY_KEY_TYPE) String type,
+    @Parameter(description = "The name of the file extension") @QueryParam(RodaConstants.FILE_EXTENSION) String extension,
+    @Parameter(description = "Choose format in which to get the representation", schema = @Schema(implementation = RodaConstants.APIMediaTypes.class)) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @Parameter(description = "JSONP callback name", required = false, schema = @Schema(defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK)) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    throws RODAException {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+
+    // get user
+    User user = UserUtility.getApiUser(request);
+    // delegate action to controller
+    String file = URLDecoder.decode(filename, StandardCharsets.UTF_8);
+    EntityResponse aipRepresentation = Browser.retrieveAIPRepresentationOthermetadataFile(user, aipId, representationId,
+      file, type, extension, acceptFormat);
     if (aipRepresentation instanceof ObjectResponse) {
       ObjectResponse<Representation> rep = (ObjectResponse<Representation>) aipRepresentation;
       return Response.ok(rep.getObject(), mediaType).build();

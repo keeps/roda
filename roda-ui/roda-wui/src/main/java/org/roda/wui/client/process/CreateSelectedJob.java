@@ -515,7 +515,6 @@ public abstract class CreateSelectedJob<T extends IsIndexed> extends Composite {
       homepageButton.addClickHandler(clickEvent -> Window.open(marketInfo.getHomepage(), "_blank", ""));
       rightPanel.add(homepageButton);
     }
-
     // LICENSE
     Button licenseButton = new Button(messages.pluginLicenseLabel());
     licenseButton.addStyleName("btn pluginWorkFlowListTitleButtons btn-stamp");

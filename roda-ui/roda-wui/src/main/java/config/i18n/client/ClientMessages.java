@@ -122,6 +122,8 @@ public interface ClientMessages extends Messages {
 
   String changeStatusSuccessful();
 
+  String otherMetadata();
+
   String statusLabel(@Select String status);
 
   String otherStatusLabel();
@@ -141,6 +143,8 @@ public interface ClientMessages extends Messages {
   String outcomeDetailPlaceholder();
 
   String chooseEntityTitle();
+
+  String tikaTitles(@Select String tika);
 
   /******* SIDEBAR ******************************************/
   String sidebarFilterDates();
@@ -508,6 +512,11 @@ public interface ClientMessages extends Messages {
 
   String viewRepresentationInfoPronom();
 
+  String viewTikaInformation();
+
+  String viewTechnicalMetadata();
+
+  String showTechnicalMetadata();
   String viewRepresentationInfoCreatingApplicationName();
 
   String viewRepresentationInfoCreatingApplicationVersion();

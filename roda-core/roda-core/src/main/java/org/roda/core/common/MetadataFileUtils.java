@@ -26,6 +26,7 @@ import org.jdom2.Element;
 import org.jdom2.IllegalDataException;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
@@ -77,7 +78,9 @@ public class MetadataFileUtils {
     Object result = expr.evaluate(doc, XPathConstants.NODESET);
     NodeList nodes = (NodeList) result;
     for (int i = 0; i < nodes.getLength(); i++) {
-      String name = nodes.item(i).getAttributes().getNamedItem("name").getNodeValue() + "_txt";
+      String key = nodes.item(i).getAttributes().getNamedItem("name").getNodeValue();
+      String name = key + RodaCoreFactory.getRodaConfiguration()
+        .getString("core.indexedFile.tika." + key.replaceAll("[:\\s]", "") + ".solr_prefix", "_txt");
       String value = nodes.item(i).getTextContent();
       List<String> values = new ArrayList<>();
       if (otherProperties.containsKey(name)) {

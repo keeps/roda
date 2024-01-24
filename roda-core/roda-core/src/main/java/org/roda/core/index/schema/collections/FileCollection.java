@@ -37,7 +37,6 @@ import org.roda.core.index.IndexingAdditionalInfo;
 import org.roda.core.index.schema.AbstractSolrCollection;
 import org.roda.core.index.schema.CopyField;
 import org.roda.core.index.schema.Field;
-import org.roda.core.index.utils.IndexUtils;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
@@ -329,11 +328,9 @@ public class FileCollection extends AbstractSolrCollection<IndexedFile, File> {
     // handle other properties
     Map<String, List<String>> otherProperties = new HashMap<>();
     for (String fieldName : doc.getFieldNames()) {
-      if (fieldName.endsWith("_txt")) {
-        List<String> otherProperty = SolrUtils.objectToListString(doc.get(fieldName));
-        otherProperties.put(fieldName, otherProperty);
-      }
 
+      List<String> otherProperty = SolrUtils.objectToListString(String.valueOf(doc.get(fieldName)));
+      otherProperties.put(fieldName, otherProperty);
     }
 
     FileFormat fileFormat = new FileFormat(formatDesignationName, formatDesignationVersion, mimetype, pronom, extension,
