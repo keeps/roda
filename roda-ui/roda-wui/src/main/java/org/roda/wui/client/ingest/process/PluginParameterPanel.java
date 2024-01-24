@@ -201,8 +201,8 @@ public class PluginParameterPanel extends Composite {
 
     dropdown.setTitle(OBJECT_BOX);
     layout.add(parameterName);
-    layout.add(dropdown);
     addHelp();
+    layout.add(dropdown);
     layout.add(innerPanel);
   }
 
@@ -264,10 +264,10 @@ public class PluginParameterPanel extends Composite {
     });
 
     panel.add(parameterName);
+    addHelp(panel, description);
     panel.add(selectBox);
     panel.add(newTypeLabel);
     panel.add(newTypeBox);
-    addHelp(panel, description);
 
     return panel;
   }
@@ -495,6 +495,7 @@ public class PluginParameterPanel extends Composite {
 
     FlowPanel result = new FlowPanel();
     FlowPanel panel = new FlowPanel();
+    FlowPanel descriptionPanel = new FlowPanel();
 
     BrowserService.Util.getInstance().retrieveUserProfilePluginItems(pluginId, repOrDip,
       LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<Set<UserProfile>>() {
@@ -534,13 +535,14 @@ public class PluginParameterPanel extends Composite {
     });
 
     panel.add(dropdown);
-    panel.add(description);
+    descriptionPanel.add(description);
     panel.addStyleName("conversion-profile");
 
     dropdown.setTitle(OBJECT_BOX);
     result.add(parameterName);
     addHelp(result, "User profile options");
     result.add(panel);
+    result.add(descriptionPanel);
     return result;
   }
 
@@ -746,8 +748,8 @@ public class PluginParameterPanel extends Composite {
     parameterBox.setTitle("parameter box");
 
     panel.add(parameterName);
-    panel.add(parameterBox);
     addHelp(panel, description);
+    panel.add(parameterBox);
 
     parameterBox.addValueChangeHandler(valueChangeEvent);
 
