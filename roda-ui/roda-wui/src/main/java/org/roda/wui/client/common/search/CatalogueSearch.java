@@ -119,7 +119,7 @@ public class CatalogueSearch extends Composite {
           if (preselectedDropdownValue == null) {
             preselectedDropdownValue = searchableClass.getSimpleName();
           }
-          searchWrapper.createListAndSearchPanel(listBuilder, true);
+          searchWrapper.createListAndSearchPanel(listBuilder, true, true);
         }
       }
     }

@@ -71,11 +71,11 @@ public class SearchWrapper extends Composite {
   }
 
   public <T extends IsIndexed> SearchWrapper createListAndSearchPanel(ListBuilder<T> listBuilder) {
-    return createListAndSearchPanel(listBuilder, false);
+    return createListAndSearchPanel(listBuilder, false, false);
   }
 
   public <T extends IsIndexed> SearchWrapper createListAndSearchPanel(ListBuilder<T> listBuilder,
-    boolean showSaveButton) {
+    boolean showSaveButton, boolean hideListAfterClear) {
     AsyncTableCell<T> list = listBuilder.build();
 
     SearchPanel<T> searchPanel;
@@ -100,7 +100,7 @@ public class SearchWrapper extends Composite {
     // create
     searchPanel = new SearchPanel<>(list, filter, allFilter, incremental,
       listBuilder.getOptions().getSearchPlaceholder(), hasMultipleSearchPanels,
-      listBuilder.getOptions().getActionable(), listBuilder.getOptions().getActionableCallback(), showSaveButton);
+      listBuilder.getOptions().getActionable(), listBuilder.getOptions().getActionableCallback(), showSaveButton, hideListAfterClear);
     if (hasMultipleSearchPanels) {
       initSearchPanelSelectionDropdown();
       searchPanelSelectionDropdown.addItem(defaultLabelText, dropdownValue,

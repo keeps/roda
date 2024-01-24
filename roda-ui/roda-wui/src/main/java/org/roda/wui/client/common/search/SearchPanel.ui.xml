@@ -57,7 +57,7 @@
                 <g:Button styleName="btn btn-search advancedSearchButton" ui:field="searchAdvancedGo">
                     <ui:text from='{messages.searchButton}'/>
                 </g:Button>
-                <g:Button styleName="btn btn-refresh advancedSearchCleanButton" ui:field="searchAdvancedClean">
+                <g:Button styleName="btn btn-clear advancedSearchCleanButton" ui:field="searchAdvancedClean">
                     <ui:text from='{messages.clearButton}'/>
                 </g:Button>
                 <g:Button styleName="btn btn-bookmark advancedSearchCleanButton" ui:field="searchAdvancedSave">

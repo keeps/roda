@@ -124,6 +124,7 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
   private AsyncTableCell<T> list;
 
   private boolean showPreFilters;
+  private boolean hideListAfterClear;
 
   private final ActionableWidgetBuilder<T> actionableBuilder;
   private final Actionable<T> actionable;
@@ -137,18 +138,16 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
 
   SearchPanel(AsyncTableCell<T> list, Filter defaultFilter, String allFilter, boolean incremental, String placeholder,
     boolean showSearchInputListBox, Actionable<T> actionable, AsyncCallback<Actionable.ActionImpact> actionableCallback,
-    boolean showSaveButton) {
+    boolean showSaveButton, boolean hideListAfterClear) {
     this.defaultFilter = defaultFilter;
     this.allFilter = allFilter;
     this.defaultFilterIncremental = incremental;
     this.list = list;
     this.actionable = actionable;
+    this.hideListAfterClear = hideListAfterClear;
 
     this.showPreFilters = ConfigurationManager.getBoolean(false, RodaConstants.UI_LISTS_PROPERTY, list.getListId(),
       RodaConstants.UI_LISTS_SEARCH_PREFILTERS_VISIBLE_PROPERTY);
-
-    boolean advancedSearchEnabled = ConfigurationManager.getBoolean(false, RodaConstants.UI_LISTS_PROPERTY,
-      list.getListId(), RodaConstants.UI_LISTS_SEARCH_ADVANCED_ENABLED_PROPERTY);
 
     searchSelectedPanel = new SelectedPanel<>(list);
 
@@ -222,19 +221,7 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
     });
 
     // setup advanced search panel and button
-    searchAdvancedDisclosureButton.setVisible(advancedSearchEnabled);
-    searchAdvancedPanel.setVisible(false);
-    if (advancedSearchEnabled) {
-      searchAdvancedDisclosureButton.addClickHandler(event -> toggleAdvancedSearchPanel());
-
-      advancedSearchFieldsPanel = new AdvancedSearchFieldsPanel(list.getClassToReturn().getSimpleName(), keyCode -> {
-        if (KeyCodes.KEY_ENTER == keyCode && searchAdvancedGo.isEnabled()) {
-          searchAdvancedGo.click();
-        }
-      });
-      advancedSearchFieldsPanel.addValueChangeHandler(event -> searchAdvancedGo.setEnabled(event.getValue() != 0));
-      searchAdvancedPanel.insert(advancedSearchFieldsPanel, 0);
-    }
+    setupAdvancedSearch(false);
 
     // bind searchSelectedPanel to show the number of selected items from the list,
     // and also to show/hide itself and the searchPanelSelectionDropdown
@@ -257,16 +244,39 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
     searchPanelSelectionDropdownWrapper.setVisible(!selectedPanelVisible);
     searchSelectedPanel.setVisible(selectedPanelVisible);
 
-    if (advancedSearchEnabled) {
-      searchPanel.addStyleName("searchPanelAdvanced");
-    }
-
     drawSearchPreFilters();
 
     updateRightButtonsCss();
 
     if (!showSaveButton) {
       searchAdvancedSave.setVisible(false);
+    }
+  }
+
+  private void setupAdvancedSearch(boolean makeAdvancedPanelVisible) {
+    boolean advancedSearchEnabled = ConfigurationManager.getBoolean(false, RodaConstants.UI_LISTS_PROPERTY,
+      list.getListId(), RodaConstants.UI_LISTS_SEARCH_ADVANCED_ENABLED_PROPERTY);
+
+    if(advancedSearchFieldsPanel != null) {
+      searchAdvancedPanel.remove(advancedSearchFieldsPanel);
+    }
+
+    searchAdvancedDisclosureButton.setVisible(advancedSearchEnabled);
+    searchAdvancedPanel.setVisible(makeAdvancedPanelVisible);
+    if (advancedSearchEnabled) {
+      searchAdvancedDisclosureButton.addClickHandler(event -> toggleAdvancedSearchPanel());
+
+      advancedSearchFieldsPanel = new AdvancedSearchFieldsPanel(list.getClassToReturn().getSimpleName(), keyCode -> {
+        if (KeyCodes.KEY_ENTER == keyCode && searchAdvancedGo.isEnabled()) {
+          searchAdvancedGo.click();
+        }
+      });
+      advancedSearchFieldsPanel.addValueChangeHandler(event -> searchAdvancedGo.setEnabled(event.getValue() != 0));
+      searchAdvancedPanel.insert(advancedSearchFieldsPanel, 0);
+    }
+
+    if (advancedSearchEnabled) {
+      searchPanel.addStyleName("searchPanelAdvanced");
     }
   }
 
@@ -299,7 +309,12 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
 
   @UiHandler("searchAdvancedClean")
   void handleSearchAdvancedClean(ClickEvent e) {
-    JavascriptUtils.cleanAdvancedSearch();
+    setupAdvancedSearch(true);
+    clearSearchInputBox();
+    if(hideListAfterClear){
+      list.setVisible(false);
+    }
+    doSearch(false);
   }
 
   @UiHandler("searchAdvancedSave")
