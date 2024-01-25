@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public class UserProfile implements Serializable {
   private static final long serialVersionUID = -117396300862413045L;
-  private String i18nProperty;
+  private String title;
   private String profile;
   private String description;
   private boolean dissemination;
@@ -27,8 +27,8 @@ public class UserProfile implements Serializable {
     options = new HashMap<>();
   }
 
-  public void setI18nProperty(String i18nProperty) {
-    this.i18nProperty = i18nProperty;
+  public void setTitle(String title) {
+    this.title = title;
   }
 
   public void setProfile(String profile) {
@@ -59,8 +59,8 @@ public class UserProfile implements Serializable {
     return representation;
   }
 
-  public String getI18nProperty() {
-    return i18nProperty;
+  public String getTitle() {
+    return title;
   }
 
   public String getProfile() {
