@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.google.gwt.core.client.JavaScriptException;
+import com.github.nmorel.gwtjackson.client.exception.JsonSerializationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
@@ -22,14 +22,17 @@ import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.utils.AsyncTableCell;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.github.nmorel.gwtjackson.client.exception.JsonDeserializationException;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptException;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -56,7 +59,10 @@ public class ListSelectionUtils {
   private static final String STORAGE_PREFIX = "ListSelectionState.Clipboard.";
   private static final Storage storage = Storage.getLocalStorageIfSupported();
 
-  private static Map<String, ListSelectionState<?>> clipboard = new HashMap<>();
+  private static final ClientLogger logger = new ClientLogger(ListSelectionUtils.class.getName());
+
+  private static final Map<String, ListSelectionState<?>> clipboard = new HashMap<>();
+
   static {
     loadClipboardOnStorage();
   }
@@ -88,6 +94,8 @@ public class ListSelectionUtils {
         storage.setItem(STORAGE_PREFIX + className, ListSelectionStateMappers.getJson(className, state));
       } catch (JavaScriptException e) {
         Toast.showError(messages.errorLoadingJobReport(e.getMessage()));
+      } catch (JsonSerializationException e) {
+        logger.debug(e.getMessage());
       }
     }
   }
@@ -95,11 +103,6 @@ public class ListSelectionUtils {
   public static <T extends IsIndexed> ListSelectionState<T> create(T selected, Filter filter, Boolean justActive,
     Facets facets, Sorter sorter, Integer index, Long total) {
     return new ListSelectionState<>(selected, filter, justActive, facets, sorter, index, total);
-  }
-
-  @FunctionalInterface
-  public interface ProcessRelativeItem<T> {
-    void process(T object);
   }
 
   private static <T extends IsIndexed> void openRelative(final ListSelectionState<T> state, final int relativeIndex,
@@ -405,5 +408,10 @@ public class ListSelectionUtils {
         }
       }
     });
+  }
+
+  @FunctionalInterface
+  public interface ProcessRelativeItem<T> {
+    void process(T object);
   }
 }

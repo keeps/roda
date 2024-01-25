@@ -24,7 +24,6 @@ import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -76,39 +75,25 @@ public class ShowAccessKey extends Composite {
       return "show_access_key";
     }
   };
-
-  interface MyUiBinder extends UiBinder<Widget, ShowAccessKey> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  private AccessKey accessKey;
-
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   @UiField
   TitlePanel title;
-
   @UiField
   Label dateCreated;
-
   @UiField
   Label dateUpdated;
-
   @UiField
   HTML nameValue;
-
   @UiField
   HTML expirationDateValue;
-
   @UiField
   HTML lastUsageValue;
-
   @UiField
   HTML statusValue;
-
   @UiField
   Button buttonEdit, buttonRegenerate, buttonRevoke, buttonDelete, buttonCancel;
+  private AccessKey accessKey;
 
   public ShowAccessKey(AccessKey accessKey) {
     initWidget(uiBinder.createAndBindUi(this));
@@ -215,7 +200,7 @@ public class ShowAccessKey extends Composite {
       messages.cancelButton(), messages.confirmButton(), new NoAsyncCallback<Boolean>() {
         @Override
         public void onSuccess(Boolean confirm) {
-          BrowserServiceImpl.Util.getInstance().deleteAccessKey(accessKey.getId(), new NoAsyncCallback<Void>() {
+          BrowserService.Util.getInstance().deleteAccessKey(accessKey.getId(), new NoAsyncCallback<Void>() {
             @Override
             public void onSuccess(Void result) {
               cancel();
@@ -276,6 +261,9 @@ public class ShowAccessKey extends Composite {
 
   private void cancel() {
     History.back();
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, ShowAccessKey> {
   }
 
 }

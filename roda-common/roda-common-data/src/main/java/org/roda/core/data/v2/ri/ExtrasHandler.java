@@ -23,7 +23,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-public class ExtrasHandler extends javax.xml.bind.annotation.adapters.XmlAdapter<Object, String> {
+public class ExtrasHandler extends jakarta.xml.bind.annotation.adapters.XmlAdapter<Object, String> {
   private final DocumentBuilderFactory docBuilderFactory;
   private final TransformerFactory transformerFactory;
 

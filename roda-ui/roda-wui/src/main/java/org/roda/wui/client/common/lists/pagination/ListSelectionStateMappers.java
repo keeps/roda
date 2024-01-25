@@ -17,45 +17,48 @@ import org.roda.core.data.v2.jobs.IndexedReport;
 
 import com.github.nmorel.gwtjackson.client.ObjectMapper;
 import com.google.gwt.core.client.GWT;
+import org.roda.wui.common.client.ClientLogger;
 
 public class ListSelectionStateMappers {
 
   // IndexedAIP
-  public static interface IndexedAIPMapper extends ObjectMapper<ListSelectionState<IndexedAIP>> {
+  public interface IndexedAIPMapper extends ObjectMapper<ListSelectionState<IndexedAIP>> {
   }
 
   private static IndexedAIPMapper indexedAIPMapper = GWT.create(IndexedAIPMapper.class);
 
   // IndexedRepresentation
-  public static interface IndexedRepresentationMapper extends ObjectMapper<ListSelectionState<IndexedRepresentation>> {
+  public interface IndexedRepresentationMapper extends ObjectMapper<ListSelectionState<IndexedRepresentation>> {
   }
 
   private static IndexedRepresentationMapper indexedRepresentationMapper = GWT
     .create(IndexedRepresentationMapper.class);
 
   // IndexedFile
-  public static interface IndexedFileMapper extends ObjectMapper<ListSelectionState<IndexedFile>> {
+  public interface IndexedFileMapper extends ObjectMapper<ListSelectionState<IndexedFile>> {
   }
 
   private static IndexedFileMapper indexedFileMapper = GWT.create(IndexedFileMapper.class);
 
   // IndexedDIP
-  public static interface IndexedDIPMapper extends ObjectMapper<ListSelectionState<IndexedDIP>> {
+  public interface IndexedDIPMapper extends ObjectMapper<ListSelectionState<IndexedDIP>> {
   }
 
   private static IndexedDIPMapper indexedDIPMapper = GWT.create(IndexedDIPMapper.class);
 
   // DIPFile
-  public static interface DIPFileMapper extends ObjectMapper<ListSelectionState<DIPFile>> {
+  public interface DIPFileMapper extends ObjectMapper<ListSelectionState<DIPFile>> {
   }
 
   private static DIPFileMapper dipFileMapper = GWT.create(DIPFileMapper.class);
 
   // Job report
-  public static interface IndexedReportMapper extends ObjectMapper<ListSelectionState<IndexedReport>> {
+  public interface IndexedReportMapper extends ObjectMapper<ListSelectionState<IndexedReport>> {
   }
 
   private static IndexedReportMapper indexedReportMapper = GWT.create(IndexedReportMapper.class);
+
+  private static final ClientLogger logger = new ClientLogger(ListSelectionUtils.class.getName());
 
   private ListSelectionStateMappers() {
     // do nothing

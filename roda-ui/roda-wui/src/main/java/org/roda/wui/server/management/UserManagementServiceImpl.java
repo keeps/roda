@@ -7,8 +7,7 @@
  */
 package org.roda.wui.server.management;
 
-import javax.servlet.http.HttpServletRequest;
-
+import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.SecureString;
@@ -37,7 +36,7 @@ import org.roda.wui.common.client.tools.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * User Management service implementation
@@ -50,10 +49,8 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
    *
    */
   private static final long serialVersionUID = 1L;
-
-  private final transient Logger logger = LoggerFactory.getLogger(this.getClass().getName());
-
   private static final String RECAPTCHA_CODE_SECRET_PROPERTY = "ui.google.recaptcha.code.secret";
+  private final transient Logger logger = LoggerFactory.getLogger(this.getClass().getName());
 
   /**
    * User Management Service implementation constructor
@@ -61,6 +58,21 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
    */
   public UserManagementServiceImpl() {
     // do nothing
+  }
+
+  private static String retrieveServletUrl(HttpServletRequest req) {
+    String scheme = req.getScheme();
+    String serverName = req.getServerName();
+    int serverPort = req.getServerPort();
+    String contextPath = req.getContextPath();
+
+    String url = scheme + "://" + serverName + ":" + serverPort + contextPath;
+    if (("http".equalsIgnoreCase(scheme) && serverPort == 80)
+      || ("https".equalsIgnoreCase(scheme) && serverPort == 443)) {
+      url = scheme + "://" + serverName + contextPath;
+    }
+
+    return url;
   }
 
   @Override
@@ -192,21 +204,6 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
     throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException,
     AuthorizationDeniedException {
     UserManagement.resetUserPassword(username, password, resetPasswordToken, getThreadLocalRequest().getRemoteAddr());
-  }
-
-  private static String retrieveServletUrl(HttpServletRequest req) {
-    String scheme = req.getScheme();
-    String serverName = req.getServerName();
-    int serverPort = req.getServerPort();
-    String contextPath = req.getContextPath();
-
-    String url = scheme + "://" + serverName + ":" + serverPort + contextPath;
-    if (("http".equalsIgnoreCase(scheme) && serverPort == 80)
-      || ("https".equalsIgnoreCase(scheme) && serverPort == 443)) {
-      url = scheme + "://" + serverName + contextPath;
-    }
-
-    return url;
   }
 
   @Override

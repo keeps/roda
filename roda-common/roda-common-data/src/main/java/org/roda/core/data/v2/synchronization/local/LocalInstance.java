@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.synchronization.local;
 
+import java.io.Serial;
 import java.util.Objects;
 
 import org.roda.core.data.common.RodaConstants;
@@ -18,10 +19,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_LOCAL_INSTANCE)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_LOCAL_INSTANCE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LocalInstance extends RODAInstance {
 
+  @Serial
   private static final long serialVersionUID = -1056506624373739060L;
 
   private String accessKey;

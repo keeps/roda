@@ -7,9 +7,9 @@
  */
 package org.roda.wui.api.v1.utils;
 
-import javax.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.XmlTransient;
 
-@javax.xml.bind.annotation.XmlRootElement
+@jakarta.xml.bind.annotation.XmlRootElement
 @javax.annotation.Generated(value = "class io.swagger.codegen.languages.JaxRSServerCodegen", date = "2015-09-03T11:38:49.275+01:00")
 public class ApiResponseMessage {
   public static final int ERROR = 1;

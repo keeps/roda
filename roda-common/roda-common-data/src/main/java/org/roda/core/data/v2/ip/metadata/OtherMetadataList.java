@@ -7,10 +7,11 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElement;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.RODAObjectList;
@@ -22,9 +23,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_OTHER_METADATA_LIST)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_OTHER_METADATA_LIST)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class OtherMetadataList implements RODAObjectList<OtherMetadata> {
+  @Serial
   private static final long serialVersionUID = 3622093303834285254L;
 
   @JsonIgnore

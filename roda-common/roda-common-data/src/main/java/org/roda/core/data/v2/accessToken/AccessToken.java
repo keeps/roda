@@ -10,14 +10,16 @@ package org.roda.core.data.v2.accessToken;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.roda.core.data.common.RodaConstants;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_ACCESS_TOKEN)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_ACCESS_TOKEN)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AccessToken implements Serializable {
+  @Serial
   private static final long serialVersionUID = -5623439180546915134L;
   private String token;
   private long expiresIn;

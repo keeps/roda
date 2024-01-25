@@ -18,7 +18,6 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -96,7 +95,7 @@ public class EditLocalInstanceConfiguration extends Composite {
   void buttonApplyHandler(ClickEvent e) {
     if (localInstanceConfigurationDataPanel.isValid()) {
       LocalInstance localInstanceReturned = localInstanceConfigurationDataPanel.getLocalInstance();
-      BrowserServiceImpl.Util.getInstance().updateLocalInstanceConfiguration(localInstanceReturned,
+      BrowserService.Util.getInstance().updateLocalInstanceConfiguration(localInstanceReturned,
         new NoAsyncCallback<DistributedInstance>() {
           @Override
           public void onSuccess(DistributedInstance distributedInstance) {

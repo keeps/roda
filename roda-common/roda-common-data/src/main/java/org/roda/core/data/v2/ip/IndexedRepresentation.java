@@ -16,7 +16,7 @@ import org.roda.core.data.v2.index.IsIndexed;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class IndexedRepresentation extends Representation
   implements IsIndexed, SetsUUID, HasPermissionFilters, HasStateFilter, HasInstanceID, HasInstanceName {

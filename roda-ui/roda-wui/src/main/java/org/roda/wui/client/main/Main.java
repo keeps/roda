@@ -144,7 +144,7 @@ public class Main extends Composite implements EntryPoint {
   }
 
   private void onHistoryChanged(String historyToken) {
-    if (historyToken.length() == 0) {
+    if (historyToken.isEmpty()) {
       contentPanel.update(Welcome.RESOLVER.getHistoryPath());
       HistoryUtils.newHistory(Welcome.RESOLVER);
     } else {

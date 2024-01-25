@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DIPFILE)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DIPFILE)
 public class DIPFile implements IsModelObject, IsIndexed, HasId, SetsUUID, HasPermissionFilters {
 
   private static final long serialVersionUID = 1L;

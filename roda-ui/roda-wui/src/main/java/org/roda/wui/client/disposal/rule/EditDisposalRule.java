@@ -9,7 +9,6 @@ package org.roda.wui.client.disposal.rule;
 
 import java.util.List;
 
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.wui.client.browse.BrowserService;
@@ -22,7 +21,6 @@ import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -77,33 +75,17 @@ public class EditDisposalRule extends Composite {
       return "edit_disposal_rule";
     }
   };
-
-  interface MyUiBinder extends UiBinder<Widget, EditDisposalRule> {
-  }
-
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static EditDisposalRule instance = null;
 
   private static EditDisposalRule.MyUiBinder uiBinder = GWT.create(EditDisposalRule.MyUiBinder.class);
-
-  private DisposalRule disposalRule;
-
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  public static EditDisposalRule getInstance() {
-    if (instance == null) {
-      instance = new EditDisposalRule();
-    }
-    return instance;
-  }
-
   @UiField
   Button buttonApply;
-
   @UiField
   Button buttonCancel;
-
   @UiField(provided = true)
   DisposalRuleDataPanel disposalRuleDataPanel;
+  private DisposalRule disposalRule;
 
   public EditDisposalRule() {
     initWidget(uiBinder.createAndBindUi(this));
@@ -114,6 +96,13 @@ public class EditDisposalRule extends Composite {
     this.disposalRuleDataPanel = new DisposalRuleDataPanel(disposalRule, disposalSchedules, true);
 
     initWidget(uiBinder.createAndBindUi(this));
+  }
+
+  public static EditDisposalRule getInstance() {
+    if (instance == null) {
+      instance = new EditDisposalRule();
+    }
+    return instance;
   }
 
   @Override
@@ -157,7 +146,7 @@ public class EditDisposalRule extends Composite {
       }
 
       if (!runApplyRulesPlugin) {
-        BrowserServiceImpl.Util.getInstance().updateDisposalRule(disposalRule, new NoAsyncCallback<DisposalRule>() {
+        BrowserService.Util.getInstance().updateDisposalRule(disposalRule, new NoAsyncCallback<DisposalRule>() {
           @Override
           public void onSuccess(DisposalRule disposalRule) {
             HistoryUtils.newHistory(ShowDisposalRule.RESOLVER, disposalRule.getId());
@@ -169,13 +158,12 @@ public class EditDisposalRule extends Composite {
             @Override
             public void onSuccess(Boolean confirm) {
               if (confirm) {
-                BrowserServiceImpl.Util.getInstance().updateDisposalRule(disposalRule,
-                  new NoAsyncCallback<DisposalRule>() {
-                    @Override
-                    public void onSuccess(DisposalRule disposalRule) {
-                      DisposalRuleActions.applyDisposalRulesAction();
-                    }
-                  });
+                BrowserService.Util.getInstance().updateDisposalRule(disposalRule, new NoAsyncCallback<DisposalRule>() {
+                  @Override
+                  public void onSuccess(DisposalRule disposalRule) {
+                    DisposalRuleActions.applyDisposalRulesAction();
+                  }
+                });
               }
             }
           });
@@ -188,6 +176,9 @@ public class EditDisposalRule extends Composite {
   @UiHandler("buttonCancel")
   void buttonCancelHandler(ClickEvent e) {
     HistoryUtils.newHistory(ShowDisposalRule.RESOLVER, disposalRule.getId());
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, EditDisposalRule> {
   }
 
 }

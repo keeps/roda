@@ -7,10 +7,9 @@
  */
 package org.roda.core.data.v2.notifications;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.bind.annotation.XmlElement;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.RODAObjectList;
@@ -18,12 +17,15 @@ import org.roda.core.data.v2.common.RODAObjectList;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.xml.bind.annotation.XmlElement;
+
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_NOTIFICATIONS)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_NOTIFICATIONS)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Notifications implements RODAObjectList<Notification> {
+  @Serial
   private static final long serialVersionUID = -6470632839283128013L;
   private List<Notification> notificationList;
 

@@ -8,6 +8,7 @@
 package org.roda.wui.server.browse;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.roda.core.RodaCoreFactory;
@@ -132,8 +134,6 @@ import org.roda_project.commons_ip.model.RepresentationContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-
 import it.burning.cron.CronExpressionDescriptor;
 
 /**
@@ -144,9 +144,9 @@ import it.burning.cron.CronExpressionDescriptor;
  */
 public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserService {
 
-  private static final long serialVersionUID = 1L;
   static final String FONDLIST_PAGESIZE = "10";
-
+  @Serial
+  private static final long serialVersionUID = 1L;
   private static final Logger LOGGER = LoggerFactory.getLogger(BrowserServiceImpl.class);
 
   /**
@@ -631,7 +631,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
       UserProfile userProfile = retrieveUserProfileItem(item, pluginName, items, messages);
       if (repOrDip.equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_REPRESENTATION) && userProfile.isRepresentation()) {
         items.add(userProfile);
-      } else if (repOrDip.equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_DISSEMINATION) && userProfile.isDissemination()) {
+      } else if (repOrDip.equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_DISSEMINATION)
+        && userProfile.isDissemination()) {
         items.add(userProfile);
       }
     }
@@ -639,23 +640,26 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return items;
   }
 
-  private UserProfile retrieveUserProfileItem(String item, String pluginName, Set<UserProfile> items, Messages messages) {
+  private UserProfile retrieveUserProfileItem(String item, String pluginName, Set<UserProfile> items,
+    Messages messages) {
     UserProfile userProfile = new UserProfile();
     Map<String, String> optionsValues = new HashMap<>();
 
-    userProfile.setI18nProperty(RodaCoreFactory.getRodaConfiguration()
-      .getString("core.plugins." + pluginName + "." + item + ".title"));
-    userProfile.setDescription(RodaCoreFactory.getRodaConfiguration()
-      .getString("core.plugins." + pluginName + "." + item + ".description"));
-    userProfile.setHasRepresentation(RodaCoreFactory.getRodaConfiguration()
-      .getBoolean("core.plugins." + pluginName + "." + item + ".representation"));
-    userProfile.setHasDissemination(RodaCoreFactory.getRodaConfiguration()
-      .getBoolean("core.plugins." + pluginName + "." + item + ".dissemination"));
+    userProfile.setI18nProperty(
+      RodaCoreFactory.getRodaConfiguration().getString("core.plugins." + pluginName + "." + item + ".title"));
+    userProfile.setDescription(
+      RodaCoreFactory.getRodaConfiguration().getString("core.plugins." + pluginName + "." + item + ".description"));
+    userProfile.setHasRepresentation(
+      RodaCoreFactory.getRodaConfiguration().getBoolean("core.plugins." + pluginName + "." + item + ".representation"));
+    userProfile.setHasDissemination(
+      RodaCoreFactory.getRodaConfiguration().getBoolean("core.plugins." + pluginName + "." + item + ".dissemination"));
     userProfile.setProfile(item);
 
-    String[] options = RodaCoreFactory.getRodaConfiguration().getStringArray("core.plugins." + pluginName + "." + item + ".options[]");
-    for(String option : options){
-      String optionValue = RodaCoreFactory.getRodaConfiguration().getString("core.plugins." + pluginName + "." + item + "." + option);
+    String[] options = RodaCoreFactory.getRodaConfiguration()
+      .getStringArray("core.plugins." + pluginName + "." + item + ".options[]");
+    for (String option : options) {
+      String optionValue = RodaCoreFactory.getRodaConfiguration()
+        .getString("core.plugins." + pluginName + "." + item + "." + option);
       optionsValues.put(option, optionValue);
     }
     userProfile.setOptions(optionsValues);
@@ -1120,8 +1124,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     } else {
       try {
         Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_TYPE));
-        IndexResult<IndexedAIP> result = find(IndexedAIP.class.getName(), Filter.ALL, Sorter.NONE, Sublist.NONE,
-          facets, locale, false, new ArrayList<>());
+        IndexResult<IndexedAIP> result = find(IndexedAIP.class.getName(), Filter.ALL, Sorter.NONE, Sublist.NONE, facets,
+          locale, false, new ArrayList<>());
 
         List<FacetFieldResult> facetResults = result.getFacetResults();
         for (FacetValue facetValue : facetResults.get(0).getValues()) {
@@ -1146,8 +1150,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     } else {
       try {
         Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.REPRESENTATION_TYPE));
-        IndexResult<IndexedRepresentation> result = find(IndexedRepresentation.class.getName(), Filter.ALL,
-          Sorter.NONE, Sublist.NONE, facets, locale, false, new ArrayList<>());
+        IndexResult<IndexedRepresentation> result = find(IndexedRepresentation.class.getName(), Filter.ALL, Sorter.NONE,
+          Sublist.NONE, facets, locale, false, new ArrayList<>());
 
         List<FacetFieldResult> facetResults = result.getFacetResults();
         for (FacetValue facetValue : facetResults.get(0).getValues()) {
@@ -1156,14 +1160,15 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
         Boolean flag = false;
 
-        for(String word : types) {
-          if(word.equals("MIXED")) {
+        for (String word : types) {
+          if (word.equals("MIXED")) {
             flag = true;
             break;
           }
         }
 
-        if(!flag) types.add("MIXED");
+        if (!flag)
+          types.add("MIXED");
       } catch (GenericException | AuthorizationDeniedException | RequestNotValidException e) {
         LOGGER.error("Could not execute find request on representations", e);
       }

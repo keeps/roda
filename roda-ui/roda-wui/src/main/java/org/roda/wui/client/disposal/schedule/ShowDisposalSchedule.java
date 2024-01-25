@@ -38,7 +38,6 @@ import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -59,6 +58,8 @@ import config.i18n.client.ClientMessages;
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 public class ShowDisposalSchedule extends Composite {
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static ShowDisposalSchedule instance = null;
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
@@ -81,94 +82,57 @@ public class ShowDisposalSchedule extends Composite {
       return "disposal_schedule";
     }
   };
-
-  private static ShowDisposalSchedule instance = null;
-
-  interface MyUiBinder extends UiBinder<Widget, ShowDisposalSchedule> {
-  }
-
   private static ShowDisposalSchedule.MyUiBinder uiBinder = GWT.create(ShowDisposalSchedule.MyUiBinder.class);
-
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  private DisposalSchedule disposalSchedule;
-  private DisposalRules disposalRules;
-
-  public static ShowDisposalSchedule getInstance() {
-    if (instance == null) {
-      instance = new ShowDisposalSchedule();
-    }
-    return instance;
-  }
-
   @UiField
   TitlePanel title;
-
   @UiField
   DisposalPolicySummaryPanel usedInRulePanel;
-
   @UiField
   Label disposalScheduleId;
-
   @UiField
   Label dateCreated, dateUpdated;
-
   @UiField
   Label descriptionLabel;
-
   @UiField
   HTML descriptionValue;
-
   @UiField
   Label mandateLabel;
-
   @UiField
   HTML mandateValue;
-
   @UiField
   Label notesLabel;
-
   @UiField
   HTML notesValue;
-
-  // disposal actions
-
   @UiField
   Label disposalActionsLabel;
-
   @UiField
   HTML disposalActionsValue;
-
-  // retention triggers
-
   @UiField
   Label retentionTriggersLabel;
-
   @UiField
   HTML retentionTriggersValue;
 
-  // retention period
-
+  // disposal actions
   @UiField
   Label retentionPeriodLabel;
-
   @UiField
   HTML retentionPeriodValue;
 
+  // retention triggers
   @UiField
   Label stateLabel;
-
   @UiField
   HTML stateValue;
 
+  // retention period
   @UiField
   FlowPanel buttonsPanel;
-
   @UiField
   FlowPanel aipListTitle;
-
   @UiField
   SimplePanel aipsListCard;
+  private DisposalSchedule disposalSchedule;
+  private DisposalRules disposalRules;
 
   public ShowDisposalSchedule() {
     this.disposalSchedule = new DisposalSchedule();
@@ -182,6 +146,13 @@ public class ShowDisposalSchedule extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
     initElements();
     initButtons();
+  }
+
+  public static ShowDisposalSchedule getInstance() {
+    if (instance == null) {
+      instance = new ShowDisposalSchedule();
+    }
+    return instance;
   }
 
   public void initElements() {
@@ -285,7 +256,7 @@ public class ShowDisposalSchedule extends Composite {
         deactivateScheduleButton.setText(messages.deactivateButton());
         deactivateScheduleButton.addClickHandler(clickEvent -> {
           disposalSchedule.setState(DisposalScheduleState.INACTIVE);
-          BrowserServiceImpl.Util.getInstance().updateDisposalSchedule(disposalSchedule,
+          BrowserService.Util.getInstance().updateDisposalSchedule(disposalSchedule,
             new NoAsyncCallback<DisposalSchedule>() {
               @Override
               public void onSuccess(DisposalSchedule disposalSchedule) {
@@ -303,7 +274,7 @@ public class ShowDisposalSchedule extends Composite {
         deleteDisposalSchedule.addStyleName("btn btn-block btn-danger btn-delete");
         deleteDisposalSchedule.setText("Delete");
         deleteDisposalSchedule.addClickHandler(clickEvent -> {
-          BrowserServiceImpl.Util.getInstance().deleteDisposalSchedule(disposalSchedule.getId(),
+          BrowserService.Util.getInstance().deleteDisposalSchedule(disposalSchedule.getId(),
             new NoAsyncCallback<Void>() {
               @Override
               public void onSuccess(Void result) {
@@ -350,6 +321,9 @@ public class ShowDisposalSchedule extends Composite {
           }
         });
     }
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, ShowDisposalSchedule> {
   }
 
 }

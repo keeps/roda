@@ -7,10 +7,11 @@
  */
 package org.roda.core.data.v2.ip.disposal;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElement;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.RODAObjectList;
@@ -21,9 +22,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_CONFIRMATIONS_METADATA)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_CONFIRMATIONS_METADATA)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DisposalConfirmations implements RODAObjectList<DisposalConfirmation> {
+  @Serial
   private static final long serialVersionUID = -690695513750502079L;
   private List<DisposalConfirmation> disposalConfirmationList;
 

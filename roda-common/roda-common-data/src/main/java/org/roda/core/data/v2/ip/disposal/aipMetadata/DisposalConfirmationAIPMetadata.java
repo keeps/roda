@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip.disposal.aipMetadata;
 
+import java.io.Serial;
 import java.util.Objects;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -18,10 +19,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 /**
  * @author Gabriel Barros <gbarrps@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_CONFIRMATION_AIP_METADATA)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_CONFIRMATION_AIP_METADATA)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DisposalConfirmationAIPMetadata implements IsModelObject {
 
+  @Serial
   private static final long serialVersionUID = -5359948610641515785L;
   private String id;
   private String confirmationOn;
@@ -29,6 +31,7 @@ public class DisposalConfirmationAIPMetadata implements IsModelObject {
   private DisposalDestructionAIPMetadata destruction;
 
   public DisposalConfirmationAIPMetadata() {
+    // TODO document why this constructor is empty
   }
 
   public void setId(String id) {

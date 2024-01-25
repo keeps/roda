@@ -18,7 +18,7 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Representation implements IsModelObject, HasId, HasInstanceID {
 

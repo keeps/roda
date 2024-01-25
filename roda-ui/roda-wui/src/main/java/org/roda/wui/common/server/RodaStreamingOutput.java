@@ -10,10 +10,10 @@ package org.roda.wui.common.server;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.ws.rs.core.StreamingOutput;
-
 import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.StreamResponse;
+
+import jakarta.ws.rs.core.StreamingOutput;
 
 public class RodaStreamingOutput implements StreamingOutput {
   private final ConsumesOutputStream outputHandler;

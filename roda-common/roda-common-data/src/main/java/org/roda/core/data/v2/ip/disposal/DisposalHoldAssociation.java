@@ -16,7 +16,7 @@ import org.roda.core.data.v2.IsModelObject;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_HOLD_ASSOCIATION)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_HOLD_ASSOCIATION)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DisposalHoldAssociation implements IsModelObject, Comparable<DisposalHoldAssociation> {
 

@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.synchronization.central.DistributedInstance;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.AccessKeyDialogs;
@@ -19,7 +20,6 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.Toast;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -61,24 +61,15 @@ public class CreateDistributedInstance extends Composite {
       return "create_distributed_instance";
     }
   };
-
-  interface MyUiBinder extends UiBinder<Widget, CreateDistributedInstance> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  private DistributedInstance distributedInstance;
-
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   @UiField
   Button buttonSave;
-
   @UiField
   Button buttonCancel;
-
   @UiField(provided = true)
   DistributedInstanceDataPanel distributedInstanceDataPanel;
+  private DistributedInstance distributedInstance;
 
   public CreateDistributedInstance() {
     this.distributedInstance = new DistributedInstance();
@@ -98,11 +89,11 @@ public class CreateDistributedInstance extends Composite {
   void buttonApplyHandler(ClickEvent e) {
     if (distributedInstanceDataPanel.isValid()) {
       distributedInstance = distributedInstanceDataPanel.getDistributedInstance();
-      BrowserServiceImpl.Util.getInstance().createDistributedInstance(distributedInstance,
+      BrowserService.Util.getInstance().createDistributedInstance(distributedInstance,
         new NoAsyncCallback<DistributedInstance>() {
           @Override
           public void onSuccess(DistributedInstance distributedInstance) {
-            BrowserServiceImpl.Util.getInstance().retrieveAccessKey(distributedInstance.getAccessKeyId(),
+            BrowserService.Util.getInstance().retrieveAccessKey(distributedInstance.getAccessKeyId(),
               new NoAsyncCallback<AccessKey>() {
                 @Override
                 public void onSuccess(AccessKey accessKey) {
@@ -128,5 +119,8 @@ public class CreateDistributedInstance extends Composite {
 
   private void cancel() {
     HistoryUtils.newHistory(DistributedInstancesManagement.RESOLVER);
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, CreateDistributedInstance> {
   }
 }

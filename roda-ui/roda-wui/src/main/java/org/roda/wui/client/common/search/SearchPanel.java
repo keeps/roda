@@ -13,9 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.gwt.regexp.shared.RegExp;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.common.SavedSearch;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.filter.AllFilterParameter;
 import org.roda.core.data.v2.index.filter.BasicSearchFilterParameter;
@@ -44,6 +42,7 @@ import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -68,8 +67,6 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
 
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static final Binder binder = GWT.create(Binder.class);
-
-  private static final SavedSearchCodec codec = GWT.create(SavedSearchCodec.class);
 
   interface Binder extends UiBinder<Widget, SearchPanel> {
   }
@@ -307,13 +304,11 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
 
   @UiHandler("searchAdvancedSave")
   void handleSearchAdvancedSave(ClickEvent e) {
-    SavedSearch savedSearch = new SavedSearch();
-    savedSearch.setFilter(buildSearchFilter());
+    String classSimpleName;
     if (searchPanelSelectionDropdownWrapper.getWidget() instanceof Dropdown) {
-      String selectedValue = ((Dropdown) searchPanelSelectionDropdownWrapper.getWidget()).getSelectedValue();
-      savedSearch.setSearchClassName(selectedValue);
+      classSimpleName = ((Dropdown) searchPanelSelectionDropdownWrapper.getWidget()).getSelectedValue();
     } else {
-      savedSearch.setSearchClassName(IndexedAIP.class.getSimpleName());
+      classSimpleName = IndexedAIP.class.getSimpleName();
     }
 
     Dialogs.showPromptDialog(messages.saveSearchTitle(), messages.saveSearchDescription(), "", "",
@@ -321,8 +316,9 @@ public class SearchPanel<T extends IsIndexed> extends Composite implements HasVa
       messages.saveButton(), true, false, new NoAsyncCallback<String>() {
         @Override
         public void onSuccess(String title) {
-          savedSearch.setTitle(title);
-          String base64String = JavascriptUtils.encodeBase64(codec.encode(savedSearch));
+          SavedSearchMapper mapper = GWT.create(SavedSearchMapper.class);
+          String json = mapper.write( new RODASavedSearch( classSimpleName, title, buildSearchFilter()));
+          String base64String = JavascriptUtils.encodeBase64(json);
           HistoryUtils.newHistory(Search.RESOLVER, RodaConstants.SEARCH_WITH_SAVED_HANDLER, base64String);
         }
       });

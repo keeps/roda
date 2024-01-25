@@ -428,7 +428,7 @@ public class JavascriptUtils {
     top.consoleRef.document.close()
 }-*/;
 
-  public static native String encodeBase64(JSONValue jsonValue) /*-{
+  public static native String encodeBase64(String jsonValue) /*-{
   if (!jsonValue) return jsonValue;
     var b64="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
     var d=new Map();

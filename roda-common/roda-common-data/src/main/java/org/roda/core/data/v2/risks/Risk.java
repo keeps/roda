@@ -19,7 +19,7 @@ import org.roda.core.data.v2.IsModelObject;
 import org.roda.core.data.v2.NamedIndexedModel;
 import org.roda.core.data.v2.ip.HasInstanceID;
 
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_RISK)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_RISK)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class Risk extends NamedIndexedModel implements IsModelObject, HasInstanceID {
 

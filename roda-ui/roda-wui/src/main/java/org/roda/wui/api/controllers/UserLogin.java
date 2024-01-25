@@ -9,8 +9,8 @@ package org.roda.wui.api.controllers;
 
 import java.util.List;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.common.RodaConstants;

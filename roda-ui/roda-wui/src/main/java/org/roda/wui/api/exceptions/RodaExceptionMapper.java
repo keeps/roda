@@ -7,13 +7,6 @@
  */
 package org.roda.wui.api.exceptions;
 
-import javax.inject.Inject;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
-
 import java.util.UUID;
 
 import org.glassfish.jersey.server.ContainerRequest;
@@ -31,12 +24,19 @@ import org.roda.wui.api.v1.utils.ApiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.inject.Inject;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.ext.Provider;
+
 @Provider
 public class RodaExceptionMapper implements ExceptionMapper<RODAException> {
   private static final Logger LOGGER = LoggerFactory.getLogger(RodaExceptionMapper.class);
 
   @Inject
-  private javax.inject.Provider<ContainerRequest> containerRequestProvider;
+  private jakarta.inject.Provider<ContainerRequest> containerRequestProvider;
 
   @Override
   public Response toResponse(RODAException e) {

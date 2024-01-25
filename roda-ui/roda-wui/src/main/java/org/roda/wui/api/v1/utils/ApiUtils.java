@@ -15,17 +15,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Request;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.StreamingOutput;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.lang3.StringUtils;
@@ -73,6 +62,18 @@ import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.wui.api.controllers.MimeTypeHelper;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.CacheControl;
+import jakarta.ws.rs.core.EntityTag;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Request;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.Response.ResponseBuilder;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.StreamingOutput;
+
 /**
  * API Utils
  *
@@ -83,6 +84,7 @@ public class ApiUtils {
   private static final String CONTENT_DISPOSITION_FILENAME_ARGUMENT = "filename=";
   private static final String CONTENT_DISPOSITION_INLINE = "inline; ";
   private static final String CONTENT_DISPOSITION_ATTACHMENT = "attachment; ";
+  private static final int CACHE_CONTROL_MAX_AGE = 60;
 
   private ApiUtils() {
     // do nothing
@@ -242,8 +244,6 @@ public class ApiUtils {
 
     return response.build();
   }
-
-  private static final int CACHE_CONTROL_MAX_AGE = 60;
 
   public static Response okResponse(StreamResponse streamResponse, boolean inline, final String range,
     Request request) {

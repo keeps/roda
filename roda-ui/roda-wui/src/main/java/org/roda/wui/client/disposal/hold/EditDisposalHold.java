@@ -19,7 +19,6 @@ import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -126,7 +125,7 @@ public class EditDisposalHold extends Composite {
       disposalHold.setMandate(disposalHoldUpdated.getMandate());
       disposalHold.setDescription(disposalHoldUpdated.getDescription());
       disposalHold.setScopeNotes(disposalHoldUpdated.getScopeNotes());
-      BrowserServiceImpl.Util.getInstance().updateDisposalHold(disposalHold, new NoAsyncCallback<DisposalHold>() {
+      BrowserService.Util.getInstance().updateDisposalHold(disposalHold, new NoAsyncCallback<DisposalHold>() {
         @Override
         public void onSuccess(DisposalHold disposalHold) {
           HistoryUtils.newHistory(ShowDisposalHold.RESOLVER, disposalHold.getId());

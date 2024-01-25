@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_SHALLOW_FILE)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_SHALLOW_FILE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ShallowFile implements IsModelObject {
   private static final long serialVersionUID = 6755039131089472458L;

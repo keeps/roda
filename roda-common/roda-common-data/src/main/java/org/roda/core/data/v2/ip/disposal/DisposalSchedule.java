@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_SCHEDULE)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_SCHEDULE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DisposalSchedule implements IsModelObject, HasId {
   private static final long serialVersionUID = -2870778207871507847L;

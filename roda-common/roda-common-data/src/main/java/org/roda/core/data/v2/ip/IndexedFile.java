@@ -18,7 +18,7 @@ import org.roda.core.data.v2.ip.metadata.FileFormat;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_FILE)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_FILE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class IndexedFile
   implements IsIndexed, HasId, SetsUUID, HasPermissionFilters, HasStateFilter, HasInstanceID, HasInstanceName {

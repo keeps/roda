@@ -7,21 +7,25 @@
  */
 package org.roda.core.data.v2.synchronization.central;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.io.Serial;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.RODAObjectList;
 
-import javax.xml.bind.annotation.XmlElement;
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.xml.bind.annotation.XmlElement;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISTRIBUTED_INSTANCES)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISTRIBUTED_INSTANCES)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DistributedInstances implements RODAObjectList<DistributedInstance> {
+  @Serial
   private static final long serialVersionUID = -2558439591345762182L;
   private List<DistributedInstance> distributedInstances;
 

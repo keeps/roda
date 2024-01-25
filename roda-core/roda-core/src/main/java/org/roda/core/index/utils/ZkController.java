@@ -19,21 +19,20 @@ import org.slf4j.LoggerFactory;
 
 public class ZkController {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ZkController.class);
   /**
    * ZkNode where named configs are stored.
-   * 
+   *
    * From:
    * https://github.com/apache/solr/blob/30bf94db62fd92354a9c9437eacf884f8fc862d9/solr/core/src/java/org/apache/solr/cloud/ZkConfigSetService.java#L54
    */
   public static final String CONFIGS_ZKNODE = "/configs";
-
   /**
    * From:
    * https://github.com/apache/solr/blob/30bf94db62fd92354a9c9437eacf884f8fc862d9/solr/core/src/java/org/apache/solr/core/ConfigSetService.java#L47-L49
    */
   public static final String UPLOAD_FILENAME_EXCLUDE_REGEX = "^\\..*$";
   public static final Pattern UPLOAD_FILENAME_EXCLUDE_PATTERN = Pattern.compile(UPLOAD_FILENAME_EXCLUDE_REGEX);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ZkController.class);
 
   private ZkController() {
 
@@ -54,7 +53,8 @@ public class ZkController {
     LOGGER.trace("zkHost includes chroot");
     String chrootPath = zkHost.substring(zkHost.indexOf("/"));
 
-    try (SolrZkClient tmpClient = new SolrZkClient(zkHost.substring(0, zkHost.indexOf("/")), 60000, 30000);) {
+    try (SolrZkClient tmpClient = new SolrZkClient.Builder().withUrl(zkHost.substring(0, zkHost.indexOf("/")))
+      .withTimeout(60, TimeUnit.SECONDS).withConnTimeOut(30, TimeUnit.SECONDS).build()) {
       boolean exists = tmpClient.exists(chrootPath, true);
       if (!exists && create) {
         LOGGER.info("creating chroot {}", chrootPath);

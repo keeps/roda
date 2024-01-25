@@ -7,7 +7,10 @@
  */
 package org.roda.wui.server.common;
 
+import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 import org.roda.core.model.utils.UserUtility;
+
+import java.io.Serial;
 import java.util.List;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
@@ -19,8 +22,6 @@ import org.roda.wui.client.common.UserLoginService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-
 /**
  * User login servlet
  *
@@ -29,10 +30,11 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
  */
 public class UserLoginServiceImpl extends RemoteServiceServlet implements UserLoginService {
 
+  @Serial
   private static final long serialVersionUID = -6898933466651262033L;
   @SuppressWarnings("unused")
   private static final String LOG_ACTION_WUI_LOGIN = "RODAWUI.login";
-  private static Logger logger = LoggerFactory.getLogger(UserLoginServiceImpl.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(UserLoginServiceImpl.class);
 
   public static UserLoginServiceImpl getInstance() {
     return new UserLoginServiceImpl();
@@ -41,7 +43,7 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements UserLo
   @Override
   public User getAuthenticatedUser() {
     User user = UserUtility.getUser(this.getThreadLocalRequest());
-    logger.debug("Serving user {}", user);
+    LOGGER.debug("Serving user {}", user);
     return user;
   }
 
@@ -56,7 +58,7 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements UserLo
     }
 
     User user = UserLogin.login(username, password, this.getThreadLocalRequest());
-    logger.debug("Logged user {}", user);
+    LOGGER.debug("Logged user {}", user);
     return user;
   }
 }

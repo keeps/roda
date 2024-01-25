@@ -373,7 +373,6 @@ public class Dialogs {
       errorPanel.clear();
     } else {
       HTML htmlMessage;
-      GWT.log(text);
       errorPanel.clear();
       if (StringUtils.isNotBlank(text)) {
         htmlMessage = new HTML(SafeHtmlUtils.fromSafeConstant(errorMessage));

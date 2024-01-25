@@ -11,7 +11,7 @@ import java.io.Serializable;
 
 import org.roda.core.data.common.RodaConstants;
 
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_FACET_VALUE)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_FACET_VALUE)
 public class FacetValue implements Serializable {
   private static final long serialVersionUID = 8898599554012120196L;
 

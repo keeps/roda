@@ -7,10 +7,11 @@
  */
 package org.roda.core.data.v2.ri;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElement;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.RODAObjectList;
@@ -18,9 +19,10 @@ import org.roda.core.data.v2.common.RODAObjectList;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION_INFORMATION_LIST)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION_INFORMATION_LIST)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RepresentationInformationList implements RODAObjectList<RepresentationInformation> {
+  @Serial
   private static final long serialVersionUID = -1500757245278990237L;
   private List<RepresentationInformation> representationInformationList;
 
@@ -29,9 +31,9 @@ public class RepresentationInformationList implements RODAObjectList<Representat
     representationInformationList = new ArrayList<>();
   }
 
-  public RepresentationInformationList(List<RepresentationInformation> representationInformations) {
+  public RepresentationInformationList(List<RepresentationInformation> representationInformation) {
     super();
-    this.representationInformationList = representationInformations;
+    this.representationInformationList = representationInformation;
   }
 
   @Override
@@ -42,8 +44,8 @@ public class RepresentationInformationList implements RODAObjectList<Representat
   }
 
   @Override
-  public void setObjects(List<RepresentationInformation> representationInformations) {
-    this.representationInformationList = representationInformations;
+  public void setObjects(List<RepresentationInformation> representationInformation) {
+    this.representationInformationList = representationInformation;
   }
 
   @Override

@@ -12,26 +12,24 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.Unmarshaller;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 public class XMLUtils {
-  private static final Logger LOGGER = LoggerFactory.getLogger(XMLUtils.class);
-
   private XMLUtils() {
     // do nothing
   }
@@ -70,13 +68,13 @@ public class XMLUtils {
       SAXSource xmlSource = getSafeSAXSource(new InputSource(new StringReader(xml)));
       JAXBContext jaxbContext = JAXBContext.newInstance(objectClass);
       Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-      return (T) unmarshaller.unmarshal(xmlSource);
+      return unmarshaller.unmarshal(xmlSource, objectClass).getValue();
     } catch (JAXBException | ParserConfigurationException | SAXException e) {
       throw new GenericException(e);
     }
   }
 
-  public static SAXSource getSafeSAXSource(InputSource inputSource) throws ParserConfigurationException, SAXException {
+  public static SAXSource getSafeSAXSource(InputSource inputSource) throws SAXException, ParserConfigurationException {
     return new SAXSource(getSafeXMLReader(), inputSource);
   }
 

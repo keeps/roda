@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.jobs;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -22,10 +23,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_REPORT)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_REPORT)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Report implements IsModelObject, HasId, HasInstanceID {
+  @Serial
   private static final long serialVersionUID = 4316398565678538090L;
 
   public static final String NO_SOURCE_OBJECT_ID = "NO_SOURCE_ID";

@@ -266,9 +266,11 @@
                                 <JDK_JAVA_OPTIONS>--add-opens java.base/java.util=ALL-UNNAMED</JDK_JAVA_OPTIONS>
                             </environmentVariables>
                             <skip>false</skip>
-                            <directories>
-                                <directory>${project.build.directory}/${project.build.finalName}</directory>
-                            </directories>
+                            <additionalClasspathElements>
+                                <additionalClasspathElement>
+                                    ${project.build.directory}/${project.build.finalName}
+                                </additionalClasspathElement>
+                            </additionalClasspathElements>
                             <jvmArguments>
                                 -Dgwt.codeServerPort=9876 -Xdebug
                                 <!-- Remove after upgrade to spring-boot 3-->
@@ -284,15 +286,16 @@
                     <plugin>
                         <groupId>net.ltgt.gwt.maven</groupId>
                         <artifactId>gwt-maven-plugin</artifactId>
+                        <version>HEAD-SNAPSHOT</version>
                         <extensions>true</extensions>
                         <configuration>
                             <moduleName>${gwt.module.main}</moduleName>
                             <launcherDir>${project.build.directory}/${project.build.finalName}</launcherDir>
-
-                            <classpathScope>compile+runtime</classpathScope>
+                            <classpathScope>test</classpathScope>
                             <skipCompilation>false</skipCompilation>
                             <draftCompile>true</draftCompile>
                             <style>PRETTY</style>
+                            <forceCompilation>true</forceCompilation>
                             <environmentVariables>
                                 <JDK_JAVA_OPTIONS>
                                     --add-opens java.base/java.util=ALL-UNNAMED
@@ -380,6 +383,10 @@
         </dependency>
         <dependency>
             <groupId>org.gwtproject</groupId>
+            <artifactId>gwt-servlet-jakarta</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.gwtproject</groupId>
             <artifactId>gwt-dev</artifactId>
             <exclusions>
                 <exclusion>
@@ -389,6 +396,10 @@
                 <exclusion>
                     <groupId>javax.servlet</groupId>
                     <artifactId>javax.servlet-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.eclipse.jetty</groupId>
+                    <artifactId>apache-jsp</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -416,8 +427,9 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apereo.cas.client/cas-client -->
         <dependency>
-            <groupId>org.jasig.cas.client</groupId>
+            <groupId>org.apereo.cas.client</groupId>
             <artifactId>cas-client-core</artifactId>
         </dependency>
         <dependency>
@@ -428,10 +440,6 @@
             <groupId>org.roda-project</groupId>
             <artifactId>roda-core</artifactId>
             <exclusions>
-                <!--                <exclusion>-->
-                <!--                    <artifactId>*</artifactId>-->
-                <!--                    <groupId>org.eclipse.jetty</groupId>-->
-                <!--                </exclusion>-->
                 <exclusion>
                     <artifactId>saxon</artifactId>
                     <groupId>net.sf.saxon</groupId>
@@ -468,10 +476,6 @@
                     <artifactId>jersey-media-json-binding</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
@@ -517,7 +521,7 @@
         </dependency>
         <dependency>
             <groupId>io.swagger.core.v3</groupId>
-            <artifactId>swagger-jaxrs2</artifactId>
+            <artifactId>swagger-jaxrs2-jakarta</artifactId>
         </dependency>
         <dependency>
             <groupId>com.mikesamuel</groupId>
@@ -547,7 +551,7 @@
         <dependency>
             <groupId>com.github.nmorel.gwtjackson</groupId>
             <artifactId>gwt-jackson</artifactId>
-            <version>0.14.2</version>
+            <version>0.15.4</version>
         </dependency>
         <!-- WebJars https://www.webjars.org -->
         <!-- Global icon font -->
@@ -651,10 +655,10 @@
             <artifactId>jjwt</artifactId>
             <version>0.12.3</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/jakarta.xml.bind/jakarta.xml.bind-api -->
         <dependency>
-            <groupId>org.fusesource.restygwt</groupId>
-            <artifactId>restygwt</artifactId>
-            <version>2.2.7</version>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
         </dependency>
     </dependencies>
     <dependencyManagement>
@@ -662,21 +666,9 @@
             <dependency>
                 <groupId>org.gwtproject</groupId>
                 <artifactId>gwt</artifactId>
-                <version>2.10.0</version>
+                <version>${gwt.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <!-- Forcing version to fix spring-boot -->
-            <dependency>
-                <groupId>javax.validation</groupId>
-                <artifactId>validation-api</artifactId>
-                <version>2.0.1.Final</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.validation</groupId>
-                <artifactId>validation-api</artifactId>
-                <version>2.0.1.Final</version>
-                <classifier>sources</classifier>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
@@ -703,7 +695,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <release>17</release>
+                    <release>21</release>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>

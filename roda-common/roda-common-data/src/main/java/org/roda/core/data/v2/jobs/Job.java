@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.jobs;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,10 +33,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_JOB)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_JOB)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Job implements IsModelObject, IsIndexed, HasId, HasInstanceID, HasInstanceName {
+  @Serial
   private static final long serialVersionUID = 615993757726175203L;
 
   public enum JOB_STATE {
@@ -164,7 +166,7 @@ public class Job implements IsModelObject, IsIndexed, HasId, HasInstanceID, HasI
     return this;
   }
 
-  @javax.xml.bind.annotation.XmlElement(nillable = true)
+  @jakarta.xml.bind.annotation.XmlElement(nillable = true)
   public Date getEndDate() {
     return endDate;
   }
@@ -219,7 +221,7 @@ public class Job implements IsModelObject, IsIndexed, HasId, HasInstanceID, HasI
     return this;
   }
 
-  @javax.xml.bind.annotation.XmlElement(nillable = true)
+  @jakarta.xml.bind.annotation.XmlElement(nillable = true)
   public Map<String, String> getPluginParameters() {
     return pluginParameters;
   }

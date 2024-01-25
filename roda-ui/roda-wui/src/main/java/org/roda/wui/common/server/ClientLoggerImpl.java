@@ -7,12 +7,13 @@
  */
 package org.roda.wui.common.server;
 
-import com.google.gwt.core.client.GWT;
+import java.io.Serial;
+
 import org.roda.wui.common.client.ClientLoggerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 
 /**
  * Client logging servlet implementation
@@ -22,6 +23,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
  */
 public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLoggerService {
 
+  @Serial
   private static final long serialVersionUID = 3694771724613537482L;
 
   private String getUserInfo() {
@@ -32,7 +34,7 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
   public void debug(String classname, String object, boolean isDisabled) {
     if (!isDisabled) {
       Logger logger = LoggerFactory.getLogger(classname);
-      logger.debug(String.format("%s%s", getUserInfo(), object));
+      logger.debug("{}{}", getUserInfo(), object);
     }
   }
 
@@ -40,7 +42,7 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
   public void debug(String classname, String object, boolean isDisabled, Throwable error) {
     if (!isDisabled) {
       Logger logger = LoggerFactory.getLogger(classname);
-      logger.debug(String.format("%s%s", getUserInfo(), object), error);
+      logger.debug("{}{}", getUserInfo(), object, error);
     }
   }
 
@@ -48,7 +50,7 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
   public void error(String classname, String object, boolean isDisabled) {
     if (!isDisabled) {
       Logger logger = LoggerFactory.getLogger(classname);
-      logger.error(String.format("%s%s", getUserInfo(), object));
+      logger.error("{}{}", getUserInfo(), object);
       sendError(classname, object, null);
     }
   }
@@ -57,7 +59,7 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
   public void error(String classname, String object, boolean isDisabled, Throwable error) {
     if (!isDisabled) {
       Logger logger = LoggerFactory.getLogger(classname);
-      logger.error(String.format("%s%s", getUserInfo(), object), error);
+      logger.error("{}{}", getUserInfo(), object, error);
       sendError(classname, object, error);
     }
   }
@@ -66,7 +68,7 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
   public void fatal(String classname, String object, boolean isDisabled) {
     if (!isDisabled) {
       Logger logger = LoggerFactory.getLogger(classname);
-      logger.error(String.format("%s%s", getUserInfo(), object));
+      logger.error("{}{}", getUserInfo(), object);
       sendError(classname, object, null);
     }
   }
@@ -75,7 +77,7 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
   public void fatal(String classname, String object, boolean isDisabled, Throwable error) {
     if (!isDisabled) {
       Logger logger = LoggerFactory.getLogger(classname);
-      logger.error(String.format("%s%s", getUserInfo(), object), error);
+      logger.error("{}{}", getUserInfo(), object, error);
       sendError(classname, object, error);
     }
   }
@@ -84,7 +86,7 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
   public void info(String classname, String object, boolean isDisabled) {
     if (!isDisabled) {
       Logger logger = LoggerFactory.getLogger(classname);
-      logger.info(String.format("%s%s", getUserInfo(), object));
+      logger.info("{}{}", getUserInfo(), object);
     }
   }
 
@@ -92,7 +94,7 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
   public void info(String classname, String object, boolean isDisabled, Throwable error) {
     if (!isDisabled) {
       Logger logger = LoggerFactory.getLogger(classname);
-      logger.info(String.format("%s%s", getUserInfo(), object), error);
+      logger.info("{}{}", getUserInfo(), object, error);
     }
   }
 
@@ -100,7 +102,7 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
   public void trace(String classname, String object, boolean isDisabled) {
     if (!isDisabled) {
       Logger logger = LoggerFactory.getLogger(classname);
-      logger.trace(String.format("%s%s", getUserInfo(), object));
+      logger.trace("{}{}", getUserInfo(), object);
     }
   }
 
@@ -108,7 +110,7 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
   public void trace(String classname, String object, boolean isDisabled, Throwable error) {
     if (!isDisabled) {
       Logger logger = LoggerFactory.getLogger(classname);
-      logger.trace(String.format("%s%s", getUserInfo(), object), error);
+      logger.trace("{}{}", getUserInfo(), object, error);
     }
   }
 
@@ -116,7 +118,7 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
   public void warn(String classname, String object, boolean isDisabled) {
     if (!isDisabled) {
       Logger logger = LoggerFactory.getLogger(classname);
-      logger.warn(String.format("%s%s", getUserInfo(), object));
+      logger.warn("{}{}", getUserInfo(), object);
     }
   }
 
@@ -124,7 +126,7 @@ public class ClientLoggerImpl extends RemoteServiceServlet implements ClientLogg
   public void warn(String classname, String object, boolean isDisabled, Throwable error) {
     if (!isDisabled) {
       Logger logger = LoggerFactory.getLogger(classname);
-      logger.warn(String.format("%s%s", getUserInfo(), object), error);
+      logger.warn("{}{}", getUserInfo(), object, error);
     }
   }
 

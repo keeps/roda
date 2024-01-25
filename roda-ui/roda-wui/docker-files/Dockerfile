@@ -1,4 +1,4 @@
-FROM tomcat:9-jre17
+FROM tomcat:10-jre21
 LABEL maintainer="admin@keep.pt" vendor="KEEP SOLUTIONS"
 
 # Install dependencies
@@ -23,6 +23,9 @@ RUN set -ex; \
 COPY /ROOT /usr/local/tomcat/webapps/ROOT
 
 # Fix configuration & do some final cleanup
+RUN mkdir -p /usr/local/tomcat/conf/Catalina/localhost
+RUN chmod -R a+rwx /usr/local/tomcat/conf/Catalina
+
 RUN set -ex; \
     unzip -q /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/roda-core.properties && \
     sed -i -e 's/^core.plugins.internal.virus_check.clamav/#&/' -e 's/^core.tools.siegfried.mode/#&/' config/roda-core.properties && \
