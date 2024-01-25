@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @author Rui Castro
  * @author Luis Faria <lfaria@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_GROUP)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_GROUP)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class Group extends RodaPrincipal {
 

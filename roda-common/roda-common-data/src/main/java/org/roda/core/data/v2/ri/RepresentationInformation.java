@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ri;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -22,10 +23,11 @@ import org.roda.core.data.v2.ip.HasInstanceID;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION_INFORMATION)
-@javax.xml.bind.annotation.XmlAccessorType(javax.xml.bind.annotation.XmlAccessType.PUBLIC_MEMBER)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_REPRESENTATION_INFORMATION)
+@jakarta.xml.bind.annotation.XmlAccessorType(jakarta.xml.bind.annotation.XmlAccessType.PUBLIC_MEMBER)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RepresentationInformation extends NamedIndexedModel implements IsModelObject, IsIndexed, HasInstanceID {
+  @Serial
   private static final long serialVersionUID = 8766448064705416130L;
 
   private String description = null;
@@ -101,8 +103,8 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
     return extras;
   }
 
-  @javax.xml.bind.annotation.XmlElement(name = "extras")
-  @javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter(value = ExtrasHandler.class)
+  @jakarta.xml.bind.annotation.XmlElement(name = "extras")
+  @jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter(value = ExtrasHandler.class)
   public void setExtras(String extras) {
     this.extras = extras;
   }
@@ -115,7 +117,7 @@ public class RepresentationInformation extends NamedIndexedModel implements IsMo
     this.support = support;
   }
 
-  @javax.xml.bind.annotation.XmlElement(name = "relation")
+  @jakarta.xml.bind.annotation.XmlElement(name = "relation")
   public List<RepresentationInformationRelation> getRelations() {
     return relations;
   }

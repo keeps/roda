@@ -10,17 +10,17 @@ package org.roda.wui.api.v1.utils;
 import java.io.IOException;
 import java.util.List;
 
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.ContainerResponseContext;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.container.PreMatching;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.Provider;
-
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
+
+import jakarta.ws.rs.HttpMethod;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.container.ContainerRequestFilter;
+import jakarta.ws.rs.container.ContainerResponseContext;
+import jakarta.ws.rs.container.ContainerResponseFilter;
+import jakarta.ws.rs.container.PreMatching;
+import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.ext.Provider;
 
 /**
  * Request filter that handles CORS, by manipulating responses to include the

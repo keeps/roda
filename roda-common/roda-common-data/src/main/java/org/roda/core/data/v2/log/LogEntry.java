@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.log;
 
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -25,9 +26,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @author Rui Castro
  *
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_LOG)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_LOG)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LogEntry implements IsModelObject, IsIndexed, HasId, SetsUUID {
+  @Serial
   private static final long serialVersionUID = -178083792639806983L;
 
   private String uuid;

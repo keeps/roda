@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.TitlePanel;
 import org.roda.wui.client.common.UserLogin;
@@ -22,7 +23,6 @@ import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -119,7 +119,7 @@ public class CreateAccessKey extends Composite {
       AccessKey accessKeyUpdated = accessKeyDataPanel.getAccessKey();
       accessKey.setName(accessKeyUpdated.getName());
       accessKey.setExpirationDate(accessKeyUpdated.getExpirationDate());
-      BrowserServiceImpl.Util.getInstance().createAccessKey(this.accessKey, new NoAsyncCallback<AccessKey>() {
+      BrowserService.Util.getInstance().createAccessKey(this.accessKey, new NoAsyncCallback<AccessKey>() {
         @Override
         public void onSuccess(AccessKey accessKey) {
           AccessKeyDialogs.showAccessKeyDialog(messages.accessKeyLabel(), accessKey, new NoAsyncCallback<Boolean>() {

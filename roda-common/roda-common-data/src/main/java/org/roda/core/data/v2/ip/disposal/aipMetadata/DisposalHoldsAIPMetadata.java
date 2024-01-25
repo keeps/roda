@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElement;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.RODAObjectList;
@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Gabriel Barros <gbarrps@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_HOLDS_AIP_METADATA)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_HOLDS_AIP_METADATA)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DisposalHoldsAIPMetadata implements RODAObjectList<DisposalHoldAIPMetadata> {
   private static final long serialVersionUID = 2571630535422685722L;

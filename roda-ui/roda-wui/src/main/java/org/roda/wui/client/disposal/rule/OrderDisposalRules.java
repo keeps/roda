@@ -25,7 +25,6 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -78,14 +77,9 @@ public class OrderDisposalRules extends Composite {
       return "change_disposal_rule_order";
     }
   };
-
-  interface MyUiBinder extends UiBinder<Widget, OrderDisposalRules> {
-  }
-
-  private static OrderDisposalRules.MyUiBinder uiBinder = GWT.create(OrderDisposalRules.MyUiBinder.class);
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  private static OrderDisposalRules.MyUiBinder uiBinder = GWT.create(OrderDisposalRules.MyUiBinder.class);
+  private final DisposalRules disposalRules;
   @UiField
   FlowPanel orderDisposalRulesDescription;
 
@@ -103,12 +97,9 @@ public class OrderDisposalRules extends Composite {
 
   @UiField
   Button buttonCancel;
-
-  private final DisposalRules disposalRules;
   private DisposalRule selectedRule;
   private int selectedIndex;
   private BasicTablePanel<DisposalRule> tableRules;
-
   public OrderDisposalRules(DisposalRules disposalRules) {
     initWidget(uiBinder.createAndBindUi(this));
     this.disposalRules = disposalRules;
@@ -288,7 +279,7 @@ public class OrderDisposalRules extends Composite {
       messages.dialogYes(), new NoAsyncCallback<Boolean>() {
         @Override
         public void onSuccess(Boolean aBoolean) {
-          BrowserServiceImpl.Util.getInstance().updateDisposalRules(disposalRules, new NoAsyncCallback<Void>() {
+          BrowserService.Util.getInstance().updateDisposalRules(disposalRules, new NoAsyncCallback<Void>() {
             @Override
             public void onSuccess(Void unused) {
               Toast.showInfo(messages.updateDisposalRulesOrderSuccessTitle(),
@@ -303,5 +294,8 @@ public class OrderDisposalRules extends Composite {
   @UiHandler("buttonCancel")
   void buttonCancelHandler(ClickEvent e) {
     HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, OrderDisposalRules> {
   }
 }

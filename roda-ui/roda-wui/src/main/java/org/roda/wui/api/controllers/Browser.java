@@ -21,7 +21,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConsumesOutputStream;

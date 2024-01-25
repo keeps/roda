@@ -7,13 +7,10 @@
  */
 package org.roda.core.data.v2.index;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlElements;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.facet.FacetFieldResult;
@@ -38,11 +35,16 @@ import org.roda.core.data.v2.user.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_INDEX_RESULT)
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlElements;
+
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_INDEX_RESULT)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class IndexResult<T extends Serializable> implements Serializable {
 
+  @Serial
   private static final long serialVersionUID = -7896294396414765557L;
 
   private long offset;
@@ -75,6 +77,10 @@ public class IndexResult<T extends Serializable> implements Serializable {
     return offset;
   }
 
+  public void setOffset(long offset) {
+    this.offset = offset;
+  }
+
   /**
    * @return the limit
    */
@@ -82,11 +88,19 @@ public class IndexResult<T extends Serializable> implements Serializable {
     return limit;
   }
 
+  public void setLimit(long limit) {
+    this.limit = limit;
+  }
+
   /**
    * @return the totalCount
    */
   public long getTotalCount() {
     return totalCount;
+  }
+
+  public void setTotalCount(long totalCount) {
+    this.totalCount = totalCount;
   }
 
   /**
@@ -113,18 +127,6 @@ public class IndexResult<T extends Serializable> implements Serializable {
     @XmlElement(name = RodaConstants.RODA_OBJECT_OTHER, type = Object.class)})
   public List<T> getResults() {
     return results;
-  }
-
-  public void setOffset(long offset) {
-    this.offset = offset;
-  }
-
-  public void setLimit(long limit) {
-    this.limit = limit;
-  }
-
-  public void setTotalCount(long totalCount) {
-    this.totalCount = totalCount;
   }
 
   public void setResults(List<T> results) {

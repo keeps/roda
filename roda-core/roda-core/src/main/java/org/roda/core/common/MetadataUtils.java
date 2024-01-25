@@ -15,13 +15,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.ValidationEvent;
-import javax.xml.bind.util.ValidationEventCollector;
-
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.core.data.v2.validation.ValidationReport;
@@ -29,6 +22,13 @@ import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.InputStreamContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.ValidationEvent;
+import jakarta.xml.bind.util.ValidationEventCollector;
 
 /**
  * This is an utility class for metadata helpers.

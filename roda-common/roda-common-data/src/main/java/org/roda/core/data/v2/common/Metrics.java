@@ -16,11 +16,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = "metrics")
+@jakarta.xml.bind.annotation.XmlRootElement(name = "metrics")
 @JsonInclude(JsonInclude.Include.ALWAYS)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Metrics {
-  private Map<String, String> metricList;
+  private final Map<String, String> metricList;
 
   public Metrics() {
     metricList = new HashMap<>();

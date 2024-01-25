@@ -19,7 +19,6 @@ import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -73,33 +72,17 @@ public class EditDisposalSchedule extends Composite {
       return "edit_disposal_schedule";
     }
   };
-
-  interface MyUiBinder extends UiBinder<Widget, EditDisposalSchedule> {
-  }
-
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static EditDisposalSchedule instance = null;
 
   private static EditDisposalSchedule.MyUiBinder uiBinder = GWT.create(EditDisposalSchedule.MyUiBinder.class);
-
-  private DisposalSchedule disposalSchedule;
-
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  public static EditDisposalSchedule getInstance() {
-    if (instance == null) {
-      instance = new EditDisposalSchedule();
-    }
-    return instance;
-  }
-
   @UiField
   Button buttonApply;
-
   @UiField
   Button buttonCancel;
-
   @UiField(provided = true)
   DisposalScheduleDataPanel disposalScheduleDataPanel;
+  private DisposalSchedule disposalSchedule;
 
   public EditDisposalSchedule() {
     initWidget(uiBinder.createAndBindUi(this));
@@ -110,6 +93,13 @@ public class EditDisposalSchedule extends Composite {
     this.disposalScheduleDataPanel = new DisposalScheduleDataPanel(disposalSchedule, true);
 
     initWidget(uiBinder.createAndBindUi(this));
+  }
+
+  public static EditDisposalSchedule getInstance() {
+    if (instance == null) {
+      instance = new EditDisposalSchedule();
+    }
+    return instance;
   }
 
   @Override
@@ -128,7 +118,7 @@ public class EditDisposalSchedule extends Composite {
       disposalSchedule.setMandate(disposalScheduleUpdated.getMandate());
       disposalSchedule.setDescription(disposalScheduleUpdated.getDescription());
       disposalSchedule.setScopeNotes(disposalScheduleUpdated.getScopeNotes());
-      BrowserServiceImpl.Util.getInstance().updateDisposalSchedule(disposalSchedule,
+      BrowserService.Util.getInstance().updateDisposalSchedule(disposalSchedule,
         new NoAsyncCallback<DisposalSchedule>() {
           @Override
           public void onSuccess(DisposalSchedule disposalSchedule) {
@@ -143,6 +133,9 @@ public class EditDisposalSchedule extends Composite {
   @UiHandler("buttonCancel")
   void buttonCancelHandler(ClickEvent e) {
     HistoryUtils.newHistory(ShowDisposalSchedule.RESOLVER, disposalSchedule.getId());
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, EditDisposalSchedule> {
   }
 
 }

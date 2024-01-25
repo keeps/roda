@@ -28,7 +28,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_CONFIRMATION_METADATA)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_CONFIRMATION_METADATA)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DisposalConfirmation implements IsModelObject, IsIndexed, HasId {
   private static final long serialVersionUID = 1429757961220532837L;

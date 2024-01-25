@@ -10,7 +10,7 @@ package org.roda.core.data.v2.jobs;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElement;
 
 import org.roda.core.data.common.RodaConstants;
 
@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Hélder Silva <hsilva@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_JOBS)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_JOBS)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Jobs {
   private List<Job> jobList;

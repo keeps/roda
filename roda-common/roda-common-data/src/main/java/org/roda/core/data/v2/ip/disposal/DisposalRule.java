@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 /**
  * @author Tiago Fraga <tfraga@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_RULE)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_RULE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DisposalRule implements IsModelObject, HasId, Comparable<DisposalRule> {
 

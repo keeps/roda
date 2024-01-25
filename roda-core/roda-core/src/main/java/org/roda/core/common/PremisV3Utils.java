@@ -20,12 +20,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.xml.XMLConstants;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.util.ValidationEventCollector;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.util.ValidationEventCollector;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
@@ -1116,8 +1117,7 @@ public final class PremisV3Utils {
       }
 
       SAXSource xmlSource = XMLUtils.getSafeSAXSource(new InputSource(new InputStreamReader(binaryInputStream)));
-      Object unmarshal = jaxbUnmarshaller.unmarshal(xmlSource);
-      return ((gov.loc.premis.v3.File) ((JAXBElement<?>) unmarshal).getValue());
+      return jaxbUnmarshaller.unmarshal(xmlSource, gov.loc.premis.v3.File.class).getValue();
 
     } catch (SAXException | JAXBException | ParserConfigurationException e) {
       if (validate && validationCollector.hasEvents()) {
@@ -1147,8 +1147,7 @@ public final class PremisV3Utils {
       }
 
       SAXSource xmlSource = XMLUtils.getSafeSAXSource(new InputSource(new InputStreamReader(binaryInputStream)));
-      Object unmarshal = jaxbUnmarshaller.unmarshal(xmlSource);
-      return ((EventComplexType) ((JAXBElement<?>) unmarshal).getValue());
+      return jaxbUnmarshaller.unmarshal(xmlSource, EventComplexType.class).getValue();
     } catch (JAXBException | SAXException | ParserConfigurationException e) {
       if (validate && validationCollector.hasEvents()) {
         throw new ValidationException(MetadataUtils.xmlValidationErrorsToValidationReport(validationCollector));

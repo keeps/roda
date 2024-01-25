@@ -10,19 +10,19 @@ package org.roda.wui.api.controllers;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.directory.api.ldap.model.exception.LdapException;
-import org.jasig.cas.client.authentication.AttributePrincipal;
+import org.apereo.cas.client.authentication.AttributePrincipal;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.EmailUnverifiedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InactiveUserException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.common.client.tools.StringUtils;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * Helper class to perform users login.
@@ -79,8 +79,7 @@ public class UserLoginHelper {
       newUser = UserUtility.resetGroupsAndRoles(newUser);
 
       // try to set user email from cas principal attributes
-      if (request.getUserPrincipal() instanceof AttributePrincipal) {
-        AttributePrincipal attributePrincipal = (AttributePrincipal) request.getUserPrincipal();
+      if (request.getUserPrincipal() instanceof AttributePrincipal attributePrincipal) {
         Map<String, Object> attributes = attributePrincipal.getAttributes();
 
         mapCasAttribute(newUser, attributes, "fullname", (u, a) -> u.setFullName(a));
@@ -118,9 +117,8 @@ public class UserLoginHelper {
   private static void mapCasAttribute(User user, Map<String, Object> attributes, String attributeKey,
     BiConsumer<User, String> mapping) {
     Object attributeValue = attributes.get(attributeKey);
-    if (attributeValue != null && attributeValue instanceof String) {
-      mapping.accept(user, (String) attributeValue);
+    if (attributeValue instanceof String value) {
+      mapping.accept(user, value);
     }
   }
-
 }

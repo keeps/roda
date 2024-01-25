@@ -1,341 +1,341 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
-         http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
-		 version="3.1">
-	<display-name>RODA Web User Interface</display-name>
+<web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
+    <display-name>RODA Web User Interface</display-name>
 
-	<servlet>
-		<servlet-name>RodaWuiServlet</servlet-name>
-		<servlet-class>org.roda.wui.servlets.RodaWuiServlet</servlet-class>
-		<load-on-startup>1</load-on-startup>
-	</servlet>
+    <servlet>
+        <servlet-name>RodaWuiServlet</servlet-name>
+        <servlet-class>org.roda.wui.servlets.RodaWuiServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
 
 
-	<!-- ********************************************** -->
-	<!-- Authentication related filters/filter-mappings -->
-	<!-- ********************************************** -->
-	<filter>
-		<filter-name>InternalWebAuthFilter</filter-name>
-		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
-		<init-param>
-			<param-name>inner-filter-class</param-name>
-			<param-value>org.roda.wui.filter.InternalWebAuthFilter</param-value>
-		</init-param>
-		<init-param>
-			<param-name>config-prefix</param-name>
-			<param-value>ui.filter.internal</param-value>
-		</init-param>
-	</filter>
-	<filter-mapping>
-		<filter-name>InternalWebAuthFilter</filter-name>
-		<url-pattern>/login</url-pattern>
-	</filter-mapping>
-	<filter-mapping>
-		<filter-name>InternalWebAuthFilter</filter-name>
-		<url-pattern>/logout</url-pattern>
-	</filter-mapping>
+    <!-- ********************************************** -->
+    <!-- Authentication related filters/filter-mappings -->
+    <!-- ********************************************** -->
+    <filter>
+        <filter-name>InternalWebAuthFilter</filter-name>
+        <filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
+        <init-param>
+            <param-name>inner-filter-class</param-name>
+            <param-value>org.roda.wui.filter.InternalWebAuthFilter</param-value>
+        </init-param>
+        <init-param>
+            <param-name>config-prefix</param-name>
+            <param-value>ui.filter.internal</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>InternalWebAuthFilter</filter-name>
+        <url-pattern>/login</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>InternalWebAuthFilter</filter-name>
+        <url-pattern>/logout</url-pattern>
+    </filter-mapping>
 
-	<filter>
-		<filter-name>InternalApiAuthFilter</filter-name>
-		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
-		<init-param>
-			<param-name>inner-filter-class</param-name>
-			<param-value>org.roda.wui.filter.InternalApiAuthFilter</param-value>
-		</init-param>
-		<init-param>
-			<param-name>config-prefix</param-name>
-			<param-value>ui.filter.internal</param-value>
-		</init-param>
-		<init-param>
-			<description>Realm to be used</description>
-			<param-name>realm</param-name>
-			<param-value>RODA REST API</param-value>
-		</init-param>
-		<init-param>
-			<description>comma separated list of relative paths to exclude in filter logic (using regular expressions for extra power)</description>
-			<param-name>exclusions</param-name>
-			<param-value>^/swagger.json,^/v1/theme/?</param-value>
-		</init-param>
-	</filter>
-	<filter-mapping>
-		<filter-name>InternalApiAuthFilter</filter-name>
-		<url-pattern>/api/*</url-pattern>
-	</filter-mapping>
+    <filter>
+        <filter-name>InternalApiAuthFilter</filter-name>
+        <filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
+        <init-param>
+            <param-name>inner-filter-class</param-name>
+            <param-value>org.roda.wui.filter.InternalApiAuthFilter</param-value>
+        </init-param>
+        <init-param>
+            <param-name>config-prefix</param-name>
+            <param-value>ui.filter.internal</param-value>
+        </init-param>
+        <init-param>
+            <description>Realm to be used</description>
+            <param-name>realm</param-name>
+            <param-value>RODA REST API</param-value>
+        </init-param>
+        <init-param>
+            <description>comma separated list of relative paths to exclude in filter logic (using regular expressions
+                for extra power)
+            </description>
+            <param-name>exclusions</param-name>
+            <param-value>^/swagger.json,^/v1/theme/?</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>InternalApiAuthFilter</filter-name>
+        <url-pattern>/api/*</url-pattern>
+    </filter-mapping>
 
-	<!-- Filter to handle logout requests sent directly by the CAS server -->
-	<filter>
-		<filter-name>CASSingleSignOutFilter</filter-name>
-		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
-		<init-param>
-			<param-name>inner-filter-class</param-name>
-			<param-value>org.jasig.cas.client.session.SingleSignOutFilter</param-value>
-		</init-param>
-		<init-param>
-			<param-name>config-prefix</param-name>
-			<param-value>ui.filter.cas</param-value>
-		</init-param>
-		<init-param>
-			<param-name>casServerUrlPrefix</param-name>
-			<param-value>http://localhost:8888/cas</param-value>
-		</init-param>
-	</filter>
-	<filter-mapping>
-		<filter-name>CASSingleSignOutFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-	<listener>
-		<!-- Listener to clean sessions -->
-		<listener-class>org.jasig.cas.client.session.SingleSignOutHttpSessionListener</listener-class>
-	</listener>
-	<listener>
-		<listener-class>org.roda.wui.servlets.ContextListener</listener-class>
-	</listener>
+    <!-- Filter to handle logout requests sent directly by the CAS server -->
+    <filter>
+        <filter-name>CASSingleSignOutFilter</filter-name>
+        <filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
+        <init-param>
+            <param-name>inner-filter-class</param-name>
+            <param-value>org.apereo.cas.client.session.SingleSignOutFilter</param-value>
+        </init-param>
+        <init-param>
+            <param-name>config-prefix</param-name>
+            <param-value>ui.filter.cas</param-value>
+        </init-param>
+        <init-param>
+            <param-name>casServerUrlPrefix</param-name>
+            <param-value>http://localhost:8888/cas</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>CASSingleSignOutFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <listener>
+        <!-- Listener to clean sessions -->
+        <listener-class>org.apereo.cas.client.session.SingleSignOutHttpSessionListener</listener-class>
+    </listener>
+    <listener>
+        <listener-class>org.roda.wui.servlets.ContextListener</listener-class>
+    </listener>
 
-	<!-- validation filter must appear before the authentication filter -->
-	<filter>
-		<filter-name>CASValidationFilter</filter-name>
-		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
-		<init-param>
-			<param-name>inner-filter-class</param-name>
-			<param-value>org.jasig.cas.client.validation.Cas30ProxyReceivingTicketValidationFilter</param-value>
-		</init-param>
-		<init-param>
-			<param-name>config-prefix</param-name>
-			<param-value>ui.filter.cas</param-value>
-		</init-param>
-		<init-param>
-			<param-name>casServerUrlPrefix</param-name>
-			<param-value>https://localhost:8443/cas</param-value>
-		</init-param>
-		<init-param>
-			<param-name>serverName</param-name>
-			<param-value>https://localhost:8888</param-value>
-		</init-param>
-		<init-param>
-			<param-name>exceptionOnValidationFailure</param-name>
-			<param-value>false</param-value>
-		</init-param>
-		<init-param>
-			<param-name>redirectAfterValidation</param-name>
-			<param-value>false</param-value>
-		</init-param>
-		<init-param>
-			<param-name>proxyCallbackUrl</param-name>
-			<param-value/>
-		</init-param>
-		<init-param>
-			<param-name>proxyReceptorUrl</param-name>
-			<param-value/>
-		</init-param>
-		<init-param>
-			<param-name>acceptAnyProxy</param-name>
-			<param-value>false</param-value>
-		</init-param>
-	</filter>
-	<filter-mapping>
-		<filter-name>CASValidationFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
+    <!-- validation filter must appear before the authentication filter -->
+    <filter>
+        <filter-name>CASValidationFilter</filter-name>
+        <filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
+        <init-param>
+            <param-name>inner-filter-class</param-name>
+            <param-value>org.apereo.cas.client.validation.Cas30ProxyReceivingTicketValidationFilter</param-value>
+        </init-param>
+        <init-param>
+            <param-name>config-prefix</param-name>
+            <param-value>ui.filter.cas</param-value>
+        </init-param>
+        <init-param>
+            <param-name>casServerUrlPrefix</param-name>
+            <param-value>https://localhost:8443/cas</param-value>
+        </init-param>
+        <init-param>
+            <param-name>serverName</param-name>
+            <param-value>https://localhost:8888</param-value>
+        </init-param>
+        <init-param>
+            <param-name>exceptionOnValidationFailure</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>redirectAfterValidation</param-name>
+            <param-value>false</param-value>
+        </init-param>
+        <init-param>
+            <param-name>proxyCallbackUrl</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>proxyReceptorUrl</param-name>
+            <param-value/>
+        </init-param>
+        <init-param>
+            <param-name>acceptAnyProxy</param-name>
+            <param-value>false</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>CASValidationFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
-	<filter>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
-		<init-param>
-			<param-name>inner-filter-class</param-name>
-			<param-value>org.jasig.cas.client.authentication.AuthenticationFilter</param-value>
-		</init-param>
-		<init-param>
-			<param-name>config-prefix</param-name>
-			<param-value>ui.filter.cas</param-value>
-		</init-param>
-		<init-param>
-			<param-name>casServerLoginUrl</param-name>
-			<param-value>https://localhost:8443/cas/login</param-value>
-		</init-param>
-		<init-param>
-			<param-name>serverName</param-name>
-			<param-value>https://localhost:8888</param-value>
-		</init-param>
-	</filter>
-	<filter-mapping>
-		<filter-name>CASAuthenticationFilter</filter-name>
-		<url-pattern>/login</url-pattern>
-	</filter-mapping>
+    <filter>
+        <filter-name>CASAuthenticationFilter</filter-name>
+        <filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
+        <init-param>
+            <param-name>inner-filter-class</param-name>
+            <param-value>org.apereo.cas.client.authentication.AuthenticationFilter</param-value>
+        </init-param>
+        <init-param>
+            <param-name>config-prefix</param-name>
+            <param-value>ui.filter.cas</param-value>
+        </init-param>
+        <init-param>
+            <param-name>casServerLoginUrl</param-name>
+            <param-value>https://localhost:8443/cas/login</param-value>
+        </init-param>
+        <init-param>
+            <param-name>serverName</param-name>
+            <param-value>https://localhost:8888</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>CASAuthenticationFilter</filter-name>
+        <url-pattern>/login</url-pattern>
+    </filter-mapping>
 
-	<filter>
-		<filter-name>CASRequestWrapperFilter</filter-name>
-		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
-		<init-param>
-			<param-name>inner-filter-class</param-name>
-			<param-value>org.jasig.cas.client.util.HttpServletRequestWrapperFilter</param-value>
-		</init-param>
-		<init-param>
-			<param-name>config-prefix</param-name>
-			<param-value>ui.filter.cas</param-value>
-		</init-param>
-	</filter>
-	<filter-mapping>
-		<filter-name>CASRequestWrapperFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
+    <filter>
+        <filter-name>CASRequestWrapperFilter</filter-name>
+        <filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
+        <init-param>
+            <param-name>inner-filter-class</param-name>
+            <param-value>org.apereo.cas.client.util.HttpServletRequestWrapperFilter</param-value>
+        </init-param>
+        <init-param>
+            <param-name>config-prefix</param-name>
+            <param-value>ui.filter.cas</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>CASRequestWrapperFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
-	<filter>
-		<filter-name>CasApiAuthFilter</filter-name>
-		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
-		<init-param>
-			<param-name>inner-filter-class</param-name>
-			<param-value>org.roda.wui.filter.CasApiAuthFilter</param-value>
-		</init-param>
-		<init-param>
-			<param-name>config-prefix</param-name>
-			<param-value>ui.filter.cas</param-value>
-		</init-param>
-		<init-param>
-			<param-name>casServerUrlPrefix</param-name>
-			<param-value>https://localhost:8443/cas</param-value>
-		</init-param>
-		<init-param>
-			<description>comma separated list of relative paths to exclude in filter logic (using regular expressions for extra power)</description>
-			<param-name>exclusions</param-name>
-			<param-value>^/swagger.json,^/v1/theme/?,^/v1/auth/ticket?</param-value>
-		</init-param>
-	</filter>
-	<filter-mapping>
-		<filter-name>CasApiAuthFilter</filter-name>
-		<url-pattern>/api/v1/*</url-pattern>
-	</filter-mapping>
+    <filter>
+        <filter-name>CasApiAuthFilter</filter-name>
+        <filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
+        <init-param>
+            <param-name>inner-filter-class</param-name>
+            <param-value>org.roda.wui.filter.CasApiAuthFilter</param-value>
+        </init-param>
+        <init-param>
+            <param-name>config-prefix</param-name>
+            <param-value>ui.filter.cas</param-value>
+        </init-param>
+        <init-param>
+            <param-name>casServerUrlPrefix</param-name>
+            <param-value>https://localhost:8443/cas</param-value>
+        </init-param>
+        <init-param>
+            <description>comma separated list of relative paths to exclude in filter logic (using regular expressions
+                for extra power)
+            </description>
+            <param-name>exclusions</param-name>
+            <param-value>^/swagger.json,^/v1/theme/?,^/v1/auth/ticket?</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>CasApiAuthFilter</filter-name>
+        <url-pattern>/api/v1/*</url-pattern>
+    </filter-mapping>
 
-	<filter>
-		<filter-name>CasWebAuthFilter</filter-name>
-		<filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
-		<init-param>
-			<param-name>inner-filter-class</param-name>
-			<param-value>org.roda.wui.filter.CasWebAuthFilter</param-value>
-		</init-param>
-		<init-param>
-			<param-name>config-prefix</param-name>
-			<param-value>ui.filter.cas</param-value>
-		</init-param>
-		<init-param>
-			<param-name>casServerLogoutUrl</param-name>
-			<param-value>https://localhost:8443/cas/logout</param-value>
-		</init-param>
-	</filter>
-	<filter-mapping>
-		<filter-name>CasWebAuthFilter</filter-name>
-		<url-pattern>/login</url-pattern>
-	</filter-mapping>
-	<filter-mapping>
-		<filter-name>CasWebAuthFilter</filter-name>
-		<url-pattern>/logout</url-pattern>
-	</filter-mapping>
+    <filter>
+        <filter-name>CasWebAuthFilter</filter-name>
+        <filter-class>org.roda.wui.filter.OnOffFilter</filter-class>
+        <init-param>
+            <param-name>inner-filter-class</param-name>
+            <param-value>org.roda.wui.filter.CasWebAuthFilter</param-value>
+        </init-param>
+        <init-param>
+            <param-name>config-prefix</param-name>
+            <param-value>ui.filter.cas</param-value>
+        </init-param>
+        <init-param>
+            <param-name>casServerLogoutUrl</param-name>
+            <param-value>https://localhost:8443/cas/logout</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>CasWebAuthFilter</filter-name>
+        <url-pattern>/login</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>CasWebAuthFilter</filter-name>
+        <url-pattern>/logout</url-pattern>
+    </filter-mapping>
 
-	<!-- ************************************ -->
-	<!-- REST related servlets/servlet-mappings -->
-	<!-- ************************************ -->
-	<servlet>
-		<servlet-name>rest_api</servlet-name>
-		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
-		<init-param>
-			<param-name>javax.ws.rs.Application</param-name>
-			<param-value>org.roda.wui.api.RestApplication</param-value>
-		</init-param>
-		<load-on-startup>2</load-on-startup>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>rest_api</servlet-name>
-		<url-pattern>/api/*</url-pattern>
-	</servlet-mapping>
+    <!-- ************************************ -->
+    <!-- REST related servlets/servlet-mappings -->
+    <!-- ************************************ -->
+    <servlet>
+        <servlet-name>rest_api</servlet-name>
+        <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+        <init-param>
+            <param-name>jakarta.ws.rs.Application</param-name>
+            <param-value>org.roda.wui.api.RestApplication</param-value>
+        </init-param>
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>rest_api</servlet-name>
+        <url-pattern>/api/*</url-pattern>
+    </servlet-mapping>
 
-	<servlet>
-		<servlet-name>ClientLogger</servlet-name>
-		<servlet-class>org.roda.wui.common.server.ClientLoggerImpl</servlet-class>
-		<!-- <init-param> -->
-		<!-- <param-name>log4j-init-file</param-name> -->
-		<!-- <param-value>WEB-INF/classes/config/log4j.xml</param-value> -->
-		<!-- </init-param> -->
-		<load-on-startup>2</load-on-startup>
-	</servlet>
-	<servlet>
-		<servlet-name>UserManagementService</servlet-name>
-		<servlet-class>
-			org.roda.wui.server.management.UserManagementServiceImpl
-		</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>UserLoginService</servlet-name>
-		<servlet-class>org.roda.wui.server.common.UserLoginServiceImpl</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>BrowserService</servlet-name>
-		<servlet-class>org.roda.wui.server.browse.BrowserServiceImpl</servlet-class>
-	</servlet>
-
-
-
-
-	<servlet-mapping>
-		<servlet-name>ClientLogger</servlet-name>
-		<url-pattern>/gwtrpc/wuilogger</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>UserManagementService</servlet-name>
-		<url-pattern>/gwtrpc/UserManagementService</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>UserLoginService</servlet-name>
-		<url-pattern>/gwtrpc/userlogin</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>BrowserService</servlet-name>
-		<url-pattern>/gwtrpc/browserservice</url-pattern>
-	</servlet-mapping>
+    <servlet>
+        <servlet-name>ClientLogger</servlet-name>
+        <servlet-class>org.roda.wui.common.server.ClientLoggerImpl</servlet-class>
+        <!-- <init-param> -->
+        <!-- <param-name>log4j-init-file</param-name> -->
+        <!-- <param-value>WEB-INF/classes/config/log4j.xml</param-value> -->
+        <!-- </init-param> -->
+        <load-on-startup>2</load-on-startup>
+    </servlet>
+    <servlet>
+        <servlet-name>UserManagementService</servlet-name>
+        <servlet-class>
+            org.roda.wui.server.management.UserManagementServiceImpl
+        </servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>UserLoginService</servlet-name>
+        <servlet-class>org.roda.wui.server.common.UserLoginServiceImpl</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>BrowserService</servlet-name>
+        <servlet-class>org.roda.wui.server.browse.BrowserServiceImpl</servlet-class>
+    </servlet>
 
 
-	<!-- Error handler -->
-
-	<servlet>
-		<servlet-name>ErrorHandler</servlet-name>
-		<servlet-class>org.roda.wui.servlets.ErrorHandler</servlet-class>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>ErrorHandler</servlet-name>
-		<url-pattern>/ErrorHandler</url-pattern>
-	</servlet-mapping>
-
-	<!-- Welcome file -->
-
-	<welcome-file-list>
-		<welcome-file>Main.html</welcome-file>
-		<welcome-file>index.html</welcome-file>
-	</welcome-file-list>
+    <servlet-mapping>
+        <servlet-name>ClientLogger</servlet-name>
+        <url-pattern>/gwtrpc/wuilogger</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UserManagementService</servlet-name>
+        <url-pattern>/gwtrpc/UserManagementService</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>UserLoginService</servlet-name>
+        <url-pattern>/gwtrpc/userlogin</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>BrowserService</servlet-name>
+        <url-pattern>/gwtrpc/browserservice</url-pattern>
+    </servlet-mapping>
 
 
-	<!-- Error page -->
-	<error-page>
-		<location>/ErrorHandler</location>
-	</error-page>
-	
-	<!-- Security -->
+    <!-- Error handler -->
 
-	<security-constraint>
-		<web-resource-collection>
-			<web-resource-name>Protected Context</web-resource-name>
-			<url-pattern>/*</url-pattern>
-		</web-resource-collection>
-		<!-- <user-data-constraint> <transport-guarantee>CONFIDENTIAL</transport-guarantee> 
-			</user-data-constraint> -->
-	</security-constraint>
+    <servlet>
+        <servlet-name>ErrorHandler</servlet-name>
+        <servlet-class>org.roda.wui.servlets.ErrorHandler</servlet-class>
+    </servlet>
 
-	<security-constraint>
-		<web-resource-collection>
-			<web-resource-name>Private Context</web-resource-name>
-			<url-pattern>/phpMyAdmin/scripts/*</url-pattern>
-			<url-pattern>/phpMyAdmin/libraries/*</url-pattern>
-		</web-resource-collection>
-		<auth-constraint />
-	</security-constraint>
+    <servlet-mapping>
+        <servlet-name>ErrorHandler</servlet-name>
+        <url-pattern>/ErrorHandler</url-pattern>
+    </servlet-mapping>
+
+    <!-- Welcome file -->
+
+    <welcome-file-list>
+        <welcome-file>Main.html</welcome-file>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+
+    <!-- Error page -->
+    <error-page>
+        <location>/ErrorHandler</location>
+    </error-page>
+
+    <!-- Security -->
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Protected Context</web-resource-name>
+            <url-pattern>/*</url-pattern>
+        </web-resource-collection>
+        <!-- <user-data-constraint> <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+            </user-data-constraint> -->
+    </security-constraint>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Private Context</web-resource-name>
+            <url-pattern>/phpMyAdmin/scripts/*</url-pattern>
+            <url-pattern>/phpMyAdmin/libraries/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint/>
+    </security-constraint>
 </web-app>

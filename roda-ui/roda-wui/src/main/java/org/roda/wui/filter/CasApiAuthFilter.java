@@ -11,21 +11,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.JwtUtils;
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.model.utils.UserUtility;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InactiveUserException;
@@ -33,9 +20,20 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.model.utils.UserUtility;
 import org.roda.wui.api.controllers.UserLogin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * CAS authentication filter for API requests.
@@ -78,10 +76,10 @@ public class CasApiAuthFilter implements Filter {
         UserLogin.casLogin(request.getUserPrincipal().getName(), request);
         filterChain.doFilter(request, response);
       } catch (InactiveUserException e) {
-        LOGGER.error("Inactive user '" + request.getUserPrincipal().getName() + "': " + e.getMessage());
+        LOGGER.error("Inactive user '{}': {}", request.getUserPrincipal().getName(), e.getMessage(), e);
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error authenticating user");
       } catch (RODAException e) {
-        LOGGER.error("Error authenticating user '" + request.getUserPrincipal().getName() + "': " + e.getMessage());
+        LOGGER.error("Error authenticating user '{}': {}", request.getUserPrincipal().getName(), e.getMessage(), e);
         response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error authenticating user");
       }
       return;
@@ -93,7 +91,7 @@ public class CasApiAuthFilter implements Filter {
       try {
         doFilterWithToken(request, response, filterChain, token);
       } catch (NotFoundException | AuthenticationDeniedException e) {
-        LOGGER.error("Error authenticating token '" + token + "': " + e.getMessage());
+        LOGGER.error("Error authenticating token '{}': {}", token, e.getMessage(), e);
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error authenticating user");
       } catch (final GenericException e) {
         throw new ServletException(e.getMessage(), e);
@@ -107,9 +105,10 @@ public class CasApiAuthFilter implements Filter {
         doFilterWithCredentials(request, response, filterChain, credentials.getFirst(), credentials.getSecond());
       } catch (final AuthenticationDeniedException | NotFoundException e) {
         if (request.getUserPrincipal() != null) {
-          LOGGER.error("Error authenticating user '" + request.getUserPrincipal().getName() + "': " + e.getMessage());
+          LOGGER.error("Error authenticating user '{}': {}" + e.getMessage(), request.getUserPrincipal().getName(),
+            e.getMessage(), e);
         } else {
-          LOGGER.error("Error authenticating user " + e.getMessage());
+          LOGGER.error("Error authenticating user {}", e.getMessage(), e);
         }
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error authenticating user");
       } catch (final GenericException e) {

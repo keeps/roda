@@ -10,8 +10,8 @@ package org.roda.wui.filter;
 import java.nio.charset.Charset;
 import java.util.Base64;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;

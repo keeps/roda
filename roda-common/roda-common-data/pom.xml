@@ -42,14 +42,12 @@
       <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
-      <version>2.3.1</version>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.xml.bind</groupId>
-      <artifactId>jaxb-api</artifactId>
-      <version>2.3.1</version>
+      <groupId>jakarta.xml.bind</groupId>
+    <artifactId>jakarta.xml.bind-api</artifactId>
       <classifier>sources</classifier>
     </dependency>
     <dependency>
@@ -69,14 +67,15 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <release>17</release>
+          <release>21</release>
           <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
+
       <plugin>
-        <groupId>org.jvnet.jaxb2.maven2</groupId>
-        <artifactId>maven-jaxb23-plugin</artifactId>
-        <version>0.15.3</version>
+        <groupId>org.jvnet.jaxb</groupId>
+        <artifactId>jaxb-maven-plugin</artifactId>
+        <version>4.0.0</version>
         <executions>
           <execution>
             <id>generate-JAXB</id>
@@ -104,9 +103,9 @@
           </args>
           <plugins>
             <plugin>
-              <groupId>org.jvnet.jaxb2_commons</groupId>
-              <artifactId>jaxb2-basics</artifactId>
-              <version>0.11.0</version>
+              <groupId>org.jvnet.jaxb</groupId>
+              <artifactId>jaxb-plugins</artifactId>
+              <version>3.0.0</version>
             </plugin>
           </plugins>
         </configuration>

@@ -7,8 +7,8 @@
  */
 package org.roda.wui.filter;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 
 /**
  * A {@link HttpServletRequestWrapper} that provides a method to access token

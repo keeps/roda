@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 /**
  * @author Gabriel Barros <gbarrps@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_TRANSITIVE_HOLD_AIP_METADATA)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_TRANSITIVE_HOLD_AIP_METADATA)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DisposalTransitiveHoldAIPMetadata implements Serializable {
   private static final long serialVersionUID = -1277210243520579523L;

@@ -45,7 +45,7 @@ services:
       - DOC_EXPANSION=none
       - VALIDATOR_URL=none
   roda:
-    image: ghcr.io/keeps/roda:latest
+    image: keeps/roda:latest
     restart: unless-stopped
     ports:
       - "8080:8080"

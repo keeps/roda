@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.SelectedItemsUtils;
@@ -48,6 +46,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 public class UserUtility {
   private static final Logger LOGGER = LoggerFactory.getLogger(UserUtility.class);

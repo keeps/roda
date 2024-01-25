@@ -9,21 +9,23 @@ package org.roda.wui.client.search;
 
 import java.util.List;
 
-import com.google.gwt.user.client.Window;
-import config.i18n.client.ClientMessages;
 import org.roda.wui.client.common.SubTitlePanel;
 import org.roda.wui.client.common.search.CatalogueSearch;
-import org.roda.wui.client.common.search.SavedSearchCodec;
+import org.roda.wui.client.common.search.RODASavedSearch;
+import org.roda.wui.client.common.search.SavedSearchMapper;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
+
+import config.i18n.client.ClientMessages;
 
 /**
  * @author Miguel Guimarãese <mguimaraes@keep.pt>
@@ -42,8 +44,6 @@ public class SavedSearch extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static final SavedSearchCodec codec = GWT.create(SavedSearchCodec.class);
-
   private static SavedSearch instance = null;
 
   private static SavedSearch getInstance(List<String> historyTokens) {
@@ -85,7 +85,9 @@ public class SavedSearch extends Composite {
 
   private static String getTitleFromHistoryTokens(List<String> historyTokens) {
     String jsonValue = JavascriptUtils.decodeBase64(historyTokens.get(1));
-    org.roda.core.data.v2.common.SavedSearch decode = codec.decode(jsonValue);
-    return decode.getTitle();
+    SavedSearchMapper mapper = GWT.create(SavedSearchMapper.class);
+    RODASavedSearch savedSearch = mapper.read(jsonValue);
+
+    return savedSearch.getTitle();
   }
 }

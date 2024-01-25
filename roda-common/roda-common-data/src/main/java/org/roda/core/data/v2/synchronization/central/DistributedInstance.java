@@ -13,12 +13,15 @@ import org.roda.core.data.v2.synchronization.RODAInstance;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.roda.core.data.v2.synchronization.SynchronizingStatus;
 
+import java.io.Serial;
+
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISTRIBUTED_INSTANCE)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISTRIBUTED_INSTANCE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DistributedInstance extends RODAInstance {
+  @Serial
   private static final long serialVersionUID = 7125122191135652087L;
 
   private String description;

@@ -62,7 +62,7 @@ public class DisposalHoldsPanel extends Composite {
   interface MyUiBinder extends UiBinder<Widget, DisposalHoldsPanel> {
   }
 
-  private static DisposalHoldsPanel.MyUiBinder uiBinder = GWT.create(DisposalHoldsPanel.MyUiBinder.class);
+  private static final DisposalHoldsPanel.MyUiBinder uiBinder = GWT.create(DisposalHoldsPanel.MyUiBinder.class);
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
 
   @UiField
@@ -80,8 +80,12 @@ public class DisposalHoldsPanel extends Composite {
   @UiField
   Button associateDisposalHoldButton;
 
-  private final IndexedAIP indexedAip;
+  private IndexedAIP indexedAip;
   private final DisposalHolds disposalHoldList = new DisposalHolds();
+
+  private DisposalHoldsPanel() {
+    //empty constructor
+  }
 
   public DisposalHoldsPanel(IndexedAIP indexedAip) {
     transitiveDisposalHoldsPanel = new TransitiveDisposalHoldsPanel(indexedAip);

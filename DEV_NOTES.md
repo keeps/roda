@@ -38,7 +38,7 @@ docker compose -f deploys/standalone/docker-compose-dev.yaml up -d
 mvn -pl roda-ui/roda-wui -am spring-boot:run -Pdebug-main
 
 # Open codeserver
-mvn -pl roda-ui/roda-wui -am gwt:codeserver -Pdebug-main -Dscope.gwt-dev=compile
+mvn -f dev/codeserver gwt:codeserver -DrodaPath=$(pwd)
 
 # Open codeserver http://127.0.0.1:9876/ and add bookmarks
 # Open RODA http://localhost:8080 and click the "Dev Mode On" bookmark

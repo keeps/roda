@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
+import java.io.Serial;
 import java.util.Date;
 import java.util.List;
 
@@ -18,9 +19,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.roda.core.data.v2.ip.HasInstanceID;
 
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_PRESERVATION_METADATA)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_PRESERVATION_METADATA)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PreservationMetadata implements IsModelObject, HasId, HasInstanceID {
+  @Serial
   private static final long serialVersionUID = -4312941542769679721L;
 
   public enum PreservationMetadataType {

@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.ip.disposal.aipMetadata;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +23,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_AIP_METADATA)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_AIP_METADATA)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DisposalAIPMetadata implements Serializable {
 
+  @Serial
   private static final long serialVersionUID = 1157420197892519914L;
 
   private DisposalScheduleAIPMetadata schedule;

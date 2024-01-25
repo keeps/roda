@@ -7,16 +7,19 @@
  */
 package org.roda.wui.servlets;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
+import java.io.Serial;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.roda.core.RodaCoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+
 public class RodaWuiServlet extends HttpServlet {
   private static final Logger LOGGER = LoggerFactory.getLogger(RodaWuiServlet.class);
+  @Serial
   private static final long serialVersionUID = 1523530268219980563L;
 
   @Override

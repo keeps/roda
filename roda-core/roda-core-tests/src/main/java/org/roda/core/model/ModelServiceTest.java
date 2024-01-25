@@ -935,13 +935,12 @@ public class ModelServiceTest {
     storage.copy(corporaService, preservationContainerPath,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER));
 
-    Binary agent_bin = model.retrievePreservationAgent(CorporaConstants.AGENT_RODA_8);
-    AgentComplexType agent = PremisV3Utils.binaryToAgent(agent_bin.getContent(), true);
+    Binary agentBinary = model.retrievePreservationAgent(CorporaConstants.AGENT_RODA_8);
+    AgentComplexType agent = PremisV3Utils.binaryToAgent(agentBinary.getContent(), true);
 
-    assertEquals(CorporaConstants.AGENT_RODA_8, agent.getAgentIdentifier().get(0).getAgentIdentifierValue());
+    assertEquals(CorporaConstants.AGENT_RODA_8, agent.getAgentIdentifier().getFirst().getAgentIdentifierValue());
     assertEquals(CorporaConstants.SOFTWARE_INGEST_TASK, agent.getAgentType().getValue());
-    assertEquals(CorporaConstants.INGEST_CREATE_AIP, agent.getAgentName().get(0).getValue());
-
+    assertEquals(CorporaConstants.INGEST_CREATE_AIP, agent.getAgentName().getFirst().getValue());
   }
 
   /*

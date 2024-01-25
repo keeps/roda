@@ -26,7 +26,6 @@ import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -47,6 +46,8 @@ import config.i18n.client.ClientMessages;
  * @author Gabriel Barros <gbarros@keep.pt>
  */
 public class ShowDistributedInstance extends Composite {
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static ShowDistributedInstance instance = null;
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
@@ -69,60 +70,43 @@ public class ShowDistributedInstance extends Composite {
       return "show_distributed_instance";
     }
   };
-
-  private static ShowDistributedInstance instance = null;
-  private DistributedInstance distributedInstance;
-
-  interface MyUiBinder extends UiBinder<Widget, ShowDistributedInstance> {
-  }
-
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  public static ShowDistributedInstance getInstance() {
-    if (instance == null) {
-      instance = new ShowDistributedInstance(new DistributedInstance());
-    }
-    return instance;
-  }
-
   @UiField
   TitlePanel title;
-
   @UiField
   Label dateCreated;
-
   @UiField
   Label dateUpdated;
-
   @UiField
   Label descriptionLabel;
   @UiField
   HTML descriptionValue;
-
   @UiField
   HTML IDValue;
-
   @UiField
   HTML lastSyncValue;
   @UiField
   HTML statusValue;
-
   @UiField
   FlowPanel userNameValue;
-
   @UiField
   ScrollPanel accessKeyTablePanel;
-
   @UiField
   FlowPanel statisticsPanel;
+  private DistributedInstance distributedInstance;
 
   public ShowDistributedInstance(DistributedInstance distributedInstance) {
     initWidget(uiBinder.createAndBindUi(this));
     this.distributedInstance = distributedInstance;
 
     initElements();
+  }
+
+  public static ShowDistributedInstance getInstance() {
+    if (instance == null) {
+      instance = new ShowDistributedInstance(new DistributedInstance());
+    }
+    return instance;
   }
 
   private void initElements() {
@@ -202,7 +186,7 @@ public class ShowDistributedInstance extends Composite {
         @Override
         public void onSuccess(Boolean confirm) {
           if (confirm) {
-            BrowserServiceImpl.Util.getInstance().deleteDistributedInstance(distributedInstance.getId(),
+            BrowserService.Util.getInstance().deleteDistributedInstance(distributedInstance.getId(),
               new NoAsyncCallback<Void>() {
                 @Override
                 public void onSuccess(Void result) {
@@ -212,6 +196,9 @@ public class ShowDistributedInstance extends Composite {
           }
         }
       });
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, ShowDistributedInstance> {
   }
 
 }

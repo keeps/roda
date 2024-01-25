@@ -7,14 +7,15 @@
  */
 package org.roda.core.index.schema;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.StringUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -56,7 +57,7 @@ public abstract class AbstractSolrCollection<I extends IsIndexed, M extends IsMo
       ret.add(new Field(RodaConstants.INDEX_INSTANCE_ID, Field.TYPE_STRING));
     }
 
-    if (SolrCollection.hasInstanceName(getIndexClass())){
+    if (SolrCollection.hasInstanceName(getIndexClass())) {
       ret.add(new Field(RodaConstants.INDEX_INSTANCE_NAME, Field.TYPE_STRING));
     }
 
@@ -123,7 +124,7 @@ public abstract class AbstractSolrCollection<I extends IsIndexed, M extends IsMo
   public I fromSolrDocument(SolrDocument doc, List<String> fieldsToReturn) throws GenericException {
     I ret = null;
     try {
-      ret = getIndexClass().newInstance();
+      ret = getIndexClass().getDeclaredConstructor().newInstance();
 
       if (ret instanceof HasId) {
         String id = SolrUtils.objectToString(doc.get(RodaConstants.INDEX_ID),
@@ -166,7 +167,7 @@ public abstract class AbstractSolrCollection<I extends IsIndexed, M extends IsMo
       }
       ret.setFields(indexedFields);
 
-    } catch (InstantiationException | IllegalAccessException e) {
+    } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
       throw new GenericException(e);
     }
 

@@ -13,7 +13,7 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_FACET_FIELD_VALUE)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_FACET_FIELD_VALUE)
 public class FacetFieldResult implements Serializable {
 
   private static final long serialVersionUID = 4007898233996477150L;

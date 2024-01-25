@@ -63,7 +63,6 @@ import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 /**
  * @author Luis Faria
@@ -71,6 +70,7 @@ import org.roda.wui.server.browse.BrowserServiceImpl;
  */
 public class EditDescriptiveMetadata extends Composite {
 
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
@@ -126,59 +126,40 @@ public class EditDescriptiveMetadata extends Composite {
       return "edit_metadata";
     }
   };
-
-  interface MyUiBinder extends UiBinder<Widget, EditDescriptiveMetadata> {
-  }
-
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   private final String aipId;
   private final String representationId;
+  @UiField
+  TextBox id;
+  @UiField
+  ListBox type;
+  @UiField
+  Label formSimilarDanger;
+  @UiField
+  FocusPanel showXml;
+  @UiField
+  HTML showXmlIconXML;
+  @UiField
+  HTML showXmlIconForm;
+  @UiField
+  FlowPanel formOrXML;
+  @UiField
+  Button buttonApply;
+  @UiField
+  Button buttonRemove;
+  @UiField
+  Button buttonCancel;
+  @UiField
+  HTML errors;
+  @UiField
+  TitlePanel title;
   private DescriptiveMetadataEditBundle bundle;
   private SupportedMetadataTypeBundle supportedBundle;
   private boolean inXML = false;
   private TextArea metadataXML;
   private String metadataTextFromForm = null;
-
   private boolean aipLocked;
-
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  @UiField
-  TextBox id;
-
-  @UiField
-  ListBox type;
-
-  @UiField
-  Label formSimilarDanger;
-
-  @UiField
-  FocusPanel showXml;
-
-  @UiField
-  HTML showXmlIconXML;
-
-  @UiField
-  HTML showXmlIconForm;
-
-  @UiField
-  FlowPanel formOrXML;
-
-  @UiField
-  Button buttonApply;
-
-  @UiField
-  Button buttonRemove;
-
-  @UiField
-  Button buttonCancel;
-
-  @UiField
-  HTML errors;
-
-  @UiField
-  TitlePanel title;
 
   /**
    * Create a new panel to edit a descriptive metadata
@@ -584,5 +565,8 @@ public class EditDescriptiveMetadata extends Composite {
     } else {
       HistoryUtils.openBrowse(aipId, representationId);
     }
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, EditDescriptiveMetadata> {
   }
 }

@@ -8,14 +8,12 @@
 package org.roda.core.data.v2.user;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.v2.IsModelObject;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;

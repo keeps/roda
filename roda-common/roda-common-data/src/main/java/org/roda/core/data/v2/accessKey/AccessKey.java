@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_ACCESS_KEY)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_ACCESS_KEY)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AccessKey implements IsModelObject {
   private static final int VERSION = 1;

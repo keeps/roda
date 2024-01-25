@@ -10,6 +10,7 @@ package org.roda.wui.client.disposal.hold;
 import java.util.List;
 
 import org.roda.core.data.v2.ip.disposal.DisposalHold;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -17,7 +18,6 @@ import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -94,7 +94,7 @@ public class CreateDisposalHold extends Composite {
   void buttonApplyHandler(ClickEvent e) {
     if (disposalHoldDataPanel.isValid()) {
       disposalHold = disposalHoldDataPanel.getDisposalHold();
-      BrowserServiceImpl.Util.getInstance().createDisposalHold(disposalHold, new NoAsyncCallback<DisposalHold>() {
+      BrowserService.Util.getInstance().createDisposalHold(disposalHold, new NoAsyncCallback<DisposalHold>() {
         @Override
         public void onSuccess(DisposalHold disposalHold) {
           HistoryUtils.newHistory(DisposalPolicy.RESOLVER);

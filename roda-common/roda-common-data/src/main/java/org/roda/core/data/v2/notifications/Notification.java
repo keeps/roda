@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.notifications;
 
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -23,10 +24,10 @@ import org.roda.core.data.v2.ip.HasInstanceName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_NOTIFICATION)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_NOTIFICATION)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class Notification implements IsModelObject, IsIndexed, HasId, HasInstanceID, HasInstanceName {
-
+  @Serial
   private static final long serialVersionUID = -585753367605901060L;
 
   private String id = null;

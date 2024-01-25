@@ -33,7 +33,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.MultivaluedMap;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -3079,7 +3079,6 @@ public class BrowserHelper {
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)
       || RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSONP.equals(acceptFormat)) {
-      GWT.log("ACCEPT FORMAT: " + acceptFormat);
       RepresentationInformation ri = RodaCoreFactory.getModelService()
         .retrieveRepresentationInformation(representationInformationId);
       return new ObjectResponse<>(acceptFormat, ri);

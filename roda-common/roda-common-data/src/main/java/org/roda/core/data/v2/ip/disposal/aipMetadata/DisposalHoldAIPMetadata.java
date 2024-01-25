@@ -19,7 +19,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 /**
  * @author Gabriel Barros <gbarrps@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_HOLD_AIP_METADATA)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_HOLD_AIP_METADATA)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DisposalHoldAIPMetadata implements IsModelObject {
   private static final long serialVersionUID = 2487191107131691113L;

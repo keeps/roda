@@ -10,7 +10,7 @@ package org.roda.core.data.v2.ip.disposal;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElement;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.roda.core.data.common.RodaConstants;
@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * @author Miguel Guimarães <mguimaraes@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_HOLDS)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_HOLDS)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DisposalHolds implements RODAObjectList<DisposalHold> {
   private static final long serialVersionUID = -7273926545808506951L;

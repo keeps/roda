@@ -20,7 +20,6 @@ import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -67,21 +66,13 @@ public class EditAccessKey extends Composite {
       return ListUtils.concat(MemberManagement.RESOLVER.getHistoryPath(), getHistoryToken());
     }
   };
-
-  interface MyUiBinder extends UiBinder<Widget, EditAccessKey> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  private AccessKey accessKey;
-
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   @UiField
   TitlePanel titlePanel;
-
   @UiField(provided = true)
   AccessKeyDataPanel accessKeyDataPanel;
+  private AccessKey accessKey;
 
   public EditAccessKey(AccessKey accessKey) {
     this.accessKey = accessKey;
@@ -104,7 +95,7 @@ public class EditAccessKey extends Composite {
       AccessKey accessKeyUpdated = accessKeyDataPanel.getAccessKey();
       accessKey.setName(accessKeyUpdated.getName());
       accessKey.setExpirationDate(accessKeyUpdated.getExpirationDate());
-      BrowserServiceImpl.Util.getInstance().updateAccessKey(this.accessKey, new NoAsyncCallback<AccessKey>() {
+      BrowserService.Util.getInstance().updateAccessKey(this.accessKey, new NoAsyncCallback<AccessKey>() {
         @Override
         public void onSuccess(AccessKey accessKey) {
           HistoryUtils.newHistory(EditUser.RESOLVER, accessKey.getUserName());
@@ -120,5 +111,8 @@ public class EditAccessKey extends Composite {
 
   private void cancel() {
     HistoryUtils.newHistory(EditUser.RESOLVER, accessKey.getUserName());
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, EditAccessKey> {
   }
 }

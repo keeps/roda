@@ -19,7 +19,6 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -70,30 +69,19 @@ public class EditDistributedInstance extends Composite {
       return "edit_distributed_instance";
     }
   };
-
-  interface MyUiBinder extends UiBinder<Widget, EditDistributedInstance> {
-  }
-
-  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  private DistributedInstance distributedInstance;
-
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   @UiField
   Button buttonSave;
-
   @UiField
   Button buttonCancel;
-
   @UiField
   Button buttonRemove;
-
   @UiField
   Button buttonChangeStatus;
-
   @UiField(provided = true)
   DistributedInstanceDataPanel distributedInstanceDataPanel;
+  private DistributedInstance distributedInstance;
 
   public EditDistributedInstance(final DistributedInstance distributedInstance) {
     this.distributedInstance = distributedInstance;
@@ -114,7 +102,7 @@ public class EditDistributedInstance extends Composite {
           @Override
           public void onClick(ClickEvent clickEvent) {
             distributedInstance.setStatus(SynchronizingStatus.INACTIVE);
-            BrowserServiceImpl.Util.getInstance().updateDistributedInstance(distributedInstance,
+            BrowserService.Util.getInstance().updateDistributedInstance(distributedInstance,
               new NoAsyncCallback<DistributedInstance>() {
                 @Override
                 public void onSuccess(DistributedInstance distributedInstance) {
@@ -131,7 +119,7 @@ public class EditDistributedInstance extends Composite {
           @Override
           public void onClick(ClickEvent clickEvent) {
             distributedInstance.setStatus(SynchronizingStatus.ACTIVE);
-            BrowserServiceImpl.Util.getInstance().updateDistributedInstance(distributedInstance,
+            BrowserService.Util.getInstance().updateDistributedInstance(distributedInstance,
               new NoAsyncCallback<DistributedInstance>() {
                 @Override
                 public void onSuccess(DistributedInstance distributedInstance) {
@@ -159,7 +147,7 @@ public class EditDistributedInstance extends Composite {
       distributedInstance.setName(distributedInstanceUpdated.getName());
       distributedInstance.setDescription(distributedInstanceUpdated.getDescription());
       // distributedInstance.setNameIdentifier(distributedInstanceUpdated.getNameIdentifier());
-      BrowserServiceImpl.Util.getInstance().updateDistributedInstance(this.distributedInstance,
+      BrowserService.Util.getInstance().updateDistributedInstance(this.distributedInstance,
         new NoAsyncCallback<DistributedInstance>() {
           @Override
           public void onSuccess(DistributedInstance distributedInstance) {
@@ -176,7 +164,7 @@ public class EditDistributedInstance extends Composite {
         @Override
         public void onSuccess(Boolean confirm) {
           if (confirm) {
-            BrowserServiceImpl.Util.getInstance().deleteDistributedInstance(distributedInstance.getId(),
+            BrowserService.Util.getInstance().deleteDistributedInstance(distributedInstance.getId(),
               new NoAsyncCallback<Void>() {
                 @Override
                 public void onSuccess(Void result) {
@@ -195,5 +183,8 @@ public class EditDistributedInstance extends Composite {
 
   private void cancel() {
     HistoryUtils.newHistory(ShowDistributedInstance.RESOLVER, distributedInstance.getId());
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, EditDistributedInstance> {
   }
 }

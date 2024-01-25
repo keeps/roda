@@ -11,15 +11,17 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
 /**
  * @author Gabriel Barros <gbarros@keep.pt>
  */
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_TRANSITIVE_SCHEDULE_AIP_METADATA)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_DISPOSAL_TRANSITIVE_SCHEDULE_AIP_METADATA)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DisposalTransitiveScheduleAIPMetadata implements Serializable {
+  @Serial
   private static final long serialVersionUID = -3946608571760723840L;
 
   private String aipId;
@@ -28,6 +30,7 @@ public class DisposalTransitiveScheduleAIPMetadata implements Serializable {
   private Integer retentionPeriodDuration;
 
   public DisposalTransitiveScheduleAIPMetadata() {
+    // TODO document why this constructor is empty
   }
 
   public String getAipId() {

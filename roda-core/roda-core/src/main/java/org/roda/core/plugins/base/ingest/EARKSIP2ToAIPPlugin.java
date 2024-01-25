@@ -148,7 +148,7 @@ public class EARKSIP2ToAIPPlugin extends SIPToAIPPlugin {
     AIP aip = null;
 
     try {
-      sip = EARKSIP.parse(earkSIPPath, FSUtils.createRandomDirectory(jobWorkingDirectory));
+      sip = new EARKSIP().parse(earkSIPPath, FSUtils.createRandomDirectory(jobWorkingDirectory));
       reportItem.setSourceObjectOriginalIds(sip.getIds());
       reportItem.setIngestType(sip.getStatus().toString());
 

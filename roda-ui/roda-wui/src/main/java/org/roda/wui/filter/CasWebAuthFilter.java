@@ -14,17 +14,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.http.client.utils.URIBuilder;
-import org.jasig.cas.client.util.CommonUtils;
+import org.apereo.cas.client.util.CommonUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.InactiveUserException;
 import org.roda.core.data.exceptions.RODAException;
@@ -32,6 +23,15 @@ import org.roda.wui.api.controllers.UserLogin;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * CAS authentication filter for web requests.
@@ -54,8 +54,8 @@ public class CasWebAuthFilter implements Filter {
   public void init(final FilterConfig config) throws ServletException {
     casLogoutURL = config.getInitParameter("casServerLogoutUrl");
 
-    LOGGER.info("CAS logout URL = " + casLogoutURL);
-    LOGGER.info(getClass().getSimpleName() + " initialized ok");
+    LOGGER.info("CAS logout URL = {}", casLogoutURL);
+    LOGGER.info("{} initialized ok", getClass().getSimpleName());
   }
 
   /**

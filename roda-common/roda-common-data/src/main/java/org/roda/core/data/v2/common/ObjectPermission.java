@@ -7,15 +7,17 @@
  */
 package org.roda.core.data.v2.common;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.roda.core.data.common.RodaConstants;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_PERMISSION)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_PERMISSION)
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class ObjectPermission implements Serializable {
+  @Serial
   private static final long serialVersionUID = -6473833736054473793L;
 
   private String objectClass = null;

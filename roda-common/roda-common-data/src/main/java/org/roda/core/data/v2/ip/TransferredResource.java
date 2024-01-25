@@ -19,7 +19,7 @@ import org.roda.core.data.v2.index.IsIndexed;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-@javax.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_TRANSFERRED_RESOURCE)
+@jakarta.xml.bind.annotation.XmlRootElement(name = RodaConstants.RODA_OBJECT_TRANSFERRED_RESOURCE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TransferredResource implements IsModelObject, IsIndexed, HasId, SetsUUID {
   private static final long serialVersionUID = 7931609057644098879L;

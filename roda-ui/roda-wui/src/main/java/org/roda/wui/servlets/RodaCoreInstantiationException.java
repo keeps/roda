@@ -7,13 +7,12 @@
  */
 package org.roda.wui.servlets;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
+
+import java.io.Serial;
 
 public class RodaCoreInstantiationException extends ServletException {
-
-  /**
-   *
-   */
+  @Serial
   private static final long serialVersionUID = -271098088066975713L;
 
   public RodaCoreInstantiationException() {

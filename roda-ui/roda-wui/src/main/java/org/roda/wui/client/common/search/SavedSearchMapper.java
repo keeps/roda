@@ -7,11 +7,9 @@
  */
 package org.roda.wui.client.common.search;
 
-import org.fusesource.restygwt.client.JsonEncoderDecoder;
-import org.roda.core.data.v2.common.SavedSearch;
+import com.github.nmorel.gwtjackson.client.ObjectMapper;
 
 /**
- * @author Miguel Guimarães <mguimaraes@keep.pt>
+ * @author Miguel Guimarãese <mguimaraes@keep.pt>
  */
-public interface SavedSearchCodec extends JsonEncoderDecoder<SavedSearch> {
-}
+public interface SavedSearchMapper extends ObjectMapper<RODASavedSearch> { }
