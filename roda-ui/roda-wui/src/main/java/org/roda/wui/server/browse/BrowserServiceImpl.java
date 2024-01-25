@@ -620,46 +620,54 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public Set<UserProfile> retrieveUserProfilePluginItems(String pluginId, String repOrDip, String localeString) {
     Set<UserProfile> items = new HashSet<>();
 
+    String pluginName = RodaCoreFactory.getRodaConfiguration().getString("core.plugins.conversion.profile." + pluginId);
+
     List<String> dropdownItems = RodaUtils
-      .copyList(RodaCoreFactory.getRodaConfiguration().getList("core.plugins.user_profile." + pluginId + "[]"));
+      .copyList(RodaCoreFactory.getRodaConfiguration().getList("core.plugins.conversion.profile." + pluginName + ".profiles[]"));
     Locale locale = ServerTools.parseLocale(localeString);
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
 
-    String pluginName = RodaCoreFactory.getRodaConfiguration().getString("core.plugins.user_profile." + pluginId);
-
     for (String item : dropdownItems) {
-      UserProfile userProfile = retrieveUserProfileItem(item, pluginName, items, messages);
-      if (repOrDip.equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_REPRESENTATION) && userProfile.isRepresentation()) {
-        items.add(userProfile);
-      } else if (repOrDip.equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_DISSEMINATION)
-        && userProfile.isDissemination()) {
-        items.add(userProfile);
+      UserProfile userProfile = retrieveUserProfileItem(item, pluginName, messages);
+      if (userProfile != null) {
+        if (repOrDip.equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_REPRESENTATION) && userProfile.isRepresentation()) {
+          items.add(userProfile);
+        } else if (repOrDip.equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_DISSEMINATION) && userProfile.isDissemination()) {
+          items.add(userProfile);
+        }
       }
     }
 
     return items;
   }
 
-  private UserProfile retrieveUserProfileItem(String item, String pluginName, Set<UserProfile> items,
-    Messages messages) {
+  private UserProfile retrieveUserProfileItem(String item, String pluginName, Messages messages) {
     UserProfile userProfile = new UserProfile();
     Map<String, String> optionsValues = new HashMap<>();
 
-    userProfile.setI18nProperty(
-      RodaCoreFactory.getRodaConfiguration().getString("core.plugins." + pluginName + "." + item + ".title"));
-    userProfile.setDescription(
-      RodaCoreFactory.getRodaConfiguration().getString("core.plugins." + pluginName + "." + item + ".description"));
-    userProfile.setHasRepresentation(
-      RodaCoreFactory.getRodaConfiguration().getBoolean("core.plugins." + pluginName + "." + item + ".representation"));
-    userProfile.setHasDissemination(
-      RodaCoreFactory.getRodaConfiguration().getBoolean("core.plugins." + pluginName + "." + item + ".dissemination"));
+    String i18nKey = RodaCoreFactory.getRodaConfiguration()
+      .getString("core.plugins.conversion.profile." + pluginName + ".profiles.i18nPrefix");
+
+    userProfile.setTitle(messages.getTranslation(i18nKey + "." + item, i18nKey));
+    userProfile.setDescription(messages.getTranslation(i18nKey + "." + item + ".description", i18nKey));
     userProfile.setProfile(item);
 
-    String[] options = RodaCoreFactory.getRodaConfiguration()
-      .getStringArray("core.plugins." + pluginName + "." + item + ".options[]");
+    String[] outcome = RodaCoreFactory.getRodaConfiguration().getStringArray("core.plugins.conversion.profile." + pluginName + "." + item + ".assignto[]");
+
+    //if a value different from dip or rep is passed as outcome, the profile is not added
+    for (String outcomeValue : outcome) {
+      if (outcomeValue.equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_REPRESENTATION)) {
+        userProfile.setHasRepresentation(true);
+      } else if (outcomeValue.equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_DISSEMINATION)) {
+        userProfile.setHasDissemination(true);
+      } else {
+        return null;
+      }
+    }
+
+    String[] options = RodaCoreFactory.getRodaConfiguration().getStringArray("core.plugins.conversion.profile." + pluginName + "." + item + ".options[]");
     for (String option : options) {
-      String optionValue = RodaCoreFactory.getRodaConfiguration()
-        .getString("core.plugins." + pluginName + "." + item + "." + option);
+      String optionValue = RodaCoreFactory.getRodaConfiguration().getString("core.plugins.conversion.profile." + pluginName + "." + item + "." + option);
       optionsValues.put(option, optionValue);
     }
     userProfile.setOptions(optionsValues);

@@ -509,7 +509,7 @@ public class PluginParameterPanel extends Composite {
         public void onSuccess(Set<UserProfile> result) {
           treeSet.addAll(result);
           for (UserProfile item : treeSet) {
-            dropdown.addItem(item.getI18nProperty(), item.getProfile());
+            dropdown.addItem(item.getTitle(), item.getProfile());
             description.setText(item.getDescription());
             description.addStyleName(FORM_HELP);
           }
