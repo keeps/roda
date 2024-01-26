@@ -8,7 +8,6 @@
 package org.roda.core.plugins;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -19,19 +18,10 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.security.CodeSigner;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.EnumMap;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -42,15 +32,10 @@ import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.jar.Attributes;
-import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.io.FilenameUtils;
@@ -78,6 +63,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.plugins.certificate.PluginCertificateUtils;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.ClassLoaderUtility;
 import org.roda.core.util.CompoundClassLoader;
@@ -636,7 +622,7 @@ public class PluginManager {
         }
 
         // load certificates
-        CertificateInfo certificateInfo = loadAndCheckCertificates(p.jarPath);
+        CertificateInfo certificateInfo = PluginCertificateUtils.loadAndCheckCertificates(p.jarPath);
 
         // for development purpose
         boolean optIn = RodaCoreFactory.getProperty(RodaConstants.PLUGINS_CERTIFICATE_OPT_IN_PROPERTY, false);
@@ -691,82 +677,20 @@ public class PluginManager {
             LOGGER.error("Plugin failed to initialize: {}", p.jarPath, e);
           }
         }
-        if (!certificateInfo.isNotVerified() || optIn) {
-          // Let's cache Plugin classloader
-          jarPluginClassloaderCache.put(getPluginClassLoaderCacheKey(p.jarPath), classloader);
-        }
 
+        if (certificateInfo.isNotVerified() && !optIn) {
+          LOGGER.error("Plugin '{}' will not be activated due to certificate validation failures",
+            p.jarPath.getFileName());
+          return;
+        } else if (certificateInfo.isNotVerified() && optIn) {
+          LOGGER.warn("OptIn is enabled. The plugin '{}' will be activated despite certificate validation failures",
+            p.jarPath.getFileName());
+        }
+        // Let's cache Plugin classloader
+        jarPluginClassloaderCache.put(getPluginClassLoaderCacheKey(p.jarPath), classloader);
       }
     } catch (IOException e1) {
       LOGGER.error("Plugin failed to initialize: {}", p.jarPath, e1);
-    }
-  }
-
-  private CertificateInfo loadAndCheckCertificates(Path jarPath) throws IOException {
-    JarFile jar = new JarFile(jarPath.toFile());
-    Enumeration<JarEntry> entries = jar.entries();
-    CertificateInfo certificateInfo = new CertificateInfo();
-
-    while (entries.hasMoreElements()) {
-      JarEntry entry = entries.nextElement();
-      // Ignore signature related files
-      if (entry.getName().equals("META-INF/LICENSE.SF") || entry.getName().equals("META-INF/LICENSE.RSA")
-        || entry.isDirectory()) {
-        continue;
-      }
-      byte buffer[] = new byte[8192];
-      try (InputStream is = jar.getInputStream(entry)) {
-        // need to read the entry's data to see the certs.
-        while (is.read(buffer) != -1)
-          ;
-        Certificate[] certificates = entry.getCertificates();
-        CodeSigner[] signers = entry.getCodeSigners();
-
-        if (signers != null && certificates != null) {
-          X509Certificate[] x509Certificates = Arrays.copyOf(certificates, certificates.length,
-            X509Certificate[].class);
-
-          X509Certificate pluginCertificate = x509Certificates[0];
-          String issuerDN = pluginCertificate.getIssuerDN().getName();
-          String subjectDN = pluginCertificate.getSubjectDN().getName();
-          Date notBefore = pluginCertificate.getNotBefore();
-          Date notAfter = pluginCertificate.getNotAfter();
-
-          certificateInfo.addCertificates(issuerDN, subjectDN, notBefore, notAfter);
-          try {
-            validateCertificate(x509Certificates);
-            certificateInfo.setCertificateStatus(CertificateInfo.CertificateStatus.VERIFIED);
-          } catch (NoSuchAlgorithmException | CertificateException | KeyStoreException e) {
-            LOGGER.error("Plugin not signed by RODA");
-            certificateInfo.setCertificateStatus(CertificateInfo.CertificateStatus.NOT_VERIFIED);
-            break;
-          }
-        } else {
-          LOGGER.error("Plugin not signed by RODA");
-          certificateInfo.setCertificateStatus(CertificateInfo.CertificateStatus.NOT_VERIFIED);
-          break;
-        }
-      }
-    }
-    return certificateInfo;
-  }
-
-  private static void validateCertificate(X509Certificate[] certificates)
-    throws NoSuchAlgorithmException, KeyStoreException, CertificateException, IOException {
-    TrustManagerFactory trustManagerFactory = TrustManagerFactory
-      .getInstance(TrustManagerFactory.getDefaultAlgorithm());
-    KeyStore keyStore = KeyStore.getInstance("PKCS12");
-
-    // default truststore
-    keyStore.load(PluginManager.class.getResourceAsStream("/config/market/roda-truststore.p12"),
-      "changeit".toCharArray());
-    trustManagerFactory.init(keyStore);
-
-    for (TrustManager trustManager : trustManagerFactory.getTrustManagers()) {
-      if (trustManager instanceof X509TrustManager) {
-        X509TrustManager x509TrustManager = (X509TrustManager) trustManager;
-        x509TrustManager.checkServerTrusted(certificates, "RSA");
-      }
     }
   }
 

@@ -739,6 +739,17 @@ public final class RodaConstants {
 
   // Plugins certificates
   public static final String PLUGINS_CERTIFICATE_OPT_IN_PROPERTY = "core.plugins.external.certificates.opt-in";
+  public static final String PLUGINS_CERTIFICATE_DEFAULT_TRUSTSTORE_AUTH_TYPE = "RSA";
+  public static final String PLUGINS_CERTIFICATE_DEFAULT_TRUSTSTORE_PATH = "/config/market/truststore/";
+  public static final String PLUGINS_CERTIFICATE_RODA_TRUSTSTORE_TYPE = "PKCS12";
+  public static final String PLUGINS_CERTIFICATE_RODA_TRUSTSTORE_NAME = "roda-truststore.p12";
+  public static final String PLUGINS_CERTIFICATE_RODA_TRUSTSTORE_PASS = "changeit";
+
+  public static final String PLUGINS_CERTIFICATE_CUSTOM_TRUSTSTORE_FOLDER = "market/truststore/";
+  public static final String PLUGINS_CERTIFICATE_CUSTOM_TRUSTSTORE_ENABLE_PROPERTY = "core.plugins.external.certificates.custom.truststore.enable";
+  public static final String PLUGINS_CERTIFICATE_CUSTOM_TRUSTSTORE_TYPE_PROPERTY = "core.plugins.external.certificates.custom.truststore.type";
+  public static final String PLUGINS_CERTIFICATE_CUSTOM_TRUSTSTORE_NAME_PROPERTY = "core.plugins.external.certificates.custom.truststore.name";
+  public static final String PLUGINS_CERTIFICATE_CUSTOM_TRUSTSTORE_PASS_PROPERTY = "core.plugins.external.certificates.custom.truststore.pass";
 
   // MARKET
   public static final String MARKET_INFO_URL_PROPERTY = "core.market.info.url";
