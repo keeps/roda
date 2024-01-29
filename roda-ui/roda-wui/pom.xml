@@ -13,6 +13,7 @@
     <properties>
         <gwt.module.main>org.roda.wui.RodaWUI</gwt.module.main>
         <gwt.module.portal>org.roda.wui.RodaWUIPortal</gwt.module.portal>
+        <gwt.skipCompilation>false</gwt.skipCompilation>
     </properties>
     <packaging>war</packaging>
     <profiles>
@@ -30,7 +31,7 @@
                         <artifactId>gwt-maven-plugin</artifactId>
                         <extensions>true</extensions>
                         <configuration>
-                            <skipCompilation>false</skipCompilation>
+                            <skipCompilation>${gwt.skipCompilation}</skipCompilation>
                         </configuration>
                         <executions>
                             <execution>
@@ -284,6 +285,7 @@
                     <plugin>
                         <groupId>net.ltgt.gwt.maven</groupId>
                         <artifactId>gwt-maven-plugin</artifactId>
+                        <version>HEAD-SNAPSHOT</version>
                         <extensions>true</extensions>
                         <configuration>
                             <moduleName>${gwt.module.main}</moduleName>
@@ -291,6 +293,7 @@
 
                             <classpathScope>compile+runtime</classpathScope>
                             <skipCompilation>false</skipCompilation>
+                            <forceCompilation>true</forceCompilation>
                             <draftCompile>true</draftCompile>
                             <style>PRETTY</style>
                             <environmentVariables>

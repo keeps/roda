@@ -19,7 +19,6 @@ import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -128,7 +127,7 @@ public class EditDisposalSchedule extends Composite {
       disposalSchedule.setMandate(disposalScheduleUpdated.getMandate());
       disposalSchedule.setDescription(disposalScheduleUpdated.getDescription());
       disposalSchedule.setScopeNotes(disposalScheduleUpdated.getScopeNotes());
-      BrowserServiceImpl.Util.getInstance().updateDisposalSchedule(disposalSchedule,
+      BrowserService.Util.getInstance().updateDisposalSchedule(disposalSchedule,
         new NoAsyncCallback<DisposalSchedule>() {
           @Override
           public void onSuccess(DisposalSchedule disposalSchedule) {

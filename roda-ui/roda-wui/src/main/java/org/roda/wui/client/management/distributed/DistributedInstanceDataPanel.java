@@ -39,15 +39,10 @@ import config.i18n.client.ClientMessages;
  */
 public class DistributedInstanceDataPanel extends Composite implements HasValueChangeHandlers<DistributedInstance> {
   public static final String IS_WRONG = "isWrong";
-
-  interface MyUiBinder extends UiBinder<Widget, DistributedInstanceDataPanel> {
-  }
-
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
   private static DistributedInstanceDataPanel.MyUiBinder uiBinder = GWT
     .create(DistributedInstanceDataPanel.MyUiBinder.class);
-
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  private final boolean editMode;
   @UiField
   TextBox name;
 
@@ -65,12 +60,8 @@ public class DistributedInstanceDataPanel extends Composite implements HasValueC
 
   @UiField
   HTML errors;
-
-  private final boolean editMode;
-
   private boolean changed = false;
   private boolean checked = false;
-
   public DistributedInstanceDataPanel(DistributedInstance distributedInstance, boolean editMode) {
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -113,12 +104,6 @@ public class DistributedInstanceDataPanel extends Composite implements HasValueC
     errors.setVisible(false);
   }
 
-  public void setDistributedInstance(DistributedInstance distributedInstance) {
-    this.name.setText(distributedInstance.getName());
-    // this.identifier.setText(distributedInstance.getNameIdentifier());
-    this.description.setText(distributedInstance.getDescription());
-  }
-
   public DistributedInstance getDistributedInstance() {
     DistributedInstance distributedInstance = new DistributedInstance();
     distributedInstance.setName(name.getText());
@@ -126,6 +111,12 @@ public class DistributedInstanceDataPanel extends Composite implements HasValueC
     distributedInstance.setDescription(description.getText());
 
     return distributedInstance;
+  }
+
+  public void setDistributedInstance(DistributedInstance distributedInstance) {
+    this.name.setText(distributedInstance.getName());
+    // this.identifier.setText(distributedInstance.getNameIdentifier());
+    this.description.setText(distributedInstance.getDescription());
   }
 
   public boolean isValid() {
@@ -198,5 +189,8 @@ public class DistributedInstanceDataPanel extends Composite implements HasValueC
 
   public DistributedInstance getValue() {
     return getDistributedInstance();
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, DistributedInstanceDataPanel> {
   }
 }

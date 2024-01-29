@@ -10,6 +10,7 @@ package org.roda.wui.client.disposal.schedule;
 import java.util.List;
 
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -17,7 +18,6 @@ import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -59,24 +59,15 @@ public class CreateDisposalSchedule extends Composite {
       return "create_disposal_schedule";
     }
   };
-
-  interface MyUiBinder extends UiBinder<Widget, CreateDisposalSchedule> {
-  }
-
-  private static CreateDisposalSchedule.MyUiBinder uiBinder = GWT.create(CreateDisposalSchedule.MyUiBinder.class);
-
-  private DisposalSchedule disposalSchedule;
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  private static CreateDisposalSchedule.MyUiBinder uiBinder = GWT.create(CreateDisposalSchedule.MyUiBinder.class);
   @UiField
   Button buttonSave;
-
   @UiField
   Button buttonCancel;
-
   @UiField(provided = true)
   DisposalScheduleDataPanel disposalScheduleDataPanel;
+  private DisposalSchedule disposalSchedule;
 
   public CreateDisposalSchedule(DisposalSchedule disposalSchedule) {
     this.disposalSchedule = disposalSchedule;
@@ -98,7 +89,7 @@ public class CreateDisposalSchedule extends Composite {
     if (disposalScheduleDataPanel.isValid()) {
       disposalSchedule = disposalScheduleDataPanel.getDisposalSchedule();
 
-      BrowserServiceImpl.Util.getInstance().createDisposalSchedule(disposalSchedule,
+      BrowserService.Util.getInstance().createDisposalSchedule(disposalSchedule,
         new NoAsyncCallback<DisposalSchedule>() {
           @Override
           public void onSuccess(DisposalSchedule createdDisposalSchedule) {
@@ -116,6 +107,9 @@ public class CreateDisposalSchedule extends Composite {
 
   private void cancel() {
     HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, CreateDisposalSchedule> {
   }
 
 }

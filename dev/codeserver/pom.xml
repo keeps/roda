@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.roda-project</groupId>
@@ -26,6 +26,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <rodaPath>..</rodaPath>
   </properties>
 
   <dependencies>
@@ -46,6 +47,11 @@
     </dependency>
     <dependency>
       <groupId>org.roda-project</groupId>
+      <artifactId>roda-common-utils</artifactId>
+      <version>5.3.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.roda-project</groupId>
       <artifactId>roda-common-data</artifactId>
       <classifier>sources</classifier>
       <version>5.3.1</version>
@@ -58,12 +64,12 @@
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
-      <version>2.16.0</version>
+      <version>2.15.3</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
-      <version>2.16.0</version>
+      <version>2.15.3</version>
       <classifier>sources</classifier>
     </dependency>
     <dependency>
@@ -88,37 +94,66 @@
       <version>2.2.7</version>
     </dependency>
     <dependency>
+      <groupId>org.fusesource.restygwt</groupId>
+      <artifactId>restygwt</artifactId>
+      <version>2.2.7</version>
+      <classifier>sources</classifier>
+    </dependency>
+    <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
       <version>2.16.0</version>
       <classifier>sources</classifier>
-  </dependency>
+    </dependency>
   </dependencies>
 
 
   <build>
     <plugins>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>3.1.0</version>
+        <groupId>net.ltgt.gwt.maven</groupId>
+        <artifactId>gwt-maven-plugin</artifactId>
+        <version>HEAD-SNAPSHOT</version>
+        <extensions>true</extensions>
         <configuration>
-          <mainClass>com.google.gwt.dev.codeserver.CodeServer</mainClass>
-          <classpathScope>test</classpathScope>
-          <arguments>
-             <argument>-logLevel</argument>
-            <argument>DEBUG</argument>
-            <argument>-src</argument>
-            <argument>/home/lfaria/Projects/github.com/keeps/roda/roda-ui/roda-wui/src/main/java</argument>
-            <argument>-src</argument>
-            <argument>/home/lfaria/Projects/github.com/keeps/roda/roda-ui/roda-wui/src/main/resources</argument>
-            <argument>-src</argument>
-            <argument>/home/lfaria/Projects/github.com/keeps/roda/roda-common/roda-common-data/src/main/java/</argument>
-            <argument>-src</argument>
-            <argument>/home/lfaria/Projects/github.com/keeps/roda/roda-common/roda-common-data/src/main/resources/</argument>
-            <argument>org.roda.wui.RodaWUI</argument>
-          </arguments>
+          <moduleName>org.roda.wui.RodaWUI</moduleName>
+          <launcherDir>${project.build.directory}/${project.build.finalName}</launcherDir>
+
+          <classpathScope>compile+runtime</classpathScope>
+          <skipCompilation>false</skipCompilation>
+          <forceCompilation>true</forceCompilation>
+          <draftCompile>true</draftCompile>
+          <codeserverArgs>
+              <arg>-src</arg>
+              <arg>${rodaPath}/roda-ui/roda-wui/src/main/java</arg>
+              <arg>-src</arg>
+              <arg>${rodaPath}/roda-ui/roda-wui/src/main/resources</arg>
+              <arg>-src</arg>
+              <arg>${rodaPath}/roda-ui/roda-wui/target/generated-sources/annotations</arg>
+              <arg>-src</arg>
+              <arg>${rodaPath}/roda-common/roda-common-data/src/main/java/</arg>
+              <arg>-src</arg>
+              <arg>${rodaPath}/roda-common/roda-common-data/src/main/resources/</arg>
+              <arg>-src</arg>
+              <arg>${rodaPath}/roda-common/roda-common-data/target/generated-sources/xjc</arg>
+              <arg>-src</arg>
+              <arg>${rodaPath}/roda-common/roda-common-data/target/generated-sources/annotations</arg>
+          </codeserverArgs>
+          <style>PRETTY</style>
+          <environmentVariables>
+            <JDK_JAVA_OPTIONS>
+              --add-opens java.base/java.util=ALL-UNNAMED
+            </JDK_JAVA_OPTIONS>
+          </environmentVariables>
         </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

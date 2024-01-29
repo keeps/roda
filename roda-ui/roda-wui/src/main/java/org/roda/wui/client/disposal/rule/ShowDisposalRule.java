@@ -29,8 +29,6 @@ import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
-import org.roda.wui.server.browse.BrowserServiceImpl;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -51,6 +49,8 @@ import config.i18n.client.ClientMessages;
  * @author Tiago Fraga <tfraga@keep.pt>
  */
 public class ShowDisposalRule extends Composite {
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private static ShowDisposalRule instance = null;
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
@@ -73,57 +73,36 @@ public class ShowDisposalRule extends Composite {
       return "disposal_rule";
     }
   };
-
-  private static ShowDisposalRule instance = null;
-
-  interface MyUiBinder extends UiBinder<Widget, ShowDisposalRule> {
-  }
-
   private static ShowDisposalRule.MyUiBinder uiBinder = GWT.create(ShowDisposalRule.MyUiBinder.class);
-
-  private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
-  private DisposalRule disposalRule;
-
   @UiField
   Label disposalRuleId;
-
   @UiField
   Label dateCreated, dateUpdated;
-
   @UiField
   TitlePanel title;
-
   @UiField
   Label disposalRuleDescriptionLabel;
-
   @UiField
   HTML disposalRuleDescription;
-
   @UiField
   Label disposalRuleScheduleLabel;
-
   @UiField
   HTML disposalRuleScheduleName;
-
   @UiField
   Label disposalRuleTypeLabel;
-
   @UiField
   HTML disposalRuleType;
-
-  // Conditions
-
   @UiField
   Label conditionsLabel;
-
   @UiField
   FlowPanel conditionsPanel;
 
-  // Sidebar
-
+  // Conditions
   @UiField
   FlowPanel buttonsPanel;
+  private DisposalRule disposalRule;
+
+  // Sidebar
 
   public ShowDisposalRule() {
     this.disposalRule = new DisposalRule();
@@ -136,6 +115,13 @@ public class ShowDisposalRule extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
     initElements();
     initButtons();
+  }
+
+  public static ShowDisposalRule getInstance() {
+    if (instance == null) {
+      instance = new ShowDisposalRule();
+    }
+    return instance;
   }
 
   public void initElements() {
@@ -166,7 +152,8 @@ public class ShowDisposalRule extends Composite {
       }
     });
 
-    disposalRuleType.setHTML(SafeHtmlUtils.fromString(messages.disposalRuleTypeValue(disposalRule.getType().toString())));
+    disposalRuleType
+      .setHTML(SafeHtmlUtils.fromString(messages.disposalRuleTypeValue(disposalRule.getType().toString())));
     disposalRuleTypeLabel.setVisible(StringUtils.isNotBlank(disposalRule.getType().toString()));
 
     conditionsLabel.setVisible(true);
@@ -215,31 +202,29 @@ public class ShowDisposalRule extends Composite {
           @Override
           public void onSuccess(Boolean confirm) {
             if (confirm) {
-              BrowserServiceImpl.Util.getInstance().deleteDisposalRule(disposalRule.getId(),
-                new NoAsyncCallback<Void>() {
-                  @Override
-                  public void onSuccess(Void unused) {
-                    Toast.showInfo(messages.deleteDisposalRuleSuccessTitle(),
-                      messages.deleteDisposalRuleSuccessMessage(disposalRule.getTitle()));
-                    BrowserService.Util.getInstance().listDisposalRules(new NoAsyncCallback<DisposalRules>() {
-                      @Override
-                      public void onSuccess(DisposalRules disposalRules) {
-                        int index = 0;
-                        for (DisposalRule disposalRule : disposalRules.getObjects()) {
-                          disposalRule.setOrder(index);
-                          index++;
-                        }
-                        BrowserServiceImpl.Util.getInstance().updateDisposalRules(disposalRules,
-                          new NoAsyncCallback<Void>() {
-                            @Override
-                            public void onSuccess(Void unused) {
-                              DisposalRuleActions.applyDisposalRulesAction();
-                            }
-                          });
+              BrowserService.Util.getInstance().deleteDisposalRule(disposalRule.getId(), new NoAsyncCallback<Void>() {
+                @Override
+                public void onSuccess(Void unused) {
+                  Toast.showInfo(messages.deleteDisposalRuleSuccessTitle(),
+                    messages.deleteDisposalRuleSuccessMessage(disposalRule.getTitle()));
+                  BrowserService.Util.getInstance().listDisposalRules(new NoAsyncCallback<DisposalRules>() {
+                    @Override
+                    public void onSuccess(DisposalRules disposalRules) {
+                      int index = 0;
+                      for (DisposalRule disposalRule : disposalRules.getObjects()) {
+                        disposalRule.setOrder(index);
+                        index++;
                       }
-                    });
-                  }
-                });
+                      BrowserService.Util.getInstance().updateDisposalRules(disposalRules, new NoAsyncCallback<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                          DisposalRuleActions.applyDisposalRulesAction();
+                        }
+                      });
+                    }
+                  });
+                }
+              });
             }
           }
         }));
@@ -254,13 +239,6 @@ public class ShowDisposalRule extends Composite {
     buttonsPanel.add(backBtn);
   }
 
-  public static ShowDisposalRule getInstance() {
-    if (instance == null) {
-      instance = new ShowDisposalRule();
-    }
-    return instance;
-  }
-
   public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 1) {
       BrowserService.Util.getInstance().retrieveDisposalRule(historyTokens.get(0), new NoAsyncCallback<DisposalRule>() {
@@ -271,5 +249,8 @@ public class ShowDisposalRule extends Composite {
         }
       });
     }
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, ShowDisposalRule> {
   }
 }

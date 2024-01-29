@@ -26,7 +26,6 @@ import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -202,7 +201,7 @@ public class ShowDistributedInstance extends Composite {
         @Override
         public void onSuccess(Boolean confirm) {
           if (confirm) {
-            BrowserServiceImpl.Util.getInstance().deleteDistributedInstance(distributedInstance.getId(),
+            BrowserService.Util.getInstance().deleteDistributedInstance(distributedInstance.getId(),
               new NoAsyncCallback<Void>() {
                 @Override
                 public void onSuccess(Void result) {

@@ -25,7 +25,6 @@ import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -288,7 +287,7 @@ public class OrderDisposalRules extends Composite {
       messages.dialogYes(), new NoAsyncCallback<Boolean>() {
         @Override
         public void onSuccess(Boolean aBoolean) {
-          BrowserServiceImpl.Util.getInstance().updateDisposalRules(disposalRules, new NoAsyncCallback<Void>() {
+          BrowserService.Util.getInstance().updateDisposalRules(disposalRules, new NoAsyncCallback<Void>() {
             @Override
             public void onSuccess(Void unused) {
               Toast.showInfo(messages.updateDisposalRulesOrderSuccessTitle(),

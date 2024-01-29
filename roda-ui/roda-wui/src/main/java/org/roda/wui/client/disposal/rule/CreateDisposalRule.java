@@ -20,7 +20,6 @@ import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -74,25 +73,16 @@ public class CreateDisposalRule extends Composite {
       return "create_disposal_rule";
     }
   };
-
-  interface MyUiBinder extends UiBinder<Widget, CreateDisposalRule> {
-  }
-
-  private static CreateDisposalRule.MyUiBinder uiBinder = GWT.create(CreateDisposalRule.MyUiBinder.class);
-
-  private DisposalRule disposalRule;
-  private DisposalRules disposalRules;
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  private static CreateDisposalRule.MyUiBinder uiBinder = GWT.create(CreateDisposalRule.MyUiBinder.class);
   @UiField
   Button buttonSave;
-
   @UiField
   Button buttonCancel;
-
   @UiField(provided = true)
   DisposalRuleDataPanel disposalRuleDataPanel;
+  private DisposalRule disposalRule;
+  private DisposalRules disposalRules;
 
   public CreateDisposalRule(DisposalRule disposalRule, DisposalSchedules disposalSchedules,
     DisposalRules disposalRules) {
@@ -115,7 +105,7 @@ public class CreateDisposalRule extends Composite {
     if (disposalRuleDataPanel.isValid()) {
       disposalRule = disposalRuleDataPanel.getDisposalRule();
       disposalRule.setOrder(disposalRules.getObjects().size());
-      BrowserServiceImpl.Util.getInstance().createDisposalRule(disposalRule, new NoAsyncCallback<DisposalRule>() {
+      BrowserService.Util.getInstance().createDisposalRule(disposalRule, new NoAsyncCallback<DisposalRule>() {
         @Override
         public void onSuccess(DisposalRule createdDisposalSchedule) {
           HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
@@ -128,6 +118,9 @@ public class CreateDisposalRule extends Composite {
   @UiHandler("buttonCancel")
   void buttonCancelHandler(ClickEvent e) {
     HistoryUtils.newHistory(DisposalPolicy.RESOLVER);
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, CreateDisposalRule> {
   }
 
 }

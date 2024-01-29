@@ -9,7 +9,6 @@ package org.roda.wui.client.disposal.rule;
 
 import java.util.List;
 
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import org.roda.core.data.v2.ip.disposal.DisposalRule;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedules;
 import org.roda.wui.client.browse.BrowserService;
@@ -22,7 +21,6 @@ import org.roda.wui.client.disposal.policy.DisposalPolicy;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.ListUtils;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -157,7 +155,7 @@ public class EditDisposalRule extends Composite {
       }
 
       if (!runApplyRulesPlugin) {
-        BrowserServiceImpl.Util.getInstance().updateDisposalRule(disposalRule, new NoAsyncCallback<DisposalRule>() {
+        BrowserService.Util.getInstance().updateDisposalRule(disposalRule, new NoAsyncCallback<DisposalRule>() {
           @Override
           public void onSuccess(DisposalRule disposalRule) {
             HistoryUtils.newHistory(ShowDisposalRule.RESOLVER, disposalRule.getId());
@@ -169,7 +167,7 @@ public class EditDisposalRule extends Composite {
             @Override
             public void onSuccess(Boolean confirm) {
               if (confirm) {
-                BrowserServiceImpl.Util.getInstance().updateDisposalRule(disposalRule,
+                BrowserService.Util.getInstance().updateDisposalRule(disposalRule,
                   new NoAsyncCallback<DisposalRule>() {
                     @Override
                     public void onSuccess(DisposalRule disposalRule) {

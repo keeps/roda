@@ -10,17 +10,13 @@ package org.roda.wui.client.disposal.schedule;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.MissingResourceException;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.KeyUpEvent;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.disposal.DisposalActionCode;
 import org.roda.core.data.v2.ip.disposal.DisposalSchedule;
 import org.roda.core.data.v2.ip.disposal.RetentionPeriodIntervalCode;
-import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -49,14 +45,9 @@ import config.i18n.client.ClientMessages;
 public class DisposalScheduleDataPanel extends Composite implements HasValueChangeHandlers<DisposalSchedule> {
 
   public static final String IS_WRONG = "isWrong";
-
-  interface MyUiBinder extends UiBinder<Widget, DisposalScheduleDataPanel> {
-  }
-
-  private static DisposalScheduleDataPanel.MyUiBinder uiBinder = GWT.create(DisposalScheduleDataPanel.MyUiBinder.class);
-
   private static final ClientMessages messages = GWT.create(ClientMessages.class);
-
+  private static DisposalScheduleDataPanel.MyUiBinder uiBinder = GWT.create(DisposalScheduleDataPanel.MyUiBinder.class);
+  private final boolean editMode;
   @UiField
   TextBox title;
 
@@ -108,14 +99,10 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
 
   @UiField
   Label retentionPeriodDurationError;
-
-  private final boolean editMode;
-
-  private boolean changed = false;
-  private boolean checked = false;
-
   @UiField
   HTML errors;
+  private boolean changed = false;
+  private boolean checked = false;
 
   public DisposalScheduleDataPanel(DisposalSchedule disposalSchedule, boolean editMode) {
 
@@ -253,13 +240,6 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
     }
   }
 
-  public void setDisposalSchedule(DisposalSchedule disposalSchedule) {
-    this.title.setText(disposalSchedule.getTitle());
-    this.description.setText(disposalSchedule.getDescription());
-    this.mandate.setText(disposalSchedule.getMandate());
-    this.notes.setText(disposalSchedule.getScopeNotes());
-  }
-
   public DisposalSchedule getDisposalSchedule() {
     DisposalSchedule disposalSchedule = new DisposalSchedule();
     disposalSchedule.setTitle(title.getText());
@@ -278,6 +258,13 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
       }
     }
     return disposalSchedule;
+  }
+
+  public void setDisposalSchedule(DisposalSchedule disposalSchedule) {
+    this.title.setText(disposalSchedule.getTitle());
+    this.description.setText(disposalSchedule.getDescription());
+    this.mandate.setText(disposalSchedule.getMandate());
+    this.notes.setText(disposalSchedule.getScopeNotes());
   }
 
   private DisposalActionCode getDisposalActionCode(String string) {
@@ -456,5 +443,8 @@ public class DisposalScheduleDataPanel extends Composite implements HasValueChan
 
   public DisposalSchedule getValue() {
     return getDisposalSchedule();
+  }
+
+  interface MyUiBinder extends UiBinder<Widget, DisposalScheduleDataPanel> {
   }
 }

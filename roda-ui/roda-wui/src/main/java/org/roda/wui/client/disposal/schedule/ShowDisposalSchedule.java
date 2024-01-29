@@ -38,7 +38,6 @@ import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -285,7 +284,7 @@ public class ShowDisposalSchedule extends Composite {
         deactivateScheduleButton.setText(messages.deactivateButton());
         deactivateScheduleButton.addClickHandler(clickEvent -> {
           disposalSchedule.setState(DisposalScheduleState.INACTIVE);
-          BrowserServiceImpl.Util.getInstance().updateDisposalSchedule(disposalSchedule,
+          BrowserService.Util.getInstance().updateDisposalSchedule(disposalSchedule,
             new NoAsyncCallback<DisposalSchedule>() {
               @Override
               public void onSuccess(DisposalSchedule disposalSchedule) {
@@ -303,7 +302,7 @@ public class ShowDisposalSchedule extends Composite {
         deleteDisposalSchedule.addStyleName("btn btn-block btn-danger btn-delete");
         deleteDisposalSchedule.setText("Delete");
         deleteDisposalSchedule.addClickHandler(clickEvent -> {
-          BrowserServiceImpl.Util.getInstance().deleteDisposalSchedule(disposalSchedule.getId(),
+          BrowserService.Util.getInstance().deleteDisposalSchedule(disposalSchedule.getId(),
             new NoAsyncCallback<Void>() {
               @Override
               public void onSuccess(Void result) {

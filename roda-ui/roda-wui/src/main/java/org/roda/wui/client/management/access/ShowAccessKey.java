@@ -24,7 +24,6 @@ import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.ListUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
-import org.roda.wui.server.browse.BrowserServiceImpl;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -215,7 +214,7 @@ public class ShowAccessKey extends Composite {
       messages.cancelButton(), messages.confirmButton(), new NoAsyncCallback<Boolean>() {
         @Override
         public void onSuccess(Boolean confirm) {
-          BrowserServiceImpl.Util.getInstance().deleteAccessKey(accessKey.getId(), new NoAsyncCallback<Void>() {
+          BrowserService.Util.getInstance().deleteAccessKey(accessKey.getId(), new NoAsyncCallback<Void>() {
             @Override
             public void onSuccess(Void result) {
               cancel();
