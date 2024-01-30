@@ -9,12 +9,14 @@
 ## Setup
 
 Install pre-requisites:
-- Java 17
+
+- Java 21
 - Maven 3.8.6 or greater
 - [Configure Maven to use your GitHub account for GitHub Packages](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry#authenticating-with-a-personal-access-token)
 
 Additional support for internal plugins:
- -  ClamAV using docker image
+
+- ClamAV using docker image
 
  ```sh
  sudo apt install clamdscan
@@ -29,10 +31,11 @@ TCPAddr localhost" | sudo tee /etc/clamav/clamd.conf
 mvn -pl roda-ui/roda-wui -am gwt:compile -Pdebug-main -Dscope.gwt-dev=compile
 ./roda-ui/roda-wui/copy_gwt_rpc.sh
 
+mvn install -Pcore -DskipTests
+
 # Start up dependencies (Solr, Zookeeper, Siegfried, ClamAV)
 mkdir -p $HOME/.roda/data/storage
 docker compose -f deploys/standalone/docker-compose-dev.yaml up -d
-
 
 # Open WUI in Spring boot
 mvn -pl roda-ui/roda-wui -am spring-boot:run -Pdebug-main
@@ -42,7 +45,6 @@ mvn -f dev/codeserver gwt:codeserver -DrodaPath=$(pwd)
 
 # Open codeserver http://127.0.0.1:9876/ and add bookmarks
 # Open RODA http://localhost:8080 and click the "Dev Mode On" bookmark
-
 ```
 
 Optional: Check Google Chrome "RemoteLiveReload" extension for automatic reloading with spring boot.
@@ -77,19 +79,19 @@ To try out this version, check the [install instructions](https://github.com/kee
 
 ## Redeploy on docker
 
-* Delete all stopped containers
+### Delete all stopped containers
 
 ```bash
 docker ps -q -f status=exited | xargs --no-run-if-empty docker rm
 ```
 
-* Delete all dangling (unused) images
+### Delete all dangling (unused) images
 
 ```bash
 docker images -q -f dangling=true | xargs --no-run-if-empty docker rmi
 ```
 
-* Use bash in running container
+### Use bash in running container
 
 ```bash
 docker exec -i -t CONTAINER_ID /bin/bash
@@ -103,16 +105,12 @@ Testing RODA on different browsers is done in an easy way thanks to BrowserStack
 
 ## Common problems
 
-* Lack of permissions to download dependencies when building RODA: to compile you need to set your GitHub access token in your settings.xml as described on https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry#authenticating-with-a-personal-access-token
-* Problems may arise when using GWT Dev Mode and having in the classpath a different jetty version
+- Lack of permissions to download dependencies when building RODA: to compile you need to set your GitHub access token in your settings.xml as described on <https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry#authenticating-with-a-personal-access-token>
+- Problems may arise when using GWT Dev Mode and having in the classpath a different jetty version
 
 ## Misc
 
-* Executing worker (compiled with -Proda-core-jar):
-  * `java -Droda.node.type=worker -jar roda-core/roda-core/target/roda-core-2.0.0-SNAPSHOT-jar-with-dependencies.jar`
-  * `java -cp roda-core/roda-core/target/roda-core-2.0.0-SNAPSHOT-jar-with-dependencies.jar -Droda.node.type=worker org.roda.core.RodaCoreFactory`
-
-* Analyze RODA dependencies for version update
+### Analyze RODA dependencies for version update
 
 ```bash
 mvn versions:display-dependency-updates
