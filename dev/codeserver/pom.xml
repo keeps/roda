@@ -22,34 +22,36 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <rodaPath>..</rodaPath>
+        <gwt.version>2.11.0</gwt.version>
+        <roda.version>5.4.0-SNAPSHOT</roda.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.gwtproject</groupId>
             <artifactId>gwt-dev</artifactId>
-            <version>2.11.0</version>
+            <version>${gwt.version}</version>
         </dependency>
         <dependency>
             <groupId>org.gwtproject</groupId>
             <artifactId>gwt-codeserver</artifactId>
-            <version>2.11.0</version>
+            <version>${gwt.version}</version>
         </dependency>
         <dependency>
             <groupId>org.gwtproject</groupId>
             <artifactId>gwt-user</artifactId>
-            <version>2.11.0</version>
+            <version>${gwt.version}</version>
         </dependency>
         <dependency>
             <groupId>org.roda-project</groupId>
             <artifactId>roda-common-data</artifactId>
             <classifier>sources</classifier>
-            <version>5.4.0-SNAPSHOT</version>
+            <version>${roda.version}</version>
         </dependency>
         <dependency>
             <groupId>org.roda-project</groupId>
             <artifactId>roda-common-data</artifactId>
-            <version>5.4.0-SNAPSHOT</version>
+            <version>${roda.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
