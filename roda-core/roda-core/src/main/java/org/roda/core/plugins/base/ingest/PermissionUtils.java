@@ -66,6 +66,16 @@ public class PermissionUtils {
           .collect(Collectors.toSet()));
     }
 
+    List<String> adminUser = RodaCoreFactory.getRodaConfigurationAsList("core.aip.default_permissions.admin.user[]");
+
+    for (String name : adminUser) {
+      finalPermissions.setUserPermissions(name,
+        RodaCoreFactory
+          .getRodaConfigurationAsList("core.aip.default_permissions.admin.user[]." + name + ".permission[]").stream()
+          .map(Permissions.PermissionType::valueOf) // Convert string to PermissionType enum
+          .collect(Collectors.toSet()));
+    }
+
     // default creator Permissions
     Set<Permissions.PermissionType> defaultCreatorPermissions = RodaCoreFactory
       .getRodaConfigurationAsList("core.aip.default_permissions.creator.permission[]").stream()
