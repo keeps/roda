@@ -88,7 +88,7 @@
             <plugin>
                 <groupId>net.ltgt.gwt.maven</groupId>
                 <artifactId>gwt-maven-plugin</artifactId>
-                <version>HEAD-SNAPSHOT</version>
+                <version>1.0.1</version>
                 <extensions>true</extensions>
                 <configuration>
                     <moduleName>org.roda.wui.RodaWUI</moduleName>
