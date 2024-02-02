@@ -26,6 +26,7 @@ Ebben a dokumentációsorozatban többek között a következő cikkekről talá
     - [Metadata formats](Metadata_Formats.md)
     - [External Authentication with CAS protocol](Central_Authentication_Service.md)
     - [Disposal feature](Disposal.md)
+    - [Alapértelmezett AIP-engedélyek](Permissions.md)
 - Hozzájárul
     - [Developers guide](Developers_Guide.md)
     - [Translation guide](Translation_Guide.md)
