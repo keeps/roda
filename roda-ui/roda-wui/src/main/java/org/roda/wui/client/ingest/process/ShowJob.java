@@ -899,6 +899,31 @@ public class ShowJob extends Composite {
       }
     }
 
+    String profile = job.getPluginParameters().get(RodaConstants.PLUGIN_PARAMS_CONVERSION_PROFILE);
+    Label profileLabel = new Label("Conversion Profile");
+    Label profileValueLabel = new Label(profile);
+    profileLabel.addStyleName("label");
+    pluginOptions.add(profileLabel);
+    pluginOptions.add(profileValueLabel);
+
+    String profileOptions = job.getPluginParameters().get("parameter.option." + profile);
+    String content = profileOptions.substring(1, profileOptions.length() - 1);
+    String[] profileOptionsArray = content.split(", ");
+
+    for (String optionName : profileOptionsArray) {
+      String optionNameCleaned = optionName.split("\\.")[1].replace("_", " ");
+      String optionNameCapitalized = optionNameCleaned.substring(0, 1).toUpperCase() + optionNameCleaned.substring(1);
+      Label optionLabel = new Label(optionNameCapitalized);
+      optionLabel.addStyleName("label");
+      String optionValue = job.getPluginParameters().get(optionName);
+      if (optionValue.isEmpty()) {
+        break;
+      }
+      Label optionValueLabel = new Label(optionValue);
+      pluginOptions.add(optionLabel);
+      pluginOptions.add(optionValueLabel);
+    }
+
     if (map.get("type").equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_DISSEMINATION)) {
       String title = map.get("title");
       String description = map.get("description");
