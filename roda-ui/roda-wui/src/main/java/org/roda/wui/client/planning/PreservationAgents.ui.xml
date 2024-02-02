@@ -9,6 +9,7 @@
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_12 content">
 				<common:TitlePanel text="{messages.preservationAgentsTitle}" iconClass="IndexedPreservationAgent" />
+				<g:FlowPanel addStyleNames="page-description" ui:field="pageDescription" />
 				<commonsearch:SearchWrapper ui:field="searchWrapper" />
 			</g:FlowPanel>
 		</g:FlowPanel>

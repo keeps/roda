@@ -12,6 +12,7 @@ package org.roda.wui.client.planning;
 
 import java.util.List;
 
+import com.google.gwt.user.client.ui.FlowPanel;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.actions.PreservationAgentActions;
@@ -32,6 +33,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.ClientMessages;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 /**
  * @author Luis Faria
@@ -73,6 +75,9 @@ public class PreservationAgents extends Composite {
   @UiField(provided = true)
   SearchWrapper searchWrapper;
 
+  @UiField
+  FlowPanel pageDescription;
+
   public PreservationAgents() {
     ListBuilder<IndexedPreservationAgent> preservationAgentListBuilder = new ListBuilder<>(
       () -> new PreservationAgentList(),
@@ -82,6 +87,8 @@ public class PreservationAgents extends Composite {
     searchWrapper = new SearchWrapper(false).createListAndSearchPanel(preservationAgentListBuilder);
 
     initWidget(uiBinder.createAndBindUi(this));
+
+    pageDescription.add(new HTMLWidgetWrapper("PreservationAgentsDescription.html"));
   }
 
   /**
