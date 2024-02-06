@@ -35,7 +35,7 @@ jobs:
           distribution: "temurin"
       
       - name: Set up Maven
-        uses: hb0730/maven-action@latest
+        uses: hb0730/maven-action@v1
         with:
           maven-version: 3.9.2
       - name: Cache
