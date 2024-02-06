@@ -33,8 +33,9 @@ jobs:
         with:
           java-version: 21
           distribution: "temurin"
+      
       - name: Set up Maven
-        uses: stCarolas/setup-maven@v4.5
+        uses: hb0730/maven-action@latest
         with:
           maven-version: 3.9.2
       - name: Cache
