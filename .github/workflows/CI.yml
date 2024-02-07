@@ -14,7 +14,7 @@ jobs:
       MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
     services:
       zookeeper:
-        image: zookeeper:3.9
+        image: zookeeper:3.9.1-jre-17
         ports:
           - 2181:2181
       solr:
@@ -35,7 +35,7 @@ jobs:
           java-version: 21
           distribution: 'temurin'
       - name: Set up Maven
-        uses: stCarolas/setup-maven@v4.5
+        uses: hb0730/maven-action@v1
         with:
           maven-version: 3.9.2
       - name: Cache
