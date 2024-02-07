@@ -102,12 +102,35 @@ public class Dialogs {
 
   public static void showLicenseModal(String title, HTML license) {
     final DialogBox dialogBox = new ClosableDialog(true, true);
+
+    VerticalPanel panel = new VerticalPanel();
+
     ScrollPanel layout = new ScrollPanel();
+    layout.setSize("70vw", "80vh");
+
+    FlowPanel footer = new FlowPanel();
+
+    Button closeButton = new Button(messages.closeButton());
+    closeButton.addStyleName("btn btn-link");
+
     layout.setSize("70vw", "80vh");
     layout.addStyleName("wui-dialog-layout");
     layout.setWidget(license);
 
-    dialogBox.setWidget(layout);
+    footer.add(closeButton);
+
+    closeButton.addClickHandler(new ClickHandler() {
+      @Override
+      public void onClick(ClickEvent clickEvent) {
+        dialogBox.hide();
+      }
+    });
+
+    panel.add(layout);
+    panel.add(footer);
+
+    dialogBox.setWidget(panel);
+    footer.addStyleName("wui-dialog-license-layout-footer");
     dialogBox.setText(title);
     dialogBox.addStyleName("wui-dialog-information");
     dialogBox.setGlassEnabled(true);
@@ -188,7 +211,6 @@ public class Dialogs {
     boolean canCopyMessage, final AsyncCallback<Void> callback) {
     final DialogBox dialogBox = new DialogBox(false, true);
     dialogBox.setText(title);
-
     FlowPanel layout = new FlowPanel();
     HTML messageLabel;
 

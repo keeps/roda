@@ -7889,3 +7889,9 @@ span.code {
 }
 
 
+
+.wui-dialog-license-layout-footer {
+     text-align: right;
+     margin-top: 10px;
+     margin-bottom: 5px;
+ }
