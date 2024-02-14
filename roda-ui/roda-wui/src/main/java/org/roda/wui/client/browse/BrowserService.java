@@ -28,8 +28,8 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
+import org.roda.core.data.v2.common.ConversionProfile;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.common.UserProfile;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -199,7 +199,7 @@ public interface BrowserService extends RemoteService {
 
   Set<Pair<String, String>> retrieveDropdownPluginItems(String parameterId, String localeString);
 
-  Set<UserProfile> retrieveUserProfilePluginItems(String pluginId, String repOrDip, String localeString);
+  Set<ConversionProfile> retrieveConversionProfilePluginItems(String pluginId, String repOrDip, String localeString);
 
   CreateIngestJobBundle retrieveCreateIngestProcessBundle();
 

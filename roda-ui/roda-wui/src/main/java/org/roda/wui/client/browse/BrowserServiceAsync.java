@@ -18,7 +18,7 @@ import java.util.Set;
 import org.roda.core.data.v2.accessKey.AccessKey;
 import org.roda.core.data.v2.accessKey.AccessKeys;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.common.UserProfile;
+import org.roda.core.data.v2.common.ConversionProfile;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
@@ -138,8 +138,8 @@ public interface BrowserServiceAsync {
   void retrieveDropdownPluginItems(String parameterId, String localeString,
     AsyncCallback<Set<Pair<String, String>>> asyncCallback);
 
-  void retrieveUserProfilePluginItems(String pluginId, String repOrDip, String localeString,
-                                   AsyncCallback<Set<UserProfile>> asyncCallback);
+  void retrieveConversionProfilePluginItems(String pluginId, String repOrDip, String localeString,
+                                            AsyncCallback<Set<ConversionProfile>> asyncCallback);
 
   void retrieveCreateIngestProcessBundle(AsyncCallback<CreateIngestJobBundle> callback);
 

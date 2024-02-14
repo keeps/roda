@@ -39,8 +39,8 @@ import com.google.gwt.user.client.ui.TextBox;
 import config.i18n.client.ClientMessages;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
+import org.roda.core.data.v2.common.ConversionProfile;
 import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.common.UserProfile;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -486,7 +486,7 @@ public class PluginParameterPanel extends Composite {
   }
 
   private FlowPanel createConversionProfileLayout(String repOrDip, String pluginId) {
-    Set<UserProfile> treeSet = new HashSet<>();
+    Set<ConversionProfile> treeSet = new HashSet<>();
     Label parameterName = new Label("Conversion Profile");
     final Label description = new Label();
     final ListBox dropdown = new ListBox();
@@ -497,8 +497,8 @@ public class PluginParameterPanel extends Composite {
     FlowPanel panel = new FlowPanel();
     FlowPanel descriptionPanel = new FlowPanel();
 
-    BrowserService.Util.getInstance().retrieveUserProfilePluginItems(pluginId, repOrDip,
-      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<Set<UserProfile>>() {
+    BrowserService.Util.getInstance().retrieveConversionProfilePluginItems(pluginId, repOrDip,
+      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<Set<ConversionProfile>>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -506,18 +506,18 @@ public class PluginParameterPanel extends Composite {
         }
 
         @Override
-        public void onSuccess(Set<UserProfile> result) {
+        public void onSuccess(Set<ConversionProfile> result) {
           treeSet.addAll(result);
-          for (UserProfile item : treeSet) {
+          for (ConversionProfile item : treeSet) {
             dropdown.addItem(item.getTitle(), item.getProfile());
             description.setText(item.getDescription());
             description.addStyleName(FORM_HELP);
           }
 
           profile = dropdown.getSelectedValue();
-          for (UserProfile userProfile : treeSet) {
-            if (userProfile.getProfile().equals(profile)) {
-              description.setText(userProfile.getDescription());
+          for (ConversionProfile conversionProfile : treeSet) {
+            if (conversionProfile.getProfile().equals(profile)) {
+              description.setText(conversionProfile.getDescription());
               break;
             }
           }
@@ -526,9 +526,9 @@ public class PluginParameterPanel extends Composite {
 
     dropdown.addChangeHandler(event -> {
       profile = dropdown.getSelectedValue();
-      for (UserProfile userProfile : treeSet) {
-        if (userProfile.getProfile().equals(profile)) {
-          description.setText(userProfile.getDescription());
+      for (ConversionProfile conversionProfile : treeSet) {
+        if (conversionProfile.getProfile().equals(profile)) {
+          description.setText(conversionProfile.getDescription());
           break;
         }
       }
@@ -540,7 +540,7 @@ public class PluginParameterPanel extends Composite {
 
     dropdown.setTitle(OBJECT_BOX);
     result.add(parameterName);
-    addHelp(result, "User profile options");
+    addHelp(result, "Conversion profile options");
     result.add(panel);
     result.add(descriptionPanel);
     return result;
