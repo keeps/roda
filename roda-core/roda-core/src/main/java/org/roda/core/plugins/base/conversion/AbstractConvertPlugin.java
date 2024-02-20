@@ -72,6 +72,9 @@ import org.roda.core.util.IdUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * @deprecated It will be removed in the next major version.
+ */
 public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends AbstractAIPComponentsPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractConvertPlugin.class);
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
@@ -92,8 +95,8 @@ public abstract class AbstractConvertPlugin<T extends IsRODAObject> extends Abst
         "Do not process files that have a different format from the indicated."));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP,
-      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP,
-        "Outcome", PluginParameterType.CONVERSION)
+      new PluginParameter.PluginParameterBuilder(RodaConstants.PLUGIN_PARAMS_REPRESENTATION_OR_DIP, "Outcome",
+        PluginParameterType.CONVERSION)
         .withDescription(
           "A conversion can create a representation or a dissemination. Please choose which option to output")
         .build());

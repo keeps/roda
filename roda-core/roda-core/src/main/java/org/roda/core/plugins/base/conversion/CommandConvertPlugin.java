@@ -18,17 +18,21 @@ import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 
+/**
+ * @deprecated It will be removed in the next major version.
+ */
 public abstract class CommandConvertPlugin<T extends IsRODAObject> extends AbstractConvertPlugin<T> {
 
-  private String commandArguments;
-
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS, "Command arguments",
         PluginParameterType.STRING, "", true, false,
         "Command arguments that will be passed to the command of the tool as configured (advanced users only!)"));
   }
+
+  private String commandArguments;
 
   protected CommandConvertPlugin() {
     super();
