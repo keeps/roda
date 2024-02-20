@@ -419,6 +419,11 @@ public class PluginParameter implements Serializable {
     CONVERSION_PROFILE,
 
     /**
+     * Interface to validation profiles
+     */
+    VALIDATION_PROFILE,
+
+    /**
      * Interface to conversion plugins
      */
     CONVERSION

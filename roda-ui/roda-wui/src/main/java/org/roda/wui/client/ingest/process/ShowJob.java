@@ -348,10 +348,10 @@ public class ShowJob extends Composite {
           createPluginSipToAipLayout(parameter);
         } else if (PluginParameterType.AIP_ID.equals(parameter.getType())) {
           createSelectAipLayout(parameter);
-        } else if (PluginParameterType.CONVERSION_PROFILE.equals(parameter.getType())) {
-          createConvertProfileLayout(parameter);
         } else if (PluginParameterType.CONVERSION.equals(parameter.getType())) {
           createConversionLayout(parameter);
+        } else if (PluginParameterType.VALIDATION_PROFILE.equals(parameter.getType())) {
+          createValidationProfileLayout(parameter);
         } else {
           createStringLayout(parameter);
         }
@@ -886,6 +886,10 @@ public class ShowJob extends Composite {
         profileParameterLabel.addStyleName("label");
       }
     }
+  }
+
+  private void createValidationProfileLayout(PluginParameter parameter) {
+
   }
 
   private void createConversionLayout(PluginParameter parameter) {
