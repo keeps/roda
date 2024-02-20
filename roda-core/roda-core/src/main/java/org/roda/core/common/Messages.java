@@ -13,7 +13,6 @@ import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
@@ -30,8 +29,6 @@ import org.apache.commons.configuration2.tree.NodeCombiner;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.Iterators;
 
 public class Messages {
   private static final Logger LOGGER = LoggerFactory.getLogger(Messages.class);

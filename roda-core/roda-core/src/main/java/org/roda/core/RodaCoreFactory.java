@@ -38,10 +38,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -329,9 +331,20 @@ public class RodaCoreFactory {
 
   private static HTTPServer prometheusMetricsServer;
 
+  private static Map<String, Function<Locale, ResourceBundle>> pluginMessageRegistry = new HashMap<>();
+
   /** Private empty constructor */
   private RodaCoreFactory() {
     // do nothing
+  }
+
+  public static void addPluginMessagesProvider(String pluginId, Function<Locale, ResourceBundle> provider) {
+    LOGGER.info("Added resource bundle provider for {}", pluginId);
+    pluginMessageRegistry.put(pluginId, provider);
+  }
+
+  public static ResourceBundle getPluginMessages(String pluginId, Locale locale) {
+    return pluginMessageRegistry.get(pluginId).apply(locale);
   }
 
   public static void addDefaultConfiguration(String configuration) {

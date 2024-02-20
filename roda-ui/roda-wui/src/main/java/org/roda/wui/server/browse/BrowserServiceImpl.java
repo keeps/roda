@@ -17,10 +17,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.Set;
 
-import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.roda.core.RodaCoreFactory;
@@ -133,6 +134,8 @@ import org.roda.wui.servlets.ContextListener;
 import org.roda_project.commons_ip.model.RepresentationContentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gwt.user.server.rpc.jakarta.RemoteServiceServlet;
 
 import it.burning.cron.CronExpressionDescriptor;
 
@@ -626,36 +629,50 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     List<String> dropdownItems = RodaUtils.copyList(
       RodaCoreFactory.getRodaConfiguration().getList("core.plugins.conversion.profile." + pluginName + ".profiles[]"));
     Locale locale = ServerTools.parseLocale(localeString);
-    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+
+    ResourceBundle pluginMessages = RodaCoreFactory.getPluginMessages(pluginId, locale);
 
     for (String item : dropdownItems) {
-      ConversionProfile conversionProfile = retrieveConversionProfileItem(item, pluginName, messages);
-      if (conversionProfile != null) {
-        if (repOrDip.equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_REPRESENTATION)
-          && conversionProfile.canBeUsedForRepresentation()) {
-          items.add(conversionProfile);
-        }
+      ConversionProfile conversionProfile = retrieveConversionProfileItem(item, pluginName, pluginMessages);
+      if (repOrDip.equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_REPRESENTATION)
+        && conversionProfile.canBeUsedForRepresentation()) {
+        items.add(conversionProfile);
+      }
 
-        if (repOrDip.equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_DISSEMINATION)
-          && conversionProfile.canBeUsedForDissemination()) {
-          items.add(conversionProfile);
-        }
+      if (repOrDip.equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_DISSEMINATION)
+        && conversionProfile.canBeUsedForDissemination()) {
+        items.add(conversionProfile);
       }
     }
 
     return items;
   }
 
-  private ConversionProfile retrieveConversionProfileItem(String item, String pluginName, Messages messages) {
+  private ConversionProfile retrieveConversionProfileItem(String item, String pluginName,
+    ResourceBundle resourceBundle) {
     ConversionProfile conversionProfile = new ConversionProfile();
     Map<String, String> optionsValues = new HashMap<>();
 
     String i18nKey = RodaCoreFactory.getRodaConfiguration()
       .getString("core.plugins.conversion.profile." + pluginName + ".profiles.i18nPrefix");
 
-    conversionProfile.setTitle(messages.getTranslation(i18nKey + "." + item + ".title", i18nKey + "." + item + ".title"));
-    conversionProfile.setDescription(
-      messages.getTranslation(i18nKey + "." + item + ".description", i18nKey + "." + item + ".description"));
+    String title;
+    String description;
+
+    try {
+      title = resourceBundle.getString(i18nKey + "." + item + ".title");
+    } catch (MissingResourceException e) {
+      title = i18nKey + "." + item + ".title";
+    }
+
+    try {
+      description = resourceBundle.getString(i18nKey + "." + item + ".description");
+    } catch (MissingResourceException e) {
+      description = i18nKey + "." + item + ".description";
+    }
+
+    conversionProfile.setTitle(title);
+    conversionProfile.setDescription(description);
     conversionProfile.setProfile(item);
 
     conversionProfile.setCanBeUsedForDissemination(RodaCoreFactory.getRodaConfiguration()
