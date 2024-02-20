@@ -10,6 +10,7 @@ package org.roda.core.data.v2.ip;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IsModelObject;
@@ -40,7 +41,7 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
   private List<Representation> representations;
 
   private String ingestSIPUUID = "";
-  private List<String> ingestSIPIds;
+  private List<String> ingestSIPIds = new ArrayList<>();
   private String ingestJobId = "";
   private List<String> ingestUpdateJobIds = new ArrayList<>();
 
@@ -423,30 +424,29 @@ public class AIP implements IsModelObject, HasId, HasState, HasPermissions, HasD
 
     AIP aip = (AIP) o;
 
-    if (id != null ? !id.equals(aip.id) : aip.id != null)
+    if (!Objects.equals(id, aip.id))
       return false;
-    if (parentId != null ? !parentId.equals(aip.parentId) : aip.parentId != null)
+    if (!Objects.equals(parentId, aip.parentId))
       return false;
-    if (type != null ? !type.equals(aip.type) : aip.type != null)
+    if (!Objects.equals(type, aip.type))
       return false;
-    if (instanceId != null ? !instanceId.equals(aip.instanceId) : aip.instanceId != null)
+    if (!Objects.equals(instanceId, aip.instanceId))
       return false;
     if (state != aip.state)
       return false;
-    if (permissions != null ? !permissions.equals(aip.permissions) : aip.permissions != null)
+    if (!Objects.equals(permissions, aip.permissions))
       return false;
-    if (descriptiveMetadata != null ? !descriptiveMetadata.equals(aip.descriptiveMetadata)
-      : aip.descriptiveMetadata != null)
+    if (!Objects.equals(descriptiveMetadata, aip.descriptiveMetadata))
       return false;
-    if (representations != null ? !representations.equals(aip.representations) : aip.representations != null)
+    if (!Objects.equals(representations, aip.representations))
       return false;
-    if (ingestSIPIds != null ? !ingestSIPIds.equals(aip.ingestSIPIds) : aip.ingestSIPIds != null)
+    if (!Objects.equals(ingestSIPIds, aip.ingestSIPIds))
       return false;
-    if (ingestJobId != null ? !ingestJobId.equals(aip.ingestJobId) : aip.ingestJobId != null)
+    if (!Objects.equals(ingestJobId, aip.ingestJobId))
       return false;
-    if (ghost != null ? !ghost.equals(aip.ghost) : aip.ghost != null)
+    if (!Objects.equals(ghost, aip.ghost))
       return false;
-    return disposal != null ? disposal.equals(aip.disposal) : aip.disposal == null;
+    return Objects.equals(disposal, aip.disposal);
 
   }
 
