@@ -26,7 +26,8 @@ I denna serie av dokumentation hittar du bland annat artiklar med information om
     - [Metadataformat](Metadata_Formats.md)
     - [Extern autentisering med CAS-protokoll](Central_Authentication_Service.md)
     - [Gallringsfunktioner](Disposal.md)
-- Bidra
+    - [Default AIP Permissions](Permissions.md)
+- Bidrar
     - [Utvecklarguide](Developers_Guide.md)
     - [Översättningsguide](Translation_Guide.md)
     - [Dokumentationsguide](Documentation_Guide.md)
