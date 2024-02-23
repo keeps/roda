@@ -1,10 +1,10 @@
 /**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE file at the root of the source
- * tree and available online at
- *
- * https://github.com/keeps/roda
- */
+* The contents of this file are subject to the license and copyright
+* detailed in the LICENSE file at the root of the source
+* tree and available online at
+*
+* https://github.com/keeps/roda
+*/
 package org.roda.core.common;
 
 import java.io.IOException;
@@ -20,13 +20,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.xml.XMLConstants;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.util.ValidationEventCollector;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
@@ -64,6 +59,7 @@ import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
@@ -106,6 +102,11 @@ import gov.loc.premis.v3.RelationshipComplexType;
 import gov.loc.premis.v3.Representation;
 import gov.loc.premis.v3.StorageComplexType;
 import gov.loc.premis.v3.StringPlusAuthority;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.util.ValidationEventCollector;
 
 public final class PremisV3Utils {
 
@@ -184,6 +185,23 @@ public final class PremisV3Utils {
 
   }
 
+  public static void updateTechnicalMetadata(gov.loc.premis.v3.File file, TechnicalMetadata technicalMetadata)
+    throws JAXBException {
+
+    String type = technicalMetadata.getType();
+    ExtensionComplexType ect = null;
+    if (StringUtils.isNotBlank(type)) {
+      ect = getTechnicalMetadata(file, type);
+    }
+
+    // Create element based on the class technicalMetadata
+    JAXBElement<TechnicalMetadata> dataElement = new JAXBElement<>(new QName("metadata", type), TechnicalMetadata.class,
+      technicalMetadata.getTechnicalMetadataElement().getSubClass(), technicalMetadata);
+
+    // Add to objectCharacteristicsExtension
+    ect.getAny().add(dataElement);
+  }
+
   public static void updateCreatingApplication(gov.loc.premis.v3.File file, String creatingApplicationName,
     String creatingApplicationVersion, String dateCreatedByApplication) {
     if (StringUtils.isNotBlank(creatingApplicationName)) {
@@ -216,6 +234,33 @@ public final class PremisV3Utils {
     cact = occt.getCreatingApplication().get(0);
 
     return cact;
+  }
+
+  private static ExtensionComplexType getTechnicalMetadata(gov.loc.premis.v3.File f, String type) {
+
+    ObjectCharacteristicsComplexType occt;
+
+    if (f.getObjectCharacteristics() == null || f.getObjectCharacteristics().isEmpty()) {
+      occt = FACTORY.createObjectCharacteristicsComplexType();
+      ExtensionComplexType extensionComplexType = FACTORY.createExtensionComplexType();
+      occt.getObjectCharacteristicsExtension().add(extensionComplexType);
+      f.getObjectCharacteristics().add(occt);
+      return extensionComplexType;
+    }
+
+    for (ObjectCharacteristicsComplexType complexType : f.getObjectCharacteristics()) {
+      for (ExtensionComplexType ect : complexType.getObjectCharacteristicsExtension()) {
+        if (ect.getAny().get(0).toString().contains(type)) {
+          ect.getAny().remove(0);
+          return ect;
+        }
+      }
+    }
+    occt = FACTORY.createObjectCharacteristicsComplexType();
+    ExtensionComplexType extensionComplexType = FACTORY.createExtensionComplexType();
+    occt.getObjectCharacteristicsExtension().add(extensionComplexType);
+    f.getObjectCharacteristics().add(occt);
+    return extensionComplexType;
   }
 
   public static FormatRegistryComplexType getFormatRegistry(gov.loc.premis.v3.File file, String registryName) {
@@ -674,6 +719,12 @@ public final class PremisV3Utils {
           doc.addField(RodaConstants.FILE_CREATING_APPLICATION_VERSION, cact.getCreatingApplicationVersion());
           doc.addField(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION, cact.getDateCreatedByApplication());
         }
+
+        SolrInputDocument docTechnicalMetadata = SolrUtils.getTechnicalMetadataFields(premisBinary, "premis", "3");
+
+        for (String key : docTechnicalMetadata.getFieldNames()) {
+          doc.addField(key, docTechnicalMetadata.getFieldValue(key));
+        }
       }
 
     } catch (IOException e) {
@@ -1036,6 +1087,62 @@ public final class PremisV3Utils {
     } catch (RODAException | IOException e) {
       LOGGER.error("PREMIS will not be updated due to an error", e);
     }
+  }
+
+  public static void updateCreatingApplicationTechnicalMetadata(ModelService model, String aipId,
+    String representationId, List<String> fileDirectoryPath, String fileId, String username, boolean notify,
+    TechnicalMetadata technicalMetadata) {
+    Binary premisBin;
+
+    try {
+      try {
+        premisBin = model.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
+      } catch (NotFoundException e) {
+        LOGGER.debug("PREMIS object skeleton does not exist yet. Creating PREMIS object!");
+        List<String> algorithms = RodaCoreFactory.getFixityAlgorithms();
+        PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, aipId, representationId, algorithms,
+          username);
+        premisBin = model.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
+        LOGGER.debug("PREMIS object skeleton created");
+      }
+
+      gov.loc.premis.v3.File premisFile = binaryToFile(premisBin.getContent(), false);
+
+      PremisV3Utils.updateTechnicalMetadata(premisFile, technicalMetadata);
+      PreservationMetadataType pmtype = PreservationMetadataType.FILE;
+      String id = IdUtils.getPreservationFileId(fileId, RODAInstanceUtils.getLocalInstanceIdentifier());
+      MetadataUtils.addAdditionalClasses(technicalMetadata.getTechnicalMetadataElement().getSubClass());
+      ContentPayload premisFilePayload = fileToBinary(premisFile);
+      model.updatePreservationMetadata(id, pmtype, aipId, representationId, fileDirectoryPath, fileId,
+        premisFilePayload, username, notify);
+    } catch (RODAException | IOException | JAXBException e) {
+      LOGGER.error("PREMIS will not be updated due to an error", e);
+    }
+  }
+
+  public static List<String> getApplicationTechnicalMetadataParameters(ModelService model, String aipId,
+    String representationId, List<String> fileDirectoryPath, String fileId) {
+    Binary premisBin = null;
+    List<String> parameters = null;
+    try {
+      try {
+        premisBin = model.retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId);
+      } catch (NotFoundException e) {
+        LOGGER.debug("PREMIS object skeleton does not exist");
+      }
+
+      parameters = getTechnicalMetadataParameters(premisBin);
+
+    } catch (RODAException | IOException e) {
+      LOGGER.error("Error fetching technical parameters", e);
+    }
+    return parameters;
+  }
+
+  private static List<String> getTechnicalMetadataParameters(Binary premisFile) throws IOException {
+
+    return XMLUtility.getListString(premisFile.getContent().createInputStream(),
+      "//featureExtractor/@featureExtractorType | //@featureExtractorVersion");
   }
 
   private static Representation binaryToRepresentation(InputStream binaryInputStream, boolean validate)

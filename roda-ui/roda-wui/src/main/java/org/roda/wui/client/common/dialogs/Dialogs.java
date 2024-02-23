@@ -7,10 +7,6 @@
  */
 package org.roda.wui.client.common.dialogs;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.search.SearchSuggestBox;
@@ -144,8 +140,8 @@ public class Dialogs {
     showInformationDialog(title, message, continueButtonText, canCopyMessage, new NoAsyncCallback<>());
   }
 
-  public static void showTechnicalMetadataInformation(String title, HashMap<String, String> tikaValues,
-    String downloadText, String closeText, IndexedFile file) {
+  public static void showTechnicalMetadataInformation(String title, String downloadText, String closeText,
+    IndexedFile file, String html) {
     final DialogBox dialogBox = new ClosableDialog(true, true);
     FlowPanel main = new FlowPanel();
     ScrollPanel layout = new ScrollPanel();
@@ -155,21 +151,13 @@ public class Dialogs {
     layout.setSize("70vw", "60vh");
 
     VerticalPanel verticalPanel = new VerticalPanel();
-    // verticalPanel.setWidth("100%");
-
-    for (Map.Entry<String, String> entry : tikaValues.entrySet()) {
-      String key = entry.getKey();
-      String value = entry.getValue();
-
-      // Wrap key and value in <b> and <span> tags for styling, respectively
-      // String tooltipText = value;
-      String keyHtmlString = "<b>" + key + "</b>: <span title='" + value + "'>" + value + "</span><br>";
-
-      // Use setHTML instead of the HTML constructor
-      HTML keyHtml = new HTML(keyHtmlString);
-      keyHtml.setStyleName("value-overflow");
-      verticalPanel.add(keyHtml);
+    verticalPanel.setWidth("100%");
+    if (html == null) {
+      html = "<div><p>No technical metadata found. Please contact system administrator</p></div>";
     }
+    HTML keyHtml = new HTML(html);
+    keyHtml.setStyleName("value-overflow");
+    verticalPanel.add(keyHtml);
 
     layout.add(verticalPanel);
     layout.addStyleName("wui-dialog-message");
@@ -189,13 +177,8 @@ public class Dialogs {
     });
 
     downloadButton.addClickHandler(event -> {
-      // RepresentationActions
-      SafeUri downloadUri = RestUtils.createRepresentationOtherMetadataFileDownloadUri(file.getAipId(),
-        file.getRepresentationId(), file.getId(), RodaConstants.OTHER_METADATA_TYPE_APACHE_TIKA,
-        RodaConstants.TIKA_FILE_SUFFIX_METADATA);
+      SafeUri downloadUri = RestUtils.createTechnicalMetadataHTMLUri(file.getAipId(), file.getUUID(), "bin", null);
       Window.Location.assign(downloadUri.asString());
-      // Toast.showInfo(messages.copiedToClipboardTitle(),
-      // messages.copiedToClipboardMessage());
     });
 
     dialogBox.setWidget(main);

@@ -15,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.core.data.v2.validation.ValidationReport;
@@ -38,6 +39,8 @@ import jakarta.xml.bind.util.ValidationEventCollector;
 public final class MetadataUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(MetadataUtils.class);
 
+  private static List<Class<?>> additionalClasses = new ArrayList<>();
+
   /** Private empty constructor */
   private MetadataUtils() {
 
@@ -57,7 +60,18 @@ public final class MetadataUtils {
     throws ValidationException {
     try {
       StringWriter writer = new StringWriter();
-      JAXBContext jaxbContext = JAXBContext.newInstance(tClass);
+
+      //Add tClass to class list
+      additionalClasses.add(tClass);
+
+      // Copy existing classes to the new array
+      Class<?>[] classesArray = additionalClasses.toArray(new Class<?>[0]);
+
+      //clean array
+      additionalClasses.clear();
+
+      // Add the new class to the end of the new array
+      JAXBContext jaxbContext = JAXBContext.newInstance(classesArray);
       Marshaller marshaller = jaxbContext.createMarshaller();
       marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
       marshaller.marshal(object, writer);
@@ -82,5 +96,11 @@ public final class MetadataUtils {
 
     report.setIssues(issues);
     return report;
+  }
+
+  public static void addAdditionalClasses(Class additionalClass) {
+    additionalClasses.add(TechnicalMetadataElement.class);
+    additionalClasses.add(TechnicalMetadata.class);
+    additionalClasses.add(additionalClass);
   }
 }

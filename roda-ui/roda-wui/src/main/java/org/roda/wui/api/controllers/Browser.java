@@ -36,6 +36,7 @@ import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.TechnicalMetadataNotFoundException;
 import org.roda.core.data.v2.common.ObjectPermissionResult;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
@@ -770,6 +771,34 @@ public class Browser extends RodaWuiController {
       controllerAssistant.registerAction(user, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
         RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId, RodaConstants.CONTROLLER_METADATA_ID_PARAM,
         metadataId);
+    }
+  }
+
+  public static EntityResponse retrieveFilePreservationMetadata(User user, String aipId, String fileId,
+    String acceptFormat, String language)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException, TechnicalMetadataNotFoundException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // validate input
+    BrowserHelper.validateGetPreservationMetadataParams(acceptFormat);
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
+      controllerAssistant.checkObjectPermissions(user, aip);
+
+      // delegate
+      return BrowserHelper.retrieveFilePreservationMetadata(aipId, fileId, acceptFormat, language);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, aipId, state, RodaConstants.CONTROLLER_METADATA_ID_PARAM, fileId);
     }
   }
 
@@ -3715,6 +3744,11 @@ public class Browser extends RodaWuiController {
       // register action
       controllerAssistant.registerAction(user, state);
     }
+  }
+
+  public static EntityResponse retrieveFilePreservationFile(User user, String aipId, String fileId,
+    String acceptFormat) {
+    return null;
   }
 
 }

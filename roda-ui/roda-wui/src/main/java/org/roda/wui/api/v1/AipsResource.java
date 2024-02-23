@@ -478,6 +478,49 @@ public class AipsResource {
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Preservation file deleted"), mediaType).build();
   }
 
+  // GET file premis
+  @GET
+  @Path("/{" + RodaConstants.API_PATH_PARAM_AIP_ID + "}/" + RodaConstants.API_PRESERVATION_METADATA + "/{"
+    + RodaConstants.API_PATH_PARAM_FILE_ID + "}")
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, ExtraMediaType.APPLICATION_ZIP,
+    ExtraMediaType.APPLICATION_JAVASCRIPT})
+  @JSONP(callback = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK, queryParam = RodaConstants.API_QUERY_KEY_JSONP_CALLBACK)
+  @Operation(summary = "Get representation preservation file", description = "Get a preservation file to a representation", responses = {
+    @ApiResponse(responseCode = "200", description = "OK", content = @Content(schema = @Schema(implementation = PreservationMetadata.class))),
+    @ApiResponse(responseCode = "404", description = "Not found", content = @Content(schema = @Schema(implementation = ApiResponseMessage.class)))})
+  public Response getPreservationMetadata(
+    @Parameter(description = "The ID of the existing AIP") @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
+    @Parameter(description = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_ID) String fileId,
+    @Parameter(description = "The ID of the existing metadata file version to retrieve", required = true) @QueryParam(RodaConstants.API_QUERY_PARAM_VERSION_ID) String versionId,
+    @Parameter(description = "Choose preservation metadata type", schema = @Schema(allowableValues = {"REPRESENTATION",
+      "FILE", "INTELLECTUAL_ENTITY", "AGENT", "EVENT", "RIGHTS_STATEMENT", "ENVIRONMENT",
+      "OTHER"}, defaultValue = "FILE", required = true)) @QueryParam(RodaConstants.API_QUERY_PARAM_TYPE) String type,
+    @Parameter(description = "Choose format in which to get the response", schema = @Schema(implementation = RodaConstants.APIMediaTypes.class)) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @Parameter(description = "The language for the HTML output", schema = @Schema(implementation = RodaConstants.DescriptibeMetadataLanguages.class, defaultValue = RodaConstants.API_QUERY_VALUE_LANG_DEFAULT)) @DefaultValue(RodaConstants.API_QUERY_VALUE_LANG_DEFAULT) @QueryParam(RodaConstants.API_QUERY_KEY_LANG) String language,
+    @Parameter(description = "JSONP callback name", required = false, schema = @Schema(defaultValue = RodaConstants.API_QUERY_DEFAULT_JSONP_CALLBACK)) @QueryParam(RodaConstants.API_QUERY_KEY_JSONP_CALLBACK) String jsonpCallbackName)
+    throws RODAException {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+
+    // get user
+    User user = UserUtility.getApiUser(request);
+
+    // delegate action to controller
+    EntityResponse filePreservationMetadata = null;
+    if (versionId == null) {
+      filePreservationMetadata = Browser.retrieveFilePreservationMetadata(user, aipId, fileId, acceptFormat, language);
+    } else {
+      filePreservationMetadata = Browser.retrieveAIPDescriptiveMetadataVersion(user, aipId, fileId, versionId,
+        acceptFormat, language);
+    }
+
+    if (filePreservationMetadata instanceof ObjectResponse) {
+      ObjectResponse<DescriptiveMetadata> dm = (ObjectResponse<DescriptiveMetadata>) filePreservationMetadata;
+      return Response.ok(dm.getObject(), mediaType).build();
+    } else {
+      return ApiUtils.okResponse((StreamResponse) filePreservationMetadata);
+    }
+  }
+
   /*** OTHER METADATA ****/
 
   @GET
