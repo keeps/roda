@@ -27,22 +27,21 @@ O Ficheiro de metadados contém as informações necessárias para que o Market 
 - O nome do ficheiro deve ser o classname do plugin e.g. `org.roda.core.plugins.external.AIPValidatorPlugin.json`
 - Deve conter os seguintes campos:
 
-| Name                | Description                                                                                                         |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| id                  | O classname do plugin                                                                                               |
-| name                | O nome que será exibido no Market e na interface RODA                                                               |
-| type                | O Tipo do plugin                                                                                                    |
-| version             | A versão do plugin                                                                                                  |
-| description         | A descrição que será exibida no Market e na interface RODA                                                          |
-| license             | Nome da licensa e endereço para a licensa                                                                           |
-| homepage            | Uma URL para ou o repositório git do plugin ou uma página Web com detalhes sobre como obter o plug-in               |
-| vendor              | O nome do fornecedor do plugin                                                                                      |
-| minSupportedVersion | Versão RODA mínima suportada pelo plugin                                                                            |
-| maxSupportedVersion | Versão RODA máxima suportada pelo plugin                                                                            |
-| price               | Custo do plugin                                                                                                     |
-| plugin              | As categorias em que o plugin se encaixa, o classname dos objetos do RODA que podem ser alvo do plugin e o seu tipo |
-| lang                | Linguagens suportadas por este plugin                                                                               |
-| region              | Regiões suportadas por este plugin                                                                                  |
+| Name          | Description                                                                                                         |
+|---------------|---------------------------------------------------------------------------------------------------------------------|
+| id            | O classname do plugin                                                                                               |
+| name          | O nome que será exibido no Market e na interface RODA                                                               |
+| type          | O Tipo do plugin                                                                                                    |
+| version       | A versão do plugin                                                                                                  |
+| description   | A descrição que será exibida no Market e na interface RODA                                                          |
+| license       | Nome da licensa e endereço para a licensa                                                                           |
+| homepage      | Uma URL para ou o repositório git do plugin ou uma página Web com detalhes sobre como obter o plug-in               |
+| vendor        | O nome do fornecedor do plugin                                                                                      |
+| compatibility | Lista de versões do RODA suportadas pelo plugin                                                                     |
+| price         | Custo do plugin                                                                                                     |
+| plugin        | As categorias em que o plugin se encaixa, o classname dos objetos do RODA que podem ser alvo do plugin e o seu tipo |
+| lang          | Linguagens suportadas por este plugin                                                                               |
+| region        | Regiões suportadas por este plugin                                                                                  |
 
 Exemplo do ficheiro org.roda.core.plugins.external.AIPValidatorPlugin.json
 ```json
@@ -61,8 +60,7 @@ Exemplo do ficheiro org.roda.core.plugins.external.AIPValidatorPlugin.json
         "name": "KEEP SOLUTIONS",
         "homepage": "https://keep.pt"
     },
-    "minSupportedVersion": "4",
-    "maxSupportedVersion": "5",
+    "compatibility": ["RODA Enterprise 5"],
     "price": "paid",
     "plugin": {
         "objectClasses": [

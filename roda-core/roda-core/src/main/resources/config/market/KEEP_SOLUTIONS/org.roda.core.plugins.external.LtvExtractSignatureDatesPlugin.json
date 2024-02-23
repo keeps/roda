@@ -13,8 +13,7 @@
     "name": "KEEP Solutions",
     "homepage": "https://keep.pt"
   },
-  "minSupportedVersion": "3",
-  "maxSupportedVersion": "5",
+  "compatibility": ["RODA Enterprise 5"],
   "price": "paid",
   "plugin": {
     "objectClasses": [

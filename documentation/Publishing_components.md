@@ -27,22 +27,21 @@ The metadata file contains the necessary information for the Market and RODA to 
 - The file name must be the classname e.g. `dropFolders.json`
 - It must contain the following fields:
 
-| Name                | Description                                                                                    |
-| ------------------- | ---------------------------------------------------------------------------------------------- |
-| id                  | The component  classname                                                                       |
-| name                | The name that will be displayed in the Market and in the RODA interface                        |
-| type                | Component  type                                                                                |
-| version             | Component version                                                                              |
-| description         | The description that will be displayed in the Market and in the RODA interface                 |
-| license             | Name of the license and url to license                                                         |
-| homepage            | A URL to the Marketplace's git repository or a web page with details on how to obtain the item |
-| vendor              | The component vendor name and link to vendor's homepage                                        |
-| minSupportedVersion | Minimum major RODA version supported by the component                                          |
-| maxSupportedVersion | Maximum major RODA version supported by the component                                          |
-| price               | component's price                                                                              |
-| plugin              | Leave this attribute as shown below                                                            |
-| lang                | Languages supported by this component                                                          |
-| region              | Regions supported by this component                                                            |
+| Name          | Description                                                                                    |
+|---------------|------------------------------------------------------------------------------------------------|
+| id            | The component  classname                                                                       |
+| name          | The name that will be displayed in the Market and in the RODA interface                        |
+| type          | Component  type                                                                                |
+| version       | Component version                                                                              |
+| description   | The description that will be displayed in the Market and in the RODA interface                 |
+| license       | Name of the license and url to license                                                         |
+| homepage      | A URL to the Marketplace's git repository or a web page with details on how to obtain the item |
+| vendor        | The component vendor name and link to vendor's homepage                                        |
+| compatibility | List of RODA versions supported by the component                                               |
+| price         | component's price                                                                              |
+| plugin        | Leave this attribute as shown below                                                            |
+| lang          | Languages supported by this component                                                          |
+| region        | Regions supported by this component                                                            |
 
 
 e.g. component file dropFolders.json
@@ -62,8 +61,7 @@ e.g. component file dropFolders.json
       "name": "KEEP SOLUTIONS",
       "homepage": "https://keep.pt"
     },
-    "minSupportedVersion": "4",
-    "maxSupportedVersion": "5",
+    "compatibility": ["RODA Enterprise 5"],
     "price": "paid",
     "plugin": {
       "objectClasses": [],
