@@ -1,5 +1,31 @@
 # Changelog
 
+## v5.4.0 (08/02/2024)
+#### New features
+-  Technological platforms major upgrade, which largely improves overall security, maintanability and performance #3055
+-  Adding support for the latest version of the [E-ARK SIP specification](https://dilcis.eu/specifications/sip) (version 2.1.0) #3046
+-  Support [trusting the your own plugins](https://github.com/keeps/roda/blob/master/documentation/Plugin_signing.md) #3059
+
+#### Enhancements
+-  Added help text to Agents register page that was missing #2831 
+-  Added close button to license popup #2975
+-  Improved documentation about default permissions #3045
+- Other small improvements #3063
+
+#### Bug fixes
+-  Fixed "Clear" button in search component that did not behave as expected #3062
+-  Fixed the Event Register menu entry that did not match the title of page #2832
+-  Fixed Date and time of last transfer resource refresh in RODA interface only updated when reloading the page #3038 
+-  Fixed default permissions issue when reading admin user permissions from configuration #3066 
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.3.1 (11/01/2024)
 #### Bug fixes:
 - Changed default permissions to old behaviour #3043
@@ -481,17 +507,4 @@ docker pull keeps/roda:v3.6.1
 Install for demonstration:
 ```
 docker pull keeps/roda:v4.2.0
-```
-
----
-
-## v3.6.0 (17/01/2022)
-New features:
-
-- Job orchestration #1981
-- Add prometheus metrics for HTTP notification system #1982
-
-Install for demonstration:
-```
-docker pull keeps/roda:v3.6
 ```
