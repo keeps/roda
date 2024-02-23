@@ -43,10 +43,8 @@ public class MarketInfo implements Serializable {
   private String homepage = null;
   @JsonProperty("vendor")
   private Vendor vendor = new Vendor();
-  @JsonProperty("minSupportedVersion")
-  private String minSupportedVersion = null;
-  @JsonProperty("maxSupportedVersion")
-  private String maxSupportedVersion = null;
+  @JsonProperty("compatibility")
+  private List<String> compatibility = null;
 
   public MarketInfo() {
   }
@@ -165,20 +163,12 @@ public class MarketInfo implements Serializable {
     this.pluginProperties = pluginProperties;
   }
 
-  public String getMinSupportedVersion() {
-    return minSupportedVersion;
+  public List<String> getCompatibility() {
+    return compatibility;
   }
 
-  public void setMinSupportedVersion(String minSupportedVersion) {
-    this.minSupportedVersion = minSupportedVersion;
-  }
-
-  public String getMaxSupportedVersion() {
-    return maxSupportedVersion;
-  }
-
-  public void setMaxSupportedVersion(String maxSupportedVersion) {
-    this.maxSupportedVersion = maxSupportedVersion;
+  public void setCompatibility(List<String> compatibility) {
+    this.compatibility = compatibility;
   }
 
   @Override
@@ -193,13 +183,12 @@ public class MarketInfo implements Serializable {
       && Objects.equals(pluginProperties.getCategories(), that.pluginProperties.getCategories()) && Objects.equals(pluginProperties.getObjectClasses(), that.pluginProperties.getObjectClasses())
       && Objects.equals(license, that.license) && Objects.equals(installation, that.installation)
       && Objects.equals(homepage, that.homepage) && Objects.equals(vendor, that.vendor)
-      && Objects.equals(minSupportedVersion, that.minSupportedVersion)
-      && Objects.equals(maxSupportedVersion, that.maxSupportedVersion);
+      && Objects.equals(compatibility, that.compatibility);
   }
 
   @Override
   public int hashCode() {
     return Objects.hash(id, name, pluginProperties.getType(), version, description, pluginProperties.getCategories(), pluginProperties.getCategories(), license, installation,
-      homepage, vendor, minSupportedVersion, maxSupportedVersion);
+      homepage, vendor, compatibility);
   }
 }
