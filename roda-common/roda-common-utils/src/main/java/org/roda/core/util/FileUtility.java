@@ -159,7 +159,7 @@ public class FileUtility {
    * @param in
    *          byte[] buffer to convert to string format
    */
-  private static String byteArrayToHexString(byte in[]) {
+  public static String byteArrayToHexString(byte in[]) {
 
     byte ch = 0x00;
 

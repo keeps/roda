@@ -37,14 +37,21 @@ import org.roda.wui.common.client.tools.ConfigurationManager;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.HistoryUtils;
 import org.roda.wui.common.client.tools.Humanize;
+import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Style;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.client.ui.Anchor;
@@ -467,38 +474,45 @@ public class InfoSliderHelper {
       values.put(messages.preservationEvents(), eventsLink);
     }
 
-    if (!file.getOtherProperties().isEmpty()) {
+    SafeUri uri = RestUtils.createTechnicalMetadataHTMLUri(file.getAipId(), file.getUUID(), "html", null);
+    RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
 
-      boolean hasOtherProperties = false;
-      HashMap<String, String> tikaValues = new HashMap<>();
-      List<String> defaultTikaValues = ConfigurationManager.getStringList("ui.display.properties.tika.fixed");
-      List<String> blackListedValues = ConfigurationManager.getStringList("ui.display.properties.tika.blacklist");
-      defaultTikaValues.forEach(s -> tikaValues.put(messages.tikaTitles(s), ""));
+    Anchor technicalInformationAnchor = new Anchor();
+    technicalInformationAnchor.setStyleName("clickable");
+    technicalInformationAnchor.setText(messages.showTechnicalMetadata());
 
-      // Get Other properties data
-      for (Entry<String, List<String>> entry : file.getOtherProperties().entrySet()) {
+    // technicalInformation
+    try {
+      requestBuilder.sendRequest(null, new RequestCallback() {
+        @Override
+        public void onResponseReceived(Request request, Response response) {
+          if (response.getStatusCode() == 200) {
+            if (!response.getText().isEmpty()) {
+              values.put(messages.viewTechnicalInformation(), technicalInformationAnchor);
+              technicalInformationAnchor
+                .addClickHandler(e -> Dialogs.showTechnicalMetadataInformation(messages.viewTechnicalMetadata(),
+                  messages.downloadButton(), messages.closeButton(), file, response.getText()));
+            }
 
-        if (entry.getKey().contains("tika")) {
-          hasOtherProperties = true;
-          tikaValues.put(messages.tikaTitles(entry.getKey()),
-            entry.getValue().toString().replace("[", "").replace("]", ""));
+          }
+          else {
+            values.put(messages.viewTechnicalInformation(), technicalInformationAnchor);
+            technicalInformationAnchor
+              .addClickHandler(e -> Dialogs.showTechnicalMetadataInformation(messages.viewTechnicalMetadata(),
+                messages.downloadButton(), messages.closeButton(), file, null));
+          }
+          populate(infoSliderPanel, values);
         }
-      }
 
-      tikaValues.entrySet().removeIf(ent -> ent.getValue().isEmpty() || blackListedValues.contains(ent.getKey()));
-
-      if (hasOtherProperties) {
-        Anchor technicalInformationAnchor = new Anchor();
-        technicalInformationAnchor.setStyleName("clickable");
-        technicalInformationAnchor.setText(messages.showTechnicalMetadata());
-        technicalInformationAnchor
-          .addClickHandler(e -> Dialogs.showTechnicalMetadataInformation(messages.viewTechnicalMetadata(), tikaValues,
-            messages.downloadButton(), messages.closeButton(), file));
-        values.put(messages.viewTikaInformation(), technicalInformationAnchor);
-      }
+        @Override
+        public void onError(Request request, Throwable throwable) {
+          populate(infoSliderPanel, values);
+        }
+      });
+    } catch (RequestException e) {
+      throw new RuntimeException(e);
     }
 
-    populate(infoSliderPanel, values);
   }
 
   private static void populate(SliderPanel infoSliderPanel, HashMap<String, Widget> values) {

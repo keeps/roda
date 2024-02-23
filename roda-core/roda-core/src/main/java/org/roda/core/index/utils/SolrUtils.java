@@ -751,6 +751,56 @@ public class SolrUtils {
     return doc == null ? new SolrInputDocument() : validateDescriptiveMetadataFields(doc);
   }
 
+
+  public static SolrInputDocument getTechnicalMetadataFields(Binary binary, String metadataType,
+                                                               String metadataVersion) throws GenericException {
+    SolrInputDocument doc;
+
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put("prefix", RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX);
+
+    String lowerCaseMetadataTypeWithVersion = metadataType.toLowerCase() + RodaConstants.METADATA_VERSION_SEPARATOR
+      + metadataVersion;
+
+    if ((RodaCoreFactory.getConfigurationFileAsStream(
+      RodaConstants.CORE_CROSSWALKS_INGEST + lowerCaseMetadataTypeWithVersion + ".xslt")) == null) {
+      return new SolrInputDocument();
+    }
+
+    try (Reader transformationResult = RodaUtils.applyMetadataStylesheet(binary, RodaConstants.CORE_CROSSWALKS_INGEST,
+      metadataType, metadataVersion, parameters)) {
+
+      if (!transformationResult.ready()) {
+        return new SolrInputDocument();
+      }
+
+      SolrXMLLoader loader = new SolrXMLLoader();
+      XMLStreamReader parser = XMLInputFactory.newInstance().createXMLStreamReader(transformationResult);
+
+      boolean parsing = true;
+      doc = null;
+      while (parsing) {
+        int event = parser.next();
+
+        if (event == XMLStreamConstants.END_DOCUMENT) {
+          parser.close();
+          parsing = false;
+        } else if (event == XMLStreamConstants.START_ELEMENT) {
+          String currTag = parser.getLocalName();
+          if ("doc".equals(currTag)) {
+            doc = loader.readDoc(parser);
+          }
+        }
+      }
+
+    } catch (XMLStreamException | FactoryConfigurationError | IOException e) {
+      throw new GenericException("Could not process technical metadata binary " + binary.getStoragePath(), e);
+    }
+
+    return doc == null ? new SolrInputDocument() : validateDescriptiveMetadataFields(doc);
+  }
+
+
   private static SolrInputDocument validateDescriptiveMetadataFields(SolrInputDocument doc) {
     if (doc.get(RodaConstants.AIP_DATE_INITIAL) != null) {
       Object value = doc.get(RodaConstants.AIP_DATE_INITIAL).getValue();

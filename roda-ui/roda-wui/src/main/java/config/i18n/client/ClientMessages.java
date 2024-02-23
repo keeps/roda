@@ -512,7 +512,7 @@ public interface ClientMessages extends Messages {
 
   String viewRepresentationInfoPronom();
 
-  String viewTikaInformation();
+  String viewTechnicalInformation();
 
   String viewTechnicalMetadata();
 

@@ -66,6 +66,7 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.TechnicalMetadataNotFoundException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.IsRODAObject;
 import org.roda.core.data.v2.LinkingObjectUtils;
@@ -1175,6 +1176,47 @@ public class BrowserHelper {
         .filter(dm -> dm.getId().equals(metadataId)).collect(Collectors.toList());
 
       return new ObjectResponse<>(acceptFormat, resultList.get(0));
+    } else {
+      throw new GenericException("Unsupported accept format: " + acceptFormat);
+    }
+
+    return ret;
+  }
+
+  public static EntityResponse retrieveFilePreservationMetadata(String aipId, String fileId, String acceptFormat,
+    String language)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException, TechnicalMetadataNotFoundException {
+
+    final String filename;
+    final ConsumesOutputStream stream;
+    StreamResponse ret;
+    ModelService model = RodaCoreFactory.getModelService();
+    IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, fileId, RodaConstants.FILE_FIELDS_TO_RETURN);
+    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+      Binary preservationMetadataBinary = model.retrievePreservationFile(aipId, file.getRepresentationId(),
+        file.getAncestorsPath(), file.getId());
+      stream = new BinaryConsumesOutputStream(preservationMetadataBinary, RodaConstants.MEDIA_TYPE_TEXT_XML);
+      ret = new StreamResponse(stream);
+    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
+      Binary preservationMetadataBinary = model.retrievePreservationFile(aipId, file.getRepresentationId(),
+        file.getAncestorsPath(), file.getId());
+      filename = preservationMetadataBinary.getStoragePath().getName() + HTML_EXT;
+      List<String> parameters = PremisV3Utils.getApplicationTechnicalMetadataParameters(model, aipId,
+        file.getRepresentationId(), file.getAncestorsPath(), file.getId());
+      // PremisV3Utils
+      StringBuilder htmlTechnical = new StringBuilder();
+      for (int i = 0; i < parameters.size(); i += 2) {
+        htmlTechnical.append(HTMLUtils.technicalMetadataToHtml(preservationMetadataBinary, parameters.get(i),
+          parameters.get(i + 1), ServerTools.parseLocale(language)));
+      }
+      stream = new DefaultConsumesOutputStream(filename, RodaConstants.MEDIA_TYPE_TEXT_HTML, out -> {
+        PrintStream printStream = new PrintStream(out);
+        printStream.print(htmlTechnical);
+        printStream.close();
+      });
+
+      ret = new StreamResponse(stream);
+
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
     }

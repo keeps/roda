@@ -19,6 +19,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.NotImplementedException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.TechnicalMetadataNotFoundException;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.slf4j.Logger;
@@ -67,7 +68,7 @@ public class RodaExceptionMapper implements ExceptionMapper<RODAException> {
         .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, message));
     } else if (e instanceof GenericException) {
       responseBuilder = Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, message));
-    } else if (e instanceof NotFoundException) {
+    } else if (e instanceof NotFoundException || e instanceof TechnicalMetadataNotFoundException) {
       responseBuilder = Response.status(Status.NOT_FOUND)
         .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, message));
     } else if (e instanceof AlreadyExistsException || e instanceof JobAlreadyStartedException
