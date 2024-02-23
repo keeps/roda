@@ -27,22 +27,21 @@ The metadata file contains the necessary information for the Market and RODA to 
 - The file name must be the classname e.g. `customDevelopment.json`
 - It must contain the following fields:
 
-| Name                | Description                                                                                    |
-| ------------------- | ---------------------------------------------------------------------------------------------- |
-| id                  | The service  classname                                                                         |
-| name                | The name that will be displayed in the Market and in the RODA interface                        |
-| type                | Service  type                                                                                  |
-| version             | Service version                                                                                |
-| description         | The description that will be displayed in the Market and in the RODA interface                 |
-| license             | Name of the license and url to license                                                         |
-| homepage            | A URL to the Marketplace's git repository or a web page with details on how to obtain the item |
-| vendor              | The service vendor name and link to vendor's homepage                                          |
-| minSupportedVersion | Minimum major RODA version supported by the service                                            |
-| maxSupportedVersion | Maximum major RODA version supported by the service                                            |
-| price               | Service's price                                                                                |
-| plugin              | Leave this attribute as shown below                                                            |
-| lang                | Languages supported by this service                                                            |
-| region              | Regions supported by this service                                                              |
+| Name          | Description                                                                                    |
+|---------------|------------------------------------------------------------------------------------------------|
+| id            | The service  classname                                                                         |
+| name          | The name that will be displayed in the Market and in the RODA interface                        |
+| type          | Service  type                                                                                  |
+| version       | Service version                                                                                |
+| description   | The description that will be displayed in the Market and in the RODA interface                 |
+| license       | Name of the license and url to license                                                         |
+| homepage      | A URL to the Marketplace's git repository or a web page with details on how to obtain the item |
+| vendor        | The service vendor name and link to vendor's homepage                                          |
+| compatibility | List of RODA versions supported by the service                                                 |
+| price         | Service's price                                                                                |
+| plugin        | Leave this attribute as shown below                                                            |
+| lang          | Languages supported by this service                                                            |
+| region        | Regions supported by this service                                                              |
 
 e.g. service file customDevelopment.json
 ```json
@@ -61,8 +60,7 @@ e.g. service file customDevelopment.json
       "name": "KEEP SOLUTIONS",
       "homepage": "https://keep.pt"
     },
-    "minSupportedVersion": "4",
-    "maxSupportedVersion": "5",
+    "compatibility": ["RODA Community 4, RODA Community 5, RODA Enterprise 5"],
     "price": "paid",
     "plugin": {
       "objectClasses": [],

@@ -28,22 +28,21 @@ O Ficheiro de metadados contém as informações necessárias para que o Market 
 - O nome do ficheiro deve ser o classname do serviço e.g. `customDevelopment.json`
 - Deve conter os seguintes campos:
 
-| Name                | Description                                                                                            |
-| ------------------- | ------------------------------------------------------------------------------------------------------ |
-| id                  | O classname do serviço                                                                                 |
-| name                | O nome que será exibido no Market e na interface RODA                                                  |
-| type                | O Tipo do serviço                                                                                      |
-| version             | A versão do serviço                                                                                    |
-| description         | A descrição que será exibida no Market e na interface RODA                                             |
-| license             | Nome da licensa e endereço para a licensa                                                              |
-| homepage            | Uma URL para ou o repositório git do serviço ou uma página Web com detalhes sobre como obter o plug-in |
-| vendor              | O nome do fornecedor do serviço                                                                        |
-| minSupportedVersion | Versão RODA mínima suportada pelo serviço                                                              |
-| maxSupportedVersion | Versão RODA máxima suportada pelo serviço                                                              |
-| price               | Custo do serviço                                                                                       |
-| plugin              | Deixe este atributo como está no exemplo abaixo                                                        |
-| lang                | Linguagens suportadas por este serviço                                                                 |
-| region              | Regiões suportadas por este serviço                                                                    |
+| Name            | Description                                                                                            |
+|-----------------|--------------------------------------------------------------------------------------------------------|
+| id              | O classname do serviço                                                                                 |
+| name            | O nome que será exibido no Market e na interface RODA                                                  |
+| type            | O Tipo do serviço                                                                                      |
+| version         | A versão do serviço                                                                                    |
+| description     | A descrição que será exibida no Market e na interface RODA                                             |
+| license         | Nome da licensa e endereço para a licensa                                                              |
+| homepage        | Uma URL para ou o repositório git do serviço ou uma página Web com detalhes sobre como obter o plug-in |
+| vendor          | O nome do fornecedor do serviço                                                                        |
+| compatibility   | Lista de versões do RODA suportadas pelo serviço                                                       |
+| price           | Custo do serviço                                                                                       |
+| plugin          | Deixe este atributo como está no exemplo abaixo                                                        |
+| lang            | Linguagens suportadas por este serviço                                                                 |
+| region          | Regiões suportadas por este serviço                                                                    |
 
 Exemplo do ficheiro customDevelopment.json
 ```json
@@ -62,8 +61,7 @@ Exemplo do ficheiro customDevelopment.json
       "name": "KEEP SOLUTIONS",
       "homepage": "https://keep.pt"
     },
-    "minSupportedVersion": "4",
-    "maxSupportedVersion": "5",
+    "compatibility": ["RODA Community 4, RODA Community 5, RODA Enterprise 5"],
     "price": "paid",
     "plugin": {
       "objectClasses": [],

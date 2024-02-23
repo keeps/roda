@@ -27,22 +27,21 @@ The metadata file contains the necessary information for the Market and RODA to 
 - The file name must be the classname e.g. `org.roda.core.plugins.external.AIPValidatorPlugin.json`
 - It must contain the following fields:
 
-| Name                | Description                                                                                                                      |
-| ------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| id                  | The plugin  classname                                                                                                            |
-| name                | The name that will be displayed in the Market and in the RODA interface                                                          |
-| type                | Plugin  type                                                                                                                     |
-| version             | Plugin version                                                                                                                   |
-| description         | The description that will be displayed in the Market and in the RODA interface                                                   |
-| license             | Name of the license and url to license                                                                                           |
-| homepage            | A URL to the Marketplace's git repository or a web page with details on how to obtain the item                                   |
-| vendor              | The plugin vendor name and link to vendor's homepage                                                                             |
-| minSupportedVersion | Minimum major RODA version supported by the plugin                                                                               |
-| maxSupportedVersion | Maximum major RODA version supported by the plugin                                                                               |
-| price               | Plugin's price                                                                                                                   |
-| plugin              | The categories that the plugin fits into,the classname of RODA objects that can be targeted by this plugin and the plugin's type |
-| lang                | Languages supported by this plugin                                                                                               |
-| region              | Regions supported by this plugin                                                                                                 |
+| Name          | Description                                                                                                                      |
+|---------------|----------------------------------------------------------------------------------------------------------------------------------|
+| id            | The plugin  classname                                                                                                            |
+| name          | The name that will be displayed in the Market and in the RODA interface                                                          |
+| type          | Plugin  type                                                                                                                     |
+| version       | Plugin version                                                                                                                   |
+| description   | The description that will be displayed in the Market and in the RODA interface                                                   |
+| license       | Name of the license and url to license                                                                                           |
+| homepage      | A URL to the Marketplace's git repository or a web page with details on how to obtain the item                                   |
+| vendor        | The plugin vendor name and link to vendor's homepage                                                                             |
+| compatibility | List of RODA versions supported by the plugin                                                                                    |
+| price         | Plugin's price                                                                                                                   |
+| plugin        | The categories that the plugin fits into,the classname of RODA objects that can be targeted by this plugin and the plugin's type |
+| lang          | Languages supported by this plugin                                                                                               |
+| region        | Regions supported by this plugin                                                                                                 |
 
 
 e.g. plugin file org.roda.core.plugins.external.AIPValidatorPlugin.json
@@ -62,8 +61,7 @@ e.g. plugin file org.roda.core.plugins.external.AIPValidatorPlugin.json
         "name": "KEEP SOLUTIONS",
         "homepage": "https://keep.pt"
     },
-    "minSupportedVersion": "4",
-    "maxSupportedVersion": "5",
+    "compatibility": ["RODA Enterprise 5"],
     "price": "paid",
     "plugin": {
         "objectClasses": [
