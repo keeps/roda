@@ -943,14 +943,15 @@ public class ModelService extends ModelObservable {
   }
 
   public Representation createRepresentation(String aipId, String representationId, boolean original, String type,
-    boolean notify, String createdBy) throws RequestNotValidException, GenericException, NotFoundException,
-    AuthorizationDeniedException, AlreadyExistsException {
+    boolean notify, String createdBy, List<String> representationState) throws RequestNotValidException,
+    GenericException, NotFoundException, AuthorizationDeniedException, AlreadyExistsException {
     RodaCoreFactory.checkIfWriteIsAllowedAndIfFalseThrowException(nodeType);
 
     Representation representation = new Representation(representationId, aipId, original, type);
     representation.setCreatedBy(createdBy);
     representation.setUpdatedBy(createdBy);
     representation.setInstanceId(RODAInstanceUtils.getLocalInstanceIdentifier());
+    representation.setRepresentationStates(representationState);
 
     StoragePath directoryPath = ModelUtils.getRepresentationStoragePath(aipId, representationId);
     storage.createDirectory(directoryPath);
@@ -966,6 +967,12 @@ public class ModelService extends ModelObservable {
     }
 
     return representation;
+  }
+
+  public Representation createRepresentation(String aipId, String representationId, boolean original, String type,
+    boolean notify, String createdBy) throws RequestNotValidException, GenericException, NotFoundException,
+    AuthorizationDeniedException, AlreadyExistsException {
+    return createRepresentation(aipId, representationId, original, type, notify, createdBy, Collections.emptyList());
   }
 
   public Representation createRepresentation(String aipId, String representationId, boolean original, String type,

@@ -14,29 +14,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.Document;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.DomEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.IntegerBox;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.RadioButton;
-import com.google.gwt.user.client.ui.TextBox;
-import config.i18n.client.ClientMessages;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.utils.RepresentationInformationUtils;
 import org.roda.core.data.v2.common.ConversionProfile;
@@ -64,6 +41,31 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.StringUtils;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.DomEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.IntegerBox;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.RadioButton;
+import com.google.gwt.user.client.ui.TextBox;
+
+import config.i18n.client.ClientMessages;
+
 public class PluginParameterPanel extends Composite {
   public static final String FORM_SELECTBOX = "form-selectbox";
   public static final String FORM_TEXTBOX_SMALL = "form-textbox-small";
@@ -80,9 +82,9 @@ public class PluginParameterPanel extends Composite {
   private final FlowPanel layout;
   private final RepresentationParameter representationParameter = new RepresentationParameter();
   private final DisseminationParameter disseminationParameter = new DisseminationParameter();
+  private final String pluginId;
   private String value;
   private String profile;
-  private final String pluginId;
   private String aipTitle;
   private boolean conversionPanel = false;
 
@@ -118,7 +120,7 @@ public class PluginParameterPanel extends Composite {
 
   private void updateLayout() {
     if (PluginParameterType.BOOLEAN.equals(parameter.getType())) {
-      createBooleanLayout();
+      createBooleanLayout(parameter);
     } else if (PluginParameterType.STRING.equals(parameter.getType())) {
       createStringLayout(parameter);
     } else if (PluginParameterType.PLUGIN_SIP_TO_AIP.equals(parameter.getType())) {
@@ -179,6 +181,11 @@ public class PluginParameterPanel extends Composite {
 
         innerPanel.add(createRepresentationType("Representation type",
           "Assign a type when creating a new representation", typeChanged));
+
+        ValueChangeHandler<Boolean> preservationStatusChanged = preservationStatusChangedEvent -> representationParameter
+          .setMarkAsPreservation(preservationStatusChangedEvent.getValue());
+
+        innerPanel.add(createBooleanLayout("Change the representation status to Preservation?", Boolean.toString(true), "test", false, preservationStatusChanged));
 
         value = RodaConstants.PLUGIN_PARAMS_CONVERSION_REPRESENTATION;
       } else {
@@ -752,6 +759,32 @@ public class PluginParameterPanel extends Composite {
     panel.add(parameterBox);
 
     parameterBox.addValueChangeHandler(valueChangeEvent);
+
+    return panel;
+  }
+
+  private void createBooleanLayout(PluginParameter parameter) {
+    ValueChangeHandler<Boolean> changeHandler = event -> value = Boolean.TRUE.equals(event.getValue()) ? "true"
+      : "false";
+    layout.add(createBooleanLayout(parameter.getName(), parameter.getDefaultValue(), parameter.getDescription(),
+      parameter.isReadonly(), changeHandler));
+  }
+
+  private FlowPanel createBooleanLayout(String name, String defaultValue, String description, boolean isReadOnly,
+    ValueChangeHandler<Boolean> valueChangeHandler) {
+    FlowPanel panel = new FlowPanel();
+
+    CheckBox checkBox = new CheckBox(name);
+    checkBox.setValue("true".equals(defaultValue));
+    value = "true".equals(defaultValue) ? "true" : "false";
+    checkBox.setEnabled(!isReadOnly);
+    checkBox.getElement().setTitle("checkbox");
+
+    checkBox.addStyleName("form-checkbox");
+    checkBox.addValueChangeHandler(valueChangeHandler);
+
+    panel.add(checkBox);
+    addHelp(panel, description);
 
     return panel;
   }

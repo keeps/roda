@@ -10,6 +10,7 @@ package org.roda.wui.client.ingest.process.model;
 public class RepresentationParameter implements PrintableParameter {
 
   private String value;
+  private boolean markAsPreservation;
 
   public RepresentationParameter() {
     // empty constructor
@@ -23,8 +24,16 @@ public class RepresentationParameter implements PrintableParameter {
     this.value = value;
   }
 
+  public boolean isMarkAsPreservation() {
+    return markAsPreservation;
+  }
+
+  public void setMarkAsPreservation(boolean markAsPreservation) {
+    this.markAsPreservation = markAsPreservation;
+  }
+
   @Override
   public String printAsParameter(String type) {
-    return "type=" + type + ";value=" + getValue();
+    return "type=" + type + ";value=" + getValue() + ";markAsPreservation=" + isMarkAsPreservation();
   }
 }
