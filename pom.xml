@@ -1088,7 +1088,7 @@
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt</artifactId>
-                <version>0.12.4</version>
+                <version>0.12.5</version>
             </dependency>
             <!-- lfaria: 2022-12-07 -->
             <!-- Forcing transitive dependencies upgrade due to vulnerabilities -->
