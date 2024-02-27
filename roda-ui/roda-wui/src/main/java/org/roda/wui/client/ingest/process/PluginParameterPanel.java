@@ -179,13 +179,13 @@ public class PluginParameterPanel extends Composite {
         ValueChangeHandler<String> typeChanged = typeChangedEvent -> representationParameter
           .setValue(typeChangedEvent.getValue());
 
-        innerPanel.add(createRepresentationType("Representation type",
-          "Assign a type when creating a new representation", typeChanged));
-
+        innerPanel.add(createRepresentationType(messages.representationTypeTitle(),
+          messages.representationTypeDescription(), typeChanged));
         ValueChangeHandler<Boolean> preservationStatusChanged = preservationStatusChangedEvent -> representationParameter
           .setMarkAsPreservation(preservationStatusChangedEvent.getValue());
 
-        innerPanel.add(createBooleanLayout("Change the representation status to Preservation?", Boolean.toString(true), "test", false, preservationStatusChanged));
+        innerPanel.add(createBooleanLayout(messages.changeRepresentationStatusToPreservationTitle(), Boolean.toString(true),
+          messages.changeRepresentationStatusToPreservationDescription(), false, preservationStatusChanged));
 
         value = RodaConstants.PLUGIN_PARAMS_CONVERSION_REPRESENTATION;
       } else {
@@ -195,10 +195,10 @@ public class PluginParameterPanel extends Composite {
         ValueChangeHandler<String> descriptionChanged = descriptionChangedEvent -> disseminationParameter
           .setDescription(descriptionChangedEvent.getValue());
 
-        innerPanel.add(createTextBoxLayout("Dissemination title", disseminationParameter.getTitle(),
-          "This will be the respective dissemination title.", false, titleChanged));
-        innerPanel.add(createTextBoxLayout("Dissemination description", disseminationParameter.getDescription(),
-          "This will be the respective dissemination description.", false, descriptionChanged));
+        innerPanel.add(createTextBoxLayout(messages.disseminationTitle(), disseminationParameter.getTitle(),
+          messages.disseminationTitleDescription(), false, titleChanged));
+        innerPanel.add(createTextBoxLayout(messages.disseminationDescriptionTitle(), disseminationParameter.getDescription(),
+          messages.disseminationDescriptionDescription(), false, descriptionChanged));
 
         value = RodaConstants.PLUGIN_PARAMS_CONVERSION_DISSEMINATION;
       }
@@ -494,7 +494,7 @@ public class PluginParameterPanel extends Composite {
 
   private FlowPanel createConversionProfileLayout(String repOrDip, String pluginId) {
     Set<ConversionProfile> treeSet = new HashSet<>();
-    Label parameterName = new Label("Conversion Profile");
+    Label parameterName = new Label(messages.conversionProfileTitle());
     final Label description = new Label();
     final ListBox dropdown = new ListBox();
     dropdown.addStyleName(FORM_SELECTBOX);
@@ -547,7 +547,7 @@ public class PluginParameterPanel extends Composite {
 
     dropdown.setTitle(OBJECT_BOX);
     result.add(parameterName);
-    addHelp(result, "Conversion profile options");
+    addHelp(result, messages.conversionProfileDescription());
     result.add(panel);
     result.add(descriptionPanel);
     return result;

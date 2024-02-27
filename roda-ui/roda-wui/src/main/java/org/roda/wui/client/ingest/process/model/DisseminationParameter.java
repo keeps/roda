@@ -7,10 +7,13 @@
  */
 package org.roda.wui.client.ingest.process.model;
 
-public class DisseminationParameter implements PrintableParameter {
+import com.google.gwt.core.client.GWT;
+import config.i18n.client.ClientMessages;
 
-  private String title = "Dissemination title";
-  private String description = "Dissemination description";
+public class DisseminationParameter implements PrintableParameter {
+  private static final ClientMessages messages = GWT.create(ClientMessages.class);
+  private String title = messages.disseminationTitleDefaultValue();
+  private String description = messages.disseminationDescriptionDefaultValue();
 
   public DisseminationParameter() {
     // empty constructor
