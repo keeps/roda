@@ -28,7 +28,6 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -63,15 +62,7 @@ public class EARKSIPToAIPPluginUtils {
 
     String aipType = getType(sip);
 
-    User user = model.retrieveUser(username);
-
-    if (parentId.isPresent()){
-      permissions = model.retrieveAIP(parentId.get()).getPermissions();
-    }
-
-    Permissions finalPermissions = PermissionUtils.calculatePermissions(user, Optional.of(permissions));
-
-    AIP aip = model.createAIP(state, parentId.orElse(null), aipType, finalPermissions, ingestSIPUUID, ingestSIPIds,
+    AIP aip = model.createAIP(state, parentId.orElse(null), aipType, permissions, ingestSIPUUID, ingestSIPIds,
       ingestJobId, notify, username);
 
     PluginHelper.acquireObjectLock(aip, plugin);

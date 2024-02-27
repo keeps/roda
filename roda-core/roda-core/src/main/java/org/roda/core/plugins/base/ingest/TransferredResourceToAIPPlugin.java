@@ -35,7 +35,6 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginState;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -127,15 +126,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
       String aipType = RodaConstants.AIP_TYPE_MIXED;
       Permissions permissions = new Permissions();
 
-      User user = model.retrieveUser(job.getUsername());
-
-      if (computedSearchScope.isPresent()) {
-        permissions = model.retrieveAIP(computedSearchScope.get()).getPermissions();
-      }
-
-      Permissions finalPermissions = PermissionUtils.calculatePermissions(user, Optional.of(permissions));
-
-      final AIP aip = model.createAIP(state, computedSearchScope.orElse(null), aipType, finalPermissions,
+      final AIP aip = model.createAIP(state, computedSearchScope.orElse(null), aipType, permissions,
         transferredResource.getUUID(), Arrays.asList(transferredResource.getName()), job.getId(), false,
         job.getUsername());
 
