@@ -80,7 +80,6 @@ import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.utils.UserUtility;
-import org.roda.core.plugins.base.ingest.PermissionUtils;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
@@ -1394,11 +1393,8 @@ public class Browser extends RodaWuiController {
     try {
       Permissions permissions = new Permissions();
 
-      //calculate final permissions
-      Permissions finalPermissions = PermissionUtils.calculatePermissions(user, Optional.of(permissions));
-
       // delegate
-      return BrowserHelper.createAIP(user, null, type, finalPermissions);
+      return BrowserHelper.createAIP(user, null, type, permissions);
 
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
@@ -1445,11 +1441,8 @@ public class Browser extends RodaWuiController {
         throw new RequestNotValidException("Creating AIP that should be below another with a null parentId");
       }
 
-      //calculate final permissions
-      Permissions finalPermissions = PermissionUtils.calculatePermissions(user, Optional.of(permissions));
-
       // delegate
-      return BrowserHelper.createAIP(user, parentId, type, finalPermissions);
+      return BrowserHelper.createAIP(user, parentId, type, permissions);
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
