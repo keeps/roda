@@ -10,7 +10,7 @@ package org.roda.wui.client.ingest.process.model;
 public class RepresentationParameter implements PrintableParameter {
 
   private String value;
-  private boolean markAsPreservation;
+  private boolean markAsPreservation = true;
 
   public RepresentationParameter() {
     // empty constructor

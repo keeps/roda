@@ -2416,4 +2416,28 @@ public interface ClientMessages extends Messages {
 
   String editDescMetadataLockedText();
 
+  String representationTypeTitle();
+
+  String representationTypeDescription();
+
+  String changeRepresentationStatusToPreservationTitle();
+
+  String changeRepresentationStatusToPreservationDescription();
+
+  String disseminationTitle();
+
+  String disseminationTitleDescription();
+
+  String disseminationDescriptionTitle();
+
+  String disseminationDescriptionDescription();
+
+  String disseminationTitleDefaultValue();
+
+  String disseminationDescriptionDefaultValue();
+
+  String conversionProfileTitle();
+
+  String conversionProfileDescription();
+
 }
