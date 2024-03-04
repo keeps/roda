@@ -1,5 +1,21 @@
 # Changelog
 
+## v5.5.0 (04/03/2024)
+#### New features
+-  Support for generic technical metadata creation and visualization #3097
+
+#### Bug fixes
+- Fixed unexpected behaviour when trying to create a new AIP #3110
+- Fixed AIP permissions calculation using ModelService #3105 
+
+#### Security
+- Several dependency major upgrades to fix security vulnerabilities
+
+---
+
+To try out this version, check the [install instructions](https://github.com/keeps/roda/blob/master/deploys/standalone/README.md).
+---
+
 ## v5.4.0 (08/02/2024)
 #### New features
 -  Technological platforms major upgrade, which largely improves overall security, maintanability and performance #3055
@@ -487,24 +503,4 @@ docker pull keeps/roda:v4.2.1
 Install for demonstration:
 ```
 docker pull keeps/roda:v3.6.1
-```
-
----
-
-## v4.2.0 (17/01/2022)
-### New features:
-
-- Job orchestration #1981
-- Add prometheus metrics for HTTP notification system #1982
-
-### Bug fixes:
-
-- LinkingObjectIdentifierValue links to unknown URN (in preservation metadata PREMIS) #1946
-- Object PREMIS does not register contentLocation in storage element #1947
-- Fixity information computation to report SKIPPED #1970
-- Allow run mutiple plugins #1977
-
-Install for demonstration:
-```
-docker pull keeps/roda:v4.2.0
 ```
