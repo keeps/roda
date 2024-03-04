@@ -31,7 +31,7 @@ Följande attribut kategoriserar ett gallringsschema:
 | Titel | Det identifierande namnet eller titeln på gallringsschemat | Sant |
 | Beskrivning | Beskrivning av gallringsschemat | Falskt |
 | Mandat | Hänvisning till gallringsbeslut eller liknande  | Falskt |
-| Omfattningsbeskrivning | Vägledning till auktoriserade användare som anger hur man bäst tillämpar en viss enhet och anger eventuella organisatoriska policyer eller begränsningar för dess användning | Falskt |
+| Omfattningsanteckningar | Vägledning till auktoriserade användare som anger hur man bäst tillämpar en viss enhet och anger eventuella organisatoriska policyer eller begränsningar för dess användning | Falskt |
 | Gallringsåtgärd | Kod som beskriver den åtgärd som ska vidtas vid gallring av posten (möjliga värden: Behåll permanent, granska, gallra) | Sant |
 | Trigger för att identifiera element för bevarande | Det beskrivande metadatafältet som används för att beräkna bevarandeperioden | Sant (om åtgärdskoden för gallring skiljer sig från Behåll permanent) |
 | Bevarandeperiod | Antal dagar, veckor, månader eller år som specificerats för att bevara ett bevarandeobjekt efter att bevarandeperioden har triggats | Sant (om åtgärdskoden för gallring skiljer sig från Behåll permanent) |
@@ -102,7 +102,7 @@ Följande attribut kategoriserar ett gallringsstopp:
 | Titel | Det identifierande namnet eller titeln på gallringsstoppet | Sant |
 | Beskrivning | Beskrivning av gallringsstoppet | Falskt |
 | Mandat | Hänvisning till gallringsbeslut som ger befogenhet för ett gallringsstopp | Falskt |
-| Beskrivning av omfattning | Vägledning till auktoriserade användare som anger hur man bäst tillämpar en viss enhet och anger eventuella organisatoriska policyer eller begränsningar för dess användning | Falskt |
+| Omfattningsanteckningar | Vägledning till auktoriserade användare som anger hur man bäst tillämpar en viss enhet och anger eventuella organisatoriska policyer eller begränsningar för dess användning | Falskt |
 
 ### 3. Hur fungerar det?
 
