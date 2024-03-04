@@ -40,7 +40,7 @@ Det är möjligt att ha poster utan digitala representationer, det vill säga en
 
 ### Kan applikationen registrera nivån på leveransen, t.ex. vem överförde vad, när?
 
-SIP:ar innehåller vanligtvis information om vem, vad och när de har skapats. Ingestprocessen skapar register över hela ingestprocessen. SIP:ar förväntas dock placeras på en nätverksplats som är tillgänglig för systemet. Att fastställa vem som kopierade SIP:ar till dessa platser ligger utanför systemets räckvidd.
+SIP:ar innehåller vanligtvis information om vem, vad och när de har skapats. Ingestprocessen skapar register över hela ingestprocessen. SIP:ar förväntas dock placeras på en nätverksplats som är tillgänglig för systemet. Att fastställa vem som kopierade SIP:ar till dessa platser ligger utanför systemets omfattning.
 
 ### Hur kan systemet registrera var de fysiska arkiven finns?
 
