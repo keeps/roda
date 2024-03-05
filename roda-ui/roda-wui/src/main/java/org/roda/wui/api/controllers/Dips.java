@@ -76,6 +76,10 @@ public class Dips extends RodaWuiController {
     }
   }
 
+  public static boolean showDIPEmbedded() {
+    return RodaCoreFactory.getRodaConfiguration().getBoolean("ui.dip.externalURL.showEmbedded", false);
+  }
+
   /*
    * ---------------------------------------------------------------------------
    * ---------------- REST related methods - end -------------------------------

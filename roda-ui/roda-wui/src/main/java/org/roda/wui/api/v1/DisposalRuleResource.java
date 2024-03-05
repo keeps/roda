@@ -93,7 +93,7 @@ public class DisposalRuleResource {
     User user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    DisposalRule rule = Browser.retrieveDisposalRule(user, ruleId);
+    DisposalRule rule = Disposals.retrieveDisposalRule(user, ruleId);
 
     return Response.ok(rule, mediaType).build();
   }

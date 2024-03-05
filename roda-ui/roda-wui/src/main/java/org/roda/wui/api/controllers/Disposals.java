@@ -10,6 +10,7 @@ package org.roda.wui.api.controllers;
 import java.io.IOException;
 import java.util.Date;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -606,6 +607,26 @@ public class Disposals extends RodaWuiController {
       // register action
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_DISPOSAL_CONFIRMATION_ID_PARAM,
         confirmationId);
+    }
+  }
+
+  public static DisposalRule retrieveDisposalRule(User user, String ruleId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
+
+    // check user permissions
+    controllerAssistant.checkRoles(user);
+
+    LogEntryState state = LogEntryState.SUCCESS;
+
+    try {
+      return RodaCoreFactory.getModelService().retrieveDisposalRule(ruleId);
+    } catch (RODAException e) {
+      state = LogEntryState.FAILURE;
+      throw e;
+    } finally {
+      // register action
+      controllerAssistant.registerAction(user, ruleId, state, RodaConstants.DISPOSAL_RULE_ID, ruleId);
     }
   }
 }

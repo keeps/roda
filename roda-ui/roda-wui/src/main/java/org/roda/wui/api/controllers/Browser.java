@@ -21,12 +21,16 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
+import it.burning.cron.CronExpressionDescriptor;
 import jakarta.ws.rs.core.MultivaluedMap;
 
+import org.apache.commons.configuration.Configuration;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConsumesOutputStream;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.common.Messages;
+import org.roda.core.common.RodaUtils;
+import org.roda.core.common.SelectedItemsUtils;
 import org.roda.core.common.StreamResponse;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -37,6 +41,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.TechnicalMetadataNotFoundException;
+import org.roda.core.data.v2.Void;
 import org.roda.core.data.v2.common.ObjectPermissionResult;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
@@ -44,7 +49,9 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.facet.Facets;
 import org.roda.core.data.v2.index.filter.Filter;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.index.sort.Sorter;
 import org.roda.core.data.v2.index.sublist.Sublist;
 import org.roda.core.data.v2.ip.AIP;
@@ -81,9 +88,11 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.utils.IterableIndexResult;
 import org.roda.core.model.utils.UserUtility;
 import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.IdUtils;
+import org.roda.wui.client.browse.Viewers;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
 import org.roda.wui.client.browse.bundle.BrowseDipBundle;
 import org.roda.wui.client.browse.bundle.BrowseFileBundle;
@@ -99,9 +108,16 @@ import org.roda.wui.client.planning.RelationTypeTranslationsBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.common.ControllerAssistant;
+import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.RodaWuiController;
+import org.roda.wui.common.client.tools.StringUtils;
+import org.roda.wui.common.server.ServerTools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Browser extends RodaWuiController {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(JobsHelper.class);
 
   private Browser() {
     super();
@@ -351,6 +367,23 @@ public class Browser extends RodaWuiController {
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_CLASS_PARAM,
         classToReturn.getSimpleName(), RodaConstants.CONTROLLER_FILTER_PARAM, filter,
         RodaConstants.CONTROLLER_SORTER_PARAM, sorter, RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
+    }
+  }
+
+  public static <T extends IsIndexed> IndexResult<T> find(String classNameToReturn, Filter filter, Sorter sorter, User user,
+                                                   Sublist sublist, Facets facets, String localeString, boolean justActive, List<String> fieldsToReturn)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+    try {
+      Class<T> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
+      IndexResult<T> result = Browser.find(classToReturn, filter, sorter, sublist, facets, user, justActive,
+        fieldsToReturn);
+      return I18nUtility.translate(result, classToReturn, localeString);
+    } catch (RuntimeException e) {
+      LOGGER.error("Unexpected error in find", e);
+      throw new GenericException(e);
+    } catch (GenericException e) {
+      LOGGER.error("Unexpected error in find", e);
+      throw e;
     }
   }
 
@@ -1551,7 +1584,7 @@ public class Browser extends RodaWuiController {
   }
 
   public static DescriptiveMetadata createDescriptiveMetadataFile(User user, String aipId, String representationId,
-    String metadataId, String metadataType, String metadataVersion, ContentPayload metadataPayload)
+    DescriptiveMetadataEditBundle bundle)
     throws AuthorizationDeniedException, GenericException, ValidationException, NotFoundException,
     RequestNotValidException, AlreadyExistsException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -1560,6 +1593,19 @@ public class Browser extends RodaWuiController {
     controllerAssistant.checkRoles(user);
 
     LogEntryState state = LogEntryState.SUCCESS;
+
+    // If the bundle has values from the form, we need to update the XML by
+    // applying the values of the form to the raw template
+    if (bundle.getValues() != null && !bundle.getValues().isEmpty()) {
+      SupportedMetadataTypeBundle smtb = new SupportedMetadataTypeBundle(bundle.getId(), bundle.getType(),
+        bundle.getVersion(), bundle.getId(), bundle.getRawTemplate(), bundle.getValues());
+      bundle.setXml(Browser.retrieveDescriptiveMetadataPreview(user, smtb));
+    }
+
+    String metadataId = bundle.getId();
+    String descriptiveMetadataType = bundle.getType();
+    String descriptiveMetadataVersion = bundle.getVersion();
+    ContentPayload payload = new StringContentPayload(bundle.getXml());
 
     try {
       IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId, RodaConstants.AIP_PERMISSIONS_FIELDS_TO_RETURN);
@@ -1572,8 +1618,8 @@ public class Browser extends RodaWuiController {
       controllerAssistant.checkIfAIPInConfirmation(aip);
 
       // delegate
-      return BrowserHelper.createDescriptiveMetadataFile(aipId, representationId, metadataId, metadataType,
-        metadataVersion, metadataPayload, user.getId());
+      return BrowserHelper.createDescriptiveMetadataFile(aipId, representationId, metadataId, descriptiveMetadataType,
+        descriptiveMetadataVersion, payload, user.getId());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -1581,15 +1627,18 @@ public class Browser extends RodaWuiController {
       // register action
       controllerAssistant.registerAction(user, aipId, state, RodaConstants.CONTROLLER_AIP_ID_PARAM, aipId,
         RodaConstants.CONTROLLER_REPRESENTATION_ID_PARAM, representationId, RodaConstants.CONTROLLER_METADATA_ID_PARAM,
-        metadataId, RodaConstants.CONTROLLER_TYPE_PARAM, metadataType, RodaConstants.CONTROLLER_VERSION_ID_PARAM,
-        metadataVersion);
+        metadataId, RodaConstants.CONTROLLER_TYPE_PARAM, descriptiveMetadataType, RodaConstants.CONTROLLER_VERSION_ID_PARAM,
+        descriptiveMetadataVersion);
     }
   }
 
   public static DescriptiveMetadata updateDescriptiveMetadataFile(User user, String aipId, String representationId,
-    String metadataId, String metadataType, String metadataVersion, ContentPayload metadataPayload)
-    throws AuthorizationDeniedException, GenericException, ValidationException, NotFoundException,
+   DescriptiveMetadataEditBundle bundle) throws AuthorizationDeniedException, GenericException, ValidationException, NotFoundException,
     RequestNotValidException {
+    String metadataId = bundle.getId();
+    String metadataType = bundle.getType();
+    String metadataVersion = bundle.getVersion();
+    ContentPayload payload = new StringContentPayload(bundle.getXml());
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
 
     // check user permissions
@@ -1613,7 +1662,7 @@ public class Browser extends RodaWuiController {
       properties.put(RodaConstants.VERSION_ACTION, RodaConstants.VersionAction.UPDATED.toString());
 
       return BrowserHelper.updateDescriptiveMetadataFile(aipId, representationId, metadataId, metadataType,
-        metadataVersion, metadataPayload, properties, user.getId());
+        metadataVersion, payload, properties, user.getId());
     } catch (RODAException e) {
       state = LogEntryState.FAILURE;
       throw e;
@@ -3699,26 +3748,6 @@ public class Browser extends RodaWuiController {
     }
   }
 
-  public static DisposalRule retrieveDisposalRule(User user, String ruleId)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
-
-    // check user permissions
-    controllerAssistant.checkRoles(user);
-
-    LogEntryState state = LogEntryState.SUCCESS;
-
-    try {
-      return RodaCoreFactory.getModelService().retrieveDisposalRule(ruleId);
-    } catch (RODAException e) {
-      state = LogEntryState.FAILURE;
-      throw e;
-    } finally {
-      // register action
-      controllerAssistant.registerAction(user, ruleId, state, RodaConstants.DISPOSAL_RULE_ID, ruleId);
-    }
-  }
-
   public static List<DisposalTransitiveHoldAIPMetadata> listTransitiveDisposalHolds(User user, String aipId)
     throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
     final ControllerAssistant controllerAssistant = new ControllerAssistant() {};
@@ -3742,6 +3771,53 @@ public class Browser extends RodaWuiController {
   public static EntityResponse retrieveFilePreservationFile(User user, String aipId, String fileId,
     String acceptFormat) {
     return null;
+  }
+  public static Viewers retrieveViewersProperties() {
+    Viewers viewers = new Viewers();
+    Configuration rodaConfig = RodaCoreFactory.getRodaConfiguration();
+    List<String> viewersSupported = RodaUtils.copyList(rodaConfig.getList("ui.viewers"));
+
+    for (String type : viewersSupported) {
+      List<String> fieldPronoms = RodaUtils.copyList(rodaConfig.getList("ui.viewers." + type + ".pronoms"));
+      List<String> fieldMimetypes = RodaUtils.copyList(rodaConfig.getList("ui.viewers." + type + ".mimetypes"));
+      List<String> fieldExtensions = RodaUtils.copyList(rodaConfig.getList("ui.viewers." + type + ".extensions"));
+
+      for (String pronom : fieldPronoms) {
+        viewers.addPronom(pronom, type);
+      }
+
+      for (String mimetype : fieldMimetypes) {
+        viewers.addMimetype(mimetype, type);
+      }
+
+      for (String extension : fieldExtensions) {
+        viewers.addExtension(extension, type);
+      }
+
+      viewers.setTextLimit(rodaConfig.getString("ui.viewers.text.limit", ""));
+      viewers.setOptions(rodaConfig.getString("ui.viewers." + type + ".options", ""));
+    }
+
+    return viewers;
+  }
+  public static String getCrontabValue(String locale) {
+    String syncSchedule = RodaCoreFactory.getRodaConfigurationAsString("core.synchronization.scheduleInfo");
+    String description = null;
+    if (StringUtils.isNotBlank(syncSchedule)) {
+      CronExpressionDescriptor.setDefaultLocale(locale.split("_")[0]);
+      description = CronExpressionDescriptor.getDescription(syncSchedule);
+    }
+    return description;
+  }
+
+  public static int getExportLimit() {
+    return RodaCoreFactory.getRodaConfiguration().getInt("ui.list.export_limit",
+      RodaConstants.DEFAULT_LIST_EXPORT_LIMIT);
+  }
+
+  public static Map<String, List<String>> retrieveSharedProperties(String localeString) {
+    Locale locale = ServerTools.parseLocale(localeString);
+    return RodaCoreFactory.getRodaSharedProperties(locale);
   }
 
 }

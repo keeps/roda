@@ -7,6 +7,8 @@
  */
 package org.roda.wui.api.controllers;
 
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.Messages;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -18,6 +20,12 @@ import org.roda.core.data.v2.ri.RepresentationInformation;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
+import org.roda.wui.common.server.ServerTools;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * FIXME 1) verify all checkObject*Permissions (because now also a permission
@@ -97,6 +105,24 @@ public class RepresentationInformations extends RodaWuiController {
       controllerAssistant.registerAction(user, representationInformationId, state,
         RodaConstants.CONTROLLER_REPRESENTATION_INFORMATION_ID_PARAM, representationInformationId);
     }
+  }
+
+  public static String retrieveRepresentationInformationFamilyOptions(String family, String localeString) {
+    Locale locale = ServerTools.parseLocale(localeString);
+    return RodaCoreFactory.getI18NMessages(locale).getTranslation("ri.family." + family, "");
+  }
+
+  public static Map<String, String> retrieveRepresentationInformationFamilyOptions(String localeString) {
+    Locale locale = ServerTools.parseLocale(localeString);
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    List<String> families = RodaCoreFactory.getRodaConfigurationAsList("ui.ri.family");
+    Map<String, String> familyAndTranslation = new HashMap<>();
+
+    for (String family : families) {
+      familyAndTranslation.put(family, messages.getTranslation("ri.family." + family));
+    }
+
+    return familyAndTranslation;
   }
 
   /*

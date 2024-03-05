@@ -7,8 +7,7 @@
  */
 package org.roda.wui.api.controllers;
 
-import java.util.List;
-
+import org.apache.commons.lang.StringEscapeUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.EntityResponse;
 import org.roda.core.data.common.RodaConstants;
@@ -19,16 +18,29 @@ import org.roda.core.data.exceptions.JobStateNotPendingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.JsonUtils;
+import org.roda.core.data.v2.Void;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.select.SelectedItems;
+import org.roda.core.data.v2.index.select.SelectedItemsAll;
 import org.roda.core.data.v2.index.select.SelectedItemsList;
+import org.roda.core.data.v2.index.select.SelectedItemsNone;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobMixIn;
+import org.roda.core.data.v2.jobs.JobParallelism;
+import org.roda.core.data.v2.jobs.JobPriority;
 import org.roda.core.data.v2.jobs.JobUserDetails;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntryState;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;
+import org.roda.core.util.IdUtils;
 import org.roda.wui.common.ControllerAssistant;
 import org.roda.wui.common.RodaWuiController;
+import org.roda.wui.servlets.ContextListener;
+
+import java.util.List;
+import java.util.Map;
 
 public class Jobs extends RodaWuiController {
 
@@ -64,6 +76,75 @@ public class Jobs extends RodaWuiController {
     } finally {
       // register action
       controllerAssistant.registerAction(user, state, RodaConstants.CONTROLLER_JOB_PARAM, updatedJob);
+    }
+  }
+
+  public static <T extends IsIndexed> Job createProcess(String jobName, JobPriority priority, JobParallelism parallelism,
+     SelectedItems<T> selected, String id, Map<String, String> value, String selectedClass, User user)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
+    JobAlreadyStartedException {
+    SelectedItems<T> selectedItems = selected;
+
+    if (selectedItems instanceof SelectedItemsList) {
+      SelectedItemsList<T> items = (SelectedItemsList<T>) selectedItems;
+
+      if (items.getIds().isEmpty()) {
+        selectedItems = getAllItemsByClass(selectedClass);
+      }
+    }
+
+    Job job = new Job();
+    job.setName(jobName);
+    job.setSourceObjects(selectedItems);
+    job.setPlugin(id);
+    job.setPluginParameters(value);
+    job.setUsername(user.getName());
+    job.setPriority(priority);
+    job.setParallelism(parallelism);
+
+    return Jobs.createJob(user, job, true);
+  }
+
+  public static <T extends IsIndexed> String createProcessJson(String jobName, JobPriority priority,
+    JobParallelism parallelism, SelectedItems<T> selected, String id, Map<String, String> value, String selectedClass, User user) {
+
+    SelectedItems<T> selectedItems = selected;
+
+    if (selectedItems instanceof SelectedItemsList) {
+      SelectedItemsList<T> items = (SelectedItemsList<T>) selectedItems;
+
+      if (items.getIds().isEmpty()) {
+        selectedItems = getAllItemsByClass(selectedClass);
+      }
+    }
+
+    JobUserDetails jobUserDetails = new JobUserDetails();
+    jobUserDetails.setUsername(user.getName());
+    jobUserDetails.setEmail(user.getEmail());
+    jobUserDetails.setFullname(user.getFullName());
+    jobUserDetails.setRole(RodaConstants.PreservationAgentRole.IMPLEMENTER.toString());
+
+    Job job = new Job();
+    job.setId(IdUtils.createUUID());
+    job.setName(jobName);
+    job.setSourceObjects(selectedItems);
+    job.setPlugin(id);
+    job.setPluginParameters(value);
+    job.setUsername(user.getName());
+    job.setPriority(priority);
+    job.setParallelism(parallelism);
+    job.getJobUsersDetails().add(jobUserDetails);
+
+    String command = RodaCoreFactory.getRodaConfiguration().getString("ui.createJob.curl");
+    if (command != null) {
+      command = command.replace("{{jsonObject}}",
+        StringEscapeUtils.escapeJava(JsonUtils.getJsonFromObject(job, JobMixIn.class)));
+
+      command = command.replace("{{RODA_CONTEXT_PATH}}",
+        StringEscapeUtils.escapeJava(ContextListener.getServletContext().getContextPath()));
+      return command;
+    } else {
+      return "";
     }
   }
 
@@ -251,6 +332,13 @@ public class Jobs extends RodaWuiController {
     }
   }
 
+  private static <T extends IsIndexed> SelectedItems<T> getAllItemsByClass(String selectedClass) {
+    if (selectedClass == null || Void.class.getName().equals(selectedClass)) {
+      return new SelectedItemsNone<>();
+    } else {
+      return new SelectedItemsAll<>(selectedClass);
+    }
+  }
   /*
    * ---------------------------------------------------------------------------
    * ---------------- REST related methods - end -------------------------------

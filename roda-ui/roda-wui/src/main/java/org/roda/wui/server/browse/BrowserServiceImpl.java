@@ -103,11 +103,17 @@ import org.roda.core.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.core.util.IdUtils;
+import org.roda.wui.api.controllers.Aips;
 import org.roda.wui.api.controllers.ApplicationAuth;
 import org.roda.wui.api.controllers.Browser;
+import org.roda.wui.api.controllers.Dips;
 import org.roda.wui.api.controllers.Disposals;
+import org.roda.wui.api.controllers.JobBundles;
 import org.roda.wui.api.controllers.Jobs;
+import org.roda.wui.api.controllers.Plugins;
 import org.roda.wui.api.controllers.RODAInstance;
+import org.roda.wui.api.controllers.RepresentationInformations;
+import org.roda.wui.api.controllers.RepresentationTypes;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.Viewers;
 import org.roda.wui.client.browse.bundle.BrowseAIPBundle;
@@ -168,8 +174,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public Map<String, List<String>> retrieveSharedProperties(String localeString) {
-    Locale locale = ServerTools.parseLocale(localeString);
-    return RodaCoreFactory.getRodaSharedProperties(locale);
+    return Browser.retrieveSharedProperties(localeString);
   }
 
   @Override
@@ -183,7 +188,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public DisposalRule retrieveDisposalRule(String disposalRuleId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.retrieveDisposalRule(user, disposalRuleId);
+    return Disposals.retrieveDisposalRule(user, disposalRuleId);
   }
 
   @Override
@@ -338,19 +343,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public <T extends IsIndexed> IndexResult<T> find(String classNameToReturn, Filter filter, Sorter sorter,
     Sublist sublist, Facets facets, String localeString, boolean justActive, List<String> fieldsToReturn)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException {
-    try {
-      User user = UserUtility.getUser(getThreadLocalRequest());
-      Class<T> classToReturn = SelectedItemsUtils.parseClass(classNameToReturn);
-      IndexResult<T> result = Browser.find(classToReturn, filter, sorter, sublist, facets, user, justActive,
-        fieldsToReturn);
-      return I18nUtility.translate(result, classToReturn, localeString);
-    } catch (RuntimeException e) {
-      LOGGER.error("Unexpected error in find", e);
-      throw new GenericException(e);
-    } catch (GenericException e) {
-      LOGGER.error("Unexpected error in find", e);
-      throw e;
-    }
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.find(classNameToReturn, filter, sorter, user, sublist, facets, localeString, justActive, fieldsToReturn);
   }
 
   @Override
@@ -435,29 +429,13 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-
-    // If the bundle has values from the form, we need to update the XML by
-    // applying the values of the form to the raw template
-    if (bundle.getValues() != null && !bundle.getValues().isEmpty()) {
-      SupportedMetadataTypeBundle smtb = new SupportedMetadataTypeBundle(bundle.getId(), bundle.getType(),
-        bundle.getVersion(), bundle.getId(), bundle.getRawTemplate(), bundle.getValues());
-      bundle.setXml(Browser.retrieveDescriptiveMetadataPreview(user, smtb));
-    }
-
-    String metadataId = bundle.getId();
-    String descriptiveMetadataType = bundle.getType();
-    String descriptiveMetadataVersion = bundle.getVersion();
-    ContentPayload payload = new StringContentPayload(bundle.getXml());
-
-    Browser.createDescriptiveMetadataFile(user, aipId, representationId, metadataId, descriptiveMetadataType,
-      descriptiveMetadataVersion, payload);
+    Browser.createDescriptiveMetadataFile(user, aipId, representationId, bundle);
   }
 
   @Override
   public String retrieveDescriptiveMetadataPreview(SupportedMetadataTypeBundle bundle)
     throws AuthorizationDeniedException, GenericException, ValidationException, NotFoundException,
     RequestNotValidException {
-
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.retrieveDescriptiveMetadataPreview(user, bundle);
   }
@@ -467,14 +445,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     ValidationException {
     User user = UserUtility.getUser(getThreadLocalRequest());
-    String metadataId = bundle.getId();
-    String metadataType = bundle.getType();
-    String metadataVersion = bundle.getVersion();
-    ContentPayload payload = new StringContentPayload(bundle.getXml());
-
-    Browser.updateDescriptiveMetadataFile(user, aipId, representationId, metadataId, metadataType, metadataVersion,
-      payload);
-
+    Browser.updateDescriptiveMetadataFile(user, aipId, representationId, bundle);
   }
 
   @Override
@@ -515,43 +486,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public JobBundle retrieveJobBundle(String jobId, List<String> fieldsToReturn) throws RODAException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     Job job = Browser.retrieve(user, Job.class, jobId, fieldsToReturn);
-
-    List<PluginInfo> pluginsInfo = new ArrayList<>();
-
-    PluginInfo basePlugin = RodaCoreFactory.getPluginManager().getPluginInfo(job.getPlugin());
-
-    if (basePlugin != null) {
-      pluginsInfo.add(basePlugin);
-
-      for (PluginParameter parameter : basePlugin.getParameters()) {
-        if (PluginParameterType.PLUGIN_SIP_TO_AIP.equals(parameter.getType())) {
-          String pluginId = job.getPluginParameters().get(parameter.getId());
-          if (pluginId == null) {
-            pluginId = parameter.getDefaultValue();
-          }
-          if (pluginId != null) {
-            PluginInfo refPlugin = RodaCoreFactory.getPluginManager().getPluginInfo(pluginId);
-            if (refPlugin != null) {
-              pluginsInfo.add(refPlugin);
-            } else {
-              LOGGER.warn("Could not find plugin: " + pluginId);
-            }
-          }
-        }
-      }
-    }
-
-    // FIXME nvieira 20170208 it could possibly, in the future, be necessary to
-    // add more plugin types adding all AIP to AIP plugins for job report list
-    List<PluginInfo> aipToAipPlugins = RodaCoreFactory.getPluginManager().getPluginsInfo(PluginType.AIP_TO_AIP);
-    if (aipToAipPlugins != null) {
-      pluginsInfo.addAll(aipToAipPlugins);
-    }
-
-    JobBundle bundle = new JobBundle();
-    bundle.setJob(job);
-    bundle.setPluginsInfo(pluginsInfo);
-    return bundle;
+    return JobBundles.retrieveJobBundle(job);
   }
 
   @Override
@@ -583,152 +518,33 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public List<PluginInfo> retrievePluginsInfo(List<PluginType> types) {
-    // TODO check permissions
-    return RodaCoreFactory.getPluginManager().getPluginsInfo(types);
+    return Plugins.retrievePluginsInfo(types);
   }
 
   @Override
   public Set<Pair<String, String>> retrieveReindexPluginObjectClasses() {
-    // TODO check permissions
-    Set<Pair<String, String>> classNames = new HashSet<>();
-    List<Class<? extends IsRODAObject>> classes = PluginHelper.getReindexObjectClasses();
-    classes.remove(Void.class);
-
-    for (Class<? extends IsRODAObject> c : classes) {
-      Pair<String, String> names = Pair.of(c.getSimpleName(), c.getName());
-      classNames.add(names);
-    }
-
-    return classNames;
+    return Plugins.retrieveReindexPluginObjectClasses();
   }
 
   @Override
   public Set<Pair<String, String>> retrieveDropdownPluginItems(String parameterId, String localeString) {
-    Set<Pair<String, String>> items = new HashSet<>();
-    List<String> dropdownItems = RodaUtils
-      .copyList(RodaCoreFactory.getRodaConfiguration().getList("core.plugins.dropdown." + parameterId + "[]"));
-    Locale locale = ServerTools.parseLocale(localeString);
-    Messages messages = RodaCoreFactory.getI18NMessages(locale);
-
-    for (String item : dropdownItems) {
-      String i18nProperty = RodaCoreFactory.getRodaConfiguration()
-        .getString("core.plugins.dropdown." + parameterId + "[]." + item + ".i18n");
-      items.add(Pair.of(messages.getTranslation(i18nProperty, item), item));
-    }
-
-    return items;
+    return Plugins.retrieveDropdownPluginItems(parameterId, localeString);
   }
 
   @Override
   public Set<ConversionProfile> retrieveConversionProfilePluginItems(String pluginId, String repOrDip,
     String localeString) {
-    Set<ConversionProfile> items = new HashSet<>();
-
-    String pluginName = RodaCoreFactory.getRodaConfiguration().getString("core.plugins.conversion.profile." + pluginId);
-
-    List<String> dropdownItems = RodaUtils.copyList(
-      RodaCoreFactory.getRodaConfiguration().getList("core.plugins.conversion.profile." + pluginName + ".profiles[]"));
-    Locale locale = ServerTools.parseLocale(localeString);
-
-    ResourceBundle pluginMessages = RodaCoreFactory.getPluginMessages(pluginId, locale);
-
-    for (String item : dropdownItems) {
-      ConversionProfile conversionProfile = retrieveConversionProfileItem(item, pluginName, pluginMessages);
-      if (repOrDip.equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_REPRESENTATION)
-        && conversionProfile.canBeUsedForRepresentation()) {
-        items.add(conversionProfile);
-      }
-
-      if (repOrDip.equals(RodaConstants.PLUGIN_PARAMS_CONVERSION_DISSEMINATION)
-        && conversionProfile.canBeUsedForDissemination()) {
-        items.add(conversionProfile);
-      }
-    }
-
-    return items;
-  }
-
-  private ConversionProfile retrieveConversionProfileItem(String item, String pluginName,
-    ResourceBundle resourceBundle) {
-    ConversionProfile conversionProfile = new ConversionProfile();
-    Map<String, String> optionsValues = new HashMap<>();
-
-    String i18nKey = RodaCoreFactory.getRodaConfiguration()
-      .getString("core.plugins.conversion.profile." + pluginName + ".profiles.i18nPrefix");
-
-    String title;
-    String description;
-
-    try {
-      title = resourceBundle.getString(i18nKey + "." + item + ".title");
-    } catch (MissingResourceException e) {
-      title = i18nKey + "." + item + ".title";
-    }
-
-    try {
-      description = resourceBundle.getString(i18nKey + "." + item + ".description");
-    } catch (MissingResourceException e) {
-      description = i18nKey + "." + item + ".description";
-    }
-
-    conversionProfile.setTitle(title);
-    conversionProfile.setDescription(description);
-    conversionProfile.setProfile(item);
-
-    conversionProfile.setCanBeUsedForDissemination(RodaCoreFactory.getRodaConfiguration()
-      .getBoolean("core.plugins.conversion.profile." + pluginName + "." + item + ".canBeUsedForDissemination", false));
-    conversionProfile.setCanBeUsedForRepresentation(RodaCoreFactory.getRodaConfiguration()
-      .getBoolean("core.plugins.conversion.profile." + pluginName + "." + item + ".canBeUsedForRepresentation", false));
-
-    String[] options = RodaCoreFactory.getRodaConfiguration()
-      .getStringArray("core.plugins.conversion.profile." + pluginName + "." + item + ".options[]");
-    for (String option : options) {
-      String optionValue = RodaCoreFactory.getRodaConfiguration()
-        .getString("core.plugins.conversion.profile." + pluginName + "." + item + "." + option);
-      optionsValues.put(option, optionValue);
-    }
-    conversionProfile.setOptions(optionsValues);
-
-    return conversionProfile;
+    return Plugins.retrieveConversionProfilePluginItems(pluginId, repOrDip, localeString);
   }
 
   @Override
   public CreateIngestJobBundle retrieveCreateIngestProcessBundle() {
-    // TODO check permissions
-    CreateIngestJobBundle bundle = new CreateIngestJobBundle();
-    bundle.setIngestPlugins(RodaCoreFactory.getPluginManager().getPluginsInfo(PluginType.INGEST));
-    bundle.setSipToAipPlugins(RodaCoreFactory.getPluginManager().getPluginsInfo(PluginType.SIP_TO_AIP));
-    return bundle;
+    return JobBundles.retrieveCreateIngestProcessBundle();
   }
 
   @Override
   public Viewers retrieveViewersProperties() {
-    Viewers viewers = new Viewers();
-    Configuration rodaConfig = RodaCoreFactory.getRodaConfiguration();
-    List<String> viewersSupported = RodaUtils.copyList(rodaConfig.getList("ui.viewers"));
-
-    for (String type : viewersSupported) {
-      List<String> fieldPronoms = RodaUtils.copyList(rodaConfig.getList("ui.viewers." + type + ".pronoms"));
-      List<String> fieldMimetypes = RodaUtils.copyList(rodaConfig.getList("ui.viewers." + type + ".mimetypes"));
-      List<String> fieldExtensions = RodaUtils.copyList(rodaConfig.getList("ui.viewers." + type + ".extensions"));
-
-      for (String pronom : fieldPronoms) {
-        viewers.addPronom(pronom, type);
-      }
-
-      for (String mimetype : fieldMimetypes) {
-        viewers.addMimetype(mimetype, type);
-      }
-
-      for (String extension : fieldExtensions) {
-        viewers.addExtension(extension, type);
-      }
-
-      viewers.setTextLimit(rodaConfig.getString("ui.viewers.text.limit", ""));
-      viewers.setOptions(rodaConfig.getString("ui.viewers." + type + ".options", ""));
-    }
-
-    return viewers;
+    return Browser.retrieveViewersProperties();
   }
 
   @Override
@@ -865,27 +681,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     SelectedItems<T> selected, String id, Map<String, String> value, String selectedClass)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
     JobAlreadyStartedException {
-    SelectedItems<T> selectedItems = selected;
     User user = UserUtility.getUser(getThreadLocalRequest());
-
-    if (selectedItems instanceof SelectedItemsList) {
-      SelectedItemsList<T> items = (SelectedItemsList<T>) selectedItems;
-
-      if (items.getIds().isEmpty()) {
-        selectedItems = getAllItemsByClass(selectedClass);
-      }
-    }
-
-    Job job = new Job();
-    job.setName(jobName);
-    job.setSourceObjects(selectedItems);
-    job.setPlugin(id);
-    job.setPluginParameters(value);
-    job.setUsername(user.getName());
-    job.setPriority(priority);
-    job.setParallelism(parallelism);
-
-    return Jobs.createJob(user, job, true);
+    return Jobs.createProcess(jobName, priority, parallelism, selected, id, value, selectedClass, user);
   }
 
   @Override
@@ -897,63 +694,15 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public <T extends IsIndexed> String createProcessJson(String jobName, JobPriority priority,
-    JobParallelism parallelism, SelectedItems<T> selected, String id, Map<String, String> value, String selectedClass)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
-    JobAlreadyStartedException {
-    SelectedItems<T> selectedItems = selected;
+    JobParallelism parallelism, SelectedItems<T> selected, String id, Map<String, String> value, String selectedClass) {
     User user = UserUtility.getUser(getThreadLocalRequest());
-
-    if (selectedItems instanceof SelectedItemsList) {
-      SelectedItemsList<T> items = (SelectedItemsList<T>) selectedItems;
-
-      if (items.getIds().isEmpty()) {
-        selectedItems = getAllItemsByClass(selectedClass);
-      }
-    }
-
-    JobUserDetails jobUserDetails = new JobUserDetails();
-    jobUserDetails.setUsername(user.getName());
-    jobUserDetails.setEmail(user.getEmail());
-    jobUserDetails.setFullname(user.getFullName());
-    jobUserDetails.setRole(RodaConstants.PreservationAgentRole.IMPLEMENTER.toString());
-
-    Job job = new Job();
-    job.setId(IdUtils.createUUID());
-    job.setName(jobName);
-    job.setSourceObjects(selectedItems);
-    job.setPlugin(id);
-    job.setPluginParameters(value);
-    job.setUsername(user.getName());
-    job.setPriority(priority);
-    job.setParallelism(parallelism);
-    job.getJobUsersDetails().add(jobUserDetails);
-
-    String command = RodaCoreFactory.getRodaConfiguration().getString("ui.createJob.curl");
-    if (command != null) {
-      command = command.replace("{{jsonObject}}",
-        StringEscapeUtils.escapeJava(JsonUtils.getJsonFromObject(job, JobMixIn.class)));
-
-      command = command.replace("{{RODA_CONTEXT_PATH}}",
-        StringEscapeUtils.escapeJava(ContextListener.getServletContext().getContextPath()));
-      return command;
-    } else {
-      return "";
-    }
+    return Jobs.createProcessJson(jobName, priority, parallelism, selected, id, value, selectedClass, user);
   }
 
   @Override
   public <T extends IsIndexed> String createProcessJson(String jobName, SelectedItems<T> selected, String id,
-    Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
-    NotFoundException, GenericException, JobAlreadyStartedException {
+    Map<String, String> value, String selectedClass) {
     return createProcessJson(jobName, JobPriority.MEDIUM, JobParallelism.NORMAL, selected, id, value, selectedClass);
-  }
-
-  private <T extends IsIndexed> SelectedItems<T> getAllItemsByClass(String selectedClass) {
-    if (selectedClass == null || Void.class.getName().equals(selectedClass)) {
-      return new SelectedItemsNone<>();
-    } else {
-      return new SelectedItemsAll<>(selectedClass);
-    }
   }
 
   @Override
@@ -988,7 +737,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public Job moveFiles(String aipId, String representationId, SelectedItems<IndexedFile> selectedFiles,
     IndexedFile toFolder, String details) throws AuthorizationDeniedException, GenericException,
-    RequestNotValidException, AlreadyExistsException, NotFoundException {
+    RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.moveFiles(user, aipId, representationId, selectedFiles, toFolder, details);
   }
@@ -1004,7 +753,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public Job moveTransferredResource(SelectedItems<TransferredResource> selected,
     TransferredResource transferredResource) throws AuthorizationDeniedException, GenericException,
-    RequestNotValidException, AlreadyExistsException, IsStillUpdatingException, NotFoundException {
+    RequestNotValidException, NotFoundException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.moveTransferredResource(user, selected, transferredResource);
   }
@@ -1122,7 +871,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public boolean showDIPEmbedded() {
-    return RodaCoreFactory.getRodaConfiguration().getBoolean("ui.dip.externalURL.showEmbedded", false);
+    return Dips.showDIPEmbedded();
   }
 
   @Override
@@ -1134,78 +883,25 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public int getExportLimit() {
-    return RodaCoreFactory.getRodaConfiguration().getInt("ui.list.export_limit",
-      RodaConstants.DEFAULT_LIST_EXPORT_LIMIT);
+    return Browser.getExportLimit();
   }
 
   @Override
   public Pair<Boolean, List<String>> retrieveAIPTypeOptions(String locale) {
-    List<String> types = new ArrayList<>();
-    boolean isControlled = RodaCoreFactory.getRodaConfiguration().getBoolean("core.aip_type.controlled_vocabulary",
-      false);
-
-    if (isControlled) {
-      types = RodaCoreFactory.getRodaConfigurationAsList("core.aip_type.value");
-    } else {
-      try {
-        Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_TYPE));
-        IndexResult<IndexedAIP> result = find(IndexedAIP.class.getName(), Filter.ALL, Sorter.NONE, Sublist.NONE, facets,
-          locale, false, new ArrayList<>());
-
-        List<FacetFieldResult> facetResults = result.getFacetResults();
-        for (FacetValue facetValue : facetResults.get(0).getValues()) {
-          types.add(facetValue.getValue());
-        }
-      } catch (GenericException | AuthorizationDeniedException | RequestNotValidException e) {
-        LOGGER.error("Could not execute find request on AIPs", e);
-      }
-    }
-
-    return Pair.of(isControlled, types);
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return Aips.retrieveAIPTypeOptions(locale, user);
   }
 
   @Override
   public Pair<Boolean, List<String>> retrieveRepresentationTypeOptions(String locale) {
-    List<String> types = new ArrayList<>();
-    boolean isControlled = RodaCoreFactory.getRodaConfiguration()
-      .getBoolean("core.representation_type.controlled_vocabulary", false);
-
-    if (isControlled) {
-      types = RodaCoreFactory.getRodaConfigurationAsList("core.representation_type.value");
-    } else {
-      try {
-        Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.REPRESENTATION_TYPE));
-        IndexResult<IndexedRepresentation> result = find(IndexedRepresentation.class.getName(), Filter.ALL, Sorter.NONE,
-          Sublist.NONE, facets, locale, false, new ArrayList<>());
-
-        List<FacetFieldResult> facetResults = result.getFacetResults();
-        for (FacetValue facetValue : facetResults.get(0).getValues()) {
-          types.add(facetValue.getValue());
-        }
-
-        Boolean flag = false;
-
-        for (String word : types) {
-          if (word.equals("MIXED")) {
-            flag = true;
-            break;
-          }
-        }
-
-        if (!flag)
-          types.add("MIXED");
-      } catch (GenericException | AuthorizationDeniedException | RequestNotValidException e) {
-        LOGGER.error("Could not execute find request on representations", e);
-      }
-    }
-
-    return Pair.of(isControlled, types);
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    return RepresentationTypes.retrieveRepresentationTypeOptions(locale, user);
   }
 
   @Override
   public RepresentationInformation createRepresentationInformation(RepresentationInformation ri,
     RepresentationInformationExtraBundle extra)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    throws AuthorizationDeniedException, GenericException {
     User user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.createRepresentationInformation(user, ri, extra);
   }
@@ -1249,22 +945,12 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public Map<String, String> retrieveRepresentationInformationFamilyOptions(String localeString) {
-    Locale locale = ServerTools.parseLocale(localeString);
-    Messages messages = RodaCoreFactory.getI18NMessages(locale);
-    List<String> families = RodaCoreFactory.getRodaConfigurationAsList("ui.ri.family");
-    Map<String, String> familyAndTranslation = new HashMap<>();
-
-    for (String family : families) {
-      familyAndTranslation.put(family, messages.getTranslation("ri.family." + family));
-    }
-
-    return familyAndTranslation;
+    return RepresentationInformations.retrieveRepresentationInformationFamilyOptions(localeString);
   }
 
   @Override
   public String retrieveRepresentationInformationFamilyOptions(String family, String localeString) {
-    Locale locale = ServerTools.parseLocale(localeString);
-    return RodaCoreFactory.getI18NMessages(locale).getTranslation("ri.family." + family, "");
+    return RepresentationInformations.retrieveRepresentationInformationFamilyOptions(family, localeString);
   }
 
   @Override
@@ -1556,38 +1242,17 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   public String getCrontabValue(String locale) {
-    String syncSchedule = RodaCoreFactory.getRodaConfigurationAsString("core.synchronization.scheduleInfo");
-    String description = null;
-    if (StringUtils.isNotBlank(syncSchedule)) {
-      CronExpressionDescriptor.setDefaultLocale(locale.split("_")[0]);
-      description = CronExpressionDescriptor.getDescription(syncSchedule);
-    }
-    return description;
+    return Browser.getCrontabValue(locale);
   }
 
   public boolean requestAIPLock(String aipId) {
-    boolean lockEnabled = RodaCoreFactory.getRodaConfiguration().getBoolean("core.aip.lockToEdit", false);
-
-    if (!lockEnabled) {
-      return true;
-    }
-
     User user = UserUtility.getUser(getThreadLocalRequest());
-    try {
-      PluginHelper.tryLock(Collections.singletonList(aipId), user.getUUID());
-    } catch (LockingException e) {
-      return false;
-    }
-    return true;
+    return Aips.requestAIPLock(aipId, user);
   }
 
   public void releaseAIPLock(String aipId) {
-    boolean lockEnabled = RodaCoreFactory.getRodaConfiguration().getBoolean("core.aip.lockToEdit", false);
-
-    if (lockEnabled) {
-      User user = UserUtility.getUser(getThreadLocalRequest());
-      PluginHelper.releaseObjectLock(aipId, user.getUUID());
-    }
+    User user = UserUtility.getUser(getThreadLocalRequest());
+    Aips.releaseAIPLock(aipId, user);
   }
 
   public List<Report> retrieveJobReportItems(String jobId, String jobReportId)
